@@ -1,0 +1,48 @@
+﻿using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.OnStock;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System.Configuration;
+
+namespace Microsoft.Extensions.DependencyInjection
+{
+    public static class DataCollectionExtensions
+    {
+        /// <summary>
+        /// 数据层依赖服务注入
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="configuration"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddData(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddCore();
+            AddConfig(services, configuration);
+            AddRepository(services);
+            return services;
+        }
+        /// <summary>
+        /// 添加仓储依赖
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        private static IServiceCollection AddRepository(this IServiceCollection services) {
+            services.AddSingleton<IWhStockChangeRecordRepository, WhStockChangeRecordRepository>();
+            return services;
+        }
+
+
+        /// <summary>
+        /// 添加配置
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="configuration"></param>
+        /// <returns></returns>
+        private static IServiceCollection AddConfig(IServiceCollection services, IConfiguration configuration) {
+            //数据库连接
+            services.Configure<ConnectionOptions>(configuration.GetSection(nameof(ConnectionOptions)));
+            //services.Configure<ConnectionOptions>(configuration);
+            return services;
+        }
+    }
+}
