@@ -1,18 +1,15 @@
 ﻿using FluentValidation;
-using Hymson.MES.Data.Options;
 using Hymson.MES.Services.Dtos.OnStock;
 using Hymson.MES.Services.Options;
 using Hymson.MES.Services.Services.OnStock;
 using Hymson.MES.Services.Validators.OnStock;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static class AppServiceCollectionExtensions
     {
         /// <summary>
@@ -67,6 +64,5 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return services;
         }
-
     }
 }

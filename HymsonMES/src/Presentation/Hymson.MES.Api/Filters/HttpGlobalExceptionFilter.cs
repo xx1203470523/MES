@@ -18,10 +18,12 @@ namespace Hymson.MES.Api.Filters
         /// </summary>
         /// <param name="env"></param>
         /// <param name="logger"></param>
-        public HttpGlobalExceptionFilter(IWebHostEnvironment env,ILogger<HttpGlobalExceptionFilter> logger) {
+        public HttpGlobalExceptionFilter(IWebHostEnvironment env, ILogger<HttpGlobalExceptionFilter> logger)
+        {
             _env = env;
             _logger = logger;
         }
+
         /// <summary>
         /// 异常处理
         /// </summary>
@@ -40,10 +42,10 @@ namespace Hymson.MES.Api.Filters
                     Status = StatusCodes.Status400BadRequest,
                     Detail = "Please refer to the errors property for additional details."
                 };
-                foreach (var  validationFailure in validationException.Errors)
+                foreach (var validationFailure in validationException.Errors)
                 {
                     problemDetails.Errors.Add(validationFailure.ErrorCode, new string[] { validationFailure.ErrorMessage });
-                    
+
                 }
                 context.Result = new BadRequestObjectResult(problemDetails);
                 context.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
@@ -66,22 +68,37 @@ namespace Hymson.MES.Api.Filters
             context.ExceptionHandled = true;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private class JsonErrorResponse
         {
+            /// <summary>
+            /// 
+            /// </summary>
             public string[] Messages { get; set; }
 
+            /// <summary>
+            /// 
+            /// </summary>
             public object DeveloperMessage { get; set; }
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class InternalServerErrorObjectResult : ObjectResult
     {
-        public InternalServerErrorObjectResult(object error)
-            : base(error)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="error"></param>
+        public InternalServerErrorObjectResult(object error) : base(error)
         {
             StatusCode = StatusCodes.Status500InternalServerError;
         }
     }
 
-    
+
 }

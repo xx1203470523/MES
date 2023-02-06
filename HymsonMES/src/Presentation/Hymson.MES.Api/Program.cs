@@ -2,14 +2,20 @@ using AutoMapper;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Api.Filters;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 
 namespace Hymson.MES.Api
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class Program
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="args"></param>
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
@@ -25,9 +31,7 @@ namespace Hymson.MES.Api
             builder.Services.AddSwaggerGen();
             AddSwaggerGen(builder.Services);
             builder.Services.AddAppService(builder.Configuration);
-            /// <summary>
-            /// 注入nlog日志服务
-            /// </summary>
+            // 注入nlog日志服务
             builder.AddNLogWeb(builder.Configuration);
             AddAutoMapper();
             var app = builder.Build();
@@ -47,7 +51,8 @@ namespace Hymson.MES.Api
             app.Run();
         }
 
-        private static void AddSwaggerGen(IServiceCollection services) {
+        private static void AddSwaggerGen(IServiceCollection services)
+        {
 #if DEBUG
             services.AddSwaggerGen(options =>
             {
