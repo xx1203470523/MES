@@ -24,13 +24,13 @@ namespace Hymson.MES.Data.Repositories.OnStock
 
         public async Task<int> DeleteAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.WMSConnectionString);
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeleteSql);
         }
 
         public async Task<WhStockChangeRecordEntity> GetByIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.WMSConnectionString);
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<WhStockChangeRecordEntity>(GetByIdSql);
         }
 
@@ -58,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.OnStock
             sqlBuilder.AddParameters(new { Rows = whStockChangeRecordPagedQuery.PageSize });
             sqlBuilder.AddParameters(whStockChangeRecordPagedQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.WMSConnectionString);
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var whStockChangeRecordEntitiesTask =   conn.QueryAsync<WhStockChangeRecordEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask =   conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var whStockChangeRecordEntities = await whStockChangeRecordEntitiesTask;
@@ -70,21 +70,21 @@ namespace Hymson.MES.Data.Repositories.OnStock
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetWhStockChangeRecordEntitiesSqlTemplate);
-            using var conn = new MySqlConnection(_connectionOptions.WMSConnectionString);
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var whStockChangeRecordEntities = await conn.QueryAsync<WhStockChangeRecordEntity>(template.RawSql, whStockChangeRecordQuery);
             return whStockChangeRecordEntities;
         }
 
         public async Task InsertAsync(WhStockChangeRecordEntity whStockChangeRecordEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.WMSConnectionString);
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var id = await conn.ExecuteScalarAsync<long>(InsertSql, whStockChangeRecordEntity);
             whStockChangeRecordEntity.Id = id;
         }
 
         public async Task<int> UpdateAsync(WhStockChangeRecordEntity whStockChangeRecordEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.WMSConnectionString);
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSql, whStockChangeRecordEntity);
         }
     }
