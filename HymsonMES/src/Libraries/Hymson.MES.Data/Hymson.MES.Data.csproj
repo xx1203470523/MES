@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Hymson.WMS.Core\Hymson.MES.Core.csproj" />
+    <ProjectReference Include="..\Hymson.MES.Core\Hymson.MES.Core.csproj" />
   </ItemGroup>
 
 </Project>

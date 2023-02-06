@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\10100HymsonSharedSDK\HymsonSharedSDK\src\Hymson.NLog.Web\Hymson.NLog.Web.csproj" />
-    <ProjectReference Include="..\..\Libraries\Hymson.WMS.Services\Hymson.MES.Services.csproj" />
+    <ProjectReference Include="..\..\Libraries\Hymson.MES.Services\Hymson.MES.Services.csproj" />
   </ItemGroup>
 
 </Project>
