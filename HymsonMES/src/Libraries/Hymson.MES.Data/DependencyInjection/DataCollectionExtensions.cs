@@ -1,11 +1,12 @@
 ﻿using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.OnStock;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using System.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static class DataCollectionExtensions
     {
         /// <summary>
@@ -21,6 +22,7 @@ namespace Microsoft.Extensions.DependencyInjection
             AddRepository(services);
             return services;
         }
+        
         /// <summary>
         /// 添加仓储依赖
         /// </summary>
@@ -30,7 +32,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IWhStockChangeRecordRepository, WhStockChangeRecordRepository>();
             return services;
         }
-
 
         /// <summary>
         /// 添加配置

@@ -51,17 +51,20 @@ namespace Hymson.MES.Api
             app.Run();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="services"></param>
         private static void AddSwaggerGen(IServiceCollection services)
         {
 #if DEBUG
             services.AddSwaggerGen(options =>
             {
-
                 options.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Version = "v1",
-                    Title = "WMS Web API",
-                    Description = "WMS Web API",
+                    Title = "MES Web API",
+                    Description = "MES Web API",
                     TermsOfService = new Uri("https://www.hymson.com/"),
                     Contact = new OpenApiContact
                     {
@@ -85,6 +88,10 @@ namespace Hymson.MES.Api
             });
 #endif
         }
+        
+        /// <summary>
+        /// 
+        /// </summary>
         private static void AddAutoMapper()
         {
             //find mapper configurations provided by other assemblies

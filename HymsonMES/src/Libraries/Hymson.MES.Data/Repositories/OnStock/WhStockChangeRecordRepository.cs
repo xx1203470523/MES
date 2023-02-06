@@ -3,13 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.OnStock;
 using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Options;
-using Microsoft.VisualBasic.FileIO;
 using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.OnStock
 {

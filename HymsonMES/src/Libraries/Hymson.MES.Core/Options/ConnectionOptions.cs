@@ -12,8 +12,8 @@
 //    public class ConnectionOptions
 //    {
 //        /// <summary>
-//        /// WMS连接字符串
+//        /// MES连接字符串
 //        /// </summary>
-//        public string WMSConnectionString { get; set; } = "";
+//        public string MESConnectionString { get; set; } = "";
 //    }
 //}
