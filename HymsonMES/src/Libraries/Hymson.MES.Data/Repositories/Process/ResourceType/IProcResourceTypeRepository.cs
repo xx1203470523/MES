@@ -30,5 +30,19 @@ namespace Hymson.MES.Data.Repositories.Process.ResourceType
         /// <param name="procResourceTypePagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ProcResourceTypeEntity>> GetListAsync(ProcResourceTypePagedQuery procResourceTypePagedQuery);
+
+        /// <summary>
+        /// 添加资源类型数据
+        /// </summary>
+        /// <param name="resourceTypeEntity"></param>
+        /// <returns></returns>
+        Task InsertAsync(ProcResourceTypeAddCommand addCommand);
+
+        /// <summary>
+        /// 更新资源类型维护数据
+        /// </summary>
+        /// <param name="updateCommand"></param>
+        /// <returns></returns>
+        Task<int> UpdateAsync(ProcResourceTypeUpdateCommand updateCommand);
     }
 }

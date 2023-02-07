@@ -88,7 +88,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.AddParameters(new { Rows = procResourceTypePagedQuery.PageSize });
             sqlBuilder.AddParameters(procResourceTypePagedQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);   
             var procResourceTypeEntitiesTask = conn.QueryAsync<ProcResourceTypeView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procResourceTypeEntities = await procResourceTypeEntitiesTask;
@@ -135,17 +135,27 @@ namespace Hymson.MES.Data.Repositories.Process
             return new PagedInfo<ProcResourceTypeEntity>(procResourceTypeEntities, procResourceTypePagedQuery.PageIndex, procResourceTypePagedQuery.PageSize, totalCount);
         }
 
-        public async Task InsertAsync(ProcResourceTypeEntity resourceTypeEntity)
+        /// <summary>
+        /// 添加资源类型数据
+        /// </summary>
+        /// <param name="resourceTypeEntity"></param>
+        /// <returns></returns>
+        public async Task InsertAsync(ProcResourceTypeAddCommand addCommand)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var id = await conn.ExecuteScalarAsync<long>(InsertSql, resourceTypeEntity);
-            resourceTypeEntity.Id = id;
+            var id = await conn.ExecuteScalarAsync<long>(InsertSql, addCommand);
+            addCommand.Id = id;
         }
 
-        public async Task<int> UpdateAsync(ProcResourceTypeEntity resourceTypeEntity)
+        /// <summary>
+        /// 更新资源类型维护数据
+        /// </summary>
+        /// <param name="updateCommand"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateAsync(ProcResourceTypeUpdateCommand updateCommand)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateSql, resourceTypeEntity);
+            return await conn.ExecuteAsync(UpdateSql, updateCommand);
         }
 
         /// <summary>

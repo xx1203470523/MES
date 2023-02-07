@@ -26,7 +26,7 @@ namespace Hymson.MES.Services.Services.Process
     public class ProcResourceTypeService : IProcResourceTypeService
     {
         private readonly IProcResourceTypeRepository _resourceTypeRepository;
-        //private readonly AbstractValidator<ProcResourceTypeDto> _validationRules;
+        private readonly AbstractValidator<ProcResourceTypeDto> _validationRules;
 
         /// <summary>
         /// 构造函数
@@ -86,6 +86,18 @@ namespace Hymson.MES.Services.Services.Process
                 procResourceTypeDtos.Add(whStockChangeRecordDto);
             }
             return new PagedInfo<ProcResourceTypeDto>(procResourceTypeDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        public async Task AddProcResourceTypeAsync(ProcResourceTypeDto param)
+        {
+            //验证DTO
+            await _validationRules.ValidateAndThrowAsync(param);
+            ////DTO转换实体
+            //var whStockChangeRecordEntity = param.ToEntity<ProcResourceTypeEntity>();
+            //whStockChangeRecordEntity.CreateBy = "jinyi";
+            //whStockChangeRecordEntity.UpdateBy = "jinyi";
+            ////入库
+            //await _resourceTypeRepository.InsertAsync(whStockChangeRecordEntity);
         }
 
     }
