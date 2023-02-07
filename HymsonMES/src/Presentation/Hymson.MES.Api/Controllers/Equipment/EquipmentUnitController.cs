@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
-using Hymson.MES.Services.Dtos.Equipment;
-using Hymson.MES.Services.Services.Equipment;
+using Hymson.MES.Services.Dtos.Equipment.EquipmentUnit;
+using Hymson.MES.Services.Services.Equipment.EquipmentUnit;
+using Hymson.Utils.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Equipment
@@ -30,51 +31,53 @@ namespace Hymson.MES.Api.Controllers.Equipment
         }
 
         /// <summary>
-        /// 获取分页数据
-        /// </summary>
-        /// <param name="equipmentUnitPagedQueryDto"></param>
-        /// <returns></returns>
-        [Route("pagelist")]
-        [HttpGet]
-        public async Task<PagedInfo<EquipmentUnitDto>> GetList([FromQuery] EquipmentUnitPagedQueryDto equipmentUnitPagedQueryDto)
-        {
-            return await _equipmentUnitService.GetListAsync(equipmentUnitPagedQueryDto);
-        }
-
-        /// <summary>
         /// 新增（单位）
         /// </summary>
-        /// <param name="equipmentUnitDto"></param>
+        /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        public async Task Create(EquipmentUnitDto equipmentUnitDto)
+        public async Task<int> Create(EquipmentUnitCreateDto createDto)
         {
-            await _equipmentUnitService.CreateEquipmentUnitAsync(equipmentUnitDto);
+            return await _equipmentUnitService.CreateEquipmentUnitAsync(createDto);
         }
 
         /// <summary>
         /// 更新（单位）
         /// </summary>
-        /// <param name="equipmentUnitDto"></param>
+        /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("update")]
-        public async Task Update(EquipmentUnitDto equipmentUnitDto)
+        public async Task<int> Modify(EquipmentUnitModifyDto modifyDto)
         {
-            await _equipmentUnitService.ModifyEquipmentUnitAsync(equipmentUnitDto);
+            return await _equipmentUnitService.ModifyEquipmentUnitAsync(modifyDto);
         }
 
         /// <summary>
         /// 删除（单位）
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="ids"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("delete")]
-        public async Task Delete(long id)
+        public async Task<int> Delete(string ids)
         {
-            await _equipmentUnitService.DeleteEquipmentUnitAsync(id);
+            long[] idsArr = StringExtension.SpitLongArrary(ids);
+            return await _equipmentUnitService.DeleteEquipmentUnitAsync(idsArr);
         }
+
+        /// <summary>
+        /// 获取分页数据
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        [Route("pagelist")]
+        [HttpGet]
+        public async Task<PagedInfo<EquipmentUnitDto>> GetList([FromQuery] EquipmentUnitPagedQueryDto pagedQueryDto)
+        {
+            return await _equipmentUnitService.GetListAsync(pagedQueryDto);
+        }
+
     }
 }

@@ -1,8 +1,8 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
-using Hymson.MES.Data.Repositories.Equipment.Query;
+using Hymson.MES.Data.Repositories.Equipment.EquipmentUnit.Query;
 
-namespace Hymson.MES.Data.Repositories.Equipment.IEquipment
+namespace Hymson.MES.Data.Repositories.Equipment.EquipmentUnit
 {
     /// <summary>
     /// 
@@ -14,7 +14,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.IEquipment
         /// </summary>
         /// <param name="equipmentUnitEntity"></param>
         /// <returns></returns>
-        Task InsertAsync(EquipmentUnitEntity equipmentUnitEntity);
+        Task<int> InsertAsync(EquipmentUnitEntity equipmentUnitEntity);
 
         /// <summary>
         /// 
@@ -26,9 +26,9 @@ namespace Hymson.MES.Data.Repositories.Equipment.IEquipment
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="idsArr"></param>
         /// <returns></returns>
-        Task<int> DeleteAsync(long id);
+        Task<int> DeleteAsync(long[] idsArr);
 
         /// <summary>
         /// 

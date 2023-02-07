@@ -1,6 +1,6 @@
 ﻿using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Equipment;
-using Hymson.MES.Data.Repositories.Equipment.IEquipment;
+using Hymson.MES.Data.Repositories.Equipment.EquipmentUnit;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection

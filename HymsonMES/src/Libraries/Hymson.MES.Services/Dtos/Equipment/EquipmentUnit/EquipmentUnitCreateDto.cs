@@ -1,17 +1,12 @@
 ﻿using Hymson.Infrastructure;
 
-namespace Hymson.MES.Services.Dtos.Equipment
+namespace Hymson.MES.Services.Dtos.Equipment.EquipmentUnit
 {
     /// <summary>
     /// 
     /// </summary>
-    public record EquipmentUnitDto : BaseEntityDto
+    public record EquipmentUnitCreateDto : BaseEntityDto
     {
-        /// <summary>
-        /// 站点编码 
-        /// </summary>
-        public string SiteCode { get; set; } = "";
-
         /// <summary>
         /// 单位编码 
         /// </summary>

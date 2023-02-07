@@ -31,5 +31,10 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// 单位状态 
         /// </summary>
         public string Status { get; set; } = "";
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string Remark { get; set; } = "";
     }
 }
