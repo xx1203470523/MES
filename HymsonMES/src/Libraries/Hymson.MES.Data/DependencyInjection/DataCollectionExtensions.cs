@@ -1,5 +1,6 @@
 ﻿using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.OnStock;
+using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -30,6 +31,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddRepository(this IServiceCollection services) {
             services.AddSingleton<IWhStockChangeRecordRepository, WhStockChangeRecordRepository>();
+            services.AddSingleton<IProcMaterialRepository, ProcMaterialRepository>();
             return services;
         }
 
