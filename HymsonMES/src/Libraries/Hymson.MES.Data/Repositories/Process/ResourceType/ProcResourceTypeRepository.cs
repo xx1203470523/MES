@@ -43,7 +43,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<ProcResourceTypeEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcResourceTypeEntity>(GetByIdSql,new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ProcResourceTypeEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.AddParameters(new { Rows = procResourceTypePagedQuery.PageSize });
             sqlBuilder.AddParameters(procResourceTypePagedQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);   
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var procResourceTypeEntitiesTask = conn.QueryAsync<ProcResourceTypeView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procResourceTypeEntities = await procResourceTypeEntitiesTask;
@@ -128,7 +128,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.AddParameters(procResourceTypePagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var procResourceTypeEntitiesTask= conn.QueryAsync<ProcResourceTypeEntity>(templateData.RawSql, templateData.Parameters);
+            var procResourceTypeEntitiesTask = conn.QueryAsync<ProcResourceTypeEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procResourceTypeEntities = await procResourceTypeEntitiesTask;
             var totalCount = await totalCountTask;
@@ -140,11 +140,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="resourceTypeEntity"></param>
         /// <returns></returns>
-        public async Task InsertAsync(ProcResourceTypeAddCommand addCommand)
+        public async Task<int> InsertAsync(ProcResourceTypeAddCommand addCommand)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var id = await conn.ExecuteScalarAsync<long>(InsertSql, addCommand);
-            addCommand.Id = id;
+            return await conn.ExecuteAsync(InsertSql, addCommand);
         }
 
         /// <summary>
@@ -163,10 +162,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<int> DeleteAsync(long id)
+        public async Task<int> DeleteAsync(long[] idsArr)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql);
+            return await conn.ExecuteAsync(DeleteSql, new { Id = idsArr });
         }
     }
 
@@ -180,8 +179,8 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetPagedListSqlTemplate = "SELECT /**select**/ FROM proc_resource_type /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows";
         const string GetPagedListCountSqlTemplate = "SELECT COUNT(*) FROM proc_resource_type /**where**/";
 
-        const string InsertSql = "INSERT INTO `wh_stock_change_record`(`Id`, `SiteCode`, `ChangeType`, `SourceNo`, `SourceItem`, `SourceBillType`, `LabelId`, `MaterialId`, `MaterialCode`, `ProjectNo`, `StockManageFeature`, `OldMaterialCode`, `BatchNo`, `Sn`, `Unit`, `Quantity`, `WarehouseId`, `WarehouseAreaId`, `WarehouseRackId`, `WarehouseBinId`, `ContainerId`, `Remark`, `CreateBy`, `CreateOn`, `UpdateBy`, `UpdateOn`, `IsDeleted`, `BeforeStockManageFeature`) VALUES (@Id, @SiteCode, @ChangeType, @SourceNo, @SourceItem, @SourceBillType, @LabelId, @MaterialId, @MaterialCode, @ProjectNo, @StockManageFeature, @OldMaterialCode, @BatchNo, @Sn, @Unit, @Quantity, @WarehouseId, @WarehouseAreaId, @WarehouseRackId, @WarehouseBinId, @ContainerId, @Remark, @CreateBy, @CreateOn, @UpdateBy, @UpdateOn, @IsDeleted, @BeforeStockManageFeature);";
-        const string UpdateSql = "";
-        const string DeleteSql = "";
+        const string InsertSql = "INSERT INTO `proc_resource_type`(`Id`, `SiteCode`, `ResType`, `ResTypeName`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteCode, @ResType, @ResTypeName, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted);";
+        const string UpdateSql = "UPDATE `proc_resource_type` SET ResTypeName = @ResTypeName, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id;";
+        const string DeleteSql = "UPDATE `proc_resource_type` SET `IsDeleted` = 1 WHERE `Id` = @Id;";
     }
 }

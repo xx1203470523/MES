@@ -1,19 +1,10 @@
 ﻿using FluentValidation;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
-using Hymson.MES.Core.Domain.OnStock;
-using Hymson.MES.Core.Domain.Process;
-using Hymson.MES.Data.Repositories.OnStock;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
-using Hymson.MES.Services.Dtos.OnStock;
 using Hymson.MES.Services.Dtos.Process.ResourceType;
-using Hymson.MES.Services.Services.OnStock;
 using Hymson.MES.Services.Services.Process.IProcessService;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Hymson.Snowflake;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -31,10 +22,10 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 构造函数
         /// </summary>
-        public ProcResourceTypeService(IProcResourceTypeRepository resourceTypeRepository)
+        public ProcResourceTypeService(IProcResourceTypeRepository resourceTypeRepository,AbstractValidator<ProcResourceTypeDto> validationRules)
         {
             _resourceTypeRepository = resourceTypeRepository;
-            //_validationRules = validationRules;
+            _validationRules = validationRules;
         }
 
         /// <summary>
@@ -88,16 +79,18 @@ namespace Hymson.MES.Services.Services.Process
             return new PagedInfo<ProcResourceTypeDto>(procResourceTypeDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
-        public async Task AddProcResourceTypeAsync(ProcResourceTypeDto param)
+        public async Task AddProcResourceTypeAsync(ProcResourceTypeAddCommandDto param)
         {
             //验证DTO
-            await _validationRules.ValidateAndThrowAsync(param);
-            ////DTO转换实体
-            //var whStockChangeRecordEntity = param.ToEntity<ProcResourceTypeEntity>();
-            //whStockChangeRecordEntity.CreateBy = "jinyi";
-            //whStockChangeRecordEntity.UpdateBy = "jinyi";
-            ////入库
-            //await _resourceTypeRepository.InsertAsync(whStockChangeRecordEntity);
+            var dto = new ProcResourceTypeDto();
+            await _validationRules.ValidateAndThrowAsync(dto);
+            //DTO转换实体
+            var entity = param.ToEntity<ProcResourceTypeAddCommand>();
+            entity.Id = IdGenProvider.Instance.CreateId();
+            entity.CreatedBy = "TODO";
+            entity.UpdatedBy = "TODO";
+            //入库
+            await _resourceTypeRepository.InsertAsync(entity);
         }
 
     }

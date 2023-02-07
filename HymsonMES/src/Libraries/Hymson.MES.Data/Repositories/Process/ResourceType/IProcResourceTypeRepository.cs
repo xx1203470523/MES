@@ -36,7 +36,7 @@ namespace Hymson.MES.Data.Repositories.Process.ResourceType
         /// </summary>
         /// <param name="resourceTypeEntity"></param>
         /// <returns></returns>
-        Task InsertAsync(ProcResourceTypeAddCommand addCommand);
+        Task<int> InsertAsync(ProcResourceTypeAddCommand addCommand);
 
         /// <summary>
         /// 更新资源类型维护数据
@@ -44,5 +44,12 @@ namespace Hymson.MES.Data.Repositories.Process.ResourceType
         /// <param name="updateCommand"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ProcResourceTypeUpdateCommand updateCommand);
+
+        /// <summary>
+        /// 批量删除
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<int> DeleteAsync(long[] idsArr);
     }
 }
