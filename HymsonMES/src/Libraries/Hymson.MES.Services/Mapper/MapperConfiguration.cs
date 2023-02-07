@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Hymson.Infrastructure.Mapper;
-using Hymson.MES.Core.Domain.OnStock;
-using Hymson.MES.Data.Repositories.OnStock;
-using Hymson.MES.Services.Dtos.OnStock;
+using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Data.Repositories.Equipment.Query;
+using Hymson.MES.Services.Dtos.Equipment;
 
 namespace Hymson.MES.Services.Mapper
 {
@@ -16,17 +16,19 @@ namespace Hymson.MES.Services.Mapper
         /// </summary>
         public MapperConfiguration()
         {
-            CreateWhStockChangeRecordMaps();
+            CreateEquipmentMaps();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        protected virtual void CreateWhStockChangeRecordMaps()
+        protected virtual void CreateEquipmentMaps()
         {
-            CreateMap<WhStockChangeRecordDto, WhStockChangeRecordEntity>();
-            CreateMap<WhStockChangeRecordEntity, WhStockChangeRecordDto>();
-            CreateMap<WhStockChangeRecordPagedQueryDto, WhStockChangeRecordPagedQuery>();
+            #region EquipmentUnit
+            CreateMap<EquipmentUnitDto, EquipmentUnitEntity>();
+            CreateMap<EquipmentUnitEntity, EquipmentUnitDto>();
+            CreateMap<EquipmentUnitPagedQueryDto, EquipmentUnitPagedQuery>();
+            #endregion
         }
 
         /// <summary>
