@@ -1,8 +1,9 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.OnStock;
-using Hymson.MES.Services.Dtos.Process.ResourceType;
+using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.OnStock;
 using Hymson.MES.Services.Services.Process.IProcessService;
+using Hymson.Utils.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers
@@ -39,7 +40,8 @@ namespace Hymson.MES.Api.Controllers
         /// </summary>
         /// <param name="procResourceTypePagedQueryDto"></param>
         /// <returns></returns>
-        [HttpGet("list")]
+        [Route("list")]
+        [HttpGet]
         public async Task<PagedInfo<ProcResourceTypeViewDto>> QueryProcResourceType([FromQuery] ProcResourceTypePagedQueryDto procResourceTypePagedQueryDto)
         {
             return await _procResourceTypeService.GetPageListAsync(procResourceTypePagedQueryDto);
@@ -50,7 +52,8 @@ namespace Hymson.MES.Api.Controllers
         /// </summary>
         /// <param name="procResourceTypePagedQueryDto"></param>
         /// <returns></returns>
-        [HttpGet("querylist")]
+        [Route("querylist")]
+        [HttpGet]
         public async Task<PagedInfo<ProcResourceTypeDto>> GetProcResourceTypeList([FromQuery] ProcResourceTypePagedQueryDto procResourceTypePagedQueryDto)
         {
             return await _procResourceTypeService.GetListAsync(procResourceTypePagedQueryDto);
@@ -68,16 +71,37 @@ namespace Hymson.MES.Api.Controllers
             return await _procResourceTypeService.GetListAsync(id);
         }
 
-        ///// <summary>
-        ///// 创建记录
-        ///// </summary>
-        ///// <param name="whStockChangeRecordDto"></param>
-        ///// <returns></returns>
-        //[HttpPost]
-        //[Route("create")]
-        //public async Task Create(WhStockChangeRecordDto whStockChangeRecordDto)
-        //{
-        //    await _whStockChangeRecordService.CreateWhStockChangeRecordAsync(whStockChangeRecordDto);
-        //}
+        /// <summary>
+        /// 添加资源类型数据
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task AddProcResourceType([FromBody] ProcResourceTypeAddCommandDto parm)
+        {
+            await _procResourceTypeService.AddProcResourceTypeAsync(parm);
+        }
+
+        /// <summary>
+        /// 更新资源类型维护表
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpPut]
+        public async Task UpdateProcResourceType([FromBody] ProcResourceTypeUpdateCommandDto parm)
+        {
+            await _procResourceTypeService.UpdateProcResrouceTypeAsync(parm);
+        }
+
+        /// <summary>
+        /// 更新资源类型维护表
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpDelete("{ids}")]
+        public async Task DeleteProcResourceType(string ids)
+        {
+            await _procResourceTypeService.DeleteProcResourceTypeAsync(ids);
+        }
     }
 }

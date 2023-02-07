@@ -10,6 +10,11 @@ namespace Hymson.MES.Data.Repositories.Process.ResourceType
     public class ProcResourceTypeAddCommand : BaseEntity
     {
         /// <summary>
+        /// 站点
+        /// </summary>
+        public string SiteCode { get; set; }
+
+        /// <summary>
         /// 描述 :资源类型 
         /// 空值 : false  
         /// </summary>

@@ -2,9 +2,12 @@
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
-using Hymson.MES.Services.Dtos.Process.ResourceType;
+using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.Snowflake;
+using Hymson.Utils;
+using Hymson.Utils.Extensions;
+using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -17,15 +20,16 @@ namespace Hymson.MES.Services.Services.Process
     public class ProcResourceTypeService : IProcResourceTypeService
     {
         private readonly IProcResourceTypeRepository _resourceTypeRepository;
-        private readonly AbstractValidator<ProcResourceTypeDto> _validationRules;
+        //private readonly AbstractValidator<ProcResourceTypeDto> _validationRules;
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        public ProcResourceTypeService(IProcResourceTypeRepository resourceTypeRepository,AbstractValidator<ProcResourceTypeDto> validationRules)
+        public ProcResourceTypeService(IProcResourceTypeRepository resourceTypeRepository)
+            //AbstractValidator<ProcResourceTypeDto> validationRules)
         {
             _resourceTypeRepository = resourceTypeRepository;
-            _validationRules = validationRules;
+           // _validationRules = validationRules;
         }
 
         /// <summary>
@@ -79,19 +83,67 @@ namespace Hymson.MES.Services.Services.Process
             return new PagedInfo<ProcResourceTypeDto>(procResourceTypeDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
+        /// <summary>
+        /// 添加资源类型数据
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
         public async Task AddProcResourceTypeAsync(ProcResourceTypeAddCommandDto param)
         {
             //验证DTO
-            var dto = new ProcResourceTypeDto();
-            await _validationRules.ValidateAndThrowAsync(dto);
+            //var dto = new ProcResourceTypeDto();
+            //await _validationRules.ValidateAndThrowAsync(dto);
             //DTO转换实体
-            var entity = param.ToEntity<ProcResourceTypeAddCommand>();
-            entity.Id = IdGenProvider.Instance.CreateId();
-            entity.CreatedBy = "TODO";
-            entity.UpdatedBy = "TODO";
+            var entity = new ProcResourceTypeAddCommand
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteCode = "TODO",
+                CreatedBy = "TODO",
+                UpdatedBy = "TODO",
+                UpdatedOn = HymsonClock.Now(),
+                CreatedOn = HymsonClock.Now(),
+                Remark = param.Remark ?? "",
+                ResType = param.ResType ?? "",
+                ResTypeName = param.ResTypeName ?? ""
+            };
             //入库
-            await _resourceTypeRepository.InsertAsync(entity);
+           var count= await _resourceTypeRepository.InsertAsync(entity);
+
+            string s = "";
         }
 
+        /// <summary>
+        /// 修改资源类型数据
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateProcResrouceTypeAsync(ProcResourceTypeUpdateCommandDto param)
+        {
+            //验证DTO
+            //var dto = new ProcResourceTypeDto();
+            //await _validationRules.ValidateAndThrowAsync(dto);
+            //DTO转换实体
+            var entity = new ProcResourceTypeUpdateCommand
+            {
+                Id = param.Id,
+                Remark = param.Remark ?? "",
+                ResTypeName = param.ResTypeName ?? "",
+                UpdatedOn = HymsonClock.Now(),
+                UpdatedBy = "TODO"
+            };
+            // 保存实体
+            return await _resourceTypeRepository.UpdateAsync(entity);
+        }
+
+        /// <summary>
+        /// 批量删除资源类型数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteProcResourceTypeAsync(string ids)
+        {
+            long[] idsArr = StringExtension.SpitLongArrary(ids);
+            return await _resourceTypeRepository.DeleteAsync(idsArr);
+        }
     }
 }

@@ -5,7 +5,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.OnStock;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Services.Dtos.OnStock;
-using Hymson.MES.Services.Dtos.Process.ResourceType;
+using Hymson.MES.Services.Dtos.Process;
 
 namespace Hymson.MES.Services.Mapper
 {
