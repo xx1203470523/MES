@@ -5,12 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.Data.Repositories.Process
+namespace Hymson.MES.Services.Dtos.Process.ResourceType
 {
-    /// <summary>
-    /// 资源类型维护表查询对象
-    /// </summary>
-    public class ProcResourceTypePagedQuery : PagerInfo
+    public class ProcResourceTypePagedQueryDto : PagerInfo
     {
         /// 描述 :资源类型代码 
         /// 空值 : false  

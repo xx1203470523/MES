@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.Services.Dtos.Process
+namespace Hymson.MES.Data.Repositories.Process.ResourceType
 {
-    public record ProcResourceTypeViewDto : BaseEntityDto
+    public class ProcResourceTypeView : BaseEntity
     {
         /// <summary>
         /// 描述 :所属站点代码 
@@ -26,21 +26,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 空值 : false  
         /// </summary>
         public string ResTypeName { get; set; }
-
-        /// <summary>
-        /// 备注
-        /// </summary>
-        public string? Remark { get; set; }
-
-        /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreateBy { get; set; } = "";
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreateOn { get; set; }
 
         /// <summary>
         /// 资源编码

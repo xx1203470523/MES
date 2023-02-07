@@ -1,12 +1,12 @@
 ﻿using Hymson.Infrastructure;
-using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.Services.Dtos.Process.ResourceType;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.Services.Services.Process
+namespace Hymson.MES.Services.Services.Process.IProcessService
 {
     public interface IProcResourceTypeService
     {

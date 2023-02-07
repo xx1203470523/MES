@@ -1,8 +1,8 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.OnStock;
-using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.Services.Dtos.Process.ResourceType;
 using Hymson.MES.Services.Services.OnStock;
-using Hymson.MES.Services.Services.Process;
+using Hymson.MES.Services.Services.Process.IProcessService;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers

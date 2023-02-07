@@ -5,6 +5,7 @@ using Hymson.MES.Core.Domain.OnStock;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.OnStock;
+using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 using System;
