@@ -2,7 +2,7 @@
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquipmentUnit.Query;
-using Hymson.MES.Services.Dtos.Equipment.EquipmentUnit;
+using Hymson.MES.Services.Dtos.Equipment;
 
 namespace Hymson.MES.Services.Mapper
 {

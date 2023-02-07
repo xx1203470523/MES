@@ -1,5 +1,5 @@
 using Hymson.Infrastructure;
-using Hymson.MES.Services.Dtos.Equipment.EquipmentUnit;
+using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquipmentUnit;
 using Hymson.Utils.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Hymson.MES.Api.Controllers.Equipment
 {
     /// <summary>
-    /// 
+    /// 控制器（单位维护）
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
@@ -20,7 +20,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         private readonly ILogger<EquipmentUnitController> _logger;
 
         /// <summary>
-        /// 
+        /// 构造函数（单位维护）
         /// </summary>
         /// <param name="equipmentUnitService"></param>
         /// <param name="logger"></param>
@@ -31,7 +31,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         }
 
         /// <summary>
-        /// 新增（单位）
+        /// 新增（单位维护）
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
@@ -43,7 +43,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         }
 
         /// <summary>
-        /// 更新（单位）
+        /// 更新（单位维护）
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
@@ -55,7 +55,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         }
 
         /// <summary>
-        /// 删除（单位）
+        /// 删除（单位维护）
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
@@ -68,7 +68,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         }
 
         /// <summary>
-        /// 获取分页数据
+        /// 获取分页数据（单位维护）
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
@@ -78,6 +78,5 @@ namespace Hymson.MES.Api.Controllers.Equipment
         {
             return await _equipmentUnitService.GetListAsync(pagedQueryDto);
         }
-
     }
 }

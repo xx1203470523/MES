@@ -4,7 +4,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquipmentUnit;
 using Hymson.MES.Data.Repositories.Equipment.EquipmentUnit.Query;
-using Hymson.MES.Services.Dtos.Equipment.EquipmentUnit;
+using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
 
 namespace Hymson.MES.Services.Services.Equipment.EquipmentUnit

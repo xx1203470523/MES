@@ -1,5 +1,5 @@
 ﻿using Hymson.Infrastructure;
-using Hymson.MES.Services.Dtos.Equipment.EquipmentUnit;
+using Hymson.MES.Services.Dtos.Equipment;
 
 namespace Hymson.MES.Services.Services.Equipment.EquipmentUnit
 {

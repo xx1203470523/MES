@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Hymson.MES.Services.Dtos.Equipment.EquipmentUnit;
+using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Options;
 using Hymson.MES.Services.Services.Equipment.EquipmentUnit;
 using Hymson.MES.Services.Validators.Equipment;
