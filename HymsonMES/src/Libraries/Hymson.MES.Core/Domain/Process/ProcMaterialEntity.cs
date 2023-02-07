@@ -1,4 +1,11 @@
-﻿using Hymson.Infrastructure;
+﻿/*
+ *creator: Karl
+ *
+ *describe: 物料维护    实体类 | 代码由框架生成  如果数据库字段发生变化,则手动调整
+ *builder:  Karl
+ *build datetime: 2023-02-07 11:16:51
+ */
+using Hymson.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +16,10 @@ using System.Threading.Tasks;
 namespace Hymson.MES.Core.Domain.Process
 {
     /// <summary>
-    /// 物料维护表，数据实体对象   
-    /// 表名： proc_material
-    /// @author Czhipu
-    /// @date 2022-08-29
+    /// 物料维护，数据实体对象   
+    /// proc_material
+    /// @author Karl
+    /// @date 2023-02-07 11:16:51
     /// </summary>
     public class ProcMaterialEntity : BaseEntity
     {

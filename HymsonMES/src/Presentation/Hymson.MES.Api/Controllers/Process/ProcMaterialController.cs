@@ -1,3 +1,10 @@
+/*
+ *creator: Karl
+ *
+ *describe: ç‰©æ–™ç»´æŠ¤    æ§åˆ¶å™¨ | ä»£ç ç”±æ¡†æ¶ç”Ÿæˆ  
+ *builder:  Karl
+ *build datetime: 2023-02-07 11:16:51
+ */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Services.Process;
 using Microsoft.AspNetCore.Mvc;
@@ -5,23 +12,22 @@ using Microsoft.AspNetCore.Mvc;
 namespace Hymson.MES.Api.Controllers.Process
 {
     /// <summary>
-    /// ¿ØÖÆÆ÷£¨ÎïÁÏÎ¬»¤£©
-    /// @tableName proc_material
-    /// @author Czhipu
-    /// @date 2022-08-29
+    /// æ§åˆ¶å™¨ï¼ˆç‰©æ–™ç»´æŠ¤ï¼‰
+    /// @author Karl
+    /// @date 2023-02-07 11:16:51
     /// </summary>
     [ApiController]
-    [Route("process/procMaterial")]
+    [Route("api/v1/[controller]")]
     public class ProcMaterialController : ControllerBase
     {
         //// <summary>
-        /// ½Ó¿Ú£¨ÎïÁÏÎ¬»¤£©
+        /// æ¥å£ï¼ˆç‰©æ–™ç»´æŠ¤ï¼‰
         /// </summary>
         private readonly IProcMaterialService _procMaterialService;
         private readonly ILogger<ProcMaterialController> _logger;
 
         /// <summary>
-        /// ¹¹Ôìº¯Êı£¨ÎïÁÏÎ¬»¤£©
+        /// æ„é€ å‡½æ•°ï¼ˆç‰©æ–™ç»´æŠ¤ï¼‰
         /// </summary>
         /// <param name="procMaterialService"></param>
         public ProcMaterialController(IProcMaterialService procMaterialService, ILogger<ProcMaterialController> logger)
@@ -30,28 +36,5 @@ namespace Hymson.MES.Api.Controllers.Process
             _logger = logger;
         }
 
-        ///// <summary>
-        ///// »ñÈ¡·ÖÒ³Êı¾İ
-        ///// </summary>
-        ///// <param name="whStockChangeRecordPagedQueryDto"></param>
-        ///// <returns></returns>
-        //[Route("pagelist")]
-        //[HttpGet]
-        //public async Task<PagedInfo<WhStockChangeRecordDto>> GetList([FromQuery]WhStockChangeRecordPagedQueryDto whStockChangeRecordPagedQueryDto)
-        //{
-        //    return await _whStockChangeRecordService.GetListAsync(whStockChangeRecordPagedQueryDto);
-        //}
-
-        ///// <summary>
-        ///// ´´½¨¼ÇÂ¼
-        ///// </summary>
-        ///// <param name="whStockChangeRecordDto"></param>
-        ///// <returns></returns>
-        //[HttpPost]
-        //[Route("create")]
-        //public async Task Create(WhStockChangeRecordDto whStockChangeRecordDto)
-        //{
-        //    await _whStockChangeRecordService.CreateWhStockChangeRecordAsync(whStockChangeRecordDto);
-        //}
     }
 }

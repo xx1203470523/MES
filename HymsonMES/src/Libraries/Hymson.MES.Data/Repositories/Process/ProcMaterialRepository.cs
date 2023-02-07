@@ -1,9 +1,9 @@
-﻿/*
+/*
  *creator: Karl
  *
  *describe: 物料维护 仓储类 | 代码由框架生成
  *builder:  Karl
- *build datetime: 2023-02-07 10:22:57
+ *build datetime: 2023-02-07 11:16:51
  */
 
 using Dapper;
@@ -16,19 +16,22 @@ using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
+	/// <summary>
+    /// 物料维护仓储
+    /// </summary>
     public partial class ProcMaterialRepository : IProcMaterialRepository
     {
         private readonly ConnectionOptions _connectionOptions;
 
         public ProcMaterialRepository(IOptions<ConnectionOptions> connectionOptions)
-        {
-            _connectionOptions = connectionOptions.Value;
-        }
+		{
+			_connectionOptions = connectionOptions.Value;
+		}
 
-        public async Task<int> DeleteAsync(long id)
+		public async Task<int> DeleteAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql);
+			using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+			return await conn.ExecuteAsync(DeleteSql);
         }
 
         public async Task<ProcMaterialEntity> GetByIdAsync(long id)
