@@ -2,17 +2,16 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
-using Hymson.MES.Data.Repositories.Equipment.EquipmentUnit;
-using Hymson.MES.Data.Repositories.Equipment.EquipmentUnit.Query;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
-namespace Hymson.MES.Data.Repositories.Equipment
+namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
 {
     /// <summary>
     /// 
     /// </summary>
-    public partial class EquipmentUnitRepository : IEquipmentUnitRepository
+    public partial class EquEquipmentRepository : IEquEquipmentRepository
     {
         /// <summary>
         /// 
@@ -23,7 +22,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public EquipmentUnitRepository(IOptions<ConnectionOptions> connectionOptions)
+        public EquEquipmentRepository(IOptions<ConnectionOptions> connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
         }
@@ -33,7 +32,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(EquipmentUnitEntity entity)
+        public async Task<int> InsertAsync(EquEquipmentEntity entity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertSql, entity);
@@ -44,7 +43,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(EquipmentUnitEntity entity)
+        public async Task<int> UpdateAsync(EquEquipmentEntity entity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSql, entity);
@@ -64,12 +63,34 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="equipmentCode"></param>
         /// <returns></returns>
-        public async Task<EquipmentUnitEntity> GetByIdAsync(long id)
+        public async Task<bool> ExistsAsync(string equipmentCode)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<EquipmentUnitEntity>(GetByIdSql, id);
+            return await conn.QueryFirstOrDefault(ExistsSql, equipmentCode) != null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<EquEquipmentEntity> GetByIdAsync(long id)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<EquEquipmentEntity>(GetByIdSql, id);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="equipmentCode"></param>
+        /// <returns></returns>
+        public async Task<EquEquipmentEntity> GetByEquipmentCodeAsync(string equipmentCode)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<EquEquipmentEntity>(GetByEquipmentCodeSql, equipmentCode);
         }
 
         /// <summary>
@@ -77,7 +98,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<EquipmentUnitEntity>> GetPagedInfoAsync(EquipmentUnitPagedQuery pagedQuery)
+        public async Task<PagedInfo<EquEquipmentEntity>> GetPagedInfoAsync(EquEquipmentPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
@@ -103,10 +124,10 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
 
-            var entities = await conn.QueryAsync<EquipmentUnitEntity>(templateData.RawSql, templateData.Parameters);
+            var entities = await conn.QueryAsync<EquEquipmentEntity>(templateData.RawSql, templateData.Parameters);
             var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
 
-            return new PagedInfo<EquipmentUnitEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
+            return new PagedInfo<EquEquipmentEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
         /// <summary>
@@ -114,30 +135,32 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<EquipmentUnitEntity>> GetEntitiesAsync(EquipmentUnitQuery query)
+        public async Task<IEnumerable<EquEquipmentEntity>> GetEntitiesAsync(EquEquipmentQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var equipmentUnitEntities = await conn.QueryAsync<EquipmentUnitEntity>(template.RawSql, query);
-            return equipmentUnitEntities;
+            var equipmentEntities = await conn.QueryAsync<EquEquipmentEntity>(template.RawSql, query);
+            return equipmentEntities;
         }
     }
 
     /// <summary>
     /// 
     /// </summary>
-    public partial class EquipmentUnitRepository
+    public partial class EquEquipmentRepository
     {
         /// <summary>
         /// 
         /// </summary>
-        const string InsertSql = "INSERT INTO `equ_unit`(`Id`, `SiteCode`, `UnitCode`, `UnitName`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteCode, @UnitCode, @UnitName, @Type, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted);";
-        const string UpdateSql = "UPDATE `equ_unit` SET UnitName = @UnitName, Type = @Type, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id;";
-        const string DeleteSql = "UPDATE `equ_unit` SET `IsDeleted` = 1 WHERE `Id` = @Id;";
-        const string GetByIdSql = "SELECT * FROM `equ_unit` WHERE `Id` = @Id;";
-        const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `equ_unit` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_unit` /**where**/";
+        const string InsertSql = "INSERT INTO `equ_equipment`(`Id`, `SiteCode`, `UnitCode`, `UnitName`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteCode, @UnitCode, @UnitName, @Type, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted);";
+        const string UpdateSql = "UPDATE `equ_equipment` SET UnitName = @UnitName, Type = @Type, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id;";
+        const string DeleteSql = "UPDATE `equ_equipment` SET `IsDeleted` = 1 WHERE `Id` = @Id;";
+        const string ExistsSql = "SELECT Id FROM equ_equipment WHERE `IsDeleted` = 0 AND EquipmentCode = @EquipmentCode LIMIT 1";
+        const string GetByIdSql = "SELECT * FROM `equ_equipment` WHERE `Id` = @Id;";
+        const string GetByEquipmentCodeSql = "SELECT * FROM `equ_equipment` WHERE `IsDeleted` = 0 AND EquipmentCode = @EquipmentCode;";
+        const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `equ_equipment` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_equipment` /**where**/";
         const string GetEntitiesSqlTemplate = "";
     }
 }

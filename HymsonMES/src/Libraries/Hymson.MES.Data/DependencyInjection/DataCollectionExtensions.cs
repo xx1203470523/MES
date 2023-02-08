@@ -1,6 +1,5 @@
 ﻿using Hymson.MES.Data.Options;
-using Hymson.MES.Data.Repositories.Equipment;
-using Hymson.MES.Data.Repositories.Equipment.EquipmentUnit;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -32,7 +31,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddRepository(this IServiceCollection services)
         {
             #region Equipment
-            services.AddSingleton<IEquipmentUnitRepository, EquipmentUnitRepository>();
+            services.AddSingleton<IEquEquipmentUnitRepository, EquEquipmentUnitRepository>();
             #endregion
 
             return services;

@@ -5,7 +5,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
     /// <summary>
     /// 
     /// </summary>
-    public record EquipmentUnitCreateDto : BaseEntityDto
+    public record EquEquipmentUnitCreateDto : BaseEntityDto
     {
         /// <summary>
         /// 单位编码 
@@ -31,7 +31,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
     /// <summary>
     /// 
     /// </summary>
-    public record EquipmentUnitModifyDto : BaseEntityDto
+    public record EquEquipmentUnitModifyDto : BaseEntityDto
     {
         /// <summary>
         /// 唯一标识
@@ -62,7 +62,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
     /// <summary>
     /// 
     /// </summary>
-    public record EquipmentUnitDto : BaseEntityDto
+    public record EquEquipmentUnitDto : BaseEntityDto
     {
         /// <summary>
         /// 单位编码 
@@ -88,7 +88,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
     /// <summary>
     /// 
     /// </summary>
-    public class EquipmentUnitPagedQueryDto : PagerInfo
+    public class EquEquipmentUnitPagedQueryDto : PagerInfo
     {
         /// <summary>
         /// 站点编码 

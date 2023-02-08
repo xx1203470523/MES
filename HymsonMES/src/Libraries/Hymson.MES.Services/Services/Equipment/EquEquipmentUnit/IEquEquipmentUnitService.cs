@@ -1,26 +1,26 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 
-namespace Hymson.MES.Services.Services.Equipment.EquipmentUnit
+namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
 {
     /// <summary>
     /// 
     /// </summary>
-    public interface IEquipmentUnitService
+    public interface IEquEquipmentUnitService
     {
         /// <summary>
         /// 
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        Task<int> CreateEquipmentUnitAsync(EquipmentUnitCreateDto createDto);
+        Task<int> CreateEquipmentUnitAsync(EquEquipmentUnitCreateDto createDto);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        Task<int> ModifyEquipmentUnitAsync(EquipmentUnitModifyDto modifyDto);
+        Task<int> ModifyEquipmentUnitAsync(EquEquipmentUnitModifyDto modifyDto);
 
         /// <summary>
         /// 
@@ -34,6 +34,6 @@ namespace Hymson.MES.Services.Services.Equipment.EquipmentUnit
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquipmentUnitDto>> GetListAsync(EquipmentUnitPagedQueryDto pagedQueryDto);
+        Task<PagedInfo<EquEquipmentUnitDto>> GetPagedListAsync(EquEquipmentUnitPagedQueryDto pagedQueryDto);
     }
 }

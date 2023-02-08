@@ -1,11 +1,11 @@
 ﻿using Hymson.Infrastructure;
 
-namespace Hymson.MES.Data.Repositories.Equipment.EquipmentUnit.Query
+namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query
 {
     /// <summary>
     /// 
     /// </summary>
-    public class EquipmentUnitPagedQuery : PagerInfo
+    public class EquEquipmentUnitPagedQuery : PagerInfo
     {
         /// <summary>
         /// 站点编码 

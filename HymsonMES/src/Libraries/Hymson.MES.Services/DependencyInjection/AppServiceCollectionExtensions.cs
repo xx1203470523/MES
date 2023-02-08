@@ -1,7 +1,8 @@
 ﻿using FluentValidation;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Options;
-using Hymson.MES.Services.Services.Equipment.EquipmentUnit;
+using Hymson.MES.Services.Services.Equipment.EquEquipment;
+using Hymson.MES.Services.Services.Equipment.EquEquipmentUnit;
 using Hymson.MES.Services.Validators.Equipment;
 using Microsoft.Extensions.Configuration;
 
@@ -35,7 +36,8 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddServices(this IServiceCollection services)
         {
             #region Equipment
-            services.AddSingleton<IEquipmentUnitService, EquipmentUnitService>();
+            services.AddSingleton<IEquEquipmentUnitService, EquEquipmentUnitService>();
+            services.AddSingleton<IEquEquipmentService, EquEquipmentService>();
             #endregion
 
             return services;
@@ -63,7 +65,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddValidators(IServiceCollection services)
         {
             #region Equipment
-            services.AddSingleton<AbstractValidator<EquipmentUnitCreateDto>, EquipmentUnitCreateValidator>();
+            services.AddSingleton<AbstractValidator<EquEquipmentUnitCreateDto>, EquipmentUnitCreateValidator>();
             #endregion
 
             return services;

@@ -1,6 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
-using Hymson.MES.Services.Services.Equipment.EquipmentUnit;
+using Hymson.MES.Services.Services.Equipment.EquEquipmentUnit;
 using Hymson.Utils.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,20 +11,20 @@ namespace Hymson.MES.Api.Controllers.Equipment
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class EquipmentUnitController : ControllerBase
+    public class EquEquipmentUnitController : ControllerBase
     {
         /// <summary>
         /// 
         /// </summary>
-        private readonly IEquipmentUnitService _equipmentUnitService;
-        private readonly ILogger<EquipmentUnitController> _logger;
+        private readonly IEquEquipmentUnitService _equipmentUnitService;
+        private readonly ILogger<EquEquipmentUnitController> _logger;
 
         /// <summary>
         /// 构造函数（单位维护）
         /// </summary>
         /// <param name="equipmentUnitService"></param>
         /// <param name="logger"></param>
-        public EquipmentUnitController(IEquipmentUnitService equipmentUnitService, ILogger<EquipmentUnitController> logger)
+        public EquEquipmentUnitController(IEquEquipmentUnitService equipmentUnitService, ILogger<EquEquipmentUnitController> logger)
         {
             _equipmentUnitService = equipmentUnitService;
             _logger = logger;
@@ -37,7 +37,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        public async Task<int> Create(EquipmentUnitCreateDto createDto)
+        public async Task<int> Create(EquEquipmentUnitCreateDto createDto)
         {
             return await _equipmentUnitService.CreateEquipmentUnitAsync(createDto);
         }
@@ -49,7 +49,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPost]
         [Route("update")]
-        public async Task<int> Modify(EquipmentUnitModifyDto modifyDto)
+        public async Task<int> Modify(EquEquipmentUnitModifyDto modifyDto)
         {
             return await _equipmentUnitService.ModifyEquipmentUnitAsync(modifyDto);
         }
@@ -74,9 +74,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [Route("pagelist")]
         [HttpGet]
-        public async Task<PagedInfo<EquipmentUnitDto>> GetList([FromQuery] EquipmentUnitPagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<EquEquipmentUnitDto>> GetPagedListAsync([FromQuery] EquEquipmentUnitPagedQueryDto pagedQueryDto)
         {
-            return await _equipmentUnitService.GetListAsync(pagedQueryDto);
+            return await _equipmentUnitService.GetPagedListAsync(pagedQueryDto);
         }
     }
 }

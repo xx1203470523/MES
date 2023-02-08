@@ -5,7 +5,7 @@ namespace Hymson.MES.Core.Domain.Equipment
     /// <summary>
     /// 单位维护
     /// </summary>
-    public class EquipmentUnitEntity : BaseEntity
+    public class EquEquipmentUnitEntity : BaseEntity
     {
         /// <summary>
         /// 站点编码 

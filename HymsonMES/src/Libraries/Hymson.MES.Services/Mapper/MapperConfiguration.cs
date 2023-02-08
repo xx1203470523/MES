@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
-using Hymson.MES.Data.Repositories.Equipment.EquipmentUnit.Query;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
 using Hymson.MES.Services.Dtos.Equipment;
 
 namespace Hymson.MES.Services.Mapper
@@ -25,10 +26,29 @@ namespace Hymson.MES.Services.Mapper
         protected virtual void CreateEquipmentMaps()
         {
             #region EquipmentUnit
-            CreateMap<EquipmentUnitCreateDto, EquipmentUnitEntity>();
-            CreateMap<EquipmentUnitModifyDto, EquipmentUnitEntity>();
+            CreateMap<EquEquipmentUnitCreateDto, EquEquipmentUnitEntity>();
+            CreateMap<EquEquipmentUnitModifyDto, EquEquipmentUnitEntity>();
             //CreateMap<EquipmentUnitEntity, EquipmentUnitCreateDto>();
-            CreateMap<EquipmentUnitPagedQueryDto, EquipmentUnitPagedQuery>();
+            CreateMap<EquEquipmentUnitPagedQueryDto, EquEquipmentUnitPagedQuery>();
+            #endregion
+
+            #region Equipment
+            CreateMap<EquEquipmentCreateDto, EquEquipmentEntity>();
+            CreateMap<EquEquipmentModifyDto, EquEquipmentEntity>();
+            //CreateMap<EquipmentUnitEntity, EquipmentUnitCreateDto>();
+            CreateMap<EquEquipmentPagedQueryDto, EquEquipmentPagedQuery>();
+            #endregion
+
+            #region EquEquipmentLinkApi
+            CreateMap<EquEquipmentLinkApiCreateDto, EquEquipmentLinkApiEntity>();
+            CreateMap<EquEquipmentLinkApiModifyDto, EquEquipmentLinkApiEntity>();
+            CreateMap<EquEquipmentLinkApiPagedQueryDto, EquEquipmentLinkApiPagedQuery>();
+            #endregion
+
+            #region EquEquipmentLinkHardware
+            CreateMap<EquEquipmentLinkHardwareCreateDto, EquEquipmentLinkHardwareEntity>();
+            CreateMap<EquEquipmentLinkHardwareModifyDto, EquEquipmentLinkHardwareEntity>();
+            CreateMap<EquEquipmentLinkHardwarePagedQueryDto, EquEquipmentLinkHardwarePagedQuery>();
             #endregion
         }
 
