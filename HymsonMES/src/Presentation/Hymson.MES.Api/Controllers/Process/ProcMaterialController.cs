@@ -57,7 +57,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<ProcMaterialDto> QueryProcMaterialByIdAsync(long id)
+        public async Task<ProcMaterialViewDto> QueryProcMaterialByIdAsync(long id)
         {
             return await _procMaterialService.QueryProcMaterialByIdAsync(id);
         }

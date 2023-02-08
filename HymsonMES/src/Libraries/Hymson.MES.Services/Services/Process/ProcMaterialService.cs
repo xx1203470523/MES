@@ -89,6 +89,8 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<PagedInfo<ProcMaterialDto>> GetPageListAsync(ProcMaterialPagedQueryDto procMaterialPagedQueryDto)
         {
+            //procMaterialPagedQueryDto.SiteCode=    TODO
+
             var procMaterialPagedQuery = procMaterialPagedQueryDto.ToQuery<ProcMaterialPagedQuery>();
             var pagedInfo = await _procMaterialRepository.GetPagedInfoAsync(procMaterialPagedQuery);
 
@@ -137,12 +139,15 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ProcMaterialDto> QueryProcMaterialByIdAsync(long id) 
+        public async Task<ProcMaterialViewDto> QueryProcMaterialByIdAsync(long id) 
         {
-           var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(id);
-           if (procMaterialEntity != null) 
+            //获取SiteCode  TODO
+            var siteCode = "";
+
+            var procMaterialView = await _procMaterialRepository.GetByIdAsync(id, siteCode);
+           if (procMaterialView != null) 
            {
-               return procMaterialEntity.ToModel<ProcMaterialDto>();
+               return procMaterialView.ToModel<ProcMaterialViewDto>();
            }
             return null;
         }

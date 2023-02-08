@@ -52,8 +52,9 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="siteCode"></param>
         /// <returns></returns>
-        Task<ProcMaterialEntity> GetByIdAsync(long id);
+        Task<ProcMaterialView> GetByIdAsync(long id,string siteCode);
         
         /// <summary>
         /// 获取List

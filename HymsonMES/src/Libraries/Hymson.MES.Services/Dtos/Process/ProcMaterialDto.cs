@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Process;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -391,10 +392,75 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public class ProcMaterialPagedQueryDto : PagerInfo
     {
-        ///// <summary>
-        ///// 描述 :站点编码 
-        ///// 空值 : false  
-        ///// </summary>
-        //public string SiteCode { get; set; }
+        /// <summary>
+        /// 所属站点代码
+        /// </summary>
+        public string SiteCode { get; set; } = "";
+
+        /// <summary>
+        /// 物料组ID
+        /// </summary>
+        public long? GroupId { get; set; }
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 版本
+        /// </summary>
+        public string Version { get; set; }
+
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string MaterialName { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public string Status { get; set; }
+
+        /// <summary>
+        /// 来源
+        /// </summary>
+        public string Origin { get; set; }
+    }
+
+    /// <summary>
+    /// 物料维护 视图
+    /// </summary>
+    public record ProcMaterialViewDto : ProcMaterialDto
+    {
+        /// <summary>
+        /// 描述 :所属物料组
+        /// 空值 : false  
+        /// </summary>
+        public string GroupName { get; set; }
+
+        /// <summary>
+        /// 描述 :名称 (工艺路线)
+        /// 空值 : true  
+        /// </summary>
+        public string ProcessRouteName { get; set; }
+
+        /// <summary>
+        /// 描述 :版本 (工艺路线) 
+        /// 空值 : true  
+        /// </summary>
+        public string ProcessRouteVersion { get; set; }
+
+        /// <summary>
+        /// 描述 :名称（工序Bom）
+        /// 空值 : true  
+        /// </summary>
+        public string ProcedureBomName { get; set; }
+
+        /// <summary>
+        /// 描述 :版本（工序Bom）
+        /// 空值 : true  
+        /// </summary>
+        public string ProcedureBomVersion { get; set; }
     }
 }

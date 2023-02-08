@@ -60,6 +60,6 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<ProcMaterialDto> QueryProcMaterialByIdAsync(long id);
+        Task<ProcMaterialViewDto> QueryProcMaterialByIdAsync(long id);
     }
 }

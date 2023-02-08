@@ -56,10 +56,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ProcMaterialEntity> GetByIdAsync(long id)
+        public async Task<ProcMaterialView> GetByIdAsync(long id, string siteCode)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcMaterialEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ProcMaterialView>(GetByIdSql, new { Id=id,siteCode= siteCode });
         }
 
         /// <summary>
@@ -75,11 +75,38 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-           
+            if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
+            {
+                sqlBuilder.Where(" SiteCode=@SiteCode ");
+            }
+            if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.MaterialCode))
+            {
+                procMaterialPagedQuery.MaterialCode = $"%{procMaterialPagedQuery.MaterialCode}%";
+                sqlBuilder.Where(" MaterialCode like @MaterialCode ");
+            }
+            if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.MaterialName))
+            {
+                procMaterialPagedQuery.MaterialName = $"%{procMaterialPagedQuery.MaterialName}%";
+                sqlBuilder.Where(" MaterialName like %@MaterialName% ");
+            }
+            if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.Version))
+            {
+                procMaterialPagedQuery.Version = $"%{procMaterialPagedQuery.Version}%";
+                sqlBuilder.Where(" Version like @Version ");
+            }
+            if (procMaterialPagedQuery.GroupId!=null)
+            {
+                sqlBuilder.Where(" GroupId = @GroupId ");
+            }
+            if (procMaterialPagedQuery.Status != null)
+            {
+                sqlBuilder.Where(" Status = @Status ");
+            }
+            if (procMaterialPagedQuery.Origin != null)
+            {
+                sqlBuilder.Where(" Origin = @Origin ");
+            }
+
             var offSet = (procMaterialPagedQuery.PageIndex - 1) * procMaterialPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = procMaterialPagedQuery.PageSize });
@@ -143,7 +170,35 @@ namespace Hymson.MES.Data.Repositories.Process
         const string DeleteSql = "UPDATE `proc_material` SET IsDeleted = '1' WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_material` SET IsDeleted = '1' WHERE Id in (@Ids)";
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteCode`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `ProcedureBomId`, `Batch`, `Unit`, `SerialNumber`, `ValidationMaskGroup`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `proc_material`  WHERE Id = @Id ";
+                                        g.`Id`,
+                                        g.`SiteCode`,
+                                        o.GroupName,
+                                        g.MaterialCode,
+                                        g.MaterialName,
+                                        g.Status, 
+                                        g.Origin, 
+                                        g.Version, 
+                                        g.Remark, 
+                                        g.BuyType, 
+                                        p.Id AS ProcessRouteId, 
+                                        p.Name as ProcessRouteName,
+                                        p.Version as ProcessRouteVersion, 
+                                        q.Id as ProcedureBomId, 
+                                        q.Name as ProcedureBomName, 
+                                        '' as ProcedureBomVersion, 
+                                        g.Batch as Batch, 
+                                        g.Unit as Unit, 
+                                        g.SerialNumber,
+                                        g.ValidationMaskGroup,
+                                        g.BaseTime,
+                                        g.ConsumptionTolerance,
+                                        g.IsDefaultVersion,
+                                        g.UpdatedBy,
+                                        g.UpdatedOn
+                            FROM `proc_material` g 
+                            LEFT JOIN proc_material_group o on o.Id=g.GroupId
+                            LEFT JOIN proc_process_route p on g.ProcessRouteId = p.Id
+                            LEFT JOIN proc_procedure_bom q on g.ProcedureBomId == q.Id 
+                            WHERE g.Id = @Id and g.SiteCode=@SiteCode ";
     }
 }
