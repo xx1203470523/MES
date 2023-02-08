@@ -4,7 +4,6 @@ namespace Hymson.MES.Core.Domain.Process
 {
     /// <summary>
     /// 物料维护表数据实体对象
-    ///
     /// @author admin
     /// @date 2023-02-08
     /// </summary>
@@ -57,6 +56,12 @@ namespace Hymson.MES.Core.Domain.Process
         /// 空值 : true  
         /// </summary>
         public byte IsDefaultVersion { get; set; }
+        
+        /// <summary>
+        /// 描述 :物料描述 
+        /// 空值 : true  
+        /// </summary>
+        public string Remark { get; set; }
         
         /// <summary>
         /// 描述 :采购类型 

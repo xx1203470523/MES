@@ -4,7 +4,6 @@ namespace Hymson.MES.Core.Domain.Manufacture
 {
     /// <summary>
     /// 设备重点参数表。对于参数表，一些使用频繁的参数，在这多记录一份数据实体对象
-    ///
     /// @author admin
     /// @date 2023-02-08
     /// </summary>

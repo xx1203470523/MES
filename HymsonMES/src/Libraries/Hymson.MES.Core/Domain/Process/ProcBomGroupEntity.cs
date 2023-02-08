@@ -4,7 +4,6 @@ namespace Hymson.MES.Core.Domain.Process
 {
     /// <summary>
     /// 物料组维护表数据实体对象
-    ///
     /// @author admin
     /// @date 2023-02-08
     /// </summary>

@@ -29,8 +29,8 @@ namespace Hymson.MES.Services.Services.OnStock
             await _validationRules.ValidateAndThrowAsync(whStockChangeRecordDto);
             //DTO转换实体
             var whStockChangeRecordEntity = whStockChangeRecordDto.ToEntity<WhStockChangeRecordEntity>();
-            whStockChangeRecordEntity.CreateBy = "jinyi";
-            whStockChangeRecordEntity.UpdateBy = "jinyi";
+            whStockChangeRecordEntity.CreatedBy = "jinyi";
+            whStockChangeRecordEntity.UpdatedBy = "jinyi";
             //入库
             await _whStockChangeRecordRepository.InsertAsync(whStockChangeRecordEntity);
 

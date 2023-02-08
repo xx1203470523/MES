@@ -4,7 +4,6 @@ namespace Hymson.MES.Core.Domain.Process
 {
     /// <summary>
     /// BOM表数据实体对象
-    ///
     /// @author admin
     /// @date 2023-02-08
     /// </summary>
@@ -45,5 +44,11 @@ namespace Hymson.MES.Core.Domain.Process
         /// 空值 : true  
         /// </summary>
         public byte IsCurrentVersion { get; set; }
+        
+        /// <summary>
+        /// 描述 :说明 
+        /// 空值 : true  
+        /// </summary>
+        public string Remark { get; set; }
         }
 }

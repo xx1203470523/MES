@@ -4,7 +4,6 @@ namespace Hymson.MES.Core.Domain.Integrated
 {
     /// <summary>
     /// 消息通知表数据实体对象
-    ///
     /// @author admin
     /// @date 2023-02-08
     /// </summary>
@@ -45,6 +44,12 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// 空值 : false  
         /// </summary>
         public string MessageStatus { get; set; }
+        
+        /// <summary>
+        /// 描述 :备注 
+        /// 空值 : false  
+        /// </summary>
+        public string Remark { get; set; }
         
         /// <summary>
         /// 描述 :所属站点代码 

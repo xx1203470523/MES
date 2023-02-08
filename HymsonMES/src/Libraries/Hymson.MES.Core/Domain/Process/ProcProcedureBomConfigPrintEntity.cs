@@ -4,7 +4,6 @@ namespace Hymson.MES.Core.Domain.Process
 {
     /// <summary>
     /// 工序BOM配置打印表数据实体对象
-    ///
     /// @author admin
     /// @date 2023-02-08
     /// </summary>
@@ -15,6 +14,12 @@ namespace Hymson.MES.Core.Domain.Process
         /// 空值 : true  
         /// </summary>
         public int? Copy { get; set; }
+        
+        /// <summary>
+        /// 描述 :备注 
+        /// 空值 : true  
+        /// </summary>
+        public string Remark { get; set; }
         
         /// <summary>
         /// 描述 :所属站点代码 

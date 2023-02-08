@@ -4,7 +4,6 @@ namespace Hymson.MES.Core.Domain.Equipment
 {
     /// <summary>
     /// 设备基础信息数据实体对象
-    ///
     /// @author admin
     /// @date 2023-02-08
     /// </summary>
@@ -33,6 +32,12 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// 空值 : true  
         /// </summary>
         public string Ip { get; set; }
+        
+        /// <summary>
+        /// 描述 :备注 
+        /// 空值 : true  
+        /// </summary>
+        public string Remark { get; set; }
         
         /// <summary>
         /// 描述 :所属站点代码 
