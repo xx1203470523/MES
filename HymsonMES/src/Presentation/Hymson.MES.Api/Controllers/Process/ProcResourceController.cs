@@ -9,27 +9,27 @@ using Microsoft.AspNetCore.Mvc;
 namespace Hymson.MES.Api.Controllers
 {
     /// <summary>
-    /// 资源类型维护表Controller
-    /// @tableName proc_resource_type
+    /// 资源维护表Controller
+    /// @tableName proc_resource
     /// @author zhaoqing
-    /// @date 2023-02-06
+    /// @date 2023-02-08
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class ProcResourceTypeController : ControllerBase
+    public class ProcResourceController : ControllerBase
     {
         /// <summary>
         /// 资源类型维护表接口
         /// </summary>
         private readonly IProcResourceTypeService _procResourceTypeService;
-        private readonly ILogger<ProcResourceTypeController> _logger;
+        private readonly ILogger<ProcResourceController> _logger;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="procResourceTypeService"></param>
         /// <param name="logger"></param>
-        public ProcResourceTypeController(IProcResourceTypeService procResourceTypeService, ILogger<ProcResourceTypeController> logger)
+        public ProcResourceController(IProcResourceTypeService procResourceTypeService, ILogger<ProcResourceController> logger)
         {
             _procResourceTypeService = procResourceTypeService;
             _logger = logger;
@@ -64,7 +64,7 @@ namespace Hymson.MES.Api.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("{Id}")]
+        [HttpGet("{id}")]
         //[ActionPermissionFilter(Permission = "business:procResourceType:query")]
         public async Task<ProcResourceTypeDto> GetProcResourceType(long id)
         {
@@ -96,7 +96,7 @@ namespace Hymson.MES.Api.Controllers
         /// <summary>
         /// 更新资源类型维护表
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="parm"></param>
         /// <returns></returns>
         [HttpDelete("{ids}")]
         public async Task DeleteProcResourceType(string ids)

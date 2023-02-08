@@ -17,12 +17,12 @@ using System.Threading.Tasks;
 namespace Hymson.MES.Data.Repositories.Process
 {
     /// <summary>
-    /// 资源类型维护表仓储层处理
-    /// @tableName proc_resource_type
+    /// 资源维护表仓储层处理
+    /// @tableName proc_resource
     /// @author zhaoqing
-    /// @date 2023-02-06
+    /// @date 2023-02-08
     /// </summary>
-    public partial class ProcResourceTypeRepository : IProcResourceTypeRepository
+    public partial class ProcResourceRepository : IProcResourceRepository
     {
         private readonly ConnectionOptions _connectionOptions;
 
@@ -30,7 +30,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 构造函数
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public ProcResourceTypeRepository(IOptions<ConnectionOptions> connectionOptions)
+        public ProcResourceRepository(IOptions<ConnectionOptions> connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
         }
@@ -40,10 +40,21 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ProcResourceTypeEntity> GetByIdAsync(long id)
+        public async Task<ProcResourceEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcResourceTypeEntity>(GetByIdSql, new { Id = id });
+            return await conn.QueryFirstOrDefaultAsync<ProcResourceEntity>(GetByIdSql, new { Id = id });
+        }
+
+        /// <summary>
+        /// 查询详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ProcResourceEntity> GetProcResrouces(long id)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<ProcResourceEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -169,18 +180,19 @@ namespace Hymson.MES.Data.Repositories.Process
         }
     }
 
-    public partial class ProcResourceTypeRepository
+    public partial class ProcResourceRepository
     {
-        const string GetByIdSql = "select * from proc_resource_type where Id =@Id ";
+        const string GetByIdSql = "select * from proc_resource where Id =@Id ";
+        const string Get = "select `proc_resource WHERE `Id` in @Id and ResTypeId >0 ";
 
         const string GetPagedInfoDataSqlTemplate = "SELECT a.Id,a.SiteCode,ResType,ResTypeName,a.Remark,a.CreateBy ,a.CreateOn,b.ResCode,b.ResName  FROM proc_resource_type a left join proc_resource b on a.Id =b.ResTypeId /**where**/ LIMIT @Offset,@Rows";
         const string GetPagedInfoCountSqlTemplate = "SELECT count(*) FROM proc_resource_type a left join proc_resource b on a.Id =b.ResTypeId  /**where**/ ";
 
-        const string GetPagedListSqlTemplate = "SELECT /**select**/ FROM proc_resource_type /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows";
-        const string GetPagedListCountSqlTemplate = "SELECT COUNT(*) FROM proc_resource_type /**where**/";
+        const string GetPagedListSqlTemplate = "SELECT /**select**/ FROM proc_resource /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows";
+        const string GetPagedListCountSqlTemplate = "SELECT COUNT(*) FROM proc_resource /**where**/";
 
-        const string InsertSql = "INSERT INTO `proc_resource_type`(`Id`, `SiteCode`, `ResType`, `ResTypeName`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteCode, @ResType, @ResTypeName, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted);";
-        const string UpdateSql = "UPDATE `proc_resource_type` SET ResTypeName = @ResTypeName, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id;";
-        const string DeleteSql = "UPDATE `proc_resource_type` SET `IsDeleted` = 1 WHERE `Id` = @Id;";
+        const string InsertSql = "INSERT INTO `proc_resource`(`Id`, `SiteCode`, `ResCode`, `ResName`,`Status`,`ResTypeId, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteCode, @ResCode, @ResName,@Status,@ResTypeId,@Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted);";
+        const string UpdateSql = "UPDATE `proc_resource` SET ResName = @ResName,ResTypeId = @ResTypeId,ResName = @ResName, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id;";
+        const string DeleteSql = "UPDATE `proc_resource` SET `IsDeleted` = 1 WHERE `Id` in @Id;";
     }
 }

@@ -19,17 +19,17 @@ namespace Hymson.MES.Services.Services.Process
     /// </summary>
     public class ProcResourceTypeService : IProcResourceTypeService
     {
-        private readonly IProcResourceTypeRepository _resourceTypeRepository;
+        private readonly IProcResourceRepository _resourceTypeRepository;
         //private readonly AbstractValidator<ProcResourceTypeDto> _validationRules;
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        public ProcResourceTypeService(IProcResourceTypeRepository resourceTypeRepository)
-            //AbstractValidator<ProcResourceTypeDto> validationRules)
+        public ProcResourceTypeService(IProcResourceRepository resourceTypeRepository)
+        //AbstractValidator<ProcResourceTypeDto> validationRules)
         {
             _resourceTypeRepository = resourceTypeRepository;
-           // _validationRules = validationRules;
+            // _validationRules = validationRules;
         }
 
         /// <summary>
@@ -107,9 +107,7 @@ namespace Hymson.MES.Services.Services.Process
                 ResTypeName = param.ResTypeName ?? ""
             };
             //入库
-           var count= await _resourceTypeRepository.InsertAsync(entity);
-
-            string s = "";
+            await _resourceTypeRepository.InsertAsync(entity);
         }
 
         /// <summary>
