@@ -1,4 +1,4 @@
-using Hymson.Infrastructure;
+﻿using Hymson.Infrastructure;
 
 namespace Hymson.MES.Core.Domain.Process
 {
