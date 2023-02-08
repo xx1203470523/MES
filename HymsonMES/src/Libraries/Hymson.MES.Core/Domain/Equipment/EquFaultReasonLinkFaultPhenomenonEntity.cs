@@ -4,7 +4,6 @@ namespace Hymson.MES.Core.Domain.Equipment
 {
     /// <summary>
     /// 设备故障原因关联设备故障现象数据实体对象
-    ///
     /// @author admin
     /// @date 2023-02-08
     /// </summary>
@@ -21,6 +20,12 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// 空值 : false  
         /// </summary>
         public long FaultPhenomenonId { get; set; }
+        
+        /// <summary>
+        /// 描述 :设备故障先 
+        /// 空值 : true  
+        /// </summary>
+        public string Remark { get; set; }
         
         /// <summary>
         /// 描述 :所属站点代码 

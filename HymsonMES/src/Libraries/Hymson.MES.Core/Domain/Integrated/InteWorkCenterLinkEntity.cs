@@ -4,7 +4,6 @@ namespace Hymson.MES.Core.Domain.Integrated
 {
     /// <summary>
     /// 工作中心关联下属中心或资源表数据实体对象
-    ///
     /// @author admin
     /// @date 2023-02-08
     /// </summary>
@@ -39,5 +38,11 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// 空值 : true  
         /// </summary>
         public long? SubResourceId { get; set; }
+        
+        /// <summary>
+        /// 描述 :说明 
+        /// 空值 : true  
+        /// </summary>
+        public string Remark { get; set; }
         }
 }

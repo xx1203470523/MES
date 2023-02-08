@@ -4,7 +4,6 @@ namespace Hymson.MES.Core.Domain.Integrated
 {
     /// <summary>
     /// 客商信息表数据实体对象
-    ///
     /// @author admin
     /// @date 2023-02-08
     /// </summary>
@@ -57,6 +56,12 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// 空值 : true  
         /// </summary>
         public byte LifeCycle { get; set; }
+        
+        /// <summary>
+        /// 描述 :备注 
+        /// 空值 : true  
+        /// </summary>
+        public string Remark { get; set; }
         
         /// <summary>
         /// 描述 :所属据点Id 
