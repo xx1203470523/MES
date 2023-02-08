@@ -3,7 +3,7 @@
  *
  *describe: 物料维护    实体类 | 代码由框架生成  如果数据库字段发生变化,则手动调整
  *builder:  Karl
- *build datetime: 2023-02-08 02:32:37
+ *build datetime: 2023-02-08 04:47:44
  */
 using Hymson.Infrastructure;
 using System;
@@ -19,7 +19,7 @@ namespace Hymson.MES.Core.Domain.Process
     /// 物料维护，数据实体对象   
     /// proc_material
     /// @author Karl
-    /// @date 2023-02-08 02:32:37
+    /// @date 2023-02-08 04:47:44
     /// </summary>
     public class ProcMaterialEntity : BaseEntity
     {

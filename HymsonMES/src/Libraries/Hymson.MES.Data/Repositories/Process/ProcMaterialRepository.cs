@@ -3,7 +3,7 @@
  *
  *describe: 物料维护 仓储类 | 代码由框架生成
  *builder:  Karl
- *build datetime: 2023-02-08 02:32:38
+ *build datetime: 2023-02-08 04:47:44
  */
 
 using Dapper;
@@ -42,21 +42,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 批量删除（软删除）
         /// </summary>
-        /// <param name="idsArr"></param>
+        /// <param name="ids"></param>
         /// <returns></returns>
         public async Task<int> DeletesAsync(string ids) 
         {
-            try
-            {
-                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-                return await conn.ExecuteAsync(DeletesSql, new { Ids=ids });
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
-            return 0;
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeletesSql, new { Ids=ids });
 
         }
 
@@ -123,17 +114,8 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> InsertAsync(ProcMaterialEntity procMaterialEntity)
         {
-            try
-            {
-                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-                return await conn.ExecuteAsync(InsertSql, procMaterialEntity);
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
-            return 0;
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(InsertSql, procMaterialEntity);
         }
 
         /// <summary>
@@ -143,17 +125,8 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> UpdateAsync(ProcMaterialEntity procMaterialEntity)
         {
-            try
-            {
-                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-                return await conn.ExecuteAsync(UpdateSql, procMaterialEntity);
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
-            return 0;
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateSql, procMaterialEntity);
         }
     }
 

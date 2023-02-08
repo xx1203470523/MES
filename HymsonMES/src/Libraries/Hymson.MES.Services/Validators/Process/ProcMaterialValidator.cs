@@ -3,7 +3,7 @@
  *
  *describe: 物料维护    验证规则 | 代码由框架生成  
  *builder:  Karl
- *build datetime: 2023-02-08 02:32:38
+ *build datetime: 2023-02-08 04:47:44
  */
 using FluentValidation;
 using Hymson.MES.Services.Dtos.Process;

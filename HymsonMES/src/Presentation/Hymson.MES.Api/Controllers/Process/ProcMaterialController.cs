@@ -3,7 +3,7 @@
  *
  *describe: 物料维护    控制器 | 代码由框架生成  
  *builder:  Karl
- *build datetime: 2023-02-08 02:32:38
+ *build datetime: 2023-02-08 04:47:44
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
@@ -17,7 +17,7 @@ namespace Hymson.MES.Api.Controllers.Process
     /// <summary>
     /// 控制器（物料维护）
     /// @author Karl
-    /// @date 2023-02-08 02:32:38
+    /// @date 2023-02-08 04:47:44
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]

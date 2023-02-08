@@ -3,7 +3,7 @@
  *
  *describe: 物料维护仓储类 | 代码由框架生成
  *builder:  Karl
- *build datetime: 2023-02-08 02:32:38
+ *build datetime: 2023-02-08 04:47:44
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
@@ -44,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="idsArr"></param>
+        /// <param name="ids"></param>
         /// <returns></returns>
         Task<int> DeletesAsync(string ids);
 
