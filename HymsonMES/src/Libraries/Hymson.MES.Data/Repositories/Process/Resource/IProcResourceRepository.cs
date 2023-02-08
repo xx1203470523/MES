@@ -1,12 +1,7 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Hymson.MES.Data.Repositories.Process.ResourceType
+namespace Hymson.MES.Data.Repositories.Process
 {
     public interface IProcResourceRepository
     {
@@ -18,32 +13,32 @@ namespace Hymson.MES.Data.Repositories.Process.ResourceType
         Task<ProcResourceEntity> GetByIdAsync(long id);
 
         /// <summary>
-        ///  查询资源类型维护表列表(关联资源：一个类型被多个资源关联就展示多条)
+        ///  查询资源维护表列表(关联资源类型，展示资源类型名称)
         /// </summary>
-        /// <param name="procResourceTypePagedQuery"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        Task<PagedInfo<ProcResourceTypeView>> GetPageListAsync(ProcResourceTypePagedQuery procResourceTypePagedQuery);
+        Task<PagedInfo<ProcResourceView>> GetPageListAsync(ProcResourcePagedQuery query);
 
         /// <summary>
-        /// 获取资源类型分页列表
+        /// 获取资源分页列表
         /// </summary>
-        /// <param name="procResourceTypePagedQuery"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        Task<PagedInfo<ProcResourceTypeEntity>> GetListAsync(ProcResourceTypePagedQuery procResourceTypePagedQuery);
+        Task<PagedInfo<ProcResourceEntity>> GetListAsync(ProcResourcePagedQuery query);
 
         /// <summary>
         /// 添加资源类型数据
         /// </summary>
-        /// <param name="resourceTypeEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(ProcResourceTypeAddCommand addCommand);
+        Task<int> InsertAsync(ProcResourceEntity entity);
 
         /// <summary>
         /// 更新资源类型维护数据
         /// </summary>
-        /// <param name="updateCommand"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(ProcResourceTypeUpdateCommand updateCommand);
+        Task<int> UpdateAsync(ProcResourceEntity entity);
 
         /// <summary>
         /// 批量删除
