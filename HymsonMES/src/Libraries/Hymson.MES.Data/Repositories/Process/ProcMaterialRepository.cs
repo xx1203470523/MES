@@ -28,23 +28,76 @@ namespace Hymson.MES.Data.Repositories.Process
 			_connectionOptions = connectionOptions.Value;
 		}
 
-		public async Task<int> DeleteAsync(long id)
+        /// <summary>
+        /// 删除（软删除）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteAsync(long id)
         {
-			using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-			return await conn.ExecuteAsync(DeleteSql);
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeleteSql, new { Id = id });
         }
 
+        /// <summary>
+        /// 批量删除（软删除）
+        /// </summary>
+        /// <param name="idsArr"></param>
+        /// <returns></returns>
+        public async Task<int> DeletesAsync(long[] idsArr) 
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeleteSql, idsArr);
+
+        }
+
+        /// <summary>
+        /// 根据ID获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task<ProcMaterialEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcMaterialEntity>(GetByIdSql);
+            return await conn.QueryFirstOrDefaultAsync<ProcMaterialEntity>(GetByIdSql, new { Id=id});
         }
 
+        /// <summary>
+        /// 分页查询
+        /// </summary>
+        /// <param name="procMaterialPagedQuery"></param>
+        /// <returns></returns>
         public async Task<PagedInfo<ProcMaterialEntity>> GetPagedInfoAsync(ProcMaterialPagedQuery procMaterialPagedQuery)
         {
-            throw new NotImplementedException();
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
+            sqlBuilder.Where("IsDeleted=0");
+            //sqlBuilder.Select("*");
+
+            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
+            //{
+            //    sqlBuilder.Where("SiteCode=@SiteCode");
+            //}
+           
+            var offSet = (procMaterialPagedQuery.PageIndex - 1) * procMaterialPagedQuery.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = procMaterialPagedQuery.PageSize });
+            sqlBuilder.AddParameters(procMaterialPagedQuery);
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var procMaterialEntitiesTask = conn.QueryAsync<ProcMaterialEntity>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var procMaterialEntities = await procMaterialEntitiesTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<ProcMaterialEntity>(procMaterialEntities, procMaterialPagedQuery.PageIndex, procMaterialPagedQuery.PageSize, totalCount);
         }
 
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="procMaterialQuery"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<ProcMaterialEntity>> GetProcMaterialEntitiesAsync(ProcMaterialQuery procMaterialQuery)
         {
             var sqlBuilder = new SqlBuilder();
@@ -54,6 +107,11 @@ namespace Hymson.MES.Data.Repositories.Process
             return procMaterialEntities;
         }
 
+        /// <summary>
+        /// 新增
+        /// </summary>
+        /// <param name="procMaterialEntity"></param>
+        /// <returns></returns>
         public async Task InsertAsync(ProcMaterialEntity procMaterialEntity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
@@ -61,6 +119,11 @@ namespace Hymson.MES.Data.Repositories.Process
             procMaterialEntity.Id = id;
         }
 
+        /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="procMaterialEntity"></param>
+        /// <returns></returns>
         public async Task<int> UpdateAsync(ProcMaterialEntity procMaterialEntity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
@@ -70,12 +133,17 @@ namespace Hymson.MES.Data.Repositories.Process
 
     public partial class ProcMaterialRepository
     {
-        const string DeleteSql = "";
-        const string GetByIdSql = "";
-        const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `wh_stock_change_record` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `wh_stock_change_record` /**where**/";
-        const string GetProcMaterialEntitiesSqlTemplate = "";
-        const string InsertSql = "INSERT INTO `wh_stock_change_record`(`Id`, `SiteCode`, `ChangeType`, `SourceNo`, `SourceItem`, `SourceBillType`, `LabelId`, `MaterialId`, `MaterialCode`, `ProjectNo`, `StockManageFeature`, `OldMaterialCode`, `BatchNo`, `Sn`, `Unit`, `Quantity`, `WarehouseId`, `WarehouseAreaId`, `WarehouseRackId`, `WarehouseBinId`, `ContainerId`, `Remark`, `CreateBy`, `CreateOn`, `UpdateBy`, `UpdateOn`, `IsDeleted`, `BeforeStockManageFeature`) VALUES (@Id, @SiteCode, @ChangeType, @SourceNo, @SourceItem, @SourceBillType, @LabelId, @MaterialId, @MaterialCode, @ProjectNo, @StockManageFeature, @OldMaterialCode, @BatchNo, @Sn, @Unit, @Quantity, @WarehouseId, @WarehouseAreaId, @WarehouseRackId, @WarehouseBinId, @ContainerId, @Remark, @CreateBy, @CreateOn, @UpdateBy, @UpdateOn, @IsDeleted, @BeforeStockManageFeature);";
-        const string UpdateSql = "";
+        const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `proc_material` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_material` /**where**/";
+        const string GetProcMaterialEntitiesSqlTemplate = @"SELECT 
+                                            /**select**/
+                                           FROM `proc_material` /**where**/  ";
+
+        const string InsertSql = "INSERT INTO `proc_material`(`Id`, `SiteCode`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `ProcedureBomId`, `Batch`, `Unit`, `SerialNumber`, `ValidationMaskGroup`, `BaseTime`, `ConsumptionTolerance`, `CreateBy`, `CreateOn`, `UpdateBy`, `UpdateOn`, `IsDeleted`) VALUES (@Id, @SiteCode, @GroupId, @MaterialCode, @MaterialName, @Status, @Origin, @Version, @IsDefaultVersion, @Remark, @BuyType, @ProcessRouteId, @ProcedureBomId, @Batch, @Unit, @SerialNumber, @ValidationMaskGroup, @BaseTime, @ConsumptionTolerance, @CreateBy, @CreateOn, @UpdateBy, @UpdateOn, @IsDeleted ) ; ";
+        const string UpdateSql = "UPDATE `proc_material` SET IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string DeleteSql = "UPDATE `proc_material` SET IsDeleted = '1' WHERE Id = @Id ";
+        const string GetByIdSql = @"SELECT 
+                             `Id`, `SiteCode`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `ProcedureBomId`, `Batch`, `Unit`, `SerialNumber`, `ValidationMaskGroup`, `BaseTime`, `ConsumptionTolerance`, `CreateBy`, `CreateOn`, `UpdateBy`, `UpdateOn`, `IsDeleted`
+                            FROM `proc_material`  WHERE Id = @Id ";
     }
 }

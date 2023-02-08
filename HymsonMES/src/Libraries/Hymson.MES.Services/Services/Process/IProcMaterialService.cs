@@ -20,26 +20,26 @@ namespace Hymson.MES.Services.Services.Process
     /// </summary>
     public interface IProcMaterialService
     {
-		/// <summary>
-        /// 获取List
+        /// <summary>
+        /// 获取分页List
         /// </summary>
         /// <param name="procMaterialPagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<ProcMaterialDto>> GetListAsync(ProcMaterialPagedQueryDto procMaterialPagedQueryDto);
+        Task<PagedInfo<ProcMaterialDto>> GetPageListAsync(ProcMaterialPagedQueryDto procMaterialPagedQueryDto);
 
 		/// <summary>
         /// 新增
         /// </summary>
         /// <param name="procMaterialDto"></param>
         /// <returns></returns>
-		Task CreateProcMaterialAsync(ProcMaterialDto procMaterialDto);
+		Task CreateProcMaterialAsync(ProcMaterialCreateDto procMaterialCreateDto);
 
 		/// <summary>
         /// 修改
         /// </summary>
         /// <param name="procMaterialDto"></param>
         /// <returns></returns>
-		Task ModifyProcMaterialAsync(ProcMaterialDto procMaterialDto);
+		Task ModifyProcMaterialAsync(ProcMaterialModifyDto procMaterialModifyDto);
 
 		/// <summary>
         /// 删除
@@ -47,5 +47,19 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="id"></param>
         /// <returns></returns>
 		Task DeleteProcMaterialAsync(long id);
+
+        /// <summary>
+        /// 批量删除
+        /// </summary>
+        /// <param name="idsArr"></param>
+        /// <returns></returns>
+        Task<int> DeletesProcMaterialAsync(long[] idsArr);
+
+        /// <summary>
+        /// 根据ID查询
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<ProcMaterialDto> QueryProcMaterialByIdAsync(long id);
     }
 }

@@ -65,7 +65,9 @@ namespace Microsoft.Extensions.DependencyInjection
         {
 
             services.AddSingleton<AbstractValidator<WhStockChangeRecordDto>, WhStockChangeRecordValidator>();
-            services.AddSingleton<AbstractValidator<ProcMaterialDto>, ProcMaterialValidator>();
+
+            services.AddSingleton<AbstractValidator<ProcMaterialCreateDto>, ProcMaterialCreateValidator>();
+            services.AddSingleton<AbstractValidator<ProcMaterialModifyDto>, ProcMaterialModifyValidator>();
 
             return services;
         }
