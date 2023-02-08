@@ -3,7 +3,7 @@
  *
  *describe: 物料维护 仓储类 | 代码由框架生成
  *builder:  Karl
- *build datetime: 2023-02-07 11:16:51
+ *build datetime: 2023-02-08 02:32:38
  */
 
 using Dapper;
@@ -16,7 +16,7 @@ using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
-	/// <summary>
+    /// <summary>
     /// 物料维护仓储
     /// </summary>
     public partial class ProcMaterialRepository : IProcMaterialRepository
@@ -24,9 +24,9 @@ namespace Hymson.MES.Data.Repositories.Process
         private readonly ConnectionOptions _connectionOptions;
 
         public ProcMaterialRepository(IOptions<ConnectionOptions> connectionOptions)
-		{
-			_connectionOptions = connectionOptions.Value;
-		}
+        {
+            _connectionOptions = connectionOptions.Value;
+        }
 
         /// <summary>
         /// 删除（软删除）
@@ -44,10 +44,19 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] idsArr) 
+        public async Task<int> DeletesAsync(string ids) 
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, idsArr);
+            try
+            {
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                return await conn.ExecuteAsync(DeletesSql, new { Ids=ids });
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+            return 0;
 
         }
 
@@ -73,7 +82,7 @@ namespace Hymson.MES.Data.Repositories.Process
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
-            //sqlBuilder.Select("*");
+            sqlBuilder.Select("*");
 
             //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
             //{
@@ -112,11 +121,19 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procMaterialEntity"></param>
         /// <returns></returns>
-        public async Task InsertAsync(ProcMaterialEntity procMaterialEntity)
+        public async Task<int> InsertAsync(ProcMaterialEntity procMaterialEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var id = await conn.ExecuteScalarAsync<long>(InsertSql, procMaterialEntity);
-            procMaterialEntity.Id = id;
+            try
+            {
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                return await conn.ExecuteAsync(InsertSql, procMaterialEntity);
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+            return 0;
         }
 
         /// <summary>
@@ -126,24 +143,34 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> UpdateAsync(ProcMaterialEntity procMaterialEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateSql, procMaterialEntity);
+            try
+            {
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                return await conn.ExecuteAsync(UpdateSql, procMaterialEntity);
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+            return 0;
         }
     }
 
     public partial class ProcMaterialRepository
     {
-        const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `proc_material` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_material` /**where**/";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_material` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_material` /**where**/ ";
         const string GetProcMaterialEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `proc_material` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `proc_material`(`Id`, `SiteCode`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `ProcedureBomId`, `Batch`, `Unit`, `SerialNumber`, `ValidationMaskGroup`, `BaseTime`, `ConsumptionTolerance`, `CreateBy`, `CreateOn`, `UpdateBy`, `UpdateOn`, `IsDeleted`) VALUES (@Id, @SiteCode, @GroupId, @MaterialCode, @MaterialName, @Status, @Origin, @Version, @IsDefaultVersion, @Remark, @BuyType, @ProcessRouteId, @ProcedureBomId, @Batch, @Unit, @SerialNumber, @ValidationMaskGroup, @BaseTime, @ConsumptionTolerance, @CreateBy, @CreateOn, @UpdateBy, @UpdateOn, @IsDeleted ) ; ";
-        const string UpdateSql = "UPDATE `proc_material` SET IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string InsertSql = "INSERT INTO `proc_material`(  `Id`, `SiteCode`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `ProcedureBomId`, `Batch`, `Unit`, `SerialNumber`, `ValidationMaskGroup`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @GroupId, @MaterialCode, @MaterialName, @Status, @Origin, @Version, @IsDefaultVersion, @Remark, @BuyType, @ProcessRouteId, @ProcedureBomId, @Batch, @Unit, @SerialNumber, @ValidationMaskGroup, @BaseTime, @ConsumptionTolerance, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string UpdateSql = "UPDATE `proc_material` SET   SiteCode = @SiteCode, GroupId = @GroupId, MaterialCode = @MaterialCode, MaterialName = @MaterialName, Status = @Status, Origin = @Origin, Version = @Version, IsDefaultVersion = @IsDefaultVersion, Remark = @Remark, BuyType = @BuyType, ProcessRouteId = @ProcessRouteId, ProcedureBomId = @ProcedureBomId, Batch = @Batch, Unit = @Unit, SerialNumber = @SerialNumber, ValidationMaskGroup = @ValidationMaskGroup, BaseTime = @BaseTime, ConsumptionTolerance = @ConsumptionTolerance, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_material` SET IsDeleted = '1' WHERE Id = @Id ";
+        const string DeletesSql = "UPDATE `proc_material` SET IsDeleted = '1' WHERE Id in (@Ids)";
         const string GetByIdSql = @"SELECT 
-                             `Id`, `SiteCode`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `ProcedureBomId`, `Batch`, `Unit`, `SerialNumber`, `ValidationMaskGroup`, `BaseTime`, `ConsumptionTolerance`, `CreateBy`, `CreateOn`, `UpdateBy`, `UpdateOn`, `IsDeleted`
+                               `Id`, `SiteCode`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `ProcedureBomId`, `Batch`, `Unit`, `SerialNumber`, `ValidationMaskGroup`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_material`  WHERE Id = @Id ";
     }
 }

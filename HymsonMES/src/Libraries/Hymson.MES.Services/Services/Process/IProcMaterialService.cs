@@ -3,7 +3,7 @@
  *
  *describe: 物料维护    服务接口 | 代码由框架生成
  *builder:  Karl
- *build datetime: 2023-02-07 11:16:51
+ *build datetime: 2023-02-08 02:32:38
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
@@ -27,33 +27,33 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         Task<PagedInfo<ProcMaterialDto>> GetPageListAsync(ProcMaterialPagedQueryDto procMaterialPagedQueryDto);
 
-		/// <summary>
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="procMaterialDto"></param>
         /// <returns></returns>
-		Task CreateProcMaterialAsync(ProcMaterialCreateDto procMaterialCreateDto);
+        Task CreateProcMaterialAsync(ProcMaterialCreateDto procMaterialCreateDto);
 
-		/// <summary>
+        /// <summary>
         /// 修改
         /// </summary>
         /// <param name="procMaterialDto"></param>
         /// <returns></returns>
-		Task ModifyProcMaterialAsync(ProcMaterialModifyDto procMaterialModifyDto);
+        Task ModifyProcMaterialAsync(ProcMaterialModifyDto procMaterialModifyDto);
 
-		/// <summary>
+        /// <summary>
         /// 删除
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-		Task DeleteProcMaterialAsync(long id);
+        Task DeleteProcMaterialAsync(long id);
 
         /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        Task<int> DeletesProcMaterialAsync(long[] idsArr);
+        Task<int> DeletesProcMaterialAsync(string ids);
 
         /// <summary>
         /// 根据ID查询

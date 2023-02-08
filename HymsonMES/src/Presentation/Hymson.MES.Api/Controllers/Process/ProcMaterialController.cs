@@ -3,7 +3,7 @@
  *
  *describe: 物料维护    控制器 | 代码由框架生成  
  *builder:  Karl
- *build datetime: 2023-02-07 11:16:51
+ *build datetime: 2023-02-08 02:32:38
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
@@ -17,7 +17,7 @@ namespace Hymson.MES.Api.Controllers.Process
     /// <summary>
     /// 控制器（物料维护）
     /// @author Karl
-    /// @date 2023-02-07 11:16:51
+    /// @date 2023-02-08 02:32:38
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
@@ -95,8 +95,8 @@ namespace Hymson.MES.Api.Controllers.Process
         [Route("delete")]
         public async Task DeleteProcMaterialAsync(string ids)
         {
-            long[] idsArr = StringExtension.SpitLongArrary(ids);
-            await _procMaterialService.DeletesProcMaterialAsync(idsArr);
+            //long[] idsArr = StringExtension.SpitLongArrary(ids);
+            await _procMaterialService.DeletesProcMaterialAsync(ids);
         }
 
     }
