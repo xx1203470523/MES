@@ -6,6 +6,7 @@ using Hymson.MES.Services.Services.OnStock;
 using Hymson.MES.Services.Services.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.MES.Services.Validators.OnStock;
+using Hymson.MES.Services.Validators.Process;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -39,6 +40,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddSingleton<IWhStockChangeRecordService, WhStockChangeRecordService>();
             services.AddSingleton<IProcResourceTypeService, ProcResourceTypeService>();
+            services.AddSingleton<IProcResourceService, ProcResourceService>();
             return services;
         }
 
@@ -65,6 +67,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
 
             services.AddSingleton<AbstractValidator<WhStockChangeRecordDto>, WhStockChangeRecordValidator>();
+            services.AddSingleton<AbstractValidator<ProcResourceDto>, ProcResourceValidator>();
             return services;
         }
     }

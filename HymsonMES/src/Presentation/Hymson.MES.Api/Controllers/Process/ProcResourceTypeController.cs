@@ -38,25 +38,25 @@ namespace Hymson.MES.Api.Controllers
         /// <summary>
         /// 获取分页数据
         /// </summary>
-        /// <param name="procResourceTypePagedQueryDto"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
         [Route("list")]
         [HttpGet]
-        public async Task<PagedInfo<ProcResourceTypeViewDto>> QueryProcResourceType([FromQuery] ProcResourceTypePagedQueryDto procResourceTypePagedQueryDto)
+        public async Task<PagedInfo<ProcResourceTypeViewDto>> QueryProcResourceType([FromQuery] ProcResourceTypePagedQueryDto query)
         {
-            return await _procResourceTypeService.GetPageListAsync(procResourceTypePagedQueryDto);
+            return await _procResourceTypeService.GetPageListAsync(query);
         }
 
         /// <summary>
         /// 获取分页数据
         /// </summary>
-        /// <param name="procResourceTypePagedQueryDto"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
         [Route("querylist")]
         [HttpGet]
-        public async Task<PagedInfo<ProcResourceTypeDto>> GetProcResourceTypeList([FromQuery] ProcResourceTypePagedQueryDto procResourceTypePagedQueryDto)
+        public async Task<PagedInfo<ProcResourceTypeDto>> GetProcResourceTypeList([FromQuery] ProcResourceTypePagedQueryDto query)
         {
-            return await _procResourceTypeService.GetListAsync(procResourceTypePagedQueryDto);
+            return await _procResourceTypeService.GetListAsync(query);
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace Hymson.MES.Api.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("{Id}")]
+        [HttpGet("{id}")]
         //[ActionPermissionFilter(Permission = "business:procResourceType:query")]
         public async Task<ProcResourceTypeDto> GetProcResourceType(long id)
         {

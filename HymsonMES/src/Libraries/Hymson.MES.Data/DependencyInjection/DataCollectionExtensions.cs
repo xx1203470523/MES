@@ -33,6 +33,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddRepository(this IServiceCollection services) {
             services.AddSingleton<IWhStockChangeRecordRepository, WhStockChangeRecordRepository>();
             services.AddSingleton<IProcResourceTypeRepository, ProcResourceTypeRepository>();
+            services.AddSingleton<IProcResourceRepository, ProcResourceRepository>();
             return services;
         }
 

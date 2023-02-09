@@ -3,6 +3,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.OnStock;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.OnStock;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Services.Dtos.OnStock;
 using Hymson.MES.Services.Dtos.Process;
@@ -34,6 +35,9 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcResourceTypeDto, ProcResourceTypeEntity>();
             CreateMap<ProcResourceTypeViewDto, ProcResourceTypeView>();
             CreateMap<ProcResourceTypePagedQueryDto, ProcResourceTypePagedQuery>();
+
+            CreateMap<ProcResourceDto, ProcResourceEntity>();
+            CreateMap<ProcResourceViewDto, ProcResourceView>();
         }
 
         /// <summary>

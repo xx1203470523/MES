@@ -24,10 +24,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         public string ResType { get; set; }
 
-        ///// <summary>
-        ///// 资源类型id
-        ///// </summary>
-        //public long? ResTypeId { get; set; }
+        /// <summary>
+        /// 资源类型id
+        /// </summary>
+        public long? ResTypeId { get; set; }
 
         /// <summary>
         /// 描述 :状态 
@@ -37,5 +37,15 @@ namespace Hymson.MES.Data.Repositories.Process
 
         //站点
         public string SiteCode { get; set; }
+    }
+
+    public class ProcResourceQuery
+    {
+        /// <summary>
+        /// 站点
+        /// </summary>
+        public string SiteCode { get; set; }
+
+        public long[] IdsArr { get; set; }
     }
 }

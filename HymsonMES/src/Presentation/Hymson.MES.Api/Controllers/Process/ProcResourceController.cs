@@ -5,6 +5,7 @@ using Hymson.MES.Services.Services.OnStock;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.Utils.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace Hymson.MES.Api.Controllers
 {
@@ -19,89 +20,100 @@ namespace Hymson.MES.Api.Controllers
     public class ProcResourceController : ControllerBase
     {
         /// <summary>
-        /// 资源类型维护表接口
+        /// 资源维护表接口
         /// </summary>
-        private readonly IProcResourceTypeService _procResourceTypeService;
+        private readonly IProcResourceService _procResourceService;
         private readonly ILogger<ProcResourceController> _logger;
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="procResourceTypeService"></param>
+        /// <param name="procResourceService"></param>
         /// <param name="logger"></param>
-        public ProcResourceController(IProcResourceTypeService procResourceTypeService, ILogger<ProcResourceController> logger)
+        public ProcResourceController(IProcResourceService procResourceService, ILogger<ProcResourceController> logger)
         {
-            _procResourceTypeService = procResourceTypeService;
+            _procResourceService = procResourceService;
             _logger = logger;
         }
 
         /// <summary>
         /// 获取分页数据
         /// </summary>
-        /// <param name="procResourceTypePagedQueryDto"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
         [Route("list")]
         [HttpGet]
-        public async Task<PagedInfo<ProcResourceTypeViewDto>> QueryProcResourceType([FromQuery] ProcResourceTypePagedQueryDto procResourceTypePagedQueryDto)
+        public async Task<PagedInfo<ProcResourceViewDto>> QueryProcResource([FromQuery] ProcResourcePagedQueryDto query)
         {
-            return await _procResourceTypeService.GetPageListAsync(procResourceTypePagedQueryDto);
+            return await _procResourceService.GetPageListAsync(query);
         }
 
         /// <summary>
         /// 获取分页数据
         /// </summary>
-        /// <param name="procResourceTypePagedQueryDto"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
         [Route("querylist")]
         [HttpGet]
-        public async Task<PagedInfo<ProcResourceTypeDto>> GetProcResourceTypeList([FromQuery] ProcResourceTypePagedQueryDto procResourceTypePagedQueryDto)
+        public async Task<PagedInfo<ProcResourceDto>> GetProcResourceList([FromQuery] ProcResourcePagedQueryDto query)
         {
-            return await _procResourceTypeService.GetListAsync(procResourceTypePagedQueryDto);
+            return await _procResourceService.GetListAsync(query);
         }
 
         /// <summary>
-        /// 查询资源类型维护表详情
+        /// 查询资源维护表详情
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        //[ActionPermissionFilter(Permission = "business:procResourceType:query")]
-        public async Task<ProcResourceTypeDto> GetProcResourceType(long id)
+        public async Task<ProcResourceDto> GetProcResource(long id)
         {
-            return await _procResourceTypeService.GetListAsync(id);
+            return await _procResourceService.GetByIdAsync(id);
         }
 
         /// <summary>
-        /// 添加资源类型数据
+        /// 查询资源类型下关联的资源
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        [Route("listforgroup")]
+        [HttpGet]
+        public async Task<PagedInfo<ProcResourceDto>> GetListForGroup([FromQuery] ProcResourcePagedQueryDto query)
+        {
+            return await _procResourceService.GetListForGroupAsync(query);
+        }
+
+        /// <summary>
+        /// 添加资源数据
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task AddProcResourceType([FromBody] ProcResourceTypeAddCommandDto parm)
+        public async Task AddProcResource([FromBody] ProcResourceDto parm)
         {
-            await _procResourceTypeService.AddProcResourceTypeAsync(parm);
+            await _procResourceService.AddProcResourceAsync(parm);
         }
 
         /// <summary>
-        /// 更新资源类型维护表
+        /// 更新资源维护表
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPut]
-        public async Task UpdateProcResourceType([FromBody] ProcResourceTypeUpdateCommandDto parm)
+        public async Task UpdateProcResource([FromBody] ProcResourceDto parm)
         {
-            await _procResourceTypeService.UpdateProcResrouceTypeAsync(parm);
+            await _procResourceService.UpdateProcResrouceAsync(parm);
         }
 
         /// <summary>
-        /// 更新资源类型维护表
+        /// 删除资源维护表
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete("{ids}")]
-        public async Task DeleteProcResourceType(string ids)
+        public async Task DeleteProcResource(string ids)
         {
-            await _procResourceTypeService.DeleteProcResourceTypeAsync(ids);
+            await _procResourceService.DeleteProcResourceAsync(ids);
         }
     }
 }

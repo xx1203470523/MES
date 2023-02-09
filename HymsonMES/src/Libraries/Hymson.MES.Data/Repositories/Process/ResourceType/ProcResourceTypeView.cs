@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Process;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,26 +8,8 @@ using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Process.ResourceType
 {
-    public class ProcResourceTypeView : BaseEntity
+    public class ProcResourceTypeView : ProcResourceTypeEntity
     {
-        /// <summary>
-        /// 描述 :所属站点代码 
-        /// 空值 : false  
-        /// </summary>
-        public string SiteCode { get; set; }
-
-        /// <summary>
-        /// 描述 :资源类型 
-        /// 空值 : false  
-        /// </summary>
-        public string ResType { get; set; }
-
-        /// <summary>
-        /// 描述 :资源类型名称 
-        /// 空值 : false  
-        /// </summary>
-        public string ResTypeName { get; set; }
-
         /// <summary>
         /// 资源编码
         /// </summary>

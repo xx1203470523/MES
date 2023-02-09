@@ -13,10 +13,9 @@ namespace Hymson.MES.Services.Dtos.Process
     public record ProcResourceTypeDto : BaseEntityDto
     {
         /// <summary>
-        /// 描述 :所属站点代码 
-        /// 空值 : false  
+        /// 主键id
         /// </summary>
-        public string SiteCode { get; set; }
+        public long Id { get; set; }
 
         /// <summary>
         /// 描述 :资源类型 
@@ -31,66 +30,34 @@ namespace Hymson.MES.Services.Dtos.Process
         public string ResTypeName { get; set; }
 
         /// <summary>
-        /// 备注
+        /// 描述 :描述 
+        /// 空值 : true  
         /// </summary>
-        public string? Remark { get; set; }
+        public string Remark { get; set; }
 
         /// <summary>
         /// 创建人
         /// </summary>
-        public string CreateBy { get; set; } = "";
+        public string CreatedBy { get; set; } = "";
 
         /// <summary>
         /// 创建时间
         /// </summary>
-        public DateTime CreateOn { get; set; }
+        public DateTime CreatedOn { get; set; }
 
         /// <summary>
         /// 更新人
         /// </summary>
-        public string? UpdateBy { get; set; }
+        public string? UpdatedBy { get; set; }
 
         /// <summary>
         /// 更新时间
         /// </summary>
-        public DateTime? UpdateOn { get; set; }
+        public DateTime? UpdatedOn { get; set; }
     }
 
-    public record ProcResourceTypeViewDto : BaseEntityDto
+    public record ProcResourceTypeViewDto : ProcResourceTypeDto
     {
-        /// <summary>
-        /// 描述 :所属站点代码 
-        /// 空值 : false  
-        /// </summary>
-        public string SiteCode { get; set; }
-
-        /// <summary>
-        /// 描述 :资源类型 
-        /// 空值 : false  
-        /// </summary>
-        public string ResType { get; set; }
-
-        /// <summary>
-        /// 描述 :资源类型名称 
-        /// 空值 : false  
-        /// </summary>
-        public string ResTypeName { get; set; }
-
-        /// <summary>
-        /// 备注
-        /// </summary>
-        public string? Remark { get; set; }
-
-        /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreateBy { get; set; } = "";
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreateOn { get; set; }
-
         /// <summary>
         /// 资源编码
         /// </summary>
@@ -102,6 +69,9 @@ namespace Hymson.MES.Services.Dtos.Process
         public string ResName { get; set; }
     }
 
+    /// <summary>
+    /// 查询实体
+    /// </summary>
     public class ProcResourceTypePagedQueryDto : PagerInfo
     {
         /// 描述 :资源类型代码 
@@ -133,6 +103,9 @@ namespace Hymson.MES.Services.Dtos.Process
         public string? SiteCode { get; set; }
     }
 
+    /// <summary>
+    /// 新增实体
+    /// </summary>
     public record ProcResourceTypeAddCommandDto : BaseEntityDto
     {
         /// <summary>
@@ -155,9 +128,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 关联的资源Id
         /// </summary>
-        public IEnumerable<string> ResourceIds { get; set; }
+        public IEnumerable<long> ResourceIds { get; set; }
     }
 
+    /// <summary>
+    /// 修改实体
+    /// </summary>
     public record ProcResourceTypeUpdateCommandDto : BaseEntityDto
     {
         /// <summary>
@@ -179,6 +155,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 关联的资源Id
         /// </summary>
-        public IEnumerable<string> ResourceIds { get; set; }
+        public IEnumerable<long> ResourceIds { get; set; }
     }
 }

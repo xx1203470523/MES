@@ -47,92 +47,103 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 查询资源类型是否存在
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<ProcResourceTypeEntity> GetByCodeAsync(ProcResourceTypeEntity param)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<ProcResourceTypeEntity>(GetByCodeSql, param);
+        }
+
+        /// <summary>
         ///  查询资源类型维护表列表(关联资源：一个类型被多个资源关联就展示多条)
         /// </summary>
-        /// <param name="procResourceTypePagedQuery"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcResourceTypeView>> GetPageListAsync(ProcResourceTypePagedQuery procResourceTypePagedQuery)
+        public async Task<PagedInfo<ProcResourceTypeView>> GetPageListAsync(ProcResourceTypePagedQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("a.IsDeleted=0");
             //sqlBuilder.Select("*");
-            if (!string.IsNullOrWhiteSpace(procResourceTypePagedQuery.SiteCode))
+            if (!string.IsNullOrWhiteSpace(query.SiteCode))
             {
                 sqlBuilder.Where("a.SiteCode=@SiteCode");
             }
-            if (!string.IsNullOrWhiteSpace(procResourceTypePagedQuery.ResType))
+            if (!string.IsNullOrWhiteSpace(query.ResType))
             {
-                procResourceTypePagedQuery.ResType = $"%{procResourceTypePagedQuery.ResType}%";
+                query.ResType = $"%{query.ResType}%";
                 sqlBuilder.Where("ResType like @ResType");
             }
-            if (!string.IsNullOrWhiteSpace(procResourceTypePagedQuery.ResTypeName))
+            if (!string.IsNullOrWhiteSpace(query.ResTypeName))
             {
-                procResourceTypePagedQuery.ResTypeName = $"%{procResourceTypePagedQuery.ResTypeName}%";
+                query.ResTypeName = $"%{query.ResTypeName}%";
                 sqlBuilder.Where("ResTypeName like @ResTypeName");
             }
-            if (!string.IsNullOrWhiteSpace(procResourceTypePagedQuery.ResCode))
+            if (!string.IsNullOrWhiteSpace(query.ResCode))
             {
-                procResourceTypePagedQuery.ResCode = $"%{procResourceTypePagedQuery.ResCode}%";
+                query.ResCode = $"%{query.ResCode}%";
                 sqlBuilder.Where("ResCode like @ResCode");
             }
-            if (!string.IsNullOrWhiteSpace(procResourceTypePagedQuery.ResName))
+            if (!string.IsNullOrWhiteSpace(query.ResName))
             {
-                procResourceTypePagedQuery.ResName = $"%{procResourceTypePagedQuery.ResName}%";
+                query.ResName = $"%{query.ResName}%";
                 sqlBuilder.Where("ResName like @ResName");
             }
 
-            var offSet = (procResourceTypePagedQuery.PageIndex - 1) * procResourceTypePagedQuery.PageSize;
+            var offSet = (query.PageIndex - 1) * query.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = procResourceTypePagedQuery.PageSize });
-            sqlBuilder.AddParameters(procResourceTypePagedQuery);
+            sqlBuilder.AddParameters(new { Rows = query.PageSize });
+            sqlBuilder.AddParameters(query);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var procResourceTypeEntitiesTask = conn.QueryAsync<ProcResourceTypeView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procResourceTypeEntities = await procResourceTypeEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<ProcResourceTypeView>(procResourceTypeEntities, procResourceTypePagedQuery.PageIndex, procResourceTypePagedQuery.PageSize, totalCount);
+            return new PagedInfo<ProcResourceTypeView>(procResourceTypeEntities, query.PageIndex, query.PageSize, totalCount);
         }
 
         /// <summary>
         /// 获取资源类型分页列表
         /// </summary>
-        /// <param name="procResourceTypePagedQuery"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcResourceTypeEntity>> GetListAsync(ProcResourceTypePagedQuery procResourceTypePagedQuery)
+        public async Task<PagedInfo<ProcResourceTypeEntity>> GetListAsync(ProcResourceTypePagedQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedListSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedListCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
-            if (!string.IsNullOrWhiteSpace(procResourceTypePagedQuery.SiteCode))
+            if (!string.IsNullOrWhiteSpace(query.SiteCode))
             {
                 sqlBuilder.Where("SiteCode=@SiteCode");
             }
-            if (!string.IsNullOrWhiteSpace(procResourceTypePagedQuery.ResType))
+            if (!string.IsNullOrWhiteSpace(query.ResType))
             {
-                procResourceTypePagedQuery.ResType = $"%{procResourceTypePagedQuery.ResType}%";
+                query.ResType = $"%{query.ResType}%";
                 sqlBuilder.Where("ResType like @ResType");
             }
-            if (!string.IsNullOrWhiteSpace(procResourceTypePagedQuery.ResTypeName))
+            if (!string.IsNullOrWhiteSpace(query.ResTypeName))
             {
-                procResourceTypePagedQuery.ResTypeName = $"%{procResourceTypePagedQuery.ResTypeName}%";
+                query.ResTypeName = $"%{query.ResTypeName}%";
                 sqlBuilder.Where("ResTypeName like @ResTypeName");
             }
-            var offSet = (procResourceTypePagedQuery.PageIndex - 1) * procResourceTypePagedQuery.PageSize;
+            var offSet = (query.PageIndex - 1) * query.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = procResourceTypePagedQuery.PageSize });
-            sqlBuilder.AddParameters(procResourceTypePagedQuery);
+            sqlBuilder.AddParameters(new { Rows = query.PageSize });
+            sqlBuilder.AddParameters(query);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var procResourceTypeEntitiesTask = conn.QueryAsync<ProcResourceTypeEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procResourceTypeEntities = await procResourceTypeEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<ProcResourceTypeEntity>(procResourceTypeEntities, procResourceTypePagedQuery.PageIndex, procResourceTypePagedQuery.PageSize, totalCount);
+            return new PagedInfo<ProcResourceTypeEntity>(procResourceTypeEntities, query.PageIndex, query.PageSize, totalCount);
         }
 
         /// <summary>
@@ -172,6 +183,7 @@ namespace Hymson.MES.Data.Repositories.Process
     public partial class ProcResourceTypeRepository
     {
         const string GetByIdSql = "select * from proc_resource_type where Id =@Id ";
+        const string GetByCodeSql = "select * from proc_resource_type where SiteCode =@SiteCode and ResType =@ResType and IsDeleted =0 ";
 
         const string GetPagedInfoDataSqlTemplate = "SELECT a.Id,a.SiteCode,ResType,ResTypeName,a.Remark,a.CreateBy ,a.CreateOn,b.ResCode,b.ResName  FROM proc_resource_type a left join proc_resource b on a.Id =b.ResTypeId /**where**/ LIMIT @Offset,@Rows";
         const string GetPagedInfoCountSqlTemplate = "SELECT count(*) FROM proc_resource_type a left join proc_resource b on a.Id =b.ResTypeId  /**where**/ ";

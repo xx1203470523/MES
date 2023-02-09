@@ -1,4 +1,5 @@
-﻿using Hymson.Infrastructure;
+﻿using FluentValidation;
+using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Process;
@@ -20,16 +21,15 @@ namespace Hymson.MES.Services.Services.Process
     public class ProcResourceService : IProcResourceService
     {
         private readonly IProcResourceRepository _resourceRepository;
-        //private readonly AbstractValidator<ProcResourceTypeDto> _validationRules;
+        private readonly AbstractValidator<ProcResourceDto> _validationRules;
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        public ProcResourceService(IProcResourceRepository resourceRepository)
-        //AbstractValidator<ProcResourceTypeDto> validationRules)
+        public ProcResourceService(IProcResourceRepository resourceRepository, AbstractValidator<ProcResourceDto> validationRules)
         {
             _resourceRepository = resourceRepository;
-            // _validationRules = validationRules;
+            _validationRules = validationRules;
         }
 
         /// <summary>
@@ -37,58 +37,78 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ProcResourceTypeDto> GetListAsync(long id)
+        public async Task<ProcResourceViewDto> GetByIdAsync(long id)
         {
             var entity = await _resourceRepository.GetByIdAsync(id);
-            return entity.ToModel<ProcResourceTypeDto>();
+            return entity.ToModel<ProcResourceViewDto>();
         }
 
         /// <summary>
-        /// 查询资源类型维护表列表(关联资源：一个类型被多个资源关联就展示多条)
+        /// 查询资源维护表列表(关联资源类型，展示资源类型名称)
         /// </summary>
-        /// <param name="procResourceTypePagedQueryDto"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        //public async Task<PagedInfo<ProcResourceTypeViewDto>> GetPageListAsync(ProcResourceTypePagedQueryDto procResourceTypePagedQueryDto)
-        //{
-        //    var procResourceTypePagedQuery = procResourceTypePagedQueryDto.ToQuery<ProcResourceTypePagedQuery>();
-        //    var pagedInfo = await _resourceRepository.GetPageListAsync(procResourceTypePagedQuery);
+        public async Task<PagedInfo<ProcResourceViewDto>> GetPageListAsync(ProcResourcePagedQueryDto query)
+        {
+            var resourcePagedQuery = query.ToQuery<ProcResourcePagedQuery>();
+            var pagedInfo = await _resourceRepository.GetPageListAsync(resourcePagedQuery);
 
-        //    //实体到DTO转换 装载数据
-        //    var procResourceTypeDtos = new List<ProcResourceTypeViewDto>();
-        //    foreach (var entity in pagedInfo.Data)
-        //    {
-        //        var resourceTypeViewDto = entity.ToModel<ProcResourceTypeViewDto>();
-        //        procResourceTypeDtos.Add(resourceTypeViewDto);
-        //    }
-        //    return new PagedInfo<ProcResourceTypeViewDto>(procResourceTypeDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
-        //}
+            //实体到DTO转换 装载数据
+            var procResourceDtos = new List<ProcResourceViewDto>();
+            foreach (var entity in pagedInfo.Data)
+            {
+                var resourceViewDto = entity.ToModel<ProcResourceViewDto>();
+                procResourceDtos.Add(resourceViewDto);
+            }
+            return new PagedInfo<ProcResourceViewDto>(procResourceDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
 
         /// <summary>
-        /// 获取资源类型分页列表(不关联资源、只展示资源类型信息)
+        /// 获取资源分页列表
         /// </summary>
-        /// <param name="procResourceTypePagedQueryDto"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        //public async Task<PagedInfo<ProcResourceTypeDto>> GetListAsync(ProcResourceTypePagedQueryDto procResourceTypePagedQueryDto)
-        //{
-        //    var procResourceTypePagedQuery = procResourceTypePagedQueryDto.ToQuery<ProcResourceTypePagedQuery>();
-        //    var pagedInfo = await _resourceRepository.GetListAsync(procResourceTypePagedQuery);
+        public async Task<PagedInfo<ProcResourceDto>> GetListAsync(ProcResourcePagedQueryDto query)
+        {
+            var resourcePagedQuery = query.ToQuery<ProcResourcePagedQuery>();
+            var pagedInfo = await _resourceRepository.GetListAsync(resourcePagedQuery);
 
-        //    //实体到DTO转换 装载数据
-        //    var procResourceTypeDtos = new List<ProcResourceTypeDto>();
-        //    foreach (var entity in pagedInfo.Data)
-        //    {
-        //        var whStockChangeRecordDto = entity.ToModel<ProcResourceTypeDto>();
-        //        procResourceTypeDtos.Add(whStockChangeRecordDto);
-        //    }
-        //    return new PagedInfo<ProcResourceTypeDto>(procResourceTypeDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
-        //}
+            //实体到DTO转换 装载数据
+            var procResourceDtos = new List<ProcResourceDto>();
+            foreach (var entity in pagedInfo.Data)
+            {
+                var resourceTypeDto = entity.ToModel<ProcResourceDto>();
+                procResourceDtos.Add(resourceTypeDto);
+            }
+            return new PagedInfo<ProcResourceDto>(procResourceDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
 
         /// <summary>
-        /// 添加资源类型数据
+        /// 查询资源类型下关联的资源(资源类型详情：可用资源，已分配资源)
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ProcResourceDto>> GetListForGroupAsync(ProcResourcePagedQueryDto query)
+        {
+            var resourcePagedQuery = query.ToQuery<ProcResourcePagedQuery>();
+            var pagedInfo = await _resourceRepository.GetListForGroupAsync(resourcePagedQuery);
+
+            //实体到DTO转换 装载数据
+            var procResourceDtos = new List<ProcResourceDto>();
+            foreach (var entity in pagedInfo.Data)
+            {
+                var resourceTypeDto = entity.ToModel<ProcResourceDto>();
+                procResourceDtos.Add(resourceTypeDto);
+            }
+            return new PagedInfo<ProcResourceDto>(procResourceDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 添加资源数据
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task AddProcResourceTypeAsync(ProcResourceTypeAddCommandDto param)
+        public async Task AddProcResourceAsync(ProcResourceDto param)
         {
             //验证DTO
             //var dto = new ProcResourceTypeDto();
@@ -102,20 +122,22 @@ namespace Hymson.MES.Services.Services.Process
                 UpdatedBy = "TODO",
                 UpdatedOn = HymsonClock.Now(),
                 CreatedOn = HymsonClock.Now(),
+                Status = param.Status,
+                ResTypeId = param.ResTypeId,
                 Remark = param.Remark ?? "",
-                ResCode = param.ResType ?? "",
-                ResName = param.ResTypeName ?? ""
+                ResCode = param.ResCode ?? "",
+                ResName = param.ResName ?? ""
             };
             //入库
             await _resourceRepository.InsertAsync(entity);
         }
 
         /// <summary>
-        /// 修改资源类型数据
+        /// 修改资源数据
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> UpdateProcResrouceTypeAsync(ProcResourceTypeUpdateCommandDto param)
+        public async Task<int> UpdateProcResrouceAsync(ProcResourceDto param)
         {
             //验证DTO
             //var dto = new ProcResourceTypeDto();
@@ -137,7 +159,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeleteProcResourceTypeAsync(string ids)
+        public async Task<int> DeleteProcResourceAsync(string ids)
         {
             long[] idsArr = StringExtension.SpitLongArrary(ids);
             return await _resourceRepository.DeleteAsync(idsArr);

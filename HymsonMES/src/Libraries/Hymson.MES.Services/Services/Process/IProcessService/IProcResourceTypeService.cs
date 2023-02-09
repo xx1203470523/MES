@@ -46,7 +46,7 @@ namespace Hymson.MES.Services.Services.Process.IProcessService
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> UpdateProcResrouceTypeAsync(ProcResourceTypeUpdateCommandDto param);
+        Task UpdateProcResrouceTypeAsync(ProcResourceTypeUpdateCommandDto param);
 
         /// <summary>
         /// 批量删除资源类型数据
