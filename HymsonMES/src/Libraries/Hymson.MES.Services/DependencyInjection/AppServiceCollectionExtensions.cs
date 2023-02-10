@@ -7,6 +7,7 @@ using Hymson.MES.Services.Services.Equipment.EquEquipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipmentUnit;
 using Hymson.MES.Services.Services.InteClass;
 using Hymson.MES.Services.Services.Process;
+using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.MES.Services.Validators.Equipment;
 using Hymson.MES.Services.Validators.Process;
 using Microsoft.Extensions.Configuration;
@@ -54,6 +55,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcMaterialService, ProcMaterialService>();
             #endregion
 
+            #region Resource
+            services.AddSingleton<IProcResourceTypeService, ProcResourceTypeService>();
+            services.AddSingleton<IProcResourceService, ProcResourceService>();
+            #endregion
             return services;
         }
 
@@ -85,6 +90,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<ProcMaterialCreateDto>, ProcMaterialCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcMaterialModifyDto>, ProcMaterialModifyValidator>();
 
+            #region Resource
+            services.AddSingleton<AbstractValidator<ProcResourceDto>, ProcResourceValidator>();
+            #endregion
             return services;
         }
     }

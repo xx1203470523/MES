@@ -6,6 +6,8 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.Resource;
+using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Process;
 
@@ -66,6 +68,16 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcMaterialModifyDto, ProcMaterialEntity>();
             CreateMap<ProcMaterialPagedQueryDto, ProcMaterialPagedQuery>();
             CreateMap<ProcMaterialEntity, ProcMaterialDto>();
+
+            CreateMap<ProcResourceTypeDto, ProcResourceTypeEntity>();
+            CreateMap<ProcResourceTypeViewDto, ProcResourceTypeView>();
+            CreateMap<ProcResourceTypePagedQueryDto, ProcResourceTypePagedQuery>();
+
+            CreateMap<ProcResourceDto, ProcResourceEntity>();
+            CreateMap<ProcResourceViewDto, ProcResourceView>();
+            CreateMap<ProcResourcePagedQueryDto, ProcResourcePagedQuery>();
+            CreateMap<ProcResourceConfigPrintViewDto, ProcResourceConfigPrintView>();
+            CreateMap<ProcResourceConfigPrintPagedQueryDto, ProcResourceConfigPrintPagedQuery>();
         }
 
         /// <summary>

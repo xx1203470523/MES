@@ -32,7 +32,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// 空值 : true  
         /// </summary>
         public string Remark { get; set; }
-
+        
         /// <summary>
         /// 描述 :所属站点代码 
         /// 空值 : false  

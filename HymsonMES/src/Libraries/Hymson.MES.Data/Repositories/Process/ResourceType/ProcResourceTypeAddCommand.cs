@@ -1,36 +1,39 @@
 ﻿using Hymson.Infrastructure;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Hymson.MES.Core.Domain.Process
+namespace Hymson.MES.Data.Repositories.Process.ResourceType
 {
-    /// <summary>
-    /// 资源类型表数据实体对象
-    /// @author admin
-    /// @date 2023-02-08
-    /// </summary>
-    public class ProcResourceTypeEntity: BaseEntity
+    public class ProcResourceTypeAddCommand : BaseEntity
     {
         /// <summary>
-        /// 描述 :所属站点代码 
-        /// 空值 : false  
+        /// 站点
         /// </summary>
         public string SiteCode { get; set; }
-        
+
         /// <summary>
         /// 描述 :资源类型 
         /// 空值 : false  
         /// </summary>
         public string ResType { get; set; }
-        
+
         /// <summary>
         /// 描述 :资源类型名称 
         /// 空值 : false  
         /// </summary>
         public string ResTypeName { get; set; }
-        
+
         /// <summary>
-        /// 描述 :描述 
-        /// 空值 : true  
+        /// 说明
         /// </summary>
         public string Remark { get; set; }
-        }
+
+        /// <summary>
+        /// 关联的资源Id
+        /// </summary>
+        public IEnumerable<string> ResourceIds { get; set; }
+    }
 }

@@ -3,7 +3,7 @@
     public class ErrorCode
     {
         #region  用户端错误 
-        public const string WMS10100 = "WMS10100";
+        public const string MES10100 = "WMS10100";
         public const string WMS10101 = "WMS10101";
         public const string WMS10001 = "WMS10001";
         public const string WMS10200 = "物料维护错误";
