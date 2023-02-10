@@ -72,7 +72,7 @@ namespace Hymson.MES.Services.Services.Process
             //存在则抛异常
             if (haveEntity != null && haveEntity.Count() > 0)
             {
-                throw new CustomerValidationException( nameof(ErrorCode.WMS10201) ).WithData("materialCode", procMaterialCreateDto.MaterialCode).WithData("version", procMaterialCreateDto.Version);
+                throw new CustomerValidationException( nameof(ErrorCode.MES10201) ).WithData("materialCode", procMaterialCreateDto.MaterialCode).WithData("version", procMaterialCreateDto.Version);
             }
             #endregion
 
@@ -113,7 +113,7 @@ namespace Hymson.MES.Services.Services.Process
 
                 if (response == 0)
                 {
-                    throw new BusinessException(ErrorCode.WMS10202);
+                    throw new BusinessException(ErrorCode.MES10202);
                 }
 
                 if (procMaterialCreateDto.DynamicList != null && procMaterialCreateDto.DynamicList.Count > 0)
@@ -123,7 +123,7 @@ namespace Hymson.MES.Services.Services.Process
 
                 if (response != procMaterialCreateDto.DynamicList.Count)
                 {
-                    throw new BusinessException(ErrorCode.WMS10202);
+                    throw new BusinessException(ErrorCode.MES10202);
                 }
 
                 ts.Complete();
@@ -153,7 +153,7 @@ namespace Hymson.MES.Services.Services.Process
             #region 参数校验
             if (string.IsNullOrEmpty(ids)) 
             {
-                throw new BusinessException(ErrorCode.WME10213);
+                throw new BusinessException(ErrorCode.MES10213);
             }
 
             var statusArr = new string[] { "2", "3" }; //可下达和保留 时无法删除
@@ -161,7 +161,7 @@ namespace Hymson.MES.Services.Services.Process
             var entitys =  await _procMaterialRepository.GetByIdsAsync(StringExtension.SpitLongArrary(ids));
             if (entitys.Where(x => statusArr.Contains(x.Status)).ToList().Count>0) 
             {
-                throw new BusinessException(ErrorCode.WME10212);
+                throw new BusinessException(ErrorCode.MES10212);
             }
 
             #endregion
@@ -240,19 +240,19 @@ namespace Hymson.MES.Services.Services.Process
             var modelOrigin = await _procMaterialRepository.GetByIdAsync(procMaterialModifyDto.Id, procMaterialModifyDto.SiteCode);
             if (modelOrigin == null)
             {
-                throw new NotFoundException(ErrorCode.WMS10204);
+                throw new NotFoundException(ErrorCode.MES10204);
             }
 
             if (procMaterialModifyDto.Origin != modelOrigin.Origin)
             {
-                throw new CustomerValidationException(ErrorCode.WMS10205);
+                throw new CustomerValidationException(ErrorCode.MES10205);
             }
 
             // 判断替代品是否包含当前物料
             var replaceMaterialList = ConvertProcReplaceMaterialList(procMaterialModifyDto.DynamicList, procMaterialEntity);
             if (replaceMaterialList.Any(a => a.ReplaceMaterialId == procMaterialEntity.Id) == true)
             {
-                throw new BusinessException(ErrorCode.WMS10206);
+                throw new BusinessException(ErrorCode.MES10206);
             }
 
             // 判断编号是否已存在
@@ -264,7 +264,7 @@ namespace Hymson.MES.Services.Services.Process
             });
             if (existsList != null && existsList.Where(x => x.Id != procMaterialEntity.Id).Any()) 
             {
-                throw new BusinessException(ErrorCode.WMS10201).WithData("materialCode", procMaterialEntity.MaterialCode).WithData("version", procMaterialEntity.Version);
+                throw new BusinessException(ErrorCode.MES10201).WithData("materialCode", procMaterialEntity.MaterialCode).WithData("version", procMaterialEntity.Version);
             }
 
             #endregion
@@ -318,7 +318,7 @@ namespace Hymson.MES.Services.Services.Process
                             }
                             break;
                         default:
-                            throw new DataException(ErrorCode.WMS10207).WithData("operationType", item.OperationType);
+                            throw new DataException(ErrorCode.MES10207).WithData("operationType", item.OperationType);
                     }
                 }
             }
@@ -361,7 +361,7 @@ namespace Hymson.MES.Services.Services.Process
 
                 if (response == 0)
                 {
-                    throw new BusinessException(ErrorCode.WME10208);
+                    throw new BusinessException(ErrorCode.MES10208);
                 }
 
                 //替代组设置数据
@@ -369,7 +369,7 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     if ((await _procReplaceMaterialRepository.InsertsAsync(addProcReplaceList))<=0)
                     {
-                        throw new BusinessException(ErrorCode.WME10209);
+                        throw new BusinessException(ErrorCode.MES10209);
                     }
                 }
 
@@ -377,7 +377,7 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     if ((await _procReplaceMaterialRepository.UpdatesAsync(updateProcReplaceList))<=0)
                     {
-                        throw new BusinessException(ErrorCode.WME10210);
+                        throw new BusinessException(ErrorCode.MES10210);
                     }
                 }
 
@@ -385,7 +385,7 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     if (await _procReplaceMaterialRepository.DeletesAsync(deleteeProcReplaceIds.ToArray()) <= 0)
                     {
-                        throw new BusinessException(ErrorCode.WME10211);
+                        throw new BusinessException(ErrorCode.MES10211);
                     }
                 }
 

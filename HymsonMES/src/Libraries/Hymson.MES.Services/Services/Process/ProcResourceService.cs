@@ -37,6 +37,11 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         private readonly IProcResourceConfigResRepository _procResourceConfigResRepository;
 
+        /// <summary>
+        /// 资源关联设备仓储
+        /// </summary>
+        private readonly IProcResourceEquipmentBindRepository _resourceEquipmentBindRepository;
+
         private readonly AbstractValidator<ProcResourceDto> _validationRules;
 
         /// <summary>
@@ -45,11 +50,13 @@ namespace Hymson.MES.Services.Services.Process
         public ProcResourceService(IProcResourceRepository resourceRepository,
                   IProcResourceConfigPrintRepository resourceConfigPrintRepository,
                   IProcResourceConfigResRepository procResourceConfigResRepository,
+                  IProcResourceEquipmentBindRepository resourceEquipmentBindRepository,
                   AbstractValidator<ProcResourceDto> validationRules)
         {
             _resourceRepository = resourceRepository;
             _resourceConfigPrintRepository = resourceConfigPrintRepository;
             _procResourceConfigResRepository = procResourceConfigResRepository;
+            _resourceEquipmentBindRepository= resourceEquipmentBindRepository;
             _validationRules = validationRules;
         }
 
@@ -162,6 +169,26 @@ namespace Hymson.MES.Services.Services.Process
                 resourceConfigResDtos.Add(resourceTypeDto);
             }
             return new PagedInfo<ProcResourceConfigResDto>(resourceConfigResDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 根据查询条件获取分页数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ProcResourceEquipmentBindViewDto>> GetcResourceConfigEquAsync(ProcResourceEquipmentBindPagedQueryDto query)
+        {
+            var resPagedQuery = query.ToQuery<ProcResourceEquipmentBindPagedQuery>();
+            var pagedInfo = await _resourceEquipmentBindRepository.GetPagedInfoAsync(resPagedQuery);
+
+            //实体到DTO转换 装载数据
+            var procResourceEquipmentBinds = new List<ProcResourceEquipmentBindViewDto>();
+            foreach (var entity in pagedInfo.Data)
+            {
+                var resourceTypeDto = entity.ToModel<ProcResourceEquipmentBindViewDto>();
+                procResourceEquipmentBinds.Add(resourceTypeDto);
+            }
+            return new PagedInfo<ProcResourceEquipmentBindViewDto>(procResourceEquipmentBinds, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
         /// <summary>

@@ -24,7 +24,7 @@ namespace Hymson.MES.Services.Mapper
         public MapperConfiguration()
         {
             CreateEquipmentMaps();
-            CreateProcMaterialMaps();
+            CreateProcessMaps();
         }
 
         /// <summary>
@@ -60,8 +60,10 @@ namespace Hymson.MES.Services.Mapper
             #endregion
         }
 
-        protected virtual void CreateProcMaterialMaps()
+        protected virtual void CreateProcessMaps()
         {
+            #region Material
+
             CreateMap<ProcMaterialCreateDto, ProcMaterialEntity>();
             CreateMap<ProcMaterialReplaceDto, ProcReplaceMaterialEntity>();
 
@@ -69,16 +71,33 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcMaterialPagedQueryDto, ProcMaterialPagedQuery>();
             CreateMap<ProcMaterialEntity, ProcMaterialDto>();
 
+            #endregion
+
+            #region ResourceType
+
             CreateMap<ProcResourceTypeDto, ProcResourceTypeEntity>();
             CreateMap<ProcResourceTypeViewDto, ProcResourceTypeView>();
             CreateMap<ProcResourceTypePagedQueryDto, ProcResourceTypePagedQuery>();
 
+            #endregion
+
+            #region ProcResource
+
             CreateMap<ProcResourceDto, ProcResourceEntity>();
             CreateMap<ProcResourceViewDto, ProcResourceView>();
             CreateMap<ProcResourcePagedQueryDto, ProcResourcePagedQuery>();
+
             CreateMap<ProcResourceConfigPrintViewDto, ProcResourceConfigPrintView>();
             CreateMap<ProcResourceConfigPrintPagedQueryDto, ProcResourceConfigPrintPagedQuery>();
+
+            CreateMap<ProcResourceConfigResDto, ProcResourceConfigResEntity>();
+            CreateMap<ProcResourceConfigResPagedQueryDto, ProcResourceConfigResPagedQuery>();
+
+            CreateMap<ProcResourceEquipmentBindViewDto, ProcResourceEquipmentBindView>();
+            CreateMap<ProcResourceEquipmentBindPagedQueryDto, ProcResourceEquipmentBindPagedQuery>();
+            #endregion
         }
+
 
         /// <summary>
         /// 排序，决定了加载的顺序

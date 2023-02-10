@@ -49,6 +49,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteClassRepository, InteClassRepository>();
             #endregion
 
+            #region  Process
+
             #region Material
             services.AddSingleton<IProcMaterialRepository, ProcMaterialRepository>();
             services.AddSingleton<IProcReplaceMaterialRepository, ProcReplaceMaterialRepository>();
@@ -61,6 +63,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcResourceRepository, ProcResourceRepository>();
             services.AddSingleton<IProcResourceConfigPrintRepository, ProcResourceConfigPrintRepository>();
             services.AddSingleton<IProcResourceConfigResRepository, ProcResourceConfigResRepository>();
+            services.AddSingleton<IProcResourceEquipmentBindRepository, ProcResourceEquipmentBindRepository>();
+            #endregion
+
             #endregion
 
             return services;
