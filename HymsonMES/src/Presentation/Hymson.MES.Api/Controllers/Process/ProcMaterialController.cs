@@ -52,6 +52,17 @@ namespace Hymson.MES.Api.Controllers.Process
         }
 
         /// <summary>
+        /// 查询列表（物料维护）
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpGet("listforgroup")]
+        public async Task<PagedInfo<ProcMaterialDto>> QueryProcMaterialForGroupAsync([FromQuery] ProcMaterialPagedQueryDto parm)
+        {
+            return await _procMaterialService.GetPageListForGroupAsync(parm);
+        }
+
+        /// <summary>
         /// 查询详情（物料维护）
         /// </summary>
         /// <param name="id"></param>

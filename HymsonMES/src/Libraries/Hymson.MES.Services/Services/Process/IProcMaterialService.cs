@@ -27,6 +27,8 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         Task<PagedInfo<ProcMaterialDto>> GetPageListAsync(ProcMaterialPagedQueryDto procMaterialPagedQueryDto);
 
+        Task<PagedInfo<ProcMaterialDto>> GetPageListForGroupAsync(ProcMaterialPagedQueryDto procMaterialPagedQueryDto);
+
         /// <summary>
         /// 新增
         /// </summary>

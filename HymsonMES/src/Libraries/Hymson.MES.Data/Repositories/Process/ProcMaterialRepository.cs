@@ -13,6 +13,7 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using System;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -44,10 +45,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(string ids) 
+        public async Task<int> DeletesAsync(long[] ids) 
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeletesSql, new { Ids=ids });
+            return await conn.ExecuteAsync(DeletesSql, new { ids=ids });
 
         }
 
@@ -60,6 +61,17 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<ProcMaterialView>(GetByIdSql, new { Id=id,siteCode= siteCode });
+        }
+
+        /// <summary>
+        /// 根据IDs批量获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcMaterialEntity>> GetByIdsAsync(long[] ids) 
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcMaterialEntity>(GetByIdsSql, new { ids = ids});
         }
 
         /// <summary>
@@ -121,6 +133,74 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 分页查询
+        /// </summary>
+        /// <param name="procMaterialPagedQuery"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ProcMaterialEntity>> GetPagedInfoForGroupAsync(ProcMaterialPagedQuery procMaterialPagedQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Select("*");
+
+            if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
+            {
+                sqlBuilder.Where(" SiteCode=@SiteCode ");
+            }
+            if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.MaterialCode))
+            {
+                procMaterialPagedQuery.MaterialCode = $"%{procMaterialPagedQuery.MaterialCode}%";
+                sqlBuilder.Where(" MaterialCode like @MaterialCode ");
+            }
+            if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.MaterialName))
+            {
+                procMaterialPagedQuery.MaterialName = $"%{procMaterialPagedQuery.MaterialName}%";
+                sqlBuilder.Where(" MaterialName like %@MaterialName% ");
+            }
+            if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.Version))
+            {
+                procMaterialPagedQuery.Version = $"%{procMaterialPagedQuery.Version}%";
+                sqlBuilder.Where(" Version like @Version ");
+            }
+            if (procMaterialPagedQuery.GroupId != null)
+            {
+                if (procMaterialPagedQuery.GroupId == 0)
+                {
+                    //predicate = predicate.And(it => it.GroupId == 0);
+                    sqlBuilder.Where(" GroupId = 0 ");
+                }
+                else
+                {
+                    sqlBuilder.Where(" ( GroupId = 0 or GroupId =@GroupId ) ");
+                }
+
+                sqlBuilder.Where(" GroupId = @GroupId ");
+            }
+            if (procMaterialPagedQuery.Status != null)
+            {
+                sqlBuilder.Where(" Status = @Status ");
+            }
+            if (procMaterialPagedQuery.Origin != null)
+            {
+                sqlBuilder.Where(" Origin = @Origin ");
+            }
+
+            var offSet = (procMaterialPagedQuery.PageIndex - 1) * procMaterialPagedQuery.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = procMaterialPagedQuery.PageSize });
+            sqlBuilder.AddParameters(procMaterialPagedQuery);
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var procMaterialEntitiesTask = conn.QueryAsync<ProcMaterialEntity>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var procMaterialEntities = await procMaterialEntitiesTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<ProcMaterialEntity>(procMaterialEntities, procMaterialPagedQuery.PageIndex, procMaterialPagedQuery.PageSize, totalCount);
+        }
+
+        /// <summary>
         /// 查询List
         /// </summary>
         /// <param name="procMaterialQuery"></param>
@@ -129,8 +209,27 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcMaterialEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Select("*");
+
+            if (!string.IsNullOrWhiteSpace(procMaterialQuery.SiteCode))
+            {
+                sqlBuilder.Where(" SiteCode=@SiteCode ");
+            }
+            if (!string.IsNullOrWhiteSpace(procMaterialQuery.MaterialCode))
+            {
+                procMaterialQuery.MaterialCode = $"%{procMaterialQuery.MaterialCode}%";
+                sqlBuilder.Where(" MaterialCode like @MaterialCode ");
+            }
+            if (!string.IsNullOrWhiteSpace(procMaterialQuery.Version))
+            {
+                procMaterialQuery.Version = $"%{procMaterialQuery.Version}%";
+                sqlBuilder.Where(" Version like @Version ");
+            }
+            sqlBuilder.AddParameters(procMaterialQuery);
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var procMaterialEntities = await conn.QueryAsync<ProcMaterialEntity>(template.RawSql, procMaterialQuery);
+            var procMaterialEntities = await conn.QueryAsync<ProcMaterialEntity>(template.RawSql, template.Parameters);
             return procMaterialEntities;
         }
 
@@ -155,6 +254,17 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSql, procMaterialEntity);
         }
+
+        /// <summary>
+        /// 更新 同编码的其他物料设置为非当前版本
+        /// </summary>
+        /// <param name="procMaterialEntity"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateSameMaterialCodeToNoVersionAsync(ProcMaterialEntity procMaterialEntity)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateSameMaterialCodeToNoVersionSql, procMaterialEntity);
+        }
     }
 
     public partial class ProcMaterialRepository
@@ -166,9 +276,9 @@ namespace Hymson.MES.Data.Repositories.Process
                                            FROM `proc_material` /**where**/  ";
 
         const string InsertSql = "INSERT INTO `proc_material`(  `Id`, `SiteCode`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `ProcedureBomId`, `Batch`, `Unit`, `SerialNumber`, `ValidationMaskGroup`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @GroupId, @MaterialCode, @MaterialName, @Status, @Origin, @Version, @IsDefaultVersion, @Remark, @BuyType, @ProcessRouteId, @ProcedureBomId, @Batch, @Unit, @SerialNumber, @ValidationMaskGroup, @BaseTime, @ConsumptionTolerance, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string UpdateSql = "UPDATE `proc_material` SET   SiteCode = @SiteCode, GroupId = @GroupId, MaterialCode = @MaterialCode, MaterialName = @MaterialName, Status = @Status, Origin = @Origin, Version = @Version, IsDefaultVersion = @IsDefaultVersion, Remark = @Remark, BuyType = @BuyType, ProcessRouteId = @ProcessRouteId, ProcedureBomId = @ProcedureBomId, Batch = @Batch, Unit = @Unit, SerialNumber = @SerialNumber, ValidationMaskGroup = @ValidationMaskGroup, BaseTime = @BaseTime, ConsumptionTolerance = @ConsumptionTolerance, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `proc_material` SET  GroupId = @GroupId, MaterialName = @MaterialName, Status = @Status, Origin = @Origin, Version = @Version, Remark = @Remark, BuyType = @BuyType, ProcessRouteId = @ProcessRouteId, ProcedureBomId = @ProcedureBomId, Batch = @Batch, Unit = @Unit, SerialNumber = @SerialNumber, BaseTime = @BaseTime, ConsumptionTolerance = @ConsumptionTolerance, IsDefaultVersion=@IsDefaultVersion, ValidationMaskGroup=@ValidationMaskGroup, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_material` SET IsDeleted = '1' WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE `proc_material` SET IsDeleted = '1' WHERE Id in (@Ids)";
+        const string DeletesSql = "UPDATE `proc_material` SET IsDeleted = '1' WHERE Id in @ids ";
         const string GetByIdSql = @"SELECT 
                                         g.`Id`,
                                         g.`SiteCode`,
@@ -200,5 +310,10 @@ namespace Hymson.MES.Data.Repositories.Process
                             LEFT JOIN proc_process_route p on g.ProcessRouteId = p.Id
                             LEFT JOIN proc_procedure_bom q on g.ProcedureBomId == q.Id 
                             WHERE g.Id = @Id and g.SiteCode=@SiteCode ";
+        const string GetByIdsSql = @"SELECT 
+                                        `Id`, `SiteCode`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `ProcedureBomId`, `Batch`, `Unit`, `SerialNumber`, `ValidationMaskGroup`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `proc_material`
+                            WHERE Id IN @ids ";
+        const string UpdateSameMaterialCodeToNoVersionSql = "UPDATE `proc_material` SET IsDefaultVersion= 0 WHERE MaterialCode= @MaterialCode ";
     }
 }

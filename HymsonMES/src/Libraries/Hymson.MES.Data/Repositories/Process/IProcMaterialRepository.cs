@@ -33,7 +33,14 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procMaterialEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ProcMaterialEntity procMaterialEntity);
-        
+
+        /// <summary>
+        /// 更新 同编码的其他物料设置为非当前版本
+        /// </summary>
+        /// <param name="procMaterialEntity"></param>
+        /// <returns></returns>
+        Task<int> UpdateSameMaterialCodeToNoVersionAsync(ProcMaterialEntity procMaterialEntity);
+
         /// <summary>
         /// 删除
         /// </summary>
@@ -46,7 +53,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<int> DeletesAsync(string ids);
+        Task<int> DeletesAsync(long[] ids);
 
         /// <summary>
         /// 根据ID获取数据
@@ -55,7 +62,14 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="siteCode"></param>
         /// <returns></returns>
         Task<ProcMaterialView> GetByIdAsync(long id,string siteCode);
-        
+
+        /// <summary>
+        /// 根据IDs批量获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcMaterialEntity>> GetByIdsAsync(long[] ids);
+
         /// <summary>
         /// 获取List
         /// </summary>
@@ -69,5 +83,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procMaterialPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ProcMaterialEntity>> GetPagedInfoAsync(ProcMaterialPagedQuery procMaterialPagedQuery);
+
+        /// <summary>
+        /// 分页查询  分组
+        /// </summary>
+        /// <param name="procMaterialPagedQuery"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ProcMaterialEntity>> GetPagedInfoForGroupAsync(ProcMaterialPagedQuery procMaterialPagedQuery);
     }
 }
