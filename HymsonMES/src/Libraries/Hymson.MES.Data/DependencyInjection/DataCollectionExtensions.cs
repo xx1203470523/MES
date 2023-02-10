@@ -64,6 +64,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcResourceConfigPrintRepository, ProcResourceConfigPrintRepository>();
             services.AddSingleton<IProcResourceConfigResRepository, ProcResourceConfigResRepository>();
             services.AddSingleton<IProcResourceEquipmentBindRepository, ProcResourceEquipmentBindRepository>();
+            services.AddSingleton<IProcResourceConfigJobRepository, ProcResourceConfigJobRepository>();
             #endregion
 
             #endregion

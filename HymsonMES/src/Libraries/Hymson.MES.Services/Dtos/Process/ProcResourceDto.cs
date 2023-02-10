@@ -15,12 +15,6 @@ namespace Hymson.MES.Services.Dtos.Process
         public long Id { get; set; }
 
         /// <summary>
-        /// 描述 :所属站点代码 
-        /// 空值 : false  
-        /// </summary>
-        public string SiteCode { get; set; }
-
-        /// <summary>
         /// 描述 :资源代码 
         /// 空值 : false  
         /// </summary>

@@ -106,6 +106,30 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
+        /// 获取资源设置数据
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpGet("equ/list")]
+        [HttpGet]
+        public async Task<PagedInfo<ProcResourceEquipmentBindViewDto>> GetResourceConfigEquAsync(ProcResourceEquipmentBindPagedQueryDto parm)
+        {
+            return await _procResourceService.GetcResourceConfigEquAsync(parm);
+        }
+
+        /// <summary>
+        /// 获取资源设置数据
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpGet("job/list")]
+        [HttpGet]
+        public async Task<PagedInfo<ProcResourceConfigJobViewDto>> GetcResourceConfigJoAsync(ProcResourceEquipmentBindPagedQueryDto parm)
+        {
+            return await _procResourceService.GetcResourceConfigJoAsync(parm);
+        }
+
+        /// <summary>
         /// 添加资源数据
         /// </summary>
         /// <param name="parm"></param>

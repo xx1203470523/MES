@@ -42,6 +42,11 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         private readonly IProcResourceEquipmentBindRepository _resourceEquipmentBindRepository;
 
+        /// <summary>
+        /// 资源作业配置表仓储
+        /// </summary>
+        private readonly IProcResourceConfigJobRepository _resourceConfigJobRepository;
+
         private readonly AbstractValidator<ProcResourceDto> _validationRules;
 
         /// <summary>
@@ -51,12 +56,14 @@ namespace Hymson.MES.Services.Services.Process
                   IProcResourceConfigPrintRepository resourceConfigPrintRepository,
                   IProcResourceConfigResRepository procResourceConfigResRepository,
                   IProcResourceEquipmentBindRepository resourceEquipmentBindRepository,
+                  IProcResourceConfigJobRepository resourceConfigJobRepository,
                   AbstractValidator<ProcResourceDto> validationRules)
         {
             _resourceRepository = resourceRepository;
             _resourceConfigPrintRepository = resourceConfigPrintRepository;
             _procResourceConfigResRepository = procResourceConfigResRepository;
-            _resourceEquipmentBindRepository= resourceEquipmentBindRepository;
+            _resourceEquipmentBindRepository = resourceEquipmentBindRepository;
+            _resourceConfigJobRepository= resourceConfigJobRepository;
             _validationRules = validationRules;
         }
 
@@ -172,7 +179,7 @@ namespace Hymson.MES.Services.Services.Process
         }
 
         /// <summary>
-        /// 根据查询条件获取分页数据
+        /// 获取资源关联设备数据
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
@@ -189,6 +196,26 @@ namespace Hymson.MES.Services.Services.Process
                 procResourceEquipmentBinds.Add(resourceTypeDto);
             }
             return new PagedInfo<ProcResourceEquipmentBindViewDto>(procResourceEquipmentBinds, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 获取资源关联作业
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ProcResourceConfigJobViewDto>> GetcResourceConfigJoAsync(ProcResourceEquipmentBindPagedQueryDto query)
+        {
+            var resPagedQuery = query.ToQuery<ProcResourceEquipmentBindPagedQuery>();
+            var pagedInfo = await _resourceEquipmentBindRepository.GetPagedInfoAsync(resPagedQuery);
+
+            //实体到DTO转换 装载数据
+            var procResourceConfigJobViews = new List<ProcResourceConfigJobViewDto>();
+            foreach (var entity in pagedInfo.Data)
+            {
+                var resourceTypeDto = entity.ToModel<ProcResourceConfigJobViewDto>();
+                procResourceConfigJobViews.Add(resourceTypeDto);
+            }
+            return new PagedInfo<ProcResourceConfigJobViewDto>(procResourceConfigJobViews, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
         /// <summary>
