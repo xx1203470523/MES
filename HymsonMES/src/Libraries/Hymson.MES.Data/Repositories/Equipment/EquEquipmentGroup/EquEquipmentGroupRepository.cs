@@ -20,6 +20,30 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
             _connectionOptions = connectionOptions.Value;
         }
 
+
+        /// <summary>
+        /// 新增
+        /// </summary>
+        /// <param name="equEquipmentGroupEntity"></param>
+        /// <returns></returns>
+        public async Task InsertAsync(EquEquipmentGroupEntity equEquipmentGroupEntity)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var id = await conn.ExecuteScalarAsync<long>(InsertSql, equEquipmentGroupEntity);
+            equEquipmentGroupEntity.Id = id;
+        }
+
+        /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="equEquipmentGroupEntity"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateAsync(EquEquipmentGroupEntity equEquipmentGroupEntity)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateSql, equEquipmentGroupEntity);
+        }
+        
         /// <summary>
         /// 删除（软删除）
         /// </summary>
@@ -103,28 +127,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
             return equEquipmentGroupEntities;
         }
 
-        /// <summary>
-        /// 新增
-        /// </summary>
-        /// <param name="equEquipmentGroupEntity"></param>
-        /// <returns></returns>
-        public async Task InsertAsync(EquEquipmentGroupEntity equEquipmentGroupEntity)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var id = await conn.ExecuteScalarAsync<long>(InsertSql, equEquipmentGroupEntity);
-            equEquipmentGroupEntity.Id = id;
-        }
-
-        /// <summary>
-        /// 更新
-        /// </summary>
-        /// <param name="equEquipmentGroupEntity"></param>
-        /// <returns></returns>
-        public async Task<int> UpdateAsync(EquEquipmentGroupEntity equEquipmentGroupEntity)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateSql, equEquipmentGroupEntity);
-        }
     }
 
     public partial class EquEquipmentGroupRepository
