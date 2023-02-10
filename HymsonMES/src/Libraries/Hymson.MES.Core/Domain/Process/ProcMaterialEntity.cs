@@ -68,7 +68,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :是否默认版本 
         /// 空值 : true  
         /// </summary>
-        public byte IsDefaultVersion { get; set; }
+        public bool IsDefaultVersion { get; set; }
         
         /// <summary>
         /// 描述 :物料描述 
