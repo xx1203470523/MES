@@ -59,6 +59,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcResourceTypeService, ProcResourceTypeService>();
             services.AddSingleton<IProcResourceService, ProcResourceService>();
             #endregion
+
             return services;
         }
 

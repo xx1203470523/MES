@@ -52,14 +52,15 @@ namespace Microsoft.Extensions.DependencyInjection
             #region ProcMaterial
             services.AddSingleton<IProcMaterialRepository, ProcMaterialRepository>();
             services.AddSingleton<IProcReplaceMaterialRepository, ProcReplaceMaterialRepository>();
-
             #endregion
 
             #region Resource
             services.AddSingleton<IProcResourceTypeRepository, ProcResourceTypeRepository>();
             services.AddSingleton<IProcResourceRepository, ProcResourceRepository>();
             services.AddSingleton<IProcResourceConfigPrintRepository, ProcResourceConfigPrintRepository>();
+            services.AddSingleton<IProcResourceConfigResRepository, ProcResourceConfigResRepository>();
             #endregion
+
             return services;
         }
 

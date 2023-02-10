@@ -35,7 +35,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 资源设置仓储
         /// </summary>
-        private readonly ProcResourceConfigResRepository _procResourceConfigResRepository;
+        private readonly IProcResourceConfigResRepository _procResourceConfigResRepository;
 
         private readonly AbstractValidator<ProcResourceDto> _validationRules;
 
@@ -44,7 +44,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         public ProcResourceService(IProcResourceRepository resourceRepository,
                   IProcResourceConfigPrintRepository resourceConfigPrintRepository,
-                  ProcResourceConfigResRepository procResourceConfigResRepository,
+                  IProcResourceConfigResRepository procResourceConfigResRepository,
                   AbstractValidator<ProcResourceDto> validationRules)
         {
             _resourceRepository = resourceRepository;
