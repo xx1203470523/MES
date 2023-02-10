@@ -89,5 +89,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procMaterialGroupPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ProcMaterialGroupEntity>> GetPagedInfoAsync(ProcMaterialGroupPagedQuery procMaterialGroupPagedQuery);
+
+        /// <summary>
+        /// 分页查询 自定义
+        /// </summary>
+        /// <param name="procMaterialGroupCustomPagedQuery"></param>
+        /// <returns></returns>
+        Task<PagedInfo<CustomProcMaterialGroupView>> GetPagedCustomInfoAsync(ProcMaterialGroupCustomPagedQuery procMaterialGroupCustomPagedQuery);
     }
 }

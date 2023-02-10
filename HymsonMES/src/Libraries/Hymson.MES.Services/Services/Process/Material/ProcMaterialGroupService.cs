@@ -6,6 +6,7 @@
  *build datetime: 2023-02-10 03:54:07
  */
 using FluentValidation;
+using Google.Protobuf.WellKnownTypes;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -89,6 +90,9 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<PagedInfo<ProcMaterialGroupDto>> GetPageListAsync(ProcMaterialGroupPagedQueryDto procMaterialGroupPagedQueryDto)
         {
+            //TODO 
+            procMaterialGroupPagedQueryDto.SiteCode = "";
+
             var procMaterialGroupPagedQuery = procMaterialGroupPagedQueryDto.ToQuery<ProcMaterialGroupPagedQuery>();
             var pagedInfo = await _procMaterialGroupRepository.GetPagedInfoAsync(procMaterialGroupPagedQuery);
 
@@ -112,6 +116,41 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             return procMaterialGroupDtos;
+        }
+
+        /// <summary>
+        /// 获取分页自定义List
+        /// </summary>
+        /// <param name="customProcMaterialGroupPagedQueryDto"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<CustomProcMaterialGroupViewDto>> GetPageCustomListAsync(CustomProcMaterialGroupPagedQueryDto customProcMaterialGroupPagedQueryDto) 
+        {
+            //TODO 
+            customProcMaterialGroupPagedQueryDto.SiteCode = "";
+
+            var procMaterialGroupCustomPagedQuery = customProcMaterialGroupPagedQueryDto.ToQuery<ProcMaterialGroupCustomPagedQuery>();
+            var pagedInfo = await _procMaterialGroupRepository.GetPagedCustomInfoAsync(procMaterialGroupCustomPagedQuery);
+
+            //实体到DTO转换 装载数据
+            List<CustomProcMaterialGroupViewDto> procMaterialGroupDtos = PrepareCustomProcMaterialGroupDtos(pagedInfo);
+            return new PagedInfo<CustomProcMaterialGroupViewDto>(procMaterialGroupDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pagedInfo"></param>
+        /// <returns></returns>
+        private static List<CustomProcMaterialGroupViewDto> PrepareCustomProcMaterialGroupDtos(PagedInfo<CustomProcMaterialGroupView> pagedInfo)
+        {
+            var customProcMaterialGroupViewDtos = new List<CustomProcMaterialGroupViewDto>();
+            foreach (var customProcMaterialGroupView in pagedInfo.Data)
+            {
+                var customProcMaterialGroupViewDto = customProcMaterialGroupView.ToModel<CustomProcMaterialGroupViewDto>();
+                customProcMaterialGroupViewDtos.Add(customProcMaterialGroupViewDto);
+            }
+
+            return customProcMaterialGroupViewDtos;
         }
 
         /// <summary>

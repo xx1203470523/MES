@@ -85,11 +85,21 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-           
+            if (!string.IsNullOrWhiteSpace(procMaterialGroupPagedQuery.SiteCode))
+            {
+                sqlBuilder.Where(" SiteCode=@SiteCode ");
+            }
+            if (!string.IsNullOrWhiteSpace(procMaterialGroupPagedQuery.GroupCode))
+            {
+                procMaterialGroupPagedQuery.GroupCode = $"%{procMaterialGroupPagedQuery.GroupCode}%";
+                sqlBuilder.Where(" GroupCode like @GroupCode ");
+            }
+            if (!string.IsNullOrWhiteSpace(procMaterialGroupPagedQuery.GroupName))
+            {
+                procMaterialGroupPagedQuery.GroupName = $"%{procMaterialGroupPagedQuery.GroupName}%";
+                sqlBuilder.Where(" GroupName like @GroupName ");
+            }
+
             var offSet = (procMaterialGroupPagedQuery.PageIndex - 1) * procMaterialGroupPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = procMaterialGroupPagedQuery.PageSize });
@@ -101,6 +111,53 @@ namespace Hymson.MES.Data.Repositories.Process
             var procMaterialGroupEntities = await procMaterialGroupEntitiesTask;
             var totalCount = await totalCountTask;
             return new PagedInfo<ProcMaterialGroupEntity>(procMaterialGroupEntities, procMaterialGroupPagedQuery.PageIndex, procMaterialGroupPagedQuery.PageSize, totalCount);
+        }
+
+        /// <summary>
+        /// 分页查询 自定义
+        /// </summary>
+        /// <param name="procMaterialGroupCustomPagedQuery"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<CustomProcMaterialGroupView>> GetPagedCustomInfoAsync(ProcMaterialGroupCustomPagedQuery procMaterialGroupCustomPagedQuery) 
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedCustomInfoDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedCustomInfoCountSqlTemplate);
+            //sqlBuilder.Where("IsDeleted=0");
+            // sqlBuilder.Select("*");
+
+            if (!string.IsNullOrWhiteSpace(procMaterialGroupCustomPagedQuery.SiteCode))
+            {
+                sqlBuilder.Where(" g.SiteCode=@SiteCode ");
+            }
+            if (!string.IsNullOrWhiteSpace(procMaterialGroupCustomPagedQuery.GroupCode))
+            {
+                procMaterialGroupCustomPagedQuery.GroupCode = $"%{procMaterialGroupCustomPagedQuery.GroupCode}%";
+                sqlBuilder.Where(" g.GroupCode like @GroupCode ");
+            }
+            if (!string.IsNullOrWhiteSpace(procMaterialGroupCustomPagedQuery.MaterialCode))
+            {
+                procMaterialGroupCustomPagedQuery.MaterialCode = $"%{procMaterialGroupCustomPagedQuery.MaterialCode}%";
+                sqlBuilder.Where(" o.MaterialCode like @MaterialCode ");
+            }
+            if (!string.IsNullOrWhiteSpace(procMaterialGroupCustomPagedQuery.Version))
+            {
+                procMaterialGroupCustomPagedQuery.Version = $"%{procMaterialGroupCustomPagedQuery.Version}%";
+                sqlBuilder.Where(" o.Version like @Version ");
+            }
+
+            var offSet = (procMaterialGroupCustomPagedQuery.PageIndex - 1) * procMaterialGroupCustomPagedQuery.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = procMaterialGroupCustomPagedQuery.PageSize });
+            sqlBuilder.AddParameters(procMaterialGroupCustomPagedQuery);
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var customProcMaterialGroupViewTask = conn.QueryAsync<CustomProcMaterialGroupView>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var customProcMaterialGroupView = await customProcMaterialGroupViewTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<CustomProcMaterialGroupView>(customProcMaterialGroupView, procMaterialGroupCustomPagedQuery.PageIndex, procMaterialGroupCustomPagedQuery.PageSize, totalCount);
+
         }
 
         /// <summary>
@@ -167,6 +224,26 @@ namespace Hymson.MES.Data.Repositories.Process
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_material_group` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_material_group` /**where**/ ";
+        const string GetPagedCustomInfoDataSqlTemplate = @"SELECT 
+g.Id,
+g.SiteCode,
+g.GroupCode,
+g.GroupName,
+g.GroupVersion,
+g.Remark,
+g.CreateBy,
+g.CreateOn,
+g.UpdateBy,
+g.UpdateOn,
+g.IsDeleted,
+o.MaterialCode,
+o.MaterialName,
+o.Version
+                                                            FROM `proc_material_group` g
+                                                            LEFT JOIN proc_material o on o.GroupId == g.Id
+/**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedCustomInfoCountSqlTemplate = @"SELECT COUNT(1) FROM `proc_material_group` 
+LEFT JOIN proc_material o on o.GroupId == g.Id  /**where**/ ";
         const string GetProcMaterialGroupEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `proc_material_group` /**where**/  ";

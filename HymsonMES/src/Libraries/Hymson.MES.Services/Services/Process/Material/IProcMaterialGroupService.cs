@@ -28,6 +28,13 @@ namespace Hymson.MES.Services.Services.Process
         Task<PagedInfo<ProcMaterialGroupDto>> GetPageListAsync(ProcMaterialGroupPagedQueryDto procMaterialGroupPagedQueryDto);
 
         /// <summary>
+        /// 获取分页自定义List
+        /// </summary>
+        /// <param name="customProcMaterialGroupPagedQueryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<CustomProcMaterialGroupViewDto>> GetPageCustomListAsync(CustomProcMaterialGroupPagedQueryDto customProcMaterialGroupPagedQueryDto);
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="procMaterialGroupDto"></param>
