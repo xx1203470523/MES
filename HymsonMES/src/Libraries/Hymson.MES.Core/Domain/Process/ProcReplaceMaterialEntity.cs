@@ -1,4 +1,17 @@
+/*
+ *creator: Karl
+ *
+ *describe: 物料替代组件表    实体类 | 代码由框架生成  如果数据库字段发生变化,则手动调整
+ *builder:  Karl
+ *build datetime: 2023-02-09 11:28:38
+ */
 using Hymson.Infrastructure;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
 namespace Hymson.MES.Core.Domain.Process
 {
@@ -38,5 +51,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 空值 : true  
         /// </summary>
         public string Remark { get; set; }
+
+       
         }
 }

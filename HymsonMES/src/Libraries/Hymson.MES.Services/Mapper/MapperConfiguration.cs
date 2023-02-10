@@ -54,6 +54,16 @@ namespace Hymson.MES.Services.Mapper
             #endregion
         }
 
+        protected virtual void CreateProcMaterialMaps()
+        {
+            CreateMap<ProcMaterialCreateDto, ProcMaterialEntity>();
+            CreateMap<ProcMaterialReplaceDto, ProcReplaceMaterialEntity>();
+
+            CreateMap<ProcMaterialModifyDto, ProcMaterialEntity>();
+            CreateMap<ProcMaterialPagedQueryDto, ProcMaterialPagedQuery>();
+            CreateMap<ProcMaterialEntity, ProcMaterialDto>();
+        }
+
         /// <summary>
         /// 排序，决定了加载的顺序
         /// </summary>

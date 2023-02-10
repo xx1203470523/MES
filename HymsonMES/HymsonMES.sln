@@ -33,7 +33,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hymson.MES.Services", "src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hymson.Utils", "..\..\10100HymsonSharedSDK\HymsonSharedSDK\src\Hymson.Utils\Hymson.Utils.csproj", "{A2D4D657-D8F8-4CDF-AC84-AD1261224750}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hymson.Snowflake", "..\..\10100HymsonSharedSDK\HymsonSharedSDK\src\Hymson.Snowflake\Hymson.Snowflake.csproj", "{9A0E6FEC-71CF-41AA-AC30-B253CC061BC7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hymson.Snowflake", "..\..\10100HymsonSharedSDK\HymsonSharedSDK\src\Hymson.Snowflake\Hymson.Snowflake.csproj", "{E27ADCC7-A4B8-4BA1-8738-7B29A6BFD9CE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -81,10 +81,10 @@ Global
 		{A2D4D657-D8F8-4CDF-AC84-AD1261224750}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A2D4D657-D8F8-4CDF-AC84-AD1261224750}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A2D4D657-D8F8-4CDF-AC84-AD1261224750}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9A0E6FEC-71CF-41AA-AC30-B253CC061BC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9A0E6FEC-71CF-41AA-AC30-B253CC061BC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9A0E6FEC-71CF-41AA-AC30-B253CC061BC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9A0E6FEC-71CF-41AA-AC30-B253CC061BC7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E27ADCC7-A4B8-4BA1-8738-7B29A6BFD9CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E27ADCC7-A4B8-4BA1-8738-7B29A6BFD9CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E27ADCC7-A4B8-4BA1-8738-7B29A6BFD9CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E27ADCC7-A4B8-4BA1-8738-7B29A6BFD9CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -103,7 +103,7 @@ Global
 		{789D0601-D0D7-42C3-B57C-D50AD1B646F2} = {161AAA01-664F-42BF-9AD3-1F159465B00A}
 		{0361F28C-DB47-4F00-90A9-0E0A0FC6F831} = {161AAA01-664F-42BF-9AD3-1F159465B00A}
 		{A2D4D657-D8F8-4CDF-AC84-AD1261224750} = {0C141FA4-F556-4587-9027-C78114A1EEA8}
-		{9A0E6FEC-71CF-41AA-AC30-B253CC061BC7} = {0C141FA4-F556-4587-9027-C78114A1EEA8}
+		{E27ADCC7-A4B8-4BA1-8738-7B29A6BFD9CE} = {0C141FA4-F556-4587-9027-C78114A1EEA8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FA9F6A13-66F6-4986-8CB3-CF8FA4CF99CD}
