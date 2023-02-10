@@ -21,17 +21,17 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// <summary>
         /// 仓储（设备注册）
         /// </summary>
-        private readonly EquEquipmentRepository _equEquipmentRepository;
+        private readonly IEquEquipmentRepository _equEquipmentRepository;
 
         /// <summary>
         /// 仓储（设备关联API）
         /// </summary>
-        private readonly EquEquipmentLinkApiRepository _equEquipmentLinkApiRepository;
+        private readonly IEquEquipmentLinkApiRepository _equEquipmentLinkApiRepository;
 
         /// <summary>
         /// 仓储（设备关联硬件）
         /// </summary>
-        private readonly EquEquipmentLinkHardwareRepository _equEquipmentLinkHardwareRepository;
+        private readonly IEquEquipmentLinkHardwareRepository _equEquipmentLinkHardwareRepository;
 
         /// <summary>
         /// 构造函数
@@ -39,9 +39,9 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// <param name="repository"></param>
         /// <param name="equEquipmentLinkApiRepository"></param>
         /// <param name="equEquipmentLinkHardwareRepository"></param>
-        public EquEquipmentService(EquEquipmentRepository repository,
-            EquEquipmentLinkApiRepository equEquipmentLinkApiRepository,
-            EquEquipmentLinkHardwareRepository equEquipmentLinkHardwareRepository)
+        public EquEquipmentService(IEquEquipmentRepository repository,
+            IEquEquipmentLinkApiRepository equEquipmentLinkApiRepository,
+            IEquEquipmentLinkHardwareRepository equEquipmentLinkHardwareRepository)
         {
             _equEquipmentRepository = repository;
             _equEquipmentLinkApiRepository = equEquipmentLinkApiRepository;

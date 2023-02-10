@@ -21,8 +21,6 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         /// </summary>
         private readonly IEquEquipmentRepository _equEquipmentRepository;
         private readonly IEquEquipmentGroupRepository _equEquipmentGroupRepository;
-        private readonly AbstractValidator<EquEquipmentGroupCreateDto> _validationCreateRules;
-        private readonly AbstractValidator<EquEquipmentGroupModifyDto> _validationModifyRules;
 
         /// <summary>
         /// 
@@ -32,14 +30,10 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         /// <param name="validationCreateRules"></param>
         /// <param name="validationModifyRules"></param>
         public EquEquipmentGroupService(IEquEquipmentRepository equEquipmentRepository,
-            IEquEquipmentGroupRepository equEquipmentGroupRepository,
-            AbstractValidator<EquEquipmentGroupCreateDto> validationCreateRules,
-            AbstractValidator<EquEquipmentGroupModifyDto> validationModifyRules)
+            IEquEquipmentGroupRepository equEquipmentGroupRepository)
         {
             _equEquipmentRepository = equEquipmentRepository;
             _equEquipmentGroupRepository = equEquipmentGroupRepository;
-            _validationCreateRules = validationCreateRules;
-            _validationModifyRules = validationModifyRules;
         }
 
 
@@ -51,7 +45,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         public async Task CreateEquEquipmentGroupAsync(EquEquipmentGroupCreateDto createDto)
         {
             //验证DTO
-            await _validationCreateRules.ValidateAndThrowAsync(createDto);
+            //await _validationCreateRules.ValidateAndThrowAsync(createDto);
 
             //DTO转换实体
             var equEquipmentGroupEntity = createDto.ToEntity<EquEquipmentGroupEntity>();
@@ -72,7 +66,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         public async Task ModifyEquEquipmentGroupAsync(EquEquipmentGroupModifyDto modifyDto)
         {
             //验证DTO
-            await _validationModifyRules.ValidateAndThrowAsync(modifyDto);
+            //await _validationModifyRules.ValidateAndThrowAsync(modifyDto);
 
             //DTO转换实体
             var equEquipmentGroupEntity = modifyDto.ToEntity<EquEquipmentGroupEntity>();
