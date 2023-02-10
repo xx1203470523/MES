@@ -1,11 +1,14 @@
 ﻿using FluentValidation;
 using Hymson.MES.Services.Dtos.Equipment;
+using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Options;
 using Hymson.MES.Services.Services.EquEquipmentGroup;
 using Hymson.MES.Services.Services.Equipment.EquEquipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipmentUnit;
 using Hymson.MES.Services.Services.InteClass;
+using Hymson.MES.Services.Services.Process;
 using Hymson.MES.Services.Validators.Equipment;
+using Hymson.MES.Services.Validators.Process;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -45,6 +48,10 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region Integrated
             services.AddSingleton<IInteClassService, InteClassService>();
+            #endregion
+
+            #region ProcMaterial
+            services.AddSingleton<IProcMaterialService, ProcMaterialService>();
             #endregion
 
             return services;

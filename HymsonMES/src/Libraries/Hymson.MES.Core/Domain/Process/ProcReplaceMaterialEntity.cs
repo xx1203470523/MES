@@ -44,7 +44,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :是否启用 
         /// 空值 : true  
         /// </summary>
-        public byte IsUse { get; set; }
+        public bool IsUse { get; set; }
         
         /// <summary>
         /// 描述 :说明 

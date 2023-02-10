@@ -4,6 +4,7 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit;
 using Hymson.MES.Data.Repositories.Integrated.InteClass;
+using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -47,6 +48,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteClassRepository, InteClassRepository>();
             #endregion
 
+            #region ProcMaterial
+            services.AddSingleton<IProcMaterialRepository, ProcMaterialRepository>();
+            services.AddSingleton<IProcReplaceMaterialRepository, ProcReplaceMaterialRepository>();
+
+            #endregion
             return services;
         }
 

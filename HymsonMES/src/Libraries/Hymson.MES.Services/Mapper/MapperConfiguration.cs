@@ -2,9 +2,12 @@
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Equipment;
+using Hymson.MES.Services.Dtos.Process;
 
 namespace Hymson.MES.Services.Mapper
 {
@@ -19,6 +22,7 @@ namespace Hymson.MES.Services.Mapper
         public MapperConfiguration()
         {
             CreateEquipmentMaps();
+            CreateProcMaterialMaps();
         }
 
         /// <summary>
