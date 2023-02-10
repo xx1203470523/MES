@@ -1,5 +1,9 @@
 ﻿using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit;
+using Hymson.MES.Data.Repositories.Integrated.InteClass;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -31,7 +35,16 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddRepository(this IServiceCollection services)
         {
             #region Equipment
+            services.AddSingleton<IEquEquipmentRepository, EquEquipmentRepository>();
+            services.AddSingleton<IEquEquipmentGroupRepository, EquEquipmentGroupRepository>();
+            services.AddSingleton<IEquEquipmentLinkApiRepository, EquEquipmentLinkApiRepository>();
+            services.AddSingleton<IEquEquipmentLinkHardwareRepository, EquEquipmentLinkHardwareRepository>();
             services.AddSingleton<IEquEquipmentUnitRepository, EquEquipmentUnitRepository>();
+            #endregion
+
+            #region Integrated
+            services.AddSingleton<IInteClassDetailRepository, InteClassDetailRepository>();
+            services.AddSingleton<IInteClassRepository, InteClassRepository>();
             #endregion
 
             return services;
