@@ -203,10 +203,10 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcResourceConfigJobViewDto>> GetcResourceConfigJoAsync(ProcResourceEquipmentBindPagedQueryDto query)
+        public async Task<PagedInfo<ProcResourceConfigJobViewDto>> GetcResourceConfigJoAsync(ProcResourceConfigJobPagedQueryDto query)
         {
-            var resPagedQuery = query.ToQuery<ProcResourceEquipmentBindPagedQuery>();
-            var pagedInfo = await _resourceEquipmentBindRepository.GetPagedInfoAsync(resPagedQuery);
+            var resPagedQuery = query.ToQuery<ProcResourceConfigJobPagedQuery>();
+            var pagedInfo = await _resourceConfigJobRepository.GetPagedInfoAsync(resPagedQuery);
 
             //实体到DTO转换 装载数据
             var procResourceConfigJobViews = new List<ProcResourceConfigJobViewDto>();

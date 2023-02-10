@@ -230,9 +230,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 是否逻辑删除
         /// </summary>
         public bool? IsDeleted { get; set; }
-
-       
-
     }
 
     /// <summary>
@@ -240,10 +237,9 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public class ProcResourceConfigJobPagedQueryDto : PagerInfo
     {
-        ///// <summary>
-        ///// 描述 :站点编码 
-        ///// 空值 : false  
-        ///// </summary>
-        //public string SiteCode { get; set; }
+        /// <summary>
+        /// 资源id
+        /// </summary>
+        public long ResourceId { get; set; }
     }
 }

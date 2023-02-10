@@ -124,7 +124,7 @@ namespace Hymson.MES.Api.Controllers
         /// <returns></returns>
         [HttpGet("job/list")]
         [HttpGet]
-        public async Task<PagedInfo<ProcResourceConfigJobViewDto>> GetcResourceConfigJoAsync(ProcResourceEquipmentBindPagedQueryDto parm)
+        public async Task<PagedInfo<ProcResourceConfigJobViewDto>> GetcResourceConfigJoAsync(ProcResourceConfigJobPagedQueryDto parm)
         {
             return await _procResourceService.GetcResourceConfigJoAsync(parm);
         }

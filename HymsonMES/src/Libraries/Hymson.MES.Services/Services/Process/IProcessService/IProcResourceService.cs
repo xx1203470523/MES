@@ -67,7 +67,7 @@ namespace Hymson.MES.Services.Services.Process.IProcessService
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<PagedInfo<ProcResourceConfigJobViewDto>> GetcResourceConfigJoAsync(ProcResourceEquipmentBindPagedQueryDto query);
+        Task<PagedInfo<ProcResourceConfigJobViewDto>> GetcResourceConfigJoAsync(ProcResourceConfigJobPagedQueryDto query);
 
         /// <summary>
         /// 添加资源数据

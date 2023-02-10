@@ -14,6 +14,9 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public class ProcResourceConfigJobPagedQuery : PagerInfo
     {
-
+        /// <summary>
+        /// 资源id
+        /// </summary>
+        public long ResourceId { get; set; }
     }
 }

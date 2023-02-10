@@ -103,7 +103,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcResourceEquipmentBindPagedQueryDto, ProcResourceEquipmentBindPagedQuery>();
 
             CreateMap<ProcResourceConfigJobViewDto, ProcResourceConfigJobView>();
-            CreateMap<ProcResourceEquipmentBindPagedQueryDto, ProcResourceEquipmentBindPagedQuery>();
+            CreateMap<ProcResourceConfigJobPagedQueryDto, ProcResourceConfigJobPagedQuery>();
             #endregion
         }
 
