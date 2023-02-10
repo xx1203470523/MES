@@ -63,13 +63,19 @@ namespace Hymson.MES.Services.Mapper
         protected virtual void CreateProcessMaps()
         {
             #region Material
-
             CreateMap<ProcMaterialCreateDto, ProcMaterialEntity>();
-            CreateMap<ProcMaterialReplaceDto, ProcReplaceMaterialEntity>();
-
             CreateMap<ProcMaterialModifyDto, ProcMaterialEntity>();
             CreateMap<ProcMaterialPagedQueryDto, ProcMaterialPagedQuery>();
             CreateMap<ProcMaterialEntity, ProcMaterialDto>();
+
+            CreateMap<ProcMaterialReplaceDto, ProcReplaceMaterialEntity>();
+
+            CreateMap<ProcMaterialGroupCreateDto, ProcMaterialGroupEntity>();
+            CreateMap<ProcMaterialGroupModifyDto, ProcMaterialGroupEntity>();
+            CreateMap<ProcMaterialGroupPagedQueryDto, ProcMaterialGroupPagedQuery>();
+            CreateMap<ProcMaterialGroupEntity, ProcMaterialGroupDto>();
+            CreateMap<CustomProcMaterialGroupPagedQueryDto, ProcMaterialGroupCustomPagedQuery>();
+            CreateMap<CustomProcMaterialGroupView, CustomProcMaterialGroupViewDto>();
 
             #endregion
 

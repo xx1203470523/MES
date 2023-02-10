@@ -52,6 +52,18 @@ namespace Hymson.MES.Api.Controllers.Process
         }
 
         /// <summary>
+        /// 分页查询自定义列表（物料组维护表）
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("customlist")]
+        public async Task<PagedInfo<CustomProcMaterialGroupViewDto>> QueryPagedCustomProcMaterialGroupAsync([FromQuery] CustomProcMaterialGroupPagedQueryDto parm)
+        {
+            return await _procMaterialGroupService.GetPageCustomListAsync(parm);
+        }
+
+        /// <summary>
         /// 查询详情（物料组维护表）
         /// </summary>
         /// <param name="id"></param>

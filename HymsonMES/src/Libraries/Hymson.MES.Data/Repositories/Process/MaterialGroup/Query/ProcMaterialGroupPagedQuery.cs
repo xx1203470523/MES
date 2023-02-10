@@ -19,6 +19,51 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public class ProcMaterialGroupPagedQuery : PagerInfo
     {
+        /// <summary>
+        /// 所属站点代码
+        /// </summary>
+        public string SiteCode { get; set; } = "";
 
+        /// <summary>
+        /// 物料组编码
+        /// </summary>
+        public string GroupCode { get; set; }
+
+        /// <summary>
+        /// 物料组名称
+        /// </summary>
+        public string GroupName { get; set; }
+
+        /// <summary>
+        /// 版本
+        /// </summary>
+        public string Version { get; set; }
     }
+
+    /// <summary>
+    /// 物料组维护表 分页参数
+    /// </summary>
+    public class ProcMaterialGroupCustomPagedQuery : PagerInfo
+    {
+        /// <summary>
+        /// 所属站点代码
+        /// </summary>
+        public string SiteCode { get; set; } = "";
+
+        /// <summary>
+        /// 物料组编码
+        /// </summary>
+        public string GroupCode { get; set; }
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 版本
+        /// </summary>
+        public string Version { get; set; }
+    }
+
 }
