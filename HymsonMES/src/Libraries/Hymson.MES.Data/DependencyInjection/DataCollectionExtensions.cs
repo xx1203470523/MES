@@ -1,5 +1,9 @@
 ﻿using Hymson.MES.Data.Options;
-using Hymson.MES.Data.Repositories.OnStock;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit;
+using Hymson.MES.Data.Repositories.Integrated.InteClass;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -22,14 +26,27 @@ namespace Microsoft.Extensions.DependencyInjection
             AddRepository(services);
             return services;
         }
-        
+
         /// <summary>
         /// 添加仓储依赖
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        private static IServiceCollection AddRepository(this IServiceCollection services) {
-            services.AddSingleton<IWhStockChangeRecordRepository, WhStockChangeRecordRepository>();
+        private static IServiceCollection AddRepository(this IServiceCollection services)
+        {
+            #region Equipment
+            services.AddSingleton<IEquEquipmentRepository, EquEquipmentRepository>();
+            services.AddSingleton<IEquEquipmentGroupRepository, EquEquipmentGroupRepository>();
+            services.AddSingleton<IEquEquipmentLinkApiRepository, EquEquipmentLinkApiRepository>();
+            services.AddSingleton<IEquEquipmentLinkHardwareRepository, EquEquipmentLinkHardwareRepository>();
+            services.AddSingleton<IEquEquipmentUnitRepository, EquEquipmentUnitRepository>();
+            #endregion
+
+            #region Integrated
+            services.AddSingleton<IInteClassDetailRepository, InteClassDetailRepository>();
+            services.AddSingleton<IInteClassRepository, InteClassRepository>();
+            #endregion
+
             return services;
         }
 
@@ -39,7 +56,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         /// <param name="configuration"></param>
         /// <returns></returns>
-        private static IServiceCollection AddConfig(IServiceCollection services, IConfiguration configuration) {
+        private static IServiceCollection AddConfig(IServiceCollection services, IConfiguration configuration)
+        {
             //数据库连接
             services.Configure<ConnectionOptions>(configuration.GetSection(nameof(ConnectionOptions)));
             //services.Configure<ConnectionOptions>(configuration);

@@ -1,8 +1,11 @@
 ﻿using FluentValidation;
-using Hymson.MES.Services.Dtos.OnStock;
+using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Options;
-using Hymson.MES.Services.Services.OnStock;
-using Hymson.MES.Services.Validators.OnStock;
+using Hymson.MES.Services.Services.EquEquipmentGroup;
+using Hymson.MES.Services.Services.Equipment.EquEquipment;
+using Hymson.MES.Services.Services.Equipment.EquEquipmentUnit;
+using Hymson.MES.Services.Services.InteClass;
+using Hymson.MES.Services.Validators.Equipment;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -34,7 +37,16 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddServices(this IServiceCollection services)
         {
-            services.AddSingleton<IWhStockChangeRecordService, WhStockChangeRecordService>();
+            #region Equipment
+            services.AddSingleton<IEquEquipmentService, EquEquipmentService>();
+            services.AddSingleton<IEquEquipmentGroupService, EquEquipmentGroupService>();
+            services.AddSingleton<IEquEquipmentUnitService, EquEquipmentUnitService>();
+            #endregion
+
+            #region Integrated
+            services.AddSingleton<IInteClassService, InteClassService>();
+            #endregion
+
             return services;
         }
 
@@ -59,8 +71,9 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddValidators(IServiceCollection services)
         {
-
-            services.AddSingleton<AbstractValidator<WhStockChangeRecordDto>, WhStockChangeRecordValidator>();
+            #region Equipment
+            services.AddSingleton<AbstractValidator<EquEquipmentUnitCreateDto>, EquipmentUnitCreateValidator>();
+            #endregion
 
             return services;
         }

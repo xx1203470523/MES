@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <Folder Include="DependencyInjection\" />
+    <Folder Include="Enums\" />
   </ItemGroup>
 
   <ItemGroup>
