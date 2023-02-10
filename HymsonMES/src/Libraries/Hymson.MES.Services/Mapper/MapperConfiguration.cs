@@ -1,11 +1,10 @@
 ﻿using AutoMapper;
+using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
-using Hymson.MES.Core.Domain.OnStock;
-using Hymson.MES.Core.Domain.Process;
-using Hymson.MES.Data.Repositories.OnStock;
-using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Services.Dtos.OnStock;
-using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
+using Hymson.MES.Services.Dtos.Equipment;
 
 namespace Hymson.MES.Services.Mapper
 {
@@ -19,19 +18,40 @@ namespace Hymson.MES.Services.Mapper
         /// </summary>
         public MapperConfiguration()
         {
-            CreateWhStockChangeRecordMaps();
-
-            CreateProcMaterialMaps();
+            CreateEquipmentMaps();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        protected virtual void CreateWhStockChangeRecordMaps()
+        protected virtual void CreateEquipmentMaps()
         {
-            CreateMap<WhStockChangeRecordDto, WhStockChangeRecordEntity>();
-            CreateMap<WhStockChangeRecordEntity, WhStockChangeRecordDto>();
-            CreateMap<WhStockChangeRecordPagedQueryDto, WhStockChangeRecordPagedQuery>();
+            #region EquipmentUnit
+            CreateMap<EquEquipmentUnitCreateDto, EquEquipmentUnitEntity>();
+            CreateMap<EquEquipmentUnitModifyDto, EquEquipmentUnitEntity>();
+            //CreateMap<EquipmentUnitEntity, EquipmentUnitCreateDto>();
+            CreateMap<EquEquipmentUnitPagedQueryDto, EquEquipmentUnitPagedQuery>();
+            #endregion
+
+            #region Equipment
+            CreateMap<EquEquipmentCreateDto, EquEquipmentEntity>();
+            CreateMap<EquEquipmentModifyDto, EquEquipmentEntity>();
+            //CreateMap<EquipmentUnitEntity, EquipmentUnitCreateDto>();
+            CreateMap<EquEquipmentPagedQueryDto, EquEquipmentPagedQuery>();
+            #endregion
+
+            #region EquEquipmentLinkApi
+            CreateMap<EquEquipmentLinkApiCreateDto, EquEquipmentLinkApiEntity>();
+            CreateMap<EquEquipmentLinkApiModifyDto, EquEquipmentLinkApiEntity>();
+            //CreateMap<EquEquipmentLinkApiDto, EquEquipmentLinkApiEntity>();
+            CreateMap<EquEquipmentLinkApiPagedQueryDto, EquEquipmentLinkApiPagedQuery>();
+            #endregion
+
+            #region EquEquipmentLinkHardware
+            CreateMap<EquEquipmentLinkHardwareCreateDto, EquEquipmentLinkHardwareEntity>();
+            CreateMap<EquEquipmentLinkHardwareModifyDto, EquEquipmentLinkHardwareEntity>();
+            CreateMap<EquEquipmentLinkHardwarePagedQueryDto, EquEquipmentLinkHardwarePagedQuery>();
+            #endregion
         }
 
         protected virtual void CreateProcMaterialMaps()
