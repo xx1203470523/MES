@@ -35,5 +35,12 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         Task<PagedInfo<EquEquipmentUnitDto>> GetPagedListAsync(EquEquipmentUnitPagedQueryDto pagedQueryDto);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<EquEquipmentUnitDto> GetEntityAsync(long id);
     }
 }

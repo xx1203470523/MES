@@ -28,14 +28,14 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        Task<int> DeleteAsync(long[] idsArr);
+        Task<int> SoftDeleteAsync(long[] idsArr);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="equipmentCode"></param>
         /// <returns></returns>
-        Task<bool> ExistsAsync(string equipmentCode);
+        Task<bool> IsExistsAsync(string equipmentCode);
 
         /// <summary>
         /// 
@@ -47,6 +47,20 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquEquipmentEntity>> GetByGroupIdAsync(long groupId);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<EquEquipmentView> GetViewByIdAsync(long id);
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="equipmentCode"></param>
         /// <returns></returns>
         Task<EquEquipmentEntity> GetByEquipmentCodeAsync(string equipmentCode);
@@ -54,15 +68,22 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquEquipmentEntity>> GetBaseListAsync();
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="equipmentQuery"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquEquipmentEntity>> GetEntitiesAsync(EquEquipmentQuery equipmentQuery);
+        Task<IEnumerable<EquEquipmentEntity>> GetListAsync(EquEquipmentQuery equipmentQuery);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="equipmentPagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquEquipmentEntity>> GetPagedInfoAsync(EquEquipmentPagedQuery equipmentPagedQuery);
+        Task<PagedInfo<EquEquipmentEntity>> GetPagedListAsync(EquEquipmentPagedQuery equipmentPagedQuery);
     }
 }

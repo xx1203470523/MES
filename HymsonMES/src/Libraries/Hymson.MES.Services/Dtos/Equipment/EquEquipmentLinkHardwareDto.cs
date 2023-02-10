@@ -57,8 +57,48 @@ namespace Hymson.MES.Services.Dtos.Equipment
     /// <summary>
     /// 设备关联硬件查询实体类
     /// </summary>
+    public record EquEquipmentLinkHardwareBaseDto : BaseEntityDto
+    {
+        /// <summary>
+        /// id
+        /// </summary>
+        public long Id { get; set; }
+        
+        /// <summary>
+        /// 描述 :设备id（equ_equipment表id） 
+        /// 空值 : false  
+        /// </summary>
+        public long EquipmentId { get; set; }
+
+        /// <summary>
+        /// 描述 :硬件设备唯一标识 
+        /// 空值 : false  
+        /// </summary>
+        public string HardwareCode { get; set; }
+
+        /// <summary>
+        /// 描述 :硬件类型（字段名称：equ_hardware_type） 
+        /// 空值 : false  
+        /// </summary>
+        public string HardwareType { get; set; }
+
+        /// <summary>
+        /// 描述 :设备故障先 
+        /// 空值 : true  
+        /// </summary>
+        public string Remark { get; set; }
+    }
+
+    /// <summary>
+    /// 设备关联硬件查询实体类
+    /// </summary>
     public record EquEquipmentLinkHardwareDto : BaseEntityDto
     {
+        /// <summary>
+        /// id
+        /// </summary>
+        public long Id { get; set; }
+        
         /// <summary>
         /// 描述 :设备id（equ_equipment表id） 
         /// 空值 : false  
@@ -84,10 +124,24 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public string Remark { get; set; }
 
         /// <summary>
-        /// 描述 :所属站点代码 
-        /// 空值 : false  
+        /// 创建人
         /// </summary>
-        public string SiteCode { get; set; }
+        public string CreatedBy { get; set; } = "";
+
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime CreatedOn { get; set; }
+
+        /// <summary>
+        /// 更新人
+        /// </summary>
+        public string? UpdatedBy { get; set; }
+
+        /// <summary>
+        /// 更新时间
+        /// </summary>
+        public DateTime? UpdatedOn { get; set; }
     }
 
     /// <summary>

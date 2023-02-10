@@ -1,5 +1,4 @@
 ﻿using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Services.Dtos.Equipment;
 
 namespace Hymson.MES.Services.Services.Equipment.EquEquipment
@@ -37,20 +36,35 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquEquipmentDto>> GetPagedListAsync(EquEquipmentPagedQueryDto pagedQueryDto);
+        Task<PagedInfo<EquEquipmentListDto>> GetPagedListAsync(EquEquipmentPagedQueryDto pagedQueryDto);
 
         /// <summary>
         /// 查询列表（设备注册）
         /// </summary>
         /// <returns></returns>
-        Task<List<EquEquipmentDictionaryDto>> QueryEquEquipmentDictionaryAsync();
+        Task<List<EquEquipmentDictionaryDto>> GetEquEquipmentDictionaryAsync();
 
         /// <summary>
         /// 查询详情（设备注册）
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<CustomEquEquipmentDetailDto> GetCustomEquEquipmentAsync(long id);
+        Task<EquEquipmentDto> GetEquEquipmentWithGroupNameAsync(long id);
+
+        /// <summary>
+        /// 查询设备关联硬件列表
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        Task<PagedInfo<EquEquipmentLinkHardwareBaseDto>> GetEquimentLinkHardwareAsync(EquEquipmentLinkHardwarePagedQueryDto parm);
+
+        /// <summary>
+        /// 查询设备关联API列表
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        Task<PagedInfo<EquEquipmentLinkApiBaseDto>> GetEquimentLinkApiAsync(EquEquipmentLinkApiPagedQueryDto parm);
+
 
         /// <summary>
         /// 查询设备（单个）
@@ -58,36 +72,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// <param name="equipmentCode">设备编码</param>
         /// <param name="siteCode">站点</param>
         /// <returns></returns>
-        Task<EquEquipmentEntity> QueryEquEquipmentAsync(string equipmentCode, string siteCode);
-
-        /// <summary>
-        /// 查询设备维护表列表
-        /// </summary>
-        /// <param name="pagedQueryDto"></param>
-        /// <returns></returns>
-        Task<PagedInfo<EquEquipmentDto>> GetListAsync(EquEquipmentPagedQueryDto pagedQueryDto);
-
-        /// <summary>
-        /// 查询设备关联硬件列表
-        /// </summary>
-        /// <param name="parm"></param>
-        /// <returns></returns>
-        Task<PagedInfo<EquEquipmentLinkHardwareDto>> GetEquimentLinkHardwareAsync(EquEquipmentLinkHardwarePagedQueryDto parm);
-
-        /// <summary>
-        /// 根据硬件编码硬件类型获取设备
-        /// </summary>
-        /// <param name="HardwareCode"></param>
-        /// <param name="HardwareType"></param>
-        /// <returns></returns>
-        Task<EquEquipmentLinkHardwareEntity> GetLinkHardwareForCodeAndTypeAsync(string HardwareCode, string HardwareType);
-
-        /// <summary>
-        /// 查询设备关联API列表
-        /// </summary>
-        /// <param name="parm"></param>
-        /// <returns></returns>
-        Task<PagedInfo<EquEquipmentLinkApiDto>> GetEquimentLinkApiAsync(EquEquipmentLinkApiPagedQueryDto parm);
+        Task<EquEquipmentDto> GetByEquipmentCodeAsync(string equipmentCode, string siteCode);
 
         /// <summary>
         /// 根据设备id+接口类型获取接口地址
@@ -95,6 +80,15 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// <param name="equipmentId"></param>
         /// <param name="apiType"></param>
         /// <returns></returns>
-        Task<EquEquipmentLinkApiEntity> GetApiForEquipmentidAndType(long equipmentId, string apiType);
+        Task<EquEquipmentLinkApiDto> GetApiForEquipmentidAndType(long equipmentId, string apiType);
+
+        /// <summary>
+        /// 根据硬件编码硬件类型获取设备
+        /// </summary>
+        /// <param name="hardwareCode"></param>
+        /// <param name="hardwareType"></param>
+        /// <returns></returns>
+        Task<EquEquipmentLinkHardwareDto> GetLinkHardwareForCodeAndTypeAsync(string hardwareCode, string hardwareType);
+
     }
 }

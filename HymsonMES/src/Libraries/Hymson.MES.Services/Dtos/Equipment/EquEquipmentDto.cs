@@ -277,7 +277,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
     /// <summary>
     /// 自定义实体列表（设备注册）
     /// </summary>
-    public record EquEquipmentDto : BaseEntityDto
+    public record EquEquipmentListDto : BaseEntityDto
     {
         /// <summary>
         /// 唯一标识
@@ -426,8 +426,13 @@ namespace Hymson.MES.Services.Dtos.Equipment
     /// <summary>
     /// 自定义实体对象（设备注册）
     /// </summary>
-    public class CustomEquEquipmentDetailDto
+    public record EquEquipmentDto : BaseEntityDto
     {
+        /// <summary>
+        /// 唯一标识
+        /// </summary>
+        public long Id { get; set; }
+
         /// <summary>
         /// 描述 :使用状态 
         /// 空值 : false  
@@ -570,23 +575,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
     /// <summary>
     /// 自定义实体列表（设备注册）
     /// </summary>
-    public class EquEquipmentDictionaryDto
-    {
-        /// <summary>
-        /// 设备类型
-        /// </summary>
-        public string EquipmentType { get; set; } = "";
-
-        /// <summary>
-        /// 集合（设备注册）
-        /// </summary>
-        public List<EquEquipmentDictionaryValueDto> Equipments { get; set; }
-    }
-
-    /// <summary>
-    /// 自定义实体列表（设备注册）
-    /// </summary>
-    public class EquEquipmentDictionaryValueDto
+    public record EquEquipmentBaseDto : BaseEntityDto
     {
         /// <summary>
         /// 唯一标识
@@ -603,4 +592,21 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public string EquipmentName { get; set; }
     }
+
+    /// <summary>
+    /// 自定义实体列表（设备注册）
+    /// </summary>
+    public class EquEquipmentDictionaryDto
+    {
+        /// <summary>
+        /// 设备类型
+        /// </summary>
+        public string EquipmentType { get; set; } = "";
+
+        /// <summary>
+        /// 集合（设备注册）
+        /// </summary>
+        public IEnumerable<EquEquipmentBaseDto> Equipments { get; set; }
+    }
+
 }

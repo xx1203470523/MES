@@ -78,5 +78,16 @@ namespace Hymson.MES.Api.Controllers.Equipment
         {
             return await _equipmentUnitService.GetPagedListAsync(pagedQueryDto);
         }
+
+        /// <summary>
+        /// 查询详情（单位维护）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        public async Task<EquEquipmentUnitDto> GetEntityAsync(long id)
+        {
+            return await _equipmentUnitService.GetEntityAsync(id);
+        }
     }
 }

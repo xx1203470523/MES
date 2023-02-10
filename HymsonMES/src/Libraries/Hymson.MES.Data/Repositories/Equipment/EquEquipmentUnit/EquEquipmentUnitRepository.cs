@@ -57,7 +57,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
         public async Task<int> DeleteAsync(long[] idsArr)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, idsArr);
+            return await conn.ExecuteAsync(DeleteSql, new { IsDeleted = 1, id = idsArr });
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
         public async Task<EquEquipmentUnitEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<EquEquipmentUnitEntity>(GetByIdSql, id);
+            return await conn.QueryFirstOrDefaultAsync<EquEquipmentUnitEntity>(GetByIdSql, new { IsDeleted = 0, id });
         }
 
         /// <summary>
@@ -83,25 +83,28 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
-            if (!string.IsNullOrWhiteSpace(pagedQuery.SiteCode))
+
+            if (string.IsNullOrWhiteSpace(pagedQuery.SiteCode) == false)
             {
-                sqlBuilder.Where("SiteCode=@SiteCode");
+                sqlBuilder.Where("SiteCode = @SiteCode");
             }
-            if (!string.IsNullOrWhiteSpace(pagedQuery.UnitCode))
+
+            if (string.IsNullOrWhiteSpace(pagedQuery.UnitCode) == false)
             {
-                sqlBuilder.Where("UnitCode=@UnitCode");
+                sqlBuilder.Where("UnitCode = @UnitCode");
             }
-            //if (equipmentUnitPagedQuery.ChangeType.HasValue)
-            //{
-            //    sqlBuilder.Where("ChangeType=@ChangeType");
-            //}
+
+            if (string.IsNullOrWhiteSpace(pagedQuery.UnitName) == false)
+            {
+                sqlBuilder.Where("UnitName = @UnitName");
+            }
+
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
             sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-
             var entities = await conn.QueryAsync<EquEquipmentUnitEntity>(templateData.RawSql, templateData.Parameters);
             var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
 
@@ -133,8 +136,8 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
         /// </summary>
         const string InsertSql = "INSERT INTO `equ_unit`(`Id`, `SiteCode`, `UnitCode`, `UnitName`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteCode, @UnitCode, @UnitName, @Type, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted);";
         const string UpdateSql = "UPDATE `equ_unit` SET UnitName = @UnitName, Type = @Type, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id;";
-        const string DeleteSql = "UPDATE `equ_unit` SET `IsDeleted` = 1 WHERE `Id` = @Id;";
-        const string GetByIdSql = "SELECT * FROM `equ_unit` WHERE `Id` = @Id;";
+        const string DeleteSql = "UPDATE `equ_unit` SET `IsDeleted` = @IsDeleted WHERE `Id` = @Id;";
+        const string GetByIdSql = "SELECT `Id`, `SiteCode`, `UnitCode`, `UnitName`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn` FROM `equ_unit` WHERE `IsDeleted` = @IsDeleted AND `Id` = @Id;";
         const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `equ_unit` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_unit` /**where**/";
         const string GetEntitiesSqlTemplate = "";

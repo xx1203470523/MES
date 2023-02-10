@@ -8,28 +8,38 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query
     public class EquEquipmentPagedQuery : PagerInfo
     {
         /// <summary>
-        /// 站点编码 
+        /// 编码（设备）
         /// </summary>
-        public string? SiteCode { get; set; }
+        public string EquipmentCode { get; set; }
 
         /// <summary>
-        /// 单位编码 
+        /// 名称（设备）
         /// </summary>
-        public string? UnitCode { get; set; }
+        public string EquipmentName { get; set; }
 
         /// <summary>
-        /// 单位名称 
+        /// 类型（设备）
         /// </summary>
-        public string? UnitName { get; set; }
+        public string EquipmentType { get; set; }
 
         /// <summary>
-        /// 单位类型
+        /// 使用状态（设备）
         /// </summary>
-        public string? Type { get; set; }
+        public string UseStatus { get; set; }
 
         /// <summary>
-        /// 单位状态 
+        /// 车间
         /// </summary>
-        public string? Status { get; set; }
+        public string WorkCenterShopName { get; set; }
+
+        /// <summary>
+        /// 使用部门
+        /// </summary>
+        public string UseDepartment { get; set; }
+
+        /// <summary>
+        /// 存放位置
+        /// </summary>
+        public string Location { get; set; }
     }
 }

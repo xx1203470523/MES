@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
@@ -42,6 +43,7 @@ namespace Hymson.MES.Services.Mapper
             #region EquEquipmentLinkApi
             CreateMap<EquEquipmentLinkApiCreateDto, EquEquipmentLinkApiEntity>();
             CreateMap<EquEquipmentLinkApiModifyDto, EquEquipmentLinkApiEntity>();
+            //CreateMap<EquEquipmentLinkApiDto, EquEquipmentLinkApiEntity>();
             CreateMap<EquEquipmentLinkApiPagedQueryDto, EquEquipmentLinkApiPagedQuery>();
             #endregion
 

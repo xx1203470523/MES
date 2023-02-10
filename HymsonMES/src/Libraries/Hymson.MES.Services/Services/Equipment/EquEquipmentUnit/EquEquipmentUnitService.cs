@@ -87,25 +87,20 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
             var pagedInfo = await _equEquipmentUnitRepository.GetPagedInfoAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
-            List<EquEquipmentUnitDto> equipmentUnitDtos = PrepareEquipmentUnitDtos(pagedInfo);
-            return new PagedInfo<EquEquipmentUnitDto>(equipmentUnitDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            var dtos = pagedInfo.Data.Select(s => s.ToModel<EquEquipmentUnitDto>());
+            return new PagedInfo<EquEquipmentUnitDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="pagedInfo"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        private static List<EquEquipmentUnitDto> PrepareEquipmentUnitDtos(PagedInfo<EquEquipmentUnitEntity> pagedInfo)
+        public async Task<EquEquipmentUnitDto> GetEntityAsync(long id)
         {
-            var dtos = new List<EquEquipmentUnitDto>();
-            foreach (var entity in pagedInfo.Data)
-            {
-                var dto = entity.ToModel<EquEquipmentUnitDto>();
-                dtos.Add(dto);
-            }
-
-            return dtos;
+            return (await _equEquipmentUnitRepository.GetByIdAsync(id)).ToModel<EquEquipmentUnitDto>();
         }
+
+
     }
 }

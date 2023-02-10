@@ -40,7 +40,7 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        public async Task<int> CreateEquEquipmentAsync([FromBody] EquEquipmentCreateDto createDto)
+        public async Task<int> Create([FromBody] EquEquipmentCreateDto createDto)
         {
             /*
             if (parm == null)
@@ -62,7 +62,7 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// <returns></returns>
         [HttpPost]
         [Route("update")]
-        public async Task<int> ModifyEquEquipmentAsync([FromBody] EquEquipmentModifyDto modifyDto)
+        public async Task<int> Modify([FromBody] EquEquipmentModifyDto modifyDto)
         {
             /*
             if (parm == null)
@@ -84,7 +84,7 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// <returns></returns>
         [HttpPost]
         [Route("delete")]
-        public async Task<int> DeleteEquEquipmentAsync(string ids)
+        public async Task<int> Delete(string ids)
         {
             /*
             long[] idsArr = StringExtension.SpitLongArrary(ids);
@@ -105,7 +105,7 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// <returns></returns>
         [Route("pagelist")]
         [HttpGet]
-        public async Task<PagedInfo<EquEquipmentDto>> QueryEquEquipmentAsync([FromQuery] EquEquipmentPagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<EquEquipmentListDto>> QueryEquEquipmentAsync([FromQuery] EquEquipmentPagedQueryDto pagedQueryDto)
         {
             return await _equEquipmentService.GetPagedListAsync(pagedQueryDto);
         }
@@ -116,9 +116,9 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<CustomEquEquipmentDetailDto> GetCustomEquEquipmentAsync(long id)
+        public async Task<EquEquipmentDto> GetEquEquipmentWithGroupNameAsync(long id)
         {
-            return await _equEquipmentService.GetCustomEquEquipmentAsync(id);
+            return await _equEquipmentService.GetEquEquipmentWithGroupNameAsync(id);
         }
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         [HttpGet("dictionary")]
         public async Task<List<EquEquipmentDictionaryDto>> QueryEquEquipmentDictionaryAsync()
         {
-            return await _equEquipmentService.QueryEquEquipmentDictionaryAsync();
+            return await _equEquipmentService.GetEquEquipmentDictionaryAsync();
         }
 
         /// <summary>
@@ -137,7 +137,7 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpGet("linkHardware/list")]
-        public async Task<PagedInfo<EquEquipmentLinkHardwareDto>> GetEquipmentLinkHardwareAsync(EquEquipmentLinkHardwarePagedQueryDto parm)
+        public async Task<PagedInfo<EquEquipmentLinkHardwareBaseDto>> GetEquipmentLinkHardwareAsync(EquEquipmentLinkHardwarePagedQueryDto parm)
         {
             return await _equEquipmentService.GetEquimentLinkHardwareAsync(parm);
         }
@@ -148,7 +148,7 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpGet("linkApi/list")]
-        public async Task<PagedInfo<EquEquipmentLinkApiDto>> GetEquipmentLinkApiAsync(EquEquipmentLinkApiPagedQueryDto parm)
+        public async Task<PagedInfo<EquEquipmentLinkApiBaseDto>> GetEquipmentLinkApiAsync(EquEquipmentLinkApiPagedQueryDto parm)
         {
             return await _equEquipmentService.GetEquimentLinkApiAsync(parm);
         }

@@ -95,7 +95,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
 
             #region 参数校验
             // 判断编号是否已存在
-            var isExists = await _equEquipmentRepository.ExistsAsync(entity.EquipmentCode);
+            var isExists = await _equEquipmentRepository.IsExistsAsync(entity.EquipmentCode);
             if (isExists == true)
             {
                 // TODO 返回值
@@ -105,11 +105,12 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             }
             #endregion
 
-            // TODO 加事务
+            // TODO 事务处理
             var rows = 0;
+
             rows += await _equEquipmentRepository.InsertAsync(entity);
-            //rows += await _equEquipmentLinkHardwareRepository.InsertAsync(linkHardwareList);
-            //rows += await _equEquipmentLinkApiRepository.InsertAsync(linkApiList);
+            rows += await _equEquipmentLinkApiRepository.InsertRangeAsync(linkApiList);
+            rows += await _equEquipmentLinkHardwareRepository.InsertRangeAsync(linkHardwareList);
 
             return rows;
         }
@@ -138,7 +139,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             {
                 foreach (var item in modifyDto.HardwareLinks)
                 {
-                    EquEquipmentLinkHardwareEntity linkHardware = new();
+                    EquEquipmentLinkHardwareEntity linkHardware;
                     switch (item.OperationType)
                     {
                         case 1:
@@ -151,13 +152,8 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
                             updateLinkHardwares.Add(linkHardware);
                             break;
                         case 3:
-                            if (item.Id != null && item.Id > 0)
-                            {
-                                deleteLinkHardwareIds.Add(item.Id ?? 0);
-                            }
+                            if (item.Id != null && item.Id > 0) deleteLinkHardwareIds.Add(item.Id ?? 0);
                             break;
-                            //default:
-                            //    return Error(ResultCode.PARAM_ERROR, $"设备绑定硬件操作类型OperationType:{item.OperationType}异常，只能传入1，2，3！");
                     }
 
                 }
@@ -171,7 +167,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             {
                 foreach (var item in modifyDto.ApiLinks)
                 {
-                    EquEquipmentLinkApiEntity linkApi = new();
+                    EquEquipmentLinkApiEntity linkApi;
                     switch (item.OperationType)
                     {
                         case 1:
@@ -184,15 +180,9 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
                             updateLinkApis.Add(linkApi);
                             break;
                         case 3:
-                            if (item.Id != null && item.Id > 0)
-                            {
-                                deleteLinkApiIds.Add(item.Id ?? 0);
-                            }
+                            if (item.Id != null && item.Id > 0) deleteLinkApiIds.Add(item.Id ?? 0);
                             break;
-                            //default:
-                            //    return Error(ResultCode.PARAM_ERROR, $"设备绑定API操作类型OperationType:{item.OperationType}异常，只能传入1，2，3！");
                     }
-
                 }
             }
 
@@ -209,17 +199,22 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             }
             #endregion
 
-            // TODO 加事务
             var rows = 0;
+
+            // TODO 事务处理
+            // TODO 需要检查更新的字段
             rows += await _equEquipmentRepository.UpdateAsync(entity);
 
-            // 绑定硬件数据
-            //await _equEquipmentLinkHardwareRepository.InsertRangeAsync(addLinkHardwares);
-            //await _equEquipmentLinkHardwareRepository.UpdateRangeAsync(addLinkHardwares);
-            //await _equEquipmentLinkHardwareRepository.SoftDeleteAsync(addLinkHardwares);
-
             // 绑定API数据
-            // TODO
+            await _equEquipmentLinkApiRepository.SoftDeleteAsync(deleteLinkApiIds);
+            await _equEquipmentLinkApiRepository.UpdateRangeAsync(updateLinkApis);
+            await _equEquipmentLinkApiRepository.InsertRangeAsync(addLinkApis);
+
+
+            // 绑定硬件数据
+            await _equEquipmentLinkHardwareRepository.SoftDeleteAsync(deleteLinkHardwareIds);
+            await _equEquipmentLinkHardwareRepository.UpdateRangeAsync(updateLinkHardwares);
+            await _equEquipmentLinkHardwareRepository.InsertRangeAsync(addLinkHardwares);
 
             return rows;
         }
@@ -231,11 +226,12 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// <returns></returns>
         public async Task<int> DeleteEquEquipmentAsync(long[] idsArr)
         {
+            // TODO 事务处理
             var rows = 0;
-            rows += await _equEquipmentRepository.DeleteAsync(idsArr);
-            //await _equEquipmentLinkHardwareRepository.SoftDeleteAsync((x => idsArr.Contains(x.EquipmentId) && !x.IsDeleted), App.GetName());
-            //await _equEquipmentLinkApiRepository.SoftDeleteAsync((x => idsArr.Contains(x.EquipmentId) && !x.IsDeleted), App.GetName());
-            // TODO
+            rows += await _equEquipmentRepository.SoftDeleteAsync(idsArr);
+            await _equEquipmentLinkApiRepository.SoftDeleteAsync(idsArr);
+            await _equEquipmentLinkHardwareRepository.SoftDeleteAsync(idsArr);
+
             return rows;
         }
 
@@ -244,128 +240,40 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<EquEquipmentDto>> GetPagedListAsync(EquEquipmentPagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<EquEquipmentListDto>> GetPagedListAsync(EquEquipmentPagedQueryDto pagedQueryDto)
         {
-            /*
-            var predicate = Expressionable.Create<EquEquipment, InteWorkCenter>();
-            predicate = predicate.And((g, o) => g.SiteCode == App.GetSite());
-            predicate = predicate.AndIF(!string.IsNullOrEmpty(pagedQueryDto.EquipmentCode), (g, o) => g.EquipmentCode.Contains(pagedQueryDto.EquipmentCode));
-            predicate = predicate.AndIF(!string.IsNullOrEmpty(pagedQueryDto.EquipmentName), (g, o) => g.EquipmentName.Contains(pagedQueryDto.EquipmentName));
-            predicate = predicate.AndIF(!string.IsNullOrEmpty(pagedQueryDto.Location), (g, o) => g.Location.Contains(pagedQueryDto.Location));
-
-            // TODO 这里暂时用名字替代
-            predicate = predicate.AndIF(!string.IsNullOrEmpty(pagedQueryDto.EquipmentType), (g, o) => g.EquipmentType == pagedQueryDto.EquipmentType);
-            predicate = predicate.AndIF(!string.IsNullOrEmpty(pagedQueryDto.UseDepartment), (g, o) => g.UseDepartment.Contains(pagedQueryDto.UseDepartment));
-            predicate = predicate.AndIF(!string.IsNullOrEmpty(pagedQueryDto.WorkCenterShopName), (g, o) => o.Name.Contains(pagedQueryDto.WorkCenterShopName));
-            predicate = predicate.AndIF(pagedQueryDto.UseStatus != null, (g, o) => g.UseStatus == pagedQueryDto.UseStatus);
-
-            var response = await _equEquipmentRepository.Queryable()
-                .LeftJoin<InteWorkCenter>((g, o) => g.WorkCenterShopId == o.Id)
-                .Where(predicate.ToExpression())
-                .Select((g, o) => new CustomEquEquipmentListDto
-                {
-                    Id = g.Id,
-                    SiteCode = g.SiteCode,
-                    EquipmentCode = g.EquipmentCode,
-                    EquipmentName = g.EquipmentName,
-                    EquipmentType = g.EquipmentType,
-                    EquipmentDesc = g.EquipmentDesc,
-                    UseDepartment = g.UseDepartment,
-                    UseStatus = g.UseStatus,
-                    WorkCenterShopName = o.Name,
-                    Location = g.Location,
-                    CreateBy = g.CreateBy,
-                    CreateOn = g.CreateOn,
-                    UpdateBy = g.UpdateBy,
-                    UpdateOn = g.UpdateOn
-                })
-                 .ToPageAsync(pagedQueryDto);
-
-            return response;
-            */
-
             var pagedQuery = pagedQueryDto.ToQuery<EquEquipmentPagedQuery>();
-            var pagedInfo = await _equEquipmentRepository.GetPagedInfoAsync(pagedQuery);
+            var pagedInfo = await _equEquipmentRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
-            List<EquEquipmentDto> equipmentDtos = PrepareEquEquipmentDtos(pagedInfo);
-            return new PagedInfo<EquEquipmentDto>(equipmentDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
-        }
-
-        /// <summary>
-        /// 查询设备维护表列表
-        /// </summary>
-        /// <param name="pagedQueryDto"></param>
-        /// <returns></returns>
-        public async Task<PagedInfo<EquEquipmentDto>> GetListAsync(EquEquipmentPagedQueryDto pagedQueryDto)
-        {
-            /*
-            //开始拼装查询条件
-            var predicate = Expressionable.Create<EquEquipment>();
-            predicate = predicate.And(g => g.SiteCode == parm.SiteCode && g.IsDeleted == false);
-            predicate = predicate.AndIF(!string.IsNullOrEmpty(parm.EquipmentCode), g => g.EquipmentCode.Contains(parm.EquipmentCode));
-            predicate = predicate.AndIF(!string.IsNullOrEmpty(parm.EquipmentName), g => g.EquipmentCode.Contains(parm.EquipmentName));
-
-            //搜索条件查询语法参考Sqlsugar
-            var response = await _equEquipmentRepository
-              .Queryable()
-              .OrderByDescending(g => g.CreateOn)
-              .Where(predicate.ToExpression())
-              .ToPageAsync(parm);
-
-            return response;
-            */
-
-            var pagedQuery = pagedQueryDto.ToQuery<EquEquipmentPagedQuery>();
-            var pagedInfo = await _equEquipmentRepository.GetPagedInfoAsync(pagedQuery);
-
-            // 实体到DTO转换 装载数据
-            List<EquEquipmentDto> equipmentDtos = PrepareEquEquipmentDtos(pagedInfo);
-            return new PagedInfo<EquEquipmentDto>(equipmentDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            var dtos = pagedInfo.Data.Select(s => s.ToModel<EquEquipmentListDto>());
+            return new PagedInfo<EquEquipmentListDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
         /// <summary>
         /// 查询列表（设备注册）
         /// </summary>
         /// <returns></returns>
-        public async Task<List<EquEquipmentDictionaryDto>> QueryEquEquipmentDictionaryAsync()
+        public async Task<List<EquEquipmentDictionaryDto>> GetEquEquipmentDictionaryAsync()
         {
-            /*
-            var predicate = Expressionable.Create<EquEquipment>();
-            predicate = predicate.And(g => g.SiteCode == App.GetSite());
-
-            var list = await _equEquipmentRepository.Queryable()
-                .Where(predicate.ToExpression())
-                .Select(g => new EquEquipment
-                {
-                    Id = g.Id,
-                    EquipmentCode = g.EquipmentCode,
-                    EquipmentName = g.EquipmentName,
-                    EquipmentType = g.EquipmentType
-                })
-                 .ToListAsync();
-
             var dics = new List<EquEquipmentDictionaryDto> { };
-            var listGroup = list.GroupBy(g => g.EquipmentType);
-            foreach (var item in listGroup)
+            var list = await _equEquipmentRepository.GetBaseListAsync();
+            var equipmentTypeDic = list.ToLookup(g => g.EquipmentType);
+            foreach (var item in equipmentTypeDic)
             {
                 dics.Add(new EquEquipmentDictionaryDto
                 {
                     EquipmentType = item.Key,
-                    Equipments = item.Select(s => new EquEquipmentDictionaryValueDto
+                    Equipments = item.Select(s => new EquEquipmentBaseDto
                     {
                         Id = s.Id,
                         EquipmentCode = s.EquipmentCode,
                         EquipmentName = s.EquipmentName
-                    }).ToList()
+                    })
                 });
             }
 
             return dics;
-            */
-
-            // TODO 
-            return null;
         }
 
         /// <summary>
@@ -373,76 +281,9 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<CustomEquEquipmentDetailDto> GetCustomEquEquipmentAsync(long id)
+        public async Task<EquEquipmentDto> GetEquEquipmentWithGroupNameAsync(long id)
         {
-            /*
-            var model = await _equEquipmentRepository.Queryable()
-                .LeftJoin<EquEquipmentGroup>((g, o) => g.EquipmentGroupId == o.Id)
-                .Where((g, o) => g.SiteCode == App.GetSite() && g.Id == id)
-                .Select((g, o) => new CustomEquEquipmentDetailDto
-                {
-                    Id = g.Id,
-                    EquipmentCode = g.EquipmentCode,
-                    EquipmentName = g.EquipmentName,
-                    EquipmentGroupId = g.EquipmentGroupId,
-                    EquipmentGroupName = o.EquipmentGroupName,
-                    EquipmentDesc = g.EquipmentDesc,
-                    WorkCenterFactoryId = g.WorkCenterFactoryId,
-                    WorkCenterShopId = g.WorkCenterShopId,
-                    WorkCenterLineId = g.WorkCenterLineId,
-                    Location = g.Location,
-                    EquipmentType = g.EquipmentType,
-                    UseDepartment = g.UseDepartment,
-                    EntryDate = g.EntryDate,
-                    QualTime = g.QualTime,
-                    ExpireDate = g.ExpireDate,
-                    Manufacturer = g.Manufacturer,
-                    Supplier = g.Supplier,
-                    UseStatus = g.UseStatus,
-                    Power = g.Power,
-                    EnergyLevel = g.EnergyLevel,
-                    Ip = g.Ip,
-                    CreateBy = g.CreateBy,
-                    CreateOn = g.CreateOn,
-                    UpdateBy = g.UpdateBy,
-                    UpdateOn = g.UpdateOn,
-                    Remark = g.Remark,
-                    TaktTime = g.TaktTime
-                })
-                .FirstAsync();
-
-            return model;
-            */
-
-            // TODO 
-            return null;
-        }
-
-        /// <summary>
-        /// 查询设备（单个）
-        /// </summary>
-        /// <param name="equipmentCode">设备编码</param>
-        /// <param name="siteCode">站点</param>
-        /// <returns></returns>
-        public async Task<EquEquipmentEntity> QueryEquEquipmentAsync(string equipmentCode, string siteCode)
-        {
-            /*
-            EquEquipment model = new EquEquipment();
-            try
-            {
-                model = await _equEquipmentRepository.Queryable()
-                    .Where(m => m.EquipmentCode == equipmentCode.ToUpper() && m.SiteCode == siteCode)
-                    .FirstAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new CustomException(ConstEqu.EQU_30001, $"设备表根据设备编码+工厂查询异常：{ex}");
-            }
-
-            return model;
-            */
-            // TODO 
-            return null;
+            return (await _equEquipmentRepository.GetViewByIdAsync(id)).ToModel<EquEquipmentDto>();
         }
 
         /// <summary>
@@ -450,7 +291,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<EquEquipmentLinkApiDto>> GetEquimentLinkApiAsync(EquEquipmentLinkApiPagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<EquEquipmentLinkApiBaseDto>> GetEquimentLinkApiAsync(EquEquipmentLinkApiPagedQueryDto pagedQueryDto)
         {
             /*
             //搜索条件查询语法参考Sqlsugar
@@ -480,50 +321,16 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             var pagedInfo = await _equEquipmentLinkApiRepository.GetPagedInfoAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
-            List<EquEquipmentLinkApiDto> equipmentDtos = PrepareEquEquipmentLinkApiDtos(pagedInfo);
-            return new PagedInfo<EquEquipmentLinkApiDto>(equipmentDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
-        }
-
-        /// <summary>
-        /// 根据设备id+接口类型获取接口地址
-        /// </summary>
-        /// <param name="equipmentId"></param>
-        /// <param name="apiType"></param>
-        /// <returns></returns>
-        public async Task<EquEquipmentLinkApiEntity> GetApiForEquipmentidAndType(long equipmentId, string apiType)
-        {
-            /*
-            var response = await _equEquipmentLinkApiRepository.Queryable()
-                 .OrderByDescending(x => x.UpdateOn)
-                 .Where((x) => x.EquipmentId == equipmentId && x.ApiType == apiType && !x.IsDeleted)
-                 .Select(x => new QueryEquipmentLinkApiDto
-                 {
-                     Id = x.Id,
-                     SiteCode = x.SiteCode,
-                     EquipmentId = x.EquipmentId,
-                     ApiUrl = x.ApiUrl,
-                     ApiType = x.ApiType,
-                     Remark = x.Remark,
-                     CreateBy = x.CreateBy,
-                     CreateOn = x.CreateOn,
-                     UpdateBy = x.UpdateBy,
-                     UpdateOn = x.UpdateOn
-                 })
-                 .FirstAsync();
-
-            return response;
-            */
-
-            // TODO 
-            return null;
+            var dtos = pagedInfo.Data.Select(s => s.ToModel<EquEquipmentLinkApiBaseDto>());
+            return new PagedInfo<EquEquipmentLinkApiBaseDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
         /// <summary>
         /// 查询设备关联硬件列表
         /// </summary>
-        /// <param name="pagedQuery"></param>
+        /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<EquEquipmentLinkHardwareDto>> GetEquimentLinkHardwareAsync(EquEquipmentLinkHardwarePagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<EquEquipmentLinkHardwareBaseDto>> GetEquimentLinkHardwareAsync(EquEquipmentLinkHardwarePagedQueryDto pagedQueryDto)
         {
             /*
             //搜索条件查询语法参考Sqlsugar
@@ -553,91 +360,49 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             var pagedInfo = await _equEquipmentLinkHardwareRepository.GetPagedInfoAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
-            List<EquEquipmentLinkHardwareDto> equipmentDtos = PrepareEquEquipmentLinkHardwareDtos(pagedInfo);
-            return new PagedInfo<EquEquipmentLinkHardwareDto>(equipmentDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            var dtos = pagedInfo.Data.Select(s => s.ToModel<EquEquipmentLinkHardwareBaseDto>());
+            return new PagedInfo<EquEquipmentLinkHardwareBaseDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+
+
+
+        #region 这里是供其他业务层调用的方法，个人觉得应该直接在其他业务层调用各业务仓储层
+        /// <summary>
+        /// 查询设备（单个）
+        /// </summary>
+        /// <param name="equipmentCode">设备编码</param>
+        /// <param name="siteCode">站点</param>
+        /// <returns></returns>
+        public async Task<EquEquipmentDto> GetByEquipmentCodeAsync(string equipmentCode, string siteCode)
+        {
+            return (await _equEquipmentRepository.GetByEquipmentCodeAsync(equipmentCode.ToUpper())).ToModel<EquEquipmentDto>();
+        }
+
+        /// <summary>
+        /// 根据设备id+接口类型获取接口地址
+        /// </summary>
+        /// <param name="equipmentId"></param>
+        /// <param name="apiType"></param>
+        /// <returns></returns>
+        public async Task<EquEquipmentLinkApiDto> GetApiForEquipmentidAndType(long equipmentId, string apiType)
+        {
+            return (await _equEquipmentLinkApiRepository.GetByEquipmentIdAsync(equipmentId, apiType)).ToModel<EquEquipmentLinkApiDto>();
         }
 
         /// <summary>
         /// 根据硬件编码硬件类型获取设备
         /// </summary>
-        /// <param name="HardwareCode"></param>
-        /// <param name="HardwareType"></param>
+        /// <param name="hardwareCode"></param>
+        /// <param name="hardwareType"></param>
         /// <returns></returns>
-        public async Task<EquEquipmentLinkHardwareEntity> GetLinkHardwareForCodeAndTypeAsync(string HardwareCode, string HardwareType)
+        public async Task<EquEquipmentLinkHardwareDto> GetLinkHardwareForCodeAndTypeAsync(string hardwareCode, string hardwareType)
         {
-            /*
-            var model = await _equEquipmentLinkHardwareRepository.Queryable()
-                .Where(m => m.HardwareCode == HardwareCode && m.HardwareType == HardwareType)
-                .Select(x => new EquEquipmentLinkHardware
-                {
-                    Id = x.Id,
-                    SiteCode = x.SiteCode,
-                    EquipmentId = x.EquipmentId,
-                    HardwareCode = x.HardwareCode,
-                    HardwareType = x.HardwareType,
-                    Remark = x.Remark,
-                    CreateBy = x.CreateBy,
-                    CreateOn = x.CreateOn,
-                    UpdateBy = x.UpdateBy,
-                    UpdateOn = x.UpdateOn
-                }).FirstAsync();
-            return model;
-            */
-
-            // TODO 
-            return null;
+            return (await _equEquipmentLinkHardwareRepository.GetByHardwareCodeAsync(hardwareCode, hardwareType)).ToModel<EquEquipmentLinkHardwareDto>();
         }
+        #endregion
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="pagedInfo"></param>
-        /// <returns></returns>
-        private static List<EquEquipmentDto> PrepareEquEquipmentDtos(PagedInfo<EquEquipmentEntity> pagedInfo)
-        {
-            var dtos = new List<EquEquipmentDto>();
-            foreach (var entity in pagedInfo.Data)
-            {
-                var dto = entity.ToModel<EquEquipmentDto>();
-                dtos.Add(dto);
-            }
 
-            return dtos;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="pagedInfo"></param>
-        /// <returns></returns>
-        private static List<EquEquipmentLinkApiDto> PrepareEquEquipmentLinkApiDtos(PagedInfo<EquEquipmentLinkApiEntity> pagedInfo)
-        {
-            var dtos = new List<EquEquipmentLinkApiDto>();
-            foreach (var entity in pagedInfo.Data)
-            {
-                var dto = entity.ToModel<EquEquipmentLinkApiDto>();
-                dtos.Add(dto);
-            }
-
-            return dtos;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="pagedInfo"></param>
-        /// <returns></returns>
-        private static List<EquEquipmentLinkHardwareDto> PrepareEquEquipmentLinkHardwareDtos(PagedInfo<EquEquipmentLinkHardwareEntity> pagedInfo)
-        {
-            var dtos = new List<EquEquipmentLinkHardwareDto>();
-            foreach (var entity in pagedInfo.Data)
-            {
-                var dto = entity.ToModel<EquEquipmentLinkHardwareDto>();
-                dtos.Add(dto);
-            }
-
-            return dtos;
-        }
     }
 }

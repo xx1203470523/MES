@@ -6,7 +6,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
     /// <summary>
     /// 新增输入对象（设备组）
     /// </summary>
-    public class EquEquipmentGroupAddDto
+    public record EquEquipmentGroupCreateDto : BaseEntityDto
     {
         /// <summary>
         /// 编码（设备组）
@@ -34,7 +34,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
     /// <summary>
     /// 修改输入对象（设备组）
     /// </summary>
-    public class EquEquipmentGroupEditDto
+    public record EquEquipmentGroupModifyDto : BaseEntityDto
     {
         /// <summary>
         /// 唯一标识
@@ -59,10 +59,15 @@ namespace Hymson.MES.Services.Dtos.Equipment
     }
 
     /// <summary>
-    /// 查询对象（设备组）
+    /// 设备组Dto
     /// </summary>
-    public class EquEquipmentGroupQueryDto : PagerInfo
+    public record EquEquipmentGroupListDto : BaseEntityDto
     {
+        /// <summary>
+        /// 主键id
+        /// </summary>
+        public long Id { get; set; }
+
         /// <summary>
         /// 编码（设备组）
         /// </summary>
@@ -75,9 +80,37 @@ namespace Hymson.MES.Services.Dtos.Equipment
     }
 
     /// <summary>
+    /// 设备组分页Dto
+    /// </summary>
+    public class EquEquipmentGroupPagedQueryDto : PagerInfo
+    {
+        ///// <summary>
+        ///// 描述 :站点编码 
+        ///// 空值 : false  
+        ///// </summary>
+        //public string SiteCode { get; set; }
+    }
+
+    /// <summary>
+    /// 自定义实体对象（设备组）
+    /// </summary>
+    public class EquEquipmentGroupDto
+    {
+        /// <summary>
+        /// 信息（设备组）
+        /// </summary>
+        public EquEquipmentGroupListDto? Info { get; set; }
+
+        /// <summary>
+        /// 集合（设备）
+        /// </summary>
+        public IEnumerable<EquEquipmentBaseDto> Equipments { get; set; }
+    }
+
+    /// <summary>
     /// 查询对象（设备组）
     /// </summary>
-    public class EquEquipmentGroupDetailQueryDto
+    public record EquEquipmentGroupQueryDto : BaseEntityDto
     {
         /// <summary>
         /// 操作类型 1:add；2:edit；3:view；
@@ -89,23 +122,4 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public long Id { get; set; }
     }
-
-    /*
-    /// <summary>
-    /// 自定义实体对象（设备组）
-    /// </summary>
-    public class CustomEquEquipmentGroupDetailDto
-    {
-        /// <summary>
-        /// 信息（设备组）
-        /// </summary>
-        public EquEquipmentGroup Info { get; set; }
-
-        /// <summary>
-        /// 集合（设备注册）
-        /// </summary>
-        public List<EquEquipment> Equipments { get; set; }
-    }
-    */
-    
 }

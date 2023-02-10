@@ -20,6 +20,13 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        Task<int> InsertRangeAsync(List<EquEquipmentLinkHardwareEntity> entitys);
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="equipmentUnitEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(EquEquipmentLinkHardwareEntity equipmentUnitEntity);
@@ -27,9 +34,23 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        Task<int> UpdateRangeAsync(List<EquEquipmentLinkHardwareEntity> entitys);
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        Task<int> DeleteAsync(long[] idsArr);
+        Task<int> SoftDeleteAsync(IEnumerable<long> idsArr);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="equipmentIds"></param>
+        /// <returns></returns>
+        Task<int> SoftDeleteAsync(long[] equipmentIds);
 
         /// <summary>
         /// 
@@ -37,6 +58,14 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         /// <param name="id"></param>
         /// <returns></returns>
         Task<EquEquipmentLinkHardwareEntity> GetByIdAsync(long id);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="hardwareCode"></param>
+        /// <param name="hardwareType"></param>
+        /// <returns></returns>
+        Task<EquEquipmentLinkHardwareEntity> GetByHardwareCodeAsync(string hardwareCode, string hardwareType);
 
         /// <summary>
         /// 
