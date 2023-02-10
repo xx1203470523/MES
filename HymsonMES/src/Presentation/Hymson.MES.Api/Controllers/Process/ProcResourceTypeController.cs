@@ -94,7 +94,7 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
-        /// 更新资源类型维护表
+        /// 删除资源类型维护表
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>

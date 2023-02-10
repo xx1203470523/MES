@@ -42,6 +42,20 @@ namespace Hymson.MES.Services.Services.Process.IProcessService
         Task<PagedInfo<ProcResourceDto>> GetListForGroupAsync(ProcResourcePagedQueryDto query);
 
         /// <summary>
+        /// 资源关联打印机数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ProcResourceConfigPrintViewDto>> GetcResourceConfigPrintAsync(ProcResourceConfigPrintPagedQueryDto query);
+
+        /// <summary>
+        /// 资源设置数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ProcResourceConfigResDto>> GetcResourceConfigResAsync(ProcResourceConfigResPagedQueryDto query);
+
+        /// <summary>
         /// 添加资源数据
         /// </summary>
         /// <param name="param"></param>

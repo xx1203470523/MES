@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.Data.Repositories.Process
+namespace Hymson.MES.Data.Repositories.Process.Resource
 {
-    public class ProcResourceView:ProcResourceEntity
+    public class ProcResourceView : ProcResourceEntity
     {
         /// <summary>
         /// 资源

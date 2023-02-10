@@ -1,6 +1,6 @@
 ﻿using Hymson.Infrastructure;
 
-namespace Hymson.MES.Data.Repositories.Process
+namespace Hymson.MES.Data.Repositories.Process.Resource
 {
     /// <summary>
     /// 资源维护表查询对象
@@ -47,5 +47,11 @@ namespace Hymson.MES.Data.Repositories.Process
         public string SiteCode { get; set; }
 
         public long[] IdsArr { get; set; }
+
+        /// <summary>
+        /// 描述 :状态 
+        /// 空值 : false  
+        /// </summary>
+        public string Status { get; set; }
     }
 }

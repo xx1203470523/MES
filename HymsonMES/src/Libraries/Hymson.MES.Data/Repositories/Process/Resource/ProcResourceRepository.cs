@@ -2,10 +2,9 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Process.Resource;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using Org.BouncyCastle.Crypto;
-using System;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -48,6 +47,17 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ProcResourceEntity>(GetByResTypeIdsSql,new { SiteCode = query.SiteCode, Ids = query.IdsArr });
+        }
+
+        /// <summary>
+        /// 查询要删除的资源列表是否有启用状态的
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcResourceEntity>> GetByIdsAsync(ProcResourceQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcResourceEntity>(GetByIdsSql, new { SiteCode = query.SiteCode, Ids = query.IdsArr, Status = query.Status });
         }
 
         /// <summary>
@@ -249,6 +259,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdSql = "SELECT a.*,b.ResType,b.ResType FROM proc_resource a left join proc_resource_type b on a.ResTypeId=b.Id and b.IsDeleted =0 where a.Id=@Id ";
         const string Get = "select `proc_resource WHERE `Id` in @Id and ResTypeId >0 ";
         const string GetByResTypeIdsSql = "select * from proc_resource where SiteCode=@SiteCode and ResTypeId in @Ids and IsDeleted =0 ";
+        const string GetByIdsSql = "select * from proc_resource where SiteCode=@SiteCode  and Id  in @Ids and Status=@Status";
 
         const string GetPagedInfoDataSqlTemplate = "SELECT a.*,b.ResType,b.ResTypeName  FROM proc_resource a left join proc_resource_type b on a.ResTypeId =b.Id and b.IsDeleted =0 /**where**/ LIMIT @Offset,@Rows";
         const string GetPagedInfoCountSqlTemplate = "SELECT count(*) FROM proc_resource a left join proc_resource_type b on a.ResTypeId =b.Id  /**where**/ ";

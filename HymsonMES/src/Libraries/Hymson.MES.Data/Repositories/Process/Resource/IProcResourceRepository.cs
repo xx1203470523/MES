@@ -1,5 +1,6 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Data.Repositories.Process.Resource;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -18,6 +19,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcResourceEntity>> GetByResTypeIdsAsync(ProcResourceQuery query);
+
+        /// <summary>
+        /// 查询要删除的资源列表是否有启用状态的
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcResourceEntity>> GetByIdsAsync(ProcResourceQuery query);
 
         /// <summary>
         ///  查询资源维护表列表(关联资源类型，展示资源类型名称)

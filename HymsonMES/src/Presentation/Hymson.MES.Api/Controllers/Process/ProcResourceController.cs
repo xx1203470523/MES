@@ -84,6 +84,30 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
+        /// 资源关联打印机数据
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [Route("print/list")]
+        [HttpGet]
+        public async Task<PagedInfo<ProcResourceConfigPrintViewDto>> GetResourceConfigPrint(ProcResourceConfigPrintPagedQueryDto parm)
+        {
+            return await _procResourceService.GetcResourceConfigPrintAsync(parm);
+        }
+
+        /// <summary>
+        /// 获取资源设置数据
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [Route("res/list")]
+        [HttpGet]
+        public async Task<PagedInfo<ProcResourceConfigResDto>> GetResourceConfigPrint(ProcResourceConfigResPagedQueryDto parm)
+        {
+            return await _procResourceService.GetcResourceConfigResAsync(parm);
+        }
+
+        /// <summary>
         /// 添加资源数据
         /// </summary>
         /// <param name="parm"></param>

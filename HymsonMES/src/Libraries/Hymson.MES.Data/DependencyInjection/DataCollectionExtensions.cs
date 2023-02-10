@@ -34,6 +34,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IWhStockChangeRecordRepository, WhStockChangeRecordRepository>();
             services.AddSingleton<IProcResourceTypeRepository, ProcResourceTypeRepository>();
             services.AddSingleton<IProcResourceRepository, ProcResourceRepository>();
+            services.AddSingleton<IProcResourceConfigPrintRepository, ProcResourceConfigPrintRepository>();
             return services;
         }
 

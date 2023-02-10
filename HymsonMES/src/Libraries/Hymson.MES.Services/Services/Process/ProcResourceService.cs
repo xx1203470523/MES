@@ -1,9 +1,11 @@
 ﻿using FluentValidation;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Process.ResourceType;
+using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.Snowflake;
@@ -20,15 +22,34 @@ namespace Hymson.MES.Services.Services.Process
     /// </summary>
     public class ProcResourceService : IProcResourceService
     {
+        /// <summary>
+        /// 资源仓储
+        /// </summary>
         private readonly IProcResourceRepository _resourceRepository;
+
+        /// <summary>
+        /// 资源关联打印机仓储
+        /// </summary>
+        private readonly IProcResourceConfigPrintRepository _resourceConfigPrintRepository;
+
+        /// <summary>
+        /// 资源设置仓储
+        /// </summary>
+        private readonly ProcResourceConfigResRepository _procResourceConfigResRepository;
+
         private readonly AbstractValidator<ProcResourceDto> _validationRules;
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        public ProcResourceService(IProcResourceRepository resourceRepository, AbstractValidator<ProcResourceDto> validationRules)
+        public ProcResourceService(IProcResourceRepository resourceRepository,
+                  IProcResourceConfigPrintRepository resourceConfigPrintRepository,
+                  ProcResourceConfigResRepository procResourceConfigResRepository,
+                  AbstractValidator<ProcResourceDto> validationRules)
         {
             _resourceRepository = resourceRepository;
+            _resourceConfigPrintRepository = resourceConfigPrintRepository;
+            _procResourceConfigResRepository = procResourceConfigResRepository;
             _validationRules = validationRules;
         }
 
@@ -104,6 +125,46 @@ namespace Hymson.MES.Services.Services.Process
         }
 
         /// <summary>
+        /// 资源关联打印机数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ProcResourceConfigPrintViewDto>> GetcResourceConfigPrintAsync(ProcResourceConfigPrintPagedQueryDto query)
+        {
+            var resourcePagedQuery = query.ToQuery<ProcResourceConfigPrintPagedQuery>();
+            var pagedInfo = await _resourceConfigPrintRepository.GetPagedInfoAsync(resourcePagedQuery);
+
+            //实体到DTO转换 装载数据
+            var procResourceConfigPrintViewDtos = new List<ProcResourceConfigPrintViewDto>();
+            foreach (var entity in pagedInfo.Data)
+            {
+                var resourceTypeDto = entity.ToModel<ProcResourceConfigPrintViewDto>();
+                procResourceConfigPrintViewDtos.Add(resourceTypeDto);
+            }
+            return new PagedInfo<ProcResourceConfigPrintViewDto>(procResourceConfigPrintViewDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 资源设置数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ProcResourceConfigResDto>> GetcResourceConfigResAsync(ProcResourceConfigResPagedQueryDto query)
+        {
+            var resPagedQuery = query.ToQuery<ProcResourceConfigResPagedQuery>();
+            var pagedInfo = await _procResourceConfigResRepository.GetPagedInfoAsync(resPagedQuery);
+
+            //实体到DTO转换 装载数据
+            var resourceConfigResDtos = new List<ProcResourceConfigResDto>();
+            foreach (var entity in pagedInfo.Data)
+            {
+                var resourceTypeDto = entity.ToModel<ProcResourceConfigResDto>();
+                resourceConfigResDtos.Add(resourceTypeDto);
+            }
+            return new PagedInfo<ProcResourceConfigResDto>(resourceConfigResDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
         /// 添加资源数据
         /// </summary>
         /// <param name="param"></param>
@@ -162,6 +223,26 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<int> DeleteProcResourceAsync(string ids)
         {
             long[] idsArr = StringExtension.SpitLongArrary(ids);
+            if (idsArr.Length < 1)
+            {
+                throw new NotFoundException(ErrorCode.MES10100, "删除失败Id 不能为空!");
+            }
+
+            var siteCode = "TODO";
+            //不能删除启用状态的资源
+            var query = new ProcResourceQuery
+            {
+                IdsArr = idsArr,
+                SiteCode = siteCode,
+                //TODO
+                Status = "1"
+            };
+            var resourceList = await _resourceRepository.GetByIdsAsync(query);
+            if (resourceList != null && resourceList.Any())
+            {
+                throw new CustomerValidationException(ErrorCode.MES10100, "不能删除启用状态的资源!");
+            }
+
             return await _resourceRepository.DeleteAsync(idsArr);
         }
     }

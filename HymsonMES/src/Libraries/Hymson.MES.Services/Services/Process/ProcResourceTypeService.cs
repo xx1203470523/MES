@@ -4,6 +4,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
@@ -11,11 +12,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Extensions;
 using Hymson.Utils.Tools;
-using IdGen;
-using Org.BouncyCastle.Crypto;
-using System.Security.AccessControl;
 using System.Transactions;
-using static Google.Protobuf.Reflection.FieldOptions.Types;
 
 namespace Hymson.MES.Services.Services.Process
 {
