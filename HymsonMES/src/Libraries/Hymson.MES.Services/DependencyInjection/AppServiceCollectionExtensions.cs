@@ -51,8 +51,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteClassService, InteClassService>();
             #endregion
 
-            #region ProcMaterial
+            #region Material
             services.AddSingleton<IProcMaterialService, ProcMaterialService>();
+            services.AddSingleton<IProcMaterialGroupService, ProcMaterialGroupService>();
             #endregion
 
             #region Resource
@@ -88,8 +89,13 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<EquEquipmentUnitCreateDto>, EquipmentUnitCreateValidator>();
             #endregion
 
+            #region Material
             services.AddSingleton<AbstractValidator<ProcMaterialCreateDto>, ProcMaterialCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcMaterialModifyDto>, ProcMaterialModifyValidator>();
+
+            services.AddSingleton<AbstractValidator<ProcMaterialGroupCreateDto>, ProcMaterialGroupCreateValidator>();
+            services.AddSingleton<AbstractValidator<ProcMaterialGroupModifyDto>, ProcMaterialGroupModifyValidator>();
+            #endregion
 
             #region Resource
             services.AddSingleton<AbstractValidator<ProcResourceDto>, ProcResourceValidator>();

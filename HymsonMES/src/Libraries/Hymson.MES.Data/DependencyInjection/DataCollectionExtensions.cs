@@ -49,9 +49,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteClassRepository, InteClassRepository>();
             #endregion
 
-            #region ProcMaterial
+            #region Material
             services.AddSingleton<IProcMaterialRepository, ProcMaterialRepository>();
             services.AddSingleton<IProcReplaceMaterialRepository, ProcReplaceMaterialRepository>();
+
+            services.AddSingleton<IProcMaterialGroupRepository, ProcMaterialGroupRepository>();
             #endregion
 
             #region Resource
