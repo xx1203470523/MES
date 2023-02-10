@@ -31,13 +31,13 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// 描述 :开始时间 
         /// 空值 : false  
         /// </summary>
-        public string StartTime { get; set; }
+        public DateTime StartTime { get; set; }
         
         /// <summary>
         /// 描述 :结束时间 
         /// 空值 : false  
         /// </summary>
-        public string EndTime { get; set; }
+        public DateTime EndTime { get; set; }
         
         /// <summary>
         /// 描述 :描述 

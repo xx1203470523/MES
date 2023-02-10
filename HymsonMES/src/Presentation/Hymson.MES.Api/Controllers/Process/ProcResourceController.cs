@@ -1,7 +1,5 @@
 using Hymson.Infrastructure;
-using Hymson.MES.Services.Dtos.OnStock;
 using Hymson.MES.Services.Dtos.Process;
-using Hymson.MES.Services.Services.OnStock;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.Utils.Extensions;
 using Microsoft.AspNetCore.Mvc;
