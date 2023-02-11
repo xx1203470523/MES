@@ -1,9 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
-using Hymson.Utils.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Api.Controllers
 {
@@ -100,7 +98,7 @@ namespace Hymson.MES.Api.Controllers
         /// <returns></returns>
         [Route("res/list")]
         [HttpGet]
-        public async Task<PagedInfo<ProcResourceConfigResDto>> GetResourceConfigPrint(ProcResourceConfigResPagedQueryDto parm)
+        public async Task<PagedInfo<ProcResourceConfigResDto>> GetResourceConfigRes(ProcResourceConfigResPagedQueryDto parm)
         {
             return await _procResourceService.GetcResourceConfigResAsync(parm);
         }
@@ -111,7 +109,6 @@ namespace Hymson.MES.Api.Controllers
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpGet("equ/list")]
-        [HttpGet]
         public async Task<PagedInfo<ProcResourceEquipmentBindViewDto>> GetResourceConfigEquAsync(ProcResourceEquipmentBindPagedQueryDto parm)
         {
             return await _procResourceService.GetcResourceConfigEquAsync(parm);
@@ -123,7 +120,6 @@ namespace Hymson.MES.Api.Controllers
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpGet("job/list")]
-        [HttpGet]
         public async Task<PagedInfo<ProcResourceConfigJobViewDto>> GetcResourceConfigJoAsync(ProcResourceConfigJobPagedQueryDto parm)
         {
             return await _procResourceService.GetcResourceConfigJoAsync(parm);
