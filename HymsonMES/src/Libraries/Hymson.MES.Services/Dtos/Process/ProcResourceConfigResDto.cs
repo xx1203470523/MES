@@ -9,6 +9,7 @@
 using Hymson.Infrastructure;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -78,16 +79,6 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public record ProcResourceConfigResCreateDto : BaseEntityDto
     {
-        /// <summary>
-        /// ID
-        /// </summary>
-        public long Id { get; set; }
-
-       /// <summary>
-        /// 所属资源ID
-        /// </summary>
-        public long ResourceId { get; set; }
-
        /// <summary>
         /// 设置类型(字典配置)
         /// </summary>
@@ -96,39 +87,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 设置值
         /// </summary>
-        public string Value { get; set; }
-
-       /// <summary>
-        /// 备注
-        /// </summary>
-        public string Remark { get; set; }
-
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-       /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-       /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public bool? IsDeleted { get; set; }
-
-       
+        public string Value { get; set; }  
     }
 
     /// <summary>
@@ -137,57 +96,26 @@ namespace Hymson.MES.Services.Dtos.Process
     public record ProcResourceConfigResModifyDto : BaseEntityDto
     {
         /// <summary>
-        /// ID
-        /// </summary>
-        public long Id { get; set; }
-
-       /// <summary>
-        /// 所属资源ID
-        /// </summary>
-        public long ResourceId { get; set; }
-
-       /// <summary>
-        /// 设置类型(字典配置)
+        /// 设置类型
         /// </summary>
         public string SetType { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 设置值
         /// </summary>
         public string Value { get; set; }
 
-       /// <summary>
-        /// 备注
+        /// <summary>
+        /// Id
         /// </summary>
-        public string Remark { get; set; }
+        public long? Id { get; set; }
 
-       /// <summary>
-        /// 创建人
+        /// <summary>
+        /// 操作类型
         /// </summary>
-        public string CreatedBy { get; set; }
-
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-       /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-       /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public bool? IsDeleted { get; set; }
-
-       
-
+        //[Required(ErrorMessage = "操作类型不可为空")]
+        //[Range(1, 3)]
+        public int OperationType { get; set; }
     }
 
     /// <summary>

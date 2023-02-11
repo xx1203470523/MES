@@ -9,6 +9,7 @@
 using Hymson.Infrastructure;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -104,132 +105,49 @@ namespace Hymson.MES.Services.Dtos.Process
     public record ProcResourceConfigJobCreateDto : BaseEntityDto
     {
         /// <summary>
-        /// ID
-        /// </summary>
-        public long Id { get; set; }
-
-       /// <summary>
-        /// 所属资源ID
-        /// </summary>
-        public long ResourceId { get; set; }
-
-       /// <summary>
-        /// 关联点(字典key值)
+        /// 关联点
         /// </summary>
         public string LinkPoint { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 作业ID
         /// </summary>
+       // [Required(ErrorMessage = "作业ID不能为空")]
         public long JobId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否启用
         /// </summary>
-        public bool? IsUse { get; set; }
+        public bool IsUse { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 参数
         /// </summary>
+       // [MaxLength(length: 100, ErrorMessage = "参数超长")]
         public string Parameter { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备注
         /// </summary>
+        //[MaxLength(length: 255, ErrorMessage = "说明超长")]
         public string Remark { get; set; }
-
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-       /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-       /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public bool? IsDeleted { get; set; }
-
-       
     }
 
     /// <summary>
     /// 资源作业配置表更新Dto
     /// </summary>
-    public record ProcResourceConfigJobModifyDto : BaseEntityDto
+    public record ProcResourceConfigJobModifyDto : ProcResourceConfigJobCreateDto
     {
         /// <summary>
-        /// ID
+        /// Id
         /// </summary>
-        public long Id { get; set; }
+        public long? Id { get; set; }
 
-       /// <summary>
-        /// 所属资源ID
+        /// <summary>
+        /// 操作类型
         /// </summary>
-        public long ResourceId { get; set; }
-
-       /// <summary>
-        /// 关联点(字典key值)
-        /// </summary>
-        public string LinkPoint { get; set; }
-
-       /// <summary>
-        /// 作业ID
-        /// </summary>
-        public long JobId { get; set; }
-
-       /// <summary>
-        /// 是否启用
-        /// </summary>
-        public bool? IsUse { get; set; }
-
-       /// <summary>
-        /// 参数
-        /// </summary>
-        public string Parameter { get; set; }
-
-       /// <summary>
-        /// 备注
-        /// </summary>
-        public string Remark { get; set; }
-
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-       /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-       /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public bool? IsDeleted { get; set; }
+        //[Required(ErrorMessage = "操作类型不可为空")]
+        public int OperationType { get; set; }
     }
 
     /// <summary>

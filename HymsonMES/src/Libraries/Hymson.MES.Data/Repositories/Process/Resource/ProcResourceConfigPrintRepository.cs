@@ -56,14 +56,25 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
-        /// 删除（软删除）
+        /// 根据资源id和打印机Id查询数据
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<int> DeleteAsync(long id)
+        public async Task<IEnumerable<ProcResourceConfigPrintEntity>> GetByResourceIdAsync(ProcResourceConfigPrintQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, new { Id = id });
+            return await conn.QueryAsync<ProcResourceConfigPrintEntity>(GetByResourceIdSql, new { ResourceId=query.ResourceId, Ids=query.Ids });
+        }
+
+        /// <summary>
+        /// 新增
+        /// </summary>
+        /// <param name="procResourceConfigPrints"></param>
+        /// <returns></returns>
+        public async Task InsertRangeAsync(List<ProcResourceConfigPrintEntity> procResourceConfigPrints)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            await conn.ExecuteScalarAsync<long>(InsertSql, procResourceConfigPrints);
         }
 
         /// <summary>
@@ -71,44 +82,21 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] idsArr)
+        public async Task<int> DeleteRangeAsync(long[] idsArr)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, idsArr);
-        }
-
-        /// <summary>
-        /// 根据ID获取数据
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<ProcResourceConfigPrintEntity> GetByIdAsync(long id)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcResourceConfigPrintEntity>(GetByIdSql, new { Id = id });
-        }
-
-        /// <summary>
-        /// 新增
-        /// </summary>
-        /// <param name="procResourceConfigPrintEntity"></param>
-        /// <returns></returns>
-        public async Task InsertAsync(ProcResourceConfigPrintEntity procResourceConfigPrintEntity)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var id = await conn.ExecuteScalarAsync<long>(InsertSql, procResourceConfigPrintEntity);
-            procResourceConfigPrintEntity.Id = id;
+            return await conn.ExecuteAsync(DeleteSql, new { Ids = idsArr });
         }
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="procResourceConfigPrintEntity"></param>
+        /// <param name="procResourceConfigPrints"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(ProcResourceConfigPrintEntity procResourceConfigPrintEntity)
+        public async Task<int> UpdateRangeAsync(List<ProcResourceConfigPrintEntity> procResourceConfigPrints)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateSql, procResourceConfigPrintEntity);
+            return await conn.ExecuteAsync(UpdateSql, procResourceConfigPrints);
         }
     }
 
@@ -116,15 +104,10 @@ namespace Hymson.MES.Data.Repositories.Process
     {
         const string GetPagedInfoDataSqlTemplate = @"select a.*,b.PrintName,b.PrintIp from proc_resource_config_print a left join proc_printer b on a.PrintId=b.Id and b.IsDeleted =0   /**where**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "select count(*) from proc_resource_config_print a left join proc_printer b on a.PrintId=b.Id and b.IsDeleted =0  /**where**/";
-        const string GetProcResourceConfigPrintEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM `proc_resource_config_print` /**where**/  ";
 
         const string InsertSql = "INSERT INTO `proc_resource_config_print`(  `Id`, `SiteCode`, `ResourceId`, `PrintId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @ResourceId, @PrintId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string UpdateSql = "UPDATE `proc_resource_config_print` SET   SiteCode = @SiteCode, ResourceId = @ResourceId, PrintId = @PrintId, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `proc_resource_config_print` SET IsDeleted = '1' WHERE Id = @Id ";
-        const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteCode`, `ResourceId`, `PrintId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `proc_resource_config_print`  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `proc_resource_config_print` SET  PrintId=@PrintId,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id=@Id ";
+        const string DeleteSql = "UPDATE `proc_resource_config_print` SET IsDeleted = '1' WHERE Id in @Ids ";
+        const string GetByResourceIdSql = "SELECT * FROM proc_resource_config_print where ResourceId=@ResourceId and PrintId  IN @Ids AND IsDeleted =0 ";
     }
 }

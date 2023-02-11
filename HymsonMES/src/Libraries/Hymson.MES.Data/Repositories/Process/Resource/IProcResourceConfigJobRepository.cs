@@ -17,32 +17,25 @@ namespace Hymson.MES.Data.Repositories.Process
     public interface IProcResourceConfigJobRepository
     {
         /// <summary>
-        /// 新增
+        /// 分页查询
         /// </summary>
-        /// <param name="procResourceConfigJobEntity"></param>
+        /// <param name="procResourceConfigJobPagedQuery"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(ProcResourceConfigJobEntity procResourceConfigJobEntity);
+        Task<PagedInfo<ProcResourceConfigJobView>> GetPagedInfoAsync(ProcResourceConfigJobPagedQuery procResourceConfigJobPagedQuery);
         
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="procResourceConfigJobEntitys"></param>
+        /// <param name="procResourceConfigJobs"></param>
         /// <returns></returns>
-        Task<int> InsertsAsync(List<ProcResourceConfigJobEntity> procResourceConfigJobEntitys);
+        Task<int> InsertRangeAsync(List<ProcResourceConfigJobEntity> procResourceConfigJobs);
 
-        /// <summary>
-        /// 更新
-        /// </summary>
-        /// <param name="procResourceConfigJobEntity"></param>
-        /// <returns></returns>
-        Task<int> UpdateAsync(ProcResourceConfigJobEntity procResourceConfigJobEntity);
-        
         /// <summary>
         /// 批量更新 
         /// </summary>
-        /// <param name="procResourceConfigJobEntitys"></param>
+        /// <param name="procResourceConfigJobs"></param>
         /// <returns></returns>
-        Task<int> UpdatesAsync(List<ProcResourceConfigJobEntity> procResourceConfigJobEntitys);
+        Task<int> UpdateRangeAsync(List<ProcResourceConfigJobEntity> procResourceConfigJobs);
 
         /// <summary>
         /// 删除
@@ -56,34 +49,6 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<int> DeletesAsync(long[] ids);
-
-        /// <summary>
-        /// 根据ID获取数据
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<ProcResourceConfigJobEntity> GetByIdAsync(long id);
-    
-        /// <summary>
-        /// 根据IDs批量获取数据
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        Task<IEnumerable<ProcResourceConfigJobEntity>> GetByIdsAsync(long[] ids);
-
-        /// <summary>
-        /// 获取List
-        /// </summary>
-        /// <param name="procResourceConfigJobQuery"></param>
-        /// <returns></returns>
-        Task<IEnumerable<ProcResourceConfigJobEntity>> GetProcResourceConfigJobEntitiesAsync(ProcResourceConfigJobQuery procResourceConfigJobQuery);
-        
-        /// <summary>
-        /// 分页查询
-        /// </summary>
-        /// <param name="procResourceConfigJobPagedQuery"></param>
-        /// <returns></returns>
-        Task<PagedInfo<ProcResourceConfigJobView>> GetPagedInfoAsync(ProcResourceConfigJobPagedQuery procResourceConfigJobPagedQuery);
+        Task<int> DeletesRangeAsync(long[] ids);
     }
 }

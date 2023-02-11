@@ -89,6 +89,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<EquEquipmentUnitCreateDto>, EquipmentUnitCreateValidator>();
             #endregion
 
+            #region Process
             #region Material
             services.AddSingleton<AbstractValidator<ProcMaterialCreateDto>, ProcMaterialCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcMaterialModifyDto>, ProcMaterialModifyValidator>();
@@ -98,7 +99,9 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Resource
-            services.AddSingleton<AbstractValidator<ProcResourceDto>, ProcResourceValidator>();
+            services.AddSingleton<AbstractValidator<ProcResourceCreateDto>, ProcResourceCreateValidator>();
+            services.AddSingleton<AbstractValidator<ProcResourceModifyDto>, ProcResourcelModifyValidator>();
+            #endregion
             #endregion
             return services;
         }

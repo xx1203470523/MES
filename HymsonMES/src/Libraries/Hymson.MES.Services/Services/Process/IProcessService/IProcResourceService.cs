@@ -74,14 +74,14 @@ namespace Hymson.MES.Services.Services.Process.IProcessService
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task AddProcResourceAsync(ProcResourceDto param);
+        Task AddProcResourceAsync(ProcResourceCreateDto param);
 
         /// <summary>
         /// 修改资源数据
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> UpdateProcResrouceAsync(ProcResourceDto param);
+        Task UpdateProcResrouceAsync(ProcResourceModifyDto param);
 
         /// <summary>
         /// 批量删除资源类型数据

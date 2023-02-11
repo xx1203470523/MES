@@ -81,28 +81,28 @@ namespace Hymson.MES.Services.Mapper
 
             #region ResourceType
 
-            CreateMap<ProcResourceTypeDto, ProcResourceTypeEntity>();
-            CreateMap<ProcResourceTypeViewDto, ProcResourceTypeView>();
+            CreateMap<ProcResourceTypeEntity, ProcResourceTypeDto>();
+            CreateMap<ProcResourceTypeView, ProcResourceTypeDto>();
             CreateMap<ProcResourceTypePagedQueryDto, ProcResourceTypePagedQuery>();
 
             #endregion
 
             #region ProcResource
 
-            CreateMap<ProcResourceDto, ProcResourceEntity>();
-            CreateMap<ProcResourceViewDto, ProcResourceView>();
+            CreateMap<ProcResourceEntity, ProcResourceDto>();
+            CreateMap<ProcResourceView, ProcResourceDto>();
             CreateMap<ProcResourcePagedQueryDto, ProcResourcePagedQuery>();
 
             CreateMap<ProcResourceConfigPrintViewDto, ProcResourceConfigPrintView>();
             CreateMap<ProcResourceConfigPrintPagedQueryDto, ProcResourceConfigPrintPagedQuery>();
 
-            CreateMap<ProcResourceConfigResDto, ProcResourceConfigResEntity>();
+            CreateMap<ProcResourceConfigResEntity, ProcResourceConfigResDto>();
             CreateMap<ProcResourceConfigResPagedQueryDto, ProcResourceConfigResPagedQuery>();
 
-            CreateMap<ProcResourceEquipmentBindViewDto, ProcResourceEquipmentBindView>();
+            CreateMap<ProcResourceEquipmentBindView, ProcResourceEquipmentBindDto>();
             CreateMap<ProcResourceEquipmentBindPagedQueryDto, ProcResourceEquipmentBindPagedQuery>();
 
-            CreateMap<ProcResourceConfigJobViewDto, ProcResourceConfigJobView>();
+            CreateMap<ProcResourceConfigJobView, ProcResourceConfigJobDto>();
             CreateMap<ProcResourceConfigJobPagedQueryDto, ProcResourceConfigJobPagedQuery>();
             #endregion
         }
