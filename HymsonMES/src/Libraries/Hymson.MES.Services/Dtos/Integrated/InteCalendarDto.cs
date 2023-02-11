@@ -42,7 +42,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public string Month { get; set; }
 
         /// <summary>
-        /// 生产班次表Id
+        /// 班制维护表Id
         /// </summary>
         public long? ClassId { get; set; }
 
@@ -111,7 +111,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public string Month { get; set; }
 
         /// <summary>
-        /// 生产班次表Id
+        /// 班制维护表Id
         /// </summary>
         public long? ClassId { get; set; }
 
@@ -246,7 +246,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public string[] Smonth { get; set; }
 
         /// <summary>
-        /// 生产班次表Id
+        /// 班制维护表Id
         /// </summary>
         public long? ClassId { get; set; }
 

@@ -4,7 +4,7 @@ using Hymson.MES.Services.Dtos.Integrated;
 namespace Hymson.MES.Services.Services.Integrated.InteClass
 {
     /// <summary>
-    /// 生产班次 service接口
+    /// 班制维护 service接口
     /// </summary>
     public interface IInteClassService
     {

@@ -5,7 +5,7 @@ using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
 namespace Hymson.MES.Data.Repositories.Integrated.InteClass
 {
     /// <summary>
-    /// 生产班次仓储接口
+    /// 班制维护仓储接口
     /// </summary>
     public interface IInteClassRepository
     {

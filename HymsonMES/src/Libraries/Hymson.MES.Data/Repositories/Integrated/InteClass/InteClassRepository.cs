@@ -12,7 +12,7 @@ using static Dapper.SqlMapper;
 namespace Hymson.MES.Data.Repositories.Integrated.InteClass
 {
     /// <summary>
-    /// 生产班次仓储
+    /// 班制维护仓储
     /// </summary>
     public partial class InteClassRepository : IInteClassRepository
     {

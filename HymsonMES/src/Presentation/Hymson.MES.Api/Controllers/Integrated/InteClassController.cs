@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Hymson.MES.Api.Controllers.Integrated
 {
     /// <summary>
-    /// 控制器（生产班次）
+    /// 控制器（班制维护）
     /// @author 陈志谱
     /// @date 2023-02-10 08:55:55
     /// </summary>
@@ -16,13 +16,13 @@ namespace Hymson.MES.Api.Controllers.Integrated
     public class InteClassController : ControllerBase
     {
         /// <summary>
-        /// 接口（生产班次）
+        /// 接口（班制维护）
         /// </summary>
         private readonly IInteClassService _inteClassService;
         private readonly ILogger<InteClassController> _logger;
 
         /// <summary>
-        /// 构造函数（生产班次）
+        /// 构造函数（班制维护）
         /// </summary>
         /// <param name="inteClassService"></param>
         public InteClassController(IInteClassService inteClassService, ILogger<InteClassController> logger)
@@ -34,7 +34,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
 
 
         /// <summary>
-        /// 添加（生产班次）
+        /// 添加（班制维护）
         /// </summary>
         /// <returns></returns>
         [HttpPost]
@@ -44,7 +44,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
-        /// 更新（生产班次）
+        /// 更新（班制维护）
         /// </summary>
         /// <returns></returns>
         [HttpPut]
@@ -54,7 +54,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
-        /// 删除（生产班次）
+        /// 删除（班制维护）
         /// </summary>
         /// <returns></returns>
         [HttpDelete("{ids}")]
@@ -65,7 +65,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
-        /// 查询列表（生产班次）
+        /// 查询列表（班制维护）
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
@@ -76,7 +76,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
-        /// 查询详情（生产班次）
+        /// 查询详情（班制维护）
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>

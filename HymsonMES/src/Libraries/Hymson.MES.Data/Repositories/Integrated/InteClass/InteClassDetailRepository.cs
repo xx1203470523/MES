@@ -9,7 +9,7 @@ using MySql.Data.MySqlClient;
 namespace Hymson.MES.Data.Repositories.Integrated.InteClass
 {
     /// <summary>
-    /// 生产班次明细仓储
+    /// 班制维护明细仓储
     /// </summary>
     public partial class InteClassDetailRepository : IInteClassDetailRepository
     {

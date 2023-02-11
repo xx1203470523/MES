@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Hymson.MES.Services.Dtos.Integrated
 {
     /// <summary>
-    /// 生产班次新增输入对象
+    /// 班制维护新增输入对象
     /// @author wangkeming
     /// @date 2022-12-26
     /// </summary>
@@ -31,7 +31,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
     }
 
     /// <summary>
-    /// 生产班次修改输入对象
+    /// 班制维护修改输入对象
     /// @author wangkeming
     /// @date 2022-12-26
     /// </summary>
@@ -68,7 +68,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
     }
     
     /// <summary>
-    /// 生产班次新增输入对象
+    /// 班制维护新增输入对象
     /// </summary>
     public record InteClassDto : BaseEntityDto
     {
@@ -103,7 +103,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
     }
 
     /// <summary>
-    /// 生产班次新增输入对象
+    /// 班制维护新增输入对象
     /// @author wangkeming
     /// @date 2022-12-26
     /// </summary>
@@ -121,7 +121,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
     }
 
     /// <summary>
-    /// 生产班次查询对象
+    /// 班制维护查询对象
     /// @author wangkeming
     /// @date 2022-12-26
     /// </summary>
