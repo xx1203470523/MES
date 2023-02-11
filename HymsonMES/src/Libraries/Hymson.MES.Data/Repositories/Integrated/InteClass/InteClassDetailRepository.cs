@@ -1,6 +1,5 @@
 using Dapper;
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
@@ -10,7 +9,7 @@ using MySql.Data.MySqlClient;
 namespace Hymson.MES.Data.Repositories.Integrated.InteClass
 {
     /// <summary>
-    /// 生产班次明细仓储
+    /// 班制维护明细仓储
     /// </summary>
     public partial class InteClassDetailRepository : IInteClassDetailRepository
     {
@@ -25,13 +24,13 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="inteClassDetailEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task InsertAsync(InteClassDetailEntity inteClassDetailEntity)
+        public async Task InsertAsync(InteClassDetailEntity entity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var id = await conn.ExecuteScalarAsync<long>(InsertSql, inteClassDetailEntity);
-            inteClassDetailEntity.Id = id;
+            var id = await conn.ExecuteScalarAsync<long>(InsertSql, entity);
+            entity.Id = id;
         }
 
         /// <summary>
@@ -48,12 +47,12 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="inteClassDetailEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(InteClassDetailEntity inteClassDetailEntity)
+        public async Task<int> UpdateAsync(InteClassDetailEntity entity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateSql, inteClassDetailEntity);
+            return await conn.ExecuteAsync(UpdateSql, entity);
         }
 
         /// <summary>
@@ -116,7 +115,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         /// </summary>
         /// <param name="inteClassDetailPagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<InteClassDetailEntity>> GetPagedInfoAsync(InteClassDetailPagedQuery inteClassDetailPagedQuery)
+        public async Task<PagedInfo<InteClassDetailEntity>> GetPagedListAsync(InteClassDetailPagedQuery inteClassDetailPagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);

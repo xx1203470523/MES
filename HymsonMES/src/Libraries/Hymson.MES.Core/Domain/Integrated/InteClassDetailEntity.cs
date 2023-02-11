@@ -3,7 +3,7 @@ using Hymson.Infrastructure;
 namespace Hymson.MES.Core.Domain.Integrated
 {
     /// <summary>
-    /// 生产班次详情数据实体对象
+    /// 班制维护详情数据实体对象
     /// @author admin
     /// @date 2023-02-08
     /// </summary>

@@ -104,7 +104,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         public async Task<PagedInfo<EquEquipmentGroupListDto>> GetPageListAsync(EquEquipmentGroupPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<EquEquipmentGroupPagedQuery>();
-            var pagedInfo = await _equEquipmentGroupRepository.GetPagedInfoAsync(pagedQuery);
+            var pagedInfo = await _equEquipmentGroupRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<EquEquipmentGroupListDto>());

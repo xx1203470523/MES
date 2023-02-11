@@ -28,7 +28,7 @@ namespace Hymson.MES.Core.Domain.Integrated
         public string Month { get; set; }
         
         /// <summary>
-        /// 描述 :生产班次表Id 
+        /// 描述 :班制维护表Id 
         /// 空值 : false  
         /// </summary>
         public long ClassId { get; set; }

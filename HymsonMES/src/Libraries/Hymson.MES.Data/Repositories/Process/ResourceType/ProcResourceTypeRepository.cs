@@ -1,18 +1,10 @@
 ﻿using Dapper;
-using Google.Protobuf.WellKnownTypes;
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.OnStock;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
-using Hymson.MES.Data.Repositories.OnStock;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Process
 {

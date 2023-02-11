@@ -76,7 +76,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<EquEquipmentUnitEntity>> GetPagedInfoAsync(EquEquipmentUnitPagedQuery pagedQuery)
+        public async Task<PagedInfo<EquEquipmentUnitEntity>> GetPagedListAsync(EquEquipmentUnitPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
