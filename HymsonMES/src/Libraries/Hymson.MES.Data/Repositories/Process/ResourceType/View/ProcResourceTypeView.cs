@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.Data.Repositories.Process.ResourceType
+namespace Hymson.MES.Data.Repositories.Process.ResourceType.View
 {
     public class ProcResourceTypeView : ProcResourceTypeEntity
     {
