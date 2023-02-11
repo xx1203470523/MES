@@ -31,7 +31,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         }
 
         /// <summary>
-        /// 新增（单位维护）
+        /// 添加（单位维护）
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>

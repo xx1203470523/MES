@@ -68,7 +68,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
-        /// 查询列表（日历）
+        /// 查询列表（日历维护）
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>

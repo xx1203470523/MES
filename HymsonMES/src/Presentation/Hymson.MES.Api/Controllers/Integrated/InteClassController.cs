@@ -34,7 +34,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
 
 
         /// <summary>
-        /// 添加生产班次
+        /// 添加（生产班次）
         /// </summary>
         /// <returns></returns>
         [HttpPost]
@@ -44,7 +44,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
-        /// 更新生产班次
+        /// 更新（生产班次）
         /// </summary>
         /// <returns></returns>
         [HttpPut]
@@ -54,7 +54,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
-        /// 删除生产班次
+        /// 删除（生产班次）
         /// </summary>
         /// <returns></returns>
         [HttpDelete("{ids}")]
@@ -65,7 +65,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
-        /// 查询生产班次列表
+        /// 查询列表（生产班次）
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
@@ -76,7 +76,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
-        /// 查询生产班次详情
+        /// 查询详情（生产班次）
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
