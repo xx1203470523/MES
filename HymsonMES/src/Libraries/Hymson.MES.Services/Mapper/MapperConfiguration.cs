@@ -6,6 +6,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
+using Hymson.MES.Data.Repositories.Equipment.EquSparePartType.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteCalendar.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
 using Hymson.MES.Data.Repositories.Process;
@@ -53,7 +54,6 @@ namespace Hymson.MES.Services.Mapper
             #region EquEquipmentLinkApi
             CreateMap<EquEquipmentLinkApiCreateDto, EquEquipmentLinkApiEntity>();
             CreateMap<EquEquipmentLinkApiModifyDto, EquEquipmentLinkApiEntity>();
-            //CreateMap<EquEquipmentLinkApiDto, EquEquipmentLinkApiEntity>();
             CreateMap<EquEquipmentLinkApiPagedQueryDto, EquEquipmentLinkApiPagedQuery>();
             #endregion
 
@@ -66,10 +66,14 @@ namespace Hymson.MES.Services.Mapper
             #region EquEquipmentUnit
             CreateMap<EquEquipmentUnitCreateDto, EquEquipmentUnitEntity>();
             CreateMap<EquEquipmentUnitModifyDto, EquEquipmentUnitEntity>();
-            //CreateMap<EquipmentUnitEntity, EquipmentUnitCreateDto>();
             CreateMap<EquEquipmentUnitPagedQueryDto, EquEquipmentUnitPagedQuery>();
             #endregion
 
+            #region EquSparePartType
+            CreateMap<EquSparePartTypeCreateDto, EquSparePartTypeEntity>();
+            CreateMap<EquSparePartTypeModifyDto, EquSparePartTypeEntity>();
+            CreateMap<EquSparePartTypePagedQueryDto, EquSparePartTypePagedQuery>();
+            #endregion
         }
 
         /// <summary>
