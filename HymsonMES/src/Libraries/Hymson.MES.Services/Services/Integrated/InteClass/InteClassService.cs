@@ -6,7 +6,7 @@ using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
 
-namespace Hymson.MES.Services.Services.InteClass
+namespace Hymson.MES.Services.Services.Integrated.InteClass
 {
     /// <summary>
     /// 生产班次 服务
@@ -36,7 +36,7 @@ namespace Hymson.MES.Services.Services.InteClass
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task<int> AddInteClassAsync(AddInteClassDto createDto)
+        public async Task<int> AddInteClassAsync(nteClassCreateDto createDto)
         {
             // 验证DTO
 
@@ -74,7 +74,7 @@ namespace Hymson.MES.Services.Services.InteClass
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task<int> UpdateInteClassAsync(UpdateInteClassDto modifyDto)
+        public async Task<int> UpdateInteClassAsync(InteClassModifyDto modifyDto)
         {
             // DTO转换实体
             var entity = modifyDto.ToEntity<InteClassEntity>();
@@ -121,7 +121,7 @@ namespace Hymson.MES.Services.Services.InteClass
         public async Task<PagedInfo<InteClassDto>> GetPagedListAsync(InteClassPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<InteClassPagedQuery>();
-            var pagedInfo = await _inteClassRepository.GetPagedInfoAsync(pagedQuery);
+            var pagedInfo = await _inteClassRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<InteClassDto>());

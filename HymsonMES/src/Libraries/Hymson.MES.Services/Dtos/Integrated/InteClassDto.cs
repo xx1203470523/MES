@@ -61,7 +61,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
     /// @author wangkeming
     /// @date 2022-12-26
     /// </summary>
-    public record AddInteClassDto : BaseEntityDto
+    public record nteClassCreateDto : BaseEntityDto
     {
         /// <summary>
         ///班次名称
@@ -88,7 +88,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
     /// @author wangkeming
     /// @date 2022-12-26
     /// </summary>
-    public record UpdateInteClassDto : BaseEntityDto
+    public record InteClassModifyDto : BaseEntityDto
     {
         /// <summary>
         ///主键id

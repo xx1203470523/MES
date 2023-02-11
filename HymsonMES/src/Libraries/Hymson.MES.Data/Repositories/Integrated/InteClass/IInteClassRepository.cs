@@ -56,6 +56,6 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         /// </summary>
         /// <param name="inteClassPagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<InteClassEntity>> GetPagedInfoAsync(InteClassPagedQuery inteClassPagedQuery);
+        Task<PagedInfo<InteClassEntity>> GetPagedListAsync(InteClassPagedQuery inteClassPagedQuery);
     }
 }

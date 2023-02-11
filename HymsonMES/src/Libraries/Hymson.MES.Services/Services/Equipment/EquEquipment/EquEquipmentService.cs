@@ -318,7 +318,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
 
             // TODO 
             var pagedQuery = pagedQueryDto.ToQuery<EquEquipmentLinkApiPagedQuery>();
-            var pagedInfo = await _equEquipmentLinkApiRepository.GetPagedInfoAsync(pagedQuery);
+            var pagedInfo = await _equEquipmentLinkApiRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<EquEquipmentLinkApiBaseDto>());
@@ -357,7 +357,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
 
             // TODO 
             var pagedQuery = pagedQueryDto.ToQuery<EquEquipmentLinkHardwarePagedQuery>();
-            var pagedInfo = await _equEquipmentLinkHardwareRepository.GetPagedInfoAsync(pagedQuery);
+            var pagedInfo = await _equEquipmentLinkHardwareRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<EquEquipmentLinkHardwareBaseDto>());

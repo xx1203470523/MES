@@ -5,7 +5,8 @@ using Hymson.MES.Services.Options;
 using Hymson.MES.Services.Services.EquEquipmentGroup;
 using Hymson.MES.Services.Services.Equipment.EquEquipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipmentUnit;
-using Hymson.MES.Services.Services.InteClass;
+using Hymson.MES.Services.Services.Integrated.InteCalendar;
+using Hymson.MES.Services.Services.Integrated.InteClass;
 using Hymson.MES.Services.Services.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.MES.Services.Validators.Equipment;
@@ -48,6 +49,7 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Integrated
+            services.AddSingleton<IInteCalendarService, InteCalendarService>();
             services.AddSingleton<IInteClassService, InteClassService>();
             #endregion
 
@@ -100,6 +102,7 @@ namespace Microsoft.Extensions.DependencyInjection
             #region Resource
             services.AddSingleton<AbstractValidator<ProcResourceDto>, ProcResourceValidator>();
             #endregion
+
             return services;
         }
     }

@@ -147,7 +147,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<EquEquipmentLinkApiEntity>> GetPagedInfoAsync(EquEquipmentLinkApiPagedQuery pagedQuery)
+        public async Task<PagedInfo<EquEquipmentLinkApiEntity>> GetPagedListAsync(EquEquipmentLinkApiPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);

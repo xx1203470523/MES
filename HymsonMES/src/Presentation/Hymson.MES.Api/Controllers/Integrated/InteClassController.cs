@@ -7,11 +7,11 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
-using Hymson.MES.Services.Services.InteClass;
+using Hymson.MES.Services.Services.Integrated.InteClass;
 using Hymson.Utils.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Hymson.MES.Api.Controllers.InteClass
+namespace Hymson.MES.Api.Controllers.Integrated
 {
     /// <summary>
     /// 控制器（生产班次）
@@ -45,7 +45,7 @@ namespace Hymson.MES.Api.Controllers.InteClass
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public async Task<int> AddInteClassAsync([FromBody] AddInteClassDto createDto)
+        public async Task<int> AddInteClassAsync([FromBody] nteClassCreateDto createDto)
         {
             return await _inteClassService.AddInteClassAsync(createDto);
         }
@@ -55,7 +55,7 @@ namespace Hymson.MES.Api.Controllers.InteClass
         /// </summary>
         /// <returns></returns>
         [HttpPut]
-        public async Task<int> UpdateInteClassAsync([FromBody] UpdateInteClassDto modifyDto)
+        public async Task<int> UpdateInteClassAsync([FromBody] InteClassModifyDto modifyDto)
         {
             return await _inteClassService.UpdateInteClassAsync(modifyDto);
         }
