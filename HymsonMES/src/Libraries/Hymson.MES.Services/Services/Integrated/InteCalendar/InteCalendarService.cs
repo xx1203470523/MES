@@ -13,7 +13,7 @@ using Hymson.Utils.Extensions;
 namespace Hymson.MES.Services.Services.Integrated.InteCalendar
 {
     /// <summary>
-    /// 日历维护 服务
+    /// 业务处理层（日历维护）
     /// </summary>
     public class InteCalendarService : IInteCalendarService
     {
@@ -469,67 +469,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
         /// </summary>
         private static List<InteCalendarDateDetailEntity> GenerateDateDetailByCreateDto(long calendarId, InteCalendarCreateDto createDto)
         {
-            var monthArr = createDto.Month.Split(',');
-            var weekDays = new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday" };
-            var weekends = new[] { "Saturday", "Sunday" };
-            var day = DateTime.MinValue;
-            int days = 0;
-            var dateDetails = new List<InteCalendarDateDetailEntity>();
-            foreach (var month in monthArr)
-            {
-                //哪年哪月有多少天，周几，按默认值存进去，把编辑了的数据再替换掉
-                days = DateTime.DaysInMonth(Convert.ToInt32(createDto.Year), Convert.ToInt32(month));
-                for (int a = 1; a <= days; a++)
-                {
-                    if (a < 10)
-                    {
-                        day = DateTime.Parse(createDto.Year + "-" + month + "-0" + a);
-                    }
-                    else
-                    {
-                        day = DateTime.Parse(createDto.Year + "-" + month + "-" + a);
-                    }
-
-                    var week = day.DayOfWeek.ToString();
-                    //如果是工作日
-                    var resType = 2;
-                    long classId = 0;
-                    if (weekDays.Contains(week))
-                    {
-                        resType = 1;
-                        classId = createDto.ClassId ?? 0;
-                    }
-                    dateDetails.Add(new InteCalendarDateDetailEntity
-                    {
-                        CalendarId = calendarId,
-                        Day = day,
-                        ClassId = classId,
-                        RestType = resType
-
-                        // TODO 这里需要替换
-                        //CreateBy = App.GetName(),
-                        //UpdateBy = App.GetName(),
-                        //SiteCode = App.GetSite()
-                    });
-                }
-            }
-
-            //编辑过的日历
-            if (createDto.CalendarDataList != null && createDto.CalendarDataList.Any())
-            {
-                var details = createDto.CalendarDataList.OrderBy(a => a.Day);
-                foreach (var item in details)
-                {
-                    // TODO 原句是  var calendarData = dateDetails.FirstOrDefault(a => a.Day.ToString("yyyy-MM-dd") == item.Day.ToString("yyyy-MM-dd"));
-                    var calendarData = dateDetails.FirstOrDefault(a => a.Day.Value.ToShortDateString() == item.Day.ToShortDateString());
-                    if (calendarData != null)
-                    {
-                        calendarData.ClassId = string.IsNullOrWhiteSpace(item.ClassId) == true ? 0 : item.ClassId.ParseToLong(0);
-                        calendarData.RestType = item.RestType ?? 0;
-                    }
-                }
-            }
-            return dateDetails;
+            return GenerateDateDetail(calendarId, createDto.ClassId, createDto.Year, createDto.Month, createDto.CalendarDataList);
         }
 
         /// <summary>
@@ -537,41 +477,55 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
         /// </summary>
         private static List<InteCalendarDateDetailEntity> GenerateDateDetailByModifyDto(long calendarId, InteCalendarModifyDto modifyDto)
         {
-            var monthArr = modifyDto.Month.Split(',');
+            return GenerateDateDetail(calendarId, modifyDto.ClassId, modifyDto.Year, modifyDto.Month, modifyDto.CalendarDataList);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="calendarId"></param>
+        /// <param name="classId"></param>
+        /// <param name="yearStr"></param>
+        /// <param name="monthStr"></param>
+        /// <param name="calendarDataList"></param>
+        /// <returns></returns>
+        private static List<InteCalendarDateDetailEntity> GenerateDateDetail(long calendarId, long? classId, string yearStr, string monthStr, List<InteCalendarDateDetailDto> calendarDataList)
+        {
+            var monthArr = monthStr.Split(',');
             var weekDays = new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday" };
-            var weekends = new[] { "Saturday", "Sunday" };
+            var weekEnds = new[] { "Saturday", "Sunday" };
             var day = DateTime.MinValue;
             int days = 0;
-            var dateDetails = new List<InteCalendarDateDetailEntity>();
+            List<InteCalendarDateDetailEntity> dateDetails = new();
             foreach (var month in monthArr)
             {
-                //哪年哪月有多少天，周几，按默认值存进去，把编辑了的数据再替换掉
-                days = DateTime.DaysInMonth(Convert.ToInt32(modifyDto.Year), Convert.ToInt32(month));
+                // 哪年哪月有多少天，周几，按默认值存进去，把编辑了的数据再替换掉
+                days = DateTime.DaysInMonth(yearStr.ParseToInt(), month.ParseToInt());
                 for (int a = 1; a <= days; a++)
                 {
                     if (a < 10)
                     {
-                        day = DateTime.Parse(modifyDto.Year + "-" + month + "-0" + a);
+                        day = DateTime.Parse($"{yearStr}-{month}-0{a}");
                     }
                     else
                     {
-                        day = DateTime.Parse(modifyDto.Year + "-" + month + "-" + a);
+                        day = DateTime.Parse($"{yearStr}-{month}-{a}");
                     }
 
                     var week = day.DayOfWeek.ToString();
-                    //如果是工作日
+                    // 如果是工作日
                     var resType = 2;
-                    long classId = 0;
-                    if (weekDays.Contains(week))
+                    long classValue = 0;
+                    if (weekDays.Contains(week) == true)
                     {
                         resType = 1;
-                        classId = modifyDto.ClassId ?? 0;
+                        classValue = classId ?? 0;
                     }
                     dateDetails.Add(new InteCalendarDateDetailEntity
                     {
                         CalendarId = calendarId,
                         Day = day,
-                        ClassId = classId,
+                        ClassId = classValue,
                         RestType = resType
 
                         // TODO 这里需要替换
@@ -583,9 +537,9 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
             }
 
             // 编辑过的日历
-            if (modifyDto.CalendarDataList != null && modifyDto.CalendarDataList.Any())
+            if (calendarDataList != null && calendarDataList.Any())
             {
-                var details = modifyDto.CalendarDataList.OrderBy(a => a.Day);
+                var details = calendarDataList.OrderBy(a => a.Day);
                 foreach (var item in details)
                 {
                     // TODO 原句是  var calendarData = dateDetails.FirstOrDefault(a => a.Day.ToString("yyyy-MM-dd") == item.Day.ToString("yyyy-MM-dd"));
@@ -597,9 +551,9 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
                     }
                 }
             }
+
             return dateDetails;
         }
-
 
     }
 }

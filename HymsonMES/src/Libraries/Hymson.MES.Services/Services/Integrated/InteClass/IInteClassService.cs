@@ -13,7 +13,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        Task<int> AddInteClassAsync(nteClassCreateDto parm);
+        Task<int> AddInteClassAsync(InteClassCreateDto parm);
 
         /// <summary>
         /// 

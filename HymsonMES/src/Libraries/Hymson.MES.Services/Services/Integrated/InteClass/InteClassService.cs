@@ -36,7 +36,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task<int> AddInteClassAsync(nteClassCreateDto createDto)
+        public async Task<int> AddInteClassAsync(InteClassCreateDto createDto)
         {
             // 验证DTO
 

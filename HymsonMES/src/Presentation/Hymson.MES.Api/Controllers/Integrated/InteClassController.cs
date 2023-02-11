@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 生产班次    控制器 | 代码由框架生成  
- *builder:  陈志谱
- *build datetime: 2023-02-10 08:55:55
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated.InteClass;
@@ -45,7 +38,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public async Task<int> AddInteClassAsync([FromBody] nteClassCreateDto createDto)
+        public async Task<int> AddInteClassAsync([FromBody] InteClassCreateDto createDto)
         {
             return await _inteClassService.AddInteClassAsync(createDto);
         }
