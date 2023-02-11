@@ -47,7 +47,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpPut]
         [Route("update")]
         public async Task<int> Modify(EquEquipmentUnitModifyDto modifyDto)
         {
@@ -59,7 +59,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpDelete]
         [Route("delete")]
         public async Task<int> Delete(string ids)
         {
