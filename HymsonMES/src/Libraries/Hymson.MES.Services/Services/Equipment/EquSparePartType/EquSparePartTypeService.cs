@@ -6,8 +6,6 @@ using Hymson.MES.Data.Repositories.Equipment.EquSparePartType;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType.Query;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
-using Hymson.Utils;
-using IdGen;
 
 namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
 {
@@ -75,9 +73,13 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
             // DTO转换实体
             var entity = modifyDto.ToEntity<EquSparePartTypeEntity>();
             entity.UpdatedBy = "TODO";
-            entity.UpdatedOn = HymsonClock.Now();
 
-            return await _equSparePartTypeRepository.UpdateAsync(entity);
+            // TODO 事务处理
+            var rows = 0;
+            rows += await _equSparePartTypeRepository.UpdateAsync(entity);
+            rows += await _equSparePartRepository.ClearSparePartTypeIdAsync(entity.Id);
+            rows += await _equSparePartRepository.UpdateSparePartTypeIdAsync(entity.Id, modifyDto.SparePartIDs);
+            return rows;
         }
 
         /// <summary>
