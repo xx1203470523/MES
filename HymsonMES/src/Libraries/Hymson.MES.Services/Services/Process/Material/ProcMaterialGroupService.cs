@@ -33,11 +33,14 @@ namespace Hymson.MES.Services.Services.Process
         private readonly AbstractValidator<ProcMaterialGroupCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcMaterialGroupModifyDto> _validationModifyRules;
 
-        public ProcMaterialGroupService(IProcMaterialGroupRepository procMaterialGroupRepository, AbstractValidator<ProcMaterialGroupCreateDto> validationCreateRules, AbstractValidator<ProcMaterialGroupModifyDto> validationModifyRules)
+        private readonly IProcMaterialRepository _procMaterialRepository;
+
+        public ProcMaterialGroupService(IProcMaterialGroupRepository procMaterialGroupRepository, AbstractValidator<ProcMaterialGroupCreateDto> validationCreateRules, AbstractValidator<ProcMaterialGroupModifyDto> validationModifyRules, IProcMaterialRepository procMaterialRepository)
         {
             _procMaterialGroupRepository = procMaterialGroupRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
+            _procMaterialRepository = procMaterialRepository;
         }
 
         /// <summary>
@@ -47,19 +50,65 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task CreateProcMaterialGroupAsync(ProcMaterialGroupCreateDto procMaterialGroupCreateDto)
         {
-            //验证DTO
-            await _validationCreateRules.ValidateAndThrowAsync(procMaterialGroupCreateDto);
-
             //DTO转换实体
             var procMaterialGroupEntity = procMaterialGroupCreateDto.ToEntity<ProcMaterialGroupEntity>();
-            procMaterialGroupEntity.Id= IdGenProvider.Instance.CreateId();
+            procMaterialGroupEntity.Id = IdGenProvider.Instance.CreateId();
             procMaterialGroupEntity.CreatedBy = "TODO";
             procMaterialGroupEntity.UpdatedBy = "TODO";
             procMaterialGroupEntity.CreatedOn = HymsonClock.Now();
             procMaterialGroupEntity.UpdatedOn = HymsonClock.Now();
 
-            //入库
-            await _procMaterialGroupRepository.InsertAsync(procMaterialGroupEntity);
+            #region 参数校验
+            //验证DTO
+            await _validationCreateRules.ValidateAndThrowAsync(procMaterialGroupCreateDto);
+
+            //判断编号是否已存在
+            var existGroupCodes= await _procMaterialGroupRepository.GetProcMaterialGroupEntitiesAsync(new ProcMaterialGroupQuery { SiteCode = procMaterialGroupCreateDto.SiteCode, GroupCode = procMaterialGroupCreateDto.GroupCode });
+            if (existGroupCodes != null && existGroupCodes.Count() > 0) 
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10216)).WithData("GroupCode", procMaterialGroupCreateDto.GroupCode);
+            }
+
+            var procMaterialList = ConvertProcMaterialList(procMaterialGroupCreateDto.DynamicList, procMaterialGroupEntity.Id);
+            var procMaterialIds = procMaterialList.Select(x => x.Id).ToArray();
+
+            // 判断物料是否已被使用
+            var procMaterials = await _procMaterialRepository.GetByIdsAsync(procMaterialIds);
+            if (procMaterials.Where(x => x.GroupId != 0).Count() > 0) 
+            {
+                throw new CustomerValidationException(ErrorCode.MES10217);
+            }
+
+            #endregion
+
+            #region 保存到数据库
+            using (TransactionScope ts = new TransactionScope()) 
+            {
+                var response = 0;
+
+                //入库
+                response = await _procMaterialGroupRepository.InsertAsync(procMaterialGroupEntity);
+
+                if (response == 0)
+                {
+                    throw new BusinessException(ErrorCode.MES10218);
+                }
+
+                foreach (var item in procMaterialList)
+                {
+                    item.UpdatedBy = procMaterialGroupEntity.UpdatedBy;
+                    item.UpdatedOn = procMaterialGroupEntity.UpdatedOn;
+                }
+                response = await _procMaterialRepository.UpdateProcMaterialGroupAsync(procMaterialList);
+
+                if (response < procMaterialList.Count)
+                {
+                    throw new BusinessException(ErrorCode.MES10218);
+                }
+            }
+
+            #endregion
+
         }
 
         /// <summary>
@@ -79,7 +128,19 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<int> DeletesProcMaterialGroupAsync(string ids)
         {
+            if (string.IsNullOrEmpty(ids)) 
+            {
+                throw new ValidationException(ErrorCode.MES10213);
+            }
+
             var idsArr = StringExtension.SpitLongArrary(ids);
+            //判断物料中是否有当前物料组
+            var procMaterials = await _procMaterialRepository.GetByGroupIdsAsync(idsArr);
+            if (procMaterials != null && procMaterials.Count() > 0) 
+            {
+                throw new CustomerValidationException(ErrorCode.MES10221);
+            }
+
             return await _procMaterialGroupRepository.DeletesAsync(idsArr);
         }
 
@@ -160,15 +221,77 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task ModifyProcMaterialGroupAsync(ProcMaterialGroupModifyDto procMaterialGroupModifyDto)
         {
-             //验证DTO
-            await _validationModifyRules.ValidateAndThrowAsync(procMaterialGroupModifyDto);
+            if (procMaterialGroupModifyDto == null) 
+            {
+                throw new ValidationException(ErrorCode.MES10213);
+            }
+            procMaterialGroupModifyDto.SiteCode = "";//TODO  App.GetSite();
 
             //DTO转换实体
             var procMaterialGroupEntity = procMaterialGroupModifyDto.ToEntity<ProcMaterialGroupEntity>();
             procMaterialGroupEntity.UpdatedBy = "TODO";
             procMaterialGroupEntity.UpdatedOn = HymsonClock.Now();
+            procMaterialGroupEntity.GroupCode = procMaterialGroupEntity.GroupCode.ToUpper();
 
-            await _procMaterialGroupRepository.UpdateAsync(procMaterialGroupEntity);
+            #region 检验
+            //验证DTO
+            await _validationModifyRules.ValidateAndThrowAsync(procMaterialGroupModifyDto);
+
+            //检验物料组是否存在
+            var procMaterialGroup = await _procMaterialGroupRepository.GetByIdAsync(procMaterialGroupEntity.Id);
+            if (procMaterialGroup == null) 
+            {
+                throw new BusinessException(ErrorCode.MES10219);
+            }
+
+            //判断编号是否已存在
+            var existGroupCodes = await _procMaterialGroupRepository.GetProcMaterialGroupEntitiesAsync(new ProcMaterialGroupQuery { SiteCode = procMaterialGroupEntity.SiteCode, GroupCode = procMaterialGroupEntity.GroupCode });
+            if (existGroupCodes != null && existGroupCodes.Count() > 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10216)).WithData("GroupCode", procMaterialGroupEntity.GroupCode);
+            }
+
+            var procMaterialList = ConvertProcMaterialList(procMaterialGroupModifyDto.DynamicList, procMaterialGroupEntity.Id);
+            var procMaterialIds = procMaterialList.Select(x => x.Id).ToArray();
+
+            // 判断物料是否已被使用
+            var procMaterials = await _procMaterialRepository.GetByIdsAsync(procMaterialIds);
+            if (procMaterials.Where(x => x.GroupId != 0 && x.GroupId != procMaterialGroupEntity.Id).Count() > 0)
+            {
+                throw new CustomerValidationException(ErrorCode.MES10217);
+            }
+            #endregion
+
+            #region 保存到数据库
+            using (TransactionScope ts = new TransactionScope())
+            {
+                var response = 0;
+                response = await _procMaterialGroupRepository.UpdateAsync(procMaterialGroupEntity);
+
+                if (response == 0)
+                {
+                    throw new BusinessException(ErrorCode.MES10220);
+                }
+
+                //将之前所有该物料组的物料改为未绑定 
+                await _procMaterialRepository.UpdateProcMaterialUnboundAsync(procMaterialGroupEntity.Id);
+
+                //绑定本次的物料
+                foreach (var item in procMaterialList)
+                {
+                    item.UpdatedBy = procMaterialGroupEntity.UpdatedBy;
+                    item.UpdatedOn = procMaterialGroupEntity.UpdatedOn;
+                }
+                response = await _procMaterialRepository.UpdateProcMaterialGroupAsync(procMaterialList);
+                if (response < procMaterialList.Count)
+                {
+                    throw new BusinessException(ErrorCode.MES10220);
+                }
+            }
+
+            #endregion
+
+                
         }
 
         /// <summary>
@@ -178,12 +301,48 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<ProcMaterialGroupDto> QueryProcMaterialGroupByIdAsync(long id) 
         {
-           var procMaterialGroupEntity = await _procMaterialGroupRepository.GetByIdAsync(id);
+            //TODO 
+            var siteCode = "";
+
+            var procMaterialGroupEntity = await _procMaterialGroupRepository.GetByIdAndSiteCodeAsync(id, siteCode);
            if (procMaterialGroupEntity != null) 
            {
                return procMaterialGroupEntity.ToModel<ProcMaterialGroupDto>();
            }
             return null;
         }
+
+
+        #region 业务扩展方法
+        /// <summary>
+        /// 转换集合（物料组）
+        /// </summary>
+        /// <param name="dynamicList"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public static List<ProcMaterialEntity> ConvertProcMaterialList(IEnumerable<string> dynamicList, long id)
+        {
+            if (dynamicList == null || dynamicList.Any() == false) return new List<ProcMaterialEntity> { };
+
+            return dynamicList.Select(s => new ProcMaterialEntity
+            {
+                Id = ObjToLong(s),
+                GroupId = id
+            }).ToList();
+        }
+
+        public static long ObjToLong(object obj) 
+        {
+            try
+            {
+                return long.Parse(obj.ToString());
+            }
+            catch
+            {
+                return 0L;
+            }
+        }
+
+        #endregion
     }
 }

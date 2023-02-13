@@ -246,7 +246,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<int> UpdateResTypeAsync(long resTypeId)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateByResTypeSql, new
+            return await conn.ExecuteAsync(UpdatedByResTypeSql, new
             {
                 ResTypeId = resTypeId
             }); ;
@@ -282,6 +282,6 @@ namespace Hymson.MES.Data.Repositories.Process
         const string DeleteSql = "UPDATE `proc_resource` SET `IsDeleted` = 1 WHERE `Id` in @Ids;";
 
         const string UpdateResTypeSql = "UPDATE `proc_resource` SET ResTypeId = @ResTypeId,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id in @Ids;";
-        const string UpdateByResTypeSql = "UPDATE `proc_resource` SET ResTypeId =0,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE ResTypeId = @ResTypeId;";
+        const string UpdatedByResTypeSql = "UPDATE `proc_resource` SET ResTypeId =0,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE ResTypeId = @ResTypeId;";
     }
 }

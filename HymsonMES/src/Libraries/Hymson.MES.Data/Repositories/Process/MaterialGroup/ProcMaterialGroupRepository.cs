@@ -62,6 +62,18 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 根据ID和站点获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="siteCode"></param>
+        /// <returns></returns>
+        public async Task<ProcMaterialGroupEntity> GetByIdAndSiteCodeAsync(long id,string siteCode)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<ProcMaterialGroupEntity>(GetByIdAndSiteCodeSql, new { Id = id, SiteCode= siteCode });
+        }
+
+        /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
         /// <param name="ids"></param>
@@ -169,6 +181,18 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcMaterialGroupEntitiesSqlTemplate);
+            //sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Select("*");
+
+            if (!string.IsNullOrWhiteSpace(procMaterialGroupQuery.SiteCode))
+            {
+                sqlBuilder.Where(" SiteCode=@SiteCode ");
+            }
+            if (!string.IsNullOrWhiteSpace(procMaterialGroupQuery.GroupCode))
+            {
+                sqlBuilder.Where(" GroupCode = @GroupCode ");
+            }
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var procMaterialGroupEntities = await conn.QueryAsync<ProcMaterialGroupEntity>(template.RawSql, procMaterialGroupQuery);
             return procMaterialGroupEntities;
@@ -231,10 +255,10 @@ g.GroupCode,
 g.GroupName,
 g.GroupVersion,
 g.Remark,
-g.CreateBy,
-g.CreateOn,
-g.UpdateBy,
-g.UpdateOn,
+g.CreatedBy,
+g.CreatedOn,
+g.UpdatedBy,
+g.UpdatedOn,
 g.IsDeleted,
 o.MaterialCode,
 o.MaterialName,
@@ -242,21 +266,25 @@ o.Version
                                                             FROM `proc_material_group` g
                                                             LEFT JOIN proc_material o on o.GroupId == g.Id
 /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-        const string GetPagedCustomInfoCountSqlTemplate = @"SELECT COUNT(1) FROM `proc_material_group` 
-LEFT JOIN proc_material o on o.GroupId == g.Id  /**where**/ ";
+        const string GetPagedCustomInfoCountSqlTemplate = @"SELECT COUNT(1) 
+                                                FROM `proc_material_group` g
+                                                LEFT JOIN proc_material o on o.GroupId == g.Id  /**where**/ ";
         const string GetProcMaterialGroupEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `proc_material_group` /**where**/  ";
 
         const string InsertSql = "INSERT INTO `proc_material_group`(  `Id`, `SiteCode`, `GroupCode`, `GroupName`, `GroupVersion`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @GroupCode, @GroupName, @GroupVersion, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `proc_material_group`(  `Id`, `SiteCode`, `GroupCode`, `GroupName`, `GroupVersion`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @GroupCode, @GroupName, @GroupVersion, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string UpdateSql = "UPDATE `proc_material_group` SET   SiteCode = @SiteCode, GroupCode = @GroupCode, GroupName = @GroupName, GroupVersion = @GroupVersion, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `proc_material_group` SET  SiteCode = @SiteCode, GroupName = @GroupName, GroupVersion = @GroupVersion, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `proc_material_group` SET   SiteCode = @SiteCode, GroupCode = @GroupCode, GroupName = @GroupName, GroupVersion = @GroupVersion, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_material_group` SET IsDeleted = '1' WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_material_group` SET IsDeleted = '1' WHERE Id in @ids";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteCode`, `GroupCode`, `GroupName`, `GroupVersion`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_material_group`  WHERE Id = @Id ";
+        const string GetByIdAndSiteCodeSql = @"SELECT 
+                               `Id`, `SiteCode`, `GroupCode`, `GroupName`, `GroupVersion`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `proc_material_group`  WHERE Id = @Id And SiteCode=@siteCode ";
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteCode`, `GroupCode`, `GroupName`, `GroupVersion`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_material_group`  WHERE Id IN @ids ";

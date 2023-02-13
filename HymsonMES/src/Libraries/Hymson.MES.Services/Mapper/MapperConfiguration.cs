@@ -6,6 +6,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
+using Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteCalendar.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
@@ -71,6 +72,12 @@ namespace Hymson.MES.Services.Mapper
             #endregion
 
             #region EquSparePartType
+            CreateMap<EquSparePartCreateDto, EquSparePartEntity>();
+            CreateMap<EquSparePartModifyDto, EquSparePartEntity>();
+            CreateMap<EquSparePartPagedQueryDto, EquSparePartPagedQuery>();
+            #endregion
+
+            #region EquSparePartType
             CreateMap<EquSparePartTypeCreateDto, EquSparePartTypeEntity>();
             CreateMap<EquSparePartTypeModifyDto, EquSparePartTypeEntity>();
             CreateMap<EquSparePartTypePagedQueryDto, EquSparePartTypePagedQuery>();
@@ -120,6 +127,21 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<CustomProcMaterialGroupPagedQueryDto, ProcMaterialGroupCustomPagedQuery>();
             CreateMap<CustomProcMaterialGroupView, CustomProcMaterialGroupViewDto>();
 
+            #endregion
+
+            #region Parameter
+            CreateMap<ProcParameterCreateDto, ProcParameterEntity>();
+            CreateMap<ProcParameterModifyDto, ProcParameterEntity>();
+            CreateMap<ProcParameterPagedQueryDto, ProcParameterPagedQuery>();
+            CreateMap<ProcParameterEntity, ProcParameterDto>();
+            CreateMap<ProcParameterEntity, CustomProcParameterDto>();
+            #endregion
+
+            #region ParameterLinkType
+            CreateMap<ProcParameterLinkTypeCreateDto, ProcParameterLinkTypeEntity>();
+            CreateMap<ProcParameterLinkTypeModifyDto, ProcParameterLinkTypeEntity>();
+            CreateMap<ProcParameterLinkTypePagedQueryDto, ProcParameterLinkTypePagedQuery>();
+            CreateMap<ProcParameterLinkTypeEntity, ProcParameterLinkTypeDto>();
             #endregion
 
             #region ResourceType

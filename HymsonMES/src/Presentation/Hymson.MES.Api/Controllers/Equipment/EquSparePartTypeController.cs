@@ -35,25 +35,25 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <summary>
         /// 添加（备件类型）
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        public async Task AddEquSparePartTypeAsync([FromBody] EquSparePartTypeCreateDto parm)
+        public async Task<int> AddEquSparePartTypeAsync([FromBody] EquSparePartTypeCreateDto createDto)
         {
-            await _equSparePartTypeService.CreateEquSparePartTypeAsync(parm);
+            return await _equSparePartTypeService.CreateEquSparePartTypeAsync(createDto);
         }
 
         /// <summary>
         /// 更新（备件类型）
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
-        public async Task UpdateEquSparePartTypeAsync([FromBody] EquSparePartTypeModifyDto parm)
+        public async Task<int> UpdateEquSparePartTypeAsync([FromBody] EquSparePartTypeModifyDto modifyDto)
         {
-            await _equSparePartTypeService.ModifyEquSparePartTypeAsync(parm);
+            return await _equSparePartTypeService.ModifyEquSparePartTypeAsync(modifyDto);
         }
 
         /// <summary>
@@ -63,12 +63,12 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
-        public async Task DeleteEquSparePartTypeAsync(string ids)
+        public async Task<int> DeleteEquSparePartTypeAsync(string ids)
         {
             long[] idsArr = StringExtension.SpitLongArrary(ids);
-            await _equSparePartTypeService.DeletesEquSparePartTypeAsync(idsArr);
+            return await _equSparePartTypeService.DeletesEquSparePartTypeAsync(idsArr);
         }
-        
+
         /// <summary>
         /// 分页查询列表（备件类型）
         /// </summary>
@@ -91,7 +91,6 @@ namespace Hymson.MES.Api.Controllers.Equipment
         {
             return await _equSparePartTypeService.QueryEquSparePartTypeByIdAsync(id);
         }
-
 
     }
 }

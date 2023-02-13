@@ -4,7 +4,7 @@ namespace Hymson.MES.Core.Domain.Equipment
 {
     /// <summary>
     /// 备件类型，数据实体对象   
-    /// equ_spare_part_type
+    /// equ_sparepart_type
     /// @author 陈志谱
     /// @date 2023-02-11 04:10:42
     /// </summary>
@@ -23,7 +23,7 @@ namespace Hymson.MES.Core.Domain.Equipment
        /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; }
+        public int Status { get; set; }
 
        /// <summary>
         /// 描述
@@ -31,30 +31,9 @@ namespace Hymson.MES.Core.Domain.Equipment
         public string Remark { get; set; }
 
        /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreateBy { get; set; }
-
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreateOn { get; set; }
-
-       /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string UpdateBy { get; set; }
-
-       /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime? UpdateOn { get; set; }
-
-       /// <summary>
         /// 站点代码
         /// </summary>
         public string SiteCode { get; set; }
-
        
     }
 }

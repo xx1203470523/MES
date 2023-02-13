@@ -1,9 +1,9 @@
 /*
  *creator: Karl
  *
- *describe: 物料组维护表    Dto | 代码由框架生成
+ *describe: 标准参数表    Dto | 代码由框架生成
  *builder:  Karl
- *build datetime: 2023-02-10 03:54:07
+ *build datetime: 2023-02-13 02:50:20
  */
 
 using Hymson.Infrastructure;
@@ -16,9 +16,9 @@ using System.Threading.Tasks;
 namespace Hymson.MES.Services.Dtos.Process
 {
     /// <summary>
-    /// 物料组维护表Dto
+    /// 标准参数表Dto
     /// </summary>
-    public record ProcMaterialGroupDto : BaseEntityDto
+    public record ProcParameterDto : BaseEntityDto
     {
         /// <summary>
         /// 
@@ -26,22 +26,22 @@ namespace Hymson.MES.Services.Dtos.Process
         public long Id { get; set; }
 
        /// <summary>
-        /// 物料组编号
+        /// 参数代码
         /// </summary>
-        public string GroupCode { get; set; }
+        public string ParameterCode { get; set; }
 
        /// <summary>
-        /// 物料组名称
+        /// 参数名称
         /// </summary>
-        public string GroupName { get; set; }
+        public string ParameterName { get; set; }
 
        /// <summary>
-        /// 物料组版本
+        /// 参数单位（字典定义）
         /// </summary>
-        public string GroupVersion { get; set; }
+        public string ParameterUnit { get; set; }
 
        /// <summary>
-        /// 物料组描述
+        /// 说明
         /// </summary>
         public string Remark { get; set; }
 
@@ -73,11 +73,22 @@ namespace Hymson.MES.Services.Dtos.Process
        
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    public record CustomProcParameterDto : ProcParameterDto
+    {
+        /// <summary>
+        /// 类型
+        /// </summary>
+        public string Type { get; set; }
+    }
+
 
     /// <summary>
-    /// 物料组维护表新增Dto
+    /// 标准参数表新增Dto
     /// </summary>
-    public record ProcMaterialGroupCreateDto : BaseEntityDto
+    public record ProcParameterCreateDto : BaseEntityDto
     {
         /// <summary>
         /// 
@@ -85,22 +96,22 @@ namespace Hymson.MES.Services.Dtos.Process
         public long Id { get; set; }
 
        /// <summary>
-        /// 物料组编号
+        /// 参数代码
         /// </summary>
-        public string GroupCode { get; set; }
+        public string ParameterCode { get; set; }
 
        /// <summary>
-        /// 物料组名称
+        /// 参数名称
         /// </summary>
-        public string GroupName { get; set; }
+        public string ParameterName { get; set; }
 
        /// <summary>
-        /// 物料组版本
+        /// 参数单位（字典定义）
         /// </summary>
-        public string GroupVersion { get; set; }
+        public string ParameterUnit { get; set; }
 
        /// <summary>
-        /// 物料组描述
+        /// 说明
         /// </summary>
         public string Remark { get; set; }
 
@@ -129,16 +140,13 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public bool? IsDeleted { get; set; }
 
-        /// <summary>
-        /// 物料集合
-        /// </summary>
-        public IEnumerable<string> DynamicList { get; set; }
+       
     }
 
     /// <summary>
-    /// 物料组维护表更新Dto
+    /// 标准参数表更新Dto
     /// </summary>
-    public record ProcMaterialGroupModifyDto : BaseEntityDto
+    public record ProcParameterModifyDto : BaseEntityDto
     {
         /// <summary>
         /// 
@@ -146,22 +154,22 @@ namespace Hymson.MES.Services.Dtos.Process
         public long Id { get; set; }
 
        /// <summary>
-        /// 物料组编号
+        /// 参数代码
         /// </summary>
-        public string GroupCode { get; set; }
+        public string ParameterCode { get; set; }
 
        /// <summary>
-        /// 物料组名称
+        /// 参数名称
         /// </summary>
-        public string GroupName { get; set; }
+        public string ParameterName { get; set; }
 
        /// <summary>
-        /// 物料组版本
+        /// 参数单位（字典定义）
         /// </summary>
-        public string GroupVersion { get; set; }
+        public string ParameterUnit { get; set; }
 
        /// <summary>
-        /// 物料组描述
+        /// 说明
         /// </summary>
         public string Remark { get; set; }
 
@@ -190,17 +198,14 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public bool? IsDeleted { get; set; }
 
-        /// <summary>
-        /// 物料集合
-        /// </summary>
-        public IEnumerable<string> DynamicList { get; set; }
+       
 
     }
 
     /// <summary>
-    /// 物料组维护表分页Dto
+    /// 标准参数表分页Dto
     /// </summary>
-    public class ProcMaterialGroupPagedQueryDto : PagerInfo
+    public class ProcParameterPagedQueryDto : PagerInfo
     {
         /// <summary>
         /// 所属站点代码
@@ -208,73 +213,18 @@ namespace Hymson.MES.Services.Dtos.Process
         public string SiteCode { get; set; } = "";
 
         /// <summary>
-        /// 物料组编码
+        /// 编码（标准参数）
         /// </summary>
-        public string GroupCode { get; set; }
+        public string ParameterCode { get; set; }
 
         /// <summary>
-        /// 物料组名称
+        /// 名称（标准参数）
         /// </summary>
-        public string GroupName { get; set; }
+        public string ParameterName { get; set; }
 
         /// <summary>
-        /// 版本
+        /// 描述（标准参数）
         /// </summary>
-        public string Version { get; set; }
+        public string Remark { get; set; }
     }
-
-    /// <summary>
-    /// 物料组维护表自定义查询对象
-    /// </summary>
-    public class CustomProcMaterialGroupPagedQueryDto : PagerInfo
-    {
-        /// <summary>
-        /// 所属站点代码
-        /// </summary>
-        public string SiteCode { get; set; } = "";
-
-        /// <summary>
-        /// 物料组编码
-        /// </summary>
-        public string GroupCode { get; set; }
-
-        /// <summary>
-        /// 物料编码
-        /// </summary>
-        public string MaterialCode { get; set; }
-
-        /// <summary>
-        /// 版本
-        /// </summary>
-        public string Version { get; set; }
-    }
-
-    /// <summary>
-    /// 自定义分组 视图
-    /// </summary>
-    public record CustomProcMaterialGroupViewDto : ProcMaterialDto
-    {
-
-        #region 物料相关属性
-        /// <summary>
-        /// 描述 :物料编码 
-        /// 空值 : false  
-        /// </summary>
-        public string MaterialCode { get; set; }
-
-        /// <summary>
-        /// 描述 :物料名称 
-        /// 空值 : false  
-        /// </summary>
-        public string MaterialName { get; set; }
-
-        /// <summary>
-        /// 描述 :版本 
-        /// 空值 : true  
-        /// </summary>
-        public string Version { get; set; }
-        #endregion
-
-    }
-
 }

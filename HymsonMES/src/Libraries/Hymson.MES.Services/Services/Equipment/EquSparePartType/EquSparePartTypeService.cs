@@ -1,10 +1,13 @@
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Data.Repositories.Equipment.EquSparePart;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType.Query;
 using Hymson.MES.Services.Dtos.Equipment;
+using Hymson.Snowflake;
 using Hymson.Utils;
+using IdGen;
 
 namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
 {
@@ -14,17 +17,26 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
     public class EquSparePartTypeService : IEquSparePartTypeService
     {
         /// <summary>
-        /// 备件类型 仓储
+        /// 仓储（备件类型） 
         /// </summary>
         private readonly IEquSparePartTypeRepository _equSparePartTypeRepository;
 
         /// <summary>
+        /// 仓储（备件注册） 
+        /// </summary>
+        private readonly IEquSparePartRepository _equSparePartRepository;
+
+        /// <summary>
         /// 
         /// </summary>
+        /// <
         /// <param name="equSparePartTypeRepository"></param>
-        public EquSparePartTypeService(IEquSparePartTypeRepository equSparePartTypeRepository)
+        /// <param name="equSparePartRepository"></param>
+        public EquSparePartTypeService(IEquSparePartTypeRepository equSparePartTypeRepository,
+            IEquSparePartRepository equSparePartRepository)
         {
             _equSparePartTypeRepository = equSparePartTypeRepository;
+            _equSparePartRepository = equSparePartRepository;
         }
 
 
@@ -33,20 +45,22 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task CreateEquSparePartTypeAsync(EquSparePartTypeCreateDto createDto)
+        public async Task<int> CreateEquSparePartTypeAsync(EquSparePartTypeCreateDto createDto)
         {
-            // 验证DTO
+            // TODO 验证DTO
 
 
             // DTO转换实体
             var entity = createDto.ToEntity<EquSparePartTypeEntity>();
+            entity.Id = IdGenProvider.Instance.CreateId();
             entity.CreatedBy = "TODO";
             entity.UpdatedBy = "TODO";
-            entity.CreatedOn = HymsonClock.Now();
-            entity.UpdatedOn = HymsonClock.Now();
 
-            // 入库
-            await _equSparePartTypeRepository.InsertAsync(entity);
+            // TODO 事务处理
+            var rows = 0;
+            rows += await _equSparePartTypeRepository.InsertAsync(entity);
+            rows += await _equSparePartRepository.UpdateSparePartTypeIdAsync(entity.Id, createDto.SparePartIDs);
+            return rows;
         }
 
         /// <summary>
@@ -54,17 +68,16 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task ModifyEquSparePartTypeAsync(EquSparePartTypeModifyDto modifyDto)
+        public async Task<int> ModifyEquSparePartTypeAsync(EquSparePartTypeModifyDto modifyDto)
         {
             // 验证DTO
-
 
             // DTO转换实体
             var entity = modifyDto.ToEntity<EquSparePartTypeEntity>();
             entity.UpdatedBy = "TODO";
             entity.UpdatedOn = HymsonClock.Now();
 
-            await _equSparePartTypeRepository.UpdateAsync(entity);
+            return await _equSparePartTypeRepository.UpdateAsync(entity);
         }
 
         /// <summary>
@@ -72,9 +85,9 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task DeleteEquSparePartTypeAsync(long id)
+        public async Task<int> DeleteEquSparePartTypeAsync(long id)
         {
-            await _equSparePartTypeRepository.DeleteAsync(id);
+            return await _equSparePartTypeRepository.DeleteAsync(id);
         }
 
         /// <summary>
@@ -111,6 +124,6 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         {
             return (await _equSparePartTypeRepository.GetByIdAsync(id)).ToModel<EquSparePartTypeDto>();
         }
-        
+
     }
 }

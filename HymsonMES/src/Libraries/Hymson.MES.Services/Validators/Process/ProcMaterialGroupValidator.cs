@@ -6,6 +6,7 @@
  *build datetime: 2023-02-10 03:54:07
  */
 using FluentValidation;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Services.Dtos.Process;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ namespace Hymson.MES.Services.Validators.Process
     {
         public ProcMaterialGroupCreateValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");
+            RuleFor(x => x.SiteCode).NotEmpty().WithErrorCode(ErrorCode.MES10203);
             //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
         }
     }
@@ -34,7 +35,7 @@ namespace Hymson.MES.Services.Validators.Process
     {
         public ProcMaterialGroupModifyValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");
+            RuleFor(x => x.SiteCode).NotEmpty().WithErrorCode(ErrorCode.MES10203);
             //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
         }
     }

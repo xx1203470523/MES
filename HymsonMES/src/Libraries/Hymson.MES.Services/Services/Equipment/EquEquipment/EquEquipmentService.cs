@@ -296,7 +296,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             /*
             //搜索条件查询语法参考Sqlsugar
             var response = await _equEquipmentLinkApiRepository.Queryable()
-                 .OrderByDescending(x => x.UpdateOn)
+                 .OrderByDescending(x => x.UpdatedOn)
                  .Where((x) => x.EquipmentId == parm.EquipmentId && !x.IsDeleted)
                  .Select(x => new QueryEquipmentLinkApiDto
                  {
@@ -306,10 +306,10 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
                      ApiUrl = x.ApiUrl,
                      ApiType = x.ApiType,
                      Remark = x.Remark,
-                     CreateBy = x.CreateBy,
-                     CreateOn = x.CreateOn,
-                     UpdateBy = x.UpdateBy,
-                     UpdateOn = x.UpdateOn
+                     CreatedBy = x.CreatedBy,
+                     CreatedOn = x.CreatedOn,
+                     UpdatedBy = x.UpdatedBy,
+                     UpdatedOn = x.UpdatedOn
                  })
                  .ToPageAsync(parm);
 
@@ -335,7 +335,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             /*
             //搜索条件查询语法参考Sqlsugar
             var response = await _equEquipmentLinkHardwareRepository.Queryable()
-                 .OrderByDescending(x => x.UpdateOn)
+                 .OrderByDescending(x => x.UpdatedOn)
                  .Where((x) => x.EquipmentId == parm.EquipmentId && !x.IsDeleted)
                  .Select(x => new QueryEquipmentLinkHardwareDto
                  {
@@ -345,10 +345,10 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
                      HardwareCode = x.HardwareCode,
                      HardwareType = x.HardwareType,
                      Remark = x.Remark,
-                     CreateBy = x.CreateBy,
-                     CreateOn = x.CreateOn,
-                     UpdateBy = x.UpdateBy,
-                     UpdateOn = x.UpdateOn
+                     CreatedBy = x.CreatedBy,
+                     CreatedOn = x.CreatedOn,
+                     UpdatedBy = x.UpdatedBy,
+                     UpdatedOn = x.UpdatedOn
                  })
                  .ToPageAsync(parm);
 

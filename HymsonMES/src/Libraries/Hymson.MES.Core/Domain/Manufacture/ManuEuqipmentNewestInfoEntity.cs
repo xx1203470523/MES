@@ -25,7 +25,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 描述 :登录结果更新时间 
         /// 空值 : false  
         /// </summary>
-        public DateTime? LoginResultUpdateOn { get; set; }
+        public DateTime? LoginResultUpdatedOn { get; set; }
         
         /// <summary>
         /// 描述 :设备状态 
@@ -37,7 +37,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 描述 :状态更新时间 
         /// 空值 : false  
         /// </summary>
-        public DateTime? StatusUpdateOn { get; set; }
+        public DateTime? StatusUpdatedOn { get; set; }
         
         /// <summary>
         /// 描述 :备注 
