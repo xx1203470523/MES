@@ -89,6 +89,8 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<PagedInfo<ProcParameterDto>> GetPageListAsync(ProcParameterPagedQueryDto procParameterPagedQueryDto)
         {
+            procParameterPagedQueryDto.SiteCode = "";//TODO
+
             var procParameterPagedQuery = procParameterPagedQueryDto.ToQuery<ProcParameterPagedQuery>();
             var pagedInfo = await _procParameterRepository.GetPagedInfoAsync(procParameterPagedQuery);
 
@@ -142,7 +144,8 @@ namespace Hymson.MES.Services.Services.Process
            var procParameterEntity = await _procParameterRepository.GetByIdAsync(id);
            if (procParameterEntity != null) 
            {
-               return procParameterEntity.ToModel<ProcParameterDto>();
+               var dto= procParameterEntity.ToModel<CustomProcParameterDto>();
+               //dto.Type=  //TODO
            }
             return null;
         }

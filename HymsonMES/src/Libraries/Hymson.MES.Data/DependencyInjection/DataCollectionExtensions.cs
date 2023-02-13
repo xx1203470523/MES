@@ -69,6 +69,11 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #endregion
 
+            #region ParameterLinkType
+            services.AddSingleton<IProcParameterLinkTypeRepository, ProcParameterLinkTypeRepository>();
+
+            #endregion
+
             #region Resource
             services.AddSingleton<IProcResourceTypeRepository, ProcResourceTypeRepository>();
             services.AddSingleton<IProcResourceRepository, ProcResourceRepository>();

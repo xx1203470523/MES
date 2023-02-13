@@ -86,11 +86,26 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-           
+            if (!string.IsNullOrWhiteSpace(procParameterPagedQuery.SiteCode))
+            {
+                sqlBuilder.Where(" SiteCode=@SiteCode ");
+            }
+            if (!string.IsNullOrWhiteSpace(procParameterPagedQuery.ParameterCode))
+            {
+                procParameterPagedQuery.ParameterCode = $"%{procParameterPagedQuery.ParameterCode}%";
+                sqlBuilder.Where(" ParameterCode like @ParameterCode ");
+            }
+            if (!string.IsNullOrWhiteSpace(procParameterPagedQuery.ParameterName))
+            {
+                procParameterPagedQuery.ParameterName = $"%{procParameterPagedQuery.ParameterName}%";
+                sqlBuilder.Where(" ParameterName like @ParameterName ");
+            }
+            if (!string.IsNullOrWhiteSpace(procParameterPagedQuery.Remark))
+            {
+                procParameterPagedQuery.Remark = $"%{procParameterPagedQuery.Remark}%";
+                sqlBuilder.Where(" Remark like @Remark ");
+            }
+
             var offSet = (procParameterPagedQuery.PageIndex - 1) * procParameterPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = procParameterPagedQuery.PageSize });

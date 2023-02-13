@@ -1,9 +1,9 @@
 /*
  *creator: Karl
  *
- *describe: 标准参数表    Dto | 代码由框架生成
+ *describe: 标准参数关联类型表    Dto | 代码由框架生成
  *builder:  Karl
- *build datetime: 2023-02-13 02:50:20
+ *build datetime: 2023-02-13 05:06:17
  */
 
 using Hymson.Infrastructure;
@@ -16,9 +16,9 @@ using System.Threading.Tasks;
 namespace Hymson.MES.Services.Dtos.Process
 {
     /// <summary>
-    /// 标准参数表Dto
+    /// 标准参数关联类型表Dto
     /// </summary>
-    public record ProcParameterDto : BaseEntityDto
+    public record ProcParameterLinkTypeDto : BaseEntityDto
     {
         /// <summary>
         /// 
@@ -26,19 +26,68 @@ namespace Hymson.MES.Services.Dtos.Process
         public long Id { get; set; }
 
        /// <summary>
-        /// 参数代码
+        /// 标准参数ID
         /// </summary>
-        public string ParameterCode { get; set; }
+        public long ParameterID { get; set; }
 
        /// <summary>
-        /// 参数名称
+        /// 参数类型
         /// </summary>
-        public string ParameterName { get; set; }
+        public int ParameterType { get; set; }
 
        /// <summary>
-        /// 参数单位（字典定义）
+        /// 说明
         /// </summary>
-        public string ParameterUnit { get; set; }
+        public string Remark { get; set; }
+
+       /// <summary>
+        /// 创建人
+        /// </summary>
+        public string CreatedBy { get; set; }
+
+       /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime CreatedOn { get; set; }
+
+       /// <summary>
+        /// 最后修改人
+        /// </summary>
+        public string UpdatedBy { get; set; }
+
+       /// <summary>
+        /// 修改时间
+        /// </summary>
+        public DateTime? UpdatedOn { get; set; }
+
+       /// <summary>
+        /// 是否逻辑删除
+        /// </summary>
+        public bool? IsDeleted { get; set; }
+
+       
+    }
+
+
+    /// <summary>
+    /// 标准参数关联类型表新增Dto
+    /// </summary>
+    public record ProcParameterLinkTypeCreateDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public long Id { get; set; }
+
+       /// <summary>
+        /// 标准参数ID
+        /// </summary>
+        public long ParameterID { get; set; }
+
+       /// <summary>
+        /// 参数类型
+        /// </summary>
+        public int ParameterType { get; set; }
 
        /// <summary>
         /// 说明
@@ -74,21 +123,9 @@ namespace Hymson.MES.Services.Dtos.Process
     }
 
     /// <summary>
-    /// 
+    /// 标准参数关联类型表更新Dto
     /// </summary>
-    public record CustomProcParameterDto : ProcParameterDto
-    {
-        /// <summary>
-        /// 类型
-        /// </summary>
-        public string Type { get; set; }
-    }
-
-
-    /// <summary>
-    /// 标准参数表新增Dto
-    /// </summary>
-    public record ProcParameterCreateDto : BaseEntityDto
+    public record ProcParameterLinkTypeModifyDto : BaseEntityDto
     {
         /// <summary>
         /// 
@@ -96,77 +133,14 @@ namespace Hymson.MES.Services.Dtos.Process
         public long Id { get; set; }
 
        /// <summary>
-        /// 参数代码
+        /// 标准参数ID
         /// </summary>
-        public string ParameterCode { get; set; }
+        public long ParameterID { get; set; }
 
        /// <summary>
-        /// 参数名称
+        /// 参数类型
         /// </summary>
-        public string ParameterName { get; set; }
-
-       /// <summary>
-        /// 参数单位（字典定义）
-        /// </summary>
-        public string ParameterUnit { get; set; }
-
-       /// <summary>
-        /// 说明
-        /// </summary>
-        public string Remark { get; set; }
-
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-       /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-       /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public bool? IsDeleted { get; set; }
-
-       
-    }
-
-    /// <summary>
-    /// 标准参数表更新Dto
-    /// </summary>
-    public record ProcParameterModifyDto : BaseEntityDto
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        public long Id { get; set; }
-
-       /// <summary>
-        /// 参数代码
-        /// </summary>
-        public string ParameterCode { get; set; }
-
-       /// <summary>
-        /// 参数名称
-        /// </summary>
-        public string ParameterName { get; set; }
-
-       /// <summary>
-        /// 参数单位（字典定义）
-        /// </summary>
-        public string ParameterUnit { get; set; }
+        public int ParameterType { get; set; }
 
        /// <summary>
         /// 说明
@@ -203,28 +177,14 @@ namespace Hymson.MES.Services.Dtos.Process
     }
 
     /// <summary>
-    /// 标准参数表分页Dto
+    /// 标准参数关联类型表分页Dto
     /// </summary>
-    public class ProcParameterPagedQueryDto : PagerInfo
+    public class ProcParameterLinkTypePagedQueryDto : PagerInfo
     {
-        /// <summary>
-        /// 所属站点代码
-        /// </summary>
-        public string SiteCode { get; set; } = "";
-
-        /// <summary>
-        /// 编码（标准参数）
-        /// </summary>
-        public string ParameterCode { get; set; }
-
-        /// <summary>
-        /// 名称（标准参数）
-        /// </summary>
-        public string ParameterName { get; set; }
-
-        /// <summary>
-        /// 描述（标准参数）
-        /// </summary>
-        public string Remark { get; set; }
+        ///// <summary>
+        ///// 描述 :站点编码 
+        ///// 空值 : false  
+        ///// </summary>
+        //public string SiteCode { get; set; }
     }
 }

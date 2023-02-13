@@ -63,6 +63,9 @@ namespace Microsoft.Extensions.DependencyInjection
             #region Parameter
             services.AddSingleton<IProcParameterService, ProcParameterService>();
             #endregion
+            #region ParameterLinkType
+            services.AddSingleton<IProcParameterLinkTypeService, ProcParameterLinkTypeService>();
+            #endregion
 
             #region Resource
             services.AddSingleton<IProcResourceTypeService, ProcResourceTypeService>();
@@ -110,6 +113,12 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<ProcParameterCreateDto>, ProcParameterCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcParameterModifyDto>, ProcParameterModifyValidator>();
             #endregion
+
+            #region ParameterLinkType
+            services.AddSingleton<AbstractValidator<ProcParameterLinkTypeCreateDto>, ProcParameterLinkTypeCreateValidator>();
+            services.AddSingleton<AbstractValidator<ProcParameterLinkTypeModifyDto>, ProcParameterLinkTypeModifyValidator>();
+            #endregion
+
 
             #region Resource
             services.AddSingleton<AbstractValidator<ProcResourceCreateDto>, ProcResourceCreateValidator>();

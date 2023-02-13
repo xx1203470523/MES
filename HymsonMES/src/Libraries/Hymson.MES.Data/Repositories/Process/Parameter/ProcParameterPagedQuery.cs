@@ -19,6 +19,24 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public class ProcParameterPagedQuery : PagerInfo
     {
+        /// <summary>
+        /// 所属站点代码
+        /// </summary>
+        public string SiteCode { get; set; } = "";
 
+        /// <summary>
+        /// 编码（标准参数）
+        /// </summary>
+        public string ParameterCode { get; set; }
+
+        /// <summary>
+        /// 名称（标准参数）
+        /// </summary>
+        public string ParameterName { get; set; }
+
+        /// <summary>
+        /// 描述（标准参数）
+        /// </summary>
+        public string Remark { get; set; }
     }
 }
