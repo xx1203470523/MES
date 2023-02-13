@@ -106,11 +106,6 @@ namespace Hymson.MES.Services.Dtos.Equipment
     public record EquSparePartCreateDto : BaseEntityDto
     {
         /// <summary>
-        /// 
-        /// </summary>
-        public long Id { get; set; }
-
-        /// <summary>
         /// 备件编码
         /// </summary>
         public string SparePartCode { get; set; }

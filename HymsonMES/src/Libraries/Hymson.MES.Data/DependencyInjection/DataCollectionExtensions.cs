@@ -3,6 +3,7 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit;
+using Hymson.MES.Data.Repositories.Equipment.EquSparePart;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType;
 using Hymson.MES.Data.Repositories.Integrated.InteCalendar;
 using Hymson.MES.Data.Repositories.Integrated.InteClass;
@@ -44,6 +45,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquEquipmentLinkApiRepository, EquEquipmentLinkApiRepository>();
             services.AddSingleton<IEquEquipmentLinkHardwareRepository, EquEquipmentLinkHardwareRepository>();
             services.AddSingleton<IEquEquipmentUnitRepository, EquEquipmentUnitRepository>();
+            services.AddSingleton<IEquSparePartRepository, EquSparePartRepository>();
             services.AddSingleton<IEquSparePartTypeRepository, EquSparePartTypeRepository>();
             #endregion
 

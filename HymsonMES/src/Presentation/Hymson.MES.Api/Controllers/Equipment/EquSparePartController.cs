@@ -39,9 +39,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        public async Task AddEquSparePartAsync([FromBody] EquSparePartCreateDto createDto)
+        public async Task<int> AddEquSparePartAsync([FromBody] EquSparePartCreateDto createDto)
         {
-            await _equSparePartService.CreateEquSparePartAsync(createDto);
+            return await _equSparePartService.CreateEquSparePartAsync(createDto);
         }
 
         /// <summary>
@@ -51,9 +51,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
-        public async Task UpdateEquSparePartAsync([FromBody] EquSparePartModifyDto modifyDto)
+        public async Task<int> UpdateEquSparePartAsync([FromBody] EquSparePartModifyDto modifyDto)
         {
-            await _equSparePartService.ModifyEquSparePartAsync(modifyDto);
+            return await _equSparePartService.ModifyEquSparePartAsync(modifyDto);
         }
 
         /// <summary>
@@ -63,10 +63,10 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
-        public async Task DeleteEquSparePartAsync(string ids)
+        public async Task<int> DeleteEquSparePartAsync(string ids)
         {
             long[] idsArr = StringExtension.SpitLongArrary(ids);
-            await _equSparePartService.DeletesEquSparePartAsync(idsArr);
+            return await _equSparePartService.DeletesEquSparePartAsync(idsArr);
         }
         
         /// <summary>

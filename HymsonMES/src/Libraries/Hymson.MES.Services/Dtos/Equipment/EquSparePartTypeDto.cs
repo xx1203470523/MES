@@ -66,11 +66,6 @@ namespace Hymson.MES.Services.Dtos.Equipment
     public record EquSparePartTypeCreateDto : BaseEntityDto
     {
         /// <summary>
-        /// 
-        /// </summary>
-        public long Id { get; set; }
-
-        /// <summary>
         /// 备件类型编码
         /// </summary>
         public string SparePartTypeCode { get; set; }
@@ -83,7 +78,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; }
+        public int Status { get; set; }
 
         /// <summary>
         /// 描述
@@ -119,7 +114,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; }
+        public int Status { get; set; }
 
         /// <summary>
         /// 描述

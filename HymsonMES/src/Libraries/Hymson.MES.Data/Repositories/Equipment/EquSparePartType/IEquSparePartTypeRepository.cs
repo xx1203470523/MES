@@ -12,16 +12,16 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="equSparePartTypeEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task InsertAsync(EquSparePartTypeEntity equSparePartTypeEntity);
+        Task<int> InsertAsync(EquSparePartTypeEntity entity);
         
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="equSparePartTypeEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(EquSparePartTypeEntity equSparePartTypeEntity);
+        Task<int> UpdateAsync(EquSparePartTypeEntity entity);
         
         /// <summary>
         /// 删除
@@ -47,15 +47,16 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
         /// <summary>
         /// 获取List
         /// </summary>
-        /// <param name="equSparePartTypeQuery"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquSparePartTypeEntity>> GetEquSparePartTypeEntitiesAsync(EquSparePartTypeQuery equSparePartTypeQuery);
+        Task<IEnumerable<EquSparePartTypeEntity>> GetEquSparePartTypeEntitiesAsync(EquSparePartTypeQuery query);
         
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="equSparePartTypePagedQuery"></param>
+        /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquSparePartTypeEntity>> GetPagedInfoAsync(EquSparePartTypePagedQuery equSparePartTypePagedQuery);
+        Task<PagedInfo<EquSparePartTypeEntity>> GetPagedInfoAsync(EquSparePartTypePagedQuery pagedQuery);
+        
     }
 }

@@ -4,7 +4,9 @@ using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query;
 using Hymson.MES.Services.Dtos.Equipment;
+using Hymson.Snowflake;
 using Hymson.Utils;
+using static Dapper.SqlMapper;
 
 namespace Hymson.MES.Services.Services.Equipment.EquSparePart
 {
@@ -33,20 +35,19 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task CreateEquSparePartAsync(EquSparePartCreateDto createDto)
+        public async Task<int> CreateEquSparePartAsync(EquSparePartCreateDto createDto)
         {
             //验证DTO
 
 
             //DTO转换实体
-            var equSparePartEntity = createDto.ToEntity<EquSparePartEntity>();
-            equSparePartEntity.CreatedBy = "TODO";
-            equSparePartEntity.UpdatedBy = "TODO";
-            equSparePartEntity.CreatedOn = HymsonClock.Now();
-            equSparePartEntity.UpdatedOn = HymsonClock.Now();
+            var entity = createDto.ToEntity<EquSparePartEntity>();
+            entity.Id = IdGenProvider.Instance.CreateId();
+            entity.CreatedBy = "TODO";
+            entity.UpdatedBy = "TODO";
 
             //入库
-            await _equSparePartRepository.InsertAsync(equSparePartEntity);
+            return await _equSparePartRepository.InsertAsync(entity);
         }
 
         /// <summary>
@@ -54,17 +55,17 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task ModifyEquSparePartAsync(EquSparePartModifyDto modifyDto)
+        public async Task<int> ModifyEquSparePartAsync(EquSparePartModifyDto modifyDto)
         {
             //验证DTO
 
 
             //DTO转换实体
-            var equSparePartEntity = modifyDto.ToEntity<EquSparePartEntity>();
-            equSparePartEntity.UpdatedBy = "TODO";
-            equSparePartEntity.UpdatedOn = HymsonClock.Now();
+            var entity = modifyDto.ToEntity<EquSparePartEntity>();
+            entity.UpdatedBy = "TODO";
+            entity.UpdatedOn = HymsonClock.Now();
 
-            await _equSparePartRepository.UpdateAsync(equSparePartEntity);
+            return await _equSparePartRepository.UpdateAsync(entity);
         }
 
         /// <summary>
@@ -72,9 +73,9 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task DeleteEquSparePartAsync(long id)
+        public async Task<int> DeleteEquSparePartAsync(long id)
         {
-            await _equSparePartRepository.DeleteAsync(id);
+            return await _equSparePartRepository.DeleteAsync(id);
         }
 
         /// <summary>
