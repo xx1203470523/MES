@@ -133,8 +133,8 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
                         RestType = resType,
 
                         // TODO 这里需要替换
-                        //CreateBy = App.GetName(),
-                        //UpdateBy = App.GetName(),
+                        //CreatedBy = App.GetName(),
+                        //UpdatedBy = App.GetName(),
                         //SiteCode = App.GetSite()
                     });
                 }
@@ -247,8 +247,8 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
                         RestType = resType,
 
                         // TODO 这里需要替换
-                        //CreateBy = App.GetName(),
-                        //UpdateBy = App.GetName(),
+                        //CreatedBy = App.GetName(),
+                        //UpdatedBy = App.GetName(),
                         //SiteCode = App.GetSite()
                     });
                 }
@@ -326,10 +326,10 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
                             Code = a.CalendarType == calendarType ? c.EquipmentCode : b.Code,
                             Name = a.CalendarType == calendarType ? c.EquipmentName : b.Name,
                             UseStatus = a.UseStatus,
-                            CreateBy = a.CreateBy,
-                            UpdateBy = a.UpdateBy,
-                            UpdateOn = a.UpdateOn,
-                            CreateOn = a.CreateOn
+                            CreatedBy = a.CreatedBy,
+                            UpdatedBy = a.UpdatedBy,
+                            UpdatedOn = a.UpdatedOn,
+                            CreatedOn = a.CreatedOn
                         })
                        .ToPageAsync(parm);
 
@@ -529,8 +529,8 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
                         RestType = resType
 
                         // TODO 这里需要替换
-                        //CreateBy = App.GetName(),
-                        //UpdateBy = App.GetName(),
+                        //CreatedBy = App.GetName(),
+                        //UpdatedBy = App.GetName(),
                         //SiteCode = App.GetSite()
                     });
                 }

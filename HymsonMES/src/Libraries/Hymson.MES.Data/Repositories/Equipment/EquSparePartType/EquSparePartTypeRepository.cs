@@ -143,7 +143,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
                                            FROM `equ_sparepart_type` /**where**/  ";
 
         const string InsertSql = "INSERT INTO `equ_sparepart_type`(  `Id`, `SparePartTypeCode`, `SparePartTypeName`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteCode`) VALUES (   @Id, @SparePartTypeCode, @SparePartTypeName, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteCode )  ";
-        const string UpdateSql = "UPDATE `equ_sparepart_type` SET   SparePartTypeCode = @SparePartTypeCode, SparePartTypeName = @SparePartTypeName, Status = @Status, Remark = @Remark, CreateBy = @CreateBy, CreateOn = @CreateOn, UpdateBy = @UpdateBy, UpdateOn = @UpdateOn, IsDeleted = @IsDeleted, SiteCode = @SiteCode  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `equ_sparepart_type` SET   SparePartTypeCode = @SparePartTypeCode, SparePartTypeName = @SparePartTypeName, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteCode = @SiteCode  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `equ_sparepart_type` SET IsDeleted = '1' WHERE Id = @Id ";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SparePartTypeCode`, `SparePartTypeName`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteCode`

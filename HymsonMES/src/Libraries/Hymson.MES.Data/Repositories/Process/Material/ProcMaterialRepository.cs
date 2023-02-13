@@ -361,7 +361,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 更改物料的物料组
         /// </summary>
-        const string UpdateProcMaterialGroupSql = "UPDATE `proc_material` SET GroupId= @GroupId, UpdateBy=@UpdateBy, UpdateOn=@UpdateOn  WHERE Id = @Id ";
+        const string UpdateProcMaterialGroupSql = "UPDATE `proc_material` SET GroupId= @GroupId, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
 
         /// <summary>
         /// 更新某物料组下的物料为未绑定物料组
