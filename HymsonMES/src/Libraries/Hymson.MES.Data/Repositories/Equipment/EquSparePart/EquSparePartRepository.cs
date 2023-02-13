@@ -33,11 +33,10 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task InsertAsync(EquSparePartEntity entity)
+        public async Task<int> InsertAsync(EquSparePartEntity entity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var id = await conn.ExecuteScalarAsync<long>(InsertSql, entity);
-            entity.Id = id;
+            return await conn.ExecuteAsync(InsertSql, entity);
         }
 
         /// <summary>
@@ -50,7 +49,19 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSql, entity);
         }
-        
+
+        /// <summary>
+        /// 批量修改备件的备件类型
+        /// </summary>
+        /// <param name="sparePartTypeId"></param>
+        /// <param name="sparePartIds"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateSparePartTypeIdAsync(long sparePartTypeId, IEnumerable<long> sparePartIds)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateSparePartTypeIdSql, new { sparePartTypeId, Id = sparePartIds });
+        }
+
         /// <summary>
         /// 删除（软删除）
         /// </summary>
@@ -67,11 +78,10 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] idsArr) 
+        public async Task<int> DeletesAsync(long[] idsArr)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeleteSql, idsArr);
-
         }
 
         /// <summary>
@@ -82,15 +92,15 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
         public async Task<EquSparePartEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<EquSparePartEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<EquSparePartEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="equSparePartPagedQuery"></param>
+        /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<EquSparePartEntity>> GetPagedInfoAsync(EquSparePartPagedQuery equSparePartPagedQuery)
+        public async Task<PagedInfo<EquSparePartEntity>> GetPagedInfoAsync(EquSparePartPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
@@ -102,31 +112,31 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
-           
-            var offSet = (equSparePartPagedQuery.PageIndex - 1) * equSparePartPagedQuery.PageSize;
+
+            var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = equSparePartPagedQuery.PageSize });
-            sqlBuilder.AddParameters(equSparePartPagedQuery);
+            sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
+            sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var equSparePartEntitiesTask = conn.QueryAsync<EquSparePartEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var equSparePartEntities = await equSparePartEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<EquSparePartEntity>(equSparePartEntities, equSparePartPagedQuery.PageIndex, equSparePartPagedQuery.PageSize, totalCount);
+            return new PagedInfo<EquSparePartEntity>(equSparePartEntities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
         /// <summary>
         /// 查询List
         /// </summary>
-        /// <param name="equSparePartQuery"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<EquSparePartEntity>> GetEquSparePartEntitiesAsync(EquSparePartQuery equSparePartQuery)
+        public async Task<IEnumerable<EquSparePartEntity>> GetEquSparePartEntitiesAsync(EquSparePartQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEquSparePartEntitiesSqlTemplate);
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var equSparePartEntities = await conn.QueryAsync<EquSparePartEntity>(template.RawSql, equSparePartQuery);
+            var equSparePartEntities = await conn.QueryAsync<EquSparePartEntity>(template.RawSql, query);
             return equSparePartEntities;
         }
 
@@ -144,11 +154,12 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
                                             /**select**/
                                            FROM `equ_sparepart` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `equ_sparepart`(  `Id`, `SparePartCode`, `SparePartName`, `SparePartTypeId`, `ProcMaterialId`, `UnitId`, `IsKey`, `IsStandard`, `Status`, `BluePrintNo`, `Brand`, `ManagementMode`, `Remark`, `CreateBy`, `CreateOn`, `UpdateBy`, `UpdateOn`, `IsDeleted`, `SiteCode`) VALUES (   @Id, @SparePartCode, @SparePartName, @SparePartTypeId, @ProcMaterialId, @UnitId, @IsKey, @IsStandard, @Status, @BluePrintNo, @Brand, @ManagementMode, @Remark, @CreateBy, @CreateOn, @UpdateBy, @UpdateOn, @IsDeleted, @SiteCode )  ";
-        const string UpdateSql = "UPDATE `equ_sparepart` SET   SparePartCode = @SparePartCode, SparePartName = @SparePartName, SparePartTypeId = @SparePartTypeId, ProcMaterialId = @ProcMaterialId, UnitId = @UnitId, IsKey = @IsKey, IsStandard = @IsStandard, Status = @Status, BluePrintNo = @BluePrintNo, Brand = @Brand, ManagementMode = @ManagementMode, Remark = @Remark, CreateBy = @CreateBy, CreateOn = @CreateOn, UpdateBy = @UpdateBy, UpdateOn = @UpdateOn, IsDeleted = @IsDeleted, SiteCode = @SiteCode  WHERE Id = @Id ";
+        const string InsertSql = "INSERT INTO `equ_sparepart`(  `Id`, `SparePartCode`, `SparePartName`, `SparePartTypeId`, `ProcMaterialId`, `UnitId`, `IsKey`, `IsStandard`, `Status`, `BluePrintNo`, `Brand`, `ManagementMode`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteCode`) VALUES (   @Id, @SparePartCode, @SparePartName, @SparePartTypeId, @ProcMaterialId, @UnitId, @IsKey, @IsStandard, @Status, @BluePrintNo, @Brand, @ManagementMode, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteCode )  ";
+        const string UpdateSql = "UPDATE `equ_sparepart` SET   SparePartCode = @SparePartCode, SparePartName = @SparePartName, SparePartTypeId = @SparePartTypeId, ProcMaterialId = @ProcMaterialId, UnitId = @UnitId, IsKey = @IsKey, IsStandard = @IsStandard, Status = @Status, BluePrintNo = @BluePrintNo, Brand = @Brand, ManagementMode = @ManagementMode, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteCode = @SiteCode  WHERE Id = @Id ";
+        const string UpdateSparePartTypeIdSql = "UPDATE `equ_sparepart` SET   SparePartTypeId = @SparePartTypeId  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `equ_sparepart` SET IsDeleted = '1' WHERE Id = @Id ";
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SparePartCode`, `SparePartName`, `SparePartTypeId`, `ProcMaterialId`, `UnitId`, `IsKey`, `IsStandard`, `Status`, `BluePrintNo`, `Brand`, `ManagementMode`, `Remark`, `CreateBy`, `CreateOn`, `UpdateBy`, `UpdateOn`, `IsDeleted`, `SiteCode`
+                               `Id`, `SparePartCode`, `SparePartName`, `SparePartTypeId`, `ProcMaterialId`, `UnitId`, `IsKey`, `IsStandard`, `Status`, `BluePrintNo`, `Brand`, `ManagementMode`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteCode`
                             FROM `equ_sparepart`  WHERE Id = @Id ";
     }
 }

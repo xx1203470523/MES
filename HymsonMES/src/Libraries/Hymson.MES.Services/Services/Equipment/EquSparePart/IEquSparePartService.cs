@@ -20,21 +20,21 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
         /// </summary>
         /// <param name="equSparePartDto"></param>
         /// <returns></returns>
-        Task CreateEquSparePartAsync(EquSparePartCreateDto equSparePartCreateDto);
+        Task<int> CreateEquSparePartAsync(EquSparePartCreateDto equSparePartCreateDto);
 
         /// <summary>
         /// 修改
         /// </summary>
         /// <param name="equSparePartDto"></param>
         /// <returns></returns>
-        Task ModifyEquSparePartAsync(EquSparePartModifyDto equSparePartModifyDto);
+        Task<int> ModifyEquSparePartAsync(EquSparePartModifyDto equSparePartModifyDto);
 
         /// <summary>
         /// 删除
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task DeleteEquSparePartAsync(long id);
+        Task<int> DeleteEquSparePartAsync(long id);
 
         /// <summary>
         /// 批量删除

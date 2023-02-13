@@ -5,6 +5,7 @@ using Hymson.MES.Services.Options;
 using Hymson.MES.Services.Services.EquEquipmentGroup;
 using Hymson.MES.Services.Services.Equipment.EquEquipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipmentUnit;
+using Hymson.MES.Services.Services.Equipment.EquSparePart;
 using Hymson.MES.Services.Services.Equipment.EquSparePartType;
 using Hymson.MES.Services.Services.Integrated.InteCalendar;
 using Hymson.MES.Services.Services.Integrated.InteClass;
@@ -47,6 +48,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquEquipmentService, EquEquipmentService>();
             services.AddSingleton<IEquEquipmentGroupService, EquEquipmentGroupService>();
             services.AddSingleton<IEquEquipmentUnitService, EquEquipmentUnitService>();
+            services.AddSingleton<IEquSparePartService, EquSparePartService>();
             services.AddSingleton<IEquSparePartTypeService, EquSparePartTypeService>();
             #endregion
 

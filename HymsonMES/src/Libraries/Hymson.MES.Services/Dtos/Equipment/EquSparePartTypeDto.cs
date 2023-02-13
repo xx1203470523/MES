@@ -35,22 +35,22 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 创建人
         /// </summary>
-        public string CreateBy { get; set; }
+        public string CreatedBy { get; set; }
 
         /// <summary>
         /// 创建时间
         /// </summary>
-        public DateTime CreateOn { get; set; }
+        public DateTime CreatedOn { get; set; }
 
         /// <summary>
         /// 最后修改人
         /// </summary>
-        public string UpdateBy { get; set; }
+        public string UpdatedBy { get; set; }
 
         /// <summary>
         /// 修改时间
         /// </summary>
-        public DateTime? UpdateOn { get; set; }
+        public DateTime? UpdatedOn { get; set; }
 
         /// <summary>
         /// 是否逻辑删除
@@ -66,11 +66,6 @@ namespace Hymson.MES.Services.Dtos.Equipment
     public record EquSparePartTypeCreateDto : BaseEntityDto
     {
         /// <summary>
-        /// 
-        /// </summary>
-        public long Id { get; set; }
-
-        /// <summary>
         /// 备件类型编码
         /// </summary>
         public string SparePartTypeCode { get; set; }
@@ -83,7 +78,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; }
+        public int Status { get; set; }
 
         /// <summary>
         /// 描述
@@ -119,7 +114,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; }
+        public int Status { get; set; }
 
         /// <summary>
         /// 描述

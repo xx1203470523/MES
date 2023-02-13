@@ -41,7 +41,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Select("*");
             sqlBuilder.Where("a.ResourceId=@ResourceId");
 
-            //TODO 按UpdateOn倒序排列
+            //TODO 按UpdatedOn倒序排列
             var offSet = (query.PageIndex - 1) * query.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = query.PageSize });

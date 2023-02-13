@@ -37,7 +37,7 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<int> UpdateAsync(ProcReplaceMaterialEntity procReplaceMaterialEntity);
 
         /// <summary>
-        /// 批量更新-只更新 UpdateOn,  UpdateBy,  ReplaceMaterialId,  IsUse 
+        /// 批量更新-只更新 UpdatedOn,  UpdatedBy,  ReplaceMaterialId,  IsUse 
         /// </summary>
         /// <param name="procReplaceMaterialEntitys"></param>
         /// <returns></returns>
