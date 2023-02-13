@@ -202,13 +202,14 @@ namespace Hymson.MES.Services.Services.Process
                 throw new ValidationException(ErrorCode.MES10100);
             }
 
+            var siteCode = "TODO";
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(parm);
 
             var code = parm.Procedure.Code.ToUpperInvariant();
             var query = new ProcProcedureQuery
             {
-                SiteCode = parm.SiteCode,
+                SiteCode = siteCode,
                 Code = code
             };
             if (await _procProcedureRepository.IsExistsAsync(query))
@@ -221,7 +222,7 @@ namespace Hymson.MES.Services.Services.Process
 
             var userId = "TODO";
             //DTO转换实体
-            var procProcedureEntity = parm.ToEntity<ProcProcedureEntity>();
+            var procProcedureEntity = parm.Procedure.ToEntity<ProcProcedureEntity>();
             procProcedureEntity.Id = IdGenProvider.Instance.CreateId();
             procProcedureEntity.CreatedBy = userId;
             procProcedureEntity.UpdatedBy = userId;

@@ -104,6 +104,64 @@ namespace Hymson.MES.Services.Dtos.Process
 
     }
 
+    public record ProcProcedureOperDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 主键id
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 工序BOM代码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 工序BOM名称
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public string Status { get; set; }
+
+        /// <summary>
+        /// 类型
+        /// </summary>
+        public string Type { get; set; }
+
+        /// <summary>
+        /// 包装等级（字典数据）
+        /// </summary>
+        public string PackingLevel { get; set; }
+
+        /// <summary>
+        /// 所属资源类型ID
+        /// </summary>
+        public long? ResourceTypeId { get; set; }
+
+        /// <summary>
+        /// 循环次数
+        /// </summary>
+        public int? Cycle { get; set; }
+
+        /// <summary>
+        /// 是否维修返回
+        /// </summary>
+        public bool? IsRepairReturn { get; set; }
+
+        /// <summary>
+        /// 版本
+        /// </summary>
+        public string Version { get; set; }
+
+        /// <summary>
+        /// 说明
+        /// </summary>
+        public string Remark { get; set; }
+    }
+
     /// <summary>
     /// 工序表分页查询Dto
     /// </summary>
@@ -169,12 +227,12 @@ namespace Hymson.MES.Services.Dtos.Process
     /// <summary>
     /// 工序表新增Dto
     /// </summary>
-    public record ProcProcedureCreateDto : BaseEntityDto
+    public record ProcProcedureCreateDto 
     {
         /// <summary>
         /// 工序信息
         /// </summary>
-        public ProcProcedureDto Procedure { get; set; }
+        public ProcProcedureOperDto Procedure { get; set; }
 
         /// <summary>
         /// 工序打印配置信息
@@ -187,86 +245,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
 
        // public List<ProcProcedureBomConfigJobDto> ProcedureJobList { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public long Id { get; set; }
-
-        /// <summary>
-        /// 工序BOM代码
-        /// </summary>
-        public string Code { get; set; }
-
-        /// <summary>
-        /// 工序BOM名称
-        /// </summary>
-        public string Name { get; set; }
-
-        /// <summary>
-        /// 状态
-        /// </summary>
-        public string Status { get; set; }
-
-        /// <summary>
-        /// 类型
-        /// </summary>
-        public string Type { get; set; }
-
-        /// <summary>
-        /// 包装等级（字典数据）
-        /// </summary>
-        public string PackingLevel { get; set; }
-
-        /// <summary>
-        /// 所属资源类型ID
-        /// </summary>
-        public long? ResourceTypeId { get; set; }
-
-        /// <summary>
-        /// 循环次数
-        /// </summary>
-        public int? Cycle { get; set; }
-
-        /// <summary>
-        /// 是否维修返回
-        /// </summary>
-        public bool? IsRepairReturn { get; set; }
-
-        /// <summary>
-        /// 版本
-        /// </summary>
-        public string Version { get; set; }
-
-        /// <summary>
-        /// 说明
-        /// </summary>
-        public string Remark { get; set; }
-
-        /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-        /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-        /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
-
-        /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public bool? IsDeleted { get; set; }
     }
 
     /// <summary>

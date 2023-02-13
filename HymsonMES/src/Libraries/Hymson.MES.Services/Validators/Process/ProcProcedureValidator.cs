@@ -17,8 +17,8 @@ namespace Hymson.MES.Services.Validators.Process
     {
         public ProcProcedureCreateValidator()
         {
-            RuleFor(x => x.Code).NotEmpty().WithErrorCode(ErrorCode.MES10401);
-            RuleFor(x => x.Name).NotEmpty().WithErrorCode(ErrorCode.MES10403);
+            RuleFor(x => x.Procedure.Code).NotEmpty().WithErrorCode(ErrorCode.MES10401);
+            RuleFor(x => x.Procedure.Name).NotEmpty().WithErrorCode(ErrorCode.MES10403);
             //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
         }
     }

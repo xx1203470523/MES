@@ -175,8 +175,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcProcedurePagedQueryDto, ProcProcedurePagedQuery>();
             CreateMap<ProcProcedureView, ProcProcedureViewDto>();
             CreateMap<ProcProcedureEntity, ProcProcedureDto>();
-            CreateMap<ProcProcedureCreateDto, ProcProcedureEntity>();
-            CreateMap<ProcProcedureModifyDto, ProcProcedureEntity>();
+            CreateMap<ProcProcedureOperDto, ProcProcedureEntity>();
             CreateMap<ProcProcedureJobReleationEntity, ProcProcedureJobReleationDto>();
             CreateMap<ProcProcedurePrintReleationEntity, ProcProcedurePrintReleationDto>();
             #endregion
