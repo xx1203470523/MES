@@ -12,52 +12,52 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备件类型编码
         /// </summary>
         public string SparePartTypeCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备件类型名称
         /// </summary>
         public string SparePartTypeName { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态
         /// </summary>
         public string Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 描述
         /// </summary>
         public string Remark { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreateBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreateOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 最后修改人
         /// </summary>
         public string UpdateBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 修改时间
         /// </summary>
         public DateTime? UpdateOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否逻辑删除
         /// </summary>
         public bool? IsDeleted { get; set; }
 
-       
+
     }
 
     /// <summary>
@@ -70,52 +70,30 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备件类型编码
         /// </summary>
         public string SparePartTypeCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备件类型名称
         /// </summary>
         public string SparePartTypeName { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态
         /// </summary>
         public string Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 描述
         /// </summary>
         public string Remark { get; set; }
 
-       /// <summary>
-        /// 创建人
+        /// <summary>
+        /// 备件ID集合
         /// </summary>
-        public string CreateBy { get; set; }
-
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreateOn { get; set; }
-
-       /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string UpdateBy { get; set; }
-
-       /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime? UpdateOn { get; set; }
-
-       /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public bool? IsDeleted { get; set; }
-
-       
+        public IEnumerable<long> SparePartIDs { get; set; }
     }
 
     /// <summary>
@@ -128,53 +106,30 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备件类型编码
         /// </summary>
         public string SparePartTypeCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备件类型名称
         /// </summary>
         public string SparePartTypeName { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态
         /// </summary>
         public string Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 描述
         /// </summary>
         public string Remark { get; set; }
 
-       /// <summary>
-        /// 创建人
+        /// <summary>
+        /// 备件ID集合
         /// </summary>
-        public string CreateBy { get; set; }
-
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreateOn { get; set; }
-
-       /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string UpdateBy { get; set; }
-
-       /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime? UpdateOn { get; set; }
-
-       /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public bool? IsDeleted { get; set; }
-
-       
-
+        public IEnumerable<long> SparePartIDs { get; set; }
     }
 
     /// <summary>

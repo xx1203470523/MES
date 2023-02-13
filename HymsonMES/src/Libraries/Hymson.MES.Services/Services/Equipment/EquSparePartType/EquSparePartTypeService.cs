@@ -14,7 +14,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
     public class EquSparePartTypeService : IEquSparePartTypeService
     {
         /// <summary>
-        /// 备件类型 仓储
+        /// 仓储（备件类型） 
         /// </summary>
         private readonly IEquSparePartTypeRepository _equSparePartTypeRepository;
 
