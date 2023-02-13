@@ -60,6 +60,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcMaterialGroupService, ProcMaterialGroupService>();
             #endregion
 
+            #region Parameter
+            services.AddSingleton<IProcParameterService, ProcParameterService>();
+            #endregion
+
             #region Resource
             services.AddSingleton<IProcResourceTypeService, ProcResourceTypeService>();
             services.AddSingleton<IProcResourceService, ProcResourceService>();
@@ -100,6 +104,11 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<AbstractValidator<ProcMaterialGroupCreateDto>, ProcMaterialGroupCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcMaterialGroupModifyDto>, ProcMaterialGroupModifyValidator>();
+            #endregion
+
+            #region Parameter
+            services.AddSingleton<AbstractValidator<ProcParameterCreateDto>, ProcParameterCreateValidator>();
+            services.AddSingleton<AbstractValidator<ProcParameterModifyDto>, ProcParameterModifyValidator>();
             #endregion
 
             #region Resource

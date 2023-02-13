@@ -122,6 +122,13 @@ namespace Hymson.MES.Services.Mapper
 
             #endregion
 
+            #region Parameter
+            CreateMap<ProcParameterCreateDto, ProcParameterEntity>();
+            CreateMap<ProcParameterModifyDto, ProcParameterEntity>();
+            CreateMap<ProcParameterPagedQueryDto, ProcParameterPagedQuery>();
+            CreateMap<ProcParameterEntity, ProcParameterDto>();
+            #endregion
+
             #region ResourceType
 
             CreateMap<ProcResourceTypeEntity, ProcResourceTypeDto>();

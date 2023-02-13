@@ -64,6 +64,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcMaterialGroupRepository, ProcMaterialGroupRepository>();
             #endregion
 
+            #region Parameter
+            services.AddSingleton<IProcParameterRepository, ProcParameterRepository>();
+
+            #endregion
+
             #region Resource
             services.AddSingleton<IProcResourceTypeRepository, ProcResourceTypeRepository>();
             services.AddSingleton<IProcResourceRepository, ProcResourceRepository>();
