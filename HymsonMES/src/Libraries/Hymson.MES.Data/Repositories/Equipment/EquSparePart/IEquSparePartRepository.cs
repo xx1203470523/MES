@@ -32,6 +32,13 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
         Task<int> UpdateSparePartTypeIdAsync(long sparePartTypeId, IEnumerable<long> sparePartIds);
 
         /// <summary>
+        /// 清空备件的指定备件类型
+        /// </summary>
+        /// <param name="sparePartTypeId"></param>
+        /// <returns></returns>
+        Task<int> ClearSparePartTypeIdAsync(long sparePartTypeId);
+
+        /// <summary>
         /// 删除
         /// </summary>
         /// <param name="id"></param>

@@ -63,6 +63,17 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
         }
 
         /// <summary>
+        /// 清空备件的指定备件类型
+        /// </summary>
+        /// <param name="sparePartTypeId"></param>
+        /// <returns></returns>
+        public async Task<int> ClearSparePartTypeIdAsync(long sparePartTypeId)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(ClearSparePartTypeIdSql, new { sparePartTypeId });
+        }
+
+        /// <summary>
         /// 删除（软删除）
         /// </summary>
         /// <param name="id"></param>
@@ -156,7 +167,8 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
 
         const string InsertSql = "INSERT INTO `equ_sparepart`(  `Id`, `SparePartCode`, `SparePartName`, `SparePartTypeId`, `ProcMaterialId`, `UnitId`, `IsKey`, `IsStandard`, `Status`, `BluePrintNo`, `Brand`, `ManagementMode`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteCode`) VALUES (   @Id, @SparePartCode, @SparePartName, @SparePartTypeId, @ProcMaterialId, @UnitId, @IsKey, @IsStandard, @Status, @BluePrintNo, @Brand, @ManagementMode, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteCode )  ";
         const string UpdateSql = "UPDATE `equ_sparepart` SET   SparePartCode = @SparePartCode, SparePartName = @SparePartName, SparePartTypeId = @SparePartTypeId, ProcMaterialId = @ProcMaterialId, UnitId = @UnitId, IsKey = @IsKey, IsStandard = @IsStandard, Status = @Status, BluePrintNo = @BluePrintNo, Brand = @Brand, ManagementMode = @ManagementMode, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteCode = @SiteCode  WHERE Id = @Id ";
-        const string UpdateSparePartTypeIdSql = "UPDATE `equ_sparepart` SET   SparePartTypeId = @SparePartTypeId  WHERE Id = @Id ";
+        const string UpdateSparePartTypeIdSql = "UPDATE `equ_sparepart` SET  SparePartTypeId = @SparePartTypeId  WHERE Id = @Id ";
+        const string ClearSparePartTypeIdSql = "UPDATE `equ_sparepart` SET  SparePartTypeId = 0 WHERE SparePartTypeId = @SparePartTypeId ";
         const string DeleteSql = "UPDATE `equ_sparepart` SET IsDeleted = '1' WHERE Id = @Id ";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SparePartCode`, `SparePartName`, `SparePartTypeId`, `ProcMaterialId`, `UnitId`, `IsKey`, `IsStandard`, `Status`, `BluePrintNo`, `Brand`, `ManagementMode`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteCode`

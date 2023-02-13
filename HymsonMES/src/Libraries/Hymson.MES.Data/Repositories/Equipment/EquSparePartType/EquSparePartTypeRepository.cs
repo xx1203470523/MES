@@ -49,7 +49,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSql, entity);
         }
-        
+
         /// <summary>
         /// 删除（软删除）
         /// </summary>
@@ -66,11 +66,10 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] idsArr) 
+        public async Task<int> DeletesAsync(long[] idsArr)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, idsArr);
-
+            return await conn.ExecuteAsync(DeleteSql, new { id = idsArr });
         }
 
         /// <summary>
@@ -81,7 +80,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
         public async Task<EquSparePartTypeEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<EquSparePartTypeEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<EquSparePartTypeEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -101,7 +100,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
-           
+
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
@@ -143,10 +142,10 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
                                            FROM `equ_sparepart_type` /**where**/  ";
 
         const string InsertSql = "INSERT INTO `equ_sparepart_type`(  `Id`, `SparePartTypeCode`, `SparePartTypeName`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteCode`) VALUES (   @Id, @SparePartTypeCode, @SparePartTypeName, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteCode )  ";
-        const string UpdateSql = "UPDATE `equ_sparepart_type` SET   SparePartTypeCode = @SparePartTypeCode, SparePartTypeName = @SparePartTypeName, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteCode = @SiteCode  WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `equ_sparepart_type` SET IsDeleted = '1' WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `equ_sparepart_type` SET  SparePartTypeName = @SparePartTypeName, Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string DeleteSql = "UPDATE `equ_sparepart_type` SET IsDeleted = 1 WHERE Id = @Id ";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SparePartTypeCode`, `SparePartTypeName`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteCode`
-                            FROM `equ_sparepart_type`  WHERE Id LIKE @Id ";
+                            FROM `equ_sparepart_type` WHERE Id = @Id ";
     }
 }

@@ -43,44 +43,58 @@ namespace Hymson.MES.Services.Mapper
             #region EquEquipment
             CreateMap<EquEquipmentCreateDto, EquEquipmentEntity>();
             CreateMap<EquEquipmentModifyDto, EquEquipmentEntity>();
-            //CreateMap<EquipmentUnitEntity, EquipmentUnitCreateDto>();
             CreateMap<EquEquipmentPagedQueryDto, EquEquipmentPagedQuery>();
+
+            CreateMap<EquEquipmentEntity, EquEquipmentDto>();
             #endregion
 
             #region EquEquipmentGroup
             CreateMap<EquEquipmentGroupCreateDto, EquEquipmentGroupEntity>();
             CreateMap<EquEquipmentGroupModifyDto, EquEquipmentGroupEntity>();
             CreateMap<EquEquipmentGroupPagedQueryDto, EquEquipmentGroupPagedQuery>();
+
+            CreateMap<EquEquipmentGroupEntity, EquEquipmentGroupListDto>();
+            CreateMap<EquEquipmentEntity, EquEquipmentBaseDto>();
             #endregion
 
             #region EquEquipmentLinkApi
             CreateMap<EquEquipmentLinkApiCreateDto, EquEquipmentLinkApiEntity>();
             CreateMap<EquEquipmentLinkApiModifyDto, EquEquipmentLinkApiEntity>();
             CreateMap<EquEquipmentLinkApiPagedQueryDto, EquEquipmentLinkApiPagedQuery>();
+
+            CreateMap<EquEquipmentLinkApiEntity, EquEquipmentLinkApiBaseDto>();
             #endregion
 
             #region EquEquipmentLinkHardware
             CreateMap<EquEquipmentLinkHardwareCreateDto, EquEquipmentLinkHardwareEntity>();
             CreateMap<EquEquipmentLinkHardwareModifyDto, EquEquipmentLinkHardwareEntity>();
             CreateMap<EquEquipmentLinkHardwarePagedQueryDto, EquEquipmentLinkHardwarePagedQuery>();
+
+            CreateMap<EquEquipmentLinkHardwareEntity, EquEquipmentLinkHardwareBaseDto>();
             #endregion
 
             #region EquEquipmentUnit
             CreateMap<EquEquipmentUnitCreateDto, EquEquipmentUnitEntity>();
             CreateMap<EquEquipmentUnitModifyDto, EquEquipmentUnitEntity>();
             CreateMap<EquEquipmentUnitPagedQueryDto, EquEquipmentUnitPagedQuery>();
+
+            CreateMap<EquEquipmentUnitEntity, EquEquipmentUnitDto>();
             #endregion
 
-            #region EquSparePartType
+            #region EquSparePart
             CreateMap<EquSparePartCreateDto, EquSparePartEntity>();
             CreateMap<EquSparePartModifyDto, EquSparePartEntity>();
             CreateMap<EquSparePartPagedQueryDto, EquSparePartPagedQuery>();
+
+            CreateMap<EquSparePartEntity, EquSparePartDto>();
             #endregion
 
             #region EquSparePartType
             CreateMap<EquSparePartTypeCreateDto, EquSparePartTypeEntity>();
             CreateMap<EquSparePartTypeModifyDto, EquSparePartTypeEntity>();
             CreateMap<EquSparePartTypePagedQueryDto, EquSparePartTypePagedQuery>();
+
+            CreateMap<EquSparePartTypeEntity, EquSparePartTypeDto>();
             #endregion
         }
 
@@ -93,6 +107,8 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteCalendarCreateDto, InteCalendarEntity>();
             CreateMap<InteCalendarModifyDto, InteCalendarEntity>();
             CreateMap<InteCalendarPagedQueryDto, InteCalendarPagedQuery>();
+
+            CreateMap<InteCalendarEntity, InteCalendarDto>();
             #endregion
 
             #region InteClassDetail
@@ -104,6 +120,8 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteClassCreateDto, InteClassEntity>();
             CreateMap<InteClassModifyDto, InteClassEntity>();
             CreateMap<InteClassPagedQueryDto, InteClassPagedQuery>();
+
+            CreateMap<InteClassEntity, InteClassDto>();
             #endregion
         }
 

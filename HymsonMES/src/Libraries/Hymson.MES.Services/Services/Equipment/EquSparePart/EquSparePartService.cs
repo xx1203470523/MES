@@ -63,7 +63,6 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
             //DTO转换实体
             var entity = modifyDto.ToEntity<EquSparePartEntity>();
             entity.UpdatedBy = "TODO";
-            entity.UpdatedOn = HymsonClock.Now();
 
             return await _equSparePartRepository.UpdateAsync(entity);
         }

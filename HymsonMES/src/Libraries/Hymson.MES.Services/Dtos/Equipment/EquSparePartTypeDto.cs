@@ -25,13 +25,13 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; }
+        public int Status { get; set; }
 
         /// <summary>
         /// 描述
         /// </summary>
         public string Remark { get; set; }
-
+        /*
         /// <summary>
         /// 创建人
         /// </summary>
@@ -51,11 +51,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 修改时间
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
-
+        */
         /// <summary>
         /// 是否逻辑删除
         /// </summary>
-        public bool? IsDeleted { get; set; }
+        //public bool? IsDeleted { get; set; }
 
 
     }

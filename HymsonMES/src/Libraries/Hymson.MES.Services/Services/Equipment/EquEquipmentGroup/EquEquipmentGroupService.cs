@@ -51,8 +51,6 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
             var equEquipmentGroupEntity = createDto.ToEntity<EquEquipmentGroupEntity>();
             equEquipmentGroupEntity.CreatedBy = "TODO";
             equEquipmentGroupEntity.UpdatedBy = "TODO";
-            equEquipmentGroupEntity.CreatedOn = HymsonClock.Now();
-            equEquipmentGroupEntity.UpdatedOn = HymsonClock.Now();
 
             //入库
             await _equEquipmentGroupRepository.InsertAsync(equEquipmentGroupEntity);
@@ -71,7 +69,6 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
             //DTO转换实体
             var equEquipmentGroupEntity = modifyDto.ToEntity<EquEquipmentGroupEntity>();
             equEquipmentGroupEntity.UpdatedBy = "TODO";
-            equEquipmentGroupEntity.UpdatedOn = HymsonClock.Now();
 
             await _equEquipmentGroupRepository.UpdateAsync(equEquipmentGroupEntity);
         }
