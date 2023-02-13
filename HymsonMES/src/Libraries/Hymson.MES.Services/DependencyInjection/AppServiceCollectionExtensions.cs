@@ -5,7 +5,9 @@ using Hymson.MES.Services.Options;
 using Hymson.MES.Services.Services.EquEquipmentGroup;
 using Hymson.MES.Services.Services.Equipment.EquEquipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipmentUnit;
-using Hymson.MES.Services.Services.InteClass;
+using Hymson.MES.Services.Services.Equipment.EquSparePartType;
+using Hymson.MES.Services.Services.Integrated.InteCalendar;
+using Hymson.MES.Services.Services.Integrated.InteClass;
 using Hymson.MES.Services.Services.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.MES.Services.Validators.Equipment;
@@ -45,9 +47,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquEquipmentService, EquEquipmentService>();
             services.AddSingleton<IEquEquipmentGroupService, EquEquipmentGroupService>();
             services.AddSingleton<IEquEquipmentUnitService, EquEquipmentUnitService>();
+            services.AddSingleton<IEquSparePartTypeService, EquSparePartTypeService>();
             #endregion
 
             #region Integrated
+            services.AddSingleton<IInteCalendarService, InteCalendarService>();
             services.AddSingleton<IInteClassService, InteClassService>();
             #endregion
 
@@ -89,6 +93,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<EquEquipmentUnitCreateDto>, EquipmentUnitCreateValidator>();
             #endregion
 
+            #region Process
             #region Material
             services.AddSingleton<AbstractValidator<ProcMaterialCreateDto>, ProcMaterialCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcMaterialModifyDto>, ProcMaterialModifyValidator>();
@@ -98,8 +103,11 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Resource
-            services.AddSingleton<AbstractValidator<ProcResourceDto>, ProcResourceValidator>();
+            services.AddSingleton<AbstractValidator<ProcResourceCreateDto>, ProcResourceCreateValidator>();
+            services.AddSingleton<AbstractValidator<ProcResourceModifyDto>, ProcResourcelModifyValidator>();
             #endregion
+            #endregion
+
             return services;
         }
     }

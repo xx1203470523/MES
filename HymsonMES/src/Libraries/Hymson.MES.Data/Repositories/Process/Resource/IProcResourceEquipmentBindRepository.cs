@@ -16,52 +16,38 @@ namespace Hymson.MES.Data.Repositories.Process
     public interface IProcResourceEquipmentBindRepository
     {
         /// <summary>
+        /// 分页查询
+        /// </summary>
+        /// <param name="procResourceEquipmentBindPagedQuery"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ProcResourceEquipmentBindView>> GetPagedInfoAsync(ProcResourceEquipmentBindPagedQuery procResourceEquipmentBindPagedQuery);
+
+        /// <summary>
+        /// 根据资源id和设备Id查询数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcResourceEquipmentBindEntity>> GetByResourceIdAsync(ProcResourceEquipmentBindQuery query);
+
+        /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="procResourceEquipmentBindEntity"></param>
+        /// <param name="procResourceEquipmentBinds"></param>
         /// <returns></returns>
-        Task InsertAsync(ProcResourceEquipmentBindEntity procResourceEquipmentBindEntity);
-        
+        Task InsertRangeAsync(List<ProcResourceEquipmentBindEntity> procResourceEquipmentBinds);
+
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="procResourceEquipmentBindEntity"></param>
+        /// <param name="procResourceEquipmentBinds"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(ProcResourceEquipmentBindEntity procResourceEquipmentBindEntity);
-        
-        /// <summary>
-        /// 删除
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<int> DeleteAsync(long id);
+        Task<int> UpdateRangeAsync(List<ProcResourceEquipmentBindEntity> procResourceEquipmentBinds);
         
         /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        Task<int> DeletesAsync(long[] idsArr);
-
-        /// <summary>
-        /// 根据ID获取数据
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<ProcResourceEquipmentBindEntity> GetByIdAsync(long id);
-        
-        /// <summary>
-        /// 获取List
-        /// </summary>
-        /// <param name="procResourceEquipmentBindQuery"></param>
-        /// <returns></returns>
-        Task<IEnumerable<ProcResourceEquipmentBindEntity>> GetProcResourceEquipmentBindEntitiesAsync(ProcResourceEquipmentBindPagedQuery procResourceEquipmentBindQuery);
-        
-        /// <summary>
-        /// 分页查询
-        /// </summary>
-        /// <param name="procResourceEquipmentBindPagedQuery"></param>
-        /// <returns></returns>
-        Task<PagedInfo<ProcResourceEquipmentBindView>> GetPagedInfoAsync(ProcResourceEquipmentBindPagedQuery procResourceEquipmentBindPagedQuery);
+        Task<int> DeletesRangeAsync(long[] idsArr);
     }
 }

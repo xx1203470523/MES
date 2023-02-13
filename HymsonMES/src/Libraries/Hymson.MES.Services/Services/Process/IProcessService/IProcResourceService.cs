@@ -56,18 +56,32 @@ namespace Hymson.MES.Services.Services.Process.IProcessService
         Task<PagedInfo<ProcResourceConfigResDto>> GetcResourceConfigResAsync(ProcResourceConfigResPagedQueryDto query);
 
         /// <summary>
+        /// 获取资源关联设备数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ProcResourceEquipmentBindViewDto>> GetcResourceConfigEquAsync(ProcResourceEquipmentBindPagedQueryDto query);
+
+        /// <summary>
+        /// 获取资源关联作业
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ProcResourceConfigJobViewDto>> GetcResourceConfigJoAsync(ProcResourceConfigJobPagedQueryDto query);
+
+        /// <summary>
         /// 添加资源数据
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task AddProcResourceAsync(ProcResourceDto param);
+        Task AddProcResourceAsync(ProcResourceCreateDto param);
 
         /// <summary>
         /// 修改资源数据
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> UpdateProcResrouceAsync(ProcResourceDto param);
+        Task UpdateProcResrouceAsync(ProcResourceModifyDto param);
 
         /// <summary>
         /// 批量删除资源类型数据

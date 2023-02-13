@@ -106,12 +106,36 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
+        /// 获取资源设置数据
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [Route("equ/list")]
+        [HttpGet]
+        public async Task<PagedInfo<ProcResourceEquipmentBindViewDto>> GetResourceConfigEquAsync(ProcResourceEquipmentBindPagedQueryDto parm)
+        {
+            return await _procResourceService.GetcResourceConfigEquAsync(parm);
+        }
+
+        /// <summary>
+        /// 获取资源设置数据
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [Route("job/list")]
+        [HttpGet]
+        public async Task<PagedInfo<ProcResourceConfigJobViewDto>> GetcResourceConfigJoAsync(ProcResourceConfigJobPagedQueryDto parm)
+        {
+            return await _procResourceService.GetcResourceConfigJoAsync(parm);
+        }
+
+        /// <summary>
         /// 添加资源数据
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task AddProcResource([FromBody] ProcResourceDto parm)
+        public async Task AddProcResource([FromBody] ProcResourceCreateDto parm)
         {
             await _procResourceService.AddProcResourceAsync(parm);
         }
@@ -122,7 +146,7 @@ namespace Hymson.MES.Api.Controllers
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPut]
-        public async Task UpdateProcResource([FromBody] ProcResourceDto parm)
+        public async Task UpdateProcResource([FromBody] ProcResourceModifyDto parm)
         {
             await _procResourceService.UpdateProcResrouceAsync(parm);
         }

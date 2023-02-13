@@ -49,13 +49,13 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
         /// </summary>
         /// <param name="equEquipmentGroupQuery"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquEquipmentGroupEntity>> GetEquEquipmentGroupEntitiesAsync(EquEquipmentGroupQuery equEquipmentGroupQuery);
+        Task<IEnumerable<EquEquipmentGroupEntity>> GetEntitiesAsync(EquEquipmentGroupQuery equEquipmentGroupQuery);
         
         /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="equEquipmentGroupPagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquEquipmentGroupEntity>> GetPagedInfoAsync(EquEquipmentGroupPagedQuery equEquipmentGroupPagedQuery);
+        Task<PagedInfo<EquEquipmentGroupEntity>> GetPagedListAsync(EquEquipmentGroupPagedQuery equEquipmentGroupPagedQuery);
     }
 }

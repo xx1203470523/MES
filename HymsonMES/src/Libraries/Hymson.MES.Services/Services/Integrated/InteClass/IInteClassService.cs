@@ -1,10 +1,10 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
 
-namespace Hymson.MES.Services.Services.InteClass
+namespace Hymson.MES.Services.Services.Integrated.InteClass
 {
     /// <summary>
-    /// 生产班次 service接口
+    /// 班制维护 service接口
     /// </summary>
     public interface IInteClassService
     {
@@ -13,14 +13,14 @@ namespace Hymson.MES.Services.Services.InteClass
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        Task<int> AddInteClassAsync(AddInteClassDto parm);
+        Task<int> AddInteClassAsync(InteClassCreateDto parm);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        Task<int> UpdateInteClassAsync(UpdateInteClassDto parm);
+        Task<int> UpdateInteClassAsync(InteClassModifyDto parm);
 
         /// <summary>
         /// 

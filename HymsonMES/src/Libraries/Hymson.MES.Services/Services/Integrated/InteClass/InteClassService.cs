@@ -6,15 +6,15 @@ using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
 
-namespace Hymson.MES.Services.Services.InteClass
+namespace Hymson.MES.Services.Services.Integrated.InteClass
 {
     /// <summary>
-    /// 生产班次 服务
+    /// 班制维护 服务
     /// </summary>
     public class InteClassService : IInteClassService
     {
         /// <summary>
-        /// 仓储（生产班次）
+        /// 仓储（班制维护）
         /// </summary>
         private readonly IInteClassRepository _inteClassRepository;
         private readonly IInteClassDetailRepository _inteClassDetailRepository;
@@ -32,11 +32,11 @@ namespace Hymson.MES.Services.Services.InteClass
 
 
         /// <summary>
-        /// 添加生产班次详情
+        /// 添加班制维护详情
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task<int> AddInteClassAsync(AddInteClassDto createDto)
+        public async Task<int> AddInteClassAsync(InteClassCreateDto createDto)
         {
             // 验证DTO
 
@@ -70,11 +70,11 @@ namespace Hymson.MES.Services.Services.InteClass
         }
 
         /// <summary>
-        /// 更新生产班次详情
+        /// 更新班制维护详情
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task<int> UpdateInteClassAsync(UpdateInteClassDto modifyDto)
+        public async Task<int> UpdateInteClassAsync(InteClassModifyDto modifyDto)
         {
             // DTO转换实体
             var entity = modifyDto.ToEntity<InteClassEntity>();
@@ -104,7 +104,7 @@ namespace Hymson.MES.Services.Services.InteClass
         }
 
         /// <summary>
-        /// 删除生产班次详情
+        /// 删除班制维护详情
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
@@ -114,14 +114,14 @@ namespace Hymson.MES.Services.Services.InteClass
         }
 
         /// <summary>
-        /// 查询生产班次详情列表
+        /// 查询班制维护详情列表
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         public async Task<PagedInfo<InteClassDto>> GetPagedListAsync(InteClassPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<InteClassPagedQuery>();
-            var pagedInfo = await _inteClassRepository.GetPagedInfoAsync(pagedQuery);
+            var pagedInfo = await _inteClassRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<InteClassDto>());

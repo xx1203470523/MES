@@ -77,7 +77,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// </summary>
         /// <param name="equipmentQuery"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquEquipmentEntity>> GetListAsync(EquEquipmentQuery equipmentQuery);
+        Task<IEnumerable<EquEquipmentEntity>> GetEntitiesAsync(EquEquipmentQuery equipmentQuery);
 
         /// <summary>
         /// 

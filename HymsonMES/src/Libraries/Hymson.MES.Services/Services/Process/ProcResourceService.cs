@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Google.Protobuf.WellKnownTypes;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -6,11 +7,16 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Resource;
+using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
+using Hymson.MES.Services.Validators.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Extensions;
+using Hymson.Utils.Tools;
+using IdGen;
+using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -28,6 +34,11 @@ namespace Hymson.MES.Services.Services.Process
         private readonly IProcResourceRepository _resourceRepository;
 
         /// <summary>
+        /// 资源类型仓储
+        /// </summary>
+        private readonly IProcResourceTypeRepository _resourceTypeRepository;
+
+        /// <summary>
         /// 资源关联打印机仓储
         /// </summary>
         private readonly IProcResourceConfigPrintRepository _resourceConfigPrintRepository;
@@ -42,22 +53,34 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         private readonly IProcResourceEquipmentBindRepository _resourceEquipmentBindRepository;
 
-        private readonly AbstractValidator<ProcResourceDto> _validationRules;
+        /// <summary>
+        /// 资源作业配置表仓储
+        /// </summary>
+        private readonly IProcResourceConfigJobRepository _resourceConfigJobRepository;
+
+        private readonly AbstractValidator<ProcResourceCreateDto> _validationCreateRules;
+        private readonly AbstractValidator<ProcResourceModifyDto> _validationModifyRules;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         public ProcResourceService(IProcResourceRepository resourceRepository,
+                  IProcResourceTypeRepository resourceTypeRepository,
                   IProcResourceConfigPrintRepository resourceConfigPrintRepository,
                   IProcResourceConfigResRepository procResourceConfigResRepository,
                   IProcResourceEquipmentBindRepository resourceEquipmentBindRepository,
-                  AbstractValidator<ProcResourceDto> validationRules)
+                  IProcResourceConfigJobRepository resourceConfigJobRepository,
+                  AbstractValidator<ProcResourceCreateDto> validationCreateRules,
+                  AbstractValidator<ProcResourceModifyDto> validationModifyRules)
         {
             _resourceRepository = resourceRepository;
+            _resourceTypeRepository = resourceTypeRepository;
             _resourceConfigPrintRepository = resourceConfigPrintRepository;
             _procResourceConfigResRepository = procResourceConfigResRepository;
-            _resourceEquipmentBindRepository= resourceEquipmentBindRepository;
-            _validationRules = validationRules;
+            _resourceEquipmentBindRepository = resourceEquipmentBindRepository;
+            _resourceConfigJobRepository = resourceConfigJobRepository;
+            _validationCreateRules = validationCreateRules;
+            _validationModifyRules = validationModifyRules;
         }
 
         /// <summary>
@@ -172,7 +195,7 @@ namespace Hymson.MES.Services.Services.Process
         }
 
         /// <summary>
-        /// 根据查询条件获取分页数据
+        /// 获取资源关联设备数据
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
@@ -192,32 +215,215 @@ namespace Hymson.MES.Services.Services.Process
         }
 
         /// <summary>
-        /// 添加资源数据
+        /// 获取资源关联作业
         /// </summary>
-        /// <param name="param"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public async Task AddProcResourceAsync(ProcResourceDto param)
+        public async Task<PagedInfo<ProcResourceConfigJobViewDto>> GetcResourceConfigJoAsync(ProcResourceConfigJobPagedQueryDto query)
         {
+            var resPagedQuery = query.ToQuery<ProcResourceConfigJobPagedQuery>();
+            var pagedInfo = await _resourceConfigJobRepository.GetPagedInfoAsync(resPagedQuery);
+
+            //实体到DTO转换 装载数据
+            var procResourceConfigJobViews = new List<ProcResourceConfigJobViewDto>();
+            foreach (var entity in pagedInfo.Data)
+            {
+                var resourceTypeDto = entity.ToModel<ProcResourceConfigJobViewDto>();
+                procResourceConfigJobViews.Add(resourceTypeDto);
+            }
+            return new PagedInfo<ProcResourceConfigJobViewDto>(procResourceConfigJobViews, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 添加资源维护表所有页签的数据
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        public async Task AddProcResourceAsync(ProcResourceCreateDto parm)
+        {
+            #region 验证
+            if (parm == null)
+            {
+                throw new ValidationException(ErrorCode.MES10100);
+            }
+
             //验证DTO
-            //var dto = new ProcResourceTypeDto();
-            //await _validationRules.ValidateAndThrowAsync(dto);
+            await _validationCreateRules.ValidateAndThrowAsync(parm);
+
+            var resCode = parm.ResCode.ToUpperInvariant();
+            var query = new ProcResourceQuery
+            {
+                SiteCode = parm.SiteCode,
+                ResCode = resCode
+            };
+            if (await _resourceRepository.IsExistsAsync(query))
+            {
+                //TODO
+                // var message = string.Format(ErrorCode.MES10308, parm.ResCode);
+                // return Error(ResultCode.PARAM_ERROR, $"此资源【{parm.ResCode}】在系统中已经存在!");
+                throw new ValidationException(ErrorCode.MES10308);
+            }
+
+            if (parm.ResTypeId > 0)
+            {
+                var resourceType = await _resourceTypeRepository.GetByIdAsync(parm.ResTypeId);
+                if (resourceType == null)
+                {
+                    throw new ValidationException(ErrorCode.MES10310);
+                }
+            }
+
+            //判断是否勾选了多个主设备，只能有一个主设备
+            if (parm.EquList != null && parm.EquList.Count > 0)
+            {
+                if (parm.EquList.GroupBy(x => x.EquipmentId).Where(g => g.Count() > 2).Count() > 1)
+                {
+                    throw new CustomerValidationException(ErrorCode.MES10306);
+                }
+
+                var ismianCount = parm.EquList.Where(a => a.IsMain == true).ToList().Count;
+                if (ismianCount > 1)
+                {
+                    throw new CustomerValidationException(ErrorCode.MES10307);
+                }
+            }
+            #endregion
+
+            string site = parm.SiteCode;
+            var userId = "TODO";
+
+            #region 组装数据
+
             //DTO转换实体
             var entity = new ProcResourceEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
-                SiteCode = "TODO",
-                CreatedBy = "TODO",
-                UpdatedBy = "TODO",
+                SiteCode = site,
+                CreatedBy = userId,
+                UpdatedBy = userId,
                 UpdatedOn = HymsonClock.Now(),
                 CreatedOn = HymsonClock.Now(),
-                Status = param.Status,
-                ResTypeId = param.ResTypeId,
-                Remark = param.Remark ?? "",
-                ResCode = param.ResCode ?? "",
-                ResName = param.ResName ?? ""
+                Status = parm.Status,
+                ResTypeId = parm.ResTypeId,
+                Remark = parm.Remark ?? "",
+                ResCode = resCode,
+                ResName = parm.ResName ?? ""
             };
-            //入库
-            await _resourceRepository.InsertAsync(entity);
+
+            //打印机数据
+            List<ProcResourceConfigPrintEntity> printList = new List<ProcResourceConfigPrintEntity>();
+            if (parm.PrintList != null && parm.PrintList.Count > 0)
+            {
+                foreach (var item in parm.PrintList)
+                {
+                    printList.Add(new ProcResourceConfigPrintEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteCode = site,
+                        ResourceId = entity.Id,
+                        PrintId = item.PrintId,
+                        Remark = "",
+                        CreatedBy = userId,
+                        UpdatedBy = userId,
+                        UpdatedOn = HymsonClock.Now(),
+                        CreatedOn = HymsonClock.Now()
+                    });
+                }
+            }
+
+            //资源绑定设置数据
+            List<ProcResourceEquipmentBindEntity> equList = new List<ProcResourceEquipmentBindEntity>();
+            if (parm.EquList != null && parm.EquList.Count > 0)
+            {
+                foreach (var item in parm.EquList)
+                {
+                    equList.Add(new ProcResourceEquipmentBindEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteCode = site,
+                        ResourceId = entity.Id,
+                        EquipmentId = item.EquipmentId,
+                        IsMain = item.IsMain ?? false,
+                        Remark = "",
+                        CreatedBy = userId,
+                        UpdatedBy = userId,
+                        UpdatedOn = HymsonClock.Now(),
+                        CreatedOn = HymsonClock.Now()
+                    });
+                }
+            }
+
+            //资源设置数据
+            List<ProcResourceConfigResEntity> resSetList = new List<ProcResourceConfigResEntity>();
+            if (parm.ResList != null && parm.ResList.Count > 0)
+            {
+                foreach (var item in parm.ResList)
+                {
+                    resSetList.Add(new ProcResourceConfigResEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteCode = site,
+                        ResourceId = entity.Id,
+                        SetType = item.SetType,
+                        Value = item.Value,
+                        Remark = "",
+                        CreatedBy = userId,
+                        UpdatedBy = userId,
+                        UpdatedOn = HymsonClock.Now(),
+                        CreatedOn = HymsonClock.Now()
+                    });
+                }
+            }
+
+            //作业设置数据
+            List<ProcResourceConfigJobEntity> jobList = new List<ProcResourceConfigJobEntity>();
+            if (parm.JobList != null && parm.JobList.Count > 0)
+            {
+                foreach (var item in parm.JobList)
+                {
+                    jobList.Add(new ProcResourceConfigJobEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteCode = site,
+                        ResourceId = entity.Id,
+                        LinkPoint = item.LinkPoint,
+                        JobId = item.JobId,
+                        IsUse = item.IsUse,
+                        Parameter = item.Parameter,
+                        Remark = item.Remark,
+                        CreatedBy = userId,
+                        UpdatedBy = userId,
+                        UpdatedOn = HymsonClock.Now(),
+                        CreatedOn = HymsonClock.Now()
+                    });
+                }
+            }
+            #endregion
+
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            {
+                //入库
+                await _resourceRepository.InsertAsync(entity);
+
+                if (parm.PrintList != null && parm.PrintList.Count > 0)
+                {
+                    await _resourceConfigPrintRepository.InsertRangeAsync(printList);
+                }
+                if (parm.EquList != null && parm.EquList.Count > 0)
+                {
+                    await _resourceEquipmentBindRepository.InsertRangeAsync(equList);
+                }
+                if (parm.ResList != null && parm.ResList.Count > 0)
+                {
+                    await _procResourceConfigResRepository.InsertRangeAsync(resSetList);
+                }
+                if (parm.JobList != null && parm.JobList.Count > 0)
+                {
+                    await _resourceConfigJobRepository.InsertRangeAsync(jobList);
+                }
+
+                ts.Complete();
+            }
         }
 
         /// <summary>
@@ -225,21 +431,441 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> UpdateProcResrouceAsync(ProcResourceDto param)
+        public async Task UpdateProcResrouceAsync(ProcResourceModifyDto param)
         {
+            string userId = "TODO";
+            var siteCode = "TODO";
+            #region 验证
+            if (param == null)
+            {
+                throw new ValidationException(ErrorCode.MES10100);
+            }
+
             //验证DTO
-            //var dto = new ProcResourceTypeDto();
-            //await _validationRules.ValidateAndThrowAsync(dto);
+            await _validationModifyRules.ValidateAndThrowAsync(param);
+
+            //资源类型在系统中不存在,请重新输入!
+            if (param.ResTypeId > 0)
+            {
+                var resourceType = await _resourceTypeRepository.GetByIdAsync(param.ResTypeId);
+                if (resourceType == null)
+                {
+                    throw new ValidationException(ErrorCode.MES10310);
+                }
+            }
+
+            if (param.PrintList != null && param.PrintList.Count > 0)
+            {
+                if (param.PrintList.Where(x => x.OperationType != 3).GroupBy(x => x.PrintId).Where(g => g.Count() > 2).Count() > 1)
+                {
+                    // return Error(ResultCode.PARAM_ERROR, $"资源配置打印机中，重复配置打印机!");
+                }
+
+                //判断打印机是否重复配置  数据库中 已经存储的情况
+
+                var parmPrintIds = param.PrintList.Select(x => x.PrintId);
+                var printQuery = new ProcResourceConfigPrintQuery
+                {
+                    ResourceId = param.Id,
+                    Ids = parmPrintIds.ToArray()
+                };
+                var resourcePrintList = await _resourceConfigPrintRepository.GetByResourceIdAsync(printQuery);
+                if (resourcePrintList != null && resourcePrintList.Any())
+                {
+                    foreach (var item in resourcePrintList)
+                    {
+                        var parmPrint = param.PrintList.Where(x => x.PrintId == item.PrintId);
+                        //  判断参数中打印机数据情况
+                        //     传入一条 只能为修改或者删除
+                        //     传入两条 只能为删除和新增
+                        //     其他则为异常
+                        if (parmPrint.Count() == 1)
+                        {
+                            if (parmPrint.FirstOrDefault()?.OperationType == 1)
+                                throw new ValidationException(ErrorCode.MES10313);
+                        }
+                        else if (parmPrint.Count() == 2)
+                        {
+                            if (!(parmPrint.Where(x => x.OperationType == 3).Count() == 1 && parmPrint.Where(x => x.OperationType == 1).Count() == 1))
+                            {
+                                throw new ValidationException(ErrorCode.MES10313);
+                            }
+                        }
+                        else
+                        {
+                            throw new ValidationException(ErrorCode.MES10313);
+                        }
+                    }
+                }
+            }
+
+            //判断是否勾选了多个主设备，只能有一个主设备
+            if (param.EquList != null && param.EquList.Count > 0)
+            {
+                if (param.EquList.Where(x => x.OperationType != 3).GroupBy(x => x.EquipmentId).Where(g => g.Count() > 2).Count() > 1)
+                {
+                    throw new Exception(ErrorCode.MES10314);
+                }
+
+                //判断打印机是否重复配置  数据库中 已经存储的情况
+                var parmEquIds = param.EquList.Select(x => x.EquipmentId).ToArray();
+                var equQuery = new ProcResourceEquipmentBindQuery
+                {
+                    ResourceId = param.Id,
+                    Ids = parmEquIds
+                };
+                var resourceEquList = await _resourceEquipmentBindRepository.GetByResourceIdAsync(equQuery);
+                if (resourceEquList != null && resourceEquList.Any())
+                {
+                    foreach (var item in resourceEquList)
+                    {
+                        var parmEqu = param.PrintList.Where(x => x.PrintId == item.EquipmentId);
+                        //  判断参数中打印机数据情况
+                        //     传入一条 只能为修改或者删除
+                        //     传入两条 只能为删除和新增
+                        //     其他则为异常
+                        if (parmEqu.Count() == 1)
+                        {
+                            if (parmEqu.FirstOrDefault()?.OperationType == 1)
+                                throw new ValidationException(ErrorCode.MES10314);
+                        }
+                        else if (parmEqu.Count() == 2)
+                        {
+                            if (!(parmEqu.Where(x => x.OperationType == 3).Count() == 1 && parmEqu.Where(x => x.OperationType == 1).Count() == 1))
+                            {
+                                throw new ValidationException(ErrorCode.MES10314);
+                            }
+                        }
+                        else
+                        {
+                            throw new ValidationException(ErrorCode.MES10314);
+                        }
+                    }
+                }
+
+                var ismianList = param.EquList.Where(a => a.IsMain == true && a.OperationType != 3).ToList();
+                if (ismianList.Count > 1)
+                {
+                    throw new ValidationException(ErrorCode.MES10307);
+                }
+                else
+                {
+                    //判断当前存储与参数主设备是否一致
+                    //        不一致 则判断 存储设备是否设置成非主设备
+                    var equQueryMain = new ProcResourceEquipmentBindQuery
+                    {
+                        ResourceId = param.Id,
+                        IsMain = true
+                    };
+                    var mainList = await _resourceEquipmentBindRepository.GetByResourceIdAsync(equQueryMain);
+                    if (mainList != null)
+                    {
+                        var isMain = mainList.FirstOrDefault();
+                        if (ismianList.FirstOrDefault().EquipmentId != isMain.EquipmentId)
+                        {
+                            if (param.EquList.Where(x => x.EquipmentId == isMain.EquipmentId).FirstOrDefault() == null)
+                            {
+                                throw new CustomerValidationException(ErrorCode.MES10307);
+                            }
+                        }
+                    }
+                }
+            }
+            #endregion
+
             //DTO转换实体
             var entity = new ProcResourceEntity
             {
                 Id = param.Id,
+                Status = param.Status,
+                ResName = param.ResName,
+                ResTypeId = param.ResTypeId,
                 Remark = param.Remark ?? "",
                 UpdatedOn = HymsonClock.Now(),
-                UpdatedBy = "TODO"
+                UpdatedBy = userId
             };
-            // 保存实体
-            return await _resourceRepository.UpdateAsync(entity);
+
+            //打印机数据
+            List<ProcResourceConfigPrintEntity> addPrintList = new List<ProcResourceConfigPrintEntity>();
+            List<ProcResourceConfigPrintEntity> updaterPintList = new List<ProcResourceConfigPrintEntity>();
+            List<long> deletePintIds = new List<long>();
+            if (param.PrintList != null && param.PrintList.Count > 0)
+            {
+                foreach (var item in param.PrintList)
+                {
+                    ProcResourceConfigPrintEntity print = new ProcResourceConfigPrintEntity();
+                    switch (item.OperationType)
+                    {
+                        case 1:
+                            print = new ProcResourceConfigPrintEntity
+                            {
+                                Id = IdGenProvider.Instance.CreateId(),
+                                ResourceId = param.Id,
+                                PrintId = item.PrintId,
+                                Remark = "",
+                                SiteCode = item.SiteCode,
+                                CreatedBy = userId,
+                                CreatedOn = HymsonClock.Now(),
+                                UpdatedBy = userId,
+                                UpdatedOn = HymsonClock.Now()
+                            };
+                            addPrintList.Add(print);
+                            break;
+                        case 2:
+                            print = print = new ProcResourceConfigPrintEntity
+                            {
+                                Id = item.Id ?? 0,
+                                PrintId = item.PrintId,
+                                UpdatedBy = userId,
+                                UpdatedOn = HymsonClock.Now()
+                            };
+                            updaterPintList.Add(print);
+                            break;
+                        case 3:
+                            if (item.Id != null && item.Id > 0)
+                            {
+                                deletePintIds.Add(item.Id ?? 0);
+                            }
+                            break;
+                        default:
+                            //return Error(ResultCode.PARAM_ERROR, $"资源打印配置操作类型OperationType:{item.OperationType}异常，只能传入1，2，3！");
+                            throw new ValidationException(ErrorCode.MES10315);
+                    }
+                }
+            }
+
+            //设备绑定设置数据
+            List<ProcResourceEquipmentBindEntity> addEquList = new List<ProcResourceEquipmentBindEntity>();
+            List<ProcResourceEquipmentBindEntity> updateEquListt = new List<ProcResourceEquipmentBindEntity>();
+            List<long> deleteEquIds = new List<long>();
+            if (param.EquList != null && param.EquList.Count > 0)
+            {
+                foreach (var item in param.EquList)
+                {
+                    ProcResourceEquipmentBindEntity equ = new ProcResourceEquipmentBindEntity();
+                    switch (item.OperationType)
+                    {
+                        case 1:
+                            equ = new ProcResourceEquipmentBindEntity
+                            {
+                                Id = IdGenProvider.Instance.CreateId(),
+                                ResourceId = param.Id,
+                                EquipmentId = item.EquipmentId,
+                                IsMain = item.IsMain ?? false,
+                                Remark = "",
+                                SiteCode = item.SiteCode,
+                                CreatedBy = userId,
+                                CreatedOn = HymsonClock.Now(),
+                                UpdatedBy = userId,
+                                UpdatedOn = HymsonClock.Now()
+                            };
+                            addEquList.Add(equ);
+                            break;
+                        case 2:
+                            equ = new ProcResourceEquipmentBindEntity
+                            {
+                                Id = item.Id ?? 0,
+                                EquipmentId = item.EquipmentId,
+                                IsMain = item.IsMain ?? false,
+                                UpdatedBy = userId,
+                                UpdatedOn = HymsonClock.Now()
+                            };
+                            updateEquListt.Add(equ);
+                            break;
+                        case 3:
+                            if (item.Id != null && item.Id > 0)
+                            {
+                                deleteEquIds.Add(item.Id ?? 0);
+                            }
+                            break;
+                        default:
+                            // return Error(ResultCode.PARAM_ERROR, $"设备绑定设置数据操作类型OperationType:{item.OperationType}异常，只能传入1，2，3！");
+                            throw new ValidationException(ErrorCode.MES10316);
+                    }
+                }
+            }
+
+            //资源设置数据
+            List<ProcResourceConfigResEntity> addResSetList = new List<ProcResourceConfigResEntity>();
+            List<ProcResourceConfigResEntity> updateSetListt = new List<ProcResourceConfigResEntity>();
+            List<long> deleteSetIds = new List<long>();
+            if (param.ResList != null && param.ResList.Count > 0)
+            {
+                foreach (var item in param.ResList)
+                {
+                    ProcResourceConfigResEntity resSet = new ProcResourceConfigResEntity();
+                    switch (item.OperationType)
+                    {
+                        case 1:
+                            resSet = new ProcResourceConfigResEntity
+                            {
+                                Id = IdGenProvider.Instance.CreateId(),
+                                ResourceId = param.Id,
+                                SetType = item.SetType,
+                                Value = item.Value,
+                                Remark = "",
+                                SiteCode = item.SiteCode,
+                                CreatedBy = userId,
+                                CreatedOn = HymsonClock.Now(),
+                                UpdatedBy = userId,
+                                UpdatedOn = HymsonClock.Now()
+                            };
+                            addResSetList.Add(resSet);
+                            break;
+                        case 2:
+                            resSet = new ProcResourceConfigResEntity
+                            {
+                                Id = item.Id ?? 0,
+                                SetType = item.SetType,
+                                Value = item.Value,
+                                UpdatedBy = userId,
+                                UpdatedOn = HymsonClock.Now()
+                            };
+                            updateSetListt.Add(resSet);
+                            break;
+                        case 3:
+                            if (item.Id != null && item.Id > 0)
+                            {
+                                deleteSetIds.Add(item.Id ?? 0);
+                            }
+                            break;
+                        default:
+                            //return Error(ResultCode.PARAM_ERROR, $"资源设置数据操作类型OperationType:{item.OperationType}异常，只能传入1，2，3！");
+                            throw new ValidationException(ErrorCode.MES10317);
+                    }
+                }
+            }
+
+            //作业设置数据
+            List<ProcResourceConfigJobEntity> addJobList = new List<ProcResourceConfigJobEntity>();
+            List<ProcResourceConfigJobEntity> updateJobList = new List<ProcResourceConfigJobEntity>();
+            List<long> deleteJobIds = new List<long>();
+            if (param.JobList != null && param.JobList.Count > 0)
+            {
+                foreach (var item in param.JobList)
+                {
+                    ProcResourceConfigJobEntity job = new ProcResourceConfigJobEntity();
+                    switch (item.OperationType)
+                    {
+                        case 1:
+                            job = new ProcResourceConfigJobEntity
+                            {
+                                Id = IdGenProvider.Instance.CreateId(),
+                                ResourceId = param.Id,
+                                LinkPoint = item.LinkPoint,
+                                JobId = item.JobId,
+                                IsUse = item.IsUse,
+                                Parameter = item.Parameter,
+                                Remark = item.Remark,
+                                SiteCode = item.SiteCode,
+                                CreatedBy = userId,
+                                CreatedOn = HymsonClock.Now(),
+                                UpdatedBy = userId,
+                                UpdatedOn = HymsonClock.Now()
+                            };
+                            addJobList.Add(job);
+                            break;
+                        case 2:
+                            job = new ProcResourceConfigJobEntity
+                            {
+                                Id = item.Id ?? 0,
+                                LinkPoint = item.LinkPoint,
+                                JobId = item.JobId,
+                                IsUse = item.IsUse,
+                                Remark=item.Remark,
+                                Parameter = item.Parameter,
+                                UpdatedBy = userId,
+                                UpdatedOn = HymsonClock.Now()
+                            };
+                            updateJobList.Add(job);
+                            break;
+                        case 3:
+                            if (item.Id != null && item.Id > 0)
+                            {
+                                deleteJobIds.Add(item.Id ?? 0);
+                            }
+                            break;
+                        default:
+                            // return Error(ResultCode.PARAM_ERROR, $"作业设置数据操作类型OperationType:{item.OperationType}异常，只能传入1，2，3！");
+                            throw new ValidationException(ErrorCode.MES10318);
+                    }
+                }
+            }
+
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            {
+                //入库
+                await _resourceRepository.UpdateAsync(entity);
+
+                //打印机数据
+                if (addPrintList != null && addPrintList.Count > 0)
+                {
+                    await _resourceConfigPrintRepository.InsertRangeAsync(addPrintList);
+                    // return Error(ResultCode.FAIL, "插入资源关联打印表失败");
+                }
+                if (updaterPintList != null && updaterPintList.Count > 0)
+                {
+                    // return Error(ResultCode.FAIL, "修改资源关联打印表失败");
+                    await _resourceConfigPrintRepository.UpdateRangeAsync(updaterPintList);
+                }
+                if (deletePintIds != null && deletePintIds.Count > 0)
+                {
+                    // return Error(ResultCode.FAIL, "删除资源关联打印表失败");
+                    await _resourceConfigPrintRepository.DeleteRangeAsync(deletePintIds.ToArray());
+                }
+
+                //设备数据
+                if (addEquList != null && addEquList.Count > 0)
+                {
+                    //  return Error(ResultCode.FAIL, "插入资源关联设备失败");
+                    await _resourceEquipmentBindRepository.InsertRangeAsync(addEquList);
+                }
+                if (updateEquListt != null && updateEquListt.Count > 0)
+                {
+                    //  return Error(ResultCode.FAIL, "修改资源关联设备失败");
+                    await _resourceEquipmentBindRepository.UpdateRangeAsync(updateEquListt);
+                }
+                if (deleteEquIds != null && deleteEquIds.Count > 0)
+                {
+                    // return Error(ResultCode.FAIL, "删除资源关联设备失败");
+                    await _resourceEquipmentBindRepository.DeletesRangeAsync(deleteEquIds.ToArray());
+                }
+
+                //资源设置数据
+                if (addResSetList != null && addResSetList.Count > 0)
+                {
+                    // return Error(ResultCode.FAIL, "插入工序关联作业表失败");
+                    await _procResourceConfigResRepository.InsertRangeAsync(addResSetList);
+                }
+                if (updateSetListt != null && updateSetListt.Count > 0)
+                {
+                    // return Error(ResultCode.FAIL, "修改工序关联作业表失败");
+                    await _procResourceConfigResRepository.UpdateRangeAsync(updateSetListt);
+                }
+                if (deleteSetIds != null && deleteSetIds.Count > 0)
+                {
+                    // return Error(ResultCode.FAIL, "删除工序关联作业表失败");
+                    await _procResourceConfigResRepository.DeletesRangeAsync(deleteSetIds.ToArray());
+                }
+
+                //作业设置数据
+                if (addJobList != null && addJobList.Count > 0)
+                {
+                    // return Error(ResultCode.FAIL, "插入工序关联作业表失败");
+                    await _resourceConfigJobRepository.InsertRangeAsync(addJobList);
+                }
+                if (updateJobList != null && updateJobList.Count > 0)
+                {
+                    // return Error(ResultCode.FAIL, "修改工序关联作业表失败");
+                    await _resourceConfigJobRepository.InsertRangeAsync(updateJobList);
+                }
+                if (deleteJobIds != null && deleteJobIds.Count > 0)
+                {
+                    // return Error(ResultCode.FAIL, "删除工序关联作业表失败");
+                    await _resourceConfigJobRepository.DeletesRangeAsync(deleteJobIds.ToArray());
+                }
+                ts.Complete();
+            }
         }
 
         /// <summary>

@@ -1,6 +1,7 @@
 ﻿using Hymson.Infrastructure;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,12 +14,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 主键id
         /// </summary>
         public long Id { get; set; }
-
-        /// <summary>
-        /// 描述 :所属站点代码 
-        /// 空值 : false  
-        /// </summary>
-        public string SiteCode { get; set; }
 
         /// <summary>
         /// 描述 :资源代码 
@@ -119,5 +114,130 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 资源类型
         /// </summary>
         public string ResTypeName { get; set; }
+    }
+
+    /// <summary>
+    /// 资源新增实体类
+    /// </summary>
+    public record ProcResourceCreateDto:BaseEntityDto
+    {
+        /// <summary>
+        /// 资源代码
+        /// </summary>
+        //[Required(ErrorMessage = "资源代码不能为空")]
+        //[MaxLength(length: 60, ErrorMessage = "资源代码超长")]
+        public string ResCode { get; set; }
+
+        /// <summary>
+        /// 资源名称
+        /// </summary>
+        //[Required(ErrorMessage = "资源名称不能为空")]
+        //[MaxLength(length: 60, ErrorMessage = "资源名称超长")]
+        public string ResName { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        //[Required(ErrorMessage = "状态不能为空")]
+        public string Status { get; set; }
+
+        /// <summary>
+        /// 所属资源类型
+        /// </summary>
+        //[Required(ErrorMessage = "所属资源类型ID不能为空")]
+        public long ResTypeId { get; set; }
+
+        /// <summary>
+        /// 说明
+        /// </summary>
+       // [MaxLength(length: 255, ErrorMessage = "工序名称超长")]
+        public string Remark { get; set; }
+
+        /// <summary>
+        /// 资源关联打印机
+        /// </summary>
+        public List<ProcResourceConfigPrintCreateDto> PrintList { get; set; }
+
+        /// <summary>
+        /// 资源关联设备
+        /// </summary>
+        public List<ProcResourceEquipmentBindCreateDto> EquList { get; set; }
+
+        /// <summary>
+        /// 资源设置
+        /// </summary>
+        public List<ProcResourceConfigResCreateDto> ResList { get; set; }
+
+        /// <summary>
+        /// 工作
+        /// </summary>
+        public List<ProcResourceConfigJobCreateDto> JobList { get; set; }
+
+        ///// <summary>
+        ///// 自定义
+        ///// </summary>
+        //public List<ProcResourceCustomDto> customList { get; set; }
+    }
+
+    /// <summary>
+    /// 资源修改实体类
+    /// </summary>
+    public record ProcResourceModifyDto : BaseEntityDto
+    {
+        /// <summary>
+        /// Id
+        /// </summary>
+       // [Required(ErrorMessage = "id不能为空")]
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 资源名称
+        /// </summary>
+        //[Required(ErrorMessage = "资源名称不能为空")]
+        //[MaxLength(length: 60, ErrorMessage = "资源名称超长")]
+        public string ResName { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+       // [Required(ErrorMessage = "状态不能为空")]
+        public string Status { get; set; }
+
+        /// <summary>
+        /// 所属资源类型
+        /// </summary>
+       // [Required(ErrorMessage = "所属资源类型ID不能为空")]
+        public long ResTypeId { get; set; }
+
+        /// <summary>
+        /// 说明
+        /// </summary>
+      //  [MaxLength(length: 255, ErrorMessage = "工序名称超长")]
+        public string Remark { get; set; }
+
+        /// <summary>
+        /// 资源关联打印机
+        /// </summary>
+        public List<ProcResourceConfigPrintModifyDto> PrintList { get; set; }
+
+        /// <summary>
+        /// 资源关联设备
+        /// </summary>
+        public List<ProcResourceEquipmentBindModifyDto> EquList { get; set; }
+
+        /// <summary>
+        /// 资源设置
+        /// </summary>
+        public List<ProcResourceConfigResModifyDto> ResList { get; set; }
+
+        /// <summary>
+        /// 工作
+        /// </summary>
+        public List<ProcResourceConfigJobModifyDto> JobList { get; set; }
+
+        ///// <summary>
+        ///// 自定义
+        ///// </summary>
+        //public List<ProcResourceCustomDto> customList { get; set; }
     }
 }

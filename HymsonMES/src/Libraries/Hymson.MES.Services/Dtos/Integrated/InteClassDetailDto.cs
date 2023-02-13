@@ -62,11 +62,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
     }
 
     /// <summary>
-    /// 生产班次详情新增输入对象
+    /// 班制维护详情新增输入对象
     /// @author wangkeming
     /// @date 2022-12-26
     /// </summary>
-    public record AddInteClassDetailDto : BaseEntityDto
+    public record InteClassDetailCreateDto : BaseEntityDto
     {
         /// <summary>
         ///班次（字典名称：manu_detail_class_type）
@@ -101,11 +101,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
     }
 
     /// <summary>
-    /// 生产班次详情修改输入对象
+    /// 班制维护详情修改输入对象
     /// @author wangkeming
     /// @date 2022-12-26
     /// </summary>
-    public record UpdateInteClassDetailDto : BaseEntityDto
+    public record InteClassDetailModifyDto : BaseEntityDto
     {
         /// <summary>
         ///主键id
@@ -153,7 +153,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
     }
 
     /// <summary>
-    /// 生产班次详情查询对象
+    /// 班制维护详情查询对象
     /// </summary>
     public class InteClassDetailQueryDto : PagerInfo
     {

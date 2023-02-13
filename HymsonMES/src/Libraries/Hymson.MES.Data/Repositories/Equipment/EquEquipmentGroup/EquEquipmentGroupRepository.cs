@@ -83,7 +83,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<EquEquipmentGroupEntity>> GetPagedInfoAsync(EquEquipmentGroupPagedQuery pagedQuery)
+        public async Task<PagedInfo<EquEquipmentGroupEntity>> GetPagedListAsync(EquEquipmentGroupPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
@@ -118,7 +118,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
         /// </summary>
         /// <param name="equEquipmentGroupQuery"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<EquEquipmentGroupEntity>> GetEquEquipmentGroupEntitiesAsync(EquEquipmentGroupQuery equEquipmentGroupQuery)
+        public async Task<IEnumerable<EquEquipmentGroupEntity>> GetEntitiesAsync(EquEquipmentGroupQuery equEquipmentGroupQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEquEquipmentGroupEntitiesSqlTemplate);

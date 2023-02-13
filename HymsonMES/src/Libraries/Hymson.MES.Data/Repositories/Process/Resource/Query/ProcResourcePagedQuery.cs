@@ -49,6 +49,11 @@ namespace Hymson.MES.Data.Repositories.Process.Resource
         public long[] IdsArr { get; set; }
 
         /// <summary>
+        /// 资源编码
+        /// </summary>
+        public string ResCode { get; set; }
+
+        /// <summary>
         /// 描述 :状态 
         /// 空值 : false  
         /// </summary>

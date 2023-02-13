@@ -5,7 +5,7 @@ using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
 namespace Hymson.MES.Data.Repositories.Integrated.InteClass
 {
     /// <summary>
-    /// 生产班次仓储接口
+    /// 班制维护仓储接口
     /// </summary>
     public interface IInteClassRepository
     {
@@ -56,6 +56,6 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         /// </summary>
         /// <param name="inteClassPagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<InteClassEntity>> GetPagedInfoAsync(InteClassPagedQuery inteClassPagedQuery);
+        Task<PagedInfo<InteClassEntity>> GetPagedListAsync(InteClassPagedQuery inteClassPagedQuery);
     }
 }
