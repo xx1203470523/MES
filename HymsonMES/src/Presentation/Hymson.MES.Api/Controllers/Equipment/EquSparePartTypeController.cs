@@ -35,25 +35,25 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <summary>
         /// 添加（备件类型）
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        public async Task AddEquSparePartTypeAsync([FromBody] EquSparePartTypeCreateDto parm)
+        public async Task AddEquSparePartTypeAsync([FromBody] EquSparePartTypeCreateDto createDto)
         {
-            await _equSparePartTypeService.CreateEquSparePartTypeAsync(parm);
+            await _equSparePartTypeService.CreateEquSparePartTypeAsync(createDto);
         }
 
         /// <summary>
         /// 更新（备件类型）
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
-        public async Task UpdateEquSparePartTypeAsync([FromBody] EquSparePartTypeModifyDto parm)
+        public async Task UpdateEquSparePartTypeAsync([FromBody] EquSparePartTypeModifyDto modifyDto)
         {
-            await _equSparePartTypeService.ModifyEquSparePartTypeAsync(parm);
+            await _equSparePartTypeService.ModifyEquSparePartTypeAsync(modifyDto);
         }
 
         /// <summary>
