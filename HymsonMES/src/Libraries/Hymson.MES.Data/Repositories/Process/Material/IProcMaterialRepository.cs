@@ -42,6 +42,20 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<int> UpdateSameMaterialCodeToNoVersionAsync(ProcMaterialEntity procMaterialEntity);
 
         /// <summary>
+        /// 更新物料的物料组
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        Task<int> UpdateProcMaterialGroupAsync(List<ProcMaterialEntity> procMaterialEntitys);
+
+        /// <summary>
+        /// 更新某物料组下的物料为未绑定的
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        Task<int> UpdateProcMaterialUnboundAsync(long groupId);
+
+        /// <summary>
         /// 删除
         /// </summary>
         /// <param name="id"></param>
@@ -69,6 +83,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcMaterialEntity>> GetByIdsAsync(long[] ids);
+
+        /// <summary>
+        /// 根据物料组ID查询物料
+        /// </summary>
+        /// <param name="groupIds"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcMaterialEntity>> GetByGroupIdsAsync(long[] groupIds);
 
         /// <summary>
         /// 获取List

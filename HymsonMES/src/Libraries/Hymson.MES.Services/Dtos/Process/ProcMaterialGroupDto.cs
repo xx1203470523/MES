@@ -129,7 +129,10 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public bool? IsDeleted { get; set; }
 
-       
+        /// <summary>
+        /// 物料集合
+        /// </summary>
+        public IEnumerable<string> DynamicList { get; set; }
     }
 
     /// <summary>
@@ -187,7 +190,10 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public bool? IsDeleted { get; set; }
 
-       
+        /// <summary>
+        /// 物料集合
+        /// </summary>
+        public IEnumerable<string> DynamicList { get; set; }
 
     }
 

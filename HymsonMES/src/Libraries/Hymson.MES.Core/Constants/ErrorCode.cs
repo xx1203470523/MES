@@ -22,6 +22,12 @@
         public const string MES10213 = "参数不能为空";
         public const string MES10214 = "物料编码不能为空";
         public const string MES10215 = "物料名称不能为空";
+        public const string MES10216 = "此物料组编码{GroupCode}在系统已经存在！";
+        public const string MES10217 = "存在已分配给其他物料组的物料！";
+        public const string MES10218 = "新增物料组失败！";
+        public const string MES10219 = "此物料组不存在！";
+        public const string MES10220 = "修改物料组失败！";
+        public const string MES10221 = "已被分配物料，不允许删除！";
         #endregion
 
         #region 系统执行出错 业务逻辑出错

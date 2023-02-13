@@ -75,6 +75,17 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 根据物料组ID查询物料
+        /// </summary>
+        /// <param name="groupIds"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcMaterialEntity>> GetByGroupIdsAsync(long[] groupIds) 
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcMaterialEntity>(GetByGroupIdSql, new { groupIds = groupIds });
+        }
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="procMaterialPagedQuery"></param>
@@ -265,6 +276,28 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSameMaterialCodeToNoVersionSql, procMaterialEntity);
         }
+
+        /// <summary>
+        /// 更新物料的物料组
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateProcMaterialGroupAsync(List<ProcMaterialEntity> procMaterialEntitys)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateProcMaterialGroupSql, procMaterialEntitys);
+        }
+
+        /// <summary>
+        /// 更新某物料组下的物料为未绑定的
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateProcMaterialUnboundAsync(long groupId)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateProcMaterialUnboundSql, new { GroupId= groupId });
+        }
     }
 
     public partial class ProcMaterialRepository
@@ -314,6 +347,25 @@ namespace Hymson.MES.Data.Repositories.Process
                                         `Id`, `SiteCode`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `ProcedureBomId`, `Batch`, `Unit`, `SerialNumber`, `ValidationMaskGroup`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_material`
                             WHERE Id IN @ids ";
+
+        /// <summary>
+        /// 根据物料组ID查询物料
+        /// </summary>
+        const string GetByGroupIdSql= @"SELECT 
+                                        `Id`, `SiteCode`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `ProcedureBomId`, `Batch`, `Unit`, `SerialNumber`, `ValidationMaskGroup`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `proc_material`
+                            WHERE GroupId IN @groupIds ";
+
         const string UpdateSameMaterialCodeToNoVersionSql = "UPDATE `proc_material` SET IsDefaultVersion= 0 WHERE MaterialCode= @MaterialCode ";
+        
+        /// <summary>
+        /// 更改物料的物料组
+        /// </summary>
+        const string UpdateProcMaterialGroupSql = "UPDATE `proc_material` SET GroupId= @GroupId, UpdateBy=@UpdateBy, UpdateOn=@UpdateOn  WHERE Id = @Id ";
+
+        /// <summary>
+        /// 更新某物料组下的物料为未绑定物料组
+        /// </summary>
+        const string UpdateProcMaterialUnboundSql = "UPDATE `proc_material` SET GroupId= 0 WHERE GroupId = @GroupId ";
     }
 }
