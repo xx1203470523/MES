@@ -7,7 +7,7 @@ namespace Hymson.MES.Core.Domain.Process
     /// @author admin
     /// @date 2023-02-08
     /// </summary>
-    public class ProcProcedureBomConfigPrintEntity: BaseEntity
+    public class ProcProcedurePrintReleationEntity : BaseEntity
     {
         /// <summary>
         /// 描述 :份数 
@@ -31,7 +31,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :所属工序ID 
         /// 空值 : false  
         /// </summary>
-        public long ProcedureBomId { get; set; }
+        public long ProcedureId { get; set; }
         
         /// <summary>
         /// 描述 :所属物料ID 

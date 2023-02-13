@@ -130,7 +130,7 @@ namespace Hymson.MES.Services.Mapper
 
             #endregion
 
-            #region ProcResource
+            #region Resource
 
             CreateMap<ProcResourceEntity, ProcResourceDto>();
             CreateMap<ProcResourceView, ProcResourceDto>();
@@ -147,6 +147,16 @@ namespace Hymson.MES.Services.Mapper
 
             CreateMap<ProcResourceConfigJobView, ProcResourceConfigJobDto>();
             CreateMap<ProcResourceConfigJobPagedQueryDto, ProcResourceConfigJobPagedQuery>();
+            #endregion
+
+            #region Procedure
+            CreateMap<ProcProcedurePagedQueryDto, ProcProcedurePagedQuery>();
+            CreateMap<ProcProcedureView, ProcProcedureViewDto>();
+            CreateMap<ProcProcedureEntity, ProcProcedureDto>();
+            CreateMap<ProcProcedureCreateDto, ProcProcedureEntity>();
+            CreateMap<ProcProcedureModifyDto, ProcProcedureEntity>();
+            CreateMap<ProcProcedureJobReleationEntity, ProcProcedureJobReleationDto>();
+            CreateMap<ProcProcedurePrintReleationEntity, ProcProcedurePrintReleationDto>();
             #endregion
         }
 

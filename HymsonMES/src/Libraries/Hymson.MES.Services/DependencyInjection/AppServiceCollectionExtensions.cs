@@ -55,6 +55,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteClassService, InteClassService>();
             #endregion
 
+            #region Process
             #region Material
             services.AddSingleton<IProcMaterialService, ProcMaterialService>();
             services.AddSingleton<IProcMaterialGroupService, ProcMaterialGroupService>();
@@ -65,6 +66,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcResourceService, ProcResourceService>();
             #endregion
 
+            //工序
+            services.AddSingleton<IProcProcedureService, ProcProcedureService>();
+            #endregion
             return services;
         }
 
@@ -105,6 +109,11 @@ namespace Microsoft.Extensions.DependencyInjection
             #region Resource
             services.AddSingleton<AbstractValidator<ProcResourceCreateDto>, ProcResourceCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcResourceModifyDto>, ProcResourcelModifyValidator>();
+            #endregion
+
+            #region Procedure
+            services.AddSingleton<AbstractValidator<ProcProcedureCreateDto>, ProcProcedureCreateValidator>();
+            services.AddSingleton<AbstractValidator<ProcProcedureModifyDto>, ProcProcedureModifyValidator>();
             #endregion
             #endregion
 

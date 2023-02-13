@@ -27,8 +27,8 @@
         #endregion
 
         #region 资源 10300
-        public const string MES10301 = "资源代码不能为空";
-        public const string MES10302 = "资源代码超长";
+        public const string MES10301 = "资源编码不能为空";
+        public const string MES10302 = "资源编码超长";
         public const string MES10303 = "资源名称不能为空";
         public const string MES10304 = "资源名称超长";
         public const string MES10305 = "资源状态不能为空";
@@ -45,6 +45,15 @@
         public const string MES10316 = $"设备绑定设置数据操作类型OperationType异常，只能传入1，2，3！";
         public const string MES10317 = $"资源设置数据操作类型OperationType异常，只能传入1，2，3！";
         public const string MES10318 = $"作业设置数据操作类型OperationType异常，只能传入1，2，3！";
+        public const string MES10319 = $"不能删除启用状态的资源!";
+        #endregion
+
+        #region 工序 10400
+        public const string MES10401 = "工序编码不能为空";
+        public const string MES10402 = "工序编码超长";
+        public const string MES10403 = "工序名称不能为空";
+        public const string MES10404 = "工序名称超长";
+        public  string MES10405 = $"编码:{0}已存在！";
         #endregion
         #endregion
 

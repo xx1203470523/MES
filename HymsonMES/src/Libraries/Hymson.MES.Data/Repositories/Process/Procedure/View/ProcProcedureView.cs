@@ -5,17 +5,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.Data.Repositories.Process.Resource
+namespace Hymson.MES.Data.Repositories.Process
 {
-    public class ProcResourceView : ProcResourceEntity
+    public class ProcProcedureView: ProcProcedureEntity
     {
         /// <summary>
-        /// 资源类型
+        /// 描述 :资源类型 
+        /// 空值 : false  
         /// </summary>
         public string ResType { get; set; }
 
         /// <summary>
-        /// 资源类型名称
+        /// 描述 :资源类型名称 
+        /// 空值 : false  
         /// </summary>
         public string ResTypeName { get; set; }
     }

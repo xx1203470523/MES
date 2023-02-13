@@ -7,7 +7,7 @@ namespace Hymson.MES.Core.Domain.Process
     /// @author admin
     /// @date 2023-02-08
     /// </summary>
-    public class ProcProcedureBomEntity: BaseEntity
+    public class ProcProcedureEntity: BaseEntity
     {
         /// <summary>
         /// 描述 :所属站点代码 

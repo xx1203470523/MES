@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Google.Protobuf.WellKnownTypes;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -10,12 +9,10 @@ using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
-using Hymson.MES.Services.Validators.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Extensions;
 using Hymson.Utils.Tools;
-using IdGen;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -878,22 +875,20 @@ namespace Hymson.MES.Services.Services.Process
             long[] idsArr = StringExtension.SpitLongArrary(ids);
             if (idsArr.Length < 1)
             {
-                throw new NotFoundException(ErrorCode.MES10100, "删除失败Id 不能为空!");
+                throw new NotFoundException(ErrorCode.MES10102);
             }
 
-            var siteCode = "TODO";
             //不能删除启用状态的资源
             var query = new ProcResourceQuery
             {
                 IdsArr = idsArr,
-                SiteCode = siteCode,
                 //TODO
                 Status = "1"
             };
             var resourceList = await _resourceRepository.GetByIdsAsync(query);
             if (resourceList != null && resourceList.Any())
             {
-                throw new CustomerValidationException(ErrorCode.MES10100, "不能删除启用状态的资源!");
+                throw new CustomerValidationException(ErrorCode.MES10319);
             }
 
             return await _resourceRepository.DeleteAsync(idsArr);

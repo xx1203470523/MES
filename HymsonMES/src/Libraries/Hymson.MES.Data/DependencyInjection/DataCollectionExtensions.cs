@@ -73,6 +73,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcResourceConfigJobRepository, ProcResourceConfigJobRepository>();
             #endregion
 
+            #region Procedure
+            services.AddSingleton<IProcProcedureRepository, ProcProcedureRepository>();
+            services.AddSingleton<IProcProcedureJobReleationRepository, ProcProcedureJobReleationRepository>();
+            services.AddSingleton<IProcProcedurePrintReleationRepository, ProcProcedurePrintReleationRepository>();
+            #endregion
             #endregion
 
             return services;

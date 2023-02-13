@@ -57,7 +57,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<IEnumerable<ProcResourceEntity>> GetByIdsAsync(ProcResourceQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcResourceEntity>(GetByIdsSql, new { SiteCode = query.SiteCode, Ids = query.IdsArr, Status = query.Status });
+            return await conn.QueryAsync<ProcResourceEntity>(GetByIdsSql, new { Ids = query.IdsArr, Status = query.Status });
         }
 
         /// <summary>
@@ -82,7 +82,6 @@ namespace Hymson.MES.Data.Repositories.Process
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("a.IsDeleted=0");
-            //sqlBuilder.Select("*");
             if (!string.IsNullOrWhiteSpace(query.SiteCode))
             {
                 sqlBuilder.Where("a.SiteCode=@SiteCode");
@@ -269,7 +268,7 @@ namespace Hymson.MES.Data.Repositories.Process
     {
         const string GetByIdSql = "SELECT a.*,b.ResType,b.ResType FROM proc_resource a left join proc_resource_type b on a.ResTypeId=b.Id and b.IsDeleted =0 where a.Id=@Id ";
         const string GetByResTypeIdsSql = "select * from proc_resource where SiteCode=@SiteCode and ResTypeId in @Ids and IsDeleted =0 ";
-        const string GetByIdsSql = "select * from proc_resource where SiteCode=@SiteCode  and Id  in @Ids and Status=@Status";
+        const string GetByIdsSql = "select * from proc_resource where  Id  in @Ids and Status=@Status";
         const string ExistsSql = "SELECT Id FROM proc_resource WHERE `IsDeleted`= 0 AND ResCode=@ResCode and SiteCode=@SiteCode LIMIT 1";
 
         const string GetPagedInfoDataSqlTemplate = "SELECT a.*,b.ResType,b.ResTypeName  FROM proc_resource a left join proc_resource_type b on a.ResTypeId =b.Id and b.IsDeleted =0 /**where**/ LIMIT @Offset,@Rows";
