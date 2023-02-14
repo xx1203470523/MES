@@ -25,10 +25,10 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 1资源  2工序 3不合格代码
         /// </summary>
-        public bool BusinessType { get; set; }
+        public int BusinessType { get; set; }
 
        /// <summary>
         /// 所属不合格代码ID
@@ -58,34 +58,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
        /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
-
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-       /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-       /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public bool IsDeleted { get; set; }
-
-       
+        public string Remark { get; set; } 
     }
 
 
@@ -94,20 +67,10 @@ namespace Hymson.MES.Services.Dtos.Integrated
     /// </summary>
     public record InteJobBusinessRelationCreateDto : BaseEntityDto
     {
-        /// <summary>
-        /// ID
-        /// </summary>
-        public long Id { get; set; }
-
        /// <summary>
         /// 1资源  2工序 3不合格代码
         /// </summary>
-        public bool BusinessType { get; set; }
-
-       /// <summary>
-        /// 所属不合格代码ID
-        /// </summary>
-        public long BusinessId { get; set; }
+        public int BusinessType { get; set; }
 
        /// <summary>
         /// 序号
@@ -132,34 +95,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
        /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
-
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-       /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-       /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public bool IsDeleted { get; set; }
-
-       
+        public string Remark { get; set; }   
     }
 
     /// <summary>
@@ -175,7 +111,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
        /// <summary>
         /// 1资源  2工序 3不合格代码
         /// </summary>
-        public bool BusinessType { get; set; }
+        public int BusinessType { get; set; }
 
        /// <summary>
         /// 所属不合格代码ID

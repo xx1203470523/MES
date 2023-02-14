@@ -31,7 +31,7 @@ namespace Hymson.MES.Core.Domain.Integrated
        /// <summary>
         /// 1资源  2工序 3不合格代码
         /// </summary>
-        public bool BusinessType { get; set; }
+        public int BusinessType { get; set; }
 
        /// <summary>
         /// 所属不合格代码ID
