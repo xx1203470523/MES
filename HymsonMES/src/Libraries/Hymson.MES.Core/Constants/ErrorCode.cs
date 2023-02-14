@@ -60,6 +60,7 @@
         public const string MES10403 = "工序名称不能为空";
         public const string MES10404 = "工序名称超长";
         public  string MES10405 = $"编码:{0}已存在！";
+        public const string MES10430 = $"有生产中工单引用当前工艺路线，不能删除！";
         #endregion
         #endregion
 

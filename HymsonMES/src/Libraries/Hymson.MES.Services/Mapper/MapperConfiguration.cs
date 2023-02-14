@@ -197,6 +197,11 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcProcedureJobReleationEntity, ProcProcedureJobReleationDto>();
             CreateMap<ProcProcedurePrintReleationEntity, ProcProcedurePrintReleationDto>();
             #endregion
+
+            #region ProcessRoute
+            CreateMap<ProcProcessRoutePagedQueryDto, ProcProcessRoutePagedQuery>();
+            CreateMap<ProcProcessRouteEntity, ProcProcessRouteDto>();
+            #endregion
         }
 
         /// <summary>
