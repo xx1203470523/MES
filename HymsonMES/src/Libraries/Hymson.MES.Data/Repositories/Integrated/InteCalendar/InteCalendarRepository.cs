@@ -78,7 +78,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
         public async Task<bool> IsExistsAsync(long equOrLineId)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefault(ExistsSql, new
+            return await conn.ExecuteScalarAsync(ExistsSql, new
             {
                 UseStatus = (int)CalendarUseStatusEnum.Enable,
                 equOrLineId
@@ -95,7 +95,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
         {
             // w.Id != modifyDto.Id
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefault(ExistsSql, new
+            return await conn.ExecuteScalarAsync(ExistsSql, new
             {
                 UseStatus = (int)CalendarUseStatusEnum.Enable,
                 equOrLineId,

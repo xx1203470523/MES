@@ -1,3 +1,4 @@
+using Hymson.Authentication;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Integrated;
@@ -14,18 +15,31 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
     public class InteClassService : IInteClassService
     {
         /// <summary>
+        /// 当前登录用户对象
+        /// </summary>
+        private readonly ICurrentUser _currentUser;
+
+        /// <summary>
         /// 仓储（班制维护）
         /// </summary>
         private readonly IInteClassRepository _inteClassRepository;
+
+        /// <summary>
+        /// 仓储（班制维护明细）
+        /// </summary>
         private readonly IInteClassDetailRepository _inteClassDetailRepository;
 
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="currentUser"></param>
         /// <param name="inteClassRepository"></param>
         /// <param name="inteClassDetailRepository"></param>
-        public InteClassService(IInteClassRepository inteClassRepository, IInteClassDetailRepository inteClassDetailRepository)
+        public InteClassService(ICurrentUser currentUser,
+            IInteClassRepository inteClassRepository,
+            IInteClassDetailRepository inteClassDetailRepository)
         {
+            _currentUser = currentUser;
             _inteClassRepository = inteClassRepository;
             _inteClassDetailRepository = inteClassDetailRepository;
         }
@@ -44,8 +58,8 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
             // DTO转换实体
             var entity = createDto.ToEntity<InteClassEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
-            entity.CreatedBy = "TODO";
-            entity.UpdatedBy = "TODO";
+            entity.CreatedBy = _currentUser.UserName;
+            entity.UpdatedBy = _currentUser.UserName;
 
             List<InteClassDetailEntity> details = new();
             foreach (var item in createDto.DetailList)
@@ -78,7 +92,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
         {
             // DTO转换实体
             var entity = modifyDto.ToEntity<InteClassEntity>();
-            entity.UpdatedBy = "TODO";
+            entity.UpdatedBy = _currentUser.UserName;
 
             List<InteClassDetailEntity> details = new();
             foreach (var item in modifyDto.DetailList)

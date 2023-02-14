@@ -11,19 +11,17 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 编码（设备注册）
         /// </summary>
-        [Required(ErrorMessage = "编码不能为空")]
-        public string EquipmentCode { get; set; }
+        public string EquipmentCode { get; set; } = "";
 
         /// <summary>
         /// 名称（设备注册）
         /// </summary>
-        [Required(ErrorMessage = "名称不能为空")]
-        public string EquipmentName { get; set; }
+        public string EquipmentName { get; set; } = "";
 
         /// <summary>
         /// 设备描述
         /// </summary>
-        public string EquipmentDesc { get; set; }
+        public string EquipmentDesc { get; set; } = "";
 
         /// <summary>
         /// 工作中心工厂id
@@ -43,23 +41,27 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 存放位置
         /// </summary>
-        [Required(ErrorMessage = "存放位置不能为空")]
-        public string Location { get; set; }
+        public string Location { get; set; } = "";
 
         /// <summary>
         /// 设备类型
         /// </summary>
-        public string EquipmentType { get; set; }
+        public int EquipmentType { get; set; }
 
         /// <summary>
         /// 使用部门
         /// </summary>
-        public string UseDepartment { get; set; }
+        public int UseDepartment { get; set; }
+
+        /// <summary>
+        /// 使用状态
+        /// </summary>
+        public int UseStatus { get; set; }
 
         /// <summary>
         /// 入厂日期
         /// </summary>
-        public string EntryDate { get; set; }
+        public string EntryDate { get; set; } = "";
 
         /// <summary>
         /// 质保期限（月）
@@ -69,33 +71,27 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 厂商
         /// </summary>
-        public string Manufacturer { get; set; }
+        public string Manufacturer { get; set; } = "";
 
         /// <summary>
         /// 供应商
         /// </summary>
-        public string Supplier { get; set; }
-
-        /// <summary>
-        /// 使用状态
-        /// </summary>
-        [Required(ErrorMessage = "使用状态不能为空")]
-        public string UseStatus { get; set; }
+        public string Supplier { get; set; } = "";
 
         /// <summary>
         /// 功率
         /// </summary>
-        public string Power { get; set; }
+        public string Power { get; set; } = "";
 
         /// <summary>
         /// 能耗等级
         /// </summary>
-        public string EnergyLevel { get; set; }
+        public string EnergyLevel { get; set; } = "";
 
         /// <summary>
         /// ip地址
         /// </summary>
-        public string Ip { get; set; }
+        public string Ip { get; set; } = "";
 
         /// <summary>
         /// 节拍时间(秒)
@@ -112,7 +108,6 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 设备关联Api
         /// </summary>
         public List<EquEquipmentLinkApiCreateDto> ApiLinks { get; set; }
-
         #endregion
     }
 

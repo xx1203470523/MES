@@ -1,3 +1,4 @@
+using Hymson.Authentication;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
@@ -16,6 +17,11 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
     public class EquSparePartService : IEquSparePartService
     {
         /// <summary>
+        /// 当前登录用户对象
+        /// </summary>
+        private readonly ICurrentUser _currentUser;
+
+        /// <summary>
         /// 仓储（备件注册） 
         /// </summary>
         private readonly IEquSparePartRepository _equSparePartRepository;
@@ -24,9 +30,12 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="currentUser"></param>
         /// <param name="equSparePartRepository"></param>
-        public EquSparePartService(IEquSparePartRepository equSparePartRepository)
+        public EquSparePartService(ICurrentUser currentUser, 
+            IEquSparePartRepository equSparePartRepository)
         {
+            _currentUser = currentUser;
             _equSparePartRepository = equSparePartRepository;
         }
 
@@ -43,8 +52,8 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
             //DTO转换实体
             var entity = createDto.ToEntity<EquSparePartEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
-            entity.CreatedBy = "TODO";
-            entity.UpdatedBy = "TODO";
+            entity.CreatedBy = _currentUser.UserName;
+            entity.UpdatedBy = _currentUser.UserName;
 
             //入库
             return await _equSparePartRepository.InsertAsync(entity);
@@ -57,12 +66,12 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
         /// <returns></returns>
         public async Task<int> ModifyEquSparePartAsync(EquSparePartModifyDto modifyDto)
         {
-            //验证DTO
+            // 验证DTO
 
 
-            //DTO转换实体
+            // DTO转换实体
             var entity = modifyDto.ToEntity<EquSparePartEntity>();
-            entity.UpdatedBy = "TODO";
+            entity.UpdatedBy = _currentUser.UserName;
 
             return await _equSparePartRepository.UpdateAsync(entity);
         }

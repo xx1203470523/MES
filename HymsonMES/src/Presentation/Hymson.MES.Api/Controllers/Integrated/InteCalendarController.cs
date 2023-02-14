@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated.InteCalendar;
 using Hymson.Utils.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Integrated
@@ -11,6 +12,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
     /// @author 陈志谱
     /// @date 2023-02-11 10:03:48
     /// </summary>
+    [Authorize]
     [ApiController]
     [Route("api/v1/[controller]")]
     public class InteCalendarController : ControllerBase
