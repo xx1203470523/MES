@@ -56,7 +56,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteCalendarRepository, InteCalendarRepository>();
             services.AddSingleton<IInteClassDetailRepository, InteClassDetailRepository>();
             services.AddSingleton<IInteClassRepository, InteClassRepository>();
+            
+            //InteJob
             services.AddSingleton<IInteJobBusinessRelationRepository, InteJobBusinessRelationRepository>();
+            services.AddSingleton<IInteJobRepository, InteJobRepository>();
             #endregion
 
             #region  Process
@@ -94,7 +97,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region Procedure
             services.AddSingleton<IProcProcedureRepository, ProcProcedureRepository>();
-            services.AddSingleton<IProcProcedureJobReleationRepository, ProcProcedureJobReleationRepository>();
             services.AddSingleton<IProcProcedurePrintReleationRepository, ProcProcedurePrintReleationRepository>();
             #endregion
             #endregion

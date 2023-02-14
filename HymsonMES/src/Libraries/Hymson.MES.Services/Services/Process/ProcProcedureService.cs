@@ -21,6 +21,8 @@ using Hymson.MES.Core.Constants;
 using Hymson.Utils.Tools;
 using System.Transactions;
 using Hymson.MES.Data.Repositories.Process.Resource;
+using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.MES.Data.Repositories.Integrated;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -40,7 +42,8 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 工序配置作业表仓储
         /// </summary>
-        private readonly IProcProcedureJobReleationRepository _procedureJobReleationRepository;
+        //private readonly IProcProcedureJobReleationRepository _procedureJobReleationRepository;
+        private readonly IInteJobBusinessRelationRepository _jobBusinessRelationRepository;
         /// <summary>
         /// 工序配置打印表仓储
         /// </summary>
@@ -58,7 +61,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         public ProcProcedureService(IProcProcedureRepository procProcedureRepository,
             IProcResourceTypeRepository resourceTypeRepository,
-            IProcProcedureJobReleationRepository procedureJobReleationRepository,
+            IInteJobBusinessRelationRepository jobBusinessRelationRepository,
             IProcProcedurePrintReleationRepository procedurePrintReleationRepository,
             IProcMaterialRepository procMaterialRepository,
             AbstractValidator<ProcProcedureCreateDto> validationCreateRules,
@@ -66,11 +69,11 @@ namespace Hymson.MES.Services.Services.Process
         {
             _procProcedureRepository = procProcedureRepository;
             _resourceTypeRepository = resourceTypeRepository;
+            _jobBusinessRelationRepository = jobBusinessRelationRepository;
+            _procedurePrintReleationRepository = procedurePrintReleationRepository;
+            _procMaterialRepository = procMaterialRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
-            _procMaterialRepository = procMaterialRepository;
-            _procedureJobReleationRepository = procedureJobReleationRepository;
-            _procedurePrintReleationRepository = procedurePrintReleationRepository;
         }
 
         /// <summary>
@@ -137,7 +140,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<QueryProcProcedurePrintReleationDto>> GetProcedureBomConfigPrintListAsync(ProcProcedurePrintReleationPagedQueryDto queryDto)
+        public async Task<PagedInfo<QueryProcProcedurePrintReleationDto>> GetProcedureConfigPrintListAsync(ProcProcedurePrintReleationPagedQueryDto queryDto)
         {
             var query = new ProcProcedurePrintReleationPagedQuery()
             {
@@ -169,19 +172,20 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<QueryProcedureJobReleationDto>> GetProcedureBomConfigJobListAsync(ProcProcedureJobReleationPagedQueryDto queryDto)
+        public async Task<PagedInfo<QueryProcedureJobReleationDto>> GetProcedureConfigJobListAsync(InteJobBusinessRelationPagedQueryDto queryDto)
         {
-            var query = new ProcProcedureJobReleationPagedQuery()
+            var query = new InteJobBusinessRelationPagedQuery()
             {
-                ProcedureId = queryDto.ProcedureId
+                SiteCode="TODO",
+                BusinessId = queryDto.BusinessId
             };
-            var pagedInfo = await _procedureJobReleationRepository.GetPagedInfoAsync(query);
+            var pagedInfo = await _jobBusinessRelationRepository.GetPagedInfoAsync(query);
 
             //实体到DTO转换 装载数据
             var dtos = new List<QueryProcedureJobReleationDto>();
             foreach (var entity in pagedInfo.Data)
             {
-                var jobReleationDto = entity.ToModel<ProcProcedureJobReleationDto>();
+                var jobReleationDto = entity.ToModel<InteJobBusinessRelationDto>();
                 dtos.Add(new QueryProcedureJobReleationDto { ProcedureBomConfigJob = jobReleationDto });
             }
 

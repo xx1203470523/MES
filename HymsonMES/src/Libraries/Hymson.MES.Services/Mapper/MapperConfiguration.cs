@@ -123,6 +123,10 @@ namespace Hymson.MES.Services.Mapper
 
             CreateMap<InteClassEntity, InteClassDto>();
             #endregion
+
+            #region InteJob
+            CreateMap<InteJobBusinessRelationEntity, InteJobBusinessRelationDto>();
+            #endregion
         }
 
         /// <summary>
@@ -206,7 +210,6 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcProcedureView, ProcProcedureViewDto>();
             CreateMap<ProcProcedureEntity, ProcProcedureDto>();
             CreateMap<ProcProcedureOperDto, ProcProcedureEntity>();
-            CreateMap<ProcProcedureJobReleationEntity, ProcProcedureJobReleationDto>();
             CreateMap<ProcProcedurePrintReleationEntity, ProcProcedurePrintReleationDto>();
             #endregion
 

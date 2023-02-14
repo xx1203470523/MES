@@ -53,9 +53,9 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="inteJobBusinessRelationPagedQuery"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<InteJobBusinessRelationEntity>> GetPagedInfoAsync(InteJobBusinessRelationPagedQuery inteJobBusinessRelationPagedQuery)
+        public async Task<PagedInfo<InteJobBusinessRelationEntity>> GetPagedInfoAsync(InteJobBusinessRelationPagedQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
@@ -63,22 +63,30 @@ namespace Hymson.MES.Data.Repositories.Integrated
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-           
-            var offSet = (inteJobBusinessRelationPagedQuery.PageIndex - 1) * inteJobBusinessRelationPagedQuery.PageSize;
+            if (!string.IsNullOrWhiteSpace(query.SiteCode))
+            {
+                sqlBuilder.Where("SiteCode=@SiteCode");
+            }
+            if (!string.IsNullOrWhiteSpace(query.BusinessType))
+            {
+                sqlBuilder.Where("BusinessType=@BusinessType");
+            }
+            if (query.BusinessId>0)
+            {
+                sqlBuilder.Where("BusinessId=@BusinessId");
+            }
+
+            var offSet = (query.PageIndex - 1) * query.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = inteJobBusinessRelationPagedQuery.PageSize });
-            sqlBuilder.AddParameters(inteJobBusinessRelationPagedQuery);
+            sqlBuilder.AddParameters(new { Rows = query.PageSize });
+            sqlBuilder.AddParameters(query);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var inteJobBusinessRelationEntitiesTask = conn.QueryAsync<InteJobBusinessRelationEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var inteJobBusinessRelationEntities = await inteJobBusinessRelationEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<InteJobBusinessRelationEntity>(inteJobBusinessRelationEntities, inteJobBusinessRelationPagedQuery.PageIndex, inteJobBusinessRelationPagedQuery.PageSize, totalCount);
+            return new PagedInfo<InteJobBusinessRelationEntity>(inteJobBusinessRelationEntities, query.PageIndex, query.PageSize, totalCount);
         }
 
         /// <summary>

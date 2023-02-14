@@ -231,9 +231,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 是否逻辑删除
         /// </summary>
         public bool IsDeleted { get; set; }
-
-       
-
     }
 
     /// <summary>
@@ -241,10 +238,19 @@ namespace Hymson.MES.Services.Dtos.Integrated
     /// </summary>
     public class InteJobBusinessRelationPagedQueryDto : PagerInfo
     {
-        ///// <summary>
-        ///// 描述 :站点编码 
-        ///// 空值 : false  
-        ///// </summary>
-        //public string SiteCode { get; set; }
+        /// <summary>
+        /// 站点编码
+        /// </summary>
+        public string? SiteCode { get; set; }
+
+        /// <summary>
+        /// 1资源  2工序 3不合格代码
+        /// </summary>
+        public string? BusinessType { get; set; }
+
+        /// <summary>
+        /// 关联的业务表的ID
+        /// </summary>
+        public long BusinessId { get; set; }
     }
 }

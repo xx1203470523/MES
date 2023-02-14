@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 using System;
 using System.Collections.Generic;
@@ -331,5 +332,21 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 是否逻辑删除
         /// </summary>
         public bool? IsDeleted { get; set; }
+    }
+
+    /// <summary>
+    /// 工序配置打印查询实体类
+    /// </summary>
+    public class QueryProcedureJobReleationDto
+    {
+        /// <summary>
+        /// 工序配置工作实体类
+        /// </summary>
+        public InteJobBusinessRelationDto ProcedureBomConfigJob { get; set; }
+
+        /// <summary>
+        /// 工作
+        /// </summary>
+        //public InteJobDto Job { get; set; }
     }
 }

@@ -6,6 +6,7 @@
  *build datetime: 2023-02-13 09:06:05
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 
 namespace Hymson.MES.Services.Services.Process.IProcessService
@@ -34,14 +35,14 @@ namespace Hymson.MES.Services.Services.Process.IProcessService
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<QueryProcProcedurePrintReleationDto>> GetProcedureBomConfigPrintListAsync(ProcProcedurePrintReleationPagedQueryDto queryDto);
+        Task<PagedInfo<QueryProcProcedurePrintReleationDto>> GetProcedureConfigPrintListAsync(ProcProcedurePrintReleationPagedQueryDto queryDto);
 
         /// <summary>
         /// 获取工序配置Job信息
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<QueryProcedureJobReleationDto>> GetProcedureBomConfigJobListAsync(ProcProcedureJobReleationPagedQueryDto queryDto);
+        Task<PagedInfo<QueryProcedureJobReleationDto>> GetProcedureConfigJobListAsync(InteJobBusinessRelationPagedQueryDto queryDto);
 
         /// <summary>
         /// 新增
