@@ -18,4 +18,8 @@
     <ProjectReference Include="..\Hymson.MES.Data\Hymson.MES.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\Integrated\IIntegratedService\" />
+  </ItemGroup>
+
 </Project>

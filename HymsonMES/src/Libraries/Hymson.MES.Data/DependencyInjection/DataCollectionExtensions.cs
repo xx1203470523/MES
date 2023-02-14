@@ -5,6 +5,7 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType;
+using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.InteCalendar;
 using Hymson.MES.Data.Repositories.Integrated.InteClass;
 using Hymson.MES.Data.Repositories.Process;
@@ -55,6 +56,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteCalendarRepository, InteCalendarRepository>();
             services.AddSingleton<IInteClassDetailRepository, InteClassDetailRepository>();
             services.AddSingleton<IInteClassRepository, InteClassRepository>();
+            services.AddSingleton<IInteJobBusinessRelationRepository, InteJobBusinessRelationRepository>();
             #endregion
 
             #region  Process
