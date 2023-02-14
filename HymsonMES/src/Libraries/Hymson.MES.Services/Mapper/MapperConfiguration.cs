@@ -167,6 +167,11 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcBomModifyDto, ProcBomEntity>();
             CreateMap<ProcBomPagedQueryDto, ProcBomPagedQuery>();
             CreateMap<ProcBomEntity, ProcBomDto>();
+
+            CreateMap<ProcBomDetailCreateDto, ProcBomDetailEntity>();
+            CreateMap<ProcBomDetailModifyDto, ProcBomDetailEntity>();
+            CreateMap<ProcBomDetailPagedQueryDto, ProcBomDetailPagedQuery>();
+            CreateMap<ProcBomDetailEntity, ProcBomDetailDto>();
             #endregion
 
             #region ResourceType

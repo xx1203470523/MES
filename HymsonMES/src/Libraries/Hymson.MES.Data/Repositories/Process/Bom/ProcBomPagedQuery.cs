@@ -19,6 +19,31 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public class ProcBomPagedQuery : PagerInfo
     {
+        /// <summary>
+        /// 所属站点代码
+        /// </summary>
+        public string SiteCode { get; set; } = "";
 
+        /// <summary>
+        /// 描述 :BomName 
+        /// 空值 : false  
+        /// </summary>
+        public string BomCode { get; set; }
+
+        /// <summary>
+        /// 描述 :BomName名称 
+        /// 空值 : false  
+        /// </summary>
+        public string BomName { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public string Status { get; set; }
+
+        /// <summary>
+        /// 版本
+        /// </summary>
+        public string Version { get; set; }
     }
 }

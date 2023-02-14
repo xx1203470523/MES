@@ -86,11 +86,30 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-           
+            if (!string.IsNullOrWhiteSpace(procBomPagedQuery.SiteCode))
+            {
+                sqlBuilder.Where("SiteCode=@SiteCode");
+            }
+            if (!string.IsNullOrWhiteSpace(procBomPagedQuery.BomCode))
+            {
+                procBomPagedQuery.BomCode = $"%{procBomPagedQuery.BomCode}%";
+                sqlBuilder.Where(" BomCode like @BomCode ");
+            }
+            if (!string.IsNullOrWhiteSpace(procBomPagedQuery.BomName))
+            {
+                procBomPagedQuery.BomName = $"%{procBomPagedQuery.BomName}%";
+                sqlBuilder.Where(" BomName like @BomName ");
+            }
+            if (!string.IsNullOrWhiteSpace(procBomPagedQuery.Version))
+            {
+                procBomPagedQuery.Version = $"%{procBomPagedQuery.Version}%";
+                sqlBuilder.Where(" Version like @Version ");
+            }
+            if (!string.IsNullOrWhiteSpace(procBomPagedQuery.Status))
+            {
+                sqlBuilder.Where(" Status = @Status ");
+            }
+
             var offSet = (procBomPagedQuery.PageIndex - 1) * procBomPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = procBomPagedQuery.PageSize });

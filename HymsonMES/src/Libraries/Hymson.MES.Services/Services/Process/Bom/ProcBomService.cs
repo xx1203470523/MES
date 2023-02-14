@@ -89,6 +89,8 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<PagedInfo<ProcBomDto>> GetPageListAsync(ProcBomPagedQueryDto procBomPagedQueryDto)
         {
+            procBomPagedQueryDto.SiteCode = "";//TODO
+
             var procBomPagedQuery = procBomPagedQueryDto.ToQuery<ProcBomPagedQuery>();
             var pagedInfo = await _procBomRepository.GetPagedInfoAsync(procBomPagedQuery);
 

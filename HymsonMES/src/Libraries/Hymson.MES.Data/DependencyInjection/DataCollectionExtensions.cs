@@ -78,6 +78,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region Bom
             services.AddSingleton<IProcBomRepository, ProcBomRepository>();
+            services.AddSingleton<IProcBomDetailRepository, ProcBomDetailRepository>();
             #endregion
 
             #region Resource

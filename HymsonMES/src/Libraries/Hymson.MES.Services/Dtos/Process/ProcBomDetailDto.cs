@@ -1,9 +1,9 @@
 /*
  *creator: Karl
  *
- *describe: BOM表    Dto | 代码由框架生成
+ *describe: BOM明细表    Dto | 代码由框架生成
  *builder:  Karl
- *build datetime: 2023-02-14 10:04:25
+ *build datetime: 2023-02-14 10:38:06
  */
 
 using Hymson.Infrastructure;
@@ -16,9 +16,9 @@ using System.Threading.Tasks;
 namespace Hymson.MES.Services.Dtos.Process
 {
     /// <summary>
-    /// BOM表Dto
+    /// BOM明细表Dto
     /// </summary>
-    public record ProcBomDto : BaseEntityDto
+    public record ProcBomDetailDto : BaseEntityDto
     {
         /// <summary>
         /// 
@@ -26,29 +26,34 @@ namespace Hymson.MES.Services.Dtos.Process
         public long Id { get; set; }
 
        /// <summary>
-        /// BOM
+        /// 所属BomID
         /// </summary>
-        public string BomCode { get; set; }
+        public long BomId { get; set; }
 
        /// <summary>
-        /// BOM名称
+        /// 所属工序ID
         /// </summary>
-        public string BomName { get; set; }
+        public long ProcedureBomId { get; set; }
 
        /// <summary>
-        /// 状态
+        /// 所属物料ID
         /// </summary>
-        public string Status { get; set; }
+        public long MaterialId { get; set; }
 
        /// <summary>
-        /// 版本
+        /// 参考点
         /// </summary>
-        public string Version { get; set; }
+        public string ReferencePoint { get; set; }
 
        /// <summary>
-        /// 是否当前版本
+        /// 用量
         /// </summary>
-        public bool? IsCurrentVersion { get; set; }
+        public decimal Usages { get; set; }
+
+       /// <summary>
+        /// 损耗
+        /// </summary>
+        public decimal? Loss { get; set; }
 
        /// <summary>
         /// 说明
@@ -85,9 +90,9 @@ namespace Hymson.MES.Services.Dtos.Process
 
 
     /// <summary>
-    /// BOM表新增Dto
+    /// BOM明细表新增Dto
     /// </summary>
-    public record ProcBomCreateDto : BaseEntityDto
+    public record ProcBomDetailCreateDto : BaseEntityDto
     {
         /// <summary>
         /// 
@@ -95,29 +100,34 @@ namespace Hymson.MES.Services.Dtos.Process
         public long Id { get; set; }
 
        /// <summary>
-        /// BOM
+        /// 所属BomID
         /// </summary>
-        public string BomCode { get; set; }
+        public long BomId { get; set; }
 
        /// <summary>
-        /// BOM名称
+        /// 所属工序ID
         /// </summary>
-        public string BomName { get; set; }
+        public long ProcedureBomId { get; set; }
 
        /// <summary>
-        /// 状态
+        /// 所属物料ID
         /// </summary>
-        public string Status { get; set; }
+        public long MaterialId { get; set; }
 
        /// <summary>
-        /// 版本
+        /// 参考点
         /// </summary>
-        public string Version { get; set; }
+        public string ReferencePoint { get; set; }
 
        /// <summary>
-        /// 是否当前版本
+        /// 用量
         /// </summary>
-        public bool? IsCurrentVersion { get; set; }
+        public decimal Usages { get; set; }
+
+       /// <summary>
+        /// 损耗
+        /// </summary>
+        public decimal? Loss { get; set; }
 
        /// <summary>
         /// 说明
@@ -153,9 +163,9 @@ namespace Hymson.MES.Services.Dtos.Process
     }
 
     /// <summary>
-    /// BOM表更新Dto
+    /// BOM明细表更新Dto
     /// </summary>
-    public record ProcBomModifyDto : BaseEntityDto
+    public record ProcBomDetailModifyDto : BaseEntityDto
     {
         /// <summary>
         /// 
@@ -163,29 +173,34 @@ namespace Hymson.MES.Services.Dtos.Process
         public long Id { get; set; }
 
        /// <summary>
-        /// BOM
+        /// 所属BomID
         /// </summary>
-        public string BomCode { get; set; }
+        public long BomId { get; set; }
 
        /// <summary>
-        /// BOM名称
+        /// 所属工序ID
         /// </summary>
-        public string BomName { get; set; }
+        public long ProcedureBomId { get; set; }
 
        /// <summary>
-        /// 状态
+        /// 所属物料ID
         /// </summary>
-        public string Status { get; set; }
+        public long MaterialId { get; set; }
 
        /// <summary>
-        /// 版本
+        /// 参考点
         /// </summary>
-        public string Version { get; set; }
+        public string ReferencePoint { get; set; }
 
        /// <summary>
-        /// 是否当前版本
+        /// 用量
         /// </summary>
-        public bool? IsCurrentVersion { get; set; }
+        public decimal Usages { get; set; }
+
+       /// <summary>
+        /// 损耗
+        /// </summary>
+        public decimal? Loss { get; set; }
 
        /// <summary>
         /// 说明
@@ -222,35 +237,14 @@ namespace Hymson.MES.Services.Dtos.Process
     }
 
     /// <summary>
-    /// BOM表分页Dto
+    /// BOM明细表分页Dto
     /// </summary>
-    public class ProcBomPagedQueryDto : PagerInfo
+    public class ProcBomDetailPagedQueryDto : PagerInfo
     {
-        /// <summary>
-        /// 所属站点代码
-        /// </summary>
-        public string SiteCode { get; set; } = "";
-
-        /// <summary>
-        /// 描述 :BomName 
-        /// 空值 : false  
-        /// </summary>
-        public string BomCode { get; set; }
-
-        /// <summary>
-        /// 描述 :BomName名称 
-        /// 空值 : false  
-        /// </summary>
-        public string BomName { get; set; }
-
-        /// <summary>
-        /// 状态
-        /// </summary>
-        public string Status { get; set; }
-
-        /// <summary>
-        /// 版本
-        /// </summary>
-        public string Version { get; set; }
+        ///// <summary>
+        ///// 描述 :站点编码 
+        ///// 空值 : false  
+        ///// </summary>
+        //public string SiteCode { get; set; }
     }
 }
