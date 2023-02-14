@@ -153,37 +153,49 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// 描述 :使用状态 
         /// 空值 : false  
         /// </summary>
-        public string UseStatus { get; set; }
+        public int UseStatus { get; set; }
+
+        /// <summary>
+        /// 描述 :设备类型 
+        /// 空值 : true  
+        /// </summary>
+        public int EquipmentType { get; set; }
+
+        /// <summary>
+        /// 描述 :使用部门 
+        /// 空值 : true  
+        /// </summary>
+        public int UseDepartment { get; set; }
 
         /// <summary>
         /// 描述 :功率 
         /// 空值 : true  
         /// </summary>
-        public string Power { get; set; }
+        public string Power { get; set; } = "";
 
         /// <summary>
         /// 描述 :能耗等级 
         /// 空值 : true  
         /// </summary>
-        public string EnergyLevel { get; set; }
+        public string EnergyLevel { get; set; } = "";
 
         /// <summary>
         /// 描述 :ip地址 
         /// 空值 : true  
         /// </summary>
-        public string Ip { get; set; }
+        public string Ip { get; set; } = "";
 
         /// <summary>
         /// 描述 :备注 
         /// 空值 : true  
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// 描述 :所属站点代码 
         /// 空值 : false  
         /// </summary>
-        public string SiteCode { get; set; }
+        public string SiteCode { get; set; } = "";
 
         /// <summary>
         /// 描述 :节拍时间(秒) 
@@ -195,13 +207,13 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// 描述 :设备编码 
         /// 空值 : false  
         /// </summary>
-        public string EquipmentCode { get; set; }
+        public string EquipmentCode { get; set; } = "";
 
         /// <summary>
         /// 描述 :设备名称 
         /// 空值 : false  
         /// </summary>
-        public string EquipmentName { get; set; }
+        public string EquipmentName { get; set; } = "";
 
         /// <summary>
         /// 描述 :设备组id 
@@ -213,7 +225,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// 描述 :设备描述 
         /// 空值 : true  
         /// </summary>
-        public string EquipmentDesc { get; set; }
+        public string EquipmentDesc { get; set; } = "";
 
         /// <summary>
         /// 描述 :工作中心工厂id 
@@ -237,19 +249,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// 描述 :位置 
         /// 空值 : false  
         /// </summary>
-        public string Location { get; set; }
-
-        /// <summary>
-        /// 描述 :设备类型 
-        /// 空值 : true  
-        /// </summary>
-        public string EquipmentType { get; set; }
-
-        /// <summary>
-        /// 描述 :使用部门 
-        /// 空值 : true  
-        /// </summary>
-        public string UseDepartment { get; set; }
+        public string Location { get; set; } = "";
 
         /// <summary>
         /// 描述 :入场日期 
@@ -273,13 +273,13 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// 描述 :厂商 
         /// 空值 : true  
         /// </summary>
-        public string Manufacturer { get; set; }
+        public string Manufacturer { get; set; } = "";
 
         /// <summary>
         /// 描述 :供应商 
         /// 空值 : true  
         /// </summary>
-        public string Supplier { get; set; }
+        public string Supplier { get; set; } = "";
 
 
         /// <summary>

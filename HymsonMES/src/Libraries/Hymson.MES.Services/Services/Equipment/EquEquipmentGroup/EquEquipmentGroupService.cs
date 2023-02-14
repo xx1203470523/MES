@@ -1,3 +1,4 @@
+using Hymson.Authentication;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
@@ -17,6 +18,11 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
     public class EquEquipmentGroupService : IEquEquipmentGroupService
     {
         /// <summary>
+        /// 当前登录用户对象
+        /// </summary>
+        private readonly ICurrentUser _currentUser;
+
+        /// <summary>
         /// 仓储（设备组）
         /// </summary>
         private readonly IEquEquipmentGroupRepository _equEquipmentGroupRepository;
@@ -29,11 +35,14 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="currentUser"></param>
         /// <param name="equEquipmentGroupRepository"></param>
         /// <param name="equEquipmentRepository"></param>
-        public EquEquipmentGroupService(IEquEquipmentGroupRepository equEquipmentGroupRepository,
+        public EquEquipmentGroupService(ICurrentUser currentUser,
+            IEquEquipmentGroupRepository equEquipmentGroupRepository,
             IEquEquipmentRepository equEquipmentRepository)
         {
+            _currentUser = currentUser;
             _equEquipmentGroupRepository = equEquipmentGroupRepository;
             _equEquipmentRepository = equEquipmentRepository;
         }
@@ -52,8 +61,8 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
             // DTO转换实体
             var entity = createDto.ToEntity<EquEquipmentGroupEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
-            entity.CreatedBy = "TODO";
-            entity.UpdatedBy = "TODO";
+            entity.CreatedBy = _currentUser.UserName;
+            entity.UpdatedBy = _currentUser.UserName;
 
             // TODO 事务处理
             var rows = 0;
@@ -74,7 +83,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
 
             // DTO转换实体
             var entity = modifyDto.ToEntity<EquEquipmentGroupEntity>();
-            entity.UpdatedBy = "TODO";
+            entity.UpdatedBy = _currentUser.UserName;
 
             // TODO 事务处理
             var rows = 0;

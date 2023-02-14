@@ -1,3 +1,4 @@
+using Hymson.Authentication;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
@@ -19,6 +20,11 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
     public class EquEquipmentService : IEquEquipmentService
     {
         /// <summary>
+        /// 当前登录用户对象
+        /// </summary>
+        private readonly ICurrentUser _currentUser;
+
+        /// <summary>
         /// 仓储（设备注册）
         /// </summary>
         private readonly IEquEquipmentRepository _equEquipmentRepository;
@@ -36,14 +42,17 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="repository"></param>
+        /// <param name="currentUser"></param>
+        /// <param name="equEquipmentRepository"></param>
         /// <param name="equEquipmentLinkApiRepository"></param>
         /// <param name="equEquipmentLinkHardwareRepository"></param>
-        public EquEquipmentService(IEquEquipmentRepository repository,
+        public EquEquipmentService(ICurrentUser currentUser,
+            IEquEquipmentRepository equEquipmentRepository,
             IEquEquipmentLinkApiRepository equEquipmentLinkApiRepository,
             IEquEquipmentLinkHardwareRepository equEquipmentLinkHardwareRepository)
         {
-            _equEquipmentRepository = repository;
+            _currentUser = currentUser;
+            _equEquipmentRepository = equEquipmentRepository;
             _equEquipmentLinkApiRepository = equEquipmentLinkApiRepository;
             _equEquipmentLinkHardwareRepository = equEquipmentLinkHardwareRepository;
         }
@@ -62,8 +71,8 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             // DTO转换实体
             var entity = createDto.ToEntity<EquEquipmentEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
-            entity.CreatedBy = "TODO";
-            entity.UpdatedBy = "TODO";
+            entity.CreatedBy = _currentUser.UserName;
+            entity.UpdatedBy = _currentUser.UserName;
             entity.EquipmentCode = createDto.EquipmentCode.ToUpper();
 
             if (entity.QualTime > 0 && entity.EntryDate > SqlDateTime.MinValue.Value) entity.ExpireDate = entity.EntryDate.AddMonths(entity.QualTime);
@@ -76,6 +85,8 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
                 {
                     EquEquipmentLinkHardwareEntity linkHardware = item.ToEntity<EquEquipmentLinkHardwareEntity>();
                     linkHardware.EquipmentId = entity.Id;
+                    linkHardware.CreatedBy = _currentUser.UserName;
+                    linkHardware.UpdatedBy = _currentUser.UserName;
                     linkHardwareList.Add(linkHardware);
                 }
             }
@@ -88,6 +99,8 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
                 {
                     EquEquipmentLinkApiEntity linkApi = item.ToEntity<EquEquipmentLinkApiEntity>();
                     linkApi.EquipmentId = entity.Id;
+                    linkApi.CreatedBy = _currentUser.UserName;
+                    linkApi.UpdatedBy = _currentUser.UserName;
                     linkApiList.Add(linkApi);
                 }
             }
@@ -107,11 +120,9 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
 
             // TODO 事务处理
             var rows = 0;
-
             rows += await _equEquipmentRepository.InsertAsync(entity);
             rows += await _equEquipmentLinkApiRepository.InsertRangeAsync(linkApiList);
             rows += await _equEquipmentLinkHardwareRepository.InsertRangeAsync(linkHardwareList);
-
             return rows;
         }
 
@@ -127,7 +138,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
 
             // DTO转换实体
             var entity = modifyDto.ToEntity<EquEquipmentEntity>();
-            entity.UpdatedBy = "TODO";
+            entity.UpdatedBy = _currentUser.UserName;
 
             if (entity.QualTime > 0 && entity.EntryDate > SqlDateTime.MinValue.Value) entity.ExpireDate = entity.EntryDate.AddMonths(entity.QualTime);
 
