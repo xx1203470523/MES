@@ -2,7 +2,9 @@ using AutoMapper;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Api.Filters;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 using System.Reflection;
 
 namespace Hymson.MES.Api
@@ -21,7 +23,6 @@ namespace Hymson.MES.Api
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
             builder.Services.AddControllers(options =>
             {
                 options.Filters.Add(typeof(HttpGlobalExceptionFilter));
@@ -48,9 +49,7 @@ namespace Hymson.MES.Api
             app.UseAuthentication();
             app.UseAuthorization();
 
-
             app.MapControllers();
-
             app.Run();
         }
 
@@ -88,6 +87,34 @@ namespace Hymson.MES.Api
                 var xmlFilename2 = $"Hymson.MES.Services.xml";
                 options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename2));
 
+                options.OperationFilter<AddResponseHeadersFilter>();
+                //options.OperationFilter<AppendAuthorizeToSummaryOperationFilter>();
+
+                // 在header 中添加token，传递到后台
+                options.OperationFilter<SecurityRequirementsOperationFilter>();
+                // JwtBearerDefaults.AuthenticationScheme
+                options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "前置Bearer。示例：Bearer {Token}",
+                    Name = "Authorization",//jwt默认的参数名称,
+                    Type = SecuritySchemeType.ApiKey, //指定ApiKey
+                    BearerFormat = "JWT",//标识承载令牌的格式 该信息主要是出于文档目的
+                    Scheme = JwtBearerDefaults.AuthenticationScheme//授权中要使用的HTTP授权方案的名称
+                });
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+                        },
+                        new List<string>()
+                    }
+                });
+
+                //options.OperationFilter<SecurityRequirementsOperationFilter>();
+                //options.OperationFilter<AuthorizationOperationFilter>();
             });
 #endif
         }
