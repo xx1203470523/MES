@@ -7,6 +7,9 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query
     /// </summary>
     public class EquSparePartPagedQuery : PagerInfo
     {
-
+        /// <summary>
+        /// 站点编码 
+        /// </summary>
+        public string? SiteCode { get; set; }
     }
 }

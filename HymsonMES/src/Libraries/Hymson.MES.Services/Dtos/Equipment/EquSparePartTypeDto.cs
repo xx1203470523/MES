@@ -132,10 +132,24 @@ namespace Hymson.MES.Services.Dtos.Equipment
     /// </summary>
     public class EquSparePartTypePagedQueryDto : PagerInfo
     {
-        ///// <summary>
-        ///// 描述 :站点编码 
-        ///// 空值 : false  
-        ///// </summary>
-        //public string SiteCode { get; set; }
+        /// <summary>
+        /// 站点编码 
+        /// </summary>
+        public string SiteCode { get; set; } = "";
+
+        /// <summary>
+        /// 备件类型编码
+        /// </summary>
+        public string SparePartTypeCode { get; set; } = "";
+
+        /// <summary>
+        /// 备件类型名称
+        /// </summary>
+        public string SparePartTypeName { get; set; } = "";
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public int Status { get; set; } = 0;
     }
 }

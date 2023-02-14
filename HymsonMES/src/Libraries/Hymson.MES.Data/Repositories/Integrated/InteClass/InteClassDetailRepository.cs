@@ -85,7 +85,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         public async Task<int> DeletesAsync(long[] idsArr)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, idsArr);
+            return await conn.ExecuteAsync(DeleteSql, new { Id = idsArr });
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
             //sqlBuilder.Select("*");
 
             //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
@@ -134,11 +134,10 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
             sqlBuilder.AddParameters(inteClassDetailPagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var inteClassDetailEntitiesTask = conn.QueryAsync<InteClassDetailEntity>(templateData.RawSql, templateData.Parameters);
-            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
-            var inteClassDetailEntities = await inteClassDetailEntitiesTask;
-            var totalCount = await totalCountTask;
-            return new PagedInfo<InteClassDetailEntity>(inteClassDetailEntities, inteClassDetailPagedQuery.PageIndex, inteClassDetailPagedQuery.PageSize, totalCount);
+            var entities = await conn.QueryAsync<InteClassDetailEntity>(templateData.RawSql, templateData.Parameters);
+            var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+
+            return new PagedInfo<InteClassDetailEntity>(entities, inteClassDetailPagedQuery.PageIndex, inteClassDetailPagedQuery.PageSize, totalCount);
         }
 
         /// <summary>

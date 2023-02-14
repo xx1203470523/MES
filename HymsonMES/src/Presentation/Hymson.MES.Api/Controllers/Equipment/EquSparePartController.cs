@@ -72,13 +72,13 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <summary>
         /// 分页查询列表（备件注册）
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("pagelist")]
-        public async Task<PagedInfo<EquSparePartDto>> QueryPagedEquSparePartAsync([FromQuery] EquSparePartPagedQueryDto parm)
+        public async Task<PagedInfo<EquSparePartDto>> QueryPagedEquSparePartAsync([FromQuery] EquSparePartPagedQueryDto pagedQueryDto)
         {
-            return await _equSparePartService.GetPageListAsync(parm);
+            return await _equSparePartService.GetPageListAsync(pagedQueryDto);
         }
 
         /// <summary>

@@ -81,7 +81,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Select("*");
 
             if (string.IsNullOrWhiteSpace(pagedQuery.SiteCode) == false)
@@ -91,11 +91,13 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
 
             if (string.IsNullOrWhiteSpace(pagedQuery.UnitCode) == false)
             {
+                pagedQuery.UnitCode = $"%{pagedQuery.UnitCode}%";
                 sqlBuilder.Where("UnitCode = @UnitCode");
             }
 
             if (string.IsNullOrWhiteSpace(pagedQuery.UnitName) == false)
             {
+                pagedQuery.UnitName = $"%{pagedQuery.UnitName}%";
                 sqlBuilder.Where("UnitName = @UnitName");
             }
 

@@ -57,7 +57,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         public async Task<int> SoftDeleteAsync(long[] idsArr)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, new { id = idsArr });
+            return await conn.ExecuteAsync(DeleteSql, new { Id = idsArr });
         }
 
         /// <summary>
@@ -155,11 +155,13 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
 
             if (string.IsNullOrWhiteSpace(pagedQuery.EquipmentCode) == false)
             {
+                pagedQuery.EquipmentCode = $"%{pagedQuery.EquipmentCode}%";
                 sqlBuilder.Where("EquipmentCode = @EquipmentCode");
             }
 
             if (string.IsNullOrWhiteSpace(pagedQuery.EquipmentName) == false)
             {
+                pagedQuery.EquipmentName = $"%{pagedQuery.EquipmentName}%";
                 sqlBuilder.Where("EquipmentName = @EquipmentName");
             }
 
@@ -175,16 +177,19 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
 
             if (string.IsNullOrWhiteSpace(pagedQuery.WorkCenterShopName) == false)
             {
+                pagedQuery.WorkCenterShopName = $"%{pagedQuery.WorkCenterShopName}%";
                 sqlBuilder.Where("WorkCenterShopName = @WorkCenterShopName");
             }
 
             if (string.IsNullOrWhiteSpace(pagedQuery.UseDepartment) == false)
             {
+                pagedQuery.UseDepartment = $"%{pagedQuery.UseDepartment}%";
                 sqlBuilder.Where("UseDepartment = @UseDepartment");
             }
 
             if (string.IsNullOrWhiteSpace(pagedQuery.Location) == false)
             {
+                pagedQuery.Location = $"%{pagedQuery.Location}%";
                 sqlBuilder.Where("Location = @Location");
             }
 
@@ -194,7 +199,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-
             var entities = await conn.QueryAsync<EquEquipmentEntity>(templateData.RawSql, templateData.Parameters);
             var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
 

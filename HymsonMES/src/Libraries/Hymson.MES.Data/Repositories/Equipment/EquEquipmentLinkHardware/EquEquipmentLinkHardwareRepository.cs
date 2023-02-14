@@ -80,7 +80,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         public async Task<int> SoftDeleteAsync(IEnumerable<long> idsArr)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(SoftDeleteSql, idsArr);
+            return await conn.ExecuteAsync(SoftDeleteSql, new { Id = idsArr });
         }
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         public async Task<EquEquipmentLinkHardwareEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<EquEquipmentLinkHardwareEntity>(GetByIdSql, id);
+            return await conn.QueryFirstOrDefaultAsync<EquEquipmentLinkHardwareEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         public async Task<IEnumerable<EquEquipmentLinkHardwareEntity>> GetListAsync(long equipmentId)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<EquEquipmentLinkHardwareEntity>(GetByEquipmentSql, equipmentId);
+            return await conn.QueryAsync<EquEquipmentLinkHardwareEntity>(GetByEquipmentSql, new { equipmentId });
         }
 
         /// <summary>
@@ -153,27 +153,19 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Select("*");
-            if (!string.IsNullOrWhiteSpace(pagedQuery.SiteCode))
+            if (string.IsNullOrWhiteSpace(pagedQuery.SiteCode) == false)
             {
-                sqlBuilder.Where("SiteCode=@SiteCode");
+                sqlBuilder.Where("SiteCode = @SiteCode");
             }
-            if (!string.IsNullOrWhiteSpace(pagedQuery.UnitCode))
-            {
-                sqlBuilder.Where("UnitCode=@UnitCode");
-            }
-            //if (equipmentUnitPagedQuery.ChangeType.HasValue)
-            //{
-            //    sqlBuilder.Where("ChangeType=@ChangeType");
-            //}
+
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
             sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-
             var entities = await conn.QueryAsync<EquEquipmentLinkHardwareEntity>(templateData.RawSql, templateData.Parameters);
             var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
 

@@ -69,7 +69,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
         public async Task<int> DeletesAsync(long[] idsArr)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, new { id = idsArr });
+            return await conn.ExecuteAsync(DeleteSql, new { Id = idsArr });
         }
 
         /// <summary>
@@ -93,13 +93,30 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
-            //sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Select("*");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
+            if (string.IsNullOrWhiteSpace(pagedQuery.SiteCode) == false)
+            {
+                sqlBuilder.Where("SiteCode = @SiteCode");
+            }
+
+            if (string.IsNullOrWhiteSpace(pagedQuery.SparePartTypeCode) == false)
+            {
+                pagedQuery.SparePartTypeCode = $"%{pagedQuery.SparePartTypeCode}%";
+                sqlBuilder.Where("SparePartTypeCode LIKE @SparePartTypeCode");
+            }
+
+            if (string.IsNullOrWhiteSpace(pagedQuery.SparePartTypeName) == false)
+            {
+                pagedQuery.SparePartTypeName = $"%{pagedQuery.SparePartTypeName}%";
+                sqlBuilder.Where("SparePartTypeName LIKE @SparePartTypeName");
+            }
+
+            if (pagedQuery.Status > 0)
+            {
+                sqlBuilder.Where("Status = @Status");
+            }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -107,11 +124,9 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
             sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var equSparePartTypeEntitiesTask = conn.QueryAsync<EquSparePartTypeEntity>(templateData.RawSql, templateData.Parameters);
-            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
-            var equSparePartTypeEntities = await equSparePartTypeEntitiesTask;
-            var totalCount = await totalCountTask;
-            return new PagedInfo<EquSparePartTypeEntity>(equSparePartTypeEntities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
+            var entities = await conn.QueryAsync<EquSparePartTypeEntity>(templateData.RawSql, templateData.Parameters);
+            var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            return new PagedInfo<EquSparePartTypeEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
         /// <summary>

@@ -88,16 +88,18 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Select("*");
 
             if (string.IsNullOrWhiteSpace(pagedQuery.EquipmentGroupCode) == false)
             {
+                pagedQuery.EquipmentGroupCode = $"%{pagedQuery.EquipmentGroupCode}%";
                 sqlBuilder.Where("EquipmentGroupCode = @EquipmentGroupCode");
             }
 
             if (string.IsNullOrWhiteSpace(pagedQuery.EquipmentGroupName) == false)
             {
+                pagedQuery.EquipmentGroupName = $"%{pagedQuery.EquipmentGroupName}%";
                 sqlBuilder.Where("EquipmentGroupName = @EquipmentGroupName");
             }
 
