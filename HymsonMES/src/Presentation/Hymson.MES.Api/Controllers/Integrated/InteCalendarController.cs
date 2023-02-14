@@ -70,12 +70,12 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <summary>
         /// 查询列表（日历维护）
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         [HttpGet("list")]
-        public async Task<PagedInfo<InteCalendarDto>> QueryInteCalendarListAsync([FromQuery] InteCalendarPagedQueryDto parm)
+        public async Task<PagedInfo<InteCalendarDto>> QueryInteCalendarListAsync([FromQuery] InteCalendarPagedQueryDto pagedQueryDto)
         {
-            return await _inteCalendarService.GetPagedListAsync(parm);
+            return await _inteCalendarService.GetPagedListAsync(pagedQueryDto);
         }
 
         /// <summary>

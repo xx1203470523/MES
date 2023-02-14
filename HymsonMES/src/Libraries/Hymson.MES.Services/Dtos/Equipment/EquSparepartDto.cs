@@ -254,11 +254,10 @@ namespace Hymson.MES.Services.Dtos.Equipment
     /// </summary>
     public class EquSparePartPagedQueryDto : PagerInfo
     {
-        ///// <summary>
-        ///// 描述 :站点编码 
-        ///// 空值 : false  
-        ///// </summary>
-        //public string SiteCode { get; set; }
+        /// <summary>
+        /// 站点编码 
+        /// </summary>
+        public string SiteCode { get; set; } = "";
     }
 
 }

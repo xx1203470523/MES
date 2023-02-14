@@ -81,7 +81,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Select("*");
 
             if (string.IsNullOrWhiteSpace(pagedQuery.SiteCode) == false)
@@ -91,11 +91,13 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
 
             if (string.IsNullOrWhiteSpace(pagedQuery.UnitCode) == false)
             {
+                pagedQuery.UnitCode = $"%{pagedQuery.UnitCode}%";
                 sqlBuilder.Where("UnitCode = @UnitCode");
             }
 
             if (string.IsNullOrWhiteSpace(pagedQuery.UnitName) == false)
             {
+                pagedQuery.UnitName = $"%{pagedQuery.UnitName}%";
                 sqlBuilder.Where("UnitName = @UnitName");
             }
 
@@ -111,19 +113,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
             return new PagedInfo<EquEquipmentUnitEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<EquEquipmentUnitEntity>> GetEntitiesAsync(EquEquipmentUnitQuery query)
-        {
-            var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var equipmentUnitEntities = await conn.QueryAsync<EquEquipmentUnitEntity>(template.RawSql, query);
-            return equipmentUnitEntities;
-        }
     }
 
     /// <summary>
@@ -136,8 +125,8 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
         /// </summary>
         const string InsertSql = "INSERT INTO `equ_unit`(`Id`, `SiteCode`, `UnitCode`, `UnitName`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteCode, @UnitCode, @UnitName, @Type, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted);";
         const string UpdateSql = "UPDATE `equ_unit` SET UnitName = @UnitName, Type = @Type, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id;";
-        const string DeleteSql = "UPDATE `equ_unit` SET `IsDeleted` = @IsDeleted WHERE `Id` = @Id;";
-        const string GetByIdSql = "SELECT `Id`, `SiteCode`, `UnitCode`, `UnitName`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn` FROM `equ_unit` WHERE `IsDeleted` = @IsDeleted AND `Id` = @Id;";
+        const string DeleteSql = "UPDATE `equ_unit` SET `IsDeleted` = @IsDeleted WHERE `Id` = @id;";
+        const string GetByIdSql = "SELECT `Id`, `SiteCode`, `UnitCode`, `UnitName`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn` FROM `equ_unit` WHERE `IsDeleted` = @IsDeleted AND `Id` = @id;";
         const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `equ_unit` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_unit` /**where**/";
         const string GetEntitiesSqlTemplate = "";

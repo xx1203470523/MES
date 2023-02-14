@@ -1,13 +1,13 @@
-using FluentValidation;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
 using Hymson.MES.Services.Dtos.Equipment;
-using Hymson.Utils;
-using System.Reflection.Emit;
+using Hymson.Snowflake;
+using static Dapper.SqlMapper;
 
 namespace Hymson.MES.Services.Services.EquEquipmentGroup
 {
@@ -17,23 +17,25 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
     public class EquEquipmentGroupService : IEquEquipmentGroupService
     {
         /// <summary>
-        /// 设备组（仓储）
+        /// 仓储（设备组）
+        /// </summary>
+        private readonly IEquEquipmentGroupRepository _equEquipmentGroupRepository;
+
+        /// <summary>
+        /// 仓储（设备）
         /// </summary>
         private readonly IEquEquipmentRepository _equEquipmentRepository;
-        private readonly IEquEquipmentGroupRepository _equEquipmentGroupRepository;
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="equEquipmentRepository"></param>
         /// <param name="equEquipmentGroupRepository"></param>
-        /// <param name="validationCreateRules"></param>
-        /// <param name="validationModifyRules"></param>
-        public EquEquipmentGroupService(IEquEquipmentRepository equEquipmentRepository,
-            IEquEquipmentGroupRepository equEquipmentGroupRepository)
+        /// <param name="equEquipmentRepository"></param>
+        public EquEquipmentGroupService(IEquEquipmentGroupRepository equEquipmentGroupRepository,
+            IEquEquipmentRepository equEquipmentRepository)
         {
-            _equEquipmentRepository = equEquipmentRepository;
             _equEquipmentGroupRepository = equEquipmentGroupRepository;
+            _equEquipmentRepository = equEquipmentRepository;
         }
 
 
@@ -42,18 +44,22 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task CreateEquEquipmentGroupAsync(EquEquipmentGroupCreateDto createDto)
+        public async Task<int> CreateEquEquipmentGroupAsync(EquEquipmentGroupCreateDto createDto)
         {
-            //验证DTO
+            // 验证DTO
             //await _validationCreateRules.ValidateAndThrowAsync(createDto);
 
-            //DTO转换实体
-            var equEquipmentGroupEntity = createDto.ToEntity<EquEquipmentGroupEntity>();
-            equEquipmentGroupEntity.CreatedBy = "TODO";
-            equEquipmentGroupEntity.UpdatedBy = "TODO";
+            // DTO转换实体
+            var entity = createDto.ToEntity<EquEquipmentGroupEntity>();
+            entity.Id = IdGenProvider.Instance.CreateId();
+            entity.CreatedBy = "TODO";
+            entity.UpdatedBy = "TODO";
 
-            //入库
-            await _equEquipmentGroupRepository.InsertAsync(equEquipmentGroupEntity);
+            // TODO 事务处理
+            var rows = 0;
+            rows += await _equEquipmentGroupRepository.InsertAsync(entity);
+            rows += await _equEquipmentRepository.UpdateEquipmentGroupIdAsync(entity.Id, createDto.EquipmentIDs);
+            return rows;
         }
 
         /// <summary>
@@ -61,16 +67,21 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task ModifyEquEquipmentGroupAsync(EquEquipmentGroupModifyDto modifyDto)
+        public async Task<int> ModifyEquEquipmentGroupAsync(EquEquipmentGroupModifyDto modifyDto)
         {
-            //验证DTO
+            // 验证DTO
             //await _validationModifyRules.ValidateAndThrowAsync(modifyDto);
 
-            //DTO转换实体
-            var equEquipmentGroupEntity = modifyDto.ToEntity<EquEquipmentGroupEntity>();
-            equEquipmentGroupEntity.UpdatedBy = "TODO";
+            // DTO转换实体
+            var entity = modifyDto.ToEntity<EquEquipmentGroupEntity>();
+            entity.UpdatedBy = "TODO";
 
-            await _equEquipmentGroupRepository.UpdateAsync(equEquipmentGroupEntity);
+            // TODO 事务处理
+            var rows = 0;
+            rows += await _equEquipmentGroupRepository.UpdateAsync(entity);
+            rows += await _equEquipmentRepository.ClearEquipmentGroupIdAsync(entity.Id);
+            rows += await _equEquipmentRepository.UpdateEquipmentGroupIdAsync(entity.Id, modifyDto.EquipmentIDs);
+            return rows;
         }
 
         /// <summary>
@@ -78,9 +89,9 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task DeleteEquEquipmentGroupAsync(long id)
+        public async Task<int> DeleteEquEquipmentGroupAsync(long id)
         {
-            await _equEquipmentGroupRepository.SoftDeleteAsync(id);
+            return await _equEquipmentGroupRepository.SoftDeleteAsync(id);
         }
 
         /// <summary>
@@ -118,11 +129,13 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
             EquEquipmentGroupDto dto = new();
             IEnumerable<EquEquipmentEntity> equipmentEntitys;
 
-            switch (query.OperateType.ToLower())
+            switch (query.OperateType)
             {
-                case "add":
+                case OperateTypeEnum.Add:
                     equipmentEntitys = await _equEquipmentRepository.GetByGroupIdAsync(0);
                     break;
+                case OperateTypeEnum.Edit:
+                case OperateTypeEnum.View:
                 default:
                     dto.Info = (await _equEquipmentGroupRepository.GetByIdAsync(query.Id)).ToModel<EquEquipmentGroupListDto>();
                     equipmentEntitys = await _equEquipmentRepository.GetByGroupIdAsync(query.Id);

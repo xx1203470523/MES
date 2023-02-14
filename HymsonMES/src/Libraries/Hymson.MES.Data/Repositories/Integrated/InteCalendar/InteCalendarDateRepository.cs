@@ -3,6 +3,7 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using System.Globalization;
 
 namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
 {
@@ -76,7 +77,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
         public async Task<int> DeleteByCalendarIdsAsync(long[] calendarIdsArr)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, calendarIdsArr);
+            return await conn.ExecuteAsync(DeleteSql, new { calendarId = calendarIdsArr });
 
         }
 

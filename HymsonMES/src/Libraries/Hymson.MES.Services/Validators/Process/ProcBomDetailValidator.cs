@@ -1,12 +1,11 @@
 /*
  *creator: Karl
  *
- *describe: 标准参数表    验证规则 | 代码由框架生成  
+ *describe: BOM明细表    验证规则 | 代码由框架生成  
  *builder:  Karl
- *build datetime: 2023-02-13 02:50:20
+ *build datetime: 2023-02-14 10:38:06
  */
 using FluentValidation;
-using Hymson.MES.Core.Constants;
 using Hymson.MES.Services.Dtos.Process;
 using System;
 using System.Collections.Generic;
@@ -17,25 +16,24 @@ using System.Threading.Tasks;
 namespace Hymson.MES.Services.Validators.Process
 {
     /// <summary>
-    /// 标准参数表 更新 验证
+    /// BOM明细表 更新 验证
     /// </summary>
-    internal class ProcParameterCreateValidator: AbstractValidator<ProcParameterCreateDto>
+    internal class ProcBomDetailCreateValidator: AbstractValidator<ProcBomDetailCreateDto>
     {
-        public ProcParameterCreateValidator()
+        public ProcBomDetailCreateValidator()
         {
-            RuleFor(x => x.SiteCode).NotEmpty().WithErrorCode(ErrorCode.MES10501);
+            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");
             //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
         }
     }
 
     /// <summary>
-    /// 标准参数表 修改 验证
+    /// BOM明细表 修改 验证
     /// </summary>
-    internal class ProcParameterModifyValidator : AbstractValidator<ProcParameterModifyDto>
+    internal class ProcBomDetailModifyValidator : AbstractValidator<ProcBomDetailModifyDto>
     {
-        public ProcParameterModifyValidator()
+        public ProcBomDetailModifyValidator()
         {
-            RuleFor(x => x.SiteCode).NotEmpty().WithErrorCode(ErrorCode.MES10501);
             //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");
             //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
         }

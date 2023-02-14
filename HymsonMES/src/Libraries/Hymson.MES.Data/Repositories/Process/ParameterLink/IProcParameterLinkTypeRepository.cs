@@ -77,6 +77,13 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<IEnumerable<ProcParameterLinkTypeEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
+        /// 根据ParameterIDs批量获取数据
+        /// </summary>
+        /// <param name="parameterIds"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcParameterLinkTypeEntity>> GetByParameterIdsAsync(long[] parameterIds);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="procParameterLinkTypeQuery"></param>

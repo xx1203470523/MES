@@ -24,7 +24,7 @@
         public const string MES10213 = "参数不能为空";
         public const string MES10214 = "物料编码不能为空";
         public const string MES10215 = "物料名称不能为空";
-        public const string MES10216 = "此物料组编码{GroupCode}在系统已经存在！";
+        public const string MES10216 = "此物料组编码{groupCode}在系统已经存在！";
         public const string MES10217 = "存在已分配给其他物料组的物料！";
         public const string MES10218 = "新增物料组失败！";
         public const string MES10219 = "此物料组不存在！";
@@ -61,6 +61,17 @@
         public const string MES10404 = "工序名称超长";
         public  string MES10405 = $"编码:{0}已存在！";
         public const string MES10430 = $"有生产中工单引用当前工艺路线，不能删除！";
+        #endregion
+
+        #region 参数 10500
+        public const string MES10500 = "基础参数错误";
+        public const string MES10501 = "站点码获取失败，请重新登录！";
+        public const string MES10502 = "此参数编码{parameterCode}在系统已经存在！";
+        public const string MES10503 = "请求实体不能为空！";
+        public const string MES10504 = "此标准参数不存在！";
+        public const string MES10505 = "删除失败Ids 不能为空";
+        public const string MES10506 = "参数已被设备参数或产品参数绑定，不允许删除!";
+        
         #endregion
         #endregion
 

@@ -38,9 +38,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        public async Task Create([FromBody] EquEquipmentGroupCreateDto createDto)
+        public async Task<int> Create([FromBody] EquEquipmentGroupCreateDto createDto)
         {
-            await _equEquipmentGroupService.CreateEquEquipmentGroupAsync(createDto);
+            return await _equEquipmentGroupService.CreateEquEquipmentGroupAsync(createDto);
         }
 
         /// <summary>
@@ -50,9 +50,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
-        public async Task Modify([FromBody] EquEquipmentGroupModifyDto modifyDto)
+        public async Task<int> Modify([FromBody] EquEquipmentGroupModifyDto modifyDto)
         {
-            await _equEquipmentGroupService.ModifyEquEquipmentGroupAsync(modifyDto);
+            return await _equEquipmentGroupService.ModifyEquEquipmentGroupAsync(modifyDto);
         }
 
         /// <summary>
@@ -62,10 +62,10 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
-        public async Task Delete(string ids)
+        public async Task<int> Delete(string ids)
         {
             long[] idsArr = StringExtension.SpitLongArrary(ids);
-            await _equEquipmentGroupService.DeletesEquEquipmentGroupAsync(idsArr);
+            return await _equEquipmentGroupService.DeletesEquEquipmentGroupAsync(idsArr);
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        [HttpGet("detail")]
+        [HttpPost("detail")]
         public async Task<EquEquipmentGroupDto> GetEquEquipmentGroupAsync(EquEquipmentGroupQueryDto query)
         {
             return await _equEquipmentGroupService.GetEquEquipmentGroupWithEquipmentsAsync(query);

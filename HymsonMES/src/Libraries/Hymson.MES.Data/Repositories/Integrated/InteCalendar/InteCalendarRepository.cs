@@ -66,7 +66,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
         public async Task<int> DeletesAsync(long[] idsArr)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, idsArr);
+            return await conn.ExecuteAsync(DeleteSql, new { Id = idsArr });
 
         }
 
@@ -124,7 +124,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Select("*");
             /*
             if (string.IsNullOrWhiteSpace(pagedQuery.SiteCode) == false)

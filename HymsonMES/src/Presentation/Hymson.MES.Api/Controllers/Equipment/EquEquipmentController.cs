@@ -134,23 +134,23 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// <summary>
         ///  获取设备关联硬件数据
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         [HttpGet("linkHardware/list")]
-        public async Task<PagedInfo<EquEquipmentLinkHardwareBaseDto>> GetEquipmentLinkHardwareAsync(EquEquipmentLinkHardwarePagedQueryDto parm)
+        public async Task<PagedInfo<EquEquipmentLinkHardwareBaseDto>> GetEquipmentLinkHardwareAsync(EquEquipmentLinkHardwarePagedQueryDto pagedQueryDto)
         {
-            return await _equEquipmentService.GetEquimentLinkHardwareAsync(parm);
+            return await _equEquipmentService.GetEquimentLinkHardwareAsync(pagedQueryDto);
         }
 
         /// <summary>
         ///  获取设备关联Api数据
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         [HttpGet("linkApi/list")]
-        public async Task<PagedInfo<EquEquipmentLinkApiBaseDto>> GetEquipmentLinkApiAsync(EquEquipmentLinkApiPagedQueryDto parm)
+        public async Task<PagedInfo<EquEquipmentLinkApiBaseDto>> GetEquipmentLinkApiAsync(EquEquipmentLinkApiPagedQueryDto pagedQueryDto)
         {
-            return await _equEquipmentService.GetEquimentLinkApiAsync(parm);
+            return await _equEquipmentService.GetEquimentLinkApiAsync(pagedQueryDto);
         }
     }
 }

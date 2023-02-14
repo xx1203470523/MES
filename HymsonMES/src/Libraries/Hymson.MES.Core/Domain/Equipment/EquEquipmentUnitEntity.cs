@@ -25,12 +25,12 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 单位类型
         /// </summary>
-        public string Type { get; set; } = "";
+        public int Type { get; set; } = 0;
 
         /// <summary>
         /// 单位状态 
         /// </summary>
-        public string Status { get; set; } = "";
+        public int Status { get; set; } = 0;
 
         /// <summary>
         /// 备注
