@@ -165,7 +165,7 @@ namespace Hymson.MES.Services.Mapper
             #region ResourceType
 
             CreateMap<ProcResourceTypeEntity, ProcResourceTypeDto>();
-            CreateMap<ProcResourceTypeView, ProcResourceTypeDto>();
+            CreateMap<ProcResourceTypeView, ProcResourceTypeViewDto>();
             CreateMap<ProcResourceTypePagedQueryDto, ProcResourceTypePagedQuery>();
 
             #endregion

@@ -194,7 +194,7 @@ namespace Hymson.MES.Services.Services.Process
                 updateCommand.UpdatedOn = HymsonClock.Now();
                 updateCommand.UpdatedBy = userId;
                 updateCommand.ResTypeId = param.Id;
-                updateCommand.IdsArr = param.ResourceIds.ToArray();
+                updateCommand.IdsArr = resourceIds.ToArray();
             }
 
             //var resources = _procResourceRepository.GetProcResrouces(ids, parm.Id);
@@ -211,11 +211,13 @@ namespace Hymson.MES.Services.Services.Process
                 await _resourceTypeRepository.UpdateAsync(updateEntity);
 
                 //清除之前的绑定关系
-                await _resourceRepository.UpdateResTypeAsync(param.Id);
+                await _resourceRepository.ResetResTypeAsync(updateCommand);
 
-                //更新资源的资源类型（重新绑定）
-                await _resourceRepository.UpdateResTypeAsync(updateCommand);
-
+                if (resourceIds != null && resourceIds.Any() == true)
+                {
+                    //更新资源的资源类型（重新绑定）
+                    await _resourceRepository.UpdateResTypeAsync(updateCommand);
+                }
                 ts.Complete();
             }
         }

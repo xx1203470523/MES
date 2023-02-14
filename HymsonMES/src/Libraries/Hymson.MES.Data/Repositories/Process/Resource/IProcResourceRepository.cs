@@ -77,11 +77,11 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<int> UpdateResTypeAsync(ProcResourceUpdateCommand entity);
 
         /// <summary>
-        /// 更新资源类型数据
+        /// 更新资源类型数据,置为0
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> UpdateResTypeAsync(long resTypeId);
+        Task<int> ResetResTypeAsync(ProcResourceUpdateCommand entity);
 
         /// <summary>
         /// 批量删除

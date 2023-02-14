@@ -88,7 +88,6 @@ namespace Hymson.MES.Api.Controllers
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
-        //[Route("create")]
         public async Task AddProcProcedureAsync([FromBody] ProcProcedureCreateDto parm)
         {
             await _procProcedureService.CreateProcProcedureAsync(parm);
@@ -100,7 +99,6 @@ namespace Hymson.MES.Api.Controllers
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPut]
-        //[Route("update")]
         public async Task UpdateProcProcedureAsync([FromBody] ProcProcedureModifyDto parm)
         {
             await _procProcedureService.ModifyProcProcedureAsync(parm);

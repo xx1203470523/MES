@@ -243,13 +243,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateResTypeAsync(long resTypeId)
+        public async Task<int> ResetResTypeAsync(ProcResourceUpdateCommand entity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdatedByResTypeSql, new
-            {
-                ResTypeId = resTypeId
-            }); ;
+            return await conn.ExecuteAsync(UpdatedByResTypeSql, entity); ;
         }
 
         /// <summary>
