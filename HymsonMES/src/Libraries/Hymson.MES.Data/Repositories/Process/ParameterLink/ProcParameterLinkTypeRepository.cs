@@ -74,6 +74,17 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 根据ParameterIDs批量获取数据
+        /// </summary>
+        /// <param name="parameterIds"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcParameterLinkTypeEntity>> GetByParameterIdsAsync(long[] parameterIds)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcParameterLinkTypeEntity>(GetByParameterIdsSql, new { parameterIds = parameterIds });
+        }
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="procParameterLinkTypePagedQuery"></param>
@@ -113,6 +124,21 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcParameterLinkTypeEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+
+            if (!string.IsNullOrEmpty(procParameterLinkTypeQuery.SiteCode)) 
+            {
+                sqlBuilder.Where(" SiteCode = @SiteCode ");
+            }
+            if (procParameterLinkTypeQuery.ParameterID!=0) 
+            {
+                sqlBuilder.Where(" ParameterID = @ParameterID ");
+            }
+            if (procParameterLinkTypeQuery.ParameterType > 0)
+            {
+                sqlBuilder.Where(" ParameterType = @ParameterType ");
+            }
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var procParameterLinkTypeEntities = await conn.QueryAsync<ProcParameterLinkTypeEntity>(template.RawSql, procParameterLinkTypeQuery);
             return procParameterLinkTypeEntities;
@@ -184,5 +210,8 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteCode`, `ParameterID`, `ParameterType`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_parameter_link_type`  WHERE Id IN @ids ";
+        const string GetByParameterIdsSql = @"SELECT 
+                                          `Id`, `SiteCode`, `ParameterID`, `ParameterType`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `proc_parameter_link_type`  WHERE IsDeleted =0 AND ParameterID IN @parameterIds ";
     }
 }

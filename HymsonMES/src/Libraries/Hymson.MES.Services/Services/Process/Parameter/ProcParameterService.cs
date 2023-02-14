@@ -32,17 +32,20 @@ namespace Hymson.MES.Services.Services.Process
         private readonly AbstractValidator<ProcParameterCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcParameterModifyDto> _validationModifyRules;
 
-        public ProcParameterService(IProcParameterRepository procParameterRepository, AbstractValidator<ProcParameterCreateDto> validationCreateRules, AbstractValidator<ProcParameterModifyDto> validationModifyRules)
+        private readonly IProcParameterLinkTypeRepository _procParameterLinkTypeRepository;
+
+        public ProcParameterService(IProcParameterRepository procParameterRepository, AbstractValidator<ProcParameterCreateDto> validationCreateRules, AbstractValidator<ProcParameterModifyDto> validationModifyRules, IProcParameterLinkTypeRepository procParameterLinkTypeRepository)
         {
             _procParameterRepository = procParameterRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
+            _procParameterLinkTypeRepository = procParameterLinkTypeRepository;
         }
 
         /// <summary>
         /// 创建
         /// </summary>
-        /// <param name="procParameterDto"></param>
+        /// <param name="procParameterCreateDto"></param>
         /// <returns></returns>
         public async Task CreateProcParameterAsync(ProcParameterCreateDto procParameterCreateDto)
         {
@@ -56,6 +59,18 @@ namespace Hymson.MES.Services.Services.Process
             procParameterEntity.UpdatedBy = "TODO";
             procParameterEntity.CreatedOn = HymsonClock.Now();
             procParameterEntity.UpdatedOn = HymsonClock.Now();
+            procParameterEntity.ParameterCode = procParameterEntity.ParameterCode.ToUpper();
+
+            //判断编号是否已经存在
+            var exists = await _procParameterRepository.GetProcParameterEntitiesAsync(new ProcParameterQuery()
+            {
+                SiteCode = procParameterEntity.SiteCode,
+                ParameterCode = procParameterEntity.ParameterCode,
+            });
+            if (exists != null && exists.Count() > 0) 
+            {
+                throw new BusinessException(ErrorCode.MES10502).WithData("parameterCode", procParameterEntity.ParameterCode);
+            }
 
             //入库
             await _procParameterRepository.InsertAsync(procParameterEntity);
@@ -78,7 +93,20 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<int> DeletesProcParameterAsync(string ids)
         {
+            if (string.IsNullOrEmpty(ids)) 
+            {
+                throw new ValidationException(ErrorCode.MES10505);
+            }
+
             var idsArr = StringExtension.SpitLongArrary(ids);
+
+            //查询参数是否关联产品参数和设备参数
+            var lists= await _procParameterLinkTypeRepository.GetByParameterIdsAsync(idsArr);
+            if (lists!=null&&lists.Count() > 0)
+            {
+                throw new BusinessException(ErrorCode.MES10506);
+            }
+
             return await _procParameterRepository.DeletesAsync(idsArr);
         }
 
@@ -119,17 +147,38 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="procParameterDto"></param>
+        /// <param name="procParameterModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyProcParameterAsync(ProcParameterModifyDto procParameterModifyDto)
         {
-             //验证DTO
-            await _validationModifyRules.ValidateAndThrowAsync(procParameterModifyDto);
+            if (procParameterModifyDto == null)
+            {
+                throw new ValidationException(ErrorCode.MES10503);
+            }
 
             //DTO转换实体
             var procParameterEntity = procParameterModifyDto.ToEntity<ProcParameterEntity>();
             procParameterEntity.UpdatedBy = "TODO";
             procParameterEntity.UpdatedOn = HymsonClock.Now();
+
+            //验证DTO
+            await _validationModifyRules.ValidateAndThrowAsync(procParameterModifyDto);
+
+            var modelOrigin = await _procParameterRepository.GetByIdAsync(procParameterEntity.Id);
+            if (modelOrigin == null)
+            {
+                throw new BusinessException(ErrorCode.MES10504);
+            }
+            //判断编号是否已经存在
+            var exists = await _procParameterRepository.GetProcParameterEntitiesAsync(new ProcParameterQuery()
+            {
+                SiteCode = procParameterEntity.SiteCode,
+                ParameterCode = procParameterEntity.ParameterCode,
+            });
+            if (exists != null && exists.Count() > 0)
+            {
+                throw new BusinessException(ErrorCode.MES10502).WithData("parameterCode", procParameterEntity.ParameterCode);
+            }
 
             await _procParameterRepository.UpdateAsync(procParameterEntity);
         }
@@ -141,11 +190,18 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<ProcParameterDto> QueryProcParameterByIdAsync(long id) 
         {
+            var siteCode = "";//TODO
+
            var procParameterEntity = await _procParameterRepository.GetByIdAsync(id);
            if (procParameterEntity != null) 
            {
                var dto= procParameterEntity.ToModel<CustomProcParameterDto>();
-               //dto.Type=  //TODO
+               var linkTypes =  await _procParameterLinkTypeRepository.GetProcParameterLinkTypeEntitiesAsync(new ProcParameterLinkTypeQuery()
+                {
+                   SiteCode= siteCode,
+                   ParameterID= dto.Id
+               });
+               dto.Type = $"{linkTypes.GroupBy(x => x.ParameterType).Select(x => x.Key).ToList().Sum()}";
            }
             return null;
         }

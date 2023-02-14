@@ -66,7 +66,7 @@ namespace Hymson.MES.Services.Services.Process
             var existGroupCodes= await _procMaterialGroupRepository.GetProcMaterialGroupEntitiesAsync(new ProcMaterialGroupQuery { SiteCode = procMaterialGroupCreateDto.SiteCode, GroupCode = procMaterialGroupCreateDto.GroupCode });
             if (existGroupCodes != null && existGroupCodes.Count() > 0) 
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10216)).WithData("GroupCode", procMaterialGroupCreateDto.GroupCode);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10216)).WithData("groupCode", procMaterialGroupCreateDto.GroupCode);
             }
 
             var procMaterialList = ConvertProcMaterialList(procMaterialGroupCreateDto.DynamicList, procMaterialGroupEntity.Id);
