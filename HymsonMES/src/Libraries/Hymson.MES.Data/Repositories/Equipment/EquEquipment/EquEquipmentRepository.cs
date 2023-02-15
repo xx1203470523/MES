@@ -77,14 +77,14 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> SoftDeleteAsync(long[] idsArr)
+        public async Task<int> DeletesAsync(long[] idsArr)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeleteSql, new { Id = idsArr });
         }
 
         /// <summary>
-        /// 
+        /// 判断是否存在（编码）
         /// </summary>
         /// <param name="equipmentCode"></param>
         /// <returns></returns>

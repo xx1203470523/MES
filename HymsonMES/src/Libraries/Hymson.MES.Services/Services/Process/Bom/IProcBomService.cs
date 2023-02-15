@@ -6,6 +6,7 @@
  *build datetime: 2023-02-14 10:04:25
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
 using System;
 using System.Collections.Generic;
@@ -61,5 +62,12 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcBomDto> QueryProcBomByIdAsync(long id);
+
+        /// <summary>
+        /// 根据ID查询Bom 详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<List<ProcBomDetailView>> GetProcBomMaterialAsync(long id);
     }
 }

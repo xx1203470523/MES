@@ -132,6 +132,22 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcBomEntitiesSqlTemplate);
+            sqlBuilder.Where(" IsDeleted=0 ");
+            sqlBuilder.Select("*");
+
+            if (!string.IsNullOrWhiteSpace(procBomQuery.SiteCode))
+            {
+                sqlBuilder.Where("SiteCode=@SiteCode");
+            }
+            if (!string.IsNullOrWhiteSpace(procBomQuery.BomCode))
+            {
+                sqlBuilder.Where(" BomCode = @BomCode ");
+            }            
+            if (!string.IsNullOrWhiteSpace(procBomQuery.Version))
+            {
+                sqlBuilder.Where(" Version = @Version ");
+            }
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var procBomEntities = await conn.QueryAsync<ProcBomEntity>(template.RawSql, procBomQuery);
             return procBomEntities;
@@ -181,6 +197,16 @@ namespace Hymson.MES.Data.Repositories.Process
             return await conn.ExecuteAsync(UpdatesSql, procBomEntitys);
         }
 
+        /// <summary>
+        /// 更新 BOM IsCurrentVersion 为 false
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateIsCurrentVersionIsFalseAsync(long[] ids)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateIsCurrentVersionIsFalseSql, new { ids=ids});
+        }
     }
 
     public partial class ProcBomRepository
@@ -194,6 +220,10 @@ namespace Hymson.MES.Data.Repositories.Process
         const string InsertSql = "INSERT INTO `proc_bom`(  `Id`, `SiteCode`, `BomCode`, `BomName`, `Status`, `Version`, `IsCurrentVersion`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @BomCode, @BomName, @Status, @Version, @IsCurrentVersion, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `proc_bom`(  `Id`, `SiteCode`, `BomCode`, `BomName`, `Status`, `Version`, `IsCurrentVersion`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @BomCode, @BomName, @Status, @Version, @IsCurrentVersion, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string UpdateSql = "UPDATE `proc_bom` SET   SiteCode = @SiteCode, BomCode = @BomCode, BomName = @BomName, Status = @Status, Version = @Version, IsCurrentVersion = @IsCurrentVersion, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        /// <summary>
+        /// 更新 BOM IsCurrentVersion 为 false
+        /// </summary>
+        const string UpdateIsCurrentVersionIsFalseSql = "UPDATE `proc_bom` SET IsCurrentVersion = false WHERE Id in @ids ";
         const string UpdatesSql = "UPDATE `proc_bom` SET   SiteCode = @SiteCode, BomCode = @BomCode, BomName = @BomName, Status = @Status, Version = @Version, IsCurrentVersion = @IsCurrentVersion, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_bom` SET IsDeleted = '1' WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_bom` SET IsDeleted = '1' WHERE Id in @ids";

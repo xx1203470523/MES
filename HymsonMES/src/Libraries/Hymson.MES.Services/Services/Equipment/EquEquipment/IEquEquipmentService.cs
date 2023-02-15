@@ -15,21 +15,21 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        Task<int> CreateEquEquipmentAsync(EquEquipmentCreateDto parm);
+        Task<int> CreateAsync(EquEquipmentCreateDto parm);
 
         /// <summary>
         /// 更新（设备注册）
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        Task<int> ModifyEquEquipmentAsync(EquEquipmentModifyDto parm);
+        Task<int> ModifyAsync(EquEquipmentModifyDto parm);
 
         /// <summary>
         /// 删除（设备注册）
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        Task<int> DeleteEquEquipmentAsync(long[] idsArr);
+        Task<int> DeletesAsync(long[] idsArr);
 
         /// <summary>
         /// 分页查询列表（设备注册）
@@ -49,7 +49,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<EquEquipmentDto> GetEquEquipmentWithGroupNameAsync(long id);
+        Task<EquEquipmentDto> GetDetailAsync(long id);
 
         /// <summary>
         /// 查询设备关联硬件列表

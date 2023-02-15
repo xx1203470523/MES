@@ -13,21 +13,21 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        Task<int> AddInteClassAsync(InteClassCreateDto parm);
+        Task<int> CreateAsync(InteClassCreateDto parm);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        Task<int> UpdateInteClassAsync(InteClassModifyDto parm);
+        Task<int> ModifyAsync(InteClassModifyDto parm);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        Task<int> DeleteInteClassAsync(long[] idsArr);
+        Task<int> DeletesAsync(long[] idsArr);
 
         /// <summary>
         /// 
@@ -41,7 +41,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<InteClassWithDetailDto> GetInteClassAsync(long id);
+        Task<InteClassWithDetailDto> GetDetailAsync(long id);
 
     }
 }

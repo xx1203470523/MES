@@ -31,7 +31,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// 描述 :使用状态 0-禁用 1-启用 
         /// 空值 : false  
         /// </summary>
-        public byte UseStatus { get; set; }
+        public int UseStatus { get; set; }
 
         /// <summary>
         /// 描述 :设备故障先 

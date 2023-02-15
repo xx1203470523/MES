@@ -13,41 +13,41 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
         /// </summary>
         /// <param name="equSparePartPagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquSparePartDto>> GetPageListAsync(EquSparePartPagedQueryDto equSparePartPagedQueryDto);
+        Task<PagedInfo<EquSparePartDto>> GetPagedListAsync(EquSparePartPagedQueryDto equSparePartPagedQueryDto);
 
         /// <summary>
         /// 新增
         /// </summary>
         /// <param name="equSparePartDto"></param>
         /// <returns></returns>
-        Task<int> CreateEquSparePartAsync(EquSparePartCreateDto equSparePartCreateDto);
+        Task<int> CreateAsync(EquSparePartCreateDto equSparePartCreateDto);
 
         /// <summary>
         /// 修改
         /// </summary>
         /// <param name="equSparePartDto"></param>
         /// <returns></returns>
-        Task<int> ModifyEquSparePartAsync(EquSparePartModifyDto equSparePartModifyDto);
+        Task<int> ModifyAsync(EquSparePartModifyDto equSparePartModifyDto);
 
         /// <summary>
         /// 删除
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<int> DeleteEquSparePartAsync(long id);
+        Task<int> DeleteAsync(long id);
 
         /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        Task<int> DeletesEquSparePartAsync(long[] idsArr);
+        Task<int> DeletesAsync(long[] idsArr);
 
         /// <summary>
         /// 根据ID查询
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<EquSparePartDto> QueryEquSparePartByIdAsync(long id);
+        Task<EquSparePartDto> GetDetailAsync(long id);
     }
 }

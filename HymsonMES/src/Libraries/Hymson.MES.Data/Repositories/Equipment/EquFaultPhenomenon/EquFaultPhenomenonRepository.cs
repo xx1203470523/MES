@@ -33,11 +33,10 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task InsertAsync(EquFaultPhenomenonEntity entity)
+        public async Task<int> InsertAsync(EquFaultPhenomenonEntity entity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var id = await conn.ExecuteScalarAsync<long>(InsertSql, entity);
-            entity.Id = id;
+            return await conn.ExecuteAsync(InsertSql, entity);
         }
 
         /// <summary>
@@ -67,11 +66,22 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] idsArr) 
+        public async Task<int> DeletesAsync(long[] idsArr)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeleteSql, idsArr);
 
+        }
+
+        /// <summary>
+        /// 判断是否存在（编码）
+        /// </summary>
+        /// <param name="faultPhenomenonCode"></param>
+        /// <returns></returns>
+        public async Task<bool> IsExistsAsync(string faultPhenomenonCode)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteScalarAsync(IsExistsSql, new { faultPhenomenonCode }) != null;
         }
 
         /// <summary>
@@ -82,7 +92,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         public async Task<EquFaultPhenomenonEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<EquFaultPhenomenonEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<EquFaultPhenomenonEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -102,7 +112,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
-           
+
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
@@ -146,6 +156,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         const string InsertSql = "INSERT INTO `equ_fault_phenomenon`(  `Id`, `FaultPhenomenonCode`, `FaultPhenomenonName`, `EquipmentGroupId`, `UseStatus`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteCode`) VALUES (   @Id, @FaultPhenomenonCode, @FaultPhenomenonName, @EquipmentGroupId, @UseStatus, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteCode )  ";
         const string UpdateSql = "UPDATE `equ_fault_phenomenon` SET   FaultPhenomenonCode = @FaultPhenomenonCode, FaultPhenomenonName = @FaultPhenomenonName, EquipmentGroupId = @EquipmentGroupId, UseStatus = @UseStatus, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, Remark = @Remark, SiteCode = @SiteCode  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `equ_fault_phenomenon` SET IsDeleted = '1' WHERE Id = @Id ";
+        const string IsExistsSql = "SELECT Id FROM equ_fault_phenomenon WHERE `IsDeleted` = 0 AND FaultPhenomenonCode = @faultPhenomenonCode LIMIT 1";
         const string GetByIdSql = @"SELECT 
                                `Id`, `FaultPhenomenonCode`, `FaultPhenomenonName`, `EquipmentGroupId`, `UseStatus`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteCode`
                             FROM `equ_fault_phenomenon`  WHERE Id = @Id ";
