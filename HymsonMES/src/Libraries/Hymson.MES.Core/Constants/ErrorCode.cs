@@ -22,7 +22,7 @@
         public const string WME10213 = "参数不能为空";
         public const string WME10214 = "物料编码不能为空";
         public const string WME10215 = "物料名称不能为空";
-        
+
 
         #endregion
 
@@ -30,6 +30,17 @@
         public const string WMS20001 = "WMS20001";
         public const string WMS20100 = "WMS20100";
         public const string WMS20101 = "WMS20101";
+
+        //品质
+        //不合格代码
+        public const string MES21100 = "不合格代码错误";
+        public const string MES21101 = "不合格代码编码不能为空";
+        public const string MES21102 = "不合格代码编码超过最大长度，不合格代码编码最大长度为50";
+        public const string MES21103 = "不合格代码名称不能为空";
+        public const string MES21104 = "不合格代码名称超过最大长度，不合格代码名称最大长度为60";
+        public const string MES21105 = "不合格代码类型不能为空";
+        public const string MES21106 = "不合格代码等级不能为空";
+        public const string MES21107 = "不合格代码备注超过最大长度，不合格代码备注最大长度为255";
         #endregion
 
 
