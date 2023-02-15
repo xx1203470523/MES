@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 using System;
 using System.Collections.Generic;
@@ -104,7 +105,7 @@ namespace Hymson.MES.Services.Dtos.Process
 
     }
 
-    public record ProcProcedureOperDto : BaseEntityDto
+    public record ProcProcedureCreateDto : BaseEntityDto
     {
         /// <summary>
         /// 主键id
@@ -227,24 +228,45 @@ namespace Hymson.MES.Services.Dtos.Process
     /// <summary>
     /// 工序表新增Dto
     /// </summary>
-    public record ProcProcedureCreateDto 
+    public record AddProcProcedureDto 
     {
         /// <summary>
         /// 工序信息
         /// </summary>
-        public ProcProcedureOperDto Procedure { get; set; }
+        public ProcProcedureCreateDto Procedure { get; set; }
 
         /// <summary>
         /// 工序打印配置信息
         /// </summary>
 
-       // public List<ProcProcedureBomConfigPrintDto> ProcedurePrintList { get; set; }
+       public List<ProcProcedurePrintReleationCreateDto> ProcedurePrintList { get; set; }
 
         /// <summary>
         /// 工序工作配置信息
         /// </summary>
+       public List<InteJobBusinessRelationCreateDto> ProcedureJobList { get; set; }
+    }
 
-       // public List<ProcProcedureBomConfigJobDto> ProcedureJobList { get; set; }
+    /// <summary>
+    /// 工序表修改Dto
+    /// </summary>
+    public record UpdateProcProcedureDto
+    {
+        /// <summary>
+        /// 工序信息
+        /// </summary>
+        public ProcProcedureModifyDto Procedure { get; set; }
+
+        /// <summary>
+        /// 工序打印配置信息
+        /// </summary>
+
+        public List<ProcProcedurePrintReleationCreateDto> ProcedurePrintList { get; set; }
+
+        /// <summary>
+        /// 工序工作配置信息
+        /// </summary>
+        public List<InteJobBusinessRelationCreateDto> ProcedureJobList { get; set; }
     }
 
     /// <summary>
@@ -257,15 +279,15 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long Id { get; set; }
 
-        /// <summary>
-        /// 工序BOM代码
-        /// </summary>
-        public string Code { get; set; }
+        ///// <summary>
+        ///// 工序BOM代码
+        ///// </summary>
+        //public string Code { get; set; }
 
-        /// <summary>
-        /// 工序BOM名称
-        /// </summary>
-        public string Name { get; set; }
+        ///// <summary>
+        ///// 工序BOM名称
+        ///// </summary>
+        //public string Name { get; set; }
 
         /// <summary>
         /// 状态
@@ -306,30 +328,21 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 说明
         /// </summary>
         public string Remark { get; set; }
+    }
+
+    /// <summary>
+    /// 工序配置打印查询实体类
+    /// </summary>
+    public class QueryProcedureJobReleationDto
+    {
+        /// <summary>
+        /// 工序配置工作实体类
+        /// </summary>
+        public InteJobBusinessRelationDto ProcedureBomConfigJob { get; set; }
 
         /// <summary>
-        /// 创建人
+        /// 工作
         /// </summary>
-        public string CreatedBy { get; set; }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-        /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-        /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
-
-        /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public bool? IsDeleted { get; set; }
+        public InteJobDto Job { get; set; }
     }
 }

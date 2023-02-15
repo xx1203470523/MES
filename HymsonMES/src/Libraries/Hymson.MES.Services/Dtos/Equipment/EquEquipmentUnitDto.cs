@@ -20,12 +20,12 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 单位类型
         /// </summary>
-        public string Type { get; set; } = "";
+        public int Type { get; set; } = 0;
 
         /// <summary>
         /// 单位状态 
         /// </summary>
-        public string Status { get; set; } = "";
+        public int Status { get; set; } = 0;
     }
 
     /// <summary>
@@ -51,19 +51,24 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 单位类型
         /// </summary>
-        public string Type { get; set; } = "";
+        public int Type { get; set; } = 0;
 
         /// <summary>
         /// 单位状态 
         /// </summary>
-        public string Status { get; set; } = "";
+        public int Status { get; set; } = 0;
     }
-    
+
     /// <summary>
     /// 
     /// </summary>
     public record EquEquipmentUnitDto : BaseEntityDto
     {
+        /// <summary>
+        /// 唯一标识
+        /// </summary>
+        public long Id { get; set; }
+
         /// <summary>
         /// 单位编码 
         /// </summary>
@@ -77,12 +82,12 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 单位类型
         /// </summary>
-        public string Type { get; set; } = "";
+        public int Type { get; set; } = 0;
 
         /// <summary>
         /// 单位状态 
         /// </summary>
-        public string Status { get; set; } = "";
+        public int Status { get; set; } = 0;
     }
 
     /// <summary>
@@ -108,11 +113,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 单位类型
         /// </summary>
-        public string? Type { get; set; }
+        public int Type { get; set; } = 0;
 
         /// <summary>
         /// 单位状态 
         /// </summary>
-        public string? Status { get; set; }
+        public int Status { get; set; } = 0;
     }
 }

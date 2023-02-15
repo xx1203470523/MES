@@ -9,7 +9,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
-using Hymson.Utils.Extensions;
+using Hymson.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Extensions;
 

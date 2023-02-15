@@ -1,3 +1,4 @@
+using Hymson.Authentication;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
@@ -15,6 +16,11 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
     public class EquSparePartTypeService : IEquSparePartTypeService
     {
         /// <summary>
+        /// 当前登录用户对象
+        /// </summary>
+        private readonly ICurrentUser _currentUser;
+
+        /// <summary>
         /// 仓储（备件类型） 
         /// </summary>
         private readonly IEquSparePartTypeRepository _equSparePartTypeRepository;
@@ -27,12 +33,14 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// <summary>
         /// 
         /// </summary>
-        /// <
+        /// <param name="currentUser"></param>
         /// <param name="equSparePartTypeRepository"></param>
         /// <param name="equSparePartRepository"></param>
-        public EquSparePartTypeService(IEquSparePartTypeRepository equSparePartTypeRepository,
+        public EquSparePartTypeService(ICurrentUser currentUser, 
+            IEquSparePartTypeRepository equSparePartTypeRepository,
             IEquSparePartRepository equSparePartRepository)
         {
+            _currentUser = currentUser;
             _equSparePartTypeRepository = equSparePartTypeRepository;
             _equSparePartRepository = equSparePartRepository;
         }
@@ -51,8 +59,8 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
             // DTO转换实体
             var entity = createDto.ToEntity<EquSparePartTypeEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
-            entity.CreatedBy = "TODO";
-            entity.UpdatedBy = "TODO";
+            entity.CreatedBy = _currentUser.UserName;
+            entity.UpdatedBy = _currentUser.UserName;
 
             // TODO 事务处理
             var rows = 0;
@@ -72,7 +80,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
 
             // DTO转换实体
             var entity = modifyDto.ToEntity<EquSparePartTypeEntity>();
-            entity.UpdatedBy = "TODO";
+            entity.UpdatedBy = _currentUser.UserName;
 
             // TODO 事务处理
             var rows = 0;

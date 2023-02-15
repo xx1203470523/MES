@@ -122,6 +122,13 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteClassPagedQueryDto, InteClassPagedQuery>();
 
             CreateMap<InteClassEntity, InteClassDto>();
+            CreateMap<InteClassEntity, InteClassDto>();
+            #endregion
+
+            #region InteJob
+
+            CreateMap<InteJobEntity, InteJobDto>();
+            CreateMap<InteJobBusinessRelationCreateDto, InteJobBusinessRelationEntity>();
             #endregion
         }
 
@@ -205,9 +212,15 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcProcedurePagedQueryDto, ProcProcedurePagedQuery>();
             CreateMap<ProcProcedureView, ProcProcedureViewDto>();
             CreateMap<ProcProcedureEntity, ProcProcedureDto>();
-            CreateMap<ProcProcedureOperDto, ProcProcedureEntity>();
-            CreateMap<ProcProcedureJobReleationEntity, ProcProcedureJobReleationDto>();
+            CreateMap<ProcProcedureCreateDto, ProcProcedureEntity>();
+            CreateMap<ProcProcedureModifyDto, ProcProcedureEntity>();
             CreateMap<ProcProcedurePrintReleationEntity, ProcProcedurePrintReleationDto>();
+            CreateMap<ProcProcedurePrintReleationCreateDto, ProcProcedurePrintReleationEntity>();
+            #endregion
+
+            #region ProcessRoute
+            CreateMap<ProcProcessRoutePagedQueryDto, ProcProcessRoutePagedQuery>();
+            CreateMap<ProcProcessRouteEntity, ProcProcessRouteDto>();
             #endregion
         }
 

@@ -8,7 +8,7 @@
 using FluentValidation;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Services.Dtos.Process;
-using Hymson.Utils.Extensions;
+using Hymson.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;

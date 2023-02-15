@@ -20,13 +20,34 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public interface IProcProcedurePrintReleationRepository
     {
-	    /// <summary>
+        /// <summary>
+        /// 分页查询
+        /// </summary>
+        /// <param name="procProcedurePrintReleationPagedQuery"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ProcProcedurePrintReleationEntity>> GetPagedInfoAsync(ProcProcedurePrintReleationPagedQuery procProcedurePrintReleationPagedQuery);
+
+        /// <summary>
+        /// 批量新增
+        /// </summary>
+        /// <param name="procProcedurePrintReleationEntitys"></param>
+        /// <returns></returns>
+        Task<int> InsertRangeAsync(List<ProcProcedurePrintReleationEntity> procProcedurePrintReleationEntitys);
+
+        /// <summary>
+        /// 删除（软删除）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<int> DeleteByProcedureIdAsync(long id);
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcProcedurePrintReleationEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -40,27 +61,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procProcedurePrintReleationQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcProcedurePrintReleationEntity>> GetProcProcedurePrintReleationEntitiesAsync(ProcProcedurePrintReleationQuery procProcedurePrintReleationQuery);
-        
-        /// <summary>
-        /// 分页查询
-        /// </summary>
-        /// <param name="procProcedurePrintReleationPagedQuery"></param>
-        /// <returns></returns>
-        Task<PagedInfo<ProcProcedurePrintReleationEntity>> GetPagedInfoAsync(ProcProcedurePrintReleationPagedQuery procProcedurePrintReleationPagedQuery);
-		
+
         /// <summary>
         /// 新增
         /// </summary>
         /// <param name="procProcedurePrintReleationEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ProcProcedurePrintReleationEntity procProcedurePrintReleationEntity);
-        
-        /// <summary>
-        /// 批量新增
-        /// </summary>
-        /// <param name="procProcedurePrintReleationEntitys"></param>
-        /// <returns></returns>
-        Task<int> InsertRangeAsync(List<ProcProcedurePrintReleationEntity> procProcedurePrintReleationEntitys);
 
         /// <summary>
         /// 更新
@@ -68,7 +75,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procProcedurePrintReleationEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ProcProcedurePrintReleationEntity procProcedurePrintReleationEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -76,13 +83,6 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         Task<int> UpdateRangeAsync(List<ProcProcedurePrintReleationEntity> procProcedurePrintReleationEntitys);
 
-        /// <summary>
-        /// 删除
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<int> DeleteAsync(long id);
-        
         /// <summary>
         /// 批量删除
         /// </summary>

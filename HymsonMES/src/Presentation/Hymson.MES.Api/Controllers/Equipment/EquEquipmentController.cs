@@ -1,7 +1,8 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipment;
-using Hymson.Utils.Extensions;
+using Hymson.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
@@ -12,6 +13,7 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
     /// @author Czhipu
     /// @date 2022-11-08
     /// </summary>
+    [Authorize]
     [ApiController]
     [Route("api/v1/[controller]")]
     public class EquEquipmentController : ControllerBase
@@ -42,16 +44,6 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         [Route("create")]
         public async Task<int> Create([FromBody] EquEquipmentCreateDto createDto)
         {
-            /*
-            if (parm == null)
-            {
-                return ToResponse(ResultCode.PARAM_ERROR, "请求参数错误");
-            }
-
-            var responseDto = await _equEquipmentService.AddEquEquipmentAsync(parm);
-            return ToResponse(responseDto);
-            */
-
             return await _equEquipmentService.CreateEquEquipmentAsync(createDto);
         }
 
@@ -64,16 +56,6 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         [Route("update")]
         public async Task<int> Modify([FromBody] EquEquipmentModifyDto modifyDto)
         {
-            /*
-            if (parm == null)
-            {
-                return ToResponse(ResultCode.PARAM_ERROR, "请求实体不能为空！");
-            }
-
-            var responseDto = await _equEquipmentService.UpdateEquEquipmentAsync(parm);
-            return ToResponse(responseDto);
-            */
-
             return await _equEquipmentService.ModifyEquEquipmentAsync(modifyDto);
         }
 
@@ -86,14 +68,6 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         [Route("delete")]
         public async Task<int> Delete(string ids)
         {
-            /*
-            long[] idsArr = StringExtension.SpitLongArrary(ids);
-            if (idsArr.Length <= 0) { return ToResponse(ApiResponse.Error($"删除失败Id 不能为空")); }
-
-            var responseDto = await _equEquipmentService.DeleteEquEquipmentAsync(idsArr);
-            return ToResponse(responseDto);
-            */
-
             long[] idsArr = StringExtension.SpitLongArrary(ids);
             return await _equEquipmentService.DeleteEquEquipmentAsync(idsArr);
         }

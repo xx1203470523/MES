@@ -25,12 +25,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 所属工序ID
         /// </summary>
         public long ProcedureId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 所属物料ID
         /// </summary>
         public long MaterialId { get; set; }
@@ -86,16 +86,6 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public record ProcProcedurePrintReleationCreateDto : BaseEntityDto
     {
-        /// <summary>
-        /// ID
-        /// </summary>
-        public long Id { get; set; }
-
-       /// <summary>
-        /// 所属工序ID
-        /// </summary>
-        public long ProcedureId { get; set; }
-
        /// <summary>
         /// 所属物料ID
         /// </summary>
@@ -120,31 +110,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 备注
         /// </summary>
         public string Remark { get; set; }
-
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-       /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-       /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public bool? IsDeleted { get; set; } 
     }
 
     /// <summary>

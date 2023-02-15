@@ -181,14 +181,14 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         /// <summary>
         /// 
         /// </summary>
-        const string InsertSql = "INSERT INTO `equ_equipment_link_api`(`Id`, `SiteCode`, `UnitCode`, `UnitName`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteCode, @UnitCode, @UnitName, @Type, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted);";
-        const string UpdateSql = "UPDATE `equ_equipment_link_api` SET UnitName = @UnitName, Type = @Type, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id;";
-        const string SoftDeleteSql = "UPDATE `equ_equipment_link_api` SET `IsDeleted` = 1 WHERE `Id` = @Id;";
-        const string GetByIdSql = "SELECT * FROM `equ_equipment_link_api` WHERE `Id` = @Id;";
-        const string GetByHardwareCodeSql = "SELECT * FROM `equ_equipment_link_api` WHERE `HardwareCode` = @HardwareCode AND `HardwareType` = @HardwareType;";
-        const string GetByEquipmentSql = "SELECT * FROM `equ_equipment_link_api` WHERE `EquipmentId` = @EquipmentId;";
-        const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `equ_equipment_link_api` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_equipment_link_api` /**where**/";
+        const string InsertSql = "INSERT INTO `equ_equipment_link_hardware`(  `Id`, `EquipmentId`, `HardwareCode`, `HardwareType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteCode`) VALUES (   @Id, @EquipmentId, @HardwareCode, @HardwareType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteCode )  ";
+        const string UpdateSql = "UPDATE `equ_equipment_link_hardware` SET   EquipmentId = @EquipmentId, HardwareCode = @HardwareCode, HardwareType = @HardwareType, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, Remark = @Remark, SiteCode = @SiteCode  WHERE Id = @Id ";
+        const string SoftDeleteSql = "UPDATE `equ_equipment_link_hardware` SET `IsDeleted` = 1 WHERE `Id` = @Id;";
+        const string GetByIdSql = "SELECT * FROM `equ_equipment_link_hardware` WHERE `Id` = @Id;";
+        const string GetByHardwareCodeSql = "SELECT * FROM `equ_equipment_link_hardware` WHERE `HardwareCode` = @HardwareCode AND `HardwareType` = @HardwareType;";
+        const string GetByEquipmentSql = "SELECT * FROM `equ_equipment_link_hardware` WHERE `EquipmentId` = @EquipmentId;";
+        const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `equ_equipment_link_hardware` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_equipment_link_hardware` /**where**/";
         const string GetEntitiesSqlTemplate = "";
     }
 }

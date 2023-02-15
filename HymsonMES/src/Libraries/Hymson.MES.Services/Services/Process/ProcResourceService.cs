@@ -11,7 +11,7 @@ using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using Hymson.Utils.Extensions;
+using Hymson.Utils;
 using Hymson.Utils.Tools;
 using System.Transactions;
 
@@ -516,17 +516,17 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     foreach (var item in resourceEquList)
                     {
-                        var parmEqu = param.PrintList.Where(x => x.PrintId == item.EquipmentId);
+                        var parmEqu = param?.PrintList?.Where(x => x.PrintId == item.EquipmentId);
                         //  判断参数中打印机数据情况
                         //     传入一条 只能为修改或者删除
                         //     传入两条 只能为删除和新增
                         //     其他则为异常
-                        if (parmEqu.Count() == 1)
+                        if (parmEqu?.Count() == 1)
                         {
                             if (parmEqu.FirstOrDefault()?.OperationType == 1)
                                 throw new ValidationException(ErrorCode.MES10314);
                         }
-                        else if (parmEqu.Count() == 2)
+                        else if (parmEqu?.Count() == 2)
                         {
                             if (!(parmEqu.Where(x => x.OperationType == 3).Count() == 1 && parmEqu.Where(x => x.OperationType == 1).Count() == 1))
                             {
@@ -558,9 +558,9 @@ namespace Hymson.MES.Services.Services.Process
                     if (mainList != null)
                     {
                         var isMain = mainList.FirstOrDefault();
-                        if (ismianList.FirstOrDefault().EquipmentId != isMain.EquipmentId)
+                        if (ismianList.FirstOrDefault()?.EquipmentId != isMain?.EquipmentId)
                         {
-                            if (param.EquList.Where(x => x.EquipmentId == isMain.EquipmentId).FirstOrDefault() == null)
+                            if (param.EquList.Where(x => x.EquipmentId == isMain?.EquipmentId).FirstOrDefault() == null)
                             {
                                 throw new CustomerValidationException(ErrorCode.MES10307);
                             }

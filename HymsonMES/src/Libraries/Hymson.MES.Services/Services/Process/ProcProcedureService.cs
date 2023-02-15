@@ -12,7 +12,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using Hymson.Utils.Extensions;
+using Hymson.Utils;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Services.Dtos.Process;
@@ -21,6 +21,11 @@ using Hymson.MES.Core.Constants;
 using Hymson.Utils.Tools;
 using System.Transactions;
 using Hymson.MES.Data.Repositories.Process.Resource;
+using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.MES.Data.Repositories.Integrated;
+using Google.Protobuf.WellKnownTypes;
+using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Core.Enums.Integrated;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -40,7 +45,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 工序配置作业表仓储
         /// </summary>
-        private readonly IProcProcedureJobReleationRepository _procedureJobReleationRepository;
+        private readonly IInteJobBusinessRelationRepository _jobBusinessRelationRepository;
         /// <summary>
         /// 工序配置打印表仓储
         /// </summary>
@@ -49,6 +54,10 @@ namespace Hymson.MES.Services.Services.Process
         /// 物料维护 仓储
         /// </summary>
         private readonly IProcMaterialRepository _procMaterialRepository;
+        /// <summary>
+        /// 作业表仓储
+        /// </summary>
+        private readonly IInteJobRepository _inteJobRepository;
 
         private readonly AbstractValidator<ProcProcedureCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcProcedureModifyDto> _validationModifyRules;
@@ -58,19 +67,21 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         public ProcProcedureService(IProcProcedureRepository procProcedureRepository,
             IProcResourceTypeRepository resourceTypeRepository,
-            IProcProcedureJobReleationRepository procedureJobReleationRepository,
+            IInteJobBusinessRelationRepository jobBusinessRelationRepository,
             IProcProcedurePrintReleationRepository procedurePrintReleationRepository,
             IProcMaterialRepository procMaterialRepository,
+            IInteJobRepository inteJobRepository,
             AbstractValidator<ProcProcedureCreateDto> validationCreateRules,
             AbstractValidator<ProcProcedureModifyDto> validationModifyRules)
         {
             _procProcedureRepository = procProcedureRepository;
             _resourceTypeRepository = resourceTypeRepository;
+            _jobBusinessRelationRepository = jobBusinessRelationRepository;
+            _procedurePrintReleationRepository = procedurePrintReleationRepository;
+            _procMaterialRepository = procMaterialRepository;
+            _inteJobRepository = inteJobRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
-            _procMaterialRepository = procMaterialRepository;
-            _procedureJobReleationRepository = procedureJobReleationRepository;
-            _procedurePrintReleationRepository = procedurePrintReleationRepository;
         }
 
         /// <summary>
@@ -137,7 +148,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<QueryProcProcedurePrintReleationDto>> GetProcedureBomConfigPrintListAsync(ProcProcedurePrintReleationPagedQueryDto queryDto)
+        public async Task<PagedInfo<QueryProcProcedurePrintReleationDto>> GetProcedureConfigPrintListAsync(ProcProcedurePrintReleationPagedQueryDto queryDto)
         {
             var query = new ProcProcedurePrintReleationPagedQuery()
             {
@@ -155,7 +166,7 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     var printReleationDto = entity.ToModel<ProcProcedurePrintReleationDto>();
                     var material = materialLsit.FirstOrDefault(a => a.Id == printReleationDto.MaterialId)?.ToModel<ProcMaterialDto>(); ;
-                    var queryEntity = new QueryProcProcedurePrintReleationDto { ProcedureBomConfigPrint = printReleationDto, Material = material??new ProcMaterialDto() };
+                    var queryEntity = new QueryProcProcedurePrintReleationDto { ProcedureBomConfigPrint = printReleationDto, Material = material ?? new ProcMaterialDto() };
                     dtos.Add(queryEntity);
                     //TODO 模板 by wangkeming 
                 }
@@ -169,23 +180,37 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<QueryProcedureJobReleationDto>> GetProcedureBomConfigJobListAsync(ProcProcedureJobReleationPagedQueryDto queryDto)
+        public async Task<PagedInfo<QueryProcedureJobReleationDto>> GetProcedureConfigJobListAsync(InteJobBusinessRelationPagedQueryDto queryDto)
         {
-            var query = new ProcProcedureJobReleationPagedQuery()
+            var query = new InteJobBusinessRelationPagedQuery()
             {
-                ProcedureId = queryDto.ProcedureId
+                SiteCode = "TODO",
+                BusinessId = queryDto.BusinessId
             };
-            var pagedInfo = await _procedureJobReleationRepository.GetPagedInfoAsync(query);
+            var pagedInfo = await _jobBusinessRelationRepository.GetPagedInfoAsync(query);
 
             //实体到DTO转换 装载数据
             var dtos = new List<QueryProcedureJobReleationDto>();
             foreach (var entity in pagedInfo.Data)
             {
-                var jobReleationDto = entity.ToModel<ProcProcedureJobReleationDto>();
+                var jobReleationDto = entity.ToModel<InteJobBusinessRelationDto>();
                 dtos.Add(new QueryProcedureJobReleationDto { ProcedureBomConfigJob = jobReleationDto });
             }
 
-            //TODO 关联job
+            var jobIds = dtos.Select(a => a.ProcedureBomConfigJob.JobId).ToArray();
+            var jobList = await _inteJobRepository.GetByIdsAsync(jobIds);
+            var jobDtoList = new List<InteJobDto>();
+            foreach (var job in jobList)
+            {
+                var inteJob = job.ToModel<InteJobDto>();
+                jobDtoList.Add(inteJob);
+            }
+
+            foreach (var entity in dtos)
+            {
+                entity.Job = jobDtoList.FirstOrDefault(a => a.Id == entity.ProcedureBomConfigJob.JobId);
+            }
+
             return new PagedInfo<QueryProcedureJobReleationDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
@@ -194,7 +219,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        public async Task CreateProcProcedureAsync(ProcProcedureCreateDto parm)
+        public async Task CreateProcProcedureAsync(AddProcProcedureDto parm)
         {
             #region 验证
             if (parm == null)
@@ -203,8 +228,9 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             var siteCode = "TODO";
+            var userId = "TODO";
             //验证DTO
-            await _validationCreateRules.ValidateAndThrowAsync(parm);
+            await _validationCreateRules.ValidateAndThrowAsync(parm.Procedure);
 
             var code = parm.Procedure.Code.ToUpperInvariant();
             var query = new ProcProcedureQuery
@@ -220,19 +246,59 @@ namespace Hymson.MES.Services.Services.Process
             }
             #endregion
 
-            var userId = "TODO";
             //DTO转换实体
             var procProcedureEntity = parm.Procedure.ToEntity<ProcProcedureEntity>();
             procProcedureEntity.Id = IdGenProvider.Instance.CreateId();
             procProcedureEntity.CreatedBy = userId;
             procProcedureEntity.UpdatedBy = userId;
-            procProcedureEntity.CreatedOn = HymsonClock.Now();
-            procProcedureEntity.UpdatedOn = HymsonClock.Now();
+
+            //打印
+            List<ProcProcedurePrintReleationEntity> procedureConfigPrintList = new List<ProcProcedurePrintReleationEntity>();
+            if (parm.ProcedurePrintList != null && parm.ProcedurePrintList.Count > 0)
+            {
+                foreach (var item in parm.ProcedurePrintList)
+                {
+                    var releationEntity = item.ToEntity<ProcProcedurePrintReleationEntity>(); ;
+                    releationEntity.Id = IdGenProvider.Instance.CreateId();
+                    releationEntity.ProcedureId = procProcedureEntity.Id;
+                    releationEntity.SiteCode = siteCode;
+                    releationEntity.CreatedBy = userId;
+                    releationEntity.UpdatedBy = userId;
+                    procedureConfigPrintList.Add(releationEntity);
+                }
+            }
+
+            //job
+            List<InteJobBusinessRelationEntity> procedureConfigJobList = new List<InteJobBusinessRelationEntity>();
+            if (parm.ProcedureJobList != null && parm.ProcedureJobList.Count > 0)
+            {
+                foreach (var item in parm.ProcedureJobList)
+                {
+                    var relationEntity = item.ToEntity<InteJobBusinessRelationEntity>(); ;
+                    relationEntity.Id = IdGenProvider.Instance.CreateId();
+                    relationEntity.BusinessType = (int)InteJobBusinessTypeEnum.Procedure;
+                    relationEntity.BusinessId = procProcedureEntity.Id;
+                    relationEntity.SiteCode = siteCode;
+                    relationEntity.CreatedBy = userId;
+                    relationEntity.UpdatedBy = userId;
+                    procedureConfigJobList.Add(relationEntity);
+                }
+            }
 
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
                 //入库
                 await _procProcedureRepository.InsertAsync(procProcedureEntity);
+
+                if (procedureConfigPrintList != null && procedureConfigPrintList.Count > 0)
+                {
+                    await _procedurePrintReleationRepository.InsertRangeAsync(procedureConfigPrintList);
+                }
+
+                if (procedureConfigJobList != null && procedureConfigJobList.Count > 0)
+                {
+                    await _jobBusinessRelationRepository.InsertRangeAsync(procedureConfigJobList);
+                }
 
                 //提交
                 ts.Complete();
@@ -242,19 +308,80 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="procProcedureModifyDto"></param>
+        /// <param name="parm"></param>
         /// <returns></returns>
-        public async Task ModifyProcProcedureAsync(ProcProcedureModifyDto procProcedureModifyDto)
+        public async Task ModifyProcProcedureAsync(UpdateProcProcedureDto parm)
         {
+            #region
+            if (parm == null)
+            {
+                throw new ValidationException(ErrorCode.MES10100);
+            }
+            var siteCode = "TODO";
+            var userId = "TODO";
+
             //验证DTO
-            await _validationModifyRules.ValidateAndThrowAsync(procProcedureModifyDto);
+            await _validationModifyRules.ValidateAndThrowAsync(parm.Procedure);
+            #endregion
 
             //DTO转换实体
-            var procProcedureEntity = procProcedureModifyDto.ToEntity<ProcProcedureEntity>();
+            var procProcedureEntity = parm.Procedure.ToEntity<ProcProcedureEntity>();
             procProcedureEntity.UpdatedBy = "TODO";
-            procProcedureEntity.UpdatedOn = HymsonClock.Now();
 
-            await _procProcedureRepository.UpdateAsync(procProcedureEntity);
+            //TODO 现在关联表批量删除批量新增，后面再修改
+            //打印
+            List<ProcProcedurePrintReleationEntity> procedureConfigPrintList = new List<ProcProcedurePrintReleationEntity>();
+            if (parm.ProcedurePrintList != null && parm.ProcedurePrintList.Count > 0)
+            {
+                foreach (var item in parm.ProcedurePrintList)
+                {
+                    var releationEntity = item.ToEntity<ProcProcedurePrintReleationEntity>(); ;
+                    releationEntity.Id = IdGenProvider.Instance.CreateId();
+                    releationEntity.ProcedureId = procProcedureEntity.Id;
+                    releationEntity.SiteCode = siteCode;
+                    releationEntity.CreatedBy = userId;
+                    releationEntity.UpdatedBy = userId;
+                    procedureConfigPrintList.Add(releationEntity);
+                }
+            }
+
+            //job
+            List<InteJobBusinessRelationEntity> procedureConfigJobList = new List<InteJobBusinessRelationEntity>();
+            if (parm.ProcedureJobList != null && parm.ProcedureJobList.Count > 0)
+            {
+                foreach (var item in parm.ProcedureJobList)
+                {
+                    var relationEntity = item.ToEntity<InteJobBusinessRelationEntity>(); ;
+                    relationEntity.Id = IdGenProvider.Instance.CreateId();
+                    relationEntity.BusinessType = (int)InteJobBusinessTypeEnum.Procedure;
+                    relationEntity.BusinessId = procProcedureEntity.Id;
+                    relationEntity.SiteCode = siteCode;
+                    relationEntity.CreatedBy = userId;
+                    relationEntity.UpdatedBy = userId;
+                    procedureConfigJobList.Add(relationEntity);
+                }
+            }
+
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            {
+                //入库
+                await _procProcedureRepository.UpdateAsync(procProcedureEntity);
+
+                await _procedurePrintReleationRepository.DeleteByProcedureIdAsync(procProcedureEntity.Id);
+                if (procedureConfigPrintList != null && procedureConfigPrintList.Count > 0)
+                {
+                    await _procedurePrintReleationRepository.InsertRangeAsync(procedureConfigPrintList);
+                }
+
+                await _jobBusinessRelationRepository.DeleteByBusinessIdAsync(procProcedureEntity.Id);
+                if (procedureConfigJobList != null && procedureConfigJobList.Count > 0)
+                {
+                    await _jobBusinessRelationRepository.InsertRangeAsync(procedureConfigJobList);
+                }
+
+                //提交
+                ts.Complete();
+            }
         }
 
         /// <summary>

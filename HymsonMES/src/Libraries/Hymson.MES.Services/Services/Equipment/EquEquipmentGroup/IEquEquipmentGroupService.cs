@@ -13,21 +13,21 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        Task CreateEquEquipmentGroupAsync(EquEquipmentGroupCreateDto createDto);
+        Task<int> CreateEquEquipmentGroupAsync(EquEquipmentGroupCreateDto createDto);
 
         /// <summary>
         /// 修改
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        Task ModifyEquEquipmentGroupAsync(EquEquipmentGroupModifyDto modifyDto);
+        Task<int> ModifyEquEquipmentGroupAsync(EquEquipmentGroupModifyDto modifyDto);
 
         /// <summary>
         /// 删除
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task DeleteEquEquipmentGroupAsync(long id);
+        Task<int> DeleteEquEquipmentGroupAsync(long id);
 
         /// <summary>
         /// 批量删除

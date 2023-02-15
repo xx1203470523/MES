@@ -4,6 +4,7 @@
  *build datetime: 2023-02-13 09:06:05
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Microsoft.AspNetCore.Mvc;
@@ -67,7 +68,7 @@ namespace Hymson.MES.Api.Controllers
         [Route("configPrint/list")]
         public async Task<PagedInfo<QueryProcProcedurePrintReleationDto>> GetProcedureBomConfigPrintListAsync([FromQuery] ProcProcedurePrintReleationPagedQueryDto parm)
         {
-            return await _procProcedureService.GetProcedureBomConfigPrintListAsync(parm);
+            return await _procProcedureService.GetProcedureConfigPrintListAsync(parm);
         }
 
         /// <summary>
@@ -77,9 +78,9 @@ namespace Hymson.MES.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("configJob/list")]
-        public async Task<PagedInfo<QueryProcedureJobReleationDto>> GetProcedureBomConfigJobList([FromQuery] ProcProcedureJobReleationPagedQueryDto parm)
+        public async Task<PagedInfo<QueryProcedureJobReleationDto>> GetProcedureBomConfigJobList([FromQuery] InteJobBusinessRelationPagedQueryDto parm)
         {
-            return await _procProcedureService.GetProcedureBomConfigJobListAsync(parm);
+            return await _procProcedureService.GetProcedureConfigJobListAsync(parm);
         }
 
         /// <summary>
@@ -88,7 +89,7 @@ namespace Hymson.MES.Api.Controllers
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task AddProcProcedureAsync([FromBody] ProcProcedureCreateDto parm)
+        public async Task AddProcProcedureAsync([FromBody] AddProcProcedureDto parm)
         {
             await _procProcedureService.CreateProcProcedureAsync(parm);
         }
@@ -99,7 +100,7 @@ namespace Hymson.MES.Api.Controllers
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPut]
-        public async Task UpdateProcProcedureAsync([FromBody] ProcProcedureModifyDto parm)
+        public async Task UpdateProcProcedureAsync([FromBody] UpdateProcProcedureDto parm)
         {
             await _procProcedureService.ModifyProcProcedureAsync(parm);
         }

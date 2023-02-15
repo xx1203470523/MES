@@ -1,7 +1,8 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquSparePart;
-using Hymson.Utils.Extensions;
+using Hymson.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Equipment
@@ -11,6 +12,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
     /// @author 陈志谱
     /// @date 2023-02-13 02:38:21
     /// </summary>
+    [Authorize]
     [ApiController]
     [Route("api/v1/[controller]")]
     public class EquSparePartController : ControllerBase

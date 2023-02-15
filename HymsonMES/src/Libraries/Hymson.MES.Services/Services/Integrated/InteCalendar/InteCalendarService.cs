@@ -1,3 +1,4 @@
+using Hymson.Authentication;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Integrated;
@@ -8,7 +9,7 @@ using Hymson.MES.Data.Repositories.Integrated.InteCalendar.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteClass;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
-using Hymson.Utils.Extensions;
+using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Integrated.InteCalendar
 {
@@ -17,6 +18,11 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
     /// </summary>
     public class InteCalendarService : IInteCalendarService
     {
+        /// <summary>
+        /// 当前登录用户对象
+        /// </summary>
+        private readonly ICurrentUser _currentUser;
+
         /// <summary>
         /// 仓储（日历）
         /// </summary>
@@ -45,17 +51,20 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="currentUser"></param>
         /// <param name="inteCalendarRepository"></param>
         /// <param name="inteCalendarDateRepository"></param>
         /// <param name="inteCalendarDateDetailRepository"></param>
         /// <param name="inteClassRepository"></param>
         /// <param name="equEquipmentRepository"></param>
-        public InteCalendarService(IInteCalendarRepository inteCalendarRepository,
+        public InteCalendarService(ICurrentUser currentUser, 
+            IInteCalendarRepository inteCalendarRepository,
             IInteCalendarDateRepository inteCalendarDateRepository,
             IInteCalendarDateDetailRepository inteCalendarDateDetailRepository,
             IInteClassRepository inteClassRepository,
             IEquEquipmentRepository equEquipmentRepository)
         {
+            _currentUser = currentUser;
             _inteCalendarRepository = inteCalendarRepository;
             _inteCalendarDateRepository = inteCalendarDateRepository;
             _inteCalendarDateDetailRepository = inteCalendarDateDetailRepository;
@@ -76,8 +85,8 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
             // DTO转换实体
             var entity = createDto.ToEntity<InteCalendarEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
-            entity.CreatedBy = "TODO";
-            entity.UpdatedBy = "TODO";
+            entity.CreatedBy = _currentUser.UserName;
+            entity.UpdatedBy = _currentUser.UserName;
 
 
             #region 参数校验
@@ -162,7 +171,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
         {
             // DTO转换实体
             var entity = modifyDto.ToEntity<InteCalendarEntity>();
-            entity.UpdatedBy = "TODO";
+            entity.UpdatedBy = _currentUser.UserName;
 
             entity.UseStatus = modifyDto.UseStatus == true ? (byte)CalendarUseStatusEnum.Enable : (byte)CalendarUseStatusEnum.NotEnabled;
 

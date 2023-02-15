@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Hymson.MES.Services.Dtos.Equipment;
+using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Options;
 using Hymson.MES.Services.Services.EquEquipmentGroup;
@@ -7,11 +8,13 @@ using Hymson.MES.Services.Services.Equipment.EquEquipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipmentUnit;
 using Hymson.MES.Services.Services.Equipment.EquSparePart;
 using Hymson.MES.Services.Services.Equipment.EquSparePartType;
+using Hymson.MES.Services.Services.Integrated;
 using Hymson.MES.Services.Services.Integrated.InteCalendar;
 using Hymson.MES.Services.Services.Integrated.InteClass;
 using Hymson.MES.Services.Services.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.MES.Services.Validators.Equipment;
+using Hymson.MES.Services.Validators.Integrated;
 using Hymson.MES.Services.Validators.Process;
 using Microsoft.Extensions.Configuration;
 
@@ -55,6 +58,7 @@ namespace Microsoft.Extensions.DependencyInjection
             #region Integrated
             services.AddSingleton<IInteCalendarService, InteCalendarService>();
             services.AddSingleton<IInteClassService, InteClassService>();
+            services.AddSingleton<IInteJobService, InteJobService>();
             #endregion
 
             #region Process
@@ -148,6 +152,10 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
             #endregion
 
+            #region Integrated
+            services.AddSingleton<AbstractValidator<InteJobCreateDto>, InteJobCreateValidator>();
+            services.AddSingleton<AbstractValidator<InteJobModifyDto>, InteJobModifyValidator>();
+            #endregion
             return services;
         }
     }

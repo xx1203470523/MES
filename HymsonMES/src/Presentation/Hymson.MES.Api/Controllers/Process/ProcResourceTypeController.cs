@@ -1,7 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
-using Hymson.Utils.Extensions;
+using Hymson.Utils;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers

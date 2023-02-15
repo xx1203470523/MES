@@ -5,6 +5,7 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using static Dapper.SqlMapper;
 
 namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
 {
@@ -24,26 +25,25 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="equEquipmentGroupEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task InsertAsync(EquEquipmentGroupEntity equEquipmentGroupEntity)
+        public async Task<int> InsertAsync(EquEquipmentGroupEntity entity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var id = await conn.ExecuteScalarAsync<long>(InsertSql, equEquipmentGroupEntity);
-            equEquipmentGroupEntity.Id = id;
+            return await conn.ExecuteAsync(InsertSql, entity);
         }
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="equEquipmentGroupEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(EquEquipmentGroupEntity equEquipmentGroupEntity)
+        public async Task<int> UpdateAsync(EquEquipmentGroupEntity entity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateSql, equEquipmentGroupEntity);
+            return await conn.ExecuteAsync(UpdateSql, entity);
         }
-        
+
         /// <summary>
         /// 删除（软删除）
         /// </summary>
@@ -140,7 +140,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
                                            FROM `equ_equipment_group` /**where**/  ";
 
         const string InsertSql = "INSERT INTO `equ_equipment_group`(  `Id`, `EquipmentGroupCode`, `EquipmentGroupName`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteCode`) VALUES (   @Id, @EquipmentGroupCode, @EquipmentGroupName, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteCode )  ";
-        const string UpdateSql = "UPDATE `equ_equipment_group` SET   EquipmentGroupCode = @EquipmentGroupCode, EquipmentGroupName = @EquipmentGroupName, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, Remark = @Remark, SiteCode = @SiteCode  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `equ_equipment_group` SET EquipmentGroupName = @EquipmentGroupName, Remark = @Remark WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `equ_equipment_group` SET IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string GetByIdSql = @"SELECT 
                                `Id`, `EquipmentGroupCode`, `EquipmentGroupName`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteCode`
