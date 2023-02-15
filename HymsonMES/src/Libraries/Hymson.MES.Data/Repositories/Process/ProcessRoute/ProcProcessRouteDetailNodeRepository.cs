@@ -40,7 +40,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("ProcessRouteId=@ProcessRouteId");
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var procProcessRouteDetailNodeEntities = await conn.QueryAsync<ProcProcessRouteDetailNodeView>(template.RawSql, query);
+            var procProcessRouteDetailNodeEntities = await conn.QueryAsync<ProcProcessRouteDetailNodeView>(template.RawSql, template.Parameters);
             return procProcessRouteDetailNodeEntities;
         }
 

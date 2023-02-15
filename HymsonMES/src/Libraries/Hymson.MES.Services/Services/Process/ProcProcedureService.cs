@@ -367,12 +367,13 @@ namespace Hymson.MES.Services.Services.Process
                 //入库
                 await _procProcedureRepository.UpdateAsync(procProcedureEntity);
 
-               // await _procedurePrintReleationRepository.DeleteRangeAsync(procedureConfigPrintList);
+                await _procedurePrintReleationRepository.DeleteByProcedureIdAsync(procProcedureEntity.Id);
                 if (procedureConfigPrintList != null && procedureConfigPrintList.Count > 0)
                 {
                     await _procedurePrintReleationRepository.InsertRangeAsync(procedureConfigPrintList);
                 }
 
+                await _jobBusinessRelationRepository.DeleteByBusinessIdAsync(procProcedureEntity.Id);
                 if (procedureConfigJobList != null && procedureConfigJobList.Count > 0)
                 {
                     await _jobBusinessRelationRepository.InsertRangeAsync(procedureConfigJobList);

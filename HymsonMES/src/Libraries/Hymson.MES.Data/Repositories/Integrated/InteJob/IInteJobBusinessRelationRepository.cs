@@ -81,7 +81,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<int> DeleteAsync(long id);
+        Task<int> DeleteByBusinessIdAsync(long id);
         
         /// <summary>
         /// 批量删除

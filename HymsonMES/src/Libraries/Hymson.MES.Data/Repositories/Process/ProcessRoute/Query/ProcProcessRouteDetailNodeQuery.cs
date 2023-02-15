@@ -19,6 +19,6 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public class ProcProcessRouteDetailNodeQuery
     {
-        public long? ProcessRouteId { get; set; }
+        public long ProcessRouteId { get; set; }
     }
 }

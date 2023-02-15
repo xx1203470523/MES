@@ -152,10 +152,10 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<int> DeleteAsync(long id)
+        public async Task<int> DeleteByBusinessIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, new { Id = id });
+            return await conn.ExecuteAsync(DeleteByBusinessIdSql, new { BusinessId = id });
         }
 
         /// <summary>
@@ -181,8 +181,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string InsertSql = "INSERT INTO `inte__job_business_relation`(  `Id`, `SiteCode`, `BusinessType`, `BusinessId`, `OrderNumber`, `JobId`, `IsUse`, `Parameter`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @BusinessType, @BusinessId, @OrderNumber, @JobId, @IsUse, @Parameter, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `inte__job_business_relation`(  `Id`, `SiteCode`, `BusinessType`, `BusinessId`, `OrderNumber`, `JobId`, `IsUse`, `Parameter`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @BusinessType, @BusinessId, @OrderNumber, @JobId, @IsUse, @Parameter, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string UpdateSql = "UPDATE `inte__job_business_relation` SET   SiteCode = @SiteCode, BusinessType = @BusinessType, BusinessId = @BusinessId, OrderNumber = @OrderNumber, JobId = @JobId, IsUse = @IsUse, Parameter = @Parameter, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `inte__job_business_relation` SET   SiteCode = @SiteCode, BusinessType = @BusinessType, BusinessId = @BusinessId, OrderNumber = @OrderNumber, JobId = @JobId, IsUse = @IsUse, Parameter = @Parameter, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `inte__job_business_relation` SET IsDeleted = '1' WHERE Id = @Id ";
+        const string DeleteByBusinessIdSql = "UPDATE `inte__job_business_relation` SET IsDeleted = '1' WHERE BusinessId = @BusinessId ";
         const string DeletesSql = "UPDATE `inte__job_business_relation` SET IsDeleted = '1' WHERE Id in @ids";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteCode`, `BusinessType`, `BusinessId`, `OrderNumber`, `JobId`, `IsUse`, `Parameter`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
