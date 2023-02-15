@@ -8,6 +8,7 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
+using Hymson.Utils.Tools;
 using static Dapper.SqlMapper;
 
 namespace Hymson.MES.Services.Services.EquEquipmentGroup
@@ -64,10 +65,13 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
 
-            // TODO 事务处理
             var rows = 0;
-            rows += await _equEquipmentGroupRepository.InsertAsync(entity);
-            rows += await _equEquipmentRepository.UpdateEquipmentGroupIdAsync(entity.Id, createDto.EquipmentIDs);
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                rows += await _equEquipmentGroupRepository.InsertAsync(entity);
+                rows += await _equEquipmentRepository.UpdateEquipmentGroupIdAsync(entity.Id, createDto.EquipmentIDs);
+                trans.Complete();
+            }
             return rows;
         }
 
@@ -85,11 +89,14 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
             var entity = modifyDto.ToEntity<EquEquipmentGroupEntity>();
             entity.UpdatedBy = _currentUser.UserName;
 
-            // TODO 事务处理
             var rows = 0;
-            rows += await _equEquipmentGroupRepository.UpdateAsync(entity);
-            rows += await _equEquipmentRepository.ClearEquipmentGroupIdAsync(entity.Id);
-            rows += await _equEquipmentRepository.UpdateEquipmentGroupIdAsync(entity.Id, modifyDto.EquipmentIDs);
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                rows += await _equEquipmentGroupRepository.UpdateAsync(entity);
+                rows += await _equEquipmentRepository.ClearEquipmentGroupIdAsync(entity.Id);
+                rows += await _equEquipmentRepository.UpdateEquipmentGroupIdAsync(entity.Id, modifyDto.EquipmentIDs);
+                trans.Complete();
+            }
             return rows;
         }
 

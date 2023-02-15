@@ -10,6 +10,7 @@ using Hymson.MES.Data.Repositories.Integrated.InteClass;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 
 namespace Hymson.MES.Services.Services.Integrated.InteCalendar
 {
@@ -57,7 +58,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
         /// <param name="inteCalendarDateDetailRepository"></param>
         /// <param name="inteClassRepository"></param>
         /// <param name="equEquipmentRepository"></param>
-        public InteCalendarService(ICurrentUser currentUser, 
+        public InteCalendarService(ICurrentUser currentUser,
             IInteCalendarRepository inteCalendarRepository,
             IInteCalendarDateRepository inteCalendarDateRepository,
             IInteCalendarDateDetailRepository inteCalendarDateDetailRepository,
@@ -152,13 +153,14 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
                 dateDetails = GenerateDateDetailByCreateDto(entity.Id, createDto);
             }
 
-            // TODO 事务处理
             var rows = 0;
-
-            rows += await _inteCalendarRepository.InsertAsync(entity);
-            rows += await _inteCalendarDateRepository.InsertRangeAsync(inteCalendarDates);
-            rows += await _inteCalendarDateDetailRepository.InsertRangeAsync(dateDetails);
-
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                rows += await _inteCalendarRepository.InsertAsync(entity);
+                rows += await _inteCalendarDateRepository.InsertRangeAsync(inteCalendarDates);
+                rows += await _inteCalendarDateDetailRepository.InsertRangeAsync(dateDetails);
+                trans.Complete();
+            }
             return rows;
         }
 
@@ -267,15 +269,17 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
 
             // TODO 事务处理
             var rows = 0;
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                rows += await _inteCalendarRepository.UpdateAsync(entity);
 
-            rows += await _inteCalendarRepository.UpdateAsync(entity);
+                rows += await _inteCalendarDateRepository.DeleteByCalendarIdAsync(entity.Id);
+                rows += await _inteCalendarDateRepository.InsertRangeAsync(inteCalendarDates);
 
-            rows += await _inteCalendarDateRepository.DeleteByCalendarIdAsync(entity.Id);
-            rows += await _inteCalendarDateRepository.InsertRangeAsync(inteCalendarDates);
-
-            rows += await _inteCalendarDateDetailRepository.DeleteByCalendarIdAsync(entity.Id);
-            rows += await _inteCalendarDateDetailRepository.InsertRangeAsync(dateDetails);
-
+                rows += await _inteCalendarDateDetailRepository.DeleteByCalendarIdAsync(entity.Id);
+                rows += await _inteCalendarDateDetailRepository.InsertRangeAsync(dateDetails);
+                trans.Complete();
+            }
             return rows;
         }
 
@@ -286,13 +290,14 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] idsArr)
         {
-            // TODO 事务处理
             var rows = 0;
-
-            rows += await _inteCalendarDateDetailRepository.DeleteByCalendarIdsAsync(idsArr);
-            rows += await _inteCalendarDateRepository.DeleteByCalendarIdsAsync(idsArr);
-            rows += await _inteCalendarRepository.DeletesAsync(idsArr);
-
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                rows += await _inteCalendarDateDetailRepository.DeleteByCalendarIdsAsync(idsArr);
+                rows += await _inteCalendarDateRepository.DeleteByCalendarIdsAsync(idsArr);
+                rows += await _inteCalendarRepository.DeletesAsync(idsArr);
+                trans.Complete();
+            }
             return rows;
         }
 

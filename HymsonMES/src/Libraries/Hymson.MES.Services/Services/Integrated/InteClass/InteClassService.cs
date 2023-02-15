@@ -6,6 +6,9 @@ using Hymson.MES.Data.Repositories.Integrated.InteClass;
 using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
+using Hymson.Utils.Tools;
+using System.Diagnostics;
+using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Integrated.InteClass
 {
@@ -61,25 +64,30 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
 
+            // 参数校验
+            if (createDto.DetailList.Any(a => TimeComparison(a.StartTime, a.EndTime) == false) == true)
+            {
+                // TODO
+                //return Error(ResultCode.PARAM_ERROR, "开始时间不能大于于结束时间");
+            }
+
             List<InteClassDetailEntity> details = new();
             foreach (var item in createDto.DetailList)
             {
-                if (TimeComparison(item.StartTime, item.EndTime) == false)
-                {
-                    // TODO
-                    //return Error(ResultCode.PARAM_ERROR, "开始时间不能大于于结束时间");
-                }
                 var classDetailEntity = item.ToEntity<InteClassDetailEntity>();
                 classDetailEntity.ClassId = entity.Id;
+                classDetailEntity.CreatedBy = entity.CreatedBy;
+                classDetailEntity.UpdatedBy = entity.UpdatedBy;
                 details.Add(classDetailEntity);
             }
 
-            // TODO 事务处理
             var rows = 0;
-            // 保存实体
-            rows += await _inteClassRepository.InsertAsync(entity);
-            rows += await _inteClassDetailRepository.InsertRangeAsync(details);
-
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                rows += await _inteClassRepository.InsertAsync(entity);
+                rows += await _inteClassDetailRepository.InsertRangeAsync(details);
+                trans.Complete();
+            }
             return rows;
         }
 
@@ -107,13 +115,14 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
                 details.Add(classDetailEntity);
             }
 
-            // TODO 事务处理
             var rows = 0;
-            // 保存实体
-            rows += await _inteClassDetailRepository.DeleteByClassIdAsync(entity.Id);
-            rows += await _inteClassRepository.UpdateAsync(entity);
-            rows += await _inteClassDetailRepository.InsertRangeAsync(details);
-
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                rows += await _inteClassDetailRepository.DeleteByClassIdAsync(entity.Id);
+                rows += await _inteClassRepository.UpdateAsync(entity);
+                rows += await _inteClassDetailRepository.InsertRangeAsync(details);
+                trans.Complete();
+            }
             return rows;
         }
 
