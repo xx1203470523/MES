@@ -14,7 +14,6 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.Snowflake;

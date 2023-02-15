@@ -40,7 +40,7 @@
         public const string MES10305 = "资源状态不能为空";
         public const string MES10306 = "资源配置打印机中，重复配置设备!";
         public const string MES10307 = "一个资源只能对用对应一个主设备";
-        public const string MES10308 = "此资源{ResCode}在系统中已经存在!";
+        public const string MES10308 = "此资源【{ResCode}】在系统中已经存在!";
         public const string MES10309= "此资源类型不存在!";
         public const string MES10310 = "资源类型在系统中不存在,请重新输入!";
         public const string MES10311 = "此资源类型{ResType}在系统中已经存在!";
@@ -52,6 +52,8 @@
         public const string MES10317 = "资源设置数据操作类型OperationType{OperationType}异常，只能传入1，2，3！";
         public const string MES10318 = "作业设置数据操作类型OperationType{OperationType}异常，只能传入1，2，3！";
         public const string MES10319 = $"不能删除启用状态的资源!";
+        public const string MES10320 = "所属资源类型ID不能为空";
+        public const string MES10321 = "工序名称超长";
         #endregion
 
         #region 工序 10400

@@ -6,27 +6,24 @@
  *build datetime: 2023-02-13 09:06:05
  */
 using FluentValidation;
+using Hymson.Authentication;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.ResourceType;
+using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using Hymson.Utils;
-using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Process.ResourceType;
-using Hymson.MES.Services.Dtos.Process;
-using Hymson.Infrastructure.Exceptions;
-using Hymson.MES.Core.Constants;
 using Hymson.Utils.Tools;
 using System.Transactions;
-using Hymson.MES.Data.Repositories.Process.Resource;
-using Hymson.MES.Services.Dtos.Integrated;
-using Hymson.MES.Data.Repositories.Integrated;
-using Google.Protobuf.WellKnownTypes;
-using Hymson.MES.Core.Domain.Integrated;
-using Hymson.MES.Core.Enums.Integrated;
-using Hymson.Authentication;
 
 namespace Hymson.MES.Services.Services.Process
 {

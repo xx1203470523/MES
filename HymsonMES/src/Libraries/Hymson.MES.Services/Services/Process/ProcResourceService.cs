@@ -449,7 +449,7 @@ namespace Hymson.MES.Services.Services.Process
             {
                 if (param.PrintList.Where(x => x.OperationType != 3).GroupBy(x => x.PrintId).Where(g => g.Count() > 2).Count() > 1)
                 {
-                    // return Error(ResultCode.PARAM_ERROR, $"资源配置打印机中，重复配置打印机!");
+                    throw new ValidationException(ErrorCode.MES10313);
                 }
 
                 //判断打印机是否重复配置  数据库中 已经存储的情况
