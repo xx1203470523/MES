@@ -16,13 +16,21 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
     /// </summary>
     public partial class InteClassRepository : IInteClassRepository
     {
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly ConnectionOptions _connectionOptions;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
         public InteClassRepository(IOptions<ConnectionOptions> connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
         }
 
+        
         /// <summary>
         /// 新增
         /// </summary>
@@ -90,22 +98,18 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Select("*");
-            /*
-            if (string.IsNullOrWhiteSpace(pagedQuery.SiteCode) == false)
+
+            if (string.IsNullOrWhiteSpace(pagedQuery.ClassName) == false)
             {
-                sqlBuilder.Where("SiteCode = @SiteCode");
+                pagedQuery.ClassName = $"%{pagedQuery.ClassName}%";
+                sqlBuilder.Where("ClassName = @ClassName");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.UnitCode) == false)
+            if (pagedQuery.ClassType > 0)
             {
-                sqlBuilder.Where("UnitCode = @UnitCode");
+                sqlBuilder.Where("ClassType = @ClassType");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.UnitName) == false)
-            {
-                sqlBuilder.Where("UnitName = @UnitName");
-            }
-            */
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });

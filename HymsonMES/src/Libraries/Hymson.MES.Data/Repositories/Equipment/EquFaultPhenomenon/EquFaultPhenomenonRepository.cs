@@ -96,6 +96,17 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         }
 
         /// <summary>
+        /// 根据ID获取数据（设备故障现象）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<EquFaultPhenomenonView> GetViewByIdAsync(long id)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<EquFaultPhenomenonView>(GetByIdSql, new { Id = id });
+        }
+
+        /// <summary>
         /// 分页查询（设备故障现象）
         /// </summary>
         /// <param name="pagedQuery"></param>

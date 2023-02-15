@@ -107,7 +107,6 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<EquFaultPhenomenonDto>());
             return new PagedInfo<EquFaultPhenomenonDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
-
         }
 
         /// <summary>
@@ -117,7 +116,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         /// <returns></returns>
         public async Task<EquFaultPhenomenonDto> GetDetailAsync(long id)
         {
-            return (await _equFaultPhenomenonRepository.GetByIdAsync(id)).ToModel<EquFaultPhenomenonDto>();
+            return (await _equFaultPhenomenonRepository.GetViewByIdAsync(id)).ToModel<EquFaultPhenomenonDto>();
         }
 
 

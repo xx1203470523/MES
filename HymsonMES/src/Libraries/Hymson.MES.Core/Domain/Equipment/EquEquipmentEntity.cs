@@ -103,7 +103,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// 描述 :设备类型 
         /// 空值 : true  
         /// </summary>
-        public string EquipmentType { get; set; }
+        public int EquipmentType { get; set; }
 
         /// <summary>
         /// 描述 :使用部门 

@@ -149,10 +149,10 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
         /// <returns></returns>
         public async Task<InteClassWithDetailDto> GetDetailAsync(long id)
         {
-            InteClassWithDetailDto response = new InteClassWithDetailDto();
+            InteClassWithDetailDto response = new();
             response.ClassInfo = (await _inteClassRepository.GetByIdAsync(id)).ToModel<InteClassDto>();
-            var detailList = await _inteClassDetailRepository.GetListByClassIdAsync(id);
 
+            var detailList = await _inteClassDetailRepository.GetListByClassIdAsync(id);
             foreach (var item in detailList)
             {
                 response.DetailList.Add(new InteClassDetailDto
