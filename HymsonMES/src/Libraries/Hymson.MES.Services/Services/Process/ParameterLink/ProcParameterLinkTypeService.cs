@@ -6,6 +6,7 @@
  *build datetime: 2023-02-13 05:06:17
  */
 using FluentValidation;
+using Hymson.Authentication;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -32,8 +33,11 @@ namespace Hymson.MES.Services.Services.Process
         private readonly AbstractValidator<ProcParameterLinkTypeCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcParameterLinkTypeModifyDto> _validationModifyRules;
 
-        public ProcParameterLinkTypeService(IProcParameterLinkTypeRepository procParameterLinkTypeRepository, AbstractValidator<ProcParameterLinkTypeCreateDto> validationCreateRules, AbstractValidator<ProcParameterLinkTypeModifyDto> validationModifyRules)
+        private readonly ICurrentUser _currentUser;
+
+        public ProcParameterLinkTypeService(ICurrentUser currentUser, IProcParameterLinkTypeRepository procParameterLinkTypeRepository, AbstractValidator<ProcParameterLinkTypeCreateDto> validationCreateRules, AbstractValidator<ProcParameterLinkTypeModifyDto> validationModifyRules)
         {
+            _currentUser = currentUser;
             _procParameterLinkTypeRepository = procParameterLinkTypeRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
@@ -52,8 +56,8 @@ namespace Hymson.MES.Services.Services.Process
             //DTO转换实体
             var procParameterLinkTypeEntity = procParameterLinkTypeCreateDto.ToEntity<ProcParameterLinkTypeEntity>();
             procParameterLinkTypeEntity.Id= IdGenProvider.Instance.CreateId();
-            procParameterLinkTypeEntity.CreatedBy = "TODO";
-            procParameterLinkTypeEntity.UpdatedBy = "TODO";
+            procParameterLinkTypeEntity.CreatedBy = _currentUser.UserName;
+            procParameterLinkTypeEntity.UpdatedBy = _currentUser.UserName;
             procParameterLinkTypeEntity.CreatedOn = HymsonClock.Now();
             procParameterLinkTypeEntity.UpdatedOn = HymsonClock.Now();
 
@@ -126,7 +130,7 @@ namespace Hymson.MES.Services.Services.Process
 
             //DTO转换实体
             var procParameterLinkTypeEntity = procParameterLinkTypeModifyDto.ToEntity<ProcParameterLinkTypeEntity>();
-            procParameterLinkTypeEntity.UpdatedBy = "TODO";
+            procParameterLinkTypeEntity.UpdatedBy = _currentUser.UserName;
             procParameterLinkTypeEntity.UpdatedOn = HymsonClock.Now();
 
             await _procParameterLinkTypeRepository.UpdateAsync(procParameterLinkTypeEntity);

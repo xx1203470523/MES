@@ -6,6 +6,7 @@
  *build datetime: 2023-02-13 02:50:20
  */
 using FluentValidation;
+using Hymson.Authentication;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -34,8 +35,11 @@ namespace Hymson.MES.Services.Services.Process
 
         private readonly IProcParameterLinkTypeRepository _procParameterLinkTypeRepository;
 
-        public ProcParameterService(IProcParameterRepository procParameterRepository, AbstractValidator<ProcParameterCreateDto> validationCreateRules, AbstractValidator<ProcParameterModifyDto> validationModifyRules, IProcParameterLinkTypeRepository procParameterLinkTypeRepository)
+        private readonly ICurrentUser _currentUser;
+
+        public ProcParameterService(ICurrentUser currentUser, IProcParameterRepository procParameterRepository, AbstractValidator<ProcParameterCreateDto> validationCreateRules, AbstractValidator<ProcParameterModifyDto> validationModifyRules, IProcParameterLinkTypeRepository procParameterLinkTypeRepository)
         {
+            _currentUser = currentUser;
             _procParameterRepository = procParameterRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
@@ -55,8 +59,8 @@ namespace Hymson.MES.Services.Services.Process
             //DTO转换实体
             var procParameterEntity = procParameterCreateDto.ToEntity<ProcParameterEntity>();
             procParameterEntity.Id= IdGenProvider.Instance.CreateId();
-            procParameterEntity.CreatedBy = "TODO";
-            procParameterEntity.UpdatedBy = "TODO";
+            procParameterEntity.CreatedBy = _currentUser.UserName;
+            procParameterEntity.UpdatedBy = _currentUser.UserName;
             procParameterEntity.CreatedOn = HymsonClock.Now();
             procParameterEntity.UpdatedOn = HymsonClock.Now();
             procParameterEntity.ParameterCode = procParameterEntity.ParameterCode.ToUpper();
@@ -158,7 +162,7 @@ namespace Hymson.MES.Services.Services.Process
 
             //DTO转换实体
             var procParameterEntity = procParameterModifyDto.ToEntity<ProcParameterEntity>();
-            procParameterEntity.UpdatedBy = "TODO";
+            procParameterEntity.UpdatedBy = _currentUser.UserName;
             procParameterEntity.UpdatedOn = HymsonClock.Now();
 
             //验证DTO

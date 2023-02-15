@@ -7,6 +7,7 @@
  */
 using FluentValidation;
 using Google.Protobuf.WellKnownTypes;
+using Hymson.Authentication;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -35,8 +36,11 @@ namespace Hymson.MES.Services.Services.Process
 
         private readonly IProcMaterialRepository _procMaterialRepository;
 
-        public ProcMaterialGroupService(IProcMaterialGroupRepository procMaterialGroupRepository, AbstractValidator<ProcMaterialGroupCreateDto> validationCreateRules, AbstractValidator<ProcMaterialGroupModifyDto> validationModifyRules, IProcMaterialRepository procMaterialRepository)
+        private readonly ICurrentUser _currentUser;
+
+        public ProcMaterialGroupService(ICurrentUser currentUser, IProcMaterialGroupRepository procMaterialGroupRepository, AbstractValidator<ProcMaterialGroupCreateDto> validationCreateRules, AbstractValidator<ProcMaterialGroupModifyDto> validationModifyRules, IProcMaterialRepository procMaterialRepository)
         {
+            _currentUser = currentUser;
             _procMaterialGroupRepository = procMaterialGroupRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
@@ -53,8 +57,8 @@ namespace Hymson.MES.Services.Services.Process
             //DTO转换实体
             var procMaterialGroupEntity = procMaterialGroupCreateDto.ToEntity<ProcMaterialGroupEntity>();
             procMaterialGroupEntity.Id = IdGenProvider.Instance.CreateId();
-            procMaterialGroupEntity.CreatedBy = "TODO";
-            procMaterialGroupEntity.UpdatedBy = "TODO";
+            procMaterialGroupEntity.CreatedBy = _currentUser.UserName;
+            procMaterialGroupEntity.UpdatedBy = _currentUser.UserName;
             procMaterialGroupEntity.CreatedOn = HymsonClock.Now();
             procMaterialGroupEntity.UpdatedOn = HymsonClock.Now();
 
@@ -229,7 +233,7 @@ namespace Hymson.MES.Services.Services.Process
 
             //DTO转换实体
             var procMaterialGroupEntity = procMaterialGroupModifyDto.ToEntity<ProcMaterialGroupEntity>();
-            procMaterialGroupEntity.UpdatedBy = "TODO";
+            procMaterialGroupEntity.UpdatedBy = _currentUser.UserName;
             procMaterialGroupEntity.UpdatedOn = HymsonClock.Now();
             procMaterialGroupEntity.GroupCode = procMaterialGroupEntity.GroupCode.ToUpper();
 

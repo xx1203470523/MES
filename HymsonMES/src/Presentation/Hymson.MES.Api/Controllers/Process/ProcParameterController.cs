@@ -9,6 +9,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
 using Hymson.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Extensions;
 
@@ -19,6 +20,7 @@ namespace Hymson.MES.Api.Controllers.Process
     /// @author Karl
     /// @date 2023-02-13 02:50:20
     /// </summary>
+    [Authorize]
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcParameterController : ControllerBase

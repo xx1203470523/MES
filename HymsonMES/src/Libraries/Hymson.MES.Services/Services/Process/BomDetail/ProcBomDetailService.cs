@@ -6,6 +6,7 @@
  *build datetime: 2023-02-14 10:38:06
  */
 using FluentValidation;
+using Hymson.Authentication;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -31,9 +32,11 @@ namespace Hymson.MES.Services.Services.Process
         private readonly IProcBomDetailRepository _procBomDetailRepository;
         private readonly AbstractValidator<ProcBomDetailCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcBomDetailModifyDto> _validationModifyRules;
+        private readonly ICurrentUser _currentUser;
 
-        public ProcBomDetailService(IProcBomDetailRepository procBomDetailRepository, AbstractValidator<ProcBomDetailCreateDto> validationCreateRules, AbstractValidator<ProcBomDetailModifyDto> validationModifyRules)
+        public ProcBomDetailService(ICurrentUser currentUser, IProcBomDetailRepository procBomDetailRepository, AbstractValidator<ProcBomDetailCreateDto> validationCreateRules, AbstractValidator<ProcBomDetailModifyDto> validationModifyRules)
         {
+            _currentUser = currentUser;
             _procBomDetailRepository = procBomDetailRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
@@ -52,8 +55,8 @@ namespace Hymson.MES.Services.Services.Process
             //DTO转换实体
             var procBomDetailEntity = procBomDetailCreateDto.ToEntity<ProcBomDetailEntity>();
             procBomDetailEntity.Id= IdGenProvider.Instance.CreateId();
-            procBomDetailEntity.CreatedBy = "TODO";
-            procBomDetailEntity.UpdatedBy = "TODO";
+            procBomDetailEntity.CreatedBy = _currentUser.UserName;
+            procBomDetailEntity.UpdatedBy = _currentUser.UserName;
             procBomDetailEntity.CreatedOn = HymsonClock.Now();
             procBomDetailEntity.UpdatedOn = HymsonClock.Now();
 
@@ -126,7 +129,7 @@ namespace Hymson.MES.Services.Services.Process
 
             //DTO转换实体
             var procBomDetailEntity = procBomDetailModifyDto.ToEntity<ProcBomDetailEntity>();
-            procBomDetailEntity.UpdatedBy = "TODO";
+            procBomDetailEntity.UpdatedBy = _currentUser.UserName;
             procBomDetailEntity.UpdatedOn = HymsonClock.Now();
 
             await _procBomDetailRepository.UpdateAsync(procBomDetailEntity);
