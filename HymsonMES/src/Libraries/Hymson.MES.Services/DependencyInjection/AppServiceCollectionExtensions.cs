@@ -6,6 +6,7 @@ using Hymson.MES.Services.Options;
 using Hymson.MES.Services.Services.EquEquipmentGroup;
 using Hymson.MES.Services.Services.Equipment.EquEquipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipmentUnit;
+using Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon;
 using Hymson.MES.Services.Services.Equipment.EquSparePart;
 using Hymson.MES.Services.Services.Equipment.EquSparePartType;
 using Hymson.MES.Services.Services.Integrated;
@@ -51,6 +52,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquEquipmentService, EquEquipmentService>();
             services.AddSingleton<IEquEquipmentGroupService, EquEquipmentGroupService>();
             services.AddSingleton<IEquEquipmentUnitService, EquEquipmentUnitService>();
+            services.AddSingleton<IEquFaultPhenomenonService, EquFaultPhenomenonService>();
             services.AddSingleton<IEquSparePartService, EquSparePartService>();
             services.AddSingleton<IEquSparePartTypeService, EquSparePartTypeService>();
             #endregion
@@ -86,6 +88,7 @@ namespace Microsoft.Extensions.DependencyInjection
             //工序
             services.AddSingleton<IProcProcedureService, ProcProcedureService>();
             #endregion
+
             return services;
         }
 
@@ -150,12 +153,18 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<ProcProcedureCreateDto>, ProcProcedureCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcProcedureModifyDto>, ProcProcedureModifyValidator>();
             #endregion
+
+            #region ProcessRoute
+            services.AddSingleton<AbstractValidator<ProcProcessRouteCreateDto>, ProcProcessRouteCreateValidator>();
+            services.AddSingleton<AbstractValidator<ProcProcessRouteModifyDto>, ProcProcessRouteModifyValidator>();
+            #endregion
             #endregion
 
             #region Integrated
             services.AddSingleton<AbstractValidator<InteJobCreateDto>, InteJobCreateValidator>();
             services.AddSingleton<AbstractValidator<InteJobModifyDto>, InteJobModifyValidator>();
             #endregion
+
             return services;
         }
     }

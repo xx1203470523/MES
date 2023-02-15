@@ -14,7 +14,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         /// </summary>
         /// <param name="equFaultPhenomenonEntity"></param>
         /// <returns></returns>
-        Task InsertAsync(EquFaultPhenomenonEntity equFaultPhenomenonEntity);
+        Task<int> InsertAsync(EquFaultPhenomenonEntity equFaultPhenomenonEntity);
 
         /// <summary>
         /// 更新（设备故障现象）
@@ -38,11 +38,25 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         Task<int> DeletesAsync(long[] idsArr);
 
         /// <summary>
+        /// 判断是否存在（编码）
+        /// </summary>
+        /// <param name="faultPhenomenonCode"></param>
+        /// <returns></returns>
+        Task<bool> IsExistsAsync(string faultPhenomenonCode);
+
+        /// <summary>
         /// 根据ID获取数据（设备故障现象）
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<EquFaultPhenomenonEntity> GetByIdAsync(long id);
+
+        /// <summary>
+        /// 根据ID获取数据（设备故障现象）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<EquFaultPhenomenonView> GetViewByIdAsync(long id);
 
         /// <summary>
         /// 获取List（设备故障现象）

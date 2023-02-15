@@ -78,7 +78,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task<int> AddInteCalendarAsync(InteCalendarCreateDto createDto)
+        public async Task<int> CreateAsync(InteCalendarCreateDto createDto)
         {
             // 验证DTO
 
@@ -167,7 +167,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task<int> UpdateInteCalendarAsync(InteCalendarModifyDto modifyDto)
+        public async Task<int> ModifyAsync(InteCalendarModifyDto modifyDto)
         {
             // DTO转换实体
             var entity = modifyDto.ToEntity<InteCalendarEntity>();
@@ -284,7 +284,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeleteInteCalendarAsync(long[] idsArr)
+        public async Task<int> DeletesAsync(long[] idsArr)
         {
             // TODO 事务处理
             var rows = 0;
@@ -351,7 +351,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<InteCalendarDetailDto> GetInteCalendarAsync(long id)
+        public async Task<InteCalendarDetailDto> GetDetailAsync(long id)
         {
             var calendar = await _inteCalendarRepository.GetByIdAsync(id);
             if (calendar == null)

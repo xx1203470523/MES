@@ -28,14 +28,14 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<int> SoftDeleteAsync(long id);
+        Task<int> DeleteAsync(long id);
         
         /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        Task<int> SoftDeleteAsync(long[] idsArr);
+        Task<int> DeletesAsync(long[] idsArr);
 
         /// <summary>
         /// 根据ID获取数据

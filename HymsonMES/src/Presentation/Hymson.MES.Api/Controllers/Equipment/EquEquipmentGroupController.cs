@@ -40,9 +40,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        public async Task<int> Create([FromBody] EquEquipmentGroupCreateDto createDto)
+        public async Task<int> CreateAsync([FromBody] EquEquipmentGroupCreateDto createDto)
         {
-            return await _equEquipmentGroupService.CreateEquEquipmentGroupAsync(createDto);
+            return await _equEquipmentGroupService.CreateAsync(createDto);
         }
 
         /// <summary>
@@ -52,9 +52,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
-        public async Task<int> Modify([FromBody] EquEquipmentGroupModifyDto modifyDto)
+        public async Task<int> ModifyAsync([FromBody] EquEquipmentGroupModifyDto modifyDto)
         {
-            return await _equEquipmentGroupService.ModifyEquEquipmentGroupAsync(modifyDto);
+            return await _equEquipmentGroupService.ModifyAsync(modifyDto);
         }
 
         /// <summary>
@@ -64,10 +64,10 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
-        public async Task<int> Delete(string ids)
+        public async Task<int> DeletesAsync(string ids)
         {
             long[] idsArr = StringExtension.SpitLongArrary(ids);
-            return await _equEquipmentGroupService.DeletesEquEquipmentGroupAsync(idsArr);
+            return await _equEquipmentGroupService.DeletesAsync(idsArr);
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         [Route("pagelist")]
         public async Task<PagedInfo<EquEquipmentGroupListDto>> GetPagedListAsync([FromQuery] EquEquipmentGroupPagedQueryDto pagedQueryDto)
         {
-            return await _equEquipmentGroupService.GetPageListAsync(pagedQueryDto);
+            return await _equEquipmentGroupService.GetPagedListAsync(pagedQueryDto);
         }
 
         /// <summary>
@@ -88,9 +88,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="query"></param>
         /// <returns></returns>
         [HttpPost("detail")]
-        public async Task<EquEquipmentGroupDto> GetEquEquipmentGroupAsync(EquEquipmentGroupQueryDto query)
+        public async Task<EquEquipmentGroupDto> GetDetailAsync(EquEquipmentGroupQueryDto query)
         {
-            return await _equEquipmentGroupService.GetEquEquipmentGroupWithEquipmentsAsync(query);
+            return await _equEquipmentGroupService.GetDetailAsync(query);
         }
     }
 }

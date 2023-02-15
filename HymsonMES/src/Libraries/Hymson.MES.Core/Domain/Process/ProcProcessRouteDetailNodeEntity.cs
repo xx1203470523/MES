@@ -49,7 +49,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :是否报工 
         /// 空值 : true  
         /// </summary>
-        public byte IsWorkReport { get; set; }
+        public bool IsWorkReport { get; set; }
         
         /// <summary>
         /// 描述 :包装等级 
@@ -61,7 +61,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :是否首工序 
         /// 空值 : true  
         /// </summary>
-        public byte IsFirstProcess { get; set; }
+        public bool IsFirstProcess { get; set; }
         
         /// <summary>
         /// 描述 :状态 

@@ -20,7 +20,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query
         /// <summary>
         /// 类型（设备）
         /// </summary>
-        public string EquipmentType { get; set; }
+        public int EquipmentType { get; set; }
 
         /// <summary>
         /// 使用状态（设备）

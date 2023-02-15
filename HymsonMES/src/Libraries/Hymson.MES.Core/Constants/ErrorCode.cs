@@ -40,17 +40,17 @@
         public const string MES10305 = "资源状态不能为空";
         public const string MES10306 = "资源配置打印机中，重复配置设备!";
         public const string MES10307 = "一个资源只能对用对应一个主设备";
-        public const string MES10308 = $"此资源在系统中已经存在!";
+        public const string MES10308 = "此资源{ResCode}在系统中已经存在!";
         public const string MES10309= "此资源类型不存在!";
         public const string MES10310 = "资源类型在系统中不存在,请重新输入!";
-        public const string MES10311 = $"此资源类型在系统中已经存在!";
+        public const string MES10311 = "此资源类型{ResType}在系统中已经存在!";
         public const string MES10312 = $"资源类型有被分配的资源，不允许删除!";
         public const string MES10313 = $"资源配置打印机中，重复配置打印机!";
         public const string MES10314 = $"资源配置设备中，重复配置设备!";
-        public const string MES10315 = $"资源打印配置操作类型OperationType异常，只能传入1，2，3！";
-        public const string MES10316 = $"设备绑定设置数据操作类型OperationType异常，只能传入1，2，3！";
-        public const string MES10317 = $"资源设置数据操作类型OperationType异常，只能传入1，2，3！";
-        public const string MES10318 = $"作业设置数据操作类型OperationType异常，只能传入1，2，3！";
+        public const string MES10315 = "资源打印配置操作类型OperationType{OperationType}异常，只能传入1，2，3！";
+        public const string MES10316 = "设备绑定设置数据操作类型OperationTyp{OperationType}异常，只能传入1，2，3！";
+        public const string MES10317 = "资源设置数据操作类型OperationType{OperationType}异常，只能传入1，2，3！";
+        public const string MES10318 = "作业设置数据操作类型OperationType{OperationType}异常，只能传入1，2，3！";
         public const string MES10319 = $"不能删除启用状态的资源!";
         #endregion
 
@@ -59,8 +59,16 @@
         public const string MES10402 = "工序编码超长";
         public const string MES10403 = "工序名称不能为空";
         public const string MES10404 = "工序名称超长";
-        public  string MES10405 = $"编码:{0}已存在！";
+        public const string MES10405 = "编码:{Code}已存在！";
         public const string MES10430 = $"有生产中工单引用当前工艺路线，不能删除！";
+        public const string MES10431 = $"此工艺路线在系统中已经存在!";
+        public const string MES10432 = $"编码不能为空!";
+        public const string MES10433= $"名称不能为空!";
+        public const string MES10434= $"版本不能为空!";
+        public const string MES10435 = $"未设置首工序！";
+        public const string MES10436 = $"只允许设置一个首工序！";
+        public const string MES10437 = "此工艺路线{Code}+{Version}在系统已经存在！";
+        public const string MES10438= "此工艺路线不存在！";
         #endregion
 
         #region 参数 10500

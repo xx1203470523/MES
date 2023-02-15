@@ -50,7 +50,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task<int> AddInteClassAsync(InteClassCreateDto createDto)
+        public async Task<int> CreateAsync(InteClassCreateDto createDto)
         {
             // 验证DTO
 
@@ -88,7 +88,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task<int> UpdateInteClassAsync(InteClassModifyDto modifyDto)
+        public async Task<int> ModifyAsync(InteClassModifyDto modifyDto)
         {
             // DTO转换实体
             var entity = modifyDto.ToEntity<InteClassEntity>();
@@ -122,7 +122,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeleteInteClassAsync(long[] idsArr)
+        public async Task<int> DeletesAsync(long[] idsArr)
         {
             return await _inteClassRepository.DeletesAsync(idsArr);
         }
@@ -147,12 +147,12 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<InteClassWithDetailDto> GetInteClassAsync(long id)
+        public async Task<InteClassWithDetailDto> GetDetailAsync(long id)
         {
-            InteClassWithDetailDto response = new InteClassWithDetailDto();
+            InteClassWithDetailDto response = new();
             response.ClassInfo = (await _inteClassRepository.GetByIdAsync(id)).ToModel<InteClassDto>();
-            var detailList = await _inteClassDetailRepository.GetListByClassIdAsync(id);
 
+            var detailList = await _inteClassDetailRepository.GetListByClassIdAsync(id);
             foreach (var item in detailList)
             {
                 response.DetailList.Add(new InteClassDetailDto

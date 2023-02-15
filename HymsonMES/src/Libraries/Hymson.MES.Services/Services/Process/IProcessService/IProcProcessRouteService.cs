@@ -32,21 +32,21 @@ namespace Hymson.MES.Services.Services.Process.IProcessService
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<CustomProcessRoute> GetCustomProcProcessRouteAsync(long id);
+        Task<CustomProcessRouteDto> GetCustomProcProcessRouteAsync(long id);
 
         /// <summary>
         /// 新增
         /// </summary>
         /// <param name="procProcessRouteDto"></param>
         /// <returns></returns>
-        Task CreateProcProcessRouteAsync(ProcProcessRouteCreateDto procProcessRouteCreateDto);
+        Task AddProcProcessRouteAsync(ProcProcessRouteCreateDto procProcessRouteCreateDto);
 
         /// <summary>
         /// 修改
         /// </summary>
         /// <param name="procProcessRouteDto"></param>
         /// <returns></returns>
-        Task ModifyProcProcessRouteAsync(ProcProcessRouteModifyDto procProcessRouteModifyDto);
+        Task UpdateProcProcessRouteAsync(ProcProcessRouteModifyDto procProcessRouteModifyDto);
 
         /// <summary>
         /// 批量删除

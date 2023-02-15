@@ -46,7 +46,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateEquipmentUnitAsync(EquEquipmentUnitCreateDto createDto)
+        public async Task<int> CreateAsync(EquEquipmentUnitCreateDto createDto)
         {
             // 验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(createDto);
@@ -66,7 +66,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyEquipmentUnitAsync(EquEquipmentUnitModifyDto modifyDto)
+        public async Task<int> ModifyAsync(EquEquipmentUnitModifyDto modifyDto)
         {
             // DTO转换实体
             var entity = modifyDto.ToEntity<EquEquipmentUnitEntity>();
@@ -81,9 +81,9 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeleteEquipmentUnitAsync(long[] idsArr)
+        public async Task<int> DeletesAsync(long[] idsArr)
         {
-            return await _equEquipmentUnitRepository.DeleteAsync(idsArr);
+            return await _equEquipmentUnitRepository.DeletesAsync(idsArr);
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<EquEquipmentUnitDto> GetEntityAsync(long id)
+        public async Task<EquEquipmentUnitDto> GetDetailAsync(long id)
         {
             return (await _equEquipmentUnitRepository.GetByIdAsync(id)).ToModel<EquEquipmentUnitDto>();
         }

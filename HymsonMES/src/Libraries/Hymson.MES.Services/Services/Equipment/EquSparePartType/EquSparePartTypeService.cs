@@ -51,7 +51,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateEquSparePartTypeAsync(EquSparePartTypeCreateDto createDto)
+        public async Task<int> CreateAsync(EquSparePartTypeCreateDto createDto)
         {
             // TODO 验证DTO
 
@@ -74,7 +74,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyEquSparePartTypeAsync(EquSparePartTypeModifyDto modifyDto)
+        public async Task<int> ModifyAsync(EquSparePartTypeModifyDto modifyDto)
         {
             // 验证DTO
 
@@ -95,7 +95,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<int> DeleteEquSparePartTypeAsync(long id)
+        public async Task<int> DeleteAsync(long id)
         {
             return await _equSparePartTypeRepository.DeleteAsync(id);
         }
@@ -105,7 +105,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeletesEquSparePartTypeAsync(long[] idsArr)
+        public async Task<int> DeletesAsync(long[] idsArr)
         {
             return await _equSparePartTypeRepository.DeletesAsync(idsArr);
         }
@@ -115,7 +115,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<EquSparePartTypeDto>> GetPageListAsync(EquSparePartTypePagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<EquSparePartTypeDto>> GetPagedListAsync(EquSparePartTypePagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<EquSparePartTypePagedQuery>();
             var pagedInfo = await _equSparePartTypeRepository.GetPagedInfoAsync(pagedQuery);
@@ -130,7 +130,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<EquSparePartTypeDto> QueryEquSparePartTypeByIdAsync(long id)
+        public async Task<EquSparePartTypeDto> GetDetailAsync(long id)
         {
             return (await _equSparePartTypeRepository.GetByIdAsync(id)).ToModel<EquSparePartTypeDto>();
         }

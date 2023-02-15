@@ -22,5 +22,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 状态列表
         /// </summary>
         public string[] StatusArr { get; set; }
+        /// <summary>
+        /// 工艺路线代码
+        /// </summary>
+        public string Code { get; set; }
+        /// <summary>
+        /// 所属站点代码
+        /// </summary>
+        public string SiteCode { get; set; }
     }
 }
