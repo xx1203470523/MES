@@ -55,7 +55,7 @@ namespace Hymson.MES.Services.Services.Process
 
             //DTO转换实体
             var procParameterLinkTypeEntity = procParameterLinkTypeCreateDto.ToEntity<ProcParameterLinkTypeEntity>();
-            procParameterLinkTypeEntity.Id= IdGenProvider.Instance.CreateId();
+            procParameterLinkTypeEntity.Id = IdGenProvider.Instance.CreateId();
             procParameterLinkTypeEntity.CreatedBy = _currentUser.UserName;
             procParameterLinkTypeEntity.UpdatedBy = _currentUser.UserName;
             procParameterLinkTypeEntity.CreatedOn = HymsonClock.Now();
@@ -91,14 +91,31 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="procParameterLinkTypePagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcParameterLinkTypeDto>> GetPageListAsync(ProcParameterLinkTypePagedQueryDto procParameterLinkTypePagedQueryDto)
+        public async Task<PagedInfo<ProcParameterLinkTypeViewDto>> GetPageListAsync(ProcParameterLinkTypePagedQueryDto procParameterLinkTypePagedQueryDto)
         {
             var procParameterLinkTypePagedQuery = procParameterLinkTypePagedQueryDto.ToQuery<ProcParameterLinkTypePagedQuery>();
+            procParameterLinkTypePagedQuery.SiteCode = "TODO";
             var pagedInfo = await _procParameterLinkTypeRepository.GetPagedInfoAsync(procParameterLinkTypePagedQuery);
 
             //实体到DTO转换 装载数据
-            List<ProcParameterLinkTypeDto> procParameterLinkTypeDtos = PrepareProcParameterLinkTypeDtos(pagedInfo);
-            return new PagedInfo<ProcParameterLinkTypeDto>(procParameterLinkTypeDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            List<ProcParameterLinkTypeViewDto> procParameterLinkTypeDtos = PrepareProcParameterLinkTypeDtos(pagedInfo);
+            return new PagedInfo<ProcParameterLinkTypeViewDto>(procParameterLinkTypeDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 分页查询详情（设备/产品参数）
+        /// </summary>
+        /// <param name="procParameterDetailPagerQueryDto"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ProcParameterLinkTypeViewDto>> QueryPagedProcParameterLinkTypeByTypeAsync(ProcParameterDetailPagerQueryDto procParameterDetailPagerQueryDto) 
+        {
+            var procParameterDetailPagerQuery = procParameterDetailPagerQueryDto.ToQuery<ProcParameterDetailPagerQuery>();
+            procParameterDetailPagerQuery.SiteCode = "TODO";
+            var pagedInfo = await _procParameterLinkTypeRepository.GetPagedProcParameterLinkTypeByTypeAsync(procParameterDetailPagerQuery);
+
+            //实体到DTO转换 装载数据
+            List<ProcParameterLinkTypeViewDto> procParameterLinkTypeDtos = PrepareProcParameterLinkTypeDtos(pagedInfo);
+            return new PagedInfo<ProcParameterLinkTypeViewDto>(procParameterLinkTypeDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
         /// <summary>
@@ -106,12 +123,12 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="pagedInfo"></param>
         /// <returns></returns>
-        private static List<ProcParameterLinkTypeDto> PrepareProcParameterLinkTypeDtos(PagedInfo<ProcParameterLinkTypeEntity>   pagedInfo)
+        private static List<ProcParameterLinkTypeViewDto> PrepareProcParameterLinkTypeDtos(PagedInfo<ProcParameterLinkTypeView>   pagedInfo)
         {
-            var procParameterLinkTypeDtos = new List<ProcParameterLinkTypeDto>();
+            var procParameterLinkTypeDtos = new List<ProcParameterLinkTypeViewDto>();
             foreach (var procParameterLinkTypeEntity in pagedInfo.Data)
             {
-                var procParameterLinkTypeDto = procParameterLinkTypeEntity.ToModel<ProcParameterLinkTypeDto>();
+                var procParameterLinkTypeDto = procParameterLinkTypeEntity.ToModel<ProcParameterLinkTypeViewDto>();
                 procParameterLinkTypeDtos.Add(procParameterLinkTypeDto);
             }
 

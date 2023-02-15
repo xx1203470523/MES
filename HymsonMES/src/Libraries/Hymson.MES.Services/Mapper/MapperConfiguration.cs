@@ -175,7 +175,9 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcParameterLinkTypeCreateDto, ProcParameterLinkTypeEntity>();
             CreateMap<ProcParameterLinkTypeModifyDto, ProcParameterLinkTypeEntity>();
             CreateMap<ProcParameterLinkTypePagedQueryDto, ProcParameterLinkTypePagedQuery>();
+            CreateMap<ProcParameterDetailPagerQueryDto, ProcParameterDetailPagerQuery>();
             CreateMap<ProcParameterLinkTypeEntity, ProcParameterLinkTypeDto>();
+            CreateMap<ProcParameterLinkTypeView, ProcParameterLinkTypeViewDto>();
             #endregion
 
             #region Bom

@@ -181,10 +181,108 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public class ProcParameterLinkTypePagedQueryDto : PagerInfo
     {
-        ///// <summary>
-        ///// 描述 :站点编码 
-        ///// 空值 : false  
-        ///// </summary>
-        //public string SiteCode { get; set; }
+        /// <summary>
+        /// 类型（设备/产品参数）
+        /// </summary>
+        public int ParameterType { get; set; } = 1;
+
+        /// <summary>
+        /// 编码（设备/产品参数）
+        /// </summary>
+        public string ParameterCode { get; set; }
+
+        /// <summary>
+        /// 名称（设备/产品参数）
+        /// </summary>
+        public string ParameterName { get; set; }
+    }
+
+    public record ProcParameterLinkTypeViewDto: BaseEntityDto
+    {
+        /// <summary>
+        /// 唯一标识
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 所属站点代码
+        /// </summary>
+        public string SiteCode { get; set; }
+
+        /// <summary>
+        /// 类型（设备/产品参数）
+        /// </summary>
+        public int ParameterType { get; set; } = 1;
+
+        /// <summary>
+        /// ID（标准参数）
+        /// </summary>
+        public long ParameterID { get; set; }
+
+        /// <summary>
+        /// 编码（标准参数）
+        /// </summary>
+        public string ParameterCode { get; set; }
+
+        /// <summary>
+        /// 名称（标准参数）
+        /// </summary>
+        public string ParameterName { get; set; }
+
+        /// <summary>
+        /// 参数单位
+        /// </summary>
+        public string ParameterUnit { get; set; }
+
+        /// <summary>
+        /// 创建人
+        /// </summary>
+        public string CreateBy { get; set; }
+
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime CreateOn { get; set; }
+
+        /// <summary>
+        /// 更新人
+        /// </summary>
+        public string? UpdateBy { get; set; }
+
+        /// <summary>
+        /// 更新时间
+        /// </summary>
+        public DateTime? UpdateOn { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+    }
+
+    /// <summary>
+    /// 查询对象（设备/产品参数） 分页
+    /// </summary>
+    public class ProcParameterDetailPagerQueryDto : PagerInfo 
+    {
+        /// <summary>
+        /// 操作类型 1:add；2:edit；3:view；
+        /// </summary>
+        public string OperateType { get; set; } = "add";
+
+        /// <summary>
+        /// 类型（设备/产品参数）
+        /// </summary>
+        public int ParameterType { get; set; } = 1;
+
+        /// <summary>
+        /// 编码（设备/产品参数）
+        /// </summary>
+        public string ParameterCode { get; set; }
+
+        /// <summary>
+        /// 名称（设备/产品参数）
+        /// </summary>
+        public string ParameterName { get; set; }
     }
 }

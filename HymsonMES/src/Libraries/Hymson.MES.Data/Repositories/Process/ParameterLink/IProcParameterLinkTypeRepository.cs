@@ -95,6 +95,8 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procParameterLinkTypePagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<ProcParameterLinkTypeEntity>> GetPagedInfoAsync(ProcParameterLinkTypePagedQuery procParameterLinkTypePagedQuery);
+        Task<PagedInfo<ProcParameterLinkTypeView>> GetPagedInfoAsync(ProcParameterLinkTypePagedQuery procParameterLinkTypePagedQuery);
+
+        Task<PagedInfo<ProcParameterLinkTypeView>> GetPagedProcParameterLinkTypeByTypeAsync(ProcParameterDetailPagerQuery procParameterDetailPagerQuery);
     }
 }

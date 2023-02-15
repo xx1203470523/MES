@@ -25,7 +25,14 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="procParameterLinkTypePagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<ProcParameterLinkTypeDto>> GetPageListAsync(ProcParameterLinkTypePagedQueryDto procParameterLinkTypePagedQueryDto);
+        Task<PagedInfo<ProcParameterLinkTypeViewDto>> GetPageListAsync(ProcParameterLinkTypePagedQueryDto procParameterLinkTypePagedQueryDto);
+
+        /// <summary>
+        /// 分页查询详情（设备/产品参数）
+        /// </summary>
+        /// <param name="procParameterDetailPagerQueryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ProcParameterLinkTypeViewDto>> QueryPagedProcParameterLinkTypeByTypeAsync(ProcParameterDetailPagerQueryDto procParameterDetailPagerQueryDto);
 
         /// <summary>
         /// 新增
