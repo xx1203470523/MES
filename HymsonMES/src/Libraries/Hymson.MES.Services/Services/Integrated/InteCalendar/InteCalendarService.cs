@@ -9,7 +9,7 @@ using Hymson.MES.Data.Repositories.Integrated.InteCalendar.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteClass;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
-using Hymson.Utils.Extensions;
+using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Integrated.InteCalendar
 {

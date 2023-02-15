@@ -12,7 +12,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using Hymson.Utils.Extensions;
+using Hymson.Utils;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Services.Dtos.Process;

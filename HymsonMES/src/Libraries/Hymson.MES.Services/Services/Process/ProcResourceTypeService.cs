@@ -10,7 +10,7 @@ using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using Hymson.Utils.Extensions;
+using Hymson.Utils;
 using Hymson.Utils.Tools;
 using System.ComponentModel.DataAnnotations;
 using System.Transactions;
