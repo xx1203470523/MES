@@ -3,6 +3,7 @@
  *builder:  zhaoqing
  *build datetime: 2023-02-14 10:07:11
  */
+using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Microsoft.AspNetCore.Authorization;

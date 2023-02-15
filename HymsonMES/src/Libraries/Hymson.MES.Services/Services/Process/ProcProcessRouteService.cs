@@ -14,15 +14,12 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Process.Resource;
+using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using Hymson.Utils.Extensions;
 using Hymson.Utils.Tools;
-using Microsoft.IdentityModel.Tokens;
-using Org.BouncyCastle.Asn1.Ocsp;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -89,8 +86,8 @@ namespace Hymson.MES.Services.Services.Process
             procProcessRoutePagedQuery.SiteCode = "TODO";
             var pagedInfo = await _procProcessRouteRepository.GetPagedInfoAsync(procProcessRoutePagedQuery);
 
-            //实体到DTO转换 装载数据
-            List<ProcProcessRouteDto> procProcessRouteDtos = PrepareProcProcessRouteDtos(pagedInfo);
+            // 实体到DTO转换 装载数据
+            var procProcessRouteDtos = pagedInfo.Data.Select(s => s.ToModel<ProcProcessRouteDto>());
             return new PagedInfo<ProcProcessRouteDto>(procProcessRouteDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
@@ -136,7 +133,7 @@ namespace Hymson.MES.Services.Services.Process
                 linkDtos.Add(linkDto);
             }
             model.Links = linkDtos;
-            return null;
+            return model;
         }
 
         /// <summary>
@@ -330,23 +327,6 @@ namespace Hymson.MES.Services.Services.Process
         }
 
         #region 业务扩展方法
-
-        /// <summary>
-        /// 分页查询实体转换
-        /// </summary>
-        /// <param name="pagedInfo"></param>
-        /// <returns></returns>
-        private static List<ProcProcessRouteDto> PrepareProcProcessRouteDtos(PagedInfo<ProcProcessRouteEntity> pagedInfo)
-        {
-            var procProcessRouteDtos = new List<ProcProcessRouteDto>();
-            foreach (var procProcessRouteEntity in pagedInfo.Data)
-            {
-                var procProcessRouteDto = procProcessRouteEntity.ToModel<ProcProcessRouteDto>();
-                procProcessRouteDtos.Add(procProcessRouteDto);
-            }
-
-            return procProcessRouteDtos;
-        }
 
         /// <summary>
         /// 转换节点工序（编码）

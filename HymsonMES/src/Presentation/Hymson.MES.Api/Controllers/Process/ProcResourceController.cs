@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -13,6 +14,7 @@ namespace Hymson.MES.Api.Controllers
     /// @author zhaoqing
     /// @date 2023-02-08
     /// </summary>
+    [Authorize]
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcResourceController : ControllerBase

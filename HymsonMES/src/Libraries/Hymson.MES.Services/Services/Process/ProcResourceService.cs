@@ -1,16 +1,17 @@
 ﻿using FluentValidation;
+using Hymson.Authentication;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.Snowflake;
-using Hymson.Utils;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using System.Transactions;
@@ -25,6 +26,10 @@ namespace Hymson.MES.Services.Services.Process
     /// </summary>
     public class ProcResourceService : IProcResourceService
     {
+        /// <summary>
+        /// 当前登录用户对象
+        /// </summary>
+        private readonly ICurrentUser _currentUser;
         /// <summary>
         /// 资源仓储
         /// </summary>
@@ -61,7 +66,8 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 构造函数
         /// </summary>
-        public ProcResourceService(IProcResourceRepository resourceRepository,
+        public ProcResourceService(ICurrentUser currentUser,
+                  IProcResourceRepository resourceRepository,
                   IProcResourceTypeRepository resourceTypeRepository,
                   IProcResourceConfigPrintRepository resourceConfigPrintRepository,
                   IProcResourceConfigResRepository procResourceConfigResRepository,
@@ -70,6 +76,7 @@ namespace Hymson.MES.Services.Services.Process
                   AbstractValidator<ProcResourceCreateDto> validationCreateRules,
                   AbstractValidator<ProcResourceModifyDto> validationModifyRules)
         {
+            _currentUser = currentUser;
             _resourceRepository = resourceRepository;
             _resourceTypeRepository = resourceTypeRepository;
             _resourceConfigPrintRepository = resourceConfigPrintRepository;
@@ -255,10 +262,7 @@ namespace Hymson.MES.Services.Services.Process
             };
             if (await _resourceRepository.IsExistsAsync(query))
             {
-                //TODO
-                // var message = string.Format(ErrorCode.MES10308, parm.ResCode);
-                // return Error(ResultCode.PARAM_ERROR, $"此资源【{parm.ResCode}】在系统中已经存在!");
-                throw new ValidationException(ErrorCode.MES10308);
+                throw new BusinessException(ErrorCode.MES10308).WithData("ResCode", parm.ResCode);
             }
 
             if (parm.ResTypeId > 0)
@@ -287,7 +291,7 @@ namespace Hymson.MES.Services.Services.Process
             #endregion
 
             string site = parm.SiteCode;
-            var userId = "TODO";
+            var userName = _currentUser.UserName;
 
             #region 组装数据
 
@@ -296,10 +300,8 @@ namespace Hymson.MES.Services.Services.Process
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteCode = site,
-                CreatedBy = userId,
-                UpdatedBy = userId,
-                UpdatedOn = HymsonClock.Now(),
-                CreatedOn = HymsonClock.Now(),
+                CreatedBy = userName,
+                UpdatedBy = userName,
                 Status = parm.Status,
                 ResTypeId = parm.ResTypeId,
                 Remark = parm.Remark ?? "",
@@ -320,10 +322,8 @@ namespace Hymson.MES.Services.Services.Process
                         ResourceId = entity.Id,
                         PrintId = item.PrintId,
                         Remark = "",
-                        CreatedBy = userId,
-                        UpdatedBy = userId,
-                        UpdatedOn = HymsonClock.Now(),
-                        CreatedOn = HymsonClock.Now()
+                        CreatedBy = userName,
+                        UpdatedBy = userName
                     });
                 }
             }
@@ -342,10 +342,8 @@ namespace Hymson.MES.Services.Services.Process
                         EquipmentId = item.EquipmentId,
                         IsMain = item.IsMain ?? false,
                         Remark = "",
-                        CreatedBy = userId,
-                        UpdatedBy = userId,
-                        UpdatedOn = HymsonClock.Now(),
-                        CreatedOn = HymsonClock.Now()
+                        CreatedBy = userName,
+                        UpdatedBy = userName
                     });
                 }
             }
@@ -364,10 +362,8 @@ namespace Hymson.MES.Services.Services.Process
                         SetType = item.SetType,
                         Value = item.Value,
                         Remark = "",
-                        CreatedBy = userId,
-                        UpdatedBy = userId,
-                        UpdatedOn = HymsonClock.Now(),
-                        CreatedOn = HymsonClock.Now()
+                        CreatedBy = userName,
+                        UpdatedBy = userName
                     });
                 }
             }
@@ -388,10 +384,8 @@ namespace Hymson.MES.Services.Services.Process
                         IsUse = item.IsUse,
                         Parameter = item.Parameter,
                         Remark = item.Remark,
-                        CreatedBy = userId,
-                        UpdatedBy = userId,
-                        UpdatedOn = HymsonClock.Now(),
-                        CreatedOn = HymsonClock.Now()
+                        CreatedBy = userName,
+                        UpdatedBy = userName
                     });
                 }
             }
@@ -430,8 +424,8 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task UpdateProcResrouceAsync(ProcResourceModifyDto param)
         {
-            string userId = "TODO";
-            var siteCode = "TODO";
+            string userName = _currentUser.UserName;
+            var siteCode = param.SiteCode;
             #region 验证
             if (param == null)
             {
@@ -578,8 +572,7 @@ namespace Hymson.MES.Services.Services.Process
                 ResName = param.ResName,
                 ResTypeId = param.ResTypeId,
                 Remark = param.Remark ?? "",
-                UpdatedOn = HymsonClock.Now(),
-                UpdatedBy = userId
+                UpdatedBy = userName
             };
 
             //打印机数据
@@ -601,10 +594,8 @@ namespace Hymson.MES.Services.Services.Process
                                 PrintId = item.PrintId,
                                 Remark = "",
                                 SiteCode = item.SiteCode,
-                                CreatedBy = userId,
-                                CreatedOn = HymsonClock.Now(),
-                                UpdatedBy = userId,
-                                UpdatedOn = HymsonClock.Now()
+                                CreatedBy = userName,
+                                UpdatedBy = userName
                             };
                             addPrintList.Add(print);
                             break;
@@ -613,8 +604,7 @@ namespace Hymson.MES.Services.Services.Process
                             {
                                 Id = item.Id ?? 0,
                                 PrintId = item.PrintId,
-                                UpdatedBy = userId,
-                                UpdatedOn = HymsonClock.Now()
+                                UpdatedBy = userName
                             };
                             updaterPintList.Add(print);
                             break;
@@ -625,8 +615,7 @@ namespace Hymson.MES.Services.Services.Process
                             }
                             break;
                         default:
-                            //return Error(ResultCode.PARAM_ERROR, $"资源打印配置操作类型OperationType:{item.OperationType}异常，只能传入1，2，3！");
-                            throw new ValidationException(ErrorCode.MES10315);
+                            throw new BusinessException(ErrorCode.MES10315).WithData("OperationType", item.OperationType);
                     }
                 }
             }
@@ -651,10 +640,8 @@ namespace Hymson.MES.Services.Services.Process
                                 IsMain = item.IsMain ?? false,
                                 Remark = "",
                                 SiteCode = item.SiteCode,
-                                CreatedBy = userId,
-                                CreatedOn = HymsonClock.Now(),
-                                UpdatedBy = userId,
-                                UpdatedOn = HymsonClock.Now()
+                                CreatedBy = userName,
+                                UpdatedBy = userName
                             };
                             addEquList.Add(equ);
                             break;
@@ -664,8 +651,7 @@ namespace Hymson.MES.Services.Services.Process
                                 Id = item.Id ?? 0,
                                 EquipmentId = item.EquipmentId,
                                 IsMain = item.IsMain ?? false,
-                                UpdatedBy = userId,
-                                UpdatedOn = HymsonClock.Now()
+                                UpdatedBy = userName
                             };
                             updateEquListt.Add(equ);
                             break;
@@ -676,8 +662,7 @@ namespace Hymson.MES.Services.Services.Process
                             }
                             break;
                         default:
-                            // return Error(ResultCode.PARAM_ERROR, $"设备绑定设置数据操作类型OperationType:{item.OperationType}异常，只能传入1，2，3！");
-                            throw new ValidationException(ErrorCode.MES10316);
+                            throw new BusinessException(ErrorCode.MES10316).WithData("OperationType", item.OperationType);
                     }
                 }
             }
@@ -702,10 +687,8 @@ namespace Hymson.MES.Services.Services.Process
                                 Value = item.Value,
                                 Remark = "",
                                 SiteCode = item.SiteCode,
-                                CreatedBy = userId,
-                                CreatedOn = HymsonClock.Now(),
-                                UpdatedBy = userId,
-                                UpdatedOn = HymsonClock.Now()
+                                CreatedBy = userName,
+                                UpdatedBy = userName
                             };
                             addResSetList.Add(resSet);
                             break;
@@ -715,8 +698,7 @@ namespace Hymson.MES.Services.Services.Process
                                 Id = item.Id ?? 0,
                                 SetType = item.SetType,
                                 Value = item.Value,
-                                UpdatedBy = userId,
-                                UpdatedOn = HymsonClock.Now()
+                                UpdatedBy = userName
                             };
                             updateSetListt.Add(resSet);
                             break;
@@ -727,8 +709,7 @@ namespace Hymson.MES.Services.Services.Process
                             }
                             break;
                         default:
-                            //return Error(ResultCode.PARAM_ERROR, $"资源设置数据操作类型OperationType:{item.OperationType}异常，只能传入1，2，3！");
-                            throw new ValidationException(ErrorCode.MES10317);
+                            throw new BusinessException(ErrorCode.MES10317).WithData("OperationType", item.OperationType);
                     }
                 }
             }
@@ -755,10 +736,8 @@ namespace Hymson.MES.Services.Services.Process
                                 Parameter = item.Parameter,
                                 Remark = item.Remark,
                                 SiteCode = item.SiteCode,
-                                CreatedBy = userId,
-                                CreatedOn = HymsonClock.Now(),
-                                UpdatedBy = userId,
-                                UpdatedOn = HymsonClock.Now()
+                                CreatedBy = userName,
+                                UpdatedBy = userName
                             };
                             addJobList.Add(job);
                             break;
@@ -771,8 +750,7 @@ namespace Hymson.MES.Services.Services.Process
                                 IsUse = item.IsUse,
                                 Remark=item.Remark,
                                 Parameter = item.Parameter,
-                                UpdatedBy = userId,
-                                UpdatedOn = HymsonClock.Now()
+                                UpdatedBy = userName,
                             };
                             updateJobList.Add(job);
                             break;
@@ -783,8 +761,7 @@ namespace Hymson.MES.Services.Services.Process
                             }
                             break;
                         default:
-                            // return Error(ResultCode.PARAM_ERROR, $"作业设置数据操作类型OperationType:{item.OperationType}异常，只能传入1，2，3！");
-                            throw new ValidationException(ErrorCode.MES10318);
+                            throw new BusinessException(ErrorCode.MES10318).WithData("OperationType", item.OperationType);
                     }
                 }
             }
@@ -882,8 +859,7 @@ namespace Hymson.MES.Services.Services.Process
             var query = new ProcResourceQuery
             {
                 IdsArr = idsArr,
-                //TODO
-                Status = "1"
+                Status = SysDataStatusEnum.Enable.ToString()
             };
             var resourceList = await _resourceRepository.GetByIdsAsync(query);
             if (resourceList != null && resourceList.Any())

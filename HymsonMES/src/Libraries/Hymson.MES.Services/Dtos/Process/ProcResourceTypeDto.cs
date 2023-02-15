@@ -106,7 +106,7 @@ namespace Hymson.MES.Services.Dtos.Process
     /// <summary>
     /// 新增实体
     /// </summary>
-    public record ProcResourceTypeAddCommandDto : BaseEntityDto
+    public record ProcResourceTypeAddDto : BaseEntityDto
     {
         /// <summary>
         /// 描述 :资源类型 
@@ -134,7 +134,7 @@ namespace Hymson.MES.Services.Dtos.Process
     /// <summary>
     /// 修改实体
     /// </summary>
-    public record ProcResourceTypeUpdateCommandDto : BaseEntityDto
+    public record ProcResourceTypeUpdateDto : BaseEntityDto
     {
         /// <summary>
         /// 唯一Id
