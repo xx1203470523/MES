@@ -52,6 +52,13 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         Task<EquFaultPhenomenonEntity> GetByIdAsync(long id);
 
         /// <summary>
+        /// 根据ID获取数据（设备故障现象）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<EquFaultPhenomenonView> GetViewByIdAsync(long id);
+
+        /// <summary>
         /// 获取List（设备故障现象）
         /// </summary>
         /// <param name="equFaultPhenomenonQuery"></param>

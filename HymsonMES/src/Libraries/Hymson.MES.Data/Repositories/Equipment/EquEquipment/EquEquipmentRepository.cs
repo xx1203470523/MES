@@ -179,16 +179,16 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             if (string.IsNullOrWhiteSpace(pagedQuery.EquipmentCode) == false)
             {
                 pagedQuery.EquipmentCode = $"%{pagedQuery.EquipmentCode}%";
-                sqlBuilder.Where("EquipmentCode = @EquipmentCode");
+                sqlBuilder.Where("EquipmentCode LIKE @EquipmentCode");
             }
 
             if (string.IsNullOrWhiteSpace(pagedQuery.EquipmentName) == false)
             {
                 pagedQuery.EquipmentName = $"%{pagedQuery.EquipmentName}%";
-                sqlBuilder.Where("EquipmentName = @EquipmentName");
+                sqlBuilder.Where("EquipmentName LIKE @EquipmentName");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.EquipmentType) == false)
+            if (pagedQuery.EquipmentType > 0)
             {
                 sqlBuilder.Where("EquipmentType = @EquipmentType");
             }
@@ -201,19 +201,19 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             if (string.IsNullOrWhiteSpace(pagedQuery.WorkCenterShopName) == false)
             {
                 pagedQuery.WorkCenterShopName = $"%{pagedQuery.WorkCenterShopName}%";
-                sqlBuilder.Where("WorkCenterShopName = @WorkCenterShopName");
+                sqlBuilder.Where("WorkCenterShopName LIKE @WorkCenterShopName");
             }
 
             if (string.IsNullOrWhiteSpace(pagedQuery.UseDepartment) == false)
             {
                 pagedQuery.UseDepartment = $"%{pagedQuery.UseDepartment}%";
-                sqlBuilder.Where("UseDepartment = @UseDepartment");
+                sqlBuilder.Where("UseDepartment LIKE @UseDepartment");
             }
 
             if (string.IsNullOrWhiteSpace(pagedQuery.Location) == false)
             {
                 pagedQuery.Location = $"%{pagedQuery.Location}%";
-                sqlBuilder.Where("Location = @Location");
+                sqlBuilder.Where("Location LIKE @Location");
             }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
