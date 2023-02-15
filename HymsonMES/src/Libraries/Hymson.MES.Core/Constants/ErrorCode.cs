@@ -70,7 +70,20 @@
         public const string MES10504 = "此标准参数不存在！";
         public const string MES10505 = "删除失败Ids 不能为空";
         public const string MES10506 = "参数已被设备参数或产品参数绑定，不允许删除!";
-        
+
+        #endregion
+
+        #region Bom 10600
+        public const string MES10600 = "Bom维护错误";
+        public const string MES10601 = "此Bom{bomCode}和版本{version}在系统已经存在!";
+        public const string MES10602 = "添加Bom失败！";
+        public const string MES10603 = "物料编码不能为空!";
+        public const string MES10604 = "替代物料编码不能为空!";
+        public const string MES10605 = "工序不能为空!";
+        public const string MES10606 = "主物料编码+工序不能重复!";
+        public const string MES10607 = "替代物料不能跟主物料重复!";
+        public const string MES10608 = "主物料关联的替代物料不能重复!";
+
         #endregion
         #endregion
 
