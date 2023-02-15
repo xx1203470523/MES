@@ -52,6 +52,17 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 批量删除关联的BomId的数据
+        /// </summary>
+        /// <param name="bomIds"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteBomIDAsync(long[] bomIds)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeleteBomIDsSql, new { bomIds = bomIds });
+        }
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -178,6 +189,10 @@ namespace Hymson.MES.Data.Repositories.Process
         const string UpdatesSql = "UPDATE `proc_bom_detail_replace_material` SET   SiteCode = @SiteCode, BomId = @BomId, BomDetailId = @BomDetailId, ReplaceMaterialId = @ReplaceMaterialId, ReferencePoint = @ReferencePoint, Usages = @Usages, Loss = @Loss, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_bom_detail_replace_material` SET IsDeleted = '1' WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_bom_detail_replace_material` SET IsDeleted = '1' WHERE Id in @ids";
+        /// <summary>
+        /// 批量删除关联的BomId的数据
+        /// </summary>
+        const string DeleteBomIDsSql = "UPDATE `proc_bom_detail_replace_material` SET IsDeleted = '1' WHERE BomId in @bomIds";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteCode`, `BomId`, `BomDetailId`, `ReplaceMaterialId`, `ReferencePoint`, `Usages`, `Loss`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_bom_detail_replace_material`  WHERE Id = @Id ";

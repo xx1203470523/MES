@@ -63,6 +63,13 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<int> DeletesAsync(long[] ids);
 
         /// <summary>
+        /// 批量删除关联的BomId的数据
+        /// </summary>
+        /// <param name="bomIds"></param>
+        /// <returns></returns>
+        Task<int> DeleteBomIDAsync(long[] bomIds);
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>

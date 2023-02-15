@@ -84,6 +84,9 @@
         public const string MES10606 = "主物料编码+工序不能重复!";
         public const string MES10607 = "替代物料不能跟主物料重复!";
         public const string MES10608 = "主物料关联的替代物料不能重复!";
+        public const string MES10609 = "更新Bom失败！";
+        public const string MES10610 = "删除失败 Id不能为空!";
+        public const string MES10611 = "不能删除启用状态的Bom!";
 
         #endregion
         #endregion

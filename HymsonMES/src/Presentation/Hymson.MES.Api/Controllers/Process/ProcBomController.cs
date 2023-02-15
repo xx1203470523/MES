@@ -10,6 +10,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
 using Hymson.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Extensions;
 
@@ -20,6 +21,7 @@ namespace Hymson.MES.Api.Controllers.Process
     /// @author Karl
     /// @date 2023-02-14 10:04:25
     /// </summary>
+    [Authorize]
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcBomController : ControllerBase
