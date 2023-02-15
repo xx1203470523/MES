@@ -15,7 +15,7 @@ using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using Hymson.Utils.Extensions;
+using Hymson.Utils;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Integrated
