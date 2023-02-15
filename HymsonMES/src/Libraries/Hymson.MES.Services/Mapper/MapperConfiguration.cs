@@ -221,6 +221,10 @@ namespace Hymson.MES.Services.Mapper
             #region ProcessRoute
             CreateMap<ProcProcessRoutePagedQueryDto, ProcProcessRoutePagedQuery>();
             CreateMap<ProcProcessRouteEntity, ProcProcessRouteDto>();
+            CreateMap<ProcProcessRouteCreateDto, ProcProcessRouteEntity>();
+            CreateMap<ProcProcessRouteModifyDto, ProcProcessRouteEntity>();
+            CreateMap<ProcProcessRouteDetailNodeView, ProcProcessRouteDetailNodeViewDto>();
+            CreateMap<ProcProcessRouteDetailLinkEntity, ProcProcessRouteDetailLinkDto>();
             #endregion
         }
 

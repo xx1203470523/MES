@@ -150,6 +150,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<ProcProcedureCreateDto>, ProcProcedureCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcProcedureModifyDto>, ProcProcedureModifyValidator>();
             #endregion
+
+            #region ProcessRoute
+            services.AddSingleton<AbstractValidator<ProcProcessRouteCreateDto>, ProcProcessRouteCreateValidator>();
+            services.AddSingleton<AbstractValidator<ProcProcessRouteModifyDto>, ProcProcessRouteModifyValidator>();
+            #endregion
             #endregion
 
             #region Integrated

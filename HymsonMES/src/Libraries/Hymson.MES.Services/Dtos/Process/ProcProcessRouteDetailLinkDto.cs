@@ -21,66 +21,64 @@ namespace Hymson.MES.Services.Dtos.Process
     public record ProcProcessRouteDetailLinkDto : BaseEntityDto
     {
         /// <summary>
-        /// 
+        /// 主键id
         /// </summary>
-        public long Id { get; set; }
+        //public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 序号
         /// </summary>
         public string SerialNo { get; set; }
 
-       /// <summary>
-        /// 所属工艺路线ID
-        /// </summary>
-        public long ProcessRouteId { get; set; }
+        ///// <summary>
+        // /// 所属工艺路线ID
+        // /// </summary>
+        // public long ProcessRouteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 前一工艺路线工序明细ID
         /// </summary>
         public long? PreProcessRouteDetailId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 当前工艺路线工序明细ID
         /// </summary>
         public long ProcessRouteDetailId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 扩展字段1(暂存坐标)
         /// </summary>
         public string Extra1 { get; set; }
 
-       /// <summary>
-        /// 说明
-        /// </summary>
-        public string Remark { get; set; }
+        ///// <summary>
+        // /// 说明
+        // /// </summary>
+        // public string Remark { get; set; }
 
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
+        ///// <summary>
+        // /// 创建人
+        // /// </summary>
+        // public string CreatedBy { get; set; }
 
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
+        ///// <summary>
+        // /// 创建时间
+        // /// </summary>
+        // public DateTime CreatedOn { get; set; }
 
-       /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string UpdatedBy { get; set; }
+        ///// <summary>
+        // /// 最后修改人
+        // /// </summary>
+        // public string UpdatedBy { get; set; }
 
-       /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
+        ///// <summary>
+        // /// 修改时间
+        // /// </summary>
+        // public DateTime? UpdatedOn { get; set; }
 
-       /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public bool? IsDeleted { get; set; }
-
-       
+        ///// <summary>
+        // /// 是否逻辑删除
+        // /// </summary>
+        // public bool? IsDeleted { get; set; }
     }
 
 
@@ -94,62 +92,62 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 序号
         /// </summary>
         public string SerialNo { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 所属工艺路线ID
         /// </summary>
         public long ProcessRouteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 前一工艺路线工序明细ID
         /// </summary>
         public long? PreProcessRouteDetailId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 当前工艺路线工序明细ID
         /// </summary>
         public long ProcessRouteDetailId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 扩展字段1(暂存坐标)
         /// </summary>
         public string Extra1 { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 说明
         /// </summary>
         public string Remark { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 最后修改人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 修改时间
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否逻辑删除
         /// </summary>
         public bool? IsDeleted { get; set; }
 
-       
+
     }
 
     /// <summary>
@@ -162,62 +160,62 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 序号
         /// </summary>
         public string SerialNo { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 所属工艺路线ID
         /// </summary>
         public long ProcessRouteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 前一工艺路线工序明细ID
         /// </summary>
         public long? PreProcessRouteDetailId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 当前工艺路线工序明细ID
         /// </summary>
         public long ProcessRouteDetailId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 扩展字段1(暂存坐标)
         /// </summary>
         public string Extra1 { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 说明
         /// </summary>
         public string Remark { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 最后修改人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 修改时间
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否逻辑删除
         /// </summary>
         public bool? IsDeleted { get; set; }
 
-       
+
 
     }
 
