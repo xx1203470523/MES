@@ -28,7 +28,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        Task<int> DeleteAsync(long[] idsArr);
+        Task<int> DeletesAsync(long[] idsArr);
 
         /// <summary>
         /// 

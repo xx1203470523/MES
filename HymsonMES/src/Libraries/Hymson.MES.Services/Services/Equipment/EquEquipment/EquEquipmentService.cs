@@ -63,7 +63,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateEquEquipmentAsync(EquEquipmentCreateDto createDto)
+        public async Task<int> CreateAsync(EquEquipmentCreateDto createDto)
         {
             #region 参数处理
             if (string.IsNullOrEmpty(createDto.EntryDate) == true) createDto.EntryDate = SqlDateTime.MinValue.Value.ToString();
@@ -131,7 +131,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyEquEquipmentAsync(EquEquipmentModifyDto modifyDto)
+        public async Task<int> ModifyAsync(EquEquipmentModifyDto modifyDto)
         {
             #region 参数处理
             if (string.IsNullOrEmpty(modifyDto.EntryDate) == true) modifyDto.EntryDate = SqlDateTime.MinValue.Value.ToString();
@@ -235,13 +235,13 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeleteEquEquipmentAsync(long[] idsArr)
+        public async Task<int> DeletesAsync(long[] idsArr)
         {
             // TODO 事务处理
             var rows = 0;
-            rows += await _equEquipmentRepository.SoftDeleteAsync(idsArr);
-            await _equEquipmentLinkApiRepository.SoftDeleteAsync(idsArr);
-            await _equEquipmentLinkHardwareRepository.SoftDeleteAsync(idsArr);
+            rows += await _equEquipmentRepository.DeletesAsync(idsArr);
+            await _equEquipmentLinkApiRepository.DeletesAsync(idsArr);
+            await _equEquipmentLinkHardwareRepository.DeletesAsync(idsArr);
 
             return rows;
         }
@@ -292,7 +292,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<EquEquipmentDto> GetEquEquipmentWithGroupNameAsync(long id)
+        public async Task<EquEquipmentDto> GetDetailAsync(long id)
         {
             return (await _equEquipmentRepository.GetViewByIdAsync(id)).ToModel<EquEquipmentDto>();
         }

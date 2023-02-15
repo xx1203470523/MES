@@ -88,7 +88,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         /// </summary>
         /// <param name="equipmentIds"></param>
         /// <returns></returns>
-        public async Task<int> SoftDeleteAsync(long[] equipmentIds)
+        public async Task<int> DeletesAsync(long[] equipmentIds)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(SoftDeleteSql, new { equipmentIds });

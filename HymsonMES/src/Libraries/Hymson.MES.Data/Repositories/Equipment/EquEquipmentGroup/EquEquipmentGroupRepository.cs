@@ -49,7 +49,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<int> SoftDeleteAsync(long id)
+        public async Task<int> DeleteAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeleteSql, new { IsDeleted = 1, Id = id });
@@ -60,7 +60,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> SoftDeleteAsync(long[] idsArr)
+        public async Task<int> DeletesAsync(long[] idsArr)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeleteSql, new { IsDeleted = 1, id = idsArr });

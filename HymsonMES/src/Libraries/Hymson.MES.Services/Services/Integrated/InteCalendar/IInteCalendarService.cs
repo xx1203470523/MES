@@ -13,21 +13,21 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        Task<int> AddInteCalendarAsync(InteCalendarCreateDto createDto);
+        Task<int> CreateAsync(InteCalendarCreateDto createDto);
 
         /// <summary>
         /// 更新（日历）
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        Task<int> UpdateInteCalendarAsync(InteCalendarModifyDto modifyDto);
+        Task<int> ModifyAsync(InteCalendarModifyDto modifyDto);
 
         /// <summary>
         /// 删除（日历）
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        Task<int> DeleteInteCalendarAsync(long[] idsArr);
+        Task<int> DeletesAsync(long[] idsArr);
         
         /// <summary>
         /// 查询列表（日历）
@@ -41,7 +41,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<InteCalendarDetailDto> GetInteCalendarAsync(long id);
+        Task<InteCalendarDetailDto> GetDetailAsync(long id);
 
     }
 }

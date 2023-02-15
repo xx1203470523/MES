@@ -53,7 +53,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateEquEquipmentGroupAsync(EquEquipmentGroupCreateDto createDto)
+        public async Task<int> CreateAsync(EquEquipmentGroupCreateDto createDto)
         {
             // 验证DTO
             //await _validationCreateRules.ValidateAndThrowAsync(createDto);
@@ -76,7 +76,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyEquEquipmentGroupAsync(EquEquipmentGroupModifyDto modifyDto)
+        public async Task<int> ModifyAsync(EquEquipmentGroupModifyDto modifyDto)
         {
             // 验证DTO
             //await _validationModifyRules.ValidateAndThrowAsync(modifyDto);
@@ -98,9 +98,9 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<int> DeleteEquEquipmentGroupAsync(long id)
+        public async Task<int> DeleteAsync(long id)
         {
-            return await _equEquipmentGroupRepository.SoftDeleteAsync(id);
+            return await _equEquipmentGroupRepository.DeleteAsync(id);
         }
 
         /// <summary>
@@ -108,9 +108,9 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeletesEquEquipmentGroupAsync(long[] idsArr)
+        public async Task<int> DeletesAsync(long[] idsArr)
         {
-            return await _equEquipmentGroupRepository.SoftDeleteAsync(idsArr);
+            return await _equEquipmentGroupRepository.DeletesAsync(idsArr);
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<EquEquipmentGroupListDto>> GetPageListAsync(EquEquipmentGroupPagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<EquEquipmentGroupListDto>> GetPagedListAsync(EquEquipmentGroupPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<EquEquipmentGroupPagedQuery>();
             var pagedInfo = await _equEquipmentGroupRepository.GetPagedListAsync(pagedQuery);
@@ -133,7 +133,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<EquEquipmentGroupDto> GetEquEquipmentGroupWithEquipmentsAsync(EquEquipmentGroupQueryDto query)
+        public async Task<EquEquipmentGroupDto> GetDetailAsync(EquEquipmentGroupQueryDto query)
         {
             EquEquipmentGroupDto dto = new();
             IEnumerable<EquEquipmentEntity> equipmentEntitys;

@@ -50,7 +50,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         /// </summary>
         /// <param name="equipmentIds"></param>
         /// <returns></returns>
-        Task<int> SoftDeleteAsync(long[] equipmentIds);
+        Task<int> DeletesAsync(long[] equipmentIds);
 
         /// <summary>
         /// 
