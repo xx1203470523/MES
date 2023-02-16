@@ -135,7 +135,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public bool UseStatus { get; set; } = false;
     }
-    
+
     /// <summary>
     /// 查询返回对象
     /// </summary>
@@ -150,13 +150,13 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 描述 :日历名称 
         /// 空值 : false  
         /// </summary>
-        public string CalendarName { get; set; }
+        public string CalendarName { get; set; } = "";
 
         /// <summary>
         /// 描述 :日历类型（字典名称：inte_calendar_type） 
         /// 空值 : false  
         /// </summary>
-        public string CalendarType { get; set; }
+        public int CalendarType { get; set; }
 
         /// <summary>
         /// 描述 :设备线体类型（字典名称：inte_calendar_equline_type） 
@@ -174,7 +174,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 描述 :所属站点代码 
         /// 空值 : false  
         /// </summary>
-        public string SiteCode { get; set; }
+        public string SiteCode { get; set; } = "";
 
         /// <summary>
         /// 启用状态
@@ -185,11 +185,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 名称
         /// </summary>
-        public string Code { get; set; }
+        public string Code { get; set; } = "";
         /// <summary>
         /// 名称
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
     }
 
     /// <summary>
@@ -205,12 +205,12 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 日历名称
         /// </summary>
-        public string CalendarName { get; set; }
+        public string CalendarName { get; set; } = "";
 
         /// <summary>
         /// 日历类型
         /// </summary>
-        public string CalendarType { get; set; }
+        public int CalendarType { get; set; }
 
         /// <summary>
         /// 描述 :设备或者线体id 
@@ -222,23 +222,23 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 描述 :设备或者线体名称
         /// 空值 : false  
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// 描述 :设备或者线体编码
         /// 空值 : false  
         /// </summary>
-        public string Code { get; set; }
+        public string Code { get; set; } = "";
 
         /// <summary>
         /// 日历描述
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// 年
         /// </summary>
-        public string Year { get; set; }
+        public string Year { get; set; } = "";
 
         /// <summary>
         /// 月
@@ -259,13 +259,13 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 描述 :班次名称 
         /// 空值 : false  
         /// </summary>
-        public string ClassName { get; set; }
+        public string ClassName { get; set; } = "";
 
         /// <summary>
         /// 描述 :班次描述
         /// 空值 : false  
         /// </summary>
-        public string ClassRemark { get; set; }
+        public string ClassRemark { get; set; } = "";
 
         /// <summary>
         /// 日历时间详情
@@ -347,22 +347,26 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 所属站点代码
         /// </summary>
         public string SiteCode { get; set; } = "";
+
         /// <summary>
         /// 日历名称
         /// </summary>
-        public string CalendarName { get; set; }
+        public string CalendarName { get; set; } = "";
+
         /// <summary>
         /// 名称
         /// </summary>
-        public string Code { get; set; }
+        public string Code { get; set; } = "";
+
         /// <summary>
         /// 名称
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
+
         /// <summary>
         /// 类型
         /// </summary>
-        public string CalendarType { get; set; }
+        public int CalendarType { get; set; }
 
         /// <summary>
         /// 

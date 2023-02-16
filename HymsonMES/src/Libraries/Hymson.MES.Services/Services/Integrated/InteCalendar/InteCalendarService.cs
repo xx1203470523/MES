@@ -118,7 +118,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
             #endregion
 
             var resType = 0;
-            if (!string.IsNullOrEmpty(createDto.Weekdays))
+            if (string.IsNullOrEmpty(createDto.Weekdays) == false)
             {
                 var weekdays = createDto.Weekdays.Split(',');
                 foreach (var day in weekdays)
@@ -142,15 +142,16 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
                         ClassId = createDto.ClassId ?? 0,
                         RestType = resType,
 
+
+                        CreatedBy = _currentUser.UserName,
+                        UpdatedBy = _currentUser.UserName,
                         // TODO 这里需要替换
-                        //CreatedBy = App.GetName(),
-                        //UpdatedBy = App.GetName(),
                         //SiteCode = App.GetSite()
                     });
                 }
 
-                //按选择的年月生成日历信息
-                dateDetails = GenerateDateDetailByCreateDto(entity.Id, createDto);
+                // 按选择的年月生成日历信息
+                dateDetails = GenerateDateDetail(entity.Id, createDto.ClassId, createDto.Year, createDto.Month, createDto.CalendarDataList);
             }
 
             var rows = 0;
@@ -178,13 +179,6 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
             entity.UseStatus = modifyDto.UseStatus == true ? (byte)CalendarUseStatusEnum.Enable : (byte)CalendarUseStatusEnum.NotEnabled;
 
             #region 参数校验
-            //// 判断是否有获取到站点码
-            //if (entity.SiteCode.IsNotEmpty() == false)
-            //{
-            //    responseDto.Msg = "站点码获取失败，请重新登录！";
-            //    return responseDto;
-            //}
-
             var calendar = await _inteCalendarRepository.GetByIdAsync(entity.Id);
             if (calendar == null)
             {
@@ -204,8 +198,6 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
                 //responseDto.Msg = "启用的日历不能修改！";
                 //return responseDto;
             }
-
-
 
             if (modifyDto.UseStatus == true)
             {
@@ -257,17 +249,17 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
                         ClassId = modifyDto.ClassId ?? 0,
                         RestType = resType,
 
+
+                        CreatedBy = _currentUser.UserName,
+                        UpdatedBy = _currentUser.UserName,
                         // TODO 这里需要替换
-                        //CreatedBy = App.GetName(),
-                        //UpdatedBy = App.GetName(),
                         //SiteCode = App.GetSite()
                     });
                 }
 
-                dateDetails = GenerateDateDetailByModifyDto(entity.Id, modifyDto);
+                dateDetails = GenerateDateDetail(entity.Id, modifyDto.ClassId, modifyDto.Year, modifyDto.Month, modifyDto.CalendarDataList);
             }
 
-            // TODO 事务处理
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
@@ -312,43 +304,17 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
             var pagedInfo = await _inteCalendarRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
-            var dtos = pagedInfo.Data.Select(s => s.ToModel<InteCalendarDto>());
+            var dtos = pagedInfo.Data.Select(s =>
+            {
+                if (s.CalendarType == (int)CalendarTypeEnum.Equipment)
+                {
+                    s.Code = s.EquipmentCode;
+                    s.Name = s.EquipmentName;
+                }
+
+                return s.ToModel<InteCalendarDto>();
+            });
             return new PagedInfo<InteCalendarDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
-
-            /*
-            parm.SiteCode = App.GetSite();
-            var predicate = Expressionable.Create<InteCalendar, InteWorkCenter, EquEquipment>();
-            predicate = predicate.And((a, b, c) => a.SiteCode == App.GetSite());
-            predicate = predicate.AndIF(!string.IsNullOrEmpty(parm.CalendarName), (a, b, c) => a.CalendarName.Contains(parm.CalendarName));
-            predicate = predicate.AndIF(!string.IsNullOrEmpty(parm.CalendarType), (a, b, c) => a.CalendarType.Contains(parm.CalendarType));
-            predicate = predicate.AndIF(!string.IsNullOrEmpty(parm.Code), (a, b, c) => b.Code.Contains(parm.Code) || c.EquipmentCode.Contains(parm.Code));
-            predicate = predicate.AndIF(!string.IsNullOrEmpty(parm.Name), (a, b, c) => b.Name.Contains(parm.Name) || c.EquipmentName.Contains(parm.Name));
-            predicate = predicate.AndIF(parm.UseStatus != -1, (a, b, c) => a.UseStatus == parm.UseStatus);
-
-            var calendarType = ((int)EnumCalendarType.Equipment).ToString();
-            var response = await _inteCalendarRepository.Queryable()
-                          .LeftJoin<InteWorkCenter>((a, b) => a.EquOrLineId == b.Id)
-                          .LeftJoin<EquEquipment>((a, b, c) => a.EquOrLineId == c.Id)
-                       .Where(predicate.ToExpression())
-                        .Select((a, b, c) => new InteCalendarDto
-                        {
-                            Id = a.Id,
-                            SiteCode = a.SiteCode,
-                            CalendarName = a.CalendarName,
-                            CalendarType = a.CalendarType,
-                            Remark = a.Remark,
-                            Code = a.CalendarType == calendarType ? c.EquipmentCode : b.Code,
-                            Name = a.CalendarType == calendarType ? c.EquipmentName : b.Name,
-                            UseStatus = a.UseStatus,
-                            CreatedBy = a.CreatedBy,
-                            UpdatedBy = a.UpdatedBy,
-                            UpdatedOn = a.UpdatedOn,
-                            CreatedOn = a.CreatedOn
-                        })
-                       .ToPageAsync(parm);
-
-            return response;
-            */
         }
 
         /// <summary>
@@ -380,7 +346,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
             };
 
             // 设备
-            if (calendar.CalendarType == ((int)CalendarTypeEnum.Equipment).ToString())
+            if (calendar.CalendarType == (int)CalendarTypeEnum.Equipment)
             {
                 var equ = await _equEquipmentRepository.GetByIdAsync(model.EquOrLineId);
                 if (equ != null)
@@ -391,7 +357,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
             }
 
             // 线体
-            if (calendar.CalendarType == ((int)CalendarTypeEnum.WorkCenter).ToString())
+            if (calendar.CalendarType == (int)CalendarTypeEnum.WorkCenter)
             {
                 // TODO 工作中心
                 /*
@@ -421,7 +387,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
                 model.Smonth = month;
                 if (first.RestType > 0)
                 {
-                    //十进制转化为二进制
+                    // 十进制转化为二进制
                     var weekDay = ConvertDecimalToBinary(first.RestType);
                     model.WeekDay = weekDay;
                 }
@@ -434,7 +400,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
                 {
                     model.CalendarDataList.Add(new QueryInteCalendarDetailDto
                     {
-                        Day = item.Day.Value.ToShortDateString(), //item.Day.ToString("yyyy-MM-dd"),
+                        Day = item.Day.ToShortDateString(), //item.Day.ToString("yyyy-MM-dd"),
                         RestType = item.RestType.ToString(),
                         ClassId = item.ClassId.ToString()
                     });
@@ -479,22 +445,6 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
         }
 
         /// <summary>
-        /// 根据选择的年月自动生成日历
-        /// </summary>
-        private static List<InteCalendarDateDetailEntity> GenerateDateDetailByCreateDto(long calendarId, InteCalendarCreateDto createDto)
-        {
-            return GenerateDateDetail(calendarId, createDto.ClassId, createDto.Year, createDto.Month, createDto.CalendarDataList);
-        }
-
-        /// <summary>
-        /// 根据选择的年月自动生成日历
-        /// </summary>
-        private static List<InteCalendarDateDetailEntity> GenerateDateDetailByModifyDto(long calendarId, InteCalendarModifyDto modifyDto)
-        {
-            return GenerateDateDetail(calendarId, modifyDto.ClassId, modifyDto.Year, modifyDto.Month, modifyDto.CalendarDataList);
-        }
-
-        /// <summary>
         /// 
         /// </summary>
         /// <param name="calendarId"></param>
@@ -503,7 +453,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
         /// <param name="monthStr"></param>
         /// <param name="calendarDataList"></param>
         /// <returns></returns>
-        private static List<InteCalendarDateDetailEntity> GenerateDateDetail(long calendarId, long? classId, string yearStr, string monthStr, List<InteCalendarDateDetailDto> calendarDataList)
+        private List<InteCalendarDateDetailEntity> GenerateDateDetail(long calendarId, long? classId, string yearStr, string monthStr, List<InteCalendarDateDetailDto> calendarDataList)
         {
             var monthArr = monthStr.Split(',');
             var weekDays = new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday" };
@@ -540,11 +490,11 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
                         CalendarId = calendarId,
                         Day = day,
                         ClassId = classValue,
-                        RestType = resType
+                        RestType = resType,
+                        CreatedBy = _currentUser.UserName,
+                        UpdatedBy = _currentUser.UserName,
 
                         // TODO 这里需要替换
-                        //CreatedBy = App.GetName(),
-                        //UpdatedBy = App.GetName(),
                         //SiteCode = App.GetSite()
                     });
                 }
@@ -557,7 +507,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
                 foreach (var item in details)
                 {
                     // TODO 原句是  var calendarData = dateDetails.FirstOrDefault(a => a.Day.ToString("yyyy-MM-dd") == item.Day.ToString("yyyy-MM-dd"));
-                    var calendarData = dateDetails.FirstOrDefault(a => a.Day.Value.ToShortDateString() == item.Day.ToShortDateString());
+                    var calendarData = dateDetails.FirstOrDefault(a => a.Day.ToShortDateString() == item.Day.ToShortDateString());
                     if (calendarData != null)
                     {
                         calendarData.ClassId = string.IsNullOrWhiteSpace(item.ClassId) == true ? 0 : item.ClassId.ParseToLong(0);

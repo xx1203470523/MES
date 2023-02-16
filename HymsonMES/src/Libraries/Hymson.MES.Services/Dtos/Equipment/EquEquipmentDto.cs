@@ -236,12 +236,12 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 编码（设备注册）
         /// </summary>
-        public string EquipmentCode { get; set; }
+        public string EquipmentCode { get; set; } = "";
 
         /// <summary>
         /// 名称（设备注册）
         /// </summary>
-        public string EquipmentName { get; set; }
+        public string EquipmentName { get; set; } = "";
 
         /// <summary>
         /// 类型（设备注册）
@@ -251,22 +251,22 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 使用状态（设备注册）
         /// </summary>
-        public string UseStatus { get; set; }
+        public int UseStatus { get; set; }
 
         /// <summary>
         /// 车间
         /// </summary>
-        public string WorkCenterShopName { get; set; }
+        public string WorkCenterShopName { get; set; } = "";
 
         /// <summary>
         /// 使用部门
         /// </summary>
-        public string UseDepartment { get; set; }
+        public string UseDepartment { get; set; } = "";
 
         /// <summary>
         /// 存放位置
         /// </summary>
-        public string Location { get; set; }
+        public string Location { get; set; } = "";
     }
 
     /// <summary>
@@ -283,7 +283,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 描述 :使用状态 
         /// 空值 : false  
         /// </summary>
-        public string UseStatus { get; set; }
+        public int UseStatus { get; set; }
 
         /// <summary>
         /// 描述 :功率 
@@ -379,7 +379,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 描述 :使用部门 
         /// 空值 : true  
         /// </summary>
-        public string UseDepartment { get; set; }
+        public int UseDepartment { get; set; }
 
         /// <summary>
         /// 描述 :入场日期 

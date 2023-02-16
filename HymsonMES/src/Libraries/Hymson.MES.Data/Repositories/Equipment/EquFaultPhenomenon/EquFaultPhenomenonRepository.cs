@@ -118,7 +118,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("EFP.IsDeleted = 0");
             sqlBuilder.Select("EFP.Id, EFP.FaultPhenomenonCode, EFP.FaultPhenomenonName, EFP.EquipmentGroupId, EFP.UseStatus, EFP.CreatedBy, EFP.CreatedOn, EFP.UpdatedBy, EFP.UpdatedOn, EEG.EquipmentGroupName");
-            sqlBuilder.LeftJoin("equ_equipment_group EEG");
+            sqlBuilder.LeftJoin("equ_equipment_group EEG ON EFP.EquipmentGroupId = EEG.Id");
 
             if (string.IsNullOrWhiteSpace(pagedQuery.SiteCode) == false)
             {
@@ -145,7 +145,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
 
             if (pagedQuery.UseStatus > 0)
             {
-                sqlBuilder.Where("EFP.Status = @Status");
+                sqlBuilder.Where("EFP.UseStatus = @UseStatus");
             }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;

@@ -13,7 +13,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// 描述 :使用状态 
         /// 空值 : false  
         /// </summary>
-        public string UseStatus { get; set; }
+        public int UseStatus { get; set; }
 
         /// <summary>
         /// 描述 :功率 
@@ -109,7 +109,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// 描述 :使用部门 
         /// 空值 : true  
         /// </summary>
-        public string UseDepartment { get; set; }
+        public int UseDepartment { get; set; }
 
         /// <summary>
         /// 描述 :入场日期 

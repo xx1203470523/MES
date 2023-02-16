@@ -64,7 +64,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<InteCalendarEntity>> GetPagedListAsync(InteCalendarPagedQuery pagedQuery);
+        Task<PagedInfo<InteCalendarView>> GetPagedListAsync(InteCalendarPagedQuery pagedQuery);
 
     }
 }

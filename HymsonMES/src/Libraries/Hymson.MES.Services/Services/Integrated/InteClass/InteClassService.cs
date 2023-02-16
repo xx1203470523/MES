@@ -7,8 +7,6 @@ using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
 using Hymson.Utils.Tools;
-using System.Diagnostics;
-using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Integrated.InteClass
 {
@@ -192,17 +190,12 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
         /// <returns></returns>
         private static bool TimeComparison(string startTime, string endTime)
         {
-            if (startTime == endTime)
-            {
-                return false;
-            }
-            if (endTime == "00:00:00")
-            {
-                return true;
-            }
+            if (startTime == endTime) return false;
+            if (endTime == "00:00:00") return true;
+
             string[] startTimeArry = startTime.Split(':');
             string[] endTimeArry = endTime.Split(':');
-            if ((int.Parse(startTimeArry[0]) * 60 + int.Parse(startTimeArry[1]) * 60 + int.Parse(startTimeArry[2])) > (int.Parse(endTimeArry[0]) * 60 + int.Parse(endTimeArry[1]) * 60 + int.Parse(endTimeArry[2])))
+            if ((int.Parse(startTimeArry.First()) * 60 + int.Parse(startTimeArry[1]) * 60 + int.Parse(startTimeArry[2])) > (int.Parse(endTimeArry[0]) * 60 + int.Parse(endTimeArry[1]) * 60 + int.Parse(endTimeArry[2])))
             {
                 return false;
             }

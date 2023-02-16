@@ -7,7 +7,7 @@ namespace Hymson.MES.Core.Domain.Integrated
     /// @author admin
     /// @date 2023-02-08
     /// </summary>
-    public class InteCalendarEntity : BaseEntity
+    public class InteCalendarView : BaseEntity
     {
         /// <summary>
         /// 描述 :日历名称 
@@ -44,5 +44,24 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// 空值 : true  
         /// </summary>
         public int UseStatus { get; set; }
+
+
+        /// <summary>
+        /// 名称（产线）
+        /// </summary>
+        public string Code { get; set; } = "";
+        /// <summary>
+        /// 名称（产线）
+        /// </summary>
+        public string Name { get; set; } = "";
+
+        /// <summary>
+        /// 名称（设备）
+        /// </summary>
+        public string EquipmentCode { get; set; } = "";
+        /// <summary>
+        /// 名称（设备）
+        /// </summary>
+        public string EquipmentName { get; set; } = "";
     }
 }

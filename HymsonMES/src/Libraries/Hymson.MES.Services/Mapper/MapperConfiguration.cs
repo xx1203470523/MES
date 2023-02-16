@@ -46,7 +46,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquEquipmentModifyDto, EquEquipmentEntity>();
             CreateMap<EquEquipmentPagedQueryDto, EquEquipmentPagedQuery>();
 
-            CreateMap<EquEquipmentEntity, EquEquipmentDto>();
+            CreateMap<EquEquipmentEntity, EquEquipmentListDto>();
             #endregion
 
             #region EquEquipmentGroup
@@ -117,7 +117,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteCalendarModifyDto, InteCalendarEntity>();
             CreateMap<InteCalendarPagedQueryDto, InteCalendarPagedQuery>();
 
-            CreateMap<InteCalendarEntity, InteCalendarDto>();
+            CreateMap<InteCalendarView, InteCalendarDto>();
             #endregion
 
             #region InteClassDetail
