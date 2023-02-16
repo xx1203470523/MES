@@ -8,6 +8,7 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
+using Hymson.Utils.Tools;
 using System.Data.SqlTypes;
 
 namespace Hymson.MES.Services.Services.Equipment.EquEquipment
@@ -77,20 +78,6 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
 
             if (entity.QualTime > 0 && entity.EntryDate > SqlDateTime.MinValue.Value) entity.ExpireDate = entity.EntryDate.AddMonths(entity.QualTime);
 
-            // 绑定硬件
-            List<EquEquipmentLinkHardwareEntity> linkHardwareList = new();
-            if (createDto.HardwareLinks != null && createDto.HardwareLinks.Any() == true)
-            {
-                foreach (var item in createDto.HardwareLinks)
-                {
-                    EquEquipmentLinkHardwareEntity linkHardware = item.ToEntity<EquEquipmentLinkHardwareEntity>();
-                    linkHardware.EquipmentId = entity.Id;
-                    linkHardware.CreatedBy = _currentUser.UserName;
-                    linkHardware.UpdatedBy = _currentUser.UserName;
-                    linkHardwareList.Add(linkHardware);
-                }
-            }
-
             // 绑定Api
             List<EquEquipmentLinkApiEntity> linkApiList = new();
             if (createDto.ApiLinks != null && createDto.ApiLinks.Any() == true)
@@ -99,9 +86,23 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
                 {
                     EquEquipmentLinkApiEntity linkApi = item.ToEntity<EquEquipmentLinkApiEntity>();
                     linkApi.EquipmentId = entity.Id;
-                    linkApi.CreatedBy = _currentUser.UserName;
-                    linkApi.UpdatedBy = _currentUser.UserName;
+                    linkApi.CreatedBy = entity.CreatedBy;
+                    linkApi.UpdatedBy = entity.UpdatedBy;
                     linkApiList.Add(linkApi);
+                }
+            }
+
+            // 绑定硬件
+            List<EquEquipmentLinkHardwareEntity> linkHardwareList = new();
+            if (createDto.HardwareLinks != null && createDto.HardwareLinks.Any() == true)
+            {
+                foreach (var item in createDto.HardwareLinks)
+                {
+                    EquEquipmentLinkHardwareEntity linkHardware = item.ToEntity<EquEquipmentLinkHardwareEntity>();
+                    linkHardware.EquipmentId = entity.Id;
+                    linkHardware.CreatedBy = entity.CreatedBy;
+                    linkHardware.UpdatedBy = entity.UpdatedBy;
+                    linkHardwareList.Add(linkHardware);
                 }
             }
             #endregion
@@ -118,11 +119,14 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             }
             #endregion
 
-            // TODO 事务处理
             var rows = 0;
-            rows += await _equEquipmentRepository.InsertAsync(entity);
-            rows += await _equEquipmentLinkApiRepository.InsertRangeAsync(linkApiList);
-            rows += await _equEquipmentLinkHardwareRepository.InsertRangeAsync(linkHardwareList);
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                rows += await _equEquipmentRepository.InsertAsync(entity);
+                rows += await _equEquipmentLinkApiRepository.InsertRangeAsync(linkApiList);
+                rows += await _equEquipmentLinkHardwareRepository.InsertRangeAsync(linkHardwareList);
+                trans.Complete();
+            }
             return rows;
         }
 
@@ -142,61 +146,33 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
 
             if (entity.QualTime > 0 && entity.EntryDate > SqlDateTime.MinValue.Value) entity.ExpireDate = entity.EntryDate.AddMonths(entity.QualTime);
 
-            //绑定硬件
-            List<EquEquipmentLinkHardwareEntity> addLinkHardwares = new();
-            List<EquEquipmentLinkHardwareEntity> updateLinkHardwares = new();
-            List<long> deleteLinkHardwareIds = new();
-            if (modifyDto.HardwareLinks != null && modifyDto.HardwareLinks.Any() == true)
-            {
-                foreach (var item in modifyDto.HardwareLinks)
-                {
-                    EquEquipmentLinkHardwareEntity linkHardware;
-                    switch (item.OperationType)
-                    {
-                        case 1:
-                            linkHardware = item.ToEntity<EquEquipmentLinkHardwareEntity>();
-                            linkHardware.EquipmentId = modifyDto.Id;
-                            addLinkHardwares.Add(linkHardware);
-                            break;
-                        case 2:
-                            linkHardware = item.ToEntity<EquEquipmentLinkHardwareEntity>();
-                            updateLinkHardwares.Add(linkHardware);
-                            break;
-                        case 3:
-                            if (item.Id != null && item.Id > 0) deleteLinkHardwareIds.Add(item.Id ?? 0);
-                            break;
-                    }
-
-                }
-            }
-
             // 绑定Api
-            List<EquEquipmentLinkApiEntity> addLinkApis = new();
-            List<EquEquipmentLinkApiEntity> updateLinkApis = new();
-            List<long> deleteLinkApiIds = new();
+            List<EquEquipmentLinkApiEntity> linkApiList = new();
             if (modifyDto.ApiLinks != null && modifyDto.ApiLinks.Any() == true)
             {
                 foreach (var item in modifyDto.ApiLinks)
                 {
-                    EquEquipmentLinkApiEntity linkApi;
-                    switch (item.OperationType)
-                    {
-                        case 1:
-                            linkApi = item.ToEntity<EquEquipmentLinkApiEntity>();
-                            linkApi.EquipmentId = modifyDto.Id;
-                            addLinkApis.Add(linkApi);
-                            break;
-                        case 2:
-                            linkApi = item.ToEntity<EquEquipmentLinkApiEntity>();
-                            updateLinkApis.Add(linkApi);
-                            break;
-                        case 3:
-                            if (item.Id != null && item.Id > 0) deleteLinkApiIds.Add(item.Id ?? 0);
-                            break;
-                    }
+                    EquEquipmentLinkApiEntity linkApi = item.ToEntity<EquEquipmentLinkApiEntity>();
+                    linkApi.EquipmentId = entity.Id;
+                    linkApi.CreatedBy = entity.CreatedBy;
+                    linkApi.UpdatedBy = entity.UpdatedBy;
+                    linkApiList.Add(linkApi);
                 }
             }
 
+            // 绑定硬件
+            List<EquEquipmentLinkHardwareEntity> linkHardwareList = new();
+            if (modifyDto.HardwareLinks != null && modifyDto.HardwareLinks.Any() == true)
+            {
+                foreach (var item in modifyDto.HardwareLinks)
+                {
+                    EquEquipmentLinkHardwareEntity linkHardware = item.ToEntity<EquEquipmentLinkHardwareEntity>();
+                    linkHardware.EquipmentId = entity.Id;
+                    linkHardware.CreatedBy = entity.CreatedBy;
+                    linkHardware.UpdatedBy = entity.UpdatedBy;
+                    linkHardwareList.Add(linkHardware);
+                }
+            }
             #endregion
 
             #region 参数校验
@@ -211,22 +187,20 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             #endregion
 
             var rows = 0;
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                // 需要检查更新的字段
+                rows += await _equEquipmentRepository.UpdateAsync(entity);
 
-            // TODO 事务处理
-            // TODO 需要检查更新的字段
-            rows += await _equEquipmentRepository.UpdateAsync(entity);
+                // 绑定API数据
+                rows += await _equEquipmentLinkApiRepository.DeletesAsync(entity.Id);
+                rows += await _equEquipmentLinkApiRepository.InsertRangeAsync(linkApiList);
 
-            // 绑定API数据
-            await _equEquipmentLinkApiRepository.SoftDeleteAsync(deleteLinkApiIds);
-            await _equEquipmentLinkApiRepository.UpdateRangeAsync(updateLinkApis);
-            await _equEquipmentLinkApiRepository.InsertRangeAsync(addLinkApis);
-
-
-            // 绑定硬件数据
-            await _equEquipmentLinkHardwareRepository.SoftDeleteAsync(deleteLinkHardwareIds);
-            await _equEquipmentLinkHardwareRepository.UpdateRangeAsync(updateLinkHardwares);
-            await _equEquipmentLinkHardwareRepository.InsertRangeAsync(addLinkHardwares);
-
+                // 绑定硬件数据
+                rows += await _equEquipmentLinkHardwareRepository.DeletesAsync(entity.Id);
+                rows += await _equEquipmentLinkHardwareRepository.InsertRangeAsync(linkHardwareList);
+                trans.Complete();
+            }
             return rows;
         }
 
@@ -237,12 +211,14 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] idsArr)
         {
-            // TODO 事务处理
             var rows = 0;
-            rows += await _equEquipmentRepository.DeletesAsync(idsArr);
-            await _equEquipmentLinkApiRepository.DeletesAsync(idsArr);
-            await _equEquipmentLinkHardwareRepository.DeletesAsync(idsArr);
-
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                rows += await _equEquipmentRepository.DeletesAsync(idsArr);
+                rows += await _equEquipmentLinkApiRepository.DeletesAsync(idsArr);
+                rows += await _equEquipmentLinkHardwareRepository.DeletesAsync(idsArr);
+                trans.Complete();
+            }
             return rows;
         }
 
@@ -377,6 +353,45 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
 
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="apiLinks"></param>
+        /// <param name="hardwareLinks"></param>
+        /// <returns></returns>
+        public static (List<EquEquipmentLinkApiEntity> Apis, List<EquEquipmentLinkHardwareEntity> Hardwares) ConvertToTupleList(EquEquipmentEntity entity, List<EquEquipmentLinkApiCreateDto> apiLinks, List<EquEquipmentLinkHardwareCreateDto> hardwareLinks)
+        {
+            // 绑定Api
+            List<EquEquipmentLinkApiEntity> linkApiList = new();
+            if (apiLinks != null && apiLinks.Any() == true)
+            {
+                foreach (var item in apiLinks)
+                {
+                    EquEquipmentLinkApiEntity linkApi = item.ToEntity<EquEquipmentLinkApiEntity>();
+                    linkApi.EquipmentId = entity.Id;
+                    linkApi.CreatedBy = entity.CreatedBy;
+                    linkApi.UpdatedBy = entity.UpdatedBy;
+                    linkApiList.Add(linkApi);
+                }
+            }
+
+            // 绑定硬件
+            List<EquEquipmentLinkHardwareEntity> linkHardwareList = new();
+            if (hardwareLinks != null && hardwareLinks.Any() == true)
+            {
+                foreach (var item in hardwareLinks)
+                {
+                    EquEquipmentLinkHardwareEntity linkHardware = item.ToEntity<EquEquipmentLinkHardwareEntity>();
+                    linkHardware.EquipmentId = entity.Id;
+                    linkHardware.CreatedBy = entity.CreatedBy;
+                    linkHardware.UpdatedBy = entity.UpdatedBy;
+                    linkHardwareList.Add(linkHardware);
+                }
+            }
+
+            return (linkApiList, linkHardwareList);
+        }
 
         #region 这里是供其他业务层调用的方法，个人觉得应该直接在其他业务层调用各业务仓储层
         /// <summary>

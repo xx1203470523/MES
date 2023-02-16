@@ -48,6 +48,13 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="equipmentId"></param>
+        /// <returns></returns>
+        Task<int> DeletesAsync(long equipmentId);
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="equipmentIds"></param>
         /// <returns></returns>
         Task<int> DeletesAsync(long[] equipmentIds);

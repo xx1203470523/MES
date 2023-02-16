@@ -13,6 +13,7 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using Org.BouncyCastle.Crypto;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -49,6 +50,17 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeletesSql, new { ids=ids });
 
+        }
+
+        /// <summary>
+        /// 批量删除关联的BomId的数据
+        /// </summary>
+        /// <param name="bomIds"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteBomIDAsync(long[] bomIds) 
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeleteBomIDsSql, new { bomIds = bomIds });
         }
 
         /// <summary>
@@ -202,6 +214,10 @@ namespace Hymson.MES.Data.Repositories.Process
         const string UpdatesSql = "UPDATE `proc_bom_detail` SET   SiteCode = @SiteCode, BomId = @BomId, ProcedureBomId = @ProcedureBomId, MaterialId = @MaterialId, ReferencePoint = @ReferencePoint, Usages = @Usages, Loss = @Loss, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_bom_detail` SET IsDeleted = '1' WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_bom_detail` SET IsDeleted = '1' WHERE Id in @ids";
+        /// <summary>
+        /// 批量删除关联的BomId的数据
+        /// </summary>
+        const string DeleteBomIDsSql = "UPDATE `proc_bom_detail` SET IsDeleted = '1' WHERE BomId in @bomIds";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteCode`, `BomId`, `ProcedureBomId`, `MaterialId`, `ReferencePoint`, `Usages`, `Loss`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_bom_detail`  WHERE Id = @Id ";

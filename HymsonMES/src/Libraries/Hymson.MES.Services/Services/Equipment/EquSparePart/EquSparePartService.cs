@@ -53,7 +53,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
 
-            //入库
+            // 入库
             return await _equSparePartRepository.InsertAsync(entity);
         }
 
