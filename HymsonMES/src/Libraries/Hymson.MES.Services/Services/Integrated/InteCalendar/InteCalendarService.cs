@@ -1,4 +1,5 @@
 using Hymson.Authentication;
+using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Integrated;
@@ -20,9 +21,14 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
     public class InteCalendarService : IInteCalendarService
     {
         /// <summary>
-        /// 当前登录用户对象
+        /// 当前对象（登录用户）
         /// </summary>
         private readonly ICurrentUser _currentUser;
+
+        /// <summary>
+        /// 当前对象（站点）
+        /// </summary>
+        private readonly ICurrentSite _currentSite;
 
         /// <summary>
         /// 仓储（日历）
@@ -50,15 +56,16 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
         private readonly IEquEquipmentRepository _equEquipmentRepository;
 
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
+        /// <param name="currentSite"></param>
         /// <param name="currentUser"></param>
         /// <param name="inteCalendarRepository"></param>
         /// <param name="inteCalendarDateRepository"></param>
         /// <param name="inteCalendarDateDetailRepository"></param>
         /// <param name="inteClassRepository"></param>
         /// <param name="equEquipmentRepository"></param>
-        public InteCalendarService(ICurrentUser currentUser,
+        public InteCalendarService(ICurrentUser currentUser, ICurrentSite currentSite,
             IInteCalendarRepository inteCalendarRepository,
             IInteCalendarDateRepository inteCalendarDateRepository,
             IInteCalendarDateDetailRepository inteCalendarDateDetailRepository,
@@ -66,6 +73,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
             IEquEquipmentRepository equEquipmentRepository)
         {
             _currentUser = currentUser;
+            _currentSite = currentSite;
             _inteCalendarRepository = inteCalendarRepository;
             _inteCalendarDateRepository = inteCalendarDateRepository;
             _inteCalendarDateDetailRepository = inteCalendarDateDetailRepository;

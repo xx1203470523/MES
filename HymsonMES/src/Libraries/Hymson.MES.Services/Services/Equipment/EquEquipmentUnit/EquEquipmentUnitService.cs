@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Hymson.Authentication;
+using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
@@ -16,9 +17,14 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
     public class EquEquipmentUnitService : IEquEquipmentUnitService
     {
         /// <summary>
-        /// 当前登录用户对象
+        /// 当前对象（登录用户）
         /// </summary>
         private readonly ICurrentUser _currentUser;
+
+        /// <summary>
+        /// 当前对象（站点）
+        /// </summary>
+        private readonly ICurrentSite _currentSite;
 
         /// <summary>
         /// 
@@ -27,16 +33,18 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
         private readonly AbstractValidator<EquEquipmentUnitCreateDto> _validationCreateRules;
 
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
+        /// <param name="currentSite"></param>
         /// <param name="currentUser"></param>
         /// <param name="equEquipmentUnitRepository"></param>
         /// <param name="validationRules"></param>
-        public EquEquipmentUnitService(ICurrentUser currentUser,
+        public EquEquipmentUnitService(ICurrentUser currentUser, ICurrentSite currentSite,
             IEquEquipmentUnitRepository equEquipmentUnitRepository,
             AbstractValidator<EquEquipmentUnitCreateDto> validationRules)
         {
             _currentUser = currentUser;
+            _currentSite = currentSite;
             _equEquipmentUnitRepository = equEquipmentUnitRepository;
             _validationCreateRules = validationRules;
         }

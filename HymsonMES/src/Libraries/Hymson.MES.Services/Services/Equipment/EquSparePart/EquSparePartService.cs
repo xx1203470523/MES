@@ -1,4 +1,5 @@
 using Hymson.Authentication;
+using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
@@ -15,9 +16,14 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
     public class EquSparePartService : IEquSparePartService
     {
         /// <summary>
-        /// 当前登录用户对象
+        /// 当前对象（登录用户）
         /// </summary>
         private readonly ICurrentUser _currentUser;
+
+        /// <summary>
+        /// 当前对象（站点）
+        /// </summary>
+        private readonly ICurrentSite _currentSite;
 
         /// <summary>
         /// 仓储（备件注册） 
@@ -26,14 +32,16 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
 
 
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
+        /// <param name="currentSite"></param>
         /// <param name="currentUser"></param>
         /// <param name="equSparePartRepository"></param>
-        public EquSparePartService(ICurrentUser currentUser,
+        public EquSparePartService(ICurrentUser currentUser, ICurrentSite currentSite,
             IEquSparePartRepository equSparePartRepository)
         {
             _currentUser = currentUser;
+            _currentSite = currentSite;
             _equSparePartRepository = equSparePartRepository;
         }
 

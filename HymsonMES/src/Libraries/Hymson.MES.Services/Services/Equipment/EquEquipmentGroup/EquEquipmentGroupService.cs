@@ -1,4 +1,5 @@
 using Hymson.Authentication;
+using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
@@ -19,9 +20,14 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
     public class EquEquipmentGroupService : IEquEquipmentGroupService
     {
         /// <summary>
-        /// 当前登录用户对象
+        /// 当前对象（登录用户）
         /// </summary>
         private readonly ICurrentUser _currentUser;
+
+        /// <summary>
+        /// 当前对象（站点）
+        /// </summary>
+        private readonly ICurrentSite _currentSite;
 
         /// <summary>
         /// 仓储（设备组）
@@ -34,16 +40,18 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         private readonly IEquEquipmentRepository _equEquipmentRepository;
 
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
+        /// <param name="currentSite"></param>
         /// <param name="currentUser"></param>
         /// <param name="equEquipmentGroupRepository"></param>
         /// <param name="equEquipmentRepository"></param>
-        public EquEquipmentGroupService(ICurrentUser currentUser,
+        public EquEquipmentGroupService(ICurrentUser currentUser, ICurrentSite currentSite,
             IEquEquipmentGroupRepository equEquipmentGroupRepository,
             IEquEquipmentRepository equEquipmentRepository)
         {
             _currentUser = currentUser;
+            _currentSite = currentSite;
             _equEquipmentGroupRepository = equEquipmentGroupRepository;
             _equEquipmentRepository = equEquipmentRepository;
         }
@@ -64,6 +72,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
             entity.Id = IdGenProvider.Instance.CreateId();
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
+            //entity.SiteCode = _currentSite.SiteId;
 
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())

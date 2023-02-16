@@ -1,4 +1,5 @@
 using Hymson.Authentication;
+using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Integrated;
@@ -16,9 +17,14 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
     public class InteClassService : IInteClassService
     {
         /// <summary>
-        /// 当前登录用户对象
+        /// 当前对象（登录用户）
         /// </summary>
         private readonly ICurrentUser _currentUser;
+
+        /// <summary>
+        /// 当前对象（站点）
+        /// </summary>
+        private readonly ICurrentSite _currentSite;
 
         /// <summary>
         /// 仓储（班制维护）
@@ -31,16 +37,18 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
         private readonly IInteClassDetailRepository _inteClassDetailRepository;
 
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
+        /// <param name="currentSite"></param>
         /// <param name="currentUser"></param>
         /// <param name="inteClassRepository"></param>
         /// <param name="inteClassDetailRepository"></param>
-        public InteClassService(ICurrentUser currentUser,
+        public InteClassService(ICurrentUser currentUser, ICurrentSite currentSite,
             IInteClassRepository inteClassRepository,
             IInteClassDetailRepository inteClassDetailRepository)
         {
             _currentUser = currentUser;
+            _currentSite = currentSite;
             _inteClassRepository = inteClassRepository;
             _inteClassDetailRepository = inteClassDetailRepository;
         }

@@ -1,4 +1,5 @@
 using Hymson.Authentication;
+using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
@@ -15,9 +16,14 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
     public class EquFaultPhenomenonService : IEquFaultPhenomenonService
     {
         /// <summary>
-        /// 当前登录用户对象
+        /// 当前对象（登录用户）
         /// </summary>
         private readonly ICurrentUser _currentUser;
+
+        /// <summary>
+        /// 当前对象（站点）
+        /// </summary>
+        private readonly ICurrentSite _currentSite;
 
         /// <summary>
         /// 仓储（设备故障现象）
@@ -25,14 +31,16 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         private readonly IEquFaultPhenomenonRepository _equFaultPhenomenonRepository;
 
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
+        /// <param name="currentSite"></param>
         /// <param name="currentUser"></param>
         /// <param name="equFaultPhenomenonRepository"></param>
-        public EquFaultPhenomenonService(ICurrentUser currentUser,
+        public EquFaultPhenomenonService(ICurrentUser currentUser, ICurrentSite currentSite,
             IEquFaultPhenomenonRepository equFaultPhenomenonRepository)
         {
             _currentUser = currentUser;
+            _currentSite = currentSite;
             _equFaultPhenomenonRepository = equFaultPhenomenonRepository;
         }
 
