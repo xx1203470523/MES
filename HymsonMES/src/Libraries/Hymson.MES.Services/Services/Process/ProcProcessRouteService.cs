@@ -251,10 +251,10 @@ namespace Hymson.MES.Services.Services.Process
                 throw new ValidationException(ErrorCode.MES10436);
             }
 
-           var  processRoute=await _procProcessRouteRepository.GetByIdAsync(parm.Id);
-            if (processRoute==null)
+            var processRoute = await _procProcessRouteRepository.GetByIdAsync(parm.Id);
+            if (processRoute == null)
             {
-                throw new DataException(ErrorCode.MES10438);
+                throw new ValidationException(ErrorCode.MES10438);
             }
 
             // 判断编号是否已存在
@@ -373,6 +373,7 @@ namespace Hymson.MES.Services.Services.Process
 
             return nodeList.Select(s => new ProcProcessRouteDetailNodeEntity
             {
+                Id = IdGenProvider.Instance.CreateId(),
                 SiteCode = model.SiteCode,
                 ProcessRouteId = model.Id,
                 SerialNo = s.SerialNo,
@@ -399,9 +400,10 @@ namespace Hymson.MES.Services.Services.Process
 
             return linkList.Select(s => new ProcProcessRouteDetailLinkEntity
             {
+                Id = IdGenProvider.Instance.CreateId(),
                 SiteCode = model.SiteCode,
-                ProcessRouteId = model.Id,
                 SerialNo = s.SerialNo,
+                ProcessRouteId = model.Id,
                 PreProcessRouteDetailId = s.PreProcessRouteDetailId,
                 ProcessRouteDetailId = s.ProcessRouteDetailId,
                 Extra1 = s.Extra1,

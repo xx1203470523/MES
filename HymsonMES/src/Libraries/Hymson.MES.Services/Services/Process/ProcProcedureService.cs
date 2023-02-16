@@ -232,7 +232,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        public async Task CreateProcProcedureAsync(AddProcProcedureDto parm)
+        public async Task AddProcProcedureAsync(AddProcProcedureDto parm)
         {
             #region 验证
             if (parm == null)
@@ -321,7 +321,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        public async Task ModifyProcProcedureAsync(UpdateProcProcedureDto parm)
+        public async Task UpdateProcProcedureAsync(UpdateProcProcedureDto parm)
         {
             #region
             if (parm == null)

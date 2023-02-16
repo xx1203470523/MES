@@ -84,15 +84,16 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 查询List
         /// </summary>
-        /// <param name="procProcessRouteDetailLinkQuery"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetListAsync(ProcProcessRouteDetailLinkQuery procProcessRouteDetailLinkQuery)
+        public async Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetListAsync(ProcProcessRouteDetailLinkQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetListSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
             sqlBuilder.Where("ProcessRouteId=@ProcessRouteId");
+            sqlBuilder.AddParameters(query);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var procProcessRouteDetailLinkEntities = await conn.QueryAsync<ProcProcessRouteDetailLinkEntity>(template.RawSql, template.Parameters);
@@ -197,6 +198,6 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteCode`, `SerialNo`, `ProcessRouteId`, `PreProcessRouteDetailId`, `ProcessRouteDetailId`, `Extra1`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_process_route_detail_link`  WHERE Id IN @ids ";
-        const string DeleteByProcessRouteIdSql = "UPDATE `proc_process_route_detail_link` SET IsDeleted = '1' WHERE ProcessRouteId = @ProcessRouteId ";
+        const string DeleteByProcessRouteIdSql = "delete from `proc_process_route_detail_link` WHERE ProcessRouteId = @ProcessRouteId ";
     }
 }
