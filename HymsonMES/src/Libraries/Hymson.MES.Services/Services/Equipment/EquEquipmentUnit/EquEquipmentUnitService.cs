@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Hymson.Authentication;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
@@ -15,6 +16,11 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
     public class EquEquipmentUnitService : IEquEquipmentUnitService
     {
         /// <summary>
+        /// 当前登录用户对象
+        /// </summary>
+        private readonly ICurrentUser _currentUser;
+
+        /// <summary>
         /// 
         /// </summary>
         private readonly IEquEquipmentUnitRepository _equEquipmentUnitRepository;
@@ -23,10 +29,14 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="currentUser"></param>
         /// <param name="equEquipmentUnitRepository"></param>
         /// <param name="validationRules"></param>
-        public EquEquipmentUnitService(IEquEquipmentUnitRepository equEquipmentUnitRepository, AbstractValidator<EquEquipmentUnitCreateDto> validationRules)
+        public EquEquipmentUnitService(ICurrentUser currentUser,
+            IEquEquipmentUnitRepository equEquipmentUnitRepository,
+            AbstractValidator<EquEquipmentUnitCreateDto> validationRules)
         {
+            _currentUser = currentUser;
             _equEquipmentUnitRepository = equEquipmentUnitRepository;
             _validationCreateRules = validationRules;
         }
@@ -44,8 +54,8 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
             // DTO转换实体
             var entity = createDto.ToEntity<EquEquipmentUnitEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
-            entity.CreatedBy = "TODO";
-            entity.UpdatedBy = "TODO";
+            entity.CreatedBy = _currentUser.UserName;
+            entity.UpdatedBy = _currentUser.UserName;
 
             // 保存实体
             return await _equEquipmentUnitRepository.InsertAsync(entity);
@@ -60,7 +70,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
         {
             // DTO转换实体
             var entity = modifyDto.ToEntity<EquEquipmentUnitEntity>();
-            entity.UpdatedBy = "TODO";
+            entity.UpdatedBy = _currentUser.UserName;
 
             // 保存实体
             return await _equEquipmentUnitRepository.UpdateAsync(entity);
@@ -84,7 +94,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
         public async Task<PagedInfo<EquEquipmentUnitDto>> GetPagedListAsync(EquEquipmentUnitPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<EquEquipmentUnitPagedQuery>();
-            var pagedInfo = await _equEquipmentUnitRepository.GetPagedInfoAsync(pagedQuery);
+            var pagedInfo = await _equEquipmentUnitRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<EquEquipmentUnitDto>());

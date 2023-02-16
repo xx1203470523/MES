@@ -8,7 +8,7 @@
 using FluentValidation;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Services.Dtos.Process;
-using Hymson.Utils.Extensions;
+using Hymson.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,9 +24,9 @@ namespace Hymson.MES.Services.Validators.Process
     {
         public ProcMaterialCreateValidator()
         {
-            RuleFor(x => x.MaterialCode).NotEmpty().WithErrorCode(ErrorCode.WME10214);
+            RuleFor(x => x.MaterialCode).NotEmpty().WithErrorCode(ErrorCode.MES10214);
             //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
-            RuleFor(x=>x.MaterialName).NotEmpty().WithErrorCode(ErrorCode.WME10215);
+            RuleFor(x=>x.MaterialName).NotEmpty().WithErrorCode(ErrorCode.MES10215);
 
         }
     }
@@ -38,7 +38,7 @@ namespace Hymson.MES.Services.Validators.Process
     {
         public ProcMaterialModifyValidator()
         {
-            RuleFor(x => x.SiteCode).NotEmpty().WithErrorCode(ErrorCode.WMS10203);// 判断是否有获取到站点码
+            RuleFor(x => x.SiteCode).NotEmpty().WithErrorCode(ErrorCode.MES10203);// 判断是否有获取到站点码
             //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
         }
     }

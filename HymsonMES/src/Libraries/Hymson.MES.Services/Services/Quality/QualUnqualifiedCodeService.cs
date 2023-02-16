@@ -2,13 +2,14 @@ using FluentValidation;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Quality;
+using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Quality.IQualityService;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using Hymson.Utils.Extensions;
+using Hymson.Utils.Tools;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -20,6 +21,7 @@ namespace Hymson.MES.Services.Services.Quality
     public class QualUnqualifiedCodeService : IQualUnqualifiedCodeService
     {
         private readonly IQualUnqualifiedCodeRepository _qualUnqualifiedCodeRepository;
+        private readonly IQualUnqualifiedGroupRepository _qualUnqualifiedGroupRepository;
         private readonly AbstractValidator<QualUnqualifiedCodeCreateDto> _validationCreateRules;
         private readonly AbstractValidator<QualUnqualifiedCodeModifyDto> _validationModifyRules;
 
@@ -29,9 +31,10 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="qualUnqualifiedCodeRepository"></param>
         /// <param name="validationCreateRules"></param>
         /// <param name="validationModifyRules"></param>
-        public QualUnqualifiedCodeService(IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository, AbstractValidator<QualUnqualifiedCodeCreateDto> validationCreateRules, AbstractValidator<QualUnqualifiedCodeModifyDto> validationModifyRules)
+        public QualUnqualifiedCodeService(IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository, IQualUnqualifiedGroupRepository qualUnqualifiedGroupRepository, AbstractValidator<QualUnqualifiedCodeCreateDto> validationCreateRules, AbstractValidator<QualUnqualifiedCodeModifyDto> validationModifyRules)
         {
             _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
+            _qualUnqualifiedGroupRepository = qualUnqualifiedGroupRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
         }
@@ -53,9 +56,15 @@ namespace Hymson.MES.Services.Services.Quality
             qualUnqualifiedCodeEntity.UpdatedBy = "TODO";
             qualUnqualifiedCodeEntity.CreatedOn = HymsonClock.Now();
             qualUnqualifiedCodeEntity.UpdatedOn = HymsonClock.Now();
+            if (parm.UnqualifiedGroupIds != null)
+            {
 
-            //入库
+            }
+            using var ts = TransactionHelper.GetTransactionScope();
+            //插入不合格代码表
             await _qualUnqualifiedCodeRepository.InsertAsync(qualUnqualifiedCodeEntity);
+
+            ts.Complete();
         }
 
         /// <summary>

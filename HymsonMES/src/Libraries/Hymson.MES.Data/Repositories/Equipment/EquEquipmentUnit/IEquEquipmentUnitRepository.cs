@@ -40,15 +40,9 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="equipmentUnitQuery"></param>
+        /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquEquipmentUnitEntity>> GetEntitiesAsync(EquEquipmentUnitQuery equipmentUnitQuery);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="equipmentUnitPagedQuery"></param>
-        /// <returns></returns>
-        Task<PagedInfo<EquEquipmentUnitEntity>> GetPagedInfoAsync(EquEquipmentUnitPagedQuery equipmentUnitPagedQuery);
+        Task<PagedInfo<EquEquipmentUnitEntity>> GetPagedListAsync(EquEquipmentUnitPagedQuery pagedQuery);
+        
     }
 }

@@ -1,5 +1,5 @@
 using Hymson.Infrastructure;
-using System.ComponentModel.DataAnnotations;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Services.Dtos.Equipment
 {
@@ -11,24 +11,22 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 编码（设备组）
         /// </summary>
-        [Required(ErrorMessage = "编码不能为空")]
-        public string EquipmentGroupCode { get; set; }
+        public string EquipmentGroupCode { get; set; } = "";
 
         /// <summary>
         /// 名称（设备组）
         /// </summary>
-        [Required(ErrorMessage = "名称不能为空")]
-        public string EquipmentGroupName { get; set; }
+        public string EquipmentGroupName { get; set; } = "";
 
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
-        /// 集合（设备注册）
+        /// ID集合（设备注册）
         /// </summary>
-        public IEnumerable<long> Equipments { get; set; }
+        public IEnumerable<long> EquipmentIDs { get; set; }
     }
 
     /// <summary>
@@ -44,18 +42,17 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 名称（设备组）
         /// </summary>
-        [Required(ErrorMessage = "名称不能为空")]
-        public string EquipmentGroupName { get; set; }
+        public string EquipmentGroupName { get; set; } = "";
 
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
-        /// 集合（设备注册）
+        /// ID集合（设备注册）
         /// </summary>
-        public IEnumerable<long> Equipments { get; set; }
+        public IEnumerable<long> EquipmentIDs { get; set; }
     }
 
     /// <summary>
@@ -84,11 +81,20 @@ namespace Hymson.MES.Services.Dtos.Equipment
     /// </summary>
     public class EquEquipmentGroupPagedQueryDto : PagerInfo
     {
-        ///// <summary>
-        ///// 描述 :站点编码 
-        ///// 空值 : false  
-        ///// </summary>
-        //public string SiteCode { get; set; }
+        /// <summary>
+        /// 站点编码 
+        /// </summary>
+        public string SiteCode { get; set; } = "";
+
+        /// <summary>
+        /// 编码（设备组）
+        /// </summary>
+        public string EquipmentGroupCode { get; set; } = "";
+
+        /// <summary>
+        /// 名称（设备组）
+        /// </summary>
+        public string EquipmentGroupName { get; set; } = "";
     }
 
     /// <summary>
@@ -115,7 +121,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 操作类型 1:add；2:edit；3:view；
         /// </summary>
-        public string OperateType { get; set; } = "add";
+        public OperateTypeEnum OperateType { get; set; } = OperateTypeEnum.None;
 
         /// <summary>
         /// 设备组Id

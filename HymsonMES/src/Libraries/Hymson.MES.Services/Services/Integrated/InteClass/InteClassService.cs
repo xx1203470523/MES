@@ -1,3 +1,4 @@
+using Hymson.Authentication;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Integrated;
@@ -6,37 +7,50 @@ using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
 
-namespace Hymson.MES.Services.Services.InteClass
+namespace Hymson.MES.Services.Services.Integrated.InteClass
 {
     /// <summary>
-    /// 生产班次 服务
+    /// 班制维护 服务
     /// </summary>
     public class InteClassService : IInteClassService
     {
         /// <summary>
-        /// 仓储（生产班次）
+        /// 当前登录用户对象
+        /// </summary>
+        private readonly ICurrentUser _currentUser;
+
+        /// <summary>
+        /// 仓储（班制维护）
         /// </summary>
         private readonly IInteClassRepository _inteClassRepository;
+
+        /// <summary>
+        /// 仓储（班制维护明细）
+        /// </summary>
         private readonly IInteClassDetailRepository _inteClassDetailRepository;
 
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="currentUser"></param>
         /// <param name="inteClassRepository"></param>
         /// <param name="inteClassDetailRepository"></param>
-        public InteClassService(IInteClassRepository inteClassRepository, IInteClassDetailRepository inteClassDetailRepository)
+        public InteClassService(ICurrentUser currentUser,
+            IInteClassRepository inteClassRepository,
+            IInteClassDetailRepository inteClassDetailRepository)
         {
+            _currentUser = currentUser;
             _inteClassRepository = inteClassRepository;
             _inteClassDetailRepository = inteClassDetailRepository;
         }
 
 
         /// <summary>
-        /// 添加生产班次详情
+        /// 添加班制维护详情
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task<int> AddInteClassAsync(AddInteClassDto createDto)
+        public async Task<int> AddInteClassAsync(InteClassCreateDto createDto)
         {
             // 验证DTO
 
@@ -44,8 +58,8 @@ namespace Hymson.MES.Services.Services.InteClass
             // DTO转换实体
             var entity = createDto.ToEntity<InteClassEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
-            entity.CreatedBy = "TODO";
-            entity.UpdatedBy = "TODO";
+            entity.CreatedBy = _currentUser.UserName;
+            entity.UpdatedBy = _currentUser.UserName;
 
             List<InteClassDetailEntity> details = new();
             foreach (var item in createDto.DetailList)
@@ -70,15 +84,15 @@ namespace Hymson.MES.Services.Services.InteClass
         }
 
         /// <summary>
-        /// 更新生产班次详情
+        /// 更新班制维护详情
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task<int> UpdateInteClassAsync(UpdateInteClassDto modifyDto)
+        public async Task<int> UpdateInteClassAsync(InteClassModifyDto modifyDto)
         {
             // DTO转换实体
             var entity = modifyDto.ToEntity<InteClassEntity>();
-            entity.UpdatedBy = "TODO";
+            entity.UpdatedBy = _currentUser.UserName;
 
             List<InteClassDetailEntity> details = new();
             foreach (var item in modifyDto.DetailList)
@@ -104,7 +118,7 @@ namespace Hymson.MES.Services.Services.InteClass
         }
 
         /// <summary>
-        /// 删除生产班次详情
+        /// 删除班制维护详情
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
@@ -114,14 +128,14 @@ namespace Hymson.MES.Services.Services.InteClass
         }
 
         /// <summary>
-        /// 查询生产班次详情列表
+        /// 查询班制维护详情列表
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         public async Task<PagedInfo<InteClassDto>> GetPagedListAsync(InteClassPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<InteClassPagedQuery>();
-            var pagedInfo = await _inteClassRepository.GetPagedInfoAsync(pagedQuery);
+            var pagedInfo = await _inteClassRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<InteClassDto>());

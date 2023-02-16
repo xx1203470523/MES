@@ -31,8 +31,8 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :所属工序ID 
         /// 空值 : false  
         /// </summary>
-        public long ProcedureBomId { get; set; }
-        
+        public long ProcedureId { get; set; }
+
         /// <summary>
         /// 描述 :抽检类型 
         /// 空值 : true  

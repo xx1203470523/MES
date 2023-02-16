@@ -1,7 +1,8 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipment;
-using Hymson.Utils.Extensions;
+using Hymson.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
@@ -12,6 +13,7 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
     /// @author Czhipu
     /// @date 2022-11-08
     /// </summary>
+    [Authorize]
     [ApiController]
     [Route("api/v1/[controller]")]
     public class EquEquipmentController : ControllerBase
@@ -42,16 +44,6 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         [Route("create")]
         public async Task<int> Create([FromBody] EquEquipmentCreateDto createDto)
         {
-            /*
-            if (parm == null)
-            {
-                return ToResponse(ResultCode.PARAM_ERROR, "请求参数错误");
-            }
-
-            var responseDto = await _equEquipmentService.AddEquEquipmentAsync(parm);
-            return ToResponse(responseDto);
-            */
-
             return await _equEquipmentService.CreateEquEquipmentAsync(createDto);
         }
 
@@ -60,20 +52,10 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpPut]
         [Route("update")]
         public async Task<int> Modify([FromBody] EquEquipmentModifyDto modifyDto)
         {
-            /*
-            if (parm == null)
-            {
-                return ToResponse(ResultCode.PARAM_ERROR, "请求实体不能为空！");
-            }
-
-            var responseDto = await _equEquipmentService.UpdateEquEquipmentAsync(parm);
-            return ToResponse(responseDto);
-            */
-
             return await _equEquipmentService.ModifyEquEquipmentAsync(modifyDto);
         }
 
@@ -82,18 +64,10 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpDelete]
         [Route("delete")]
         public async Task<int> Delete(string ids)
         {
-            /*
-            long[] idsArr = StringExtension.SpitLongArrary(ids);
-            if (idsArr.Length <= 0) { return ToResponse(ApiResponse.Error($"删除失败Id 不能为空")); }
-
-            var responseDto = await _equEquipmentService.DeleteEquEquipmentAsync(idsArr);
-            return ToResponse(responseDto);
-            */
-
             long[] idsArr = StringExtension.SpitLongArrary(ids);
             return await _equEquipmentService.DeleteEquEquipmentAsync(idsArr);
         }
@@ -134,23 +108,23 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// <summary>
         ///  获取设备关联硬件数据
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         [HttpGet("linkHardware/list")]
-        public async Task<PagedInfo<EquEquipmentLinkHardwareBaseDto>> GetEquipmentLinkHardwareAsync(EquEquipmentLinkHardwarePagedQueryDto parm)
+        public async Task<PagedInfo<EquEquipmentLinkHardwareBaseDto>> GetEquipmentLinkHardwareAsync(EquEquipmentLinkHardwarePagedQueryDto pagedQueryDto)
         {
-            return await _equEquipmentService.GetEquimentLinkHardwareAsync(parm);
+            return await _equEquipmentService.GetEquimentLinkHardwareAsync(pagedQueryDto);
         }
 
         /// <summary>
         ///  获取设备关联Api数据
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         [HttpGet("linkApi/list")]
-        public async Task<PagedInfo<EquEquipmentLinkApiBaseDto>> GetEquipmentLinkApiAsync(EquEquipmentLinkApiPagedQueryDto parm)
+        public async Task<PagedInfo<EquEquipmentLinkApiBaseDto>> GetEquipmentLinkApiAsync(EquEquipmentLinkApiPagedQueryDto pagedQueryDto)
         {
-            return await _equEquipmentService.GetEquimentLinkApiAsync(parm);
+            return await _equEquipmentService.GetEquimentLinkApiAsync(pagedQueryDto);
         }
     }
 }

@@ -110,7 +110,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 不合格代码组
         /// </summary>
-        public long[] UnqualifiedGroupIds { get; set; }
+        public List<long> UnqualifiedGroupIds { get; set; }
 }
 
 

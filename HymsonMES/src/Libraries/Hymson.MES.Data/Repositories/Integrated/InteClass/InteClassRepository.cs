@@ -1,7 +1,9 @@
 using Dapper;
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -10,7 +12,7 @@ using static Dapper.SqlMapper;
 namespace Hymson.MES.Data.Repositories.Integrated.InteClass
 {
     /// <summary>
-    /// 生产班次仓储
+    /// 班制维护仓储
     /// </summary>
     public partial class InteClassRepository : IInteClassRepository
     {
@@ -24,23 +26,23 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="inteClassEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(InteClassEntity inteClassEntity)
+        public async Task<int> InsertAsync(InteClassEntity entity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertSql, inteClassEntity);
+            return await conn.ExecuteAsync(InsertSql, entity);
         }
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="inteClassEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(InteClassEntity inteClassEntity)
+        public async Task<int> UpdateAsync(InteClassEntity entity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateSql, inteClassEntity);
+            return await conn.ExecuteAsync(UpdateSql, entity);
         }
 
         /// <summary>
@@ -62,7 +64,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         public async Task<int> DeletesAsync(long[] idsArr)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, idsArr);
+            return await conn.ExecuteAsync(DeleteSql, new { Id = idsArr });
         }
 
         /// <summary>
@@ -77,35 +79,45 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         }
 
         /// <summary>
-        /// 分页查询
+        /// 
         /// </summary>
-        /// <param name="inteClassPagedQuery"></param>
+        /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<InteClassEntity>> GetPagedInfoAsync(InteClassPagedQuery inteClassPagedQuery)
+        public async Task<PagedInfo<InteClassEntity>> GetPagedListAsync(InteClassPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
-            //sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Select("*");
+            /*
+            if (string.IsNullOrWhiteSpace(pagedQuery.SiteCode) == false)
+            {
+                sqlBuilder.Where("SiteCode = @SiteCode");
+            }
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
+            if (string.IsNullOrWhiteSpace(pagedQuery.UnitCode) == false)
+            {
+                sqlBuilder.Where("UnitCode = @UnitCode");
+            }
 
-            var offSet = (inteClassPagedQuery.PageIndex - 1) * inteClassPagedQuery.PageSize;
+            if (string.IsNullOrWhiteSpace(pagedQuery.UnitName) == false)
+            {
+                sqlBuilder.Where("UnitName = @UnitName");
+            }
+            */
+            var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = inteClassPagedQuery.PageSize });
-            sqlBuilder.AddParameters(inteClassPagedQuery);
+            sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
+            sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var inteClassEntitiesTask = conn.QueryAsync<InteClassEntity>(templateData.RawSql, templateData.Parameters);
-            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
-            var inteClassEntities = await inteClassEntitiesTask;
-            var totalCount = await totalCountTask;
-            return new PagedInfo<InteClassEntity>(inteClassEntities, inteClassPagedQuery.PageIndex, inteClassPagedQuery.PageSize, totalCount);
+            var entities = await conn.QueryAsync<InteClassEntity>(templateData.RawSql, templateData.Parameters);
+            var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+
+            return new PagedInfo<InteClassEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
+
 
         /// <summary>
         /// 查询List

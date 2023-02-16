@@ -46,7 +46,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<IEnumerable<ProcResourceEntity>> GetByResTypeIdsAsync(ProcResourceQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcResourceEntity>(GetByResTypeIdsSql,new { SiteCode = query.SiteCode, Ids = query.IdsArr });
+            return await conn.QueryAsync<ProcResourceEntity>(GetByResTypeIdsSql, new { SiteCode = query.SiteCode, Ids = query.IdsArr });
         }
 
         /// <summary>
@@ -57,7 +57,18 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<IEnumerable<ProcResourceEntity>> GetByIdsAsync(ProcResourceQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcResourceEntity>(GetByIdsSql, new { SiteCode = query.SiteCode, Ids = query.IdsArr, Status = query.Status });
+            return await conn.QueryAsync<ProcResourceEntity>(GetByIdsSql, new { Ids = query.IdsArr, Status = query.Status });
+        }
+
+        /// <summary>
+        /// 判断资源是否存在
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<bool> IsExistsAsync(ProcResourceQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefault(ExistsSql, new { ResCode = query.ResCode, SiteCode = query.SiteCode }) != null;
         }
 
         /// <summary>
@@ -71,7 +82,6 @@ namespace Hymson.MES.Data.Repositories.Process
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("a.IsDeleted=0");
-            //sqlBuilder.Select("*");
             if (!string.IsNullOrWhiteSpace(query.SiteCode))
             {
                 sqlBuilder.Where("a.SiteCode=@SiteCode");
@@ -233,13 +243,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateResTypeAsync(long resTypeId)
+        public async Task<int> ResetResTypeAsync(ProcResourceUpdateCommand entity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateByResTypeSql, new
-            {
-                ResTypeId = resTypeId
-            }); ;
+            return await conn.ExecuteAsync(UpdatedByResTypeSql, entity); ;
         }
 
         /// <summary>
@@ -257,9 +264,9 @@ namespace Hymson.MES.Data.Repositories.Process
     public partial class ProcResourceRepository
     {
         const string GetByIdSql = "SELECT a.*,b.ResType,b.ResType FROM proc_resource a left join proc_resource_type b on a.ResTypeId=b.Id and b.IsDeleted =0 where a.Id=@Id ";
-        const string Get = "select `proc_resource WHERE `Id` in @Id and ResTypeId >0 ";
         const string GetByResTypeIdsSql = "select * from proc_resource where SiteCode=@SiteCode and ResTypeId in @Ids and IsDeleted =0 ";
-        const string GetByIdsSql = "select * from proc_resource where SiteCode=@SiteCode  and Id  in @Ids and Status=@Status";
+        const string GetByIdsSql = "select * from proc_resource where  Id  in @Ids and Status=@Status";
+        const string ExistsSql = "SELECT Id FROM proc_resource WHERE `IsDeleted`= 0 AND ResCode=@ResCode and SiteCode=@SiteCode LIMIT 1";
 
         const string GetPagedInfoDataSqlTemplate = "SELECT a.*,b.ResType,b.ResTypeName  FROM proc_resource a left join proc_resource_type b on a.ResTypeId =b.Id and b.IsDeleted =0 /**where**/ LIMIT @Offset,@Rows";
         const string GetPagedInfoCountSqlTemplate = "SELECT count(*) FROM proc_resource a left join proc_resource_type b on a.ResTypeId =b.Id  /**where**/ ";
@@ -272,6 +279,6 @@ namespace Hymson.MES.Data.Repositories.Process
         const string DeleteSql = "UPDATE `proc_resource` SET `IsDeleted` = 1 WHERE `Id` in @Ids;";
 
         const string UpdateResTypeSql = "UPDATE `proc_resource` SET ResTypeId = @ResTypeId,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id in @Ids;";
-        const string UpdateByResTypeSql = "UPDATE `proc_resource` SET ResTypeId =0,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE ResTypeId = @ResTypeId;";
+        const string UpdatedByResTypeSql = "UPDATE `proc_resource` SET ResTypeId =0,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE ResTypeId = @ResTypeId;";
     }
 }

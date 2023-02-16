@@ -2,7 +2,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Quality;
-using Hymson.Utils.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Extensions;
 

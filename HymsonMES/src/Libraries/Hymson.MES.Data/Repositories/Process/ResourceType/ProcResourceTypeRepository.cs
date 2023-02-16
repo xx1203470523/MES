@@ -1,18 +1,11 @@
 ﻿using Dapper;
-using Google.Protobuf.WellKnownTypes;
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.OnStock;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
-using Hymson.MES.Data.Repositories.OnStock;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
+using Hymson.MES.Data.Repositories.Process.ResourceType.View;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -176,7 +169,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<int> DeleteAsync(long[] idsArr)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, new { Id = idsArr });
+            return await conn.ExecuteAsync(DeleteSql, new { Ids = idsArr });
         }
     }
 
@@ -185,7 +178,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdSql = "select * from proc_resource_type where Id =@Id ";
         const string GetByCodeSql = "select * from proc_resource_type where SiteCode =@SiteCode and ResType =@ResType and IsDeleted =0 ";
 
-        const string GetPagedInfoDataSqlTemplate = "SELECT a.Id,a.SiteCode,ResType,ResTypeName,a.Remark,a.CreateBy ,a.CreateOn,b.ResCode,b.ResName  FROM proc_resource_type a left join proc_resource b on a.Id =b.ResTypeId /**where**/ LIMIT @Offset,@Rows";
+        const string GetPagedInfoDataSqlTemplate = "SELECT a.*,b.ResCode,b.ResName  FROM proc_resource_type a left join proc_resource b on a.Id =b.ResTypeId /**where**/ LIMIT @Offset,@Rows";
         const string GetPagedInfoCountSqlTemplate = "SELECT count(*) FROM proc_resource_type a left join proc_resource b on a.Id =b.ResTypeId  /**where**/ ";
 
         const string GetPagedListSqlTemplate = "SELECT /**select**/ FROM proc_resource_type /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows";
@@ -193,6 +186,6 @@ namespace Hymson.MES.Data.Repositories.Process
 
         const string InsertSql = "INSERT INTO `proc_resource_type`(`Id`, `SiteCode`, `ResType`, `ResTypeName`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteCode, @ResType, @ResTypeName, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted);";
         const string UpdateSql = "UPDATE `proc_resource_type` SET ResTypeName = @ResTypeName, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id;";
-        const string DeleteSql = "UPDATE `proc_resource_type` SET `IsDeleted` = 1 WHERE `Id` = @Id;";
+        const string DeleteSql = "UPDATE `proc_resource_type` SET `IsDeleted` = 1 WHERE `Id` in @Ids";
     }
 }

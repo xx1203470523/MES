@@ -10,8 +10,9 @@ using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using Hymson.Utils.Extensions;
+using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.ComponentModel.DataAnnotations;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -102,7 +103,7 @@ namespace Hymson.MES.Services.Services.Process
             //await _validationRules.ValidateAndThrowAsync(dto);
             if (param == null)
             {
-                throw new NotFoundException(ErrorCode.MES10100, "请求实体不能为空!");
+                throw new ValidationException(ErrorCode.MES10100);
             }
 
             var userId = "TODO";
@@ -127,7 +128,9 @@ namespace Hymson.MES.Services.Services.Process
             var resourceType = await _resourceTypeRepository.GetByCodeAsync(resEntity);
             if (resourceType != null)
             {
-                throw new CustomerValidationException(ErrorCode.MES10100, $"此资源类型{param.ResType}在系统已经存在!");
+                //TODO 
+                // throw new CustomerValidationException(ErrorCode.MES10100, $"此资源类型{param.ResType}在系统已经存在!");
+                throw new ValidationException(ErrorCode.MES10311);
             }
 
             var resourceIds = param.ResourceIds;
@@ -165,12 +168,12 @@ namespace Hymson.MES.Services.Services.Process
             //TODO
             if (param == null)
             {
-                throw new NotFoundException(ErrorCode.MES10100, "请求实体不能为空!");
+                throw new ValidationException(ErrorCode.MES10100);
             }
             var entity = await _resourceTypeRepository.GetByIdAsync(param?.Id ?? 0);
             if (entity == null)
-            {
-                throw new NotFoundException(ErrorCode.MES10100, "此资源类型不存在!");
+            {      
+                throw new NotFoundException(ErrorCode.MES10309);
             }
 
             var userId = "TODO";
@@ -191,7 +194,7 @@ namespace Hymson.MES.Services.Services.Process
                 updateCommand.UpdatedOn = HymsonClock.Now();
                 updateCommand.UpdatedBy = userId;
                 updateCommand.ResTypeId = param.Id;
-                updateCommand.IdsArr = param.ResourceIds.ToArray();
+                updateCommand.IdsArr = resourceIds.ToArray();
             }
 
             //var resources = _procResourceRepository.GetProcResrouces(ids, parm.Id);
@@ -208,11 +211,13 @@ namespace Hymson.MES.Services.Services.Process
                 await _resourceTypeRepository.UpdateAsync(updateEntity);
 
                 //清除之前的绑定关系
-                await _resourceRepository.UpdateResTypeAsync(param.Id);
+                await _resourceRepository.ResetResTypeAsync(updateCommand);
 
-                //更新资源的资源类型（重新绑定）
-                await _resourceRepository.UpdateResTypeAsync(updateCommand);
-
+                if (resourceIds != null && resourceIds.Any() == true)
+                {
+                    //更新资源的资源类型（重新绑定）
+                    await _resourceRepository.UpdateResTypeAsync(updateCommand);
+                }
                 ts.Complete();
             }
         }
@@ -227,7 +232,7 @@ namespace Hymson.MES.Services.Services.Process
             long[] idsArr = StringExtension.SpitLongArrary(ids);
             if (idsArr.Length < 1)
             {
-                throw new NotFoundException(ErrorCode.MES10100, "删除失败Id 不能为空!");
+                throw new NotFoundException(ErrorCode.MES10102);
             }
 
             //查询资源类型是否关联资源
@@ -240,7 +245,7 @@ namespace Hymson.MES.Services.Services.Process
             var resourceList = await _resourceRepository.GetByResTypeIdsAsync(query);
             if(resourceList!=null&& resourceList.Any())
             {
-                throw new CustomerValidationException(ErrorCode.MES10100, "资源类型有被分配的资源，不允许删除!");
+                throw new CustomerValidationException(ErrorCode.MES10312);
             }
 
             return await _resourceTypeRepository.DeleteAsync(idsArr);

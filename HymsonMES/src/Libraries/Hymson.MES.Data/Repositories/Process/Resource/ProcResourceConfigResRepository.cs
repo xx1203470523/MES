@@ -41,7 +41,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Select("*");
             sqlBuilder.Where("a.ResourceId=@ResourceId");
 
-            //TODO 按UpdateOn倒序排列
+            //TODO 按UpdatedOn倒序排列
             var offSet = (query.PageIndex - 1) * query.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = query.PageSize });
@@ -71,44 +71,32 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] idsArr) 
+        public async Task<int> DeletesRangeAsync(long[] idsArr) 
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeleteSql, idsArr);
         }
 
         /// <summary>
-        /// 根据ID获取数据
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<ProcResourceConfigResEntity> GetByIdAsync(long id)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcResourceConfigResEntity>(GetByIdSql, new { Id=id});
-        }
-
-        /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="procResourceConfigResEntity"></param>
+        /// <param name="procResourceConfigRess"></param>
         /// <returns></returns>
-        public async Task InsertAsync(ProcResourceConfigResEntity procResourceConfigResEntity)
+        public async Task InsertRangeAsync(List<ProcResourceConfigResEntity> procResourceConfigRess)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var id = await conn.ExecuteScalarAsync<long>(InsertSql, procResourceConfigResEntity);
-            procResourceConfigResEntity.Id = id;
+            var id = await conn.ExecuteScalarAsync<long>(InsertSql, procResourceConfigRess);
         }
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="procResourceConfigResEntity"></param>
+        /// <param name="procResourceConfigRess"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(ProcResourceConfigResEntity procResourceConfigResEntity)
+        public async Task<int> UpdateRangeAsync(List<ProcResourceConfigResEntity> procResourceConfigRess)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateSql, procResourceConfigResEntity);
+            return await conn.ExecuteAsync(UpdateSql, procResourceConfigRess);
         }
     }
 
@@ -118,10 +106,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_resource_config_res` /**where**/";
 
         const string InsertSql = "INSERT INTO `proc_resource_config_res`(  `Id`, `SiteCode`, `ResourceId`, `SetType`, `Value`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @ResourceId, @SetType, @Value, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string UpdateSql = "UPDATE `proc_resource_config_res` SET   SiteCode = @SiteCode, ResourceId = @ResourceId, SetType = @SetType, Value = @Value, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `proc_resource_config_res` SET  SetType = @SetType, Value = @Value,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_resource_config_res` SET IsDeleted = '1' WHERE Id = @Id ";
-        const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteCode`, `ResourceId`, `SetType`, `Value`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `proc_resource_config_res`  WHERE Id = @Id ";
     }
 }

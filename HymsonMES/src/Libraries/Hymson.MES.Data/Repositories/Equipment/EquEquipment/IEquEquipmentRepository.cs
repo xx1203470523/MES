@@ -1,6 +1,8 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
+using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
 {
@@ -22,6 +24,21 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// <param name="equipmentUnitEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(EquEquipmentEntity equipmentUnitEntity);
+
+        /// <summary>
+        /// 批量修改设备的设备组
+        /// </summary>
+        /// <param name="equipmentGroupId"></param>
+        /// <param name="equipmentIds"></param>
+        /// <returns></returns>
+        Task<int> UpdateEquipmentGroupIdAsync(long equipmentGroupId, IEnumerable<long> equipmentIds);
+
+        /// <summary>
+        /// 清空设备的设备组
+        /// </summary>
+        /// <param name="equipmentGroupId"></param>
+        /// <returns></returns>
+        Task<int> ClearEquipmentGroupIdAsync(long equipmentGroupId);
 
         /// <summary>
         /// 
@@ -47,9 +64,9 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="groupId"></param>
+        /// <param name="equipmentGroupId"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquEquipmentEntity>> GetByGroupIdAsync(long groupId);
+        Task<IEnumerable<EquEquipmentEntity>> GetByGroupIdAsync(long equipmentGroupId);
 
         /// <summary>
         /// 
@@ -77,7 +94,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// </summary>
         /// <param name="equipmentQuery"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquEquipmentEntity>> GetListAsync(EquEquipmentQuery equipmentQuery);
+        Task<IEnumerable<EquEquipmentEntity>> GetEntitiesAsync(EquEquipmentQuery equipmentQuery);
 
         /// <summary>
         /// 

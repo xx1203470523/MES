@@ -28,6 +28,13 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<IEnumerable<ProcResourceEntity>> GetByIdsAsync(ProcResourceQuery query);
 
         /// <summary>
+        /// 判断资源是否存在
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<bool> IsExistsAsync(ProcResourceQuery query);
+
+        /// <summary>
         ///  查询资源维护表列表(关联资源类型，展示资源类型名称)
         /// </summary>
         /// <param name="query"></param>
@@ -70,11 +77,11 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<int> UpdateResTypeAsync(ProcResourceUpdateCommand entity);
 
         /// <summary>
-        /// 更新资源类型数据
+        /// 更新资源类型数据,置为0
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> UpdateResTypeAsync(long resTypeId);
+        Task<int> ResetResTypeAsync(ProcResourceUpdateCommand entity);
 
         /// <summary>
         /// 批量删除

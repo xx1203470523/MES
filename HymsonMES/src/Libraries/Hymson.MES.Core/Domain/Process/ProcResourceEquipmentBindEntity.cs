@@ -31,7 +31,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :是否主设备 
         /// 空值 : true  
         /// </summary>
-        public byte IsMain { get; set; }
+        public bool IsMain { get; set; }
         
         /// <summary>
         /// 描述 :备注 

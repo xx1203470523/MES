@@ -35,7 +35,9 @@ namespace Hymson.MES.Data.Repositories.Process.Resource
         /// </summary>
         public string Status { get; set; }
 
-        //站点
+        /// <summary>
+        /// 站点编码
+        /// </summary>
         public string SiteCode { get; set; }
     }
 
@@ -47,6 +49,11 @@ namespace Hymson.MES.Data.Repositories.Process.Resource
         public string SiteCode { get; set; }
 
         public long[] IdsArr { get; set; }
+
+        /// <summary>
+        /// 资源编码
+        /// </summary>
+        public string ResCode { get; set; }
 
         /// <summary>
         /// 描述 :状态 
