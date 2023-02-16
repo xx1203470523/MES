@@ -37,8 +37,11 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetListSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.Where("ProcessRouteId=@ProcessRouteId");
+            sqlBuilder.Where("a.IsDeleted=0");
+            if (query.ProcessRouteId > 0)
+            {
+                sqlBuilder.Where("ProcessRouteId=@ProcessRouteId");
+            }
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var procProcessRouteDetailNodeEntities = await conn.QueryAsync<ProcProcessRouteDetailNodeView>(template.RawSql, template.Parameters);

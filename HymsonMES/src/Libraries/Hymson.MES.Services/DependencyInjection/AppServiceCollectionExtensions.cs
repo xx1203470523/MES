@@ -87,6 +87,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
             //工序
             services.AddSingleton<IProcProcedureService, ProcProcedureService>();
+            //工艺路线
+            services.AddSingleton<IProcProcessRouteService, ProcProcessRouteService>();
             #endregion
 
             return services;

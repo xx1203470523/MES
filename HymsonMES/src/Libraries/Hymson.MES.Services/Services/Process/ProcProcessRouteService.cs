@@ -82,7 +82,6 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcProcessRouteDto>> GetPageListAsync(ProcProcessRoutePagedQueryDto procProcessRoutePagedQueryDto)
         {
             var procProcessRoutePagedQuery = procProcessRoutePagedQueryDto.ToQuery<ProcProcessRoutePagedQuery>();
-            procProcessRoutePagedQuery.SiteCode = "TODO";
             var pagedInfo = await _procProcessRouteRepository.GetPagedInfoAsync(procProcessRoutePagedQuery);
 
             // 实体到DTO转换 装载数据
@@ -101,7 +100,7 @@ namespace Hymson.MES.Services.Services.Process
             var processRoute = await _procProcessRouteRepository.GetByIdAsync(id);
             if (processRoute == null)
             {
-                throw new Exception(ErrorCode.MES10431);
+                throw new Exception(ErrorCode.MES10439);
             }
             model.Info = processRoute.ToModel<ProcProcessRouteDto>();
 

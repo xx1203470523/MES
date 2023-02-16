@@ -157,7 +157,11 @@ namespace Hymson.MES.Services.Services.Process
         {
             var query = new ProcProcedurePrintReleationPagedQuery()
             {
-                ProcedureId = queryDto.ProcedureId
+                SiteCode= queryDto.SiteCode,
+                ProcedureId = queryDto.ProcedureId,
+                PageIndex = queryDto.PageIndex,
+                PageSize    = queryDto.PageSize,
+                Sorting= queryDto.Sorting,
             };
             var pagedInfo = await _procedurePrintReleationRepository.GetPagedInfoAsync(query);
 
@@ -170,7 +174,7 @@ namespace Hymson.MES.Services.Services.Process
                 foreach (var entity in pagedInfo.Data)
                 {
                     var printReleationDto = entity.ToModel<ProcProcedurePrintReleationDto>();
-                    var material = materialLsit.FirstOrDefault(a => a.Id == printReleationDto.MaterialId)?.ToModel<ProcMaterialDto>(); ;
+                    var material = materialLsit.FirstOrDefault(a => a.Id == printReleationDto.MaterialId)?.ToModel<ProcMaterialDto>(); 
                     var queryEntity = new QueryProcProcedurePrintReleationDto { ProcedureBomConfigPrint = printReleationDto, Material = material ?? new ProcMaterialDto() };
                     dtos.Add(queryEntity);
                     //TODO 模板 by wangkeming 
@@ -190,7 +194,11 @@ namespace Hymson.MES.Services.Services.Process
             var query = new InteJobBusinessRelationPagedQuery()
             {
                 SiteCode = queryDto.SiteCode,
-                BusinessId = queryDto.BusinessId
+                BusinessId = queryDto.BusinessId,
+                BusinessType= queryDto.BusinessType,
+                PageIndex= queryDto.PageIndex,
+                PageSize= queryDto.PageSize,
+                Sorting= queryDto.Sorting
             };
             var pagedInfo = await _jobBusinessRelationRepository.GetPagedInfoAsync(query);
 

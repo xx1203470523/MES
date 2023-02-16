@@ -71,6 +71,7 @@
         public const string MES10436 = $"只允许设置一个首工序！";
         public const string MES10437 = "此工艺路线{Code}+{Version}在系统已经存在！";
         public const string MES10438= "此工艺路线不存在！";
+        public const string MES10439 = $"此工艺路线在系统中不存在!";
         #endregion
 
         #region 参数 10500

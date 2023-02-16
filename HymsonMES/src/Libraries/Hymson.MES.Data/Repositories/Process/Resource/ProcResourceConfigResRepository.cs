@@ -39,7 +39,7 @@ namespace Hymson.MES.Data.Repositories.Process
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
-            sqlBuilder.Where("a.ResourceId=@ResourceId");
+            sqlBuilder.Where("ResourceId=@ResourceId");
 
             //TODO 按UpdatedOn倒序排列
             var offSet = (query.PageIndex - 1) * query.PageSize;

@@ -19,6 +19,10 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public class ProcProcedurePrintReleationPagedQuery : PagerInfo
     {
+        /// <summary>
+        /// 站点编码
+        /// </summary>
+        public string? SiteCode { get; set; }
         public long ProcedureId { get; set; }
     }
 }

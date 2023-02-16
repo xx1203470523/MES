@@ -31,28 +31,35 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="procProcedurePrintReleationPagedQuery"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcProcedurePrintReleationEntity>> GetPagedInfoAsync(ProcProcedurePrintReleationPagedQuery procProcedurePrintReleationPagedQuery)
+        public async Task<PagedInfo<ProcProcedurePrintReleationEntity>> GetPagedInfoAsync(ProcProcedurePrintReleationPagedQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
-            sqlBuilder.Where("ProcedureId=@ProcedureId");
+            if (!string.IsNullOrWhiteSpace(query.SiteCode))
+            {
+                sqlBuilder.Where("SiteCode=@SiteCode");
+            }
+            if (query.ProcedureId > 0)
+            {
+                sqlBuilder.Where("ProcedureId=@ProcedureId");
+            }
 
-            var offSet = (procProcedurePrintReleationPagedQuery.PageIndex - 1) * procProcedurePrintReleationPagedQuery.PageSize;
+            var offSet = (query.PageIndex - 1) * query.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = procProcedurePrintReleationPagedQuery.PageSize });
-            sqlBuilder.AddParameters(procProcedurePrintReleationPagedQuery);
+            sqlBuilder.AddParameters(new { Rows = query.PageSize });
+            sqlBuilder.AddParameters(query);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var procProcedurePrintReleationEntitiesTask = conn.QueryAsync<ProcProcedurePrintReleationEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procProcedurePrintReleationEntities = await procProcedurePrintReleationEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<ProcProcedurePrintReleationEntity>(procProcedurePrintReleationEntities, procProcedurePrintReleationPagedQuery.PageIndex, procProcedurePrintReleationPagedQuery.PageSize, totalCount);
+            return new PagedInfo<ProcProcedurePrintReleationEntity>(procProcedurePrintReleationEntities, query.PageIndex, query.PageSize, totalCount);
         }
 
         /// <summary>
