@@ -6,26 +6,24 @@
  *build datetime: 2023-02-13 09:06:05
  */
 using FluentValidation;
+using Hymson.Authentication;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.ResourceType;
+using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using Hymson.Utils;
-using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Process.ResourceType;
-using Hymson.MES.Services.Dtos.Process;
-using Hymson.Infrastructure.Exceptions;
-using Hymson.MES.Core.Constants;
 using Hymson.Utils.Tools;
 using System.Transactions;
-using Hymson.MES.Data.Repositories.Process.Resource;
-using Hymson.MES.Services.Dtos.Integrated;
-using Hymson.MES.Data.Repositories.Integrated;
-using Google.Protobuf.WellKnownTypes;
-using Hymson.MES.Core.Domain.Integrated;
-using Hymson.MES.Core.Enums.Integrated;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -34,6 +32,10 @@ namespace Hymson.MES.Services.Services.Process
     /// </summary>
     public class ProcProcedureService : IProcProcedureService
     {
+        /// <summary>
+        /// 当前登录用户对象
+        /// </summary>
+        private readonly ICurrentUser _currentUser;
         /// <summary>
         /// 工序表 仓储
         /// </summary>
@@ -65,7 +67,9 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 构造函数
         /// </summary>
-        public ProcProcedureService(IProcProcedureRepository procProcedureRepository,
+        public ProcProcedureService(
+            ICurrentUser currentUser,
+            IProcProcedureRepository procProcedureRepository,
             IProcResourceTypeRepository resourceTypeRepository,
             IInteJobBusinessRelationRepository jobBusinessRelationRepository,
             IProcProcedurePrintReleationRepository procedurePrintReleationRepository,
@@ -74,6 +78,7 @@ namespace Hymson.MES.Services.Services.Process
             AbstractValidator<ProcProcedureCreateDto> validationCreateRules,
             AbstractValidator<ProcProcedureModifyDto> validationModifyRules)
         {
+            _currentUser = currentUser;
             _procProcedureRepository = procProcedureRepository;
             _resourceTypeRepository = resourceTypeRepository;
             _jobBusinessRelationRepository = jobBusinessRelationRepository;
@@ -140,7 +145,7 @@ namespace Hymson.MES.Services.Services.Process
                     };
                 }
             }
-            return null;
+            return queryProcDto;
         }
 
         /// <summary>
@@ -152,7 +157,11 @@ namespace Hymson.MES.Services.Services.Process
         {
             var query = new ProcProcedurePrintReleationPagedQuery()
             {
-                ProcedureId = queryDto.ProcedureId
+                SiteCode= queryDto.SiteCode,
+                ProcedureId = queryDto.ProcedureId,
+                PageIndex = queryDto.PageIndex,
+                PageSize    = queryDto.PageSize,
+                Sorting= queryDto.Sorting,
             };
             var pagedInfo = await _procedurePrintReleationRepository.GetPagedInfoAsync(query);
 
@@ -165,7 +174,7 @@ namespace Hymson.MES.Services.Services.Process
                 foreach (var entity in pagedInfo.Data)
                 {
                     var printReleationDto = entity.ToModel<ProcProcedurePrintReleationDto>();
-                    var material = materialLsit.FirstOrDefault(a => a.Id == printReleationDto.MaterialId)?.ToModel<ProcMaterialDto>(); ;
+                    var material = materialLsit.FirstOrDefault(a => a.Id == printReleationDto.MaterialId)?.ToModel<ProcMaterialDto>(); 
                     var queryEntity = new QueryProcProcedurePrintReleationDto { ProcedureBomConfigPrint = printReleationDto, Material = material ?? new ProcMaterialDto() };
                     dtos.Add(queryEntity);
                     //TODO 模板 by wangkeming 
@@ -184,8 +193,12 @@ namespace Hymson.MES.Services.Services.Process
         {
             var query = new InteJobBusinessRelationPagedQuery()
             {
-                SiteCode = "TODO",
-                BusinessId = queryDto.BusinessId
+                SiteCode = queryDto.SiteCode,
+                BusinessId = queryDto.BusinessId,
+                BusinessType= queryDto.BusinessType,
+                PageIndex= queryDto.PageIndex,
+                PageSize= queryDto.PageSize,
+                Sorting= queryDto.Sorting
             };
             var pagedInfo = await _jobBusinessRelationRepository.GetPagedInfoAsync(query);
 
@@ -219,7 +232,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        public async Task CreateProcProcedureAsync(AddProcProcedureDto parm)
+        public async Task AddProcProcedureAsync(AddProcProcedureDto parm)
         {
             #region 验证
             if (parm == null)
@@ -227,8 +240,8 @@ namespace Hymson.MES.Services.Services.Process
                 throw new ValidationException(ErrorCode.MES10100);
             }
 
-            var siteCode = "TODO";
-            var userId = "TODO";
+            var siteCode = parm.SiteCode;
+            var userName = _currentUser.UserName;
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(parm.Procedure);
 
@@ -240,17 +253,15 @@ namespace Hymson.MES.Services.Services.Process
             };
             if (await _procProcedureRepository.IsExistsAsync(query))
             {
-                //TODO
-                //return Error(ResultCode.PARAM_ERROR, $"编码:{parm.Procedure.Code}已存在！");
-                throw new ValidationException(string.Format(new ErrorCode().MES10405, parm.Procedure.Code));
+                throw new BusinessException(ErrorCode.MES10405).WithData("Code", parm.Procedure.Code);
             }
             #endregion
 
             //DTO转换实体
             var procProcedureEntity = parm.Procedure.ToEntity<ProcProcedureEntity>();
             procProcedureEntity.Id = IdGenProvider.Instance.CreateId();
-            procProcedureEntity.CreatedBy = userId;
-            procProcedureEntity.UpdatedBy = userId;
+            procProcedureEntity.CreatedBy = userName;
+            procProcedureEntity.UpdatedBy = userName;
 
             //打印
             List<ProcProcedurePrintReleationEntity> procedureConfigPrintList = new List<ProcProcedurePrintReleationEntity>();
@@ -262,8 +273,8 @@ namespace Hymson.MES.Services.Services.Process
                     releationEntity.Id = IdGenProvider.Instance.CreateId();
                     releationEntity.ProcedureId = procProcedureEntity.Id;
                     releationEntity.SiteCode = siteCode;
-                    releationEntity.CreatedBy = userId;
-                    releationEntity.UpdatedBy = userId;
+                    releationEntity.CreatedBy = userName;
+                    releationEntity.UpdatedBy = userName;
                     procedureConfigPrintList.Add(releationEntity);
                 }
             }
@@ -279,8 +290,8 @@ namespace Hymson.MES.Services.Services.Process
                     relationEntity.BusinessType = (int)InteJobBusinessTypeEnum.Procedure;
                     relationEntity.BusinessId = procProcedureEntity.Id;
                     relationEntity.SiteCode = siteCode;
-                    relationEntity.CreatedBy = userId;
-                    relationEntity.UpdatedBy = userId;
+                    relationEntity.CreatedBy = userName;
+                    relationEntity.UpdatedBy = userName;
                     procedureConfigJobList.Add(relationEntity);
                 }
             }
@@ -310,15 +321,15 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        public async Task ModifyProcProcedureAsync(UpdateProcProcedureDto parm)
+        public async Task UpdateProcProcedureAsync(UpdateProcProcedureDto parm)
         {
             #region
             if (parm == null)
             {
                 throw new ValidationException(ErrorCode.MES10100);
             }
-            var siteCode = "TODO";
-            var userId = "TODO";
+            var siteCode = parm.SiteCode;
+            var userName = _currentUser.UserName;
 
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(parm.Procedure);
@@ -326,7 +337,7 @@ namespace Hymson.MES.Services.Services.Process
 
             //DTO转换实体
             var procProcedureEntity = parm.Procedure.ToEntity<ProcProcedureEntity>();
-            procProcedureEntity.UpdatedBy = "TODO";
+            procProcedureEntity.UpdatedBy = _currentUser.UserName;
 
             //TODO 现在关联表批量删除批量新增，后面再修改
             //打印
@@ -339,8 +350,8 @@ namespace Hymson.MES.Services.Services.Process
                     releationEntity.Id = IdGenProvider.Instance.CreateId();
                     releationEntity.ProcedureId = procProcedureEntity.Id;
                     releationEntity.SiteCode = siteCode;
-                    releationEntity.CreatedBy = userId;
-                    releationEntity.UpdatedBy = userId;
+                    releationEntity.CreatedBy = userName;
+                    releationEntity.UpdatedBy = userName;
                     procedureConfigPrintList.Add(releationEntity);
                 }
             }
@@ -356,8 +367,8 @@ namespace Hymson.MES.Services.Services.Process
                     relationEntity.BusinessType = (int)InteJobBusinessTypeEnum.Procedure;
                     relationEntity.BusinessId = procProcedureEntity.Id;
                     relationEntity.SiteCode = siteCode;
-                    relationEntity.CreatedBy = userId;
-                    relationEntity.UpdatedBy = userId;
+                    relationEntity.CreatedBy = userName;
+                    relationEntity.UpdatedBy = userName;
                     procedureConfigJobList.Add(relationEntity);
                 }
             }

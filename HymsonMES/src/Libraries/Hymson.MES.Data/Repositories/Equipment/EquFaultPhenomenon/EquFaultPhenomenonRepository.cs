@@ -33,11 +33,10 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task InsertAsync(EquFaultPhenomenonEntity entity)
+        public async Task<int> InsertAsync(EquFaultPhenomenonEntity entity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var id = await conn.ExecuteScalarAsync<long>(InsertSql, entity);
-            entity.Id = id;
+            return await conn.ExecuteAsync(InsertSql, entity);
         }
 
         /// <summary>
@@ -67,11 +66,22 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] idsArr) 
+        public async Task<int> DeletesAsync(long[] idsArr)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeleteSql, idsArr);
 
+        }
+
+        /// <summary>
+        /// 判断是否存在（编码）
+        /// </summary>
+        /// <param name="faultPhenomenonCode"></param>
+        /// <returns></returns>
+        public async Task<bool> IsExistsAsync(string faultPhenomenonCode)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteScalarAsync(IsExistsSql, new { faultPhenomenonCode }) != null;
         }
 
         /// <summary>
@@ -82,7 +92,18 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         public async Task<EquFaultPhenomenonEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<EquFaultPhenomenonEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<EquFaultPhenomenonEntity>(GetByIdSql, new { Id = id });
+        }
+
+        /// <summary>
+        /// 根据ID获取数据（设备故障现象）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<EquFaultPhenomenonView> GetViewByIdAsync(long id)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<EquFaultPhenomenonView>(GetViewById, new { Id = id });
         }
 
         /// <summary>
@@ -95,39 +116,47 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
-            //sqlBuilder.Select("*");
+            sqlBuilder.Where("EFP.IsDeleted = 0");
+            sqlBuilder.Select("EFP.Id, EFP.FaultPhenomenonCode, EFP.FaultPhenomenonName, EFP.EquipmentGroupId, EFP.UseStatus, EFP.CreatedBy, EFP.CreatedOn, EFP.UpdatedBy, EFP.UpdatedOn, EEG.EquipmentGroupName");
+            sqlBuilder.LeftJoin("equ_equipment_group EEG");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-           
+            if (string.IsNullOrWhiteSpace(pagedQuery.SiteCode) == false)
+            {
+                sqlBuilder.Where("EFP.SiteCode = @SiteCode");
+            }
+
+            if (string.IsNullOrWhiteSpace(pagedQuery.FaultPhenomenonCode) == false)
+            {
+                pagedQuery.FaultPhenomenonCode = $"%{pagedQuery.FaultPhenomenonCode}%";
+                sqlBuilder.Where("EFP.FaultPhenomenonCode LIKE @FaultPhenomenonCode");
+            }
+
+            if (string.IsNullOrWhiteSpace(pagedQuery.FaultPhenomenonName) == false)
+            {
+                pagedQuery.FaultPhenomenonName = $"%{pagedQuery.FaultPhenomenonName}%";
+                sqlBuilder.Where("EFP.FaultPhenomenonName LIKE @FaultPhenomenonName");
+            }
+
+            if (string.IsNullOrWhiteSpace(pagedQuery.EquipmentGroupName) == false)
+            {
+                pagedQuery.EquipmentGroupName = $"%{pagedQuery.EquipmentGroupName}%";
+                sqlBuilder.Where("EEG.EquipmentGroupName LIKE @EquipmentGroupName");
+            }
+
+            if (pagedQuery.UseStatus > 0)
+            {
+                sqlBuilder.Where("EFP.Status = @Status");
+            }
+
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
             sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var equFaultPhenomenonEntitiesTask = conn.QueryAsync<EquFaultPhenomenonEntity>(templateData.RawSql, templateData.Parameters);
-            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
-            var equFaultPhenomenonEntities = await equFaultPhenomenonEntitiesTask;
-            var totalCount = await totalCountTask;
-            return new PagedInfo<EquFaultPhenomenonEntity>(equFaultPhenomenonEntities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
-        }
-
-        /// <summary>
-        /// 查询List（设备故障现象）
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<EquFaultPhenomenonEntity>> GetEquFaultPhenomenonEntitiesAsync(EquFaultPhenomenonQuery query)
-        {
-            var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetEquFaultPhenomenonEntitiesSqlTemplate);
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var equFaultPhenomenonEntities = await conn.QueryAsync<EquFaultPhenomenonEntity>(template.RawSql, query);
-            return equFaultPhenomenonEntities;
+            var entities = await conn.QueryAsync<EquFaultPhenomenonEntity>(templateData.RawSql, templateData.Parameters);
+            var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            return new PagedInfo<EquFaultPhenomenonEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
     }
@@ -137,17 +166,20 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
     /// </summary>
     public partial class EquFaultPhenomenonRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_fault_phenomenon` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `equ_fault_phenomenon` /**where**/";
-        const string GetEquFaultPhenomenonEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM `equ_fault_phenomenon` /**where**/  ";
-
         const string InsertSql = "INSERT INTO `equ_fault_phenomenon`(  `Id`, `FaultPhenomenonCode`, `FaultPhenomenonName`, `EquipmentGroupId`, `UseStatus`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteCode`) VALUES (   @Id, @FaultPhenomenonCode, @FaultPhenomenonName, @EquipmentGroupId, @UseStatus, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteCode )  ";
-        const string UpdateSql = "UPDATE `equ_fault_phenomenon` SET   FaultPhenomenonCode = @FaultPhenomenonCode, FaultPhenomenonName = @FaultPhenomenonName, EquipmentGroupId = @EquipmentGroupId, UseStatus = @UseStatus, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, Remark = @Remark, SiteCode = @SiteCode  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `equ_fault_phenomenon` SET FaultPhenomenonName = @FaultPhenomenonName, EquipmentGroupId = @EquipmentGroupId, UseStatus = @UseStatus, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, Remark = @Remark WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `equ_fault_phenomenon` SET IsDeleted = '1' WHERE Id = @Id ";
+        const string IsExistsSql = "SELECT Id FROM equ_fault_phenomenon WHERE `IsDeleted` = 0 AND FaultPhenomenonCode = @faultPhenomenonCode LIMIT 1";
         const string GetByIdSql = @"SELECT 
                                `Id`, `FaultPhenomenonCode`, `FaultPhenomenonName`, `EquipmentGroupId`, `UseStatus`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteCode`
                             FROM `equ_fault_phenomenon`  WHERE Id = @Id ";
+        const string GetViewById = @"SELECT 
+                EFP.Id, EFP.FaultPhenomenonCode, EFP.FaultPhenomenonName, EFP.EquipmentGroupId, EFP.UseStatus, EFP.CreatedBy, EFP.CreatedOn, EFP.UpdatedBy, EFP.UpdatedOn, EEG.EquipmentGroupName
+                FROM equ_fault_phenomenon EFP LEFT JOIN equ_equipment_group EEG ON EFP.EquipmentGroupId = EEG.Id 
+                WHERE EFP.Id = @Id ";
+
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM equ_fault_phenomenon EFP /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM equ_fault_phenomenon EFP /**innerjoin**/ /**leftjoin**/ /**where**/";
+
     }
 }

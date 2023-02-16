@@ -6,6 +6,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
+using Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteCalendar.Query;
@@ -79,6 +80,14 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquEquipmentUnitPagedQueryDto, EquEquipmentUnitPagedQuery>();
 
             CreateMap<EquEquipmentUnitEntity, EquEquipmentUnitDto>();
+            #endregion
+
+            #region EquFaultPhenomenon
+            CreateMap<EquFaultPhenomenonCreateDto, EquFaultPhenomenonEntity>();
+            CreateMap<EquFaultPhenomenonModifyDto, EquFaultPhenomenonEntity>();
+            CreateMap<EquFaultPhenomenonPagedQueryDto, EquFaultPhenomenonPagedQuery>();
+
+            CreateMap<EquFaultPhenomenonView, EquFaultPhenomenonDto>();
             #endregion
 
             #region EquSparePart
@@ -166,7 +175,9 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcParameterLinkTypeCreateDto, ProcParameterLinkTypeEntity>();
             CreateMap<ProcParameterLinkTypeModifyDto, ProcParameterLinkTypeEntity>();
             CreateMap<ProcParameterLinkTypePagedQueryDto, ProcParameterLinkTypePagedQuery>();
+            CreateMap<ProcParameterDetailPagerQueryDto, ProcParameterDetailPagerQuery>();
             CreateMap<ProcParameterLinkTypeEntity, ProcParameterLinkTypeDto>();
+            CreateMap<ProcParameterLinkTypeView, ProcParameterLinkTypeViewDto>();
             #endregion
 
             #region Bom
@@ -192,19 +203,20 @@ namespace Hymson.MES.Services.Mapper
             #region Resource
 
             CreateMap<ProcResourceEntity, ProcResourceDto>();
-            CreateMap<ProcResourceView, ProcResourceDto>();
+            CreateMap<ProcResourceView, ProcResourceViewDto>();
+            CreateMap<ProcResourceCreateDto, ProcResourceEntity>();
             CreateMap<ProcResourcePagedQueryDto, ProcResourcePagedQuery>();
 
-            CreateMap<ProcResourceConfigPrintViewDto, ProcResourceConfigPrintView>();
+            CreateMap<ProcResourceConfigPrintView, ProcResourceConfigPrintViewDto>();
             CreateMap<ProcResourceConfigPrintPagedQueryDto, ProcResourceConfigPrintPagedQuery>();
 
             CreateMap<ProcResourceConfigResEntity, ProcResourceConfigResDto>();
             CreateMap<ProcResourceConfigResPagedQueryDto, ProcResourceConfigResPagedQuery>();
 
-            CreateMap<ProcResourceEquipmentBindView, ProcResourceEquipmentBindDto>();
+            CreateMap<ProcResourceEquipmentBindView, ProcResourceEquipmentBindViewDto>();
             CreateMap<ProcResourceEquipmentBindPagedQueryDto, ProcResourceEquipmentBindPagedQuery>();
 
-            CreateMap<ProcResourceConfigJobView, ProcResourceConfigJobDto>();
+            CreateMap<ProcResourceConfigJobView, ProcResourceConfigJobViewDto>();
             CreateMap<ProcResourceConfigJobPagedQueryDto, ProcResourceConfigJobPagedQuery>();
             #endregion
 
@@ -216,11 +228,16 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcProcedureModifyDto, ProcProcedureEntity>();
             CreateMap<ProcProcedurePrintReleationEntity, ProcProcedurePrintReleationDto>();
             CreateMap<ProcProcedurePrintReleationCreateDto, ProcProcedurePrintReleationEntity>();
+            CreateMap<InteJobBusinessRelationEntity, InteJobBusinessRelationDto>();
             #endregion
 
             #region ProcessRoute
             CreateMap<ProcProcessRoutePagedQueryDto, ProcProcessRoutePagedQuery>();
             CreateMap<ProcProcessRouteEntity, ProcProcessRouteDto>();
+            CreateMap<ProcProcessRouteCreateDto, ProcProcessRouteEntity>();
+            CreateMap<ProcProcessRouteModifyDto, ProcProcessRouteEntity>();
+            CreateMap<ProcProcessRouteDetailNodeView, ProcProcessRouteDetailNodeViewDto>();
+            CreateMap<ProcProcessRouteDetailLinkEntity, ProcProcessRouteDetailLinkDto>();
             #endregion
         }
 

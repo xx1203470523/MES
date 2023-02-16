@@ -41,18 +41,20 @@
         public const string MES10305 = "资源状态不能为空";
         public const string MES10306 = "资源配置打印机中，重复配置设备!";
         public const string MES10307 = "一个资源只能对用对应一个主设备";
-        public const string MES10308 = $"此资源在系统中已经存在!";
+        public const string MES10308 = "此资源【{ResCode}】在系统中已经存在!";
         public const string MES10309 = "此资源类型不存在!";
         public const string MES10310 = "资源类型在系统中不存在,请重新输入!";
-        public const string MES10311 = $"此资源类型在系统中已经存在!";
+        public const string MES10311 = "此资源类型{ResType}在系统中已经存在!";
         public const string MES10312 = $"资源类型有被分配的资源，不允许删除!";
         public const string MES10313 = $"资源配置打印机中，重复配置打印机!";
         public const string MES10314 = $"资源配置设备中，重复配置设备!";
-        public const string MES10315 = $"资源打印配置操作类型OperationType异常，只能传入1，2，3！";
-        public const string MES10316 = $"设备绑定设置数据操作类型OperationType异常，只能传入1，2，3！";
-        public const string MES10317 = $"资源设置数据操作类型OperationType异常，只能传入1，2，3！";
-        public const string MES10318 = $"作业设置数据操作类型OperationType异常，只能传入1，2，3！";
+        public const string MES10315 = "资源打印配置操作类型OperationType{OperationType}异常，只能传入1，2，3！";
+        public const string MES10316 = "设备绑定设置数据操作类型OperationTyp{OperationType}异常，只能传入1，2，3！";
+        public const string MES10317 = "资源设置数据操作类型OperationType{OperationType}异常，只能传入1，2，3！";
+        public const string MES10318 = "作业设置数据操作类型OperationType{OperationType}异常，只能传入1，2，3！";
         public const string MES10319 = $"不能删除启用状态的资源!";
+        public const string MES10320 = "所属资源类型ID不能为空";
+        public const string MES10321 = "工序名称超长";
         #endregion
 
         #region 工序 10400
@@ -60,8 +62,21 @@
         public const string MES10402 = "工序编码超长";
         public const string MES10403 = "工序名称不能为空";
         public const string MES10404 = "工序名称超长";
+<<<<<<< .mine
         public string MES10405 = $"编码:{0}已存在！";
+=======
+        public const string MES10405 = "编码:{Code}已存在！";
+>>>>>>> .theirs
         public const string MES10430 = $"有生产中工单引用当前工艺路线，不能删除！";
+        public const string MES10431 = $"此工艺路线在系统中已经存在!";
+        public const string MES10432 = $"编码不能为空!";
+        public const string MES10433 = $"名称不能为空!";
+        public const string MES10434 = $"版本不能为空!";
+        public const string MES10435 = $"未设置首工序！";
+        public const string MES10436 = $"只允许设置一个首工序！";
+        public const string MES10437 = "此工艺路线{Code}+{Version}在系统已经存在！";
+        public const string MES10438 = "此工艺路线不存在！";
+        public const string MES10439 = $"此工艺路线在系统中不存在!";
         #endregion
 
         #region 参数 10500
@@ -72,11 +87,26 @@
         public const string MES10504 = "此标准参数不存在！";
         public const string MES10505 = "删除失败Ids 不能为空";
         public const string MES10506 = "参数已被设备参数或产品参数绑定，不允许删除!";
+        public const string MES10507 = "修改参数关联类型失败!";
+        #endregion
+
+        #region Bom 10600
+        public const string MES10600 = "Bom维护错误";
+        public const string MES10601 = "此Bom{bomCode}和版本{version}在系统已经存在!";
+        public const string MES10602 = "添加Bom失败！";
+        public const string MES10603 = "物料编码不能为空!";
+        public const string MES10604 = "替代物料编码不能为空!";
+        public const string MES10605 = "工序不能为空!";
+        public const string MES10606 = "主物料编码+工序不能重复!";
+        public const string MES10607 = "替代物料不能跟主物料重复!";
+        public const string MES10608 = "主物料关联的替代物料不能重复!";
+        public const string MES10609 = "更新Bom失败！";
+        public const string MES10610 = "删除失败 Id不能为空!";
+        public const string MES10611 = "不能删除启用状态的Bom!";
 
         #endregion
 
         #region 品质
-
         #region 不合格代码 11100
         public const string MES11100 = "不合格代码错误";
         public const string MES11101 = "不合格代码编码不能为空";
@@ -86,11 +116,11 @@
         public const string MES11105 = "不合格代码类型不能为空";
         public const string MES11106 = "不合格代码等级不能为空";
         public const string MES11107 = "不合格代码备注超过最大长度，不合格代码备注最大长度为255";
-        #endregion 
-
+        #endregion
+        #endregion
         #endregion
 
-        #endregion
+
 
         #region 系统执行出错 业务逻辑出错
         public const string MES20001 = "MES20001";

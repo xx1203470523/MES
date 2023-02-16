@@ -6,9 +6,11 @@
  *build datetime: 2023-02-14 10:04:25
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
 using Hymson.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Extensions;
 
@@ -19,6 +21,7 @@ namespace Hymson.MES.Api.Controllers.Process
     /// @author Karl
     /// @date 2023-02-14 10:04:25
     /// </summary>
+    [Authorize]
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcBomController : ControllerBase
@@ -60,6 +63,18 @@ namespace Hymson.MES.Api.Controllers.Process
         public async Task<ProcBomDto> QueryProcBomByIdAsync(long id)
         {
             return await _procBomService.QueryProcBomByIdAsync(id);
+        }
+
+        /// <summary>
+        /// 查询Bom维护表详情
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        [HttpGet("material/list")]
+        public async Task<List<ProcBomDetailView>> GetProcBomMaterialAsync(ProcBomMaterialQueryDto query)
+        {
+            var bomId = query?.BomId ?? 0;
+            return await _procBomService.GetProcBomMaterialAsync(bomId);
         }
 
         /// <summary>

@@ -77,14 +77,14 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> SoftDeleteAsync(long[] idsArr)
+        public async Task<int> DeletesAsync(long[] idsArr)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeleteSql, new { Id = idsArr });
         }
 
         /// <summary>
-        /// 
+        /// 判断是否存在（编码）
         /// </summary>
         /// <param name="equipmentCode"></param>
         /// <returns></returns>
@@ -179,16 +179,16 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             if (string.IsNullOrWhiteSpace(pagedQuery.EquipmentCode) == false)
             {
                 pagedQuery.EquipmentCode = $"%{pagedQuery.EquipmentCode}%";
-                sqlBuilder.Where("EquipmentCode = @EquipmentCode");
+                sqlBuilder.Where("EquipmentCode LIKE @EquipmentCode");
             }
 
             if (string.IsNullOrWhiteSpace(pagedQuery.EquipmentName) == false)
             {
                 pagedQuery.EquipmentName = $"%{pagedQuery.EquipmentName}%";
-                sqlBuilder.Where("EquipmentName = @EquipmentName");
+                sqlBuilder.Where("EquipmentName LIKE @EquipmentName");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.EquipmentType) == false)
+            if (pagedQuery.EquipmentType > 0)
             {
                 sqlBuilder.Where("EquipmentType = @EquipmentType");
             }
@@ -201,19 +201,19 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             if (string.IsNullOrWhiteSpace(pagedQuery.WorkCenterShopName) == false)
             {
                 pagedQuery.WorkCenterShopName = $"%{pagedQuery.WorkCenterShopName}%";
-                sqlBuilder.Where("WorkCenterShopName = @WorkCenterShopName");
+                sqlBuilder.Where("WorkCenterShopName LIKE @WorkCenterShopName");
             }
 
             if (string.IsNullOrWhiteSpace(pagedQuery.UseDepartment) == false)
             {
                 pagedQuery.UseDepartment = $"%{pagedQuery.UseDepartment}%";
-                sqlBuilder.Where("UseDepartment = @UseDepartment");
+                sqlBuilder.Where("UseDepartment LIKE @UseDepartment");
             }
 
             if (string.IsNullOrWhiteSpace(pagedQuery.Location) == false)
             {
                 pagedQuery.Location = $"%{pagedQuery.Location}%";
-                sqlBuilder.Where("Location = @Location");
+                sqlBuilder.Where("Location LIKE @Location");
             }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
@@ -238,7 +238,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// 
         /// </summary>
         const string InsertSql = "INSERT INTO `equ_equipment`(  `Id`, `EquipmentCode`, `EquipmentName`, `EquipmentGroupId`, `EquipmentDesc`, `WorkCenterFactoryId`, `WorkCenterShopId`, `WorkCenterLineId`, `Location`, `EquipmentType`, `UseDepartment`, `EntryDate`, `QualTime`, `ExpireDate`, `Manufacturer`, `Supplier`, `UseStatus`, `Power`, `EnergyLevel`, `Ip`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteCode`, `TaktTime`) VALUES (   @Id, @EquipmentCode, @EquipmentName, @EquipmentGroupId, @EquipmentDesc, @WorkCenterFactoryId, @WorkCenterShopId, @WorkCenterLineId, @Location, @EquipmentType, @UseDepartment, @EntryDate, @QualTime, @ExpireDate, @Manufacturer, @Supplier, @UseStatus, @Power, @EnergyLevel, @Ip, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteCode, @TaktTime )  ";
-        const string UpdateSql = "UPDATE `equ_equipment` SET EquipmentName = @EquipmentName, EquipmentGroupId = @EquipmentGroupId, EquipmentDesc = @EquipmentDesc, WorkCenterFactoryId = @WorkCenterFactoryId, WorkCenterShopId = @WorkCenterShopId, WorkCenterLineId = @WorkCenterLineId, Location = @Location, EquipmentType = @EquipmentType, UseDepartment = @UseDepartment, EntryDate = @EntryDate, QualTime = @QualTime, ExpireDate = @ExpireDate, Manufacturer = @Manufacturer, Supplier = @Supplier, UseStatus = @UseStatus, Power = @Power, EnergyLevel = @EnergyLevel, Ip = @Ip, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, Remark = @Remark, TaktTime = @TaktTime WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `equ_equipment` SET EquipmentName = @EquipmentName, EquipmentDesc = @EquipmentDesc, WorkCenterFactoryId = @WorkCenterFactoryId, WorkCenterShopId = @WorkCenterShopId, WorkCenterLineId = @WorkCenterLineId, Location = @Location, EquipmentType = @EquipmentType, UseDepartment = @UseDepartment, EntryDate = @EntryDate, QualTime = @QualTime, ExpireDate = @ExpireDate, Manufacturer = @Manufacturer, Supplier = @Supplier, UseStatus = @UseStatus, Power = @Power, EnergyLevel = @EnergyLevel, Ip = @Ip, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, Remark = @Remark, TaktTime = @TaktTime WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `equ_equipment` SET `IsDeleted` = 1 WHERE `Id` = @Id;";
         const string IsExistsSql = "SELECT Id FROM equ_equipment WHERE `IsDeleted` = 0 AND EquipmentCode = @equipmentCode LIMIT 1";
         const string GetByIdSql = "SELECT * FROM `equ_equipment` WHERE `Id` = @Id;";
@@ -248,7 +248,9 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `equ_equipment` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_equipment` /**where**/";
         const string GetEntitiesSqlTemplate = "";
-
+        /// <summary>
+        /// 
+        /// </summary>
         const string UpdateEquipmentGroupIdSql = "UPDATE `equ_equipment` SET EquipmentGroupId = @equipmentGroupId  WHERE Id = @Id ";
         const string ClearEquipmentGroupIdSql = "UPDATE `equ_equipment` SET EquipmentGroupId = 0 WHERE EquipmentGroupId = @equipmentGroupId ";
     }

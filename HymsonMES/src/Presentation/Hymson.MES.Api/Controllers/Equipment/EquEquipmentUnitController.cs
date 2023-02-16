@@ -39,9 +39,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        public async Task<int> Create(EquEquipmentUnitCreateDto createDto)
+        public async Task<int> CreateAsync(EquEquipmentUnitCreateDto createDto)
         {
-            return await _equipmentUnitService.CreateEquipmentUnitAsync(createDto);
+            return await _equipmentUnitService.CreateAsync(createDto);
         }
 
         /// <summary>
@@ -51,9 +51,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
-        public async Task<int> Modify(EquEquipmentUnitModifyDto modifyDto)
+        public async Task<int> ModifyAsync(EquEquipmentUnitModifyDto modifyDto)
         {
-            return await _equipmentUnitService.ModifyEquipmentUnitAsync(modifyDto);
+            return await _equipmentUnitService.ModifyAsync(modifyDto);
         }
 
         /// <summary>
@@ -63,10 +63,10 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
-        public async Task<int> Delete(string ids)
+        public async Task<int> DeletesAsync(string ids)
         {
             long[] idsArr = StringExtension.SpitLongArrary(ids);
-            return await _equipmentUnitService.DeleteEquipmentUnitAsync(idsArr);
+            return await _equipmentUnitService.DeletesAsync(idsArr);
         }
 
         /// <summary>
@@ -87,9 +87,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<EquEquipmentUnitDto> GetEntityAsync(long id)
+        public async Task<EquEquipmentUnitDto> GetDetailAsync(long id)
         {
-            return await _equipmentUnitService.GetEntityAsync(id);
+            return await _equipmentUnitService.GetDetailAsync(id);
         }
     }
 }

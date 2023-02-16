@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers
@@ -12,6 +13,7 @@ namespace Hymson.MES.Api.Controllers
     /// @author zhaoqing
     /// @date 2023-02-06
     /// </summary>
+    [Authorize]
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcResourceTypeController : ControllerBase
@@ -75,7 +77,7 @@ namespace Hymson.MES.Api.Controllers
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task AddProcResourceType([FromBody] ProcResourceTypeAddCommandDto parm)
+        public async Task AddProcResourceType([FromBody] ProcResourceTypeAddDto parm)
         {
             await _procResourceTypeService.AddProcResourceTypeAsync(parm);
         }
@@ -86,7 +88,7 @@ namespace Hymson.MES.Api.Controllers
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPut]
-        public async Task UpdateProcResourceType([FromBody] ProcResourceTypeUpdateCommandDto parm)
+        public async Task UpdateProcResourceType([FromBody] ProcResourceTypeUpdateDto parm)
         {
             await _procResourceTypeService.UpdateProcResrouceTypeAsync(parm);
         }

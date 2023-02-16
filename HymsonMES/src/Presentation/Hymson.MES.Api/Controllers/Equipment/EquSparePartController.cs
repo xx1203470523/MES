@@ -41,9 +41,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        public async Task<int> AddEquSparePartAsync([FromBody] EquSparePartCreateDto createDto)
+        public async Task<int> CreateAsync([FromBody] EquSparePartCreateDto createDto)
         {
-            return await _equSparePartService.CreateEquSparePartAsync(createDto);
+            return await _equSparePartService.CreateAsync(createDto);
         }
 
         /// <summary>
@@ -53,9 +53,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
-        public async Task<int> UpdateEquSparePartAsync([FromBody] EquSparePartModifyDto modifyDto)
+        public async Task<int> ModifyAsync([FromBody] EquSparePartModifyDto modifyDto)
         {
-            return await _equSparePartService.ModifyEquSparePartAsync(modifyDto);
+            return await _equSparePartService.ModifyAsync(modifyDto);
         }
 
         /// <summary>
@@ -65,10 +65,10 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
-        public async Task<int> DeleteEquSparePartAsync(string ids)
+        public async Task<int> DeletesAsync(string ids)
         {
             long[] idsArr = StringExtension.SpitLongArrary(ids);
-            return await _equSparePartService.DeletesEquSparePartAsync(idsArr);
+            return await _equSparePartService.DeletesAsync(idsArr);
         }
         
         /// <summary>
@@ -78,9 +78,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpGet]
         [Route("pagelist")]
-        public async Task<PagedInfo<EquSparePartDto>> QueryPagedEquSparePartAsync([FromQuery] EquSparePartPagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<EquSparePartDto>> GetPagedListAsync([FromQuery] EquSparePartPagedQueryDto pagedQueryDto)
         {
-            return await _equSparePartService.GetPageListAsync(pagedQueryDto);
+            return await _equSparePartService.GetPagedListAsync(pagedQueryDto);
         }
 
         /// <summary>
@@ -89,9 +89,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<EquSparePartDto> QueryEquSparePartByIdAsync(long id)
+        public async Task<EquSparePartDto> GetDetailAsync(long id)
         {
-            return await _equSparePartService.QueryEquSparePartByIdAsync(id);
+            return await _equSparePartService.GetDetailAsync(id);
         }
 
 

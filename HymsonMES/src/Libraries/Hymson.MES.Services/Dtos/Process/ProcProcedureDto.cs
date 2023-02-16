@@ -108,11 +108,6 @@ namespace Hymson.MES.Services.Dtos.Process
     public record ProcProcedureCreateDto : BaseEntityDto
     {
         /// <summary>
-        /// 主键id
-        /// </summary>
-        public long Id { get; set; }
-
-        /// <summary>
         /// 工序BOM代码
         /// </summary>
         public string Code { get; set; }
@@ -228,7 +223,7 @@ namespace Hymson.MES.Services.Dtos.Process
     /// <summary>
     /// 工序表新增Dto
     /// </summary>
-    public record AddProcProcedureDto 
+    public record AddProcProcedureDto :BaseEntityDto
     {
         /// <summary>
         /// 工序信息
@@ -250,7 +245,7 @@ namespace Hymson.MES.Services.Dtos.Process
     /// <summary>
     /// 工序表修改Dto
     /// </summary>
-    public record UpdateProcProcedureDto
+    public record UpdateProcProcedureDto:BaseEntityDto
     {
         /// <summary>
         /// 工序信息

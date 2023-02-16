@@ -13,6 +13,7 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using Org.BouncyCastle.Crypto;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -52,6 +53,17 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 批量删除关联的BomId的数据
+        /// </summary>
+        /// <param name="bomIds"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteBomIDAsync(long[] bomIds) 
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeleteBomIDsSql, new { bomIds = bomIds });
+        }
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -71,6 +83,30 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ProcBomDetailEntity>(GetByIdsSql, new { ids = ids});
+        }
+
+        /// <summary>
+        /// 查询主物料表列表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcBomDetailView>> GetListMainAsync(long id)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+
+            return await conn.QueryAsync<ProcBomDetailView>(GetListMainSql, new { id = id });
+        }
+
+        /// <summary>
+        /// 查询替代物料列表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcBomDetailView>> GetListReplaceAsync(long id)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+
+            return await conn.QueryAsync<ProcBomDetailView>(GetListReplaceSql, new { id = id });
         }
 
         /// <summary>
@@ -178,11 +214,42 @@ namespace Hymson.MES.Data.Repositories.Process
         const string UpdatesSql = "UPDATE `proc_bom_detail` SET   SiteCode = @SiteCode, BomId = @BomId, ProcedureBomId = @ProcedureBomId, MaterialId = @MaterialId, ReferencePoint = @ReferencePoint, Usages = @Usages, Loss = @Loss, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_bom_detail` SET IsDeleted = '1' WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_bom_detail` SET IsDeleted = '1' WHERE Id in @ids";
+        /// <summary>
+        /// 批量删除关联的BomId的数据
+        /// </summary>
+        const string DeleteBomIDsSql = "UPDATE `proc_bom_detail` SET IsDeleted = '1' WHERE BomId in @bomIds";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteCode`, `BomId`, `ProcedureBomId`, `MaterialId`, `ReferencePoint`, `Usages`, `Loss`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_bom_detail`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteCode`, `BomId`, `ProcedureBomId`, `MaterialId`, `ReferencePoint`, `Usages`, `Loss`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_bom_detail`  WHERE Id IN @ids ";
+
+        /// <summary>
+        /// 查询主物料表列表
+        /// </summary>
+        const string GetListMainSql = @"SELECT 
+                                          a.`Id`,a.MaterialId, 0 as BomDetailId,  a.`Usages`, a.`Loss`,a.`ReferencePoint`, a.`ProcedureBomId`, 
+                     1 as IsMain, b.MaterialCode, b.MaterialName,
+                     b.Version, c.Name, c.Code 
+                            FROM `proc_bom_detail` a
+                            INNER JOIN proc_material b on a.MaterialId = b.Id 
+                            LEFT JOIN proc_procedure c on a.ProcedureBomId = c.Id
+                            WHERE a.IsDeleted =0
+                            AND a.BomId=@id
+                            ORDER by a.CreateOn DESC ";
+        /// <summary>
+        /// 查询替代物料列表
+        /// </summary>
+        const string GetListReplaceSql = @"SELECT 
+                                          a.`Id`,b.MaterialId, a.BomDetailId,
+                                          a.`ReplaceMaterialId`, a.`Usages`, a.`Loss`,  a.`ReferencePoint`,b.ProcedureBomId, 0 as IsMain,
+                     c.MaterialCode, c.MaterialName,c.Version, "" as Name, "" as Code
+                            FROM `proc_bom_detail_replace_material` a
+                            INNER JOIN proc_bom_detail b on a.BomDetailId = b.Id 
+                            LEFT JOIN proc_material c on a.ReplaceMaterialId = c.Id
+                            WHERE a.IsDeleted =0
+                            AND a.BomId=@id
+                            ORDER by a.CreateOn DESC ";
     }
 }

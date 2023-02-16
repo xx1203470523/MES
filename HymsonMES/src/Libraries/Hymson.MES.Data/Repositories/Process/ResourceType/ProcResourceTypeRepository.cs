@@ -175,7 +175,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
     public partial class ProcResourceTypeRepository
     {
-        const string GetByIdSql = "select * from proc_resource_type where Id =@Id ";
+        const string GetByIdSql = "select * from proc_resource_type where Id =@Id and IsDeleted =0 ";
         const string GetByCodeSql = "select * from proc_resource_type where SiteCode =@SiteCode and ResType =@ResType and IsDeleted =0 ";
 
         const string GetPagedInfoDataSqlTemplate = "SELECT a.*,b.ResCode,b.ResName  FROM proc_resource_type a left join proc_resource b on a.Id =b.ResTypeId /**where**/ LIMIT @Offset,@Rows";

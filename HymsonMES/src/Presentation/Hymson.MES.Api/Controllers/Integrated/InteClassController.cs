@@ -40,9 +40,9 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public async Task<int> AddInteClassAsync([FromBody] InteClassCreateDto createDto)
+        public async Task<int> CreateAsync([FromBody] InteClassCreateDto createDto)
         {
-            return await _inteClassService.AddInteClassAsync(createDto);
+            return await _inteClassService.CreateAsync(createDto);
         }
 
         /// <summary>
@@ -50,9 +50,9 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// </summary>
         /// <returns></returns>
         [HttpPut]
-        public async Task<int> UpdateInteClassAsync([FromBody] InteClassModifyDto modifyDto)
+        public async Task<int> ModifyAsync([FromBody] InteClassModifyDto modifyDto)
         {
-            return await _inteClassService.UpdateInteClassAsync(modifyDto);
+            return await _inteClassService.ModifyAsync(modifyDto);
         }
 
         /// <summary>
@@ -60,10 +60,10 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// </summary>
         /// <returns></returns>
         [HttpDelete("{ids}")]
-        public async Task<int> DeleteInteClassAsync(string ids)
+        public async Task<int> DeletesAsync(string ids)
         {
             long[] idsArr = StringExtension.SpitLongArrary(ids);
-            return await _inteClassService.DeleteInteClassAsync(idsArr);
+            return await _inteClassService.DeletesAsync(idsArr);
         }
 
         /// <summary>
@@ -83,9 +83,9 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{Id}")]
-        public async Task<InteClassWithDetailDto> GetInteClassAsync(long id)
+        public async Task<InteClassWithDetailDto> GetDetailAsync(long id)
         {
-            return await _inteClassService.GetInteClassAsync(id);
+            return await _inteClassService.GetDetailAsync(id);
         }
 
 

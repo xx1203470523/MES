@@ -10,6 +10,7 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Process.Resource;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 using Org.BouncyCastle.Crypto;
@@ -54,7 +55,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
             if (!string.IsNullOrWhiteSpace(query.SiteCode))
             {
-                sqlBuilder.Where("a.SiteCode=@SiteCode");
+                sqlBuilder.Where("SiteCode=@SiteCode");
             }
             if (!string.IsNullOrWhiteSpace(query.Code))
             {
@@ -126,6 +127,18 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 判断工艺路线是否存在
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<bool> IsExistsAsync(ProcProcessRouteQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var  procProcessRoutes= await conn.QueryAsync<ProcProcessRouteEntity>(ExistsSql, new { Code = query.Code, SiteCode = query.SiteCode }) ;
+            return procProcessRoutes != null && procProcessRoutes.Any();
+        }
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="procProcessRouteEntity"></param>
@@ -188,10 +201,11 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetProcProcessRouteEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `proc_process_route` /**where**/  ";
+        const string ExistsSql = "SELECT Id FROM proc_process_route WHERE `IsDeleted`= 0 AND Code=@Code and SiteCode=@SiteCode LIMIT 1";
 
         const string InsertSql = "INSERT INTO `proc_process_route`(  `Id`, `SiteCode`, `Code`, `Name`, `Status`, `Type`, `Version`, `IsCurrentVersion`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @Code, @Name, @Status, @Type, @Version, @IsCurrentVersion, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `proc_process_route`(  `Id`, `SiteCode`, `Code`, `Name`, `Status`, `Type`, `Version`, `IsCurrentVersion`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @Code, @Name, @Status, @Type, @Version, @IsCurrentVersion, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string UpdateSql = "UPDATE `proc_process_route` SET   SiteCode = @SiteCode, Code = @Code, Name = @Name, Status = @Status, Type = @Type, Version = @Version, IsCurrentVersion = @IsCurrentVersion, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `proc_process_route` SET Status = @Status, Type = @Type, IsCurrentVersion = @IsCurrentVersion, Remark = @Remark,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_process_route` SET IsDeleted = '1' WHERE Id in @ids";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteCode`, `Code`, `Name`, `Status`, `Type`, `Version`, `IsCurrentVersion`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`

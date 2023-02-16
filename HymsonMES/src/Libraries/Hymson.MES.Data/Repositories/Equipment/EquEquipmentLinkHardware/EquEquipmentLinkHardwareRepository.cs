@@ -86,12 +86,23 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="equipmentIds"></param>
+        /// <param name="equipmentId"></param>
         /// <returns></returns>
-        public async Task<int> SoftDeleteAsync(long[] equipmentIds)
+        public async Task<int> DeletesAsync(long equipmentId)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(SoftDeleteSql, new { equipmentIds });
+            return await conn.ExecuteAsync(DeletesByEquipmentIdSql, new { equipmentId });
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="equipmentIds"></param>
+        /// <returns></returns>
+        public async Task<int> DeletesAsync(long[] equipmentIds)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeletesByEquipmentIdSql, new { EquipmentId = equipmentIds });
         }
 
         /// <summary>
@@ -184,6 +195,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         const string InsertSql = "INSERT INTO `equ_equipment_link_hardware`(  `Id`, `EquipmentId`, `HardwareCode`, `HardwareType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteCode`) VALUES (   @Id, @EquipmentId, @HardwareCode, @HardwareType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteCode )  ";
         const string UpdateSql = "UPDATE `equ_equipment_link_hardware` SET   EquipmentId = @EquipmentId, HardwareCode = @HardwareCode, HardwareType = @HardwareType, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, Remark = @Remark, SiteCode = @SiteCode  WHERE Id = @Id ";
         const string SoftDeleteSql = "UPDATE `equ_equipment_link_hardware` SET `IsDeleted` = 1 WHERE `Id` = @Id;";
+        const string DeletesByEquipmentIdSql = "DELETE `equ_equipment_link_hardware` WHERE `EquipmentId` = @EquipmentId;";
         const string GetByIdSql = "SELECT * FROM `equ_equipment_link_hardware` WHERE `Id` = @Id;";
         const string GetByHardwareCodeSql = "SELECT * FROM `equ_equipment_link_hardware` WHERE `HardwareCode` = @HardwareCode AND `HardwareType` = @HardwareType;";
         const string GetByEquipmentSql = "SELECT * FROM `equ_equipment_link_hardware` WHERE `EquipmentId` = @EquipmentId;";

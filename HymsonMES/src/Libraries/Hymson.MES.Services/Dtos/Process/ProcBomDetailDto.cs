@@ -20,72 +20,42 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public record ProcBomDetailDto : BaseEntityDto
     {
+        public string MaterialId { get; set; }
+
+        public string ReplaceMaterialId { get; set; }
+
         /// <summary>
-        /// 
+        /// 物料编码
         /// </summary>
-        public long Id { get; set; }
+        public string MaterialCode { get; set; }
 
-       /// <summary>
-        /// 所属BomID
-        /// </summary>
-        public long BomId { get; set; }
-
-       /// <summary>
-        /// 所属工序ID
-        /// </summary>
-        public long ProcedureBomId { get; set; }
-
-       /// <summary>
-        /// 所属物料ID
-        /// </summary>
-        public long MaterialId { get; set; }
-
-       /// <summary>
-        /// 参考点
-        /// </summary>
-        public string ReferencePoint { get; set; }
-
-       /// <summary>
+        /// <summary>
         /// 用量
         /// </summary>
         public decimal Usages { get; set; }
 
-       /// <summary>
-        /// 损耗
+        /// <summary>
+        ///    损耗
         /// </summary>
         public decimal? Loss { get; set; }
 
-       /// <summary>
-        /// 说明
+        /// <summary>
+        /// 参考点
         /// </summary>
-        public string Remark { get; set; }
+        public string ReferencePoint { get; set; }
+        public decimal Sequence { get; set; }
 
-       /// <summary>
-        /// 创建人
+        public string ProcedureBomId { get; set; }
+
+        /// <summary>
+        /// 工序代码
         /// </summary>
-        public string CreatedBy { get; set; }
+        public string Code { get; set; }
 
-       /// <summary>
-        /// 创建时间
+        /// <summary>
+        /// 是否主物料，1：主物料
         /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-       /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-       /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public bool? IsDeleted { get; set; }
-
-       
+        public int IsMain { get; set; }
     }
 
 

@@ -7,6 +7,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers
@@ -16,6 +17,7 @@ namespace Hymson.MES.Api.Controllers
     /// @author zhaoqing
     /// @date 2023-02-13 09:06:05
     /// </summary>
+    [Authorize]
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcProcedureController : ControllerBase
@@ -91,7 +93,7 @@ namespace Hymson.MES.Api.Controllers
         [HttpPost]
         public async Task AddProcProcedureAsync([FromBody] AddProcProcedureDto parm)
         {
-            await _procProcedureService.CreateProcProcedureAsync(parm);
+            await _procProcedureService.AddProcProcedureAsync(parm);
         }
 
         /// <summary>
@@ -102,7 +104,7 @@ namespace Hymson.MES.Api.Controllers
         [HttpPut]
         public async Task UpdateProcProcedureAsync([FromBody] UpdateProcProcedureDto parm)
         {
-            await _procProcedureService.ModifyProcProcedureAsync(parm);
+            await _procProcedureService.UpdateProcProcedureAsync(parm);
         }
 
         /// <summary>

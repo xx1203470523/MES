@@ -307,4 +307,16 @@ namespace Hymson.MES.Services.Dtos.Process
         ///// </summary>
         //public string SiteCode { get; set; }
     }
+
+    public record ProcProcessRouteDetailNodeViewDto : ProcProcessRouteDetailNodeDto
+    {
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string Code { get; set; }
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string Name { get; set; }
+    }
 }

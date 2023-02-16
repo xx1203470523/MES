@@ -63,6 +63,13 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<int> DeletesAsync(long[] ids);
 
         /// <summary>
+        /// 批量删除关联的BomId的数据
+        /// </summary>
+        /// <param name="bomIds"></param>
+        /// <returns></returns>
+        Task<int> DeleteBomIDAsync(long[] bomIds);
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -75,6 +82,20 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcBomDetailEntity>> GetByIdsAsync(long[] ids);
+
+        /// <summary>
+        /// 查询主物料表列表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcBomDetailView>> GetListMainAsync(long id);
+
+        /// <summary>
+        /// 查询替代物料列表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcBomDetailView>> GetListReplaceAsync(long id);
 
         /// <summary>
         /// 获取List

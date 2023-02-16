@@ -13,6 +13,7 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using System;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -48,7 +49,17 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeletesSql, new { ids=ids });
+        }
 
+        /// <summary>
+        /// 批量删除（真删除）
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<int> DeletesTrueAsync(long[] ids)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeletesTrueSql, new { ids = ids });
         }
 
         /// <summary>
@@ -89,30 +100,90 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procParameterLinkTypePagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcParameterLinkTypeEntity>> GetPagedInfoAsync(ProcParameterLinkTypePagedQuery procParameterLinkTypePagedQuery)
+        public async Task<PagedInfo<ProcParameterLinkTypeView>> GetPagedInfoAsync(ProcParameterLinkTypePagedQuery procParameterLinkTypePagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.Select("*");
+            //sqlBuilder.Where("IsDeleted=0");
+            //sqlBuilder.Select("*");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-           
+            if (!string.IsNullOrWhiteSpace(procParameterLinkTypePagedQuery.SiteCode))
+            {
+                sqlBuilder.Where(" g.SiteCode=@SiteCode ");
+            }
+            if (procParameterLinkTypePagedQuery.ParameterType!=0)
+            {
+                sqlBuilder.Where(" g.ParameterType=@ParameterType ");
+            }
+            if (!string.IsNullOrWhiteSpace(procParameterLinkTypePagedQuery.ParameterCode))
+            {
+                procParameterLinkTypePagedQuery.ParameterCode = $"%{procParameterLinkTypePagedQuery.ParameterCode}%";
+                sqlBuilder.Where(" o.ParameterCode like @ParameterCode ");
+            }
+            if (!string.IsNullOrWhiteSpace(procParameterLinkTypePagedQuery.ParameterName))
+            {
+                procParameterLinkTypePagedQuery.ParameterName = $"%{procParameterLinkTypePagedQuery.ParameterName}%";
+                sqlBuilder.Where(" o.ParameterName like @ParameterName ");
+            }
+
             var offSet = (procParameterLinkTypePagedQuery.PageIndex - 1) * procParameterLinkTypePagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = procParameterLinkTypePagedQuery.PageSize });
             sqlBuilder.AddParameters(procParameterLinkTypePagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var procParameterLinkTypeEntitiesTask = conn.QueryAsync<ProcParameterLinkTypeEntity>(templateData.RawSql, templateData.Parameters);
+            var procParameterLinkTypeEntitiesTask = conn.QueryAsync<ProcParameterLinkTypeView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procParameterLinkTypeEntities = await procParameterLinkTypeEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<ProcParameterLinkTypeEntity>(procParameterLinkTypeEntities, procParameterLinkTypePagedQuery.PageIndex, procParameterLinkTypePagedQuery.PageSize, totalCount);
+            return new PagedInfo<ProcParameterLinkTypeView>(procParameterLinkTypeEntities, procParameterLinkTypePagedQuery.PageIndex, procParameterLinkTypePagedQuery.PageSize, totalCount);
+        }
+
+        /// <summary>
+        /// 分页查询
+        /// </summary>
+        /// <param name="procParameterLinkTypePagedQuery"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ProcParameterLinkTypeView>> GetPagedProcParameterLinkTypeByTypeAsync(ProcParameterDetailPagerQuery procParameterDetailPagerQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedProcParameterLinkTypeByTypeSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedProcParameterLinkTypeByTypeCountSqlTemplate);
+            //sqlBuilder.Where("IsDeleted=0");
+            //sqlBuilder.Select("*");
+
+            if (!string.IsNullOrWhiteSpace(procParameterDetailPagerQuery.SiteCode))
+            {
+                sqlBuilder.Where(" g.SiteCode=@SiteCode ");
+            }
+            if (!string.IsNullOrWhiteSpace(procParameterDetailPagerQuery.ParameterCode))
+            {
+                procParameterDetailPagerQuery.ParameterCode = $"%{procParameterDetailPagerQuery.ParameterCode}%";
+                sqlBuilder.Where(" g.ParameterCode like @ParameterCode ");
+            }
+            if (!string.IsNullOrWhiteSpace(procParameterDetailPagerQuery.ParameterName))
+            {
+                procParameterDetailPagerQuery.ParameterName = $"%{procParameterDetailPagerQuery.ParameterName}%";
+                sqlBuilder.Where(" g.ParameterName like @ParameterName ");
+            }
+            if (procParameterDetailPagerQuery.OperateType.ToLower() == "add")
+            {
+                sqlBuilder.Where(" (o.Id is null or trim(o.Id) = '') ");
+            }
+
+
+            var offSet = (procParameterDetailPagerQuery.PageIndex - 1) * procParameterDetailPagerQuery.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = procParameterDetailPagerQuery.PageSize });
+            sqlBuilder.AddParameters(procParameterDetailPagerQuery);
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var procParameterLinkTypeEntitiesTask = conn.QueryAsync<ProcParameterLinkTypeView>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var procParameterLinkTypeEntities = await procParameterLinkTypeEntitiesTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<ProcParameterLinkTypeView>(procParameterLinkTypeEntities, procParameterDetailPagerQuery.PageIndex, procParameterDetailPagerQuery.PageSize, totalCount);
         }
 
         /// <summary>
@@ -192,8 +263,29 @@ namespace Hymson.MES.Data.Repositories.Process
 
     public partial class ProcParameterLinkTypeRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_parameter_link_type` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_parameter_link_type` /**where**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT 
+                                g.Id, g.SiteCode, g.ParameterType, o.Id as ParameterID,
+                                o.ParameterCode, o.ParameterName, o.ParameterUnit,
+                                g.Remark, g.CreateBy, g.CreateOn, g.UpdateBy, g.UpdateOn
+                                FROM `proc_parameter_link_type` g 
+                                LEFT JOIN proc_parameter o ON g.ParameterID = o.Id 
+            /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = @"SELECT COUNT(1) 
+                FROM `proc_parameter_link_type` g 
+                LEFT JOIN proc_parameter o ON g.ParameterID = o.Id 
+                /**where**/ ";
+
+        const string GetPagedProcParameterLinkTypeByTypeSqlTemplate = @"SELECT 
+                                o.Id, g.SiteCode, g.Id as ParameterID, o.ParameterType, 
+                                g.ParameterCode, g.ParameterName, g.Remark, o.CreateBy,
+                                o.CreateOn, o.UpdateBy, o.UpdateOn 
+                                FROM `proc_parameter` g 
+                                LEFT JOIN proc_parameter_link_type o ON o.ParameterID = g.Id && o.ParameterType = @ParameterType 
+            /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedProcParameterLinkTypeByTypeCountSqlTemplate = @"SELECT COUNT(1) 
+                        FROM `proc_parameter` g 
+                        LEFT JOIN proc_parameter_link_type o ON o.ParameterID = g.Id && o.ParameterType = @ParameterType 
+                /**where**/ ";
         const string GetProcParameterLinkTypeEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `proc_parameter_link_type` /**where**/  ";
@@ -204,6 +296,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string UpdatesSql = "UPDATE `proc_parameter_link_type` SET   SiteCode = @SiteCode, ParameterID = @ParameterID, ParameterType = @ParameterType, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_parameter_link_type` SET IsDeleted = '1' WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_parameter_link_type` SET IsDeleted = '1' WHERE Id in @ids";
+        const string DeletesTrueSql = " Delete FROM `proc_parameter_link_type` WHERE Id in @ids ";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteCode`, `ParameterID`, `ParameterType`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_parameter_link_type`  WHERE Id = @Id ";

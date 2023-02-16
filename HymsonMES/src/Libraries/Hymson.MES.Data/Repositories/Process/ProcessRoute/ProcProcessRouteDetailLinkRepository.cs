@@ -84,14 +84,19 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 查询List
         /// </summary>
-        /// <param name="procProcessRouteDetailLinkQuery"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetProcProcessRouteDetailLinkEntitiesAsync(ProcProcessRouteDetailLinkQuery procProcessRouteDetailLinkQuery)
+        public async Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetListAsync(ProcProcessRouteDetailLinkQuery query)
         {
             var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetProcProcessRouteDetailLinkEntitiesSqlTemplate);
+            var template = sqlBuilder.AddTemplate(GetListSqlTemplate);
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("ProcessRouteId=@ProcessRouteId");
+            sqlBuilder.AddParameters(query);
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var procProcessRouteDetailLinkEntities = await conn.QueryAsync<ProcProcessRouteDetailLinkEntity>(template.RawSql, procProcessRouteDetailLinkQuery);
+            var procProcessRouteDetailLinkEntities = await conn.QueryAsync<ProcProcessRouteDetailLinkEntity>(template.RawSql, template.Parameters);
             return procProcessRouteDetailLinkEntities;
         }
 
@@ -160,13 +165,24 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeletesSql, new { ids=ids });
         }
+
+        /// <summary>
+        /// 删除（软删除）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteByProcessRouteIdAsync(long id)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeleteByProcessRouteIdSql, new { ProcedureId = id });
+        }
     }
 
     public partial class ProcProcessRouteDetailLinkRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_process_route_detail_link` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_process_route_detail_link` /**where**/ ";
-        const string GetProcProcessRouteDetailLinkEntitiesSqlTemplate = @"SELECT 
+        const string GetListSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `proc_process_route_detail_link` /**where**/  ";
 
@@ -182,5 +198,6 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteCode`, `SerialNo`, `ProcessRouteId`, `PreProcessRouteDetailId`, `ProcessRouteDetailId`, `Extra1`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_process_route_detail_link`  WHERE Id IN @ids ";
+        const string DeleteByProcessRouteIdSql = "delete from `proc_process_route_detail_link` WHERE ProcessRouteId = @ProcessRouteId ";
     }
 }

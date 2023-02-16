@@ -66,7 +66,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public List<InteClassDetailModifyDto> DetailList { get; set; }
     }
-    
+
     /// <summary>
     /// 班制维护新增输入对象
     /// </summary>
@@ -130,11 +130,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         ///班次名称
         /// </summary>
-        public string ClassName { get; set; }
+        public string ClassName { get; set; } = "";
 
         /// <summary>
         ///班次类型（字典名称：manu_class_type）
         /// </summary>
-        public string ClassType { get; set; }
+        public int ClassType { get; set; }
     }
 }

@@ -149,7 +149,10 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public bool? IsDeleted { get; set; }
 
-       
+        /// <summary>
+        /// 物料集合，包含替代物料
+        /// </summary>
+        public IEnumerable<ProcBomDetailDto> MaterialList { get; set; }
     }
 
     /// <summary>
@@ -217,8 +220,10 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public bool? IsDeleted { get; set; }
 
-       
-
+        /// <summary>
+        /// 物料集合，包含替代物料
+        /// </summary>
+        public IEnumerable<ProcBomDetailDto> MaterialList { get; set; }
     }
 
     /// <summary>
@@ -252,5 +257,16 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 版本
         /// </summary>
         public string Version { get; set; }
+    }
+
+    /// <summary>
+    /// Bom配置物料信息查询对象
+    /// </summary>
+    public class ProcBomMaterialQueryDto : PagerInfo
+    {
+        /// <summary>
+        /// 所属BomID
+        /// </summary>
+        public long BomId { get; set; }
     }
 }

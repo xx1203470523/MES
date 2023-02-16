@@ -6,6 +6,7 @@
  *build datetime: 2023-02-08 04:47:44
  */
 using FluentValidation;
+using Hymson.Authentication;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -34,8 +35,11 @@ namespace Hymson.MES.Services.Services.Process
 
         private readonly IProcReplaceMaterialRepository _procReplaceMaterialRepository;
 
-        public ProcMaterialService(IProcMaterialRepository procMaterialRepository, AbstractValidator<ProcMaterialCreateDto> validationCreateRules, AbstractValidator<ProcMaterialModifyDto> validationModifyRules, IProcReplaceMaterialRepository procReplaceMaterialRepository)
+        private readonly ICurrentUser _currentUser;
+
+        public ProcMaterialService(ICurrentUser currentUser, IProcMaterialRepository procMaterialRepository, AbstractValidator<ProcMaterialCreateDto> validationCreateRules, AbstractValidator<ProcMaterialModifyDto> validationModifyRules, IProcReplaceMaterialRepository procReplaceMaterialRepository)
         {
+            _currentUser = currentUser;
             _procMaterialRepository = procMaterialRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
@@ -80,8 +84,8 @@ namespace Hymson.MES.Services.Services.Process
             //DTO转换实体
             var procMaterialEntity = procMaterialCreateDto.ToEntity<ProcMaterialEntity>();
             procMaterialEntity.Id= IdGenProvider.Instance.CreateId();
-            procMaterialEntity.CreatedBy = "TODO";
-            procMaterialEntity.UpdatedBy = "TODO";
+            procMaterialEntity.CreatedBy = _currentUser.UserName;
+            procMaterialEntity.UpdatedBy = _currentUser.UserName;
             procMaterialEntity.CreatedOn = HymsonClock.Now();
             procMaterialEntity.UpdatedOn = HymsonClock.Now();
 
@@ -96,7 +100,7 @@ namespace Hymson.MES.Services.Services.Process
                     procReplaceMaterial.IsUse = item.IsEnabled;
                     procReplaceMaterial.ReplaceMaterialId = (long)item.MaterialId;
                     procReplaceMaterial.MaterialId = procMaterialEntity.Id;
-                    procReplaceMaterial.CreatedBy = "TODO";
+                    procReplaceMaterial.CreatedBy = _currentUser.UserName;
                     procReplaceMaterial.CreatedOn = HymsonClock.Now();
                     addProcReplaceList.Add(procReplaceMaterial);
                 }
@@ -230,7 +234,7 @@ namespace Hymson.MES.Services.Services.Process
         {
             //DTO转换实体
             var procMaterialEntity = procMaterialModifyDto.ToEntity<ProcMaterialEntity>();
-            procMaterialEntity.UpdatedBy = "TODO";
+            procMaterialEntity.UpdatedBy = _currentUser.UserName;
             procMaterialEntity.UpdatedOn = HymsonClock.Now();
 
             #region 校验
@@ -284,7 +288,7 @@ namespace Hymson.MES.Services.Services.Process
                         case 1:
                             procReplaceMaterial = item.ToEntity<ProcReplaceMaterialEntity>();
                             procReplaceMaterial.Id= IdGenProvider.Instance.CreateId();
-                            procReplaceMaterial.CreatedBy = "TODO";
+                            procReplaceMaterial.CreatedBy = _currentUser.UserName;
                             procReplaceMaterial.CreatedOn = HymsonClock.Now();
                             procReplaceMaterial.IsUse = item.IsEnabled;
                             procReplaceMaterial.ReplaceMaterialId = (long)item.MaterialId;
@@ -293,7 +297,7 @@ namespace Hymson.MES.Services.Services.Process
                             break;
                         case 2:
                             procReplaceMaterial = item.ToEntity<ProcReplaceMaterialEntity>();  //item.Adapt<ProcReplaceMaterial>().ToUpdate();
-                            procReplaceMaterial.UpdatedBy = "TODO";
+                            procReplaceMaterial.UpdatedBy = _currentUser.UserName;
                             procReplaceMaterial.UpdatedOn = HymsonClock.Now();
                             if (item.Id == item.MaterialId)
                             {

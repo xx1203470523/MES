@@ -49,6 +49,13 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<int> UpdatesAsync(List<ProcBomEntity> procBomEntitys);
 
         /// <summary>
+        /// 更新 BOM IsCurrentVersion 为 false
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<int> UpdateIsCurrentVersionIsFalseAsync(long[] ids);
+
+        /// <summary>
         /// 删除
         /// </summary>
         /// <param name="id"></param>

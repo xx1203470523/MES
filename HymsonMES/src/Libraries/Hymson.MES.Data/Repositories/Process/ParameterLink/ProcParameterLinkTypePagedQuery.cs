@@ -19,6 +19,57 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public class ProcParameterLinkTypePagedQuery : PagerInfo
     {
+        /// <summary>
+        /// 描述 :所属站点代码 
+        /// 空值 : false  
+        /// </summary>
+        public string SiteCode { get; set; }
 
+        /// <summary>
+        /// 类型（设备/产品参数） （1:设备参数;2:产品参数）
+        /// </summary>
+        public int ParameterType { get; set; } = 1;
+
+        /// <summary>
+        /// 编码（设备/产品参数）
+        /// </summary>
+        public string ParameterCode { get; set; }
+
+        /// <summary>
+        /// 名称（设备/产品参数）
+        /// </summary>
+        public string ParameterName { get; set; }
+    }
+
+    /// <summary>
+    /// 查询对象（设备/产品参数） 分页
+    /// </summary>
+    public class ProcParameterDetailPagerQuery : PagerInfo
+    {
+        /// <summary>
+        /// 描述 :所属站点代码 
+        /// 空值 : false  
+        /// </summary>
+        public string SiteCode { get; set; }
+
+        /// <summary>
+        /// 操作类型 1:add；2:edit；3:view；
+        /// </summary>
+        public string OperateType { get; set; } = "add";
+
+        /// <summary>
+        /// 类型（设备/产品参数）
+        /// </summary>
+        public int ParameterType { get; set; } = 1;
+
+        /// <summary>
+        /// 编码（设备/产品参数）
+        /// </summary>
+        public string ParameterCode { get; set; }
+
+        /// <summary>
+        /// 名称（设备/产品参数）
+        /// </summary>
+        public string ParameterName { get; set; }
     }
 }

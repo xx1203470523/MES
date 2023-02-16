@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -13,6 +14,7 @@ namespace Hymson.MES.Api.Controllers
     /// @author zhaoqing
     /// @date 2023-02-08
     /// </summary>
+    [Authorize]
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcResourceController : ControllerBase
@@ -84,49 +86,49 @@ namespace Hymson.MES.Api.Controllers
         /// <summary>
         /// 资源关联打印机数据
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
         [Route("print/list")]
         [HttpGet]
-        public async Task<PagedInfo<ProcResourceConfigPrintViewDto>> GetResourceConfigPrint(ProcResourceConfigPrintPagedQueryDto parm)
+        public async Task<PagedInfo<ProcResourceConfigPrintViewDto>> GetResourceConfigPrint([FromQuery] ProcResourceConfigPrintPagedQueryDto query)
         {
-            return await _procResourceService.GetcResourceConfigPrintAsync(parm);
+            return await _procResourceService.GetcResourceConfigPrintAsync(query);
         }
 
         /// <summary>
         /// 获取资源设置数据
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
         [Route("res/list")]
         [HttpGet]
-        public async Task<PagedInfo<ProcResourceConfigResDto>> GetResourceConfigPrint(ProcResourceConfigResPagedQueryDto parm)
+        public async Task<PagedInfo<ProcResourceConfigResDto>> GetResourceConfigPrint([FromQuery] ProcResourceConfigResPagedQueryDto query)
         {
-            return await _procResourceService.GetcResourceConfigResAsync(parm);
+            return await _procResourceService.GetcResourceConfigResAsync(query);
         }
 
         /// <summary>
-        /// 获取资源设置数据
+        /// 获取资源关联设备数据
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
         [Route("equ/list")]
         [HttpGet]
-        public async Task<PagedInfo<ProcResourceEquipmentBindViewDto>> GetResourceConfigEquAsync(ProcResourceEquipmentBindPagedQueryDto parm)
+        public async Task<PagedInfo<ProcResourceEquipmentBindViewDto>> GetResourceConfigEquAsync([FromQuery] ProcResourceEquipmentBindPagedQueryDto query)
         {
-            return await _procResourceService.GetcResourceConfigEquAsync(parm);
+            return await _procResourceService.GetcResourceConfigEquAsync(query);
         }
 
         /// <summary>
-        /// 获取资源设置数据
+        /// 获取资源关联作业数据
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
         [Route("job/list")]
         [HttpGet]
-        public async Task<PagedInfo<ProcResourceConfigJobViewDto>> GetcResourceConfigJoAsync(ProcResourceConfigJobPagedQueryDto parm)
+        public async Task<PagedInfo<ProcResourceConfigJobViewDto>> GetcResourceConfigJoAsync([FromQuery] ProcResourceConfigJobPagedQueryDto query)
         {
-            return await _procResourceService.GetcResourceConfigJoAsync(parm);
+            return await _procResourceService.GetcResourceConfigJoAsync(query);
         }
 
         /// <summary>

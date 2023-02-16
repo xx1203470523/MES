@@ -51,6 +51,13 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<PagedInfo<ProcProcessRouteEntity>> GetPagedInfoAsync(ProcProcessRoutePagedQuery procProcessRoutePagedQuery);
 
         /// <summary>
+        /// 判断工艺路线是否存在
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<bool> IsExistsAsync(ProcProcessRouteQuery query);
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="procProcessRouteEntity"></param>

@@ -19,5 +19,23 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public class ProcBomQuery
     {
+        /// <summary>
+        /// 描述 :所属站点代码 
+        /// 空值 : false  
+        /// </summary>
+        public string SiteCode { get; set; }
+
+        /// <summary>
+        /// 描述 :BOM 
+        /// 空值 : false  
+        /// </summary>
+        public string BomCode { get; set; }
+
+        /// <summary>
+        /// 描述 :版本 
+        /// 空值 : false  
+        /// </summary>
+        public string Version { get; set; }
+
     }
 }

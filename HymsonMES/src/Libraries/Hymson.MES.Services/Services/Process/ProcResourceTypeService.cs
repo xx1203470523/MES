@@ -1,4 +1,5 @@
-﻿using Hymson.Infrastructure;
+﻿using Hymson.Authentication;
+using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
@@ -9,7 +10,6 @@ using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.Snowflake;
-using Hymson.Utils;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using System.ComponentModel.DataAnnotations;
@@ -25,16 +25,29 @@ namespace Hymson.MES.Services.Services.Process
     /// </summary>
     public class ProcResourceTypeService : IProcResourceTypeService
     {
+        /// <summary>
+        /// 当前登录用户对象
+        /// </summary>
+        private readonly ICurrentUser _currentUser;
+        /// <summary>
+        /// 资源类型仓储对象
+        /// </summary>
         private readonly IProcResourceTypeRepository _resourceTypeRepository;
+        /// <summary>
+        /// 资源仓储对象
+        /// </summary>
         private readonly IProcResourceRepository _resourceRepository;
         //private readonly AbstractValidator<ProcResourceTypeDto> _validationRules;
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        public ProcResourceTypeService(IProcResourceTypeRepository resourceTypeRepository, IProcResourceRepository resourceRepository)
-        //AbstractValidator<ProcResourceTypeDto> validationRules)
+        public ProcResourceTypeService(ICurrentUser currentUser,
+            IProcResourceTypeRepository resourceTypeRepository,
+            IProcResourceRepository resourceRepository)
+           //AbstractValidator<ProcResourceTypeDto> validationRules)
         {
+            _currentUser = currentUser;
             _resourceTypeRepository = resourceTypeRepository;
             _resourceRepository = resourceRepository;
             // _validationRules = validationRules;
@@ -48,7 +61,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<ProcResourceTypeDto> GetListAsync(long id)
         {
             var entity = await _resourceTypeRepository.GetByIdAsync(id);
-            return entity.ToModel<ProcResourceTypeDto>();
+            return entity?.ToModel<ProcResourceTypeDto>()??new ProcResourceTypeDto();
         }
 
         /// <summary>
@@ -96,7 +109,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task AddProcResourceTypeAsync(ProcResourceTypeAddCommandDto param)
+        public async Task AddProcResourceTypeAsync(ProcResourceTypeAddDto param)
         {
             //验证DTO
             //var dto = new ProcResourceTypeDto();
@@ -106,18 +119,16 @@ namespace Hymson.MES.Services.Services.Process
                 throw new ValidationException(ErrorCode.MES10100);
             }
 
-            var userId = "TODO";
-            var siteCode = "TODO";
+            var userName =_currentUser.UserName;
+            var siteCode = param.SiteCode;
             //DTO转换实体
             var id = IdGenProvider.Instance.CreateId();
             var entity = new ProcResourceTypeAddCommand
             {
                 Id = id,
                 SiteCode = siteCode,
-                CreatedBy = userId,
-                UpdatedBy = userId,
-                UpdatedOn = HymsonClock.Now(),
-                CreatedOn = HymsonClock.Now(),
+                CreatedBy = userName,
+                UpdatedBy = userName,
                 Remark = param.Remark ?? "",
                 ResType = param.ResType.ToUpperInvariant(),
                 ResTypeName = param.ResTypeName ?? ""
@@ -128,17 +139,14 @@ namespace Hymson.MES.Services.Services.Process
             var resourceType = await _resourceTypeRepository.GetByCodeAsync(resEntity);
             if (resourceType != null)
             {
-                //TODO 
-                // throw new CustomerValidationException(ErrorCode.MES10100, $"此资源类型{param.ResType}在系统已经存在!");
-                throw new ValidationException(ErrorCode.MES10311);
+                throw new BusinessException(ErrorCode.MES10311).WithData("ResType", param.ResType);
             }
 
             var resourceIds = param.ResourceIds;
             var updateCommand = new ProcResourceUpdateCommand();
             if (resourceIds != null && resourceIds.Any() == true)
             {
-                updateCommand.UpdatedOn = HymsonClock.Now();
-                updateCommand.UpdatedBy = userId;
+                updateCommand.UpdatedBy = userName;
                 updateCommand.ResTypeId = id;
                 updateCommand.IdsArr = param.ResourceIds.ToArray();
             }
@@ -160,12 +168,11 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task UpdateProcResrouceTypeAsync(ProcResourceTypeUpdateCommandDto param)
+        public async Task UpdateProcResrouceTypeAsync(ProcResourceTypeUpdateDto param)
         {
             //验证DTO
             //var dto = new ProcResourceTypeDto();
             //await _validationRules.ValidateAndThrowAsync(dto);
-            //TODO
             if (param == null)
             {
                 throw new ValidationException(ErrorCode.MES10100);
@@ -176,23 +183,21 @@ namespace Hymson.MES.Services.Services.Process
                 throw new NotFoundException(ErrorCode.MES10309);
             }
 
-            var userId = "TODO";
+            var userName =_currentUser.UserName;
             //DTO转换实体
             var updateEntity = new ProcResourceTypeUpdateCommand
             {
                 Id = param.Id,
                 Remark = param.Remark ?? "",
                 ResTypeName = param.ResTypeName ?? "",
-                UpdatedOn = HymsonClock.Now(),
-                UpdatedBy = userId
+                UpdatedBy = userName
             };
 
             var resourceIds = param.ResourceIds;
             var updateCommand = new ProcResourceUpdateCommand();
             if (resourceIds != null && resourceIds.Any() == true)
             {
-                updateCommand.UpdatedOn = HymsonClock.Now();
-                updateCommand.UpdatedBy = userId;
+                updateCommand.UpdatedBy = userName;
                 updateCommand.ResTypeId = param.Id;
                 updateCommand.IdsArr = resourceIds.ToArray();
             }

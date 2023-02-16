@@ -20,13 +20,13 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public interface IProcProcessRouteDetailLinkRepository
     {
-	    /// <summary>
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcProcessRouteDetailLinkEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -35,26 +35,26 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
-        /// 获取List
+        /// 查询List
         /// </summary>
         /// <param name="procProcessRouteDetailLinkQuery"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetProcProcessRouteDetailLinkEntitiesAsync(ProcProcessRouteDetailLinkQuery procProcessRouteDetailLinkQuery);
-        
+        Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetListAsync(ProcProcessRouteDetailLinkQuery procProcessRouteDetailLinkQuery);
+
         /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="procProcessRouteDetailLinkPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ProcProcessRouteDetailLinkEntity>> GetPagedInfoAsync(ProcProcessRouteDetailLinkPagedQuery procProcessRouteDetailLinkPagedQuery);
-		
+
         /// <summary>
         /// 新增
         /// </summary>
         /// <param name="procProcessRouteDetailLinkEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ProcProcessRouteDetailLinkEntity procProcessRouteDetailLinkEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -68,7 +68,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procProcessRouteDetailLinkEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ProcProcessRouteDetailLinkEntity procProcessRouteDetailLinkEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -82,12 +82,19 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<int> DeleteRangeAsync(long[] ids);
+
+        /// <summary>
+        /// 删除（软删除）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<int> DeleteByProcessRouteIdAsync(long id);
     }
 }

@@ -49,14 +49,14 @@ namespace Hymson.MES.Services.Services.Process.IProcessService
         /// </summary>
         /// <param name="procProcedureCreateDto"></param>
         /// <returns></returns>
-        Task CreateProcProcedureAsync(AddProcProcedureDto procProcedureCreateDto);
+        Task AddProcProcedureAsync(AddProcProcedureDto procProcedureCreateDto);
 
         /// <summary>
         /// 修改
         /// </summary>
         /// <param name="procProcedureModifyDto"></param>
         /// <returns></returns>
-        Task ModifyProcProcedureAsync(UpdateProcProcedureDto procProcedureModifyDto);
+        Task UpdateProcProcedureAsync(UpdateProcProcedureDto procProcedureModifyDto);
 
         /// <summary>
         /// 批量删除

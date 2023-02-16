@@ -6,6 +6,9 @@ using Hymson.MES.Data.Repositories.Integrated.InteClass;
 using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
+using Hymson.Utils.Tools;
+using System.Diagnostics;
+using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Integrated.InteClass
 {
@@ -50,7 +53,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task<int> AddInteClassAsync(InteClassCreateDto createDto)
+        public async Task<int> CreateAsync(InteClassCreateDto createDto)
         {
             // 验证DTO
 
@@ -61,25 +64,30 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
 
+            // 参数校验
+            if (createDto.DetailList.Any(a => TimeComparison(a.StartTime, a.EndTime) == false) == true)
+            {
+                // TODO
+                //return Error(ResultCode.PARAM_ERROR, "开始时间不能大于于结束时间");
+            }
+
             List<InteClassDetailEntity> details = new();
             foreach (var item in createDto.DetailList)
             {
-                if (TimeComparison(item.StartTime, item.EndTime) == false)
-                {
-                    // TODO
-                    //return Error(ResultCode.PARAM_ERROR, "开始时间不能大于于结束时间");
-                }
                 var classDetailEntity = item.ToEntity<InteClassDetailEntity>();
                 classDetailEntity.ClassId = entity.Id;
+                classDetailEntity.CreatedBy = entity.CreatedBy;
+                classDetailEntity.UpdatedBy = entity.UpdatedBy;
                 details.Add(classDetailEntity);
             }
 
-            // TODO 事务处理
             var rows = 0;
-            // 保存实体
-            rows += await _inteClassRepository.InsertAsync(entity);
-            rows += await _inteClassDetailRepository.InsertRangeAsync(details);
-
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                rows += await _inteClassRepository.InsertAsync(entity);
+                rows += await _inteClassDetailRepository.InsertRangeAsync(details);
+                trans.Complete();
+            }
             return rows;
         }
 
@@ -88,7 +96,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task<int> UpdateInteClassAsync(InteClassModifyDto modifyDto)
+        public async Task<int> ModifyAsync(InteClassModifyDto modifyDto)
         {
             // DTO转换实体
             var entity = modifyDto.ToEntity<InteClassEntity>();
@@ -107,13 +115,14 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
                 details.Add(classDetailEntity);
             }
 
-            // TODO 事务处理
             var rows = 0;
-            // 保存实体
-            rows += await _inteClassDetailRepository.DeleteByClassIdAsync(entity.Id);
-            rows += await _inteClassRepository.UpdateAsync(entity);
-            rows += await _inteClassDetailRepository.InsertRangeAsync(details);
-
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                rows += await _inteClassDetailRepository.DeleteByClassIdAsync(entity.Id);
+                rows += await _inteClassRepository.UpdateAsync(entity);
+                rows += await _inteClassDetailRepository.InsertRangeAsync(details);
+                trans.Complete();
+            }
             return rows;
         }
 
@@ -122,7 +131,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeleteInteClassAsync(long[] idsArr)
+        public async Task<int> DeletesAsync(long[] idsArr)
         {
             return await _inteClassRepository.DeletesAsync(idsArr);
         }
@@ -147,12 +156,12 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<InteClassWithDetailDto> GetInteClassAsync(long id)
+        public async Task<InteClassWithDetailDto> GetDetailAsync(long id)
         {
-            InteClassWithDetailDto response = new InteClassWithDetailDto();
+            InteClassWithDetailDto response = new();
             response.ClassInfo = (await _inteClassRepository.GetByIdAsync(id)).ToModel<InteClassDto>();
-            var detailList = await _inteClassDetailRepository.GetListByClassIdAsync(id);
 
+            var detailList = await _inteClassDetailRepository.GetListByClassIdAsync(id);
             foreach (var item in detailList)
             {
                 response.DetailList.Add(new InteClassDetailDto
