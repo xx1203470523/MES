@@ -14,7 +14,6 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.Snowflake;
@@ -83,7 +82,6 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcProcessRouteDto>> GetPageListAsync(ProcProcessRoutePagedQueryDto procProcessRoutePagedQueryDto)
         {
             var procProcessRoutePagedQuery = procProcessRoutePagedQueryDto.ToQuery<ProcProcessRoutePagedQuery>();
-            procProcessRoutePagedQuery.SiteCode = "TODO";
             var pagedInfo = await _procProcessRouteRepository.GetPagedInfoAsync(procProcessRoutePagedQuery);
 
             // 实体到DTO转换 装载数据
@@ -102,7 +100,7 @@ namespace Hymson.MES.Services.Services.Process
             var processRoute = await _procProcessRouteRepository.GetByIdAsync(id);
             if (processRoute == null)
             {
-                throw new Exception(ErrorCode.MES10431);
+                throw new Exception(ErrorCode.MES10439);
             }
             model.Info = processRoute.ToModel<ProcProcessRouteDto>();
 
@@ -253,10 +251,10 @@ namespace Hymson.MES.Services.Services.Process
                 throw new ValidationException(ErrorCode.MES10436);
             }
 
-           var  processRoute=await _procProcessRouteRepository.GetByIdAsync(parm.Id);
-            if (processRoute==null)
+            var processRoute = await _procProcessRouteRepository.GetByIdAsync(parm.Id);
+            if (processRoute == null)
             {
-                throw new DataException(ErrorCode.MES10438);
+                throw new ValidationException(ErrorCode.MES10438);
             }
 
             // 判断编号是否已存在
@@ -375,6 +373,7 @@ namespace Hymson.MES.Services.Services.Process
 
             return nodeList.Select(s => new ProcProcessRouteDetailNodeEntity
             {
+                Id = IdGenProvider.Instance.CreateId(),
                 SiteCode = model.SiteCode,
                 ProcessRouteId = model.Id,
                 SerialNo = s.SerialNo,
@@ -401,9 +400,10 @@ namespace Hymson.MES.Services.Services.Process
 
             return linkList.Select(s => new ProcProcessRouteDetailLinkEntity
             {
+                Id = IdGenProvider.Instance.CreateId(),
                 SiteCode = model.SiteCode,
-                ProcessRouteId = model.Id,
                 SerialNo = s.SerialNo,
+                ProcessRouteId = model.Id,
                 PreProcessRouteDetailId = s.PreProcessRouteDetailId,
                 ProcessRouteDetailId = s.ProcessRouteDetailId,
                 Extra1 = s.Extra1,

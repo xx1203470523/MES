@@ -6,27 +6,24 @@
  *build datetime: 2023-02-13 09:06:05
  */
 using FluentValidation;
+using Hymson.Authentication;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.ResourceType;
+using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using Hymson.Utils;
-using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Process.ResourceType;
-using Hymson.MES.Services.Dtos.Process;
-using Hymson.Infrastructure.Exceptions;
-using Hymson.MES.Core.Constants;
 using Hymson.Utils.Tools;
 using System.Transactions;
-using Hymson.MES.Data.Repositories.Process.Resource;
-using Hymson.MES.Services.Dtos.Integrated;
-using Hymson.MES.Data.Repositories.Integrated;
-using Google.Protobuf.WellKnownTypes;
-using Hymson.MES.Core.Domain.Integrated;
-using Hymson.MES.Core.Enums.Integrated;
-using Hymson.Authentication;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -160,7 +157,11 @@ namespace Hymson.MES.Services.Services.Process
         {
             var query = new ProcProcedurePrintReleationPagedQuery()
             {
-                ProcedureId = queryDto.ProcedureId
+                SiteCode= queryDto.SiteCode,
+                ProcedureId = queryDto.ProcedureId,
+                PageIndex = queryDto.PageIndex,
+                PageSize    = queryDto.PageSize,
+                Sorting= queryDto.Sorting,
             };
             var pagedInfo = await _procedurePrintReleationRepository.GetPagedInfoAsync(query);
 
@@ -173,7 +174,7 @@ namespace Hymson.MES.Services.Services.Process
                 foreach (var entity in pagedInfo.Data)
                 {
                     var printReleationDto = entity.ToModel<ProcProcedurePrintReleationDto>();
-                    var material = materialLsit.FirstOrDefault(a => a.Id == printReleationDto.MaterialId)?.ToModel<ProcMaterialDto>(); ;
+                    var material = materialLsit.FirstOrDefault(a => a.Id == printReleationDto.MaterialId)?.ToModel<ProcMaterialDto>(); 
                     var queryEntity = new QueryProcProcedurePrintReleationDto { ProcedureBomConfigPrint = printReleationDto, Material = material ?? new ProcMaterialDto() };
                     dtos.Add(queryEntity);
                     //TODO 模板 by wangkeming 
@@ -193,7 +194,11 @@ namespace Hymson.MES.Services.Services.Process
             var query = new InteJobBusinessRelationPagedQuery()
             {
                 SiteCode = queryDto.SiteCode,
-                BusinessId = queryDto.BusinessId
+                BusinessId = queryDto.BusinessId,
+                BusinessType= queryDto.BusinessType,
+                PageIndex= queryDto.PageIndex,
+                PageSize= queryDto.PageSize,
+                Sorting= queryDto.Sorting
             };
             var pagedInfo = await _jobBusinessRelationRepository.GetPagedInfoAsync(query);
 
@@ -227,7 +232,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        public async Task CreateProcProcedureAsync(AddProcProcedureDto parm)
+        public async Task AddProcProcedureAsync(AddProcProcedureDto parm)
         {
             #region 验证
             if (parm == null)
@@ -316,7 +321,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        public async Task ModifyProcProcedureAsync(UpdateProcProcedureDto parm)
+        public async Task UpdateProcProcedureAsync(UpdateProcProcedureDto parm)
         {
             #region
             if (parm == null)

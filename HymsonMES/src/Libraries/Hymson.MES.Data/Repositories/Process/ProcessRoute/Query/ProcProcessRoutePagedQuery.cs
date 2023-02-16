@@ -17,32 +17,32 @@ namespace Hymson.MES.Data.Repositories.Process
         // <summary>
         /// 所属站点代码
         /// </summary>
-        public string SiteCode { get; set; } = "";
+        public string? SiteCode { get; set; } = "";
 
         /// <summary>
         /// 工艺路线代码
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
         /// <summary>
         /// 工艺路线名称
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; }
+        public string? Status { get; set; }
 
         /// <summary>
         /// 类型
         /// </summary>
-        public string Type { get; set; }
+        public string? Type { get; set; }
 
         /// <summary>
         /// 版本
         /// </summary>
-        public string Version { get; set; }
+        public string? Version { get; set; }
 
         /// <summary>
         /// 物料名称

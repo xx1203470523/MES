@@ -61,7 +61,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<ProcResourceTypeDto> GetListAsync(long id)
         {
             var entity = await _resourceTypeRepository.GetByIdAsync(id);
-            return entity.ToModel<ProcResourceTypeDto>();
+            return entity?.ToModel<ProcResourceTypeDto>()??new ProcResourceTypeDto();
         }
 
         /// <summary>

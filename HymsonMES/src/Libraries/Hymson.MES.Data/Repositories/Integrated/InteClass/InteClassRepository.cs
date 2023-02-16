@@ -102,7 +102,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
             if (string.IsNullOrWhiteSpace(pagedQuery.ClassName) == false)
             {
                 pagedQuery.ClassName = $"%{pagedQuery.ClassName}%";
-                sqlBuilder.Where("ClassName = @ClassName");
+                sqlBuilder.Where("ClassName LIKE @ClassName");
             }
 
             if (pagedQuery.ClassType > 0)

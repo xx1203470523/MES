@@ -55,7 +55,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
             if (!string.IsNullOrWhiteSpace(query.SiteCode))
             {
-                sqlBuilder.Where("a.SiteCode=@SiteCode");
+                sqlBuilder.Where("SiteCode=@SiteCode");
             }
             if (!string.IsNullOrWhiteSpace(query.Code))
             {
@@ -134,7 +134,8 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<bool> IsExistsAsync(ProcProcessRouteQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefault(ExistsSql, new { Code = query.Code, SiteCode = query.SiteCode }) != null;
+            var  procProcessRoutes= await conn.QueryAsync<ProcProcessRouteEntity>(ExistsSql, new { Code = query.Code, SiteCode = query.SiteCode }) ;
+            return procProcessRoutes != null && procProcessRoutes.Any();
         }
 
         /// <summary>

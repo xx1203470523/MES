@@ -95,7 +95,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<ProcResourceViewDto> GetByIdAsync(long id)
         {
             var entity = await _resourceRepository.GetByIdAsync(id);
-            return entity.ToModel<ProcResourceViewDto>();
+            return entity?.ToModel<ProcResourceViewDto>()??new ProcResourceViewDto();
         }
 
         /// <summary>
@@ -165,8 +165,8 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<PagedInfo<ProcResourceConfigPrintViewDto>> GetcResourceConfigPrintAsync(ProcResourceConfigPrintPagedQueryDto query)
         {
-            var resourcePagedQuery = query.ToQuery<ProcResourceConfigPrintPagedQuery>();
-            var pagedInfo = await _resourceConfigPrintRepository.GetPagedInfoAsync(resourcePagedQuery);
+            var printPagedQuery= query.ToQuery<ProcResourceConfigPrintPagedQuery>();
+            var pagedInfo = await _resourceConfigPrintRepository.GetPagedInfoAsync(printPagedQuery);
 
             //实体到DTO转换 装载数据
             var procResourceConfigPrintViewDtos = new List<ProcResourceConfigPrintViewDto>();
@@ -205,8 +205,8 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<PagedInfo<ProcResourceEquipmentBindViewDto>> GetcResourceConfigEquAsync(ProcResourceEquipmentBindPagedQueryDto query)
         {
-            var resPagedQuery = query.ToQuery<ProcResourceEquipmentBindPagedQuery>();
-            var pagedInfo = await _resourceEquipmentBindRepository.GetPagedInfoAsync(resPagedQuery);
+            var bindPagedQuery = query.ToQuery<ProcResourceEquipmentBindPagedQuery>();
+            var pagedInfo = await _resourceEquipmentBindRepository.GetPagedInfoAsync(bindPagedQuery);
 
             //实体到DTO转换 装载数据
             var procResourceEquipmentBinds = new List<ProcResourceEquipmentBindViewDto>();
@@ -219,14 +219,14 @@ namespace Hymson.MES.Services.Services.Process
         }
 
         /// <summary>
-        /// 获取资源关联作业
+        /// 获取资源关联作业数据
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
         public async Task<PagedInfo<ProcResourceConfigJobViewDto>> GetcResourceConfigJoAsync(ProcResourceConfigJobPagedQueryDto query)
         {
-            var resPagedQuery = query.ToQuery<ProcResourceConfigJobPagedQuery>();
-            var pagedInfo = await _resourceConfigJobRepository.GetPagedInfoAsync(resPagedQuery);
+            var jobPagedQuery = query.ToQuery<ProcResourceConfigJobPagedQuery>();
+            var pagedInfo = await _resourceConfigJobRepository.GetPagedInfoAsync(jobPagedQuery);
 
             //实体到DTO转换 装载数据
             var procResourceConfigJobViews = new List<ProcResourceConfigJobViewDto>();
@@ -296,18 +296,11 @@ namespace Hymson.MES.Services.Services.Process
             #region 组装数据
 
             //DTO转换实体
-            var entity = new ProcResourceEntity
-            {
-                Id = IdGenProvider.Instance.CreateId(),
-                SiteCode = site,
-                CreatedBy = userName,
-                UpdatedBy = userName,
-                Status = parm.Status,
-                ResTypeId = parm.ResTypeId,
-                Remark = parm.Remark ?? "",
-                ResCode = resCode,
-                ResName = parm.ResName ?? ""
-            };
+            var entity = parm.ToEntity<ProcResourceEntity>();
+            entity.Id = IdGenProvider.Instance.CreateId();
+            entity.CreatedBy = userName;
+            entity.UpdatedBy = userName;
+            entity.ResCode = resCode;
 
             //打印机数据
             List<ProcResourceConfigPrintEntity> printList = new List<ProcResourceConfigPrintEntity>();
@@ -449,7 +442,7 @@ namespace Hymson.MES.Services.Services.Process
             {
                 if (param.PrintList.Where(x => x.OperationType != 3).GroupBy(x => x.PrintId).Where(g => g.Count() > 2).Count() > 1)
                 {
-                    // return Error(ResultCode.PARAM_ERROR, $"资源配置打印机中，重复配置打印机!");
+                    throw new ValidationException(ErrorCode.MES10313);
                 }
 
                 //判断打印机是否重复配置  数据库中 已经存储的情况

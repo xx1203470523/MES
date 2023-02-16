@@ -31,28 +31,35 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="procProcedurePrintReleationPagedQuery"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcProcedurePrintReleationEntity>> GetPagedInfoAsync(ProcProcedurePrintReleationPagedQuery procProcedurePrintReleationPagedQuery)
+        public async Task<PagedInfo<ProcProcedurePrintReleationEntity>> GetPagedInfoAsync(ProcProcedurePrintReleationPagedQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
-            sqlBuilder.Where("ProcedureId=@ProcedureId");
+            if (!string.IsNullOrWhiteSpace(query.SiteCode))
+            {
+                sqlBuilder.Where("SiteCode=@SiteCode");
+            }
+            if (query.ProcedureId > 0)
+            {
+                sqlBuilder.Where("ProcedureId=@ProcedureId");
+            }
 
-            var offSet = (procProcedurePrintReleationPagedQuery.PageIndex - 1) * procProcedurePrintReleationPagedQuery.PageSize;
+            var offSet = (query.PageIndex - 1) * query.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = procProcedurePrintReleationPagedQuery.PageSize });
-            sqlBuilder.AddParameters(procProcedurePrintReleationPagedQuery);
+            sqlBuilder.AddParameters(new { Rows = query.PageSize });
+            sqlBuilder.AddParameters(query);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var procProcedurePrintReleationEntitiesTask = conn.QueryAsync<ProcProcedurePrintReleationEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procProcedurePrintReleationEntities = await procProcedurePrintReleationEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<ProcProcedurePrintReleationEntity>(procProcedurePrintReleationEntities, procProcedurePrintReleationPagedQuery.PageIndex, procProcedurePrintReleationPagedQuery.PageSize, totalCount);
+            return new PagedInfo<ProcProcedurePrintReleationEntity>(procProcedurePrintReleationEntities, query.PageIndex, query.PageSize, totalCount);
         }
 
         /// <summary>
@@ -169,7 +176,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string InsertSql = "INSERT INTO `proc_procedure_print_releation`(  `Id`, `SiteCode`, `ProcedureId`, `MaterialId`, `Version`, `TemplateId`, `Copy`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @ProcedureId, @MaterialId, @Version, @TemplateId, @Copy, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `proc_procedure_print_releation`(  `Id`, `SiteCode`, `ProcedureId`, `MaterialId`, `Version`, `TemplateId`, `Copy`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @ProcedureId, @MaterialId, @Version, @TemplateId, @Copy, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string UpdateSql = "UPDATE `proc_procedure_print_releation` SET   SiteCode = @SiteCode, ProcedureId = @ProcedureId, MaterialId = @MaterialId, Version = @Version, TemplateId = @TemplateId, Copy = @Copy, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string DeleteByProcedureIdSql = "UPDATE `proc_procedure_print_releation` SET IsDeleted = '1' WHERE ProcedureId = @ProcedureId ";
+        const string DeleteByProcedureIdSql = "delete from `proc_procedure_print_releation` WHERE ProcedureId = @ProcedureId ";
         const string DeletesSql = "UPDATE `proc_procedure_print_releation` SET IsDeleted = '1' WHERE Id in @ids";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteCode`, `ProcedureId`, `MaterialId`, `Version`, `TemplateId`, `Copy`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
