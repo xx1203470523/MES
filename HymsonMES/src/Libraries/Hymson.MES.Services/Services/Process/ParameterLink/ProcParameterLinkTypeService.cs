@@ -16,7 +16,6 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using Hymson.Utils;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -50,19 +49,34 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task CreateProcParameterLinkTypeAsync(ProcParameterLinkTypeCreateDto procParameterLinkTypeCreateDto)
         {
+            //检查SiteCode
+            if ("TODO".IsNotEmpty() == false)
+            {
+                throw new BusinessException(ErrorCode.MES10101);
+            }
+
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procParameterLinkTypeCreateDto);
 
-            //DTO转换实体
-            var procParameterLinkTypeEntity = procParameterLinkTypeCreateDto.ToEntity<ProcParameterLinkTypeEntity>();
-            procParameterLinkTypeEntity.Id = IdGenProvider.Instance.CreateId();
-            procParameterLinkTypeEntity.CreatedBy = _currentUser.UserName;
-            procParameterLinkTypeEntity.UpdatedBy = _currentUser.UserName;
-            procParameterLinkTypeEntity.CreatedOn = HymsonClock.Now();
-            procParameterLinkTypeEntity.UpdatedOn = HymsonClock.Now();
+            var links = procParameterLinkTypeCreateDto.Parameters.Select(s =>
+            {
+                var item = new ProcParameterLinkTypeEntity();
+                item.Id = IdGenProvider.Instance.CreateId();
+                item.CreatedBy = _currentUser.UserName;
+                item.UpdatedBy = _currentUser.UserName;
+                item.CreatedOn = HymsonClock.Now();
+                item.UpdatedOn = HymsonClock.Now();
+                item.ParameterType = procParameterLinkTypeCreateDto.ParameterType;
+                item.ParameterID = s;
+                return item;
+            }).ToList();
 
-            //入库
-            await _procParameterLinkTypeRepository.InsertAsync(procParameterLinkTypeEntity);
+
+            var current = await _procParameterLinkTypeRepository.GetProcParameterLinkTypeEntitiesAsync(new ProcParameterLinkTypeQuery() { ParameterType = procParameterLinkTypeCreateDto.ParameterType });
+
+            var adds = links.Where(w => current.Any(e => e.ParameterID == w.ParameterID) == false).ToList();
+
+            await _procParameterLinkTypeRepository.InsertsAsync(adds);
         }
 
         /// <summary>
@@ -83,6 +97,11 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<int> DeletesProcParameterLinkTypeAsync(string ids)
         {
             var idsArr = StringExtension.SpitLongArrary(ids);
+            if (idsArr.Length <= 0) 
+            {
+                throw new ValidationException(ErrorCode.MES10100);
+            }
+
             return await _procParameterLinkTypeRepository.DeletesAsync(idsArr);
         }
 
@@ -138,19 +157,85 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="procParameterLinkTypeDto"></param>
+        /// <param name="procParameterLinkTypeModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyProcParameterLinkTypeAsync(ProcParameterLinkTypeModifyDto procParameterLinkTypeModifyDto)
         {
-             //验证DTO
+            if (procParameterLinkTypeModifyDto == null)
+            {
+                throw new ValidationException(ErrorCode.MES10100);
+            }
+
+            //检查SiteCode
+            if ("TODO".IsNotEmpty() == false)
+            {
+                throw new BusinessException(ErrorCode.MES10101);
+            }
+
+            //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(procParameterLinkTypeModifyDto);
 
-            //DTO转换实体
-            var procParameterLinkTypeEntity = procParameterLinkTypeModifyDto.ToEntity<ProcParameterLinkTypeEntity>();
-            procParameterLinkTypeEntity.UpdatedBy = _currentUser.UserName;
-            procParameterLinkTypeEntity.UpdatedOn = HymsonClock.Now();
+            var links = procParameterLinkTypeModifyDto.Parameters.Select(s =>
+            {
+                var item = new ProcParameterLinkTypeEntity();
+                //item.Id = IdGenProvider.Instance.CreateId();
+                //item.CreatedBy = _currentUser.UserName;
+                item.UpdatedBy = _currentUser.UserName;
+                //item.CreatedOn = HymsonClock.Now();
+                item.UpdatedOn = HymsonClock.Now();
+                item.ParameterType = procParameterLinkTypeModifyDto.ParameterType;
+                item.ParameterID = s;
+                return item;
+            }).ToList();
 
-            await _procParameterLinkTypeRepository.UpdateAsync(procParameterLinkTypeEntity);
+            var current = await _procParameterLinkTypeRepository.GetProcParameterLinkTypeEntitiesAsync(new ProcParameterLinkTypeQuery
+            {
+                ParameterType = procParameterLinkTypeModifyDto.ParameterType
+            });
+
+            var adds = links.Where(w => current.Any(e => e.ParameterID == w.ParameterID) == false)
+                   .Select(s => {
+                       s.Id = IdGenProvider.Instance.CreateId();
+                       s.CreatedBy = _currentUser.UserName;
+                       s.CreatedOn = HymsonClock.Now();
+                       return s;
+                   })
+                   .ToList();
+
+            var deletes = current.Where(w => links.Any(e => e.ParameterID == w.ParameterID) == false).ToList();
+
+            links.RemoveAll(w => adds.Any(e => e.ParameterID == w.ParameterID) == true);
+
+            using (TransactionScope ts = new TransactionScope())
+            {
+                var response = 0;
+                if (adds.Count > 0) 
+                {
+                    response = await _procParameterLinkTypeRepository.InsertsAsync(adds);
+                    if (response == 0) 
+                    {
+                        throw new BusinessException(ErrorCode.MES10507);
+                    }
+                }
+
+                if (deletes.Count > 0) 
+                {
+                    response = await _procParameterLinkTypeRepository.DeletesTrueAsync(deletes.Select(x => x.Id).ToArray());
+                    if (response == 0)
+                    {
+                        throw new BusinessException(ErrorCode.MES10507);
+                    }
+                }
+
+                response = await _procParameterLinkTypeRepository.UpdatesAsync(links);
+                if (response == 0)
+                {
+                    throw new BusinessException(ErrorCode.MES10507);
+                }
+
+                ts.Complete();
+            }
+
         }
 
         /// <summary>

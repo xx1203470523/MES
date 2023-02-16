@@ -49,7 +49,17 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeletesSql, new { ids=ids });
+        }
 
+        /// <summary>
+        /// 批量删除（真删除）
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<int> DeletesTrueAsync(long[] ids)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeletesTrueSql, new { ids = ids });
         }
 
         /// <summary>
@@ -286,6 +296,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string UpdatesSql = "UPDATE `proc_parameter_link_type` SET   SiteCode = @SiteCode, ParameterID = @ParameterID, ParameterType = @ParameterType, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_parameter_link_type` SET IsDeleted = '1' WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_parameter_link_type` SET IsDeleted = '1' WHERE Id in @ids";
+        const string DeletesTrueSql = " Delete FROM `proc_parameter_link_type` WHERE Id in @ids ";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteCode`, `ParameterID`, `ParameterType`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_parameter_link_type`  WHERE Id = @Id ";

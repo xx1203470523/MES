@@ -64,16 +64,16 @@ namespace Hymson.MES.Api.Controllers.Process
             return await _procParameterLinkTypeService.QueryPagedProcParameterLinkTypeByTypeAsync(parm);
         }
 
-        /// <summary>
-        /// 查询详情（标准参数关联类型表）
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpGet("{id}")]
-        public async Task<ProcParameterLinkTypeDto> QueryProcParameterLinkTypeByIdAsync(long id)
-        {
-            return await _procParameterLinkTypeService.QueryProcParameterLinkTypeByIdAsync(id);
-        }
+        ///// <summary>
+        ///// 查询详情（标准参数关联类型表）
+        ///// </summary>
+        ///// <param name="id"></param>
+        ///// <returns></returns>
+        //[HttpGet("{id}")]
+        //public async Task<ProcParameterLinkTypeDto> QueryProcParameterLinkTypeByIdAsync(long id)
+        //{
+        //    return await _procParameterLinkTypeService.QueryProcParameterLinkTypeByIdAsync(id);
+        //}
 
         /// <summary>
         /// 添加（标准参数关联类型表）

@@ -79,7 +79,7 @@
         public const string MES10504 = "此标准参数不存在！";
         public const string MES10505 = "删除失败Ids 不能为空";
         public const string MES10506 = "参数已被设备参数或产品参数绑定，不允许删除!";
-
+        public const string MES10507 = "修改参数关联类型失败!";
         #endregion
 
         #region Bom 10600
