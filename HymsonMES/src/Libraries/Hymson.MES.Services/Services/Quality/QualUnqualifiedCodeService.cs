@@ -1,6 +1,8 @@
 using FluentValidation;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
@@ -42,28 +44,56 @@ namespace Hymson.MES.Services.Services.Quality
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="parm">新增参数</param>
         /// <returns></returns>
+        /// <exception cref="ValidationException">参数为空</exception>
+        /// <exception cref="BusinessException">编码复用</exception>
         public async Task CreateQualUnqualifiedCodeAsync(QualUnqualifiedCodeCreateDto parm)
         {
+            if (parm == null)
+            {
+                throw new ValidationException(ErrorCode.MES10100);
+            }
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(parm);
 
+            var qualUnqualifiedCodeEntity = await _qualUnqualifiedCodeRepository.GetByCodeAsync(new QualUnqualifiedCodeByCodeQuery { Code = parm.UnqualifiedCode, Site = "" });
+            if (qualUnqualifiedCodeEntity != null)
+            {
+                throw new BusinessException(ErrorCode.MES11108).WithData("code", parm.UnqualifiedCode);
+            }
+            var userId = "TODO";
             //DTO转换实体
-            var qualUnqualifiedCodeEntity = parm.ToEntity<QualUnqualifiedCodeEntity>();
+            qualUnqualifiedCodeEntity = parm.ToEntity<QualUnqualifiedCodeEntity>();
             qualUnqualifiedCodeEntity.Id = IdGenProvider.Instance.CreateId();
-            qualUnqualifiedCodeEntity.CreatedBy = "TODO";
-            qualUnqualifiedCodeEntity.UpdatedBy = "TODO";
+            qualUnqualifiedCodeEntity.CreatedBy = userId;
+            qualUnqualifiedCodeEntity.UpdatedBy = userId;
             qualUnqualifiedCodeEntity.CreatedOn = HymsonClock.Now();
             qualUnqualifiedCodeEntity.UpdatedOn = HymsonClock.Now();
-            if (parm.UnqualifiedGroupIds != null)
-            {
 
+            List<QualUnqualifiedCodeGroupRelation> list = new List<QualUnqualifiedCodeGroupRelation>();
+            if (parm.UnqualifiedGroupIds != null && parm.UnqualifiedGroupIds.Any())
+            {
+                foreach (var item in parm.UnqualifiedGroupIds)
+                {
+                    list.Add(new QualUnqualifiedCodeGroupRelation
+                    {
+                        UnqualifiedGroupId = qualUnqualifiedCodeEntity.Id,
+                        UnqualifiedCodeId = item,
+                        CreatedBy = userId,
+                        UpdatedBy = userId
+                    });
+                }
             }
+
             using var ts = TransactionHelper.GetTransactionScope();
             //插入不合格代码表
             await _qualUnqualifiedCodeRepository.InsertAsync(qualUnqualifiedCodeEntity);
-
+            if (list != null && list.Any())
+            {
+                //插入不合格代码
+                await _qualUnqualifiedGroupRepository.AddQualUnqualifiedCodeGroupRelationAsync(list);
+            }
             ts.Complete();
         }
 
@@ -91,19 +121,49 @@ namespace Hymson.MES.Services.Services.Quality
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="qualUnqualifiedCodeModifyDto"></param>
+        /// <param name="parm"></param>
         /// <returns></returns>
-        public async Task ModifyQualUnqualifiedCodeAsync(QualUnqualifiedCodeModifyDto qualUnqualifiedCodeModifyDto)
+        public async Task ModifyQualUnqualifiedCodeAsync(QualUnqualifiedCodeModifyDto parm)
         {
+            if (parm == null)
+            {
+                throw new ValidationException(ErrorCode.MES10100);
+            }
             //验证DTO
-            await _validationModifyRules.ValidateAndThrowAsync(qualUnqualifiedCodeModifyDto);
-
+            await _validationModifyRules.ValidateAndThrowAsync(parm);
+            var userId = "TODO";
             //DTO转换实体
-            var qualUnqualifiedCodeEntity = qualUnqualifiedCodeModifyDto.ToEntity<QualUnqualifiedCodeEntity>();
-            qualUnqualifiedCodeEntity.UpdatedBy = "TODO";
+            var qualUnqualifiedCodeEntity = parm.ToEntity<QualUnqualifiedCodeEntity>();
+            qualUnqualifiedCodeEntity.UpdatedBy = userId;
             qualUnqualifiedCodeEntity.UpdatedOn = HymsonClock.Now();
 
+            List<QualUnqualifiedCodeGroupRelation> list = new List<QualUnqualifiedCodeGroupRelation>();
+            if (parm.UnqualifiedGroupIds != null && parm.UnqualifiedGroupIds.Any())
+            {
+                foreach (var item in parm.UnqualifiedGroupIds)
+                {
+                    list.Add(new QualUnqualifiedCodeGroupRelation
+                    {
+                        UnqualifiedGroupId = qualUnqualifiedCodeEntity.Id,
+                        UnqualifiedCodeId = item,
+                        CreatedBy = userId,
+                        UpdatedBy = userId
+                    });
+                }
+            }
+
+            using var ts = TransactionHelper.GetTransactionScope();
+            //更新不合格代码表
             await _qualUnqualifiedCodeRepository.UpdateAsync(qualUnqualifiedCodeEntity);
+            //TODO 清理关联表
+            await _qualUnqualifiedGroupRepository.RealDelteQualUnqualifiedCodeGroupRelationAsync(parm.Id);
+
+            if (list != null && list.Any())
+            {
+                //插入不合格代码
+                await _qualUnqualifiedGroupRepository.AddQualUnqualifiedCodeGroupRelationAsync(list);
+            }
+            ts.Complete();
         }
 
         /// <summary>
@@ -145,12 +205,35 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task<QualUnqualifiedCodeDto> QueryQualUnqualifiedCodeByIdAsync(long id)
         {
-            var qualUnqualifiedCodeEntity = await _qualUnqualifiedCodeRepository.GetByIdAsync(id);
+            var qualUnqualifiedCodeTask = _qualUnqualifiedCodeRepository.GetByIdAsync(id);
+            var unqualifiedCodeGroupRelationTask = _qualUnqualifiedCodeRepository.GetQualUnqualifiedCodeGroupRelationAsync(id);
+            var qualUnqualifiedCodeEntity = await qualUnqualifiedCodeTask;
+            var unqualifiedCodeGroupRelations = await unqualifiedCodeGroupRelationTask;
+            QualUnqualifiedCodeDto qualUnqualifiedCodeDto = new QualUnqualifiedCodeDto();
             if (qualUnqualifiedCodeEntity != null)
             {
-                return qualUnqualifiedCodeEntity.ToModel<QualUnqualifiedCodeDto>();
+                qualUnqualifiedCodeDto = qualUnqualifiedCodeEntity.ToModel<QualUnqualifiedCodeDto>();
             }
-            return null;
+            if (unqualifiedCodeGroupRelations != null && unqualifiedCodeGroupRelations.Any())
+            {
+                qualUnqualifiedCodeDto.UnqualifiedCodeGroupRelationList = new List<UnqualifiedCodeGroupRelationDto>();
+                foreach (var item in unqualifiedCodeGroupRelations)
+                {
+                    qualUnqualifiedCodeDto.UnqualifiedCodeGroupRelationList.Add(new UnqualifiedCodeGroupRelationDto()
+                    {
+                        Id = item.Id,
+                        UnqualifiedGroupId = item.UnqualifiedGroupId,
+                        UnqualifiedCode = item.UnqualifiedCode,
+                        UnqualifiedCodeName = item.UnqualifiedCodeName,
+                        CreatedBy = item.CreatedBy,
+                        CreatedOn = item.CreatedOn,
+                        UpdatedBy = item.UpdatedBy,
+                        UpdatedOn = item.UpdatedOn
+                    });
+                }
+            }
+
+            return qualUnqualifiedCodeDto;
         }
     }
 }

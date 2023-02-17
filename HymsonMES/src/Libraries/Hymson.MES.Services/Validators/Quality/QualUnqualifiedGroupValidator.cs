@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: QualUnqualifiedGroupEntity    验证规则 | 代码由框架生成  
- *builder:  wangkeming
- *build datetime: 2023-02-13 02:05:50
- */
 using FluentValidation;
 using Hymson.MES.Services.Dtos.Quality;
 using System;
@@ -16,7 +9,9 @@ using System.Threading.Tasks;
 namespace Hymson.MES.Services.Validators.Quality
 {
     /// <summary>
-    /// QualUnqualifiedGroupEntity 更新 验证
+    ///不合格代码组验证
+    /// @author wangkeming
+    /// @date 2023-02-11 04:45:25
     /// </summary>
     internal class QualUnqualifiedGroupCreateValidator: AbstractValidator<QualUnqualifiedGroupCreateDto>
     {
@@ -28,7 +23,9 @@ namespace Hymson.MES.Services.Validators.Quality
     }
 
     /// <summary>
-    /// QualUnqualifiedGroupEntity 修改 验证
+    /// 不合格代码组修改验证
+    /// @author wangkeming
+    /// @date 2023-02-11 04:45:25   
     /// </summary>
     internal class QualUnqualifiedGroupModifyValidator : AbstractValidator<QualUnqualifiedGroupModifyDto>
     {

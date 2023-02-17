@@ -25,4 +25,8 @@
     <ProjectReference Include="..\Hymson.MES.Core\Hymson.MES.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Repositories\Quality\QualUnqualifiedCode\Command\" />
+  </ItemGroup>
+
 </Project>

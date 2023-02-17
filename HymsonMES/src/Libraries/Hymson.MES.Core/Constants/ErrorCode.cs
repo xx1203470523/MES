@@ -62,20 +62,17 @@
         public const string MES10402 = "工序编码超长";
         public const string MES10403 = "工序名称不能为空";
         public const string MES10404 = "工序名称超长";
-<<<<<<< .mine
-        public string MES10405 = $"编码:{0}已存在！";
-=======
-        public const string MES10405 = "编码:{Code}已存在！";
->>>>>>> .theirs
+        public const string MES10405 = "编码:{0}已存在！";
+
         public const string MES10430 = $"有生产中工单引用当前工艺路线，不能删除！";
         public const string MES10431 = $"此工艺路线在系统中已经存在!";
         public const string MES10432 = $"编码不能为空!";
-        public const string MES10433 = $"名称不能为空!";
-        public const string MES10434 = $"版本不能为空!";
+        public const string MES10433= $"名称不能为空!";
+        public const string MES10434= $"版本不能为空!";
         public const string MES10435 = $"未设置首工序！";
         public const string MES10436 = $"只允许设置一个首工序！";
         public const string MES10437 = "此工艺路线{Code}+{Version}在系统已经存在！";
-        public const string MES10438 = "此工艺路线不存在！";
+        public const string MES10438= "此工艺路线不存在！";
         public const string MES10439 = $"此工艺路线在系统中不存在!";
         #endregion
 
@@ -103,10 +100,8 @@
         public const string MES10609 = "更新Bom失败！";
         public const string MES10610 = "删除失败 Id不能为空!";
         public const string MES10611 = "不能删除启用状态的Bom!";
-
         #endregion
 
-        #region 品质
         #region 不合格代码 11100
         public const string MES11100 = "不合格代码错误";
         public const string MES11101 = "不合格代码编码不能为空";
@@ -116,8 +111,9 @@
         public const string MES11105 = "不合格代码类型不能为空";
         public const string MES11106 = "不合格代码等级不能为空";
         public const string MES11107 = "不合格代码备注超过最大长度，不合格代码备注最大长度为255";
+        public const string MES11108 = "不合格代码{code}已经存在";
         #endregion
-        #endregion
+
         #endregion
 
 

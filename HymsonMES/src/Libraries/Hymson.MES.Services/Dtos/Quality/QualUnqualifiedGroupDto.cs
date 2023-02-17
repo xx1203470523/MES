@@ -63,11 +63,6 @@ namespace Hymson.MES.Services.Dtos.Quality
     public record QualUnqualifiedGroupCreateDto : BaseEntityDto
     {
         /// <summary>
-        /// 
-        /// </summary>
-        public long Id { get; set; }
-
-        /// <summary>
         /// 不合格组
         /// </summary>
         public string UnqualifiedGroup { get; set; }
@@ -83,31 +78,14 @@ namespace Hymson.MES.Services.Dtos.Quality
         public string Remark { get; set; }
 
         /// <summary>
-        /// 创建人
+        /// 不和代码id
         /// </summary>
-        public string CreatedBy { get; set; }
+        public List<long> UnqualifiedCodeIds { get; set; }
 
         /// <summary>
-        /// 创建时间
+        /// 工序id
         /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-        /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-        /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
-
-        /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public bool? IsDeleted { get; set; }
-
-
+        public List<long> ProcedureBomIds { get; set; }
     }
 
     /// <summary>
