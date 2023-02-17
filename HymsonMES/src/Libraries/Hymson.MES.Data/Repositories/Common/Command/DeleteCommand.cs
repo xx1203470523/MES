@@ -16,11 +16,16 @@ namespace Hymson.MES.Data.Repositories.Common.Command
         /// <summary>
         /// 主键Id
         /// </summary>
-        public long Id { get; set; }
+        public List<long>  Ids { get; set; }
 
         /// <summary>
         /// 操作人员
         /// </summary>
         public string UserId { get; set; }
+
+       /// <summary>
+       /// 删除时间
+       /// </summary>
+        public string DeleteOn { get; set; }
     }
 }
