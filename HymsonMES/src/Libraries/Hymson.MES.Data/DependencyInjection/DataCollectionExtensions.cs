@@ -89,6 +89,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcBomDetailReplaceMaterialRepository, ProcBomDetailReplaceMaterialRepository>();
             #endregion
 
+            #region LoadPoint
+            services.AddSingleton<IProcLoadPointRepository, ProcLoadPointRepository>();
+
+            #endregion
+
             #region Resource
             services.AddSingleton<IProcResourceTypeRepository, ProcResourceTypeRepository>();
             services.AddSingleton<IProcResourceRepository, ProcResourceRepository>();
