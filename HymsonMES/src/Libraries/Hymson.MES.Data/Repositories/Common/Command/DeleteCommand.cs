@@ -14,18 +14,18 @@ namespace Hymson.MES.Data.Repositories.Common.Command
     public class DeleteCommand
     {
         /// <summary>
-        /// 主键Id
+        /// 主键Ids
         /// </summary>
-        public List<long>  Ids { get; set; }
+        public  long[] Ids { get; set; }
 
         /// <summary>
         /// 操作人员
         /// </summary>
         public string UserId { get; set; }
 
-       /// <summary>
-       /// 删除时间
-       /// </summary>
+        /// <summary>
+        /// 删除时间
+        /// </summary>
         public string DeleteOn { get; set; }
     }
 }
