@@ -118,7 +118,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<QualUnqualifiedCodeEntity> GetByCodeAsync(QualUnqualifiedCodeQuery parm)
+        public async Task<QualUnqualifiedCodeEntity> GetByCodeAsync(QualUnqualifiedCodeByCodeQuery parm)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<QualUnqualifiedCodeEntity>(GetByCodeSql, parm);
