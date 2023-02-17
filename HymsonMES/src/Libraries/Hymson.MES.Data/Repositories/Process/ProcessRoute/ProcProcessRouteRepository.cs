@@ -10,6 +10,7 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -185,12 +186,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 批量删除（软删除）
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeleteRangeAsync(long[] ids) 
+        public async Task<int> DeleteRangeAsync(DeleteCommand command)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeletesSql, new { ids=ids });
+            return await conn.ExecuteAsync(DeletesSql, new { UpdatedBy = command.UserId, UpdatedOn = command.DeleteOn, Ids = command.Ids });
         }
     }
 
@@ -206,7 +207,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string InsertSql = "INSERT INTO `proc_process_route`(  `Id`, `SiteCode`, `Code`, `Name`, `Status`, `Type`, `Version`, `IsCurrentVersion`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @Code, @Name, @Status, @Type, @Version, @IsCurrentVersion, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `proc_process_route`(  `Id`, `SiteCode`, `Code`, `Name`, `Status`, `Type`, `Version`, `IsCurrentVersion`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @Code, @Name, @Status, @Type, @Version, @IsCurrentVersion, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string UpdateSql = "UPDATE `proc_process_route` SET Status = @Status, Type = @Type, IsCurrentVersion = @IsCurrentVersion, Remark = @Remark,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE `proc_process_route` SET IsDeleted = '1' WHERE Id in @ids";
+        const string DeletesSql = "UPDATE `proc_process_route` SET IsDeleted = '1',UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id in @Ids";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteCode`, `Code`, `Name`, `Status`, `Type`, `Version`, `IsCurrentVersion`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_process_route`  WHERE Id = @Id ";

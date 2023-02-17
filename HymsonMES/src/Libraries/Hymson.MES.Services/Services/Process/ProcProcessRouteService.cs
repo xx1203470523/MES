@@ -13,6 +13,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
@@ -321,7 +322,13 @@ namespace Hymson.MES.Services.Services.Process
             }
             #endregion
 
-            return await _procProcessRouteRepository.DeleteRangeAsync(idsArr);
+            var command = new DeleteCommand
+            {
+                UserId = _currentUser.UserName,
+                DeleteOn = HymsonClock.Now(),
+                Ids = idsArr
+            };
+            return await _procProcessRouteRepository.DeleteRangeAsync(command);
         }
 
         #region 业务扩展方法
