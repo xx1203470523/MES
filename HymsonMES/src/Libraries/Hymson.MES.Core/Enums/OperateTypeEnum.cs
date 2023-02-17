@@ -1,12 +1,12 @@
 ﻿namespace Hymson.MES.Core.Enums
 {
     /// <summary>
-    /// 日历类型枚举
+    /// 操作类型枚举
     /// </summary>
-    public enum OperateTypeEnum
+    public enum OperateTypeEnum : byte
     {
         /// <summary>
-        /// 
+        /// 未知操作
         /// </summary>
         None = 0,
         /// <summary>

@@ -2,6 +2,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -52,13 +53,12 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// <summary>
         /// 批量修改设备的设备组
         /// </summary>
-        /// <param name="equipmentGroupId"></param>
-        /// <param name="equipmentIds"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> UpdateEquipmentGroupIdAsync(long equipmentGroupId, IEnumerable<long> equipmentIds)
+        public async Task<int> UpdateEquipmentGroupIdAsync(UpdateEquipmentGroupIdCommand command)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateEquipmentGroupIdSql, new { equipmentGroupId, Id = equipmentIds });
+            return await conn.ExecuteAsync(UpdateEquipmentGroupIdSql, command);
         }
 
         /// <summary>
@@ -251,7 +251,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// <summary>
         /// 
         /// </summary>
-        const string UpdateEquipmentGroupIdSql = "UPDATE `equ_equipment` SET EquipmentGroupId = @equipmentGroupId  WHERE Id = @Id ";
+        const string UpdateEquipmentGroupIdSql = "UPDATE `equ_equipment` SET EquipmentGroupId = @EquipmentGroupId WHERE Id = @Id ";
         const string ClearEquipmentGroupIdSql = "UPDATE `equ_equipment` SET EquipmentGroupId = 0 WHERE EquipmentGroupId = @equipmentGroupId ";
     }
 }

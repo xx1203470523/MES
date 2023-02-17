@@ -5,12 +5,12 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
 using Hymson.Utils.Tools;
-using static Dapper.SqlMapper;
 
 namespace Hymson.MES.Services.Services.EquEquipmentGroup
 {
@@ -78,7 +78,11 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
             using (var trans = TransactionHelper.GetTransactionScope())
             {
                 rows += await _equEquipmentGroupRepository.InsertAsync(entity);
-                rows += await _equEquipmentRepository.UpdateEquipmentGroupIdAsync(entity.Id, createDto.EquipmentIDs);
+                rows += await _equEquipmentRepository.UpdateEquipmentGroupIdAsync(new UpdateEquipmentGroupIdCommand
+                {
+                    EquipmentGroupId = entity.Id,
+                    EquipmentIds = createDto.EquipmentIDs
+                });
                 trans.Complete();
             }
             return rows;
@@ -103,7 +107,11 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
             {
                 rows += await _equEquipmentGroupRepository.UpdateAsync(entity);
                 rows += await _equEquipmentRepository.ClearEquipmentGroupIdAsync(entity.Id);
-                rows += await _equEquipmentRepository.UpdateEquipmentGroupIdAsync(entity.Id, modifyDto.EquipmentIDs);
+                rows += await _equEquipmentRepository.UpdateEquipmentGroupIdAsync(new UpdateEquipmentGroupIdCommand
+                {
+                    EquipmentGroupId = entity.Id,
+                    EquipmentIds = modifyDto.EquipmentIDs
+                });
                 trans.Complete();
             }
             return rows;

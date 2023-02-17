@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Equipment.EquConsumableType;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi;
@@ -42,6 +43,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddRepository(this IServiceCollection services)
         {
             #region Equipment
+            services.AddSingleton<IEquConsumableTypeRepository, EquConsumableTypeRepository>();
             services.AddSingleton<IEquEquipmentRepository, EquEquipmentRepository>();
             services.AddSingleton<IEquEquipmentGroupRepository, EquEquipmentGroupRepository>();
             services.AddSingleton<IEquEquipmentLinkApiRepository, EquEquipmentLinkApiRepository>();
@@ -130,6 +132,6 @@ namespace Microsoft.Extensions.DependencyInjection
             //services.Configure<ConnectionOptions>(configuration);
             return services;
         }
-        
+
     }
 }
