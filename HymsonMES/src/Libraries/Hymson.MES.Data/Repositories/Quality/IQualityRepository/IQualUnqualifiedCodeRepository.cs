@@ -78,7 +78,7 @@ namespace Hymson.MES.Data.Repositories.Quality.IQualityRepository
         /// </summary>
         /// <param name="code"></param>
         /// <returns></returns>
-        Task<QualUnqualifiedCodeEntity> GetByCodeAsync(QualUnqualifiedCodeByCodeQuery code);
+        Task<QualUnqualifiedCodeEntity> GetByCodeAsync(QualUnqualifiedCodeByCodeQuery parm);
 
         /// <summary>
         /// 获取List
