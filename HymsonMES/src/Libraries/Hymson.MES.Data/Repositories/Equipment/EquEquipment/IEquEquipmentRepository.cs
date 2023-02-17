@@ -1,6 +1,7 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using MySql.Data.MySqlClient;
 
@@ -28,10 +29,9 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// <summary>
         /// 批量修改设备的设备组
         /// </summary>
-        /// <param name="equipmentGroupId"></param>
-        /// <param name="equipmentIds"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        Task<int> UpdateEquipmentGroupIdAsync(long equipmentGroupId, IEnumerable<long> equipmentIds);
+        Task<int> UpdateEquipmentGroupIdAsync(UpdateEquipmentGroupIdCommand command);
 
         /// <summary>
         /// 清空设备的设备组
