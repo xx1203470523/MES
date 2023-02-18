@@ -103,7 +103,7 @@
         #endregion
 
         #region 不合格代码 11100
-        public const string MES11100 = "不合格代码错误";
+        public const string MES11100 = "不合格代码维护错误";
         public const string MES11101 = "不合格代码编码不能为空";
         public const string MES11102 = "不合格代码编码超过最大长度，不合格代码编码最大长度为50";
         public const string MES11103 = "不合格代码名称不能为空";
@@ -112,6 +112,16 @@
         public const string MES11106 = "不合格代码等级不能为空";
         public const string MES11107 = "不合格代码备注超过最大长度，不合格代码备注最大长度为255";
         public const string MES11108 = "不合格代码{code}已经存在";
+        #endregion
+
+        #region 不合格代码 11100
+        public const string MES11200 = "不合格代码组错误";
+        public const string MES11201 = "不合格代码组编码不能为空";
+        public const string MES11202 = "不合格代码组编码超过最大长度，不合格代码编码最大长度为50";
+        public const string MES11203 = "不合格代码组名称不能为空";
+        public const string MES11204 = "不合格代码组名称超过最大长度，不合格代码名称最大长度为60"; 
+        public const string MES11207 = "不合格代码备注超过最大长度，不合格代码备注最大长度为255";
+        public const string MES11208 = "不合格代码{code}已经存在";
         #endregion
 
         #endregion

@@ -26,6 +26,6 @@ namespace Hymson.MES.Data.Repositories.Common.Command
         /// <summary>
         /// 删除时间
         /// </summary>
-        public string DeleteOn { get; set; }
+        public DateTime DeleteOn { get; set; }
     }
 }

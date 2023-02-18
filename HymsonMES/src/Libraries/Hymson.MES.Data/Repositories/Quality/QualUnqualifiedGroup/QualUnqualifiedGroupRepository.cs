@@ -236,15 +236,15 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string InsertQualUnqualifiedGroupProcedureRelationSql = "";
         const string UpdateSql = "UPDATE `qual_unqualified_group` SET   SiteCode = @SiteCode, UnqualifiedGroup = @UnqualifiedGroup, UnqualifiedGroupName = @UnqualifiedGroupName, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `qual_unqualified_group` SET   SiteCode = @SiteCode, UnqualifiedGroup = @UnqualifiedGroup, UnqualifiedGroupName = @UnqualifiedGroupName, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `qual_unqualified_group` SET IsDeleted = '1' WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE `qual_unqualified_group` SET IsDeleted = '1' WHERE Id in @ids";
+        const string DeleteSql = "UPDATE `qual_unqualified_group` SET IsDeleted = '1' WHERE Id = @Id  AND IsDeleted=0 ";
+        const string DeletesSql = "UPDATE `qual_unqualified_group` SET IsDeleted = '1' WHERE Id in @ids AND IsDeleted=0 ";
         const string DelteQualUnqualifiedCodeGroupRelationSql = "";
         const string RealDelteQualUnqualifiedGroupProcedureRelationSql = "";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteCode`, `UnqualifiedGroup`, `UnqualifiedGroupName`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `qual_unqualified_group`  WHERE Id = @Id ";
+                            FROM `qual_unqualified_group`  WHERE Id = @Id  AND IsDeleted=0 ";
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteCode`, `UnqualifiedGroup`, `UnqualifiedGroupName`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `qual_unqualified_group`  WHERE Id IN @ids ";
+                            FROM `qual_unqualified_group`  WHERE Id IN @ids AND IsDeleted=0 ";
     }
 }
