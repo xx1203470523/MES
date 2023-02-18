@@ -21,6 +21,11 @@ namespace Hymson.MES.Core.Domain.Equipment
         public string SparePartTypeName { get; set; } = "";
 
         /// <summary>
+        /// 备件/工装
+        /// </summary>
+        public int Type { get; set; }
+
+        /// <summary>
         /// 状态
         /// </summary>
         public int Status { get; set; }

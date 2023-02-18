@@ -40,12 +40,12 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 是否关键备件
         /// </summary>
-        public bool? IsKey { get; set; }
+        public int IsKey { get; set; } = 0;
 
         /// <summary>
         /// 是否标准件
         /// </summary>
-        public bool? IsStandard { get; set; }
+        public int IsStandard { get; set; } = 0;
 
         /// <summary>
         /// 状态
@@ -127,12 +127,12 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 是否关键备件
         /// </summary>
-        public bool? IsKey { get; set; }
+        public int IsKey { get; set; } = 0;
 
         /// <summary>
         /// 是否标准件
         /// </summary>
-        public bool? IsStandard { get; set; }
+        public int IsStandard { get; set; } = 0;
 
         /// <summary>
         /// 状态
@@ -204,12 +204,12 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 是否关键备件
         /// </summary>
-        public bool? IsKey { get; set; }
+        public int IsKey { get; set; } = 0;
 
         /// <summary>
         /// 是否标准件
         /// </summary>
-        public bool? IsStandard { get; set; }
+        public int IsStandard { get; set; } = 0;
 
         /// <summary>
         /// 状态
@@ -229,7 +229,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 管理方式
         /// </summary>
-        public bool? ManagementMode { get; set; }
+        public int ManagementMode { get; set; } = 0;
 
         /// <summary>
         /// 描述

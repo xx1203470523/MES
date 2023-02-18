@@ -53,7 +53,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 管理方式
         /// </summary>
-        public int? ManagementMode { get; set; }
+        public int ManagementMode { get; set; } = 0;
 
         /// <summary>
         /// 描述

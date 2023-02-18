@@ -38,12 +38,17 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 是否关键备件
         /// </summary>
-        public bool? IsKey { get; set; }
+        public int IsKey { get; set; } = 0;
 
         /// <summary>
         /// 是否标准件
         /// </summary>
-        public bool? IsStandard { get; set; }
+        public int IsStandard { get; set; } = 0;
+
+        /// <summary>
+        /// 备件/工装
+        /// </summary>
+        public int Type { get; set; }
 
         /// <summary>
         /// 状态
@@ -63,17 +68,12 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 管理方式
         /// </summary>
-        public int? ManagementMode { get; set; }
+        public int ManagementMode { get; set; } = 0;
 
         /// <summary>
         /// 描述
         /// </summary>
         public string Remark { get; set; } = "";
-
-        /// <summary>
-        /// 站点代码
-        /// </summary>
-        public string SiteCode { get; set; }
 
     }
 }

@@ -117,6 +117,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("Type = @Type");
             sqlBuilder.Select("*");
 
             if (string.IsNullOrWhiteSpace(pagedQuery.SiteCode) == false)

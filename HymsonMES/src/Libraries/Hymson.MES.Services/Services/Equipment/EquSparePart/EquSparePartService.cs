@@ -3,6 +3,7 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query;
 using Hymson.MES.Services.Dtos.Equipment;
@@ -52,7 +53,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
         /// <returns></returns>
         public async Task<int> CreateAsync(EquSparePartCreateDto createDto)
         {
-            //验证DTO
+            // 验证DTO
 
 
             // DTO转换实体
@@ -60,6 +61,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
             entity.Id = IdGenProvider.Instance.CreateId();
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
+            entity.Type = (int)EquipmentPartTypeEnum.SparePart; // 备件
 
             // 入库
             return await _equSparePartRepository.InsertAsync(entity);
@@ -110,6 +112,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
         public async Task<PagedInfo<EquSparePartDto>> GetPagedListAsync(EquSparePartPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<EquSparePartPagedQuery>();
+            pagedQuery.Type = (int)EquipmentPartTypeEnum.SparePart; // 备件
             var pagedInfo = await _equSparePartRepository.GetPagedInfoAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据

@@ -3,6 +3,7 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query;
 using Hymson.MES.Services.Dtos.Equipment;
@@ -26,9 +27,9 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
-        /// 仓储（工装注册） 
+        /// 仓储（备件/工装注册） 
         /// </summary>
-        private readonly IEquConsumableRepository _equConsumableRepository;
+        private readonly IEquSparePartRepository _equConsumableRepository;
 
 
         /// <summary>
@@ -38,7 +39,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
         /// <param name="currentUser"></param>
         /// <param name="equConsumableRepository"></param>
         public EquConsumableService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IEquConsumableRepository equConsumableRepository)
+            IEquSparePartRepository equConsumableRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -52,14 +53,15 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
         /// <returns></returns>
         public async Task<int> CreateAsync(EquConsumableCreateDto createDto)
         {
-            //验证DTO
+            // 验证DTO
 
 
             // DTO转换实体
-            var entity = createDto.ToEntity<EquConsumableEntity>();
+            var entity = createDto.ToEntity<EquSparePartEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
+            entity.Type = (int)EquipmentPartTypeEnum.Consumable; // 工装
 
             // 入库
             return await _equConsumableRepository.InsertAsync(entity);
@@ -76,7 +78,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
 
 
             // DTO转换实体
-            var entity = modifyDto.ToEntity<EquConsumableEntity>();
+            var entity = modifyDto.ToEntity<EquSparePartEntity>();
             entity.UpdatedBy = _currentUser.UserName;
 
             return await _equConsumableRepository.UpdateAsync(entity);
@@ -109,7 +111,8 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
         /// <returns></returns>
         public async Task<PagedInfo<EquConsumableDto>> GetPagedListAsync(EquConsumablePagedQueryDto equSparePartPagedQueryDto)
         {
-            var pagedQuery = equSparePartPagedQueryDto.ToQuery<EquConsumablePagedQuery>();
+            var pagedQuery = equSparePartPagedQueryDto.ToQuery<EquSparePartPagedQuery>();
+            pagedQuery.Type = (int)EquipmentPartTypeEnum.Consumable; // 工装
             var pagedInfo = await _equConsumableRepository.GetPagedInfoAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据

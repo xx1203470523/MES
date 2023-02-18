@@ -55,7 +55,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 管理方式
         /// </summary>
-        public bool? ManagementMode { get; set; }
+        public int ManagementMode { get; set; } = 0;
 
         /// <summary>
         /// 描述
@@ -132,7 +132,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 管理方式
         /// </summary>
-        public bool? ManagementMode { get; set; }
+        public int ManagementMode { get; set; } = 0;
 
         /// <summary>
         /// 描述
@@ -194,7 +194,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 管理方式
         /// </summary>
-        public bool? ManagementMode { get; set; }
+        public int ManagementMode { get; set; } = 0;
 
         /// <summary>
         /// 描述
