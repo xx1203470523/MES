@@ -53,6 +53,112 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 是否逻辑删除
         /// </summary>
         public bool? IsDeleted { get; set; }
+
+        /// <summary>
+        /// 不合格组关联不合格
+        /// </summary>
+        public List<QualUnqualifiedGroupCodeRelationDto> QualUnqualifiedGroupCodeRelationList { get; set; }
+
+        /// <summary>
+        /// 不合格组关联
+        /// </summary>
+        public List<QualUnqualifiedGroupProcedureRelationDto> QualUnqualifiedGroupProcedureRelationList { get; set; }
+    }
+
+    /// <summary>
+    /// 不合格关联不合格代码
+    /// @author wangkeming
+    /// @date 2023-02-11 04:45:25
+    /// </summary>
+    public record QualUnqualifiedGroupCodeRelationDto
+    {
+        /// <summary>
+        /// 主键id
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 不合格代码组id
+        /// </summary>
+        public long UnqualifiedGroupId { get; set; }
+
+        // <summary>
+        /// 不合格代码
+        /// </summary>
+        public string UnqualifiedCode { get; set; }
+
+        /// <summary>
+        /// 不合格代码名称
+        /// </summary>
+        public string UnqualifiedCodeName { get; set; }
+
+        /// <summary>
+        /// 创建人
+        /// </summary>
+        public string CreatedBy { get; set; }
+
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime CreatedOn { get; set; }
+
+        /// <summary>
+        /// 最后修改人
+        /// </summary>
+        public string UpdatedBy { get; set; }
+
+        /// <summary>
+        /// 修改时间
+        /// </summary>
+        public DateTime? UpdatedOn { get; set; }
+    }
+
+    /// <summary>
+    /// 不合格组关联工序
+    /// @author wangkeming
+    /// @date 2023-02-11 04:45:25
+    /// </summary>
+    public record QualUnqualifiedGroupProcedureRelationDto
+    {
+        /// <summary>
+        /// 主键id
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 不合格代码组id
+        /// </summary>
+        public long UnqualifiedGroupId { get; set; }
+
+        // <summary>
+        /// 工序编码
+        /// </summary>
+        public string ProcedureCode { get; set; }
+
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string ProcedureName { get; set; }
+
+        /// <summary>
+        /// 创建人
+        /// </summary>
+        public string CreatedBy { get; set; }
+
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime CreatedOn { get; set; }
+
+        /// <summary>
+        /// 最后修改人
+        /// </summary>
+        public string UpdatedBy { get; set; }
+
+        /// <summary>
+        /// 修改时间
+        /// </summary>
+        public DateTime? UpdatedOn { get; set; }
     }
 
     /// <summary>
@@ -85,7 +191,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 工序id
         /// </summary>
-        public List<long> ProcedureBomIds { get; set; }
+        public List<long> ProcedureIds { get; set; }
     }
 
     /// <summary>
@@ -99,12 +205,6 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 
         /// </summary>
         public long Id { get; set; }
-
-        /// <summary>
-        /// 不合格组
-        /// </summary>
-        public string UnqualifiedGroup { get; set; }
-
         /// <summary>
         /// 不合格组名称
         /// </summary>
@@ -116,29 +216,14 @@ namespace Hymson.MES.Services.Dtos.Quality
         public string Remark { get; set; }
 
         /// <summary>
-        /// 创建人
+        /// 不和代码id
         /// </summary>
-        public string CreatedBy { get; set; }
+        public List<long> UnqualifiedCodeIds { get; set; }
 
         /// <summary>
-        /// 创建时间
+        /// 工序id
         /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-        /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-        /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
-
-        /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public bool? IsDeleted { get; set; }
+        public List<long> ProcedureIds { get; set; }
     }
 
     /// <summary>
@@ -148,10 +233,14 @@ namespace Hymson.MES.Services.Dtos.Quality
     /// </summary>
     public class QualUnqualifiedGroupPagedQueryDto : PagerInfo
     {
-        ///// <summary>
-        ///// 描述 :站点编码 
-        ///// 空值 : false  
-        ///// </summary>
-        //public string SiteCode { get; set; }
+        /// <summary>
+        /// 不合格组
+        /// </summary>
+        public string UnqualifiedGroup { get; set; }
+
+        /// <summary>
+        /// 不合格组名称
+        /// </summary>
+        public string UnqualifiedGroupName { get; set; }
     }
 }

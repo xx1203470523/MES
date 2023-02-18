@@ -10,6 +10,10 @@ namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query
     public class QualUnqualifiedCodePagedQuery : PagerInfo
     {
         // <summary>
+        /// 工厂
+        /// </summary>
+        public string SiteCode { get; set; }
+        // <summary>
         /// 不合格代码
         /// </summary>
         public string UnqualifiedCode { get; set; }

@@ -21,9 +21,9 @@ namespace Hymson.MES.Data.Repositories.Quality.IQualityRepository
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="qualUnqualifiedCodePagedQuery"></param>
+        /// <param name="parm"></param>
         /// <returns></returns>
-        Task<PagedInfo<QualUnqualifiedCodeEntity>> GetPagedInfoAsync(QualUnqualifiedCodePagedQuery qualUnqualifiedCodePagedQuery);
+        Task<PagedInfo<QualUnqualifiedCodeEntity>> GetPagedInfoAsync(QualUnqualifiedCodePagedQuery parm);
 
         /// <summary>
         /// 根据ID获取数据
@@ -35,30 +35,30 @@ namespace Hymson.MES.Data.Repositories.Quality.IQualityRepository
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="qualUnqualifiedCodeEntity"></param>
+        /// <param name="parm"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(QualUnqualifiedCodeEntity qualUnqualifiedCodeEntity);
+        Task<int> InsertAsync(QualUnqualifiedCodeEntity parm);
 
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="qualUnqualifiedCodeEntitys"></param>
+        /// <param name="parm"></param>
         /// <returns></returns>
-        Task<int> InsertsAsync(List<QualUnqualifiedCodeEntity> qualUnqualifiedCodeEntitys);
+        Task<int> InsertsAsync(List<QualUnqualifiedCodeEntity> parm);
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="qualUnqualifiedCodeEntity"></param>
+        /// <param name="parm"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(QualUnqualifiedCodeEntity qualUnqualifiedCodeEntity);
+        Task<int> UpdateAsync(QualUnqualifiedCodeEntity parm);
 
         /// <summary>
         /// 批量更新 
         /// </summary>
-        /// <param name="qualUnqualifiedCodeEntitys"></param>
+        /// <param name="parm"></param>
         /// <returns></returns>
-        Task<int> UpdatesAsync(List<QualUnqualifiedCodeEntity> qualUnqualifiedCodeEntitys);
+        Task<int> UpdatesAsync(List<QualUnqualifiedCodeEntity> parm);
 
         /// <summary>
         /// 删除
@@ -70,7 +70,7 @@ namespace Hymson.MES.Data.Repositories.Quality.IQualityRepository
         /// <summary>
         /// 根据编码获取数据
         /// </summary>
-        /// <param name="code"></param>
+        /// <param name="parm"></param>
         /// <returns></returns>
         Task<QualUnqualifiedCodeEntity> GetByCodeAsync(QualUnqualifiedCodeByCodeQuery parm);
 
@@ -79,6 +79,6 @@ namespace Hymson.MES.Data.Repositories.Quality.IQualityRepository
         /// </summary>
         /// <param name="Id"></param>
         /// <returns></returns>
-        Task<IEnumerable<UnqualifiedCodeGroupRelationView>> GetQualUnqualifiedCodeGroupRelationAsync(long Id);
+        Task<IEnumerable<QualUnqualifiedCodeGroupRelationView>> GetQualUnqualifiedCodeGroupRelationAsync(long Id);
     }
 }

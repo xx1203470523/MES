@@ -7,7 +7,10 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Quality;
+using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.Query;
+using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.View;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,51 +20,46 @@ using System.Threading.Tasks;
 namespace Hymson.MES.Data.Repositories.Quality
 {
     /// <summary>
-    /// QualUnqualifiedGroupEntity仓储接口
+    /// 不合格组仓储接口
+    /// @author wangkeming
+    /// @date 2023-02-11 04:45:25
     /// </summary>
     public interface IQualUnqualifiedGroupRepository
     {
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="qualUnqualifiedGroupEntity"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(QualUnqualifiedGroupEntity qualUnqualifiedGroupEntity);
+        Task<int> InsertAsync(QualUnqualifiedGroupEntity param);
 
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="qualUnqualifiedGroupEntitys"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> InsertsAsync(List<QualUnqualifiedGroupEntity> qualUnqualifiedGroupEntitys);
+        Task<int> InsertRangAsync(List<QualUnqualifiedGroupEntity> param);
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="qualUnqualifiedGroupEntity"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(QualUnqualifiedGroupEntity qualUnqualifiedGroupEntity);
+        Task<int> UpdateAsync(QualUnqualifiedGroupEntity param);
 
         /// <summary>
         /// 批量更新 
         /// </summary>
-        /// <param name="qualUnqualifiedGroupEntitys"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> UpdatesAsync(List<QualUnqualifiedGroupEntity> qualUnqualifiedGroupEntitys);
-
-        /// <summary>
-        /// 删除
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<int> DeleteAsync(long id);
+        Task<int> UpdateRangAsync(List<QualUnqualifiedGroupEntity> param);
 
         /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<int> DeletesAsync(long[] ids);
+        Task<int> DeleteRangAsync(DeleteCommand param);
 
         /// <summary>
         /// 根据ID获取数据
@@ -71,52 +69,66 @@ namespace Hymson.MES.Data.Repositories.Quality
         Task<QualUnqualifiedGroupEntity> GetByIdAsync(long id);
 
         /// <summary>
-        /// 根据IDs批量获取数据
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        Task<IEnumerable<QualUnqualifiedGroupEntity>> GetByIdsAsync(long[] ids);
-
-        /// <summary>
         /// 获取List
         /// </summary>
-        /// <param name="qualUnqualifiedGroupQuery"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task<IEnumerable<QualUnqualifiedGroupEntity>> GetQualUnqualifiedGroupEntitiesAsync(QualUnqualifiedGroupQuery qualUnqualifiedGroupQuery);
+        Task<IEnumerable<QualUnqualifiedGroupEntity>> GetQualUnqualifiedGroupEntitiesAsync(QualUnqualifiedGroupQuery param);
 
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="qualUnqualifiedGroupPagedQuery"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task<PagedInfo<QualUnqualifiedGroupEntity>> GetPagedInfoAsync(QualUnqualifiedGroupPagedQuery qualUnqualifiedGroupPagedQuery);
+        Task<PagedInfo<QualUnqualifiedGroupEntity>> GetPagedInfoAsync(QualUnqualifiedGroupPagedQuery param);
+
+        /// <summary>
+        /// 根据编码获取数据
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<QualUnqualifiedGroupEntity> GetByCodeAsync(QualUnqualifiedGroupByCodeQuery param);
 
         /// <summary>
         /// 插入不合格代码组关联不合格代码
         /// </summary>
-        /// <param name="qualUnqualifiedCodeGroupRelationList"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> AddQualUnqualifiedCodeGroupRelationAsync(List<QualUnqualifiedCodeGroupRelation> qualUnqualifiedCodeGroupRelationList);
+        Task<int> InsertQualUnqualifiedCodeGroupRelationRangAsync(List<QualUnqualifiedCodeGroupRelation> param);
 
         /// <summary>
         /// 删除不合格代码组关联不合格代码
         /// </summary>
         /// <param name="groupId"></param>
         /// <returns></returns>
-        Task<int> RealDelteQualUnqualifiedCodeGroupRelationAsync(long groupId);
+        Task<int> RealDelteQualUnqualifiedCodeGroupRelationAsync(long id);
 
         /// <summary>
-        /// 插入不合格代码组关联工序
+        /// 插入不合格组关联工序
         /// </summary>
-        /// <param name="qualUnqualifiedGroupProcedureRelationList"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> AddQualUnqualifiedGroupProcedureRelationAsync(List<QualUnqualifiedGroupProcedureRelation> qualUnqualifiedGroupProcedureRelationList);
+        Task<int> InsertQualUnqualifiedGroupProcedureRelationRangAsync(List<QualUnqualifiedGroupProcedureRelation> param);
 
         /// <summary>
-        /// 删除不合格代码组关联工序
+        /// 删除不合格组关联工序
         /// </summary>
         /// <param name="groupId"></param>
         /// <returns></returns>
-        Task<int> RealDelteQualUnqualifiedGroupProcedureRelationAsync(long groupId);
+        Task<int> RealDelteQualUnqualifiedGroupProcedureRelationAsync(long id);
+
+        /// <summary>
+        /// 获取不合格组关联不合格代码关系表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<QualUnqualifiedGroupProcedureRelationView>> GetQualUnqualifiedCodeProcedureRelationAsync(long id);
+
+        /// <summary>
+        /// 获取不合格组关联不合格代码关系表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<QualUnqualifiedGroupCodeRelationView>> GetQualUnqualifiedCodeGroupRelationAsync(long id);
     }
 }

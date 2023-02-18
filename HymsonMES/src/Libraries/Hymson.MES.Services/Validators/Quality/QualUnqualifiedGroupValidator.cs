@@ -1,4 +1,5 @@
 using FluentValidation;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Services.Dtos.Quality;
 using System;
 using System.Collections.Generic;
@@ -17,8 +18,11 @@ namespace Hymson.MES.Services.Validators.Quality
     {
         public QualUnqualifiedGroupCreateValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
+            RuleFor(x => x.UnqualifiedGroup).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11201));
+            RuleFor(x => x.UnqualifiedGroup).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES11202));
+            RuleFor(x => x.UnqualifiedGroupName).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11203));
+            RuleFor(x => x.UnqualifiedGroupName).MaximumLength(60).WithErrorCode(nameof(ErrorCode.MES11204));
+            RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES11205));
         }
     }
 
@@ -31,8 +35,9 @@ namespace Hymson.MES.Services.Validators.Quality
     {
         public QualUnqualifiedGroupModifyValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
+            RuleFor(x => x.UnqualifiedGroupName).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11203));
+            RuleFor(x => x.UnqualifiedGroupName).MaximumLength(60).WithErrorCode(nameof(ErrorCode.MES11204));
+            RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES11205));
         }
     }
 }

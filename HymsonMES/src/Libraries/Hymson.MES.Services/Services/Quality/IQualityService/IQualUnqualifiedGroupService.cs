@@ -32,13 +32,6 @@ namespace Hymson.MES.Services.Services.Quality
         Task ModifyQualUnqualifiedGroupAsync(QualUnqualifiedGroupModifyDto qualUnqualifiedGroupModifyDto);
 
         /// <summary>
-        /// 删除
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task DeleteQualUnqualifiedGroupAsync(long id);
-
-        /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="ids"></param>

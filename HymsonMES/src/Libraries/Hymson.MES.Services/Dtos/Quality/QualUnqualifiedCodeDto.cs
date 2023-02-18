@@ -88,15 +88,14 @@ namespace Hymson.MES.Services.Dtos.Quality
         public long UnqualifiedGroupId { get; set; }
 
         // <summary>
-        /// 不合格代码
+        /// 不合格组
         /// </summary>
-        public string UnqualifiedCode { get; set; }
+        public string UnqualifiedGroup { get; set; }
 
         /// <summary>
-        /// 不合格代码名称
+        /// 不合格组名称
         /// </summary>
-        public string UnqualifiedCodeName { get; set; }
-
+        public string UnqualifiedGroupName { get; set; }
         /// <summary>
         /// 创建人
         /// </summary>

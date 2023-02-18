@@ -10,23 +10,18 @@ namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.Query
     public class QualUnqualifiedGroupPagedQuery : PagerInfo
     {
         // <summary>
-        /// 不合格代码
+        /// 工厂
         /// </summary>
-        public string UnqualifiedCode { get; set; }
+        public string SiteCode { get; set; }
 
         /// <summary>
-        /// 不合格代码名称
+        /// 不合格组
         /// </summary>
-        public string UnqualifiedCodeName { get; set; }
+        public string UnqualifiedGroup { get; set; }
 
         /// <summary>
-        /// 状态
+        /// 不合格组名称
         /// </summary>
-        public string Status { get; set; }
-
-        /// <summary>
-        /// 类型
-        /// </summary>
-        public short? Type { get; set; }
+        public string UnqualifiedGroupName { get; set; }
     }
 }
