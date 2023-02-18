@@ -2,6 +2,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Process.ResourceType.View;
 using Microsoft.Extensions.Options;
@@ -164,12 +165,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeleteAsync(long[] idsArr)
+        public async Task<int> DeleteRangeAsync(DeleteCommand command)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, new { Ids = idsArr });
+            return await conn.ExecuteAsync(DeleteSql, new { UpdatedBy = command.UserId, UpdatedOn = command.DeleteOn, Ids = command.Ids });
         }
     }
 
@@ -186,6 +187,6 @@ namespace Hymson.MES.Data.Repositories.Process
 
         const string InsertSql = "INSERT INTO `proc_resource_type`(`Id`, `SiteCode`, `ResType`, `ResTypeName`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteCode, @ResType, @ResTypeName, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted);";
         const string UpdateSql = "UPDATE `proc_resource_type` SET ResTypeName = @ResTypeName, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id;";
-        const string DeleteSql = "UPDATE `proc_resource_type` SET `IsDeleted` = 1 WHERE `Id` in @Ids";
+        const string DeleteSql = "UPDATE `proc_resource_type` SET `IsDeleted` = 1,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE `Id` in @Ids";
     }
 }

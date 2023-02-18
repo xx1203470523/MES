@@ -14,6 +14,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
@@ -407,7 +408,14 @@ namespace Hymson.MES.Services.Services.Process
             {
                 throw new NotFoundException(ErrorCode.MES10102);
             }
-            return await _procProcedureRepository.DeleteRangeAsync(idsArr);
+
+            var command = new DeleteCommand
+            {
+                UserId = _currentUser.UserName,
+                DeleteOn = HymsonClock.Now(),
+                Ids= idsArr
+            };
+            return await _procProcedureRepository.DeleteRangeAsync(command);
         }
     }
 }

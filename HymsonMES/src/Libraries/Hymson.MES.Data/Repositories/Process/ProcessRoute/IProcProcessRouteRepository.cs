@@ -7,6 +7,7 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Data.Repositories.Common.Command;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -88,8 +89,8 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        Task<int> DeleteRangeAsync(long[] ids);
+        Task<int> DeleteRangeAsync(DeleteCommand command);
     }
 }

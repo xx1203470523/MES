@@ -6,6 +6,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
@@ -860,7 +861,13 @@ namespace Hymson.MES.Services.Services.Process
                 throw new CustomerValidationException(ErrorCode.MES10319);
             }
 
-            return await _resourceRepository.DeleteAsync(idsArr);
+            var command = new DeleteCommand
+            {
+                UserId = _currentUser.UserName,
+                DeleteOn = HymsonClock.Now(),
+                Ids = idsArr
+            };
+            return await _resourceRepository.DeleteRangeAsync(command);
         }
     }
 }

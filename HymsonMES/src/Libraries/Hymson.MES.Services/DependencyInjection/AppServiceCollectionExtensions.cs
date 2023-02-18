@@ -79,6 +79,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcBomService, ProcBomService>();
             services.AddSingleton<IProcBomDetailService, ProcBomDetailService>();
             #endregion
+            #region LoadPoint
+            services.AddSingleton<IProcLoadPointService, ProcLoadPointService>();
+            #endregion
 
             #region Resource
             services.AddSingleton<IProcResourceTypeService, ProcResourceTypeService>();
@@ -144,6 +147,12 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<AbstractValidator<ProcBomDetailCreateDto>, ProcBomDetailCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcBomDetailModifyDto>, ProcBomDetailModifyValidator>();
+            #endregion
+
+            #region LoadPoint
+            services.AddSingleton<AbstractValidator<ProcLoadPointCreateDto>, ProcLoadPointCreateValidator>();
+            services.AddSingleton<AbstractValidator<ProcLoadPointModifyDto>, ProcLoadPointModifyValidator>();
+
             #endregion
 
             #region Resource
