@@ -16,7 +16,7 @@ namespace Hymson.MES.Core.Domain.Quality
         public string SiteCode { get; set; }
 
         /// <summary>
-        /// 描述 :不合格组 
+        /// 描述 :不合格组
         /// 空值 : false  
         /// </summary>
         public string UnqualifiedGroup { get; set; }

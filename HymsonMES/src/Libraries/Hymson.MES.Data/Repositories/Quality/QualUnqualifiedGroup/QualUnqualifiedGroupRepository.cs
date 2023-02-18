@@ -2,14 +2,16 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.Query;
+using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.View;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Quality
 {
     /// <summary>
-    /// 不合格代码组仓储
+    /// 不合格组仓储
     /// @author wangkeming
     /// @date 2023-02-11 04:45:25
     /// </summary>
@@ -26,60 +28,50 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="pram"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<QualUnqualifiedGroupEntity>> GetPagedInfoAsync(QualUnqualifiedGroupPagedQuery pram)
+        public async Task<PagedInfo<QualUnqualifiedGroupEntity>> GetPagedInfoAsync(QualUnqualifiedGroupPagedQuery param)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
-
-            if (!string.IsNullOrWhiteSpace(pram.UnqualifiedCode))
+            sqlBuilder.Where(" SiteCode= @SiteCode");
+            if (!string.IsNullOrWhiteSpace(param.UnqualifiedGroup))
             {
-                sqlBuilder.Where("UnqualifiedCode like %@UnqualifiedCode%");
+                sqlBuilder.Where("UnqualifiedGroup like '%@UnqualifiedGroup%'");
             }
 
-            if (!string.IsNullOrWhiteSpace(pram.UnqualifiedCodeName))
+            if (!string.IsNullOrWhiteSpace(param.UnqualifiedGroupName))
             {
-                sqlBuilder.Where("UnqualifiedCodeName like %@UnqualifiedCodeName%");
+                sqlBuilder.Where("UnqualifiedGroupName like '%@UnqualifiedGroupName%'");
             }
 
-            if (!string.IsNullOrWhiteSpace(pram.Status))
-            {
-                sqlBuilder.Where("Status=@Status");
-            }
-
-            if (pram.Type != null)
-            {
-                sqlBuilder.Where("Type=@Type");
-            }
-
-            var offSet = (pram.PageIndex - 1) * pram.PageSize;
+            var offSet = (param.PageIndex - 1) * param.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = pram.PageSize });
-            sqlBuilder.AddParameters(pram);
+            sqlBuilder.AddParameters(new { Rows = param.PageSize });
+            sqlBuilder.AddParameters(param);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var qualUnqualifiedGroupEntitiesTask = conn.QueryAsync<QualUnqualifiedGroupEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var qualUnqualifiedGroupEntities = await qualUnqualifiedGroupEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<QualUnqualifiedGroupEntity>(qualUnqualifiedGroupEntities, pram.PageIndex, pram.PageSize, totalCount);
+            return new PagedInfo<QualUnqualifiedGroupEntity>(qualUnqualifiedGroupEntities, param.PageIndex, param.PageSize, totalCount);
         }
 
         /// <summary>
         /// 查询List
         /// </summary>
-        /// <param name="qualUnqualifiedGroupQuery"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualUnqualifiedGroupEntity>> GetQualUnqualifiedGroupEntitiesAsync(QualUnqualifiedGroupQuery qualUnqualifiedGroupQuery)
+        public async Task<IEnumerable<QualUnqualifiedGroupEntity>> GetQualUnqualifiedGroupEntitiesAsync(QualUnqualifiedGroupQuery param)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetQualUnqualifiedGroupEntitiesSqlTemplate);
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var qualUnqualifiedGroupEntities = await conn.QueryAsync<QualUnqualifiedGroupEntity>(template.RawSql, qualUnqualifiedGroupQuery);
+            var qualUnqualifiedGroupEntities = await conn.QueryAsync<QualUnqualifiedGroupEntity>(template.RawSql, param);
             return qualUnqualifiedGroupEntities;
         }
 
@@ -95,132 +87,142 @@ namespace Hymson.MES.Data.Repositories.Quality
         }
 
         /// <summary>
-        /// 根据IDs批量获取数据
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<QualUnqualifiedGroupEntity>> GetByIdsAsync(long[] ids)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<QualUnqualifiedGroupEntity>(GetByIdsSql, new { ids = ids });
-        }
-
-        /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="qualUnqualifiedGroupEntity"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(QualUnqualifiedGroupEntity qualUnqualifiedGroupEntity)
+        public async Task<int> InsertAsync(QualUnqualifiedGroupEntity param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertSql, qualUnqualifiedGroupEntity);
+            return await conn.ExecuteAsync(InsertSql, param);
         }
 
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="qualUnqualifiedGroupEntitys"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(List<QualUnqualifiedGroupEntity> qualUnqualifiedGroupEntitys)
+        public async Task<int> InsertRangAsync(List<QualUnqualifiedGroupEntity> param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertsSql, qualUnqualifiedGroupEntitys);
+            return await conn.ExecuteAsync(InsertsSql, param);
         }
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="qualUnqualifiedGroupEntity"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(QualUnqualifiedGroupEntity qualUnqualifiedGroupEntity)
+        public async Task<int> UpdateAsync(QualUnqualifiedGroupEntity param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateSql, qualUnqualifiedGroupEntity);
+            return await conn.ExecuteAsync(UpdateSql, param);
         }
 
         /// <summary>
         /// 批量更新
         /// </summary>
-        /// <param name="qualUnqualifiedGroupEntitys"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> UpdatesAsync(List<QualUnqualifiedGroupEntity> qualUnqualifiedGroupEntitys)
+        public async Task<int> UpdateRangAsync(List<QualUnqualifiedGroupEntity> param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdatesSql, qualUnqualifiedGroupEntitys);
+            return await conn.ExecuteAsync(UpdatesSql, param);
         }
 
         /// <summary>
-        /// 删除（软删除）
+        /// 批量删除
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> DeleteAsync(long id)
+        public async Task<int> DeleteRangAsync(DeleteCommand param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, new { Id = id });
+            return await conn.ExecuteAsync(DeletesSql, param);
         }
 
         /// <summary>
-        /// 批量删除（软删除）
+        /// 根据编码获取数据
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] ids)
+        public async Task<QualUnqualifiedGroupEntity> GetByCodeAsync(QualUnqualifiedGroupByCodeQuery param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeletesSql, new { ids = ids });
+            return await conn.QueryFirstOrDefaultAsync<QualUnqualifiedGroupEntity>(GetByCodeSql, param);
         }
         #endregion
 
-        #region 不合格代码组关联不合格代码
+        #region 不合格组关联不合格代码
         /// <summary>
         /// 插入不合格代码组关联不合格代码
         /// </summary>
-        /// <param name="qualUnqualifiedCodeGroupRelationList"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> AddQualUnqualifiedCodeGroupRelationAsync(List<QualUnqualifiedCodeGroupRelation> qualUnqualifiedCodeGroupRelationList)
+        public async Task<int> InsertQualUnqualifiedCodeGroupRelationRangAsync(List<QualUnqualifiedCodeGroupRelation> param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertQualUnqualifiedCodeGroupRelationSql, qualUnqualifiedCodeGroupRelationList);
+            return await conn.ExecuteAsync(InsertQualUnqualifiedCodeGroupRelationSql, param);
         }
 
         /// <summary>
-        /// 删除不合格代码组关联不合格代码
+        /// 删除不合格组关联不合格代码
         /// </summary>
-        /// <param name="groupId"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<int> RealDelteQualUnqualifiedCodeGroupRelationAsync(long groupId)
+        public async Task<int> RealDelteQualUnqualifiedCodeGroupRelationAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DelteQualUnqualifiedCodeGroupRelationSql, groupId);
+            return await conn.ExecuteAsync(DelteQualUnqualifiedCodeGroupRelationSql, new { UnqualifiedGroupId = id });
         }
         #endregion
 
-        #region 不合格代码组关联工序
+        #region 不合格组关联工序
         /// <summary>
         /// 插入不合格代码组关联工序
         /// </summary>
-        /// <param name="qualUnqualifiedGroupProcedureRelationList"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> AddQualUnqualifiedGroupProcedureRelationAsync(List<QualUnqualifiedGroupProcedureRelation> qualUnqualifiedGroupProcedureRelationList)
+        public async Task<int> InsertQualUnqualifiedGroupProcedureRelationRangAsync(List<QualUnqualifiedGroupProcedureRelation> param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertQualUnqualifiedGroupProcedureRelationSql, qualUnqualifiedGroupProcedureRelationList);
+            return await conn.ExecuteAsync(InsertQualUnqualifiedGroupProcedureRelationSql, param);
         }
 
         /// <summary>
-        /// 删除不合格代码组关联工序
+        /// 删除不合格组关联工序
         /// </summary>
-        /// <param name="groupId"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<int> RealDelteQualUnqualifiedGroupProcedureRelationAsync(long groupId)
+        public async Task<int> RealDelteQualUnqualifiedGroupProcedureRelationAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(RealDelteQualUnqualifiedGroupProcedureRelationSql, groupId);
+            return await conn.ExecuteAsync(RealDelteQualUnqualifiedGroupProcedureRelationSql, new { UnqualifiedGroupId = id });
         }
         #endregion
-    }
 
+        /// <summary>
+        /// 获取不合格组关联不合格代码关系表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualUnqualifiedGroupProcedureRelationView>> GetQualUnqualifiedCodeProcedureRelationAsync(long id)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<QualUnqualifiedGroupProcedureRelationView>(GetQualUnqualifiedCodeProcedureRelationSqlTemplate, new { Id = id });
+        }
+
+        /// <summary>
+        /// 获取不合格组关联不合格代码关系表
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualUnqualifiedGroupCodeRelationView>> GetQualUnqualifiedCodeGroupRelationAsync(long id)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<QualUnqualifiedGroupCodeRelationView>(GetQualUnqualifiedCodeGroupRelationSqlTemplate, new { Id = id });
+        }
+    }
 
     public partial class QualUnqualifiedGroupRepository
     {
@@ -229,22 +231,27 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string GetQualUnqualifiedGroupEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `qual_unqualified_group` /**where**/  ";
-
-        const string InsertSql = "INSERT INTO `qual_unqualified_group`(  `Id`, `SiteCode`, `UnqualifiedGroup`, `UnqualifiedGroupName`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @UnqualifiedGroup, @UnqualifiedGroupName, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `qual_unqualified_group`(  `Id`, `SiteCode`, `UnqualifiedGroup`, `UnqualifiedGroupName`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @UnqualifiedGroup, @UnqualifiedGroupName, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertQualUnqualifiedCodeGroupRelationSql = "INSERT INTO `qual_unqualified_code`(`Id`, `SiteCode`, `UnqualifiedCode`, `UnqualifiedCodeName`, `Status`, `Type`, `Degree`, `ProcessRouteId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`)";
-        const string InsertQualUnqualifiedGroupProcedureRelationSql = "";
-        const string UpdateSql = "UPDATE `qual_unqualified_group` SET   SiteCode = @SiteCode, UnqualifiedGroup = @UnqualifiedGroup, UnqualifiedGroupName = @UnqualifiedGroupName, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `qual_unqualified_group` SET   SiteCode = @SiteCode, UnqualifiedGroup = @UnqualifiedGroup, UnqualifiedGroupName = @UnqualifiedGroupName, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `qual_unqualified_group` SET IsDeleted = '1' WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE `qual_unqualified_group` SET IsDeleted = '1' WHERE Id in @ids";
-        const string DelteQualUnqualifiedCodeGroupRelationSql = "";
-        const string RealDelteQualUnqualifiedGroupProcedureRelationSql = "";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteCode`, `UnqualifiedGroup`, `UnqualifiedGroupName`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `qual_unqualified_group`  WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteCode`, `UnqualifiedGroup`, `UnqualifiedGroupName`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `qual_unqualified_group`  WHERE Id IN @ids ";
+                                FROM `qual_unqualified_group`  WHERE Id = @Id  AND IsDeleted=0 ";
+        const string GetByCodeSql = @"SELECT 
+                               `Id`, `SiteCode`, `UnqualifiedGroup`, `UnqualifiedGroupName`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                                FROM `qual_unqualified_group`  WHERE UnqualifiedGroup = @Code AND SiteCode = @SiteCode  AND IsDeleted = 0";
+        const string GetQualUnqualifiedCodeProcedureRelationSqlTemplate = @"SELECT  QUGP.Id,QUGP.UnqualifiedGroupId,QUGP.ProcedureId,PP.Code AS ProcedureCode,PP.Name AS UnqualifiedCodeName,QUGP.CreatedBy,QUGP.CreatedOn,QUGP.UpdatedBy,QUGP.UpdatedOn
+                                                                            FROM qual_unqualified_group_procedure_relation  QUGP LEFT JOIN proc_procedure PP ON QUGP.ProcedureId=PP.Id AND PP.IsDeleted=0 WHERE  QUGP.UnqualifiedGroupId=@Id AND QUGP.IsDeleted = 0";
+        const string GetQualUnqualifiedCodeGroupRelationSqlTemplate = @"SELECT  QUCGR.Id,QUCGR.UnqualifiedGroupId,QUC.UnqualifiedCode,QUC.UnqualifiedCodeName,QUCGR.CreatedBy,QUCGR.CreatedOn,QUCGR.UpdatedBy,QUCGR.UpdatedOn
+                                                                        FROM qual_unqualified_code_group_relation QUCGR    LEFT JOIN   qual_unqualified_code QUC on QUC.Id=QUCGR.UnqualifiedCodeId AND QUC.IsDeleted=0
+                                                                        WHERE QUCGR.UnqualifiedGroupId=@Id AND QUCGR.IsDeleted=0";
+        const string InsertSql = "INSERT INTO `qual_unqualified_group`(  `Id`, `SiteCode`, `UnqualifiedGroup`, `UnqualifiedGroupName`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @UnqualifiedGroup, @UnqualifiedGroupName, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsSql = "INSERT INTO `qual_unqualified_group`(  `Id`, `SiteCode`, `UnqualifiedGroup`, `UnqualifiedGroupName`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @UnqualifiedGroup, @UnqualifiedGroupName, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertQualUnqualifiedCodeGroupRelationSql = @"INSERT INTO `qual_unqualified_code_group_relation`(`Id`, `SiteCode`, `UnqualifiedCodeId`, `UnqualifiedGroupId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) 
+                                                                   VALUES (@Id, @SiteCode, @UnqualifiedCodeId, @UnqualifiedGroupId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted)";
+        const string InsertQualUnqualifiedGroupProcedureRelationSql = @"INSERT INTO `qual_unqualified_group_procedure_relation`(`Id`, `SiteCode`, `UnqualifiedGroupId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) 
+                                                                        VALUES(@Id, @SiteCode, @UnqualifiedGroupId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string UpdateSql = "UPDATE `qual_unqualified_group`  SET    UnqualifiedGroupName = @UnqualifiedGroupName, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `qual_unqualified_group` SET    UnqualifiedGroupName = @UnqualifiedGroupName, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
+        const string DeletesSql = "UPDATE `qual_unqualified_group` SET IsDeleted = '1', UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id in @ids AND IsDeleted=0 ";
+        const string DelteQualUnqualifiedCodeGroupRelationSql = "DELETE  FROM qual_unqualified_code_group_relation WHERE  UnqualifiedGroupId = @UnqualifiedGroupId AND IsDeleted=0";
+        const string RealDelteQualUnqualifiedGroupProcedureRelationSql = "DELETE  FROM qual_unqualified_group_procedure_relation WHERE  UnqualifiedGroupId = @UnqualifiedGroupId AND IsDeleted=0";
     }
 }

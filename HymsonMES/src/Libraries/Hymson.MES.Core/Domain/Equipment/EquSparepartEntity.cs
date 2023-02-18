@@ -3,7 +3,7 @@ using Hymson.Infrastructure;
 namespace Hymson.MES.Core.Domain.Equipment
 {
     /// <summary>
-    /// 备件注册，数据实体对象   
+    /// 数据实体对象（备件注册） 
     /// equ_sparepart
     /// @author 陈志谱
     /// @date 2023-02-13 02:27:20
@@ -13,67 +13,67 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 备件编码
         /// </summary>
-        public string SparePartCode { get; set; }
+        public string SparePartCode { get; set; } = "";
 
-       /// <summary>
+        /// <summary>
         /// 备件名称
         /// </summary>
-        public string SparePartName { get; set; }
+        public string SparePartName { get; set; } = "";
 
-       /// <summary>
+        /// <summary>
         /// 备件类型ID
         /// </summary>
         public long SparePartTypeId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料ID
         /// </summary>
         public long ProcMaterialId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 单位ID
         /// </summary>
         public long UnitId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否关键备件
         /// </summary>
-        public bool? IsKey { get; set; }
+        public int IsKey { get; set; } = 0;
 
-       /// <summary>
+        /// <summary>
         /// 是否标准件
         /// </summary>
-        public bool? IsStandard { get; set; }
+        public int IsStandard { get; set; } = 0;
 
-       /// <summary>
+        /// <summary>
+        /// 备件/工装
+        /// </summary>
+        public int Type { get; set; }
+
+        /// <summary>
         /// 状态
         /// </summary>
         public int Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 图纸编号
         /// </summary>
-        public string BluePrintNo { get; set; }
+        public string BluePrintNo { get; set; } = "";
 
-       /// <summary>
+        /// <summary>
         /// 品牌
         /// </summary>
-        public string Brand { get; set; }
+        public string Brand { get; set; } = "";
 
-       /// <summary>
+        /// <summary>
         /// 管理方式
         /// </summary>
-        public int? ManagementMode { get; set; }
+        public int ManagementMode { get; set; } = 0;
 
-       /// <summary>
+        /// <summary>
         /// 描述
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
-       /// <summary>
-        /// 站点代码
-        /// </summary>
-        public string SiteCode { get; set; }
-       
     }
 }

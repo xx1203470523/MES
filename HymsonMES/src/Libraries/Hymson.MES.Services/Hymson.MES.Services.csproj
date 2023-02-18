@@ -8,12 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Services\Equipment\EquConsumableType\**" />
-    <EmbeddedResource Remove="Services\Equipment\EquConsumableType\**" />
-    <None Remove="Services\Equipment\EquConsumableType\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="FluentValidation" Version="11.4.0" />
     <PackageReference Include="Hymson.Authentication.JwtBearer" Version="1.3.5" />
     <PackageReference Include="Hymson.Snowflake" Version="1.3.5" />

@@ -43,6 +43,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddRepository(this IServiceCollection services)
         {
             #region Equipment
+            services.AddSingleton<IEquConsumableRepository, EquConsumableRepository>();
             services.AddSingleton<IEquConsumableTypeRepository, EquConsumableTypeRepository>();
             services.AddSingleton<IEquEquipmentRepository, EquEquipmentRepository>();
             services.AddSingleton<IEquEquipmentGroupRepository, EquEquipmentGroupRepository>();

@@ -4,7 +4,7 @@ using Hymson.MES.Services.Dtos.Equipment;
 namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
 {
     /// <summary>
-    /// 备件类型 service接口
+    /// 业务接口层（备件类型） 
     /// </summary>
     public interface IEquSparePartTypeService
     {
@@ -39,9 +39,9 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// <summary>
         /// 分页查询列表（备件类型）
         /// </summary>
-        /// <param name="equSparePartTypePagedQueryDto"></param>
+        /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquSparePartTypeDto>> GetPagedListAsync(EquSparePartTypePagedQueryDto equSparePartTypePagedQueryDto);
+        Task<PagedInfo<EquSparePartTypeDto>> GetPagedListAsync(EquSparePartTypePagedQueryDto pagedQueryDto);
 
         /// <summary>
         /// 查询详情（备件类型）

@@ -2,6 +2,7 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.View;
@@ -27,57 +28,45 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(QualUnqualifiedCodeEntity parm)
+        public async Task<int> InsertAsync(QualUnqualifiedCodeEntity param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertSql, parm);
+            return await conn.ExecuteAsync(InsertSql, param);
         }
 
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(List<QualUnqualifiedCodeEntity> parm)
+        public async Task<int> InsertsAsync(List<QualUnqualifiedCodeEntity> param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertsSql, parm);
+            return await conn.ExecuteAsync(InsertsSql, param);
         }
 
         /// <summary>
         /// 删除
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> DeleteAsync(long id)
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, new { Id = id });
-        }
-
-        /// <summary>
-        /// 批量删除
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] ids)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeletesSql, new { ids = ids });
-
+            return await conn.ExecuteAsync(DeleteRangSql, param);
         }
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(QualUnqualifiedCodeEntity parm)
+        public async Task<int> UpdateAsync(QualUnqualifiedCodeEntity param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateSql, parm);
+            return await conn.ExecuteAsync(UpdateSql, param);
         }
 
         /// <summary>
@@ -85,10 +74,10 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="qualUnqualifiedCodeEntitys"></param>
         /// <returns></returns>
-        public async Task<int> UpdatesAsync(List<QualUnqualifiedCodeEntity> parm)
+        public async Task<int> UpdatesAsync(List<QualUnqualifiedCodeEntity> param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdatesSql, parm);
+            return await conn.ExecuteAsync(UpdatesSql, param);
         }
 
         /// <summary>
@@ -118,16 +107,16 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<QualUnqualifiedCodeEntity> GetByCodeAsync(QualUnqualifiedCodeByCodeQuery parm)
+        public async Task<QualUnqualifiedCodeEntity> GetByCodeAsync(QualUnqualifiedCodeByCodeQuery param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<QualUnqualifiedCodeEntity>(GetByCodeSql, parm);
+            return await conn.QueryFirstOrDefaultAsync<QualUnqualifiedCodeEntity>(GetByCodeSql, param);
         }
 
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="qualUnqualifiedCodePagedQuery"></param>
+        /// <param name="pram"></param>
         /// <returns></returns>
         public async Task<PagedInfo<QualUnqualifiedCodeEntity>> GetPagedInfoAsync(QualUnqualifiedCodePagedQuery pram)
         {
@@ -136,15 +125,15 @@ namespace Hymson.MES.Data.Repositories.Quality
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
-
+            sqlBuilder.Where(" SiteCode= @SiteCode");
             if (!string.IsNullOrWhiteSpace(pram.UnqualifiedCode))
             {
-                sqlBuilder.Where("UnqualifiedCode like %@UnqualifiedCode%");
+                sqlBuilder.Where("UnqualifiedCode like '%@UnqualifiedCode%'");
             }
 
             if (!string.IsNullOrWhiteSpace(pram.UnqualifiedCodeName))
             {
-                sqlBuilder.Where("UnqualifiedCodeName like %@UnqualifiedCodeName%");
+                sqlBuilder.Where("UnqualifiedCodeName like '%@UnqualifiedCodeName%'");
             }
 
             if (!string.IsNullOrWhiteSpace(pram.Status))
@@ -171,28 +160,14 @@ namespace Hymson.MES.Data.Repositories.Quality
         }
 
         /// <summary>
-        /// 查询List
-        /// </summary>
-        /// <param name="qualUnqualifiedCodeQuery"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<QualUnqualifiedCodeEntity>> GetQualUnqualifiedCodeEntitiesAsync(QualUnqualifiedCodeQuery qualUnqualifiedCodeQuery)
-        {
-            var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetQualUnqualifiedCodeEntitiesSqlTemplate);
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var qualUnqualifiedCodeEntities = await conn.QueryAsync<QualUnqualifiedCodeEntity>(template.RawSql, qualUnqualifiedCodeQuery);
-            return qualUnqualifiedCodeEntities;
-        }
-
-        /// <summary>
-        /// 获取不合格代码关联不合格代码关系表
+        /// 获取不合格组关联不合格代码关系表
         /// </summary>
         /// <param name="Id"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<UnqualifiedCodeGroupRelationView>> GetQualUnqualifiedCodeGroupRelationAsync(long Id)
+        public async Task<IEnumerable<QualUnqualifiedCodeGroupRelationView>> GetQualUnqualifiedCodeGroupRelationAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<UnqualifiedCodeGroupRelationView>(GetQualUnqualifiedCodeGroupRelationSqlTemplate, new { id = Id });
+            return await conn.QueryAsync<QualUnqualifiedCodeGroupRelationView>(GetQualUnqualifiedCodeGroupRelationSqlTemplate, new { Id = id });
         }
     }
 
@@ -205,9 +180,7 @@ namespace Hymson.MES.Data.Repositories.Quality
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `qual_unqualified_code` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `qual_unqualified_code` /**where**/ ";
-        const string GetQualUnqualifiedCodeEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM `qual_unqualified_code` /**where**/  ";
+      
         const string GetQualUnqualifiedCodeGroupRelationSqlTemplate = @"SELECT  QUCGR.Id,QUCGR.UnqualifiedGroupId,QUG.UnqualifiedGroup,QUG.UnqualifiedGroupName,QUCGR.CreatedBy,QUCGR.CreatedOn,QUCGR.UpdatedBy,QUCGR.UpdatedOn
                                                                         FROM qual_unqualified_code QUC 
                                                                         LEFT JOIN qual_unqualified_code_group_relation QUCGR ON QUC.Id=QUCGR.UnqualifiedCodeId AND QUCGR.IsDeleted=0
@@ -217,14 +190,13 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string InsertsSql = "INSERT INTO `qual_unqualified_code`(  `Id`, `SiteCode`, `UnqualifiedCode`, `UnqualifiedCodeName`, `Status`, `Type`, `Degree`, `ProcessRouteId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @UnqualifiedCode, @UnqualifiedCodeName, @Status, @Type, @Degree, @ProcessRouteId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string UpdateSql = "UPDATE `qual_unqualified_code` SET   SiteCode = @SiteCode, UnqualifiedCode = @UnqualifiedCode, UnqualifiedCodeName = @UnqualifiedCodeName, Status = @Status, Type = @Type, Degree = @Degree, ProcessRouteId = @ProcessRouteId, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `qual_unqualified_code` SET   SiteCode = @SiteCode, UnqualifiedCode = @UnqualifiedCode, UnqualifiedCodeName = @UnqualifiedCodeName, Status = @Status, Type = @Type, Degree = @Degree, ProcessRouteId = @ProcessRouteId, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `qual_unqualified_code` SET IsDeleted = '1' WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE `qual_unqualified_code` SET IsDeleted = '1' WHERE Id in @ids";
+        const string DeleteRangSql = "UPDATE `qual_unqualified_code` SET IsDeleted = '1', UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id in @ids ";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteCode`, `UnqualifiedCode`, `UnqualifiedCodeName`, `Status`, `Type`, `Degree`, `ProcessRouteId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `qual_unqualified_code`  WHERE Id = @Id ";
+                            FROM `qual_unqualified_code`  WHERE Id = @Id AND IsDeleted=0";
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteCode`, `UnqualifiedCode`, `UnqualifiedCodeName`, `Status`, `Type`, `Degree`, `ProcessRouteId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `qual_unqualified_code`  WHERE Id IN @ids ";
+                            FROM `qual_unqualified_code`  WHERE Id IN @ids AND IsDeleted=0  ";
         const string GetByCodeSql = @"SELECT 
                                `Id`, `SiteCode`, `UnqualifiedCode`, `UnqualifiedCodeName`, `Status`, `Type`, `Degree`, `ProcessRouteId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `qual_unqualified_code`  WHERE UnqualifiedCode = @UnqualifiedCode  AND Site=@Site AND IsDeleted=0 ";

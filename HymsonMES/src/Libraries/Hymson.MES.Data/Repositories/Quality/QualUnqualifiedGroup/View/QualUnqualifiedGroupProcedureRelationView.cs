@@ -1,18 +1,17 @@
-﻿using Hymson.Infrastructure;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.View
+namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.View
 {
     /// <summary>
-    /// 不合格代码关联不合格代码组视图
+    /// 关联工序视图
     /// @author wangkeming
     /// @date 2023-02-11 04:45:25
     /// </summary>
-    public class UnqualifiedCodeGroupRelationView
+    public class QualUnqualifiedGroupProcedureRelationView
     {
         /// <summary>
         /// 主键id
@@ -25,14 +24,14 @@ namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.View
         public long UnqualifiedGroupId { get; set; }
 
         // <summary>
-        /// 不合格代码
+        /// 工序编码
         /// </summary>
-        public string UnqualifiedCode { get; set; }
+        public string ProcedureCode { get; set; }
 
         /// <summary>
-        /// 不合格代码名称
+        /// 工序名称
         /// </summary>
-        public string UnqualifiedCodeName { get; set; }
+        public string ProcedureName { get; set; }
 
         /// <summary>
         /// 创建人

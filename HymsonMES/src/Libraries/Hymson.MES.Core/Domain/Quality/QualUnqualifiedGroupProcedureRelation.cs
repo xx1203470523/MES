@@ -25,7 +25,7 @@ namespace Hymson.MES.Core.Domain.Quality
         /// 描述 :所属工序ID 
         /// 空值 : false  
         /// </summary>
-        public long ProcedureBomId { get; set; }
+        public long ProcedureId { get; set; }
 
         /// <summary>
         /// 描述 :说明 

@@ -5,7 +5,7 @@ using Hymson.MES.Data.Repositories.Equipment.EquSparePartType.Query;
 namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
 {
     /// <summary>
-    /// 备件类型仓储接口
+    /// 仓储接口（备件类型）
     /// </summary>
     public interface IEquSparePartTypeRepository
     {
@@ -49,7 +49,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquSparePartTypeEntity>> GetEquSparePartTypeEntitiesAsync(EquSparePartTypeQuery query);
+        Task<IEnumerable<EquSparePartTypeEntity>> GetEntitiesAsync(EquSparePartTypeQuery query);
         
         /// <summary>
         /// 分页查询

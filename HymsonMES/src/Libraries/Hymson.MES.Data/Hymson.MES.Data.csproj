@@ -7,12 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Repositories\新文件夹\**" />
-    <EmbeddedResource Remove="Repositories\新文件夹\**" />
-    <None Remove="Repositories\新文件夹\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Dapper.SqlBuilder" Version="2.0.78" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
@@ -23,10 +17,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Hymson.MES.Core\Hymson.MES.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Repositories\Quality\QualUnqualifiedCode\Command\" />
   </ItemGroup>
 
 </Project>

@@ -85,7 +85,6 @@ namespace Hymson.MES.Api.Controllers.Quality
         [Route("delete")]
         public async Task DeleteQualUnqualifiedCodeAsync(string ids)
         {
-            //long[] idsArr = StringExtension.SpitLongArrary(ids);
             await _qualUnqualifiedCodeService.DeletesQualUnqualifiedCodeAsync(ids);
         }
     }

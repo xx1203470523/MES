@@ -2,6 +2,7 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Equipment.EquConsumable.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -9,7 +10,7 @@ using MySql.Data.MySqlClient;
 namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
 {
     /// <summary>
-    /// 备件注册仓储
+    /// 仓储（备件注册）
     /// </summary>
     public partial class EquSparePartRepository : IEquSparePartRepository
     {
@@ -19,7 +20,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
         private readonly ConnectionOptions _connectionOptions;
 
         /// <summary>
-        /// 
+        /// 构造函数（备件注册）
         /// </summary>
         /// <param name="connectionOptions"></param>
         public EquSparePartRepository(IOptions<ConnectionOptions> connectionOptions)
@@ -53,13 +54,12 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
         /// <summary>
         /// 批量修改备件的备件类型
         /// </summary>
-        /// <param name="sparePartTypeId"></param>
-        /// <param name="sparePartIds"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> UpdateSparePartTypeIdAsync(long sparePartTypeId, IEnumerable<long> sparePartIds)
+        public async Task<int> UpdateSparePartTypeIdAsync(UpdateSparePartTypeIdCommand command)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateSparePartTypeIdSql, new { sparePartTypeId, Id = sparePartIds });
+            return await conn.ExecuteAsync(UpdateSparePartTypeIdSql, command);
         }
 
         /// <summary>
@@ -117,6 +117,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("Type = @Type");
             sqlBuilder.Select("*");
 
             if (string.IsNullOrWhiteSpace(pagedQuery.SiteCode) == false)
@@ -141,7 +142,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<EquSparePartEntity>> GetEquSparePartEntitiesAsync(EquSparePartQuery query)
+        public async Task<IEnumerable<EquSparePartEntity>> GetEntitiesAsync(EquSparePartQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEquSparePartEntitiesSqlTemplate);

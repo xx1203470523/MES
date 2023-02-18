@@ -1,11 +1,12 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Data.Repositories.Equipment.EquConsumable.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query;
 
 namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
 {
     /// <summary>
-    /// 备件注册仓储接口
+    /// 仓储接口（备件注册）
     /// </summary>
     public interface IEquSparePartRepository
     {
@@ -26,10 +27,9 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
         /// <summary>
         /// 批量修改备件的备件类型
         /// </summary>
-        /// <param name="sparePartTypeId"></param>
-        /// <param name="sparePartIds"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        Task<int> UpdateSparePartTypeIdAsync(long sparePartTypeId, IEnumerable<long> sparePartIds);
+        Task<int> UpdateSparePartTypeIdAsync(UpdateSparePartTypeIdCommand command);
 
         /// <summary>
         /// 清空备件的指定备件类型
@@ -64,7 +64,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquSparePartEntity>> GetEquSparePartEntitiesAsync(EquSparePartQuery query);
+        Task<IEnumerable<EquSparePartEntity>> GetEntitiesAsync(EquSparePartQuery query);
 
         /// <summary>
         /// 分页查询

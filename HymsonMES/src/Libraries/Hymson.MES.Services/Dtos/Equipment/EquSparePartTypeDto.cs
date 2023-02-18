@@ -3,7 +3,7 @@ using Hymson.Infrastructure;
 namespace Hymson.MES.Services.Dtos.Equipment
 {
     /// <summary>
-    /// 备件类型Dto
+    /// Dto（备件类型）
     /// </summary>
     public record EquSparePartTypeDto : BaseEntityDto
     {
@@ -30,7 +30,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 描述
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
         /*
         /// <summary>
         /// 创建人
@@ -61,7 +61,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
     }
 
     /// <summary>
-    /// 备件类型新增Dto
+    /// 新增Dto（备件类型）
     /// </summary>
     public record EquSparePartTypeCreateDto : BaseEntityDto
     {
@@ -92,7 +92,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
     }
 
     /// <summary>
-    /// 备件类型更新Dto
+    /// 更新Dto（备件类型）
     /// </summary>
     public record EquSparePartTypeModifyDto : BaseEntityDto
     {
@@ -128,7 +128,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
     }
 
     /// <summary>
-    /// 备件类型分页Dto
+    /// 分页Dto（备件类型）
     /// </summary>
     public class EquSparePartTypePagedQueryDto : PagerInfo
     {
