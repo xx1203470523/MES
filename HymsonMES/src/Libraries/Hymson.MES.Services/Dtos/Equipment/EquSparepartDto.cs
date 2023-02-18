@@ -161,9 +161,9 @@ namespace Hymson.MES.Services.Dtos.Equipment
 
 
         /// <summary>
-        /// 设备ID集合
+        /// ID集合（设备组）
         /// </summary>
-        public IEnumerable<long> EquipmentIDs { get; set; }
+        public IEnumerable<long> EquipmentGroupIDs { get; set; }
     }
 
     /// <summary>
@@ -238,9 +238,9 @@ namespace Hymson.MES.Services.Dtos.Equipment
 
 
         /// <summary>
-        /// 设备ID集合
+        /// ID集合（设备组）
         /// </summary>
-        public IEnumerable<long> EquipmentIDs { get; set; }
+        public IEnumerable<long> EquipmentGroupIDs { get; set; }
     }
 
     /// <summary>
