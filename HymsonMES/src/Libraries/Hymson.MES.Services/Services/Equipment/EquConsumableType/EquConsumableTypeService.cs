@@ -3,9 +3,10 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Data.Repositories.Equipment.EquConsumable.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquConsumableType;
+using Hymson.MES.Data.Repositories.Equipment.EquConsumableType.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart;
-using Hymson.MES.Data.Repositories.Equipment.EquSparePartType;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType.Query;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
@@ -31,28 +32,28 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// <summary>
         /// 仓储（工装类型） 
         /// </summary>
-        private readonly IEquConsumableTypeRepository equConsumableTypeRepository;
+        private readonly IEquConsumableTypeRepository _equConsumableTypeRepository;
 
         /// <summary>
-        /// 仓储（备件注册） 
+        /// 仓储（工装注册） 
         /// </summary>
-        private readonly IEquSparePartRepository _equSparePartRepository;
+        private readonly IEquConsumableRepository _equConsumableRepository;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentSite"></param>
         /// <param name="currentUser"></param>
-        /// <param name="equSparePartTypeRepository"></param>
-        /// <param name="equSparePartRepository"></param>
+        /// <param name="equConsumableTypeRepository"></param>
+        /// <param name="equConsumableRepository"></param>
         public EquConsumableTypeService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IEquSparePartTypeRepository equSparePartTypeRepository,
-            IEquSparePartRepository equSparePartRepository)
+            IEquConsumableTypeRepository equConsumableTypeRepository,
+            IEquConsumableRepository equConsumableRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _equSparePartTypeRepository = equSparePartTypeRepository;
-            _equSparePartRepository = equSparePartRepository;
+            _equConsumableTypeRepository = equConsumableTypeRepository;
+            _equConsumableRepository = equConsumableRepository;
         }
 
 
@@ -61,13 +62,13 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(EquSparePartTypeCreateDto createDto)
+        public async Task<int> CreateAsync(EquConsumableTypeCreateDto createDto)
         {
             // TODO 验证DTO
 
 
             // DTO转换实体
-            var entity = createDto.ToEntity<EquSparePartTypeEntity>();
+            var entity = createDto.ToEntity<EquConsumableTypeEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
@@ -75,8 +76,12 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
-                rows += await _equSparePartTypeRepository.InsertAsync(entity);
-                rows += await _equSparePartRepository.UpdateSparePartTypeIdAsync(entity.Id, createDto.SparePartIDs);
+                rows += await _equConsumableTypeRepository.InsertAsync(entity);
+                rows += await _equConsumableRepository.UpdateConsumableTypeIdAsync(new UpdateConsumableTypeIdCommand
+                {
+                    ConsumableTypeId = entity.Id,
+                    ConsumableIds = createDto.ConsumableIDs
+                });
                 trans.Complete();
             }
             return rows;
@@ -87,20 +92,24 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyAsync(EquSparePartTypeModifyDto modifyDto)
+        public async Task<int> ModifyAsync(EquConsumableTypeModifyDto modifyDto)
         {
             // 验证DTO
 
             // DTO转换实体
-            var entity = modifyDto.ToEntity<EquSparePartTypeEntity>();
+            var entity = modifyDto.ToEntity<EquConsumableTypeEntity>();
             entity.UpdatedBy = _currentUser.UserName;
 
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
-                rows += await _equSparePartTypeRepository.UpdateAsync(entity);
-                rows += await _equSparePartRepository.ClearSparePartTypeIdAsync(entity.Id);
-                rows += await _equSparePartRepository.UpdateSparePartTypeIdAsync(entity.Id, modifyDto.SparePartIDs);
+                rows += await _equConsumableTypeRepository.UpdateAsync(entity);
+                rows += await _equConsumableRepository.ClearConsumableTypeIdAsync(entity.Id);
+                rows += await _equConsumableRepository.UpdateConsumableTypeIdAsync(new UpdateConsumableTypeIdCommand
+                {
+                    ConsumableTypeId = entity.Id,
+                    ConsumableIds = modifyDto.ConsumableIDs
+                });
                 trans.Complete();
             }
             return rows;
@@ -113,7 +122,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// <returns></returns>
         public async Task<int> DeleteAsync(long id)
         {
-            return await _equSparePartTypeRepository.DeleteAsync(id);
+            return await _equConsumableTypeRepository.DeleteAsync(id);
         }
 
         /// <summary>
@@ -123,7 +132,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] idsArr)
         {
-            return await _equSparePartTypeRepository.DeletesAsync(idsArr);
+            return await _equConsumableTypeRepository.DeletesAsync(idsArr);
         }
 
         /// <summary>
@@ -131,14 +140,14 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<EquSparePartTypeDto>> GetPagedListAsync(EquSparePartTypePagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<EquConsumableTypeDto>> GetPagedListAsync(EquConsumableTypePagedQueryDto pagedQueryDto)
         {
-            var pagedQuery = pagedQueryDto.ToQuery<EquSparePartTypePagedQuery>();
-            var pagedInfo = await _equSparePartTypeRepository.GetPagedInfoAsync(pagedQuery);
+            var pagedQuery = pagedQueryDto.ToQuery<EquConsumableTypePagedQuery>();
+            var pagedInfo = await _equConsumableTypeRepository.GetPagedInfoAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
-            var dtos = pagedInfo.Data.Select(s => s.ToModel<EquSparePartTypeDto>());
-            return new PagedInfo<EquSparePartTypeDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            var dtos = pagedInfo.Data.Select(s => s.ToModel<EquConsumableTypeDto>());
+            return new PagedInfo<EquConsumableTypeDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
         /// <summary>
@@ -146,9 +155,9 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<EquSparePartTypeDto> GetDetailAsync(long id)
+        public async Task<EquConsumableTypeDto> GetDetailAsync(long id)
         {
-            return (await _equSparePartTypeRepository.GetByIdAsync(id)).ToModel<EquSparePartTypeDto>();
+            return (await _equConsumableTypeRepository.GetByIdAsync(id)).ToModel<EquConsumableTypeDto>();
         }
 
     }

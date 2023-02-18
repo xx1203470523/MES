@@ -3,9 +3,9 @@ using Hymson.Infrastructure;
 namespace Hymson.MES.Services.Dtos.Equipment
 {
     /// <summary>
-    /// Dto（备件注册）
+    /// Dto（工装注册）
     /// </summary>
-    public record EquSparePartDto : BaseEntityDto
+    public record EquConsumableDto : BaseEntityDto
     {
         /// <summary>
         /// 
@@ -13,19 +13,19 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public long Id { get; set; }
 
         /// <summary>
-        /// 备件编码
+        /// 工装编码
         /// </summary>
-        public string SparePartCode { get; set; } = "";
+        public string ConsumableCode { get; set; } = "";
 
         /// <summary>
-        /// 备件名称
+        /// 工装名称
         /// </summary>
-        public string SparePartName { get; set; } = "";
+        public string ConsumableName { get; set; } = "";
 
         /// <summary>
-        /// 备件类型ID
+        /// 工装类型ID
         /// </summary>
-        public long SparePartTypeId { get; set; }
+        public long ConsumableTypeId { get; set; }
 
         /// <summary>
         /// 物料ID
@@ -36,16 +36,6 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 单位ID
         /// </summary>
         public long UnitId { get; set; }
-
-        /// <summary>
-        /// 是否关键备件
-        /// </summary>
-        public bool? IsKey { get; set; }
-
-        /// <summary>
-        /// 是否标准件
-        /// </summary>
-        public bool? IsStandard { get; set; }
 
         /// <summary>
         /// 状态
@@ -95,24 +85,24 @@ namespace Hymson.MES.Services.Dtos.Equipment
     }
 
     /// <summary>
-    /// 新增Dto（备件注册）
+    /// 新增Dto（工装注册）
     /// </summary>
-    public record EquSparePartCreateDto : BaseEntityDto
+    public record EquConsumableCreateDto : BaseEntityDto
     {
         /// <summary>
-        /// 备件编码
+        /// 工装编码
         /// </summary>
-        public string SparePartCode { get; set; } = "";
+        public string ConsumableCode { get; set; } = "";
 
         /// <summary>
-        /// 备件名称
+        /// 工装名称
         /// </summary>
-        public string SparePartName { get; set; } = "";
+        public string ConsumableName { get; set; } = "";
 
         /// <summary>
-        /// 备件类型ID
+        /// 工装类型ID
         /// </summary>
-        public long SparePartTypeId { get; set; }
+        public long ConsumableTypeId { get; set; }
 
         /// <summary>
         /// 物料ID
@@ -123,16 +113,6 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 单位ID
         /// </summary>
         public long UnitId { get; set; }
-
-        /// <summary>
-        /// 是否关键备件
-        /// </summary>
-        public bool? IsKey { get; set; }
-
-        /// <summary>
-        /// 是否标准件
-        /// </summary>
-        public bool? IsStandard { get; set; }
 
         /// <summary>
         /// 状态
@@ -167,9 +147,9 @@ namespace Hymson.MES.Services.Dtos.Equipment
     }
 
     /// <summary>
-    /// 更新Dto（备件注册）
+    /// 更新Dto（工装注册）
     /// </summary>
-    public record EquSparePartModifyDto : BaseEntityDto
+    public record EquConsumableModifyDto : BaseEntityDto
     {
         /// <summary>
         /// 
@@ -177,19 +157,14 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public long Id { get; set; }
 
         /// <summary>
-        /// 备件编码
+        /// 工装名称
         /// </summary>
-        public string SparePartCode { get; set; } = "";
+        public string ConsumableName { get; set; } = "";
 
         /// <summary>
-        /// 备件名称
+        /// 工装类型ID
         /// </summary>
-        public string SparePartName { get; set; } = "";
-
-        /// <summary>
-        /// 备件类型ID
-        /// </summary>
-        public long SparePartTypeId { get; set; }
+        public long ConsumableTypeId { get; set; }
 
         /// <summary>
         /// 物料ID
@@ -200,16 +175,6 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 单位ID
         /// </summary>
         public long UnitId { get; set; }
-
-        /// <summary>
-        /// 是否关键备件
-        /// </summary>
-        public bool? IsKey { get; set; }
-
-        /// <summary>
-        /// 是否标准件
-        /// </summary>
-        public bool? IsStandard { get; set; }
 
         /// <summary>
         /// 状态
@@ -244,9 +209,9 @@ namespace Hymson.MES.Services.Dtos.Equipment
     }
 
     /// <summary>
-    /// 分页Dto（备件注册）
+    /// 分页Dto（工装注册）
     /// </summary>
-    public class EquSparePartPagedQueryDto : PagerInfo
+    public class EquConsumablePagedQueryDto : PagerInfo
     {
         /// <summary>
         /// 站点编码 

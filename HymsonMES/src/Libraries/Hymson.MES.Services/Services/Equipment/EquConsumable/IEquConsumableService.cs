@@ -1,53 +1,53 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 
-namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
+namespace Hymson.MES.Services.Services.Equipment.EquSparePart
 {
     /// <summary>
-    /// 业务接口层（备件类型） 
+    /// 业务接口层（工装注册） 
     /// </summary>
-    public interface IEquSparePartTypeService
+    public interface IEquConsumableService
     {
         /// <summary>
-        /// 添加（备件类型）
+        /// 添加（工装注册）
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        Task<int> CreateAsync(EquSparePartTypeCreateDto createDto);
+        Task<int> CreateAsync(EquConsumableCreateDto createDto);
 
         /// <summary>
-        /// 修改（备件类型）
+        /// 修改（工装注册）
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        Task<int> ModifyAsync(EquSparePartTypeModifyDto modifyDto);
+        Task<int> ModifyAsync(EquConsumableModifyDto modifyDto);
 
         /// <summary>
-        /// 删除（备件类型）
+        /// 删除（工装注册）
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
 
         /// <summary>
-        /// 批量删除（备件类型）
+        /// 批量删除（工装注册）
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
         Task<int> DeletesAsync(long[] idsArr);
 
         /// <summary>
-        /// 分页查询列表（备件类型）
+        /// 分页查询列表（工装注册）
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquSparePartTypeDto>> GetPagedListAsync(EquSparePartTypePagedQueryDto pagedQueryDto);
+        Task<PagedInfo<EquConsumableDto>> GetPagedListAsync(EquConsumablePagedQueryDto pagedQueryDto);
 
         /// <summary>
-        /// 查询详情（备件类型）
+        /// 查询详情（工装注册）
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<EquSparePartTypeDto> GetDetailAsync(long id);
+        Task<EquConsumableDto> GetDetailAsync(long id);
     }
 }

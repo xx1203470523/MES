@@ -9,7 +9,7 @@ using MySql.Data.MySqlClient;
 namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
 {
     /// <summary>
-    /// 备件类型仓储
+    /// 仓储（备件类型）
     /// </summary>
     public partial class EquSparePartTypeRepository : IEquSparePartTypeRepository
     {
@@ -19,7 +19,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
         private readonly ConnectionOptions _connectionOptions;
 
         /// <summary>
-        /// 
+        /// 构造函数（备件类型）
         /// </summary>
         /// <param name="connectionOptions"></param>
         public EquSparePartTypeRepository(IOptions<ConnectionOptions> connectionOptions)
@@ -134,7 +134,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<EquSparePartTypeEntity>> GetEquSparePartTypeEntitiesAsync(EquSparePartTypeQuery query)
+        public async Task<IEnumerable<EquSparePartTypeEntity>> GetEntitiesAsync(EquSparePartTypeQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEquSparePartTypeEntitiesSqlTemplate);

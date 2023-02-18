@@ -134,7 +134,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquConsumableType
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<EquConsumableTypeEntity>> GetEquSparePartTypeEntitiesAsync(EquConsumableTypeQuery query)
+        public async Task<IEnumerable<EquConsumableTypeEntity>> GetEntitiesAsync(EquConsumableTypeQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEquSparePartTypeEntitiesSqlTemplate);

@@ -4,47 +4,47 @@ using Hymson.MES.Services.Dtos.Equipment;
 namespace Hymson.MES.Services.Services.Equipment.EquSparePart
 {
     /// <summary>
-    /// 备件注册 service接口
+    /// 业务接口层（备件注册） 
     /// </summary>
     public interface IEquSparePartService
     {
         /// <summary>
-        /// 获取分页List
+        /// 添加（备件注册）
         /// </summary>
-        /// <param name="equSparePartPagedQueryDto"></param>
+        /// <param name="createDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquSparePartDto>> GetPagedListAsync(EquSparePartPagedQueryDto equSparePartPagedQueryDto);
+        Task<int> CreateAsync(EquSparePartCreateDto createDto);
 
         /// <summary>
-        /// 新增
+        /// 修改（备件注册）
         /// </summary>
-        /// <param name="equSparePartDto"></param>
+        /// <param name="modifyDto"></param>
         /// <returns></returns>
-        Task<int> CreateAsync(EquSparePartCreateDto equSparePartCreateDto);
+        Task<int> ModifyAsync(EquSparePartModifyDto modifyDto);
 
         /// <summary>
-        /// 修改
-        /// </summary>
-        /// <param name="equSparePartDto"></param>
-        /// <returns></returns>
-        Task<int> ModifyAsync(EquSparePartModifyDto equSparePartModifyDto);
-
-        /// <summary>
-        /// 删除
+        /// 删除（备件注册）
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
 
         /// <summary>
-        /// 批量删除
+        /// 批量删除（备件注册）
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
         Task<int> DeletesAsync(long[] idsArr);
 
         /// <summary>
-        /// 根据ID查询
+        /// 分页查询列表（备件注册）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<EquSparePartDto>> GetPagedListAsync(EquSparePartPagedQueryDto pagedQueryDto);
+
+        /// <summary>
+        /// 查询详情（备件注册）
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
