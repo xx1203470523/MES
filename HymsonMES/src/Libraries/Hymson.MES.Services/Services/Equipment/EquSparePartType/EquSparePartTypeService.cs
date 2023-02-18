@@ -3,6 +3,8 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Data.Repositories.Equipment.EquConsumable.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType.Query;
@@ -70,12 +72,17 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
             entity.Id = IdGenProvider.Instance.CreateId();
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
+            entity.Type = (int)EquipmentPartTypeEnum.SparePart; // 备件
 
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
                 rows += await _equSparePartTypeRepository.InsertAsync(entity);
-                rows += await _equSparePartRepository.UpdateSparePartTypeIdAsync(entity.Id, createDto.SparePartIDs);
+                rows += await _equSparePartRepository.UpdateSparePartTypeIdAsync(new UpdateSparePartTypeIdCommand
+                {
+                    SparePartTypeId = entity.Id,
+                    SparePartIds = createDto.SparePartIDs
+                });
                 trans.Complete();
             }
             return rows;
@@ -99,7 +106,11 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
             {
                 rows += await _equSparePartTypeRepository.UpdateAsync(entity);
                 rows += await _equSparePartRepository.ClearSparePartTypeIdAsync(entity.Id);
-                rows += await _equSparePartRepository.UpdateSparePartTypeIdAsync(entity.Id, modifyDto.SparePartIDs);
+                rows += await _equSparePartRepository.UpdateSparePartTypeIdAsync(new UpdateSparePartTypeIdCommand
+                {
+                    SparePartTypeId = entity.Id,
+                    SparePartIds = modifyDto.SparePartIDs
+                });
                 trans.Complete();
             }
             return rows;
@@ -133,6 +144,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         public async Task<PagedInfo<EquSparePartTypeDto>> GetPagedListAsync(EquSparePartTypePagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<EquSparePartTypePagedQuery>();
+            pagedQuery.Type = (int)EquipmentPartTypeEnum.SparePart; // 备件
             var pagedInfo = await _equSparePartTypeRepository.GetPagedInfoAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据

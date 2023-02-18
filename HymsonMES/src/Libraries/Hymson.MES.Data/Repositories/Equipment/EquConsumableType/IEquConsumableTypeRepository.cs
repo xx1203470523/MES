@@ -49,7 +49,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquConsumableType
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquConsumableTypeEntity>> GetEquSparePartTypeEntitiesAsync(EquConsumableTypeQuery query);
+        Task<IEnumerable<EquConsumableTypeEntity>> GetEntitiesAsync(EquConsumableTypeQuery query);
 
         /// <summary>
         /// 分页查询（工装类型）

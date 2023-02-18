@@ -3,27 +3,27 @@ using Hymson.Infrastructure;
 namespace Hymson.MES.Core.Domain.Equipment
 {
     /// <summary>
-    /// 数据实体对象（备件注册） 
-    /// equ_sparepart
+    /// 数据实体对象（工装注册）
+    /// equ_consumable
     /// @author 陈志谱
-    /// @date 2023-02-13 02:27:20
+    /// @date 2023-02-18
     /// </summary>
-    public class EquSparePartEntity : BaseEntity
+    public class EquConsumableEntity : BaseEntity, ISite
     {
         /// <summary>
-        /// 备件编码
+        /// 工装编码
         /// </summary>
-        public string SparePartCode { get; set; } = "";
+        public string ConsumableCode { get; set; } = "";
 
         /// <summary>
-        /// 备件名称
+        /// 工装名称
         /// </summary>
-        public string SparePartName { get; set; } = "";
+        public string ConsumableName { get; set; } = "";
 
         /// <summary>
-        /// 备件类型ID
+        /// 工装类型ID
         /// </summary>
-        public long SparePartTypeId { get; set; }
+        public long ConsumableTypeId { get; set; }
 
         /// <summary>
         /// 物料ID
@@ -34,21 +34,6 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// 单位ID
         /// </summary>
         public long UnitId { get; set; }
-
-        /// <summary>
-        /// 是否关键备件
-        /// </summary>
-        public int IsKey { get; set; } = 0;
-
-        /// <summary>
-        /// 是否标准件
-        /// </summary>
-        public int IsStandard { get; set; } = 0;
-
-        /// <summary>
-        /// 备件/工装
-        /// </summary>
-        public int Type { get; set; }
 
         /// <summary>
         /// 状态
@@ -74,6 +59,11 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// 描述
         /// </summary>
         public string Remark { get; set; } = "";
+
+        /// <summary>
+        /// 站点Id
+        /// </summary>
+        long ISite.SiteId { get; }
 
     }
 }

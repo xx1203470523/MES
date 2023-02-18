@@ -3,7 +3,7 @@
     /// <summary>
     /// 日历类型枚举
     /// </summary>
-    public enum CalendarTypeEnum : byte
+    public enum CalendarTypeEnum : sbyte
     {
         /// <summary>
         /// 设备

@@ -4,7 +4,7 @@
     /// 日历启用状态
     /// </summary>
 
-    public enum CalendarUseStatusEnum : byte
+    public enum CalendarUseStatusEnum : sbyte
     {
         /// <summary>
         /// 启用

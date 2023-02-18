@@ -6,7 +6,7 @@
     public class UpdateEquipmentGroupIdCommand
     {
         /// <summary>
-        /// 设备组ID
+        /// ID（设备组）
         /// </summary>
         public long EquipmentGroupId { get; set; }
 
