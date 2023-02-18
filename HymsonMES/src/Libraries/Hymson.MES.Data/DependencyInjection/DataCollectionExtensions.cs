@@ -95,6 +95,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcLoadPointRepository, ProcLoadPointRepository>();
 
             #endregion
+            #region LoadPointLink
+            services.AddSingleton<IProcLoadPointLinkMaterialRepository, ProcLoadPointLinkMaterialRepository>();
+            services.AddSingleton<IProcLoadPointLinkResourceRepository, ProcLoadPointLinkResourceRepository>();
+            #endregion
 
             #region Resource
             services.AddSingleton<IProcResourceTypeRepository, ProcResourceTypeRepository>();

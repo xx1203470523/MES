@@ -198,6 +198,19 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcLoadPointPagedQueryDto, ProcLoadPointPagedQuery>();
             CreateMap<ProcLoadPointEntity, ProcLoadPointDto>();
             #endregion
+            #region LoadPointLink
+            CreateMap<ProcLoadPointLinkMaterialCreateDto, ProcLoadPointLinkMaterialEntity>();
+            CreateMap<ProcLoadPointLinkMaterialModifyDto, ProcLoadPointLinkMaterialEntity>();
+            CreateMap<ProcLoadPointLinkMaterialPagedQueryDto, ProcLoadPointLinkMaterialPagedQuery>();
+            CreateMap<ProcLoadPointLinkMaterialEntity, ProcLoadPointLinkMaterialDto>();
+            CreateMap<ProcLoadPointLinkResourceCreateDto, ProcLoadPointLinkResourceEntity>();
+            CreateMap<ProcLoadPointLinkResourceModifyDto, ProcLoadPointLinkResourceEntity>();
+            CreateMap<ProcLoadPointLinkResourcePagedQueryDto, ProcLoadPointLinkResourcePagedQuery>();
+            CreateMap<ProcLoadPointLinkResourceEntity, ProcLoadPointLinkResourceDto>();
+
+            CreateMap<ProcLoadPointLinkMaterialView, ProcLoadPointLinkMaterialViewDto>();
+            CreateMap<ProcLoadPointLinkResourceView, ProcLoadPointLinkResourceViewDto>();
+            #endregion
 
             #region ResourceType
 

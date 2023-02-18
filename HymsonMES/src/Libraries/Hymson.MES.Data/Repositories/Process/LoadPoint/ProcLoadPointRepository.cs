@@ -83,14 +83,29 @@ namespace Hymson.MES.Data.Repositories.Process
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where(" IsDeleted=0 ");
             sqlBuilder.Select("*");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-           
+            if (!string.IsNullOrWhiteSpace(procLoadPointPagedQuery.SiteCode))
+            {
+                sqlBuilder.Where(" SiteCode=@SiteCode ");
+            }
+            if (!string.IsNullOrWhiteSpace(procLoadPointPagedQuery.LoadPoint))
+            {
+                procLoadPointPagedQuery.LoadPoint = $"%{procLoadPointPagedQuery.LoadPoint}%";
+                sqlBuilder.Where(" LoadPoint like @LoadPoint ");
+            }
+            if (!string.IsNullOrWhiteSpace(procLoadPointPagedQuery.LoadPointName))
+            {
+                procLoadPointPagedQuery.LoadPointName = $"%{procLoadPointPagedQuery.LoadPointName}%";
+                sqlBuilder.Where(" LoadPointName like @LoadPointName ");
+            }
+            if (!string.IsNullOrWhiteSpace(procLoadPointPagedQuery.Status))
+            {
+                procLoadPointPagedQuery.Status = $"%{procLoadPointPagedQuery.Status}%";
+                sqlBuilder.Where(" Status like @Status ");
+            }
+
             var offSet = (procLoadPointPagedQuery.PageIndex - 1) * procLoadPointPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = procLoadPointPagedQuery.PageSize });
@@ -113,6 +128,18 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcLoadPointEntitiesSqlTemplate);
+            sqlBuilder.Where(" IsDeleted=0 ");
+            sqlBuilder.Select("*");
+
+            if (!string.IsNullOrWhiteSpace(procLoadPointQuery.SiteCode))
+            {
+                sqlBuilder.Where(" SiteCode=@SiteCode ");
+            }
+            if (!string.IsNullOrWhiteSpace(procLoadPointQuery.LoadPoint))
+            {
+                sqlBuilder.Where(" LoadPoint = @LoadPoint ");
+            }
+            
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var procLoadPointEntities = await conn.QueryAsync<ProcLoadPointEntity>(template.RawSql, procLoadPointQuery);
             return procLoadPointEntities;
@@ -166,7 +193,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
     public partial class ProcLoadPointRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_load_point` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_load_point` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY CreatedOn LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_load_point` /**where**/ ";
         const string GetProcLoadPointEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
@@ -174,7 +201,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
         const string InsertSql = "INSERT INTO `proc_load_point`(  `Id`, `SiteCode`, `LoadPoint`, `LoadPointName`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @LoadPoint, @LoadPointName, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `proc_load_point`(  `Id`, `SiteCode`, `LoadPoint`, `LoadPointName`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @LoadPoint, @LoadPointName, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string UpdateSql = "UPDATE `proc_load_point` SET   SiteCode = @SiteCode, LoadPoint = @LoadPoint, LoadPointName = @LoadPointName, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `proc_load_point` SET  LoadPointName = @LoadPointName, Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn   WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `proc_load_point` SET   SiteCode = @SiteCode, LoadPoint = @LoadPoint, LoadPointName = @LoadPointName, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_load_point` SET IsDeleted = '1' WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_load_point` SET IsDeleted = '1' WHERE Id in @ids";

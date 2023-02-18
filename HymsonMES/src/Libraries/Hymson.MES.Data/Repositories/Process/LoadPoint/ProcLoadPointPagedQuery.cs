@@ -19,6 +19,24 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public class ProcLoadPointPagedQuery : PagerInfo
     {
+        /// <summary>
+        /// 所属站点代码
+        /// </summary>
+        public string SiteCode { get; set; } = "";
 
+        /// <summary>
+        /// 描述 :上料点 
+        /// </summary>
+        public string LoadPoint { get; set; }
+
+        /// <summary>
+        /// 描述 :上料点名称 
+        /// </summary>
+        public string LoadPointName { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public string Status { get; set; }
     }
 }

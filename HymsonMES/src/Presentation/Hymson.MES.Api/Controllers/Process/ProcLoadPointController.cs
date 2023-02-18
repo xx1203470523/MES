@@ -58,7 +58,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<ProcLoadPointDto> QueryProcLoadPointByIdAsync(long id)
+        public async Task<ProcLoadPointDetailDto> QueryProcLoadPointByIdAsync(long id)
         {
             return await _procLoadPointService.QueryProcLoadPointByIdAsync(id);
         }

@@ -102,6 +102,18 @@
         public const string MES10611 = "不能删除启用状态的Bom!";
         #endregion
 
+        #region 上料点 10700
+        public const string MES10700 = "上料单维护错误";
+        public const string MES10701 = "此上料点{LoadPoint}在系统已经存在!";
+        public const string MES10702 = "关联物料页签物料不能为空!";
+        public const string MES10703 = "关联资源页签资源不能为空!";
+        public const string MES10704 = "新增上料单维护失败!";
+        public const string MES10705 = "此上料点在系统不存在!";
+        public const string MES10706 = "更新上料单维护失败!";
+        public const string MES10707 = "请选择数据!";
+        public const string MES10708 = "删除数据失败!";
+        #endregion
+
         #region 不合格代码 11100
         public const string MES11100 = "不合格代码错误";
         public const string MES11101 = "不合格代码编码不能为空";

@@ -1,9 +1,9 @@
 /*
  *creator: Karl
  *
- *describe: 上料点表    Dto | 代码由框架生成
+ *describe: 上料点关联资源表    Dto | 代码由框架生成
  *builder:  Karl
- *build datetime: 2023-02-17 08:57:53
+ *build datetime: 2023-02-18 09:36:09
  */
 
 using Hymson.Infrastructure;
@@ -16,9 +16,9 @@ using System.Threading.Tasks;
 namespace Hymson.MES.Services.Dtos.Process
 {
     /// <summary>
-    /// 上料点表Dto
+    /// 上料点关联资源表Dto
     /// </summary>
-    public record ProcLoadPointDto : BaseEntityDto
+    public record ProcLoadPointLinkResourceDto : BaseEntityDto
     {
         /// <summary>
         /// 
@@ -26,21 +26,26 @@ namespace Hymson.MES.Services.Dtos.Process
         public long Id { get; set; }
 
        /// <summary>
-        /// 上料点
+        /// 序号( 程序生成)
         /// </summary>
-        public string LoadPoint { get; set; }
+        public string SerialNo { get; set; }
 
        /// <summary>
-        /// 上料点名称
+        /// 所属上料点ID
         /// </summary>
-        public string LoadPointName { get; set; }
+        public long LoadPointId { get; set; }
 
        /// <summary>
-        /// 状态
+        /// 所属资源ID
         /// </summary>
-        public string Status { get; set; }
+        public long ResourceId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 所属资源ID
+        /// </summary>
+        public string ResCode { get; set; }
+
+        /// <summary>
         /// 说明
         /// </summary>
         public string Remark { get; set; }
@@ -69,72 +74,15 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 是否逻辑删除
         /// </summary>
         public bool? IsDeleted { get; set; }
-    }
 
-    /// <summary>
-    /// 上料点表详情Dto
-    /// </summary>
-    public record ProcLoadPointDetailDto : BaseEntityDto
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        public long Id { get; set; }
-
-        /// <summary>
-        /// 上料点
-        /// </summary>
-        public string LoadPoint { get; set; }
-
-        /// <summary>
-        /// 上料点名称
-        /// </summary>
-        public string LoadPointName { get; set; }
-
-        /// <summary>
-        /// 状态
-        /// </summary>
-        public string Status { get; set; }
-
-        /// <summary>
-        /// 说明
-        /// </summary>
-        public string Remark { get; set; }
-
-        /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-        /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-        /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
-
-        /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public bool? IsDeleted { get; set; }
-
-        public List<ProcLoadPointLinkMaterialViewDto> LinkMaterials { get; set; }
-        public List<ProcLoadPointLinkResourceViewDto> LinkResources { get; set; }
+       
     }
 
 
     /// <summary>
-    /// 上料点表新增Dto
+    /// 上料点关联资源表新增Dto
     /// </summary>
-    public record ProcLoadPointCreateDto : BaseEntityDto
+    public record ProcLoadPointLinkResourceCreateDto : BaseEntityDto
     {
         /// <summary>
         /// 
@@ -142,19 +90,19 @@ namespace Hymson.MES.Services.Dtos.Process
         public long Id { get; set; }
 
        /// <summary>
-        /// 上料点
+        /// 序号( 程序生成)
         /// </summary>
-        public string LoadPoint { get; set; }
+        public string SerialNo { get; set; }
 
        /// <summary>
-        /// 上料点名称
+        /// 所属上料点ID
         /// </summary>
-        public string LoadPointName { get; set; }
+        public long LoadPointId { get; set; }
 
        /// <summary>
-        /// 状态
+        /// 所属资源ID
         /// </summary>
-        public string Status { get; set; }
+        public long ResourceId { get; set; }
 
        /// <summary>
         /// 说明
@@ -186,14 +134,13 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public bool? IsDeleted { get; set; }
 
-        public List<ProcLoadPointLinkMaterialDto> LinkMaterials { get; set; }
-        public List<ProcLoadPointLinkResourceDto> LinkResources { get; set; }
+       
     }
 
     /// <summary>
-    /// 上料点表更新Dto
+    /// 上料点关联资源表更新Dto
     /// </summary>
-    public record ProcLoadPointModifyDto : BaseEntityDto
+    public record ProcLoadPointLinkResourceModifyDto : BaseEntityDto
     {
         /// <summary>
         /// 
@@ -201,19 +148,19 @@ namespace Hymson.MES.Services.Dtos.Process
         public long Id { get; set; }
 
        /// <summary>
-        /// 上料点
+        /// 序号( 程序生成)
         /// </summary>
-        public string LoadPoint { get; set; }
+        public string SerialNo { get; set; }
 
        /// <summary>
-        /// 上料点名称
+        /// 所属上料点ID
         /// </summary>
-        public string LoadPointName { get; set; }
+        public long LoadPointId { get; set; }
 
        /// <summary>
-        /// 状态
+        /// 所属资源ID
         /// </summary>
-        public string Status { get; set; }
+        public long ResourceId { get; set; }
 
        /// <summary>
         /// 说明
@@ -245,34 +192,43 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public bool? IsDeleted { get; set; }
 
-        public List<ProcLoadPointLinkMaterialDto> LinkMaterials { get; set; }
-        public List<ProcLoadPointLinkResourceDto> LinkResources { get; set; }
+       
 
     }
 
     /// <summary>
-    /// 上料点表分页Dto
+    /// 上料点关联资源表分页Dto
     /// </summary>
-    public class ProcLoadPointPagedQueryDto : PagerInfo
+    public class ProcLoadPointLinkResourcePagedQueryDto : PagerInfo
+    {
+        ///// <summary>
+        ///// 描述 :站点编码 
+        ///// 空值 : false  
+        ///// </summary>
+        //public string SiteCode { get; set; }
+    }
+
+    /// <summary>
+    /// 上料点关联资源表Dto
+    /// </summary>
+    public record ProcLoadPointLinkResourceViewDto : BaseEntityDto
     {
         /// <summary>
-        /// 所属站点代码
+        /// 描述 :所属资源ID 
         /// </summary>
-        public string SiteCode { get; set; } = "";
+        public long ResourceId { get; set; }
 
         /// <summary>
-        /// 描述 :上料点 
+        /// 描述 :资源代码 
+        /// 空值 : false  
         /// </summary>
-        public string LoadPoint { get; set; }
+        public string ResCode { get; set; }
 
         /// <summary>
-        /// 描述 :上料点名称 
+        /// 描述 :资源名称 
+        /// 空值 : false  
         /// </summary>
-        public string LoadPointName { get; set; }
-
-        /// <summary>
-        /// 状态
-        /// </summary>
-        public string Status { get; set; }
+        public string ResName { get; set; }
     }
+
 }

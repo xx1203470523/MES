@@ -22,7 +22,7 @@ namespace Hymson.MES.Services.Validators.Process
     {
         public ProcLoadPointCreateValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");
+            //RuleFor(x => x.LinkMaterials.ToString()).NotEmpty().WithErrorCode("11").WithMessage("11");
             //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
         }
     }
