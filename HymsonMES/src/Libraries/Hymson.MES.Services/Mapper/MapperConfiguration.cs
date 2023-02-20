@@ -41,6 +41,22 @@ namespace Hymson.MES.Services.Mapper
         /// </summary>
         protected virtual void CreateEquipmentMaps()
         {
+            #region EquConsumable
+            CreateMap<EquConsumableCreateDto, EquSparePartEntity>();
+            CreateMap<EquConsumableModifyDto, EquSparePartEntity>();
+            CreateMap<EquConsumablePagedQueryDto, EquSparePartPagedQuery>();
+
+            CreateMap<EquSparePartEntity, EquConsumableDto>();
+            #endregion
+
+            #region EquConsumableType
+            CreateMap<EquConsumableTypeCreateDto, EquSparePartTypeEntity>();
+            CreateMap<EquConsumableTypeModifyDto, EquSparePartTypeEntity>();
+            CreateMap<EquConsumableTypePagedQueryDto, EquSparePartTypePagedQuery>();
+
+            CreateMap<EquSparePartTypeEntity, EquConsumableTypeDto>();
+            #endregion
+
             #region EquEquipment
             CreateMap<EquEquipmentCreateDto, EquEquipmentEntity>();
             CreateMap<EquEquipmentModifyDto, EquEquipmentEntity>();
