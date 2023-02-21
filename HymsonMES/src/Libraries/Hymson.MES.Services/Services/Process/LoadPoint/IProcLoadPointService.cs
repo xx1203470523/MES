@@ -60,6 +60,6 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<ProcLoadPointDto> QueryProcLoadPointByIdAsync(long id);
+        Task<ProcLoadPointDetailDto> QueryProcLoadPointByIdAsync(long id);
     }
 }

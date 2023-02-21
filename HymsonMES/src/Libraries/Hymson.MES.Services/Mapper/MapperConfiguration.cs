@@ -41,6 +41,22 @@ namespace Hymson.MES.Services.Mapper
         /// </summary>
         protected virtual void CreateEquipmentMaps()
         {
+            #region EquConsumable
+            CreateMap<EquConsumableCreateDto, EquSparePartEntity>();
+            CreateMap<EquConsumableModifyDto, EquSparePartEntity>();
+            CreateMap<EquConsumablePagedQueryDto, EquSparePartPagedQuery>();
+
+            CreateMap<EquSparePartEntity, EquConsumableDto>();
+            #endregion
+
+            #region EquConsumableType
+            CreateMap<EquConsumableTypeCreateDto, EquSparePartTypeEntity>();
+            CreateMap<EquConsumableTypeModifyDto, EquSparePartTypeEntity>();
+            CreateMap<EquConsumableTypePagedQueryDto, EquSparePartTypePagedQuery>();
+
+            CreateMap<EquSparePartTypeEntity, EquConsumableTypeDto>();
+            #endregion
+
             #region EquEquipment
             CreateMap<EquEquipmentCreateDto, EquEquipmentEntity>();
             CreateMap<EquEquipmentModifyDto, EquEquipmentEntity>();
@@ -197,6 +213,19 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcLoadPointModifyDto, ProcLoadPointEntity>();
             CreateMap<ProcLoadPointPagedQueryDto, ProcLoadPointPagedQuery>();
             CreateMap<ProcLoadPointEntity, ProcLoadPointDto>();
+            #endregion
+            #region LoadPointLink
+            CreateMap<ProcLoadPointLinkMaterialCreateDto, ProcLoadPointLinkMaterialEntity>();
+            CreateMap<ProcLoadPointLinkMaterialModifyDto, ProcLoadPointLinkMaterialEntity>();
+            CreateMap<ProcLoadPointLinkMaterialPagedQueryDto, ProcLoadPointLinkMaterialPagedQuery>();
+            CreateMap<ProcLoadPointLinkMaterialEntity, ProcLoadPointLinkMaterialDto>();
+            CreateMap<ProcLoadPointLinkResourceCreateDto, ProcLoadPointLinkResourceEntity>();
+            CreateMap<ProcLoadPointLinkResourceModifyDto, ProcLoadPointLinkResourceEntity>();
+            CreateMap<ProcLoadPointLinkResourcePagedQueryDto, ProcLoadPointLinkResourcePagedQuery>();
+            CreateMap<ProcLoadPointLinkResourceEntity, ProcLoadPointLinkResourceDto>();
+
+            CreateMap<ProcLoadPointLinkMaterialView, ProcLoadPointLinkMaterialViewDto>();
+            CreateMap<ProcLoadPointLinkResourceView, ProcLoadPointLinkResourceViewDto>();
             #endregion
 
             #region ResourceType
