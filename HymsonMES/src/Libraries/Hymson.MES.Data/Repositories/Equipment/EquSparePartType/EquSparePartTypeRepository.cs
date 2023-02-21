@@ -156,7 +156,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
                                             /**select**/
                                            FROM `equ_sparepart_type` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `equ_sparepart_type`(  `Id`, `SparePartTypeCode`, `SparePartTypeName`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteCode`) VALUES (   @Id, @SparePartTypeCode, @SparePartTypeName, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteCode )  ";
+        const string InsertSql = "INSERT INTO `equ_sparepart_type`(  `Id`, `SparePartTypeCode`, `SparePartTypeName`, Type, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @SparePartTypeCode, @SparePartTypeName, @Type, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string UpdateSql = "UPDATE `equ_sparepart_type` SET  SparePartTypeName = @SparePartTypeName, Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `equ_sparepart_type` SET IsDeleted = 1 WHERE Id = @Id ";
         const string GetByIdSql = @"SELECT 
