@@ -97,10 +97,9 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
             sqlBuilder.Where("Type = @Type");
             sqlBuilder.Select("*");
 
-            sqlBuilder.Where("Type = @SiteCode");
-            if (string.IsNullOrWhiteSpace(pagedQuery.SiteCode) == false)
+            if (pagedQuery.SiteId > 0)
             {
-                sqlBuilder.Where("SiteCode = @SiteCode");
+                sqlBuilder.Where("SiteId = @SiteId");
             }
 
             if (string.IsNullOrWhiteSpace(pagedQuery.SparePartTypeCode) == false)
@@ -161,7 +160,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
         const string UpdateSql = "UPDATE `equ_sparepart_type` SET  SparePartTypeName = @SparePartTypeName, Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `equ_sparepart_type` SET IsDeleted = 1 WHERE Id = @Id ";
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SparePartTypeCode`, `SparePartTypeName`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteCode`
+                               `Id`, `SparePartTypeCode`, `SparePartTypeName`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `equ_sparepart_type` WHERE Id = @Id ";
     }
 }
