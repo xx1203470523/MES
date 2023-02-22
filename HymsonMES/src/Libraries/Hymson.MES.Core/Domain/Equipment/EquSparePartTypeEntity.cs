@@ -36,9 +36,9 @@ namespace Hymson.MES.Core.Domain.Equipment
         public string Remark { get; set; } = "";
 
         /// <summary>
-        /// 站点代码
+        /// 站点Id
         /// </summary>
-        public string SiteCode { get; set; }
+        public long SiteId { get; set; }
        
     }
 }
