@@ -136,9 +136,18 @@
         public const string MES11206 = "不合格代码{code}已经存在";
         #endregion
 
+        //综合
+        #region 作业
+        public const string MES12001 = "作业表{code}已经存在";
+        public const string MES12002 = "作业编号 不能为空.";
+        public const string MES12003 = "作业编号 超过最大长度，最大长度为50.";
+        public const string MES12004 = "作业名称 不能为空.";
+        public const string MES12005 = "作业名称 超过最大长度，最大长度为50.";
+        public const string MES12006 = "类程序 不能为空.";
+        public const string MES12007 = "类程序 超过最大长度，最大长度为255.";
+        public const string MES12008 = "备注 超过最大长度，最大长度为255.";
         #endregion
-
-
+        #endregion
 
         #region 系统执行出错 业务逻辑出错
         public const string MES20001 = "MES20001";

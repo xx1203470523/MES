@@ -1,24 +1,25 @@
-/*
- *creator: Karl
- *
- *describe: 作业表 分页查询类 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-02-14 04:32:34
- */
 using Hymson.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Hymson.MES.Data.Repositories.Integrated
+namespace Hymson.MES.Data.Repositories.Integrated.InteJob.Query
 {
     /// <summary>
-    /// 作业表 分页参数
+    /// 作业表分页参数
+    /// @author admin
+    /// @date 2023-02-21
     /// </summary>
     public class InteJobPagedQuery : PagerInfo
     {
-
+        /// <summary>
+        /// 所属站点代码 
+        /// </summary>
+        public long SiteId { get; set; }
+        /// <summary>
+        /// 作业编号 
+        /// </summary>
+        public string Code { get; set; }
+        /// <summary>
+        /// 作业名称 
+        /// </summary>
+        public string Name { get; set; }
     }
 }

@@ -1,9 +1,7 @@
-
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Quality;
-using Hymson.MES.Services.Services.Quality;
+using Hymson.MES.Services.Services.Quality.IQualityService;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Extensions;
 
 namespace Hymson.MES.Api.Controllers.Quality
 {

@@ -1,59 +1,23 @@
-/*
- *creator: Karl
- *
- *describe: 作业表    服务接口 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-02-14 04:32:34
- */
+using FluentValidation;
+using Hymson.Authentication;
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Hymson.MES.Services.Services.Integrated
+namespace Hymson.MES.Services.Services.Integrated.IIntegratedService
 {
     /// <summary>
-    /// 作业表 service接口
+    /// 作业表服务接口
+    /// @author admin
+    /// @date 2023-02-21
     /// </summary>
     public interface IInteJobService
     {
         /// <summary>
-        /// 获取分页List
+        /// 根据查询条件获取分页数据
         /// </summary>
-        /// <param name="inteJobPagedQueryDto"></param>
+        /// <param name="pram"></param>
         /// <returns></returns>
-        Task<PagedInfo<InteJobDto>> GetPageListAsync(InteJobPagedQueryDto inteJobPagedQueryDto);
-
-        /// <summary>
-        /// 新增
-        /// </summary>
-        /// <param name="inteJobDto"></param>
-        /// <returns></returns>
-        Task CreateInteJobAsync(InteJobCreateDto inteJobCreateDto);
-
-        /// <summary>
-        /// 修改
-        /// </summary>
-        /// <param name="inteJobDto"></param>
-        /// <returns></returns>
-        Task ModifyInteJobAsync(InteJobModifyDto inteJobModifyDto);
-
-        /// <summary>
-        /// 删除
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task DeleteInteJobAsync(long id);
-
-        /// <summary>
-        /// 批量删除
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        Task<int> DeletesInteJobAsync(string ids);
+        Task<PagedInfo<InteJobDto>> GetPageListAsync(InteJobPagedQueryDto pram);
 
         /// <summary>
         /// 根据ID查询
@@ -61,5 +25,27 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="id"></param>
         /// <returns></returns>
         Task<InteJobDto> QueryInteJobByIdAsync(long id);
+
+        /// <summary>
+        /// 新增
+        /// </summary>
+        /// <param name="param">新增参数</param>
+        /// <returns></returns>
+        Task CreateInteJobAsync(InteJobCreateDto param);
+
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<int> DeleteRangInteJobAsync(string ids);
+
+
+        /// <summary>
+        /// 修改
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task ModifyInteJobAsync(InteJobModifyDto param);
     }
 }
