@@ -159,7 +159,8 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// <returns></returns>
         public async Task<EquSparePartTypeDto> GetDetailAsync(long id)
         {
-            return (await _equSparePartTypeRepository.GetByIdAsync(id)).ToModel<EquSparePartTypeDto>();
+            var entity = await _equSparePartTypeRepository.GetByIdAsync(id);
+            return entity.ToModel<EquSparePartTypeDto>();
         }
 
     }

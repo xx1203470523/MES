@@ -3,18 +3,12 @@ using Hymson.Infrastructure;
 namespace Hymson.MES.Core.Domain.Integrated
 {
     /// <summary>
-    /// 工作中心表数据实体对象
-    /// @author admin
-    /// @date 2023-02-08
+    /// 工作中心数据实体对象
+    /// @author wangkeming
+    /// @date 2023-02-21
     /// </summary>
     public class InteWorkCenterEntity: BaseEntity
     {
-        /// <summary>
-        /// 描述 :所属站点代码 
-        /// 空值 : false  
-        /// </summary>
-        public string SiteCode { get; set; }
-        
         /// <summary>
         /// 描述 :工作中心代码 
         /// 空值 : false  
@@ -25,13 +19,13 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// 描述 :工作中心名称 
         /// 空值 : false  
         /// </summary>
-        public string Name { get; set; }
+        public short Name { get; set; }
         
         /// <summary>
         /// 描述 :类型(工厂/车间/产线) 
         /// 空值 : false  
         /// </summary>
-        public string Type { get; set; }
+        public short Type { get; set; }
         
         /// <summary>
         /// 描述 :数据来源 
@@ -41,13 +35,13 @@ namespace Hymson.MES.Core.Domain.Integrated
         
         /// <summary>
         /// 描述 :状态 
-        /// 空值 : true  
+        /// 空值 : false  
         /// </summary>
         public string Status { get; set; }
         
         /// <summary>
         /// 描述 :是否混线 
-        /// 空值 : true  
+        /// 空值 : false  
         /// </summary>
         public byte IsMixLine { get; set; }
         
@@ -56,5 +50,11 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// 空值 : true  
         /// </summary>
         public string Remark { get; set; }
+        
+        /// <summary>
+        /// 描述 :站点Id 
+        /// 空值 : true  
+        /// </summary>
+        public long? SiteId { get; set; }
         }
 }

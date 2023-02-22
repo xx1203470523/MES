@@ -1,7 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Quality;
 
-namespace Hymson.MES.Services.Services.Quality
+namespace Hymson.MES.Services.Services.Quality.IQualityService
 {
     /// <summary>
     /// 不合格代码服务接口

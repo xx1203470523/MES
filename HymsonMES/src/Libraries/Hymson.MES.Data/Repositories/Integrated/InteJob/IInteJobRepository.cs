@@ -1,93 +1,78 @@
-/*
- *creator: Karl
- *
- *describe: 作业表仓储类 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-02-14 04:32:34
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 
-namespace Hymson.MES.Data.Repositories.Integrated
+namespace Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository
 {
     /// <summary>
-    /// 作业表仓储接口
-    /// </summary>
+    /// 作业表仓储
+    /// @author admin
+    /// @date 2023-02-21
     public interface IInteJobRepository
     {
-	    /// <summary>
+        /// <summary>
+        /// 分页查询
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<PagedInfo<InteJobEntity>> GetPagedInfoAsync(InteJobPagedQuery param);
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<InteJobEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
-        /// 根据IDs批量获取数据
+        /// 根据ID获取数据
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
         Task<IEnumerable<InteJobEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
-        /// 获取List
+        /// 根据编码获取数据
         /// </summary>
-        /// <param name="inteJobQuery"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task<IEnumerable<InteJobEntity>> GetInteJobEntitiesAsync(InteJobQuery inteJobQuery);
-        
-        /// <summary>
-        /// 分页查询
-        /// </summary>
-        /// <param name="inteJobPagedQuery"></param>
-        /// <returns></returns>
-        Task<PagedInfo<InteJobEntity>> GetPagedInfoAsync(InteJobPagedQuery inteJobPagedQuery);
-		
+        Task<InteJobEntity> GetByCodeAsync(EntityByCodeQuery param);
+
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="inteJobEntity"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(InteJobEntity inteJobEntity);
-        
+        Task<int> InsertAsync(InteJobEntity param);
+
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="inteJobEntitys"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> InsertRangeAsync(List<InteJobEntity> inteJobEntitys);
+        Task<int> InsertRangAsync(List<InteJobEntity> param);
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="inteJobEntity"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(InteJobEntity inteJobEntity);
-        
-        /// <summary>
-        /// 批量更新 
-        /// </summary>
-        /// <param name="inteJobEntitys"></param>
-        /// <returns></returns>
-        Task<int> UpdateRangeAsync(List<InteJobEntity> inteJobEntitys);
+        Task<int> UpdateAsync(InteJobEntity param);
 
         /// <summary>
-        /// 删除
+        /// 批量更新
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> DeleteAsync(long id);
-        
+        Task<int> UpdateRangAsync(List<InteJobEntity> param);
+
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> DeleteRangeAsync(long[] ids);
+        Task<int> DeleteRangAsync(DeleteCommand param);
     }
 }
