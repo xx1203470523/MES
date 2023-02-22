@@ -32,7 +32,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="procParameterDto"></param>
         /// <returns></returns>
-        Task CreateProcParameterAsync(ProcParameterCreateDto procParameterCreateDto);
+        Task<int> CreateProcParameterAsync(ProcParameterCreateDto procParameterCreateDto);
 
         /// <summary>
         /// 修改

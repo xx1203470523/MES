@@ -7,6 +7,7 @@
  */
 using FluentValidation;
 using Hymson.Authentication;
+using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -33,10 +34,12 @@ namespace Hymson.MES.Services.Services.Process
         private readonly AbstractValidator<ProcParameterLinkTypeModifyDto> _validationModifyRules;
 
         private readonly ICurrentUser _currentUser;
+        private readonly ICurrentSite _currentSite;
 
-        public ProcParameterLinkTypeService(ICurrentUser currentUser, IProcParameterLinkTypeRepository procParameterLinkTypeRepository, AbstractValidator<ProcParameterLinkTypeCreateDto> validationCreateRules, AbstractValidator<ProcParameterLinkTypeModifyDto> validationModifyRules)
+        public ProcParameterLinkTypeService(ICurrentUser currentUser, IProcParameterLinkTypeRepository procParameterLinkTypeRepository, AbstractValidator<ProcParameterLinkTypeCreateDto> validationCreateRules, AbstractValidator<ProcParameterLinkTypeModifyDto> validationModifyRules, ICurrentSite currentSite)
         {
             _currentUser = currentUser;
+            _currentSite = currentSite;
             _procParameterLinkTypeRepository = procParameterLinkTypeRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
@@ -49,8 +52,8 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task CreateProcParameterLinkTypeAsync(ProcParameterLinkTypeCreateDto procParameterLinkTypeCreateDto)
         {
-            //检查SiteCode
-            if ("TODO".IsNotEmpty() == false)
+            //检查SiteId
+            if (_currentSite.SiteId==0)
             {
                 throw new BusinessException(ErrorCode.MES10101);
             }
@@ -113,7 +116,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcParameterLinkTypeViewDto>> GetPageListAsync(ProcParameterLinkTypePagedQueryDto procParameterLinkTypePagedQueryDto)
         {
             var procParameterLinkTypePagedQuery = procParameterLinkTypePagedQueryDto.ToQuery<ProcParameterLinkTypePagedQuery>();
-            procParameterLinkTypePagedQuery.SiteCode = "TODO";
+            procParameterLinkTypePagedQuery.SiteId = _currentSite.SiteId;
             var pagedInfo = await _procParameterLinkTypeRepository.GetPagedInfoAsync(procParameterLinkTypePagedQuery);
 
             //实体到DTO转换 装载数据
@@ -129,7 +132,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcParameterLinkTypeViewDto>> QueryPagedProcParameterLinkTypeByTypeAsync(ProcParameterDetailPagerQueryDto procParameterDetailPagerQueryDto) 
         {
             var procParameterDetailPagerQuery = procParameterDetailPagerQueryDto.ToQuery<ProcParameterDetailPagerQuery>();
-            procParameterDetailPagerQuery.SiteCode = "TODO";
+            procParameterDetailPagerQuery.SiteId = _currentSite.SiteId;
             var pagedInfo = await _procParameterLinkTypeRepository.GetPagedProcParameterLinkTypeByTypeAsync(procParameterDetailPagerQuery);
 
             //实体到DTO转换 装载数据
@@ -166,8 +169,8 @@ namespace Hymson.MES.Services.Services.Process
                 throw new ValidationException(ErrorCode.MES10100);
             }
 
-            //检查SiteCode
-            if ("TODO".IsNotEmpty() == false)
+            //检查SiteId
+            if (_currentSite.SiteId==0)
             {
                 throw new BusinessException(ErrorCode.MES10101);
             }
