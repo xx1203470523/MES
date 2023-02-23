@@ -448,7 +448,7 @@ namespace Hymson.MES.Services.Services.Process
                     relationEntity.Id = IdGenProvider.Instance.CreateId();
                     relationEntity.BusinessType = (int)InteJobBusinessTypeEnum.Resource;
                     relationEntity.BusinessId = entity.Id;
-                    relationEntity.SiteCode = "TODO";
+                    //relationEntity.SiteCode = "TODO";
                     relationEntity.CreatedBy = userName;
                     relationEntity.UpdatedBy = userName;
                     jobList.Add(relationEntity);

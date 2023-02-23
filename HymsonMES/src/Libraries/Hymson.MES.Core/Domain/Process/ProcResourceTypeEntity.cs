@@ -7,26 +7,20 @@ namespace Hymson.MES.Core.Domain.Process
     /// @author admin
     /// @date 2023-02-08
     /// </summary>
-    public class ProcResourceTypeEntity: BaseEntity
-    {   
-        /// <summary>
-        /// 描述 :所属站点代码 
-        /// 空值 : false  
-        /// </summary>
-        public long SiteId { get; set; }
-        
+    public class ProcResourceTypeEntity : BaseEntity
+    {
         /// <summary>
         /// 描述 :资源类型 
         /// 空值 : false  
         /// </summary>
         public string ResType { get; set; }
-        
+
         /// <summary>
         /// 描述 :资源类型名称 
         /// 空值 : false  
         /// </summary>
         public string ResTypeName { get; set; }
-        
+
         /// <summary>
         /// 描述 :描述 
         /// 空值 : true  
@@ -36,6 +30,6 @@ namespace Hymson.MES.Core.Domain.Process
         /// <summary>
         /// 站点编id
         /// </summary>
-        public long SiteId { get; set; } 
+        public long SiteId { get; set; }
     }
 }
