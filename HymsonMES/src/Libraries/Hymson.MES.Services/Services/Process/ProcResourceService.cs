@@ -319,7 +319,7 @@ namespace Hymson.MES.Services.Services.Process
             var resCode = parm.ResCode.ToUpperInvariant();
             var query = new ProcResourceQuery
             {
-                SiteCode = "TODO",
+                //SiteCode = "TODO",
                 ResCode = resCode
             };
             if (await _resourceRepository.IsExistsAsync(query))
