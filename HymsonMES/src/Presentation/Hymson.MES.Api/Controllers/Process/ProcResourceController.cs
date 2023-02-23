@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.Utils;
@@ -126,9 +127,9 @@ namespace Hymson.MES.Api.Controllers
         /// <returns></returns>
         [Route("job/list")]
         [HttpGet]
-        public async Task<PagedInfo<ProcResourceConfigJobViewDto>> GetcResourceConfigJoAsync([FromQuery] ProcResourceConfigJobPagedQueryDto query)
+        public async Task<PagedInfo<QueryProcedureJobReleationDto>> GetProcedureConfigJobList(InteJobBusinessRelationPagedQueryDto query)
         {
-            return await _procResourceService.GetcResourceConfigJoAsync(query);
+            return await _procResourceService.GetProcedureConfigJobListAsync(query);
         }
 
         /// <summary>

@@ -1,7 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 
-namespace Hymson.MES.Services.Services.Equipment.EquSparePart
+namespace Hymson.MES.Services.Services.Equipment.EquConsumable
 {
     /// <summary>
     /// 业务接口层（工装注册） 

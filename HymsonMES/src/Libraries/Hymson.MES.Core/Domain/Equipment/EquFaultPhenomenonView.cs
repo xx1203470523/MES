@@ -37,7 +37,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// 描述 :所属站点代码 
         /// 空值 : false  
         /// </summary>
-        public string SiteCode { get; set; } = "";
+        public long SiteId { get; set; }
 
         
         /// <summary>

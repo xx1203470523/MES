@@ -27,8 +27,8 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         public string Code { get; set; }
         /// <summary>
-        /// 所属站点代码
+        /// 站点id
         /// </summary>
-        public string SiteCode { get; set; }
+        public long SiteId { get; set; } = 0;
     }
 }

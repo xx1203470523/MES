@@ -5,8 +5,6 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Equipment.EquConsumable.Command;
-using Hymson.MES.Data.Repositories.Equipment.EquConsumableType;
-using Hymson.MES.Data.Repositories.Equipment.EquConsumableType.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType.Query;
@@ -14,7 +12,7 @@ using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
 using Hymson.Utils.Tools;
 
-namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
+namespace Hymson.MES.Services.Services.Equipment.EquConsumableType
 {
     /// <summary>
     /// 业务处理层（工装类型） 
@@ -53,7 +51,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
             IEquSparePartRepository equConsumableRepository)
         {
             _currentUser = currentUser;
-            _currentSite = currentSite;
+            //_currentSite = currentSite;
             _equConsumableTypeRepository = equConsumableTypeRepository;
             _equConsumableRepository = equConsumableRepository;
         }

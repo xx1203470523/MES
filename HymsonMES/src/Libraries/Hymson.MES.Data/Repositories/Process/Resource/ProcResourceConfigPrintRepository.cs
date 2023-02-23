@@ -105,7 +105,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetPagedInfoDataSqlTemplate = @"select a.*,b.PrintName,b.PrintIp from proc_resource_config_print a left join proc_printer b on a.PrintId=b.Id and b.IsDeleted =0   /**where**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "select count(*) from proc_resource_config_print a left join proc_printer b on a.PrintId=b.Id and b.IsDeleted =0  /**where**/";
 
-        const string InsertSql = "INSERT INTO `proc_resource_config_print`(  `Id`, `SiteCode`, `ResourceId`, `PrintId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @ResourceId, @PrintId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `proc_resource_config_print`(  `Id`, `SiteId`, `ResourceId`, `PrintId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ResourceId, @PrintId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string UpdateSql = "UPDATE `proc_resource_config_print` SET  PrintId=@PrintId,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id=@Id ";
         const string DeleteSql = "UPDATE `proc_resource_config_print` SET IsDeleted = '1' WHERE Id in @Ids ";
         const string GetByResourceIdSql = "SELECT * FROM proc_resource_config_print where ResourceId=@ResourceId and PrintId  IN @Ids AND IsDeleted =0 ";

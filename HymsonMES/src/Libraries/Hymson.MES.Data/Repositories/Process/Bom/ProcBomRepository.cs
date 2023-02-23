@@ -44,10 +44,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] ids) 
+        public async Task<int> DeletesAsync(long[] ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeletesSql, new { ids=ids });
+            return await conn.ExecuteAsync(DeletesSql, new { ids = ids });
 
         }
 
@@ -59,7 +59,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<ProcBomEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcBomEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ProcBomEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -67,10 +67,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcBomEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ProcBomEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcBomEntity>(GetByIdsSql, new { ids = ids});
+            return await conn.QueryAsync<ProcBomEntity>(GetByIdsSql, new { ids = ids });
         }
 
         /// <summary>
@@ -84,12 +84,9 @@ namespace Hymson.MES.Data.Repositories.Process
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
 
-            if (!string.IsNullOrWhiteSpace(procBomPagedQuery.SiteCode))
-            {
-                sqlBuilder.Where("SiteCode=@SiteCode");
-            }
             if (!string.IsNullOrWhiteSpace(procBomPagedQuery.BomCode))
             {
                 procBomPagedQuery.BomCode = $"%{procBomPagedQuery.BomCode}%";
@@ -133,16 +130,13 @@ namespace Hymson.MES.Data.Repositories.Process
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcBomEntitiesSqlTemplate);
             sqlBuilder.Where(" IsDeleted=0 ");
+            sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
 
-            if (!string.IsNullOrWhiteSpace(procBomQuery.SiteCode))
-            {
-                sqlBuilder.Where("SiteCode=@SiteCode");
-            }
             if (!string.IsNullOrWhiteSpace(procBomQuery.BomCode))
             {
                 sqlBuilder.Where(" BomCode = @BomCode ");
-            }            
+            }
             if (!string.IsNullOrWhiteSpace(procBomQuery.Version))
             {
                 sqlBuilder.Where(" Version = @Version ");
@@ -205,7 +199,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<int> UpdateIsCurrentVersionIsFalseAsync(long[] ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateIsCurrentVersionIsFalseSql, new { ids=ids});
+            return await conn.ExecuteAsync(UpdateIsCurrentVersionIsFalseSql, new { ids = ids });
         }
     }
 

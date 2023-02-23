@@ -251,9 +251,6 @@ namespace Hymson.MES.Services.Mapper
 
             CreateMap<ProcResourceEquipmentBindView, ProcResourceEquipmentBindViewDto>();
             CreateMap<ProcResourceEquipmentBindPagedQueryDto, ProcResourceEquipmentBindPagedQuery>();
-
-            CreateMap<ProcResourceConfigJobView, ProcResourceConfigJobViewDto>();
-            CreateMap<ProcResourceConfigJobPagedQueryDto, ProcResourceConfigJobPagedQuery>();
             #endregion
 
             #region Procedure
@@ -262,8 +259,8 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcProcedureEntity, ProcProcedureDto>();
             CreateMap<ProcProcedureCreateDto, ProcProcedureEntity>();
             CreateMap<ProcProcedureModifyDto, ProcProcedureEntity>();
-            CreateMap<ProcProcedurePrintReleationEntity, ProcProcedurePrintReleationDto>();
-            CreateMap<ProcProcedurePrintReleationCreateDto, ProcProcedurePrintReleationEntity>();
+            CreateMap<ProcProcedurePrintRelationEntity, ProcProcedurePrintRelationDto>();
+            CreateMap<ProcProcedurePrintReleationCreateDto, ProcProcedurePrintRelationEntity>();
             CreateMap<InteJobBusinessRelationEntity, InteJobBusinessRelationDto>();
             #endregion
 

@@ -63,9 +63,9 @@ namespace Hymson.MES.Data.Repositories.Process
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("a.IsDeleted=0");
             //sqlBuilder.Select("*");
-            if (!string.IsNullOrWhiteSpace(query.SiteCode))
+            if (query.SiteId > 0)
             {
-                sqlBuilder.Where("a.SiteCode=@SiteCode");
+                sqlBuilder.Where("SiteId = @SiteId");
             }
             if (!string.IsNullOrWhiteSpace(query.ResType))
             {
@@ -113,9 +113,9 @@ namespace Hymson.MES.Data.Repositories.Process
             var templateCount = sqlBuilder.AddTemplate(GetPagedListCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
-            if (!string.IsNullOrWhiteSpace(query.SiteCode))
+            if (query.SiteId > 0)
             {
-                sqlBuilder.Where("SiteCode=@SiteCode");
+                sqlBuilder.Where("SiteId = @SiteId");
             }
             if (!string.IsNullOrWhiteSpace(query.ResType))
             {
@@ -177,7 +177,7 @@ namespace Hymson.MES.Data.Repositories.Process
     public partial class ProcResourceTypeRepository
     {
         const string GetByIdSql = "select * from proc_resource_type where Id =@Id and IsDeleted =0 ";
-        const string GetByCodeSql = "select * from proc_resource_type where SiteCode =@SiteCode and ResType =@ResType and IsDeleted =0 ";
+        const string GetByCodeSql = "select * from proc_resource_type where SiteId =@SiteId and ResType =@ResType and IsDeleted =0 ";
 
         const string GetPagedInfoDataSqlTemplate = "SELECT a.*,b.ResCode,b.ResName  FROM proc_resource_type a left join proc_resource b on a.Id =b.ResTypeId /**where**/ LIMIT @Offset,@Rows";
         const string GetPagedInfoCountSqlTemplate = "SELECT count(*) FROM proc_resource_type a left join proc_resource b on a.Id =b.ResTypeId  /**where**/ ";
@@ -185,7 +185,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetPagedListSqlTemplate = "SELECT /**select**/ FROM proc_resource_type /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows";
         const string GetPagedListCountSqlTemplate = "SELECT COUNT(*) FROM proc_resource_type /**where**/";
 
-        const string InsertSql = "INSERT INTO `proc_resource_type`(`Id`, `SiteCode`, `ResType`, `ResTypeName`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteCode, @ResType, @ResTypeName, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted);";
+        const string InsertSql = "INSERT INTO `proc_resource_type`(`Id`, `SiteId`, `ResType`, `ResTypeName`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @ResType, @ResTypeName, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted);";
         const string UpdateSql = "UPDATE `proc_resource_type` SET ResTypeName = @ResTypeName, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id;";
         const string DeleteSql = "UPDATE `proc_resource_type` SET `IsDeleted` = 1,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE `Id` in @Ids";
     }

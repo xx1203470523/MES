@@ -7,7 +7,7 @@ namespace Hymson.MES.Core.Domain.Process
     /// @author admin
     /// @date 2023-02-08
     /// </summary>
-    public class ProcProcedurePrintReleationEntity : BaseEntity
+    public class ProcProcedurePrintRelationEntity : BaseEntity
     {
         /// <summary>
         /// 描述 :份数 
@@ -20,12 +20,6 @@ namespace Hymson.MES.Core.Domain.Process
         /// 空值 : true  
         /// </summary>
         public string Remark { get; set; }
-        
-        /// <summary>
-        /// 描述 :所属站点代码 
-        /// 空值 : false  
-        /// </summary>
-        public string SiteCode { get; set; }
         
         /// <summary>
         /// 描述 :所属工序ID 
@@ -50,5 +44,10 @@ namespace Hymson.MES.Core.Domain.Process
         /// 空值 : true  
         /// </summary>
         public long? TemplateId { get; set; }
-        }
+
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long SiteId { get; set; } = 0;
+    }
 }

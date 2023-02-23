@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated.InteCalendar;
 using Hymson.Utils;
@@ -41,9 +42,9 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<int> CreateAsync([FromBody] InteCalendarCreateDto createDto)
+        public async Task CreateAsync([FromBody] InteCalendarCreateDto createDto)
         {
-            return await _inteCalendarService.CreateAsync(createDto);
+            await _inteCalendarService.CreateAsync(createDto);
         }
 
         /// <summary>
@@ -52,21 +53,21 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
-        public async Task<int> ModifyAsync([FromBody] InteCalendarModifyDto modifyDto)
+        public async Task ModifyAsync([FromBody] InteCalendarModifyDto modifyDto)
         {
-            return await _inteCalendarService.ModifyAsync(modifyDto);
+            await _inteCalendarService.ModifyAsync(modifyDto);
         }
 
         /// <summary>
         /// 删除（日历维护）
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="deleteDto"></param>
         /// <returns></returns>
-        [HttpDelete("{ids}")]
-        public async Task<int> DeletesAsync(string ids)
+        [HttpDelete]
+        [Route("delete")]
+        public async Task DeletesAsync(InteCalendarDeleteDto deleteDto)
         {
-            long[] idsArr = StringExtension.SpitLongArrary(ids);
-            return await _inteCalendarService.DeletesAsync(idsArr);
+            await _inteCalendarService.DeletesAsync(deleteDto.Ids);
         }
 
         /// <summary>
@@ -74,7 +75,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        [HttpGet("list")]
+        [HttpGet("pagelist")]
         public async Task<PagedInfo<InteCalendarDto>> GetPagedListAsync([FromQuery] InteCalendarPagedQueryDto pagedQueryDto)
         {
             return await _inteCalendarService.GetPagedListAsync(pagedQueryDto);
@@ -85,7 +86,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("{id}")]
+        [HttpGet("detail")]
         public async Task<InteCalendarDetailDto> GetDetailAsync(long id)
         {
             return await _inteCalendarService.GetDetailAsync(id);

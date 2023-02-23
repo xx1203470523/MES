@@ -23,7 +23,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 站点编码 
         /// </summary>
-        public string SiteCode { get; set; } = "";
+        public long SiteId { get; set; }
 
         /// <summary>
         /// 物料编码

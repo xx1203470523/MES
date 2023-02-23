@@ -2,9 +2,13 @@ using AutoMapper;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Api.Filters;
+using Hymson.WebApi.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
+using System.Globalization;
 using System.Reflection;
 
 namespace Hymson.MES.Api
@@ -26,7 +30,9 @@ namespace Hymson.MES.Api
             builder.Services.AddControllers(options =>
             {
                 options.Filters.Add(typeof(HttpGlobalExceptionFilter));
-            });
+            }).AddJsonOptions((jsonOptions) => {
+                jsonOptions.JsonSerializerOptions.Converters.Add(new CustomInt64Converter());
+            }); ;
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -34,18 +40,44 @@ namespace Hymson.MES.Api
 
             builder.Services.AddJwtBearerService(builder.Configuration);
             builder.Services.AddAppService(builder.Configuration);
+            builder.Services.AddSqlLocalization(builder.Configuration);
+            builder.Services.AddLocalization();
             // 注入nlog日志服务
             builder.AddNLogWeb(builder.Configuration);
             AddAutoMapper();
             var app = builder.Build();
-
+            //https://learn.microsoft.com/zh-cn/aspnet/core/host-and-deploy/linux-nginx?view=aspnetcore-6.0&tabs=linux-ubuntu
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            #region snippet_ConfigureLocalization
+            var supportedCultures = new List<CultureInfo>
+            {
+                new CultureInfo("en-US"),
+                new CultureInfo("en-AU"),
+                new CultureInfo("en-GB"),
+                new CultureInfo("es-ES"),
+                new CultureInfo("ja-JP"),
+                new CultureInfo("fr-FR"),
+                new CultureInfo("zh"),
+                new CultureInfo("zh-CN")
+            };
+            var options = new RequestLocalizationOptions
+            {
+                DefaultRequestCulture = new RequestCulture("zh-CN"),
+                SupportedCultures = supportedCultures,
+                SupportedUICultures = supportedCultures
+            };
 
+            app.UseRequestLocalization(options);
+            #endregion
             app.UseAuthentication();
             app.UseAuthorization();
 

@@ -19,11 +19,11 @@ namespace Hymson.MES.Data.Repositories.Process
     /// <summary>
     /// 工序配置打印表仓储
     /// </summary>
-    public partial class ProcProcedurePrintReleationRepository : IProcProcedurePrintReleationRepository
+    public partial class ProcProcedurePrintRelationRepository : IProcProcedurePrintRelationRepository
     {
         private readonly ConnectionOptions _connectionOptions;
 
-        public ProcProcedurePrintReleationRepository(IOptions<ConnectionOptions> connectionOptions)
+        public ProcProcedurePrintRelationRepository(IOptions<ConnectionOptions> connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
         }
@@ -33,16 +33,16 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcProcedurePrintReleationEntity>> GetPagedInfoAsync(ProcProcedurePrintReleationPagedQuery query)
+        public async Task<PagedInfo<ProcProcedurePrintRelationEntity>> GetPagedInfoAsync(ProcProcedurePrintReleationPagedQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
-            if (!string.IsNullOrWhiteSpace(query.SiteCode))
+            if (query.SiteId > 0)
             {
-                sqlBuilder.Where("SiteCode=@SiteCode");
+                sqlBuilder.Where("SiteId = @SiteId");
             }
             if (query.ProcedureId > 0)
             {
@@ -55,11 +55,11 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.AddParameters(query);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var procProcedurePrintReleationEntitiesTask = conn.QueryAsync<ProcProcedurePrintReleationEntity>(templateData.RawSql, templateData.Parameters);
+            var procProcedurePrintReleationEntitiesTask = conn.QueryAsync<ProcProcedurePrintRelationEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
-            var procProcedurePrintReleationEntities = await procProcedurePrintReleationEntitiesTask;
+            var procProcedurePrintRelationEntities = await procProcedurePrintReleationEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<ProcProcedurePrintReleationEntity>(procProcedurePrintReleationEntities, query.PageIndex, query.PageSize, totalCount);
+            return new PagedInfo<ProcProcedurePrintRelationEntity>(procProcedurePrintRelationEntities, query.PageIndex, query.PageSize, totalCount);
         }
 
         /// <summary>
@@ -67,10 +67,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procProcedurePrintReleationEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangeAsync(List<ProcProcedurePrintReleationEntity> procProcedurePrintReleationEntitys)
+        public async Task<int> InsertRangeAsync(List<ProcProcedurePrintRelationEntity> procProcedurePrintReleationEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertsSql, procProcedurePrintReleationEntitys);
+            return await conn.ExecuteAsync(InsertSql, procProcedurePrintReleationEntitys);
         }
 
         /// <summary>
@@ -89,10 +89,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ProcProcedurePrintReleationEntity> GetByIdAsync(long id)
+        public async Task<ProcProcedurePrintRelationEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcProcedurePrintReleationEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ProcProcedurePrintRelationEntity>(GetByIdSql, new { Id=id});
         }
 
         /// <summary>
@@ -100,10 +100,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcProcedurePrintReleationEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ProcProcedurePrintRelationEntity>> GetByIdsAsync(long[] ids) 
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcProcedurePrintReleationEntity>(GetByIdsSql, new { ids = ids});
+            return await conn.QueryAsync<ProcProcedurePrintRelationEntity>(GetByIdsSql, new { ids = ids});
         }
 
         /// <summary>
@@ -111,12 +111,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procProcedurePrintReleationQuery"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcProcedurePrintReleationEntity>> GetProcProcedurePrintReleationEntitiesAsync(ProcProcedurePrintReleationQuery procProcedurePrintReleationQuery)
+        public async Task<IEnumerable<ProcProcedurePrintRelationEntity>> GetProcProcedurePrintReleationEntitiesAsync(ProcProcedurePrintReleationQuery procProcedurePrintReleationQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcProcedurePrintReleationEntitiesSqlTemplate);
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var procProcedurePrintReleationEntities = await conn.QueryAsync<ProcProcedurePrintReleationEntity>(template.RawSql, procProcedurePrintReleationQuery);
+            var procProcedurePrintReleationEntities = await conn.QueryAsync<ProcProcedurePrintRelationEntity>(template.RawSql, procProcedurePrintReleationQuery);
             return procProcedurePrintReleationEntities;
         }
 
@@ -125,7 +125,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procProcedurePrintReleationEntity"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(ProcProcedurePrintReleationEntity procProcedurePrintReleationEntity)
+        public async Task<int> InsertAsync(ProcProcedurePrintRelationEntity procProcedurePrintReleationEntity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertSql, procProcedurePrintReleationEntity);
@@ -136,7 +136,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procProcedurePrintReleationEntity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(ProcProcedurePrintReleationEntity procProcedurePrintReleationEntity)
+        public async Task<int> UpdateAsync(ProcProcedurePrintRelationEntity procProcedurePrintReleationEntity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSql, procProcedurePrintReleationEntity);
@@ -147,7 +147,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procProcedurePrintReleationEntitys"></param>
         /// <returns></returns>
-        public async Task<int> UpdateRangeAsync(List<ProcProcedurePrintReleationEntity> procProcedurePrintReleationEntitys)
+        public async Task<int> UpdateRangeAsync(List<ProcProcedurePrintRelationEntity> procProcedurePrintReleationEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSql, procProcedurePrintReleationEntitys);
@@ -165,24 +165,23 @@ namespace Hymson.MES.Data.Repositories.Process
         }
     }
 
-    public partial class ProcProcedurePrintReleationRepository
+    public partial class ProcProcedurePrintRelationRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_procedure_print_releation` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_procedure_print_releation` /**where**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_procedure_print_relation` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_procedure_print_relation` /**where**/ ";
         const string GetProcProcedurePrintReleationEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
-                                           FROM `proc_procedure_print_releation` /**where**/  ";
+                                           FROM `proc_procedure_print_relation` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `proc_procedure_print_releation`(  `Id`, `SiteCode`, `ProcedureId`, `MaterialId`, `Version`, `TemplateId`, `Copy`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @ProcedureId, @MaterialId, @Version, @TemplateId, @Copy, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `proc_procedure_print_releation`(  `Id`, `SiteCode`, `ProcedureId`, `MaterialId`, `Version`, `TemplateId`, `Copy`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @ProcedureId, @MaterialId, @Version, @TemplateId, @Copy, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string UpdateSql = "UPDATE `proc_procedure_print_releation` SET   SiteCode = @SiteCode, ProcedureId = @ProcedureId, MaterialId = @MaterialId, Version = @Version, TemplateId = @TemplateId, Copy = @Copy, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string DeleteByProcedureIdSql = "delete from `proc_procedure_print_releation` WHERE ProcedureId = @ProcedureId ";
-        const string DeletesSql = "UPDATE `proc_procedure_print_releation` SET IsDeleted = '1' WHERE Id in @ids";
+        const string InsertSql = "INSERT INTO `proc_procedure_print_relation`(  `Id`, `SiteId`, `ProcedureId`, `MaterialId`, `Version`, `TemplateId`, `Copy`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ProcedureId, @MaterialId, @Version, @TemplateId, @Copy, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string UpdateSql = "UPDATE `proc_procedure_print_relation` SET    ProcedureId = @ProcedureId, MaterialId = @MaterialId, Version = @Version, TemplateId = @TemplateId, Copy = @Copy, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string DeleteByProcedureIdSql = "delete from `proc_procedure_print_relation` WHERE ProcedureId = @ProcedureId ";
+        const string DeletesSql = "UPDATE `proc_procedure_print_relation` SET IsDeleted = '1' WHERE Id in @ids";
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteCode`, `ProcedureId`, `MaterialId`, `Version`, `TemplateId`, `Copy`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `proc_procedure_print_releation`  WHERE Id = @Id ";
+                               `Id`, `SiteId`, `ProcedureId`, `MaterialId`, `Version`, `TemplateId`, `Copy`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `proc_procedure_print_relation`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteCode`, `ProcedureId`, `MaterialId`, `Version`, `TemplateId`, `Copy`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `proc_procedure_print_releation`  WHERE Id IN @ids ";
+                                          `Id`, `SiteId`, `ProcedureId`, `MaterialId`, `Version`, `TemplateId`, `Copy`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `proc_procedure_print_relation`  WHERE Id IN @ids ";
     }
 }

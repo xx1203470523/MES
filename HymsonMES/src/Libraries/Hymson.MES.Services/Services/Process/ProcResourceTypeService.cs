@@ -1,4 +1,5 @@
 ﻿using Hymson.Authentication;
+using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -31,6 +32,10 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         private readonly ICurrentUser _currentUser;
         /// <summary>
+        /// 当前站点
+        /// </summary>
+        private readonly ICurrentSite _currentSite;
+        /// <summary>
         /// 资源类型仓储对象
         /// </summary>
         private readonly IProcResourceTypeRepository _resourceTypeRepository;
@@ -43,12 +48,13 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 构造函数
         /// </summary>
-        public ProcResourceTypeService(ICurrentUser currentUser,
+        public ProcResourceTypeService(ICurrentUser currentUser, ICurrentSite currentSite,
             IProcResourceTypeRepository resourceTypeRepository,
             IProcResourceRepository resourceRepository)
            //AbstractValidator<ProcResourceTypeDto> validationRules)
         {
             _currentUser = currentUser;
+            _currentSite= currentSite;
             _resourceTypeRepository = resourceTypeRepository;
             _resourceRepository = resourceRepository;
             // _validationRules = validationRules;
@@ -73,6 +79,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcResourceTypeViewDto>> GetPageListAsync(ProcResourceTypePagedQueryDto procResourceTypePagedQueryDto)
         {
             var procResourceTypePagedQuery = procResourceTypePagedQueryDto.ToQuery<ProcResourceTypePagedQuery>();
+            procResourceTypePagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _resourceTypeRepository.GetPageListAsync(procResourceTypePagedQuery);
 
             //实体到DTO转换 装载数据
@@ -93,6 +100,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcResourceTypeDto>> GetListAsync(ProcResourceTypePagedQueryDto procResourceTypePagedQueryDto)
         {
             var procResourceTypePagedQuery = procResourceTypePagedQueryDto.ToQuery<ProcResourceTypePagedQuery>();
+            procResourceTypePagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _resourceTypeRepository.GetListAsync(procResourceTypePagedQuery);
 
             //实体到DTO转换 装载数据
@@ -121,13 +129,13 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             var userName =_currentUser.UserName;
-            var siteCode = param.SiteCode;
+            var siteId = _currentSite.SiteId??0;
             //DTO转换实体
             var id = IdGenProvider.Instance.CreateId();
             var entity = new ProcResourceTypeAddCommand
             {
                 Id = id,
-                SiteCode = siteCode,
+                SiteId = siteId,
                 CreatedBy = userName,
                 UpdatedBy = userName,
                 Remark = param.Remark ?? "",
@@ -136,7 +144,7 @@ namespace Hymson.MES.Services.Services.Process
             };
 
             //判断资源类型在系统中是否已经存在
-            var resEntity = new ProcResourceTypeEntity { SiteCode = siteCode, ResType = entity.ResType };
+            var resEntity = new ProcResourceTypeEntity { SiteId = siteId, ResType = entity.ResType };
             var resourceType = await _resourceTypeRepository.GetByCodeAsync(resEntity);
             if (resourceType != null)
             {
@@ -242,10 +250,10 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             //查询资源类型是否关联资源
-            var siteCode = "TODO";
+            var siteId =_currentSite.SiteId??0;
             var query = new ProcResourceQuery
             {
-                SiteCode = siteCode,
+                SiteId = siteId,
                 IdsArr = idsArr
             };
             var resourceList = await _resourceRepository.GetByResTypeIdsAsync(query);

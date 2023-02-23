@@ -75,7 +75,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <param name="siteCode"></param>
         /// <returns></returns>
-        Task<ProcMaterialView> GetByIdAsync(long id,string siteCode);
+        Task<ProcMaterialView> GetByIdAsync(long id,long SiteId);
 
         /// <summary>
         /// 根据IDs批量获取数据

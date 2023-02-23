@@ -20,9 +20,9 @@ namespace Hymson.MES.Data.Repositories.Integrated
     public class InteJobBusinessRelationPagedQuery : PagerInfo
     {
         /// <summary>
-        /// 站点编码
+        /// 站点Id
         /// </summary>
-        public string? SiteCode { get; set; }
+        public long SiteId { get; set; } = 0;
 
         /// <summary>
         /// 1资源  2工序 3不合格代码

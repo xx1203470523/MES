@@ -23,11 +23,6 @@ namespace Hymson.MES.Core.Domain.Integrated
     /// </summary>
     public class InteJobBusinessRelationEntity : BaseEntity
     {
-        /// <summary>
-        /// 所属站点代码
-        /// </summary>
-        public string SiteCode { get; set; }
-
        /// <summary>
         /// 1资源  2工序 3不合格代码
         /// </summary>
@@ -63,6 +58,9 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// </summary>
         public string Remark { get; set; }
 
-       
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long SiteId { get; set; } = 0;
     }
 }

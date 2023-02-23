@@ -9,7 +9,7 @@ using Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
 
-namespace Hymson.MES.Services.Services.Equipment.EquSparePart
+namespace Hymson.MES.Services.Services.Equipment.EquConsumable
 {
     /// <summary>
     /// 业务处理层（工装注册） 

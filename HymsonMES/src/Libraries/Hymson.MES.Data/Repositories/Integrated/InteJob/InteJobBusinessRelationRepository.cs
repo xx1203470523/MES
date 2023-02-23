@@ -63,9 +63,9 @@ namespace Hymson.MES.Data.Repositories.Integrated
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
 
-            if (!string.IsNullOrWhiteSpace(query.SiteCode))
+            if (query.SiteId > 0)
             {
-                sqlBuilder.Where("SiteCode=@SiteCode");
+                sqlBuilder.Where("SiteId = @SiteId");
             }
             if (!string.IsNullOrWhiteSpace(query.BusinessType))
             {
@@ -122,7 +122,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         public async Task<int> InsertRangeAsync(List<InteJobBusinessRelationEntity> inteJobBusinessRelationEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertsSql, inteJobBusinessRelationEntitys);
+            return await conn.ExecuteAsync(InsertSql, inteJobBusinessRelationEntitys);
         }
 
         /// <summary>
@@ -178,16 +178,15 @@ namespace Hymson.MES.Data.Repositories.Integrated
                                             /**select**/
                                            FROM `inte__job_business_relation` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `inte__job_business_relation`(  `Id`, `SiteCode`, `BusinessType`, `BusinessId`, `OrderNumber`, `JobId`, `IsUse`, `Parameter`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @BusinessType, @BusinessId, @OrderNumber, @JobId, @IsUse, @Parameter, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `inte__job_business_relation`(  `Id`, `SiteCode`, `BusinessType`, `BusinessId`, `OrderNumber`, `JobId`, `IsUse`, `Parameter`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @BusinessType, @BusinessId, @OrderNumber, @JobId, @IsUse, @Parameter, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string UpdateSql = "UPDATE `inte__job_business_relation` SET   SiteCode = @SiteCode, BusinessType = @BusinessType, BusinessId = @BusinessId, OrderNumber = @OrderNumber, JobId = @JobId, IsUse = @IsUse, Parameter = @Parameter, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string InsertSql = "INSERT INTO `inte__job_business_relation`(  `Id`, `SiteId`, `BusinessType`, `BusinessId`, `OrderNumber`, `JobId`, `IsUse`, `Parameter`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @BusinessType, @BusinessId, @OrderNumber, @JobId, @IsUse, @Parameter, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string UpdateSql = "UPDATE `inte__job_business_relation` SET   BusinessType = @BusinessType, BusinessId = @BusinessId, OrderNumber = @OrderNumber, JobId = @JobId, IsUse = @IsUse, Parameter = @Parameter, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteByBusinessIdSql = "delete from `inte__job_business_relation` WHERE BusinessId = @BusinessId ";
         const string DeletesSql = "UPDATE `inte__job_business_relation` SET IsDeleted = '1' WHERE Id in @ids";
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteCode`, `BusinessType`, `BusinessId`, `OrderNumber`, `JobId`, `IsUse`, `Parameter`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                               `Id`, `SiteId`, `BusinessType`, `BusinessId`, `OrderNumber`, `JobId`, `IsUse`, `Parameter`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `inte__job_business_relation`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteCode`, `BusinessType`, `BusinessId`, `OrderNumber`, `JobId`, `IsUse`, `Parameter`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                                          `Id`, `SiteId`, `BusinessType`, `BusinessId`, `OrderNumber`, `JobId`, `IsUse`, `Parameter`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `inte__job_business_relation`  WHERE Id IN @ids ";
     }
 }

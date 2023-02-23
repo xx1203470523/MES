@@ -15,11 +15,6 @@ namespace Hymson.MES.Data.Repositories.Process
     public class ProcProcedurePagedQuery : PagerInfo
     {
         /// <summary>
-        /// 站点编码
-        /// </summary>
-        public string SiteCode { get; set; }
-
-        /// <summary>
         /// 工序编码
         /// </summary>
         public string Code { get; set; }
@@ -43,5 +38,9 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 描述 :资源类型名称 
         /// </summary>
         public string ResTypeName { get; set; }
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long SiteId { get; set; } = 0;
     }
 }

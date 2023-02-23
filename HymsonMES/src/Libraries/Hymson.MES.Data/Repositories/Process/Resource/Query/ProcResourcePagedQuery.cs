@@ -36,9 +36,9 @@ namespace Hymson.MES.Data.Repositories.Process.Resource
         public string Status { get; set; }
 
         /// <summary>
-        /// 站点编码
+        /// 站点id
         /// </summary>
-        public string SiteCode { get; set; }
+        public long SiteId { get; set; } = 0;
     }
 
     public class ProcResourceQuery
@@ -46,7 +46,7 @@ namespace Hymson.MES.Data.Repositories.Process.Resource
         /// <summary>
         /// 站点
         /// </summary>
-        public string SiteCode { get; set; }
+        public long SiteId { get; set; } = 0;
 
         public long[] IdsArr { get; set; }
 

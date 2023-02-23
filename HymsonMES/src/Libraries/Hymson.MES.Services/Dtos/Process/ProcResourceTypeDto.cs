@@ -96,11 +96,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 空值 : false  
         /// </summary>
         public string? ResName { get; set; }
-
-        /// <summary>
-        /// 站点
-        /// </summary>
-        public string? SiteCode { get; set; }
     }
 
     /// <summary>

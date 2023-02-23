@@ -137,6 +137,17 @@ namespace Hymson.MES.Services.Dtos.Integrated
     }
 
     /// <summary>
+    /// 删除Dto（日历维护）
+    /// </summary>
+    public record InteCalendarDeleteDto
+    {
+        /// <summary>
+        /// 集合（主键）
+        /// </summary>
+        public long[] Ids { get; set; }
+    }
+
+    /// <summary>
     /// 查询返回对象
     /// </summary>
     public record InteCalendarDto : BaseEntityDto
@@ -174,7 +185,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 描述 :所属站点代码 
         /// 空值 : false  
         /// </summary>
-        public string SiteCode { get; set; } = "";
+        public long SiteId { get; set; }
 
         /// <summary>
         /// 启用状态
@@ -344,14 +355,14 @@ namespace Hymson.MES.Services.Dtos.Integrated
     public class InteCalendarPagedQueryDto : PagerInfo
     {
         /// <summary>
-        /// 所属站点代码
-        /// </summary>
-        public string SiteCode { get; set; } = "";
-
-        /// <summary>
         /// 日历名称
         /// </summary>
         public string CalendarName { get; set; } = "";
+
+        /// <summary>
+        /// 类型
+        /// </summary>
+        public int CalendarType { get; set; }
 
         /// <summary>
         /// 名称
@@ -364,12 +375,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public string Name { get; set; } = "";
 
         /// <summary>
-        /// 类型
-        /// </summary>
-        public int CalendarType { get; set; }
-
-        /// <summary>
-        /// 
+        /// 启用状态
         /// </summary>
         public int UseStatus { get; set; } = -1;
     }

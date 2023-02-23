@@ -48,5 +48,9 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 物料名称
         /// </summary>
         public int IsCurrentVersion { get; set; }
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long SiteId { get; set; } = 0;
     }
 }

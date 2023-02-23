@@ -12,6 +12,7 @@ using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteCalendar;
 using Hymson.MES.Data.Repositories.Integrated.InteClass;
 using Hymson.MES.Data.Repositories.Integrated.InteJob;
+using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Quality;
@@ -69,6 +70,7 @@ namespace Microsoft.Extensions.DependencyInjection
             //InteJob
             services.AddSingleton<IInteJobBusinessRelationRepository, InteJobBusinessRelationRepository>();
             services.AddSingleton<IInteJobRepository, InteJobRepository>();
+            services.AddSingleton<IInteWorkCenterRepository, InteWorkCenterRepository>();
             #endregion
 
             #region  Process
@@ -111,12 +113,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcResourceConfigPrintRepository, ProcResourceConfigPrintRepository>();
             services.AddSingleton<IProcResourceConfigResRepository, ProcResourceConfigResRepository>();
             services.AddSingleton<IProcResourceEquipmentBindRepository, ProcResourceEquipmentBindRepository>();
-            services.AddSingleton<IProcResourceConfigJobRepository, ProcResourceConfigJobRepository>();
             #endregion
 
             #region Procedure
             services.AddSingleton<IProcProcedureRepository, ProcProcedureRepository>();
-            services.AddSingleton<IProcProcedurePrintReleationRepository, ProcProcedurePrintReleationRepository>();
+            services.AddSingleton<IProcProcedurePrintRelationRepository, ProcProcedurePrintRelationRepository>();
             #endregion
             #region ProcessRoute
             services.AddSingleton<IProcProcessRouteRepository, ProcProcessRouteRepository>();
@@ -129,6 +130,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IQualUnqualifiedCodeRepository, QualUnqualifiedCodeRepository>();
             services.AddSingleton<IQualUnqualifiedGroupRepository, QualUnqualifiedGroupRepository>();
             #endregion
+
             return services;
         }
 

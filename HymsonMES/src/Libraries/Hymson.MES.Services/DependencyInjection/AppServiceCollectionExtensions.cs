@@ -5,6 +5,8 @@ using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Options;
 using Hymson.MES.Services.Services.EquEquipmentGroup;
+using Hymson.MES.Services.Services.Equipment.EquConsumable;
+using Hymson.MES.Services.Services.Equipment.EquConsumableType;
 using Hymson.MES.Services.Services.Equipment.EquEquipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipmentUnit;
 using Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon;
@@ -39,6 +41,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         public static IServiceCollection AddAppService(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddWebFrameworkService(configuration);
             services.AddData(configuration);
             AddConfig(services, configuration);
             AddServices(services);
@@ -68,6 +71,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteCalendarService, InteCalendarService>();
             services.AddSingleton<IInteClassService, InteClassService>();
             services.AddSingleton<IInteJobService, InteJobService>();
+            services.AddSingleton<IInteWorkCenterService, InteWorkCenterService>();
             #endregion
 
             #region Process
@@ -187,6 +191,8 @@ namespace Microsoft.Extensions.DependencyInjection
             #region Integrated
             services.AddSingleton<AbstractValidator<InteJobCreateDto>, InteJobCreateValidator>();
             services.AddSingleton<AbstractValidator<InteJobModifyDto>, InteJobModifyValidator>();
+            services.AddSingleton<AbstractValidator<InteWorkCenterCreateDto>, InteWorkCenterCreateValidator>();
+            services.AddSingleton<AbstractValidator<InteWorkCenterModifyDto>, InteWorkCenterModifyValidator>();
             #endregion
 
             #region Quality
@@ -195,6 +201,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<QualUnqualifiedGroupCreateDto>, QualUnqualifiedGroupCreateValidator>();
             services.AddSingleton<AbstractValidator<QualUnqualifiedGroupModifyDto>, QualUnqualifiedGroupModifyValidator>();
             #endregion
+
             return services;
         }
     }

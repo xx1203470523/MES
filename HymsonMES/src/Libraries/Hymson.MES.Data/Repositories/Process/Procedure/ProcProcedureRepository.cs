@@ -41,9 +41,9 @@ namespace Hymson.MES.Data.Repositories.Process
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("a.IsDeleted=0");
-            if (!string.IsNullOrWhiteSpace(query.SiteCode))
+            if (query.SiteId > 0)
             {
-                sqlBuilder.Where("a.SiteCode=@SiteCode");
+                sqlBuilder.Where("SiteId = @SiteId");
             }
             if (!string.IsNullOrWhiteSpace(query.Code))
             {
@@ -101,7 +101,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<bool> IsExistsAsync(ProcProcedureQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var entity= await conn.QueryAsync<ProcProcedureEntity>(ExistsSql, new { Code = query.Code, SiteCode = query.SiteCode });
+            var entity= await conn.QueryAsync<ProcProcedureEntity>(ExistsSql, new { Code = query.Code, SiteId = query.SiteId });
             return entity != null&&entity.Any();
         }
 
@@ -142,17 +142,6 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
-        /// 批量新增
-        /// </summary>
-        /// <param name="procProcedureEntitys"></param>
-        /// <returns></returns>
-        public async Task<int> InsertRangeAsync(List<ProcProcedureEntity> procProcedureEntitys)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertsSql, procProcedureEntitys);
-        }
-
-        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="procProcedureEntity"></param>
@@ -161,28 +150,6 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSql, procProcedureEntity);
-        }
-
-        /// <summary>
-        /// 批量更新
-        /// </summary>
-        /// <param name="procProcedureEntitys"></param>
-        /// <returns></returns>
-        public  async Task<int> UpdateRangeAsync(List<ProcProcedureEntity> procProcedureEntitys)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateSql, procProcedureEntitys);
-        }
-
-        /// <summary>
-        /// 删除（软删除）
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<int> DeleteAsync(long id)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, new { Id = id });
         }
 
         /// <summary>
@@ -204,18 +171,17 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetProcProcedureEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `proc_procedure` /**where**/  ";
-        const string ExistsSql = "SELECT Id FROM proc_procedure WHERE `IsDeleted`= 0 AND Code=@Code and SiteCode=@SiteCode LIMIT 1 ";
+        const string ExistsSql = "SELECT Id FROM proc_procedure WHERE `IsDeleted`= 0 AND Code=@Code and SiteId=@SiteId LIMIT 1 ";
 
-        const string InsertSql = "INSERT INTO `proc_procedure`(  `Id`, `SiteCode`, `Code`, `Name`, `Status`, `Type`, `PackingLevel`, `ResourceTypeId`, `Cycle`, `IsRepairReturn`, `Version`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @Code, @Name, @Status, @Type, @PackingLevel, @ResourceTypeId, @Cycle, @IsRepairReturn, @Version, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `proc_procedure`(  `Id`, `SiteCode`, `Code`, `Name`, `Status`, `Type`, `PackingLevel`, `ResourceTypeId`, `Cycle`, `IsRepairReturn`, `Version`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @Code, @Name, @Status, @Type, @PackingLevel, @ResourceTypeId, @Cycle, @IsRepairReturn, @Version, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `proc_procedure`(  `Id`, `SiteId`, `Code`, `Name`, `Status`, `Type`, `PackingLevel`, `ResourceTypeId`, `Cycle`, `IsRepairReturn`, `Version`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Status, @Type, @PackingLevel, @ResourceTypeId, @Cycle, @IsRepairReturn, @Version, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string UpdateSql = "UPDATE `proc_procedure` SET  Status = @Status, Type = @Type, PackingLevel = @PackingLevel, ResourceTypeId = @ResourceTypeId, Cycle = @Cycle, IsRepairReturn = @IsRepairReturn, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `proc_procedure` SET IsDeleted = '1' WHERE Id = @Id ";
+        const string DeleteSql = "UPDATE `proc_procedure` SET IsDeleted = '1'  WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_procedure` SET IsDeleted = '1',UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id in @Ids";
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteCode`, `Code`, `Name`, `Status`, `Type`, `PackingLevel`, `ResourceTypeId`, `Cycle`, `IsRepairReturn`, `Version`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                               `Id`, `SiteId`, `Code`, `Name`, `Status`, `Type`, `PackingLevel`, `ResourceTypeId`, `Cycle`, `IsRepairReturn`, `Version`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_procedure`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteCode`, `Code`, `Name`, `Status`, `Type`, `PackingLevel`, `ResourceTypeId`, `Cycle`, `IsRepairReturn`, `Version`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                                          `Id`, `SiteId`, `Code`, `Name`, `Status`, `Type`, `PackingLevel`, `ResourceTypeId`, `Cycle`, `IsRepairReturn`, `Version`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_procedure`  WHERE Id IN @ids ";
     }
 }
