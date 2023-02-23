@@ -59,32 +59,11 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<int> InsertAsync(ProcProcedureEntity procProcedureEntity);
 
         /// <summary>
-        /// 批量新增
-        /// </summary>
-        /// <param name="procProcedureEntitys"></param>
-        /// <returns></returns>
-        Task<int> InsertRangeAsync(List<ProcProcedureEntity> procProcedureEntitys);
-
-        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="procProcedureEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ProcProcedureEntity procProcedureEntity);
-
-        /// <summary>
-        /// 批量更新 
-        /// </summary>
-        /// <param name="procProcedureEntitys"></param>
-        /// <returns></returns>
-        Task<int> UpdateRangeAsync(List<ProcProcedureEntity> procProcedureEntitys);
-
-        /// <summary>
-        /// 删除
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<int> DeleteAsync(long id);
 
         /// <summary>
         /// 批量删除

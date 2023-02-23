@@ -28,7 +28,7 @@ namespace Hymson.MES.Core.Domain.Process
         public string Remark { get; set; }
 
         /// <summary>
-        /// 站点编id
+        /// 站点id
         /// </summary>
         public long SiteId { get; set; } 
     }

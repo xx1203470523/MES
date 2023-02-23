@@ -175,11 +175,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
     public class InteJobBusinessRelationPagedQueryDto : PagerInfo
     {
         /// <summary>
-        /// 站点编码
-        /// </summary>
-        public string? SiteCode { get; set; }
-
-        /// <summary>
         /// 1资源  2工序 3不合格代码
         /// </summary>
         public string? BusinessType { get; set; }

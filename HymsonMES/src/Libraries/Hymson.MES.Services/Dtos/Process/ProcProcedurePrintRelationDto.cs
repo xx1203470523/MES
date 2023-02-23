@@ -178,10 +178,6 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public class ProcProcedurePrintReleationPagedQueryDto : PagerInfo
     {
-        /// <summary>
-        /// 站点编码
-        /// </summary>
-        public string? SiteCode { get; set; }
         public long ProcedureId { get; set; }
     }
 

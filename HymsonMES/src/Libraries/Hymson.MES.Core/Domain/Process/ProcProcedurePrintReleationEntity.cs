@@ -22,12 +22,6 @@ namespace Hymson.MES.Core.Domain.Process
         public string Remark { get; set; }
         
         /// <summary>
-        /// 描述 :所属站点代码 
-        /// 空值 : false  
-        /// </summary>
-        public string SiteCode { get; set; }
-        
-        /// <summary>
         /// 描述 :所属工序ID 
         /// 空值 : false  
         /// </summary>
@@ -50,5 +44,10 @@ namespace Hymson.MES.Core.Domain.Process
         /// 空值 : true  
         /// </summary>
         public long? TemplateId { get; set; }
-        }
+
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long SiteId { get; set; } = 0;
+    }
 }

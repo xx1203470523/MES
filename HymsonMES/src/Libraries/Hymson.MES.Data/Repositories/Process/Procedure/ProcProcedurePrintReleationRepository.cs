@@ -40,9 +40,9 @@ namespace Hymson.MES.Data.Repositories.Process
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
-            if (!string.IsNullOrWhiteSpace(query.SiteCode))
+            if (query.SiteId > 0)
             {
-                sqlBuilder.Where("SiteCode=@SiteCode");
+                sqlBuilder.Where("SiteId = @SiteId");
             }
             if (query.ProcedureId > 0)
             {
@@ -70,7 +70,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<int> InsertRangeAsync(List<ProcProcedurePrintRelationEntity> procProcedurePrintReleationEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertsSql, procProcedurePrintReleationEntitys);
+            return await conn.ExecuteAsync(InsertSql, procProcedurePrintReleationEntitys);
         }
 
         /// <summary>
@@ -173,16 +173,15 @@ namespace Hymson.MES.Data.Repositories.Process
                                             /**select**/
                                            FROM `proc_procedure_print_relation` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `proc_procedure_print_relation`(  `Id`, `SiteCode`, `ProcedureId`, `MaterialId`, `Version`, `TemplateId`, `Copy`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @ProcedureId, @MaterialId, @Version, @TemplateId, @Copy, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `proc_procedure_print_relation`(  `Id`, `SiteCode`, `ProcedureId`, `MaterialId`, `Version`, `TemplateId`, `Copy`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @ProcedureId, @MaterialId, @Version, @TemplateId, @Copy, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string UpdateSql = "UPDATE `proc_procedure_print_relation` SET   SiteCode = @SiteCode, ProcedureId = @ProcedureId, MaterialId = @MaterialId, Version = @Version, TemplateId = @TemplateId, Copy = @Copy, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string InsertSql = "INSERT INTO `proc_procedure_print_relation`(  `Id`, `SiteId`, `ProcedureId`, `MaterialId`, `Version`, `TemplateId`, `Copy`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ProcedureId, @MaterialId, @Version, @TemplateId, @Copy, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string UpdateSql = "UPDATE `proc_procedure_print_relation` SET    ProcedureId = @ProcedureId, MaterialId = @MaterialId, Version = @Version, TemplateId = @TemplateId, Copy = @Copy, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteByProcedureIdSql = "delete from `proc_procedure_print_relation` WHERE ProcedureId = @ProcedureId ";
         const string DeletesSql = "UPDATE `proc_procedure_print_relation` SET IsDeleted = '1' WHERE Id in @ids";
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteCode`, `ProcedureId`, `MaterialId`, `Version`, `TemplateId`, `Copy`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                               `Id`, `SiteId`, `ProcedureId`, `MaterialId`, `Version`, `TemplateId`, `Copy`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_procedure_print_relation`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteCode`, `ProcedureId`, `MaterialId`, `Version`, `TemplateId`, `Copy`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                                          `Id`, `SiteId`, `ProcedureId`, `MaterialId`, `Version`, `TemplateId`, `Copy`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_procedure_print_relation`  WHERE Id IN @ids ";
     }
 }

@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Hymson.Authentication;
+using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -37,6 +38,10 @@ namespace Hymson.MES.Services.Services.Process
         /// 当前登录用户对象
         /// </summary>
         private readonly ICurrentUser _currentUser;
+        /// <summary>
+        /// 当前站点
+        /// </summary>
+        private readonly ICurrentSite _currentSite;
         /// <summary>
         /// 资源仓储
         /// </summary>
@@ -77,7 +82,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 构造函数
         /// </summary>
-        public ProcResourceService(ICurrentUser currentUser,
+        public ProcResourceService(ICurrentUser currentUser, ICurrentSite currentSite,
                   IProcResourceRepository resourceRepository,
                   IProcResourceTypeRepository resourceTypeRepository,
                   IProcResourceConfigPrintRepository resourceConfigPrintRepository,
@@ -89,6 +94,7 @@ namespace Hymson.MES.Services.Services.Process
                   AbstractValidator<ProcResourceModifyDto> validationModifyRules)
         {
             _currentUser = currentUser;
+            _currentSite = currentSite;
             _resourceRepository = resourceRepository;
             _resourceTypeRepository = resourceTypeRepository;
             _resourceConfigPrintRepository = resourceConfigPrintRepository;
@@ -260,7 +266,7 @@ namespace Hymson.MES.Services.Services.Process
         {
             var query = new InteJobBusinessRelationPagedQuery()
             {
-                SiteCode = queryDto.SiteCode,
+                SiteId = _currentSite.SiteId??0,
                 BusinessId = queryDto.BusinessId,
                 BusinessType = InteJobBusinessTypeEnum.Resource.ToString(),
                 PageIndex = queryDto.PageIndex,
@@ -448,7 +454,7 @@ namespace Hymson.MES.Services.Services.Process
                     relationEntity.Id = IdGenProvider.Instance.CreateId();
                     relationEntity.BusinessType = (int)InteJobBusinessTypeEnum.Resource;
                     relationEntity.BusinessId = entity.Id;
-                    relationEntity.SiteCode = "TODO";
+                    relationEntity.SiteId = 0;//TODO
                     relationEntity.CreatedBy = userName;
                     relationEntity.UpdatedBy = userName;
                     jobList.Add(relationEntity);
