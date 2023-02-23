@@ -30,7 +30,9 @@ namespace Hymson.MES.Api
             builder.Services.AddControllers(options =>
             {
                 options.Filters.Add(typeof(HttpGlobalExceptionFilter));
-            });
+            }).AddJsonOptions((jsonOptions) => {
+                jsonOptions.JsonSerializerOptions.Converters.Add(new CustomInt64Converter());
+            }); ;
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
