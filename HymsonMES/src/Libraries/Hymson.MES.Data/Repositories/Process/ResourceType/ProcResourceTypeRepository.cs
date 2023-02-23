@@ -65,7 +65,7 @@ namespace Hymson.MES.Data.Repositories.Process
             //sqlBuilder.Select("*");
             if (query.SiteId > 0)
             {
-                sqlBuilder.Where("SiteId = @SiteId");
+                sqlBuilder.Where("a.SiteId = @SiteId");
             }
             if (!string.IsNullOrWhiteSpace(query.ResType))
             {
