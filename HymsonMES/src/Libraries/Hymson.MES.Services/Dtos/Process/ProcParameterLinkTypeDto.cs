@@ -114,12 +114,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 编码（设备/产品参数）
         /// </summary>
-        public string ParameterCode { get; set; }
+        public string ParameterCode { get; set; } = "";
 
         /// <summary>
         /// 名称（设备/产品参数）
         /// </summary>
-        public string ParameterName { get; set; }
+        public string ParameterName { get; set; } = "";
     }
 
     public record ProcParameterLinkTypeViewDto: BaseEntityDto
@@ -203,11 +203,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 编码（设备/产品参数）
         /// </summary>
-        public string ParameterCode { get; set; }
+        public string ParameterCode { get; set; } = "";
 
         /// <summary>
         /// 名称（设备/产品参数）
         /// </summary>
-        public string ParameterName { get; set; }
+        public string ParameterName { get; set; } = "";
     }
 }

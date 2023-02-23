@@ -48,16 +48,19 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 创建
         /// </summary>
-        /// <param name="procParameterLinkTypeDto"></param>
+        /// <param name="procParameterLinkTypeCreateDto"></param>
         /// <returns></returns>
         public async Task CreateProcParameterLinkTypeAsync(ProcParameterLinkTypeCreateDto procParameterLinkTypeCreateDto)
         {
+#if DEBUG
+            //TODO
+#else
             //检查SiteId
-            if (_currentSite.SiteId==0)
+            if (_currentSite.SiteId==0|| _currentSite.SiteId==null)
             {
                 throw new BusinessException(ErrorCode.MES10101);
             }
-
+#endif
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procParameterLinkTypeCreateDto);
 
@@ -71,6 +74,7 @@ namespace Hymson.MES.Services.Services.Process
                 item.UpdatedOn = HymsonClock.Now();
                 item.ParameterType = procParameterLinkTypeCreateDto.ParameterType;
                 item.ParameterID = s;
+                item.SiteId = 1;//TODO 
                 return item;
             }).ToList();
 
@@ -116,7 +120,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcParameterLinkTypeViewDto>> GetPageListAsync(ProcParameterLinkTypePagedQueryDto procParameterLinkTypePagedQueryDto)
         {
             var procParameterLinkTypePagedQuery = procParameterLinkTypePagedQueryDto.ToQuery<ProcParameterLinkTypePagedQuery>();
-            procParameterLinkTypePagedQuery.SiteId = _currentSite.SiteId;
+            procParameterLinkTypePagedQuery.SiteId = 1;//TODO _currentSite.SiteId;
             var pagedInfo = await _procParameterLinkTypeRepository.GetPagedInfoAsync(procParameterLinkTypePagedQuery);
 
             //实体到DTO转换 装载数据
@@ -132,7 +136,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcParameterLinkTypeViewDto>> QueryPagedProcParameterLinkTypeByTypeAsync(ProcParameterDetailPagerQueryDto procParameterDetailPagerQueryDto) 
         {
             var procParameterDetailPagerQuery = procParameterDetailPagerQueryDto.ToQuery<ProcParameterDetailPagerQuery>();
-            procParameterDetailPagerQuery.SiteId = _currentSite.SiteId;
+            procParameterDetailPagerQuery.SiteId = 1;//TODO _currentSite.SiteId;
             var pagedInfo = await _procParameterLinkTypeRepository.GetPagedProcParameterLinkTypeByTypeAsync(procParameterDetailPagerQuery);
 
             //实体到DTO转换 装载数据
