@@ -8,11 +8,6 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar.Query
     public class InteCalendarPagedQuery : PagerInfo
     {
         /// <summary>
-        /// 所属站点代码
-        /// </summary>
-        public string SiteCode { get; set; } = "";
-
-        /// <summary>
         /// 日历名称
         /// </summary>
         public string CalendarName { get; set; } = "";
@@ -30,7 +25,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar.Query
         /// <summary>
         /// 类型
         /// </summary>
-        public int CalendarType { get; set; }
+        public int CalendarType { get; set; } = -1;
 
         /// <summary>
         /// 
