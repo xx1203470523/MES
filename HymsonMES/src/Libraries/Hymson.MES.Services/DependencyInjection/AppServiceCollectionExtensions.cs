@@ -41,6 +41,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         public static IServiceCollection AddAppService(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddWebFrameworkService(configuration);
             services.AddData(configuration);
             AddConfig(services, configuration);
             AddServices(services);
