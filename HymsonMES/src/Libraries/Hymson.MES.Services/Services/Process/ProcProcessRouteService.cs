@@ -7,6 +7,7 @@
  */
 using FluentValidation;
 using Hymson.Authentication;
+using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -43,6 +44,10 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         private readonly ICurrentUser _currentUser;
         /// <summary>
+        /// 当前站点
+        /// </summary>
+        private readonly ICurrentSite _currentSite;
+        /// <summary>
         /// 工艺路线表 仓储
         /// </summary>
         private readonly IProcProcessRouteRepository _procProcessRouteRepository;
@@ -60,7 +65,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 构造函数
         /// </summary>
-        public ProcProcessRouteService(ICurrentUser currentUser,
+        public ProcProcessRouteService(ICurrentUser currentUser, ICurrentSite currentSite,
             IProcProcessRouteRepository procProcessRouteRepository,
             IProcProcessRouteDetailNodeRepository procProcessRouteNodeRepository,
             IProcProcessRouteDetailLinkRepository procProcessRouteLinkRepository,
@@ -68,6 +73,7 @@ namespace Hymson.MES.Services.Services.Process
             AbstractValidator<ProcProcessRouteModifyDto> validationModifyRules)
         {
             _currentUser = currentUser;
+            _currentSite = currentSite;
             _procProcessRouteRepository = procProcessRouteRepository;
             _procProcessRouteNodeRepository = procProcessRouteNodeRepository;
             _procProcessRouteLinkRepository = procProcessRouteLinkRepository;
@@ -83,6 +89,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcProcessRouteDto>> GetPageListAsync(ProcProcessRoutePagedQueryDto procProcessRoutePagedQueryDto)
         {
             var procProcessRoutePagedQuery = procProcessRoutePagedQueryDto.ToQuery<ProcProcessRoutePagedQuery>();
+            procProcessRoutePagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _procProcessRouteRepository.GetPagedInfoAsync(procProcessRoutePagedQuery);
 
             // 实体到DTO转换 装载数据
@@ -148,7 +155,7 @@ namespace Hymson.MES.Services.Services.Process
             {
                 throw new ValidationException(ErrorCode.MES10100);
             }
-            // TODO SiteId
+
             //// 判断是否有获取到站点码
             //if (string.IsNullOrWhiteSpace(parm.SiteCode))
             //{
@@ -158,8 +165,10 @@ namespace Hymson.MES.Services.Services.Process
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(parm);
 
+            var siteId = _currentSite.SiteId ?? 0;
             //DTO转换实体
             var procProcessRouteEntity = parm.ToEntity<ProcProcessRouteEntity>();
+            procProcessRouteEntity.SiteId = siteId;
             procProcessRouteEntity.Code = parm.Code.ToUpperInvariant();
             procProcessRouteEntity.Id = IdGenProvider.Instance.CreateId();
             procProcessRouteEntity.CreatedBy = _currentUser.UserName;
@@ -184,7 +193,7 @@ namespace Hymson.MES.Services.Services.Process
             var query = new ProcProcessRouteQuery
             {
                 Code = procProcessRouteEntity.Code,
-                // TODO    SiteCode = procProcessRouteEntity.SiteCode
+                SiteId = _currentSite.SiteId??0
             };
             //if (await _procProcessRouteRepository.IsExistsAsync(query))
             //{
@@ -224,7 +233,6 @@ namespace Hymson.MES.Services.Services.Process
                 throw new ValidationException(ErrorCode.MES10100);
             }
 
-            // TODO SiteId
             //// 判断是否有获取到站点码
             //if (string.IsNullOrWhiteSpace(parm.SiteCode))
             //{
@@ -236,6 +244,7 @@ namespace Hymson.MES.Services.Services.Process
 
             //DTO转换实体
             var procProcessRouteEntity = parm.ToEntity<ProcProcessRouteEntity>();
+            procProcessRouteEntity.SiteId = _currentSite.SiteId ?? 0;
             procProcessRouteEntity.UpdatedBy = _currentUser.UserName;
 
             var nodes = ConvertProcessRouteNodeList(parm.DynamicData.Nodes, procProcessRouteEntity);
@@ -382,7 +391,7 @@ namespace Hymson.MES.Services.Services.Process
             return nodeList.Select(s => new ProcProcessRouteDetailNodeEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
-                // TODO  SiteCode = model.SiteCode,
+                SiteId = model.SiteId,
                 ProcessRouteId = model.Id,
                 SerialNo = s.SerialNo,
                 ProcedureId = s.ProcedureBomId,
@@ -409,7 +418,7 @@ namespace Hymson.MES.Services.Services.Process
             return linkList.Select(s => new ProcProcessRouteDetailLinkEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
-                // TODO SiteId  SiteCode = model.SiteCode,
+                SiteId = model.SiteId,
                 SerialNo = s.SerialNo,
                 ProcessRouteId = model.Id,
                 PreProcessRouteDetailId = s.PreProcessRouteDetailId,

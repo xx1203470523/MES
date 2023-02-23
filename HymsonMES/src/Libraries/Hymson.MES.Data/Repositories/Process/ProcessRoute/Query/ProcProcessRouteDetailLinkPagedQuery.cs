@@ -19,6 +19,9 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public class ProcProcessRouteDetailLinkPagedQuery : PagerInfo
     {
-
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long SiteId { get; set; } = 0;
     }
 }
