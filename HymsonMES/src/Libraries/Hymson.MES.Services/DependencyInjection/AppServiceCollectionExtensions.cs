@@ -68,6 +68,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteCalendarService, InteCalendarService>();
             services.AddSingleton<IInteClassService, InteClassService>();
             services.AddSingleton<IInteJobService, InteJobService>();
+            services.AddSingleton<IInteWorkCenterService, InteWorkCenterService>();
             #endregion
 
             #region Process
@@ -187,6 +188,8 @@ namespace Microsoft.Extensions.DependencyInjection
             #region Integrated
             services.AddSingleton<AbstractValidator<InteJobCreateDto>, InteJobCreateValidator>();
             services.AddSingleton<AbstractValidator<InteJobModifyDto>, InteJobModifyValidator>();
+            services.AddSingleton<AbstractValidator<InteWorkCenterCreateDto>, InteWorkCenterCreateValidator>();
+            services.AddSingleton<AbstractValidator<InteWorkCenterModifyDto>, InteWorkCenterModifyValidator>();
             #endregion
 
             #region Quality

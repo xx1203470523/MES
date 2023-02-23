@@ -3,7 +3,7 @@
 namespace Hymson.MES.Services.Dtos.Equipment
 {
     /// <summary>
-    /// 
+    /// 新增Dto（单位维护）
     /// </summary>
     public record EquEquipmentUnitCreateDto : BaseEntityDto
     {
@@ -29,7 +29,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
     }
 
     /// <summary>
-    /// 
+    /// 更新Dto（单位维护）
     /// </summary>
     public record EquEquipmentUnitModifyDto : BaseEntityDto
     {
@@ -60,7 +60,18 @@ namespace Hymson.MES.Services.Dtos.Equipment
     }
 
     /// <summary>
-    /// 
+    /// 删除Dto（单位维护）
+    /// </summary>
+    public record EquEquipmentUnitDeleteDto
+    {
+        /// <summary>
+        /// 集合（主键）
+        /// </summary>
+        public long[] Ids { get; set; }
+    }
+
+    /// <summary>
+    ///  Dto（单位维护）
     /// </summary>
     public record EquEquipmentUnitDto : BaseEntityDto
     {
@@ -106,7 +117,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
     }
 
     /// <summary>
-    /// 
+    /// 分页Dto（单位维护）
     /// </summary>
     public class EquEquipmentUnitPagedQueryDto : PagerInfo
     {

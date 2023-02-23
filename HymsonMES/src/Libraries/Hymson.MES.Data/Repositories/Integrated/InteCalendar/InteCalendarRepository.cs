@@ -125,15 +125,17 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IC.IsDeleted = 0");
-            sqlBuilder.Select("IC.Id, IC.SiteCode, IC.CalendarName, IC.CalendarType, IC.Remark, IC.UseStatus, IC.CreatedBy, IC.CreatedOn, IC.UpdatedBy, IC.UpdatedOn");
+            sqlBuilder.Select("IC.Id, IC.CalendarName, IC.CalendarType, IC.Remark, IC.UseStatus, IC.CreatedBy, IC.CreatedOn, IC.UpdatedBy, IC.UpdatedOn");
             sqlBuilder.Select("IWC.`Code`, IWC.`Name`, EE.EquipmentCode, EE.EquipmentName");
             sqlBuilder.LeftJoin("inte_work_center IWC ON IC.EquOrLineId = IWC.Id");
             sqlBuilder.LeftJoin("equ_equipment EE ON IC.EquOrLineId = EE.Id");
 
+            /*
             if (string.IsNullOrWhiteSpace(pagedQuery.SiteCode) == false)
             {
                 sqlBuilder.Where("IC.SiteCode = @SiteCode");
             }
+            */
 
             if (string.IsNullOrWhiteSpace(pagedQuery.CalendarName) == false)
             {

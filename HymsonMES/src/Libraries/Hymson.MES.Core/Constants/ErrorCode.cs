@@ -141,8 +141,9 @@
         #endregion
 
         //综合
-        #region 作业
-        public const string MES12001 = "作业表{code}已经存在";
+        #region 作业12000
+        public const string MES12000 = "作业维护错误";
+        public const string MES12001 = "作业{code}已经存在";
         public const string MES12002 = "作业编号 不能为空.";
         public const string MES12003 = "作业编号 超过最大长度，最大长度为50.";
         public const string MES12004 = "作业名称 不能为空.";
@@ -150,6 +151,22 @@
         public const string MES12006 = "类程序 不能为空.";
         public const string MES12007 = "类程序 超过最大长度，最大长度为255.";
         public const string MES12008 = "备注 超过最大长度，最大长度为255.";
+        #endregion
+
+        #region 工作中心 12100
+        public const string MES12100 = "工作中心维护错误";
+        public const string MES12101 = "工作中心{code}已经存在";
+        public const string MES12102 = "工作中心代码不能为空.";
+        public const string MES12103 = "工作中心代码超过最大长度，最大长度为50.";
+        public const string MES12104 = "工作中心名称不能为空.";
+        public const string MES12105 = "工作中心名称超过最大长度，最大长度为50.";
+        public const string MES12106 = "工作中心类型不能为空.";
+        public const string MES12107 = "工作中心数据来源不能为空.";
+        public const string MES12108 = "工作中心是否混线不能为空.";
+        public const string MES12109 = "说明 超过最大长度，最大长度为255.";
+        public const string MES12110 = "工作中心状态不能为空.";
+        public const string MES12111 = "工作中心修改的数据不存在.";
+        public const string MES12112 = "工作中心已经关联数据,允许修改.";
         #endregion
         #endregion
 
