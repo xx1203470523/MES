@@ -4,12 +4,18 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
+using Hymson.MES.Data.Repositories.Integrated.InteJob;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
+using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.Snowflake;
@@ -57,9 +63,13 @@ namespace Hymson.MES.Services.Services.Process
         private readonly IProcResourceEquipmentBindRepository _resourceEquipmentBindRepository;
 
         /// <summary>
-        /// 资源作业配置表仓储
+        /// 工序配置作业表仓储
         /// </summary>
-        private readonly IProcResourceConfigJobRepository _resourceConfigJobRepository;
+        private readonly IInteJobBusinessRelationRepository _jobBusinessRelationRepository;
+        /// <summary>
+        /// 作业表仓储
+        /// </summary>
+        private readonly IInteJobRepository _inteJobRepository;
 
         private readonly AbstractValidator<ProcResourceCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcResourceModifyDto> _validationModifyRules;
@@ -73,7 +83,8 @@ namespace Hymson.MES.Services.Services.Process
                   IProcResourceConfigPrintRepository resourceConfigPrintRepository,
                   IProcResourceConfigResRepository procResourceConfigResRepository,
                   IProcResourceEquipmentBindRepository resourceEquipmentBindRepository,
-                  IProcResourceConfigJobRepository resourceConfigJobRepository,
+                  IInteJobBusinessRelationRepository jobBusinessRelationRepository,
+                  IInteJobRepository inteJobRepository,
                   AbstractValidator<ProcResourceCreateDto> validationCreateRules,
                   AbstractValidator<ProcResourceModifyDto> validationModifyRules)
         {
@@ -83,7 +94,8 @@ namespace Hymson.MES.Services.Services.Process
             _resourceConfigPrintRepository = resourceConfigPrintRepository;
             _procResourceConfigResRepository = procResourceConfigResRepository;
             _resourceEquipmentBindRepository = resourceEquipmentBindRepository;
-            _resourceConfigJobRepository = resourceConfigJobRepository;
+            _jobBusinessRelationRepository = jobBusinessRelationRepository;
+            _inteJobRepository = inteJobRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
         }
@@ -224,19 +236,62 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcResourceConfigJobViewDto>> GetcResourceConfigJoAsync(ProcResourceConfigJobPagedQueryDto query)
+        //public async Task<PagedInfo<ProcResourceConfigJobViewDto>> GetcResourceConfigJoAsync(ProcResourceConfigJobPagedQueryDto query)
+        //{
+        //    var jobPagedQuery = query.ToQuery<ProcResourceConfigJobPagedQuery>();
+        //    var pagedInfo = await _jobBusinessRelationRepository.GetPagedInfoAsync(jobPagedQuery);
+
+        //    //实体到DTO转换 装载数据
+        //    var procResourceConfigJobViews = new List<ProcResourceConfigJobViewDto>();
+        //    foreach (var entity in pagedInfo.Data)
+        //    {
+        //        var resourceTypeDto = entity.ToModel<ProcResourceConfigJobViewDto>();
+        //        procResourceConfigJobViews.Add(resourceTypeDto);
+        //    }
+        //    return new PagedInfo<ProcResourceConfigJobViewDto>(procResourceConfigJobViews, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        //}
+
+        /// <summary>
+        /// 获取工序配置Job信息
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<QueryProcedureJobReleationDto>> GetProcedureConfigJobListAsync(InteJobBusinessRelationPagedQueryDto queryDto)
         {
-            var jobPagedQuery = query.ToQuery<ProcResourceConfigJobPagedQuery>();
-            var pagedInfo = await _resourceConfigJobRepository.GetPagedInfoAsync(jobPagedQuery);
+            var query = new InteJobBusinessRelationPagedQuery()
+            {
+                SiteCode = queryDto.SiteCode,
+                BusinessId = queryDto.BusinessId,
+                BusinessType = InteJobBusinessTypeEnum.Resource.ToString(),
+                PageIndex = queryDto.PageIndex,
+                PageSize = queryDto.PageSize,
+                Sorting = queryDto.Sorting
+            };
+            var pagedInfo = await _jobBusinessRelationRepository.GetPagedInfoAsync(query);
 
             //实体到DTO转换 装载数据
-            var procResourceConfigJobViews = new List<ProcResourceConfigJobViewDto>();
+            var dtos = new List<QueryProcedureJobReleationDto>();
             foreach (var entity in pagedInfo.Data)
             {
-                var resourceTypeDto = entity.ToModel<ProcResourceConfigJobViewDto>();
-                procResourceConfigJobViews.Add(resourceTypeDto);
+                var jobReleationDto = entity.ToModel<InteJobBusinessRelationDto>();
+                dtos.Add(new QueryProcedureJobReleationDto { ProcedureBomConfigJob = jobReleationDto });
             }
-            return new PagedInfo<ProcResourceConfigJobViewDto>(procResourceConfigJobViews, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+
+            var jobIds = dtos.Select(a => a.ProcedureBomConfigJob.JobId).ToArray();
+            var jobList = await _inteJobRepository.GetByIdsAsync(jobIds);
+            var jobDtoList = new List<InteJobDto>();
+            foreach (var job in jobList)
+            {
+                var inteJob = job.ToModel<InteJobDto>();
+                jobDtoList.Add(inteJob);
+            }
+
+            foreach (var entity in dtos)
+            {
+                entity.Job = jobDtoList.FirstOrDefault(a => a.Id == entity.ProcedureBomConfigJob.JobId);
+            }
+
+            return new PagedInfo<QueryProcedureJobReleationDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
         /// <summary>
@@ -363,24 +418,40 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             //作业设置数据
-            List<ProcResourceConfigJobEntity> jobList = new List<ProcResourceConfigJobEntity>();
+            //List<ProcResourceConfigJobEntity> jobList = new List<ProcResourceConfigJobEntity>();
+            //if (parm.JobList != null && parm.JobList.Count > 0)
+            //{
+            //    foreach (var item in parm.JobList)
+            //    {
+            //        jobList.Add(new ProcResourceConfigJobEntity
+            //        {
+            //            Id = IdGenProvider.Instance.CreateId(),
+            //            SiteCode = site,
+            //            ResourceId = entity.Id,
+            //            LinkPoint = item.LinkPoint,
+            //            JobId = item.JobId,
+            //            IsUse = item.IsUse,
+            //            Parameter = item.Parameter,
+            //            Remark = item.Remark,
+            //            CreatedBy = userName,
+            //            UpdatedBy = userName
+            //        });
+            //    }
+            //}
+            //job
+            List<InteJobBusinessRelationEntity> jobList = new List<InteJobBusinessRelationEntity>();
             if (parm.JobList != null && parm.JobList.Count > 0)
             {
                 foreach (var item in parm.JobList)
                 {
-                    jobList.Add(new ProcResourceConfigJobEntity
-                    {
-                        Id = IdGenProvider.Instance.CreateId(),
-                        SiteCode = site,
-                        ResourceId = entity.Id,
-                        LinkPoint = item.LinkPoint,
-                        JobId = item.JobId,
-                        IsUse = item.IsUse,
-                        Parameter = item.Parameter,
-                        Remark = item.Remark,
-                        CreatedBy = userName,
-                        UpdatedBy = userName
-                    });
+                    var relationEntity = item.ToEntity<InteJobBusinessRelationEntity>(); ;
+                    relationEntity.Id = IdGenProvider.Instance.CreateId();
+                    relationEntity.BusinessType = (int)InteJobBusinessTypeEnum.Resource;
+                    relationEntity.BusinessId = entity.Id;
+                    relationEntity.SiteCode = "TODO";
+                    relationEntity.CreatedBy = userName;
+                    relationEntity.UpdatedBy = userName;
+                    jobList.Add(relationEntity);
                 }
             }
             #endregion
@@ -404,7 +475,7 @@ namespace Hymson.MES.Services.Services.Process
                 }
                 if (parm.JobList != null && parm.JobList.Count > 0)
                 {
-                    await _resourceConfigJobRepository.InsertRangeAsync(jobList);
+                    await _jobBusinessRelationRepository.InsertRangeAsync(jobList);
                 }
 
                 ts.Complete();
@@ -816,22 +887,22 @@ namespace Hymson.MES.Services.Services.Process
                     await _procResourceConfigResRepository.DeletesRangeAsync(deleteSetIds.ToArray());
                 }
 
-                //作业设置数据
-                if (addJobList != null && addJobList.Count > 0)
-                {
-                    // return Error(ResultCode.FAIL, "插入工序关联作业表失败");
-                    await _resourceConfigJobRepository.InsertRangeAsync(addJobList);
-                }
-                if (updateJobList != null && updateJobList.Count > 0)
-                {
-                    // return Error(ResultCode.FAIL, "修改工序关联作业表失败");
-                    await _resourceConfigJobRepository.InsertRangeAsync(updateJobList);
-                }
-                if (deleteJobIds != null && deleteJobIds.Count > 0)
-                {
-                    // return Error(ResultCode.FAIL, "删除工序关联作业表失败");
-                    await _resourceConfigJobRepository.DeletesRangeAsync(deleteJobIds.ToArray());
-                }
+                //TODO作业设置数据
+                //if (addJobList != null && addJobList.Count > 0)
+                //{
+                //    // return Error(ResultCode.FAIL, "插入工序关联作业表失败");
+                //    await _resourceConfigJobRepository.InsertRangeAsync(addJobList);
+                //}
+                //if (updateJobList != null && updateJobList.Count > 0)
+                //{
+                //    // return Error(ResultCode.FAIL, "修改工序关联作业表失败");
+                //    await _resourceConfigJobRepository.InsertRangeAsync(updateJobList);
+                //}
+                //if (deleteJobIds != null && deleteJobIds.Count > 0)
+                //{
+                //    // return Error(ResultCode.FAIL, "删除工序关联作业表失败");
+                //    await _resourceConfigJobRepository.DeletesRangeAsync(deleteJobIds.ToArray());
+                //}
                 ts.Complete();
             }
         }

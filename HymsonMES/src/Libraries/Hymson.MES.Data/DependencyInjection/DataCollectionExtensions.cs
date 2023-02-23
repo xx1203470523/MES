@@ -116,7 +116,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region Procedure
             services.AddSingleton<IProcProcedureRepository, ProcProcedureRepository>();
-            services.AddSingleton<IProcProcedurePrintReleationRepository, ProcProcedurePrintReleationRepository>();
+            services.AddSingleton<IProcProcedurePrintRelationRepository, ProcProcedurePrintRelationRepository>();
             #endregion
             #region ProcessRoute
             services.AddSingleton<IProcProcessRouteRepository, ProcProcessRouteRepository>();

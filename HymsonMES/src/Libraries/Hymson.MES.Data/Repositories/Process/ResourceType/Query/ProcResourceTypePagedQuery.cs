@@ -36,8 +36,8 @@ namespace Hymson.MES.Data.Repositories.Process.ResourceType
         public string? ResName { get; set; }
 
         /// <summary>
-        /// 站点
+        /// 站点id
         /// </summary>
-        public string? SiteCode { get; set; }
+        public long SiteId { get; set; } = 0;
     }
 }

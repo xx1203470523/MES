@@ -262,8 +262,8 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcProcedureEntity, ProcProcedureDto>();
             CreateMap<ProcProcedureCreateDto, ProcProcedureEntity>();
             CreateMap<ProcProcedureModifyDto, ProcProcedureEntity>();
-            CreateMap<ProcProcedurePrintReleationEntity, ProcProcedurePrintReleationDto>();
-            CreateMap<ProcProcedurePrintReleationCreateDto, ProcProcedurePrintReleationEntity>();
+            CreateMap<ProcProcedurePrintRelationEntity, ProcProcedurePrintRelationDto>();
+            CreateMap<ProcProcedurePrintReleationCreateDto, ProcProcedurePrintRelationEntity>();
             CreateMap<InteJobBusinessRelationEntity, InteJobBusinessRelationDto>();
             #endregion
 

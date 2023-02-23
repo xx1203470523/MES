@@ -53,7 +53,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 工序配置打印表仓储
         /// </summary>
-        private readonly IProcProcedurePrintReleationRepository _procedurePrintReleationRepository;
+        private readonly IProcProcedurePrintRelationRepository _procedurePrintRelationRepository;
         /// <summary>
         /// 物料维护 仓储
         /// </summary>
@@ -74,7 +74,7 @@ namespace Hymson.MES.Services.Services.Process
             IProcProcedureRepository procProcedureRepository,
             IProcResourceTypeRepository resourceTypeRepository,
             IInteJobBusinessRelationRepository jobBusinessRelationRepository,
-            IProcProcedurePrintReleationRepository procedurePrintReleationRepository,
+            IProcProcedurePrintRelationRepository procedurePrintRelationRepository,
             IProcMaterialRepository procMaterialRepository,
             IInteJobRepository inteJobRepository,
             AbstractValidator<ProcProcedureCreateDto> validationCreateRules,
@@ -84,7 +84,7 @@ namespace Hymson.MES.Services.Services.Process
             _procProcedureRepository = procProcedureRepository;
             _resourceTypeRepository = resourceTypeRepository;
             _jobBusinessRelationRepository = jobBusinessRelationRepository;
-            _procedurePrintReleationRepository = procedurePrintReleationRepository;
+            _procedurePrintRelationRepository = procedurePrintRelationRepository;
             _procMaterialRepository = procMaterialRepository;
             _inteJobRepository = inteJobRepository;
             _validationCreateRules = validationCreateRules;
@@ -165,7 +165,7 @@ namespace Hymson.MES.Services.Services.Process
                 PageSize = queryDto.PageSize,
                 Sorting = queryDto.Sorting,
             };
-            var pagedInfo = await _procedurePrintReleationRepository.GetPagedInfoAsync(query);
+            var pagedInfo = await _procedurePrintRelationRepository.GetPagedInfoAsync(query);
 
             //实体到DTO转换 装载数据
             var dtos = new List<QueryProcProcedurePrintReleationDto>();
@@ -175,7 +175,7 @@ namespace Hymson.MES.Services.Services.Process
                 var materialLsit = await _procMaterialRepository.GetByIdsAsync(materialIds);
                 foreach (var entity in pagedInfo.Data)
                 {
-                    var printReleationDto = entity.ToModel<ProcProcedurePrintReleationDto>();
+                    var printReleationDto = entity.ToModel<ProcProcedurePrintRelationDto>();
                     var material = materialLsit.FirstOrDefault(a => a.Id == printReleationDto.MaterialId)?.ToModel<ProcMaterialDto>();
                     var queryEntity = new QueryProcProcedurePrintReleationDto { ProcedureBomConfigPrint = printReleationDto, Material = material ?? new ProcMaterialDto() };
                     dtos.Add(queryEntity);
@@ -197,7 +197,7 @@ namespace Hymson.MES.Services.Services.Process
             {
                 SiteCode = queryDto.SiteCode,
                 BusinessId = queryDto.BusinessId,
-                BusinessType = queryDto.BusinessType,
+                BusinessType = InteJobBusinessTypeEnum.Procedure.ToString(),
                 PageIndex = queryDto.PageIndex,
                 PageSize = queryDto.PageSize,
                 Sorting = queryDto.Sorting
@@ -266,12 +266,12 @@ namespace Hymson.MES.Services.Services.Process
             procProcedureEntity.UpdatedBy = userName;
 
             //打印
-            List<ProcProcedurePrintReleationEntity> procedureConfigPrintList = new List<ProcProcedurePrintReleationEntity>();
+            List<ProcProcedurePrintRelationEntity> procedureConfigPrintList = new List<ProcProcedurePrintRelationEntity>();
             if (parm.ProcedurePrintList != null && parm.ProcedurePrintList.Count > 0)
             {
                 foreach (var item in parm.ProcedurePrintList)
                 {
-                    var releationEntity = item.ToEntity<ProcProcedurePrintReleationEntity>(); ;
+                    var releationEntity = item.ToEntity<ProcProcedurePrintRelationEntity>(); ;
                     releationEntity.Id = IdGenProvider.Instance.CreateId();
                     releationEntity.ProcedureId = procProcedureEntity.Id;
                     releationEntity.SiteCode = siteCode;
@@ -305,7 +305,7 @@ namespace Hymson.MES.Services.Services.Process
 
                 if (procedureConfigPrintList != null && procedureConfigPrintList.Count > 0)
                 {
-                    await _procedurePrintReleationRepository.InsertRangeAsync(procedureConfigPrintList);
+                    await _procedurePrintRelationRepository.InsertRangeAsync(procedureConfigPrintList);
                 }
 
                 if (procedureConfigJobList != null && procedureConfigJobList.Count > 0)
@@ -343,12 +343,12 @@ namespace Hymson.MES.Services.Services.Process
 
             //TODO 现在关联表批量删除批量新增，后面再修改
             //打印
-            List<ProcProcedurePrintReleationEntity> procedureConfigPrintList = new List<ProcProcedurePrintReleationEntity>();
+            List<ProcProcedurePrintRelationEntity> procedureConfigPrintList = new List<ProcProcedurePrintRelationEntity>();
             if (parm.ProcedurePrintList != null && parm.ProcedurePrintList.Count > 0)
             {
                 foreach (var item in parm.ProcedurePrintList)
                 {
-                    var releationEntity = item.ToEntity<ProcProcedurePrintReleationEntity>(); ;
+                    var releationEntity = item.ToEntity<ProcProcedurePrintRelationEntity>(); ;
                     releationEntity.Id = IdGenProvider.Instance.CreateId();
                     releationEntity.ProcedureId = procProcedureEntity.Id;
                     releationEntity.SiteCode = siteCode;
@@ -380,10 +380,10 @@ namespace Hymson.MES.Services.Services.Process
                 //入库
                 await _procProcedureRepository.UpdateAsync(procProcedureEntity);
 
-                await _procedurePrintReleationRepository.DeleteByProcedureIdAsync(procProcedureEntity.Id);
+                await _procedurePrintRelationRepository.DeleteByProcedureIdAsync(procProcedureEntity.Id);
                 if (procedureConfigPrintList != null && procedureConfigPrintList.Count > 0)
                 {
-                    await _procedurePrintReleationRepository.InsertRangeAsync(procedureConfigPrintList);
+                    await _procedurePrintRelationRepository.InsertRangeAsync(procedureConfigPrintList);
                 }
 
                 await _jobBusinessRelationRepository.DeleteByBusinessIdAsync(procProcedureEntity.Id);

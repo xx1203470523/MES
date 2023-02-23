@@ -173,21 +173,21 @@ namespace Hymson.MES.Data.Repositories.Integrated
     public partial class InteJobBusinessRelationRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte__job_business_relation` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `inte__job_business_relation` /**where**/ ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_procedure_job_relation` /**where**/ ";
         const string GetInteJobBusinessRelationEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
-                                           FROM `inte__job_business_relation` /**where**/  ";
+                                           FROM `proc_procedure_job_relation` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `inte__job_business_relation`(  `Id`, `SiteCode`, `BusinessType`, `BusinessId`, `OrderNumber`, `JobId`, `IsUse`, `Parameter`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @BusinessType, @BusinessId, @OrderNumber, @JobId, @IsUse, @Parameter, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `inte__job_business_relation`(  `Id`, `SiteCode`, `BusinessType`, `BusinessId`, `OrderNumber`, `JobId`, `IsUse`, `Parameter`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @BusinessType, @BusinessId, @OrderNumber, @JobId, @IsUse, @Parameter, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `proc_procedure_job_relation`(  `Id`, `SiteCode`, `BusinessType`, `BusinessId`, `OrderNumber`, `JobId`, `IsUse`, `Parameter`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @BusinessType, @BusinessId, @OrderNumber, @JobId, @IsUse, @Parameter, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsSql = "INSERT INTO `proc_procedure_job_relation`(  `Id`, `SiteCode`, `BusinessType`, `BusinessId`, `OrderNumber`, `JobId`, `IsUse`, `Parameter`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @BusinessType, @BusinessId, @OrderNumber, @JobId, @IsUse, @Parameter, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string UpdateSql = "UPDATE `inte__job_business_relation` SET   SiteCode = @SiteCode, BusinessType = @BusinessType, BusinessId = @BusinessId, OrderNumber = @OrderNumber, JobId = @JobId, IsUse = @IsUse, Parameter = @Parameter, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string DeleteByBusinessIdSql = "delete from `inte__job_business_relation` WHERE BusinessId = @BusinessId ";
-        const string DeletesSql = "UPDATE `inte__job_business_relation` SET IsDeleted = '1' WHERE Id in @ids";
+        const string DeleteByBusinessIdSql = "delete from `proc_procedure_job_relation` WHERE BusinessId = @BusinessId ";
+        const string DeletesSql = "UPDATE `proc_procedure_job_relation` SET IsDeleted = '1' WHERE Id in @ids";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteCode`, `BusinessType`, `BusinessId`, `OrderNumber`, `JobId`, `IsUse`, `Parameter`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `inte__job_business_relation`  WHERE Id = @Id ";
+                            FROM `proc_procedure_job_relation`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteCode`, `BusinessType`, `BusinessId`, `OrderNumber`, `JobId`, `IsUse`, `Parameter`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `inte__job_business_relation`  WHERE Id IN @ids ";
+                            FROM `proc_procedure_job_relation`  WHERE Id IN @ids ";
     }
 }

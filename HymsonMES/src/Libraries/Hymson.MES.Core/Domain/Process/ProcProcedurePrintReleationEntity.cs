@@ -7,7 +7,7 @@ namespace Hymson.MES.Core.Domain.Process
     /// @author admin
     /// @date 2023-02-08
     /// </summary>
-    public class ProcProcedurePrintReleationEntity : BaseEntity
+    public class ProcProcedurePrintRelationEntity : BaseEntity
     {
         /// <summary>
         /// 描述 :份数 

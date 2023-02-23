@@ -7,18 +7,13 @@
  */
 
 using Hymson.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Dtos.Process
 {
     /// <summary>
     /// 工序配置打印表Dto
     /// </summary>
-    public record ProcProcedurePrintReleationDto : BaseEntityDto
+    public record ProcProcedurePrintRelationDto : BaseEntityDto
     {
         /// <summary>
         /// ID
@@ -198,7 +193,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 工序配置打印实体类
         /// </summary>
-        public ProcProcedurePrintReleationDto ProcedureBomConfigPrint { get; set; }
+        public ProcProcedurePrintRelationDto ProcedureBomConfigPrint { get; set; }
 
         /// <summary>
         /// 物料
