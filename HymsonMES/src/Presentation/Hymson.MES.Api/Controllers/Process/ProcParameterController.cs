@@ -48,7 +48,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("pagelist")]
-        public async Task<PagedInfo<ProcParameterDto>> QueryPagedProcParameterAsync([FromQuery] ProcParameterPagedQueryDto parm)
+        public async Task<PagedInfo<ProcParameterDto>> QueryPagedProcParameterAsync(ProcParameterPagedQueryDto parm)
         {
             return await _procParameterService.GetPageListAsync(parm);
         }
@@ -71,9 +71,9 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        public async Task AddProcParameterAsync([FromBody] ProcParameterCreateDto parm)
+        public async Task<int> AddProcParameterAsync([FromBody] ProcParameterCreateDto parm)
         {
-             await _procParameterService.CreateProcParameterAsync(parm);
+             return await _procParameterService.CreateProcParameterAsync(parm);
         }
 
         /// <summary>
@@ -95,10 +95,10 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("delete")]
-        public async Task DeleteProcParameterAsync(string ids)
+        public async Task<int> DeleteProcParameterAsync([FromBody] long[] ids)
         {
             //long[] idsArr = StringExtension.SpitLongArrary(ids);
-            await _procParameterService.DeletesProcParameterAsync(ids);
+            return await _procParameterService.DeletesProcParameterAsync(string.Join(",", ids));
         }
 
     }

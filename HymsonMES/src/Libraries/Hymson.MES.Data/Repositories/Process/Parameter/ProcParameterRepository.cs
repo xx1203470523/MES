@@ -86,9 +86,9 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
 
-            if (!string.IsNullOrWhiteSpace(procParameterPagedQuery.SiteCode))
+            if (procParameterPagedQuery.SiteId != 0)
             {
-                sqlBuilder.Where(" SiteCode=@SiteCode ");
+                sqlBuilder.Where(" SiteId=@SiteId ");
             }
             if (!string.IsNullOrWhiteSpace(procParameterPagedQuery.ParameterCode))
             {
@@ -132,9 +132,9 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
 
-            if (!string.IsNullOrWhiteSpace(procParameterQuery.SiteCode))
+            if (procParameterQuery.SiteId!=0)
             {
-                sqlBuilder.Where(" SiteCode=@SiteCode ");
+                sqlBuilder.Where(" SiteId=@SiteId ");
             }
             if (!string.IsNullOrWhiteSpace(procParameterQuery.ParameterCode))
             {
@@ -201,18 +201,18 @@ namespace Hymson.MES.Data.Repositories.Process
                                             /**select**/
                                            FROM `proc_parameter` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `proc_parameter`(  `Id`, `SiteCode`, `ParameterCode`, `ParameterName`, `ParameterUnit`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @ParameterCode, @ParameterName, @ParameterUnit, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `proc_parameter`(  `Id`, `SiteCode`, `ParameterCode`, `ParameterName`, `ParameterUnit`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @ParameterCode, @ParameterName, @ParameterUnit, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        //const string UpdateSql = "UPDATE `proc_parameter` SET   SiteCode = @SiteCode, ParameterCode = @ParameterCode, ParameterName = @ParameterName, ParameterUnit = @ParameterUnit, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string InsertSql = "INSERT INTO `proc_parameter`(  `Id`, `SiteId`, `ParameterCode`, `ParameterName`, `ParameterUnit`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ParameterCode, @ParameterName, @ParameterUnit, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsSql = "INSERT INTO `proc_parameter`(  `Id`, `SiteId`, `ParameterCode`, `ParameterName`, `ParameterUnit`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ParameterCode, @ParameterName, @ParameterUnit, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        //const string UpdateSql = "UPDATE `proc_parameter` SET   SiteId = @SiteId, ParameterCode = @ParameterCode, ParameterName = @ParameterName, ParameterUnit = @ParameterUnit, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdateSql = "UPDATE `proc_parameter` SET  ParameterUnit = @ParameterUnit, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `proc_parameter` SET   SiteCode = @SiteCode, ParameterCode = @ParameterCode, ParameterName = @ParameterName, ParameterUnit = @ParameterUnit, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `proc_parameter` SET   SiteId = @SiteId, ParameterCode = @ParameterCode, ParameterName = @ParameterName, ParameterUnit = @ParameterUnit, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_parameter` SET IsDeleted = '1' WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_parameter` SET IsDeleted = '1' WHERE Id in @ids";
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteCode`, `ParameterCode`, `ParameterName`, `ParameterUnit`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                               `Id`, `SiteId`, `ParameterCode`, `ParameterName`, `ParameterUnit`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_parameter`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteCode`, `ParameterCode`, `ParameterName`, `ParameterUnit`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                                          `Id`, `SiteId`, `ParameterCode`, `ParameterName`, `ParameterUnit`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_parameter`  WHERE Id IN @ids ";
     }
 }

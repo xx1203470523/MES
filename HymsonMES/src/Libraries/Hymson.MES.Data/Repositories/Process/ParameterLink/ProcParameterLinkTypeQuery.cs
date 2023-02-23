@@ -19,11 +19,16 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public class ProcParameterLinkTypeQuery
     {
-        /// <summary>
-        /// 描述 :所属站点代码 
-        /// 空值 : false  
-        /// </summary>
-        public string SiteCode { get; set; }
+        ///// <summary>
+        ///// 描述 :所属站点代码 
+        ///// 空值 : false  
+        ///// </summary>
+        //public string SiteCode { get; set; }
+
+        //
+        // 摘要:
+        //     站点id
+        public long? SiteId { get; set; }
 
         /// <summary>
         /// 描述 :标准参数ID 

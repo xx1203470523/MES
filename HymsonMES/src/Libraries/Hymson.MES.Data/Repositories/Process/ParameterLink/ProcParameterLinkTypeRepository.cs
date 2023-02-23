@@ -108,9 +108,9 @@ namespace Hymson.MES.Data.Repositories.Process
             //sqlBuilder.Where("IsDeleted=0");
             //sqlBuilder.Select("*");
 
-            if (!string.IsNullOrWhiteSpace(procParameterLinkTypePagedQuery.SiteCode))
+            if (procParameterLinkTypePagedQuery.SiteId != 0)
             {
-                sqlBuilder.Where(" g.SiteCode=@SiteCode ");
+                sqlBuilder.Where(" g.SiteId=@SiteId ");
             }
             if (procParameterLinkTypePagedQuery.ParameterType!=0)
             {
@@ -153,9 +153,9 @@ namespace Hymson.MES.Data.Repositories.Process
             //sqlBuilder.Where("IsDeleted=0");
             //sqlBuilder.Select("*");
 
-            if (!string.IsNullOrWhiteSpace(procParameterDetailPagerQuery.SiteCode))
+            if (procParameterDetailPagerQuery.SiteId != 0)
             {
-                sqlBuilder.Where(" g.SiteCode=@SiteCode ");
+                sqlBuilder.Where(" g.SiteId=@SiteId ");
             }
             if (!string.IsNullOrWhiteSpace(procParameterDetailPagerQuery.ParameterCode))
             {
@@ -197,9 +197,9 @@ namespace Hymson.MES.Data.Repositories.Process
             var template = sqlBuilder.AddTemplate(GetProcParameterLinkTypeEntitiesSqlTemplate);
             sqlBuilder.Select("*");
 
-            if (!string.IsNullOrEmpty(procParameterLinkTypeQuery.SiteCode)) 
+            if (procParameterLinkTypeQuery.SiteId!=0) 
             {
-                sqlBuilder.Where(" SiteCode = @SiteCode ");
+                sqlBuilder.Where(" SiteId = @SiteId ");
             }
             if (procParameterLinkTypeQuery.ParameterID!=0) 
             {
@@ -264,7 +264,7 @@ namespace Hymson.MES.Data.Repositories.Process
     public partial class ProcParameterLinkTypeRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT 
-                                g.Id, g.SiteCode, g.ParameterType, o.Id as ParameterID,
+                                g.Id, g.SiteId, g.ParameterType, o.Id as ParameterID,
                                 o.ParameterCode, o.ParameterName, o.ParameterUnit,
                                 g.Remark, g.CreateBy, g.CreateOn, g.UpdateBy, g.UpdateOn
                                 FROM `proc_parameter_link_type` g 
@@ -276,7 +276,7 @@ namespace Hymson.MES.Data.Repositories.Process
                 /**where**/ ";
 
         const string GetPagedProcParameterLinkTypeByTypeSqlTemplate = @"SELECT 
-                                o.Id, g.SiteCode, g.Id as ParameterID, o.ParameterType, 
+                                o.Id, g.SiteId, g.Id as ParameterID, o.ParameterType, 
                                 g.ParameterCode, g.ParameterName, g.Remark, o.CreateBy,
                                 o.CreateOn, o.UpdateBy, o.UpdateOn 
                                 FROM `proc_parameter` g 
@@ -290,21 +290,21 @@ namespace Hymson.MES.Data.Repositories.Process
                                             /**select**/
                                            FROM `proc_parameter_link_type` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `proc_parameter_link_type`(  `Id`, `SiteCode`, `ParameterID`, `ParameterType`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @ParameterID, @ParameterType, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `proc_parameter_link_type`(  `Id`, `SiteCode`, `ParameterID`, `ParameterType`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @ParameterID, @ParameterType, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string UpdateSql = "UPDATE `proc_parameter_link_type` SET   SiteCode = @SiteCode, ParameterID = @ParameterID, ParameterType = @ParameterType, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `proc_parameter_link_type` SET   SiteCode = @SiteCode, ParameterID = @ParameterID, ParameterType = @ParameterType, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string InsertSql = "INSERT INTO `proc_parameter_link_type`(  `Id`, `SiteId`, `ParameterID`, `ParameterType`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ParameterID, @ParameterType, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsSql = "INSERT INTO `proc_parameter_link_type`(  `Id`, `SiteId`, `ParameterID`, `ParameterType`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ParameterID, @ParameterType, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string UpdateSql = "UPDATE `proc_parameter_link_type` SET   SiteId = @SiteId, ParameterID = @ParameterID, ParameterType = @ParameterType, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `proc_parameter_link_type` SET   SiteId = @SiteId, ParameterID = @ParameterID, ParameterType = @ParameterType, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_parameter_link_type` SET IsDeleted = '1' WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_parameter_link_type` SET IsDeleted = '1' WHERE Id in @ids";
         const string DeletesTrueSql = " Delete FROM `proc_parameter_link_type` WHERE Id in @ids ";
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteCode`, `ParameterID`, `ParameterType`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                               `Id`, `SiteId`, `ParameterID`, `ParameterType`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_parameter_link_type`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteCode`, `ParameterID`, `ParameterType`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                                          `Id`, `SiteId`, `ParameterID`, `ParameterType`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_parameter_link_type`  WHERE Id IN @ids ";
         const string GetByParameterIdsSql = @"SELECT 
-                                          `Id`, `SiteCode`, `ParameterID`, `ParameterType`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                                          `Id`, `SiteId`, `ParameterID`, `ParameterType`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_parameter_link_type`  WHERE IsDeleted =0 AND ParameterID IN @parameterIds ";
     }
 }
