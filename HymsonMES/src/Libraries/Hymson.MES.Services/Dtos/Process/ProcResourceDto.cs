@@ -98,9 +98,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 空值 : false  
         /// </summary>
         public string? Status { get; set; }
-
-        //站点
-        public string? SiteCode { get; set; }
     }
 
     public record ProcResourceViewDto: ProcResourceDto

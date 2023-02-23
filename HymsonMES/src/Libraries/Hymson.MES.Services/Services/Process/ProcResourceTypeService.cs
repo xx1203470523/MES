@@ -253,7 +253,7 @@ namespace Hymson.MES.Services.Services.Process
             var siteId =_currentSite.SiteId??0;
             var query = new ProcResourceQuery
             {
-                // TODO  SiteCode = siteCode,
+                SiteId = siteId,
                 IdsArr = idsArr
             };
             var resourceList = await _resourceRepository.GetByResTypeIdsAsync(query);

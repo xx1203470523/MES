@@ -105,7 +105,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_resource_config_res` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_resource_config_res` /**where**/";
 
-        const string InsertSql = "INSERT INTO `proc_resource_config_res`(  `Id`, `SiteCode`, `ResourceId`, `SetType`, `Value`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @ResourceId, @SetType, @Value, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `proc_resource_config_res`(  `Id`, `SiteId`, `ResourceId`, `SetType`, `Value`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @ResourceId, @SetType, @Value, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string UpdateSql = "UPDATE `proc_resource_config_res` SET  SetType = @SetType, Value = @Value,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_resource_config_res` SET IsDeleted = '1' WHERE Id = @Id ";
     }
