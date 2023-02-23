@@ -129,17 +129,10 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long Id { get; set; }
 
-<<<<<<< HEAD
-        //
-        // 摘要:
-        //     站点id
-        public long? SiteId { get; set; }
-=======
         /// <summary>
         /// 所属站点代码
         /// </summary>
         public long SiteId { get; set; }
->>>>>>> d1ebed8ea423cccb2e0ae2e5a9aa221da28a9195
 
         /// <summary>
         /// 类型（设备/产品参数）
