@@ -5,6 +5,8 @@ using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Options;
 using Hymson.MES.Services.Services.EquEquipmentGroup;
+using Hymson.MES.Services.Services.Equipment.EquConsumable;
+using Hymson.MES.Services.Services.Equipment.EquConsumableType;
 using Hymson.MES.Services.Services.Equipment.EquEquipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipmentUnit;
 using Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon;
@@ -198,6 +200,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<QualUnqualifiedGroupCreateDto>, QualUnqualifiedGroupCreateValidator>();
             services.AddSingleton<AbstractValidator<QualUnqualifiedGroupModifyDto>, QualUnqualifiedGroupModifyValidator>();
             #endregion
+
             return services;
         }
     }

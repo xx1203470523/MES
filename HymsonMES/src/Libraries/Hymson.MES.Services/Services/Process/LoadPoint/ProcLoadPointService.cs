@@ -91,13 +91,13 @@ namespace Hymson.MES.Services.Services.Process
             procLoadPointEntity.CreatedOn = HymsonClock.Now();
             procLoadPointEntity.UpdatedOn = HymsonClock.Now();
 
-            procLoadPointEntity.SiteCode = "TODO";
+            // TODO   procLoadPointEntity.SiteCode = "TODO";
 
             #region 数据库验证
             var isExists = (await _procLoadPointRepository.GetProcLoadPointEntitiesAsync(new ProcLoadPointQuery()
             {
-                SiteCode = procLoadPointEntity.SiteCode,
-                LoadPoint= procLoadPointEntity.LoadPoint
+                // TODO   SiteCode = procLoadPointEntity.SiteCode,
+                LoadPoint = procLoadPointEntity.LoadPoint
             })).Any();  
             if (isExists == true)
             {
@@ -115,7 +115,7 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     linkMaterials.Add(new ProcLoadPointLinkMaterialEntity
                     {
-                        SiteCode = procLoadPointEntity.SiteCode,
+                        // TODO   SiteCode = procLoadPointEntity.SiteCode,
                         LoadPointId = procLoadPointEntity.Id,
                         MaterialId = material.MaterialId.ParseToLong(),
                         Version = material.Version,
@@ -134,7 +134,7 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     linkResources.Add(new ProcLoadPointLinkResourceEntity
                     {
-                        SiteCode = procLoadPointEntity.SiteCode,
+                        // TODO    SiteCode = procLoadPointEntity.SiteCode,
                         LoadPointId = procLoadPointEntity.Id,
                         ResourceId = resource.ResourceId.ParseToLong(),
                         CreatedBy = _currentUser.UserName,
@@ -278,7 +278,7 @@ namespace Hymson.MES.Services.Services.Process
             var procLoadPointEntity = procLoadPointModifyDto.ToEntity<ProcLoadPointEntity>();
             procLoadPointEntity.UpdatedBy = _currentUser.UserName;
             procLoadPointEntity.UpdatedOn = HymsonClock.Now();
-            procLoadPointEntity.SiteCode = "TODO";
+            // TODO   procLoadPointEntity.SiteCode = "TODO";
 
             #region 数据库验证
             var modelOrigin = await _procLoadPointRepository.GetByIdAsync(procLoadPointModifyDto.Id);
@@ -298,7 +298,7 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     linkMaterials.Add(new ProcLoadPointLinkMaterialEntity
                     {
-                        SiteCode = procLoadPointEntity.SiteCode,
+                        // TODO     SiteCode = procLoadPointEntity.SiteCode,
                         LoadPointId = procLoadPointEntity.Id,
                         MaterialId = material.MaterialId.ParseToLong(),
                         Version = material.Version,
@@ -317,7 +317,7 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     linkResources.Add(new ProcLoadPointLinkResourceEntity
                     {
-                        SiteCode = procLoadPointEntity.SiteCode,
+                        // TODO    SiteCode = procLoadPointEntity.SiteCode,
                         LoadPointId = procLoadPointEntity.Id,
                         ResourceId = resource.ResourceId,
                         CreatedBy = _currentUser.UserName,
@@ -384,7 +384,7 @@ namespace Hymson.MES.Services.Services.Process
             ProcLoadPointDetailDto loadPointDto = new ProcLoadPointDetailDto
             {
                 Id = procLoadPointEntity.Id,
-                SiteCode = procLoadPointEntity.SiteCode,
+                // TODO    SiteCode = procLoadPointEntity.SiteCode,
                 LoadPoint = procLoadPointEntity.LoadPoint,
                 LoadPointName = procLoadPointEntity.LoadPointName,
                 Status = procLoadPointEntity.Status,

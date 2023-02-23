@@ -40,7 +40,7 @@ namespace Hymson.MES.Services.Services.Process
 
         private readonly ICurrentUser _currentUser;
 
-        public ProcBomService(ICurrentUser currentUser,IProcBomRepository procBomRepository, AbstractValidator<ProcBomCreateDto> validationCreateRules, AbstractValidator<ProcBomModifyDto> validationModifyRules, IProcBomDetailRepository procBomDetailRepository, IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository)
+        public ProcBomService(ICurrentUser currentUser, IProcBomRepository procBomRepository, AbstractValidator<ProcBomCreateDto> validationCreateRules, AbstractValidator<ProcBomModifyDto> validationModifyRules, IProcBomDetailRepository procBomDetailRepository, IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository)
         {
             _currentUser = currentUser;
             _procBomRepository = procBomRepository;
@@ -57,7 +57,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task CreateProcBomAsync(ProcBomCreateDto procBomCreateDto)
         {
-            if (procBomCreateDto == null) 
+            if (procBomCreateDto == null)
             {
                 throw new ValidationException(ErrorCode.MES10503);
             }
@@ -71,14 +71,14 @@ namespace Hymson.MES.Services.Services.Process
                 }
             });
 
-            procBomCreateDto.SiteCode = "";//TODO App.GetSite();
+            // TODO SiteId procBomCreateDto.SiteCode = "";//TODO App.GetSite();
 
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procBomCreateDto);
 
             //DTO转换实体
             var procBomEntity = procBomCreateDto.ToEntity<ProcBomEntity>();
-            procBomEntity.Id= IdGenProvider.Instance.CreateId();
+            procBomEntity.Id = IdGenProvider.Instance.CreateId();
             procBomEntity.CreatedBy = _currentUser.UserName;
             procBomEntity.UpdatedBy = _currentUser.UserName;
             procBomEntity.CreatedOn = HymsonClock.Now();
@@ -89,11 +89,11 @@ namespace Hymson.MES.Services.Services.Process
             //验证是否存在
             var exists = await _procBomRepository.GetProcBomEntitiesAsync(new ProcBomQuery()
             {
-                SiteCode = procBomEntity.SiteCode,
+                // TODO SiteCode = procBomEntity.SiteCode,
                 BomCode = procBomEntity.BomCode,
                 Version = procBomEntity.Version,
             });
-            if (exists != null && exists.Count() > 0) 
+            if (exists != null && exists.Count() > 0)
             {
                 throw new BusinessException(ErrorCode.MES10601).WithData("bomCode", procBomEntity.BomCode).WithData("version", procBomEntity.Version);
             }
@@ -155,7 +155,7 @@ namespace Hymson.MES.Services.Services.Process
                         var bomdeail = new ProcBomDetailEntity
                         {
                             Id = IdGenProvider.Instance.CreateId(),
-                            SiteCode = procBomCreateDto.SiteCode,
+                            // TODO  SiteCode = procBomCreateDto.SiteCode,
                             BomId = procBomEntity.Id,
                             MaterialId = material.MaterialId.ParseToLong(),
                             ProcedureBomId = material.ProcedureBomId.ParseToLong(),
@@ -173,7 +173,7 @@ namespace Hymson.MES.Services.Services.Process
                         var bomReplacedeail = new ProcBomDetailReplaceMaterialEntity
                         {
                             Id = IdGenProvider.Instance.CreateId(),
-                            SiteCode = procBomCreateDto.SiteCode,
+                            // TODO   SiteCode = procBomCreateDto.SiteCode,
                             BomId = procBomEntity.Id,
                             BomDetailId = mainId,
                             ReplaceMaterialId = material.ReplaceMaterialId.ParseToLong(),
@@ -196,7 +196,7 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     var currentProcBom = (await _procBomRepository.GetProcBomEntitiesAsync(new ProcBomQuery()
                     {
-                        SiteCode = procBomEntity.SiteCode,
+                        // TODO   SiteCode = procBomEntity.SiteCode,
                         BomCode = procBomEntity.BomCode,
                     })).Where(x => x.IsCurrentVersion = true).First(); ;//a => a.SiteCode == parm.SiteCode && a.BomCode == procBom.BomCode && a.IsCurrentVersion == true
                     if (currentProcBom != null)
@@ -262,7 +262,7 @@ namespace Hymson.MES.Services.Services.Process
 
             //判断需要删除的Bom是否是启用状态
             var bomList = await _procBomRepository.GetByIdsAsync(idsArr);
-            if (bomList.Any(x => x.Status == "1")) 
+            if (bomList.Any(x => x.Status == "1"))
             {
                 throw new BusinessException(ErrorCode.MES10611);
             }
@@ -277,7 +277,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<PagedInfo<ProcBomDto>> GetPageListAsync(ProcBomPagedQueryDto procBomPagedQueryDto)
         {
-            procBomPagedQueryDto.SiteCode = "";//TODO
+            procBomPagedQueryDto.SiteId = 0;//TODO
 
             var procBomPagedQuery = procBomPagedQueryDto.ToQuery<ProcBomPagedQuery>();
             var pagedInfo = await _procBomRepository.GetPagedInfoAsync(procBomPagedQuery);
@@ -292,7 +292,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="pagedInfo"></param>
         /// <returns></returns>
-        private static List<ProcBomDto> PrepareProcBomDtos(PagedInfo<ProcBomEntity>   pagedInfo)
+        private static List<ProcBomDto> PrepareProcBomDtos(PagedInfo<ProcBomEntity> pagedInfo)
         {
             var procBomDtos = new List<ProcBomDto>();
             foreach (var procBomEntity in pagedInfo.Data)
@@ -324,7 +324,7 @@ namespace Hymson.MES.Services.Services.Process
                     a.ProcedureBomId = "0";
                 }
             });
-            procBomModifyDto.SiteCode = "TODO";
+            // TODO SiteId  procBomModifyDto.SiteCode = "TODO";
 
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(procBomModifyDto);
@@ -347,10 +347,10 @@ namespace Hymson.MES.Services.Services.Process
             //验证是否存在
             var exists = (await _procBomRepository.GetProcBomEntitiesAsync(new ProcBomQuery()
             {
-                SiteCode = procBomEntity.SiteCode,
+                // TODO    SiteCode = procBomEntity.SiteCode,
                 BomCode = procBomEntity.BomCode,
                 Version = procBomEntity.Version,
-            })).Where(x=>x.Id!= procBomEntity.Id && x.IsDeleted==false) ;
+            })).Where(x => x.Id != procBomEntity.Id && x.IsDeleted == false);
             if (exists != null && exists.Count() > 0)
             {
                 throw new BusinessException(ErrorCode.MES10601).WithData("bomCode", procBomEntity.BomCode).WithData("version", procBomEntity.Version);
@@ -412,7 +412,7 @@ namespace Hymson.MES.Services.Services.Process
                         var bomdeail = new ProcBomDetailEntity
                         {
                             Id = IdGenProvider.Instance.CreateId(),
-                            SiteCode = procBomModifyDto.SiteCode,
+                            // TODO    SiteCode = procBomModifyDto.SiteCode,
                             BomId = procBomEntity.Id,
                             MaterialId = material.MaterialId.ParseToLong(),
                             ProcedureBomId = material.ProcedureBomId.ParseToLong(),
@@ -430,7 +430,7 @@ namespace Hymson.MES.Services.Services.Process
                         var bomReplacedeail = new ProcBomDetailReplaceMaterialEntity
                         {
                             Id = IdGenProvider.Instance.CreateId(),
-                            SiteCode = procBomModifyDto.SiteCode,
+                            // TODO   SiteCode = procBomModifyDto.SiteCode,
                             BomId = procBomEntity.Id,
                             BomDetailId = mainId,
                             ReplaceMaterialId = material.ReplaceMaterialId.ParseToLong(),
@@ -453,7 +453,7 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     var currentProcBom = (await _procBomRepository.GetProcBomEntitiesAsync(new ProcBomQuery()
                     {
-                        SiteCode = procBomEntity.SiteCode,
+                        // TODO   SiteCode = procBomEntity.SiteCode,
                         BomCode = procBomEntity.BomCode,
                     })).Where(x => x.IsCurrentVersion = true).First(); ;//a => a.SiteCode == parm.SiteCode && a.BomCode == procBom.BomCode && a.IsCurrentVersion == true
                     if (currentProcBom != null)
@@ -465,7 +465,7 @@ namespace Hymson.MES.Services.Services.Process
                 //编码+版本唯一在修改时两者均不可修改
                 response = await _procBomRepository.UpdateAsync(procBomEntity);
 
-                if (response == 0) 
+                if (response == 0)
                 {
                     throw new BusinessException(ErrorCode.MES10609);
                 }
@@ -502,13 +502,13 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ProcBomDto> QueryProcBomByIdAsync(long id) 
+        public async Task<ProcBomDto> QueryProcBomByIdAsync(long id)
         {
-           var procBomEntity = await _procBomRepository.GetByIdAsync(id);
-           if (procBomEntity != null) 
-           {
-               return procBomEntity.ToModel<ProcBomDto>();
-           }
+            var procBomEntity = await _procBomRepository.GetByIdAsync(id);
+            if (procBomEntity != null)
+            {
+                return procBomEntity.ToModel<ProcBomDto>();
+            }
             return null;
         }
 
@@ -519,7 +519,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<List<ProcBomDetailView>> GetProcBomMaterialAsync(long id)
         {
-            var procBomDetailViews=new List<ProcBomDetailView>();
+            var procBomDetailViews = new List<ProcBomDetailView>();
             var mainBomDetails = await _procBomDetailRepository.GetListMainAsync(id);
             var replaceBomDetails = await _procBomDetailRepository.GetListReplaceAsync(id);
 

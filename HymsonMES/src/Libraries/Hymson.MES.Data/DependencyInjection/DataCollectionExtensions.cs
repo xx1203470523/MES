@@ -131,6 +131,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IQualUnqualifiedCodeRepository, QualUnqualifiedCodeRepository>();
             services.AddSingleton<IQualUnqualifiedGroupRepository, QualUnqualifiedGroupRepository>();
             #endregion
+
             return services;
         }
 

@@ -13,7 +13,7 @@ namespace Hymson.MES.Core.Domain.System
         /// 描述 :站点(代码) 
         /// 空值 : false  
         /// </summary>
-        public string SiteCode { get; set; }
+        public long SiteId { get; set; }
         
         /// <summary>
         /// 描述 :站点名称 

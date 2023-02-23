@@ -94,12 +94,8 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquConsumableType
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
-
-            if (string.IsNullOrWhiteSpace(pagedQuery.SiteCode) == false)
-            {
-                sqlBuilder.Where("SiteCode = @SiteCode");
-            }
 
             if (string.IsNullOrWhiteSpace(pagedQuery.ConsumableTypeCode) == false)
             {

@@ -258,7 +258,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 所属站点代码
         /// </summary>
-        public string SiteCode { get; set; } = "";
+        public long SiteId { get; set; }
 
         /// <summary>
         /// 描述 :上料点 

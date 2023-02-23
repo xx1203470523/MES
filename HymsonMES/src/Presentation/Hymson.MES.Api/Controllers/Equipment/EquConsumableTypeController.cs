@@ -1,6 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
-using Hymson.MES.Services.Services.Equipment.EquSparePartType;
+using Hymson.MES.Services.Services.Equipment.EquConsumableType;
 using Hymson.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

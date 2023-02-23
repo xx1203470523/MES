@@ -215,6 +215,6 @@ namespace Hymson.MES.Services.Dtos.Process
         ///// 描述 :站点编码 
         ///// 空值 : false  
         ///// </summary>
-        //public string SiteCode { get; set; }
+        //public long SiteId { get; set; }
     }
 }

@@ -319,7 +319,7 @@ namespace Hymson.MES.Services.Services.Process
             var resCode = parm.ResCode.ToUpperInvariant();
             var query = new ProcResourceQuery
             {
-                SiteCode = parm.SiteCode,
+                SiteCode = "TODO",
                 ResCode = resCode
             };
             if (await _resourceRepository.IsExistsAsync(query))
@@ -352,7 +352,7 @@ namespace Hymson.MES.Services.Services.Process
             }
             #endregion
 
-            string site = parm.SiteCode;
+            string site = "TODO";
             var userName = _currentUser.UserName;
 
             #region 组装数据
@@ -373,7 +373,7 @@ namespace Hymson.MES.Services.Services.Process
                     printList.Add(new ProcResourceConfigPrintEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
-                        SiteCode = site,
+                        SiteId = _currentSite.SiteId??0,
                         ResourceId = entity.Id,
                         PrintId = item.PrintId,
                         Remark = "",
@@ -392,7 +392,7 @@ namespace Hymson.MES.Services.Services.Process
                     equList.Add(new ProcResourceEquipmentBindEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
-                        SiteCode = site,
+                        SiteId = _currentSite.SiteId??0,
                         ResourceId = entity.Id,
                         EquipmentId = item.EquipmentId,
                         IsMain = item.IsMain ?? false,
@@ -412,7 +412,7 @@ namespace Hymson.MES.Services.Services.Process
                     resSetList.Add(new ProcResourceConfigResEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
-                        SiteCode = site,
+                        SiteId = _currentSite.SiteId??0,
                         ResourceId = entity.Id,
                         SetType = item.SetType,
                         Value = item.Value,
@@ -496,7 +496,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task UpdateProcResrouceAsync(ProcResourceModifyDto param)
         {
             string userName = _currentUser.UserName;
-            var siteCode = param.SiteCode;
+            var siteCode = _currentSite.SiteId??0;
             #region 验证
             if (param == null)
             {
@@ -664,7 +664,7 @@ namespace Hymson.MES.Services.Services.Process
                                 ResourceId = param.Id,
                                 PrintId = item.PrintId,
                                 Remark = "",
-                                SiteCode = item.SiteCode,
+                                SiteId = _currentSite.SiteId??0,
                                 CreatedBy = userName,
                                 UpdatedBy = userName
                             };
@@ -710,7 +710,7 @@ namespace Hymson.MES.Services.Services.Process
                                 EquipmentId = item.EquipmentId,
                                 IsMain = item.IsMain ?? false,
                                 Remark = "",
-                                SiteCode = item.SiteCode,
+                                SiteId = _currentSite.SiteId??0,
                                 CreatedBy = userName,
                                 UpdatedBy = userName
                             };
@@ -757,7 +757,7 @@ namespace Hymson.MES.Services.Services.Process
                                 SetType = item.SetType,
                                 Value = item.Value,
                                 Remark = "",
-                                SiteCode = item.SiteCode,
+                                SiteId = _currentSite.SiteId??0,
                                 CreatedBy = userName,
                                 UpdatedBy = userName
                             };
@@ -806,7 +806,7 @@ namespace Hymson.MES.Services.Services.Process
                                 IsUse = item.IsUse,
                                 Parameter = item.Parameter,
                                 Remark = item.Remark,
-                                SiteCode = item.SiteCode,
+                                SiteId = _currentSite.SiteId??0,
                                 CreatedBy = userName,
                                 UpdatedBy = userName
                             };
