@@ -47,7 +47,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("pagelist")]
-        public async Task<PagedInfo<ProcParameterLinkTypeViewDto>> QueryPagedProcParameterLinkTypeAsync([FromQuery] ProcParameterLinkTypePagedQueryDto parm)
+        public async Task<PagedInfo<ProcParameterLinkTypeViewDto>> QueryPagedProcParameterLinkTypeAsync(ProcParameterLinkTypePagedQueryDto parm)
         {
             return await _procParameterLinkTypeService.GetPageListAsync(parm);
         }
@@ -58,7 +58,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("{detail}")]
+        [Route("detail")]
         public async Task<PagedInfo<ProcParameterLinkTypeViewDto>> QueryPagedProcParameterLinkTypeByTypeAsync(ProcParameterDetailPagerQueryDto parm)
         {
             return await _procParameterLinkTypeService.QueryPagedProcParameterLinkTypeByTypeAsync(parm);
@@ -106,10 +106,10 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("delete")]
-        public async Task DeleteProcParameterLinkTypeAsync(string ids)
+        public async Task<int> DeleteProcParameterLinkTypeAsync(long[] ids)
         {
             //long[] idsArr = StringExtension.SpitLongArrary(ids);
-            await _procParameterLinkTypeService.DeletesProcParameterLinkTypeAsync(ids);
+            return await _procParameterLinkTypeService.DeletesProcParameterLinkTypeAsync(string.Join(",", ids));
         }
 
     }
