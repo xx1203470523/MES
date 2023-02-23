@@ -26,7 +26,7 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// <summary>
         /// 所属站点代码
         /// </summary>
-        public string SiteCode { get; set; }
+        public long SiteId { get; set; }
 
        /// <summary>
         /// 1资源  2工序 3不合格代码

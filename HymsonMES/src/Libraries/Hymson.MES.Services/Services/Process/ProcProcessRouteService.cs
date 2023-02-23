@@ -148,12 +148,12 @@ namespace Hymson.MES.Services.Services.Process
             {
                 throw new ValidationException(ErrorCode.MES10100);
             }
-
-            // 判断是否有获取到站点码
-            if (string.IsNullOrWhiteSpace(parm.SiteCode))
-            {
-                throw new ValidationException(ErrorCode.MES10101);
-            }
+            // TODO SiteId
+            //// 判断是否有获取到站点码
+            //if (string.IsNullOrWhiteSpace(parm.SiteCode))
+            //{
+            //    throw new ValidationException(ErrorCode.MES10101);
+            //}
 
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(parm);
@@ -184,12 +184,12 @@ namespace Hymson.MES.Services.Services.Process
             var query = new ProcProcessRouteQuery
             {
                 Code = procProcessRouteEntity.Code,
-                SiteCode = procProcessRouteEntity.SiteCode
+                // TODO    SiteCode = procProcessRouteEntity.SiteCode
             };
-            if (await _procProcessRouteRepository.IsExistsAsync(query))
-            {
-                throw new DataException(ErrorCode.MES10437).WithData("Code", procProcessRouteEntity.Code).WithData("Version", procProcessRouteEntity.Version);
-            }
+            //if (await _procProcessRouteRepository.IsExistsAsync(query))
+            //{
+            //    throw new DataException(ErrorCode.MES10437).WithData("Code", procProcessRouteEntity.Code).WithData("Version", procProcessRouteEntity.Version);
+            //}
             #endregion
 
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
@@ -224,11 +224,12 @@ namespace Hymson.MES.Services.Services.Process
                 throw new ValidationException(ErrorCode.MES10100);
             }
 
-            // 判断是否有获取到站点码
-            if (string.IsNullOrWhiteSpace(parm.SiteCode))
-            {
-                throw new ValidationException(ErrorCode.MES10101);
-            }
+            // TODO SiteId
+            //// 判断是否有获取到站点码
+            //if (string.IsNullOrWhiteSpace(parm.SiteCode))
+            //{
+            //    throw new ValidationException(ErrorCode.MES10101);
+            //}
 
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(parm);
@@ -381,7 +382,7 @@ namespace Hymson.MES.Services.Services.Process
             return nodeList.Select(s => new ProcProcessRouteDetailNodeEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
-                SiteCode = model.SiteCode,
+                // TODO  SiteCode = model.SiteCode,
                 ProcessRouteId = model.Id,
                 SerialNo = s.SerialNo,
                 ProcedureId = s.ProcedureBomId,
@@ -408,7 +409,7 @@ namespace Hymson.MES.Services.Services.Process
             return linkList.Select(s => new ProcProcessRouteDetailLinkEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
-                SiteCode = model.SiteCode,
+                // TODO SiteId  SiteCode = model.SiteCode,
                 SerialNo = s.SerialNo,
                 ProcessRouteId = model.Id,
                 PreProcessRouteDetailId = s.PreProcessRouteDetailId,

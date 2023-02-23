@@ -43,10 +43,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] ids) 
+        public async Task<int> DeletesAsync(long[] ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeletesSql, new { ids=ids });
+            return await conn.ExecuteAsync(DeletesSql, new { ids = ids });
 
         }
 
@@ -58,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<ProcMaterialGroupEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcMaterialGroupEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ProcMaterialGroupEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -67,10 +67,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <param name="siteCode"></param>
         /// <returns></returns>
-        public async Task<ProcMaterialGroupEntity> GetByIdAndSiteCodeAsync(long id,string siteCode)
+        public async Task<ProcMaterialGroupEntity> GetByIdAndSiteCodeAsync(long id, long SiteId)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcMaterialGroupEntity>(GetByIdAndSiteCodeSql, new { Id = id, SiteCode= siteCode });
+            return await conn.QueryFirstOrDefaultAsync<ProcMaterialGroupEntity>(GetByIdAndSiteCodeSql, new { Id = id, SiteCode = SiteId });
         }
 
         /// <summary>
@@ -78,10 +78,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcMaterialGroupEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ProcMaterialGroupEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcMaterialGroupEntity>(GetByIdsSql, new { ids = ids});
+            return await conn.QueryAsync<ProcMaterialGroupEntity>(GetByIdsSql, new { ids = ids });
         }
 
         /// <summary>
@@ -95,12 +95,9 @@ namespace Hymson.MES.Data.Repositories.Process
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
 
-            if (!string.IsNullOrWhiteSpace(procMaterialGroupPagedQuery.SiteCode))
-            {
-                sqlBuilder.Where(" SiteCode=@SiteCode ");
-            }
             if (!string.IsNullOrWhiteSpace(procMaterialGroupPagedQuery.GroupCode))
             {
                 procMaterialGroupPagedQuery.GroupCode = $"%{procMaterialGroupPagedQuery.GroupCode}%";
@@ -130,18 +127,15 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procMaterialGroupCustomPagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<CustomProcMaterialGroupView>> GetPagedCustomInfoAsync(ProcMaterialGroupCustomPagedQuery procMaterialGroupCustomPagedQuery) 
+        public async Task<PagedInfo<CustomProcMaterialGroupView>> GetPagedCustomInfoAsync(ProcMaterialGroupCustomPagedQuery procMaterialGroupCustomPagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedCustomInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedCustomInfoCountSqlTemplate);
             //sqlBuilder.Where("IsDeleted=0");
             // sqlBuilder.Select("*");
+            sqlBuilder.Where("SiteId = @SiteId");
 
-            if (!string.IsNullOrWhiteSpace(procMaterialGroupCustomPagedQuery.SiteCode))
-            {
-                sqlBuilder.Where(" g.SiteCode=@SiteCode ");
-            }
             if (!string.IsNullOrWhiteSpace(procMaterialGroupCustomPagedQuery.GroupCode))
             {
                 procMaterialGroupCustomPagedQuery.GroupCode = $"%{procMaterialGroupCustomPagedQuery.GroupCode}%";
@@ -182,12 +176,9 @@ namespace Hymson.MES.Data.Repositories.Process
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcMaterialGroupEntitiesSqlTemplate);
             //sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
 
-            if (!string.IsNullOrWhiteSpace(procMaterialGroupQuery.SiteCode))
-            {
-                sqlBuilder.Where(" SiteCode=@SiteCode ");
-            }
             if (!string.IsNullOrWhiteSpace(procMaterialGroupQuery.GroupCode))
             {
                 sqlBuilder.Where(" GroupCode = @GroupCode ");

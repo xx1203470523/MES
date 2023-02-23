@@ -10,6 +10,12 @@ namespace Hymson.MES.Core.Domain.Process
     public class ProcResourceTypeEntity: BaseEntity
     {   
         /// <summary>
+        /// 描述 :所属站点代码 
+        /// 空值 : false  
+        /// </summary>
+        public long SiteId { get; set; }
+        
+        /// <summary>
         /// 描述 :资源类型 
         /// 空值 : false  
         /// </summary>

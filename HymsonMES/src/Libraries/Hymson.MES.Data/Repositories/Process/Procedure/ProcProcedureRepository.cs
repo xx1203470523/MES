@@ -41,10 +41,8 @@ namespace Hymson.MES.Data.Repositories.Process
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("a.IsDeleted=0");
-            if (!string.IsNullOrWhiteSpace(query.SiteCode))
-            {
-                sqlBuilder.Where("a.SiteCode=@SiteCode");
-            }
+            sqlBuilder.Where("SiteId = @SiteId");
+
             if (!string.IsNullOrWhiteSpace(query.Code))
             {
                 query.Code = $"%{query.Code}%";
@@ -101,7 +99,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<bool> IsExistsAsync(ProcProcedureQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var entity= await conn.QueryAsync<ProcProcedureEntity>(ExistsSql, new { Code = query.Code, SiteCode = query.SiteCode });
+            var entity= await conn.QueryAsync<ProcProcedureEntity>(ExistsSql, new { Code = query.Code, SiteCode = query.SiteId });
             return entity != null&&entity.Any();
         }
 

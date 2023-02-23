@@ -56,12 +56,13 @@ namespace Hymson.MES.Services.Services.Process
         {
             #region 参数校验
 
-            // 判断是否有获取到站点码  TODO
-            if (procMaterialCreateDto.SiteCode.IfNotEmpty() == false)
-            {
-                //responseDto.Msg = "站点码获取失败，请重新登录！";
-                //return responseDto;
-            }
+            // TODO SiteId
+            //// 判断是否有获取到站点码  TODO
+            //if (procMaterialCreateDto.SiteCode.IfNotEmpty() == false)
+            //{
+            //    //responseDto.Msg = "站点码获取失败，请重新登录！";
+            //    //return responseDto;
+            //}
 
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procMaterialCreateDto);
@@ -69,7 +70,7 @@ namespace Hymson.MES.Services.Services.Process
             //判断编号是否已存在
             var haveEntity = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery()
             {
-                SiteCode= procMaterialCreateDto.SiteCode,
+                // TODO SiteId  SiteCode= procMaterialCreateDto.SiteCode,
                 MaterialCode = procMaterialCreateDto.MaterialCode,
                 Version = procMaterialCreateDto.Version
             });
@@ -215,7 +216,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcMaterialDto>> GetPageListForGroupAsync(ProcMaterialPagedQueryDto procMaterialPagedQueryDto) 
         {
             //TODO 
-            procMaterialPagedQueryDto.SiteCode = "TODO";
+            // TODO SiteId procMaterialPagedQueryDto.SiteCode = "TODO";
 
             var procMaterialPagedQuery = procMaterialPagedQueryDto.ToQuery<ProcMaterialPagedQuery>();
             var pagedInfo = await _procMaterialRepository.GetPagedInfoForGroupAsync(procMaterialPagedQuery);
@@ -241,7 +242,7 @@ namespace Hymson.MES.Services.Services.Process
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(procMaterialModifyDto);
 
-            var modelOrigin = await _procMaterialRepository.GetByIdAsync(procMaterialModifyDto.Id, procMaterialModifyDto.SiteCode);
+            var modelOrigin = await _procMaterialRepository.GetByIdAsync(procMaterialModifyDto.Id, 0);// TODO SiteId
             if (modelOrigin == null)
             {
                 throw new NotFoundException(ErrorCode.MES10204);
@@ -262,7 +263,7 @@ namespace Hymson.MES.Services.Services.Process
             // 判断编号是否已存在
             var existsList = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery()
             {
-                SiteCode = modelOrigin.SiteCode,
+                // TODO SiteId   SiteCode = modelOrigin.SiteCode,
                 MaterialCode = procMaterialEntity.MaterialCode,
                 Version = procMaterialEntity.Version
             });
@@ -321,12 +322,12 @@ namespace Hymson.MES.Services.Services.Process
                                 deleteeProcReplaceIds.Add(item.MaterialId ?? 0);
                             }
                             break;
-                        default:
-                            throw new DataException(ErrorCode.MES10207).WithData("operationType", item.OperationType);
+                        //default:
+                        //    throw new DataException(ErrorCode.MES10207).WithData("operationType", item.OperationType);
                     }
                 }
             }
-            #endregion
+            #endregion// TODO SiteId
 
             #region 操作数据库
             using (TransactionScope ts = new TransactionScope())
@@ -412,8 +413,8 @@ namespace Hymson.MES.Services.Services.Process
             //获取SiteCode  TODO
             var siteCode = "";
 
-            var procMaterialView = await _procMaterialRepository.GetByIdAsync(id, siteCode);
-           if (procMaterialView != null) 
+            var procMaterialView = await _procMaterialRepository.GetByIdAsync(id, 0);    // TODO SiteId
+            if (procMaterialView != null) 
            {
                return procMaterialView.ToModel<ProcMaterialViewDto>();
            }
@@ -433,7 +434,7 @@ namespace Hymson.MES.Services.Services.Process
 
             return dynamicList.Select(s => new ProcReplaceMaterialEntity
             {
-                SiteCode = model.SiteCode,
+                // TODO   SiteCode = model.SiteCode,
                 MaterialId = model.Id,
                 ReplaceMaterialId = (long)s.MaterialId,
                 IsUse = s.IsEnabled,

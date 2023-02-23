@@ -135,7 +135,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<bool> IsExistsAsync(ProcProcessRouteQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var  procProcessRoutes= await conn.QueryAsync<ProcProcessRouteEntity>(ExistsSql, new { Code = query.Code, SiteCode = query.SiteCode }) ;
+            var  procProcessRoutes= await conn.QueryAsync<ProcProcessRouteEntity>(ExistsSql, new { Code = query.Code, SiteCode = query.SiteId }) ;
             return procProcessRoutes != null && procProcessRoutes.Any();
         }
 

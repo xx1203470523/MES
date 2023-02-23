@@ -47,7 +47,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<IEnumerable<ProcResourceEntity>> GetByResTypeIdsAsync(ProcResourceQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcResourceEntity>(GetByResTypeIdsSql, new { SiteCode = query.SiteCode, Ids = query.IdsArr });
+            return await conn.QueryAsync<ProcResourceEntity>(GetByResTypeIdsSql, new { SiteCode = query.SiteId, Ids = query.IdsArr });
         }
 
         /// <summary>
@@ -69,21 +69,19 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<bool> IsExistsAsync(ProcResourceQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var procResource= await conn.QueryAsync<ProcResourceEntity>(ExistsSql, new { ResCode = query.ResCode, SiteCode = query.SiteCode });
-            return procResource != null&&procResource.Any();
+            var procResource = await conn.QueryAsync<ProcResourceEntity>(ExistsSql, new { ResCode = query.ResCode, SiteCode = query.SiteId });
+            return procResource != null && procResource.Any();
         }
 
-        
+
         public async Task<PagedInfo<ProcResourceView>> GetPageListAsync(ProcResourcePagedQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("a.IsDeleted=0");
-            if (!string.IsNullOrWhiteSpace(query.SiteCode))
-            {
-                sqlBuilder.Where("a.SiteCode=@SiteCode");
-            }
+            sqlBuilder.Where("SiteId = @SiteId");
+
             if (!string.IsNullOrWhiteSpace(query.ResCode))
             {
                 query.ResCode = $"%{query.ResCode}%";
@@ -128,11 +126,9 @@ namespace Hymson.MES.Data.Repositories.Process
             var templateData = sqlBuilder.AddTemplate(GetPagedListSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedListCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
-            if (!string.IsNullOrWhiteSpace(query.SiteCode))
-            {
-                sqlBuilder.Where("SiteCode=@SiteCode");
-            }
+
             if (!string.IsNullOrWhiteSpace(query.ResCode))
             {
                 query.ResCode = $"%{query.ResCode}%";
@@ -167,11 +163,9 @@ namespace Hymson.MES.Data.Repositories.Process
             var templateData = sqlBuilder.AddTemplate(GetPagedListSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedListCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
-            if (!string.IsNullOrWhiteSpace(query.SiteCode))
-            {
-                sqlBuilder.Where("SiteCode=@SiteCode");
-            }
+
             if (query.ResTypeId != null)
             {
                 if (query.ResTypeId == 0)

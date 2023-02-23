@@ -108,7 +108,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<ProcResourceViewDto> GetByIdAsync(long id)
         {
             var entity = await _resourceRepository.GetByIdAsync(id);
-            return entity?.ToModel<ProcResourceViewDto>()??new ProcResourceViewDto();
+            return entity?.ToModel<ProcResourceViewDto>() ?? new ProcResourceViewDto();
         }
 
         /// <summary>
@@ -178,7 +178,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<PagedInfo<ProcResourceConfigPrintViewDto>> GetcResourceConfigPrintAsync(ProcResourceConfigPrintPagedQueryDto query)
         {
-            var printPagedQuery= query.ToQuery<ProcResourceConfigPrintPagedQuery>();
+            var printPagedQuery = query.ToQuery<ProcResourceConfigPrintPagedQuery>();
             var pagedInfo = await _resourceConfigPrintRepository.GetPagedInfoAsync(printPagedQuery);
 
             //实体到DTO转换 装载数据
@@ -313,7 +313,7 @@ namespace Hymson.MES.Services.Services.Process
             var resCode = parm.ResCode.ToUpperInvariant();
             var query = new ProcResourceQuery
             {
-                SiteCode = parm.SiteCode,
+                // TODO   SiteCode = parm.SiteCode,
                 ResCode = resCode
             };
             if (await _resourceRepository.IsExistsAsync(query))
@@ -346,7 +346,7 @@ namespace Hymson.MES.Services.Services.Process
             }
             #endregion
 
-            string site = parm.SiteCode;
+            string site = ""; // TODO SiteId  parm.SiteCode;
             var userName = _currentUser.UserName;
 
             #region 组装数据
@@ -367,7 +367,7 @@ namespace Hymson.MES.Services.Services.Process
                     printList.Add(new ProcResourceConfigPrintEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
-                        SiteCode = site,
+                        // TODO   SiteCode = site,
                         ResourceId = entity.Id,
                         PrintId = item.PrintId,
                         Remark = "",
@@ -386,7 +386,7 @@ namespace Hymson.MES.Services.Services.Process
                     equList.Add(new ProcResourceEquipmentBindEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
-                        SiteCode = site,
+                        // TODO   SiteCode = site,
                         ResourceId = entity.Id,
                         EquipmentId = item.EquipmentId,
                         IsMain = item.IsMain ?? false,
@@ -406,7 +406,7 @@ namespace Hymson.MES.Services.Services.Process
                     resSetList.Add(new ProcResourceConfigResEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
-                        SiteCode = site,
+                        // TODO   SiteCode = site,
                         ResourceId = entity.Id,
                         SetType = item.SetType,
                         Value = item.Value,
@@ -490,7 +490,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task UpdateProcResrouceAsync(ProcResourceModifyDto param)
         {
             string userName = _currentUser.UserName;
-            var siteCode = param.SiteCode;
+            var siteCode = "";// TODO SiteId param.SiteCode;
             #region 验证
             if (param == null)
             {
@@ -658,7 +658,7 @@ namespace Hymson.MES.Services.Services.Process
                                 ResourceId = param.Id,
                                 PrintId = item.PrintId,
                                 Remark = "",
-                                SiteCode = item.SiteCode,
+                                // TODO   SiteCode = item.SiteCode,
                                 CreatedBy = userName,
                                 UpdatedBy = userName
                             };
@@ -704,7 +704,7 @@ namespace Hymson.MES.Services.Services.Process
                                 EquipmentId = item.EquipmentId,
                                 IsMain = item.IsMain ?? false,
                                 Remark = "",
-                                SiteCode = item.SiteCode,
+                                // TODO   SiteCode = item.SiteCode,
                                 CreatedBy = userName,
                                 UpdatedBy = userName
                             };
@@ -751,7 +751,7 @@ namespace Hymson.MES.Services.Services.Process
                                 SetType = item.SetType,
                                 Value = item.Value,
                                 Remark = "",
-                                SiteCode = item.SiteCode,
+                                SiteId = 0, // TODO  item.SiteCode,
                                 CreatedBy = userName,
                                 UpdatedBy = userName
                             };
@@ -800,7 +800,7 @@ namespace Hymson.MES.Services.Services.Process
                                 IsUse = item.IsUse,
                                 Parameter = item.Parameter,
                                 Remark = item.Remark,
-                                SiteCode = item.SiteCode,
+                                // TODO    SiteCode = item.SiteCode,
                                 CreatedBy = userName,
                                 UpdatedBy = userName
                             };
@@ -813,7 +813,7 @@ namespace Hymson.MES.Services.Services.Process
                                 LinkPoint = item.LinkPoint,
                                 JobId = item.JobId,
                                 IsUse = item.IsUse,
-                                Remark=item.Remark,
+                                Remark = item.Remark,
                                 Parameter = item.Parameter,
                                 UpdatedBy = userName,
                             };

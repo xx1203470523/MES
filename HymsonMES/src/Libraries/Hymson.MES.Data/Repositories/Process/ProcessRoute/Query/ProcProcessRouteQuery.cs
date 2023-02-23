@@ -29,6 +29,6 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 所属站点代码
         /// </summary>
-        public string SiteCode { get; set; }
+        public long SiteId { get; set; }
     }
 }

@@ -84,12 +84,9 @@ namespace Hymson.MES.Data.Repositories.Process
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where(" IsDeleted=0 ");
+            sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
 
-            if (!string.IsNullOrWhiteSpace(procLoadPointPagedQuery.SiteCode))
-            {
-                sqlBuilder.Where(" SiteCode=@SiteCode ");
-            }
             if (!string.IsNullOrWhiteSpace(procLoadPointPagedQuery.LoadPoint))
             {
                 procLoadPointPagedQuery.LoadPoint = $"%{procLoadPointPagedQuery.LoadPoint}%";
@@ -129,12 +126,9 @@ namespace Hymson.MES.Data.Repositories.Process
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcLoadPointEntitiesSqlTemplate);
             sqlBuilder.Where(" IsDeleted=0 ");
+            sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
 
-            if (!string.IsNullOrWhiteSpace(procLoadPointQuery.SiteCode))
-            {
-                sqlBuilder.Where(" SiteCode=@SiteCode ");
-            }
             if (!string.IsNullOrWhiteSpace(procLoadPointQuery.LoadPoint))
             {
                 sqlBuilder.Where(" LoadPoint = @LoadPoint ");

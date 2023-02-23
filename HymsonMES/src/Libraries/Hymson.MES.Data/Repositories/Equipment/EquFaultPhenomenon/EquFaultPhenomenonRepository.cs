@@ -117,13 +117,10 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("EFP.IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
             sqlBuilder.Select("EFP.Id, EFP.FaultPhenomenonCode, EFP.FaultPhenomenonName, EFP.EquipmentGroupId, EFP.UseStatus, EFP.CreatedBy, EFP.CreatedOn, EFP.UpdatedBy, EFP.UpdatedOn, EEG.EquipmentGroupName");
             sqlBuilder.LeftJoin("equ_equipment_group EEG ON EFP.EquipmentGroupId = EEG.Id");
-
-            if (string.IsNullOrWhiteSpace(pagedQuery.SiteCode) == false)
-            {
-                sqlBuilder.Where("EFP.SiteCode = @SiteCode");
-            }
 
             if (string.IsNullOrWhiteSpace(pagedQuery.FaultPhenomenonCode) == false)
             {

@@ -129,7 +129,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 站点编码 
         /// </summary>
-        public string SiteCode { get; set; } = "";
+        public long SiteId { get; set; }
 
         /// <summary>
         /// 工装类型编码

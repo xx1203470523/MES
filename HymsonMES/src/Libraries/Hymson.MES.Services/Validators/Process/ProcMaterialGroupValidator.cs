@@ -23,7 +23,7 @@ namespace Hymson.MES.Services.Validators.Process
     {
         public ProcMaterialGroupCreateValidator()
         {
-            RuleFor(x => x.SiteCode).NotEmpty().WithErrorCode(ErrorCode.MES10203);
+            // TODO SiteId  RuleFor(x => x.SiteCode).NotEmpty().WithErrorCode(ErrorCode.MES10203);
             //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
         }
     }
@@ -35,7 +35,7 @@ namespace Hymson.MES.Services.Validators.Process
     {
         public ProcMaterialGroupModifyValidator()
         {
-            RuleFor(x => x.SiteCode).NotEmpty().WithErrorCode(ErrorCode.MES10203);
+            // TODO SiteId RuleFor(x => x.SiteCode).NotEmpty().WithErrorCode(ErrorCode.MES10203);
             //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
         }
     }

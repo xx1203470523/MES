@@ -12,7 +12,7 @@ namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query
         // <summary>
         /// 工厂
         /// </summary>
-        public string SiteCode { get; set; }
+        public long SiteId { get; set; }
         // <summary>
         /// 不合格代码
         /// </summary>

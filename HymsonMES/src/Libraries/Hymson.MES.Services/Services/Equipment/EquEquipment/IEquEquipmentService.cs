@@ -72,7 +72,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// <param name="equipmentCode">设备编码</param>
         /// <param name="siteCode">站点</param>
         /// <returns></returns>
-        Task<EquEquipmentDto> GetByEquipmentCodeAsync(string equipmentCode, string siteCode);
+        Task<EquEquipmentDto> GetByEquipmentCodeAsync(string equipmentCode, long SiteId);
 
         /// <summary>
         /// 根据设备id+接口类型获取接口地址

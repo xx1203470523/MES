@@ -38,7 +38,7 @@ namespace Hymson.MES.Services.Validators.Process
     {
         public ProcMaterialModifyValidator()
         {
-            RuleFor(x => x.SiteCode).NotEmpty().WithErrorCode(ErrorCode.MES10203);// 判断是否有获取到站点码
+            // TODO SiteId RuleFor(x => x.SiteCode).NotEmpty().WithErrorCode(ErrorCode.MES10203);// 判断是否有获取到站点码
             //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
         }
     }
