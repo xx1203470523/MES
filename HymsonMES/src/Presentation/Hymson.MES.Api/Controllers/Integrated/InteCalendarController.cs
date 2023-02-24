@@ -75,7 +75,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        [HttpGet("pagelist")]
+        [HttpGet("page")]
         public async Task<PagedInfo<InteCalendarDto>> GetPagedListAsync([FromQuery] InteCalendarPagedQueryDto pagedQueryDto)
         {
             return await _inteCalendarService.GetPagedListAsync(pagedQueryDto);

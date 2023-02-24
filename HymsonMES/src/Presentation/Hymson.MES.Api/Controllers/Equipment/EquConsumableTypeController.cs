@@ -1,7 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquConsumableType;
-using Hymson.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -41,9 +40,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        public async Task<int> CreateAsync([FromBody] EquConsumableTypeCreateDto createDto)
+        public async Task CreateAsync([FromBody] EquConsumableTypeCreateDto createDto)
         {
-            return await _equConsumableTypeService.CreateAsync(createDto);
+            await _equConsumableTypeService.CreateAsync(createDto);
         }
 
         /// <summary>
@@ -53,22 +52,21 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
-        public async Task<int> ModifyAsync([FromBody] EquConsumableTypeModifyDto modifyDto)
+        public async Task ModifyAsync([FromBody] EquConsumableTypeModifyDto modifyDto)
         {
-            return await _equConsumableTypeService.ModifyAsync(modifyDto);
+            await _equConsumableTypeService.ModifyAsync(modifyDto);
         }
 
         /// <summary>
         /// 删除（工装类型）
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="deleteDto"></param>
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
-        public async Task<int> DeletesAsync(string ids)
+        public async Task DeletesAsync(EquConsumableTypeDeleteDto deleteDto)
         {
-            long[] idsArr = StringExtension.SpitLongArrary(ids);
-            return await _equConsumableTypeService.DeletesAsync(idsArr);
+            await _equConsumableTypeService.DeletesAsync(deleteDto.Ids);
         }
 
         /// <summary>
@@ -77,7 +75,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("pagelist")]
+        [Route("page")]
         public async Task<PagedInfo<EquConsumableTypeDto>> GetPagedListAsync([FromQuery] EquConsumableTypePagedQueryDto pagedQueryDto)
         {
             return await _equConsumableTypeService.GetPagedListAsync(pagedQueryDto);
@@ -88,7 +86,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("{id}")]
+        [HttpGet("detail")]
         public async Task<EquConsumableTypeDto> GetDetailAsync(long id)
         {
             return await _equConsumableTypeService.GetDetailAsync(id);

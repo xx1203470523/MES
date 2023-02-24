@@ -122,6 +122,17 @@ namespace Hymson.MES.Services.Dtos.Equipment
     }
 
     /// <summary>
+    /// 删除Dto（工装类型）
+    /// </summary>
+    public record EquConsumableTypeDeleteDto
+    {
+        /// <summary>
+        /// 集合（主键）
+        /// </summary>
+        public long[] Ids { get; set; }
+    }
+
+    /// <summary>
     /// 分页Dto（工装类型）
     /// </summary>
     public class EquConsumableTypePagedQueryDto : PagerInfo
