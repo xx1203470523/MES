@@ -117,7 +117,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("EFP.IsDeleted = 0");
-            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Where("EFP.SiteId = @SiteId");
 
             sqlBuilder.Select("EFP.Id, EFP.FaultPhenomenonCode, EFP.FaultPhenomenonName, EFP.EquipmentGroupId, EFP.UseStatus, EFP.CreatedBy, EFP.CreatedOn, EFP.UpdatedBy, EFP.UpdatedOn, EEG.EquipmentGroupName");
             sqlBuilder.LeftJoin("equ_equipment_group EEG ON EFP.EquipmentGroupId = EEG.Id");
@@ -145,15 +145,24 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
                 sqlBuilder.Where("EFP.UseStatus = @UseStatus");
             }
 
-            var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
-            sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
-            sqlBuilder.AddParameters(pagedQuery);
+            try
+            {
+                var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
+                sqlBuilder.AddParameters(new { OffSet = offSet });
+                sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
+                sqlBuilder.AddParameters(pagedQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var entities = await conn.QueryAsync<EquFaultPhenomenonEntity>(templateData.RawSql, templateData.Parameters);
-            var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
-            return new PagedInfo<EquFaultPhenomenonEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                var entities = await conn.QueryAsync<EquFaultPhenomenonEntity>(templateData.RawSql, templateData.Parameters);
+                var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+                return new PagedInfo<EquFaultPhenomenonEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
+            }
+            catch (Exception ex)
+            {
+                return null;
+                throw;
+            }
+         
         }
 
     }

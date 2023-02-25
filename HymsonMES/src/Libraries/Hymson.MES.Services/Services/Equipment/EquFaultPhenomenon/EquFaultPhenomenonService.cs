@@ -110,6 +110,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         public async Task<PagedInfo<EquFaultPhenomenonDto>> GetPagedListAsync(EquFaultPhenomenonPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<EquFaultPhenomenonPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId;
             var pagedInfo = await _equFaultPhenomenonRepository.GetPagedInfoAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据

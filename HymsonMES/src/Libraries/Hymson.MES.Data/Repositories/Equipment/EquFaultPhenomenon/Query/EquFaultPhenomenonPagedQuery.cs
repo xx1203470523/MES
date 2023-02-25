@@ -10,7 +10,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon.Query
         /// <summary>
         /// 站点编码 
         /// </summary>
-        public long SiteId { get; set; }
+        public long? SiteId { get; set; }
 
         /// <summary>
         /// 编号（设备故障现象）

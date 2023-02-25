@@ -50,7 +50,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 状态
         /// </summary>
-        public bool Status { get; set; }
+        public int Status { get; set; }
 
         /// <summary>
         /// 图纸编号
