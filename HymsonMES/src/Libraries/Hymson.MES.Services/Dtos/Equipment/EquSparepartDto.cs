@@ -248,10 +248,6 @@ namespace Hymson.MES.Services.Dtos.Equipment
     /// </summary>
     public class EquSparePartPagedQueryDto : PagerInfo
     {
-        /// <summary>
-        /// 站点编码 
-        /// </summary>
-        public long SiteId { get; set; }
     }
 
 }
