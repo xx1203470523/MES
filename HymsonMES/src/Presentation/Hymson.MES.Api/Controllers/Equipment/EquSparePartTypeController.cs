@@ -76,7 +76,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("pagelist")]
+        [Route("page")]
         public async Task<PagedInfo<EquSparePartTypeDto>> GetPagedListAsync([FromQuery] EquSparePartTypePagedQueryDto pagedQueryDto)
         {
             return await _equSparePartTypeService.GetPagedListAsync(pagedQueryDto);

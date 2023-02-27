@@ -5,8 +5,6 @@ using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Options;
 using Hymson.MES.Services.Services.EquEquipmentGroup;
-using Hymson.MES.Services.Services.Equipment.EquConsumable;
-using Hymson.MES.Services.Services.Equipment.EquConsumableType;
 using Hymson.MES.Services.Services.Equipment.EquEquipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipmentUnit;
 using Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon;
@@ -57,8 +55,8 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddServices(this IServiceCollection services)
         {
             #region Equipment
-            services.AddSingleton<IEquConsumableService, EquConsumableService>();
-            services.AddSingleton<IEquConsumableTypeService, EquConsumableTypeService>();
+            //services.AddSingleton<IEquConsumableService, EquConsumableService>();
+            //services.AddSingleton<IEquConsumableTypeService, EquConsumableTypeService>();
             services.AddSingleton<IEquEquipmentService, EquEquipmentService>();
             services.AddSingleton<IEquEquipmentGroupService, EquEquipmentGroupService>();
             services.AddSingleton<IEquEquipmentUnitService, EquEquipmentUnitService>();
@@ -104,7 +102,6 @@ namespace Microsoft.Extensions.DependencyInjection
             //工艺路线
             services.AddSingleton<IProcProcessRouteService, ProcProcessRouteService>();
             #endregion
-
 
             #region Quality
             services.AddSingleton<IQualUnqualifiedCodeService, QualUnqualifiedCodeService>();

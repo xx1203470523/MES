@@ -4,9 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Hymson.MES.Services.Dtos.Integrated
 {
     /// <summary>
-    /// 班制维护新增输入对象
-    /// @author wangkeming
-    /// @date 2022-12-26
+    /// 新增Dto（班制维护）
     /// </summary>
     public record InteClassCreateDto : BaseEntityDto
     {
@@ -31,9 +29,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
     }
 
     /// <summary>
-    /// 班制维护修改输入对象
-    /// @author wangkeming
-    /// @date 2022-12-26
+    /// 更新Dto（班制维护）
     /// </summary>
     public record InteClassModifyDto : BaseEntityDto
     {
@@ -65,6 +61,17 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 
         /// </summary>
         public List<InteClassDetailModifyDto> DetailList { get; set; }
+    }
+
+    /// <summary>
+    /// 删除Dto（班制维护）
+    /// </summary>
+    public record InteClassDeleteDto
+    {
+        /// <summary>
+        /// 集合（主键）
+        /// </summary>
+        public long[] Ids { get; set; }
     }
 
     /// <summary>

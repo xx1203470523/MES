@@ -1,7 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated.InteClass;
-using Hymson.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -40,9 +39,10 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public async Task<int> CreateAsync([FromBody] InteClassCreateDto createDto)
+        [Route("create")]
+        public async Task CreateAsync([FromBody] InteClassCreateDto createDto)
         {
-            return await _inteClassService.CreateAsync(createDto);
+            await _inteClassService.CreateAsync(createDto);
         }
 
         /// <summary>
@@ -50,20 +50,22 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// </summary>
         /// <returns></returns>
         [HttpPut]
-        public async Task<int> ModifyAsync([FromBody] InteClassModifyDto modifyDto)
+        [Route("update")]
+        public async Task ModifyAsync([FromBody] InteClassModifyDto modifyDto)
         {
-            return await _inteClassService.ModifyAsync(modifyDto);
+            await _inteClassService.ModifyAsync(modifyDto);
         }
 
         /// <summary>
         /// 删除（班制维护）
         /// </summary>
+        /// <param name="deleteDto"></param>
         /// <returns></returns>
-        [HttpDelete("{ids}")]
-        public async Task<int> DeletesAsync(string ids)
+        [HttpDelete]
+        [Route("delete")]
+        public async Task DeletesAsync(InteClassDeleteDto deleteDto)
         {
-            long[] idsArr = StringExtension.SpitLongArrary(ids);
-            return await _inteClassService.DeletesAsync(idsArr);
+            await _inteClassService.DeletesAsync(deleteDto.Ids);
         }
 
         /// <summary>
@@ -71,7 +73,8 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        [HttpGet("list")]
+        [HttpGet]
+        [Route("page")]
         public async Task<PagedInfo<InteClassDto>> GetPagedListAsync([FromQuery] InteClassPagedQueryDto pagedQueryDto)
         {
             return await _inteClassService.GetPagedListAsync(pagedQueryDto);
@@ -82,7 +85,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("{Id}")]
+        [HttpGet("detail")]
         public async Task<InteClassWithDetailDto> GetDetailAsync(long id)
         {
             return await _inteClassService.GetDetailAsync(id);

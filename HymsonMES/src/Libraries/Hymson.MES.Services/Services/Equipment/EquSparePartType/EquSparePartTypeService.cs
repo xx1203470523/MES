@@ -2,6 +2,7 @@ using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Equipment.EquConsumable.Command;
@@ -30,6 +31,11 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
+        /// 枚举服务
+        /// </summary>
+        private readonly IEnumService _enumService;
+
+        /// <summary>
         /// 仓储（备件类型） 
         /// </summary>
         private readonly IEquSparePartTypeRepository _equSparePartTypeRepository;
@@ -44,14 +50,16 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// </summary>
         /// <param name="currentSite"></param>
         /// <param name="currentUser"></param>
+        /// <param name="enumService"></param>
         /// <param name="equSparePartTypeRepository"></param>
         /// <param name="equSparePartRepository"></param>
-        public EquSparePartTypeService(ICurrentUser currentUser, ICurrentSite currentSite,
+        public EquSparePartTypeService(ICurrentUser currentUser, ICurrentSite currentSite, IEnumService enumService,
             IEquSparePartTypeRepository equSparePartTypeRepository,
             IEquSparePartRepository equSparePartRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _enumService = enumService;
             _equSparePartTypeRepository = equSparePartTypeRepository;
             _equSparePartRepository = equSparePartRepository;
         }
@@ -65,7 +73,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         public async Task<int> CreateAsync(EquSparePartTypeCreateDto createDto)
         {
             // TODO 验证DTO
-
+           //TODO  _enumService.GetEnumTypes();
 
             // DTO转换实体
             var entity = createDto.ToEntity<EquSparePartTypeEntity>();

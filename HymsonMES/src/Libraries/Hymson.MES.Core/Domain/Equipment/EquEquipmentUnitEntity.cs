@@ -10,7 +10,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 站点编码 
         /// </summary>
-        public long SiteId { get; set; }
+        public long? SiteId { get; set; }
 
         /// <summary>
         /// 单位编码 

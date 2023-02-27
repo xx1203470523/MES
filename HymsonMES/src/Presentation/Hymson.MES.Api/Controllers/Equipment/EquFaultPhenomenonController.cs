@@ -77,7 +77,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("pagelist")]
+        [Route("page")]
         public async Task<PagedInfo<EquFaultPhenomenonDto>> GetPagedListAsync([FromQuery] EquFaultPhenomenonPagedQueryDto pagedQueryDto)
         {
             return await _equFaultPhenomenonService.GetPagedListAsync(pagedQueryDto);
@@ -88,7 +88,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("{id}")]
+        [HttpGet("detail")]
         public async Task<EquFaultPhenomenonDto> GetDetailAsync(long id)
         {
             return await _equFaultPhenomenonService.GetDetailAsync(id);
