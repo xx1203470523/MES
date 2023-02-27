@@ -15,6 +15,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query
         /// <summary>
         /// 站点编码 
         /// </summary>
-        public long SiteId { get; set; }
+        public long? SiteId { get; set; }
     }
 }

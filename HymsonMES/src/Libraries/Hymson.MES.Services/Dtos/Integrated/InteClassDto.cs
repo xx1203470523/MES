@@ -134,11 +134,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
     public class InteClassPagedQueryDto : PagerInfo
     {
         /// <summary>
-        /// 站点编码 
-        /// </summary>
-        public long? SiteId { get; set; }
-
-        /// <summary>
         ///班次名称
         /// </summary>
         public string ClassName { get; set; } = "";

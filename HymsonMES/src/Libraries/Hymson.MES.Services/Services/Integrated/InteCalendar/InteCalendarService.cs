@@ -309,6 +309,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
         public async Task<PagedInfo<InteCalendarDto>> GetPagedListAsync(InteCalendarPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<InteCalendarPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId;
             var pagedInfo = await _inteCalendarRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据

@@ -113,6 +113,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
         public async Task<PagedInfo<EquSparePartDto>> GetPagedListAsync(EquSparePartPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<EquSparePartPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId;
             pagedQuery.Type = (int)EquipmentPartTypeEnum.SparePart; // 备件
             var pagedInfo = await _equSparePartRepository.GetPagedInfoAsync(pagedQuery);
 
