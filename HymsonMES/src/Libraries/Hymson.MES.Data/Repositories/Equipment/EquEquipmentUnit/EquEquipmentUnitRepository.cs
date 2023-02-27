@@ -88,13 +88,13 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
             if (string.IsNullOrWhiteSpace(pagedQuery.UnitCode) == false)
             {
                 pagedQuery.UnitCode = $"%{pagedQuery.UnitCode}%";
-                sqlBuilder.Where("UnitCode = @UnitCode");
+                sqlBuilder.Where("UnitCode LIKE @UnitCode");
             }
 
             if (string.IsNullOrWhiteSpace(pagedQuery.UnitName) == false)
             {
                 pagedQuery.UnitName = $"%{pagedQuery.UnitName}%";
-                sqlBuilder.Where("UnitName = @UnitName");
+                sqlBuilder.Where("UnitName LIKE @UnitName");
             }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;

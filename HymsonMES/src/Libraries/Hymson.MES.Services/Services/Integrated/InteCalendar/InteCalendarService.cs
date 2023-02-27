@@ -96,7 +96,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
             entity.Id = IdGenProvider.Instance.CreateId();
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
-
+            entity.SiteId = _currentSite.SiteId;
 
             #region 参数校验
             if (createDto.UseStatus == true)

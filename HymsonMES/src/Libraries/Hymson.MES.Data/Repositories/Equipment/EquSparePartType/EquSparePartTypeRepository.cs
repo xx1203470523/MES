@@ -94,13 +94,9 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Where("Type = @Type");
             sqlBuilder.Select("*");
-
-            if (pagedQuery.SiteId > 0)
-            {
-                sqlBuilder.Where("SiteId = @SiteId");
-            }
 
             if (string.IsNullOrWhiteSpace(pagedQuery.SparePartTypeCode) == false)
             {

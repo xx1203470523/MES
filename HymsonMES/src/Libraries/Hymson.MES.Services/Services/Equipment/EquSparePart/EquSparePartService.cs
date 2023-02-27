@@ -61,6 +61,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
             entity.Id = IdGenProvider.Instance.CreateId();
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
+            entity.SiteId = _currentSite.SiteId;
             entity.Type = (int)EquipmentPartTypeEnum.SparePart; // 备件
 
             // 入库

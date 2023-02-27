@@ -15,7 +15,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// </summary>
         public string SparePartTypeCode { get; set; } = "";
 
-       /// <summary>
+        /// <summary>
         /// 备件类型名称
         /// </summary>
         public string SparePartTypeName { get; set; } = "";
@@ -30,15 +30,15 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// </summary>
         public int Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 描述
         /// </summary>
         public string Remark { get; set; } = "";
 
         /// <summary>
-        /// 站点Id
+        /// 站点ID 
         /// </summary>
-        public long SiteId { get; set; }
-       
+        public long? SiteId { get; set; }
+
     }
 }

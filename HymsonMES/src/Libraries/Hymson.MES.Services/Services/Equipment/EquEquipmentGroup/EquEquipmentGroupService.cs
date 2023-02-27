@@ -72,7 +72,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
             entity.Id = IdGenProvider.Instance.CreateId();
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
-            //entity.SiteCode = _currentSite.SiteId;
+            entity.SiteId = _currentSite.SiteId;
 
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
@@ -145,6 +145,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         public async Task<PagedInfo<EquEquipmentGroupListDto>> GetPagedListAsync(EquEquipmentGroupPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<EquEquipmentGroupPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId;
             var pagedInfo = await _equEquipmentGroupRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据

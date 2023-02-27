@@ -68,12 +68,12 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 编码（设备组）
         /// </summary>
-        public string EquipmentGroupCode { get; set; }
+        public string EquipmentGroupCode { get; set; } = "";
 
         /// <summary>
         /// 名称（设备组）
         /// </summary>
-        public string EquipmentGroupName { get; set; }
+        public string EquipmentGroupName { get; set; } = "";
     }
 
     /// <summary>
@@ -81,11 +81,6 @@ namespace Hymson.MES.Services.Dtos.Equipment
     /// </summary>
     public class EquEquipmentGroupPagedQueryDto : PagerInfo
     {
-        /// <summary>
-        /// 站点编码 
-        /// </summary>
-        public long SiteId { get; set; }
-
         /// <summary>
         /// 编码（设备组）
         /// </summary>

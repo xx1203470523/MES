@@ -89,18 +89,19 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
 
             if (string.IsNullOrWhiteSpace(pagedQuery.EquipmentGroupCode) == false)
             {
                 pagedQuery.EquipmentGroupCode = $"%{pagedQuery.EquipmentGroupCode}%";
-                sqlBuilder.Where("EquipmentGroupCode = @EquipmentGroupCode");
+                sqlBuilder.Where("EquipmentGroupCode LIKE @EquipmentGroupCode");
             }
 
             if (string.IsNullOrWhiteSpace(pagedQuery.EquipmentGroupName) == false)
             {
                 pagedQuery.EquipmentGroupName = $"%{pagedQuery.EquipmentGroupName}%";
-                sqlBuilder.Where("EquipmentGroupName = @EquipmentGroupName");
+                sqlBuilder.Where("EquipmentGroupName LIKE @EquipmentGroupName");
             }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
@@ -139,11 +140,11 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
                                             /**select**/
                                            FROM `equ_equipment_group` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `equ_equipment_group`(  `Id`, `EquipmentGroupCode`, `EquipmentGroupName`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteCode`) VALUES (   @Id, @EquipmentGroupCode, @EquipmentGroupName, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteCode )  ";
+        const string InsertSql = "INSERT INTO `equ_equipment_group`(  `Id`, `EquipmentGroupCode`, `EquipmentGroupName`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteId`) VALUES (   @Id, @EquipmentGroupCode, @EquipmentGroupName, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteId )  ";
         const string UpdateSql = "UPDATE `equ_equipment_group` SET EquipmentGroupName = @EquipmentGroupName, Remark = @Remark WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `equ_equipment_group` SET IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string GetByIdSql = @"SELECT 
-                               `Id`, `EquipmentGroupCode`, `EquipmentGroupName`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteCode`
+                               `Id`, `EquipmentGroupCode`, `EquipmentGroupName`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteId`
                             FROM `equ_equipment_group`  WHERE IsDeleted = @IsDeleted AND Id = @Id ";
     }
 }

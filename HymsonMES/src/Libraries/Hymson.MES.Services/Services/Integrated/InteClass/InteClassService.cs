@@ -69,6 +69,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
             entity.Id = IdGenProvider.Instance.CreateId();
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
+            entity.SiteId = _currentSite.SiteId;
 
             // 参数校验
             if (createDto.DetailList.Any(a => TimeComparison(a.StartTime, a.EndTime) == false) == true)
@@ -150,6 +151,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
         public async Task<PagedInfo<InteClassDto>> GetPagedListAsync(InteClassPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<InteClassPagedQuery>();
+            pagedQuery.SiteId = pagedQueryDto.SiteId;
             var pagedInfo = await _inteClassRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
