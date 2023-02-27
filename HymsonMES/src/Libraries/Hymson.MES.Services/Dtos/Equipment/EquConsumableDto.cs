@@ -3,9 +3,9 @@ using Hymson.Infrastructure;
 namespace Hymson.MES.Services.Dtos.Equipment
 {
     /// <summary>
-    /// Dto（备件注册）
+    /// Dto（工装注册）
     /// </summary>
-    public record EquSparePartDto : BaseEntityDto
+    public record EquConsumableDto : BaseEntityDto
     {
         /// <summary>
         /// 
@@ -13,19 +13,19 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public long Id { get; set; }
 
         /// <summary>
-        /// 备件编码
+        /// 工装编码
         /// </summary>
-        public string SparePartCode { get; set; } = "";
+        public string ConsumableCode { get; set; } = "";
 
         /// <summary>
-        /// 备件名称
+        /// 工装名称
         /// </summary>
-        public string SparePartName { get; set; } = "";
+        public string ConsumableName { get; set; } = "";
 
         /// <summary>
-        /// 备件类型ID
+        /// 工装类型ID
         /// </summary>
-        public long SparePartTypeId { get; set; }
+        public long ConsumableTypeId { get; set; }
 
         /// <summary>
         /// 物料ID
@@ -38,19 +38,9 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public long UnitId { get; set; }
 
         /// <summary>
-        /// 是否关键备件
-        /// </summary>
-        public int IsKey { get; set; } = 0;
-
-        /// <summary>
-        /// 是否标准件
-        /// </summary>
-        public int IsStandard { get; set; } = 0;
-
-        /// <summary>
         /// 状态
         /// </summary>
-        public int Status { get; set; }
+        public bool Status { get; set; }
 
         /// <summary>
         /// 图纸编号
@@ -65,7 +55,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 管理方式
         /// </summary>
-        public bool? ManagementMode { get; set; }
+        public int ManagementMode { get; set; } = 0;
 
         /// <summary>
         /// 描述
@@ -95,24 +85,24 @@ namespace Hymson.MES.Services.Dtos.Equipment
     }
 
     /// <summary>
-    /// 新增Dto（备件注册）
+    /// 新增Dto（工装注册）
     /// </summary>
-    public record EquSparePartCreateDto : BaseEntityDto
+    public record EquConsumableCreateDto : BaseEntityDto
     {
         /// <summary>
-        /// 备件编码
+        /// 工装编码
         /// </summary>
-        public string SparePartCode { get; set; } = "";
+        public string ConsumableCode { get; set; } = "";
 
         /// <summary>
-        /// 备件名称
+        /// 工装名称
         /// </summary>
-        public string SparePartName { get; set; } = "";
+        public string ConsumableName { get; set; } = "";
 
         /// <summary>
-        /// 备件类型ID
+        /// 工装类型ID
         /// </summary>
-        public long SparePartTypeId { get; set; }
+        public long ConsumableTypeId { get; set; }
 
         /// <summary>
         /// 物料ID
@@ -123,93 +113,6 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 单位ID
         /// </summary>
         public long UnitId { get; set; }
-
-        /// <summary>
-        /// 是否关键备件
-        /// </summary>
-        public int IsKey { get; set; } = 0;
-
-        /// <summary>
-        /// 是否标准件
-        /// </summary>
-        public int IsStandard { get; set; } = 0;
-
-        /// <summary>
-        /// 状态
-        /// </summary>
-        public bool Status { get; set; }
-
-        /// <summary>
-        /// 图纸编号
-        /// </summary>
-        public string BluePrintNo { get; set; } = "";
-
-        /// <summary>
-        /// 品牌
-        /// </summary>
-        public string Brand { get; set; } = "";
-
-        /// <summary>
-        /// 管理方式
-        /// </summary>
-        public bool? ManagementMode { get; set; }
-
-        /// <summary>
-        /// 描述
-        /// </summary>
-        public string Remark { get; set; } = "";
-
-
-        /// <summary>
-        /// ID集合（设备组）
-        /// </summary>
-        public IEnumerable<long> EquipmentGroupIDs { get; set; }
-    }
-
-    /// <summary>
-    /// 更新Dto（备件注册）
-    /// </summary>
-    public record EquSparePartModifyDto : BaseEntityDto
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        public long Id { get; set; }
-
-        /// <summary>
-        /// 备件编码
-        /// </summary>
-        public string SparePartCode { get; set; } = "";
-
-        /// <summary>
-        /// 备件名称
-        /// </summary>
-        public string SparePartName { get; set; } = "";
-
-        /// <summary>
-        /// 备件类型ID
-        /// </summary>
-        public long SparePartTypeId { get; set; }
-
-        /// <summary>
-        /// 物料ID
-        /// </summary>
-        public long ProcMaterialId { get; set; }
-
-        /// <summary>
-        /// 单位ID
-        /// </summary>
-        public long UnitId { get; set; }
-
-        /// <summary>
-        /// 是否关键备件
-        /// </summary>
-        public int IsKey { get; set; } = 0;
-
-        /// <summary>
-        /// 是否标准件
-        /// </summary>
-        public int IsStandard { get; set; } = 0;
 
         /// <summary>
         /// 状态
@@ -244,9 +147,71 @@ namespace Hymson.MES.Services.Dtos.Equipment
     }
 
     /// <summary>
-    /// 删除Dto（备件注册）
+    /// 更新Dto（工装注册）
     /// </summary>
-    public record EquSparePartDeleteDto
+    public record EquConsumableModifyDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 工装名称
+        /// </summary>
+        public string ConsumableName { get; set; } = "";
+
+        /// <summary>
+        /// 工装类型ID
+        /// </summary>
+        public long ConsumableTypeId { get; set; }
+
+        /// <summary>
+        /// 物料ID
+        /// </summary>
+        public long ProcMaterialId { get; set; }
+
+        /// <summary>
+        /// 单位ID
+        /// </summary>
+        public long UnitId { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public bool Status { get; set; }
+
+        /// <summary>
+        /// 图纸编号
+        /// </summary>
+        public string BluePrintNo { get; set; } = "";
+
+        /// <summary>
+        /// 品牌
+        /// </summary>
+        public string Brand { get; set; } = "";
+
+        /// <summary>
+        /// 管理方式
+        /// </summary>
+        public int ManagementMode { get; set; } = 0;
+
+        /// <summary>
+        /// 描述
+        /// </summary>
+        public string Remark { get; set; } = "";
+
+
+        /// <summary>
+        /// ID集合（设备组）
+        /// </summary>
+        public IEnumerable<long> EquipmentGroupIDs { get; set; }
+    }
+
+    /// <summary>
+    /// 删除Dto（工装注册）
+    /// </summary>
+    public record EquConsumableDeleteDto
     {
         /// <summary>
         /// 集合（主键）
@@ -255,9 +220,9 @@ namespace Hymson.MES.Services.Dtos.Equipment
     }
 
     /// <summary>
-    /// 分页Dto（备件注册）
+    /// 分页Dto（工装注册）
     /// </summary>
-    public class EquSparePartPagedQueryDto : PagerInfo
+    public class EquConsumablePagedQueryDto : PagerInfo
     {
     }
 

@@ -56,6 +56,17 @@ namespace Hymson.MES.Services.Dtos.Equipment
     }
 
     /// <summary>
+    /// 删除Dto（设备组）
+    /// </summary>
+    public record EquEquipmentGroupDeleteDto
+    {
+        /// <summary>
+        /// 集合（主键）
+        /// </summary>
+        public long[] Ids { get; set; }
+    }
+
+    /// <summary>
     /// 设备组Dto
     /// </summary>
     public record EquEquipmentGroupListDto : BaseEntityDto

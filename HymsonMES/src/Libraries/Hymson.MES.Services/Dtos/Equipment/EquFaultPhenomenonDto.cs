@@ -115,6 +115,18 @@ namespace Hymson.MES.Services.Dtos.Equipment
     }
 
     /// <summary>
+    /// 删除Dto（设备故障现象）
+    /// </summary>
+    public record EquFaultPhenomenonDeleteDto
+    {
+        /// <summary>
+        /// 集合（主键）
+        /// </summary>
+        public long[] Ids { get; set; }
+    }
+
+
+    /// <summary>
     /// 分页Dto（设备故障现象）
     /// </summary>
     public class EquFaultPhenomenonPagedQueryDto : PagerInfo

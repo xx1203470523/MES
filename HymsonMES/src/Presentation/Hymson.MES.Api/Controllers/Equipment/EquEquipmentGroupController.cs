@@ -40,9 +40,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        public async Task<int> CreateAsync([FromBody] EquEquipmentGroupCreateDto createDto)
+        public async Task CreateAsync(EquEquipmentGroupCreateDto createDto)
         {
-            return await _equEquipmentGroupService.CreateAsync(createDto);
+            await _equEquipmentGroupService.CreateAsync(createDto);
         }
 
         /// <summary>
@@ -52,22 +52,21 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
-        public async Task<int> ModifyAsync([FromBody] EquEquipmentGroupModifyDto modifyDto)
+        public async Task ModifyAsync(EquEquipmentGroupModifyDto modifyDto)
         {
-            return await _equEquipmentGroupService.ModifyAsync(modifyDto);
+            await _equEquipmentGroupService.ModifyAsync(modifyDto);
         }
 
         /// <summary>
         /// 删除（设备组）
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="deleteDto"></param>
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
-        public async Task<int> DeletesAsync(string ids)
+        public async Task DeletesAsync(EquEquipmentGroupDeleteDto deleteDto)
         {
-            long[] idsArr = StringExtension.SpitLongArrary(ids);
-            return await _equEquipmentGroupService.DeletesAsync(idsArr);
+            await _equEquipmentGroupService.DeletesAsync(deleteDto.Ids);
         }
 
         /// <summary>

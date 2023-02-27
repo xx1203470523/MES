@@ -229,6 +229,17 @@ namespace Hymson.MES.Services.Dtos.Equipment
     }
 
     /// <summary>
+    /// 删除Dto（设备注册）
+    /// </summary>
+    public record EquEquipmentDeleteDto
+    {
+        /// <summary>
+        /// 集合（主键）
+        /// </summary>
+        public long[] Ids { get; set; }
+    }
+
+    /// <summary>
     /// 查询对象（设备注册）
     /// </summary>
     public class EquEquipmentPagedQueryDto : PagerInfo
