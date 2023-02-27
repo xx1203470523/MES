@@ -147,7 +147,6 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteClassPagedQueryDto, InteClassPagedQuery>();
 
             CreateMap<InteClassEntity, InteClassDto>();
-            CreateMap<InteClassEntity, InteClassDto>();
             #endregion
 
             #region InteJob

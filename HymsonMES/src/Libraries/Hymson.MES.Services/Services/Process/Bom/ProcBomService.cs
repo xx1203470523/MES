@@ -350,7 +350,7 @@ namespace Hymson.MES.Services.Services.Process
                 // TODO    SiteCode = procBomEntity.SiteCode,
                 BomCode = procBomEntity.BomCode,
                 Version = procBomEntity.Version,
-            })).Where(x => x.Id != procBomEntity.Id && x.IsDeleted == false);
+            })).Where(x => x.Id != procBomEntity.Id && x.IsDeleted == 0);
             if (exists != null && exists.Count() > 0)
             {
                 throw new BusinessException(ErrorCode.MES10601).WithData("bomCode", procBomEntity.BomCode).WithData("version", procBomEntity.Version);

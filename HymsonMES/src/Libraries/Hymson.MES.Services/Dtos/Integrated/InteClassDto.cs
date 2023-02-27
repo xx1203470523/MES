@@ -93,7 +93,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 描述 :班次类型（字典名称：manu_class_type） 
         /// 空值 : false  
         /// </summary>
-        public string ClassType { get; set; }
+        public int ClassType { get; set; }
 
         /// <summary>
         /// 描述 :描述 
@@ -101,11 +101,16 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public string Remark { get; set; }
 
+
         /// <summary>
-        /// 描述 :所属站点代码 
-        /// 空值 : false  
+        /// 最后修改人
         /// </summary>
-        public long SiteId { get; set; }
+        public string UpdatedBy { get; set; } = "";
+
+        /// <summary>
+        /// 修改时间
+        /// </summary>
+        public DateTime? UpdatedOn { get; set; }
     }
 
     /// <summary>
