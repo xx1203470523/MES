@@ -30,7 +30,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 使用状态 0-禁用 1-启用
         /// </summary>
-        public bool UseStatus { get; set; }
+        public int UseStatus { get; set; }
 
         /// <summary>
         /// 设备故障先

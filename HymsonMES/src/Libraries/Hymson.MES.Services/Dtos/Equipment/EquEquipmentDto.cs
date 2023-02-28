@@ -96,7 +96,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 节拍时间(秒)
         /// </summary>
-        public int? TaktTime { get; set; }
+        public int? TakeTime { get; set; }
 
         #region 子
         /// <summary>
@@ -212,7 +212,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 节拍时间(秒)
         /// </summary>
-        public int? TaktTime { get; set; }
+        public int? TakeTime { get; set; }
 
         #region 子
         /// <summary>
@@ -324,7 +324,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 描述 :节拍时间(秒) 
         /// 空值 : true  
         /// </summary>
-        public int? TaktTime { get; set; }
+        public int? TakeTime { get; set; }
 
         /// <summary>
         /// 描述 :设备编码 
@@ -416,6 +416,16 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public string Supplier { get; set; } = "";
 
+        /// <summary>
+        /// 最后修改人
+        /// </summary>
+        public string UpdatedBy { get; set; } = "";
+
+        /// <summary>
+        /// 修改时间
+        /// </summary>
+        public DateTime? UpdatedOn { get; set; }
+
 
         /// <summary>
         /// 车间名称
@@ -467,7 +477,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 描述 :节拍时间(秒) 
         /// 空值 : true  
         /// </summary>
-        public int? TaktTime { get; set; }
+        public int? TakeTime { get; set; }
 
         /// <summary>
         /// 描述 :设备编码 
