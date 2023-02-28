@@ -86,7 +86,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("detail")]
+        [HttpGet("{id}")]
         public async Task<InteClassWithDetailDto> GetDetailAsync(long id)
         {
             return await _inteClassService.GetDetailAsync(id);

@@ -86,7 +86,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        [HttpPost("detail")]
+        [HttpGet("{id}")]
         public async Task<EquEquipmentGroupDto> GetDetailAsync(EquEquipmentGroupQueryDto query)
         {
             return await _equEquipmentGroupService.GetDetailAsync(query);

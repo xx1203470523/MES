@@ -86,7 +86,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("detail")]
+        [HttpGet("{id}")]
         public async Task<InteCalendarDetailDto> GetDetailAsync(long id)
         {
             return await _inteCalendarService.GetDetailAsync(id);

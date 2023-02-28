@@ -87,7 +87,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("detail")]
+        [HttpGet("{id}")]
         public async Task<EquFaultPhenomenonDto> GetDetailAsync(long id)
         {
             return await _equFaultPhenomenonService.GetDetailAsync(id);

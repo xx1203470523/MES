@@ -88,7 +88,7 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("detail")]
+        [HttpGet("{id}")]
         public async Task<EquEquipmentDto> GetDetailAsync(long id)
         {
             return await _equEquipmentService.GetDetailAsync(id);
