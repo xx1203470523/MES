@@ -3,12 +3,14 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
+using Hymson.Utils;
 using Hymson.Utils.Tools;
 using System.Data.SqlTypes;
 
@@ -223,9 +225,14 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
-                rows += await _equEquipmentRepository.DeletesAsync(idsArr);
                 rows += await _equEquipmentLinkApiRepository.DeletesAsync(idsArr);
                 rows += await _equEquipmentLinkHardwareRepository.DeletesAsync(idsArr);
+                rows += await _equEquipmentRepository.DeletesAsync(new DeleteCommand
+                {
+                    Ids = idsArr,
+                    UserId = _currentUser.UserName,
+                    DeleteOn = HymsonClock.Now()
+                });
                 trans.Complete();
             }
             return rows;

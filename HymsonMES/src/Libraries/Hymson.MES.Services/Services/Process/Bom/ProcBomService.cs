@@ -13,12 +13,14 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils;
 using Microsoft.AspNetCore.Http;
+using Org.BouncyCastle.Crypto;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -250,24 +252,23 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesProcBomAsync(string ids)
+        public async Task<int> DeletesProcBomAsync(long[] ids)
         {
             var updateBy = _currentUser.UserName;
-            var idsArr = StringExtension.SpitLongArrary(ids);
 
-            if (idsArr.Length < 1)
+            if (ids.Length < 1)
             {
                 throw new ValidationException(ErrorCode.MES10610);
             }
 
             //判断需要删除的Bom是否是启用状态
-            var bomList = await _procBomRepository.GetByIdsAsync(idsArr);
+            var bomList = await _procBomRepository.GetByIdsAsync(ids);
             if (bomList.Any(x => x.Status == "1"))
             {
                 throw new BusinessException(ErrorCode.MES10611);
             }
 
-            return await _procBomRepository.DeletesAsync(idsArr);
+            return await _procBomRepository.DeletesAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
         }
 
         /// <summary>

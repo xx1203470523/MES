@@ -98,7 +98,7 @@ namespace Hymson.MES.Api.Controllers.Process
         public async Task<int> DeleteProcParameterAsync([FromBody] long[] ids)
         {
             //long[] idsArr = StringExtension.SpitLongArrary(ids);
-            return await _procParameterService.DeletesProcParameterAsync(string.Join(",", ids));
+            return await _procParameterService.DeletesProcParameterAsync(ids);
         }
 
     }

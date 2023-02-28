@@ -53,7 +53,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<int> DeletesProcBomDetailAsync(string ids);
+        Task<int> DeletesProcBomDetailAsync(long[] ids);
 
         /// <summary>
         /// 根据ID查询
