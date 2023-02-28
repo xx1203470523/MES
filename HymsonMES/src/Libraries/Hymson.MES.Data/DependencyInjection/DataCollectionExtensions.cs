@@ -108,6 +108,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcLoadPointRepository, ProcLoadPointRepository>();
 
             #endregion
+
             #region LoadPointLink
             services.AddSingleton<IProcLoadPointLinkMaterialRepository, ProcLoadPointLinkMaterialRepository>();
             services.AddSingleton<IProcLoadPointLinkResourceRepository, ProcLoadPointLinkResourceRepository>();
@@ -125,6 +126,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcProcedureRepository, ProcProcedureRepository>();
             services.AddSingleton<IProcProcedurePrintRelationRepository, ProcProcedurePrintRelationRepository>();
             #endregion
+
             #region ProcessRoute
             services.AddSingleton<IProcProcessRouteRepository, ProcProcessRouteRepository>();
             services.AddSingleton<IProcProcessRouteDetailNodeRepository, ProcProcessRouteDetailNodeRepository>();
