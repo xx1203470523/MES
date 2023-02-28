@@ -67,6 +67,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
             entity.SiteId = _currentSite.SiteId;
+            entity.UnitCode = entity.UnitCode.ToUpper();
 
             // 保存实体
             return await _equEquipmentUnitRepository.InsertAsync(entity);

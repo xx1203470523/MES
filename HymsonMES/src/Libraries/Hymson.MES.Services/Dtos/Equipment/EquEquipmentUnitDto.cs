@@ -31,6 +31,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 单位状态 
         /// </summary>
         public int Status { get; set; } = 0;
+
+        /// <summary>
+        /// 描述
+        /// </summary>
+        public string Remark { get; set; } = "";
     }
 
     /// <summary>
