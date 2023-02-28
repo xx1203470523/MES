@@ -35,6 +35,8 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string Remark { get; set; }
 
+        public long[] ResourceIds { get; set; }
+
         /// <summary>
         /// 创建人
         /// </summary>

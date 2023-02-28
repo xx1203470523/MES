@@ -73,13 +73,14 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         public async Task<int> CreateAsync(EquSparePartTypeCreateDto createDto)
         {
             // TODO 验证DTO
-           //TODO  _enumService.GetEnumTypes();
+            //TODO  _enumService.GetEnumTypes();
 
             // DTO转换实体
             var entity = createDto.ToEntity<EquSparePartTypeEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
+            entity.SiteId = _currentSite.SiteId;
             entity.Type = (int)EquipmentPartTypeEnum.SparePart; // 备件
 
             var rows = 0;
@@ -152,6 +153,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         public async Task<PagedInfo<EquSparePartTypeDto>> GetPagedListAsync(EquSparePartTypePagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<EquSparePartTypePagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId;
             pagedQuery.Type = (int)EquipmentPartTypeEnum.SparePart; // 备件
             var pagedInfo = await _equSparePartTypeRepository.GetPagedInfoAsync(pagedQuery);
 

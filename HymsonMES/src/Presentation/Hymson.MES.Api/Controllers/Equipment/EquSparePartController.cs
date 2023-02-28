@@ -1,7 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquSparePart;
-using Hymson.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -41,9 +40,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        public async Task<int> CreateAsync([FromBody] EquSparePartCreateDto createDto)
+        public async Task CreateAsync([FromBody] EquSparePartCreateDto createDto)
         {
-            return await _equSparePartService.CreateAsync(createDto);
+            await _equSparePartService.CreateAsync(createDto);
         }
 
         /// <summary>
@@ -53,24 +52,23 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
-        public async Task<int> ModifyAsync([FromBody] EquSparePartModifyDto modifyDto)
+        public async Task ModifyAsync([FromBody] EquSparePartModifyDto modifyDto)
         {
-            return await _equSparePartService.ModifyAsync(modifyDto);
+            await _equSparePartService.ModifyAsync(modifyDto);
         }
 
         /// <summary>
         /// 删除（备件注册）
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="deleteDto"></param>
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
-        public async Task<int> DeletesAsync(string ids)
+        public async Task DeletesAsync(EquSparePartDeleteDto deleteDto)
         {
-            long[] idsArr = StringExtension.SpitLongArrary(ids);
-            return await _equSparePartService.DeletesAsync(idsArr);
+            await _equSparePartService.DeletesAsync(deleteDto.Ids);
         }
-        
+
         /// <summary>
         /// 分页查询列表（备件注册）
         /// </summary>

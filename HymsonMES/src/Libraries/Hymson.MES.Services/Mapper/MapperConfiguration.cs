@@ -42,19 +42,19 @@ namespace Hymson.MES.Services.Mapper
         protected virtual void CreateEquipmentMaps()
         {
             #region EquConsumable
-            //CreateMap<EquConsumableCreateDto, EquSparePartEntity>();
-            //CreateMap<EquConsumableModifyDto, EquSparePartEntity>();
-            //CreateMap<EquConsumablePagedQueryDto, EquSparePartPagedQuery>();
+            CreateMap<EquConsumableCreateDto, EquSparePartEntity>();
+            CreateMap<EquConsumableModifyDto, EquSparePartEntity>();
+            CreateMap<EquConsumablePagedQueryDto, EquSparePartPagedQuery>();
 
-            //CreateMap<EquSparePartEntity, EquConsumableDto>();
+            CreateMap<EquSparePartEntity, EquConsumableDto>();
             #endregion
 
             #region EquConsumableType
-            //CreateMap<EquConsumableTypeCreateDto, EquSparePartTypeEntity>();
-            //CreateMap<EquConsumableTypeModifyDto, EquSparePartTypeEntity>();
-            //CreateMap<EquConsumableTypePagedQueryDto, EquSparePartTypePagedQuery>();
+            CreateMap<EquConsumableTypeCreateDto, EquSparePartTypeEntity>();
+            CreateMap<EquConsumableTypeModifyDto, EquSparePartTypeEntity>();
+            CreateMap<EquConsumableTypePagedQueryDto, EquSparePartTypePagedQuery>();
 
-            //CreateMap<EquSparePartTypeEntity, EquConsumableTypeDto>();
+            CreateMap<EquSparePartTypeEntity, EquConsumableTypeDto>();
             #endregion
 
             #region EquEquipment
@@ -146,7 +146,6 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteClassModifyDto, InteClassEntity>();
             CreateMap<InteClassPagedQueryDto, InteClassPagedQuery>();
 
-            CreateMap<InteClassEntity, InteClassDto>();
             CreateMap<InteClassEntity, InteClassDto>();
             #endregion
 

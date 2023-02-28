@@ -55,8 +55,8 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddServices(this IServiceCollection services)
         {
             #region Equipment
-            //services.AddSingleton<IEquConsumableService, EquConsumableService>();
-            //services.AddSingleton<IEquConsumableTypeService, EquConsumableTypeService>();
+            services.AddSingleton<IEquConsumableService, EquConsumableService>();
+            services.AddSingleton<IEquConsumableTypeService, EquConsumableTypeService>();
             services.AddSingleton<IEquEquipmentService, EquEquipmentService>();
             services.AddSingleton<IEquEquipmentGroupService, EquEquipmentGroupService>();
             services.AddSingleton<IEquEquipmentUnitService, EquEquipmentUnitService>();

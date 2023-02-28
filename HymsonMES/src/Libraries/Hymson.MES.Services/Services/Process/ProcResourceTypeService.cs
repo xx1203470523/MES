@@ -51,10 +51,10 @@ namespace Hymson.MES.Services.Services.Process
         public ProcResourceTypeService(ICurrentUser currentUser, ICurrentSite currentSite,
             IProcResourceTypeRepository resourceTypeRepository,
             IProcResourceRepository resourceRepository)
-           //AbstractValidator<ProcResourceTypeDto> validationRules)
+        //AbstractValidator<ProcResourceTypeDto> validationRules)
         {
             _currentUser = currentUser;
-            _currentSite= currentSite;
+            _currentSite = currentSite;
             _resourceTypeRepository = resourceTypeRepository;
             _resourceRepository = resourceRepository;
             // _validationRules = validationRules;
@@ -68,7 +68,17 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<ProcResourceTypeDto> GetListAsync(long id)
         {
             var entity = await _resourceTypeRepository.GetByIdAsync(id);
-            return entity?.ToModel<ProcResourceTypeDto>()??new ProcResourceTypeDto();
+            var model = entity?.ToModel<ProcResourceTypeDto>() ?? new ProcResourceTypeDto();
+
+            var ids = new List<long> { id };
+            var query = new ProcResourceQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                IdsArr = ids.ToArray()
+            };
+            var resources = await _resourceRepository.GetByResTypeIdsAsync(query);
+            model.ResourceIds = resources.Select(a => a.Id).ToArray();
+            return model;
         }
 
         /// <summary>
@@ -128,8 +138,8 @@ namespace Hymson.MES.Services.Services.Process
                 throw new ValidationException(ErrorCode.MES10100);
             }
 
-            var userName =_currentUser.UserName;
-            var siteId = _currentSite.SiteId??0;
+            var userName = _currentUser.UserName;
+            var siteId = _currentSite.SiteId ?? 0;
             //DTO转换实体
             var id = IdGenProvider.Instance.CreateId();
             var entity = new ProcResourceTypeAddCommand
@@ -188,11 +198,11 @@ namespace Hymson.MES.Services.Services.Process
             }
             var entity = await _resourceTypeRepository.GetByIdAsync(param?.Id ?? 0);
             if (entity == null)
-            {      
+            {
                 throw new NotFoundException(ErrorCode.MES10309);
             }
 
-            var userName =_currentUser.UserName;
+            var userName = _currentUser.UserName;
             //DTO转换实体
             var updateEntity = new ProcResourceTypeUpdateCommand
             {
@@ -204,12 +214,13 @@ namespace Hymson.MES.Services.Services.Process
 
             var resourceIds = param.ResourceIds;
             var updateCommand = new ProcResourceUpdateCommand();
-            if (resourceIds != null && resourceIds.Any() == true)
+            if (resourceIds == null)
             {
-                updateCommand.UpdatedBy = userName;
-                updateCommand.ResTypeId = param.Id;
-                updateCommand.IdsArr = resourceIds.ToArray();
+                resourceIds = new List<long>();
             }
+            updateCommand.UpdatedBy = userName;
+            updateCommand.ResTypeId = param.Id;
+            updateCommand.IdsArr = resourceIds.ToArray();
 
             //var resources = _procResourceRepository.GetProcResrouces(ids, parm.Id);
             //if (resources.Count > 0)
@@ -250,14 +261,14 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             //查询资源类型是否关联资源
-            var siteId =_currentSite.SiteId??0;
+            var siteId = _currentSite.SiteId ?? 0;
             var query = new ProcResourceQuery
             {
                 SiteId = siteId,
                 IdsArr = idsArr
             };
             var resourceList = await _resourceRepository.GetByResTypeIdsAsync(query);
-            if(resourceList!=null&& resourceList.Any())
+            if (resourceList != null && resourceList.Any())
             {
                 throw new CustomerValidationException(ErrorCode.MES10312);
             }

@@ -3,9 +3,9 @@ using Hymson.Infrastructure;
 namespace Hymson.MES.Services.Dtos.Equipment
 {
     /// <summary>
-    /// Dto（备件类型）
+    /// Dto（工装类型）
     /// </summary>
-    public record EquSparePartTypeDto : BaseEntityDto
+    public record EquConsumableTypeDto : BaseEntityDto
     {
         /// <summary>
         /// 
@@ -13,14 +13,14 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public long Id { get; set; }
 
         /// <summary>
-        /// 备件类型编码
+        /// 工装类型编码
         /// </summary>
-        public string SparePartTypeCode { get; set; } = "";
+        public string ConsumableTypeCode { get; set; } = "";
 
         /// <summary>
-        /// 备件类型名称
+        /// 工装类型名称
         /// </summary>
-        public string SparePartTypeName { get; set; } = "";
+        public string ConsumableTypeName { get; set; } = "";
 
         /// <summary>
         /// 状态
@@ -33,6 +33,16 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public string Remark { get; set; } = "";
 
         /// <summary>
+        /// 创建人
+        /// </summary>
+        public string CreatedBy { get; set; } = "";
+
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime CreatedOn { get; set; }
+
+        /// <summary>
         /// 最后修改人
         /// </summary>
         public string UpdatedBy { get; set; } = "";
@@ -42,23 +52,22 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
 
-
     }
 
     /// <summary>
-    /// 新增Dto（备件类型）
+    /// 新增Dto（工装类型）
     /// </summary>
-    public record EquSparePartTypeCreateDto : BaseEntityDto
+    public record EquConsumableTypeCreateDto : BaseEntityDto
     {
         /// <summary>
-        /// 备件类型编码
+        /// 工装类型编码
         /// </summary>
-        public string SparePartTypeCode { get; set; } = "";
+        public string ConsumableTypeCode { get; set; } = "";
 
         /// <summary>
-        /// 备件类型名称
+        /// 工装类型名称
         /// </summary>
-        public string SparePartTypeName { get; set; } = "";
+        public string ConsumableTypeName { get; set; } = "";
 
         /// <summary>
         /// 状态
@@ -71,15 +80,15 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public string Remark { get; set; } = "";
 
         /// <summary>
-        /// 备件ID集合
+        /// 工装ID集合
         /// </summary>
-        public IEnumerable<long> SparePartIDs { get; set; }
+        public IEnumerable<long> ConsumableIDs { get; set; }
     }
 
     /// <summary>
-    /// 更新Dto（备件类型）
+    /// 更新Dto（工装类型）
     /// </summary>
-    public record EquSparePartTypeModifyDto : BaseEntityDto
+    public record EquConsumableTypeModifyDto : BaseEntityDto
     {
         /// <summary>
         /// 
@@ -87,14 +96,14 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public long Id { get; set; }
 
         /// <summary>
-        /// 备件类型编码
+        /// 工装类型编码
         /// </summary>
-        public string SparePartTypeCode { get; set; }
+        public string ConsumableTypeCode { get; set; } = "";
 
         /// <summary>
-        /// 备件类型名称
+        /// 工装类型名称
         /// </summary>
-        public string SparePartTypeName { get; set; }
+        public string ConsumableTypeName { get; set; } = "";
 
         /// <summary>
         /// 状态
@@ -104,18 +113,18 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 描述
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// 备件ID集合
         /// </summary>
-        public IEnumerable<long> SparePartIDs { get; set; }
+        public IEnumerable<long> ConsumableIDs { get; set; }
     }
 
     /// <summary>
-    /// 删除Dto（备件类型）
+    /// 删除Dto（工装类型）
     /// </summary>
-    public record EquSparePartTypeDeleteDto
+    public record EquConsumableTypeDeleteDto
     {
         /// <summary>
         /// 集合（主键）
@@ -123,20 +132,21 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public long[] Ids { get; set; }
     }
 
+
     /// <summary>
-    /// 分页Dto（备件类型）
+    /// 分页Dto（工装类型）
     /// </summary>
-    public class EquSparePartTypePagedQueryDto : PagerInfo
+    public class EquConsumableTypePagedQueryDto : PagerInfo
     {
         /// <summary>
-        /// 备件类型编码
+        /// 工装类型编码
         /// </summary>
-        public string? SparePartTypeCode { get; set; }
+        public string? ConsumableTypeCode { get; set; }
 
         /// <summary>
-        /// 备件类型名称
+        /// 工装类型名称
         /// </summary>
-        public string? SparePartTypeName { get; set; }
+        public string? ConsumableTypeName { get; set; }
 
         /// <summary>
         /// 状态

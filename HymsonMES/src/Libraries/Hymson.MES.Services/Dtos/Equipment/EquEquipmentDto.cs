@@ -96,7 +96,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 节拍时间(秒)
         /// </summary>
-        public int? TaktTime { get; set; }
+        public int? TakeTime { get; set; }
 
         #region 子
         /// <summary>
@@ -212,7 +212,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 节拍时间(秒)
         /// </summary>
-        public int? TaktTime { get; set; }
+        public int? TakeTime { get; set; }
 
         #region 子
         /// <summary>
@@ -229,6 +229,17 @@ namespace Hymson.MES.Services.Dtos.Equipment
     }
 
     /// <summary>
+    /// 删除Dto（设备注册）
+    /// </summary>
+    public record EquEquipmentDeleteDto
+    {
+        /// <summary>
+        /// 集合（主键）
+        /// </summary>
+        public long[] Ids { get; set; }
+    }
+
+    /// <summary>
     /// 查询对象（设备注册）
     /// </summary>
     public class EquEquipmentPagedQueryDto : PagerInfo
@@ -236,37 +247,37 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 编码（设备注册）
         /// </summary>
-        public string EquipmentCode { get; set; } = "";
+        public string? EquipmentCode { get; set; }
 
         /// <summary>
         /// 名称（设备注册）
         /// </summary>
-        public string EquipmentName { get; set; } = "";
+        public string? EquipmentName { get; set; }
 
         /// <summary>
         /// 类型（设备注册）
         /// </summary>
-        public int EquipmentType { get; set; }
+        public int? EquipmentType { get; set; }
 
         /// <summary>
         /// 使用状态（设备注册）
         /// </summary>
-        public int UseStatus { get; set; }
+        public int? UseStatus { get; set; }
 
         /// <summary>
         /// 车间
         /// </summary>
-        public string WorkCenterShopName { get; set; } = "";
+        public string? WorkCenterShopName { get; set; }
 
         /// <summary>
         /// 使用部门
         /// </summary>
-        public string UseDepartment { get; set; } = "";
+        public string? UseDepartment { get; set; }
 
         /// <summary>
         /// 存放位置
         /// </summary>
-        public string Location { get; set; } = "";
+        public string? Location { get; set; }
     }
 
     /// <summary>
@@ -313,7 +324,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 描述 :节拍时间(秒) 
         /// 空值 : true  
         /// </summary>
-        public int? TaktTime { get; set; }
+        public int? TakeTime { get; set; }
 
         /// <summary>
         /// 描述 :设备编码 
@@ -405,6 +416,16 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public string Supplier { get; set; } = "";
 
+        /// <summary>
+        /// 最后修改人
+        /// </summary>
+        public string UpdatedBy { get; set; } = "";
+
+        /// <summary>
+        /// 修改时间
+        /// </summary>
+        public DateTime? UpdatedOn { get; set; }
+
 
         /// <summary>
         /// 车间名称
@@ -456,7 +477,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 描述 :节拍时间(秒) 
         /// 空值 : true  
         /// </summary>
-        public int? TaktTime { get; set; }
+        public int? TakeTime { get; set; }
 
         /// <summary>
         /// 描述 :设备编码 

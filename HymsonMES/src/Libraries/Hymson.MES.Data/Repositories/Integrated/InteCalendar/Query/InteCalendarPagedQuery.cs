@@ -8,6 +8,11 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar.Query
     public class InteCalendarPagedQuery : PagerInfo
     {
         /// <summary>
+        /// 站点编码 
+        /// </summary>
+        public long? SiteId { get; set; }
+
+        /// <summary>
         /// 日历名称
         /// </summary>
         public string CalendarName { get; set; } = "";

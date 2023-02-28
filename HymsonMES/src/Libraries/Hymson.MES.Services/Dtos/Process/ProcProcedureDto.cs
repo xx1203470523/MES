@@ -40,17 +40,17 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; }
+        public int Status { get; set; }
 
         /// <summary>
         /// 类型
         /// </summary>
-        public string Type { get; set; }
+        public int Type { get; set; }
 
         /// <summary>
         /// 包装等级（字典数据）
         /// </summary>
-        public string PackingLevel { get; set; }
+        public int PackingLevel { get; set; }
 
         /// <summary>
         /// 所属资源类型ID
@@ -120,17 +120,17 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; }
+        public int Status { get; set; }
 
         /// <summary>
         /// 类型
         /// </summary>
-        public string Type { get; set; }
+        public int Type { get; set; }
 
         /// <summary>
         /// 包装等级（字典数据）
         /// </summary>
-        public string PackingLevel { get; set; }
+        public int PackingLevel { get; set; }
 
         /// <summary>
         /// 所属资源类型ID
@@ -150,12 +150,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 版本
         /// </summary>
-        public string Version { get; set; }
+        public string Version { get; set; } = "";
 
         /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
     }
 
     /// <summary>
@@ -270,7 +270,7 @@ namespace Hymson.MES.Services.Dtos.Process
     public record ProcProcedureModifyDto : BaseEntityDto
     {
         /// <summary>
-        /// 
+        /// 自增id
         /// </summary>
         public long Id { get; set; }
 
@@ -279,25 +279,25 @@ namespace Hymson.MES.Services.Dtos.Process
         ///// </summary>
         //public string Code { get; set; }
 
-        ///// <summary>
-        ///// 工序BOM名称
-        ///// </summary>
-        //public string Name { get; set; }
+        /// <summary>
+        /// 工序BOM名称
+        /// </summary>
+        public string Name { get; set; }
 
         /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; }
+        public int Status { get; set; }
 
         /// <summary>
         /// 类型
         /// </summary>
-        public string Type { get; set; }
+        public int Type { get; set; }
 
         /// <summary>
         /// 包装等级（字典数据）
         /// </summary>
-        public string PackingLevel { get; set; }
+        public int PackingLevel { get; set; }
 
         /// <summary>
         /// 所属资源类型ID
@@ -317,12 +317,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 版本
         /// </summary>
-        public string Version { get; set; }
+        public string Version { get; set; } = "";
 
         /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
     }
 
     /// <summary>

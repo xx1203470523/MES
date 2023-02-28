@@ -11,21 +11,23 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         ///班次名称
         /// </summary>
-        [Required(ErrorMessage = "班次名称不能为空")]
-        public string ClassName { get; set; }
+        public string ClassName { get; set; } = "";
 
         /// <summary>
         ///班次类型（字典名称：manu_class_type）
         /// </summary>
-        [Required(ErrorMessage = "班次类型不能为空")]
-        public string ClassType { get; set; }
+        public int ClassType { get; set; }
 
         /// <summary>
         ///描述
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
-        public List<InteClassDetailCreateDto> DetailList { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<InteClassDetailCreateDto> DetailList { get; set; } = new();
     }
 
     /// <summary>
@@ -36,31 +38,28 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         ///主键id
         /// </summary>
-        [Required(ErrorMessage = "主键id不能为空")]
         public long Id { get; set; }
 
         /// <summary>
         ///班次名称
         /// </summary>
-        [Required(ErrorMessage = "班次名称不能为空")]
-        public string ClassName { get; set; }
+        public string ClassName { get; set; } = "";
 
         /// <summary>
         ///班次类型（字典名称：manu_class_type）
         /// </summary>
-        [Required(ErrorMessage = "班次类型（字典名称：manu_class_type）不能为空")]
-        public string ClassType { get; set; }
+        public int ClassType { get; set; }
 
         /// <summary>
         ///描述
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
 
         /// <summary>
         /// 
         /// </summary>
-        public List<InteClassDetailModifyDto> DetailList { get; set; }
+        public List<InteClassDetailModifyDto> DetailList { get; set; } = new();
     }
 
     /// <summary>
@@ -94,7 +93,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 描述 :班次类型（字典名称：manu_class_type） 
         /// 空值 : false  
         /// </summary>
-        public string ClassType { get; set; }
+        public int ClassType { get; set; }
 
         /// <summary>
         /// 描述 :描述 
@@ -102,11 +101,16 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public string Remark { get; set; }
 
+
         /// <summary>
-        /// 描述 :所属站点代码 
-        /// 空值 : false  
+        /// 最后修改人
         /// </summary>
-        public long SiteId { get; set; }
+        public string UpdatedBy { get; set; } = "";
+
+        /// <summary>
+        /// 修改时间
+        /// </summary>
+        public DateTime? UpdatedOn { get; set; }
     }
 
     /// <summary>
@@ -137,11 +141,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         ///班次名称
         /// </summary>
-        public string ClassName { get; set; } = "";
+        public string? ClassName { get; set; }
 
         /// <summary>
         ///班次类型（字典名称：manu_class_type）
         /// </summary>
-        public int ClassType { get; set; }
+        public int? ClassType { get; set; }
     }
 }

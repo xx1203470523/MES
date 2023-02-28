@@ -96,7 +96,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
             entity.Id = IdGenProvider.Instance.CreateId();
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
-
+            entity.SiteId = _currentSite.SiteId;
 
             #region 参数校验
             if (createDto.UseStatus == true)
@@ -309,6 +309,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
         public async Task<PagedInfo<InteCalendarDto>> GetPagedListAsync(InteCalendarPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<InteCalendarPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId;
             var pagedInfo = await _inteCalendarRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据

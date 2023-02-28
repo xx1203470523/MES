@@ -60,6 +60,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
             entity.Id = IdGenProvider.Instance.CreateId();
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
+            entity.SiteId = _currentSite.SiteId;
 
             // 判断编号是否已存在
             var isExists = await _equFaultPhenomenonRepository.IsExistsAsync(entity.FaultPhenomenonCode);
