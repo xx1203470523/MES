@@ -43,7 +43,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("a.IsDeleted=0");
             if (query.SiteId > 0)
             {
-                sqlBuilder.Where("SiteId = @SiteId");
+                sqlBuilder.Where("a.SiteId = @SiteId");
             }
             if (!string.IsNullOrWhiteSpace(query.Code))
             {
@@ -174,7 +174,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string ExistsSql = "SELECT Id FROM proc_procedure WHERE `IsDeleted`= 0 AND Code=@Code and SiteId=@SiteId LIMIT 1 ";
 
         const string InsertSql = "INSERT INTO `proc_procedure`(  `Id`, `SiteId`, `Code`, `Name`, `Status`, `Type`, `PackingLevel`, `ResourceTypeId`, `Cycle`, `IsRepairReturn`, `Version`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Status, @Type, @PackingLevel, @ResourceTypeId, @Cycle, @IsRepairReturn, @Version, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string UpdateSql = "UPDATE `proc_procedure` SET  Status = @Status, Type = @Type, PackingLevel = @PackingLevel, ResourceTypeId = @ResourceTypeId, Cycle = @Cycle, IsRepairReturn = @IsRepairReturn, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `proc_procedure` SET  Name=@Name,Status = @Status, Type = @Type, PackingLevel = @PackingLevel, ResourceTypeId = @ResourceTypeId, Cycle = @Cycle, IsRepairReturn = @IsRepairReturn, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_procedure` SET IsDeleted = '1'  WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_procedure` SET IsDeleted = '1',UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id in @Ids";
         const string GetByIdSql = @"SELECT 

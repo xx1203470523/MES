@@ -269,6 +269,8 @@ namespace Hymson.MES.Services.Services.Process
             //DTO转换实体
             var procProcedureEntity = parm.Procedure.ToEntity<ProcProcedureEntity>();
             procProcedureEntity.Id = IdGenProvider.Instance.CreateId();
+            procProcedureEntity.Code = code;
+            procProcedureEntity.SiteId= siteId;
             procProcedureEntity.CreatedBy = userName;
             procProcedureEntity.UpdatedBy = userName;
 

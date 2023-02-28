@@ -136,13 +136,13 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 状态
         /// </summary>
         //[Required(ErrorMessage = "状态不能为空")]
-        public string Status { get; set; }
+        public int Status { get; set; }
 
         /// <summary>
         /// 所属资源类型
         /// </summary>
         //[Required(ErrorMessage = "所属资源类型ID不能为空")]
-        public long ResTypeId { get; set; }
+        public long? ResTypeId { get; set; }
 
         /// <summary>
         /// 说明

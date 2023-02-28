@@ -40,7 +40,7 @@ namespace Hymson.MES.Services.Services.Process.IProcessService
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<PagedInfo<ProcResourceDto>> GetListForGroupAsync(ProcResourcePagedQueryDto query);
+        Task<List<ProcResourceDto>> GetListForGroupAsync(ProcResourcePagedQueryDto query);
 
         /// <summary>
         /// 资源关联打印机数据

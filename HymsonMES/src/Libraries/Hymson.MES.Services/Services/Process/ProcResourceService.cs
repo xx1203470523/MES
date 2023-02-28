@@ -164,20 +164,20 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcResourceDto>> GetListForGroupAsync(ProcResourcePagedQueryDto query)
+        public async Task<List<ProcResourceDto>> GetListForGroupAsync(ProcResourcePagedQueryDto query)
         {
             var resourcePagedQuery = query.ToQuery<ProcResourcePagedQuery>();
             resourcePagedQuery.SiteId = _currentSite.SiteId ?? 0;
-            var pagedInfo = await _resourceRepository.GetListForGroupAsync(resourcePagedQuery);
+            var list = await _resourceRepository.GetListForGroupAsync(resourcePagedQuery);
 
             //实体到DTO转换 装载数据
             var procResourceDtos = new List<ProcResourceDto>();
-            foreach (var entity in pagedInfo.Data)
+            foreach (var entity in list)
             {
                 var resourceTypeDto = entity.ToModel<ProcResourceDto>();
                 procResourceDtos.Add(resourceTypeDto);
             }
-            return new PagedInfo<ProcResourceDto>(procResourceDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            return procResourceDtos;
         }
 
         /// <summary>
@@ -332,7 +332,7 @@ namespace Hymson.MES.Services.Services.Process
 
             if (parm.ResTypeId > 0)
             {
-                var resourceType = await _resourceTypeRepository.GetByIdAsync(parm.ResTypeId);
+                var resourceType = await _resourceTypeRepository.GetByIdAsync(parm.ResTypeId??0);
                 if (resourceType == null)
                 {
                     throw new ValidationException(ErrorCode.MES10310);
@@ -363,6 +363,7 @@ namespace Hymson.MES.Services.Services.Process
             //DTO转换实体
             var entity = parm.ToEntity<ProcResourceEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
+            entity.SiteId = siteId;
             entity.CreatedBy = userName;
             entity.UpdatedBy = userName;
             entity.ResCode = resCode;

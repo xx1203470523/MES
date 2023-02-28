@@ -79,7 +79,7 @@ namespace Hymson.MES.Api.Controllers
         /// <returns></returns>
         [Route("listforgroup")]
         [HttpGet]
-        public async Task<PagedInfo<ProcResourceDto>> GetListForGroup([FromQuery] ProcResourcePagedQueryDto query)
+        public async Task<List<ProcResourceDto>> GetListForGroup([FromQuery] ProcResourcePagedQueryDto query)
         {
             return await _procResourceService.GetListForGroupAsync(query);
         }

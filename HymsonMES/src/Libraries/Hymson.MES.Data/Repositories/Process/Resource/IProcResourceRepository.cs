@@ -54,7 +54,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<PagedInfo<ProcResourceEntity>> GetListForGroupAsync(ProcResourcePagedQuery query);
+        Task<IEnumerable<ProcResourceEntity>> GetListForGroupAsync(ProcResourcePagedQuery query);
 
         /// <summary>
         /// 添加资源类型数据
