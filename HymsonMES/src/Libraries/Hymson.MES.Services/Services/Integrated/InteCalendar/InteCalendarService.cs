@@ -4,6 +4,7 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Integrated.InteCalendar;
 using Hymson.MES.Data.Repositories.Integrated.InteCalendar.Query;
@@ -295,7 +296,12 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
             {
                 rows += await _inteCalendarDateDetailRepository.DeleteByCalendarIdsAsync(idsArr);
                 rows += await _inteCalendarDateRepository.DeleteByCalendarIdsAsync(idsArr);
-                rows += await _inteCalendarRepository.DeletesAsync(idsArr);
+                rows += await _inteCalendarRepository.DeletesAsync(new DeleteCommand
+                {
+                    Ids = idsArr,
+                    UserId = $"{_currentUser.UserId}",
+                    DeleteOn = HymsonClock.Now()
+                });
                 trans.Complete();
             }
             return rows;

@@ -4,10 +4,12 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
+using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
 {
@@ -92,7 +94,12 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] idsArr)
         {
-            return await _equEquipmentUnitRepository.DeletesAsync(idsArr);
+            return await _equEquipmentUnitRepository.DeletesAsync(new DeleteCommand
+            {
+                Ids = idsArr,
+                UserId = $"{_currentUser.UserId}",
+                DeleteOn = HymsonClock.Now()
+            });
         }
 
         /// <summary>

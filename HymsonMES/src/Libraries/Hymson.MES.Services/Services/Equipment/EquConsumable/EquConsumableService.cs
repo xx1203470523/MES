@@ -4,10 +4,12 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
+using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Equipment.EquSparePart
 {
@@ -101,7 +103,12 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] idsArr)
         {
-            return await _equConsumableRepository.DeletesAsync(idsArr);
+            return await _equConsumableRepository.DeletesAsync(new DeleteCommand
+            {
+                Ids = idsArr,
+                UserId = $"{_currentUser.UserId}",
+                DeleteOn = HymsonClock.Now()
+            });
         }
 
         /// <summary>
