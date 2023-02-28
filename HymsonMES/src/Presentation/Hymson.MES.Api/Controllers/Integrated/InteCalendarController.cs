@@ -64,7 +64,6 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="deleteDto"></param>
         /// <returns></returns>
         [HttpDelete]
-        [Route("delete")]
         public async Task DeletesAsync(InteCalendarDeleteDto deleteDto)
         {
             await _inteCalendarService.DeletesAsync(deleteDto.Ids);
@@ -86,7 +85,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("detail")]
+        [HttpGet("{id}")]
         public async Task<InteCalendarDetailDto> GetDetailAsync(long id)
         {
             return await _inteCalendarService.GetDetailAsync(id);

@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteCalendar.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
@@ -61,12 +62,12 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
         /// <summary>
         /// 批量删除（软删除）
         /// </summary>
-        /// <param name="idsArr"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] idsArr)
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, new { Id = idsArr });
+            return await conn.ExecuteAsync(DeleteSql, command);
 
         }
 
@@ -189,7 +190,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
     {
         const string InsertSql = "INSERT INTO `inte_calendar`(  `Id`, `CalendarName`, `CalendarType`, `EquOrLineId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteCode`, `UseStatus`) VALUES (   @Id, @CalendarName, @CalendarType, @EquOrLineId, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteCode, @UseStatus )  ";
         const string UpdateSql = "UPDATE `inte_calendar` SET   CalendarName = @CalendarName, CalendarType = @CalendarType, EquOrLineId = @EquOrLineId, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, Remark = @Remark, SiteCode = @SiteCode, UseStatus = @UseStatus  WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `inte_calendar` SET IsDeleted = '1' WHERE Id = @Id ";
+        const string DeleteSql = "UPDATE `inte_calendar` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id = @Id ";
         const string ExistsSql = "SELECT 1 FROM `inte_calendar` WHERE EquOrLineId = @EquOrLineId AND UseStatus = @UseStatus AND IsDeleted = 0 ";
         const string GetByIdSql = @"SELECT 
                                `Id`, `CalendarName`, `CalendarType`, `EquOrLineId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteCode`, `UseStatus`

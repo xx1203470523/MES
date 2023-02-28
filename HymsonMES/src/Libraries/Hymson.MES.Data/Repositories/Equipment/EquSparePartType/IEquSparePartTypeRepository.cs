@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType.Query;
 
 namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
@@ -33,9 +34,9 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="idsArr"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        Task<int> DeletesAsync(long[] idsArr);
+        Task<int> DeletesAsync(DeleteCommand command);
 
         /// <summary>
         /// 根据ID获取数据

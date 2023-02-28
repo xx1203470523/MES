@@ -3,10 +3,12 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon;
 using Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon.Query;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
+using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
 {
@@ -100,7 +102,12 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] idsArr)
         {
-            return await _equFaultPhenomenonRepository.DeletesAsync(idsArr);
+            return await _equFaultPhenomenonRepository.DeletesAsync(new DeleteCommand
+            {
+                Ids = idsArr,
+                UserId = $"{_currentUser.UserName}",
+                DeleteOn = HymsonClock.Now()
+            });
         }
 
         /// <summary>

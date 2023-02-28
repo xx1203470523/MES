@@ -39,7 +39,6 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("create")]
         public async Task CreateAsync(EquEquipmentGroupCreateDto createDto)
         {
             await _equEquipmentGroupService.CreateAsync(createDto);
@@ -51,7 +50,6 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
-        [Route("update")]
         public async Task ModifyAsync(EquEquipmentGroupModifyDto modifyDto)
         {
             await _equEquipmentGroupService.ModifyAsync(modifyDto);
@@ -63,7 +61,6 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="deleteDto"></param>
         /// <returns></returns>
         [HttpDelete]
-        [Route("delete")]
         public async Task DeletesAsync(EquEquipmentGroupDeleteDto deleteDto)
         {
             await _equEquipmentGroupService.DeletesAsync(deleteDto.Ids);
@@ -86,7 +83,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        [HttpPost("detail")]
+        [HttpGet("{id}")]
         public async Task<EquEquipmentGroupDto> GetDetailAsync(EquEquipmentGroupQueryDto query)
         {
             return await _equEquipmentGroupService.GetDetailAsync(query);
