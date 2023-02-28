@@ -65,7 +65,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(EquConsumableTypeCreateDto createDto)
+        public async Task<int> CreateAsync(EquConsumableTypeSaveDto createDto)
         {
             // TODO 验证DTO
 
@@ -96,7 +96,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyAsync(EquConsumableTypeModifyDto modifyDto)
+        public async Task<int> ModifyAsync(EquConsumableTypeSaveDto modifyDto)
         {
             // 验证DTO
 

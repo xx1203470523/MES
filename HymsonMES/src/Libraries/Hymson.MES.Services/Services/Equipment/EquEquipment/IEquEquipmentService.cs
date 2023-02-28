@@ -15,14 +15,14 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        Task<int> CreateAsync(EquEquipmentCreateDto parm);
+        Task<int> CreateAsync(EquEquipmentSaveDto parm);
 
         /// <summary>
         /// 更新（设备注册）
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        Task<int> ModifyAsync(EquEquipmentModifyDto parm);
+        Task<int> ModifyAsync(EquEquipmentSaveDto parm);
 
         /// <summary>
         /// 删除（设备注册）

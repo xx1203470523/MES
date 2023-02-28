@@ -4,36 +4,9 @@ using System.ComponentModel.DataAnnotations;
 namespace Hymson.MES.Services.Dtos.Integrated
 {
     /// <summary>
-    /// 新增Dto（班制维护）
+    /// 保存Dto（班制维护）
     /// </summary>
-    public record InteClassCreateDto : BaseEntityDto
-    {
-        /// <summary>
-        ///班次名称
-        /// </summary>
-        public string ClassName { get; set; } = "";
-
-        /// <summary>
-        ///班次类型（字典名称：manu_class_type）
-        /// </summary>
-        public int ClassType { get; set; }
-
-        /// <summary>
-        ///描述
-        /// </summary>
-        public string Remark { get; set; } = "";
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public List<InteClassDetailCreateDto> DetailList { get; set; } = new();
-    }
-
-    /// <summary>
-    /// 更新Dto（班制维护）
-    /// </summary>
-    public record InteClassModifyDto : BaseEntityDto
+    public record InteClassSaveDto : BaseEntityDto
     {
         /// <summary>
         ///主键id
@@ -59,7 +32,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 
         /// </summary>
-        public List<InteClassDetailModifyDto> DetailList { get; set; } = new();
+        public List<InteClassDetailCreateDto> DetailList { get; set; } = new();
     }
 
     /// <summary>

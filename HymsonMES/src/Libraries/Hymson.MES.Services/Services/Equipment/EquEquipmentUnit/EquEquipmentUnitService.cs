@@ -32,7 +32,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
         /// 
         /// </summary>
         private readonly IEquEquipmentUnitRepository _equEquipmentUnitRepository;
-        private readonly AbstractValidator<EquEquipmentUnitCreateDto> _validationCreateRules;
+        private readonly AbstractValidator<EquEquipmentUnitSaveDto> _validationCreateRules;
 
         /// <summary>
         /// 构造函数
@@ -43,7 +43,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
         /// <param name="validationRules"></param>
         public EquEquipmentUnitService(ICurrentUser currentUser, ICurrentSite currentSite,
             IEquEquipmentUnitRepository equEquipmentUnitRepository,
-            AbstractValidator<EquEquipmentUnitCreateDto> validationRules)
+            AbstractValidator<EquEquipmentUnitSaveDto> validationRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -56,7 +56,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(EquEquipmentUnitCreateDto createDto)
+        public async Task<int> CreateAsync(EquEquipmentUnitSaveDto createDto)
         {
             // 验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(createDto);
@@ -77,7 +77,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyAsync(EquEquipmentUnitModifyDto modifyDto)
+        public async Task<int> ModifyAsync(EquEquipmentUnitSaveDto modifyDto)
         {
             // DTO转换实体
             var entity = modifyDto.ToEntity<EquEquipmentUnitEntity>();

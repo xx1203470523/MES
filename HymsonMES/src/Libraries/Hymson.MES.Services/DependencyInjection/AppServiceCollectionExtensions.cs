@@ -140,6 +140,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddValidators(IServiceCollection services)
         {
             #region Equipment
+            services.AddSingleton<AbstractValidator<EquEquipmentUnitSaveDto>, EquipmentUnitCreateValidator>();
             services.AddSingleton<AbstractValidator<EquEquipmentUnitCreateDto>, EquipmentUnitCreateValidator>();
 
             services.AddSingleton<AbstractValidator<EquFaultReasonCreateDto>, EquFaultReasonCreateValidator>();

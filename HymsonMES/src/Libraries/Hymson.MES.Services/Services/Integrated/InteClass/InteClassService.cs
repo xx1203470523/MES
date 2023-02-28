@@ -61,7 +61,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(InteClassCreateDto createDto)
+        public async Task<int> CreateAsync(InteClassSaveDto createDto)
         {
             // 验证DTO
 
@@ -105,7 +105,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyAsync(InteClassModifyDto modifyDto)
+        public async Task<int> ModifyAsync(InteClassSaveDto modifyDto)
         {
             // DTO转换实体
             var entity = modifyDto.ToEntity<InteClassEntity>();

@@ -6,8 +6,13 @@ namespace Hymson.MES.Services.Dtos.Equipment
     /// <summary>
     /// 新增输入对象（设备注册）
     /// </summary>
-    public record EquEquipmentCreateDto : BaseEntityDto
+    public record EquEquipmentSaveDto : BaseEntityDto
     {
+        /// <summary>
+        /// 唯一标识
+        /// </summary>
+        public long Id { get; set; }
+
         /// <summary>
         /// 编码（设备注册）
         /// </summary>
@@ -108,123 +113,6 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 设备关联Api
         /// </summary>
         public List<EquEquipmentLinkApiCreateDto> ApiLinks { get; set; }
-        #endregion
-    }
-
-    /// <summary>
-    /// 修改输入对象（设备注册）
-    /// </summary>
-    public record EquEquipmentModifyDto : BaseEntityDto
-    {
-        /// <summary>
-        /// 唯一标识
-        /// </summary>
-        public long Id { get; set; }
-
-        /// <summary>
-        /// 名称（设备注册）
-        /// </summary>
-        [Required(ErrorMessage = "名称不能为空")]
-        public string EquipmentName { get; set; }
-
-        /// <summary>
-        /// 设备描述
-        /// </summary>
-        public string EquipmentDesc { get; set; }
-
-        /// <summary>
-        /// 工作中心工厂id
-        /// </summary>
-        public long? WorkCenterFactoryId { get; set; }
-
-        /// <summary>
-        /// 工作中心车间id
-        /// </summary>
-        public long? WorkCenterShopId { get; set; }
-
-        /// <summary>
-        /// 工作中心产线id
-        /// </summary>
-        public long? WorkCenterLineId { get; set; }
-
-        /// <summary>
-        /// 存放位置
-        /// </summary>
-        [Required(ErrorMessage = "存放位置不能为空")]
-        public string Location { get; set; }
-
-        /// <summary>
-        /// 设备类型
-        /// </summary>
-        public int EquipmentType { get; set; }
-
-        /// <summary>
-        /// 使用部门
-        /// </summary>
-        public string UseDepartment { get; set; }
-
-        /// <summary>
-        /// 入厂日期
-        /// </summary>
-        public string EntryDate { get; set; }
-
-        /// <summary>
-        /// 质保期限（月）
-        /// </summary>
-        public int QualTime { get; set; }
-
-        /// <summary>
-        /// 厂商
-        /// </summary>
-        public string Manufacturer { get; set; }
-
-        /// <summary>
-        /// 供应商
-        /// </summary>
-        public string Supplier { get; set; }
-
-        /// <summary>
-        /// 使用状态
-        /// </summary>
-        [Required(ErrorMessage = "使用状态不能为空")]
-        public string UseStatus { get; set; }
-
-        /// <summary>
-        /// 功率
-        /// </summary>
-        public string Power { get; set; }
-
-        /// <summary>
-        /// 能耗等级
-        /// </summary>
-        public string EnergyLevel { get; set; }
-
-        /// <summary>
-        /// ip地址
-        /// </summary>
-        public string Ip { get; set; }
-
-        /// <summary>
-        /// 备注
-        /// </summary>
-        public string Remark { get; set; }
-
-        /// <summary>
-        /// 节拍时间(秒)
-        /// </summary>
-        public int? TakeTime { get; set; }
-
-        #region 子
-        /// <summary>
-        /// 设备关联硬件设备
-        /// </summary>
-        public List<EquEquipmentLinkHardwareModifyDto> HardwareLinks { get; set; }
-
-        /// <summary>
-        /// 设备关联Api
-        /// </summary>
-        public List<EquEquipmentLinkApiModifyDto> ApiLinks { get; set; }
-
         #endregion
     }
 

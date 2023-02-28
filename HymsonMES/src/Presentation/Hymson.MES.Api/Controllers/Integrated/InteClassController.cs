@@ -40,7 +40,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public async Task CreateAsync(InteClassCreateDto createDto)
+        public async Task CreateAsync(InteClassSaveDto createDto)
         {
             await _inteClassService.CreateAsync(createDto);
         }
@@ -50,7 +50,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// </summary>
         /// <returns></returns>
         [HttpPut]
-        public async Task ModifyAsync(InteClassModifyDto modifyDto)
+        public async Task ModifyAsync(InteClassSaveDto modifyDto)
         {
             await _inteClassService.ModifyAsync(modifyDto);
         }

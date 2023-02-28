@@ -74,7 +74,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(EquEquipmentCreateDto createDto)
+        public async Task<int> CreateAsync(EquEquipmentSaveDto createDto)
         {
             #region 参数处理
             if (string.IsNullOrEmpty(createDto.EntryDate) == true) createDto.EntryDate = SqlDateTime.MinValue.Value.ToString();
@@ -146,7 +146,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyAsync(EquEquipmentModifyDto modifyDto)
+        public async Task<int> ModifyAsync(EquEquipmentSaveDto modifyDto)
         {
             #region 参数处理
             if (string.IsNullOrEmpty(modifyDto.EntryDate) == true) modifyDto.EntryDate = SqlDateTime.MinValue.Value.ToString();

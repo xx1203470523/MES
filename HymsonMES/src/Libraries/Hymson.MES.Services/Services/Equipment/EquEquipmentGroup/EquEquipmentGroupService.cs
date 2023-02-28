@@ -64,7 +64,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(EquEquipmentGroupCreateDto createDto)
+        public async Task<int> CreateAsync(EquEquipmentGroupSaveDto createDto)
         {
             // 验证DTO
             //await _validationCreateRules.ValidateAndThrowAsync(createDto);
@@ -95,7 +95,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyAsync(EquEquipmentGroupModifyDto modifyDto)
+        public async Task<int> ModifyAsync(EquEquipmentGroupSaveDto modifyDto)
         {
             // 验证DTO
             //await _validationModifyRules.ValidateAndThrowAsync(modifyDto);

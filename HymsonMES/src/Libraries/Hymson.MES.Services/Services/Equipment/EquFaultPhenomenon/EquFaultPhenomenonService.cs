@@ -52,7 +52,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(EquFaultPhenomenonCreateDto createDto)
+        public async Task<int> CreateAsync(EquFaultPhenomenonSaveDto createDto)
         {
             // 验证DTO
 
@@ -83,7 +83,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyAsync(EquFaultPhenomenonModifyDto modifyDto)
+        public async Task<int> ModifyAsync(EquFaultPhenomenonSaveDto modifyDto)
         {
             // 验证DTO
 

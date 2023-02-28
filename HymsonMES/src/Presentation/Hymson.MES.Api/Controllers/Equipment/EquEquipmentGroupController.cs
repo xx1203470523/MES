@@ -39,7 +39,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task CreateAsync(EquEquipmentGroupCreateDto createDto)
+        public async Task CreateAsync(EquEquipmentGroupSaveDto createDto)
         {
             await _equEquipmentGroupService.CreateAsync(createDto);
         }
@@ -50,7 +50,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
-        public async Task ModifyAsync(EquEquipmentGroupModifyDto modifyDto)
+        public async Task ModifyAsync(EquEquipmentGroupSaveDto modifyDto)
         {
             await _equEquipmentGroupService.ModifyAsync(modifyDto);
         }

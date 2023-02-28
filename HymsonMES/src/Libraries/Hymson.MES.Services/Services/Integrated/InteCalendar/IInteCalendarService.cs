@@ -13,14 +13,14 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        Task<int> CreateAsync(InteCalendarCreateDto createDto);
+        Task<int> CreateAsync(InteCalendarSaveDto createDto);
 
         /// <summary>
         /// 更新（日历）
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        Task<int> ModifyAsync(InteCalendarModifyDto modifyDto);
+        Task<int> ModifyAsync(InteCalendarSaveDto modifyDto);
 
         /// <summary>
         /// 删除（日历）
