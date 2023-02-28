@@ -109,7 +109,7 @@ namespace Hymson.MES.Api.Controllers.Process
         public async Task<int> DeleteProcMaterialAsync([FromBody] long[] ids)
         {
             //long[] idsArr = StringExtension.SpitLongArrary(ids);
-           return await _procMaterialService.DeletesProcMaterialAsync(string.Join(",", ids));
+           return await _procMaterialService.DeletesProcMaterialAsync(ids);
         }
 
     }

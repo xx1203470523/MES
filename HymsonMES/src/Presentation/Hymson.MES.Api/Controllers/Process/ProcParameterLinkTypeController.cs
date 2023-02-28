@@ -109,7 +109,7 @@ namespace Hymson.MES.Api.Controllers.Process
         public async Task<int> DeleteProcParameterLinkTypeAsync(long[] ids)
         {
             //long[] idsArr = StringExtension.SpitLongArrary(ids);
-            return await _procParameterLinkTypeService.DeletesProcParameterLinkTypeAsync(string.Join(",", ids));
+            return await _procParameterLinkTypeService.DeletesProcParameterLinkTypeAsync(ids);
         }
 
     }

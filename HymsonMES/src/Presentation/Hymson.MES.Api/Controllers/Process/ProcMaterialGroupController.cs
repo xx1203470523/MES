@@ -107,7 +107,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("delete")]
-        public async Task DeleteProcMaterialGroupAsync(string ids)
+        public async Task DeleteProcMaterialGroupAsync(long[] ids)
         {
             //long[] idsArr = StringExtension.SpitLongArrary(ids);
             await _procMaterialGroupService.DeletesProcMaterialGroupAsync(ids);

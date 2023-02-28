@@ -13,6 +13,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
@@ -67,7 +68,7 @@ namespace Hymson.MES.Services.Services.Process
             procParameterEntity.CreatedOn = HymsonClock.Now();
             procParameterEntity.UpdatedOn = HymsonClock.Now();
             procParameterEntity.ParameterCode = procParameterEntity.ParameterCode.ToUpper();
-            procParameterEntity.SiteId = 1;//TODO _currentSite.SiteId;
+            procParameterEntity.SiteId = _currentSite.SiteId;
 
             //判断编号是否已经存在
             var exists = await _procParameterRepository.GetProcParameterEntitiesAsync(new ProcParameterQuery()
@@ -97,16 +98,14 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeletesProcParameterAsync(string ids)
+        public async Task<int> DeletesProcParameterAsync(long[] idsArr)
         {
-            if (string.IsNullOrEmpty(ids)) 
+            if (idsArr.Length < 1)
             {
                 throw new ValidationException(ErrorCode.MES10505);
             }
-
-            var idsArr = StringExtension.SpitLongArrary(ids);
 
             //查询参数是否关联产品参数和设备参数
             var lists= await _procParameterLinkTypeRepository.GetByParameterIdsAsync(idsArr);
@@ -115,7 +114,7 @@ namespace Hymson.MES.Services.Services.Process
                 throw new BusinessException(ErrorCode.MES10506);
             }
 
-            return await _procParameterRepository.DeletesAsync(idsArr);
+            return await _procParameterRepository.DeletesAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
         }
 
         /// <summary>
@@ -125,7 +124,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<PagedInfo<ProcParameterDto>> GetPageListAsync(ProcParameterPagedQueryDto procParameterPagedQueryDto)
         {
-            procParameterPagedQueryDto.SiteId = 1;//TODO   _currentSite.SiteId;
+            procParameterPagedQueryDto.SiteId = _currentSite.SiteId;
 
             var procParameterPagedQuery = procParameterPagedQueryDto.ToQuery<ProcParameterPagedQuery>();
             var pagedInfo = await _procParameterRepository.GetPagedInfoAsync(procParameterPagedQuery);
@@ -168,7 +167,7 @@ namespace Hymson.MES.Services.Services.Process
             var procParameterEntity = procParameterModifyDto.ToEntity<ProcParameterEntity>();
             procParameterEntity.UpdatedBy = _currentUser.UserName;
             procParameterEntity.UpdatedOn = HymsonClock.Now();
-            procParameterEntity.SiteId = 1;//TODO 
+            procParameterEntity.SiteId = _currentSite.SiteId;
 
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(procParameterModifyDto);
@@ -199,9 +198,9 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<ProcParameterDto> QueryProcParameterByIdAsync(long id) 
         {
-            var siteId = 1;//TODO _currentSite.SiteId;
+            var siteId = _currentSite.SiteId;
 
-           var procParameterEntity = await _procParameterRepository.GetByIdAsync(id);
+            var procParameterEntity = await _procParameterRepository.GetByIdAsync(id);
            if (procParameterEntity != null) 
            {
                var dto= procParameterEntity.ToModel<CustomProcParameterDto>();

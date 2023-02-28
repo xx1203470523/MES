@@ -51,9 +51,9 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="idsArr"></param>
         /// <returns></returns>
-        Task<int> DeletesProcLoadPointAsync(string ids);
+        Task<int> DeletesProcLoadPointAsync(long[] idsArr);
 
         /// <summary>
         /// 根据ID查询
