@@ -139,7 +139,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
             return await _equEquipmentGroupRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = idsArr,
-                UserId = $"{_currentUser.UserName}",
+                UserId = _currentUser.UserName,
                 DeleteOn = HymsonClock.Now()
             });
         }

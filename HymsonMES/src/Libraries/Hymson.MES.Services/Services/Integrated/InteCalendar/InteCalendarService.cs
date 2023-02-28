@@ -299,7 +299,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
                 rows += await _inteCalendarRepository.DeletesAsync(new DeleteCommand
                 {
                     Ids = idsArr,
-                    UserId = $"{_currentUser.UserName}",
+                    UserId = _currentUser.UserName,
                     DeleteOn = HymsonClock.Now()
                 });
                 trans.Complete();
