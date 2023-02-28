@@ -107,7 +107,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 关联点
         /// </summary>
-        public string LinkPoint { get; set; }
+        public int LinkPoint { get; set; }
 
         /// <summary>
         /// 作业ID

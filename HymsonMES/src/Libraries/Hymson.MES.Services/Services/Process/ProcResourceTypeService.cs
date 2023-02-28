@@ -142,6 +142,7 @@ namespace Hymson.MES.Services.Services.Process
             var siteId = _currentSite.SiteId ?? 0;
             //DTO转换实体
             var id = IdGenProvider.Instance.CreateId();
+            var resType = param.ResType.ToUpperInvariant();
             var entity = new ProcResourceTypeAddCommand
             {
                 Id = id,
@@ -149,12 +150,12 @@ namespace Hymson.MES.Services.Services.Process
                 CreatedBy = userName,
                 UpdatedBy = userName,
                 Remark = param.Remark ?? "",
-                ResType = param.ResType.ToUpperInvariant(),
+                ResType = resType,
                 ResTypeName = param.ResTypeName ?? ""
             };
 
             //判断资源类型在系统中是否已经存在
-            var resEntity = new ProcResourceTypeEntity { SiteId = siteId, ResType = entity.ResType };
+            var resEntity = new ProcResourceTypeEntity { SiteId = siteId, ResType = resType };
             var resourceType = await _resourceTypeRepository.GetByCodeAsync(resEntity);
             if (resourceType != null)
             {

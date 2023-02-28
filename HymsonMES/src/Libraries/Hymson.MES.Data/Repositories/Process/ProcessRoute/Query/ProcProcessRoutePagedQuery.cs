@@ -14,11 +14,6 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public class ProcProcessRoutePagedQuery : PagerInfo
     {
-        // <summary>
-        /// 所属站点代码
-        /// </summary>
-        public string? SiteCode { get; set; } = "";
-
         /// <summary>
         /// 工艺路线代码
         /// </summary>

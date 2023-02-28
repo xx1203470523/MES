@@ -54,9 +54,9 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
 
-            if (!string.IsNullOrWhiteSpace(query.SiteCode))
+            if (query.SiteId > 0)
             {
-                sqlBuilder.Where("SiteCode=@SiteCode");
+                sqlBuilder.Where("SiteId = @SiteId");
             }
             if (!string.IsNullOrWhiteSpace(query.Code))
             {
@@ -135,7 +135,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<bool> IsExistsAsync(ProcProcessRouteQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var  procProcessRoutes= await conn.QueryAsync<ProcProcessRouteEntity>(ExistsSql, new { Code = query.Code, SiteCode = query.SiteId }) ;
+            var  procProcessRoutes= await conn.QueryAsync<ProcProcessRouteEntity>(ExistsSql, new { Code = query.Code, Version=query.Version,SiteId = query.SiteId }) ;
             return procProcessRoutes != null && procProcessRoutes.Any();
         }
 
@@ -158,7 +158,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<int> InsertRangeAsync(List<ProcProcessRouteEntity> procProcessRouteEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertsSql, procProcessRouteEntitys);
+            return await conn.ExecuteAsync(InsertSql, procProcessRouteEntitys);
         }
 
         /// <summary>
@@ -202,18 +202,13 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetProcProcessRouteEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `proc_process_route` /**where**/  ";
-        const string ExistsSql = "SELECT Id FROM proc_process_route WHERE `IsDeleted`= 0 AND Code=@Code and SiteCode=@SiteCode LIMIT 1";
+        const string ExistsSql = "SELECT Id FROM proc_process_route WHERE `IsDeleted`= 0 AND Code=@Code and Version=@Version and SiteId=@SiteId LIMIT 1";
 
-        const string InsertSql = "INSERT INTO `proc_process_route`(  `Id`, `SiteCode`, `Code`, `Name`, `Status`, `Type`, `Version`, `IsCurrentVersion`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @Code, @Name, @Status, @Type, @Version, @IsCurrentVersion, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `proc_process_route`(  `Id`, `SiteCode`, `Code`, `Name`, `Status`, `Type`, `Version`, `IsCurrentVersion`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @Code, @Name, @Status, @Type, @Version, @IsCurrentVersion, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `proc_process_route`(  `Id`, `SiteId`, `Code`, `Name`, `Status`, `Type`, `Version`, `IsCurrentVersion`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Status, @Type, @Version, @IsCurrentVersion, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string UpdateSql = "UPDATE `proc_process_route` SET Status = @Status, Type = @Type, IsCurrentVersion = @IsCurrentVersion, Remark = @Remark,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE `proc_process_route` SET IsDeleted = '1',UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id in @Ids";
-        const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteCode`, `Code`, `Name`, `Status`, `Type`, `Version`, `IsCurrentVersion`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `proc_process_route`  WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteCode`, `Code`, `Name`, `Status`, `Type`, `Version`, `IsCurrentVersion`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `proc_process_route`  WHERE Id IN @ids ";
+        const string DeletesSql = "UPDATE `proc_process_route` SET IsDeleted = Id,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id in @Ids";
+        const string GetByIdSql = @"SELECT * FROM `proc_process_route`  WHERE Id = @Id ";
+        const string GetByIdsSql = @"SELECT * FROM `proc_process_route`  WHERE Id IN @ids ";
         const string IsIsExistsEnabledSql = "select Id  from proc_process_route where IsDeleted=0 and Status in @StatusArr and Id  in @Ids  limit 1";
     }
 }

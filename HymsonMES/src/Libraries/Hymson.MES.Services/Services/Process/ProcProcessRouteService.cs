@@ -165,12 +165,25 @@ namespace Hymson.MES.Services.Services.Process
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(parm);
 
+            //工艺路线编码和版本唯一
+            var code = parm.Code.ToUpperInvariant();
+            var query = new ProcProcessRouteQuery
+            {
+                Code = code,
+                SiteId = _currentSite.SiteId ?? 0,
+                Version = parm.Version
+            };
+            if (await _procProcessRouteRepository.IsExistsAsync(query))
+            {
+                throw new BusinessException(ErrorCode.MES10437).WithData("Code", parm.Code).WithData("Version", parm.Version);
+            }
+
             var siteId = _currentSite.SiteId ?? 0;
             //DTO转换实体
             var procProcessRouteEntity = parm.ToEntity<ProcProcessRouteEntity>();
-            procProcessRouteEntity.SiteId = siteId;
-            procProcessRouteEntity.Code = parm.Code.ToUpperInvariant();
             procProcessRouteEntity.Id = IdGenProvider.Instance.CreateId();
+            procProcessRouteEntity.SiteId = siteId;
+            procProcessRouteEntity.Code = code;
             procProcessRouteEntity.CreatedBy = _currentUser.UserName;
             procProcessRouteEntity.UpdatedBy = _currentUser.UserName;
 
@@ -188,17 +201,6 @@ namespace Hymson.MES.Services.Services.Process
             {
                 throw new ValidationException(ErrorCode.MES10436);
             }
-
-            // 判断编号是否已存在
-            var query = new ProcProcessRouteQuery
-            {
-                Code = procProcessRouteEntity.Code,
-                SiteId = _currentSite.SiteId??0
-            };
-            //if (await _procProcessRouteRepository.IsExistsAsync(query))
-            //{
-            //    throw new DataException(ErrorCode.MES10437).WithData("Code", procProcessRouteEntity.Code).WithData("Version", procProcessRouteEntity.Version);
-            //}
             #endregion
 
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
@@ -242,9 +244,15 @@ namespace Hymson.MES.Services.Services.Process
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(parm);
 
+            //判断是否存在
+            var processRoute = await _procProcessRouteRepository.GetByIdAsync(parm.Id);
+            if (processRoute == null)
+            {
+                throw new ValidationException(ErrorCode.MES10438);
+            }
+
             //DTO转换实体
             var procProcessRouteEntity = parm.ToEntity<ProcProcessRouteEntity>();
-            procProcessRouteEntity.SiteId = _currentSite.SiteId ?? 0;
             procProcessRouteEntity.UpdatedBy = _currentUser.UserName;
 
             var nodes = ConvertProcessRouteNodeList(parm.DynamicData.Nodes, procProcessRouteEntity);
@@ -262,22 +270,17 @@ namespace Hymson.MES.Services.Services.Process
                 throw new ValidationException(ErrorCode.MES10436);
             }
 
-            var processRoute = await _procProcessRouteRepository.GetByIdAsync(parm.Id);
-            if (processRoute == null)
+            // 工艺路线编码和版本唯一
+            var query = new ProcProcessRouteQuery
             {
-                throw new ValidationException(ErrorCode.MES10438);
+                Code = processRoute.Code,
+                SiteId = _currentSite.SiteId ?? 0,
+                Version = processRoute.Version
+            };
+            if (await _procProcessRouteRepository.IsExistsAsync(query))
+            {
+                throw new BusinessException(ErrorCode.MES10437).WithData("Code", processRoute.Code).WithData("Version", processRoute.Version);
             }
-
-            // 判断编号是否已存在
-            //var query = new ProcProcessRouteQuery
-            //{
-            //    Code = procProcessRouteEntity.Code,
-            //    SiteCode = procProcessRouteEntity.SiteCode
-            //};
-            //if (await _procProcessRouteRepository.IsExistsAsync(query))
-            //{
-            //    throw new DataException(ErrorCode.MES10437).WithData("Code", procProcessRouteEntity.Code).WithData("Version", procProcessRouteEntity.Version);
-            //}
             #endregion
 
             //TODO 现在关联表批量删除批量新增，后面再修改

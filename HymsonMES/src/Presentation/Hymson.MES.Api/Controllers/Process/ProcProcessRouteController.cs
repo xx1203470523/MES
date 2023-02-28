@@ -42,7 +42,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Route("list")]
         public async Task<PagedInfo<ProcProcessRouteDto>> QueryPagedProcProcessRoute([FromQuery] ProcProcessRoutePagedQueryDto parm)
         {

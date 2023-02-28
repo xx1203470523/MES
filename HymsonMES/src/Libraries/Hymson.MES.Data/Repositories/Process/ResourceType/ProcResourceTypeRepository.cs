@@ -187,6 +187,6 @@ namespace Hymson.MES.Data.Repositories.Process
 
         const string InsertSql = "INSERT INTO `proc_resource_type`(`Id`, `SiteId`, `ResType`, `ResTypeName`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @ResType, @ResTypeName, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted);";
         const string UpdateSql = "UPDATE `proc_resource_type` SET ResTypeName = @ResTypeName, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id;";
-        const string DeleteSql = "UPDATE `proc_resource_type` SET `IsDeleted` = 1,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE `Id` in @Ids";
+        const string DeleteSql = "UPDATE `proc_resource_type` SET `IsDeleted` = Id,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE `Id` in @Ids";
     }
 }

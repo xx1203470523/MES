@@ -114,7 +114,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<ProcResourceViewDto> GetByIdAsync(long id)
         {
             var entity = await _resourceRepository.GetByIdAsync(id);
-            return entity?.ToModel<ProcResourceViewDto>()??new ProcResourceViewDto();
+            return entity?.ToModel<ProcResourceViewDto>() ?? new ProcResourceViewDto();
         }
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcResourceViewDto>> GetPageListAsync(ProcResourcePagedQueryDto query)
         {
             var resourcePagedQuery = query.ToQuery<ProcResourcePagedQuery>();
-            resourcePagedQuery.SiteId = _currentSite.SiteId??0;
+            resourcePagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _resourceRepository.GetPageListAsync(resourcePagedQuery);
 
             //实体到DTO转换 装载数据
@@ -187,7 +187,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<PagedInfo<ProcResourceConfigPrintViewDto>> GetcResourceConfigPrintAsync(ProcResourceConfigPrintPagedQueryDto query)
         {
-            var printPagedQuery= query.ToQuery<ProcResourceConfigPrintPagedQuery>();
+            var printPagedQuery = query.ToQuery<ProcResourceConfigPrintPagedQuery>();
             var pagedInfo = await _resourceConfigPrintRepository.GetPagedInfoAsync(printPagedQuery);
 
             //实体到DTO转换 装载数据
@@ -269,7 +269,7 @@ namespace Hymson.MES.Services.Services.Process
         {
             var query = new InteJobBusinessRelationPagedQuery()
             {
-                SiteId = _currentSite.SiteId??0,
+                SiteId = _currentSite.SiteId ?? 0,
                 BusinessId = queryDto.BusinessId,
                 BusinessType = InteJobBusinessTypeEnum.Resource.ToString(),
                 PageIndex = queryDto.PageIndex,
@@ -322,7 +322,7 @@ namespace Hymson.MES.Services.Services.Process
             var resCode = parm.ResCode.ToUpperInvariant();
             var query = new ProcResourceQuery
             {
-                SiteId =_currentSite.SiteId??0,
+                SiteId = _currentSite.SiteId ?? 0,
                 ResCode = resCode
             };
             if (await _resourceRepository.IsExistsAsync(query))
@@ -332,7 +332,7 @@ namespace Hymson.MES.Services.Services.Process
 
             if (parm.ResTypeId > 0)
             {
-                var resourceType = await _resourceTypeRepository.GetByIdAsync(parm.ResTypeId??0);
+                var resourceType = await _resourceTypeRepository.GetByIdAsync(parm.ResTypeId ?? 0);
                 if (resourceType == null)
                 {
                     throw new ValidationException(ErrorCode.MES10310);
@@ -502,53 +502,17 @@ namespace Hymson.MES.Services.Services.Process
 
             if (param.PrintList != null && param.PrintList.Count > 0)
             {
-                if (param.PrintList.Where(x => x.OperationType != 3).GroupBy(x => x.PrintId).Where(g => g.Count() > 2).Count() > 1)
+                //判断打印机是否重复配置  数据库中 已经存储的情况
+                if (param.PrintList.GroupBy(x => x.PrintId).Where(g => g.Count() > 2).Count() > 1)
                 {
                     throw new ValidationException(ErrorCode.MES10313);
-                }
-
-                //判断打印机是否重复配置  数据库中 已经存储的情况
-
-                var parmPrintIds = param.PrintList.Select(x => x.PrintId);
-                var printQuery = new ProcResourceConfigPrintQuery
-                {
-                    ResourceId = param.Id,
-                    Ids = parmPrintIds.ToArray()
-                };
-                var resourcePrintList = await _resourceConfigPrintRepository.GetByResourceIdAsync(printQuery);
-                if (resourcePrintList != null && resourcePrintList.Any())
-                {
-                    foreach (var item in resourcePrintList)
-                    {
-                        var parmPrint = param.PrintList.Where(x => x.PrintId == item.PrintId);
-                        //  判断参数中打印机数据情况
-                        //     传入一条 只能为修改或者删除
-                        //     传入两条 只能为删除和新增
-                        //     其他则为异常
-                        if (parmPrint.Count() == 1)
-                        {
-                            if (parmPrint.FirstOrDefault()?.OperationType == 1)
-                                throw new ValidationException(ErrorCode.MES10313);
-                        }
-                        else if (parmPrint.Count() == 2)
-                        {
-                            if (!(parmPrint.Where(x => x.OperationType == 3).Count() == 1 && parmPrint.Where(x => x.OperationType == 1).Count() == 1))
-                            {
-                                throw new ValidationException(ErrorCode.MES10313);
-                            }
-                        }
-                        else
-                        {
-                            throw new ValidationException(ErrorCode.MES10313);
-                        }
-                    }
-                }
+                }     
             }
 
             //判断是否勾选了多个主设备，只能有一个主设备
             if (param.EquList != null && param.EquList.Count > 0)
             {
-                if (param.EquList.Where(x => x.OperationType != 3).GroupBy(x => x.EquipmentId).Where(g => g.Count() > 2).Count() > 1)
+                if (param.EquList.GroupBy(x => x.EquipmentId).Where(g => g.Count() > 2).Count() > 1)
                 {
                     throw new Exception(ErrorCode.MES10314);
                 }
@@ -560,61 +524,11 @@ namespace Hymson.MES.Services.Services.Process
                     ResourceId = param.Id,
                     Ids = parmEquIds
                 };
-                var resourceEquList = await _resourceEquipmentBindRepository.GetByResourceIdAsync(equQuery);
-                if (resourceEquList != null && resourceEquList.Any())
-                {
-                    foreach (var item in resourceEquList)
-                    {
-                        var parmEqu = param?.PrintList?.Where(x => x.PrintId == item.EquipmentId);
-                        //  判断参数中打印机数据情况
-                        //     传入一条 只能为修改或者删除
-                        //     传入两条 只能为删除和新增
-                        //     其他则为异常
-                        if (parmEqu?.Count() == 1)
-                        {
-                            if (parmEqu.FirstOrDefault()?.OperationType == 1)
-                                throw new ValidationException(ErrorCode.MES10314);
-                        }
-                        else if (parmEqu?.Count() == 2)
-                        {
-                            if (!(parmEqu.Where(x => x.OperationType == 3).Count() == 1 && parmEqu.Where(x => x.OperationType == 1).Count() == 1))
-                            {
-                                throw new ValidationException(ErrorCode.MES10314);
-                            }
-                        }
-                        else
-                        {
-                            throw new ValidationException(ErrorCode.MES10314);
-                        }
-                    }
-                }
 
-                var ismianList = param.EquList.Where(a => a.IsMain == true && a.OperationType != 3).ToList();
+                var ismianList = param.EquList.Where(a => a.IsMain == true).ToList();
                 if (ismianList.Count > 1)
                 {
                     throw new ValidationException(ErrorCode.MES10307);
-                }
-                else
-                {
-                    //判断当前存储与参数主设备是否一致
-                    //        不一致 则判断 存储设备是否设置成非主设备
-                    var equQueryMain = new ProcResourceEquipmentBindQuery
-                    {
-                        ResourceId = param.Id,
-                        IsMain = true
-                    };
-                    var mainList = await _resourceEquipmentBindRepository.GetByResourceIdAsync(equQueryMain);
-                    if (mainList != null)
-                    {
-                        var isMain = mainList.FirstOrDefault();
-                        if (ismianList.FirstOrDefault()?.EquipmentId != isMain?.EquipmentId)
-                        {
-                            if (param.EquList.Where(x => x.EquipmentId == isMain?.EquipmentId).FirstOrDefault() == null)
-                            {
-                                throw new CustomerValidationException(ErrorCode.MES10307);
-                            }
-                        }
-                    }
                 }
             }
             #endregion
@@ -632,193 +546,91 @@ namespace Hymson.MES.Services.Services.Process
 
             //打印机数据
             List<ProcResourceConfigPrintEntity> addPrintList = new List<ProcResourceConfigPrintEntity>();
-            List<ProcResourceConfigPrintEntity> updaterPintList = new List<ProcResourceConfigPrintEntity>();
-            List<long> deletePintIds = new List<long>();
             if (param.PrintList != null && param.PrintList.Count > 0)
             {
                 foreach (var item in param.PrintList)
                 {
                     ProcResourceConfigPrintEntity print = new ProcResourceConfigPrintEntity();
-                    switch (item.OperationType)
+                    print = new ProcResourceConfigPrintEntity
                     {
-                        case 1:
-                            print = new ProcResourceConfigPrintEntity
-                            {
-                                Id = IdGenProvider.Instance.CreateId(),
-                                ResourceId = param.Id,
-                                PrintId = item.PrintId,
-                                Remark = "",
-                                SiteId = _currentSite.SiteId ?? 0,
-                                CreatedBy = userName,
-                                UpdatedBy = userName
-                            };
-                            addPrintList.Add(print);
-                            break;
-                        case 2:
-                            print = print = new ProcResourceConfigPrintEntity
-                            {
-                                Id = item.Id ?? 0,
-                                PrintId = item.PrintId,
-                                UpdatedBy = userName
-                            };
-                            updaterPintList.Add(print);
-                            break;
-                        case 3:
-                            if (item.Id != null && item.Id > 0)
-                            {
-                                deletePintIds.Add(item.Id ?? 0);
-                            }
-                            break;
-                        default:
-                            throw new BusinessException(ErrorCode.MES10315).WithData("OperationType", item.OperationType);
-                    }
+                        Id = IdGenProvider.Instance.CreateId(),
+                        ResourceId = param.Id,
+                        PrintId = item.PrintId,
+                        Remark = "",
+                        SiteId = _currentSite.SiteId ?? 0,
+                        CreatedBy = userName,
+                        UpdatedBy = userName
+                    };
+                    addPrintList.Add(print);
                 }
             }
 
             //设备绑定设置数据
             List<ProcResourceEquipmentBindEntity> addEquList = new List<ProcResourceEquipmentBindEntity>();
-            List<ProcResourceEquipmentBindEntity> updateEquListt = new List<ProcResourceEquipmentBindEntity>();
-            List<long> deleteEquIds = new List<long>();
             if (param.EquList != null && param.EquList.Count > 0)
             {
                 foreach (var item in param.EquList)
                 {
                     ProcResourceEquipmentBindEntity equ = new ProcResourceEquipmentBindEntity();
-                    switch (item.OperationType)
+                    equ = new ProcResourceEquipmentBindEntity
                     {
-                        case 1:
-                            equ = new ProcResourceEquipmentBindEntity
-                            {
-                                Id = IdGenProvider.Instance.CreateId(),
-                                ResourceId = param.Id,
-                                EquipmentId = item.EquipmentId,
-                                IsMain = item.IsMain ?? false,
-                                Remark = "",
-                                SiteId = _currentSite.SiteId ?? 0,
-                                CreatedBy = userName,
-                                UpdatedBy = userName
-                            };
-                            addEquList.Add(equ);
-                            break;
-                        case 2:
-                            equ = new ProcResourceEquipmentBindEntity
-                            {
-                                Id = item.Id ?? 0,
-                                EquipmentId = item.EquipmentId,
-                                IsMain = item.IsMain ?? false,
-                                UpdatedBy = userName
-                            };
-                            updateEquListt.Add(equ);
-                            break;
-                        case 3:
-                            if (item.Id != null && item.Id > 0)
-                            {
-                                deleteEquIds.Add(item.Id ?? 0);
-                            }
-                            break;
-                        default:
-                            throw new BusinessException(ErrorCode.MES10316).WithData("OperationType", item.OperationType);
-                    }
+                        Id = IdGenProvider.Instance.CreateId(),
+                        ResourceId = param.Id,
+                        EquipmentId = item.EquipmentId,
+                        IsMain = item.IsMain ?? false,
+                        Remark = "",
+                        SiteId = _currentSite.SiteId ?? 0,
+                        CreatedBy = userName,
+                        UpdatedBy = userName
+                    };
+                    addEquList.Add(equ);
                 }
             }
 
             //资源设置数据
             List<ProcResourceConfigResEntity> addResSetList = new List<ProcResourceConfigResEntity>();
-            List<ProcResourceConfigResEntity> updateSetListt = new List<ProcResourceConfigResEntity>();
-            List<long> deleteSetIds = new List<long>();
             if (param.ResList != null && param.ResList.Count > 0)
             {
                 foreach (var item in param.ResList)
                 {
                     ProcResourceConfigResEntity resSet = new ProcResourceConfigResEntity();
-                    switch (item.OperationType)
+                    resSet = new ProcResourceConfigResEntity
                     {
-                        case 1:
-                            resSet = new ProcResourceConfigResEntity
-                            {
-                                Id = IdGenProvider.Instance.CreateId(),
-                                ResourceId = param.Id,
-                                SetType = item.SetType,
-                                Value = item.Value,
-                                Remark = "",
-                                SiteId = _currentSite.SiteId ?? 0,
-                                CreatedBy = userName,
-                                UpdatedBy = userName
-                            };
-                            addResSetList.Add(resSet);
-                            break;
-                        case 2:
-                            resSet = new ProcResourceConfigResEntity
-                            {
-                                Id = item.Id ?? 0,
-                                SetType = item.SetType,
-                                Value = item.Value,
-                                UpdatedBy = userName
-                            };
-                            updateSetListt.Add(resSet);
-                            break;
-                        case 3:
-                            if (item.Id != null && item.Id > 0)
-                            {
-                                deleteSetIds.Add(item.Id ?? 0);
-                            }
-                            break;
-                        default:
-                            throw new BusinessException(ErrorCode.MES10317).WithData("OperationType", item.OperationType);
-                    }
+                        Id = IdGenProvider.Instance.CreateId(),
+                        ResourceId = param.Id,
+                        SetType = item.SetType,
+                        Value = item.Value,
+                        Remark = "",
+                        SiteId = _currentSite.SiteId ?? 0,
+                        CreatedBy = userName,
+                        UpdatedBy = userName
+                    };
+                    addResSetList.Add(resSet);
                 }
             }
 
             //作业设置数据
             List<InteJobBusinessRelationEntity> addJobList = new List<InteJobBusinessRelationEntity>();
-            List<InteJobBusinessRelationEntity> updateJobList = new List<InteJobBusinessRelationEntity>();
-            List<long> deleteJobIds = new List<long>();
             if (param.JobList != null && param.JobList.Count > 0)
             {
                 foreach (var item in param.JobList)
                 {
                     InteJobBusinessRelationEntity job = new InteJobBusinessRelationEntity();
-                    switch (item.OperationType)
+                    job = new InteJobBusinessRelationEntity
                     {
-                        case 1:
-                            job = new InteJobBusinessRelationEntity
-                            {
-                                Id = IdGenProvider.Instance.CreateId(),
-                                BusinessId = param.Id,
-                                BusinessType= (int)InteJobBusinessTypeEnum.Resource,
-                                //LinkPoint = item.LinkPoint,
-                                JobId = item.JobId,
-                                IsUse = item.IsUse,
-                                Parameter = item.Parameter,
-                                Remark = item.Remark,
-                                SiteId = _currentSite.SiteId ?? 0,
-                                CreatedBy = userName,
-                                UpdatedBy = userName
-                            };
-                            addJobList.Add(job);
-                            break;
-                        case 2:
-                            job = new InteJobBusinessRelationEntity
-                            {
-                                Id = item.Id ?? 0,
-                                //LinkPoint = item.LinkPoint,
-                                JobId = item.JobId,
-                                IsUse = item.IsUse,
-                                Remark = item.Remark,
-                                Parameter = item.Parameter,
-                                UpdatedBy = userName,
-                            };
-                            updateJobList.Add(job);
-                            break;
-                        case 3:
-                            if (item.Id != null && item.Id > 0)
-                            {
-                                deleteJobIds.Add(item.Id ?? 0);
-                            }
-                            break;
-                        default:
-                            throw new BusinessException(ErrorCode.MES10318).WithData("OperationType", item.OperationType);
-                    }
+                        Id = IdGenProvider.Instance.CreateId(),
+                        BusinessId = param.Id,
+                        BusinessType = (int)InteJobBusinessTypeEnum.Resource,
+                        LinkPoint = item.LinkPoint,
+                        JobId = item.JobId,
+                        IsUse = item.IsUse,
+                        Parameter = item.Parameter,
+                        Remark = item.Remark,
+                        SiteId = _currentSite.SiteId ?? 0,
+                        CreatedBy = userName,
+                        UpdatedBy = userName
+                    };
+                    addJobList.Add(job);
                 }
             }
 
@@ -827,73 +639,41 @@ namespace Hymson.MES.Services.Services.Process
                 //入库
                 await _resourceRepository.UpdateAsync(entity);
 
+                //删除之前的数据
+                await _resourceConfigPrintRepository.DeleteByResourceIdAsync(param.Id);
                 //打印机数据
                 if (addPrintList != null && addPrintList.Count > 0)
                 {
                     await _resourceConfigPrintRepository.InsertRangeAsync(addPrintList);
                     // return Error(ResultCode.FAIL, "插入资源关联打印表失败");
                 }
-                if (updaterPintList != null && updaterPintList.Count > 0)
-                {
-                    // return Error(ResultCode.FAIL, "修改资源关联打印表失败");
-                    await _resourceConfigPrintRepository.UpdateRangeAsync(updaterPintList);
-                }
-                if (deletePintIds != null && deletePintIds.Count > 0)
-                {
-                    // return Error(ResultCode.FAIL, "删除资源关联打印表失败");
-                    await _resourceConfigPrintRepository.DeleteRangeAsync(deletePintIds.ToArray());
-                }
 
+                //删除之前的数据
+                await _resourceEquipmentBindRepository.DeleteByResourceIdAsync(param.Id);
                 //设备数据
                 if (addEquList != null && addEquList.Count > 0)
                 {
-                    //  return Error(ResultCode.FAIL, "插入资源关联设备失败");
                     await _resourceEquipmentBindRepository.InsertRangeAsync(addEquList);
-                }
-                if (updateEquListt != null && updateEquListt.Count > 0)
-                {
-                    //  return Error(ResultCode.FAIL, "修改资源关联设备失败");
-                    await _resourceEquipmentBindRepository.UpdateRangeAsync(updateEquListt);
-                }
-                if (deleteEquIds != null && deleteEquIds.Count > 0)
-                {
-                    // return Error(ResultCode.FAIL, "删除资源关联设备失败");
-                    await _resourceEquipmentBindRepository.DeletesRangeAsync(deleteEquIds.ToArray());
+                    //  return Error(ResultCode.FAIL, "插入资源关联设备失败");
                 }
 
+                //删除之前的数据
+                await _procResourceConfigResRepository.DeleteByResourceIdAsync(param.Id);
                 //资源设置数据
                 if (addResSetList != null && addResSetList.Count > 0)
                 {
-                    // return Error(ResultCode.FAIL, "插入工序关联作业表失败");
                     await _procResourceConfigResRepository.InsertRangeAsync(addResSetList);
-                }
-                if (updateSetListt != null && updateSetListt.Count > 0)
-                {
-                    // return Error(ResultCode.FAIL, "修改工序关联作业表失败");
-                    await _procResourceConfigResRepository.UpdateRangeAsync(updateSetListt);
-                }
-                if (deleteSetIds != null && deleteSetIds.Count > 0)
-                {
-                    // return Error(ResultCode.FAIL, "删除工序关联作业表失败");
-                    await _procResourceConfigResRepository.DeletesRangeAsync(deleteSetIds.ToArray());
+                    // return Error(ResultCode.FAIL, "插入工序关联作业表失败");
                 }
 
-                //TODO作业设置数据
+                //删除之前的数据
+                await _jobBusinessRelationRepository.DeleteByBusinessIdAsync(param.Id);
+                //作业设置数据
                 if (addJobList != null && addJobList.Count > 0)
                 {
-                    // return Error(ResultCode.FAIL, "插入工序关联作业表失败");
                     await _jobBusinessRelationRepository.InsertRangeAsync(addJobList);
                 }
-                if (updateJobList != null && updateJobList.Count > 0)
-                {
-                    // return Error(ResultCode.FAIL, "修改工序关联作业表失败");
-                    await _jobBusinessRelationRepository.InsertRangeAsync(updateJobList);
-                }
-                if (deleteJobIds != null && deleteJobIds.Count > 0)
-                {
-                    // return Error(ResultCode.FAIL, "删除工序关联作业表失败");
-                    await _jobBusinessRelationRepository.DeleteRangeAsync(deleteJobIds.ToArray());
-                }
+
                 ts.Complete();
             }
         }

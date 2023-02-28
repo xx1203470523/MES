@@ -49,5 +49,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="idsArr"></param>
         /// <returns></returns>
         Task<int> DeletesRangeAsync(long[] idsArr);
+
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<int> DeleteByResourceIdAsync(long id);
     }
 }
