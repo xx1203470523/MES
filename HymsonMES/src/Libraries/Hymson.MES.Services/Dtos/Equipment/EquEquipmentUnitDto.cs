@@ -122,11 +122,6 @@ namespace Hymson.MES.Services.Dtos.Equipment
     public class EquEquipmentUnitPagedQueryDto : PagerInfo
     {
         /// <summary>
-        /// 站点编码 
-        /// </summary>
-        public string? SiteCode { get; set; }
-
-        /// <summary>
         /// 单位编码 
         /// </summary>
         public string? UnitCode { get; set; }
@@ -139,11 +134,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 单位类型
         /// </summary>
-        public int Type { get; set; } = 0;
+        public int? Type { get; set; }
 
         /// <summary>
         /// 单位状态 
         /// </summary>
-        public int Status { get; set; } = 0;
+        public int? Status { get; set; }
     }
 }

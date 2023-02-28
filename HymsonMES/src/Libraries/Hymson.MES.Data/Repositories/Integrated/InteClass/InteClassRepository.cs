@@ -97,6 +97,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
 
             if (string.IsNullOrWhiteSpace(pagedQuery.ClassName) == false)
@@ -149,11 +150,11 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
                                             /**select**/
                                            FROM `inte_class` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `inte_class`(  `Id`, `ClassName`, `ClassType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteCode`) VALUES (   @Id, @ClassName, @ClassType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteCode )  ";
-        const string UpdateSql = "UPDATE `inte_class` SET   ClassName = @ClassName, ClassType = @ClassType, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, Remark = @Remark, SiteCode = @SiteCode  WHERE Id = @Id ";
+        const string InsertSql = "INSERT INTO `inte_class`(  `Id`, `ClassName`, `ClassType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteId`) VALUES (   @Id, @ClassName, @ClassType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteId )  ";
+        const string UpdateSql = "UPDATE `inte_class` SET   ClassName = @ClassName, ClassType = @ClassType, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, Remark = @Remark, SiteId = @SiteId  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `inte_class` SET IsDeleted = '1' WHERE Id = @Id ";
         const string GetByIdSql = @"SELECT 
-                               `Id`, `ClassName`, `ClassType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteCode`
+                               `Id`, `ClassName`, `ClassType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteId`
                             FROM `inte_class`  WHERE Id = @Id ";
     }
 }

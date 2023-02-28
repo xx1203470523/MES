@@ -56,6 +56,17 @@ namespace Hymson.MES.Services.Dtos.Equipment
     }
 
     /// <summary>
+    /// 删除Dto（设备组）
+    /// </summary>
+    public record EquEquipmentGroupDeleteDto
+    {
+        /// <summary>
+        /// 集合（主键）
+        /// </summary>
+        public long[] Ids { get; set; }
+    }
+
+    /// <summary>
     /// 设备组Dto
     /// </summary>
     public record EquEquipmentGroupListDto : BaseEntityDto
@@ -68,12 +79,12 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 编码（设备组）
         /// </summary>
-        public string EquipmentGroupCode { get; set; }
+        public string EquipmentGroupCode { get; set; } = "";
 
         /// <summary>
         /// 名称（设备组）
         /// </summary>
-        public string EquipmentGroupName { get; set; }
+        public string EquipmentGroupName { get; set; } = "";
     }
 
     /// <summary>
@@ -82,19 +93,14 @@ namespace Hymson.MES.Services.Dtos.Equipment
     public class EquEquipmentGroupPagedQueryDto : PagerInfo
     {
         /// <summary>
-        /// 站点编码 
-        /// </summary>
-        public long SiteId { get; set; }
-
-        /// <summary>
         /// 编码（设备组）
         /// </summary>
-        public string EquipmentGroupCode { get; set; } = "";
+        public string? EquipmentGroupCode { get; set; } = "";
 
         /// <summary>
         /// 名称（设备组）
         /// </summary>
-        public string EquipmentGroupName { get; set; } = "";
+        public string? EquipmentGroupName { get; set; } = "";
     }
 
     /// <summary>

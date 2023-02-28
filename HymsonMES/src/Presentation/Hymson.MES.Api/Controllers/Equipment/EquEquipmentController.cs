@@ -42,9 +42,9 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        public async Task<int> CreateAsync([FromBody] EquEquipmentCreateDto createDto)
+        public async Task CreateAsync(EquEquipmentCreateDto createDto)
         {
-            return await _equEquipmentService.CreateAsync(createDto);
+            await _equEquipmentService.CreateAsync(createDto);
         }
 
         /// <summary>
@@ -54,22 +54,21 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
-        public async Task<int> ModifyAsync([FromBody] EquEquipmentModifyDto modifyDto)
+        public async Task ModifyAsync(EquEquipmentModifyDto modifyDto)
         {
-            return await _equEquipmentService.ModifyAsync(modifyDto);
+            await _equEquipmentService.ModifyAsync(modifyDto);
         }
 
         /// <summary>
         /// 删除（设备注册）
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="deleteDto"></param>
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
-        public async Task<int> DeletesAsync(string ids)
+        public async Task DeletesAsync(EquEquipmentDeleteDto deleteDto)
         {
-            long[] idsArr = StringExtension.SpitLongArrary(ids);
-            return await _equEquipmentService.DeletesAsync(idsArr);
+            await _equEquipmentService.DeletesAsync(deleteDto.Ids);
         }
 
         /// <summary>
@@ -94,7 +93,7 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         {
             return await _equEquipmentService.GetDetailAsync(id);
         }
-        
+
 
         /// <summary>
         /// 查询字典（设备注册）

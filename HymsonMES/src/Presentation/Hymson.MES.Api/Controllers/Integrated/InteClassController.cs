@@ -26,6 +26,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// 构造函数（班制维护）
         /// </summary>
         /// <param name="inteClassService"></param>
+        /// <param name="logger"></param>
         public InteClassController(IInteClassService inteClassService, ILogger<InteClassController> logger)
         {
             _inteClassService = inteClassService;
@@ -40,7 +41,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        public async Task CreateAsync([FromBody] InteClassCreateDto createDto)
+        public async Task CreateAsync(InteClassCreateDto createDto)
         {
             await _inteClassService.CreateAsync(createDto);
         }
@@ -51,7 +52,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
-        public async Task ModifyAsync([FromBody] InteClassModifyDto modifyDto)
+        public async Task ModifyAsync(InteClassModifyDto modifyDto)
         {
             await _inteClassService.ModifyAsync(modifyDto);
         }

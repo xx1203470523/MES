@@ -357,26 +357,26 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 日历名称
         /// </summary>
-        public string CalendarName { get; set; } = "";
+        public string? CalendarName { get; set; }
 
         /// <summary>
         /// 类型
         /// </summary>
-        public int CalendarType { get; set; }
+        public int? CalendarType { get; set; }
 
         /// <summary>
         /// 名称
         /// </summary>
-        public string Code { get; set; } = "";
+        public string? Code { get; set; }
 
         /// <summary>
         /// 名称
         /// </summary>
-        public string Name { get; set; } = "";
+        public string? Name { get; set; }
 
         /// <summary>
         /// 启用状态
         /// </summary>
-        public int UseStatus { get; set; } = -1;
+        public int? UseStatus { get; set; }
     }
 }

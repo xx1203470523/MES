@@ -75,5 +75,9 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// </summary>
         public string Remark { get; set; } = "";
 
+        /// <summary>
+        /// 站点ID 
+        /// </summary>
+        public long? SiteId { get; set; }
     }
 }
