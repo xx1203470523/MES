@@ -105,7 +105,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
             return await _equFaultPhenomenonRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = idsArr,
-                UserId = $"{_currentUser.UserId}",
+                UserId = $"{_currentUser.UserName}",
                 DeleteOn = HymsonClock.Now()
             });
         }

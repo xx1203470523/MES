@@ -97,7 +97,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
             return await _equEquipmentUnitRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = idsArr,
-                UserId = $"{_currentUser.UserId}",
+                UserId = $"{_currentUser.UserName}",
                 DeleteOn = HymsonClock.Now()
             });
         }

@@ -145,7 +145,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
             return await _inteClassRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = idsArr,
-                UserId = $"{_currentUser.UserId}",
+                UserId = $"{_currentUser.UserName}",
                 DeleteOn = HymsonClock.Now()
             });
         }
