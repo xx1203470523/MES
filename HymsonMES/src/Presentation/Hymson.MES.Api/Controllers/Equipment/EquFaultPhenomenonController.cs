@@ -40,7 +40,6 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("create")]
         public async Task CreateAsync(EquFaultPhenomenonCreateDto createDto)
         {
             await _equFaultPhenomenonService.CreateAsync(createDto);
@@ -52,7 +51,6 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
-        [Route("update")]
         public async Task ModifyAsync(EquFaultPhenomenonModifyDto modifyDto)
         {
             await _equFaultPhenomenonService.ModifyAsync(modifyDto);
@@ -64,7 +62,6 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="deleteDto"></param>
         /// <returns></returns>
         [HttpDelete]
-        [Route("delete")]
         public async Task DeletesAsync(EquFaultPhenomenonDeleteDto deleteDto)
         {
             await _equFaultPhenomenonService.DeletesAsync(deleteDto.Ids);

@@ -40,7 +40,6 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("create")]
         public async Task CreateAsync([FromBody] EquSparePartTypeCreateDto createDto)
         {
             await _equSparePartTypeService.CreateAsync(createDto);
@@ -52,7 +51,6 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
-        [Route("update")]
         public async Task ModifyAsync([FromBody] EquSparePartTypeModifyDto modifyDto)
         {
             await _equSparePartTypeService.ModifyAsync(modifyDto);
@@ -64,7 +62,6 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="deleteDto"></param>
         /// <returns></returns>
         [HttpDelete]
-        [Route("delete")]
         public async Task DeletesAsync(EquSparePartTypeDeleteDto deleteDto)
         {
             await _equSparePartTypeService.DeletesAsync(deleteDto.Ids);
