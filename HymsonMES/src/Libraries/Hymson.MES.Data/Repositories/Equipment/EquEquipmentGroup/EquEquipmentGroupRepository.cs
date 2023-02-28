@@ -2,6 +2,7 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -58,12 +59,12 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
         /// <summary>
         /// 批量删除（软删除）
         /// </summary>
-        /// <param name="idsArr"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] idsArr)
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, new { IsDeleted = 1, id = idsArr });
+            return await conn.ExecuteAsync(DeleteSql, command);
 
         }
 
@@ -142,7 +143,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
 
         const string InsertSql = "INSERT INTO `equ_equipment_group`(  `Id`, `EquipmentGroupCode`, `EquipmentGroupName`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteId`) VALUES (   @Id, @EquipmentGroupCode, @EquipmentGroupName, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteId )  ";
         const string UpdateSql = "UPDATE `equ_equipment_group` SET EquipmentGroupName = @EquipmentGroupName, Remark = @Remark WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `equ_equipment_group` SET IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string DeleteSql = "UPDATE `equ_equipment_group` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id = @Id ";
         const string GetByIdSql = @"SELECT 
                                `Id`, `EquipmentGroupCode`, `EquipmentGroupName`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteId`
                             FROM `equ_equipment_group`  WHERE IsDeleted = @IsDeleted AND Id = @Id ";

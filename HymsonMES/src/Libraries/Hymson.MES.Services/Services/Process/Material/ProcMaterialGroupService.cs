@@ -13,6 +13,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
@@ -128,16 +129,15 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeletesProcMaterialGroupAsync(string ids)
+        public async Task<int> DeletesProcMaterialGroupAsync(long[] idsArr)
         {
-            if (string.IsNullOrEmpty(ids))
+            if (idsArr.Length<1)
             {
                 throw new ValidationException(ErrorCode.MES10213);
             }
 
-            var idsArr = StringExtension.SpitLongArrary(ids);
             //判断物料中是否有当前物料组
             var procMaterials = await _procMaterialRepository.GetByGroupIdsAsync(idsArr);
             if (procMaterials != null && procMaterials.Count() > 0)
@@ -145,7 +145,7 @@ namespace Hymson.MES.Services.Services.Process
                 throw new CustomerValidationException(ErrorCode.MES10221);
             }
 
-            return await _procMaterialGroupRepository.DeletesAsync(idsArr);
+            return await _procMaterialGroupRepository.DeletesAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
         }
 
         /// <summary>

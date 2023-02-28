@@ -98,7 +98,7 @@ namespace Hymson.MES.Services.Dtos.Process
         //
         // 摘要:
         //     站点id
-        long? SiteId { get; }
+        public long? SiteId { get; set; }
 
         /// <summary>
         /// 
@@ -135,7 +135,7 @@ namespace Hymson.MES.Services.Dtos.Process
         //
         // 摘要:
         //     站点id
-        long? SiteId { get; }
+        public long? SiteId { get; set; }
 
         /// <summary>
         /// 

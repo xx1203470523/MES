@@ -10,6 +10,7 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -43,12 +44,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 批量删除（软删除）
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] ids)
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeletesSql, new { ids = ids });
+            return await conn.ExecuteAsync(DeletesSql, param);
 
         }
 
@@ -60,7 +61,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<ProcMaterialView> GetByIdAsync(long id, long SiteId)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcMaterialView>(GetByIdSql, new { Id = id, siteCode = SiteId });
+            return await conn.QueryFirstOrDefaultAsync<ProcMaterialView>(GetByIdSql, new { Id = id, SiteId = SiteId });
         }
 
         /// <summary>
@@ -107,7 +108,7 @@ namespace Hymson.MES.Data.Repositories.Process
             if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.MaterialName))
             {
                 procMaterialPagedQuery.MaterialName = $"%{procMaterialPagedQuery.MaterialName}%";
-                sqlBuilder.Where(" MaterialName like %@MaterialName% ");
+                sqlBuilder.Where(" MaterialName like @MaterialName ");
             }
             if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.Version))
             {
@@ -118,11 +119,11 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 sqlBuilder.Where(" GroupId = @GroupId ");
             }
-            if (procMaterialPagedQuery.Status != null)
+            if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.Status))
             {
                 sqlBuilder.Where(" Status = @Status ");
             }
-            if (procMaterialPagedQuery.Origin != null)
+            if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.Origin))
             {
                 sqlBuilder.Where(" Origin = @Origin ");
             }
@@ -299,13 +300,13 @@ namespace Hymson.MES.Data.Repositories.Process
                                             /**select**/
                                            FROM `proc_material` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `proc_material`(  `Id`, `SiteCode`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `ProcedureBomId`, `Batch`, `Unit`, `SerialNumber`, `ValidationMaskGroup`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @GroupId, @MaterialCode, @MaterialName, @Status, @Origin, @Version, @IsDefaultVersion, @Remark, @BuyType, @ProcessRouteId, @ProcedureBomId, @Batch, @Unit, @SerialNumber, @ValidationMaskGroup, @BaseTime, @ConsumptionTolerance, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `proc_material`(  `Id`, `SiteId`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `ProcedureBomId`, `Batch`, `Unit`, `SerialNumber`, `ValidationMaskGroup`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @GroupId, @MaterialCode, @MaterialName, @Status, @Origin, @Version, @IsDefaultVersion, @Remark, @BuyType, @ProcessRouteId, @ProcedureBomId, @Batch, @Unit, @SerialNumber, @ValidationMaskGroup, @BaseTime, @ConsumptionTolerance, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string UpdateSql = "UPDATE `proc_material` SET  GroupId = @GroupId, MaterialName = @MaterialName, Status = @Status, Origin = @Origin, Version = @Version, Remark = @Remark, BuyType = @BuyType, ProcessRouteId = @ProcessRouteId, ProcedureBomId = @ProcedureBomId, Batch = @Batch, Unit = @Unit, SerialNumber = @SerialNumber, BaseTime = @BaseTime, ConsumptionTolerance = @ConsumptionTolerance, IsDefaultVersion=@IsDefaultVersion, ValidationMaskGroup=@ValidationMaskGroup, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `proc_material` SET IsDeleted = '1' WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE `proc_material` SET IsDeleted = '1' WHERE Id in @ids ";
+        const string DeleteSql = "UPDATE `proc_material` SET IsDeleted = Id WHERE Id = @Id ";
+        const string DeletesSql = "UPDATE `proc_material` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids ";
         const string GetByIdSql = @"SELECT 
                                         g.`Id`,
-                                        g.`SiteCode`,
+                                        g.`SiteId`,
                                         o.GroupName,
                                         g.MaterialCode,
                                         g.MaterialName,
@@ -332,10 +333,10 @@ namespace Hymson.MES.Data.Repositories.Process
                             FROM `proc_material` g 
                             LEFT JOIN proc_material_group o on o.Id=g.GroupId
                             LEFT JOIN proc_process_route p on g.ProcessRouteId = p.Id
-                            LEFT JOIN proc_procedure_bom q on g.ProcedureBomId == q.Id 
-                            WHERE g.Id = @Id and g.SiteCode=@SiteCode ";
+                            LEFT JOIN proc_procedure q on g.ProcedureBomId = q.Id 
+                            WHERE g.Id = @Id and g.SiteId=@SiteId ";
         const string GetByIdsSql = @"SELECT 
-                                        `Id`, `SiteCode`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `ProcedureBomId`, `Batch`, `Unit`, `SerialNumber`, `ValidationMaskGroup`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                                        `Id`, `SiteId`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `ProcedureBomId`, `Batch`, `Unit`, `SerialNumber`, `ValidationMaskGroup`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_material`
                             WHERE Id IN @ids ";
 
@@ -343,7 +344,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 根据物料组ID查询物料
         /// </summary>
         const string GetByGroupIdSql = @"SELECT 
-                                        `Id`, `SiteCode`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `ProcedureBomId`, `Batch`, `Unit`, `SerialNumber`, `ValidationMaskGroup`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                                        `Id`, `SiteId`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `ProcedureBomId`, `Batch`, `Unit`, `SerialNumber`, `ValidationMaskGroup`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_material`
                             WHERE GroupId IN @groupIds ";
 

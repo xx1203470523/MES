@@ -2,6 +2,7 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -64,12 +65,12 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
         /// <summary>
         /// 批量删除（软删除）
         /// </summary>
-        /// <param name="idsArr"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] idsArr)
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, new { Id = idsArr });
+            return await conn.ExecuteAsync(DeleteSql, command);
         }
 
         /// <summary>
@@ -154,7 +155,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
 
         const string InsertSql = "INSERT INTO `equ_sparepart_type`(  `Id`, `SparePartTypeCode`, `SparePartTypeName`, Type, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @SparePartTypeCode, @SparePartTypeName, @Type, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string UpdateSql = "UPDATE `equ_sparepart_type` SET  SparePartTypeName = @SparePartTypeName, Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `equ_sparepart_type` SET IsDeleted = 1 WHERE Id = @Id ";
+        const string DeleteSql = "UPDATE `equ_sparepart_type` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id = @Id ";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SparePartTypeCode`, `SparePartTypeName`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `equ_sparepart_type` WHERE Id = @Id ";

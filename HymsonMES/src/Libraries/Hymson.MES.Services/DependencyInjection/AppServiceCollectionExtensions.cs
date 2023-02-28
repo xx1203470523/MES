@@ -1,10 +1,12 @@
 ﻿using FluentValidation;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Options;
 using Hymson.MES.Services.Services.EquEquipmentGroup;
+using Hymson.MES.Services.Services.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipmentUnit;
 using Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon;
@@ -63,6 +65,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquFaultPhenomenonService, EquFaultPhenomenonService>();
             services.AddSingleton<IEquSparePartService, EquSparePartService>();
             services.AddSingleton<IEquSparePartTypeService, EquSparePartTypeService>();
+
+            #region FaultReason
+            services.AddSingleton<IEquFaultReasonService, EquFaultReasonService>();
+
+            #endregion
             #endregion
 
             #region Integrated
@@ -134,6 +141,9 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             #region Equipment
             services.AddSingleton<AbstractValidator<EquEquipmentUnitCreateDto>, EquipmentUnitCreateValidator>();
+
+            services.AddSingleton<AbstractValidator<EquFaultReasonCreateDto>, EquFaultReasonCreateValidator>();
+            services.AddSingleton<AbstractValidator<EquFaultReasonModifyDto>, EquFaultReasonModifyValidator>();
             #endregion
 
             #region Process

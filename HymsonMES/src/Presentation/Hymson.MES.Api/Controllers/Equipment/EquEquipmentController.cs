@@ -41,7 +41,6 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("create")]
         public async Task CreateAsync(EquEquipmentCreateDto createDto)
         {
             await _equEquipmentService.CreateAsync(createDto);
@@ -53,7 +52,6 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
-        [Route("update")]
         public async Task ModifyAsync(EquEquipmentModifyDto modifyDto)
         {
             await _equEquipmentService.ModifyAsync(modifyDto);
@@ -65,7 +63,6 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// <param name="deleteDto"></param>
         /// <returns></returns>
         [HttpDelete]
-        [Route("delete")]
         public async Task DeletesAsync(EquEquipmentDeleteDto deleteDto)
         {
             await _equEquipmentService.DeletesAsync(deleteDto.Ids);
@@ -88,7 +85,7 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("detail")]
+        [HttpGet("{id}")]
         public async Task<EquEquipmentDto> GetDetailAsync(long id)
         {
             return await _equEquipmentService.GetDetailAsync(id);

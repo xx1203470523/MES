@@ -3,6 +3,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
@@ -121,6 +122,14 @@ namespace Hymson.MES.Services.Mapper
 
             CreateMap<EquSparePartTypeEntity, EquSparePartTypeDto>();
             #endregion
+
+            #region EquFaultReason
+            CreateMap<EquFaultReasonCreateDto, EquFaultReasonEntity>();
+            CreateMap<EquFaultReasonModifyDto, EquFaultReasonEntity>();
+            CreateMap<EquFaultReasonPagedQueryDto, EquFaultReasonPagedQuery>(); 
+            CreateMap<EquFaultReasonEntity, EquFaultReasonDto>();
+            CreateMap<EquFaultReasonEntity, CustomEquFaultReasonDto>();
+            #endregion
         }
 
         /// <summary>
@@ -166,6 +175,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcMaterialModifyDto, ProcMaterialEntity>();
             CreateMap<ProcMaterialPagedQueryDto, ProcMaterialPagedQuery>();
             CreateMap<ProcMaterialEntity, ProcMaterialDto>();
+            CreateMap<ProcMaterialView, ProcMaterialViewDto>();
 
             CreateMap<ProcMaterialReplaceDto, ProcReplaceMaterialEntity>();
 

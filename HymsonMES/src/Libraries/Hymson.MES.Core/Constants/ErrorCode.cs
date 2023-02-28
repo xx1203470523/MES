@@ -168,6 +168,22 @@
         public const string MES12111 = "工作中心修改的数据不存在.";
         public const string MES12112 = "工作中心已经关联数据,允许修改.";
         #endregion
+
+        //设备
+        #region 故障原因 13000
+        public const string MES13000 = "基础故障原因错误";
+        public const string MES13001 = "站点码获取失败，请重新登录！";
+        public const string MES13002 = "此故障原因编码{FaultReasonCode}在系统已经存在！"; 
+        public const string MES13003 = "请求实体不能为空！";
+        public const string MES13004 = "此标准故障原因不存在！";
+        public const string MES13005 = "删除失败Ids 不能为空";
+        public const string MES13006 = "故障原因已被设备故障原因或产品故障原因绑定，不允许删除!";
+        public const string MES13007 = "修改故障原因关联类型失败!";
+        public const string MES13008 = "故障原因状态不能为空";
+        public const string MES13009 = "故障原因编码不能为空";
+        public const string MES13010 = "故障原因名称不能为空"; 
+
+        #endregion
         #endregion
 
         #region 系统执行出错 业务逻辑出错

@@ -7,6 +7,7 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Data.Repositories.Common.Command;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,13 +55,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> DeletesAsync(long[] ids);
+        Task<int> DeletesAsync(DeleteCommand param);
 
         /// <summary>
         /// 根据LoadPointId批量真删除 

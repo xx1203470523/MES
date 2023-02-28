@@ -10,6 +10,7 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -42,12 +43,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 批量删除（软删除）
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] ids) 
+        public async Task<int> DeletesAsync(DeleteCommand param) 
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeletesSql, new { ids=ids });
+            return await conn.ExecuteAsync(DeletesSql, param);
 
         }
 
@@ -206,8 +207,8 @@ namespace Hymson.MES.Data.Repositories.Process
         //const string UpdateSql = "UPDATE `proc_parameter` SET   SiteId = @SiteId, ParameterCode = @ParameterCode, ParameterName = @ParameterName, ParameterUnit = @ParameterUnit, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdateSql = "UPDATE `proc_parameter` SET  ParameterUnit = @ParameterUnit, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `proc_parameter` SET   SiteId = @SiteId, ParameterCode = @ParameterCode, ParameterName = @ParameterName, ParameterUnit = @ParameterUnit, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `proc_parameter` SET IsDeleted = '1' WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE `proc_parameter` SET IsDeleted = '1' WHERE Id in @ids";
+        const string DeleteSql = "UPDATE `proc_parameter` SET IsDeleted = Id WHERE Id = @Id ";
+        const string DeletesSql = "UPDATE `proc_parameter` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteId`, `ParameterCode`, `ParameterName`, `ParameterUnit`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_parameter`  WHERE Id = @Id ";

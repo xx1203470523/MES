@@ -12,6 +12,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
@@ -193,15 +194,14 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesProcLoadPointAsync(string ids)
+        public async Task<int> DeletesProcLoadPointAsync(long[] idsArr)
         {
-            var idsArr = StringExtension.SpitLongArrary(ids);
             if (idsArr.Length < 1)
             {
                 throw new ValidationException(ErrorCode.MES10707);
             }
 
-            var result= await _procLoadPointRepository.DeletesAsync(idsArr);
+            var result= await _procLoadPointRepository.DeletesAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
             if (result <= 0) 
             {
                 throw new BusinessException(ErrorCode.MES10708);

@@ -10,6 +10,7 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -44,10 +45,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] ids) 
+        public async Task<int> DeletesAsync(DeleteCommand param) 
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeletesSql, new { Ids=ids });
+            return await conn.ExecuteAsync(DeletesSql, param);
 
         }
 
@@ -163,8 +164,8 @@ namespace Hymson.MES.Data.Repositories.Process
         const string InsertSql = "INSERT INTO `proc_replace_material`(  `Id`, `SiteCode`, `MaterialId`, `ReplaceMaterialId`, `IsUse`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @MaterialId, @ReplaceMaterialId, @IsUse, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string UpdateSql = "UPDATE `proc_replace_material` SET   SiteCode = @SiteCode, MaterialId = @MaterialId, ReplaceMaterialId = @ReplaceMaterialId, IsUse = @IsUse, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `proc_replace_material` SET   ReplaceMaterialId = @ReplaceMaterialId, IsUse = @IsUse, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `proc_replace_material` SET IsDeleted = '1' WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE `proc_replace_material` SET IsDeleted = '1' WHERE Id in @Ids";
+        const string DeleteSql = "UPDATE `proc_replace_material` SET IsDeleted = Id WHERE Id = @Id ";
+        const string DeletesSql = "UPDATE `proc_replace_material` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @Ids";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteCode`, `MaterialId`, `ReplaceMaterialId`, `IsUse`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_replace_material`  WHERE Id = @Id ";

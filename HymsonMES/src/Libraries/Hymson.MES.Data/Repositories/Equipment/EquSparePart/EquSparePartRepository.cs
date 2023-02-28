@@ -2,6 +2,7 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquConsumable.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query;
 using Microsoft.Extensions.Options;
@@ -87,12 +88,12 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
         /// <summary>
         /// 批量删除（软删除）
         /// </summary>
-        /// <param name="idsArr"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] idsArr)
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, new { Id = idsArr });
+            return await conn.ExecuteAsync(DeleteSql, command);
         }
 
         /// <summary>
@@ -162,10 +163,10 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
                                            FROM `equ_sparepart` /**where**/  ";
 
         const string InsertSql = "INSERT INTO `equ_sparepart`(  `Id`, `SparePartCode`, `SparePartName`, `SparePartTypeId`, `ProcMaterialId`, `UnitId`, `IsKey`, `IsStandard`, `Status`, `BluePrintNo`, `Brand`, `ManagementMode`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteCode`) VALUES (   @Id, @SparePartCode, @SparePartName, @SparePartTypeId, @ProcMaterialId, @UnitId, @IsKey, @IsStandard, @Status, @BluePrintNo, @Brand, @ManagementMode, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteCode )  ";
-        const string UpdateSql = "UPDATE `equ_sparepart` SET   SparePartCode = @SparePartCode, SparePartName = @SparePartName, SparePartTypeId = @SparePartTypeId, ProcMaterialId = @ProcMaterialId, UnitId = @UnitId, IsKey = @IsKey, IsStandard = @IsStandard, Status = @Status, BluePrintNo = @BluePrintNo, Brand = @Brand, ManagementMode = @ManagementMode, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteCode = @SiteCode  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `equ_sparepart` SET SparePartCode = @SparePartCode, SparePartName = @SparePartName, SparePartTypeId = @SparePartTypeId, ProcMaterialId = @ProcMaterialId, UnitId = @UnitId, IsKey = @IsKey, IsStandard = @IsStandard, Status = @Status, BluePrintNo = @BluePrintNo, Brand = @Brand, ManagementMode = @ManagementMode, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteCode = @SiteCode  WHERE Id = @Id ";
         const string UpdateSparePartTypeIdSql = "UPDATE `equ_sparepart` SET SparePartTypeId = @SparePartTypeId WHERE Id = @SparePartIds ";
         const string ClearSparePartTypeIdSql = "UPDATE `equ_sparepart` SET SparePartTypeId = 0 WHERE SparePartTypeId = @SparePartTypeId ";
-        const string DeleteSql = "UPDATE `equ_sparepart` SET IsDeleted = '1' WHERE Id = @Id ";
+        const string DeleteSql = "UPDATE `equ_sparepart` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id = @Id ";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SparePartCode`, `SparePartName`, `SparePartTypeId`, `ProcMaterialId`, `UnitId`, `IsKey`, `IsStandard`, `Status`, `BluePrintNo`, `Brand`, `ManagementMode`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteCode`
                             FROM `equ_sparepart`  WHERE Id = @Id ";
