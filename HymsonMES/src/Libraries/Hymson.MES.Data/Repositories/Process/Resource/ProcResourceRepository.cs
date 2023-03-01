@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -96,7 +97,7 @@ namespace Hymson.MES.Data.Repositories.Process
                 query.ResType = $"%{query.ResType}%";
                 sqlBuilder.Where("ResType like @ResType");
             }
-            if (!string.IsNullOrWhiteSpace(query.Status))
+            if (query.Status> DbDefaultValueConstant.IntDefaultValue)
             {
                 sqlBuilder.Where("Status = @Status");
             }

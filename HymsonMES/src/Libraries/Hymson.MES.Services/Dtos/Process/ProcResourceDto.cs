@@ -31,7 +31,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 描述 :状态 
         /// 空值 : false  
         /// </summary>
-        public string Status { get; set; }
+        public int Status { get; set; }
 
         /// <summary>
         /// 描述 :所属资源类型ID 
@@ -84,7 +84,7 @@ namespace Hymson.MES.Services.Dtos.Process
         public string? ResName { get; set; }
 
         /// <summary>
-        /// 资源类型
+        /// 资源类型编码
         /// </summary>
         public string? ResType { get; set; }
 
@@ -97,7 +97,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 描述 :状态 
         /// 空值 : false  
         /// </summary>
-        public string? Status { get; set; }
+        public int? Status { get; set; } 
     }
 
     public record ProcResourceViewDto: ProcResourceDto
@@ -198,7 +198,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 状态
         /// </summary>
        // [Required(ErrorMessage = "状态不能为空")]
-        public string Status { get; set; }
+        public int Status { get; set; }
 
         /// <summary>
         /// 所属资源类型

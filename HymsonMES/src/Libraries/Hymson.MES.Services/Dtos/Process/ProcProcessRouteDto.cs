@@ -315,12 +315,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 状态
         /// </summary>
-        public string? Status { get; set; }
+        public int? Status { get; set; }
 
         /// <summary>
         /// 类型
         /// </summary>
-        public string? Type { get; set; }
+        public int? Type { get; set; }
 
         /// <summary>
         /// 版本

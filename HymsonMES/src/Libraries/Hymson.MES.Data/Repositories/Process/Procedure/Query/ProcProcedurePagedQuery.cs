@@ -17,27 +17,27 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 工序编码
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
         /// <summary>
         /// 工序名称
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; }
+        public int? Status { get; set; } = -1;
 
         /// <summary>
         /// 类型
         /// </summary>
-        public string Type { get; set; }
+        public int? Type { get; set; } = -1;
 
         /// <summary>
         /// 描述 :资源类型名称 
         /// </summary>
-        public string ResTypeName { get; set; }
+        public string? ResTypeName { get; set; }
         /// <summary>
         /// 站点id
         /// </summary>
