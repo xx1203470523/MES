@@ -1,5 +1,6 @@
 using Dapper;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
@@ -107,7 +108,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
                 sqlBuilder.Where("ClassName LIKE @ClassName");
             }
 
-            if (pagedQuery.ClassType > 0)
+            if (pagedQuery.ClassType > DbDefaultValueConstant.IntDefaultValue)
             {
                 sqlBuilder.Where("ClassType = @ClassType");
             }

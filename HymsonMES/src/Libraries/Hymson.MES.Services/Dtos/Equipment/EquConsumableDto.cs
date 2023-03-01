@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Constants;
 
 namespace Hymson.MES.Services.Dtos.Equipment
 {
@@ -56,7 +57,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 管理方式
         /// </summary>
-        public int ManagementMode { get; set; } = 0;
+        public int ManagementMode { get; set; } = DbDefaultValueConstant.IntDefaultValue;
 
         /// <summary>
         /// 描述
@@ -134,7 +135,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 管理方式
         /// </summary>
-        public int ManagementMode { get; set; } = 0;
+        public int ManagementMode { get; set; } = DbDefaultValueConstant.IntDefaultValue;
 
         /// <summary>
         /// 描述

@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -85,6 +86,16 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
+
+            if (pagedQuery.Type > DbDefaultValueConstant.IntDefaultValue)
+            {
+                sqlBuilder.Where("Type = @Type");
+            }
+
+            if (pagedQuery.Status > DbDefaultValueConstant.IntDefaultValue)
+            {
+                sqlBuilder.Where("Status = @Status");
+            }
 
             if (string.IsNullOrWhiteSpace(pagedQuery.UnitCode) == false)
             {

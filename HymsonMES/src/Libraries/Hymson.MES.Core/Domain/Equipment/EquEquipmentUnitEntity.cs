@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.Infrastructure.Constants;
 
 namespace Hymson.MES.Core.Domain.Equipment
 {
@@ -25,12 +26,12 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 单位类型
         /// </summary>
-        public int Type { get; set; } = 0;
+        public int Type { get; set; } = DbDefaultValueConstant.IntDefaultValue;
 
         /// <summary>
         /// 单位状态 
         /// </summary>
-        public int Status { get; set; } = 0;
+        public int Status { get; set; } = DbDefaultValueConstant.IntDefaultValue;
 
         /// <summary>
         /// 备注
