@@ -196,7 +196,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
                 sqlBuilder.Where("EquipmentType = @EquipmentType");
             }
 
-            if (pagedQuery.UseStatus > 0)
+            if (pagedQuery.UseStatus > DbDefaultValueConstant.IntDefaultValue)
             {
                 sqlBuilder.Where("UseStatus = @UseStatus");
             }
@@ -207,7 +207,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
                 sqlBuilder.Where("WorkCenterShopName LIKE @WorkCenterShopName");
             }
 
-            if (pagedQuery.UseDepartment > 0)
+            if (pagedQuery.UseDepartment > DbDefaultValueConstant.IntDefaultValue)
             {
                 sqlBuilder.Where("UseDepartment = @UseDepartment");
             }

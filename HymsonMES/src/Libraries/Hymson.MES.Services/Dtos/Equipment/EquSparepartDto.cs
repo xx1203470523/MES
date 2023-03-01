@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Constants;
 
 namespace Hymson.MES.Services.Dtos.Equipment
 {
@@ -35,12 +36,12 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 是否关键备件
         /// </summary>
-        public int IsKey { get; set; } = 0;
+        public int IsKey { get; set; } = DbDefaultValueConstant.IntDefaultValue;
 
         /// <summary>
         /// 是否标准件
         /// </summary>
-        public int IsStandard { get; set; } = 0;
+        public int IsStandard { get; set; } = DbDefaultValueConstant.IntDefaultValue;
 
         /// <summary>
         /// 状态
@@ -123,12 +124,12 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 是否关键备件
         /// </summary>
-        public int IsKey { get; set; } = 0;
+        public int IsKey { get; set; } = DbDefaultValueConstant.IntDefaultValue;
 
         /// <summary>
         /// 是否标准件
         /// </summary>
-        public int IsStandard { get; set; } = 0;
+        public int IsStandard { get; set; } = DbDefaultValueConstant.IntDefaultValue;
 
         /// <summary>
         /// 状态

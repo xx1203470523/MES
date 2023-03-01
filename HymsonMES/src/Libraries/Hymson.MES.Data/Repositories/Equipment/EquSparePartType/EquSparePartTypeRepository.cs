@@ -1,5 +1,6 @@
 using Dapper;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -111,7 +112,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
                 sqlBuilder.Where("SparePartTypeName LIKE @SparePartTypeName");
             }
 
-            if (pagedQuery.Status > 0)
+            if (pagedQuery.Status > DbDefaultValueConstant.IntDefaultValue)
             {
                 sqlBuilder.Where("Status = @Status");
             }

@@ -1,5 +1,6 @@
 using Dapper;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -141,7 +142,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
                 sqlBuilder.Where("EEG.EquipmentGroupName LIKE @EquipmentGroupName");
             }
 
-            if (pagedQuery.UseStatus > 0)
+            if (pagedQuery.UseStatus > DbDefaultValueConstant.IntDefaultValue)
             {
                 sqlBuilder.Where("EFP.UseStatus = @UseStatus");
             }

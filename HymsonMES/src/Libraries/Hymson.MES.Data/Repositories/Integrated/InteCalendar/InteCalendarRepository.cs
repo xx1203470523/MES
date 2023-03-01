@@ -1,5 +1,6 @@
 using Dapper;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums.Integrated;
@@ -144,12 +145,12 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
                 sqlBuilder.Where("IC.CalendarName LIKE @CalendarName");
             }
 
-            if (pagedQuery.CalendarType > 0)
+            if (pagedQuery.CalendarType > DbDefaultValueConstant.IntDefaultValue)
             {
                 sqlBuilder.Where("IC.CalendarType = @CalendarType");
             }
 
-            if (pagedQuery.UseStatus > 0)
+            if (pagedQuery.UseStatus > DbDefaultValueConstant.IntDefaultValue)
             {
                 sqlBuilder.Where("IC.UseStatus = @UseStatus");
             }
