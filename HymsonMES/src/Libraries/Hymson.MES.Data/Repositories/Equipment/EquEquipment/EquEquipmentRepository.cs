@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -190,7 +191,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
                 sqlBuilder.Where("EquipmentName LIKE @EquipmentName");
             }
 
-            if (pagedQuery.EquipmentType > 0)
+            if (pagedQuery.EquipmentType > DbDefaultValueConstant.IntDefaultValue)
             {
                 sqlBuilder.Where("EquipmentType = @EquipmentType");
             }
