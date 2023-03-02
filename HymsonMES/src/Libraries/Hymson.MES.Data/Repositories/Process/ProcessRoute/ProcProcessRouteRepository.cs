@@ -39,7 +39,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<ProcProcessRouteEntity> IsIsExistsEnabledAsync(ProcProcessRouteQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcProcessRouteEntity>(IsIsExistsEnabledSql, new { StatusArr= query.StatusArr, Ids =query.Ids});
+            return await conn.QueryFirstOrDefaultAsync<ProcProcessRouteEntity>(IsIsExistsEnabledSql, new { StatusArr = query.StatusArr, Ids = query.Ids });
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace Hymson.MES.Data.Repositories.Process
                 query.Version = $"%{query.Version}%";
                 sqlBuilder.Where("Version like @Version");
             }
-            if (query.Status> DbDefaultValueConstant.IntDefaultValue)
+            if (query.Status > DbDefaultValueConstant.IntDefaultValue)
             {
                 sqlBuilder.Where("Status = @Status");
             }
@@ -100,7 +100,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<ProcProcessRouteEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcProcessRouteEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ProcProcessRouteEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -108,10 +108,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcProcessRouteEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ProcProcessRouteEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcProcessRouteEntity>(GetByIdsSql, new { ids = ids});
+            return await conn.QueryAsync<ProcProcessRouteEntity>(GetByIdsSql, new { ids = ids });
         }
 
         /// <summary>
@@ -135,8 +135,20 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<bool> IsExistsAsync(ProcProcessRouteQuery query)
         {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(ExistsSql);
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("Code = @Code");
+            sqlBuilder.Where("Version = @Version");
+            sqlBuilder.Where("SiteId = @SiteId");
+            if (query.Id > 0)
+            {
+                sqlBuilder.Where("Id!=@Id");
+            }
+            sqlBuilder.AddParameters(query);
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var  procProcessRoutes= await conn.QueryAsync<ProcProcessRouteEntity>(ExistsSql, new { Code = query.Code, Version=query.Version,SiteId = query.SiteId }) ;
+            var procProcessRoutes = await conn.QueryAsync<ProcProcessRouteEntity>(templateData.RawSql, templateData.Parameters);
             return procProcessRoutes != null && procProcessRoutes.Any();
         }
 
@@ -172,8 +184,8 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSql, procProcessRouteEntity);
         }
-		
-		/// <summary>
+
+        /// <summary>
         /// 批量更新
         /// </summary>
         /// <param name="procProcessRouteEntitys"></param>
@@ -203,7 +215,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetProcProcessRouteEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `proc_process_route` /**where**/  ";
-        const string ExistsSql = "SELECT Id FROM proc_process_route WHERE `IsDeleted`= 0 AND Code=@Code and Version=@Version and SiteId=@SiteId LIMIT 1";
+        const string ExistsSql = "SELECT Id FROM proc_process_route  /**where**/ LIMIT 1";
 
         const string InsertSql = "INSERT INTO `proc_process_route`(  `Id`, `SiteId`, `Code`, `Name`, `Status`, `Type`, `Version`, `IsCurrentVersion`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Status, @Type, @Version, @IsCurrentVersion, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string UpdateSql = "UPDATE `proc_process_route` SET Status = @Status, Type = @Type, IsCurrentVersion = @IsCurrentVersion, Remark = @Remark,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
