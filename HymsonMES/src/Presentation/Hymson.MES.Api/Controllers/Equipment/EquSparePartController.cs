@@ -58,12 +58,12 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <summary>
         /// 删除（备件注册）
         /// </summary>
-        /// <param name="deleteDto"></param>
+        /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
-        public async Task DeletesAsync(EquSparePartDeleteDto deleteDto)
+        public async Task DeletesAsync(long[] ids)
         {
-            await _equSparePartService.DeletesAsync(deleteDto.Ids);
+            await _equSparePartService.DeletesAsync(ids);
         }
 
         /// <summary>

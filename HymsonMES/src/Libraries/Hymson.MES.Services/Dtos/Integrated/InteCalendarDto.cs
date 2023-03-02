@@ -73,17 +73,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
     }
 
     /// <summary>
-    /// 删除Dto（日历维护）
-    /// </summary>
-    public record InteCalendarDeleteDto
-    {
-        /// <summary>
-        /// 集合（主键）
-        /// </summary>
-        public long[] Ids { get; set; }
-    }
-
-    /// <summary>
     /// 查询返回对象
     /// </summary>
     public record InteCalendarDto : BaseEntityDto

@@ -61,12 +61,12 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <summary>
         /// 删除（日历维护）
         /// </summary>
-        /// <param name="deleteDto"></param>
+        /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
-        public async Task DeletesAsync(InteCalendarDeleteDto deleteDto)
+        public async Task DeletesAsync(long[] ids)
         {
-            await _inteCalendarService.DeletesAsync(deleteDto.Ids);
+            await _inteCalendarService.DeletesAsync(ids);
         }
 
         /// <summary>
