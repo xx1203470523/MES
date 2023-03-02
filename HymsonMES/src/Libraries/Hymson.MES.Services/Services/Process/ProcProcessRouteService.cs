@@ -191,16 +191,16 @@ namespace Hymson.MES.Services.Services.Process
             var links = ConvertProcessRouteLinkList(parm.DynamicData.Links, procProcessRouteEntity);
 
             // 判断是否存在多个首工序
-            var firstProcessCount = nodes.Where(w => w.IsFirstProcess == true).Count();
-            if (firstProcessCount == 0)
-            {
-                throw new ValidationException(ErrorCode.MES10435);
-            }
+            //var firstProcessCount = nodes.Where(w => w.IsFirstProcess == true).Count();
+            //if (firstProcessCount == 0)
+            //{
+            //    throw new ValidationException(ErrorCode.MES10435);
+            //}
 
-            if (firstProcessCount > 1)
-            {
-                throw new ValidationException(ErrorCode.MES10436);
-            }
+            //if (firstProcessCount > 1)
+            //{
+            //    throw new ValidationException(ErrorCode.MES10436);
+            //}
             #endregion
 
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
@@ -259,16 +259,16 @@ namespace Hymson.MES.Services.Services.Process
             var links = ConvertProcessRouteLinkList(parm.DynamicData.Links, procProcessRouteEntity);
 
             // 判断是否存在多个首工序
-            var firstProcessCount = nodes.Where(w => w.IsFirstProcess == true).Count();
-            if (firstProcessCount == 0)
-            {
-                throw new ValidationException(ErrorCode.MES10435);
-            }
+            //var firstProcessCount = nodes.Where(w => w.IsFirstProcess == true).Count();
+            //if (firstProcessCount == 0)
+            //{
+            //    throw new ValidationException(ErrorCode.MES10435);
+            //}
 
-            if (firstProcessCount > 1)
-            {
-                throw new ValidationException(ErrorCode.MES10436);
-            }
+            //if (firstProcessCount > 1)
+            //{
+            //    throw new ValidationException(ErrorCode.MES10436);
+            //}
 
             // 工艺路线编码和版本唯一
             var query = new ProcProcessRouteQuery
@@ -308,11 +308,10 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeleteProcProcessRouteAsync(string ids)
+        public async Task<int> DeleteProcProcessRouteAsync(long[] idsArr)
         {
-            var idsArr = StringExtension.SpitLongArrary(ids);
             if (idsArr.Length < 1)
             {
                 throw new NotFoundException(ErrorCode.MES10102);
@@ -321,7 +320,6 @@ namespace Hymson.MES.Services.Services.Process
             #region 参数校验
             //有生产中工单引用当前工艺路线，不能删除！
             // // 状态（0:新建;1:启用;2:保留;3:废除）
-            //TODO 状态枚举由proc_process_status改为sys_data_status
             var statusArr = new string[] { SysDataStatusEnum.Enable.ToString(), SysDataStatusEnum.Retain.ToString() };
             var query = new ProcProcessRouteQuery
             {

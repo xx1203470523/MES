@@ -409,11 +409,10 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeleteProcProcedureAsync(string ids)
+        public async Task<int> DeleteProcProcedureAsync(long[] idsArr)
         {
-            var idsArr = StringExtension.SpitLongArrary(ids);
             if (idsArr.Length < 1)
             {
                 throw new NotFoundException(ErrorCode.MES10102);

@@ -681,21 +681,20 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 批量删除资源类型数据
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeleteProcResourceAsync(string ids)
+        public async Task<int> DeleteProcResourceAsync(long[] idsArr)
         {
-            long[] idsArr = StringExtension.SpitLongArrary(ids);
             if (idsArr.Length < 1)
             {
-                throw new NotFoundException(ErrorCode.MES10102);
+                throw new ValidationException(ErrorCode.MES10102);
             }
 
             //不能删除启用状态的资源
             var query = new ProcResourceQuery
             {
                 IdsArr = idsArr,
-                Status = SysDataStatusEnum.Enable.ToString()
+                Status = (int)SysDataStatusEnum.Enable
             };
             var resourceList = await _resourceRepository.GetByIdsAsync(query);
             if (resourceList != null && resourceList.Any())

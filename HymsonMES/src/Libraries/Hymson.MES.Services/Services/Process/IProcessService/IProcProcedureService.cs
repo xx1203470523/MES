@@ -61,8 +61,8 @@ namespace Hymson.MES.Services.Services.Process.IProcessService
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="idsAr"></param>
         /// <returns></returns>
-        Task<int> DeleteProcProcedureAsync(string ids);
+        Task<int> DeleteProcProcedureAsync(long[] idsAr);
     }
 }

@@ -64,7 +64,7 @@
         public const string MES10404 = "工序名称超长";
         public const string MES10405 = "编码:{0}已存在！";
 
-        public const string MES10430 = $"有生产中工单引用当前工艺路线，不能删除！";
+        public const string MES10430 = $"不能删除启用和保留状态的工艺路线！";
         public const string MES10431 = $"此工艺路线在系统中已经存在!";
         public const string MES10432 = $"编码不能为空!";
         public const string MES10433 = $"名称不能为空!";

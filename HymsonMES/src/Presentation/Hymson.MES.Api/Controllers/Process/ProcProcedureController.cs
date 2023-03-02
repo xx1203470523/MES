@@ -4,6 +4,7 @@
  *build datetime: 2023-02-13 09:06:05
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
@@ -110,12 +111,12 @@ namespace Hymson.MES.Api.Controllers
         /// <summary>
         /// 删除（工序表）
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="deleteDto"></param>
         /// <returns></returns>
-        [HttpDelete("{ids}")]
-        public async Task DeleteProcProcedureAsync(string ids)
+        [HttpDelete]
+        public async Task DeleteProcProcedureAsync(DeleteDto deleteDto)
         {
-            await _procProcedureService.DeleteProcProcedureAsync(ids);
+            await _procProcedureService.DeleteProcProcedureAsync(deleteDto.Ids);
         }
 
     }

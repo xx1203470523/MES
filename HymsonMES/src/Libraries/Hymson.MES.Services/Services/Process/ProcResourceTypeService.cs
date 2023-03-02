@@ -251,14 +251,13 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 批量删除资源类型数据
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeleteProcResourceTypeAsync(string ids)
+        public async Task<int> DeleteProcResourceTypeAsync(long[] idsArr)
         {
-            long[] idsArr = StringExtension.SpitLongArrary(ids);
             if (idsArr.Length < 1)
             {
-                throw new NotFoundException(ErrorCode.MES10102);
+                throw new ValidationException(ErrorCode.MES10102);
             }
 
             //查询资源类型是否关联资源

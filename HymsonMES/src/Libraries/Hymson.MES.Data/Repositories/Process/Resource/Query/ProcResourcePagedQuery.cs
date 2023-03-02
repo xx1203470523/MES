@@ -59,6 +59,6 @@ namespace Hymson.MES.Data.Repositories.Process.Resource
         /// 描述 :状态 
         /// 空值 : false  
         /// </summary>
-        public string Status { get; set; }
+        public int? Status { get; set; }
     }
 }
