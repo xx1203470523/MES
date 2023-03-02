@@ -1,5 +1,6 @@
 using Dapper;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -111,7 +112,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
                 sqlBuilder.Where("SparePartTypeName LIKE @SparePartTypeName");
             }
 
-            if (pagedQuery.Status > 0)
+            if (pagedQuery.Status > DbDefaultValueConstant.IntDefaultValue)
             {
                 sqlBuilder.Where("Status = @Status");
             }
@@ -155,7 +156,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
 
         const string InsertSql = "INSERT INTO `equ_sparepart_type`(  `Id`, `SparePartTypeCode`, `SparePartTypeName`, Type, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @SparePartTypeCode, @SparePartTypeName, @Type, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string UpdateSql = "UPDATE `equ_sparepart_type` SET  SparePartTypeName = @SparePartTypeName, Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `equ_sparepart_type` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id = @Id ";
+        const string DeleteSql = "UPDATE `equ_sparepart_type` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id = @Ids ";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SparePartTypeCode`, `SparePartTypeName`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `equ_sparepart_type` WHERE Id = @Id ";

@@ -39,20 +39,20 @@ namespace Hymson.MES.Services.Services.Process.IProcessService
         /// </summary>
         /// <param name="procProcessRouteDto"></param>
         /// <returns></returns>
-        Task AddProcProcessRouteAsync(ProcProcessRouteCreateDto procProcessRouteCreateDto);
+        Task AddProcProcessRouteAsync(ProcProcessRouteCreateDto procProcessRouteDto);
 
         /// <summary>
         /// 修改
         /// </summary>
         /// <param name="procProcessRouteDto"></param>
         /// <returns></returns>
-        Task UpdateProcProcessRouteAsync(ProcProcessRouteModifyDto procProcessRouteModifyDto);
+        Task UpdateProcProcessRouteAsync(ProcProcessRouteModifyDto procProcessRouteDto);
 
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="idsAr"></param>
         /// <returns></returns>
-        Task<int> DeleteProcProcessRouteAsync(string ids);
+        Task<int> DeleteProcProcessRouteAsync(long[] idsAr);
     }
 }

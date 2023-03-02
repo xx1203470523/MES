@@ -30,5 +30,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 站点id
         /// </summary>
         public long SiteId { get; set; } = 0;
+
+        public string Version { get; set; }
     }
 }

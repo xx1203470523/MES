@@ -13,14 +13,14 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        Task<int> CreateAsync(InteClassCreateDto parm);
+        Task<int> CreateAsync(InteClassSaveDto parm);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        Task<int> ModifyAsync(InteClassModifyDto parm);
+        Task<int> ModifyAsync(InteClassSaveDto parm);
 
         /// <summary>
         /// 

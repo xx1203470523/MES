@@ -13,14 +13,14 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        Task<int> CreateAsync(EquFaultPhenomenonCreateDto parm);
+        Task<int> CreateAsync(EquFaultPhenomenonSaveDto parm);
 
         /// <summary>
         /// 更新（设备故障现象）
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        Task<int> ModifyAsync(EquFaultPhenomenonModifyDto parm);
+        Task<int> ModifyAsync(EquFaultPhenomenonSaveDto parm);
 
         /// <summary>
         /// 删除（设备故障现象）

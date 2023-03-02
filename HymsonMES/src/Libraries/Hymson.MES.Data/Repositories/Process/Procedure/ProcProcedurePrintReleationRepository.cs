@@ -74,7 +74,7 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
-        /// 删除（软删除）
+        /// 删除
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -176,7 +176,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string InsertSql = "INSERT INTO `proc_procedure_print_relation`(  `Id`, `SiteId`, `ProcedureId`, `MaterialId`, `Version`, `TemplateId`, `Copy`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ProcedureId, @MaterialId, @Version, @TemplateId, @Copy, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string UpdateSql = "UPDATE `proc_procedure_print_relation` SET    ProcedureId = @ProcedureId, MaterialId = @MaterialId, Version = @Version, TemplateId = @TemplateId, Copy = @Copy, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteByProcedureIdSql = "delete from `proc_procedure_print_relation` WHERE ProcedureId = @ProcedureId ";
-        const string DeletesSql = "UPDATE `proc_procedure_print_relation` SET IsDeleted = '1' WHERE Id in @ids";
+        const string DeletesSql = "UPDATE `proc_procedure_print_relation` SET IsDeleted = Id WHERE Id in @ids";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteId`, `ProcedureId`, `MaterialId`, `Version`, `TemplateId`, `Copy`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_procedure_print_relation`  WHERE Id = @Id ";

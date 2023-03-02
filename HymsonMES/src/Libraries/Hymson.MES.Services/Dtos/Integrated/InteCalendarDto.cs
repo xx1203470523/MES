@@ -6,71 +6,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
     /// <summary>
     ///  新增对象（日历维护）
     /// </summary>
-    public record InteCalendarCreateDto : BaseEntityDto
-    {
-        /// <summary>
-        ///日历名称
-        /// </summary>
-        [Required(ErrorMessage = "日历名称不能为空")]
-        public string CalendarName { get; set; }
-
-        /// <summary>
-        ///日历类型（字典名称：inte_calendar_type）
-        /// </summary>
-        [Required(ErrorMessage = "日历类型（字典名称：inte_calendar_type）不能为空")]
-        public string CalendarType { get; set; }
-
-        /// <summary>
-        ///设备或者线体id
-        /// </summary>
-        [Required(ErrorMessage = "设备或者线体id不能为空")]
-        public long EquOrLineId { get; set; }
-
-        /// <summary>
-        ///日历描述
-        /// </summary>
-        public string Remark { get; set; }
-
-        /// <summary>
-        /// 年
-        /// </summary>
-        public string Year { get; set; }
-
-        /// <summary>
-        /// 月
-        /// </summary>
-        public string Month { get; set; }
-
-        /// <summary>
-        /// 班制维护表Id
-        /// </summary>
-        public long? ClassId { get; set; }
-
-        /// <summary>
-        /// 默认作休类型
-        /// </summary>
-        //public string RestType { get; set; }
-
-        /// <summary>
-        /// 勾选的工作日
-        /// </summary>
-        public string Weekdays { get; set; }
-
-        /// <summary>
-        /// 日历详情
-        /// </summary>
-        public List<InteCalendarDateDetailDto> CalendarDataList { get; set; }
-
-        /// <summary>
-        /// 是否启用
-        /// </summary>
-        public bool UseStatus { get; set; } = false;
-    }
-
-    /// <summary>
-    ///  更新对象（日历维护）
-    /// </summary>
-    public record InteCalendarModifyDto : BaseEntityDto
+    public record InteCalendarSaveDto : BaseEntityDto
     {
         /// <summary>
         ///主键id

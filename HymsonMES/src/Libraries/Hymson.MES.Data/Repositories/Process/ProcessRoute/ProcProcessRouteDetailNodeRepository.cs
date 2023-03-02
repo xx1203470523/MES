@@ -112,7 +112,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<int> DeleteByProcessRouteIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteByProcessRouteIdSql, new { ProcedureId = id });
+            return await conn.ExecuteAsync(DeleteByProcessRouteIdSql, new { ProcessRouteId = id });
         }
     }
 

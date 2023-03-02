@@ -98,6 +98,17 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSql, procResourceConfigRess);
         }
+
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteByResourceIdAsync(long id)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeleteByResourceIdSql, new { ResourceId = id });
+        }
     }
 
     public partial class ProcResourceConfigResRepository
@@ -107,6 +118,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
         const string InsertSql = "INSERT INTO `proc_resource_config_res`(  `Id`, `SiteId`, `ResourceId`, `SetType`, `Value`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @ResourceId, @SetType, @Value, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string UpdateSql = "UPDATE `proc_resource_config_res` SET  SetType = @SetType, Value = @Value,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `proc_resource_config_res` SET IsDeleted = '1' WHERE Id = @Id ";
+        const string DeleteSql = "UPDATE `proc_resource_config_res` SET IsDeleted =Id WHERE Id = @Id ";
+        const string DeleteByResourceIdSql = "delete from `proc_resource_config_res` WHERE ResourceId = @ResourceId ";
     }
 }

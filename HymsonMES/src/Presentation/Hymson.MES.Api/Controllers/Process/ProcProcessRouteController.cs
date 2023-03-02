@@ -4,6 +4,7 @@
  *build datetime: 2023-02-14 10:07:11
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Microsoft.AspNetCore.Authorization;
@@ -42,9 +43,9 @@ namespace Hymson.MES.Api.Controllers.Process
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Route("list")]
-        public async Task<PagedInfo<ProcProcessRouteDto>> QueryPagedProcProcessRoute([FromQuery] ProcProcessRoutePagedQueryDto parm)
+        public async Task<PagedInfo<ProcProcessRouteDto>> QueryPagedProcProcessRouteAsync([FromQuery] ProcProcessRoutePagedQueryDto parm)
         {
             return await _procProcessRouteService.GetPageListAsync(parm);
         }
@@ -55,7 +56,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<CustomProcessRouteDto> GetCustomProcProcessRoute(long id)
+        public async Task<CustomProcessRouteDto> GetCustomProcProcessRouteAsync(long id)
         {
             return await _procProcessRouteService.GetCustomProcProcessRouteAsync(id);
         }
@@ -85,12 +86,12 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <summary>
         /// 删除（工艺路线表）
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="deleteDto"></param>
         /// <returns></returns>
-        [HttpDelete("{ids}")]
-        public async Task DeleteProcProcessRouteAsync(string ids)
+        [HttpDelete]
+        public async Task DeleteProcProcessRouteAsync(DeleteDto deleteDto)
         {
-            await _procProcessRouteService.DeleteProcProcessRouteAsync(ids);
+            await _procProcessRouteService.DeleteProcProcessRouteAsync(deleteDto.Ids);
         }
 
     }

@@ -13,14 +13,14 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        Task<int> CreateAsync(EquEquipmentUnitCreateDto createDto);
+        Task<int> CreateAsync(EquEquipmentUnitSaveDto createDto);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        Task<int> ModifyAsync(EquEquipmentUnitModifyDto modifyDto);
+        Task<int> ModifyAsync(EquEquipmentUnitSaveDto modifyDto);
 
         /// <summary>
         /// 

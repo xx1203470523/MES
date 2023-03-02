@@ -6,38 +6,17 @@ namespace Hymson.MES.Services.Dtos.Equipment
     /// <summary>
     /// 新增输入对象（设备组）
     /// </summary>
-    public record EquEquipmentGroupCreateDto : BaseEntityDto
-    {
-        /// <summary>
-        /// 编码（设备组）
-        /// </summary>
-        public string EquipmentGroupCode { get; set; } = "";
-
-        /// <summary>
-        /// 名称（设备组）
-        /// </summary>
-        public string EquipmentGroupName { get; set; } = "";
-
-        /// <summary>
-        /// 备注
-        /// </summary>
-        public string Remark { get; set; } = "";
-
-        /// <summary>
-        /// ID集合（设备注册）
-        /// </summary>
-        public IEnumerable<long> EquipmentIDs { get; set; }
-    }
-
-    /// <summary>
-    /// 修改输入对象（设备组）
-    /// </summary>
-    public record EquEquipmentGroupModifyDto : BaseEntityDto
+    public record EquEquipmentGroupSaveDto : BaseEntityDto
     {
         /// <summary>
         /// 唯一标识
         /// </summary>
         public long Id { get; set; }
+
+        /// <summary>
+        /// 编码（设备组）
+        /// </summary>
+        public string EquipmentGroupCode { get; set; } = "";
 
         /// <summary>
         /// 名称（设备组）

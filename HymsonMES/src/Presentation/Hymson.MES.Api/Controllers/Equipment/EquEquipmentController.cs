@@ -1,7 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipment;
-using Hymson.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -41,7 +40,7 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task CreateAsync(EquEquipmentCreateDto createDto)
+        public async Task CreateAsync(EquEquipmentSaveDto createDto)
         {
             await _equEquipmentService.CreateAsync(createDto);
         }
@@ -52,7 +51,7 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
-        public async Task ModifyAsync(EquEquipmentModifyDto modifyDto)
+        public async Task ModifyAsync(EquEquipmentSaveDto modifyDto)
         {
             await _equEquipmentService.ModifyAsync(modifyDto);
         }

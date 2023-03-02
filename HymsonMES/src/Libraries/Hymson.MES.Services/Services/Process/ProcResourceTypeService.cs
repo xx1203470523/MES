@@ -142,6 +142,7 @@ namespace Hymson.MES.Services.Services.Process
             var siteId = _currentSite.SiteId ?? 0;
             //DTO转换实体
             var id = IdGenProvider.Instance.CreateId();
+            var resType = param.ResType.ToUpperInvariant();
             var entity = new ProcResourceTypeAddCommand
             {
                 Id = id,
@@ -149,12 +150,12 @@ namespace Hymson.MES.Services.Services.Process
                 CreatedBy = userName,
                 UpdatedBy = userName,
                 Remark = param.Remark ?? "",
-                ResType = param.ResType.ToUpperInvariant(),
+                ResType = resType,
                 ResTypeName = param.ResTypeName ?? ""
             };
 
             //判断资源类型在系统中是否已经存在
-            var resEntity = new ProcResourceTypeEntity { SiteId = siteId, ResType = entity.ResType };
+            var resEntity = new ProcResourceTypeEntity { SiteId = siteId, ResType = resType };
             var resourceType = await _resourceTypeRepository.GetByCodeAsync(resEntity);
             if (resourceType != null)
             {
@@ -250,14 +251,13 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 批量删除资源类型数据
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeleteProcResourceTypeAsync(string ids)
+        public async Task<int> DeleteProcResourceTypeAsync(long[] idsArr)
         {
-            long[] idsArr = StringExtension.SpitLongArrary(ids);
             if (idsArr.Length < 1)
             {
-                throw new NotFoundException(ErrorCode.MES10102);
+                throw new ValidationException(ErrorCode.MES10102);
             }
 
             //查询资源类型是否关联资源

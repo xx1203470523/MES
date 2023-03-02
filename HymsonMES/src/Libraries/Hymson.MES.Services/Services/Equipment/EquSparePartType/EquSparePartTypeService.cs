@@ -72,7 +72,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(EquSparePartTypeCreateDto createDto)
+        public async Task<int> CreateAsync(EquSparePartTypeSaveDto createDto)
         {
             // TODO 验证DTO
             //TODO  _enumService.GetEnumTypes();
@@ -104,7 +104,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyAsync(EquSparePartTypeModifyDto modifyDto)
+        public async Task<int> ModifyAsync(EquSparePartTypeSaveDto modifyDto)
         {
             // 验证DTO
 
@@ -147,7 +147,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
             return await _equSparePartTypeRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = idsArr,
-                UserId = $"{_currentUser.UserName}",
+                UserId = _currentUser.UserName,
                 DeleteOn = HymsonClock.Now()
             });
         }

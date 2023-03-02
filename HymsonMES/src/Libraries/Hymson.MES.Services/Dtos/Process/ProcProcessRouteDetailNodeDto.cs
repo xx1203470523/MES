@@ -99,13 +99,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 修改时间
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public bool? IsDeleted { get; set; }
-
-       
     }
 
 

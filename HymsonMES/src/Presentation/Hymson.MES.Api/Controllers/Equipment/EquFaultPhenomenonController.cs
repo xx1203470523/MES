@@ -40,7 +40,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task CreateAsync(EquFaultPhenomenonCreateDto createDto)
+        public async Task CreateAsync(EquFaultPhenomenonSaveDto createDto)
         {
             await _equFaultPhenomenonService.CreateAsync(createDto);
         }
@@ -51,7 +51,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
-        public async Task ModifyAsync(EquFaultPhenomenonModifyDto modifyDto)
+        public async Task ModifyAsync(EquFaultPhenomenonSaveDto modifyDto)
         {
             await _equFaultPhenomenonService.ModifyAsync(modifyDto);
         }

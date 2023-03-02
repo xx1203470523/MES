@@ -114,6 +114,17 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeleteSql, new { Ids = idsArr });
         }
+
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteByResourceIdAsync(long id)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeleteByResourceIdSql, new { ResourceId = id });
+        }
     }
 
     public partial class ProcResourceEquipmentBindRepository
@@ -123,7 +134,8 @@ namespace Hymson.MES.Data.Repositories.Process
 
         const string InsertSql = "INSERT INTO `proc_resource_equipment_bind`(  `Id`, `SiteId`, `ResourceId`, `EquipmentId`, `IsMain`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @ResourceId, @EquipmentId, @IsMain, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string UpdateSql = "UPDATE `proc_resource_equipment_bind` SET  EquipmentId=@EquipmentId,IsMain=@IsMain,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `proc_resource_equipment_bind` SET IsDeleted = '1' WHERE Id in @Ids ";
+        const string DeleteSql = "UPDATE `proc_resource_equipment_bind` SET IsDeleted = Id WHERE Id in @Ids ";
+        const string DeleteByResourceIdSql = "delete from `proc_resource_equipment_bind` WHERE ResourceId = @ResourceId ";
         const string GetByResourceIdSqllTemplate = "SELECT * FROM proc_resource_equipment_bind /**where**/  ";
     }
 }

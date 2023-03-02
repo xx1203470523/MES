@@ -25,19 +25,19 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :状态 
         /// 空值 : false  
         /// </summary>
-        public string Status { get; set; }
+        public int Status { get; set; }
         
         /// <summary>
         /// 描述 :类型 
         /// 空值 : false  
         /// </summary>
-        public string Type { get; set; }
+        public int Type { get; set; }
         
         /// <summary>
         /// 描述 :包装等级（字典数据） 
         /// 空值 : true  
         /// </summary>
-        public string PackingLevel { get; set; }
+        public int? PackingLevel { get; set; }
         
         /// <summary>
         /// 描述 :所属资源类型ID 

@@ -38,9 +38,14 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// </summary>
         public string OrderNumber { get; set; }
 
-       /// <summary>
-        /// 作业ID
+        /// <summary>
+        /// 关联点
         /// </summary>
+        public int LinkPoint { get; set; } = -1;
+
+       /// <summary>
+       /// 作业ID
+       /// </summary>
         public long JobId { get; set; }
 
        /// <summary>

@@ -42,7 +42,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task CreateAsync([FromBody] InteCalendarCreateDto createDto)
+        public async Task CreateAsync(InteCalendarSaveDto createDto)
         {
             await _inteCalendarService.CreateAsync(createDto);
         }
@@ -53,7 +53,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
-        public async Task ModifyAsync([FromBody] InteCalendarModifyDto modifyDto)
+        public async Task ModifyAsync(InteCalendarSaveDto modifyDto)
         {
             await _inteCalendarService.ModifyAsync(modifyDto);
         }
