@@ -44,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 参数单位
         /// </summary>
-        public string ParameterUnit { get; set; }
+        public int ParameterUnit { get; set; }
 
         /// <summary>
         /// 备注

@@ -104,31 +104,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string Remark { get; set; }
 
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-       /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-       /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public bool? IsDeleted { get; set; }
-
         /// <summary>
         /// 物料集合
         /// </summary>
@@ -236,17 +211,17 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 物料组编码
         /// </summary>
-        public string GroupCode { get; set; }
+        public string GroupCode { get; set; } = "";
 
         /// <summary>
         /// 物料编码
         /// </summary>
-        public string MaterialCode { get; set; }
+        public string MaterialCode { get; set; } = "";
 
         /// <summary>
         /// 版本
         /// </summary>
-        public string Version { get; set; }
+        public string Version { get; set; } = "";
     }
 
     /// <summary>

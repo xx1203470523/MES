@@ -73,7 +73,7 @@ namespace Hymson.MES.Services.Services.Process
             await _validationCreateRules.ValidateAndThrowAsync(procMaterialCreateDto);
 
             procMaterialCreateDto.MaterialCode = procMaterialCreateDto.MaterialCode.ToUpper();
-            procMaterialCreateDto.Origin = "1"; // ERP/EIS（sys_source_type）
+            procMaterialCreateDto.Origin = 1; // ERP/EIS（sys_source_type）
 
             //判断编号是否已存在
             var haveEntity = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery()
@@ -171,10 +171,10 @@ namespace Hymson.MES.Services.Services.Process
                 throw new ValidationException(ErrorCode.MES10213);
             }
 
-            var statusArr = new string[] { "2", "3" }; //可下达和保留 时无法删除
+            var statusArr = new int[] { 2, 3 }; //可下达和保留 时无法删除
             //判断这些ID 对应的物料是否在 可下达和保留中  （1:新建;2:可下达;3:保留;4:废除）
             var entitys =  await _procMaterialRepository.GetByIdsAsync(idsArr);
-            if (entitys.Where(x => statusArr.Contains(x.Status)).ToList().Count>0) 
+            if (entitys.Where(x => statusArr.Contains(x.Status.Value)).ToList().Count>0) 
             {
                 throw new BusinessException(ErrorCode.MES10212);
             }

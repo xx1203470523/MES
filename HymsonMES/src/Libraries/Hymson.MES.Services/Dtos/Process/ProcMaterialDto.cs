@@ -46,17 +46,17 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; }
+        public int? Status { get; set; }
 
        /// <summary>
         /// 来源
         /// </summary>
-        public string Origin { get; set; }
+        public int? Origin { get; set; }
 
        /// <summary>
         /// 版本
         /// </summary>
-        public string Version { get; set; }
+        public string? Version { get; set; }
 
        /// <summary>
         /// 是否默认版本
@@ -66,12 +66,12 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 物料描述
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
        /// <summary>
         /// 采购类型
         /// </summary>
-        public string BuyType { get; set; }
+        public int? BuyType { get; set; }
 
        /// <summary>
         /// 工艺路线ID
@@ -86,32 +86,32 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 批次大小
         /// </summary>
-        public int? Batch { get; set; }
+        public int Batch { get; set; }
 
        /// <summary>
         /// 计量单位(字典定义)
         /// </summary>
-        public string Unit { get; set; }
+        public string? Unit { get; set; }
 
        /// <summary>
         /// 内/外序列号
         /// </summary>
-        public string SerialNumber { get; set; }
+        public int? SerialNumber { get; set; }
 
        /// <summary>
         /// 验证掩码组
         /// </summary>
-        public string ValidationMaskGroup { get; set; }
+        public string? ValidationMaskGroup { get; set; }
 
        /// <summary>
         /// 基于时间(字典定义)
         /// </summary>
-        public string BaseTime { get; set; }
+        public int? BaseTime { get; set; }
 
        /// <summary>
         /// 消耗公差
         /// </summary>
-        public string ConsumptionTolerance { get; set; }
+        public int? ConsumptionTolerance { get; set; }
 
        /// <summary>
         /// 创建人
@@ -137,8 +137,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 是否逻辑删除
         /// </summary>
         public bool? IsDeleted { get; set; }
-
-       
     }
 
 
@@ -167,27 +165,27 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; } = "1";
+        public int? Status { get; set; } 
 
         /// <summary>
         /// 来源
         /// </summary>
-        public string Origin { get; set; } = "";
+        public int? Origin { get; set; } 
 
         /// <summary>
         /// 版本
         /// </summary>
-        public string Version { get; set; } = "";
+        public string Version { get; set; }
 
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; } = "";
+        public string? Remark { get; set; }
 
         /// <summary>
         /// 采购类型
         /// </summary>
-        public string BuyType { get; set; } = "";
+        public int? BuyType { get; set; }
 
         /// <summary>
         /// 工艺路线ID
@@ -202,32 +200,32 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 批次大小
         /// </summary>
-        public int? Batch { get; set; } = 0;
+        public int Batch { get; set; }
 
         /// <summary>
         /// 计量单位(字典定义)
         /// </summary>
-        public string Unit { get; set; } = "";
+        public string? Unit { get; set; }
 
         /// <summary>
         /// 内/外序列号
         /// </summary>
-        public string SerialNumber { get; set; } = "";
+        public int? SerialNumber { get; set; } 
 
         /// <summary>
         /// 验证掩码组
         /// </summary>
-        public string ValidationMaskGroup { get; set; } = "";
+        public string? ValidationMaskGroup { get; set; }
 
         /// <summary>
         /// 基于时间(字典定义)
         /// </summary>
-        public string BaseTime { get; set; } = "";
+        public int? BaseTime { get; set; }
 
         /// <summary>
         /// 消耗公差
         /// </summary>
-        public int? ConsumptionTolerance { get; set; } = 0;
+        public int? ConsumptionTolerance { get; set; }
 
         /// <summary>
         /// 是否默认版本
@@ -237,7 +235,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 替代品集合
         /// </summary>
-        public List<ProcMaterialReplaceDto> DynamicList { get; set; } = new List<ProcMaterialReplaceDto>();
+        public List<ProcMaterialReplaceDto>? DynamicList { get; set; } = new List<ProcMaterialReplaceDto>();
     }
 
     /// <summary>
@@ -299,7 +297,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 所属物料组ID
         /// </summary>
-        public long GroupId { get; set; }
+        public long? GroupId { get; set; }
 
         /// <summary>
         /// 物料编码
@@ -314,12 +312,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; } = "1";
+        public int? Status { get; set; }
 
         /// <summary>
         /// 来源
         /// </summary>
-        public string Origin { get; set; } = "";
+        public int? Origin { get; set; }
 
         /// <summary>
         /// 版本
@@ -334,12 +332,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 物料描述
         /// </summary>
-        public string Remark { get; set; } = "";
+        public string? Remark { get; set; }
 
         /// <summary>
         /// 采购类型
         /// </summary>
-        public string BuyType { get; set; } = "";
+        public int? BuyType { get; set; }
 
         /// <summary>
         /// 工艺路线ID
@@ -354,37 +352,37 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 批次大小
         /// </summary>
-        public int? Batch { get; set; }
+        public int Batch { get; set; }
 
         /// <summary>
         /// 计量单位(字典定义)
         /// </summary>
-        public string Unit { get; set; } = "";
+        public string? Unit { get; set; }
 
         /// <summary>
         /// 内/外序列号
         /// </summary>
-        public string SerialNumber { get; set; } = "";
+        public int? SerialNumber { get; set; }
 
         /// <summary>
         /// 验证掩码组
         /// </summary>
-        public string ValidationMaskGroup { get; set; } = "";
+        public string? ValidationMaskGroup { get; set; }
 
         /// <summary>
         /// 基于时间(字典定义)
         /// </summary>
-        public string BaseTime { get; set; } = "";
+        public int? BaseTime { get; set; }
 
         /// <summary>
         /// 消耗公差
         /// </summary>
-        public string ConsumptionTolerance { get; set; } = "";
+        public int? ConsumptionTolerance { get; set; }
 
         /// <summary>
         /// 替代品集合
         /// </summary>
-        public List<ProcMaterialReplaceDto> DynamicList { get; set; } = new List<ProcMaterialReplaceDto>();
+        public List<ProcMaterialReplaceDto>? DynamicList { get; set; } = new List<ProcMaterialReplaceDto>();
 
     }
 
@@ -406,27 +404,27 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 物料编码
         /// </summary>
-        public string MaterialCode { get; set; } = "";
+        public string? MaterialCode { get; set; } = "";
 
         /// <summary>
         /// 版本
         /// </summary>
-        public string Version { get; set; } = "";
+        public string? Version { get; set; } = "";
 
         /// <summary>
         /// 物料名称
         /// </summary>
-        public string MaterialName { get; set; } = "";
+        public string? MaterialName { get; set; } = "";
 
         /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; } = "";
+        public int? Status { get; set; }
 
         /// <summary>
         /// 来源
         /// </summary>
-        public string Origin { get; set; } = "";
+        public int? Origin { get; set; }
     }
 
     /// <summary>
@@ -438,30 +436,30 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 描述 :所属物料组
         /// 空值 : false  
         /// </summary>
-        public string GroupName { get; set; }
+        public string? GroupName { get; set; }
 
         /// <summary>
         /// 描述 :名称 (工艺路线)
         /// 空值 : true  
         /// </summary>
-        public string ProcessRouteName { get; set; }
+        public string? ProcessRouteName { get; set; }
 
         /// <summary>
         /// 描述 :版本 (工艺路线) 
         /// 空值 : true  
         /// </summary>
-        public string ProcessRouteVersion { get; set; }
+        public string? ProcessRouteVersion { get; set; }
 
         /// <summary>
         /// 描述 :名称（工序Bom）
         /// 空值 : true  
         /// </summary>
-        public string ProcedureBomName { get; set; }
+        public string? ProcedureBomName { get; set; }
 
         /// <summary>
         /// 描述 :版本（工序Bom）
         /// 空值 : true  
         /// </summary>
-        public string ProcedureBomVersion { get; set; }
+        public string? ProcedureBomVersion { get; set; }
     }
 }

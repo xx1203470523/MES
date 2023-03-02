@@ -34,6 +34,6 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 描述 :参数代码 
         /// 空值 : false  
         /// </summary>
-        public string ParameterCode { get; set; }
+        public string? ParameterCode { get; set; }
     }
 }

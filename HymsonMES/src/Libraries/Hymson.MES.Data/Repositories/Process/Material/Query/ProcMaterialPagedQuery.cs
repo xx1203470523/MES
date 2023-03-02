@@ -32,26 +32,26 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 物料编码
         /// </summary>
-        public string MaterialCode { get; set; }
+        public string? MaterialCode { get; set; }
 
         /// <summary>
         /// 版本
         /// </summary>
-        public string Version { get; set; }
+        public string? Version { get; set; }
 
         /// <summary>
         /// 物料名称
         /// </summary>
-        public string MaterialName { get; set; }
+        public string? MaterialName { get; set; }
 
         /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; }
+        public int? Status { get; set; }
 
         /// <summary>
         /// 来源
         /// </summary>
-        public string Origin { get; set; }
+        public int? Origin { get; set; }
     }
 }

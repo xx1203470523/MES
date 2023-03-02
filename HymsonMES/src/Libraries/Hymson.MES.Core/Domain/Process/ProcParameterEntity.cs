@@ -36,12 +36,12 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :参数单位（字典定义） 
         /// 空值 : false  
         /// </summary>
-        public string ParameterUnit { get; set; }
+        public int ParameterUnit { get; set; }
         
         /// <summary>
         /// 描述 :说明 
         /// 空值 : true  
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
         }
 }

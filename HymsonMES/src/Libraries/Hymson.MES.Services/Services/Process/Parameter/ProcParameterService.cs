@@ -209,7 +209,7 @@ namespace Hymson.MES.Services.Services.Process
                    SiteId = siteId,
                    ParameterID= dto.Id
                });
-               dto.Type = $"{linkTypes.GroupBy(x => x.ParameterType).Select(x => x.Key).ToList().Sum()}";
+               dto.Type = linkTypes.GroupBy(x => x.ParameterType).Select(x => x.Key).ToList().Sum();
 
                 return dto;
            }

@@ -46,6 +46,6 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 描述 :说明 
         /// 空值 : true  
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
     }
 }

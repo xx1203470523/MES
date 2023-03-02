@@ -74,9 +74,9 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 根据ID和站点获取数据
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="siteCode"></param>
+        /// <param name="siteId"></param>
         /// <returns></returns>
-        Task<ProcMaterialGroupEntity> GetByIdAndSiteCodeAsync(long id, long SiteId);
+        Task<ProcMaterialGroupEntity> GetByIdAndSiteIdAsync(long id, long SiteId);
 
         /// <summary>
         /// 根据IDs批量获取数据

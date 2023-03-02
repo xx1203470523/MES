@@ -45,9 +45,9 @@ namespace Hymson.MES.Api.Controllers.Process
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Route("pagelist")]
-        public async Task<PagedInfo<ProcParameterLinkTypeViewDto>> QueryPagedProcParameterLinkTypeAsync(ProcParameterLinkTypePagedQueryDto parm)
+        public async Task<PagedInfo<ProcParameterLinkTypeViewDto>> QueryPagedProcParameterLinkTypeAsync([FromQuery] ProcParameterLinkTypePagedQueryDto parm)
         {
             return await _procParameterLinkTypeService.GetPageListAsync(parm);
         }
@@ -57,9 +57,9 @@ namespace Hymson.MES.Api.Controllers.Process
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Route("detail")]
-        public async Task<PagedInfo<ProcParameterLinkTypeViewDto>> QueryPagedProcParameterLinkTypeByTypeAsync(ProcParameterDetailPagerQueryDto parm)
+        public async Task<PagedInfo<ProcParameterLinkTypeViewDto>> QueryPagedProcParameterLinkTypeByTypeAsync([FromQuery] ProcParameterDetailPagerQueryDto parm)
         {
             return await _procParameterLinkTypeService.QueryPagedProcParameterLinkTypeByTypeAsync(parm);
         }
@@ -92,7 +92,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpPut]
         [Route("update")]
         public async Task UpdateProcParameterLinkTypeAsync([FromBody] ProcParameterLinkTypeModifyDto parm)
         {
@@ -104,7 +104,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpDelete]
         [Route("delete")]
         public async Task<int> DeleteProcParameterLinkTypeAsync(long[] ids)
         {

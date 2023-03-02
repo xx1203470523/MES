@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +39,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
        /// <summary>
         /// 创建人
@@ -53,7 +54,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 最后修改人
         /// </summary>
-        public string UpdatedBy { get; set; }
+        public string? UpdatedBy { get; set; }
 
        /// <summary>
         /// 修改时间
@@ -109,17 +110,17 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 类型（设备/产品参数）
         /// </summary>
-        public int ParameterType { get; set; } = 1;
+        public int? ParameterType { get; set; } = 1;
 
         /// <summary>
         /// 编码（设备/产品参数）
         /// </summary>
-        public string ParameterCode { get; set; } = "";
+        public string? ParameterCode { get; set; } = "";
 
         /// <summary>
         /// 名称（设备/产品参数）
         /// </summary>
-        public string ParameterName { get; set; } = "";
+        public string? ParameterName { get; set; } = "";
     }
 
     public record ProcParameterLinkTypeViewDto: BaseEntityDto
@@ -193,21 +194,21 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 操作类型 1:add；2:edit；3:view；
         /// </summary>
-        public string OperateType { get; set; } = "add";
+        public OperateTypeEnum OperateType { get; set; } = OperateTypeEnum.Add;
 
         /// <summary>
         /// 类型（设备/产品参数）
         /// </summary>
-        public int ParameterType { get; set; } = 1;
+        public int? ParameterType { get; set; } = 1;
 
         /// <summary>
         /// 编码（设备/产品参数）
         /// </summary>
-        public string ParameterCode { get; set; } = "";
+        public string? ParameterCode { get; set; } = "";
 
         /// <summary>
         /// 名称（设备/产品参数）
         /// </summary>
-        public string ParameterName { get; set; } = "";
+        public string? ParameterName { get; set; } = "";
     }
 }

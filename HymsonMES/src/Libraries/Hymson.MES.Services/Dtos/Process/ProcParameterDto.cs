@@ -43,12 +43,12 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 参数单位（字典定义）
         /// </summary>
-        public string ParameterUnit { get; set; }
+        public int ParameterUnit { get; set; }
 
        /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
        /// <summary>
         /// 创建人
@@ -63,7 +63,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 最后修改人
         /// </summary>
-        public string UpdatedBy { get; set; }
+        public string? UpdatedBy { get; set; }
 
        /// <summary>
         /// 修改时间
@@ -84,9 +84,9 @@ namespace Hymson.MES.Services.Dtos.Process
     public record CustomProcParameterDto : ProcParameterDto
     {
         /// <summary>
-        /// 类型
+        /// 类型   1 设备  2 产品  3 设备+产品  4 环境  等等
         /// </summary>
-        public string Type { get; set; }
+        public int Type { get; set; }
     }
 
 
@@ -118,12 +118,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 参数单位（字典定义）
         /// </summary>
-        public string ParameterUnit { get; set; } = "";
+        public int ParameterUnit { get; set; }
 
         /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; } = "";
+        public string? Remark { get; set; } = "";
 
     }
 
@@ -155,12 +155,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 参数单位（字典定义）
         /// </summary>
-        public string ParameterUnit { get; set; } = "";
+        public int ParameterUnit { get; set; }
 
         /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; } = "";
+        public string? Remark { get; set; } = "";
 
     }
 
@@ -182,16 +182,16 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 编码（标准参数）
         /// </summary>
-        public string ParameterCode { get; set; } = "";
+        public string? ParameterCode { get; set; } = "";
 
         /// <summary>
         /// 名称（标准参数）
         /// </summary>
-        public string ParameterName { get; set; } = "";
+        public string? ParameterName { get; set; } = "";
 
         /// <summary>
         /// 描述（标准参数）
         /// </summary>
-        public string Remark { get; set; } = "";
+        public string? Remark { get; set; } = "";
     }
 }

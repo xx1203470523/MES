@@ -119,11 +119,11 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 sqlBuilder.Where(" GroupId = @GroupId ");
             }
-            if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.Status))
+            if (procMaterialPagedQuery.Status>0)
             {
                 sqlBuilder.Where(" Status = @Status ");
             }
-            if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.Origin))
+            if (procMaterialPagedQuery.Origin>0)
             {
                 sqlBuilder.Where(" Origin = @Origin ");
             }
@@ -182,13 +182,13 @@ namespace Hymson.MES.Data.Repositories.Process
                     sqlBuilder.Where(" ( GroupId = 0 or GroupId =@GroupId ) ");
                 }
 
-                sqlBuilder.Where(" GroupId = @GroupId ");
+                //sqlBuilder.Where(" GroupId = @GroupId ");
             }
-            if (procMaterialPagedQuery.Status != null)
+            if (procMaterialPagedQuery.Status >0)
             {
                 sqlBuilder.Where(" Status = @Status ");
             }
-            if (procMaterialPagedQuery.Origin != null)
+            if (procMaterialPagedQuery.Origin >0)
             {
                 sqlBuilder.Where(" Origin = @Origin ");
             }

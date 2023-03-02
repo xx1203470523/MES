@@ -113,7 +113,7 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 sqlBuilder.Where(" g.SiteId=@SiteId ");
             }
-            if (procParameterLinkTypePagedQuery.ParameterType!=0)
+            if (procParameterLinkTypePagedQuery.ParameterType>0)
             {
                 sqlBuilder.Where(" g.ParameterType=@ParameterType ");
             }
@@ -168,7 +168,7 @@ namespace Hymson.MES.Data.Repositories.Process
                 procParameterDetailPagerQuery.ParameterName = $"%{procParameterDetailPagerQuery.ParameterName}%";
                 sqlBuilder.Where(" g.ParameterName like @ParameterName ");
             }
-            if (procParameterDetailPagerQuery.OperateType.ToLower() == "add")
+            if (procParameterDetailPagerQuery.OperateType == Core.Enums.OperateTypeEnum.Add)
             {
                 sqlBuilder.Where(" (o.Id is null or trim(o.Id) = '') ");
             }

@@ -8,6 +8,7 @@
 using FluentValidation;
 using Google.Protobuf.WellKnownTypes;
 using Hymson.Authentication;
+using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -38,10 +39,12 @@ namespace Hymson.MES.Services.Services.Process
         private readonly IProcMaterialRepository _procMaterialRepository;
 
         private readonly ICurrentUser _currentUser;
+        private readonly ICurrentSite _currentSite;
 
-        public ProcMaterialGroupService(ICurrentUser currentUser, IProcMaterialGroupRepository procMaterialGroupRepository, AbstractValidator<ProcMaterialGroupCreateDto> validationCreateRules, AbstractValidator<ProcMaterialGroupModifyDto> validationModifyRules, IProcMaterialRepository procMaterialRepository)
+        public ProcMaterialGroupService(ICurrentUser currentUser, ICurrentSite currentSite , IProcMaterialGroupRepository procMaterialGroupRepository, AbstractValidator<ProcMaterialGroupCreateDto> validationCreateRules, AbstractValidator<ProcMaterialGroupModifyDto> validationModifyRules, IProcMaterialRepository procMaterialRepository)
         {
             _currentUser = currentUser;
+            _currentSite = currentSite;
             _procMaterialGroupRepository = procMaterialGroupRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
@@ -190,8 +193,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<PagedInfo<CustomProcMaterialGroupViewDto>> GetPageCustomListAsync(CustomProcMaterialGroupPagedQueryDto customProcMaterialGroupPagedQueryDto)
         {
-            //TODO 
-            // TODO   customProcMaterialGroupPagedQueryDto.SiteCode = "";
+            customProcMaterialGroupPagedQueryDto.SiteId = _currentSite.SiteId??0;
 
             var procMaterialGroupCustomPagedQuery = customProcMaterialGroupPagedQueryDto.ToQuery<ProcMaterialGroupCustomPagedQuery>();
             var pagedInfo = await _procMaterialGroupRepository.GetPagedCustomInfoAsync(procMaterialGroupCustomPagedQuery);
@@ -305,10 +307,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<ProcMaterialGroupDto> QueryProcMaterialGroupByIdAsync(long id)
         {
-            //TODO 
-            var siteCode = "";
-
-            var procMaterialGroupEntity = await _procMaterialGroupRepository.GetByIdAndSiteCodeAsync(id, 0);// TODO SiteId
+            var procMaterialGroupEntity = await _procMaterialGroupRepository.GetByIdAndSiteIdAsync(id, _currentSite.SiteId??0);
             if (procMaterialGroupEntity != null)
             {
                 return procMaterialGroupEntity.ToModel<ProcMaterialGroupDto>();

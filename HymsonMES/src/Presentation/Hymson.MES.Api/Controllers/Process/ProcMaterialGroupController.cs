@@ -48,7 +48,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("pagelist")]
-        public async Task<PagedInfo<ProcMaterialGroupDto>> QueryPagedProcMaterialGroupAsync([FromQuery] ProcMaterialGroupPagedQueryDto parm)
+        public async Task<PagedInfo<ProcMaterialGroupDto>> QueryPagedProcMaterialGroupAsync(ProcMaterialGroupPagedQueryDto parm)
         {
             return await _procMaterialGroupService.GetPageListAsync(parm);
         }
@@ -60,7 +60,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("customlist")]
-        public async Task<PagedInfo<CustomProcMaterialGroupViewDto>> QueryPagedCustomProcMaterialGroupAsync([FromQuery] CustomProcMaterialGroupPagedQueryDto parm)
+        public async Task<PagedInfo<CustomProcMaterialGroupViewDto>> QueryPagedCustomProcMaterialGroupAsync(CustomProcMaterialGroupPagedQueryDto parm)
         {
             return await _procMaterialGroupService.GetPageCustomListAsync(parm);
         }
