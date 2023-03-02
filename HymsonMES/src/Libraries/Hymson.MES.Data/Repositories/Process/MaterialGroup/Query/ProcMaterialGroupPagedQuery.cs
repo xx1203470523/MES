@@ -27,17 +27,17 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 物料组编码
         /// </summary>
-        public string GroupCode { get; set; }
+        public string? GroupCode { get; set; }
 
         /// <summary>
         /// 物料组名称
         /// </summary>
-        public string GroupName { get; set; }
+        public string? GroupName { get; set; }
 
         /// <summary>
         /// 版本
         /// </summary>
-        public string Version { get; set; }
+        public string? Version { get; set; }
     }
 
     /// <summary>
@@ -53,17 +53,17 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 物料组编码
         /// </summary>
-        public string GroupCode { get; set; }
+        public string? GroupCode { get; set; }
 
         /// <summary>
         /// 物料编码
         /// </summary>
-        public string MaterialCode { get; set; }
+        public string? MaterialCode { get; set; }
 
         /// <summary>
         /// 版本
         /// </summary>
-        public string Version { get; set; }
+        public string? Version { get; set; }
     }
 
 }

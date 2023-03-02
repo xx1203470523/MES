@@ -65,13 +65,14 @@ namespace Hymson.MES.Services.Services.Process
             procMaterialGroupEntity.UpdatedBy = _currentUser.UserName;
             procMaterialGroupEntity.CreatedOn = HymsonClock.Now();
             procMaterialGroupEntity.UpdatedOn = HymsonClock.Now();
+            procMaterialGroupEntity.SiteId = _currentSite.SiteId??0;
 
             #region 参数校验
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procMaterialGroupCreateDto);
 
             //判断编号是否已存在
-            var existGroupCodes = await _procMaterialGroupRepository.GetProcMaterialGroupEntitiesAsync(new ProcMaterialGroupQuery { SiteId = 0, GroupCode = procMaterialGroupCreateDto.GroupCode });
+            var existGroupCodes = await _procMaterialGroupRepository.GetProcMaterialGroupEntitiesAsync(new ProcMaterialGroupQuery { SiteId = _currentSite.SiteId??0, GroupCode = procMaterialGroupCreateDto.GroupCode });
             if (existGroupCodes != null && existGroupCodes.Count() > 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10216)).WithData("groupCode", procMaterialGroupCreateDto.GroupCode);
@@ -113,6 +114,8 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     throw new BusinessException(ErrorCode.MES10218);
                 }
+
+                ts.Complete();
             }
 
             #endregion

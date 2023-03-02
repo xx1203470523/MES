@@ -29,6 +29,6 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 描述 :物料组编号 
         /// 空值 : false  
         /// </summary>
-        public string GroupCode { get; set; }
+        public string? GroupCode { get; set; }
     }
 }

@@ -346,7 +346,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByGroupIdSql = @"SELECT 
                                         `Id`, `SiteId`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `ProcedureBomId`, `Batch`, `Unit`, `SerialNumber`, `ValidationMaskGroup`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_material`
-                            WHERE GroupId IN @groupIds ";
+                            WHERE IsDeleted = 0 and GroupId IN @groupIds ";
 
         const string UpdateSameMaterialCodeToNoVersionSql = "UPDATE `proc_material` SET IsDefaultVersion= 0 WHERE MaterialCode= @MaterialCode ";
 

@@ -46,9 +46,9 @@ namespace Hymson.MES.Api.Controllers.Process
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Route("pagelist")]
-        public async Task<PagedInfo<ProcMaterialGroupDto>> QueryPagedProcMaterialGroupAsync(ProcMaterialGroupPagedQueryDto parm)
+        public async Task<PagedInfo<ProcMaterialGroupDto>> QueryPagedProcMaterialGroupAsync([FromQuery] ProcMaterialGroupPagedQueryDto parm)
         {
             return await _procMaterialGroupService.GetPageListAsync(parm);
         }
@@ -58,9 +58,9 @@ namespace Hymson.MES.Api.Controllers.Process
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Route("customlist")]
-        public async Task<PagedInfo<CustomProcMaterialGroupViewDto>> QueryPagedCustomProcMaterialGroupAsync(CustomProcMaterialGroupPagedQueryDto parm)
+        public async Task<PagedInfo<CustomProcMaterialGroupViewDto>> QueryPagedCustomProcMaterialGroupAsync([FromQuery] CustomProcMaterialGroupPagedQueryDto parm)
         {
             return await _procMaterialGroupService.GetPageCustomListAsync(parm);
         }
@@ -93,7 +93,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpPut]
         [Route("update")]
         public async Task UpdateProcMaterialGroupAsync([FromBody] ProcMaterialGroupModifyDto parm)
         {
@@ -105,7 +105,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpDelete]
         [Route("delete")]
         public async Task DeleteProcMaterialGroupAsync(long[] ids)
         {
