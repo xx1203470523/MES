@@ -275,7 +275,8 @@ namespace Hymson.MES.Services.Services.Process
             {
                 Code = processRoute.Code,
                 SiteId = _currentSite.SiteId ?? 0,
-                Version = processRoute.Version
+                Version = processRoute.Version,
+                Id= processRoute.Id,
             };
             if (await _procProcessRouteRepository.IsExistsAsync(query))
             {
