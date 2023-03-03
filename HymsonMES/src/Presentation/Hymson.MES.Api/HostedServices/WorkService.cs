@@ -17,8 +17,9 @@ namespace Hymson.MES.Api
         {
             try
             {
-                await _resourceService.InitErrorCodeAsync(typeof(ErrorCode));
                 await _resourceService.InitEnumAsync();
+                await _resourceService.InitErrorCodeAsync(typeof(ErrorCode));
+                
             }
             catch (Exception e)
             {
