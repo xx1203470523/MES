@@ -313,7 +313,7 @@ namespace Hymson.MES.Services.Services.Process
             #region 验证
             if (parm == null)
             {
-                throw new ValidationException(ErrorCode.MES10100);
+                throw new ValidationException(nameof(ErrorCode.MES10100));
             }
 
             //验证DTO
@@ -327,7 +327,7 @@ namespace Hymson.MES.Services.Services.Process
             };
             if (await _resourceRepository.IsExistsAsync(query))
             {
-                throw new BusinessException(ErrorCode.MES10308).WithData("ResCode", parm.ResCode);
+                throw new BusinessException(nameof(ErrorCode.MES10308)).WithData("ResCode", parm.ResCode);
             }
 
             if (parm.ResTypeId > 0)
@@ -335,7 +335,7 @@ namespace Hymson.MES.Services.Services.Process
                 var resourceType = await _resourceTypeRepository.GetByIdAsync(parm.ResTypeId ?? 0);
                 if (resourceType == null)
                 {
-                    throw new ValidationException(ErrorCode.MES10310);
+                    throw new ValidationException(nameof(ErrorCode.MES10310));
                 }
             }
 
@@ -344,13 +344,13 @@ namespace Hymson.MES.Services.Services.Process
             {
                 if (parm.EquList.GroupBy(x => x.EquipmentId).Where(g => g.Count() > 2).Count() > 1)
                 {
-                    throw new CustomerValidationException(ErrorCode.MES10306);
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10306));
                 }
 
                 var ismianCount = parm.EquList.Where(a => a.IsMain == true).ToList().Count;
                 if (ismianCount > 1)
                 {
-                    throw new CustomerValidationException(ErrorCode.MES10307);
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10307));
                 }
             }
             #endregion
@@ -484,7 +484,7 @@ namespace Hymson.MES.Services.Services.Process
             #region 验证
             if (param == null)
             {
-                throw new ValidationException(ErrorCode.MES10100);
+                throw new ValidationException(nameof(ErrorCode.MES10100));
             }
 
             //验证DTO
@@ -496,7 +496,7 @@ namespace Hymson.MES.Services.Services.Process
                 var resourceType = await _resourceTypeRepository.GetByIdAsync(param.ResTypeId);
                 if (resourceType == null)
                 {
-                    throw new ValidationException(ErrorCode.MES10310);
+                    throw new ValidationException(nameof(ErrorCode.MES10310));
                 }
             }
 
@@ -505,7 +505,7 @@ namespace Hymson.MES.Services.Services.Process
                 //判断打印机是否重复配置  数据库中 已经存储的情况
                 if (param.PrintList.GroupBy(x => x.PrintId).Where(g => g.Count() > 2).Count() > 1)
                 {
-                    throw new ValidationException(ErrorCode.MES10313);
+                    throw new ValidationException(nameof(ErrorCode.MES10313));
                 }     
             }
 
@@ -514,7 +514,7 @@ namespace Hymson.MES.Services.Services.Process
             {
                 if (param.EquList.GroupBy(x => x.EquipmentId).Where(g => g.Count() > 2).Count() > 1)
                 {
-                    throw new Exception(ErrorCode.MES10314);
+                    throw new Exception(nameof(ErrorCode.MES10314));
                 }
 
                 //判断打印机是否重复配置  数据库中 已经存储的情况
@@ -528,7 +528,7 @@ namespace Hymson.MES.Services.Services.Process
                 var ismianList = param.EquList.Where(a => a.IsMain == true).ToList();
                 if (ismianList.Count > 1)
                 {
-                    throw new ValidationException(ErrorCode.MES10307);
+                    throw new ValidationException(nameof(ErrorCode.MES10307));
                 }
             }
             #endregion
@@ -687,7 +687,7 @@ namespace Hymson.MES.Services.Services.Process
         {
             if (idsArr.Length < 1)
             {
-                throw new ValidationException(ErrorCode.MES10102);
+                throw new ValidationException(nameof(ErrorCode.MES10102));
             }
 
             //不能删除启用状态的资源
@@ -699,7 +699,7 @@ namespace Hymson.MES.Services.Services.Process
             var resourceList = await _resourceRepository.GetByIdsAsync(query);
             if (resourceList != null && resourceList.Any())
             {
-                throw new CustomerValidationException(ErrorCode.MES10319);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10319));
             }
 
             var command = new DeleteCommand

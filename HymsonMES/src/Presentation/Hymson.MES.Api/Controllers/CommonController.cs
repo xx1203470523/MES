@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers
 {
-    [Route("api/common")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class CommonController : ControllerBase
     {
