@@ -161,26 +161,23 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         }
 
         /// <summary>
-        /// 
+        /// 查询详情（设备组）
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<EquEquipmentGroupDto> GetDetailAsync(EquEquipmentGroupQueryDto query)
+        public async Task<EquEquipmentGroupDto> GetDetailAsync(long id)
         {
             EquEquipmentGroupDto dto = new();
             IEnumerable<EquEquipmentEntity> equipmentEntitys;
 
-            switch (query.OperateType)
+            if (id == 0)
             {
-                case OperateTypeEnum.Add:
-                    equipmentEntitys = await _equEquipmentRepository.GetByGroupIdAsync(0);
-                    break;
-                case OperateTypeEnum.Edit:
-                case OperateTypeEnum.View:
-                default:
-                    dto.Info = (await _equEquipmentGroupRepository.GetByIdAsync(query.Id)).ToModel<EquEquipmentGroupListDto>();
-                    equipmentEntitys = await _equEquipmentRepository.GetByGroupIdAsync(query.Id);
-                    break;
+                equipmentEntitys = await _equEquipmentRepository.GetByGroupIdAsync(0);
+            }
+            else
+            {
+                dto.Info = (await _equEquipmentGroupRepository.GetByIdAsync(id)).ToModel<EquEquipmentGroupListDto>();
+                equipmentEntitys = await _equEquipmentRepository.GetByGroupIdAsync(id);
             }
 
             dto.Equipments = equipmentEntitys.Select(s => s.ToModel<EquEquipmentBaseDto>());
