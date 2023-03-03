@@ -68,9 +68,9 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 批量删除关联的BomId的数据
         /// </summary>
-        /// <param name="bomIds"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        Task<int> DeleteBomIDAsync(long[] bomIds);
+        Task<int> DeleteBomIDAsync(DeleteCommand command);
 
         /// <summary>
         /// 根据ID获取数据

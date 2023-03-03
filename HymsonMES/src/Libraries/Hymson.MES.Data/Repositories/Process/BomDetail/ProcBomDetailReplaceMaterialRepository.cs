@@ -12,6 +12,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.Utils;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -55,12 +56,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 批量删除关联的BomId的数据
         /// </summary>
-        /// <param name="bomIds"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeleteBomIDAsync(long[] bomIds)
+        public async Task<int> DeleteBomIDAsync(DeleteCommand command)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteBomIDsSql, new { bomIds = bomIds });
+            return await conn.ExecuteAsync(DeleteBomIDsSql, new { command.UserId, command.DeleteOn, bomIds = command.Ids });
         }
 
         /// <summary>
@@ -96,13 +97,9 @@ namespace Hymson.MES.Data.Repositories.Process
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId=@SiteId");
             sqlBuilder.Select("*");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-           
             var offSet = (procBomDetailReplaceMaterialPagedQuery.PageIndex - 1) * procBomDetailReplaceMaterialPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = procBomDetailReplaceMaterialPagedQuery.PageSize });
@@ -149,7 +146,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<int> InsertsAsync(List<ProcBomDetailReplaceMaterialEntity> procBomDetailReplaceMaterialEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertsSql, procBomDetailReplaceMaterialEntitys);
+            return await conn.ExecuteAsync(InsertSql, procBomDetailReplaceMaterialEntitys);
         }
 
         /// <summary>
@@ -171,7 +168,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<int> UpdatesAsync(List<ProcBomDetailReplaceMaterialEntity> procBomDetailReplaceMaterialEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdatesSql, procBomDetailReplaceMaterialEntitys);
+            return await conn.ExecuteAsync(UpdateSql, procBomDetailReplaceMaterialEntitys);
         }
 
     }
@@ -184,21 +181,15 @@ namespace Hymson.MES.Data.Repositories.Process
                                             /**select**/
                                            FROM `proc_bom_detail_replace_material` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `proc_bom_detail_replace_material`(  `Id`, `SiteCode`, `BomId`, `BomDetailId`, `ReplaceMaterialId`, `ReferencePoint`, `Usages`, `Loss`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @BomId, @BomDetailId, @ReplaceMaterialId, @ReferencePoint, @Usages, @Loss, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `proc_bom_detail_replace_material`(  `Id`, `SiteCode`, `BomId`, `BomDetailId`, `ReplaceMaterialId`, `ReferencePoint`, `Usages`, `Loss`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @BomId, @BomDetailId, @ReplaceMaterialId, @ReferencePoint, @Usages, @Loss, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string UpdateSql = "UPDATE `proc_bom_detail_replace_material` SET   SiteCode = @SiteCode, BomId = @BomId, BomDetailId = @BomDetailId, ReplaceMaterialId = @ReplaceMaterialId, ReferencePoint = @ReferencePoint, Usages = @Usages, Loss = @Loss, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `proc_bom_detail_replace_material` SET   SiteCode = @SiteCode, BomId = @BomId, BomDetailId = @BomDetailId, ReplaceMaterialId = @ReplaceMaterialId, ReferencePoint = @ReferencePoint, Usages = @Usages, Loss = @Loss, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string InsertSql = "INSERT INTO `proc_bom_detail_replace_material`(  `Id`, `SiteId`, `BomId`, `BomDetailId`, `ReplaceMaterialId`, `ReferencePoint`, `Usages`, `Loss`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @BomId, @BomDetailId, @ReplaceMaterialId, @ReferencePoint, @Usages, @Loss, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string UpdateSql = "UPDATE `proc_bom_detail_replace_material` SET BomDetailId = @BomDetailId, ReplaceMaterialId = @ReplaceMaterialId, ReferencePoint = @ReferencePoint, Usages = @Usages, Loss = @Loss, Remark = @Remark,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_bom_detail_replace_material` SET IsDeleted = Id WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE `proc_bom_detail_replace_material` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids";
+        const string DeletesSql = "UPDATE `proc_bom_detail_replace_material` SET IsDeleted = Id,UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids";
         /// <summary>
         /// 批量删除关联的BomId的数据
         /// </summary>
-        const string DeleteBomIDsSql = "UPDATE `proc_bom_detail_replace_material` SET IsDeleted = '1' WHERE BomId in @bomIds";
-        const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteCode`, `BomId`, `BomDetailId`, `ReplaceMaterialId`, `ReferencePoint`, `Usages`, `Loss`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `proc_bom_detail_replace_material`  WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteCode`, `BomId`, `BomDetailId`, `ReplaceMaterialId`, `ReferencePoint`, `Usages`, `Loss`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `proc_bom_detail_replace_material`  WHERE Id IN @ids ";
+        const string DeleteBomIDsSql = "UPDATE `proc_bom_detail_replace_material` SET IsDeleted =Id,UpdatedBy = @UserId,UpdatedOn = @DeleteOn WHERE BomId in @bomIds ";
+        const string GetByIdSql = @"SELECT * FROM `proc_bom_detail_replace_material`  WHERE Id = @Id ";
+        const string GetByIdsSql = @"SELECT * FROM `proc_bom_detail_replace_material`  WHERE Id IN @ids ";
     }
 }

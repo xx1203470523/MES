@@ -471,12 +471,17 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 编码（设备注册）
         /// </summary>
-        public string EquipmentCode { get; set; }
+        public string EquipmentCode { get; set; } = "";
 
         /// <summary>
         /// 名称（设备注册）
         /// </summary>
-        public string EquipmentName { get; set; }
+        public string EquipmentName { get; set; } = "";
+
+        /// <summary>
+        /// 设备组ID
+        /// </summary>
+        public long EquipmentGroupId { get; set; }
     }
 
     /// <summary>

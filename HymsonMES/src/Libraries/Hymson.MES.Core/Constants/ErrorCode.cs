@@ -104,6 +104,7 @@
         public const string MES10609 = "更新Bom失败！";
         public const string MES10610 = "删除失败 Id不能为空!";
         public const string MES10611 = "不能删除启用状态的Bom!";
+        public const string MES10612 = "此Bom在系统中不存在!";
         #endregion
 
         #region 上料点 10700

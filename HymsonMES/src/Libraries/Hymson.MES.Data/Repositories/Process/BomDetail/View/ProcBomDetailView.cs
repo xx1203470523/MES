@@ -47,7 +47,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public string ReferencePoint { get; set; }
 
         //工序id
-        public string ProcedureBomId { get; set; }
+        public string ProcedureId { get; set; }
 
         /// <summary>
         /// 工序代码

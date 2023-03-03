@@ -45,7 +45,7 @@ namespace Hymson.MES.Services.Dtos.Process
         public string ReferencePoint { get; set; }
         public decimal Sequence { get; set; }
 
-        public string ProcedureBomId { get; set; }
+        public string ProcedureId { get; set; }
 
         /// <summary>
         /// 工序代码
@@ -77,7 +77,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 所属工序ID
         /// </summary>
-        public long ProcedureBomId { get; set; }
+        public long ProcedureId { get; set; }
 
        /// <summary>
         /// 所属物料ID
@@ -150,7 +150,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 所属工序ID
         /// </summary>
-        public long ProcedureBomId { get; set; }
+        public long ProcedureId { get; set; }
 
        /// <summary>
         /// 所属物料ID

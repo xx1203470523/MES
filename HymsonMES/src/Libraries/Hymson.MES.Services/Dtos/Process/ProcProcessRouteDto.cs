@@ -143,7 +143,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 工序明细ID
         /// </summary>
         //[JsonConverter(typeof(ValueToStringConverter))]
-        public long ProcedureBomId { get; set; }
+        public long ProcedureId { get; set; }
 
         /// <summary>
         /// 工序编码

@@ -44,10 +44,10 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         Task<PagedInfo<EquEquipmentGroupListDto>> GetPagedListAsync(EquEquipmentGroupPagedQueryDto pagedQueryDto);
 
         /// <summary>
-        /// 
+        /// 查询详情（设备组）
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        Task<EquEquipmentGroupDto> GetDetailAsync(EquEquipmentGroupQueryDto query);
+        Task<EquEquipmentGroupDto> GetDetailAsync(long id);
     }
 }

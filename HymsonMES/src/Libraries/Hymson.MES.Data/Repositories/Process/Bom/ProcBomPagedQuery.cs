@@ -6,6 +6,7 @@
  *build datetime: 2023-02-14 10:04:25
  */
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Constants;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,7 +40,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; }
+        public int? Status { get; set; } = DbDefaultValueConstant.IntDefaultValue;
 
         /// <summary>
         /// 版本

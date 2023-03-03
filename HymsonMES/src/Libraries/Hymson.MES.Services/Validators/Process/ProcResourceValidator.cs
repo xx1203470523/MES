@@ -13,8 +13,8 @@ namespace Hymson.MES.Services.Validators.Process
     {
         public ProcResourceCreateValidator()
         {
-            RuleFor(x => x.ResCode).NotEmpty().WithErrorCode(ErrorCode.MES10301);
-            RuleFor(x => x.ResName).NotEmpty().WithErrorCode(ErrorCode.MES10303);
+            RuleFor(x => x.ResCode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10301));
+            RuleFor(x => x.ResName).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10303));
             //RuleFor(x => x.Status).NotEmpty().WithErrorCode(ErrorCode.MES10305);
             //RuleFor(x => x.ResTypeId).NotEmpty().WithErrorCode(ErrorCode.MES10320);
             //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
@@ -25,7 +25,7 @@ namespace Hymson.MES.Services.Validators.Process
     {
         public ProcResourcelModifyValidator()
         {
-            RuleFor(x => x.ResName).NotEmpty().WithErrorCode(ErrorCode.MES10303);
+            RuleFor(x => x.ResName).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10303));
             //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
         }
     }

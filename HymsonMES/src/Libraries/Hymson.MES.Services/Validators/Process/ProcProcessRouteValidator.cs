@@ -23,9 +23,9 @@ namespace Hymson.MES.Services.Validators.Process
     {
         public ProcProcessRouteCreateValidator()
         {
-            RuleFor(x => x.Code).NotEmpty().WithErrorCode(ErrorCode.MES10432);
-            RuleFor(x => x.Name).NotEmpty().WithErrorCode(ErrorCode.MES10433);
-            RuleFor(x => x.Version).NotEmpty().WithErrorCode(ErrorCode.MES10434);
+            RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10432));
+            RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10433));
+            RuleFor(x => x.Version).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10434));
             //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
         }
     }
