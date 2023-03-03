@@ -206,7 +206,7 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             var loadPoints= await _procLoadPointRepository.GetByIdsAsync(idsArr);
-            if (loadPoints.Any(x => (int)SysDataStatusEnum.Enable == x.Status || (int)SysDataStatusEnum.Retain == x.Status)) 
+            if (loadPoints.Any(x => (SysDataStatusEnum.Enable == x.Status || SysDataStatusEnum.Retain == x.Status)))
             {
                 throw new BusinessException(ErrorCode.MES10709);
             }
