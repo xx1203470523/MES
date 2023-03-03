@@ -117,6 +117,7 @@
         public const string MES10706 = "更新上料单维护失败!";
         public const string MES10707 = "请选择数据!";
         public const string MES10708 = "删除数据失败!";
+        public const string MES10709 = "删除数据失败!无法删除保留或者启用的数据！";
         #endregion
 
         #region 不合格代码 11100
