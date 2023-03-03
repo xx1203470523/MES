@@ -27,16 +27,16 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 描述 :上料点 
         /// </summary>
-        public string LoadPoint { get; set; }
+        public string? LoadPoint { get; set; }
 
         /// <summary>
         /// 描述 :上料点名称 
         /// </summary>
-        public string LoadPointName { get; set; }
+        public string? LoadPointName { get; set; }
 
         /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; }
+        public int? Status { get; set; }
     }
 }

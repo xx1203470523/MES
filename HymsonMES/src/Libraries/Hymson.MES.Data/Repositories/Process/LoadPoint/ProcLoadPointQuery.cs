@@ -23,12 +23,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 描述 :所属站点代码 
         /// 空值 : false  
         /// </summary>
-        public long SiteId { get; set; }
+        public long? SiteId { get; set; }
 
         /// <summary>
         /// 描述 :上料点 
         /// </summary>
-        public string LoadPoint { get; set; }
+        public string? LoadPoint { get; set; }
 
     }
 }

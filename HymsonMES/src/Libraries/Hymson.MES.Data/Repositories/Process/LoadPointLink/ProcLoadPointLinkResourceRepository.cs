@@ -110,9 +110,9 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
+            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteId))
             //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
+            //    sqlBuilder.Where("SiteId=@SiteId");
             //}
            
             var offSet = (procLoadPointLinkResourcePagedQuery.PageIndex - 1) * procLoadPointLinkResourcePagedQuery.PageSize;
@@ -196,24 +196,24 @@ namespace Hymson.MES.Data.Repositories.Process
                                             /**select**/
                                            FROM `proc_load_point_link_resource` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `proc_load_point_link_resource`(  `Id`, `SiteCode`, `SerialNo`, `LoadPointId`, `ResourceId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @SerialNo, @LoadPointId, @ResourceId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `proc_load_point_link_resource`(  `Id`, `SiteCode`, `SerialNo`, `LoadPointId`, `ResourceId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @SerialNo, @LoadPointId, @ResourceId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string UpdateSql = "UPDATE `proc_load_point_link_resource` SET   SiteCode = @SiteCode, SerialNo = @SerialNo, LoadPointId = @LoadPointId, ResourceId = @ResourceId, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `proc_load_point_link_resource` SET   SiteCode = @SiteCode, SerialNo = @SerialNo, LoadPointId = @LoadPointId, ResourceId = @ResourceId, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string InsertSql = "INSERT INTO `proc_load_point_link_resource`(  `Id`, `SiteId`, `SerialNo`, `LoadPointId`, `ResourceId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SerialNo, @LoadPointId, @ResourceId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsSql = "INSERT INTO `proc_load_point_link_resource`(  `Id`, `SiteId`, `SerialNo`, `LoadPointId`, `ResourceId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SerialNo, @LoadPointId, @ResourceId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string UpdateSql = "UPDATE `proc_load_point_link_resource` SET   SiteId = @SiteId, SerialNo = @SerialNo, LoadPointId = @LoadPointId, ResourceId = @ResourceId, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `proc_load_point_link_resource` SET   SiteId = @SiteId, SerialNo = @SerialNo, LoadPointId = @LoadPointId, ResourceId = @ResourceId, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_load_point_link_resource` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_load_point_link_resource` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids";
         const string DeletesByLoadPointIdTrueSql = "DELETE  FROM `proc_load_point_link_resource` WHERE LoadPointId in @ids ";
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteCode`, `SerialNo`, `LoadPointId`, `ResourceId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                               `Id`, `SiteId`, `SerialNo`, `LoadPointId`, `ResourceId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_load_point_link_resource`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteCode`, `SerialNo`, `LoadPointId`, `ResourceId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                                          `Id`, `SiteId`, `SerialNo`, `LoadPointId`, `ResourceId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_load_point_link_resource`  WHERE Id IN @ids ";
         const string GetLoadPointLinkResourceByIdsSql = @"SELECT 
                                            a.Id,  a.ResourceId, b.ResCode, b.ResName 
                             FROM `proc_load_point_link_resource` a
                             Inner JOIN proc_resource b on a.ResourceId = b.Id
-                            WHERE Id IN @ids 
+                            WHERE a.Id IN @ids 
                             Order by a.CreatedOn ";
     }
 }

@@ -104,5 +104,6 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procLoadPointLinkMaterialPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ProcLoadPointLinkMaterialEntity>> GetPagedInfoAsync(ProcLoadPointLinkMaterialPagedQuery procLoadPointLinkMaterialPagedQuery);
+
     }
 }

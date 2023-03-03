@@ -45,7 +45,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Route("pagelist")]
         public async Task<PagedInfo<ProcLoadPointDto>> QueryPagedProcLoadPointAsync([FromQuery] ProcLoadPointPagedQueryDto parm)
         {
@@ -80,7 +80,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpPut]
         [Route("update")]
         public async Task UpdateProcLoadPointAsync([FromBody] ProcLoadPointModifyDto parm)
         {
@@ -92,9 +92,9 @@ namespace Hymson.MES.Api.Controllers.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpDelete]
         [Route("delete")]
-        public async Task DeleteProcLoadPointAsync(long[] ids)
+        public async Task DeleteProcLoadPointAsync([FromBody] long[] ids)
         {
             //long[] idsArr = StringExtension.SpitLongArrary(ids);
             await _procLoadPointService.DeletesProcLoadPointAsync(ids);
