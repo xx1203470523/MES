@@ -59,12 +59,12 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// <summary>
         /// 删除（设备注册）
         /// </summary>
-        /// <param name="deleteDto"></param>
+        /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
-        public async Task DeletesAsync(EquEquipmentDeleteDto deleteDto)
+        public async Task DeletesAsync(long[] ids)
         {
-            await _equEquipmentService.DeletesAsync(deleteDto.Ids);
+            await _equEquipmentService.DeletesAsync(ids);
         }
 
         /// <summary>

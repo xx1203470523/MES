@@ -36,17 +36,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
     }
 
     /// <summary>
-    /// 删除Dto（班制维护）
-    /// </summary>
-    public record InteClassDeleteDto
-    {
-        /// <summary>
-        /// 集合（主键）
-        /// </summary>
-        public long[] Ids { get; set; }
-    }
-
-    /// <summary>
     /// 班制维护新增输入对象
     /// </summary>
     public record InteClassDto : BaseEntityDto

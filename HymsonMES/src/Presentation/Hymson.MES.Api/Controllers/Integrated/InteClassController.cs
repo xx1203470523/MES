@@ -58,12 +58,12 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <summary>
         /// 删除（班制维护）
         /// </summary>
-        /// <param name="deleteDto"></param>
+        /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
-        public async Task DeletesAsync(InteClassDeleteDto deleteDto)
+        public async Task DeletesAsync(long[] ids)
         {
-            await _inteClassService.DeletesAsync(deleteDto.Ids);
+            await _inteClassService.DeletesAsync(ids);
         }
 
         /// <summary>

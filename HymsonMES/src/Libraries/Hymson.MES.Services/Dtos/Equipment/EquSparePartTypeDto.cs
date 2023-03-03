@@ -35,17 +35,6 @@ namespace Hymson.MES.Services.Dtos.Equipment
     }
 
     /// <summary>
-    /// 删除Dto（备件类型）
-    /// </summary>
-    public record EquSparePartTypeDeleteDto
-    {
-        /// <summary>
-        /// 集合（主键）
-        /// </summary>
-        public long[] Ids { get; set; }
-    }
-
-    /// <summary>
     /// Dto（备件类型）
     /// </summary>
     public record EquSparePartTypeDto : BaseEntityDto

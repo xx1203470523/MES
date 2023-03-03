@@ -72,17 +72,6 @@ namespace Hymson.MES.Services.Dtos.Equipment
     }
 
     /// <summary>
-    /// 删除Dto（工装注册）
-    /// </summary>
-    public record EquConsumableDeleteDto
-    {
-        /// <summary>
-        /// 集合（主键）
-        /// </summary>
-        public long[] Ids { get; set; }
-    }
-
-    /// <summary>
     /// Dto（工装注册）
     /// </summary>
     public record EquConsumableDto : BaseEntityDto
