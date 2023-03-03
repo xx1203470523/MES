@@ -8,6 +8,7 @@
 
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -46,12 +47,12 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 状态
         /// </summary>
-        public int? Status { get; set; }
+        public SysDataStatusEnum? Status { get; set; }
 
        /// <summary>
         /// 来源
         /// </summary>
-        public int? Origin { get; set; }
+        public MaterialOriginEnum? Origin { get; set; }
 
        /// <summary>
         /// 版本
@@ -71,7 +72,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 采购类型
         /// </summary>
-        public int? BuyType { get; set; }
+        public MaterialBuyTypeEnum? BuyType { get; set; }
 
        /// <summary>
         /// 工艺路线ID
@@ -96,7 +97,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 内/外序列号
         /// </summary>
-        public int? SerialNumber { get; set; }
+        public MaterialSerialNumberEnum? SerialNumber { get; set; }
 
        /// <summary>
         /// 验证掩码组
@@ -106,7 +107,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 基于时间(字典定义)
         /// </summary>
-        public int? BaseTime { get; set; }
+        public MaterialBaseTimeEnum? BaseTime { get; set; }
 
        /// <summary>
         /// 消耗公差
@@ -165,12 +166,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 状态
         /// </summary>
-        public int? Status { get; set; } 
+        public SysDataStatusEnum? Status { get; set; } 
 
         /// <summary>
         /// 来源
         /// </summary>
-        public int? Origin { get; set; } 
+        public MaterialOriginEnum? Origin { get; set; } 
 
         /// <summary>
         /// 版本
@@ -185,7 +186,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 采购类型
         /// </summary>
-        public int? BuyType { get; set; }
+        public MaterialBuyTypeEnum? BuyType { get; set; }
 
         /// <summary>
         /// 工艺路线ID
@@ -210,7 +211,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 内/外序列号
         /// </summary>
-        public int? SerialNumber { get; set; } 
+        public MaterialSerialNumberEnum? SerialNumber { get; set; } 
 
         /// <summary>
         /// 验证掩码组
@@ -220,7 +221,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 基于时间(字典定义)
         /// </summary>
-        public int? BaseTime { get; set; }
+        public MaterialBaseTimeEnum? BaseTime { get; set; }
 
         /// <summary>
         /// 消耗公差
@@ -281,7 +282,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 操作类型
         /// </summary>
         [Required(ErrorMessage = "操作类型不可为空")]
-        public int OperationType { get; set; }
+        public OperateTypeEnum OperationType { get; set; }
     }
 
     /// <summary>
@@ -312,12 +313,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 状态
         /// </summary>
-        public int? Status { get; set; }
+        public SysDataStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 来源
         /// </summary>
-        public int? Origin { get; set; }
+        public MaterialOriginEnum? Origin { get; set; }
 
         /// <summary>
         /// 版本
@@ -337,7 +338,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 采购类型
         /// </summary>
-        public int? BuyType { get; set; }
+        public MaterialBuyTypeEnum? BuyType { get; set; }
 
         /// <summary>
         /// 工艺路线ID
@@ -362,7 +363,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 内/外序列号
         /// </summary>
-        public int? SerialNumber { get; set; }
+        public MaterialSerialNumberEnum? SerialNumber { get; set; }
 
         /// <summary>
         /// 验证掩码组
@@ -372,7 +373,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 基于时间(字典定义)
         /// </summary>
-        public int? BaseTime { get; set; }
+        public MaterialBaseTimeEnum? BaseTime { get; set; }
 
         /// <summary>
         /// 消耗公差
@@ -419,12 +420,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 状态
         /// </summary>
-        public int? Status { get; set; }
+        public SysDataStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 来源
         /// </summary>
-        public int? Origin { get; set; }
+        public MaterialOriginEnum? Origin { get; set; }
     }
 
     /// <summary>
