@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +39,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
        /// <summary>
         /// 说明
@@ -96,7 +97,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 状态
         /// </summary>
-        public int Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 说明
@@ -156,7 +157,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 状态
         /// </summary>
-        public int Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
        /// <summary>
         /// 说明
@@ -190,7 +191,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 状态
         /// </summary>
-        public int Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
        /// <summary>
         /// 说明
@@ -230,6 +231,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 状态
         /// </summary>
-        public int? Status { get; set; }
+        public SysDataStatusEnum? Status { get; set; }
     }
 }
