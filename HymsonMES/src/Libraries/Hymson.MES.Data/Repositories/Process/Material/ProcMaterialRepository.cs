@@ -8,6 +8,7 @@
 
 using Dapper;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -119,11 +120,11 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 sqlBuilder.Where(" GroupId = @GroupId ");
             }
-            if (procMaterialPagedQuery.Status>0)
+            if (procMaterialPagedQuery.Status.HasValue)
             {
                 sqlBuilder.Where(" Status = @Status ");
             }
-            if (procMaterialPagedQuery.Origin>0)
+            if (procMaterialPagedQuery.Origin.HasValue)
             {
                 sqlBuilder.Where(" Origin = @Origin ");
             }
@@ -184,11 +185,11 @@ namespace Hymson.MES.Data.Repositories.Process
 
                 //sqlBuilder.Where(" GroupId = @GroupId ");
             }
-            if (procMaterialPagedQuery.Status >0)
+            if (procMaterialPagedQuery.Status.HasValue)
             {
                 sqlBuilder.Where(" Status = @Status ");
             }
-            if (procMaterialPagedQuery.Origin >0)
+            if (procMaterialPagedQuery.Origin.HasValue)
             {
                 sqlBuilder.Where(" Origin = @Origin ");
             }

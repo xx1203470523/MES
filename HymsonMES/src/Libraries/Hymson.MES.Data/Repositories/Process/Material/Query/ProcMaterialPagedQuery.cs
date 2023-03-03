@@ -6,6 +6,7 @@
  *build datetime: 2023-02-08 04:47:44
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,11 +48,11 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 状态
         /// </summary>
-        public int? Status { get; set; }
+        public SysDataStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 来源
         /// </summary>
-        public int? Origin { get; set; }
+        public MaterialOriginEnum? Origin { get; set; }
     }
 }

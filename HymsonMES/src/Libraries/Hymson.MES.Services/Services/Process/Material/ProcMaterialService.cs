@@ -13,6 +13,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
@@ -73,7 +74,7 @@ namespace Hymson.MES.Services.Services.Process
             await _validationCreateRules.ValidateAndThrowAsync(procMaterialCreateDto);
 
             procMaterialCreateDto.MaterialCode = procMaterialCreateDto.MaterialCode.ToUpper();
-            procMaterialCreateDto.Origin = 1; // ERP/EIS（sys_source_type）
+            procMaterialCreateDto.Origin = MaterialOriginEnum.ManualEntry; // ERP/EIS（sys_source_type）
 
             //判断编号是否已存在
             var haveEntity = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery()
@@ -128,7 +129,7 @@ namespace Hymson.MES.Services.Services.Process
 
                 if (response == 0)
                 {
-                    throw new BusinessException(ErrorCode.MES10202);
+                    throw new BusinessException(nameof(ErrorCode.MES10202));
                 }
 
                 if (procMaterialCreateDto.DynamicList != null && procMaterialCreateDto.DynamicList.Count > 0)
@@ -137,7 +138,7 @@ namespace Hymson.MES.Services.Services.Process
 
                     if (response != procMaterialCreateDto.DynamicList.Count)
                     {
-                        throw new BusinessException(ErrorCode.MES10202);
+                        throw new BusinessException(nameof(ErrorCode.MES10202));
                     }
                 }
 
@@ -171,10 +172,10 @@ namespace Hymson.MES.Services.Services.Process
                 throw new ValidationException(ErrorCode.MES10213);
             }
 
-            var statusArr = new int[] { 2, 3 }; //可下达和保留 时无法删除
+            //var statusArr = new int[] { 2, 3 }; //可下达和保留 时无法删除
             //判断这些ID 对应的物料是否在 可下达和保留中  （1:新建;2:可下达;3:保留;4:废除）
             var entitys =  await _procMaterialRepository.GetByIdsAsync(idsArr);
-            if (entitys.Where(x => statusArr.Contains(x.Status.Value)).ToList().Count>0) 
+            if (entitys.Where(x => (SysDataStatusEnum.Enable|SysDataStatusEnum.Retain).HasFlag(x.Status)).ToList().Count>0) 
             {
                 throw new BusinessException(ErrorCode.MES10212);
             }
@@ -292,48 +293,47 @@ namespace Hymson.MES.Services.Services.Process
                 foreach (var item in procMaterialModifyDto.DynamicList)
                 {
                     ProcReplaceMaterialEntity procReplaceMaterial = new ProcReplaceMaterialEntity();
-                    switch (item.OperationType)
-                    {
-                        case 1:
-                            procReplaceMaterial = item.ToEntity<ProcReplaceMaterialEntity>();
-                            procReplaceMaterial.Id= IdGenProvider.Instance.CreateId();
-                            procReplaceMaterial.CreatedBy = _currentUser.UserName;
-                            procReplaceMaterial.CreatedOn = HymsonClock.Now();
-                            procReplaceMaterial.IsUse = item.IsEnabled;
-                            procReplaceMaterial.ReplaceMaterialId = (long)item.MaterialId;
-                            procReplaceMaterial.MaterialId = procMaterialEntity.Id;
-                            procReplaceMaterial.SiteId = _currentSite.SiteId??0;
-                            addProcReplaceList.Add(procReplaceMaterial);
-                            break;
-                        case 2:
-                            procReplaceMaterial = item.ToEntity<ProcReplaceMaterialEntity>();  //item.Adapt<ProcReplaceMaterial>().ToUpdate();
-                            procReplaceMaterial.UpdatedBy = _currentUser.UserName;
-                            procReplaceMaterial.UpdatedOn = HymsonClock.Now();
-                            if (item.Id == item.MaterialId)
-                            {
-                                var modelReplaceMaterial = await _procReplaceMaterialRepository.GetByIdAsync(item.Id);
-                                if (modelReplaceMaterial != null)
-                                {
-                                    procReplaceMaterial.ReplaceMaterialId = modelReplaceMaterial.ReplaceMaterialId;
-                                }
-                            }
-                            else
-                            {
-                                procReplaceMaterial.ReplaceMaterialId = (long)item.MaterialId;
-                            }
-                            procReplaceMaterial.IsUse = item.IsEnabled;
-                            procReplaceMaterial.MaterialId = procMaterialEntity.Id;
-                            updateProcReplaceList.Add(procReplaceMaterial);
-                            break;
-                        case 3:
-                            if (item.MaterialId != null && item.MaterialId > 0)
-                            {
-                                deleteeProcReplaceIds.Add(item.MaterialId ?? 0);
-                            }
-                            break;
-                        //default:
-                        //    throw new DataException(ErrorCode.MES10207).WithData("operationType", item.OperationType);
-                    }
+                    //switch (item.OperationType)
+                    //{
+                        //TODO  不管是新增，更新，删除    都是先真删除之后再新增
+                        //case OperateTypeEnum.Add:
+                        //    procReplaceMaterial = item.ToEntity<ProcReplaceMaterialEntity>();
+                        //    procReplaceMaterial.Id= IdGenProvider.Instance.CreateId();
+                        //    procReplaceMaterial.CreatedBy = _currentUser.UserName;
+                        //    procReplaceMaterial.CreatedOn = HymsonClock.Now();
+                        //    procReplaceMaterial.IsUse = item.IsEnabled;
+                        //    procReplaceMaterial.ReplaceMaterialId = (long)item.MaterialId;
+                        //    procReplaceMaterial.MaterialId = procMaterialEntity.Id;
+                        //    procReplaceMaterial.SiteId = _currentSite.SiteId??0;
+                        //    addProcReplaceList.Add(procReplaceMaterial);
+                        //    break;
+                        //case OperateTypeEnum.Edit:
+                        //    procReplaceMaterial = item.ToEntity<ProcReplaceMaterialEntity>();  //item.Adapt<ProcReplaceMaterial>().ToUpdate();
+                        //    procReplaceMaterial.UpdatedBy = _currentUser.UserName;
+                        //    procReplaceMaterial.UpdatedOn = HymsonClock.Now();
+                        //    if (item.Id == item.MaterialId)
+                        //    {
+                        //        var modelReplaceMaterial = await _procReplaceMaterialRepository.GetByIdAsync(item.Id);
+                        //        if (modelReplaceMaterial != null)
+                        //        {
+                        //            procReplaceMaterial.ReplaceMaterialId = modelReplaceMaterial.ReplaceMaterialId;
+                        //        }
+                        //    }
+                        //    else
+                        //    {
+                        //        procReplaceMaterial.ReplaceMaterialId = (long)item.MaterialId;
+                        //    }
+                        //    procReplaceMaterial.IsUse = item.IsEnabled;
+                        //    procReplaceMaterial.MaterialId = procMaterialEntity.Id;
+                        //    updateProcReplaceList.Add(procReplaceMaterial);
+                        //    break;
+                        //case 3:
+                        //    if (item.MaterialId != null && item.MaterialId > 0)
+                        //    {
+                        //        deleteeProcReplaceIds.Add(item.MaterialId ?? 0);
+                        //    }
+                        //    break;
+                    //}
                 }
             }
             #endregion 
