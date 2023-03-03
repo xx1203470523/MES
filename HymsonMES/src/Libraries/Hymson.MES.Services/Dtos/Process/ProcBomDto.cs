@@ -89,11 +89,6 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public record ProcBomCreateDto : BaseEntityDto
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public long Id { get; set; }
-
        /// <summary>
         /// BOM
         /// </summary>
@@ -107,7 +102,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; }
+        public int Status { get; set; }
 
        /// <summary>
         /// 版本
@@ -123,31 +118,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 说明
         /// </summary>
         public string Remark { get; set; }
-
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-       /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-       /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public bool? IsDeleted { get; set; }
 
         /// <summary>
         /// 物料集合，包含替代物料
@@ -161,14 +131,9 @@ namespace Hymson.MES.Services.Dtos.Process
     public record ProcBomModifyDto : BaseEntityDto
     {
         /// <summary>
-        /// 
+        /// 主键id
         /// </summary>
         public long Id { get; set; }
-
-       /// <summary>
-        /// BOM
-        /// </summary>
-        public string BomCode { get; set; }
 
        /// <summary>
         /// BOM名称
@@ -178,12 +143,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; }
-
-       /// <summary>
-        /// 版本
-        /// </summary>
-        public string Version { get; set; }
+        public int Status { get; set; }
 
        /// <summary>
         /// 是否当前版本
@@ -194,31 +154,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 说明
         /// </summary>
         public string Remark { get; set; }
-
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-       /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-       /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public bool? IsDeleted { get; set; }
 
         /// <summary>
         /// 物料集合，包含替代物料
@@ -240,23 +175,23 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 描述 :BomName 
         /// 空值 : false  
         /// </summary>
-        public string BomCode { get; set; }
+        public string? BomCode { get; set; }
 
         /// <summary>
         /// 描述 :BomName名称 
         /// 空值 : false  
         /// </summary>
-        public string BomName { get; set; }
+        public string? BomName { get; set; }
 
         /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; }
+        public int? Status { get; set; }
 
         /// <summary>
         /// 版本
         /// </summary>
-        public string Version { get; set; }
+        public string? Version { get; set; }
     }
 
     /// <summary>

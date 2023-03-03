@@ -47,7 +47,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Route("pagelist")]
         public async Task<PagedInfo<ProcBomDto>> QueryPagedProcBomAsync([FromQuery] ProcBomPagedQueryDto parm)
         {

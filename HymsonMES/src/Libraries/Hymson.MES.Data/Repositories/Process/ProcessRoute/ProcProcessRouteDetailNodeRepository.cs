@@ -123,12 +123,8 @@ namespace Hymson.MES.Data.Repositories.Process
         const string InsertSql = "INSERT INTO `proc_process_route_detail_node`(  `Id`, `SiteId`, `ProcessRouteId`, `SerialNo`, `ProcedureId`, `CheckType`, `CheckRate`, `IsWorkReport`, `PackingLevel`, `IsFirstProcess`, `Status`, `Extra1`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ProcessRouteId, @SerialNo, @ProcedureId, @CheckType, @CheckRate, @IsWorkReport, @PackingLevel, @IsFirstProcess, @Status, @Extra1, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string UpdateSql = "UPDATE `proc_process_route_detail_node` SET    ProcessRouteId = @ProcessRouteId, SerialNo = @SerialNo, ProcedureId = @ProcedureId, CheckType = @CheckType, CheckRate = @CheckRate, IsWorkReport = @IsWorkReport, PackingLevel = @PackingLevel, IsFirstProcess = @IsFirstProcess, Status = @Status, Extra1 = @Extra1, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_process_route_detail_node` SET IsDeleted = '1' WHERE Id in @ids";
-        const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteId`, `ProcessRouteId`, `SerialNo`, `ProcedureBomId`, `CheckType`, `CheckRate`, `IsWorkReport`, `PackingLevel`, `IsFirstProcess`, `Status`, `Extra1`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `proc_process_route_detail_node`  WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteId`, `ProcessRouteId`, `SerialNo`, `ProcedureBomId`, `CheckType`, `CheckRate`, `IsWorkReport`, `PackingLevel`, `IsFirstProcess`, `Status`, `Extra1`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `proc_process_route_detail_node`  WHERE Id IN @ids ";
+        const string GetByIdSql = @"SELECT * FROM `proc_process_route_detail_node`  WHERE Id = @Id ";
+        const string GetByIdsSql = @"SELECT * FROM `proc_process_route_detail_node`  WHERE Id IN @ids ";
         const string DeleteByProcessRouteIdSql = "delete from `proc_process_route_detail_node` WHERE ProcessRouteId = @ProcessRouteId ";
     }
 }

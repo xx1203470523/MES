@@ -396,7 +396,7 @@ namespace Hymson.MES.Services.Services.Process
                 SiteId = model.SiteId,
                 ProcessRouteId = model.Id,
                 SerialNo = s.SerialNo,
-                ProcedureId = s.ProcedureBomId,
+                ProcedureId = s.ProcedureId,
                 CheckType = s.CheckType,
                 CheckRate = s.CheckRate,
                 IsWorkReport = s.IsWorkReport,
