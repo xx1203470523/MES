@@ -186,7 +186,15 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// <returns></returns>
         public async Task<EquConsumableTypeDto> GetDetailAsync(long id)
         {
-            return (await _equConsumableTypeRepository.GetByIdAsync(id)).ToModel<EquConsumableTypeDto>();
+            EquConsumableTypeDto dto = new();
+            var entity = await _equConsumableTypeRepository.GetByIdAsync(id);
+            if (entity != null)
+            {
+                dto = entity.ToModel<EquConsumableTypeDto>();
+                dto.ConsumableTypeCode = entity.SparePartTypeCode;
+                dto.ConsumableTypeName = entity.SparePartTypeName;
+            }
+            return dto;
         }
 
     }
