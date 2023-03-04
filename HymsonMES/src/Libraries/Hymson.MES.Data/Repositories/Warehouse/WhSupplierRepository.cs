@@ -10,9 +10,13 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using Mysqlx.Crud;
+using Org.BouncyCastle.Crypto;
 
 namespace Hymson.MES.Data.Repositories.Warehouse
 {
@@ -44,10 +48,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] ids)
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeletesSql, new { ids = ids });
+            return await conn.ExecuteAsync(DeletesSql, param);
 
         }
 
@@ -88,10 +92,12 @@ namespace Hymson.MES.Data.Repositories.Warehouse
 
             if (!string.IsNullOrWhiteSpace(whSupplierPagedQuery.Code))
             {
+                whSupplierPagedQuery.Code = $"%{whSupplierPagedQuery.Code}%";
                 sqlBuilder.Where("Code=@Code");
             }
             if (!string.IsNullOrWhiteSpace(whSupplierPagedQuery.Name))
             {
+                whSupplierPagedQuery.Name = $"%{whSupplierPagedQuery.Name}%";
                 sqlBuilder.Where("Name=@Name");
             }
 
@@ -116,11 +122,30 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         public async Task<IEnumerable<WhSupplierEntity>> GetWhSupplierEntitiesAsync(WhSupplierQuery whSupplierQuery)
         {
-            var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetWhSupplierEntitiesSqlTemplate);
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var whSupplierEntities = await conn.QueryAsync<WhSupplierEntity>(template.RawSql, whSupplierQuery);
-            return whSupplierEntities;
+            try
+            {
+                var sqlBuilder = new SqlBuilder();
+                var template = sqlBuilder.AddTemplate(GetWhSupplierEntitiesSqlTemplate);
+                sqlBuilder.Select("*");
+                if (!string.IsNullOrWhiteSpace(whSupplierQuery.Code))
+                {
+                    sqlBuilder.Where("Code=@Code");
+                }
+                if (!string.IsNullOrWhiteSpace(whSupplierQuery.Name))
+                {
+                    sqlBuilder.Where("Name=@Name");
+                }
+
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                var whSupplierEntities = await conn.QueryAsync<WhSupplierEntity>(template.RawSql, whSupplierQuery);
+                return whSupplierEntities;
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+
         }
 
         /// <summary>
@@ -173,21 +198,22 @@ namespace Hymson.MES.Data.Repositories.Warehouse
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `wh_supplier` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `wh_supplier` /**where**/ ";
-        const string GetWhSupplierEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM `wh_supplier` /**where**/  ";
+        const string GetWhSupplierEntitiesSqlTemplate = @"SELECT  
+                                             /**select**/
+                                            FROM  `wh_supplier`  /**where**/   ";
 
         const string InsertSql = "INSERT INTO `wh_supplier`(  `Id`, `Code`, `Name`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string InsertsSql = "INSERT INTO `wh_supplier`(  `Id`, `Code`, `Name`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string UpdateSql = "UPDATE `wh_supplier` SET   Code = @Code, Name = @Name, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `wh_supplier` SET   Code = @Code, Name = @Name, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `wh_supplier` SET IsDeleted = '1' WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE `wh_supplier` SET IsDeleted = '1' WHERE Id in @ids";
+        const string DeleteSql = "UPDATE `wh_supplier` SET IsDeleted = Id WHERE Id = @Id ";
+        const string DeletesSql = "UPDATE `wh_supplier` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids";
         const string GetByIdSql = @"SELECT 
                                `Id`, `Code`, `Name`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `wh_supplier`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `Code`, `Name`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
-                            FROM `wh_supplier`  WHERE Id IN @ids ";
+                            FROM `wh_supplier`  WHERE Id IN @ids "
+        ;
     }
 }

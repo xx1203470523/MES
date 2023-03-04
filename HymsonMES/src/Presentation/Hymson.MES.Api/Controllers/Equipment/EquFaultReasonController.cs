@@ -98,7 +98,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         public async Task<int> DeleteEquFaultReasonAsync([FromBody] long[] ids)
         {
             //long[] idsArr = StringExtension.SpitLongArrary(ids);
-            return await _EquFaultReasonService.DeletesEquFaultReasonAsync(string.Join(",", ids));
+            return await _EquFaultReasonService.DeletesEquFaultReasonAsync(ids);
         }
 
     }

@@ -7,13 +7,14 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Data.Repositories.Common.Command;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.Data.Repositories.Equipment 
+namespace Hymson.MES.Data.Repositories.Equipment
 {
     /// <summary>
     /// 设备故障原因表仓储接口
@@ -26,7 +27,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="EquFaultReasonEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(EquFaultReasonEntity EquFaultReasonEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -40,7 +41,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="EquFaultReasonEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(EquFaultReasonEntity EquFaultReasonEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -54,13 +55,13 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<int> DeletesAsync(long[] ids);
+        Task<int> DeletesAsync(DeleteCommand param);
 
         /// <summary>
         /// 根据ID获取数据
@@ -68,7 +69,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         Task<EquFaultReasonEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -82,7 +83,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="EquFaultReasonQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<EquFaultReasonEntity>> GetEquFaultReasonEntitiesAsync(EquFaultReasonQuery EquFaultReasonQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>

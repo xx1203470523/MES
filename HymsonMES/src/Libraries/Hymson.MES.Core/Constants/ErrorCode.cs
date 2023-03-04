@@ -175,7 +175,7 @@
         #region 故障原因 13000
         public const string MES13000 = "基础故障原因错误";
         public const string MES13001 = "站点码获取失败，请重新登录！";
-        public const string MES13002 = "此故障原因编码{FaultReasonCode}在系统已经存在！"; 
+        public const string MES13002 = "此故障原因编码{FaultReasonCode}在系统已经存在！";
         public const string MES13003 = "请求实体不能为空！";
         public const string MES13004 = "此标准故障原因不存在！";
         public const string MES13005 = "删除失败Ids 不能为空";
@@ -183,7 +183,22 @@
         public const string MES13007 = "修改故障原因关联类型失败!";
         public const string MES13008 = "故障原因状态不能为空";
         public const string MES13009 = "故障原因编码不能为空";
-        public const string MES13010 = "故障原因名称不能为空"; 
+        public const string MES13010 = "故障原因名称不能为空";
+
+        #endregion
+
+
+        //库存
+        #region 供应商库存  15000
+        public const string MES15000 = "基础参数错误";
+        public const string MES15001 = "站点码获取失败，请重新登录！";
+        public const string MES15002 = "此供应商编码{Code}在系统已经存在！";
+        public const string MES15003 = "请求实体不能为空！";
+        public const string MES15005 = "删除失败Ids 不能为空";
+        public const string MES15006 = "供应商编码不能为空";
+        public const string MES15007 = "供应商名称不能为空";
+        public const string MES15008 = "此供应商编码{Code}不符合规则，字母/数字！";
+
 
         #endregion
         #endregion

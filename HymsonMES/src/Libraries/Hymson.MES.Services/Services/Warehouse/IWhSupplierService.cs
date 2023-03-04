@@ -53,7 +53,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<int> DeletesWhSupplierAsync(string ids);
+        Task<int> DeletesWhSupplierAsync(long[] ids);
 
         /// <summary>
         /// 根据ID查询
