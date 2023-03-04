@@ -1,9 +1,11 @@
 ﻿using FluentValidation;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Dtos.Quality;
+using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.MES.Services.Options;
 using Hymson.MES.Services.Services.EquEquipmentGroup;
 using Hymson.MES.Services.Services.Equipment;
@@ -20,10 +22,12 @@ using Hymson.MES.Services.Services.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.MES.Services.Services.Quality;
 using Hymson.MES.Services.Services.Quality.IQualityService;
+using Hymson.MES.Services.Services.Warehouse;
 using Hymson.MES.Services.Validators.Equipment;
 using Hymson.MES.Services.Validators.Integrated;
 using Hymson.MES.Services.Validators.Process;
 using Hymson.MES.Services.Validators.Quality;
+using Hymson.MES.Services.Validators.Warehouse;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -113,6 +117,12 @@ namespace Microsoft.Extensions.DependencyInjection
             #region Quality
             services.AddSingleton<IQualUnqualifiedCodeService, QualUnqualifiedCodeService>();
             services.AddSingleton<IQualUnqualifiedGroupService, QualUnqualifiedGroupService>();
+            #endregion
+
+            #region Warehouse 
+            services.AddSingleton<IWhSupplierService, WhSupplierService>();
+
+
             #endregion
 
             return services;
@@ -207,6 +217,14 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<QualUnqualifiedCodeModifyDto>, QualUnqualifiedCodeModifyValidator>();
             services.AddSingleton<AbstractValidator<QualUnqualifiedGroupCreateDto>, QualUnqualifiedGroupCreateValidator>();
             services.AddSingleton<AbstractValidator<QualUnqualifiedGroupModifyDto>, QualUnqualifiedGroupModifyValidator>();
+            #endregion
+
+            #region Warehouse 
+
+            services.AddSingleton<AbstractValidator<WhSupplierCreateDto>, WhSupplierCreateValidator>();
+            services.AddSingleton<AbstractValidator<WhSupplierModifyDto>, WhSupplierModifyValidator>();
+
+
             #endregion
 
             return services;

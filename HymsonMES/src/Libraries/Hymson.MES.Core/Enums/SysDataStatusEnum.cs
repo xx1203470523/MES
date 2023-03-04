@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Hymson.MES.Core.Enums
 {
-    public enum SysDataStatusEnum:short
+    public enum SysDataStatusEnum : short
     {
         /// <summary>
         /// 新建

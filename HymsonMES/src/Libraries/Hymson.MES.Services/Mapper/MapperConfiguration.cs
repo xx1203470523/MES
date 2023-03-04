@@ -3,6 +3,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
@@ -16,9 +17,11 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Process.ResourceType.View;
+using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.Services.Dtos.Warehouse;
 
 namespace Hymson.MES.Services.Mapper
 {
@@ -118,7 +121,7 @@ namespace Hymson.MES.Services.Mapper
             #region EquFaultReason
             CreateMap<EquFaultReasonCreateDto, EquFaultReasonEntity>();
             CreateMap<EquFaultReasonModifyDto, EquFaultReasonEntity>();
-            CreateMap<EquFaultReasonPagedQueryDto, EquFaultReasonPagedQuery>(); 
+            CreateMap<EquFaultReasonPagedQueryDto, EquFaultReasonPagedQuery>();
             CreateMap<EquFaultReasonEntity, EquFaultReasonDto>();
             CreateMap<EquFaultReasonEntity, CustomEquFaultReasonDto>();
             #endregion
@@ -270,6 +273,13 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcProcessRouteModifyDto, ProcProcessRouteEntity>();
             CreateMap<ProcProcessRouteDetailNodeView, ProcProcessRouteDetailNodeViewDto>();
             CreateMap<ProcProcessRouteDetailLinkEntity, ProcProcessRouteDetailLinkDto>();
+            #endregion
+
+            #region Warehouse
+            CreateMap<WhSupplierCreateDto, WhSupplierEntity>();
+            CreateMap<WhSupplierModifyDto, WhSupplierEntity>();
+            CreateMap<WhSupplierPagedQueryDto, WhSupplierPagedQuery>();
+            CreateMap<WhSupplierEntity, WhSupplierDto>();
             #endregion
         }
 
