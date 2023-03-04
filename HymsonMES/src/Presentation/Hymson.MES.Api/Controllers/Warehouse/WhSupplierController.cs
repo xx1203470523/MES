@@ -48,7 +48,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <returns></returns>
         [HttpPost]
         [Route("pagelist")]
-        public async Task<PagedInfo<WhSupplierDto>> QueryPagedWhSupplierAsync([FromQuery] WhSupplierPagedQueryDto parm)
+        public async Task<PagedInfo<WhSupplierDto>> QueryPagedWhSupplierAsync(WhSupplierPagedQueryDto parm)
         {
             return await _whSupplierService.GetPageListAsync(parm);
         }
@@ -73,7 +73,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         [Route("create")]
         public async Task AddWhSupplierAsync([FromBody] WhSupplierCreateDto parm)
         {
-             await _whSupplierService.CreateWhSupplierAsync(parm);
+            await _whSupplierService.CreateWhSupplierAsync(parm);
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         [Route("update")]
         public async Task UpdateWhSupplierAsync([FromBody] WhSupplierModifyDto parm)
         {
-             await _whSupplierService.ModifyWhSupplierAsync(parm);
+            await _whSupplierService.ModifyWhSupplierAsync(parm);
         }
 
         /// <summary>
@@ -95,9 +95,8 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <returns></returns>
         [HttpPost]
         [Route("delete")]
-        public async Task DeleteWhSupplierAsync(string ids)
+        public async Task DeleteWhSupplierAsync([FromBody] long[] ids)
         {
-            //long[] idsArr = StringExtension.SpitLongArrary(ids);
             await _whSupplierService.DeletesWhSupplierAsync(ids);
         }
 

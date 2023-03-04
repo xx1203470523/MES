@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,7 +44,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 参数单位（字典定义）
         /// </summary>
-        public int ParameterUnit { get; set; }
+        public ParameterUnitEnum ParameterUnit { get; set; }
 
        /// <summary>
         /// 说明
@@ -86,7 +87,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 类型   1 设备  2 产品  3 设备+产品  4 环境  等等
         /// </summary>
-        public int Type { get; set; }
+        public ParameterTypeShowEnum Type { get; set; }
     }
 
 
@@ -118,7 +119,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 参数单位（字典定义）
         /// </summary>
-        public int ParameterUnit { get; set; }
+        public ParameterUnitEnum ParameterUnit { get; set; }
 
         /// <summary>
         /// 说明
@@ -155,7 +156,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 参数单位（字典定义）
         /// </summary>
-        public int ParameterUnit { get; set; }
+        public ParameterUnitEnum ParameterUnit { get; set; }
 
         /// <summary>
         /// 说明

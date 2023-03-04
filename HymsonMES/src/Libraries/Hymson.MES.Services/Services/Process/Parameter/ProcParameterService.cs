@@ -13,6 +13,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
@@ -78,7 +79,7 @@ namespace Hymson.MES.Services.Services.Process
             });
             if (exists != null && exists.Count() > 0) 
             {
-                throw new BusinessException(ErrorCode.MES10502).WithData("parameterCode", procParameterEntity.ParameterCode);
+                throw new BusinessException(nameof(ErrorCode.MES10502)).WithData("parameterCode", procParameterEntity.ParameterCode);
             }
 
             //入库
@@ -104,14 +105,14 @@ namespace Hymson.MES.Services.Services.Process
         {
             if (idsArr.Length < 1)
             {
-                throw new ValidationException(ErrorCode.MES10505);
+                throw new ValidationException(nameof(ErrorCode.MES10505));
             }
 
             //查询参数是否关联产品参数和设备参数
             var lists= await _procParameterLinkTypeRepository.GetByParameterIdsAsync(idsArr);
             if (lists!=null&&lists.Count() > 0)
             {
-                throw new BusinessException(ErrorCode.MES10506);
+                throw new BusinessException(nameof(ErrorCode.MES10506));
             }
 
             return await _procParameterRepository.DeletesAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
@@ -160,7 +161,7 @@ namespace Hymson.MES.Services.Services.Process
         {
             if (procParameterModifyDto == null)
             {
-                throw new ValidationException(ErrorCode.MES10503);
+                throw new ValidationException(nameof(ErrorCode.MES10503));
             }
 
             //DTO转换实体
@@ -175,7 +176,7 @@ namespace Hymson.MES.Services.Services.Process
             var modelOrigin = await _procParameterRepository.GetByIdAsync(procParameterEntity.Id);
             if (modelOrigin == null)
             {
-                throw new BusinessException(ErrorCode.MES10504);
+                throw new BusinessException(nameof(ErrorCode.MES10504));
             }
             //判断编号是否已经存在
             var exists = (await _procParameterRepository.GetProcParameterEntitiesAsync(new ProcParameterQuery()
@@ -185,7 +186,7 @@ namespace Hymson.MES.Services.Services.Process
             })).Where(x=>x.Id!= procParameterEntity.Id).ToList();
             if (exists != null && exists.Count() > 0)
             {
-                throw new BusinessException(ErrorCode.MES10502).WithData("parameterCode", procParameterEntity.ParameterCode);
+                throw new BusinessException(nameof(ErrorCode.MES10502)).WithData("parameterCode", procParameterEntity.ParameterCode);
             }
 
             await _procParameterRepository.UpdateAsync(procParameterEntity);
@@ -209,7 +210,7 @@ namespace Hymson.MES.Services.Services.Process
                    SiteId = siteId,
                    ParameterID= dto.Id
                });
-               dto.Type = linkTypes.GroupBy(x => x.ParameterType).Select(x => x.Key).ToList().Sum();
+               dto.Type = (ParameterTypeShowEnum)linkTypes.GroupBy(x => x.ParameterType).Select(x => (int)x.Key).ToList().Sum();
 
                 return dto;
            }

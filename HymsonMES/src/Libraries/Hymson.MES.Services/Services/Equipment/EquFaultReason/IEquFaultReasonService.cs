@@ -53,7 +53,7 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<int> DeletesEquFaultReasonAsync(string ids);
+        Task<int> DeletesEquFaultReasonAsync(long[] idsArr);
 
         /// <summary>
         /// 根据ID查询

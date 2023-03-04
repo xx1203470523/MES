@@ -10,10 +10,11 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
-namespace Hymson.MES.Data.Repositories.Equipment 
+namespace Hymson.MES.Data.Repositories.Equipment
 {
     /// <summary>
     /// 设备故障原因表仓储
@@ -43,10 +44,10 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] ids) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeletesSql, new { ids=ids });
+            return await conn.ExecuteAsync(DeletesSql, param);
 
         }
 
@@ -58,7 +59,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         public async Task<EquFaultReasonEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<EquFaultReasonEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<EquFaultReasonEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -66,10 +67,10 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<EquFaultReasonEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<EquFaultReasonEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<EquFaultReasonEntity>(GetByIdsSql, new { ids = ids});
+            return await conn.QueryAsync<EquFaultReasonEntity>(GetByIdsSql, new { ids = ids });
         }
 
         /// <summary>
@@ -131,7 +132,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
 
-            if (EquFaultReasonQuery.SiteId!=0)
+            if (EquFaultReasonQuery.SiteId != 0)
             {
                 sqlBuilder.Where(" SiteId=@SiteId ");
             }
@@ -204,8 +205,8 @@ namespace Hymson.MES.Data.Repositories.Equipment
         const string InsertsSql = "INSERT INTO `equ_fault_reason`(  `Id`, `SiteId`, `FaultReasonCode`, `FaultReasonName`, `UseStatus`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @FaultReasonCode, @FaultReasonName, @UseStatus, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string UpdateSql = "UPDATE `equ_fault_reason` SET  UseStatus = @UseStatus, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `equ_fault_reason` SET   SiteId = @SiteId, FaultReasonCode = @FaultReasonCode, FaultReasonName = @FaultReasonName, UseStatus = @UseStatus, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `equ_fault_reason` SET IsDeleted = '1' WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE `equ_fault_reason` SET IsDeleted = '1' WHERE Id in @ids";
+        const string DeleteSql = "UPDATE `equ_fault_reason` SET IsDeleted = Id WHERE Id = @Id  ";
+        const string DeletesSql = "UPDATE `equ_fault_reason` SET IsDeleted = Id  UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteId`, `FaultReasonCode`, `FaultReasonName`, `UseStatus`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `equ_fault_reason`  WHERE Id = @Id ";

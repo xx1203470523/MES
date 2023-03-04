@@ -179,6 +179,21 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
 
+            if (pagedQuery.EquipmentType.HasValue == true)
+            {
+                sqlBuilder.Where("EquipmentType = @EquipmentType");
+            }
+
+            if (pagedQuery.UseStatus.HasValue == true)
+            {
+                sqlBuilder.Where("UseStatus = @UseStatus");
+            }
+
+            if (pagedQuery.UseDepartment.HasValue == true)
+            {
+                sqlBuilder.Where("UseDepartment = @UseDepartment");
+            }
+
             if (string.IsNullOrWhiteSpace(pagedQuery.EquipmentCode) == false)
             {
                 pagedQuery.EquipmentCode = $"%{pagedQuery.EquipmentCode}%";
@@ -191,25 +206,10 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
                 sqlBuilder.Where("EquipmentName LIKE @EquipmentName");
             }
 
-            if (pagedQuery.EquipmentType > DbDefaultValueConstant.IntDefaultValue)
-            {
-                sqlBuilder.Where("EquipmentType = @EquipmentType");
-            }
-
-            if (pagedQuery.UseStatus > DbDefaultValueConstant.IntDefaultValue)
-            {
-                sqlBuilder.Where("UseStatus = @UseStatus");
-            }
-
             if (string.IsNullOrWhiteSpace(pagedQuery.WorkCenterShopName) == false)
             {
                 pagedQuery.WorkCenterShopName = $"%{pagedQuery.WorkCenterShopName}%";
                 sqlBuilder.Where("WorkCenterShopName LIKE @WorkCenterShopName");
-            }
-
-            if (pagedQuery.UseDepartment > DbDefaultValueConstant.IntDefaultValue)
-            {
-                sqlBuilder.Where("UseDepartment = @UseDepartment");
             }
 
             if (string.IsNullOrWhiteSpace(pagedQuery.Location) == false)
