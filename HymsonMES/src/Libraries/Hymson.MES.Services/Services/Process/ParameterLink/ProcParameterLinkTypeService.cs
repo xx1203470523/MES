@@ -57,7 +57,7 @@ namespace Hymson.MES.Services.Services.Process
             //检查SiteId
             if (_currentSite.SiteId==0|| _currentSite.SiteId==null)
             {
-                throw new BusinessException(ErrorCode.MES10101);
+                throw new BusinessException(nameof(ErrorCode.MES10101));
             }
 
             //验证DTO
@@ -104,7 +104,7 @@ namespace Hymson.MES.Services.Services.Process
         {
             if (idsArr.Length < 1)
             {
-                throw new ValidationException(ErrorCode.MES10100);
+                throw new ValidationException(nameof(ErrorCode.MES10100));
             }
 
             return await _procParameterLinkTypeRepository.DeletesAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
@@ -168,13 +168,13 @@ namespace Hymson.MES.Services.Services.Process
         {
             if (procParameterLinkTypeModifyDto == null)
             {
-                throw new ValidationException(ErrorCode.MES10100);
+                throw new ValidationException(nameof(ErrorCode.MES10100));
             }
 
             //检查SiteId
             if (_currentSite.SiteId==0)
             {
-                throw new BusinessException(ErrorCode.MES10101);
+                throw new BusinessException(nameof(ErrorCode.MES10101));
             }
 
             //验证DTO
@@ -219,7 +219,7 @@ namespace Hymson.MES.Services.Services.Process
                     response = await _procParameterLinkTypeRepository.InsertsAsync(adds);
                     if (response == 0) 
                     {
-                        throw new BusinessException(ErrorCode.MES10507);
+                        throw new BusinessException(nameof(ErrorCode.MES10507));
                     }
                 }
 
@@ -228,14 +228,14 @@ namespace Hymson.MES.Services.Services.Process
                     response = await _procParameterLinkTypeRepository.DeletesTrueAsync(deletes.Select(x => x.Id).ToArray());
                     if (response == 0)
                     {
-                        throw new BusinessException(ErrorCode.MES10507);
+                        throw new BusinessException(nameof(ErrorCode.MES10507));
                     }
                 }
 
                 response = await _procParameterLinkTypeRepository.UpdatesAsync(links);
                 if (response == 0)
                 {
-                    throw new BusinessException(ErrorCode.MES10507);
+                    throw new BusinessException(nameof(ErrorCode.MES10507));
                 }
 
                 ts.Complete();

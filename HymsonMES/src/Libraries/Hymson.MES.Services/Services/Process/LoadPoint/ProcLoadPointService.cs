@@ -64,28 +64,28 @@ namespace Hymson.MES.Services.Services.Process
         {
             if (procLoadPointCreateDto == null) 
             {
-                throw new ValidationException(ErrorCode.MES10100);
+                throw new ValidationException(nameof(ErrorCode.MES10100));
             }
 
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procLoadPointCreateDto);
             if (procLoadPointCreateDto.LinkMaterials!=null&&procLoadPointCreateDto.LinkMaterials.Any(a => string.IsNullOrWhiteSpace(a.MaterialId.ToString())))
             {
-                throw new ValidationException(ErrorCode.MES10702);
+                throw new ValidationException(nameof(ErrorCode.MES10702));
             }
             if (procLoadPointCreateDto.LinkMaterials != null && procLoadPointCreateDto.LinkMaterials.Any(a => string.IsNullOrWhiteSpace(a.MaterialCode)))
             {
-                throw new ValidationException(ErrorCode.MES10702);
+                throw new ValidationException(nameof(ErrorCode.MES10702));
             }
 
             if (procLoadPointCreateDto.LinkResources != null && procLoadPointCreateDto.LinkResources.Any(a => string.IsNullOrWhiteSpace(a.ResourceId.ToString())))
             {
-                throw new ValidationException(ErrorCode.MES10703);
+                throw new ValidationException(nameof(ErrorCode.MES10703));
             }
 
             if (procLoadPointCreateDto.LinkResources != null && procLoadPointCreateDto.LinkResources.Any(a => string.IsNullOrWhiteSpace(a.ResCode)))
             {
-                throw new ValidationException(ErrorCode.MES10703);
+                throw new ValidationException(nameof(ErrorCode.MES10703));
             }
 
             //DTO转换实体
@@ -106,7 +106,7 @@ namespace Hymson.MES.Services.Services.Process
             })).Any();  
             if (isExists == true)
             {
-                throw new BusinessException(ErrorCode.MES10701).WithData("LoadPoint", procLoadPointEntity.LoadPoint);
+                throw new BusinessException(nameof(ErrorCode.MES10701)).WithData("LoadPoint", procLoadPointEntity.LoadPoint);
             }
 
             #endregion
@@ -157,7 +157,7 @@ namespace Hymson.MES.Services.Services.Process
 
                 if (response == 0) 
                 {
-                    throw new BusinessException(ErrorCode.MES10704);
+                    throw new BusinessException(nameof(ErrorCode.MES10704));
                 }
 
                 if (linkMaterials.Count > 0)
@@ -166,7 +166,7 @@ namespace Hymson.MES.Services.Services.Process
 
                     if (response <= 0) 
                     {
-                        throw new BusinessException(ErrorCode.MES10704);
+                        throw new BusinessException(nameof(ErrorCode.MES10704));
                     }
                 }
                 if (linkResources.Count > 0)
@@ -175,7 +175,7 @@ namespace Hymson.MES.Services.Services.Process
 
                     if (response <= 0)
                     {
-                        throw new BusinessException(ErrorCode.MES10704);
+                        throw new BusinessException(nameof(ErrorCode.MES10704));
                     }
                 }
 
@@ -202,13 +202,13 @@ namespace Hymson.MES.Services.Services.Process
         {
             if (idsArr.Length < 1)
             {
-                throw new ValidationException(ErrorCode.MES10707);
+                throw new ValidationException(nameof(ErrorCode.MES10707));
             }
 
             var loadPoints= await _procLoadPointRepository.GetByIdsAsync(idsArr);
             if (loadPoints.Any(x => (SysDataStatusEnum.Enable == x.Status || SysDataStatusEnum.Retain == x.Status)))
             {
-                throw new BusinessException(ErrorCode.MES10709);
+                throw new BusinessException(nameof(ErrorCode.MES10709));
             }
 
             int response = 0;
@@ -218,7 +218,7 @@ namespace Hymson.MES.Services.Services.Process
                 response = await _procLoadPointRepository.DeletesAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
                 if (response <= 0)
                 {
-                    throw new BusinessException(ErrorCode.MES10708);
+                    throw new BusinessException(nameof(ErrorCode.MES10708));
                 }
 
                 await _procLoadPointLinkMaterialRepository.DeletesByLoadPointIdTrueAsync(idsArr);
@@ -272,28 +272,28 @@ namespace Hymson.MES.Services.Services.Process
         {
             if (procLoadPointModifyDto == null)
             {
-                throw new ValidationException(ErrorCode.MES10100);
+                throw new ValidationException(nameof(ErrorCode.MES10100));
             }
 
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(procLoadPointModifyDto);
             if (procLoadPointModifyDto.LinkMaterials != null && procLoadPointModifyDto.LinkMaterials.Any(a => string.IsNullOrWhiteSpace(a.MaterialId.ToString())))
             {
-                throw new ValidationException(ErrorCode.MES10702);
+                throw new ValidationException(nameof(ErrorCode.MES10702));
             }
             if (procLoadPointModifyDto.LinkMaterials != null && procLoadPointModifyDto.LinkMaterials.Any(a => string.IsNullOrWhiteSpace(a.MaterialCode)))
             {
-                throw new ValidationException(ErrorCode.MES10702);
+                throw new ValidationException(nameof(ErrorCode.MES10702));
             }
 
             if (procLoadPointModifyDto.LinkResources != null && procLoadPointModifyDto.LinkResources.Any(a => string.IsNullOrWhiteSpace(a.ResourceId.ToString())))
             {
-                throw new ValidationException(ErrorCode.MES10703);
+                throw new ValidationException(nameof(ErrorCode.MES10703));
             }
 
             if (procLoadPointModifyDto.LinkResources != null && procLoadPointModifyDto.LinkResources.Any(a => string.IsNullOrWhiteSpace(a.ResCode)))
             {
-                throw new ValidationException(ErrorCode.MES10703);
+                throw new ValidationException(nameof(ErrorCode.MES10703));
             }
 
             //DTO转换实体
@@ -306,7 +306,7 @@ namespace Hymson.MES.Services.Services.Process
             var modelOrigin = await _procLoadPointRepository.GetByIdAsync(procLoadPointModifyDto.Id);
             if (modelOrigin == null)
             {
-                throw new ValidationException(ErrorCode.MES10705);
+                throw new ValidationException(nameof(ErrorCode.MES10705));
             }
             #endregion
 
@@ -359,7 +359,7 @@ namespace Hymson.MES.Services.Services.Process
 
                 if (response == 0)
                 {
-                    throw new BusinessException(ErrorCode.MES10706);
+                    throw new BusinessException(nameof(ErrorCode.MES10706));
                 }
 
                 await _procLoadPointLinkMaterialRepository.DeletesByLoadPointIdTrueAsync(new long[] { procLoadPointEntity.Id });
@@ -369,7 +369,7 @@ namespace Hymson.MES.Services.Services.Process
 
                     if (response <= 0)
                     {
-                        throw new BusinessException(ErrorCode.MES10706);
+                        throw new BusinessException(nameof(ErrorCode.MES10706));
                     }
                 }
                 await _procLoadPointLinkResourceRepository.DeletesByLoadPointIdTrueAsync(new long[] { procLoadPointEntity.Id });
@@ -379,7 +379,7 @@ namespace Hymson.MES.Services.Services.Process
 
                     if (response <= 0)
                     {
-                        throw new BusinessException(ErrorCode.MES10706);
+                        throw new BusinessException(nameof(ErrorCode.MES10706));
                     }
                 }
                 ts.Complete();

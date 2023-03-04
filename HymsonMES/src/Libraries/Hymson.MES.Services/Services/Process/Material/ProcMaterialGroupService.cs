@@ -85,7 +85,7 @@ namespace Hymson.MES.Services.Services.Process
             var procMaterials = await _procMaterialRepository.GetByIdsAsync(procMaterialIds);
             if (procMaterials.Where(x => x.GroupId != 0).Count() > 0)
             {
-                throw new CustomerValidationException(ErrorCode.MES10217);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10217));
             }
 
             #endregion
@@ -100,7 +100,7 @@ namespace Hymson.MES.Services.Services.Process
 
                 if (response == 0)
                 {
-                    throw new BusinessException(ErrorCode.MES10218);
+                    throw new BusinessException(nameof(ErrorCode.MES10218));
                 }
 
                 foreach (var item in procMaterialList)
@@ -112,7 +112,7 @@ namespace Hymson.MES.Services.Services.Process
 
                 if (response < procMaterialList.Count)
                 {
-                    throw new BusinessException(ErrorCode.MES10218);
+                    throw new BusinessException(nameof(ErrorCode.MES10218));
                 }
 
                 ts.Complete();
@@ -141,14 +141,14 @@ namespace Hymson.MES.Services.Services.Process
         {
             if (idsArr.Length<1)
             {
-                throw new ValidationException(ErrorCode.MES10213);
+                throw new ValidationException(nameof(ErrorCode.MES10213));
             }
 
             //判断物料中是否有当前物料组
             var procMaterials = await _procMaterialRepository.GetByGroupIdsAsync(idsArr);
             if (procMaterials != null && procMaterials.Count() > 0)
             {
-                throw new CustomerValidationException(ErrorCode.MES10221);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10221));
             }
 
             return await _procMaterialGroupRepository.DeletesAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
@@ -232,7 +232,7 @@ namespace Hymson.MES.Services.Services.Process
         {
             if (procMaterialGroupModifyDto == null)
             {
-                throw new ValidationException(ErrorCode.MES10213);
+                throw new ValidationException(nameof(ErrorCode.MES10213));
             }
             // TODO SiteId  procMaterialGroupModifyDto.SiteCode = "";//TODO  App.GetSite();
 
@@ -250,7 +250,7 @@ namespace Hymson.MES.Services.Services.Process
             var procMaterialGroup = await _procMaterialGroupRepository.GetByIdAsync(procMaterialGroupEntity.Id);
             if (procMaterialGroup == null)
             {
-                throw new BusinessException(ErrorCode.MES10219);
+                throw new BusinessException(nameof(ErrorCode.MES10219));
             }
 
             //判断编号是否已存在
@@ -267,7 +267,7 @@ namespace Hymson.MES.Services.Services.Process
             var procMaterials = await _procMaterialRepository.GetByIdsAsync(procMaterialIds);
             if (procMaterials.Where(x => x.GroupId != 0 && x.GroupId != procMaterialGroupEntity.Id).Count() > 0)
             {
-                throw new CustomerValidationException(ErrorCode.MES10217);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10217));
             }
             #endregion
 
@@ -279,7 +279,7 @@ namespace Hymson.MES.Services.Services.Process
 
                 if (response == 0)
                 {
-                    throw new BusinessException(ErrorCode.MES10220);
+                    throw new BusinessException(nameof(ErrorCode.MES10220));
                 }
 
                 //将之前所有该物料组的物料改为未绑定 
@@ -294,7 +294,7 @@ namespace Hymson.MES.Services.Services.Process
                 response = await _procMaterialRepository.UpdateProcMaterialGroupAsync(procMaterialList);
                 if (response < procMaterialList.Count)
                 {
-                    throw new BusinessException(ErrorCode.MES10220);
+                    throw new BusinessException(nameof(ErrorCode.MES10220));
                 }
             }
 

@@ -102,7 +102,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         public async Task<int> DeletesAsync(long[] equipmentIds)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeletesByEquipmentIdSql, new { EquipmentId = equipmentIds });
+            return await conn.ExecuteAsync(DeletesByEquipmentIdSql, new { equipmentIds });
         }
 
         /// <summary>
@@ -194,7 +194,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         const string InsertSql = "INSERT INTO `equ_equipment_link_api`(  `Id`, `EquipmentId`, `ApiUrl`, `ApiType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteCode`) VALUES (   @Id, @EquipmentId, @ApiUrl, @ApiType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteCode )  ";
         const string UpdateSql = "UPDATE `equ_equipment_link_api` SET   EquipmentId = @EquipmentId, ApiUrl = @ApiUrl, ApiType = @ApiType, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, Remark = @Remark, SiteCode = @SiteCode  WHERE Id = @Id ";
         const string SoftDeleteSql = "UPDATE `equ_equipment_link_api` SET `IsDeleted` = 1 WHERE `Id` = @Id;";
-        const string DeletesByEquipmentIdSql = "DELETE `equ_equipment_link_api` WHERE `EquipmentId` = @EquipmentId;";
+        const string DeletesByEquipmentIdSql = "DELETE FROM equ_equipment_link_api WHERE EquipmentId = @equipmentIds;";
         const string GetByIdSql = "SELECT * FROM `equ_equipment_link_api` WHERE `Id` = @Id;";
         const string GetByEquipmentIdSql = "SELECT * FROM `equ_equipment_link_api` WHERE `EquipmentId` = @EquipmentId;";
         const string GetByEquipmentSql = "SELECT * FROM `equ_equipment_link_api` WHERE `EquipmentId` = @EquipmentId;";
