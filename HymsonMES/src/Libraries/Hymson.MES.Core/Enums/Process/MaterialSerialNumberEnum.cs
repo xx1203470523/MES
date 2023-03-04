@@ -3,7 +3,7 @@
 namespace Hymson.MES.Core.Enums
 {
     /// <summary>
-    /// 物料来源枚举
+    /// 物料内/外序列号枚举
     /// </summary>
     public enum MaterialSerialNumberEnum : sbyte
     {

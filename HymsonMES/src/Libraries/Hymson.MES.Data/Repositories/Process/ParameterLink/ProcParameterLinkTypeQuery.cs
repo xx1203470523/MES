@@ -6,6 +6,7 @@
  *build datetime: 2023-02-13 05:06:17
  */
 
+using Hymson.MES.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,7 +41,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 描述 :参数类型 
         /// 空值 : false  
         /// </summary>
-        public int ParameterType { get; set; }
+        public ParameterTypeEnum ParameterType { get; set; }
 
         /// <summary>
         /// 描述 :说明 

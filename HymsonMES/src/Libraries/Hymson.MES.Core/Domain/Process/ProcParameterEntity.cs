@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Process
 {
@@ -36,7 +37,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :参数单位（字典定义） 
         /// 空值 : false  
         /// </summary>
-        public int ParameterUnit { get; set; }
+        public ParameterUnitEnum ParameterUnit { get; set; }
         
         /// <summary>
         /// 描述 :说明 

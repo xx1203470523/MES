@@ -13,6 +13,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
@@ -209,7 +210,7 @@ namespace Hymson.MES.Services.Services.Process
                    SiteId = siteId,
                    ParameterID= dto.Id
                });
-               dto.Type = linkTypes.GroupBy(x => x.ParameterType).Select(x => x.Key).ToList().Sum();
+               dto.Type = (ParameterTypeShowEnum)linkTypes.GroupBy(x => x.ParameterType).Select(x => (int)x.Key).ToList().Sum();
 
                 return dto;
            }

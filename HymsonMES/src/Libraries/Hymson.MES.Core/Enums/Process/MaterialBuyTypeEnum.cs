@@ -3,7 +3,7 @@
 namespace Hymson.MES.Core.Enums
 {
     /// <summary>
-    /// 物料来源枚举
+    /// 物料采购类型枚举
     /// </summary>
     public enum MaterialBuyTypeEnum : sbyte
     {
