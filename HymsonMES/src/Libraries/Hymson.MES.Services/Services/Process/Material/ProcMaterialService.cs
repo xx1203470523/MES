@@ -67,7 +67,7 @@ namespace Hymson.MES.Services.Services.Process
             {
                 //responseDto.Msg = "站点码获取失败，请重新登录！";
                 //return responseDto;
-                throw new ValidationException(ErrorCode.MES10101);
+                throw new ValidationException(nameof(ErrorCode.MES10101));
             }
 
             //验证DTO
@@ -169,7 +169,7 @@ namespace Hymson.MES.Services.Services.Process
             #region 参数校验
             if (idsArr.Length < 1)
             {
-                throw new ValidationException(ErrorCode.MES10213);
+                throw new ValidationException(nameof(ErrorCode.MES10213));
             }
 
             //var statusArr = new int[] { 2, 3 }; //可下达和保留 时无法删除
@@ -177,7 +177,7 @@ namespace Hymson.MES.Services.Services.Process
             var entitys =  await _procMaterialRepository.GetByIdsAsync(idsArr);
             if (entitys.Where(x => (SysDataStatusEnum.Enable|SysDataStatusEnum.Retain).HasFlag(x.Status)).ToList().Count>0) 
             {
-                throw new BusinessException(ErrorCode.MES10212);
+                throw new BusinessException(nameof(ErrorCode.MES10212));
             }
 
             #endregion
@@ -254,19 +254,19 @@ namespace Hymson.MES.Services.Services.Process
             var modelOrigin = await _procMaterialRepository.GetByIdAsync(procMaterialModifyDto.Id, _currentSite.SiteId??0);
             if (modelOrigin == null)
             {
-                throw new NotFoundException(ErrorCode.MES10204);
+                throw new NotFoundException(nameof(ErrorCode.MES10204));
             }
 
             if (procMaterialModifyDto.Origin != modelOrigin.Origin)
             {
-                throw new CustomerValidationException(ErrorCode.MES10205);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10205));
             }
 
             // 判断替代品是否包含当前物料
             var replaceMaterialList = ConvertProcReplaceMaterialList(procMaterialModifyDto.DynamicList, procMaterialEntity);
             if (replaceMaterialList.Any(a => a.ReplaceMaterialId == procMaterialEntity.Id) == true)
             {
-                throw new BusinessException(ErrorCode.MES10206);
+                throw new BusinessException(nameof(ErrorCode.MES10206));
             }
 
             // 判断编号是否已存在
@@ -278,7 +278,7 @@ namespace Hymson.MES.Services.Services.Process
             });
             if (existsList != null && existsList.Where(x => x.Id != procMaterialEntity.Id).Any()) 
             {
-                throw new BusinessException(ErrorCode.MES10201).WithData("materialCode", procMaterialEntity.MaterialCode).WithData("version", procMaterialEntity.Version);
+                throw new BusinessException(nameof(ErrorCode.MES10201)).WithData("materialCode", procMaterialEntity.MaterialCode).WithData("version", procMaterialEntity.Version);
             }
 
             #endregion
@@ -376,7 +376,7 @@ namespace Hymson.MES.Services.Services.Process
 
                 if (response == 0)
                 {
-                    throw new BusinessException(ErrorCode.MES10208);
+                    throw new BusinessException(nameof(ErrorCode.MES10208));
                 }
 
                 //替代组设置数据
@@ -384,7 +384,7 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     if ((await _procReplaceMaterialRepository.InsertsAsync(addProcReplaceList))<=0)
                     {
-                        throw new BusinessException(ErrorCode.MES10209);
+                        throw new BusinessException(nameof(ErrorCode.MES10209));
                     }
                 }
 
@@ -392,7 +392,7 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     if ((await _procReplaceMaterialRepository.UpdatesAsync(updateProcReplaceList))<=0)
                     {
-                        throw new BusinessException(ErrorCode.MES10210);
+                        throw new BusinessException(nameof(ErrorCode.MES10210));
                     }
                 }
 
@@ -400,7 +400,7 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     if (await _procReplaceMaterialRepository.DeletesAsync(new DeleteCommand { Ids = deleteeProcReplaceIds.ToArray(), DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName }) <= 0)
                     {
-                        throw new BusinessException(ErrorCode.MES10211);
+                        throw new BusinessException(nameof(ErrorCode.MES10211));
                     }
                 }
 
