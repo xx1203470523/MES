@@ -34,7 +34,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 参数类型
         /// </summary>
-        public int ParameterType { get; set; }
+        public ParameterTypeEnum ParameterType { get; set; }
 
        /// <summary>
         /// 说明
@@ -78,7 +78,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 类型（设备/产品参数）
         /// </summary>
-        public int ParameterType { get; set; } = 1;
+        public ParameterTypeEnum ParameterType { get; set; } = ParameterTypeEnum.Equipment;
 
         /// <summary>
         /// 集合（标准参数）
@@ -94,7 +94,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 类型（设备/产品参数）
         /// </summary>
-        public int ParameterType { get; set; } = 1;
+        public ParameterTypeEnum ParameterType { get; set; } = ParameterTypeEnum.Equipment;
 
         /// <summary>
         /// 集合（标准参数）
@@ -110,7 +110,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 类型（设备/产品参数）
         /// </summary>
-        public int? ParameterType { get; set; } = 1;
+        public ParameterTypeEnum? ParameterType { get; set; } = ParameterTypeEnum.Equipment;
 
         /// <summary>
         /// 编码（设备/产品参数）
@@ -138,7 +138,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 类型（设备/产品参数）
         /// </summary>
-        public int ParameterType { get; set; } = 1;
+        public ParameterTypeEnum ParameterType { get; set; } = ParameterTypeEnum.Equipment;
 
         /// <summary>
         /// ID（标准参数）
@@ -158,7 +158,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 参数单位
         /// </summary>
-        public string ParameterUnit { get; set; }
+        public ParameterUnitEnum ParameterUnit { get; set; }
 
         /// <summary>
         /// 创建人
@@ -199,7 +199,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 类型（设备/产品参数）
         /// </summary>
-        public int? ParameterType { get; set; } = 1;
+        public ParameterTypeEnum? ParameterType { get; set; } = ParameterTypeEnum.Equipment;
 
         /// <summary>
         /// 编码（设备/产品参数）

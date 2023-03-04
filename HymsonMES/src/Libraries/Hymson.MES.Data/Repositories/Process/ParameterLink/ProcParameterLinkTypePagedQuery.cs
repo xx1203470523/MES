@@ -34,7 +34,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 类型（设备/产品参数） （1:设备参数;2:产品参数）
         /// </summary>
-        public int ParameterType { get; set; } = 1;
+        public ParameterTypeEnum ParameterType { get; set; } = ParameterTypeEnum.Equipment;
 
         /// <summary>
         /// 编码（设备/产品参数）
@@ -71,7 +71,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 类型（设备/产品参数）
         /// </summary>
-        public int ParameterType { get; set; } = 1;
+        public ParameterTypeEnum ParameterType { get; set; } = ParameterTypeEnum.Equipment;
 
         /// <summary>
         /// 编码（设备/产品参数）
