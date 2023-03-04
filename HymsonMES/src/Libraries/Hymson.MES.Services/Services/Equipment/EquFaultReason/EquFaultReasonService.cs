@@ -20,7 +20,7 @@ using Hymson.Utils;
 using Hymson.Utils;
 using System.Transactions;
 
-namespace Hymson.MES.Services.Services.Equipment 
+namespace Hymson.MES.Services.Services.Equipment
 {
     /// <summary>
     /// 设备故障原因表 服务
@@ -75,7 +75,7 @@ namespace Hymson.MES.Services.Services.Equipment
             });
             if (exists != null && exists.Count() > 0)
             {
-                throw new BusinessException(ErrorCode.MES13002).WithData("FaultReasonCode", EquFaultReasonEntity.FaultReasonCode);
+                throw new BusinessException(nameof(ErrorCode.MES13002)).WithData("FaultReasonCode", EquFaultReasonEntity.FaultReasonCode);
             }
 
             //入库
@@ -174,7 +174,7 @@ namespace Hymson.MES.Services.Services.Equipment
             var modelOrigin = await _EquFaultReasonRepository.GetByIdAsync(EquFaultReasonEntity.Id);
             if (modelOrigin == null)
             {
-                throw new BusinessException(ErrorCode.MES13004);
+                throw new BusinessException(nameof(ErrorCode.MES13004));
             }
             //判断编号是否已经存在
             var exists = (await _EquFaultReasonRepository.GetEquFaultReasonEntitiesAsync(new EquFaultReasonQuery()
@@ -184,7 +184,7 @@ namespace Hymson.MES.Services.Services.Equipment
             })).Where(x => x.Id != EquFaultReasonEntity.Id).ToList();
             if (exists != null && exists.Count() > 0)
             {
-                throw new BusinessException(ErrorCode.MES13002).WithData("FaultReasonCode", EquFaultReasonEntity.FaultReasonCode);
+                throw new BusinessException(nameof(ErrorCode.MES13002)).WithData("FaultReasonCode", EquFaultReasonEntity.FaultReasonCode);
             }
 
             await _EquFaultReasonRepository.UpdateAsync(EquFaultReasonEntity);
