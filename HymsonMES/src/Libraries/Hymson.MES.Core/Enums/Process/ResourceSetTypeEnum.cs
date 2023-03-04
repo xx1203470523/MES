@@ -5,29 +5,27 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.Core.Enums.Integrated
+namespace Hymson.MES.Core.Enums.Process
 {
     /// <summary>
-    /// 工作中心类型
+    /// 资源设置
     /// </summary>
-    public enum WorkCenterType : short
+    public enum ResourceSetTypeEnum : sbyte
     {
         /// <summary>
-        /// 工厂
+        /// 工单
         /// </summary>
-        [Description("工厂")]
-        Factory = 0,
-
+        [Description("工单")]
+        Workorder = 1,
         /// <summary>
-        /// 产线
+        /// 物料
         /// </summary>
-        [Description("产线")]
-        Line = 1,
-
+        [Description("物料")]
+        Material = 2,
         /// <summary>
-        /// 车间
+        /// 工具
         /// </summary>
-        [Description("车间")]
-        Farm = 2
+        [Description("工具")]
+        Tool = 3
     }
 }
