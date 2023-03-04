@@ -415,9 +415,8 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// 查询设备（单个）
         /// </summary>
         /// <param name="equipmentCode">设备编码</param>
-        /// <param name="siteCode">站点</param>
         /// <returns></returns>
-        public async Task<EquEquipmentDto> GetByEquipmentCodeAsync(string equipmentCode, long SiteId)
+        public async Task<EquEquipmentDto> GetByEquipmentCodeAsync(string equipmentCode)
         {
             return (await _equEquipmentRepository.GetByEquipmentCodeAsync(equipmentCode.ToUpper())).ToModel<EquEquipmentDto>();
         }
