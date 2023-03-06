@@ -1,6 +1,4 @@
 ﻿using FluentValidation;
-using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
@@ -20,6 +18,7 @@ using Hymson.MES.Services.Services.Integrated.InteCalendar;
 using Hymson.MES.Services.Services.Integrated.InteClass;
 using Hymson.MES.Services.Services.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
+using Hymson.MES.Services.Services.Process.MaskCode;
 using Hymson.MES.Services.Services.Quality;
 using Hymson.MES.Services.Services.Quality.IQualityService;
 using Hymson.MES.Services.Services.Warehouse;
@@ -84,6 +83,8 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Process
+            services.AddSingleton<IProcMaskCodeService, ProcMaskCodeService>();
+
             #region Material
             services.AddSingleton<IProcMaterialService, ProcMaterialService>();
             services.AddSingleton<IProcMaterialGroupService, ProcMaterialGroupService>();
@@ -92,13 +93,16 @@ namespace Microsoft.Extensions.DependencyInjection
             #region Parameter
             services.AddSingleton<IProcParameterService, ProcParameterService>();
             #endregion
+
             #region ParameterLinkType
             services.AddSingleton<IProcParameterLinkTypeService, ProcParameterLinkTypeService>();
             #endregion
+
             #region Bom
             services.AddSingleton<IProcBomService, ProcBomService>();
             services.AddSingleton<IProcBomDetailService, ProcBomDetailService>();
             #endregion
+
             #region LoadPoint
             services.AddSingleton<IProcLoadPointService, ProcLoadPointService>();
             #endregion

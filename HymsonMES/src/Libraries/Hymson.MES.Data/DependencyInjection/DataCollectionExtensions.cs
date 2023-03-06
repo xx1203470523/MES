@@ -14,6 +14,7 @@ using Hymson.MES.Data.Repositories.Integrated.InteClass;
 using Hymson.MES.Data.Repositories.Integrated.InteJob;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
@@ -80,7 +81,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteWorkCenterRepository, InteWorkCenterRepository>();
             #endregion
 
-            #region  Process
+            #region Process
+            services.AddSingleton<IProcMaskCodeRepository, ProcMaskCodeRepository>();
 
             #region Material
             services.AddSingleton<IProcMaterialRepository, ProcMaterialRepository>();
@@ -145,6 +147,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
 
             #endregion
+
             return services;
         }
 
