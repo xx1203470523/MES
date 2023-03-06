@@ -176,10 +176,11 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcMaterialCreateDto, ProcMaterialEntity>();
             CreateMap<ProcMaterialModifyDto, ProcMaterialEntity>();
             CreateMap<ProcMaterialPagedQueryDto, ProcMaterialPagedQuery>();
-            CreateMap<ProcMaterialEntity, ProcMaterialDto>();
+            CreateMap<ProcMaterialEntity, ProcMaterialDto>();            
             CreateMap<ProcMaterialView, ProcMaterialViewDto>();
 
             CreateMap<ProcMaterialReplaceDto, ProcReplaceMaterialEntity>();
+            CreateMap<ProcReplaceMaterialView, ProcMaterialReplaceViewDto>();
 
             CreateMap<ProcMaterialGroupCreateDto, ProcMaterialGroupEntity>();
             CreateMap<ProcMaterialGroupModifyDto, ProcMaterialGroupEntity>();

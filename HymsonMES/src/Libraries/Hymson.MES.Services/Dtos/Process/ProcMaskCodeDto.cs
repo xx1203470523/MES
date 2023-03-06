@@ -1,5 +1,4 @@
 ﻿using Hymson.Infrastructure;
-using Hymson.Infrastructure.Constants;
 
 namespace Hymson.MES.Services.Dtos.Process
 {
@@ -14,24 +13,14 @@ namespace Hymson.MES.Services.Dtos.Process
         public long Id { get; set; }
 
         /// <summary>
-        /// 单位编码 
+        /// 编码
         /// </summary>
-        public string UnitCode { get; set; } = "";
+        public string Code { get; set; } = "";
 
         /// <summary>
-        /// 单位名称 
+        /// 名称 
         /// </summary>
-        public string UnitName { get; set; } = "";
-
-        /// <summary>
-        /// 单位类型
-        /// </summary>
-        public int Type { get; set; } = DbDefaultValueConstant.IntDefaultValue;
-
-        /// <summary>
-        /// 单位状态 
-        /// </summary>
-        public int Status { get; set; } = DbDefaultValueConstant.IntDefaultValue;
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// 描述
@@ -50,24 +39,14 @@ namespace Hymson.MES.Services.Dtos.Process
         public long Id { get; set; }
 
         /// <summary>
-        /// 单位编码 
+        /// 编码 
         /// </summary>
-        public string UnitCode { get; set; } = "";
+        public string Code { get; set; } = "";
 
         /// <summary>
-        /// 单位名称 
+        /// 名称 
         /// </summary>
-        public string UnitName { get; set; } = "";
-
-        /// <summary>
-        /// 单位类型
-        /// </summary>
-        public int Type { get; set; } = DbDefaultValueConstant.IntDefaultValue;
-
-        /// <summary>
-        /// 单位状态 
-        /// </summary>
-        public int Status { get; set; } = DbDefaultValueConstant.IntDefaultValue;
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// 描述
@@ -91,23 +70,14 @@ namespace Hymson.MES.Services.Dtos.Process
     public class ProcMaskCodePagedQueryDto : PagerInfo
     {
         /// <summary>
-        /// 单位编码 
+        /// 编码 
         /// </summary>
-        public string? UnitCode { get; set; }
+        public string? Code { get; set; }
 
         /// <summary>
-        /// 单位名称 
+        /// 名称 
         /// </summary>
-        public string? UnitName { get; set; }
+        public string? Name { get; set; }
 
-        /// <summary>
-        /// 单位类型
-        /// </summary>
-        public int? Type { get; set; }
-
-        /// <summary>
-        /// 单位状态 
-        /// </summary>
-        public int? Status { get; set; }
     }
 }

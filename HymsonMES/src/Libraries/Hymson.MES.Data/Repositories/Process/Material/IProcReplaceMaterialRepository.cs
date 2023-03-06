@@ -59,6 +59,13 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<int> DeletesAsync(DeleteCommand param);
 
         /// <summary>
+        /// 通过主物料ID批量删除 （硬删除）
+        /// </summary>
+        /// <param name="materialIds"></param>
+        /// <returns></returns>
+        Task<int> DeleteTrueByMaterialIdsAsync(long[] materialIds);
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -71,7 +78,9 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procReplaceMaterialQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcReplaceMaterialEntity>> GetProcReplaceMaterialEntitiesAsync(ProcReplaceMaterialQuery procReplaceMaterialQuery);
-        
+
+        Task<IEnumerable<ProcReplaceMaterialView>> GetProcReplaceMaterialViewsAsync(ProcReplaceMaterialQuery procReplaceMaterialQuery);
+
         /// <summary>
         /// 分页查询
         /// </summary>
