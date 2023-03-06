@@ -311,5 +311,9 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 工序名称
         /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// 工序类型
+        /// </summary>
+        public int ProcessType { get; set; }
     }
 }

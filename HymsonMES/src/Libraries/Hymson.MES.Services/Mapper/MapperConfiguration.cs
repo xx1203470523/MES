@@ -14,6 +14,7 @@ using Hymson.MES.Data.Repositories.Equipment.EquSparePartType.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteCalendar.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.MaskCode.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Process.ResourceType.View;
@@ -164,6 +165,13 @@ namespace Hymson.MES.Services.Mapper
         /// </summary>
         protected virtual void CreateProcessMaps()
         {
+            #region MaskCode
+            CreateMap<ProcMaskCodeSaveDto, ProcMaskCodeEntity>();
+            CreateMap<ProcMaskCodePagedQueryDto, ProcMaskCodePagedQuery>();
+
+            CreateMap<ProcMaskCodeEntity, ProcMaskCodeDto>();
+            #endregion
+
             #region Material
             CreateMap<ProcMaterialCreateDto, ProcMaterialEntity>();
             CreateMap<ProcMaterialModifyDto, ProcMaterialEntity>();

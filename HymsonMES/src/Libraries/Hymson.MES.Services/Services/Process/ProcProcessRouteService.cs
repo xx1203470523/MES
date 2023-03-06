@@ -118,15 +118,16 @@ namespace Hymson.MES.Services.Services.Process
             foreach (var node in nodes)
             {
                 //实体转换
-                var nodeViewDto = node.ToModel<ProcProcessRouteDetailNodeViewDto>(); ;
+                var nodeViewDto = node.ToModel<ProcProcessRouteDetailNodeViewDto>();
+                nodeViewDto.ProcessType = (int)ProcessRouteTypeEnum.ProductionRoute;
                 detailNodeViewDtos.Add(nodeViewDto);
             }
             model.Nodes = detailNodeViewDtos;
 
             foreach (var item in model.Nodes)
             {
-                item.Code = ConvertProcedureBomCode(item.ProcedureId, item.Code);
-                item.Name = ConvertProcedureBomName(item.ProcedureId, item.Name);
+                item.Code = ConvertProcedureCode(item.ProcedureId, item.Code);
+                item.Name = ConvertProcedureName(item.ProcedureId, item.Name);
             }
 
             var linkQuery = new ProcProcessRouteDetailLinkQuery { ProcessRouteId = id };
@@ -351,7 +352,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="procedureId"></param>
         /// <param name="defaultCode"></param>
         /// <returns></returns>
-        public static string ConvertProcedureBomCode(long procedureId, string defaultCode)
+        public static string ConvertProcedureCode(long procedureId, string defaultCode)
         {
             return procedureId switch
             {
@@ -367,7 +368,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="procedureId"></param>
         /// <param name="defaultName"></param>
         /// <returns></returns>
-        public static string ConvertProcedureBomName(long procedureId, string defaultName)
+        public static string ConvertProcedureName(long procedureId, string defaultName)
         {
             return procedureId switch
             {
