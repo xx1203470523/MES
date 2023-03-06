@@ -8,12 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Services\Process\MaskCode\**" />
-    <EmbeddedResource Remove="Services\Process\MaskCode\**" />
-    <None Remove="Services\Process\MaskCode\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="FluentValidation" Version="11.5.1" />
     <PackageReference Include="Hymson.Authentication.JwtBearer" Version="1.6.8" />
     <PackageReference Include="Hymson.Snowflake" Version="1.6.8" />

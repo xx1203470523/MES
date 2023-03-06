@@ -32,7 +32,7 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
         /// 
         /// </summary>
         private readonly IProcMaskCodeRepository _procMaskCodeRepository;
-        private readonly AbstractValidator<ProcMaskCodeSaveDto> _validationCreateRules;
+        //private readonly AbstractValidator<ProcMaskCodeSaveDto> _validationCreateRules;
 
         /// <summary>
         /// 构造函数
@@ -42,13 +42,11 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
         /// <param name="procMaskCodeRepository"></param>
         /// <param name="validationRules"></param>
         public ProcMaskCodeService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IProcMaskCodeRepository procMaskCodeRepository,
-            AbstractValidator<ProcMaskCodeSaveDto> validationRules)
+            IProcMaskCodeRepository procMaskCodeRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _procMaskCodeRepository = procMaskCodeRepository;
-            _validationCreateRules = validationRules;
         }
 
         /// <summary>

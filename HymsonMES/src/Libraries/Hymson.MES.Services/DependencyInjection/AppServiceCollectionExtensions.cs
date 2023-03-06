@@ -18,6 +18,7 @@ using Hymson.MES.Services.Services.Integrated.InteCalendar;
 using Hymson.MES.Services.Services.Integrated.InteClass;
 using Hymson.MES.Services.Services.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
+using Hymson.MES.Services.Services.Process.MaskCode;
 using Hymson.MES.Services.Services.Quality;
 using Hymson.MES.Services.Services.Quality.IQualityService;
 using Hymson.MES.Services.Services.Warehouse;
@@ -82,7 +83,7 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Process
-            //services.AddSingleton<IProcMaskCodeService, ProcMaskCodeService>();
+            services.AddSingleton<IProcMaskCodeService, ProcMaskCodeService>();
 
             #region Material
             services.AddSingleton<IProcMaterialService, ProcMaterialService>();
