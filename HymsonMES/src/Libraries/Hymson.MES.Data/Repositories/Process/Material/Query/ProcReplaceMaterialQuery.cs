@@ -19,5 +19,10 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public class ProcReplaceMaterialQuery
     {
+        public long SiteId { get; set; }
+
+        public long MaterialId { get; set; }
+
+        //public long ReplaceMaterialId { get; set; }
     }
 }
