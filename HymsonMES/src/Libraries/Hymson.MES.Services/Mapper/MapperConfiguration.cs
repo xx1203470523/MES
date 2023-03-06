@@ -289,6 +289,11 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<WhSupplierModifyDto, WhSupplierEntity>();
             CreateMap<WhSupplierPagedQueryDto, WhSupplierPagedQuery>();
             CreateMap<WhSupplierEntity, WhSupplierDto>();
+
+            CreateMap<WhMaterialInventoryCreateDto, WhMaterialInventoryEntity>();
+            CreateMap<WhMaterialInventoryModifyDto, WhMaterialInventoryEntity>();
+            CreateMap<WhMaterialInventoryPagedQueryDto, WhMaterialInventoryPagedQuery>();
+            CreateMap<WhMaterialInventoryEntity, WhMaterialInventoryDto>();
             #endregion
         }
 

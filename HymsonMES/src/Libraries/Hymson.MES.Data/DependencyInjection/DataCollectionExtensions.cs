@@ -144,6 +144,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region Warehouse 
             services.AddSingleton<IWhSupplierRepository, WhSupplierRepository>();
+            services.AddSingleton<IWhMaterialInventoryRepository, WhMaterialInventoryRepository>();
 
 
             #endregion
