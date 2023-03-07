@@ -11,6 +11,7 @@ using Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteCalendar.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
+using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
@@ -150,9 +151,9 @@ namespace Hymson.MES.Services.Mapper
             #endregion
 
             #region InteJob
-
             CreateMap<InteJobEntity, InteJobDto>();
             CreateMap<InteJobBusinessRelationCreateDto, InteJobBusinessRelationEntity>();
+            CreateMap<InteJobPagedQueryDto, InteJobPagedQuery>();
             #endregion
         }
 

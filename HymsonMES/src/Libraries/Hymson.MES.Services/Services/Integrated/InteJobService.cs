@@ -8,14 +8,12 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
-using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated.IIntegratedService;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using Hymson.Utils.Tools;
 
 namespace Hymson.MES.Services.Services.Integrated
 {
@@ -57,7 +55,7 @@ namespace Hymson.MES.Services.Services.Integrated
         public async Task<PagedInfo<InteJobDto>> GetPageListAsync(InteJobPagedQueryDto pram)
         {
             var inteJobPagedQuery = pram.ToQuery<InteJobPagedQuery>();
-            inteJobPagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            inteJobPagedQuery.SiteId = _currentSite.SiteId ;
             var pagedInfo = await _inteJobRepository.GetPagedInfoAsync(inteJobPagedQuery);
 
             //实体到DTO转换 装载数据
@@ -91,7 +89,7 @@ namespace Hymson.MES.Services.Services.Integrated
         {
             if (param == null)
             {
-                throw new ValidationException(ErrorCode.MES10100);
+                throw new ValidationException(nameof(ErrorCode.MES10100));
             }
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(param);
@@ -99,7 +97,7 @@ namespace Hymson.MES.Services.Services.Integrated
             var inteJobEntity = await _inteJobRepository.GetByCodeAsync(new EntityByCodeQuery { Code = param.Code, Site = _currentSite.SiteId });
             if (inteJobEntity != null)
             {
-                throw new BusinessException(ErrorCode.MES12001).WithData("code", param.Code);
+                throw new BusinessException(nameof(ErrorCode.MES12001)).WithData("code", param.Code);
             }
             var userId = _currentUser.UserName;
             //DTO转换实体
@@ -134,7 +132,7 @@ namespace Hymson.MES.Services.Services.Integrated
         {
             if (param == null)
             {
-                throw new ValidationException(ErrorCode.MES10100);
+                throw new ValidationException(nameof(ErrorCode.MES10100));
             }
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(param);
