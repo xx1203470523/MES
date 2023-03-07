@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using Hymson.Authentication;
+﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
@@ -8,8 +7,11 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Data.Repositories.Process.MaskCode.Query;
 using Hymson.MES.Services.Dtos.Process;
+using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
+using System.Data;
 
 namespace Hymson.MES.Services.Services.Process.MaskCode
 {
@@ -29,9 +31,15 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
+        /// 序列号生成服务
+        /// </summary>
+        private readonly ISequenceService _sequenceService;
+
+        /// <summary>
         /// 
         /// </summary>
         private readonly IProcMaskCodeRepository _procMaskCodeRepository;
+        private readonly IProcMaskCodeRuleRepository _procMaskCodeRuleRepository;
         //private readonly AbstractValidator<ProcMaskCodeSaveDto> _validationCreateRules;
 
         /// <summary>
@@ -39,14 +47,18 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
         /// </summary>
         /// <param name="currentSite"></param>
         /// <param name="currentUser"></param>
+        /// <param name="sequenceService"></param>
         /// <param name="procMaskCodeRepository"></param>
-        /// <param name="validationRules"></param>
-        public ProcMaskCodeService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IProcMaskCodeRepository procMaskCodeRepository)
+        /// <param name="procMaskCodeRuleRepository"></param>
+        public ProcMaskCodeService(ICurrentUser currentUser, ICurrentSite currentSite, ISequenceService sequenceService,
+            IProcMaskCodeRepository procMaskCodeRepository,
+            IProcMaskCodeRuleRepository procMaskCodeRuleRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _sequenceService = sequenceService;
             _procMaskCodeRepository = procMaskCodeRepository;
+            _procMaskCodeRuleRepository = procMaskCodeRuleRepository;
         }
 
         /// <summary>
@@ -67,8 +79,26 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
             entity.SiteId = _currentSite.SiteId ?? 0;
             entity.Code = entity.Code.ToUpper();
 
+            List<ProcMaskCodeRuleEntity> rules = new();
+            for (int i = 0; i < createDto.RuleList.Count; i++)
+            {
+                var item = createDto.RuleList[i].ToEntity<ProcMaskCodeRuleEntity>();
+                item.SiteId = entity.SiteId;
+                item.MaskCodeId = entity.Id;
+                item.SerialNo = $"{i}"; //_sequenceService.GetSerialNumberAsync(SerialNumberTypeEnum.None,''),
+                item.CreatedBy = entity.CreatedBy;
+                rules.Add(item);
+            }
+
             // 保存实体
-            return await _procMaskCodeRepository.InsertAsync(entity);
+            var rows = 0;
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                rows += await _procMaskCodeRepository.InsertAsync(entity);
+                rows += await _procMaskCodeRuleRepository.InsertRangeAsync(rules);
+                trans.Complete();
+            }
+            return rows;
         }
 
         /// <summary>
@@ -82,8 +112,27 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
             var entity = modifyDto.ToEntity<ProcMaskCodeEntity>();
             entity.UpdatedBy = _currentUser.UserName;
 
+            List<ProcMaskCodeRuleEntity> rules = new();
+            for (int i = 0; i < modifyDto.RuleList.Count; i++)
+            {
+                var item = modifyDto.RuleList[i].ToEntity<ProcMaskCodeRuleEntity>();
+                item.SiteId = entity.SiteId;
+                item.MaskCodeId = entity.Id;
+                item.SerialNo = $"{i}"; //_sequenceService.GetSerialNumberAsync(SerialNumberTypeEnum.None,''),
+                item.CreatedBy = entity.CreatedBy;
+                rules.Add(item);
+            }
+
             // 保存实体
-            return await _procMaskCodeRepository.UpdateAsync(entity);
+            var rows = 0;
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                rows += await _procMaskCodeRuleRepository.ClearByMaskCodeId(entity.Id);
+                rows += await _procMaskCodeRuleRepository.InsertRangeAsync(rules);
+                rows += await _procMaskCodeRepository.UpdateAsync(entity);
+                trans.Complete();
+            }
+            return rows;
         }
 
         /// <summary>
