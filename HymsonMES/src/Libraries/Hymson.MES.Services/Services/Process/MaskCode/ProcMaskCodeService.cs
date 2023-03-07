@@ -83,9 +83,10 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
             for (int i = 0; i < createDto.RuleList.Count; i++)
             {
                 var item = createDto.RuleList[i].ToEntity<ProcMaskCodeRuleEntity>();
+                item.Id = IdGenProvider.Instance.CreateId();
                 item.SiteId = entity.SiteId;
                 item.MaskCodeId = entity.Id;
-                item.SerialNo = $"{i}"; //_sequenceService.GetSerialNumberAsync(SerialNumberTypeEnum.None,''),
+                item.SerialNo = $"{i + 1}"; //_sequenceService.GetSerialNumberAsync(SerialNumberTypeEnum.None,''),
                 item.CreatedBy = entity.CreatedBy;
                 rules.Add(item);
             }
@@ -116,9 +117,10 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
             for (int i = 0; i < modifyDto.RuleList.Count; i++)
             {
                 var item = modifyDto.RuleList[i].ToEntity<ProcMaskCodeRuleEntity>();
+                item.Id = IdGenProvider.Instance.CreateId();
                 item.SiteId = entity.SiteId;
                 item.MaskCodeId = entity.Id;
-                item.SerialNo = $"{i}"; //_sequenceService.GetSerialNumberAsync(SerialNumberTypeEnum.None,''),
+                item.SerialNo = $"{i + 1}"; //_sequenceService.GetSerialNumberAsync(SerialNumberTypeEnum.None,''),
                 item.CreatedBy = entity.CreatedBy;
                 rules.Add(item);
             }
@@ -173,7 +175,12 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
         /// <returns></returns>
         public async Task<ProcMaskCodeDto> GetDetailAsync(long id)
         {
-            return (await _procMaskCodeRepository.GetByIdAsync(id)).ToModel<ProcMaskCodeDto>();
+            var dto = (await _procMaskCodeRepository.GetByIdAsync(id)).ToModel<ProcMaskCodeDto>();
+            if (dto != null)
+            {
+                dto.RuleList = (await _procMaskCodeRuleRepository.GetByMaskCodeIdAsync(dto.Id)).Select(s => s.ToModel<ProcMaskCodeRuleDto>());
+            }
+            return dto;
         }
     }
 }

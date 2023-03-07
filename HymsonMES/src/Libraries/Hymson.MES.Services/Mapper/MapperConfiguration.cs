@@ -170,6 +170,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcMaskCodeSaveDto, ProcMaskCodeEntity>();
             CreateMap<ProcMaskCodePagedQueryDto, ProcMaskCodePagedQuery>();
 
+            CreateMap<ProcMaskCodeRuleEntity, ProcMaskCodeRuleDto>();
             CreateMap<ProcMaskCodeEntity, ProcMaskCodeDto>();
             #endregion
 
@@ -177,7 +178,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcMaterialCreateDto, ProcMaterialEntity>();
             CreateMap<ProcMaterialModifyDto, ProcMaterialEntity>();
             CreateMap<ProcMaterialPagedQueryDto, ProcMaterialPagedQuery>();
-            CreateMap<ProcMaterialEntity, ProcMaterialDto>();            
+            CreateMap<ProcMaterialEntity, ProcMaterialDto>();
             CreateMap<ProcMaterialView, ProcMaterialViewDto>();
 
             CreateMap<ProcMaterialReplaceDto, ProcReplaceMaterialEntity>();
