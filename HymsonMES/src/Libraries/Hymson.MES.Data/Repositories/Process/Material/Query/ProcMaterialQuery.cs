@@ -23,17 +23,16 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 站点编码 
         /// </summary>
-        public long SiteId { get; set; }
+        public long? SiteId { get; set; }
 
         /// <summary>
         /// 物料编码
         /// </summary>
-        [Required(ErrorMessage = "物料编码不能为空")]
-        public string MaterialCode { get; set; }
+        public string? MaterialCode { get; set; }
 
         /// <summary>
         /// 版本
         /// </summary>
-        public string Version { get; set; }
+        public string? Version { get; set; }
     }
 }

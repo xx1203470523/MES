@@ -1,7 +1,9 @@
 ﻿using Dapper;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Microsoft.Extensions.Options;
@@ -75,12 +77,12 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="idsArr"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] idsArr)
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, new { Id = idsArr });
+            return await conn.ExecuteAsync(DeleteSql, command);
         }
 
         /// <summary>
@@ -177,6 +179,21 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
 
+            if (pagedQuery.EquipmentType.HasValue == true)
+            {
+                sqlBuilder.Where("EquipmentType = @EquipmentType");
+            }
+
+            if (pagedQuery.UseStatus.HasValue == true)
+            {
+                sqlBuilder.Where("UseStatus = @UseStatus");
+            }
+
+            if (pagedQuery.UseDepartment.HasValue == true)
+            {
+                sqlBuilder.Where("UseDepartment = @UseDepartment");
+            }
+
             if (string.IsNullOrWhiteSpace(pagedQuery.EquipmentCode) == false)
             {
                 pagedQuery.EquipmentCode = $"%{pagedQuery.EquipmentCode}%";
@@ -189,25 +206,10 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
                 sqlBuilder.Where("EquipmentName LIKE @EquipmentName");
             }
 
-            if (pagedQuery.EquipmentType > 0)
-            {
-                sqlBuilder.Where("EquipmentType = @EquipmentType");
-            }
-
-            if (pagedQuery.UseStatus > 0)
-            {
-                sqlBuilder.Where("UseStatus = @UseStatus");
-            }
-
             if (string.IsNullOrWhiteSpace(pagedQuery.WorkCenterShopName) == false)
             {
                 pagedQuery.WorkCenterShopName = $"%{pagedQuery.WorkCenterShopName}%";
                 sqlBuilder.Where("WorkCenterShopName LIKE @WorkCenterShopName");
-            }
-
-            if (pagedQuery.UseDepartment > 0)
-            {
-                sqlBuilder.Where("UseDepartment = @UseDepartment");
             }
 
             if (string.IsNullOrWhiteSpace(pagedQuery.Location) == false)
@@ -239,7 +241,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// </summary>
         const string InsertSql = "INSERT INTO `equ_equipment`(  `Id`, `EquipmentCode`, `EquipmentName`, `EquipmentGroupId`, `EquipmentDesc`, `WorkCenterFactoryId`, `WorkCenterShopId`, `WorkCenterLineId`, `Location`, `EquipmentType`, `UseDepartment`, `EntryDate`, `QualTime`, `ExpireDate`, `Manufacturer`, `Supplier`, `UseStatus`, `Power`, `EnergyLevel`, `Ip`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteId`, `TakeTime`) VALUES (   @Id, @EquipmentCode, @EquipmentName, @EquipmentGroupId, @EquipmentDesc, @WorkCenterFactoryId, @WorkCenterShopId, @WorkCenterLineId, @Location, @EquipmentType, @UseDepartment, @EntryDate, @QualTime, @ExpireDate, @Manufacturer, @Supplier, @UseStatus, @Power, @EnergyLevel, @Ip, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteId, @TakeTime )  ";
         const string UpdateSql = "UPDATE `equ_equipment` SET EquipmentName = @EquipmentName, EquipmentDesc = @EquipmentDesc, WorkCenterFactoryId = @WorkCenterFactoryId, WorkCenterShopId = @WorkCenterShopId, WorkCenterLineId = @WorkCenterLineId, Location = @Location, EquipmentType = @EquipmentType, UseDepartment = @UseDepartment, EntryDate = @EntryDate, QualTime = @QualTime, ExpireDate = @ExpireDate, Manufacturer = @Manufacturer, Supplier = @Supplier, UseStatus = @UseStatus, Power = @Power, EnergyLevel = @EnergyLevel, Ip = @Ip, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, Remark = @Remark, TakeTime = @TakeTime WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `equ_equipment` SET `IsDeleted` = 1 WHERE `Id` = @Id;";
+        const string DeleteSql = "UPDATE `equ_equipment` SET `IsDeleted` = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE `Id` = @Ids;";
         const string IsExistsSql = "SELECT Id FROM equ_equipment WHERE `IsDeleted` = 0 AND EquipmentCode = @equipmentCode LIMIT 1";
         const string GetByIdSql = "SELECT * FROM `equ_equipment` WHERE `Id` = @Id;";
         const string GetByGroupIdSql = "SELECT * FROM `equ_equipment` WHERE `IsDeleted` = 0 AND EquipmentGroupId = @EquipmentGroupId;";

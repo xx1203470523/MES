@@ -58,7 +58,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
        /// <summary>
         /// 创建人
@@ -73,7 +73,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 最后修改人
         /// </summary>
-        public string UpdatedBy { get; set; }
+        public string? UpdatedBy { get; set; }
 
        /// <summary>
         /// 修改时间
@@ -127,7 +127,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
        /// <summary>
         /// 创建人
@@ -142,7 +142,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 最后修改人
         /// </summary>
-        public string UpdatedBy { get; set; }
+        public string? UpdatedBy { get; set; }
 
        /// <summary>
         /// 修改时间
@@ -195,7 +195,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
        /// <summary>
         /// 创建人
@@ -210,7 +210,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 最后修改人
         /// </summary>
-        public string UpdatedBy { get; set; }
+        public string? UpdatedBy { get; set; }
 
        /// <summary>
         /// 修改时间

@@ -32,16 +32,16 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 编码（标准参数）
         /// </summary>
-        public string ParameterCode { get; set; }
+        public string? ParameterCode { get; set; }
 
         /// <summary>
         /// 名称（标准参数）
         /// </summary>
-        public string ParameterName { get; set; }
+        public string? ParameterName { get; set; }
 
         /// <summary>
         /// 描述（标准参数）
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
     }
 }

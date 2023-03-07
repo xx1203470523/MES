@@ -1,7 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.EquEquipmentGroup;
-using Hymson.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -39,8 +38,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("create")]
-        public async Task CreateAsync(EquEquipmentGroupCreateDto createDto)
+        public async Task CreateAsync(EquEquipmentGroupSaveDto createDto)
         {
             await _equEquipmentGroupService.CreateAsync(createDto);
         }
@@ -51,8 +49,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
-        [Route("update")]
-        public async Task ModifyAsync(EquEquipmentGroupModifyDto modifyDto)
+        public async Task ModifyAsync(EquEquipmentGroupSaveDto modifyDto)
         {
             await _equEquipmentGroupService.ModifyAsync(modifyDto);
         }
@@ -60,13 +57,12 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <summary>
         /// 删除（设备组）
         /// </summary>
-        /// <param name="deleteDto"></param>
+        /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
-        [Route("delete")]
-        public async Task DeletesAsync(EquEquipmentGroupDeleteDto deleteDto)
+        public async Task DeletesAsync(long[] ids)
         {
-            await _equEquipmentGroupService.DeletesAsync(deleteDto.Ids);
+            await _equEquipmentGroupService.DeletesAsync(ids);
         }
 
         /// <summary>
@@ -84,12 +80,12 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <summary>
         /// 查询详情（设备组）
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        [HttpPost("detail")]
-        public async Task<EquEquipmentGroupDto> GetDetailAsync(EquEquipmentGroupQueryDto query)
+        [HttpGet("{id}")]
+        public async Task<EquEquipmentGroupDto> GetDetailAsync(long id)
         {
-            return await _equEquipmentGroupService.GetDetailAsync(query);
+            return await _equEquipmentGroupService.GetDetailAsync(id);
         }
     }
 }

@@ -135,13 +135,14 @@ namespace Hymson.MES.Services.Services.Process
             //await _validationRules.ValidateAndThrowAsync(dto);
             if (param == null)
             {
-                throw new ValidationException(ErrorCode.MES10100);
+                throw new ValidationException(nameof(ErrorCode.MES10100));
             }
 
             var userName = _currentUser.UserName;
             var siteId = _currentSite.SiteId ?? 0;
             //DTO转换实体
             var id = IdGenProvider.Instance.CreateId();
+            var resType = param.ResType.ToUpperInvariant();
             var entity = new ProcResourceTypeAddCommand
             {
                 Id = id,
@@ -149,16 +150,16 @@ namespace Hymson.MES.Services.Services.Process
                 CreatedBy = userName,
                 UpdatedBy = userName,
                 Remark = param.Remark ?? "",
-                ResType = param.ResType.ToUpperInvariant(),
+                ResType = resType,
                 ResTypeName = param.ResTypeName ?? ""
             };
 
             //判断资源类型在系统中是否已经存在
-            var resEntity = new ProcResourceTypeEntity { SiteId = siteId, ResType = entity.ResType };
+            var resEntity = new ProcResourceTypeEntity { SiteId = siteId, ResType = resType };
             var resourceType = await _resourceTypeRepository.GetByCodeAsync(resEntity);
             if (resourceType != null)
             {
-                throw new BusinessException(ErrorCode.MES10311).WithData("ResType", param.ResType);
+                throw new BusinessException(nameof(ErrorCode.MES10311)).WithData("ResType", param.ResType);
             }
 
             var resourceIds = param.ResourceIds;
@@ -194,12 +195,12 @@ namespace Hymson.MES.Services.Services.Process
             //await _validationRules.ValidateAndThrowAsync(dto);
             if (param == null)
             {
-                throw new ValidationException(ErrorCode.MES10100);
+                throw new ValidationException(nameof(ErrorCode.MES10100));
             }
             var entity = await _resourceTypeRepository.GetByIdAsync(param?.Id ?? 0);
             if (entity == null)
             {
-                throw new NotFoundException(ErrorCode.MES10309);
+                throw new NotFoundException(nameof(ErrorCode.MES10309));
             }
 
             var userName = _currentUser.UserName;
@@ -250,14 +251,13 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 批量删除资源类型数据
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeleteProcResourceTypeAsync(string ids)
+        public async Task<int> DeleteProcResourceTypeAsync(long[] idsArr)
         {
-            long[] idsArr = StringExtension.SpitLongArrary(ids);
             if (idsArr.Length < 1)
             {
-                throw new NotFoundException(ErrorCode.MES10102);
+                throw new ValidationException(nameof(ErrorCode.MES10102));
             }
 
             //查询资源类型是否关联资源
@@ -270,7 +270,7 @@ namespace Hymson.MES.Services.Services.Process
             var resourceList = await _resourceRepository.GetByResTypeIdsAsync(query);
             if (resourceList != null && resourceList.Any())
             {
-                throw new CustomerValidationException(ErrorCode.MES10312);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10312));
             }
 
             var command = new DeleteCommand

@@ -1,7 +1,9 @@
 ﻿using Dapper;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -52,12 +54,12 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="idsArr"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] idsArr)
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, new { IsDeleted = 1, id = idsArr });
+            return await conn.ExecuteAsync(DeleteSql, command);
         }
 
         /// <summary>
@@ -84,6 +86,16 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
+
+            if (pagedQuery.Type > DbDefaultValueConstant.IntDefaultValue)
+            {
+                sqlBuilder.Where("Type = @Type");
+            }
+
+            if (pagedQuery.Status > DbDefaultValueConstant.IntDefaultValue)
+            {
+                sqlBuilder.Where("Status = @Status");
+            }
 
             if (string.IsNullOrWhiteSpace(pagedQuery.UnitCode) == false)
             {
@@ -120,8 +132,8 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
         /// 
         /// </summary>
         const string InsertSql = "INSERT INTO `equ_unit`(`Id`, `SiteId`, `UnitCode`, `UnitName`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @UnitCode, @UnitName, @Type, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted);";
-        const string UpdateSql = "UPDATE `equ_unit` SET UnitName = @UnitName, Type = @Type, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id;";
-        const string DeleteSql = "UPDATE `equ_unit` SET `IsDeleted` = @IsDeleted WHERE `Id` = @id;";
+        const string UpdateSql = "UPDATE `equ_unit` SET UnitName = @UnitName, Type = @Type, Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id;";
+        const string DeleteSql = "UPDATE `equ_unit` SET `IsDeleted` = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE `Id` = @Ids;";
         const string GetByIdSql = "SELECT `Id`, `SiteId`, `UnitCode`, `UnitName`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn` FROM `equ_unit` WHERE `IsDeleted` = @IsDeleted AND `Id` = @id;";
         const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `equ_unit` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_unit` /**where**/";

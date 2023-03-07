@@ -8,8 +8,10 @@
 
 using Dapper;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -42,12 +44,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 批量删除（软删除）
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] ids)
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeletesSql, new { ids = ids });
+            return await conn.ExecuteAsync(DeletesSql, param);
 
         }
 
@@ -102,7 +104,7 @@ namespace Hymson.MES.Data.Repositories.Process
                 procBomPagedQuery.Version = $"%{procBomPagedQuery.Version}%";
                 sqlBuilder.Where(" Version like @Version ");
             }
-            if (!string.IsNullOrWhiteSpace(procBomPagedQuery.Status))
+            if (procBomPagedQuery.Status > DbDefaultValueConstant.IntDefaultValue)
             {
                 sqlBuilder.Where(" Status = @Status ");
             }
@@ -166,7 +168,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<int> InsertsAsync(List<ProcBomEntity> procBomEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertsSql, procBomEntitys);
+            return await conn.ExecuteAsync(InsertSql, procBomEntitys);
         }
 
         /// <summary>
@@ -207,25 +209,18 @@ namespace Hymson.MES.Data.Repositories.Process
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_bom` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_bom` /**where**/ ";
-        const string GetProcBomEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM `proc_bom` /**where**/  ";
+        const string GetProcBomEntitiesSqlTemplate = @"SELECT  /**select**/ FROM `proc_bom` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `proc_bom`(  `Id`, `SiteCode`, `BomCode`, `BomName`, `Status`, `Version`, `IsCurrentVersion`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @BomCode, @BomName, @Status, @Version, @IsCurrentVersion, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `proc_bom`(  `Id`, `SiteCode`, `BomCode`, `BomName`, `Status`, `Version`, `IsCurrentVersion`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @BomCode, @BomName, @Status, @Version, @IsCurrentVersion, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `proc_bom`( `Id`, `SiteId`, `BomCode`, `BomName`, `Status`, `Version`, `IsCurrentVersion`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @BomCode, @BomName, @Status, @Version, @IsCurrentVersion, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string UpdateSql = "UPDATE `proc_bom` SET BomName = @BomName, Status = @Status, IsCurrentVersion = @IsCurrentVersion, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         /// <summary>
         /// 更新 BOM IsCurrentVersion 为 false
         /// </summary>
         const string UpdateIsCurrentVersionIsFalseSql = "UPDATE `proc_bom` SET IsCurrentVersion = false WHERE Id in @ids ";
-        const string UpdatesSql = "UPDATE `proc_bom` SET   SiteCode = @SiteCode, BomCode = @BomCode, BomName = @BomName, Status = @Status, Version = @Version, IsCurrentVersion = @IsCurrentVersion, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `proc_bom` SET IsDeleted = '1' WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE `proc_bom` SET IsDeleted = '1' WHERE Id in @ids";
-        const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteCode`, `BomCode`, `BomName`, `Status`, `Version`, `IsCurrentVersion`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `proc_bom`  WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteCode`, `BomCode`, `BomName`, `Status`, `Version`, `IsCurrentVersion`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `proc_bom`  WHERE Id IN @ids ";
+        const string UpdatesSql = "UPDATE `proc_bom` SET  BomName = @BomName, Status = @Status, Version = @Version, IsCurrentVersion = @IsCurrentVersion, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string DeleteSql = "UPDATE `proc_bom` SET IsDeleted = Id WHERE Id = @Id ";
+        const string DeletesSql = "UPDATE `proc_bom` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids";
+        const string GetByIdSql = @"SELECT * FROM `proc_bom`  WHERE Id = @Id ";
+        const string GetByIdsSql = @"SELECT * FROM `proc_bom`  WHERE Id IN @ids ";
     }
 }

@@ -7,6 +7,7 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Data.Repositories.Common.Command;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,13 +50,20 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> DeletesAsync(long[] ids);
+        Task<int> DeletesAsync(DeleteCommand param);
+
+        /// <summary>
+        /// 通过主物料ID批量删除 （硬删除）
+        /// </summary>
+        /// <param name="materialIds"></param>
+        /// <returns></returns>
+        Task<int> DeleteTrueByMaterialIdsAsync(long[] materialIds);
 
         /// <summary>
         /// 根据ID获取数据
@@ -70,7 +78,9 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procReplaceMaterialQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcReplaceMaterialEntity>> GetProcReplaceMaterialEntitiesAsync(ProcReplaceMaterialQuery procReplaceMaterialQuery);
-        
+
+        Task<IEnumerable<ProcReplaceMaterialView>> GetProcReplaceMaterialViewsAsync(ProcReplaceMaterialQuery procReplaceMaterialQuery);
+
         /// <summary>
         /// 分页查询
         /// </summary>

@@ -1,8 +1,10 @@
 using Dapper;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
 using Microsoft.Extensions.Options;
@@ -30,7 +32,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
             _connectionOptions = connectionOptions.Value;
         }
 
-        
+
         /// <summary>
         /// 新增
         /// </summary>
@@ -67,12 +69,12 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         /// <summary>
         /// 批量删除（软删除）
         /// </summary>
-        /// <param name="idsArr"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] idsArr)
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, new { Id = idsArr });
+            return await conn.ExecuteAsync(DeleteSql, command);
         }
 
         /// <summary>
@@ -106,7 +108,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
                 sqlBuilder.Where("ClassName LIKE @ClassName");
             }
 
-            if (pagedQuery.ClassType > 0)
+            if (pagedQuery.ClassType > DbDefaultValueConstant.IntDefaultValue)
             {
                 sqlBuilder.Where("ClassType = @ClassType");
             }
@@ -152,7 +154,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
 
         const string InsertSql = "INSERT INTO `inte_class`(  `Id`, `ClassName`, `ClassType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteId`) VALUES (   @Id, @ClassName, @ClassType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteId )  ";
         const string UpdateSql = "UPDATE `inte_class` SET   ClassName = @ClassName, ClassType = @ClassType, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, Remark = @Remark, SiteId = @SiteId  WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `inte_class` SET IsDeleted = '1' WHERE Id = @Id ";
+        const string DeleteSql = "UPDATE `inte_class` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id = @Id ";
         const string GetByIdSql = @"SELECT 
                                `Id`, `ClassName`, `ClassType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteId`
                             FROM `inte_class`  WHERE Id = @Id ";

@@ -26,10 +26,10 @@ namespace Hymson.MES.Data.Repositories.Process
         public string MaterialName { get; set; }
 
         /// <summary>
-        /// 描述 :版本 
+        /// 描述 :物料版本 
         /// 空值 : true  
         /// </summary>
-        public string Version { get; set; }
+        public string? Version { get; set; }
         #endregion
 
     }

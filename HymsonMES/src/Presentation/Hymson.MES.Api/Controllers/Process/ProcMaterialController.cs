@@ -46,7 +46,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Route("pagelist")]
         public async Task<PagedInfo<ProcMaterialDto>> QueryPagedProcMaterialAsync([FromQuery] ProcMaterialPagedQueryDto parm)
         {
@@ -92,7 +92,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpPut]
         [Route("update")]
         public async Task UpdateProcMaterialAsync([FromBody] ProcMaterialModifyDto parm)
         {
@@ -104,12 +104,12 @@ namespace Hymson.MES.Api.Controllers.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpDelete]
         [Route("delete")]
-        public async Task DeleteProcMaterialAsync(string ids)
+        public async Task<int> DeleteProcMaterialAsync([FromBody] long[] ids)
         {
             //long[] idsArr = StringExtension.SpitLongArrary(ids);
-            await _procMaterialService.DeletesProcMaterialAsync(ids);
+           return await _procMaterialService.DeletesProcMaterialAsync(ids);
         }
 
     }

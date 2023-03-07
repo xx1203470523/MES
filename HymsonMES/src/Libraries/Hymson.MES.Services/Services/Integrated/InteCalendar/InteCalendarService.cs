@@ -4,6 +4,7 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Integrated.InteCalendar;
 using Hymson.MES.Data.Repositories.Integrated.InteCalendar.Query;
@@ -87,7 +88,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(InteCalendarCreateDto createDto)
+        public async Task<int> CreateAsync(InteCalendarSaveDto createDto)
         {
             // 验证DTO
 
@@ -178,7 +179,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyAsync(InteCalendarModifyDto modifyDto)
+        public async Task<int> ModifyAsync(InteCalendarSaveDto modifyDto)
         {
             // DTO转换实体
             var entity = modifyDto.ToEntity<InteCalendarEntity>();
@@ -295,7 +296,12 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
             {
                 rows += await _inteCalendarDateDetailRepository.DeleteByCalendarIdsAsync(idsArr);
                 rows += await _inteCalendarDateRepository.DeleteByCalendarIdsAsync(idsArr);
-                rows += await _inteCalendarRepository.DeletesAsync(idsArr);
+                rows += await _inteCalendarRepository.DeletesAsync(new DeleteCommand
+                {
+                    Ids = idsArr,
+                    UserId = _currentUser.UserName,
+                    DeleteOn = HymsonClock.Now()
+                });
                 trans.Complete();
             }
             return rows;

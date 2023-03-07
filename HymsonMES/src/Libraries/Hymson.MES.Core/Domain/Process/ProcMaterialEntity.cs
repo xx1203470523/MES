@@ -6,6 +6,7 @@
  *build datetime: 2023-02-08 04:47:44
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,24 +46,24 @@ namespace Hymson.MES.Core.Domain.Process
         /// 空值 : false  
         /// </summary>
         public string MaterialName { get; set; }
-        
+
         /// <summary>
         /// 描述 :状态 
         /// 空值 : true  
         /// </summary>
-        public string Status { get; set; }
+        public SysDataStatusEnum? Status { get; set; }
         
         /// <summary>
         /// 描述 :来源 
         /// 空值 : true  
         /// </summary>
-        public string Origin { get; set; }
+        public MaterialOriginEnum? Origin { get; set; }
         
         /// <summary>
         /// 描述 :版本 
         /// 空值 : true  
         /// </summary>
-        public string Version { get; set; }
+        public string? Version { get; set; }
         
         /// <summary>
         /// 描述 :是否默认版本 
@@ -74,13 +75,13 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :物料描述 
         /// 空值 : true  
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
         
         /// <summary>
         /// 描述 :采购类型 
         /// 空值 : true  
         /// </summary>
-        public string BuyType { get; set; }
+        public MaterialBuyTypeEnum? BuyType { get; set; }
         
         /// <summary>
         /// 描述 :工艺路线ID 
@@ -98,37 +99,37 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :批次大小 
         /// 空值 : true  
         /// </summary>
-        public int? Batch { get; set; }
+        public int Batch { get; set; }
         
         /// <summary>
         /// 描述 :计量单位(字典定义) 
         /// 空值 : true  
         /// </summary>
-        public string Unit { get; set; }
+        public string? Unit { get; set; }
         
         /// <summary>
         /// 描述 :内/外序列号 
         /// 空值 : true  
         /// </summary>
-        public string SerialNumber { get; set; }
+        public MaterialSerialNumberEnum? SerialNumber { get; set; }
         
         /// <summary>
         /// 描述 :验证掩码组 
         /// 空值 : true  
         /// </summary>
-        public string ValidationMaskGroup { get; set; }
+        public string? ValidationMaskGroup { get; set; }
         
         /// <summary>
         /// 描述 :基于时间(字典定义) 
         /// 空值 : true  
         /// </summary>
-        public string BaseTime { get; set; }
+        public MaterialBaseTimeEnum? BaseTime { get; set; }
         
         /// <summary>
         /// 描述 :消耗公差 
         /// 空值 : true  
         /// </summary>
-        public string ConsumptionTolerance { get; set; }
+        public int? ConsumptionTolerance { get; set; }
 
        
         }

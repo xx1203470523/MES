@@ -8,11 +8,13 @@
 using FluentValidation;
 using Google.Protobuf.WellKnownTypes;
 using Hymson.Authentication;
+using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
@@ -37,10 +39,12 @@ namespace Hymson.MES.Services.Services.Process
         private readonly IProcMaterialRepository _procMaterialRepository;
 
         private readonly ICurrentUser _currentUser;
+        private readonly ICurrentSite _currentSite;
 
-        public ProcMaterialGroupService(ICurrentUser currentUser, IProcMaterialGroupRepository procMaterialGroupRepository, AbstractValidator<ProcMaterialGroupCreateDto> validationCreateRules, AbstractValidator<ProcMaterialGroupModifyDto> validationModifyRules, IProcMaterialRepository procMaterialRepository)
+        public ProcMaterialGroupService(ICurrentUser currentUser, ICurrentSite currentSite , IProcMaterialGroupRepository procMaterialGroupRepository, AbstractValidator<ProcMaterialGroupCreateDto> validationCreateRules, AbstractValidator<ProcMaterialGroupModifyDto> validationModifyRules, IProcMaterialRepository procMaterialRepository)
         {
             _currentUser = currentUser;
+            _currentSite = currentSite;
             _procMaterialGroupRepository = procMaterialGroupRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
@@ -61,13 +65,14 @@ namespace Hymson.MES.Services.Services.Process
             procMaterialGroupEntity.UpdatedBy = _currentUser.UserName;
             procMaterialGroupEntity.CreatedOn = HymsonClock.Now();
             procMaterialGroupEntity.UpdatedOn = HymsonClock.Now();
+            procMaterialGroupEntity.SiteId = _currentSite.SiteId??0;
 
             #region 参数校验
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procMaterialGroupCreateDto);
 
             //判断编号是否已存在
-            var existGroupCodes = await _procMaterialGroupRepository.GetProcMaterialGroupEntitiesAsync(new ProcMaterialGroupQuery { SiteId = 0, GroupCode = procMaterialGroupCreateDto.GroupCode });
+            var existGroupCodes = await _procMaterialGroupRepository.GetProcMaterialGroupEntitiesAsync(new ProcMaterialGroupQuery { SiteId = _currentSite.SiteId??0, GroupCode = procMaterialGroupCreateDto.GroupCode });
             if (existGroupCodes != null && existGroupCodes.Count() > 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10216)).WithData("groupCode", procMaterialGroupCreateDto.GroupCode);
@@ -80,7 +85,7 @@ namespace Hymson.MES.Services.Services.Process
             var procMaterials = await _procMaterialRepository.GetByIdsAsync(procMaterialIds);
             if (procMaterials.Where(x => x.GroupId != 0).Count() > 0)
             {
-                throw new CustomerValidationException(ErrorCode.MES10217);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10217));
             }
 
             #endregion
@@ -95,7 +100,7 @@ namespace Hymson.MES.Services.Services.Process
 
                 if (response == 0)
                 {
-                    throw new BusinessException(ErrorCode.MES10218);
+                    throw new BusinessException(nameof(ErrorCode.MES10218));
                 }
 
                 foreach (var item in procMaterialList)
@@ -107,8 +112,10 @@ namespace Hymson.MES.Services.Services.Process
 
                 if (response < procMaterialList.Count)
                 {
-                    throw new BusinessException(ErrorCode.MES10218);
+                    throw new BusinessException(nameof(ErrorCode.MES10218));
                 }
+
+                ts.Complete();
             }
 
             #endregion
@@ -128,24 +135,23 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeletesProcMaterialGroupAsync(string ids)
+        public async Task<int> DeletesProcMaterialGroupAsync(long[] idsArr)
         {
-            if (string.IsNullOrEmpty(ids))
+            if (idsArr.Length<1)
             {
-                throw new ValidationException(ErrorCode.MES10213);
+                throw new ValidationException(nameof(ErrorCode.MES10213));
             }
 
-            var idsArr = StringExtension.SpitLongArrary(ids);
             //判断物料中是否有当前物料组
             var procMaterials = await _procMaterialRepository.GetByGroupIdsAsync(idsArr);
             if (procMaterials != null && procMaterials.Count() > 0)
             {
-                throw new CustomerValidationException(ErrorCode.MES10221);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10221));
             }
 
-            return await _procMaterialGroupRepository.DeletesAsync(idsArr);
+            return await _procMaterialGroupRepository.DeletesAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
         }
 
         /// <summary>
@@ -190,8 +196,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<PagedInfo<CustomProcMaterialGroupViewDto>> GetPageCustomListAsync(CustomProcMaterialGroupPagedQueryDto customProcMaterialGroupPagedQueryDto)
         {
-            //TODO 
-            // TODO   customProcMaterialGroupPagedQueryDto.SiteCode = "";
+            customProcMaterialGroupPagedQueryDto.SiteId = _currentSite.SiteId??0;
 
             var procMaterialGroupCustomPagedQuery = customProcMaterialGroupPagedQueryDto.ToQuery<ProcMaterialGroupCustomPagedQuery>();
             var pagedInfo = await _procMaterialGroupRepository.GetPagedCustomInfoAsync(procMaterialGroupCustomPagedQuery);
@@ -227,7 +232,7 @@ namespace Hymson.MES.Services.Services.Process
         {
             if (procMaterialGroupModifyDto == null)
             {
-                throw new ValidationException(ErrorCode.MES10213);
+                throw new ValidationException(nameof(ErrorCode.MES10213));
             }
             // TODO SiteId  procMaterialGroupModifyDto.SiteCode = "";//TODO  App.GetSite();
 
@@ -245,7 +250,7 @@ namespace Hymson.MES.Services.Services.Process
             var procMaterialGroup = await _procMaterialGroupRepository.GetByIdAsync(procMaterialGroupEntity.Id);
             if (procMaterialGroup == null)
             {
-                throw new BusinessException(ErrorCode.MES10219);
+                throw new BusinessException(nameof(ErrorCode.MES10219));
             }
 
             //判断编号是否已存在
@@ -262,7 +267,7 @@ namespace Hymson.MES.Services.Services.Process
             var procMaterials = await _procMaterialRepository.GetByIdsAsync(procMaterialIds);
             if (procMaterials.Where(x => x.GroupId != 0 && x.GroupId != procMaterialGroupEntity.Id).Count() > 0)
             {
-                throw new CustomerValidationException(ErrorCode.MES10217);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10217));
             }
             #endregion
 
@@ -274,7 +279,7 @@ namespace Hymson.MES.Services.Services.Process
 
                 if (response == 0)
                 {
-                    throw new BusinessException(ErrorCode.MES10220);
+                    throw new BusinessException(nameof(ErrorCode.MES10220));
                 }
 
                 //将之前所有该物料组的物料改为未绑定 
@@ -289,7 +294,7 @@ namespace Hymson.MES.Services.Services.Process
                 response = await _procMaterialRepository.UpdateProcMaterialGroupAsync(procMaterialList);
                 if (response < procMaterialList.Count)
                 {
-                    throw new BusinessException(ErrorCode.MES10220);
+                    throw new BusinessException(nameof(ErrorCode.MES10220));
                 }
             }
 
@@ -305,10 +310,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<ProcMaterialGroupDto> QueryProcMaterialGroupByIdAsync(long id)
         {
-            //TODO 
-            var siteCode = "";
-
-            var procMaterialGroupEntity = await _procMaterialGroupRepository.GetByIdAndSiteCodeAsync(id, 0);// TODO SiteId
+            var procMaterialGroupEntity = await _procMaterialGroupRepository.GetByIdAndSiteIdAsync(id, _currentSite.SiteId??0);
             if (procMaterialGroupEntity != null)
             {
                 return procMaterialGroupEntity.ToModel<ProcMaterialGroupDto>();

@@ -38,12 +38,12 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; }
+        public int Status { get; set; }
 
        /// <summary>
         /// 类型
         /// </summary>
-        public string Type { get; set; }
+        public int Type { get; set; }
 
        /// <summary>
         /// 版本
@@ -143,7 +143,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 工序明细ID
         /// </summary>
         //[JsonConverter(typeof(ValueToStringConverter))]
-        public long ProcedureBomId { get; set; }
+        public long ProcedureId { get; set; }
 
         /// <summary>
         /// 工序编码
@@ -233,12 +233,12 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; }
+        public int Status { get; set; }
 
        /// <summary>
         /// 类型
         /// </summary>
-        public string Type { get; set; }
+        public int Type { get; set; }
 
        /// <summary>
         /// 版本
@@ -266,6 +266,7 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public record ProcProcessRouteModifyDto : BaseEntityDto
     {
+        /// <summary>
         /// 唯一标识
         /// </summary>
         public long Id { get; set; }
@@ -283,12 +284,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; }
+        public int Status { get; set; }
 
         /// <summary>
         /// 类型
         /// </summary>
-        public string Type { get; set; }
+        public int Type { get; set; }
 
         /// <summary>
         /// 工序集合
@@ -314,12 +315,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 状态
         /// </summary>
-        public string? Status { get; set; }
+        public int? Status { get; set; }
 
         /// <summary>
         /// 类型
         /// </summary>
-        public string? Type { get; set; }
+        public int? Type { get; set; }
 
         /// <summary>
         /// 版本
@@ -329,6 +330,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 物料名称
         /// </summary>
-        public int IsCurrentVersion { get; set; }
+        public int? IsCurrentVersion { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
 
 namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
@@ -26,9 +27,9 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="idsArr"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        Task<int> DeletesAsync(long[] idsArr);
+        Task<int> DeletesAsync(DeleteCommand command);
 
         /// <summary>
         /// 

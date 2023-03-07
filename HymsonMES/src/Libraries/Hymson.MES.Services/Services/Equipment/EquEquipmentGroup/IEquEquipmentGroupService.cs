@@ -13,14 +13,14 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        Task<int> CreateAsync(EquEquipmentGroupCreateDto createDto);
+        Task<int> CreateAsync(EquEquipmentGroupSaveDto createDto);
 
         /// <summary>
         /// 修改
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        Task<int> ModifyAsync(EquEquipmentGroupModifyDto modifyDto);
+        Task<int> ModifyAsync(EquEquipmentGroupSaveDto modifyDto);
 
         /// <summary>
         /// 删除
@@ -44,10 +44,10 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         Task<PagedInfo<EquEquipmentGroupListDto>> GetPagedListAsync(EquEquipmentGroupPagedQueryDto pagedQueryDto);
 
         /// <summary>
-        /// 
+        /// 查询详情（设备组）
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        Task<EquEquipmentGroupDto> GetDetailAsync(EquEquipmentGroupQueryDto query);
+        Task<EquEquipmentGroupDto> GetDetailAsync(long id);
     }
 }

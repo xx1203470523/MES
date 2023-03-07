@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,12 +39,12 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
        /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
        /// <summary>
         /// 创建人
@@ -58,7 +59,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 最后修改人
         /// </summary>
-        public string UpdatedBy { get; set; }
+        public string? UpdatedBy { get; set; }
 
        /// <summary>
         /// 修改时间
@@ -76,6 +77,8 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public record ProcLoadPointDetailDto : BaseEntityDto
     {
+        public long SiteId { get; set; }
+
         /// <summary>
         /// 
         /// </summary>
@@ -94,12 +97,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
         /// <summary>
         /// 创建人
@@ -114,7 +117,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 最后修改人
         /// </summary>
-        public string UpdatedBy { get; set; }
+        public string? UpdatedBy { get; set; }
 
         /// <summary>
         /// 修改时间
@@ -126,8 +129,8 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public bool? IsDeleted { get; set; }
 
-        public List<ProcLoadPointLinkMaterialViewDto> LinkMaterials { get; set; }
-        public List<ProcLoadPointLinkResourceViewDto> LinkResources { get; set; }
+        public List<ProcLoadPointLinkMaterialViewDto>? LinkMaterials { get; set; }
+        public List<ProcLoadPointLinkResourceViewDto>? LinkResources { get; set; }
     }
 
 
@@ -154,40 +157,15 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
        /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-       /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-       /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public bool? IsDeleted { get; set; }
-
-        public List<ProcLoadPointLinkMaterialDto> LinkMaterials { get; set; }
-        public List<ProcLoadPointLinkResourceDto> LinkResources { get; set; }
+        public List<ProcLoadPointLinkMaterialDto>? LinkMaterials { get; set; }
+        public List<ProcLoadPointLinkResourceDto>? LinkResources { get; set; }
     }
 
     /// <summary>
@@ -213,40 +191,20 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
        /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; }
-
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-       /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-       /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
+        public string? Remark { get; set; }
 
        /// <summary>
         /// 是否逻辑删除
         /// </summary>
         public bool? IsDeleted { get; set; }
 
-        public List<ProcLoadPointLinkMaterialDto> LinkMaterials { get; set; }
-        public List<ProcLoadPointLinkResourceDto> LinkResources { get; set; }
+        public List<ProcLoadPointLinkMaterialDto>? LinkMaterials { get; set; }
+        public List<ProcLoadPointLinkResourceDto>? LinkResources { get; set; }
 
     }
 
@@ -263,16 +221,16 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 描述 :上料点 
         /// </summary>
-        public string LoadPoint { get; set; }
+        public string? LoadPoint { get; set; }
 
         /// <summary>
         /// 描述 :上料点名称 
         /// </summary>
-        public string LoadPointName { get; set; }
+        public string? LoadPointName { get; set; }
 
         /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; }
+        public SysDataStatusEnum? Status { get; set; }
     }
 }

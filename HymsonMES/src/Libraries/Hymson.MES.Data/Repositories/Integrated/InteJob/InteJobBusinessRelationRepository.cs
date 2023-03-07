@@ -181,7 +181,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string InsertSql = "INSERT INTO `inte__job_business_relation`(  `Id`, `SiteId`, `BusinessType`, `BusinessId`, `OrderNumber`, `JobId`, `IsUse`, `Parameter`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @BusinessType, @BusinessId, @OrderNumber, @JobId, @IsUse, @Parameter, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string UpdateSql = "UPDATE `inte__job_business_relation` SET   BusinessType = @BusinessType, BusinessId = @BusinessId, OrderNumber = @OrderNumber, JobId = @JobId, IsUse = @IsUse, Parameter = @Parameter, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteByBusinessIdSql = "delete from `inte__job_business_relation` WHERE BusinessId = @BusinessId ";
-        const string DeletesSql = "UPDATE `inte__job_business_relation` SET IsDeleted = '1' WHERE Id in @ids";
+        const string DeletesSql = "UPDATE `inte__job_business_relation` SET IsDeleted = Id WHERE Id in @ids";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteId`, `BusinessType`, `BusinessId`, `OrderNumber`, `JobId`, `IsUse`, `Parameter`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `inte__job_business_relation`  WHERE Id = @Id ";

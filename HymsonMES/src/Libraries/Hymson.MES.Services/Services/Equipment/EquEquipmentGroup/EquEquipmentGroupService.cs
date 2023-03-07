@@ -4,12 +4,14 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
+using Hymson.Utils;
 using Hymson.Utils.Tools;
 
 namespace Hymson.MES.Services.Services.EquEquipmentGroup
@@ -62,7 +64,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(EquEquipmentGroupCreateDto createDto)
+        public async Task<int> CreateAsync(EquEquipmentGroupSaveDto createDto)
         {
             // 验证DTO
             //await _validationCreateRules.ValidateAndThrowAsync(createDto);
@@ -93,7 +95,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyAsync(EquEquipmentGroupModifyDto modifyDto)
+        public async Task<int> ModifyAsync(EquEquipmentGroupSaveDto modifyDto)
         {
             // 验证DTO
             //await _validationModifyRules.ValidateAndThrowAsync(modifyDto);
@@ -134,7 +136,12 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] idsArr)
         {
-            return await _equEquipmentGroupRepository.DeletesAsync(idsArr);
+            return await _equEquipmentGroupRepository.DeletesAsync(new DeleteCommand
+            {
+                Ids = idsArr,
+                UserId = _currentUser.UserName,
+                DeleteOn = HymsonClock.Now()
+            });
         }
 
         /// <summary>
@@ -154,26 +161,23 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         }
 
         /// <summary>
-        /// 
+        /// 查询详情（设备组）
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<EquEquipmentGroupDto> GetDetailAsync(EquEquipmentGroupQueryDto query)
+        public async Task<EquEquipmentGroupDto> GetDetailAsync(long id)
         {
             EquEquipmentGroupDto dto = new();
             IEnumerable<EquEquipmentEntity> equipmentEntitys;
 
-            switch (query.OperateType)
+            if (id == 0)
             {
-                case OperateTypeEnum.Add:
-                    equipmentEntitys = await _equEquipmentRepository.GetByGroupIdAsync(0);
-                    break;
-                case OperateTypeEnum.Edit:
-                case OperateTypeEnum.View:
-                default:
-                    dto.Info = (await _equEquipmentGroupRepository.GetByIdAsync(query.Id)).ToModel<EquEquipmentGroupListDto>();
-                    equipmentEntitys = await _equEquipmentRepository.GetByGroupIdAsync(query.Id);
-                    break;
+                equipmentEntitys = await _equEquipmentRepository.GetByGroupIdAsync(0);
+            }
+            else
+            {
+                dto.Info = (await _equEquipmentGroupRepository.GetByIdAsync(id)).ToModel<EquEquipmentGroupListDto>();
+                equipmentEntitys = await _equEquipmentRepository.GetByGroupIdAsync(id);
             }
 
             dto.Equipments = equipmentEntitys.Select(s => s.ToModel<EquEquipmentBaseDto>());

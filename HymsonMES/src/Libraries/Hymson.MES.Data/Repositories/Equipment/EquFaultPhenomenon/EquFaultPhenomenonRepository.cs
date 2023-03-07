@@ -1,7 +1,9 @@
 using Dapper;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -64,12 +66,12 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         /// <summary>
         /// 批量删除（设备故障现象）
         /// </summary>
-        /// <param name="idsArr"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] idsArr)
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, idsArr);
+            return await conn.ExecuteAsync(DeleteSql, command);
 
         }
 
@@ -140,7 +142,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
                 sqlBuilder.Where("EEG.EquipmentGroupName LIKE @EquipmentGroupName");
             }
 
-            if (pagedQuery.UseStatus > 0)
+            if (pagedQuery.UseStatus > DbDefaultValueConstant.IntDefaultValue)
             {
                 sqlBuilder.Where("EFP.UseStatus = @UseStatus");
             }
@@ -174,7 +176,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
     {
         const string InsertSql = "INSERT INTO `equ_fault_phenomenon`(  `Id`, `FaultPhenomenonCode`, `FaultPhenomenonName`, `EquipmentGroupId`, `UseStatus`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteCode`) VALUES (   @Id, @FaultPhenomenonCode, @FaultPhenomenonName, @EquipmentGroupId, @UseStatus, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteCode )  ";
         const string UpdateSql = "UPDATE `equ_fault_phenomenon` SET FaultPhenomenonName = @FaultPhenomenonName, EquipmentGroupId = @EquipmentGroupId, UseStatus = @UseStatus, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, Remark = @Remark WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `equ_fault_phenomenon` SET IsDeleted = '1' WHERE Id = @Id ";
+        const string DeleteSql = "UPDATE `equ_fault_phenomenon` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id = @Ids ";
         const string IsExistsSql = "SELECT Id FROM equ_fault_phenomenon WHERE `IsDeleted` = 0 AND FaultPhenomenonCode = @faultPhenomenonCode LIMIT 1";
         const string GetByIdSql = @"SELECT 
                                `Id`, `FaultPhenomenonCode`, `FaultPhenomenonName`, `EquipmentGroupId`, `UseStatus`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteCode`

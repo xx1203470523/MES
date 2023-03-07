@@ -4,12 +4,14 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquConsumable.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType.Query;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
+using Hymson.Utils;
 using Hymson.Utils.Tools;
 using IdGen;
 
@@ -63,7 +65,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(EquConsumableTypeCreateDto createDto)
+        public async Task<int> CreateAsync(EquConsumableTypeSaveDto createDto)
         {
             // TODO 验证DTO
 
@@ -94,7 +96,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyAsync(EquConsumableTypeModifyDto modifyDto)
+        public async Task<int> ModifyAsync(EquConsumableTypeSaveDto modifyDto)
         {
             // 验证DTO
 
@@ -134,7 +136,12 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] idsArr)
         {
-            return await _equConsumableTypeRepository.DeletesAsync(idsArr);
+            return await _equConsumableTypeRepository.DeletesAsync(new DeleteCommand
+            {
+                Ids = idsArr,
+                UserId = _currentUser.UserName,
+                DeleteOn = HymsonClock.Now()
+            });
         }
 
         /// <summary>
@@ -179,7 +186,15 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// <returns></returns>
         public async Task<EquConsumableTypeDto> GetDetailAsync(long id)
         {
-            return (await _equConsumableTypeRepository.GetByIdAsync(id)).ToModel<EquConsumableTypeDto>();
+            EquConsumableTypeDto dto = new();
+            var entity = await _equConsumableTypeRepository.GetByIdAsync(id);
+            if (entity != null)
+            {
+                dto = entity.ToModel<EquConsumableTypeDto>();
+                dto.ConsumableTypeCode = entity.SparePartTypeCode;
+                dto.ConsumableTypeName = entity.SparePartTypeName;
+            }
+            return dto;
         }
 
     }

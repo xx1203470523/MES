@@ -3,6 +3,8 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Domain.Warehouse;
+using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
@@ -13,12 +15,15 @@ using Hymson.MES.Data.Repositories.Integrated.InteCalendar.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.MaskCode.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Process.ResourceType.View;
+using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.Services.Dtos.Warehouse;
 
 namespace Hymson.MES.Services.Mapper
 {
@@ -43,32 +48,29 @@ namespace Hymson.MES.Services.Mapper
         protected virtual void CreateEquipmentMaps()
         {
             #region EquConsumable
-            CreateMap<EquConsumableCreateDto, EquSparePartEntity>();
-            CreateMap<EquConsumableModifyDto, EquSparePartEntity>();
+            CreateMap<EquConsumableSaveDto, EquSparePartEntity>();
             CreateMap<EquConsumablePagedQueryDto, EquSparePartPagedQuery>();
 
             CreateMap<EquSparePartEntity, EquConsumableDto>();
             #endregion
 
             #region EquConsumableType
-            CreateMap<EquConsumableTypeCreateDto, EquSparePartTypeEntity>();
-            CreateMap<EquConsumableTypeModifyDto, EquSparePartTypeEntity>();
+            CreateMap<EquConsumableTypeSaveDto, EquSparePartTypeEntity>();
             CreateMap<EquConsumableTypePagedQueryDto, EquSparePartTypePagedQuery>();
 
             CreateMap<EquSparePartTypeEntity, EquConsumableTypeDto>();
             #endregion
 
             #region EquEquipment
-            CreateMap<EquEquipmentCreateDto, EquEquipmentEntity>();
-            CreateMap<EquEquipmentModifyDto, EquEquipmentEntity>();
+            CreateMap<EquEquipmentSaveDto, EquEquipmentEntity>();
             CreateMap<EquEquipmentPagedQueryDto, EquEquipmentPagedQuery>();
 
+            CreateMap<EquEquipmentView, EquEquipmentDto>();
             CreateMap<EquEquipmentEntity, EquEquipmentListDto>();
             #endregion
 
             #region EquEquipmentGroup
-            CreateMap<EquEquipmentGroupCreateDto, EquEquipmentGroupEntity>();
-            CreateMap<EquEquipmentGroupModifyDto, EquEquipmentGroupEntity>();
+            CreateMap<EquEquipmentGroupSaveDto, EquEquipmentGroupEntity>();
             CreateMap<EquEquipmentGroupPagedQueryDto, EquEquipmentGroupPagedQuery>();
 
             CreateMap<EquEquipmentGroupEntity, EquEquipmentGroupListDto>();
@@ -92,35 +94,39 @@ namespace Hymson.MES.Services.Mapper
             #endregion
 
             #region EquEquipmentUnit
-            CreateMap<EquEquipmentUnitCreateDto, EquEquipmentUnitEntity>();
-            CreateMap<EquEquipmentUnitModifyDto, EquEquipmentUnitEntity>();
+            CreateMap<EquEquipmentUnitSaveDto, EquEquipmentUnitEntity>();
             CreateMap<EquEquipmentUnitPagedQueryDto, EquEquipmentUnitPagedQuery>();
 
             CreateMap<EquEquipmentUnitEntity, EquEquipmentUnitDto>();
             #endregion
 
             #region EquFaultPhenomenon
-            CreateMap<EquFaultPhenomenonCreateDto, EquFaultPhenomenonEntity>();
-            CreateMap<EquFaultPhenomenonModifyDto, EquFaultPhenomenonEntity>();
+            CreateMap<EquFaultPhenomenonSaveDto, EquFaultPhenomenonEntity>();
             CreateMap<EquFaultPhenomenonPagedQueryDto, EquFaultPhenomenonPagedQuery>();
 
             CreateMap<EquFaultPhenomenonView, EquFaultPhenomenonDto>();
             #endregion
 
             #region EquSparePart
-            CreateMap<EquSparePartCreateDto, EquSparePartEntity>();
-            CreateMap<EquSparePartModifyDto, EquSparePartEntity>();
+            CreateMap<EquSparePartSaveDto, EquSparePartEntity>();
             CreateMap<EquSparePartPagedQueryDto, EquSparePartPagedQuery>();
 
             CreateMap<EquSparePartEntity, EquSparePartDto>();
             #endregion
 
             #region EquSparePartType
-            CreateMap<EquSparePartTypeCreateDto, EquSparePartTypeEntity>();
-            CreateMap<EquSparePartTypeModifyDto, EquSparePartTypeEntity>();
+            CreateMap<EquSparePartTypeSaveDto, EquSparePartTypeEntity>();
             CreateMap<EquSparePartTypePagedQueryDto, EquSparePartTypePagedQuery>();
 
             CreateMap<EquSparePartTypeEntity, EquSparePartTypeDto>();
+            #endregion
+
+            #region EquFaultReason
+            CreateMap<EquFaultReasonCreateDto, EquFaultReasonEntity>();
+            CreateMap<EquFaultReasonModifyDto, EquFaultReasonEntity>();
+            CreateMap<EquFaultReasonPagedQueryDto, EquFaultReasonPagedQuery>();
+            CreateMap<EquFaultReasonEntity, EquFaultReasonDto>();
+            CreateMap<EquFaultReasonEntity, CustomEquFaultReasonDto>();
             #endregion
         }
 
@@ -130,8 +136,7 @@ namespace Hymson.MES.Services.Mapper
         protected virtual void CreateIntegratedMaps()
         {
             #region InteCalendar
-            CreateMap<InteCalendarCreateDto, InteCalendarEntity>();
-            CreateMap<InteCalendarModifyDto, InteCalendarEntity>();
+            CreateMap<InteCalendarSaveDto, InteCalendarEntity>();
             CreateMap<InteCalendarPagedQueryDto, InteCalendarPagedQuery>();
 
             CreateMap<InteCalendarView, InteCalendarDto>();
@@ -143,8 +148,7 @@ namespace Hymson.MES.Services.Mapper
             #endregion
 
             #region InteClass
-            CreateMap<InteClassCreateDto, InteClassEntity>();
-            CreateMap<InteClassModifyDto, InteClassEntity>();
+            CreateMap<InteClassSaveDto, InteClassEntity>();
             CreateMap<InteClassPagedQueryDto, InteClassPagedQuery>();
 
             CreateMap<InteClassEntity, InteClassDto>();
@@ -162,13 +166,22 @@ namespace Hymson.MES.Services.Mapper
         /// </summary>
         protected virtual void CreateProcessMaps()
         {
+            #region MaskCode
+            CreateMap<ProcMaskCodeSaveDto, ProcMaskCodeEntity>();
+            CreateMap<ProcMaskCodePagedQueryDto, ProcMaskCodePagedQuery>();
+
+            CreateMap<ProcMaskCodeEntity, ProcMaskCodeDto>();
+            #endregion
+
             #region Material
             CreateMap<ProcMaterialCreateDto, ProcMaterialEntity>();
             CreateMap<ProcMaterialModifyDto, ProcMaterialEntity>();
             CreateMap<ProcMaterialPagedQueryDto, ProcMaterialPagedQuery>();
-            CreateMap<ProcMaterialEntity, ProcMaterialDto>();
+            CreateMap<ProcMaterialEntity, ProcMaterialDto>();            
+            CreateMap<ProcMaterialView, ProcMaterialViewDto>();
 
             CreateMap<ProcMaterialReplaceDto, ProcReplaceMaterialEntity>();
+            CreateMap<ProcReplaceMaterialView, ProcMaterialReplaceViewDto>();
 
             CreateMap<ProcMaterialGroupCreateDto, ProcMaterialGroupEntity>();
             CreateMap<ProcMaterialGroupModifyDto, ProcMaterialGroupEntity>();
@@ -271,6 +284,18 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcProcessRouteModifyDto, ProcProcessRouteEntity>();
             CreateMap<ProcProcessRouteDetailNodeView, ProcProcessRouteDetailNodeViewDto>();
             CreateMap<ProcProcessRouteDetailLinkEntity, ProcProcessRouteDetailLinkDto>();
+            #endregion
+
+            #region Warehouse
+            CreateMap<WhSupplierCreateDto, WhSupplierEntity>();
+            CreateMap<WhSupplierModifyDto, WhSupplierEntity>();
+            CreateMap<WhSupplierPagedQueryDto, WhSupplierPagedQuery>();
+            CreateMap<WhSupplierEntity, WhSupplierDto>();
+
+            CreateMap<WhMaterialInventoryCreateDto, WhMaterialInventoryEntity>();
+            CreateMap<WhMaterialInventoryModifyDto, WhMaterialInventoryEntity>();
+            CreateMap<WhMaterialInventoryPagedQueryDto, WhMaterialInventoryPagedQuery>();
+            CreateMap<WhMaterialInventoryEntity, WhMaterialInventoryDto>();
             #endregion
         }
 

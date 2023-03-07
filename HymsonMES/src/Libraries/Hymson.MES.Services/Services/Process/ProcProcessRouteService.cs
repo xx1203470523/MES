@@ -108,7 +108,7 @@ namespace Hymson.MES.Services.Services.Process
             var processRoute = await _procProcessRouteRepository.GetByIdAsync(id);
             if (processRoute == null)
             {
-                throw new Exception(ErrorCode.MES10439);
+                throw new Exception(nameof(ErrorCode.MES10439));
             }
             model.Info = processRoute.ToModel<ProcProcessRouteDto>();
 
@@ -118,15 +118,16 @@ namespace Hymson.MES.Services.Services.Process
             foreach (var node in nodes)
             {
                 //实体转换
-                var nodeViewDto = node.ToModel<ProcProcessRouteDetailNodeViewDto>(); ;
+                var nodeViewDto = node.ToModel<ProcProcessRouteDetailNodeViewDto>();
+                nodeViewDto.ProcessType = (int)ProcessRouteTypeEnum.ProductionRoute;
                 detailNodeViewDtos.Add(nodeViewDto);
             }
             model.Nodes = detailNodeViewDtos;
 
             foreach (var item in model.Nodes)
             {
-                item.Code = ConvertProcedureBomCode(item.ProcedureId, item.Code);
-                item.Name = ConvertProcedureBomName(item.ProcedureId, item.Name);
+                item.Code = ConvertProcedureCode(item.ProcedureId, item.Code);
+                item.Name = ConvertProcedureName(item.ProcedureId, item.Name);
             }
 
             var linkQuery = new ProcProcessRouteDetailLinkQuery { ProcessRouteId = id };
@@ -153,7 +154,7 @@ namespace Hymson.MES.Services.Services.Process
 
             if (parm == null)
             {
-                throw new ValidationException(ErrorCode.MES10100);
+                throw new ValidationException(nameof(ErrorCode.MES10100));
             }
 
             //// 判断是否有获取到站点码
@@ -165,12 +166,25 @@ namespace Hymson.MES.Services.Services.Process
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(parm);
 
+            //工艺路线编码和版本唯一
+            var code = parm.Code.ToUpperInvariant();
+            var query = new ProcProcessRouteQuery
+            {
+                Code = code,
+                SiteId = _currentSite.SiteId ?? 0,
+                Version = parm.Version
+            };
+            if (await _procProcessRouteRepository.IsExistsAsync(query))
+            {
+                throw new BusinessException(nameof(ErrorCode.MES10437)).WithData("Code", parm.Code).WithData("Version", parm.Version);
+            }
+
             var siteId = _currentSite.SiteId ?? 0;
             //DTO转换实体
             var procProcessRouteEntity = parm.ToEntity<ProcProcessRouteEntity>();
-            procProcessRouteEntity.SiteId = siteId;
-            procProcessRouteEntity.Code = parm.Code.ToUpperInvariant();
             procProcessRouteEntity.Id = IdGenProvider.Instance.CreateId();
+            procProcessRouteEntity.SiteId = siteId;
+            procProcessRouteEntity.Code = code;
             procProcessRouteEntity.CreatedBy = _currentUser.UserName;
             procProcessRouteEntity.UpdatedBy = _currentUser.UserName;
 
@@ -181,24 +195,13 @@ namespace Hymson.MES.Services.Services.Process
             var firstProcessCount = nodes.Where(w => w.IsFirstProcess == true).Count();
             if (firstProcessCount == 0)
             {
-                throw new ValidationException(ErrorCode.MES10435);
+                throw new ValidationException(nameof(ErrorCode.MES10435));
             }
 
             if (firstProcessCount > 1)
             {
-                throw new ValidationException(ErrorCode.MES10436);
+                throw new ValidationException(nameof(ErrorCode.MES10436));
             }
-
-            // 判断编号是否已存在
-            var query = new ProcProcessRouteQuery
-            {
-                Code = procProcessRouteEntity.Code,
-                SiteId = _currentSite.SiteId??0
-            };
-            //if (await _procProcessRouteRepository.IsExistsAsync(query))
-            //{
-            //    throw new DataException(ErrorCode.MES10437).WithData("Code", procProcessRouteEntity.Code).WithData("Version", procProcessRouteEntity.Version);
-            //}
             #endregion
 
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
@@ -230,7 +233,7 @@ namespace Hymson.MES.Services.Services.Process
 
             if (parm == null)
             {
-                throw new ValidationException(ErrorCode.MES10100);
+                throw new ValidationException(nameof(ErrorCode.MES10100));
             }
 
             //// 判断是否有获取到站点码
@@ -242,9 +245,15 @@ namespace Hymson.MES.Services.Services.Process
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(parm);
 
+            //判断是否存在
+            var processRoute = await _procProcessRouteRepository.GetByIdAsync(parm.Id);
+            if (processRoute == null)
+            {
+                throw new ValidationException(nameof(ErrorCode.MES10438));
+            }
+
             //DTO转换实体
             var procProcessRouteEntity = parm.ToEntity<ProcProcessRouteEntity>();
-            procProcessRouteEntity.SiteId = _currentSite.SiteId ?? 0;
             procProcessRouteEntity.UpdatedBy = _currentUser.UserName;
 
             var nodes = ConvertProcessRouteNodeList(parm.DynamicData.Nodes, procProcessRouteEntity);
@@ -254,30 +263,26 @@ namespace Hymson.MES.Services.Services.Process
             var firstProcessCount = nodes.Where(w => w.IsFirstProcess == true).Count();
             if (firstProcessCount == 0)
             {
-                throw new ValidationException(ErrorCode.MES10435);
+                throw new ValidationException(nameof(ErrorCode.MES10435));
             }
 
             if (firstProcessCount > 1)
             {
-                throw new ValidationException(ErrorCode.MES10436);
+                throw new ValidationException(nameof(ErrorCode.MES10436));
             }
 
-            var processRoute = await _procProcessRouteRepository.GetByIdAsync(parm.Id);
-            if (processRoute == null)
+            // 工艺路线编码和版本唯一
+            var query = new ProcProcessRouteQuery
             {
-                throw new ValidationException(ErrorCode.MES10438);
+                Code = processRoute.Code,
+                SiteId = _currentSite.SiteId ?? 0,
+                Version = processRoute.Version,
+                Id= processRoute.Id,
+            };
+            if (await _procProcessRouteRepository.IsExistsAsync(query))
+            {
+                throw new BusinessException(nameof(ErrorCode.MES10437)).WithData("Code", processRoute.Code).WithData("Version", processRoute.Version);
             }
-
-            // 判断编号是否已存在
-            //var query = new ProcProcessRouteQuery
-            //{
-            //    Code = procProcessRouteEntity.Code,
-            //    SiteCode = procProcessRouteEntity.SiteCode
-            //};
-            //if (await _procProcessRouteRepository.IsExistsAsync(query))
-            //{
-            //    throw new DataException(ErrorCode.MES10437).WithData("Code", procProcessRouteEntity.Code).WithData("Version", procProcessRouteEntity.Version);
-            //}
             #endregion
 
             //TODO 现在关联表批量删除批量新增，后面再修改
@@ -305,20 +310,18 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeleteProcProcessRouteAsync(string ids)
+        public async Task<int> DeleteProcProcessRouteAsync(long[] idsArr)
         {
-            var idsArr = StringExtension.SpitLongArrary(ids);
             if (idsArr.Length < 1)
             {
-                throw new NotFoundException(ErrorCode.MES10102);
+                throw new NotFoundException(nameof(ErrorCode.MES10102));
             }
 
             #region 参数校验
             //有生产中工单引用当前工艺路线，不能删除！
             // // 状态（0:新建;1:启用;2:保留;3:废除）
-            //TODO 状态枚举由proc_process_status改为sys_data_status
             var statusArr = new string[] { SysDataStatusEnum.Enable.ToString(), SysDataStatusEnum.Retain.ToString() };
             var query = new ProcProcessRouteQuery
             {
@@ -328,7 +331,7 @@ namespace Hymson.MES.Services.Services.Process
             var resourceList = await _procProcessRouteRepository.IsIsExistsEnabledAsync(query);
             if (resourceList != null)
             {
-                throw new CustomerValidationException(ErrorCode.MES10430);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10430));
             }
             #endregion
 
@@ -349,7 +352,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="procedureId"></param>
         /// <param name="defaultCode"></param>
         /// <returns></returns>
-        public static string ConvertProcedureBomCode(long procedureId, string defaultCode)
+        public static string ConvertProcedureCode(long procedureId, string defaultCode)
         {
             return procedureId switch
             {
@@ -365,7 +368,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="procedureId"></param>
         /// <param name="defaultName"></param>
         /// <returns></returns>
-        public static string ConvertProcedureBomName(long procedureId, string defaultName)
+        public static string ConvertProcedureName(long procedureId, string defaultName)
         {
             return procedureId switch
             {
@@ -394,7 +397,7 @@ namespace Hymson.MES.Services.Services.Process
                 SiteId = model.SiteId,
                 ProcessRouteId = model.Id,
                 SerialNo = s.SerialNo,
-                ProcedureId = s.ProcedureBomId,
+                ProcedureId = s.ProcedureId,
                 CheckType = s.CheckType,
                 CheckRate = s.CheckRate,
                 IsWorkReport = s.IsWorkReport,

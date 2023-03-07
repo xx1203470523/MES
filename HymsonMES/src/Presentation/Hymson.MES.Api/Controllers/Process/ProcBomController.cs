@@ -47,7 +47,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Route("pagelist")]
         public async Task<PagedInfo<ProcBomDto>> QueryPagedProcBomAsync([FromQuery] ProcBomPagedQueryDto parm)
         {
@@ -108,9 +108,8 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("delete")]
-        public async Task DeleteProcBomAsync(string ids)
+        public async Task DeleteProcBomAsync(long[] ids)
         {
-            //long[] idsArr = StringExtension.SpitLongArrary(ids);
             await _procBomService.DeletesProcBomAsync(ids);
         }
 

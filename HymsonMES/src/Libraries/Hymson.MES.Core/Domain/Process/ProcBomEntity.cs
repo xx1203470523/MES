@@ -31,7 +31,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :状态 
         /// 空值 : false  
         /// </summary>
-        public string Status { get; set; }
+        public int Status { get; set; }
         
         /// <summary>
         /// 描述 :版本 

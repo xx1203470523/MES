@@ -3,10 +3,12 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.InteClass;
 using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
+using Hymson.Utils;
 using Hymson.Utils.Tools;
 
 namespace Hymson.MES.Services.Services.Integrated.InteClass
@@ -59,7 +61,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(InteClassCreateDto createDto)
+        public async Task<int> CreateAsync(InteClassSaveDto createDto)
         {
             // 验证DTO
 
@@ -103,7 +105,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyAsync(InteClassModifyDto modifyDto)
+        public async Task<int> ModifyAsync(InteClassSaveDto modifyDto)
         {
             // DTO转换实体
             var entity = modifyDto.ToEntity<InteClassEntity>();
@@ -140,7 +142,12 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] idsArr)
         {
-            return await _inteClassRepository.DeletesAsync(idsArr);
+            return await _inteClassRepository.DeletesAsync(new DeleteCommand
+            {
+                Ids = idsArr,
+                UserId = _currentUser.UserName,
+                DeleteOn = HymsonClock.Now()
+            });
         }
 
         /// <summary>

@@ -46,7 +46,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Route("pagelist")]
         public async Task<PagedInfo<ProcMaterialGroupDto>> QueryPagedProcMaterialGroupAsync([FromQuery] ProcMaterialGroupPagedQueryDto parm)
         {
@@ -58,7 +58,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Route("customlist")]
         public async Task<PagedInfo<CustomProcMaterialGroupViewDto>> QueryPagedCustomProcMaterialGroupAsync([FromQuery] CustomProcMaterialGroupPagedQueryDto parm)
         {
@@ -93,7 +93,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpPut]
         [Route("update")]
         public async Task UpdateProcMaterialGroupAsync([FromBody] ProcMaterialGroupModifyDto parm)
         {
@@ -105,9 +105,9 @@ namespace Hymson.MES.Api.Controllers.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpDelete]
         [Route("delete")]
-        public async Task DeleteProcMaterialGroupAsync(string ids)
+        public async Task DeleteProcMaterialGroupAsync(long[] ids)
         {
             //long[] idsArr = StringExtension.SpitLongArrary(ids);
             await _procMaterialGroupService.DeletesProcMaterialGroupAsync(ids);

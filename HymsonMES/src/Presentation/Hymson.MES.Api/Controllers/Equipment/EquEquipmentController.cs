@@ -1,7 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipment;
-using Hymson.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -41,8 +40,7 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("create")]
-        public async Task CreateAsync(EquEquipmentCreateDto createDto)
+        public async Task CreateAsync(EquEquipmentSaveDto createDto)
         {
             await _equEquipmentService.CreateAsync(createDto);
         }
@@ -53,8 +51,7 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
-        [Route("update")]
-        public async Task ModifyAsync(EquEquipmentModifyDto modifyDto)
+        public async Task ModifyAsync(EquEquipmentSaveDto modifyDto)
         {
             await _equEquipmentService.ModifyAsync(modifyDto);
         }
@@ -62,13 +59,12 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// <summary>
         /// 删除（设备注册）
         /// </summary>
-        /// <param name="deleteDto"></param>
+        /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
-        [Route("delete")]
-        public async Task DeletesAsync(EquEquipmentDeleteDto deleteDto)
+        public async Task DeletesAsync(long[] ids)
         {
-            await _equEquipmentService.DeletesAsync(deleteDto.Ids);
+            await _equEquipmentService.DeletesAsync(ids);
         }
 
         /// <summary>
@@ -88,7 +84,7 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("detail")]
+        [HttpGet("{id}")]
         public async Task<EquEquipmentDto> GetDetailAsync(long id)
         {
             return await _equEquipmentService.GetDetailAsync(id);

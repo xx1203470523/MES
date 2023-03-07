@@ -4,10 +4,12 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
+using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Equipment.EquSparePart
 {
@@ -51,7 +53,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(EquConsumableCreateDto createDto)
+        public async Task<int> CreateAsync(EquConsumableSaveDto createDto)
         {
             // 验证DTO
 
@@ -72,7 +74,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyAsync(EquConsumableModifyDto modifyDto)
+        public async Task<int> ModifyAsync(EquConsumableSaveDto modifyDto)
         {
             // 验证DTO
 
@@ -101,7 +103,12 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] idsArr)
         {
-            return await _equConsumableRepository.DeletesAsync(idsArr);
+            return await _equConsumableRepository.DeletesAsync(new DeleteCommand
+            {
+                Ids = idsArr,
+                UserId = _currentUser.UserName,
+                DeleteOn = HymsonClock.Now()
+            });
         }
 
         /// <summary>

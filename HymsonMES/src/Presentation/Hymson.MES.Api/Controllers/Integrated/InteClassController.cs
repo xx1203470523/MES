@@ -40,8 +40,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        [Route("create")]
-        public async Task CreateAsync(InteClassCreateDto createDto)
+        public async Task CreateAsync(InteClassSaveDto createDto)
         {
             await _inteClassService.CreateAsync(createDto);
         }
@@ -51,8 +50,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// </summary>
         /// <returns></returns>
         [HttpPut]
-        [Route("update")]
-        public async Task ModifyAsync(InteClassModifyDto modifyDto)
+        public async Task ModifyAsync(InteClassSaveDto modifyDto)
         {
             await _inteClassService.ModifyAsync(modifyDto);
         }
@@ -60,13 +58,12 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <summary>
         /// 删除（班制维护）
         /// </summary>
-        /// <param name="deleteDto"></param>
+        /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
-        [Route("delete")]
-        public async Task DeletesAsync(InteClassDeleteDto deleteDto)
+        public async Task DeletesAsync(long[] ids)
         {
-            await _inteClassService.DeletesAsync(deleteDto.Ids);
+            await _inteClassService.DeletesAsync(ids);
         }
 
         /// <summary>
@@ -86,7 +83,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("detail")]
+        [HttpGet("{id}")]
         public async Task<InteClassWithDetailDto> GetDetailAsync(long id)
         {
             return await _inteClassService.GetDetailAsync(id);

@@ -1,37 +1,12 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.Infrastructure.Constants;
 
 namespace Hymson.MES.Services.Dtos.Equipment
 {
     /// <summary>
-    /// 新增Dto（单位维护）
+    /// 保存Dto（单位维护）
     /// </summary>
-    public record EquEquipmentUnitCreateDto : BaseEntityDto
-    {
-        /// <summary>
-        /// 单位编码 
-        /// </summary>
-        public string UnitCode { get; set; } = "";
-
-        /// <summary>
-        /// 单位名称 
-        /// </summary>
-        public string UnitName { get; set; } = "";
-
-        /// <summary>
-        /// 单位类型
-        /// </summary>
-        public int Type { get; set; } = 0;
-
-        /// <summary>
-        /// 单位状态 
-        /// </summary>
-        public int Status { get; set; } = 0;
-    }
-
-    /// <summary>
-    /// 更新Dto（单位维护）
-    /// </summary>
-    public record EquEquipmentUnitModifyDto : BaseEntityDto
+    public record EquEquipmentUnitSaveDto : BaseEntityDto
     {
         /// <summary>
         /// 唯一标识
@@ -51,23 +26,17 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 单位类型
         /// </summary>
-        public int Type { get; set; } = 0;
+        public int Type { get; set; } = DbDefaultValueConstant.IntDefaultValue;
 
         /// <summary>
         /// 单位状态 
         /// </summary>
-        public int Status { get; set; } = 0;
-    }
+        public int Status { get; set; } = DbDefaultValueConstant.IntDefaultValue;
 
-    /// <summary>
-    /// 删除Dto（单位维护）
-    /// </summary>
-    public record EquEquipmentUnitDeleteDto
-    {
         /// <summary>
-        /// 集合（主键）
+        /// 描述
         /// </summary>
-        public long[] Ids { get; set; }
+        public string Remark { get; set; } = "";
     }
 
     /// <summary>
@@ -93,12 +62,12 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 单位类型
         /// </summary>
-        public int Type { get; set; } = 0;
+        public int Type { get; set; } = DbDefaultValueConstant.IntDefaultValue;
 
         /// <summary>
         /// 单位状态 
         /// </summary>
-        public int Status { get; set; } = 0;
+        public int Status { get; set; } = DbDefaultValueConstant.IntDefaultValue;
 
         /// <summary>
         /// 描述

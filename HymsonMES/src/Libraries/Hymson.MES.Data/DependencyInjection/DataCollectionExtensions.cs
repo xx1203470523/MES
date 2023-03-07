@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi;
@@ -13,9 +14,11 @@ using Hymson.MES.Data.Repositories.Integrated.InteClass;
 using Hymson.MES.Data.Repositories.Integrated.InteJob;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
+using Hymson.MES.Data.Repositories.Warehouse;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -57,6 +60,12 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquFaultPhenomenonRepository, EquFaultPhenomenonRepository>();
             services.AddSingleton<IEquSparePartRepository, EquSparePartRepository>();
             services.AddSingleton<IEquSparePartTypeRepository, EquSparePartTypeRepository>();
+
+
+            #region FaultReason
+            services.AddSingleton<IEquFaultReasonRepository, EquFaultReasonRepository>();
+
+            #endregion
             #endregion
 
             #region Integrated
@@ -72,7 +81,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteWorkCenterRepository, InteWorkCenterRepository>();
             #endregion
 
-            #region  Process
+            #region Process
+            services.AddSingleton<IProcMaskCodeRepository, ProcMaskCodeRepository>();
 
             #region Material
             services.AddSingleton<IProcMaterialRepository, ProcMaterialRepository>();
@@ -101,6 +111,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcLoadPointRepository, ProcLoadPointRepository>();
 
             #endregion
+
             #region LoadPointLink
             services.AddSingleton<IProcLoadPointLinkMaterialRepository, ProcLoadPointLinkMaterialRepository>();
             services.AddSingleton<IProcLoadPointLinkResourceRepository, ProcLoadPointLinkResourceRepository>();
@@ -118,6 +129,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcProcedureRepository, ProcProcedureRepository>();
             services.AddSingleton<IProcProcedurePrintRelationRepository, ProcProcedurePrintRelationRepository>();
             #endregion
+
             #region ProcessRoute
             services.AddSingleton<IProcProcessRouteRepository, ProcProcessRouteRepository>();
             services.AddSingleton<IProcProcessRouteDetailNodeRepository, ProcProcessRouteDetailNodeRepository>();
@@ -128,6 +140,13 @@ namespace Microsoft.Extensions.DependencyInjection
             #region Quality
             services.AddSingleton<IQualUnqualifiedCodeRepository, QualUnqualifiedCodeRepository>();
             services.AddSingleton<IQualUnqualifiedGroupRepository, QualUnqualifiedGroupRepository>();
+            #endregion
+
+            #region Warehouse 
+            services.AddSingleton<IWhSupplierRepository, WhSupplierRepository>();
+            services.AddSingleton<IWhMaterialInventoryRepository, WhMaterialInventoryRepository>();
+
+
             #endregion
 
             return services;

@@ -13,10 +13,12 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Org.BouncyCastle.Crypto;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -52,15 +54,12 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task CreateProcParameterLinkTypeAsync(ProcParameterLinkTypeCreateDto procParameterLinkTypeCreateDto)
         {
-#if DEBUG
-            //TODO
-#else
             //检查SiteId
             if (_currentSite.SiteId==0|| _currentSite.SiteId==null)
             {
-                throw new BusinessException(ErrorCode.MES10101);
+                throw new BusinessException(nameof(ErrorCode.MES10101));
             }
-#endif
+
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procParameterLinkTypeCreateDto);
 
@@ -74,7 +73,7 @@ namespace Hymson.MES.Services.Services.Process
                 item.UpdatedOn = HymsonClock.Now();
                 item.ParameterType = procParameterLinkTypeCreateDto.ParameterType;
                 item.ParameterID = s;
-                item.SiteId = 1;//TODO 
+                item.SiteId = _currentSite.SiteId??0;
                 return item;
             }).ToList();
 
@@ -101,15 +100,14 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesProcParameterLinkTypeAsync(string ids)
+        public async Task<int> DeletesProcParameterLinkTypeAsync(long[] idsArr)
         {
-            var idsArr = StringExtension.SpitLongArrary(ids);
-            if (idsArr.Length <= 0) 
+            if (idsArr.Length < 1)
             {
-                throw new ValidationException(ErrorCode.MES10100);
+                throw new ValidationException(nameof(ErrorCode.MES10100));
             }
 
-            return await _procParameterLinkTypeRepository.DeletesAsync(idsArr);
+            return await _procParameterLinkTypeRepository.DeletesAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
         }
 
         /// <summary>
@@ -120,7 +118,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcParameterLinkTypeViewDto>> GetPageListAsync(ProcParameterLinkTypePagedQueryDto procParameterLinkTypePagedQueryDto)
         {
             var procParameterLinkTypePagedQuery = procParameterLinkTypePagedQueryDto.ToQuery<ProcParameterLinkTypePagedQuery>();
-            procParameterLinkTypePagedQuery.SiteId = 1;//TODO _currentSite.SiteId;
+            procParameterLinkTypePagedQuery.SiteId = _currentSite.SiteId;
             var pagedInfo = await _procParameterLinkTypeRepository.GetPagedInfoAsync(procParameterLinkTypePagedQuery);
 
             //实体到DTO转换 装载数据
@@ -136,7 +134,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcParameterLinkTypeViewDto>> QueryPagedProcParameterLinkTypeByTypeAsync(ProcParameterDetailPagerQueryDto procParameterDetailPagerQueryDto) 
         {
             var procParameterDetailPagerQuery = procParameterDetailPagerQueryDto.ToQuery<ProcParameterDetailPagerQuery>();
-            procParameterDetailPagerQuery.SiteId = 1;//TODO _currentSite.SiteId;
+            procParameterDetailPagerQuery.SiteId = _currentSite.SiteId; 
             var pagedInfo = await _procParameterLinkTypeRepository.GetPagedProcParameterLinkTypeByTypeAsync(procParameterDetailPagerQuery);
 
             //实体到DTO转换 装载数据
@@ -170,13 +168,13 @@ namespace Hymson.MES.Services.Services.Process
         {
             if (procParameterLinkTypeModifyDto == null)
             {
-                throw new ValidationException(ErrorCode.MES10100);
+                throw new ValidationException(nameof(ErrorCode.MES10100));
             }
 
             //检查SiteId
             if (_currentSite.SiteId==0)
             {
-                throw new BusinessException(ErrorCode.MES10101);
+                throw new BusinessException(nameof(ErrorCode.MES10101));
             }
 
             //验证DTO
@@ -221,7 +219,7 @@ namespace Hymson.MES.Services.Services.Process
                     response = await _procParameterLinkTypeRepository.InsertsAsync(adds);
                     if (response == 0) 
                     {
-                        throw new BusinessException(ErrorCode.MES10507);
+                        throw new BusinessException(nameof(ErrorCode.MES10507));
                     }
                 }
 
@@ -230,14 +228,14 @@ namespace Hymson.MES.Services.Services.Process
                     response = await _procParameterLinkTypeRepository.DeletesTrueAsync(deletes.Select(x => x.Id).ToArray());
                     if (response == 0)
                     {
-                        throw new BusinessException(ErrorCode.MES10507);
+                        throw new BusinessException(nameof(ErrorCode.MES10507));
                     }
                 }
 
                 response = await _procParameterLinkTypeRepository.UpdatesAsync(links);
                 if (response == 0)
                 {
-                    throw new BusinessException(ErrorCode.MES10507);
+                    throw new BusinessException(nameof(ErrorCode.MES10507));
                 }
 
                 ts.Complete();

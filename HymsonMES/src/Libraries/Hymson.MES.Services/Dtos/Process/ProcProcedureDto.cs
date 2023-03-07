@@ -23,7 +23,7 @@ namespace Hymson.MES.Services.Dtos.Process
     public record ProcProcedureDto : BaseEntityDto
     {
         /// <summary>
-        /// 
+        /// 主键id
         /// </summary>
         public long Id { get; set; }
 
@@ -176,12 +176,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 状态
         /// </summary>
-        public string? Status { get; set; }
+        public int? Status { get; set; }
 
         /// <summary>
         /// 类型
         /// </summary>
-        public string? Type { get; set; }
+        public int? Type { get; set; }
 
         /// <summary>
         /// 描述 :资源类型名称 
@@ -297,7 +297,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 包装等级（字典数据）
         /// </summary>
-        public int PackingLevel { get; set; }
+        public int? PackingLevel { get; set; }
 
         /// <summary>
         /// 所属资源类型ID

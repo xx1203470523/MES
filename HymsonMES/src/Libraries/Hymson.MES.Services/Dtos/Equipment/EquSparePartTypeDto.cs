@@ -1,7 +1,39 @@
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Constants;
 
 namespace Hymson.MES.Services.Dtos.Equipment
 {
+    /// <summary>
+    /// 保存Dto（备件类型）
+    /// </summary>
+    public record EquSparePartTypeSaveDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 备件类型编码
+        /// </summary>
+        public string SparePartTypeCode { get; set; } = "";
+
+        /// <summary>
+        /// 备件类型名称
+        /// </summary>
+        public string SparePartTypeName { get; set; } = "";
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public int Status { get; set; } = DbDefaultValueConstant.IntDefaultValue;
+
+        /// <summary>
+        /// 描述
+        /// </summary>
+        public string Remark { get; set; } = "";
+
+        /// <summary>
+        /// 备件ID集合
+        /// </summary>
+        public IEnumerable<long> SparePartIDs { get; set; }
+    }
+
     /// <summary>
     /// Dto（备件类型）
     /// </summary>
@@ -43,84 +75,6 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public DateTime? UpdatedOn { get; set; }
 
 
-    }
-
-    /// <summary>
-    /// 新增Dto（备件类型）
-    /// </summary>
-    public record EquSparePartTypeCreateDto : BaseEntityDto
-    {
-        /// <summary>
-        /// 备件类型编码
-        /// </summary>
-        public string SparePartTypeCode { get; set; } = "";
-
-        /// <summary>
-        /// 备件类型名称
-        /// </summary>
-        public string SparePartTypeName { get; set; } = "";
-
-        /// <summary>
-        /// 状态
-        /// </summary>
-        public int Status { get; set; } = 0;
-
-        /// <summary>
-        /// 描述
-        /// </summary>
-        public string Remark { get; set; } = "";
-
-        /// <summary>
-        /// 备件ID集合
-        /// </summary>
-        public IEnumerable<long> SparePartIDs { get; set; }
-    }
-
-    /// <summary>
-    /// 更新Dto（备件类型）
-    /// </summary>
-    public record EquSparePartTypeModifyDto : BaseEntityDto
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        public long Id { get; set; }
-
-        /// <summary>
-        /// 备件类型编码
-        /// </summary>
-        public string SparePartTypeCode { get; set; }
-
-        /// <summary>
-        /// 备件类型名称
-        /// </summary>
-        public string SparePartTypeName { get; set; }
-
-        /// <summary>
-        /// 状态
-        /// </summary>
-        public int Status { get; set; }
-
-        /// <summary>
-        /// 描述
-        /// </summary>
-        public string Remark { get; set; }
-
-        /// <summary>
-        /// 备件ID集合
-        /// </summary>
-        public IEnumerable<long> SparePartIDs { get; set; }
-    }
-
-    /// <summary>
-    /// 删除Dto（备件类型）
-    /// </summary>
-    public record EquSparePartTypeDeleteDto
-    {
-        /// <summary>
-        /// 集合（主键）
-        /// </summary>
-        public long[] Ids { get; set; }
     }
 
     /// <summary>

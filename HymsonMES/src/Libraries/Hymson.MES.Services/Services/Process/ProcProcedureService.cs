@@ -246,7 +246,7 @@ namespace Hymson.MES.Services.Services.Process
             #region 验证
             if (parm == null)
             {
-                throw new ValidationException(ErrorCode.MES10100);
+                throw new ValidationException(nameof(ErrorCode.MES10100));
             }
 
             var siteId = _currentSite.SiteId??0;
@@ -262,7 +262,7 @@ namespace Hymson.MES.Services.Services.Process
             };
             if (await _procProcedureRepository.IsExistsAsync(query))
             {
-                throw new BusinessException(ErrorCode.MES10405).WithData("Code", parm.Procedure.Code);
+                throw new BusinessException(nameof(ErrorCode.MES10405)).WithData("Code", parm.Procedure.Code);
             }
             #endregion
 
@@ -337,7 +337,7 @@ namespace Hymson.MES.Services.Services.Process
             #region
             if (parm == null)
             {
-                throw new ValidationException(ErrorCode.MES10100);
+                throw new ValidationException(nameof(ErrorCode.MES10100));
             }
             var siteId = _currentSite.SiteId??0;
             var userName = _currentUser.UserName;
@@ -409,14 +409,13 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeleteProcProcedureAsync(string ids)
+        public async Task<int> DeleteProcProcedureAsync(long[] idsArr)
         {
-            var idsArr = StringExtension.SpitLongArrary(ids);
             if (idsArr.Length < 1)
             {
-                throw new NotFoundException(ErrorCode.MES10102);
+                throw new NotFoundException(nameof(ErrorCode.MES10102));
             }
 
             var command = new DeleteCommand

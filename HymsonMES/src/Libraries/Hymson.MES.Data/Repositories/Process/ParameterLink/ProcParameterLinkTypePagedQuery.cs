@@ -6,6 +6,7 @@
  *build datetime: 2023-02-13 05:06:17
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +34,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 类型（设备/产品参数） （1:设备参数;2:产品参数）
         /// </summary>
-        public int ParameterType { get; set; } = 1;
+        public ParameterTypeEnum ParameterType { get; set; } = ParameterTypeEnum.Equipment;
 
         /// <summary>
         /// 编码（设备/产品参数）
@@ -65,12 +66,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 操作类型 1:add；2:edit；3:view；
         /// </summary>
-        public string OperateType { get; set; } = "add";
+        public OperateTypeEnum OperateType { get; set; } = OperateTypeEnum.Add;
 
         /// <summary>
         /// 类型（设备/产品参数）
         /// </summary>
-        public int ParameterType { get; set; } = 1;
+        public ParameterTypeEnum ParameterType { get; set; } = ParameterTypeEnum.Equipment;
 
         /// <summary>
         /// 编码（设备/产品参数）

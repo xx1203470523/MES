@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon.Query;
 
 namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
@@ -33,9 +34,9 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         /// <summary>
         /// 批量删除（设备故障现象）
         /// </summary>
-        /// <param name="idsArr"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        Task<int> DeletesAsync(long[] idsArr);
+        Task<int> DeletesAsync(DeleteCommand command);
 
         /// <summary>
         /// 判断是否存在（编码）

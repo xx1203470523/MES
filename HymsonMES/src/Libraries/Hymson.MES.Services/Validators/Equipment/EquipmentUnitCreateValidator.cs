@@ -6,7 +6,7 @@ namespace Hymson.MES.Services.Validators.Equipment
     /// <summary>
     /// 
     /// </summary>
-    internal class EquipmentUnitCreateValidator : AbstractValidator<EquEquipmentUnitCreateDto>
+    internal class EquipmentUnitCreateValidator : AbstractValidator<EquEquipmentUnitSaveDto>
     {
         /// <summary>
         /// 

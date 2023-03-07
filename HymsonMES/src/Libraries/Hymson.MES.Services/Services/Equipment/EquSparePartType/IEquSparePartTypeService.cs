@@ -13,14 +13,14 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        Task<int> CreateAsync(EquSparePartTypeCreateDto createDto);
+        Task<int> CreateAsync(EquSparePartTypeSaveDto createDto);
 
         /// <summary>
         /// 修改（备件类型）
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        Task<int> ModifyAsync(EquSparePartTypeModifyDto modifyDto);
+        Task<int> ModifyAsync(EquSparePartTypeSaveDto modifyDto);
 
         /// <summary>
         /// 删除（备件类型）

@@ -3,8 +3,10 @@ using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Dtos.Quality;
+using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.MES.Services.Options;
 using Hymson.MES.Services.Services.EquEquipmentGroup;
+using Hymson.MES.Services.Services.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipmentUnit;
 using Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon;
@@ -16,12 +18,15 @@ using Hymson.MES.Services.Services.Integrated.InteCalendar;
 using Hymson.MES.Services.Services.Integrated.InteClass;
 using Hymson.MES.Services.Services.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
+using Hymson.MES.Services.Services.Process.MaskCode;
 using Hymson.MES.Services.Services.Quality;
 using Hymson.MES.Services.Services.Quality.IQualityService;
+using Hymson.MES.Services.Services.Warehouse;
 using Hymson.MES.Services.Validators.Equipment;
 using Hymson.MES.Services.Validators.Integrated;
 using Hymson.MES.Services.Validators.Process;
 using Hymson.MES.Services.Validators.Quality;
+using Hymson.MES.Services.Validators.Warehouse;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -63,6 +68,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquFaultPhenomenonService, EquFaultPhenomenonService>();
             services.AddSingleton<IEquSparePartService, EquSparePartService>();
             services.AddSingleton<IEquSparePartTypeService, EquSparePartTypeService>();
+
+            #region FaultReason
+            services.AddSingleton<IEquFaultReasonService, EquFaultReasonService>();
+
+            #endregion
             #endregion
 
             #region Integrated
@@ -73,6 +83,8 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Process
+            services.AddSingleton<IProcMaskCodeService, ProcMaskCodeService>();
+
             #region Material
             services.AddSingleton<IProcMaterialService, ProcMaterialService>();
             services.AddSingleton<IProcMaterialGroupService, ProcMaterialGroupService>();
@@ -81,13 +93,16 @@ namespace Microsoft.Extensions.DependencyInjection
             #region Parameter
             services.AddSingleton<IProcParameterService, ProcParameterService>();
             #endregion
+
             #region ParameterLinkType
             services.AddSingleton<IProcParameterLinkTypeService, ProcParameterLinkTypeService>();
             #endregion
+
             #region Bom
             services.AddSingleton<IProcBomService, ProcBomService>();
             services.AddSingleton<IProcBomDetailService, ProcBomDetailService>();
             #endregion
+
             #region LoadPoint
             services.AddSingleton<IProcLoadPointService, ProcLoadPointService>();
             #endregion
@@ -106,6 +121,13 @@ namespace Microsoft.Extensions.DependencyInjection
             #region Quality
             services.AddSingleton<IQualUnqualifiedCodeService, QualUnqualifiedCodeService>();
             services.AddSingleton<IQualUnqualifiedGroupService, QualUnqualifiedGroupService>();
+            #endregion
+
+            #region Warehouse 
+            services.AddSingleton<IWhSupplierService, WhSupplierService>();
+            services.AddSingleton<IWhMaterialInventoryService, WhMaterialInventoryService>();
+
+
             #endregion
 
             return services;
@@ -133,10 +155,14 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddValidators(IServiceCollection services)
         {
             #region Equipment
-            services.AddSingleton<AbstractValidator<EquEquipmentUnitCreateDto>, EquipmentUnitCreateValidator>();
+            services.AddSingleton<AbstractValidator<EquEquipmentUnitSaveDto>, EquipmentUnitCreateValidator>();
+
+            services.AddSingleton<AbstractValidator<EquFaultReasonCreateDto>, EquFaultReasonCreateValidator>();
+            services.AddSingleton<AbstractValidator<EquFaultReasonModifyDto>, EquFaultReasonModifyValidator>();
             #endregion
 
             #region Process
+
             #region Material
             services.AddSingleton<AbstractValidator<ProcMaterialCreateDto>, ProcMaterialCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcMaterialModifyDto>, ProcMaterialModifyValidator>();
@@ -197,6 +223,16 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<QualUnqualifiedCodeModifyDto>, QualUnqualifiedCodeModifyValidator>();
             services.AddSingleton<AbstractValidator<QualUnqualifiedGroupCreateDto>, QualUnqualifiedGroupCreateValidator>();
             services.AddSingleton<AbstractValidator<QualUnqualifiedGroupModifyDto>, QualUnqualifiedGroupModifyValidator>();
+            #endregion
+
+            #region Warehouse 
+
+            services.AddSingleton<AbstractValidator<WhSupplierCreateDto>, WhSupplierCreateValidator>();
+            services.AddSingleton<AbstractValidator<WhSupplierModifyDto>, WhSupplierModifyValidator>();
+            services.AddSingleton<AbstractValidator<WhMaterialInventoryCreateDto>, WhMaterialInventoryCreateValidator>();
+            services.AddSingleton<AbstractValidator<WhMaterialInventoryModifyDto>, WhMaterialInventoryModifyValidator>();
+
+
             #endregion
 
             return services;

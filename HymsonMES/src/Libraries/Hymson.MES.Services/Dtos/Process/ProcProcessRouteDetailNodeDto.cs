@@ -99,13 +99,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 修改时间
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public bool? IsDeleted { get; set; }
-
-       
     }
 
 
@@ -318,5 +311,9 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 工序名称
         /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// 工序类型
+        /// </summary>
+        public int ProcessType { get; set; }
     }
 }

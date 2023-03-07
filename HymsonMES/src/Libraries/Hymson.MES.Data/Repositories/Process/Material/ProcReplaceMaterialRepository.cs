@@ -10,6 +10,7 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -44,12 +45,24 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] ids) 
+        public async Task<int> DeletesAsync(DeleteCommand param) 
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeletesSql, new { Ids=ids });
+            return await conn.ExecuteAsync(DeletesSql, param);
 
         }
+
+        /// <summary>
+        /// 批量删除（真删除）
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteTrueByMaterialIdsAsync(long[] materialIds)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeleteTrueByMaterialIdsSql, new { materialIds= materialIds});
+        }
+        
 
         /// <summary>
         /// 根据ID获取数据
@@ -75,9 +88,9 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
+            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteId))
             //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
+            //    sqlBuilder.Where("SiteId=@SiteId");
             //}
            
             var offSet = (procReplaceMaterialPagedQuery.PageIndex - 1) * procReplaceMaterialPagedQuery.PageSize;
@@ -102,9 +115,35 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcReplaceMaterialEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Select("*");
+
+            if (procReplaceMaterialQuery.MaterialId != 0)
+            {
+                sqlBuilder.Where(" MaterialId=@MaterialId ");
+            }
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var procReplaceMaterialEntities = await conn.QueryAsync<ProcReplaceMaterialEntity>(template.RawSql, procReplaceMaterialQuery);
             return procReplaceMaterialEntities;
+        }
+
+        public async Task<IEnumerable<ProcReplaceMaterialView>> GetProcReplaceMaterialViewsAsync(ProcReplaceMaterialQuery procReplaceMaterialQuery) 
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetProcReplaceMaterialViewsSqlTemplate);
+            sqlBuilder.Where("r.IsDeleted=0");
+            sqlBuilder.Where("r.SiteId = @SiteId");
+
+            if (procReplaceMaterialQuery.MaterialId != 0)
+            {
+                sqlBuilder.Where(" r.MaterialId=@MaterialId ");
+            }
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var ProcReplaceMaterialViews = await conn.QueryAsync<ProcReplaceMaterialView>(template.RawSql, procReplaceMaterialQuery);
+            return ProcReplaceMaterialViews;
         }
 
         /// <summary>
@@ -159,14 +198,22 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetProcReplaceMaterialEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `proc_replace_material` /**where**/  ";
+        const string GetProcReplaceMaterialViewsSqlTemplate = @"SELECT 
+                            r.ReplaceMaterialId as Id , m.MaterialName, m.MaterialCode, m.Version, r.IsUse as IsEnabled
+                        FROM `proc_replace_material` r
+                        LEFT JOIN proc_material m on r.ReplaceMaterialId=m.id and m.IsDeleted=0
+                    /**where**/  
+                ";
 
-        const string InsertSql = "INSERT INTO `proc_replace_material`(  `Id`, `SiteCode`, `MaterialId`, `ReplaceMaterialId`, `IsUse`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @MaterialId, @ReplaceMaterialId, @IsUse, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string UpdateSql = "UPDATE `proc_replace_material` SET   SiteCode = @SiteCode, MaterialId = @MaterialId, ReplaceMaterialId = @ReplaceMaterialId, IsUse = @IsUse, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string InsertSql = "INSERT INTO `proc_replace_material`(  `Id`, `SiteId`, `MaterialId`, `ReplaceMaterialId`, `IsUse`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @MaterialId, @ReplaceMaterialId, @IsUse, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string UpdateSql = "UPDATE `proc_replace_material` SET   SiteId = @SiteId, MaterialId = @MaterialId, ReplaceMaterialId = @ReplaceMaterialId, IsUse = @IsUse, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `proc_replace_material` SET   ReplaceMaterialId = @ReplaceMaterialId, IsUse = @IsUse, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `proc_replace_material` SET IsDeleted = '1' WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE `proc_replace_material` SET IsDeleted = '1' WHERE Id in @Ids";
+        const string DeleteSql = "UPDATE `proc_replace_material` SET IsDeleted = Id WHERE Id = @Id ";
+        const string DeletesSql = "UPDATE `proc_replace_material` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @Ids";
+        const string DeleteTrueByMaterialIdsSql = "DELETE From `proc_replace_material` WHERE  MaterialId=@materialIds";
+
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteCode`, `MaterialId`, `ReplaceMaterialId`, `IsUse`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                               `Id`, `SiteId`, `MaterialId`, `ReplaceMaterialId`, `IsUse`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_replace_material`  WHERE Id = @Id ";
     }
 }

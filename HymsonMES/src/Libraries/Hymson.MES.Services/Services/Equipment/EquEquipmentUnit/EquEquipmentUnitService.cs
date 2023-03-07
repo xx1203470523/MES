@@ -4,10 +4,12 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
+using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
 {
@@ -30,7 +32,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
         /// 
         /// </summary>
         private readonly IEquEquipmentUnitRepository _equEquipmentUnitRepository;
-        private readonly AbstractValidator<EquEquipmentUnitCreateDto> _validationCreateRules;
+        private readonly AbstractValidator<EquEquipmentUnitSaveDto> _validationCreateRules;
 
         /// <summary>
         /// 构造函数
@@ -41,7 +43,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
         /// <param name="validationRules"></param>
         public EquEquipmentUnitService(ICurrentUser currentUser, ICurrentSite currentSite,
             IEquEquipmentUnitRepository equEquipmentUnitRepository,
-            AbstractValidator<EquEquipmentUnitCreateDto> validationRules)
+            AbstractValidator<EquEquipmentUnitSaveDto> validationRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -54,7 +56,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(EquEquipmentUnitCreateDto createDto)
+        public async Task<int> CreateAsync(EquEquipmentUnitSaveDto createDto)
         {
             // 验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(createDto);
@@ -65,6 +67,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
             entity.SiteId = _currentSite.SiteId;
+            entity.UnitCode = entity.UnitCode.ToUpper();
 
             // 保存实体
             return await _equEquipmentUnitRepository.InsertAsync(entity);
@@ -75,7 +78,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyAsync(EquEquipmentUnitModifyDto modifyDto)
+        public async Task<int> ModifyAsync(EquEquipmentUnitSaveDto modifyDto)
         {
             // DTO转换实体
             var entity = modifyDto.ToEntity<EquEquipmentUnitEntity>();
@@ -92,7 +95,12 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] idsArr)
         {
-            return await _equEquipmentUnitRepository.DeletesAsync(idsArr);
+            return await _equEquipmentUnitRepository.DeletesAsync(new DeleteCommand
+            {
+                Ids = idsArr,
+                UserId = _currentUser.UserName,
+                DeleteOn = HymsonClock.Now()
+            });
         }
 
         /// <summary>
