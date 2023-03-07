@@ -87,12 +87,12 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
             sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
 
-            if (pagedQuery.Type > DbDefaultValueConstant.IntDefaultValue)
+            if (pagedQuery.Type.HasValue == true)
             {
                 sqlBuilder.Where("Type = @Type");
             }
 
-            if (pagedQuery.Status > DbDefaultValueConstant.IntDefaultValue)
+            if (pagedQuery.Status.HasValue == true)
             {
                 sqlBuilder.Where("Status = @Status");
             }
