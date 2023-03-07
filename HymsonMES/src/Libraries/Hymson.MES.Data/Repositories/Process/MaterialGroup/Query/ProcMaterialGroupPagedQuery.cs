@@ -35,6 +35,11 @@ namespace Hymson.MES.Data.Repositories.Process
         public string? GroupName { get; set; }
 
         /// <summary>
+        /// 物料组描述
+        /// </summary>
+        public string? Remark { get; set; }
+
+        /// <summary>
         /// 版本
         /// </summary>
         public string? Version { get; set; }

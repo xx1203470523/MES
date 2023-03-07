@@ -108,6 +108,11 @@ namespace Hymson.MES.Data.Repositories.Process
                 procMaterialGroupPagedQuery.GroupName = $"%{procMaterialGroupPagedQuery.GroupName}%";
                 sqlBuilder.Where(" GroupName like @GroupName ");
             }
+            if (!string.IsNullOrWhiteSpace(procMaterialGroupPagedQuery.Remark))
+            {
+                procMaterialGroupPagedQuery.GroupName = $"%{procMaterialGroupPagedQuery.Remark}%";
+                sqlBuilder.Where(" Remark like @Remark ");
+            }
 
             var offSet = (procMaterialGroupPagedQuery.PageIndex - 1) * procMaterialGroupPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
