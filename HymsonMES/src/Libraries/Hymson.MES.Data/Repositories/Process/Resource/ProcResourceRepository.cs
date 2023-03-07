@@ -139,6 +139,10 @@ namespace Hymson.MES.Data.Repositories.Process
                 query.ResName = $"%{query.ResName}%";
                 sqlBuilder.Where("ResName like @ResName");
             }
+            if (query.Status.HasValue)
+            {
+                sqlBuilder.Where("Status = @Status");
+            }
             var offSet = (query.PageIndex - 1) * query.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = query.PageSize });
