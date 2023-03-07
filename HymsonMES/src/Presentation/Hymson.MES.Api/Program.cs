@@ -42,7 +42,9 @@ namespace Hymson.MES.Api
             builder.Services.AddJwtBearerService(builder.Configuration);
             builder.Services.AddAppService(builder.Configuration);
             builder.Services.AddSqlLocalization(builder.Configuration);
+            builder.Services.AddSequenceService(builder.Configuration);
             builder.Services.AddLocalization();
+
             // 注入nlog日志服务
             builder.AddNLogWeb(builder.Configuration);
             AddAutoMapper();

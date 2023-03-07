@@ -135,17 +135,17 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 类型（设备注册）
         /// </summary>
-        public int? EquipmentType { get; set; } = DbDefaultValueConstant.IntDefaultValue;
+        public int? EquipmentType { get; set; }
 
         /// <summary>
         /// 使用状态（设备注册）
         /// </summary>
-        public int? UseStatus { get; set; } = DbDefaultValueConstant.IntDefaultValue;
+        public int? UseStatus { get; set; }
 
         /// <summary>
         /// 使用部门
         /// </summary>
-        public int? UseDepartment { get; set; } = DbDefaultValueConstant.IntDefaultValue;
+        public int? UseDepartment { get; set; }
 
         /// <summary>
         /// 车间

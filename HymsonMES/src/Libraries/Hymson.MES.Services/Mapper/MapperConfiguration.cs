@@ -166,6 +166,7 @@ namespace Hymson.MES.Services.Mapper
         protected virtual void CreateProcessMaps()
         {
             #region MaskCode
+            CreateMap<ProcMaskCodeRuleDto, ProcMaskCodeRuleEntity>();
             CreateMap<ProcMaskCodeSaveDto, ProcMaskCodeEntity>();
             CreateMap<ProcMaskCodePagedQueryDto, ProcMaskCodePagedQuery>();
 
