@@ -97,7 +97,7 @@ namespace Hymson.MES.Data.Repositories.Process
                 query.ResType = $"%{query.ResType}%";
                 sqlBuilder.Where("ResType like @ResType");
             }
-            if (query.Status> DbDefaultValueConstant.IntDefaultValue)
+            if (query.Status.HasValue)
             {
                 sqlBuilder.Where("Status = @Status");
             }
