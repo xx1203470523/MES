@@ -166,6 +166,7 @@ namespace Hymson.MES.Services.Mapper
         protected virtual void CreateProcessMaps()
         {
             #region MaskCode
+            CreateMap<ProcMaskCodeRuleDto, ProcMaskCodeRuleEntity>();
             CreateMap<ProcMaskCodeSaveDto, ProcMaskCodeEntity>();
             CreateMap<ProcMaskCodePagedQueryDto, ProcMaskCodePagedQuery>();
 
@@ -290,6 +291,11 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<WhSupplierModifyDto, WhSupplierEntity>();
             CreateMap<WhSupplierPagedQueryDto, WhSupplierPagedQuery>();
             CreateMap<WhSupplierEntity, WhSupplierDto>();
+
+            CreateMap<WhMaterialInventoryCreateDto, WhMaterialInventoryEntity>();
+            CreateMap<WhMaterialInventoryModifyDto, WhMaterialInventoryEntity>();
+            CreateMap<WhMaterialInventoryPagedQueryDto, WhMaterialInventoryPagedQuery>();
+            CreateMap<WhMaterialInventoryEntity, WhMaterialInventoryDto>();
             #endregion
         }
 

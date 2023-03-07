@@ -76,6 +76,10 @@ namespace Hymson.MES.Services.Services.Warehouse
                 SiteId = _currentSite.SiteId,
                 Code = whSupplierCreateDto.Code
             });
+            if (exists != null && exists.Count() > 0)
+            {
+                throw new BusinessException(ErrorCode.MES15002).WithData("Code", whSupplierCreateDto.Code);
+            }
 
             //DTO转换实体
             var whSupplierEntity = whSupplierCreateDto.ToEntity<WhSupplierEntity>();
@@ -85,10 +89,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             whSupplierEntity.CreatedOn = HymsonClock.Now();
             whSupplierEntity.UpdatedOn = HymsonClock.Now();
             whSupplierEntity.SiteId = _currentSite.SiteId ?? 0;
-            if (exists != null && exists.Count() > 0)
-            {
-                throw new BusinessException(ErrorCode.MES15002).WithData("Code", whSupplierEntity.Code);
-            }
+
 
             //入库
             await _whSupplierRepository.InsertAsync(whSupplierEntity);
@@ -167,15 +168,15 @@ namespace Hymson.MES.Services.Services.Warehouse
 
 
             //判断编号是否已经存在
-            var exists = await _whSupplierRepository.GetWhSupplierEntitiesAsync(new WhSupplierQuery()
-            {
-                SiteId = _currentSite.SiteId,
-                Code = whSupplierModifyDto.Code
-            });
-            if (exists != null && exists.Count() > 0)
-            {
-                throw new BusinessException(ErrorCode.MES15002).WithData("Code", whSupplierModifyDto.Code);
-            }
+            //var exists = await _whSupplierRepository.GetWhSupplierEntitiesAsync(new WhSupplierQuery()
+            //{
+            //    SiteId = _currentSite.SiteId,
+            //    Code = whSupplierModifyDto.Code
+            //});
+            //if (exists != null && exists.Count() > 0)
+            //{
+            //    throw new BusinessException(ErrorCode.MES15002).WithData("Code", whSupplierModifyDto.Code);
+            //}
 
             //DTO转换实体
             var whSupplierEntity = whSupplierModifyDto.ToEntity<WhSupplierEntity>();

@@ -10,6 +10,12 @@ namespace Hymson.MES.Core.Domain.Process
     public class ProcMaskCodeRuleEntity : BaseEntity
     {
         /// <summary>
+        /// 描述 :所属站点代码 
+        /// 空值 : false  
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
         /// 描述 :所属掩码ID 
         /// 空值 : false  
         /// </summary>
@@ -32,11 +38,5 @@ namespace Hymson.MES.Core.Domain.Process
         /// 空值 : true  
         /// </summary>
         public string MatchWay { get; set; }
-
-        /// <summary>
-        /// 描述 :说明 
-        /// 空值 : true  
-        /// </summary>
-        public string Remark { get; set; }
     }
 }

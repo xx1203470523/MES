@@ -27,12 +27,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 状态
         /// </summary>
-        public int? Status { get; set; } = -1;
+        public int? Status { get; set; }
 
         /// <summary>
         /// 类型
         /// </summary>
-        public int? Type { get; set; } = -1;
+        public int? Type { get; set; } 
 
         /// <summary>
         /// 版本
