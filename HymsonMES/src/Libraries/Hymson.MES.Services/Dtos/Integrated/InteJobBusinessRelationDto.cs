@@ -72,25 +72,30 @@ namespace Hymson.MES.Services.Dtos.Integrated
     /// </summary>
     public record InteJobBusinessRelationCreateDto : BaseEntityDto
     {
-       /// <summary>
+        /// <summary>
+        /// 关联点
+        /// </summary>
+        public int LinkPoint { get; set; }
+
+        /// <summary>
         /// 1资源  2工序 3不合格代码
         /// </summary>
-        public int BusinessType { get; set; }
+       // public int BusinessType { get; set; }
 
        /// <summary>
         /// 序号
         /// </summary>
-        public string OrderNumber { get; set; }
+       // public string OrderNumber { get; set; }
 
        /// <summary>
         /// 作业ID
         /// </summary>
         public long JobId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否启用
         /// </summary>
-        public bool IsUse { get; set; }
+        public bool IsUse { get; set; } = false;
 
        /// <summary>
         /// 参数

@@ -262,7 +262,7 @@ namespace Hymson.MES.Services.Services.Process
         //}
 
         /// <summary>
-        /// 获取工序配置Job信息
+        /// 获取资源配置Job信息
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
