@@ -33,12 +33,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 版本
         /// </summary>
-        public string Version { get; set; }
+        public string? Version { get; set; }
 
        /// <summary>
         /// 参考点
         /// </summary>
-        public string ReferencePoint { get; set; }
+        public string? ReferencePoint { get; set; }
 
        ///// <summary>
        // /// 说明
