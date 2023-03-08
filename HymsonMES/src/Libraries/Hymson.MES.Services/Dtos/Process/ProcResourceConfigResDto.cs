@@ -34,7 +34,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 设置类型(字典配置)
         /// </summary>
-        public string SetType { get; set; }
+        public int SetType { get; set; }
 
        /// <summary>
         /// 设置值
@@ -82,7 +82,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 设置类型(字典配置)
         /// </summary>
-        public string SetType { get; set; }
+        public int SetType { get; set; }
 
        /// <summary>
         /// 设置值
@@ -103,7 +103,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 设置类型
         /// </summary>
-        public string SetType { get; set; }
+        public int SetType { get; set; }
 
         /// <summary>
         /// 设置值
