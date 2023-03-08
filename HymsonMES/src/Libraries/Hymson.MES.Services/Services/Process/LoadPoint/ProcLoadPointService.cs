@@ -69,7 +69,7 @@ namespace Hymson.MES.Services.Services.Process
 
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procLoadPointCreateDto);
-            if (procLoadPointCreateDto.LinkMaterials!=null&&procLoadPointCreateDto.LinkMaterials.Any(a => string.IsNullOrWhiteSpace(a.MaterialId.ToString())))
+            if (procLoadPointCreateDto.LinkMaterials!=null&&procLoadPointCreateDto.LinkMaterials.Any(a => a.MaterialId==0))
             {
                 throw new ValidationException(nameof(ErrorCode.MES10702));
             }
@@ -120,9 +120,10 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     linkMaterials.Add(new ProcLoadPointLinkMaterialEntity
                     {
+                        Id= IdGenProvider.Instance.CreateId(),
                         SiteId = procLoadPointEntity.SiteId,
                         LoadPointId = procLoadPointEntity.Id,
-                        MaterialId = material.MaterialId.ParseToLong(),
+                        MaterialId = material.MaterialId,
                         Version = material.Version,
                         ReferencePoint = material.ReferencePoint,
                         CreatedBy = _currentUser.UserName,
@@ -277,7 +278,7 @@ namespace Hymson.MES.Services.Services.Process
 
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(procLoadPointModifyDto);
-            if (procLoadPointModifyDto.LinkMaterials != null && procLoadPointModifyDto.LinkMaterials.Any(a => string.IsNullOrWhiteSpace(a.MaterialId.ToString())))
+            if (procLoadPointModifyDto.LinkMaterials != null && procLoadPointModifyDto.LinkMaterials.Any(a => a.MaterialId==0))
             {
                 throw new ValidationException(nameof(ErrorCode.MES10702));
             }
@@ -320,9 +321,10 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     linkMaterials.Add(new ProcLoadPointLinkMaterialEntity
                     {
+                        Id = IdGenProvider.Instance.CreateId(),
                         SiteId = procLoadPointEntity.SiteId,
                         LoadPointId = procLoadPointEntity.Id,
-                        MaterialId = material.MaterialId.ParseToLong(),
+                        MaterialId = material.MaterialId,
                         Version = material.Version,
                         ReferencePoint = material.ReferencePoint,
                         CreatedBy = _currentUser.UserName,
