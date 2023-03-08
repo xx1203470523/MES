@@ -13,16 +13,16 @@ namespace Hymson.MES.Data.Repositories.Process.MaskCode
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="equipmentUnitEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(ProcMaskCodeEntity equipmentUnitEntity);
+        Task<int> InsertAsync(ProcMaskCodeEntity entity);
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="equipmentUnitEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(ProcMaskCodeEntity equipmentUnitEntity);
+        Task<int> UpdateAsync(ProcMaskCodeEntity entity);
 
         /// <summary>
         /// 

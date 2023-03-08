@@ -36,6 +36,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("'SiteId','Id','Code','Name','ClassProgram','Remark','CreatedBy','CreatedOn','UpdatedBy','UpdatedOn','IsDeleted'");
 
             if (!string.IsNullOrWhiteSpace(param.Code)) { sqlBuilder.Where("Code like '%@Code%'"); }

@@ -333,11 +333,41 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 工序配置工作实体类
         /// </summary>
-        public InteJobBusinessRelationDto ProcedureBomConfigJob { get; set; }
+        // public InteJobBusinessRelationDto ProcedureConfigJob { get; set; }
 
         /// <summary>
-        /// 工作
+        /// 关联点
         /// </summary>
-        public InteJobDto Job { get; set; }
+        public int LinkPoint { get; set; } = -1;
+
+        /// <summary>
+        /// 所属不合格代码ID
+        /// </summary>
+        public long BusinessId { get; set; }
+
+        /// <summary>
+        /// 作业ID
+        /// </summary>
+        public long JobId { get; set; }
+
+        /// <summary>
+        /// 是否启用
+        /// </summary>
+        public bool IsUse { get; set; }
+
+        /// <summary>
+        /// 参数
+        /// </summary>
+        public string Parameter { get; set; }
+
+        /// <summary>
+        /// 作业编号 
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 作业名称 
+        /// </summary>
+        public string Name { get; set; }
     }
 }

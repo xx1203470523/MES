@@ -13,6 +13,8 @@ using Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteCalendar.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
+using Hymson.MES.Data.Repositories.Integrated.InteContainer.Query;
+using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
@@ -153,9 +155,16 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteClassEntity, InteClassDto>();
             #endregion
 
-            #region InteJob
+            #region InteContainer
+            CreateMap<InteContainerSaveDto, InteContainerEntity>();
+            CreateMap<InteContainerPagedQueryDto, InteContainerPagedQuery>();
 
+            CreateMap<InteContainerEntity, InteContainerDto>();
+            #endregion
+
+            #region InteJob
             CreateMap<InteJobEntity, InteJobDto>();
+            CreateMap<InteJobPagedQueryDto, InteJobPagedQuery>();
             CreateMap<InteJobBusinessRelationCreateDto, InteJobBusinessRelationEntity>();
             #endregion
         }
@@ -166,9 +175,11 @@ namespace Hymson.MES.Services.Mapper
         protected virtual void CreateProcessMaps()
         {
             #region MaskCode
+            CreateMap<ProcMaskCodeRuleDto, ProcMaskCodeRuleEntity>();
             CreateMap<ProcMaskCodeSaveDto, ProcMaskCodeEntity>();
             CreateMap<ProcMaskCodePagedQueryDto, ProcMaskCodePagedQuery>();
 
+            CreateMap<ProcMaskCodeRuleEntity, ProcMaskCodeRuleDto>();
             CreateMap<ProcMaskCodeEntity, ProcMaskCodeDto>();
             #endregion
 
@@ -180,6 +191,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcMaterialView, ProcMaterialViewDto>();
 
             CreateMap<ProcMaterialReplaceDto, ProcReplaceMaterialEntity>();
+            CreateMap<ProcReplaceMaterialView, ProcMaterialReplaceViewDto>();
 
             CreateMap<ProcMaterialGroupCreateDto, ProcMaterialGroupEntity>();
             CreateMap<ProcMaterialGroupModifyDto, ProcMaterialGroupEntity>();
@@ -289,6 +301,11 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<WhSupplierModifyDto, WhSupplierEntity>();
             CreateMap<WhSupplierPagedQueryDto, WhSupplierPagedQuery>();
             CreateMap<WhSupplierEntity, WhSupplierDto>();
+
+            CreateMap<WhMaterialInventoryCreateDto, WhMaterialInventoryEntity>();
+            CreateMap<WhMaterialInventoryModifyDto, WhMaterialInventoryEntity>();
+            CreateMap<WhMaterialInventoryPagedQueryDto, WhMaterialInventoryPagedQuery>();
+            CreateMap<WhMaterialInventoryEntity, WhMaterialInventoryDto>();
             #endregion
             #region PrintConfig
             CreateMap<ProcPrinterDto, ProcPrinterEntity>();

@@ -142,7 +142,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
                 sqlBuilder.Where("EEG.EquipmentGroupName LIKE @EquipmentGroupName");
             }
 
-            if (pagedQuery.UseStatus > DbDefaultValueConstant.IntDefaultValue)
+            if (pagedQuery.UseStatus.HasValue == true)
             {
                 sqlBuilder.Where("EFP.UseStatus = @UseStatus");
             }

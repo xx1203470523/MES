@@ -74,7 +74,7 @@ namespace Hymson.MES.Data.Repositories.Process
                 query.Version = $"%{query.Version}%";
                 sqlBuilder.Where("Version like @Version");
             }
-            if (query.Status > DbDefaultValueConstant.IntDefaultValue)
+            if (query.Status.HasValue)
             {
                 sqlBuilder.Where("Status = @Status");
             }

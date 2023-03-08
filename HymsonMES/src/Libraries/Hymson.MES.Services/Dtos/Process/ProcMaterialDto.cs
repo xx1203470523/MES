@@ -244,20 +244,20 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public record ProcMaterialReplaceDto : BaseEntityDto
     {
-        /// <summary>
-        /// 序号
-        /// </summary>
-        public long Sequence { get; set; }
+        ///// <summary>
+        ///// 序号
+        ///// </summary>
+        //public long Sequence { get; set; }
 
-        /// <summary>
-        /// 物料维护表Id
-        /// </summary>
-        public long Id { get; set; }
+        ///// <summary>
+        ///// 物料维护表Id
+        ///// </summary>
+        //public long Id { get; set; }
 
         /// <summary>
         /// 物料ID
         /// </summary>
-        public long? MaterialId { get; set; }
+        public long Id { get; set; }
 
         /// <summary>
         /// 物料名称
@@ -278,11 +278,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 是否启用
         /// </summary>
         public bool IsEnabled { get; set; }
-        /// <summary>
-        /// 操作类型
-        /// </summary>
-        [Required(ErrorMessage = "操作类型不可为空")]
-        public OperateTypeEnum OperationType { get; set; }
+        ///// <summary>
+        ///// 操作类型
+        ///// </summary>
+        //[Required(ErrorMessage = "操作类型不可为空")]
+        //public OperateTypeEnum OperationType { get; set; }
     }
 
     /// <summary>
@@ -462,5 +462,54 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 空值 : true  
         /// </summary>
         public string? ProcedureBomVersion { get; set; }
+
+        public List<ProcMaterialReplaceViewDto> ReplaceMaterialList { get; set; }=new List<ProcMaterialReplaceViewDto>();
     }
+
+    /// <summary>
+    /// 替换物料 视图
+    /// </summary>
+    public record ProcMaterialReplaceViewDto : BaseEntityDto
+    {
+        ///// <summary>
+        ///// 序号
+        ///// </summary>
+        //public long Sequence { get; set; }
+
+        ///// <summary>
+        ///// 物料维护表Id
+        ///// </summary>
+        //public long Id { get; set; }
+
+        /// <summary>
+        /// 物料ID
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string MaterialName { get; set; }
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 版本
+        /// </summary>
+        public string Version { get; set; }
+
+        /// <summary>
+        /// 是否启用
+        /// </summary>
+        public bool IsEnabled { get; set; }
+        ///// <summary>
+        ///// 操作类型
+        ///// </summary>
+        //[Required(ErrorMessage = "操作类型不可为空")]
+        //public OperateTypeEnum OperationType { get; set; }
+    }
+
 }

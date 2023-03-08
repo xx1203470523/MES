@@ -98,7 +98,7 @@ namespace Hymson.MES.Data.Repositories.Process
                 query.ResType = $"%{query.ResType}%";
                 sqlBuilder.Where("ResType like @ResType");
             }
-            if (query.Status> DbDefaultValueConstant.IntDefaultValue)
+            if (query.Status.HasValue)
             {
                 sqlBuilder.Where("Status = @Status");
             }
@@ -139,6 +139,10 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 query.ResName = $"%{query.ResName}%";
                 sqlBuilder.Where("ResName like @ResName");
+            }
+            if (query.Status.HasValue)
+            {
+                sqlBuilder.Where("Status = @Status");
             }
             var offSet = (query.PageIndex - 1) * query.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });

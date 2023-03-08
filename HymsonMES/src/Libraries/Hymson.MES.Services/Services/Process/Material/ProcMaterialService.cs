@@ -88,6 +88,7 @@ namespace Hymson.MES.Services.Services.Process
             {
                 throw new CustomerValidationException( nameof(ErrorCode.MES10201) ).WithData("materialCode", procMaterialCreateDto.MaterialCode).WithData("version", procMaterialCreateDto.Version);
             }
+
             #endregion
 
             #region 组装数据
@@ -109,7 +110,7 @@ namespace Hymson.MES.Services.Services.Process
                     ProcReplaceMaterialEntity procReplaceMaterial=item.ToEntity<ProcReplaceMaterialEntity>();
                     procReplaceMaterial.Id= IdGenProvider.Instance.CreateId();
                     procReplaceMaterial.IsUse = item.IsEnabled;
-                    procReplaceMaterial.ReplaceMaterialId = (long)item.MaterialId;
+                    procReplaceMaterial.ReplaceMaterialId = item.Id;
                     procReplaceMaterial.MaterialId = procMaterialEntity.Id;
                     procReplaceMaterial.CreatedBy = _currentUser.UserName;
                     procReplaceMaterial.CreatedOn = HymsonClock.Now();
@@ -286,54 +287,19 @@ namespace Hymson.MES.Services.Services.Process
             #region 组装数据
             //替代品数据
             List<ProcReplaceMaterialEntity> addProcReplaceList = new List<ProcReplaceMaterialEntity>();
-            List<ProcReplaceMaterialEntity> updateProcReplaceList = new List<ProcReplaceMaterialEntity>();
-            List<long> deleteeProcReplaceIds = new List<long>();
-            if (procMaterialModifyDto.DynamicList != null && procMaterialModifyDto.DynamicList.Count() > 0)
+            if (procMaterialModifyDto.DynamicList != null && procMaterialModifyDto.DynamicList.Count > 0)
             {
                 foreach (var item in procMaterialModifyDto.DynamicList)
                 {
-                    ProcReplaceMaterialEntity procReplaceMaterial = new ProcReplaceMaterialEntity();
-                    //switch (item.OperationType)
-                    //{
-                        //TODO  不管是新增，更新，删除    都是先真删除之后再新增
-                        //case OperateTypeEnum.Add:
-                        //    procReplaceMaterial = item.ToEntity<ProcReplaceMaterialEntity>();
-                        //    procReplaceMaterial.Id= IdGenProvider.Instance.CreateId();
-                        //    procReplaceMaterial.CreatedBy = _currentUser.UserName;
-                        //    procReplaceMaterial.CreatedOn = HymsonClock.Now();
-                        //    procReplaceMaterial.IsUse = item.IsEnabled;
-                        //    procReplaceMaterial.ReplaceMaterialId = (long)item.MaterialId;
-                        //    procReplaceMaterial.MaterialId = procMaterialEntity.Id;
-                        //    procReplaceMaterial.SiteId = _currentSite.SiteId??0;
-                        //    addProcReplaceList.Add(procReplaceMaterial);
-                        //    break;
-                        //case OperateTypeEnum.Edit:
-                        //    procReplaceMaterial = item.ToEntity<ProcReplaceMaterialEntity>();  //item.Adapt<ProcReplaceMaterial>().ToUpdate();
-                        //    procReplaceMaterial.UpdatedBy = _currentUser.UserName;
-                        //    procReplaceMaterial.UpdatedOn = HymsonClock.Now();
-                        //    if (item.Id == item.MaterialId)
-                        //    {
-                        //        var modelReplaceMaterial = await _procReplaceMaterialRepository.GetByIdAsync(item.Id);
-                        //        if (modelReplaceMaterial != null)
-                        //        {
-                        //            procReplaceMaterial.ReplaceMaterialId = modelReplaceMaterial.ReplaceMaterialId;
-                        //        }
-                        //    }
-                        //    else
-                        //    {
-                        //        procReplaceMaterial.ReplaceMaterialId = (long)item.MaterialId;
-                        //    }
-                        //    procReplaceMaterial.IsUse = item.IsEnabled;
-                        //    procReplaceMaterial.MaterialId = procMaterialEntity.Id;
-                        //    updateProcReplaceList.Add(procReplaceMaterial);
-                        //    break;
-                        //case 3:
-                        //    if (item.MaterialId != null && item.MaterialId > 0)
-                        //    {
-                        //        deleteeProcReplaceIds.Add(item.MaterialId ?? 0);
-                        //    }
-                        //    break;
-                    //}
+                    ProcReplaceMaterialEntity procReplaceMaterial = item.ToEntity<ProcReplaceMaterialEntity>();
+                    procReplaceMaterial.Id = IdGenProvider.Instance.CreateId();
+                    procReplaceMaterial.IsUse = item.IsEnabled;
+                    procReplaceMaterial.ReplaceMaterialId = item.Id;
+                    procReplaceMaterial.MaterialId = procMaterialEntity.Id;
+                    procReplaceMaterial.CreatedBy = _currentUser.UserName;
+                    procReplaceMaterial.CreatedOn = HymsonClock.Now();
+                    procReplaceMaterial.SiteId = _currentSite.SiteId ?? 0;
+                    addProcReplaceList.Add(procReplaceMaterial);
                 }
             }
             #endregion 
@@ -379,28 +345,15 @@ namespace Hymson.MES.Services.Services.Process
                     throw new BusinessException(nameof(ErrorCode.MES10208));
                 }
 
+                //先真删除替换物料
+                response = await _procReplaceMaterialRepository.DeleteTrueByMaterialIdsAsync(new long[] { procMaterialEntity.Id });
+
                 //替代组设置数据
                 if (addProcReplaceList != null && addProcReplaceList.Count > 0)
                 {
                     if ((await _procReplaceMaterialRepository.InsertsAsync(addProcReplaceList))<=0)
                     {
                         throw new BusinessException(nameof(ErrorCode.MES10209));
-                    }
-                }
-
-                if (updateProcReplaceList != null && updateProcReplaceList.Count > 0)
-                {
-                    if ((await _procReplaceMaterialRepository.UpdatesAsync(updateProcReplaceList))<=0)
-                    {
-                        throw new BusinessException(nameof(ErrorCode.MES10210));
-                    }
-                }
-
-                if (deleteeProcReplaceIds != null && deleteeProcReplaceIds.Count > 0)
-                {
-                    if (await _procReplaceMaterialRepository.DeletesAsync(new DeleteCommand { Ids = deleteeProcReplaceIds.ToArray(), DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName }) <= 0)
-                    {
-                        throw new BusinessException(nameof(ErrorCode.MES10211));
                     }
                 }
 
@@ -422,9 +375,22 @@ namespace Hymson.MES.Services.Services.Process
         {
             var procMaterialView = await _procMaterialRepository.GetByIdAsync(id, _currentSite.SiteId??0);   
             if (procMaterialView != null) 
-           {
-               return procMaterialView.ToModel<ProcMaterialViewDto>();
-           }
+            {
+                var procMaterialViewDto = procMaterialView.ToModel<ProcMaterialViewDto>();
+
+                 //查询替代物料
+                var replaceMaterialViews=  await _procReplaceMaterialRepository.GetProcReplaceMaterialViewsAsync(new ProcReplaceMaterialQuery
+                {
+                    SiteId = procMaterialView.SiteId,
+                    MaterialId = procMaterialView.Id
+                });                
+                foreach (var replaceMaterialView in replaceMaterialViews) 
+                {
+                    procMaterialViewDto.ReplaceMaterialList.Add(replaceMaterialView.ToModel<ProcMaterialReplaceViewDto>());
+                }
+
+                return procMaterialViewDto;
+            }
             return null;
         }
 
@@ -441,7 +407,7 @@ namespace Hymson.MES.Services.Services.Process
             return dynamicList.Select(s => new ProcReplaceMaterialEntity
             {
                 MaterialId = model.Id,
-                ReplaceMaterialId = (long)s.MaterialId,
+                ReplaceMaterialId = s.Id,
                 IsUse = s.IsEnabled,
                 CreatedBy = model.UpdatedBy,
                 CreatedOn = model.UpdatedOn ?? HymsonClock.Now()

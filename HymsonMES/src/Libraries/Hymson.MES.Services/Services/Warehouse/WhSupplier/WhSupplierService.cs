@@ -67,7 +67,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             Regex reg = new Regex(@"^[A-Za-z0-9]+$");
             if (!reg.Match(whSupplierCreateDto.Code).Success)
             {
-                throw new BusinessException(ErrorCode.MES15008).WithData("Code", whSupplierCreateDto.Code);
+                throw new BusinessException(nameof(ErrorCode.MES15008)).WithData("Code", whSupplierCreateDto.Code);
             }
             whSupplierCreateDto.Code = whSupplierCreateDto.Code.ToUpper();
             //判断编号是否已经存在
@@ -76,6 +76,10 @@ namespace Hymson.MES.Services.Services.Warehouse
                 SiteId = _currentSite.SiteId,
                 Code = whSupplierCreateDto.Code
             });
+            if (exists != null && exists.Count() > 0)
+            {
+                throw new BusinessException(nameof(ErrorCode.MES15002)).WithData("Code", whSupplierCreateDto.Code);
+            }
 
             //DTO转换实体
             var whSupplierEntity = whSupplierCreateDto.ToEntity<WhSupplierEntity>();
@@ -85,10 +89,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             whSupplierEntity.CreatedOn = HymsonClock.Now();
             whSupplierEntity.UpdatedOn = HymsonClock.Now();
             whSupplierEntity.SiteId = _currentSite.SiteId ?? 0;
-            if (exists != null && exists.Count() > 0)
-            {
-                throw new BusinessException(ErrorCode.MES15002).WithData("Code", whSupplierEntity.Code);
-            }
+
 
             //入库
             await _whSupplierRepository.InsertAsync(whSupplierEntity);
@@ -113,7 +114,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         {
             if (ids == null || ids.Count() <= 0)
             {
-                throw new ValidationException(ErrorCode.MES13005);
+                throw new ValidationException(nameof(ErrorCode.MES13005));
             }
             return await _whSupplierRepository.DeletesAsync(new DeleteCommand
             {
@@ -164,18 +165,6 @@ namespace Hymson.MES.Services.Services.Warehouse
         {
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(whSupplierModifyDto);
-
-
-            //判断编号是否已经存在
-            var exists = await _whSupplierRepository.GetWhSupplierEntitiesAsync(new WhSupplierQuery()
-            {
-                SiteId = _currentSite.SiteId,
-                Code = whSupplierModifyDto.Code
-            });
-            if (exists != null && exists.Count() > 0)
-            {
-                throw new BusinessException(ErrorCode.MES15002).WithData("Code", whSupplierModifyDto.Code);
-            }
 
             //DTO转换实体
             var whSupplierEntity = whSupplierModifyDto.ToEntity<WhSupplierEntity>();
