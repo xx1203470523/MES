@@ -16,10 +16,10 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob.Query
         /// <summary>
         /// 作业编号 
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
         /// <summary>
         /// 作业名称 
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
     }
 }

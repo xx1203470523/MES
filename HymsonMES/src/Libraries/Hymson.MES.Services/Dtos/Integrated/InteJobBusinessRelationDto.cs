@@ -30,9 +30,14 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public int BusinessType { get; set; }
 
-       /// <summary>
-        /// 所属不合格代码ID
+        /// <summary>
+        /// 关联点
         /// </summary>
+        public int LinkPoint { get; set; } = -1;
+
+       /// <summary>
+       /// 所属不合格代码ID
+       /// </summary>
         public long BusinessId { get; set; }
 
        /// <summary>
