@@ -65,40 +65,20 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public bool? IsFirstProcess { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 扩展字段1(暂存坐标)
+        /// </summary>
+        public string Extra1 { get; set; }
+
+        /// <summary>
         /// 状态
         /// </summary>
         public string Status { get; set; }
 
        /// <summary>
-        /// 扩展字段1(暂存坐标)
-        /// </summary>
-        public string Extra1 { get; set; }
-
-       /// <summary>
         /// 说明
         /// </summary>
         public string Remark { get; set; }
-
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-       /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-       /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
     }
 
 
@@ -284,9 +264,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 是否逻辑删除
         /// </summary>
         public bool? IsDeleted { get; set; }
-
-       
-
     }
 
     /// <summary>

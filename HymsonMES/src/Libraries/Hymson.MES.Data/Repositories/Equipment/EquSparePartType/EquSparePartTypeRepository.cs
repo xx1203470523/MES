@@ -112,7 +112,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
                 sqlBuilder.Where("SparePartTypeName LIKE @SparePartTypeName");
             }
 
-            if (pagedQuery.Status > DbDefaultValueConstant.IntDefaultValue)
+            if (pagedQuery.Status.HasValue == true)
             {
                 sqlBuilder.Where("Status = @Status");
             }
