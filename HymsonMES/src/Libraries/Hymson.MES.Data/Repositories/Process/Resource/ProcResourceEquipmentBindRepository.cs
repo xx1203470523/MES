@@ -8,6 +8,7 @@
 
 using Dapper;
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Options;
@@ -85,12 +86,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="procResourceEquipmentBindEntity"></param>
+        /// <param name="bindEntitys"></param>
         /// <returns></returns>
-        public async Task InsertRangeAsync(List<ProcResourceEquipmentBindEntity> procResourceEquipmentBindEntity)
+        public async Task InsertRangeAsync(List<ProcResourceEquipmentBindEntity> bindEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var id = await conn.ExecuteScalarAsync<long>(InsertSql, procResourceEquipmentBindEntity);
+           await conn.ExecuteAsync(InsertSql, bindEntitys);
         }
 
         /// <summary>
