@@ -290,6 +290,13 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<WhSupplierPagedQueryDto, WhSupplierPagedQuery>();
             CreateMap<WhSupplierEntity, WhSupplierDto>();
             #endregion
+            #region PrintConfig
+            CreateMap<ProcPrinterDto, ProcPrinterEntity>();
+            CreateMap<ProcPrinterEntity, ProcPrinterDto>();//ProcPrinterPagedQuery
+           // CreateMap<ProcPrinterPagedQuery, ProcPrinterPagedQueryDto>();
+            CreateMap<ProcPrinterPagedQueryDto, ProcPrinterPagedQuery>();
+            #endregion
+
         }
 
         /// <summary>

@@ -61,6 +61,7 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ProcResourceEntity>(GetByIdsSql, new { Ids = query.IdsArr, Status = query.Status });
         }
+        
 
         /// <summary>
         /// 判断资源是否存在
@@ -251,6 +252,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdSql = "SELECT a.*,b.ResType,b.ResType FROM proc_resource a left join proc_resource_type b on a.ResTypeId=b.Id and b.IsDeleted =0 where a.Id=@Id ";
         const string GetByResTypeIdsSql = "select * from proc_resource where SiteId=@SiteId and ResTypeId in @Ids and IsDeleted =0 ";
         const string GetByIdsSql = "select * from proc_resource where  Id  in @Ids and Status=@Status";
+        
         const string ExistsSql = "SELECT Id FROM proc_resource WHERE `IsDeleted`= 0 AND ResCode=@ResCode and SiteId=@SiteId LIMIT 1";
 
         const string GetPagedInfoDataSqlTemplate = "SELECT a.*,b.ResType,b.ResTypeName  FROM proc_resource a left join proc_resource_type b on a.ResTypeId =b.Id and b.IsDeleted =0 /**where**/ LIMIT @Offset,@Rows";

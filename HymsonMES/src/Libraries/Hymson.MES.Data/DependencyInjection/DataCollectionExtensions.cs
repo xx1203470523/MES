@@ -83,6 +83,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region Process
             services.AddSingleton<IProcMaskCodeRepository, ProcMaskCodeRepository>();
+           
 
             #region Material
             services.AddSingleton<IProcMaterialRepository, ProcMaterialRepository>();
@@ -146,6 +147,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IWhSupplierRepository, WhSupplierRepository>();
 
 
+            #endregion
+            #region printConfig
+            services.AddSingleton<IProcPrintConfigRepository, ProcPrintConfigRepository>();
             #endregion
 
             return services;

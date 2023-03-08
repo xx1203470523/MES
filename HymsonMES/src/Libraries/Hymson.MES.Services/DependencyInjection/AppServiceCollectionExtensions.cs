@@ -116,6 +116,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcProcedureService, ProcProcedureService>();
             //工艺路线
             services.AddSingleton<IProcProcessRouteService, ProcProcessRouteService>();
+
+            services.AddSingleton<IProcPrintConfigService, ProcPrintConfigService>();
             #endregion
 
             #region Quality
