@@ -40,7 +40,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 最小值
         /// </summary>
-        public decimal MInimun { get; set; }
+        public decimal Minimum { get; set; }
 
         /// <summary>
         /// 高度(mm)
@@ -68,14 +68,9 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public decimal? Weight { get; set; }
 
         /// <summary>
-        /// 创建人;创建人
+        /// 备注
         /// </summary>
-        public string CreatedBy { get; set; }
-
-        /// <summary>
-        /// 创建时间;创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// 更新人;更新人
@@ -86,12 +81,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 更新时间;更新时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
-
-        /// <summary>
-        /// 删除标识
-        /// </summary>
-        public long IsDeleted { get; set; }
-
 
     }
 
@@ -133,7 +122,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 最小值
         /// </summary>
-        public decimal MInimun { get; set; }
+        public decimal Minimum { get; set; }
 
         /// <summary>
         /// 高度(mm)
@@ -161,14 +150,9 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public decimal? Weight { get; set; }
 
         /// <summary>
-        /// 创建人;创建人
+        /// 备注
         /// </summary>
-        public string CreatedBy { get; set; }
-
-        /// <summary>
-        /// 创建时间;创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// 更新人;更新人
@@ -180,12 +164,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public DateTime UpdatedOn { get; set; }
 
-        /// <summary>
-        /// 删除标识
-        /// </summary>
-        public long IsDeleted { get; set; }
-
-
     }
 
     /// <summary>
@@ -193,10 +171,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
     /// </summary>
     public class InteContainerPagedQueryDto : PagerInfo
     {
-        ///// <summary>
-        ///// 描述 :站点编码 
-        ///// 空值 : false  
-        ///// </summary>
-        //public string SiteCode { get; set; }
+
     }
 }

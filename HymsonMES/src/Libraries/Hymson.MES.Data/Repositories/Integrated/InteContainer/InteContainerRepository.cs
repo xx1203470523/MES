@@ -85,7 +85,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
-            //sqlBuilder.Select("*");
+            sqlBuilder.Select("*");
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -110,11 +110,11 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
                                             /**select**/
                                            FROM `inte_container` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `inte_container`(  `Id`, `DefinitionMethod`, `MaterialId`, `MaterialGroupId`, `Status`, `Maximum`, `MInimun`, `Height`, `Length`, `Width`, `MaxFillWeight`, `Weight`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @DefinitionMethod, @MaterialId, @MaterialGroupId, @Status, @Maximum, @MInimun, @Height, @Length, @Width, @MaxFillWeight, @Weight, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string UpdateSql = "UPDATE `inte_container` SET   DefinitionMethod = @DefinitionMethod, MaterialId = @MaterialId, MaterialGroupId = @MaterialGroupId, Status = @Status, Maximum = @Maximum, MInimun = @MInimun, Height = @Height, Length = @Length, Width = @Width, MaxFillWeight = @MaxFillWeight, Weight = @Weight, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string InsertSql = "INSERT INTO `inte_container`(  `Id`, `DefinitionMethod`, `MaterialId`, `MaterialGroupId`, `Status`, `Maximum`, `Minimum`, `Height`, `Length`, `Width`, `MaxFillWeight`, `Weight`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @DefinitionMethod, @MaterialId, @MaterialGroupId, @Status, @Maximum, @Minimum, @Height, @Length, @Width, @MaxFillWeight, @Weight, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string UpdateSql = "UPDATE `inte_container` SET   DefinitionMethod = @DefinitionMethod, MaterialId = @MaterialId, MaterialGroupId = @MaterialGroupId, Status = @Status, Maximum = @Maximum, Minimum = @Minimum, Height = @Height, Length = @Length, Width = @Width, MaxFillWeight = @MaxFillWeight, Weight = @Weight, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE inte_container SET `IsDeleted` = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE `Id` = @Ids;";
         const string GetByIdSql = @"SELECT 
-                               `Id`, `DefinitionMethod`, `MaterialId`, `MaterialGroupId`, `Status`, `Maximum`, `MInimun`, `Height`, `Length`, `Width`, `MaxFillWeight`, `Weight`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                               `Id`, `DefinitionMethod`, `MaterialId`, `MaterialGroupId`, `Status`, `Maximum`, `Minimum`, `Height`, `Length`, `Width`, `MaxFillWeight`, `Weight`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `inte_container`  WHERE Id = @Id ";
     }
 }
