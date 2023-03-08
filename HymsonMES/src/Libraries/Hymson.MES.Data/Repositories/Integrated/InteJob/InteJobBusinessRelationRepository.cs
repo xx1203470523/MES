@@ -122,7 +122,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         public async Task<int> InsertRangeAsync(List<InteJobBusinessRelationEntity> inteJobBusinessRelationEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertSql, inteJobBusinessRelationEntitys);
+           return  await conn.ExecuteAsync(InsertSql, inteJobBusinessRelationEntitys);
         }
 
         /// <summary>

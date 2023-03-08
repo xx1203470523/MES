@@ -16,6 +16,31 @@ using System.Threading.Tasks;
 namespace Hymson.MES.Services.Dtos.Warehouse
 {
     /// <summary>
+    /// 物料信息Dto
+    /// </summary>
+    public record ProcMaterialInfoViewDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 主键id
+        /// </summary>
+        public long Id { get; set; }
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string MaterialCode { get; set; }
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string MaterialName { get; set; }
+        /// <summary>
+        /// 物料版本
+        /// </summary>
+
+        public string Version { get; set; }
+    }
+
+
+    /// <summary>
     /// 物料库存Dto
     /// </summary>
     public record WhMaterialInventoryDto : BaseEntityDto
@@ -25,77 +50,77 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 供应商ID
         /// </summary>
         public long SupplierId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料ID
         /// </summary>
         public long MaterialId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料条码
         /// </summary>
         public string MaterialBarCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 批次
         /// </summary>
         public string Batch { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 数量（剩余）
         /// </summary>
         public decimal QuantityResidue { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态;待使用/使用中/锁定
         /// </summary>
         public bool Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 有效期/到期日
         /// </summary>
         public DateTime? DueDate { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 来源/目标;手动录入/WMS/上料点编号
         /// </summary>
         public bool Source { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否删除;删除时赋值为主键
         /// </summary>
         public long IsDeleted { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
 
-       
+
     }
 
 
@@ -109,77 +134,77 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 供应商ID
         /// </summary>
         public long SupplierId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料ID
         /// </summary>
         public long MaterialId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料条码
         /// </summary>
         public string MaterialBarCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 批次
         /// </summary>
         public string Batch { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 数量（剩余）
         /// </summary>
         public decimal QuantityResidue { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态;待使用/使用中/锁定
         /// </summary>
         public bool Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 有效期/到期日
         /// </summary>
         public DateTime? DueDate { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 来源/目标;手动录入/WMS/上料点编号
         /// </summary>
         public bool Source { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否删除;删除时赋值为主键
         /// </summary>
         public long IsDeleted { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
 
-       
+
     }
 
     /// <summary>
@@ -192,77 +217,77 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 供应商ID
         /// </summary>
         public long SupplierId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料ID
         /// </summary>
         public long MaterialId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料条码
         /// </summary>
         public string MaterialBarCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 批次
         /// </summary>
         public string Batch { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 数量（剩余）
         /// </summary>
         public decimal QuantityResidue { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态;待使用/使用中/锁定
         /// </summary>
         public bool Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 有效期/到期日
         /// </summary>
         public DateTime? DueDate { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 来源/目标;手动录入/WMS/上料点编号
         /// </summary>
         public bool Source { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否删除;删除时赋值为主键
         /// </summary>
         public long IsDeleted { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
 
-       
+
 
     }
 

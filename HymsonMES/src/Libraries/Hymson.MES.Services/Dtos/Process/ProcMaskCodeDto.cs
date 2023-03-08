@@ -71,7 +71,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 掩码规则列表
         /// </summary>
-        public List<ProcMaskCodeRuleDto> RuleList { get; set; } = new();
+        public IEnumerable<ProcMaskCodeRuleDto> RuleList { get; set; }
     }
 
     /// <summary>
@@ -82,7 +82,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 序号( 程序生成)
         /// </summary>
-        public string SerialNo { get; set; } = "";
+        public string? SerialNo { get; set; }
 
         /// <summary>
         /// 描述 :掩码规则 
@@ -92,7 +92,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 描述 :匹配方式 
         /// </summary>
-        public string MatchWay { get; set; } = "";
+        public int MatchWay { get; set; }
     }
 
     /// <summary>

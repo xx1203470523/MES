@@ -1,49 +1,48 @@
-﻿using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.Equipment;
+using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
+using Hymson.MES.Data.Repositories.Integrated.InteContainer.Query;
 
-namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
+namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
 {
     /// <summary>
-    /// 
+    /// 仓储接口（容器维护）
     /// </summary>
-    public interface IEquEquipmentUnitRepository
+    public interface IInteContainerRepository
     {
         /// <summary>
-        /// 
+        /// 新增
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(EquEquipmentUnitEntity entity);
+        Task<int> InsertAsync(InteContainerEntity entity);
 
         /// <summary>
-        /// 
+        /// 更新
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(EquEquipmentUnitEntity entity);
+        Task<int> UpdateAsync(InteContainerEntity entity);
 
         /// <summary>
-        /// 
+        /// 批量删除
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> DeletesAsync(DeleteCommand command);
 
         /// <summary>
-        /// 
+        /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<EquEquipmentUnitEntity> GetByIdAsync(long id);
+        Task<InteContainerEntity> GetByIdAsync(long id);
 
         /// <summary>
-        /// 
+        /// 分页查询
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquEquipmentUnitEntity>> GetPagedListAsync(EquEquipmentUnitPagedQuery pagedQuery);
-        
+        Task<PagedInfo<InteContainerEntity>> GetPagedInfoAsync(InteContainerPagedQuery pagedQuery);
     }
 }
