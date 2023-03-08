@@ -204,7 +204,7 @@ namespace Hymson.MES.Services.Services.Process
             {
                 SiteId = _currentSite.SiteId??0,
                 BusinessId = queryDto.BusinessId,
-                BusinessType = InteJobBusinessTypeEnum.Procedure.ToString(),
+                BusinessType = (int)InteJobBusinessTypeEnum.Procedure,
                 PageIndex = queryDto.PageIndex,
                 PageSize = queryDto.PageSize,
                 Sorting = queryDto.Sorting

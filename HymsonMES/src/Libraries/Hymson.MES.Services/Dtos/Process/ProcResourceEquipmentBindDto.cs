@@ -100,10 +100,10 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long EquipmentId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否主设备
         /// </summary>
-        public bool? IsMain { get; set; }
+        public bool IsMain { get; set; } = false;
 
         /// <summary>
         /// Id
