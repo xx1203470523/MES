@@ -30,7 +30,12 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// </summary>
         public long MaterialGroupId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 包装等级（分为一级/二级/三级）
+        /// </summary>
+        public int Level { get; set; }
+
+        /// <summary>
         /// 状态;0-新建 1-启用 2-保留3-废弃
         /// </summary>
         public int Status { get; set; }
@@ -43,7 +48,7 @@ namespace Hymson.MES.Core.Domain.Integrated
        /// <summary>
         /// 最小值
         /// </summary>
-        public decimal MInimun { get; set; }
+        public decimal Minimum { get; set; }
 
        /// <summary>
         /// 高度(mm)
@@ -69,5 +74,10 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// 重量(KG)
         /// </summary>
         public decimal? Weight { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string Remark { get; set; } = "";
     }
 }
