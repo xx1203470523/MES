@@ -1,4 +1,6 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Integrated;
 
 namespace Hymson.MES.Core.Domain.Integrated
 {
@@ -18,9 +20,9 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// <summary>
         /// 定义方式;0-物料，1-物料组
         /// </summary>
-        public int DefinitionMethod { get; set; }
+        public DefinitionMethodEnum DefinitionMethod { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料id
         /// </summary>
         public long MaterialId { get; set; }
@@ -33,12 +35,12 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// <summary>
         /// 包装等级（分为一级/二级/三级）
         /// </summary>
-        public int Level { get; set; }
+        public LevelEnum Level { get; set; }
 
         /// <summary>
         /// 状态;0-新建 1-启用 2-保留3-废弃
         /// </summary>
-        public int Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
        /// <summary>
         /// 最大值
