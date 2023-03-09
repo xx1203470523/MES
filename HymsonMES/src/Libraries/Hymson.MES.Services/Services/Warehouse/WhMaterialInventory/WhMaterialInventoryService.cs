@@ -5,8 +5,10 @@
  *builder:  pengxin
  *build datetime: 2023-03-06 03:27:59
  */
+using Dapper;
 using FluentValidation;
 using Hymson.Authentication;
+using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -16,6 +18,7 @@ using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using MySql.Data.MySqlClient;
 //using Hymson.Utils.Extensions;
 using System.Transactions;
 
@@ -34,13 +37,14 @@ namespace Hymson.MES.Services.Services.Warehouse
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
         private readonly AbstractValidator<WhMaterialInventoryCreateDto> _validationCreateRules;
         private readonly AbstractValidator<WhMaterialInventoryModifyDto> _validationModifyRules;
-
-        public WhMaterialInventoryService(ICurrentUser currentUser,IWhMaterialInventoryRepository whMaterialInventoryRepository, AbstractValidator<WhMaterialInventoryCreateDto> validationCreateRules, AbstractValidator<WhMaterialInventoryModifyDto> validationModifyRules)
+        private readonly ICurrentSite _currentSite;
+        public WhMaterialInventoryService(ICurrentUser currentUser, IWhMaterialInventoryRepository whMaterialInventoryRepository, AbstractValidator<WhMaterialInventoryCreateDto> validationCreateRules, AbstractValidator<WhMaterialInventoryModifyDto> validationModifyRules, ICurrentSite currentSite)
         {
             _currentUser = currentUser;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
+            _currentSite = currentSite;
         }
 
         /// <summary>
@@ -55,7 +59,7 @@ namespace Hymson.MES.Services.Services.Warehouse
 
             //DTO转换实体
             var whMaterialInventoryEntity = whMaterialInventoryCreateDto.ToEntity<WhMaterialInventoryEntity>();
-            whMaterialInventoryEntity.Id= IdGenProvider.Instance.CreateId();
+            whMaterialInventoryEntity.Id = IdGenProvider.Instance.CreateId();
             whMaterialInventoryEntity.CreatedBy = _currentUser.UserName;
             whMaterialInventoryEntity.UpdatedBy = _currentUser.UserName;
             whMaterialInventoryEntity.CreatedOn = HymsonClock.Now();
@@ -63,6 +67,60 @@ namespace Hymson.MES.Services.Services.Warehouse
 
             //入库
             await _whMaterialInventoryRepository.InsertAsync(whMaterialInventoryEntity);
+        }
+
+
+        /// <summary>
+        /// 创建
+        /// </summary>
+        /// <param name="whMaterialInventoryDto"></param>
+        /// <returns></returns> 
+        public async Task CreateWhMaterialInventoryListAsync(List<WhMaterialInventoryListCreateDto> whMaterialInventoryCreateDto)
+        {
+            var list = new List<WhMaterialInventoryEntity>();
+            foreach (var item in whMaterialInventoryCreateDto)
+            {
+                if (item.QuantityResidue <= 0)
+                {
+                    throw new BusinessException(nameof(ErrorCode.MES15103));
+                }
+                //验证DTO
+                //await _validationCreateRules.ValidateAndThrowAsync(item);
+
+                //DTO转换实体 
+                //var whMaterialInventoryEntity = item.ToEntity<WhMaterialInventoryEntity>();
+                var materialInfo = await _whMaterialInventoryRepository.GetProcMaterialByMaterialCodeAsync(item.MaterialCode);
+                if (materialInfo == null)
+                {
+                    throw new BusinessException(nameof(ErrorCode.MES15101));
+                }
+                //var supplierInfo = await _whMaterialInventoryRepository.GetWhSupplierByMaterialIdAsync(materialInfo.Id, item.SupplierCode);
+                //if (materialInfo == null || supplierInfo.Count() <= 0)
+                //{
+                //    throw new BusinessException(nameof(ErrorCode.MES15102)).WithData("MateialCode", item.MaterialCode);
+                //}
+                var whMaterialInventoryEntity = new WhMaterialInventoryEntity();
+                whMaterialInventoryEntity.SupplierId = item.SupplierId;//supplierInfo.FirstOrDefault().Id;
+                whMaterialInventoryEntity.MaterialId = materialInfo.Id;
+                whMaterialInventoryEntity.MaterialBarCode = item.MaterialBarCode;
+                whMaterialInventoryEntity.Batch = item.Batch;
+                whMaterialInventoryEntity.QuantityResidue = item.QuantityResidue;
+                whMaterialInventoryEntity.Status = 0;
+                whMaterialInventoryEntity.DueDate = null;
+                whMaterialInventoryEntity.Source = item.Source;
+                whMaterialInventoryEntity.SiteId = _currentSite.SiteId ?? 0;
+
+
+                whMaterialInventoryEntity.Id = IdGenProvider.Instance.CreateId();
+                whMaterialInventoryEntity.CreatedBy = _currentUser.UserName;
+                whMaterialInventoryEntity.UpdatedBy = _currentUser.UserName;
+                whMaterialInventoryEntity.CreatedOn = HymsonClock.Now();
+                whMaterialInventoryEntity.UpdatedOn = HymsonClock.Now();
+                list.Add(whMaterialInventoryEntity);
+            }
+
+            //入库
+            await _whMaterialInventoryRepository.InsertsAsync(list);
         }
 
         /// <summary>
@@ -106,7 +164,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// </summary>
         /// <param name="pagedInfo"></param>
         /// <returns></returns>
-        private static List<WhMaterialInventoryDto> PrepareWhMaterialInventoryDtos(PagedInfo<WhMaterialInventoryEntity>   pagedInfo)
+        private static List<WhMaterialInventoryDto> PrepareWhMaterialInventoryDtos(PagedInfo<WhMaterialInventoryEntity> pagedInfo)
         {
             var whMaterialInventoryDtos = new List<WhMaterialInventoryDto>();
             foreach (var whMaterialInventoryEntity in pagedInfo.Data)
@@ -125,7 +183,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <returns></returns>
         public async Task ModifyWhMaterialInventoryAsync(WhMaterialInventoryModifyDto whMaterialInventoryModifyDto)
         {
-             //验证DTO
+            //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(whMaterialInventoryModifyDto);
 
             //DTO转换实体
@@ -141,14 +199,37 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<WhMaterialInventoryDto> QueryWhMaterialInventoryByIdAsync(long id) 
+        public async Task<WhMaterialInventoryDto> QueryWhMaterialInventoryByIdAsync(long id)
         {
-           var whMaterialInventoryEntity = await _whMaterialInventoryRepository.GetByIdAsync(id);
-           if (whMaterialInventoryEntity != null) 
-           {
-               return whMaterialInventoryEntity.ToModel<WhMaterialInventoryDto>();
-           }
+            var whMaterialInventoryEntity = await _whMaterialInventoryRepository.GetByIdAsync(id);
+            if (whMaterialInventoryEntity != null)
+            {
+                return whMaterialInventoryEntity.ToModel<WhMaterialInventoryDto>();
+            }
             return null;
+        }
+
+        /// <summary>
+        /// 根据物料编码查询物料与供应商信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ProcMaterialInfoViewDto> GetMaterialAndSupplierByMateialCodeIdAsync(string materialCode)
+        {
+            var materialInfo = await _whMaterialInventoryRepository.GetProcMaterialByMaterialCodeAsync(materialCode);
+            if (materialInfo == null)
+            {
+                throw new BusinessException(nameof(ErrorCode.MES15101));
+            }
+            var supplierInfo = await _whMaterialInventoryRepository.GetWhSupplierByMaterialIdAsync(materialInfo.Id);
+            if (materialInfo == null)
+            {
+                throw new BusinessException(nameof(ErrorCode.MES15102)).WithData("MateialCode", materialCode);
+            }
+            ProcMaterialInfoViewDto dto = new ProcMaterialInfoViewDto();
+            dto.MaterialInfo = materialInfo;
+            dto.SupplierInfo = supplierInfo;
+            return dto;
         }
     }
 }

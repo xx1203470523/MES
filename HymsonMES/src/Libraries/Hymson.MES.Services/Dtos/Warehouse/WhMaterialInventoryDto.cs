@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Data.Repositories.Warehouse;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,22 +22,15 @@ namespace Hymson.MES.Services.Dtos.Warehouse
     public record ProcMaterialInfoViewDto : BaseEntityDto
     {
         /// <summary>
-        /// 主键id
+        /// 物料信息
         /// </summary>
-        public long Id { get; set; }
-        /// <summary>
-        /// 物料编码
-        /// </summary>
-        public string MaterialCode { get; set; }
-        /// <summary>
-        /// 物料名称
-        /// </summary>
-        public string MaterialName { get; set; }
-        /// <summary>
-        /// 物料版本
-        /// </summary>
+        public ProcMaterialInfoView MaterialInfo { get; set; }
 
-        public string Version { get; set; }
+        /// <summary>
+        /// 供应商信息
+        /// </summary>
+        public IEnumerable<WhSupplierInfoView> SupplierInfo { get; set; }
+
     }
 
 
@@ -205,6 +199,46 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         public long SiteId { get; set; }
 
 
+    }
+
+
+
+
+    /// <summary>
+    /// 物料库存批量新增Dto
+    /// </summary>
+    public record WhMaterialInventoryListCreateDto : BaseEntityDto
+    {
+
+        /// <summary>
+        /// 来源
+        /// </summary>
+        public int Source { get; set; }
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string MaterialCode { get; set; }
+        /// <summary>
+        /// 批次
+        /// </summary>
+        public string Batch { get; set; }
+        /// <summary>
+        /// 物料条码
+        /// </summary>
+        public string MaterialBarCode { get; set; }
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public decimal QuantityResidue { get; set; }
+
+        /// <summary>
+        /// 供应商ID
+        /// </summary>
+        public long SupplierId { get; set; }
+        /// <summary>
+        /// 供应商编码
+        /// </summary>
+        public string SupplierCode { get; set; }
     }
 
     /// <summary>

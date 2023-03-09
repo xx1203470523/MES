@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Hymson.MES.Data.Repositories.Warehouse
 {
     /// <summary>
-    /// 物料信息Dto
+    /// 物料信息
     /// </summary>
     public record ProcMaterialInfoView : BaseEntityDto
     {
@@ -25,11 +25,36 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// 物料名称
         /// </summary>
         public string MaterialName { get; set; }
+
+        /// <summary>
+        /// 物料批次大小
+        /// </summary>
+        public string Batch { get; set; }
         /// <summary>
         /// 物料版本
         /// </summary>
 
         public string Version { get; set; }
     }
+
+    /// <summary>
+    /// 供应商信息
+    /// </summary>
+    public record WhSupplierInfoView : BaseEntityDto
+    {
+        /// <summary>
+        /// 主键id
+        /// </summary>
+        public long Id { get; set; }
+        /// <summary>
+        /// 供应商编码
+        /// </summary>
+        public string Code { get; set; }
+        /// <summary>
+        /// 供应商名称
+        /// </summary>
+        public string Name { get; set; }
+    }
+
 
 }
