@@ -164,7 +164,7 @@ namespace Hymson.MES.Data.Repositories.Process
             var templateData = sqlBuilder.AddTemplate(GetPagedListSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedListCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.Where("SiteId = @SiteId");
+            //sqlBuilder.Where("SiteId = @SiteId");
            
             sqlBuilder.Select("*");
 
@@ -211,7 +211,7 @@ namespace Hymson.MES.Data.Repositories.Process
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("SiteId = @SiteId");
+            //sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
 
            
@@ -245,7 +245,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         const string InsertSql = "INSERT INTO `proc_printer`(  `Id`, `SiteId`, `PrintName`, `PrintIp`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @PrintName, @PrintIp, @Remark,  @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted)  ";
         const string UpdateSql = "UPDATE `proc_printer` SET PrintName = @PrintName, PrintIp = @PrintIp, Remark = @Remark,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `proc_printer` SET `IsDeleted` = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE `Id` = @Ids;";
+        const string DeleteSql = "UPDATE `proc_printer` SET `IsDeleted` = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE `Id` in @Ids;";
         const string IsExistsSql = "SELECT Id FROM proc_printer WHERE `IsDeleted` = 0 AND PrintName = @PrintName LIMIT 1";
         const string GetByIdSql = "SELECT * FROM `proc_printer` WHERE `Id` = @Id;";
         //const string GetByGroupIdSql = "SELECT * FROM `proc_printer` WHERE `IsDeleted` = 0 AND EquipmentGroupId = @EquipmentGroupId;";
