@@ -1,4 +1,6 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Integrated;
 
 namespace Hymson.MES.Services.Dtos.Integrated
 {
@@ -15,7 +17,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 定义方式;0-物料，1-物料组
         /// </summary>
-        public bool DefinitionMethod { get; set; }
+        public DefinitionMethodEnum DefinitionMethod { get; set; }
 
         /// <summary>
         /// 物料id
@@ -28,9 +30,14 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public long MaterialGroupId { get; set; }
 
         /// <summary>
+        /// 包装等级（分为一级/二级/三级）
+        /// </summary>
+        public LevelEnum Level { get; set; }
+
+        /// <summary>
         /// 状态;0-新建 1-启用 2-保留3-废弃
         /// </summary>
-        public bool Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 最大值
@@ -81,7 +88,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 更新时间;更新时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
-
     }
 
     /// <summary>
@@ -97,7 +103,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 定义方式;0-物料，1-物料组
         /// </summary>
-        public bool DefinitionMethod { get; set; }
+        public DefinitionMethodEnum DefinitionMethod { get; set; }
 
         /// <summary>
         /// 物料id
@@ -110,9 +116,14 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public long MaterialGroupId { get; set; }
 
         /// <summary>
+        /// 包装等级分为一级/二级/三级
+        /// </summary>
+        public LevelEnum Level { get; set; }
+
+        /// <summary>
         /// 状态;0-新建 1-启用 2-保留3-废弃
         /// </summary>
-        public bool Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 最大值
@@ -153,17 +164,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 备注
         /// </summary>
         public string Remark { get; set; } = "";
-
-        /// <summary>
-        /// 更新人;更新人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-        /// <summary>
-        /// 更新时间;更新时间
-        /// </summary>
-        public DateTime UpdatedOn { get; set; }
-
     }
 
     /// <summary>
