@@ -27,7 +27,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <summary>
         /// 1资源  2工序 3不合格代码
         /// </summary>
-        public string? BusinessType { get; set; }
+        public int? BusinessType { get; set; }
 
         /// <summary>
         /// 关联的业务表的ID

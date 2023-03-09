@@ -105,7 +105,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcProcedureViewDto>> GetPageListAsync(ProcProcedurePagedQueryDto procProcedurePagedQueryDto)
         {
             var procProcedurePagedQuery = procProcedurePagedQueryDto.ToQuery<ProcProcedurePagedQuery>();
-            procProcedurePagedQuery.SiteId = _currentSite.SiteId??0;
+            procProcedurePagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _procProcedureRepository.GetPagedInfoAsync(procProcedurePagedQuery);
 
             //实体到DTO转换 装载数据
@@ -166,7 +166,7 @@ namespace Hymson.MES.Services.Services.Process
         {
             var query = new ProcProcedurePrintReleationPagedQuery()
             {
-                SiteId = _currentSite.SiteId??0,
+                SiteId = _currentSite.SiteId ?? 0,
                 ProcedureId = queryDto.ProcedureId,
                 PageIndex = queryDto.PageIndex,
                 PageSize = queryDto.PageSize,
@@ -202,9 +202,9 @@ namespace Hymson.MES.Services.Services.Process
         {
             var query = new InteJobBusinessRelationPagedQuery()
             {
-                SiteId = _currentSite.SiteId??0,
+                SiteId = _currentSite.SiteId ?? 0,
                 BusinessId = queryDto.BusinessId,
-                BusinessType = InteJobBusinessTypeEnum.Procedure.ToString(),
+                BusinessType = (int)InteJobBusinessTypeEnum.Procedure,
                 PageIndex = queryDto.PageIndex,
                 PageSize = queryDto.PageSize,
                 Sorting = queryDto.Sorting
@@ -239,6 +239,7 @@ namespace Hymson.MES.Services.Services.Process
                 var job = jobDtoList.FirstOrDefault(a => a.Id == entity.JobId);
                 entity.Code = job?.Code ?? "";
                 entity.Name = job?.Name ?? "";
+                entity.Remark = job?.Remark ?? "";
             }
 
             return new PagedInfo<QueryProcedureJobReleationDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
@@ -257,7 +258,7 @@ namespace Hymson.MES.Services.Services.Process
                 throw new ValidationException(nameof(ErrorCode.MES10100));
             }
 
-            var siteId = _currentSite.SiteId??0;
+            var siteId = _currentSite.SiteId ?? 0;
             var userName = _currentUser.UserName;
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(parm.Procedure);
@@ -278,7 +279,7 @@ namespace Hymson.MES.Services.Services.Process
             var procProcedureEntity = parm.Procedure.ToEntity<ProcProcedureEntity>();
             procProcedureEntity.Id = IdGenProvider.Instance.CreateId();
             procProcedureEntity.Code = code;
-            procProcedureEntity.SiteId= siteId;
+            procProcedureEntity.SiteId = siteId;
             procProcedureEntity.CreatedBy = userName;
             procProcedureEntity.UpdatedBy = userName;
 
@@ -308,6 +309,12 @@ namespace Hymson.MES.Services.Services.Process
                     relationEntity.Id = IdGenProvider.Instance.CreateId();
                     relationEntity.BusinessType = (int)InteJobBusinessTypeEnum.Procedure;
                     relationEntity.BusinessId = procProcedureEntity.Id;
+                    relationEntity.OrderNumber = "";
+                    relationEntity.LinkPoint = item.LinkPoint;
+                    relationEntity.JobId = item.JobId;
+                    relationEntity.IsUse = item.IsUse;
+                    relationEntity.Parameter = item.Parameter;
+                    relationEntity.Remark = item.Remark ?? "";
                     relationEntity.SiteId = siteId;
                     relationEntity.CreatedBy = userName;
                     relationEntity.UpdatedBy = userName;
@@ -347,7 +354,7 @@ namespace Hymson.MES.Services.Services.Process
             {
                 throw new ValidationException(nameof(ErrorCode.MES10100));
             }
-            var siteId = _currentSite.SiteId??0;
+            var siteId = _currentSite.SiteId ?? 0;
             var userName = _currentUser.UserName;
 
             //验证DTO
@@ -385,6 +392,12 @@ namespace Hymson.MES.Services.Services.Process
                     relationEntity.Id = IdGenProvider.Instance.CreateId();
                     relationEntity.BusinessType = (int)InteJobBusinessTypeEnum.Procedure;
                     relationEntity.BusinessId = procProcedureEntity.Id;
+                    relationEntity.OrderNumber = "";
+                    relationEntity.LinkPoint = item.LinkPoint;
+                    relationEntity.JobId = item.JobId;
+                    relationEntity.IsUse = item.IsUse;
+                    relationEntity.Parameter = item.Parameter;
+                    relationEntity.Remark = item.Remark ?? "";
                     relationEntity.SiteId = siteId;
                     relationEntity.CreatedBy = userName;
                     relationEntity.UpdatedBy = userName;
@@ -430,7 +443,7 @@ namespace Hymson.MES.Services.Services.Process
             {
                 UserId = _currentUser.UserName,
                 DeleteOn = HymsonClock.Now(),
-                Ids= idsArr
+                Ids = idsArr
             };
             return await _procProcedureRepository.DeleteRangeAsync(command);
         }

@@ -118,7 +118,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 是否启用
         /// </summary>
-        public bool IsUse { get; set; }
+        public bool IsUse { get; set; } = false;
 
         /// <summary>
         /// 参数

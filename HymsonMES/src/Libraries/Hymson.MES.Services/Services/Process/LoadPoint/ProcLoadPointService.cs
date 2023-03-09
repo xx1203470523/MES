@@ -78,7 +78,7 @@ namespace Hymson.MES.Services.Services.Process
                 throw new ValidationException(nameof(ErrorCode.MES10702));
             }
 
-            if (procLoadPointCreateDto.LinkResources != null && procLoadPointCreateDto.LinkResources.Any(a => string.IsNullOrWhiteSpace(a.ResourceId.ToString())))
+            if (procLoadPointCreateDto.LinkResources != null && procLoadPointCreateDto.LinkResources.Any(a => a.ResourceId==0))
             {
                 throw new ValidationException(nameof(ErrorCode.MES10703));
             }
@@ -140,6 +140,7 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     linkResources.Add(new ProcLoadPointLinkResourceEntity
                     {
+                        Id = IdGenProvider.Instance.CreateId(),
                         SiteId = procLoadPointEntity.SiteId,
                         LoadPointId = procLoadPointEntity.Id,
                         ResourceId = resource.ResourceId.ParseToLong(),
@@ -287,7 +288,7 @@ namespace Hymson.MES.Services.Services.Process
                 throw new ValidationException(nameof(ErrorCode.MES10702));
             }
 
-            if (procLoadPointModifyDto.LinkResources != null && procLoadPointModifyDto.LinkResources.Any(a => string.IsNullOrWhiteSpace(a.ResourceId.ToString())))
+            if (procLoadPointModifyDto.LinkResources != null && procLoadPointModifyDto.LinkResources.Any(a => a.ResourceId==0))
             {
                 throw new ValidationException(nameof(ErrorCode.MES10703));
             }
@@ -341,6 +342,7 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     linkResources.Add(new ProcLoadPointLinkResourceEntity
                     {
+                        Id = IdGenProvider.Instance.CreateId(),
                         SiteId = procLoadPointEntity.SiteId,
                         LoadPointId = procLoadPointEntity.Id,
                         ResourceId = resource.ResourceId,

@@ -369,5 +369,10 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 作业名称 
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// 作业描述
+        /// </summary>
+        public string Remark { get; set; }
     }
 }

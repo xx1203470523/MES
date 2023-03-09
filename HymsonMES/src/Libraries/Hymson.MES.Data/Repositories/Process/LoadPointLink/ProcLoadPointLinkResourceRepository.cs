@@ -213,7 +213,7 @@ namespace Hymson.MES.Data.Repositories.Process
                                            a.Id,  a.ResourceId, b.ResCode, b.ResName 
                             FROM `proc_load_point_link_resource` a
                             Inner JOIN proc_resource b on a.ResourceId = b.Id
-                            WHERE a.Id IN @ids 
+                            WHERE a.LoadPointId IN @ids 
                             Order by a.CreatedOn ";
     }
 }
