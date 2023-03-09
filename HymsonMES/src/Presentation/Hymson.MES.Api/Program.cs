@@ -1,6 +1,8 @@
 using AutoMapper;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Kafka.Debezium.Options;
+using Hymson.Kafka.Debezium;
 using Hymson.MES.Api.Filters;
 using Hymson.WebApi.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -10,6 +12,8 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Globalization;
 using System.Reflection;
+using static K4os.Compression.LZ4.Engine.Pubternal;
+using Hymson.MES.Api.HostedServices;
 
 namespace Hymson.MES.Api
 {
@@ -37,6 +41,9 @@ namespace Hymson.MES.Api
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddMemoryCache();
+            builder.Services.AddKafkaForDebeziumService();
+            builder.Services.Configure<KafkaForDebeziumOptions>(builder.Configuration.GetSection(nameof(KafkaForDebeziumOptions)));
+            builder.Services.AddSingleton<IKafkaEventHandler<BinlogData>, ClearCacheEventHandler>();
 #if DEBUG
             builder.Services.AddHostedService<WorkService>();
 #endif
