@@ -36,7 +36,10 @@ namespace Hymson.MES.Api
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddMemoryCache();
+#if DEBUG
             builder.Services.AddHostedService<WorkService>();
+#endif
             AddSwaggerGen(builder.Services);
 
             builder.Services.AddJwtBearerService(builder.Configuration);

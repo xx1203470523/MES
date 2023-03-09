@@ -36,10 +36,19 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.Select("'SiteId','Id','Code','Name','ClassProgram','Remark','CreatedBy','CreatedOn','UpdatedBy','UpdatedOn','IsDeleted'");
+            sqlBuilder.Select("SiteId,Id,Code,Name,ClassProgram,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted");
+            if (param.SiteId != null) { sqlBuilder.Where("SiteId = @SiteId"); }
+            if (!string.IsNullOrWhiteSpace(param.Code))
+            {
+                param.Code = $"%{param.Code}%";
+                sqlBuilder.Where("Code like @Code");
+            }
+            if (!string.IsNullOrWhiteSpace(param.Name))
+            {
+                param.Code = $"%{param.Name}%";
+                sqlBuilder.Where("Name like @Name");
+            }
 
-            if (!string.IsNullOrWhiteSpace(param.Code)) { sqlBuilder.Where("Code like '%@Code%'"); }
-            if (!string.IsNullOrWhiteSpace(param.Name)) { sqlBuilder.Where("Name like '%@Name%'"); }
 
             var offSet = (param.PageIndex - 1) * param.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -155,7 +164,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob
         const string UpdateRangSql = "UPDATE `inte_job` SET Name=@Name,ClassProgram=@ClassProgram,Remark=@Remark,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn,IsDeleted=@IsDeleted WHERE Id = @Id AND IsDeleted = @IsDeleted ";
         const string DeleteRangSql = "UPDATE `inte_job` SET IsDeleted = '1', UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id in @ids AND IsDeleted=0";
         const string GetByIdSql = @"SELECT 'SiteId','Id','Code','Name','ClassProgram','Remark','CreatedBy','CreatedOn','UpdatedBy','UpdatedOn','IsDeleted' FROM `inte_job`  WHERE Id = @Id AND IsDeleted=0  ";
-        const string GetByIdsSql = @"SELECT 'SiteId','Id','Code','Name','ClassProgram','Remark','CreatedBy','CreatedOn','UpdatedBy','UpdatedOn','IsDeleted' FROM `inte_job`  WHERE Id IN @ids AND IsDeleted=0  ";
+        const string GetByIdsSql = @"SELECT  * FROM `inte_job`  WHERE Id IN @ids AND IsDeleted=0  ";
         const string GetByCodeSql = @"SELECT 'SiteId','Id','Code','Name','ClassProgram','Remark','CreatedBy','CreatedOn','UpdatedBy','UpdatedOn','IsDeleted' FROM `inte_job`  WHERE Code = @Code  AND SiteId=@Site AND IsDeleted=0 ";
     }
 }

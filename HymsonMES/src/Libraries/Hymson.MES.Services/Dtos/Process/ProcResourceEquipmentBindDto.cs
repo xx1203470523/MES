@@ -70,8 +70,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 是否逻辑删除
         /// </summary>
         public bool? IsDeleted { get; set; }
-
-       
     }
 
     public record ProcResourceEquipmentBindViewDto: ProcResourceEquipmentBindDto
@@ -102,10 +100,15 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long EquipmentId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否主设备
         /// </summary>
-        public bool? IsMain { get; set; }
+        public bool IsMain { get; set; } = false;
+
+        /// <summary>
+        /// Id
+        /// </summary>
+        public long? Id { get; set; }
     }
 
     /// <summary>
@@ -121,7 +124,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 是否主设备
         /// </summary>
-        public bool? IsMain { get; set; }
+        public bool IsMain { get; set; }=false;
 
         /// <summary>
         /// Id
@@ -133,7 +136,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
       // [Required(ErrorMessage = "操作类型不可为空")]
       //  [Range(1, 3)]
-        public int OperationType { get; set; }
+        //public int OperationType { get; set; }
     }
 
     /// <summary>

@@ -10,8 +10,8 @@ docker push $registryUrl/$imageName:$timestamp
 docker service rm $serviceName
 docker service create \
   --name $serviceName \
-  --publish published=10023,target=80 \
-  --replicas 2 \
+  --mode global \
+  --publish mode=host,published=10223,target=80 \
   --env ASPNETCORE_ENVIRONMENT=Development \
   --env TZ="Asia/Shanghai" \
   --env SERVICE_CHECK_HTTP=/health \

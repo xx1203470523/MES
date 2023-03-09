@@ -13,6 +13,8 @@ using Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteCalendar.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
+using Hymson.MES.Data.Repositories.Integrated.InteContainer.Query;
+using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
@@ -153,10 +155,18 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteClassEntity, InteClassDto>();
             #endregion
 
-            #region InteJob
+            #region InteContainer
+            CreateMap<InteContainerSaveDto, InteContainerEntity>();
+            CreateMap<InteContainerPagedQueryDto, InteContainerPagedQuery>();
 
+            CreateMap<InteContainerEntity, InteContainerDto>();
+            #endregion
+
+            #region InteJob
             CreateMap<InteJobEntity, InteJobDto>();
+            CreateMap<InteJobPagedQueryDto, InteJobPagedQuery>();
             CreateMap<InteJobBusinessRelationCreateDto, InteJobBusinessRelationEntity>();
+            CreateMap<InteJobPagedQueryDto, InteJobPagedQuery>();
             #endregion
         }
 
@@ -298,6 +308,13 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<WhMaterialInventoryPagedQueryDto, WhMaterialInventoryPagedQuery>();
             CreateMap<WhMaterialInventoryEntity, WhMaterialInventoryDto>();
             #endregion
+            #region PrintConfig
+            CreateMap<ProcPrinterDto, ProcPrinterEntity>();
+            CreateMap<ProcPrinterEntity, ProcPrinterDto>();//ProcPrinterPagedQuery
+           // CreateMap<ProcPrinterPagedQuery, ProcPrinterPagedQueryDto>();
+            CreateMap<ProcPrinterPagedQueryDto, ProcPrinterPagedQuery>();
+            #endregion
+
         }
 
         /// <summary>

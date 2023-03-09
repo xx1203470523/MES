@@ -20,21 +20,6 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public record ProcLoadPointLinkResourceDto : BaseEntityDto
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public long Id { get; set; }
-
-       /// <summary>
-        /// 序号( 程序生成)
-        /// </summary>
-        public string SerialNo { get; set; }
-
-       /// <summary>
-        /// 所属上料点ID
-        /// </summary>
-        public long LoadPointId { get; set; }
-
        /// <summary>
         /// 所属资源ID
         /// </summary>
@@ -49,33 +34,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 说明
         /// </summary>
         public string? Remark { get; set; }
-
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-       /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string? UpdatedBy { get; set; }
-
-       /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public bool? IsDeleted { get; set; }
-
-       
+               
     }
 
 

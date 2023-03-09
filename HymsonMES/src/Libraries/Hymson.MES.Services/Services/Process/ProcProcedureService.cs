@@ -105,7 +105,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcProcedureViewDto>> GetPageListAsync(ProcProcedurePagedQueryDto procProcedurePagedQueryDto)
         {
             var procProcedurePagedQuery = procProcedurePagedQueryDto.ToQuery<ProcProcedurePagedQuery>();
-            procProcedurePagedQuery.SiteId = _currentSite.SiteId??0;
+            procProcedurePagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _procProcedureRepository.GetPagedInfoAsync(procProcedurePagedQuery);
 
             //实体到DTO转换 装载数据
@@ -166,7 +166,7 @@ namespace Hymson.MES.Services.Services.Process
         {
             var query = new ProcProcedurePrintReleationPagedQuery()
             {
-                SiteId = _currentSite.SiteId??0,
+                SiteId = _currentSite.SiteId ?? 0,
                 ProcedureId = queryDto.ProcedureId,
                 PageIndex = queryDto.PageIndex,
                 PageSize = queryDto.PageSize,
@@ -184,7 +184,15 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     var printReleationDto = entity.ToModel<ProcProcedurePrintRelationDto>();
                     var material = materialLsit.FirstOrDefault(a => a.Id == printReleationDto.MaterialId)?.ToModel<ProcMaterialDto>();
-                    var queryEntity = new QueryProcProcedurePrintReleationDto { ProcedureBomConfigPrint = printReleationDto, Material = material ?? new ProcMaterialDto() };
+                    var queryEntity = new QueryProcProcedurePrintReleationDto
+                    {
+                        TemplateId = entity.TemplateId,
+                        Copy = entity.Copy,
+                        MaterialId = entity.MaterialId,
+                        Version = entity.Version,
+                        MaterialCode = material?.MaterialCode ?? "",
+                        MaterialName = material?.MaterialName ?? ""
+                    };
                     dtos.Add(queryEntity);
                     //TODO 模板 by wangkeming 
                 }
@@ -202,9 +210,9 @@ namespace Hymson.MES.Services.Services.Process
         {
             var query = new InteJobBusinessRelationPagedQuery()
             {
-                SiteId = _currentSite.SiteId??0,
+                SiteId = _currentSite.SiteId ?? 0,
                 BusinessId = queryDto.BusinessId,
-                BusinessType = InteJobBusinessTypeEnum.Procedure.ToString(),
+                BusinessType = (int)InteJobBusinessTypeEnum.Procedure,
                 PageIndex = queryDto.PageIndex,
                 PageSize = queryDto.PageSize,
                 Sorting = queryDto.Sorting
@@ -213,26 +221,27 @@ namespace Hymson.MES.Services.Services.Process
 
             //实体到DTO转换 装载数据
             var dtos = new List<QueryProcedureJobReleationDto>();
-            foreach (var entity in pagedInfo.Data)
+            if (pagedInfo.Data != null && pagedInfo.Data.Any())
             {
-                var jobReleationDto = entity.ToModel<InteJobBusinessRelationDto>();
-                dtos.Add(new QueryProcedureJobReleationDto { ProcedureBomConfigJob = jobReleationDto });
-            }
+                var jobIds = pagedInfo.Data.Select(a => a.JobId).ToArray();
+                var jobList = await _inteJobRepository.GetByIdsAsync(jobIds);
 
-            var jobIds = dtos.Select(a => a.ProcedureBomConfigJob.JobId).ToArray();
-            var jobList = await _inteJobRepository.GetByIdsAsync(jobIds);
-            var jobDtoList = new List<InteJobDto>();
-            foreach (var job in jobList)
-            {
-                var inteJob = job.ToModel<InteJobDto>();
-                jobDtoList.Add(inteJob);
+                foreach (var entity in pagedInfo.Data)
+                {
+                    var job = jobList.FirstOrDefault(a => a.Id == entity.JobId);
+                    dtos.Add(new QueryProcedureJobReleationDto()
+                    {
+                        LinkPoint = entity.LinkPoint,
+                        Parameter = entity.Parameter,
+                        JobId = entity.JobId,
+                        BusinessId = entity.BusinessId,
+                        IsUse = entity.IsUse,
+                        Code = job?.Code ?? "",
+                        Name = job?.Name ?? "",
+                        Remark = job?.Remark ?? ""
+                    });
+                }
             }
-
-            foreach (var entity in dtos)
-            {
-                entity.Job = jobDtoList.FirstOrDefault(a => a.Id == entity.ProcedureBomConfigJob.JobId);
-            }
-
             return new PagedInfo<QueryProcedureJobReleationDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
@@ -249,7 +258,7 @@ namespace Hymson.MES.Services.Services.Process
                 throw new ValidationException(nameof(ErrorCode.MES10100));
             }
 
-            var siteId = _currentSite.SiteId??0;
+            var siteId = _currentSite.SiteId ?? 0;
             var userName = _currentUser.UserName;
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(parm.Procedure);
@@ -270,7 +279,7 @@ namespace Hymson.MES.Services.Services.Process
             var procProcedureEntity = parm.Procedure.ToEntity<ProcProcedureEntity>();
             procProcedureEntity.Id = IdGenProvider.Instance.CreateId();
             procProcedureEntity.Code = code;
-            procProcedureEntity.SiteId= siteId;
+            procProcedureEntity.SiteId = siteId;
             procProcedureEntity.CreatedBy = userName;
             procProcedureEntity.UpdatedBy = userName;
 
@@ -283,6 +292,10 @@ namespace Hymson.MES.Services.Services.Process
                     var releationEntity = item.ToEntity<ProcProcedurePrintRelationEntity>(); ;
                     releationEntity.Id = IdGenProvider.Instance.CreateId();
                     releationEntity.ProcedureId = procProcedureEntity.Id;
+                    releationEntity.MaterialId = item.MaterialId;
+                    releationEntity.Version = item.Version;
+                    releationEntity.TemplateId = item.TemplateId;
+                    releationEntity.Copy = item.Copy;
                     releationEntity.SiteId = siteId;
                     releationEntity.CreatedBy = userName;
                     releationEntity.UpdatedBy = userName;
@@ -300,6 +313,12 @@ namespace Hymson.MES.Services.Services.Process
                     relationEntity.Id = IdGenProvider.Instance.CreateId();
                     relationEntity.BusinessType = (int)InteJobBusinessTypeEnum.Procedure;
                     relationEntity.BusinessId = procProcedureEntity.Id;
+                    relationEntity.OrderNumber = "";
+                    relationEntity.LinkPoint = item.LinkPoint;
+                    relationEntity.JobId = item.JobId;
+                    relationEntity.IsUse = item.IsUse;
+                    relationEntity.Parameter = item.Parameter;
+                    relationEntity.Remark = "";
                     relationEntity.SiteId = siteId;
                     relationEntity.CreatedBy = userName;
                     relationEntity.UpdatedBy = userName;
@@ -339,7 +358,7 @@ namespace Hymson.MES.Services.Services.Process
             {
                 throw new ValidationException(nameof(ErrorCode.MES10100));
             }
-            var siteId = _currentSite.SiteId??0;
+            var siteId = _currentSite.SiteId ?? 0;
             var userName = _currentUser.UserName;
 
             //验证DTO
@@ -360,6 +379,10 @@ namespace Hymson.MES.Services.Services.Process
                     var releationEntity = item.ToEntity<ProcProcedurePrintRelationEntity>(); ;
                     releationEntity.Id = IdGenProvider.Instance.CreateId();
                     releationEntity.ProcedureId = procProcedureEntity.Id;
+                    releationEntity.MaterialId = item.MaterialId;
+                    releationEntity.Version = item.Version;
+                    releationEntity.TemplateId = item.TemplateId;
+                    releationEntity.Copy = item.Copy;
                     releationEntity.SiteId = siteId;
                     releationEntity.CreatedBy = userName;
                     releationEntity.UpdatedBy = userName;
@@ -377,6 +400,12 @@ namespace Hymson.MES.Services.Services.Process
                     relationEntity.Id = IdGenProvider.Instance.CreateId();
                     relationEntity.BusinessType = (int)InteJobBusinessTypeEnum.Procedure;
                     relationEntity.BusinessId = procProcedureEntity.Id;
+                    relationEntity.OrderNumber = "";
+                    relationEntity.LinkPoint = item.LinkPoint;
+                    relationEntity.JobId = item.JobId;
+                    relationEntity.IsUse = item.IsUse;
+                    relationEntity.Parameter = item.Parameter;
+                    relationEntity.Remark = "";
                     relationEntity.SiteId = siteId;
                     relationEntity.CreatedBy = userName;
                     relationEntity.UpdatedBy = userName;
@@ -422,7 +451,7 @@ namespace Hymson.MES.Services.Services.Process
             {
                 UserId = _currentUser.UserName,
                 DeleteOn = HymsonClock.Now(),
-                Ids= idsArr
+                Ids = idsArr
             };
             return await _procProcedureRepository.DeleteRangeAsync(command);
         }

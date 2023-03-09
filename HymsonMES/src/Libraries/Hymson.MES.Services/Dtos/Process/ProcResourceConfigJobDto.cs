@@ -118,7 +118,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 是否启用
         /// </summary>
-        public bool IsUse { get; set; }
+        public bool IsUse { get; set; } = false;
 
         /// <summary>
         /// 参数
@@ -130,7 +130,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 备注
         /// </summary>
         //[MaxLength(length: 255, ErrorMessage = "说明超长")]
-        public string Remark { get; set; }
+        //public string Remark { get; set; }
+
+        /// <summary>
+        /// Id
+        /// </summary>
+        public long? Id { get; set; }
     }
 
     /// <summary>
@@ -138,16 +143,16 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public record ProcResourceConfigJobModifyDto : ProcResourceConfigJobCreateDto
     {
-        /// <summary>
-        /// Id
-        /// </summary>
-        public long? Id { get; set; }
+        ///// <summary>
+        ///// Id
+        ///// </summary>
+        //public long? Id { get; set; }
 
         /// <summary>
         /// 操作类型
         /// </summary>
         //[Required(ErrorMessage = "操作类型不可为空")]
-        public int OperationType { get; set; }
+       // public int OperationType { get; set; }
     }
 
     /// <summary>

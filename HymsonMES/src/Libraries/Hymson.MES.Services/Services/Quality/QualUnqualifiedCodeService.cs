@@ -116,7 +116,7 @@ namespace Hymson.MES.Services.Services.Quality
         {
             if (param == null)
             {
-                throw new ValidationException(ErrorCode.MES10100);
+                throw new ValidationException(nameof(ErrorCode.MES10100) );
             }
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(param);
@@ -124,7 +124,7 @@ namespace Hymson.MES.Services.Services.Quality
             var qualUnqualifiedCodeEntity = await _qualUnqualifiedCodeRepository.GetByCodeAsync(new QualUnqualifiedCodeByCodeQuery { Code = param.UnqualifiedCode, Site = "" });
             if (qualUnqualifiedCodeEntity != null)
             {
-                throw new BusinessException(ErrorCode.MES11108).WithData("code", param.UnqualifiedCode);
+                throw new BusinessException(nameof(ErrorCode.MES11108)).WithData("code", param.UnqualifiedCode);
             }
             var userId = _currentUser.UserName;
             //DTO转换实体
@@ -180,7 +180,7 @@ namespace Hymson.MES.Services.Services.Quality
         {
             if (param == null)
             {
-                throw new ValidationException(ErrorCode.MES10100);
+                throw new ValidationException(nameof(ErrorCode.MES10100) );
             }
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(param);

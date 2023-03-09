@@ -136,7 +136,7 @@ namespace Hymson.MES.Services.Services.Integrated
         {
             if (param == null)
             {
-                throw new ValidationException(ErrorCode.MES10100);
+                throw new ValidationException(nameof(ErrorCode.MES10100));
             }
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(param);
@@ -144,7 +144,7 @@ namespace Hymson.MES.Services.Services.Integrated
             var inteWorkCenterEntity = await _inteWorkCenterRepository.GetByCodeAsync(new EntityByCodeQuery { Code = param.Code, Site = _currentSite.SiteId });
             if (inteWorkCenterEntity != null)
             {
-                throw new BusinessException(ErrorCode.MES12101).WithData("code", param.Code);
+                throw new BusinessException(nameof(ErrorCode.MES12101)).WithData("code", param.Code);
             }
             var userId = _currentUser.UserName;
             //DTO转换实体
@@ -218,14 +218,14 @@ namespace Hymson.MES.Services.Services.Integrated
         {
             if (param == null)
             {
-                throw new ValidationException(ErrorCode.MES10100);
+                throw new ValidationException(nameof(ErrorCode.MES10100));
             }
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(param);
             var entity = await _inteWorkCenterRepository.GetByIdAsync(param.Id);
             if (entity == null)
             {
-                throw new BusinessException(ErrorCode.MES12111);
+                throw new BusinessException(nameof(ErrorCode.MES12111));
 
             }
             else
@@ -239,7 +239,7 @@ namespace Hymson.MES.Services.Services.Integrated
 
                     if (inteWorkCenterRelationList != null && inteWorkCenterRelationList.Any() || inteWorkCenterResourceRelationList != null && inteWorkCenterResourceRelationList.Any())
                     {
-                        throw new BusinessException(ErrorCode.MES12111);
+                        throw new BusinessException(nameof(ErrorCode.MES12111));
                     }
                 }
             }

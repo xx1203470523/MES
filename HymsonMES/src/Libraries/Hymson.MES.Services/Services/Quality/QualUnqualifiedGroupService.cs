@@ -72,14 +72,14 @@ namespace Hymson.MES.Services.Services.Quality
         {
             if (param == null)
             {
-                throw new ValidationException(ErrorCode.MES10100);
+                throw new ValidationException(nameof( ErrorCode.MES10100));
             }
             await _validationCreateRules.ValidateAndThrowAsync(param);
 
             var qualUnqualifiedGroupEntity = await _qualUnqualifiedGroupRepository.GetByCodeAsync(new QualUnqualifiedGroupByCodeQuery { Code = param.UnqualifiedGroup, Site = _currentSite.Name });
             if (qualUnqualifiedGroupEntity != null)
             {
-                throw new BusinessException(ErrorCode.MES11206).WithData("code", param.UnqualifiedGroup);
+                throw new BusinessException(nameof(ErrorCode.MES11206)).WithData("code", param.UnqualifiedGroup);
             }
             var userId = _currentUser.UserName;
             //DTO转换实体
@@ -174,7 +174,7 @@ namespace Hymson.MES.Services.Services.Quality
         {
             if (param == null)
             {
-                throw new ValidationException(ErrorCode.MES10100);
+                throw new ValidationException(nameof(ErrorCode.MES10100));
             }
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(param);

@@ -125,7 +125,7 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
                 rules.Add(item);
             }
 
-            // 保存实体
+            // 更新实体
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
