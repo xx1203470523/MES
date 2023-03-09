@@ -56,11 +56,11 @@ namespace Hymson.MES.Data.Repositories.Process
                 query.Name = $"%{query.Name}%";
                 sqlBuilder.Where("Name like @Name");
             }
-            if (query.Status > DbDefaultValueConstant.IntDefaultValue)
+            if (query.Status.HasValue)
             {
                 sqlBuilder.Where("Status = @Status");
             }
-            if (query.Type > DbDefaultValueConstant.IntDefaultValue)
+            if (query.Type.HasValue)
             {
                 sqlBuilder.Where("Type=@Type");
             }

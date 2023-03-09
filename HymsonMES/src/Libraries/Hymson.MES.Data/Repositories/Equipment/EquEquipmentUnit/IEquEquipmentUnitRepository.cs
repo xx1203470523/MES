@@ -13,16 +13,16 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="equipmentUnitEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(EquEquipmentUnitEntity equipmentUnitEntity);
+        Task<int> InsertAsync(EquEquipmentUnitEntity entity);
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="equipmentUnitEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(EquEquipmentUnitEntity equipmentUnitEntity);
+        Task<int> UpdateAsync(EquEquipmentUnitEntity entity);
 
         /// <summary>
         /// 

@@ -161,8 +161,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<PagedInfo<ProcMaterialGroupDto>> GetPageListAsync(ProcMaterialGroupPagedQueryDto procMaterialGroupPagedQueryDto)
         {
-            //TODO 
-            // TODO   procMaterialGroupPagedQueryDto.SiteCode = "";
+            procMaterialGroupPagedQueryDto.SiteId = _currentSite.SiteId??0;
 
             var procMaterialGroupPagedQuery = procMaterialGroupPagedQueryDto.ToQuery<ProcMaterialGroupPagedQuery>();
             var pagedInfo = await _procMaterialGroupRepository.GetPagedInfoAsync(procMaterialGroupPagedQuery);
@@ -234,13 +233,14 @@ namespace Hymson.MES.Services.Services.Process
             {
                 throw new ValidationException(nameof(ErrorCode.MES10213));
             }
-            // TODO SiteId  procMaterialGroupModifyDto.SiteCode = "";//TODO  App.GetSite();
 
             //DTO转换实体
             var procMaterialGroupEntity = procMaterialGroupModifyDto.ToEntity<ProcMaterialGroupEntity>();
             procMaterialGroupEntity.UpdatedBy = _currentUser.UserName;
             procMaterialGroupEntity.UpdatedOn = HymsonClock.Now();
             procMaterialGroupEntity.GroupCode = procMaterialGroupEntity.GroupCode.ToUpper();
+
+            procMaterialGroupEntity.SiteId = _currentSite.SiteId ?? 0;
 
             #region 检验
             //验证DTO

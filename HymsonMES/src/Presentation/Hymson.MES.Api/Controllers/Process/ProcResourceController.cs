@@ -128,7 +128,7 @@ namespace Hymson.MES.Api.Controllers
         /// <returns></returns>
         [Route("job/list")]
         [HttpGet]
-        public async Task<PagedInfo<QueryProcedureJobReleationDto>> GetProcedureConfigJobLisAsynct(InteJobBusinessRelationPagedQueryDto query)
+        public async Task<PagedInfo<QueryProcedureJobReleationDto>> GetProcedureConfigJobLisAsynct([FromQuery] InteJobBusinessRelationPagedQueryDto query)
         {
             return await _procResourceService.GetProcedureConfigJobListAsync(query);
         }

@@ -65,6 +65,11 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ProcResourceConfigPrintEntity>(GetByResourceIdSql, new { ResourceId=query.ResourceId, Ids=query.Ids });
         }
+        public async Task<IEnumerable<ProcResourceConfigPrintEntity>> GetByPrintIdAsync(ProcResourceConfigPrintQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcResourceConfigPrintEntity>(GetByPrintIdSql, new {  Ids = query.Ids });
+        }
 
         /// <summary>
         /// 新增
@@ -74,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task InsertRangeAsync(List<ProcResourceConfigPrintEntity> procResourceConfigPrints)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            await conn.ExecuteScalarAsync<long>(InsertSql, procResourceConfigPrints);
+            await conn.ExecuteAsync(InsertSql, procResourceConfigPrints);
         }
 
         /// <summary>
@@ -121,5 +126,6 @@ namespace Hymson.MES.Data.Repositories.Process
         const string DeleteSql = "UPDATE `proc_resource_config_print` SET IsDeleted = '1' WHERE Id in @Ids ";
         const string DeleteByResourceIdSql = "delete from `proc_resource_config_print` WHERE ResourceId = @ResourceId ";
         const string GetByResourceIdSql = "SELECT * FROM proc_resource_config_print where ResourceId=@ResourceId and PrintId  IN @Ids AND IsDeleted =0 ";
+        const string GetByPrintIdSql = "SELECT * FROM proc_resource_config_print where  PrintId  IN @Ids AND IsDeleted =0 ";
     }
 }

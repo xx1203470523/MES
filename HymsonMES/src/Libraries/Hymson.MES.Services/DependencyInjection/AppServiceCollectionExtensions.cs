@@ -16,6 +16,7 @@ using Hymson.MES.Services.Services.Integrated;
 using Hymson.MES.Services.Services.Integrated.IIntegratedService;
 using Hymson.MES.Services.Services.Integrated.InteCalendar;
 using Hymson.MES.Services.Services.Integrated.InteClass;
+using Hymson.MES.Services.Services.Integrated.InteContainer;
 using Hymson.MES.Services.Services.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.MES.Services.Services.Process.MaskCode;
@@ -79,6 +80,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteCalendarService, InteCalendarService>();
             services.AddSingleton<IInteClassService, InteClassService>();
             services.AddSingleton<IInteJobService, InteJobService>();
+            services.AddSingleton<IInteContainerService, InteContainerService>();
             services.AddSingleton<IInteWorkCenterService, InteWorkCenterService>();
             #endregion
 
@@ -116,6 +118,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcProcedureService, ProcProcedureService>();
             //工艺路线
             services.AddSingleton<IProcProcessRouteService, ProcProcessRouteService>();
+
+            services.AddSingleton<IProcPrintConfigService, ProcPrintConfigService>();
             #endregion
 
             #region Quality

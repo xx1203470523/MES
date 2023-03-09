@@ -34,7 +34,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 设置类型(字典配置)
         /// </summary>
-        public string SetType { get; set; }
+        public int SetType { get; set; }
 
        /// <summary>
         /// 设置值
@@ -82,12 +82,17 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 设置类型(字典配置)
         /// </summary>
-        public string SetType { get; set; }
+        public int SetType { get; set; }
 
        /// <summary>
         /// 设置值
         /// </summary>
-        public string Value { get; set; }  
+        public string Value { get; set; }
+
+        /// <summary>
+        /// Id
+        /// </summary>
+        public long? Id { get; set; }
     }
 
     /// <summary>
@@ -98,7 +103,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 设置类型
         /// </summary>
-        public string SetType { get; set; }
+        public int SetType { get; set; }
 
         /// <summary>
         /// 设置值
@@ -115,7 +120,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         //[Required(ErrorMessage = "操作类型不可为空")]
         //[Range(1, 3)]
-        public int OperationType { get; set; }
+       // public int OperationType { get; set; }
     }
 
     /// <summary>

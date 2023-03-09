@@ -95,6 +95,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 打印机ID
         /// </summary>
         public long PrintId { get; set; }
+
+        /// <summary>
+        /// Id
+        /// </summary>
+        public long? Id { get; set; }
     }
 
     /// <summary>
@@ -117,6 +122,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
        // [Required(ErrorMessage = "操作类型不可为空")]
        // [Range(1, 3)]
-        public int OperationType { get; set; }
+        //public int OperationType { get; set; }
     }
 }

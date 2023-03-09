@@ -4,6 +4,7 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Domain.Query;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
@@ -261,7 +262,7 @@ namespace Hymson.MES.Services.Services.Process
         //}
 
         /// <summary>
-        /// 获取工序配置Job信息
+        /// 获取资源配置Job信息
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
@@ -271,33 +272,36 @@ namespace Hymson.MES.Services.Services.Process
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 BusinessId = queryDto.BusinessId,
-                BusinessType = InteJobBusinessTypeEnum.Resource.ToString(),
+                BusinessType = (int)InteJobBusinessTypeEnum.Resource,
                 PageIndex = queryDto.PageIndex,
                 PageSize = queryDto.PageSize,
                 Sorting = queryDto.Sorting
             };
             var pagedInfo = await _jobBusinessRelationRepository.GetPagedInfoAsync(query);
 
+
             //实体到DTO转换 装载数据
             var dtos = new List<QueryProcedureJobReleationDto>();
-            foreach (var entity in pagedInfo.Data)
+            if (pagedInfo.Data != null && pagedInfo.Data.Any())
             {
-                var jobReleationDto = entity.ToModel<InteJobBusinessRelationDto>();
-                dtos.Add(new QueryProcedureJobReleationDto { ProcedureBomConfigJob = jobReleationDto });
-            }
+                var jobIds = pagedInfo.Data.Select(a => a.JobId).ToArray();
+                var jobList = await _inteJobRepository.GetByIdsAsync(jobIds);
 
-            var jobIds = dtos.Select(a => a.ProcedureBomConfigJob.JobId).ToArray();
-            var jobList = await _inteJobRepository.GetByIdsAsync(jobIds);
-            var jobDtoList = new List<InteJobDto>();
-            foreach (var job in jobList)
-            {
-                var inteJob = job.ToModel<InteJobDto>();
-                jobDtoList.Add(inteJob);
-            }
-
-            foreach (var entity in dtos)
-            {
-                entity.Job = jobDtoList.FirstOrDefault(a => a.Id == entity.ProcedureBomConfigJob.JobId);
+                foreach (var entity in pagedInfo.Data)
+                {
+                    var job = jobList.FirstOrDefault(a => a.Id == entity.JobId);
+                    dtos.Add(new QueryProcedureJobReleationDto()
+                    {
+                        LinkPoint = entity.LinkPoint,
+                        Parameter = entity.Parameter,
+                        JobId = entity.JobId,
+                        BusinessId = entity.BusinessId,
+                        IsUse = entity.IsUse,
+                        Code = job?.Code ?? "",
+                        Name = job?.Name ?? "",
+                        Remark = job?.Remark ?? ""
+                    });
+                }
             }
 
             return new PagedInfo<QueryProcedureJobReleationDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
@@ -339,9 +343,34 @@ namespace Hymson.MES.Services.Services.Process
                 }
             }
 
+            //打印机验证
+            if (parm.PrintList != null && parm.PrintList.Count > 0)
+            {
+                parm.PrintList.ForEach(x =>
+                {
+                    if (x.PrintId == 0)
+                    {
+                        x.PrintId = x.Id.ParseToLong();
+                    }
+                });
+                //判断打印机是否重复配置  数据库中 已经存储的情况
+                if (parm.PrintList.GroupBy(x => x.PrintId).Where(g => g.Count() > 2).Count() > 1)
+                {
+                    throw new ValidationException(nameof(ErrorCode.MES10313));
+                }
+            }
+
             //判断是否勾选了多个主设备，只能有一个主设备
             if (parm.EquList != null && parm.EquList.Count > 0)
             {
+                parm.EquList.ForEach(x =>
+                {
+                    if (x.EquipmentId == 0)
+                    {
+                        x.EquipmentId = x.Id.ParseToLong();
+                    }
+                });
+
                 if (parm.EquList.GroupBy(x => x.EquipmentId).Where(g => g.Count() > 2).Count() > 1)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10306));
@@ -352,6 +381,18 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10307));
                 }
+            }
+
+            //作业设置
+            if (parm.JobList != null && parm.JobList.Count > 0)
+            {
+                parm.JobList.ForEach(x =>
+                {
+                    if (x.JobId == 0)
+                    {
+                        x.JobId = x.Id.ParseToLong();
+                    }
+                });
             }
             #endregion
 
@@ -374,36 +415,40 @@ namespace Hymson.MES.Services.Services.Process
             {
                 foreach (var item in parm.PrintList)
                 {
-                    printList.Add(new ProcResourceConfigPrintEntity
+                    ProcResourceConfigPrintEntity print = new ProcResourceConfigPrintEntity();
+                    print = new ProcResourceConfigPrintEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
-                        SiteId = siteId,
                         ResourceId = entity.Id,
                         PrintId = item.PrintId,
                         Remark = "",
+                        SiteId = _currentSite.SiteId ?? 0,
                         CreatedBy = userName,
                         UpdatedBy = userName
-                    });
+                    };
+                    printList.Add(print);
                 }
             }
 
-            //资源绑定设置数据
+            //设备绑定设置数据
             List<ProcResourceEquipmentBindEntity> equList = new List<ProcResourceEquipmentBindEntity>();
             if (parm.EquList != null && parm.EquList.Count > 0)
             {
                 foreach (var item in parm.EquList)
                 {
-                    equList.Add(new ProcResourceEquipmentBindEntity
+                    ProcResourceEquipmentBindEntity equ = new ProcResourceEquipmentBindEntity();
+                    equ = new ProcResourceEquipmentBindEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
-                        SiteId = siteId,
                         ResourceId = entity.Id,
                         EquipmentId = item.EquipmentId,
-                        IsMain = item.IsMain ?? false,
+                        IsMain = item.IsMain,
                         Remark = "",
+                        SiteId = _currentSite.SiteId ?? 0,
                         CreatedBy = userName,
                         UpdatedBy = userName
-                    });
+                    };
+                    equList.Add(equ);
                 }
             }
 
@@ -413,35 +458,45 @@ namespace Hymson.MES.Services.Services.Process
             {
                 foreach (var item in parm.ResList)
                 {
-                    resSetList.Add(new ProcResourceConfigResEntity
+                    ProcResourceConfigResEntity resSet = new ProcResourceConfigResEntity();
+                    resSet = new ProcResourceConfigResEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
-                        SiteId = siteId,
                         ResourceId = entity.Id,
                         SetType = item.SetType,
                         Value = item.Value,
                         Remark = "",
+                        SiteId = _currentSite.SiteId ?? 0,
                         CreatedBy = userName,
                         UpdatedBy = userName
-                    });
+                    };
+                    resSetList.Add(resSet);
                 }
             }
 
             //作业设置数据
-            //job,LinkPoint
             List<InteJobBusinessRelationEntity> jobList = new List<InteJobBusinessRelationEntity>();
             if (parm.JobList != null && parm.JobList.Count > 0)
             {
                 foreach (var item in parm.JobList)
                 {
-                    var relationEntity = item.ToEntity<InteJobBusinessRelationEntity>(); ;
-                    relationEntity.Id = IdGenProvider.Instance.CreateId();
-                    relationEntity.BusinessType = (int)InteJobBusinessTypeEnum.Resource;
-                    relationEntity.BusinessId = entity.Id;
-                    relationEntity.SiteId = siteId;
-                    relationEntity.CreatedBy = userName;
-                    relationEntity.UpdatedBy = userName;
-                    jobList.Add(relationEntity);
+                    InteJobBusinessRelationEntity job = new InteJobBusinessRelationEntity();
+                    job = new InteJobBusinessRelationEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        BusinessId = entity.Id,
+                        BusinessType = (int)InteJobBusinessTypeEnum.Resource,
+                        OrderNumber = "",
+                        LinkPoint = item.LinkPoint,
+                        JobId = item.JobId,
+                        IsUse = item.IsUse,
+                        Parameter = item.Parameter,
+                        Remark =  "",
+                        SiteId = _currentSite.SiteId ?? 0,
+                        CreatedBy = userName,
+                        UpdatedBy = userName
+                    };
+                    jobList.Add(job);
                 }
             }
             #endregion
@@ -502,16 +557,31 @@ namespace Hymson.MES.Services.Services.Process
 
             if (param.PrintList != null && param.PrintList.Count > 0)
             {
+                param.PrintList.ForEach(x =>
+                {
+                    if (x.PrintId == 0)
+                    {
+                        x.PrintId = x.Id.ParseToLong();
+                    }
+                });
                 //判断打印机是否重复配置  数据库中 已经存储的情况
                 if (param.PrintList.GroupBy(x => x.PrintId).Where(g => g.Count() > 2).Count() > 1)
                 {
                     throw new ValidationException(nameof(ErrorCode.MES10313));
-                }     
+                }
             }
 
             //判断是否勾选了多个主设备，只能有一个主设备
             if (param.EquList != null && param.EquList.Count > 0)
             {
+                param.EquList.ForEach(x =>
+                {
+                    if (x.EquipmentId == 0)
+                    {
+                        x.EquipmentId = x.Id.ParseToLong();
+                    }
+                });
+
                 if (param.EquList.GroupBy(x => x.EquipmentId).Where(g => g.Count() > 2).Count() > 1)
                 {
                     throw new Exception(nameof(ErrorCode.MES10314));
@@ -530,6 +600,18 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     throw new ValidationException(nameof(ErrorCode.MES10307));
                 }
+            }
+
+            //作业设置
+            if (param.JobList != null && param.JobList.Count > 0)
+            {
+                param.JobList.ForEach(x =>
+                {
+                    if (x.JobId == 0)
+                    {
+                        x.JobId = x.Id.ParseToLong();
+                    }
+                });
             }
             #endregion
 
@@ -577,7 +659,7 @@ namespace Hymson.MES.Services.Services.Process
                         Id = IdGenProvider.Instance.CreateId(),
                         ResourceId = param.Id,
                         EquipmentId = item.EquipmentId,
-                        IsMain = item.IsMain ?? false,
+                        IsMain = item.IsMain,
                         Remark = "",
                         SiteId = _currentSite.SiteId ?? 0,
                         CreatedBy = userName,
@@ -621,11 +703,12 @@ namespace Hymson.MES.Services.Services.Process
                         Id = IdGenProvider.Instance.CreateId(),
                         BusinessId = param.Id,
                         BusinessType = (int)InteJobBusinessTypeEnum.Resource,
+                        OrderNumber = "",
                         LinkPoint = item.LinkPoint,
                         JobId = item.JobId,
                         IsUse = item.IsUse,
                         Parameter = item.Parameter,
-                        Remark = item.Remark,
+                        Remark = "",
                         SiteId = _currentSite.SiteId ?? 0,
                         CreatedBy = userName,
                         UpdatedBy = userName

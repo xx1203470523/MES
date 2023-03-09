@@ -33,7 +33,7 @@ namespace Hymson.MES.Data.Repositories.Process.Resource
         /// 描述 :状态 
         /// 空值 : false  
         /// </summary>
-        public int? Status { get; set; } = -1;
+        public int? Status { get; set; }
 
         /// <summary>
         /// 站点id

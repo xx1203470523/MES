@@ -44,10 +44,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] ids) 
+        public async Task<int> DeletesAsync(long[] ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeletesSql, new { ids=ids });
+            return await conn.ExecuteAsync(DeletesSql, new { ids = ids });
 
         }
 
@@ -59,7 +59,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         public async Task<WhMaterialInventoryEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<WhMaterialInventoryEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<WhMaterialInventoryEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -67,10 +67,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<WhMaterialInventoryEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<WhMaterialInventoryEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<WhMaterialInventoryEntity>(GetByIdsSql, new { ids = ids});
+            return await conn.QueryAsync<WhMaterialInventoryEntity>(GetByIdsSql, new { ids = ids });
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
-           
+
             var offSet = (whMaterialInventoryPagedQuery.PageIndex - 1) * whMaterialInventoryPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = whMaterialInventoryPagedQuery.PageSize });
@@ -162,6 +162,24 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             return await conn.ExecuteAsync(UpdatesSql, whMaterialInventoryEntitys);
         }
 
+
+        /// <summary>
+        /// 根据物料编码获取物料数据
+        /// </summary>
+        /// <param name="materialCode"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcMaterialInfoView>> GetProcMaterialByMaterialCodeAsync(string materialCode)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetMaterialByIdsSql);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("MaterialCode=@materialCode");
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var pmInfo = await conn.QueryAsync<ProcMaterialInfoView>(template.RawSql, new { materialCode });
+            return pmInfo;
+        }
+
     }
 
     public partial class WhMaterialInventoryRepository
@@ -184,5 +202,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SupplierId`, `MaterialId`, `MaterialBarCode`, `Batch`, `QuantityResidue`, `Status`, `DueDate`, `Source`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `wh_material_inventory`  WHERE Id IN @ids ";
+
+
+        const string GetMaterialByIdsSql = @"SELECT  
+                                            /**select**/
+                                           FROM `proc_material` /**where**/  ";
     }
 }

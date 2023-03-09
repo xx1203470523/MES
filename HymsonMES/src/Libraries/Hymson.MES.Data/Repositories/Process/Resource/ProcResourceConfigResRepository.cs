@@ -85,7 +85,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task InsertRangeAsync(List<ProcResourceConfigResEntity> procResourceConfigRess)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var id = await conn.ExecuteScalarAsync<long>(InsertSql, procResourceConfigRess);
+            await conn.ExecuteAsync(InsertSql, procResourceConfigRess);
         }
 
         /// <summary>

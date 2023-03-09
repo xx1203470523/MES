@@ -26,6 +26,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 描述
         /// </summary>
         public string Remark { get; set; } = "";
+
+        /// <summary>
+        /// 掩码规则列表
+        /// </summary>
+        public List<ProcMaskCodeRuleDto> RuleList { get; set; } = new();
     }
 
     /// <summary>
@@ -62,6 +67,32 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 修改时间
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
+
+        /// <summary>
+        /// 掩码规则列表
+        /// </summary>
+        public IEnumerable<ProcMaskCodeRuleDto> RuleList { get; set; }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public record ProcMaskCodeRuleDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 序号( 程序生成)
+        /// </summary>
+        public string? SerialNo { get; set; }
+
+        /// <summary>
+        /// 描述 :掩码规则 
+        /// </summary>
+        public string Rule { get; set; } = "";
+
+        /// <summary>
+        /// 描述 :匹配方式 
+        /// </summary>
+        public int MatchWay { get; set; }
     }
 
     /// <summary>

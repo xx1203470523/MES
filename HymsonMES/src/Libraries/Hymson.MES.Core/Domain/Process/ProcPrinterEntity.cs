@@ -16,12 +16,6 @@ namespace Hymson.MES.Core.Domain.Process
         public long SiteId { get; set; }
         
         /// <summary>
-        /// 描述 :所属资源ID 
-        /// 空值 : false  
-        /// </summary>
-        public long ResourceId { get; set; }
-        
-        /// <summary>
         /// 描述 :打印机名称 
         /// 空值 : false  
         /// </summary>

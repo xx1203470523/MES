@@ -11,6 +11,7 @@ using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteCalendar;
 using Hymson.MES.Data.Repositories.Integrated.InteClass;
+using Hymson.MES.Data.Repositories.Integrated.InteContainer;
 using Hymson.MES.Data.Repositories.Integrated.InteJob;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter;
 using Hymson.MES.Data.Repositories.Process;
@@ -74,6 +75,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteCalendarRepository, InteCalendarRepository>();
             services.AddSingleton<IInteClassDetailRepository, InteClassDetailRepository>();
             services.AddSingleton<IInteClassRepository, InteClassRepository>();
+            services.AddSingleton<IInteContainerRepository, InteContainerRepository>();
 
             //InteJob
             services.AddSingleton<IInteJobBusinessRelationRepository, InteJobBusinessRelationRepository>();
@@ -82,7 +84,9 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Process
+            services.AddSingleton<IProcMaskCodeRuleRepository, ProcMaskCodeRuleRepository>();
             services.AddSingleton<IProcMaskCodeRepository, ProcMaskCodeRepository>();
+           
 
             #region Material
             services.AddSingleton<IProcMaterialRepository, ProcMaterialRepository>();
@@ -147,6 +151,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IWhMaterialInventoryRepository, WhMaterialInventoryRepository>();
 
 
+            #endregion
+            #region printConfig
+            services.AddSingleton<IProcPrintConfigRepository, ProcPrintConfigRepository>();
             #endregion
 
             return services;
