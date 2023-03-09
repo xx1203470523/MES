@@ -130,7 +130,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 备注
         /// </summary>
         //[MaxLength(length: 255, ErrorMessage = "说明超长")]
-        public string Remark { get; set; }
+        //public string Remark { get; set; }
 
         /// <summary>
         /// Id

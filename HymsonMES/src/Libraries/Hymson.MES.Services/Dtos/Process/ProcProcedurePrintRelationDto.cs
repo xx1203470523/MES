@@ -104,7 +104,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
     }
 
     /// <summary>
@@ -186,15 +186,50 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public class QueryProcProcedurePrintReleationDto
     {
+        ///// <summary>
+        ///// 工序配置打印实体类
+        ///// </summary>
+        //public ProcProcedurePrintRelationDto ProcedureBomConfigPrint { get; set; }
+
         /// <summary>
-        /// 工序配置打印实体类
+        /// 所属物料ID
         /// </summary>
-        public ProcProcedurePrintRelationDto ProcedureBomConfigPrint { get; set; }
+        public long MaterialId { get; set; }
+
+        /// <summary>
+        /// 版本
+        /// </summary>
+        public string Version { get; set; }
+
+        /// <summary>
+        /// 所属模板ID
+        /// </summary>
+        public long? TemplateId { get; set; }
+
+        /// <summary>
+        /// 份数
+        /// </summary>
+        public int? Copy { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+       // public string Remark { get; set; }
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string MaterialName { get; set; }
 
         /// <summary>
         /// 物料
         /// </summary>
-        public ProcMaterialDto Material { get; set; }
+      //  public ProcMaterialDto Material { get; set; }
 
         //TODO 模板 by wangkeming 
     }

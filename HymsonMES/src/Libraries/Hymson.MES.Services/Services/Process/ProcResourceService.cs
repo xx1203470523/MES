@@ -279,35 +279,29 @@ namespace Hymson.MES.Services.Services.Process
             };
             var pagedInfo = await _jobBusinessRelationRepository.GetPagedInfoAsync(query);
 
+
             //实体到DTO转换 装载数据
             var dtos = new List<QueryProcedureJobReleationDto>();
-            foreach (var entity in pagedInfo.Data)
+            if (pagedInfo.Data != null && pagedInfo.Data.Any())
             {
-                dtos.Add(new QueryProcedureJobReleationDto()
+                var jobIds = pagedInfo.Data.Select(a => a.JobId).ToArray();
+                var jobList = await _inteJobRepository.GetByIdsAsync(jobIds);
+
+                foreach (var entity in pagedInfo.Data)
                 {
-                    LinkPoint = entity.LinkPoint,
-                    Parameter = entity.Parameter,
-                    JobId = entity.JobId,
-                    BusinessId = entity.BusinessId,
-                    IsUse = entity.IsUse
-                });
-            }
-
-            var jobIds = dtos.Select(a => a.JobId).ToArray();
-            var jobList = await _inteJobRepository.GetByIdsAsync(jobIds);
-            var jobDtoList = new List<InteJobDto>();
-            foreach (var job in jobList)
-            {
-                var inteJob = job.ToModel<InteJobDto>();
-                jobDtoList.Add(inteJob);
-            }
-
-            foreach (var entity in dtos)
-            {
-                var job = jobDtoList.FirstOrDefault(a => a.Id == entity.JobId);
-                entity.Code = job?.Code ?? "";
-                entity.Name = job?.Name ?? "";
-                entity.Remark = job?.Remark ?? "";
+                    var job = jobList.FirstOrDefault(a => a.Id == entity.JobId);
+                    dtos.Add(new QueryProcedureJobReleationDto()
+                    {
+                        LinkPoint = entity.LinkPoint,
+                        Parameter = entity.Parameter,
+                        JobId = entity.JobId,
+                        BusinessId = entity.BusinessId,
+                        IsUse = entity.IsUse,
+                        Code = job?.Code ?? "",
+                        Name = job?.Name ?? "",
+                        Remark = job?.Remark ?? ""
+                    });
+                }
             }
 
             return new PagedInfo<QueryProcedureJobReleationDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
@@ -497,7 +491,7 @@ namespace Hymson.MES.Services.Services.Process
                         JobId = item.JobId,
                         IsUse = item.IsUse,
                         Parameter = item.Parameter,
-                        Remark = item.Remark ?? "",
+                        Remark =  "",
                         SiteId = _currentSite.SiteId ?? 0,
                         CreatedBy = userName,
                         UpdatedBy = userName
@@ -714,7 +708,7 @@ namespace Hymson.MES.Services.Services.Process
                         JobId = item.JobId,
                         IsUse = item.IsUse,
                         Parameter = item.Parameter,
-                        Remark = item.Remark ?? "",
+                        Remark = "",
                         SiteId = _currentSite.SiteId ?? 0,
                         CreatedBy = userName,
                         UpdatedBy = userName

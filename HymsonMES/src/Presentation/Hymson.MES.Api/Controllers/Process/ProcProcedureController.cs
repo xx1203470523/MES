@@ -68,7 +68,7 @@ namespace Hymson.MES.Api.Controllers
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("configPrint/list")]
+        [Route("print/list")]
         public async Task<PagedInfo<QueryProcProcedurePrintReleationDto>> GetProcedureBomConfigPrintListAsync([FromQuery] ProcProcedurePrintReleationPagedQueryDto parm)
         {
             return await _procProcedureService.GetProcedureConfigPrintListAsync(parm);
@@ -80,7 +80,7 @@ namespace Hymson.MES.Api.Controllers
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("configJob/list")]
+        [Route("job/list")]
         public async Task<PagedInfo<QueryProcedureJobReleationDto>> GetProcedureBomConfigJobList([FromQuery] InteJobBusinessRelationPagedQueryDto parm)
         {
             return await _procProcedureService.GetProcedureConfigJobListAsync(parm);
