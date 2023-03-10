@@ -94,13 +94,13 @@ namespace Hymson.MES.Services.Services.Warehouse
                 {
                     throw new BusinessException(nameof(ErrorCode.MES15101));
                 }
-                //var supplierInfo = await _whMaterialInventoryRepository.GetWhSupplierByMaterialIdAsync(materialInfo.Id, item.SupplierCode);
-                //if (materialInfo == null || supplierInfo.Count() <= 0)
-                //{
-                //    throw new BusinessException(nameof(ErrorCode.MES15102)).WithData("MateialCode", item.MaterialCode);
-                //}
+                var supplierInfo = await _whMaterialInventoryRepository.GetWhSupplierByMaterialIdAsync(materialInfo.Id, item.SupplierCode);
+                if (materialInfo == null || supplierInfo.Count() <= 0)
+                {
+                    throw new BusinessException(nameof(ErrorCode.MES15102)).WithData("MateialCode", item.MaterialCode);
+                }
                 var whMaterialInventoryEntity = new WhMaterialInventoryEntity();
-                whMaterialInventoryEntity.SupplierId = item.SupplierId;//supplierInfo.FirstOrDefault().Id;
+                whMaterialInventoryEntity.SupplierId = supplierInfo.FirstOrDefault().Id;//item.SupplierId;//
                 whMaterialInventoryEntity.MaterialId = materialInfo.Id;
                 whMaterialInventoryEntity.MaterialBarCode = item.MaterialBarCode;
                 whMaterialInventoryEntity.Batch = item.Batch;
