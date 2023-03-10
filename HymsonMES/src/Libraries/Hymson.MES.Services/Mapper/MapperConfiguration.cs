@@ -159,6 +159,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteContainerSaveDto, InteContainerEntity>();
             CreateMap<InteContainerPagedQueryDto, InteContainerPagedQuery>();
 
+            CreateMap<InteContainerView, InteContainerDto>();
             CreateMap<InteContainerEntity, InteContainerDto>();
             #endregion
 
@@ -311,7 +312,7 @@ namespace Hymson.MES.Services.Mapper
             #region PrintConfig
             CreateMap<ProcPrinterDto, ProcPrinterEntity>();
             CreateMap<ProcPrinterEntity, ProcPrinterDto>();//ProcPrinterPagedQuery
-           // CreateMap<ProcPrinterPagedQuery, ProcPrinterPagedQueryDto>();
+                                                           // CreateMap<ProcPrinterPagedQuery, ProcPrinterPagedQueryDto>();
             CreateMap<ProcPrinterPagedQueryDto, ProcPrinterPagedQuery>();
             #endregion
 

@@ -11,7 +11,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
     /// @author 陈志谱
     /// @date 2023-02-08 02:43:18
     /// </summary>
-    [Authorize]
+    //[Authorize]
     [ApiController]
     [Route("api/v1/[controller]")]
     public class EquEquipmentGroupController : ControllerBase
