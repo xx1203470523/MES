@@ -120,6 +120,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcProcessRouteService, ProcProcessRouteService>();
 
             services.AddSingleton<IProcPrintConfigService, ProcPrintConfigService>();
+            //标签模板
+            services.AddSingleton<IProcLabelTemplateService, ProcLabelTemplateService>();
             #endregion
 
             #region Quality
@@ -212,6 +214,11 @@ namespace Microsoft.Extensions.DependencyInjection
             #region ProcessRoute
             services.AddSingleton<AbstractValidator<ProcProcessRouteCreateDto>, ProcProcessRouteCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcProcessRouteModifyDto>, ProcProcessRouteModifyValidator>();
+            #endregion
+            #region LabelTemplate
+
+            services.AddSingleton<AbstractValidator<ProcLabelTemplateCreateDto>, ProcLabelTemplateCreateValidator>();
+            services.AddSingleton<AbstractValidator<ProcLabelTemplateModifyDto>, ProcLabelTemplateModifyValidator>();
             #endregion
             #endregion
 
