@@ -297,6 +297,20 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcProcessRouteDetailNodeView, ProcProcessRouteDetailNodeViewDto>();
             CreateMap<ProcProcessRouteDetailLinkEntity, ProcProcessRouteDetailLinkDto>();
             #endregion
+            #region PrintConfig
+            CreateMap<ProcPrinterDto, ProcPrinterEntity>();
+            CreateMap<ProcPrinterEntity, ProcPrinterDto>();
+                                                           
+            CreateMap<ProcPrinterPagedQueryDto, ProcPrinterPagedQuery>();
+            #endregion
+            #region LabelTemplate
+            CreateMap<ProcLabelTemplateEntity, ProcLabelTemplateDto>(); 
+            CreateMap<ProcLabelTemplateDto, ProcLabelTemplateEntity>();
+            CreateMap<ProcLabelTemplateModifyDto, ProcLabelTemplateEntity>();
+            CreateMap<ProcLabelTemplateCreateDto, ProcLabelTemplateEntity>();
+
+            CreateMap<ProcLabelTemplatePagedQueryDto, ProcLabelTemplatePagedQuery>();
+            #endregion
 
             #region Warehouse
             CreateMap<WhSupplierCreateDto, WhSupplierEntity>();
@@ -309,12 +323,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<WhMaterialInventoryPagedQueryDto, WhMaterialInventoryPagedQuery>();
             CreateMap<WhMaterialInventoryEntity, WhMaterialInventoryDto>();
             #endregion
-            #region PrintConfig
-            CreateMap<ProcPrinterDto, ProcPrinterEntity>();
-            CreateMap<ProcPrinterEntity, ProcPrinterDto>();//ProcPrinterPagedQuery
-                                                           // CreateMap<ProcPrinterPagedQuery, ProcPrinterPagedQueryDto>();
-            CreateMap<ProcPrinterPagedQueryDto, ProcPrinterPagedQuery>();
-            #endregion
+          
 
         }
 

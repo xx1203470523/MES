@@ -139,6 +139,14 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcProcessRouteDetailNodeRepository, ProcProcessRouteDetailNodeRepository>();
             services.AddSingleton<IProcProcessRouteDetailLinkRepository, ProcProcessRouteDetailLinkRepository>();
             #endregion
+
+            #region LabelTemplate
+            services.AddSingleton<IProcLabelTemplateRepository, ProcLabelTemplateRepository>();
+            #endregion
+
+            #region printConfig
+            services.AddSingleton<IProcPrintConfigRepository, ProcPrintConfigRepository>();
+            #endregion
             #endregion
 
             #region Quality
@@ -152,9 +160,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
 
             #endregion
-            #region printConfig
-            services.AddSingleton<IProcPrintConfigRepository, ProcPrintConfigRepository>();
-            #endregion
+           
 
             return services;
         }
