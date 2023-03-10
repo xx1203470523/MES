@@ -176,6 +176,22 @@ namespace Hymson.MES.Services.Services.Warehouse
             return whMaterialInventoryDtos;
         }
 
+
+        /// <summary>
+        /// 查询是否已存在物料条码
+        /// </summary>
+        /// <param name="materialBarCode"></param>
+        /// <returns></returns>
+        public async Task<bool> GetMaterialBarCodeAnyAsync(string materialBarCode)
+        {
+            var pagedInfo = await _whMaterialInventoryRepository.GetWhMaterialInventoryEntitiesAsync(new WhMaterialInventoryQuery
+            {
+                MaterialBarCode = materialBarCode
+            });
+            return pagedInfo.Any();
+        }
+
+
         /// <summary>
         /// 修改
         /// </summary>

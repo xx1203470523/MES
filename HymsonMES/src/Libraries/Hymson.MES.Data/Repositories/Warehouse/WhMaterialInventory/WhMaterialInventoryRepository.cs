@@ -114,6 +114,13 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetWhMaterialInventoryEntitiesSqlTemplate);
+            //sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Select("*");
+            if (!string.IsNullOrWhiteSpace(whMaterialInventoryQuery.MaterialBarCode))
+            {
+                sqlBuilder.Where("MaterialBarCode=@MaterialBarCode");
+            }
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var whMaterialInventoryEntities = await conn.QueryAsync<WhMaterialInventoryEntity>(template.RawSql, whMaterialInventoryQuery);
             return whMaterialInventoryEntities;

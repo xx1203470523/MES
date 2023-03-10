@@ -109,6 +109,5 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <param name="materialCode"></param>
         /// <returns></returns>
         Task<IEnumerable<WhSupplierInfoView>> GetWhSupplierByMaterialIdAsync(long materialId, string supplierCode = "");
-
     }
 }

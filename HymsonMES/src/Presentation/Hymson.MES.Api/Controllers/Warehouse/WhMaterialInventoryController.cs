@@ -54,15 +54,16 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         }
 
         /// <summary>
-        /// 查询详情（物料库存）
+        /// 查询是否已存在物料条码
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="materialBarCode"></param>
         /// <returns></returns>
-        //[HttpGet("{id}")]
-        //public async Task<WhMaterialInventoryDto> QueryWhMaterialInventoryByIdAsync(long id)
-        //{
-        //    return await _whMaterialInventoryService.QueryWhMaterialInventoryByIdAsync(id);
-        //}
+        [HttpGet("getMaterialBarCodeAny/{materialBarCode}")]
+        public async Task<bool> GetMaterialBarCodeAnyAsync(string materialBarCode)
+        {
+            return await _whMaterialInventoryService.GetMaterialBarCodeAnyAsync(materialBarCode);
+        }
+
 
         /// <summary>
         /// 添加（物料库存）
@@ -75,6 +76,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         {
             await _whMaterialInventoryService.CreateWhMaterialInventoryAsync(parm);
         }
+
 
 
         /// <summary>
