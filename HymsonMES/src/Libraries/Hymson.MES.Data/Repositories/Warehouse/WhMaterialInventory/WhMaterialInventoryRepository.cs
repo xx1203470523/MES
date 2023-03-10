@@ -91,6 +91,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
 
+
             var offSet = (whMaterialInventoryPagedQuery.PageIndex - 1) * whMaterialInventoryPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = whMaterialInventoryPagedQuery.PageSize });
@@ -168,16 +169,39 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="materialCode"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcMaterialInfoView>> GetProcMaterialByMaterialCodeAsync(string materialCode)
+        public async Task<ProcMaterialInfoView> GetProcMaterialByMaterialCodeAsync(string materialCode)
         {
             var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetMaterialByIdsSql);
+            var template = sqlBuilder.AddTemplate(GetMaterialByMaterialCodeSql);
             sqlBuilder.Select("*");
             sqlBuilder.Where("MaterialCode=@materialCode");
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var pmInfo = await conn.QueryAsync<ProcMaterialInfoView>(template.RawSql, new { materialCode });
+            var pmInfo = await conn.QueryFirstOrDefaultAsync<ProcMaterialInfoView>(template.RawSql, new { materialCode });
             return pmInfo;
+        }
+
+
+        /// <summary>
+        /// 根据物料编码获取供应商信息
+        /// </summary>
+        /// <param name="materialCode"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<WhSupplierInfoView>> GetWhSupplierByMaterialIdAsync(long materialId, string supplierCode = "")
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetSupplierlByMaterialCodeSql);
+            sqlBuilder.Select("ws.Id,ws.Code,ws.Name");
+            sqlBuilder.InnerJoin("proc_material_supplier_relation pmsr ON pmsr.SupplierId=ws.Id");
+            sqlBuilder.Where("pmsr.MaterialId=@materialId");
+            if (!string.IsNullOrWhiteSpace(supplierCode))
+            {
+                sqlBuilder.Where("ws.SupplierCode=@supplierCode");
+            }
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var wsInfo = await conn.QueryAsync<WhSupplierInfoView>(template.RawSql, new { materialId, supplierCode });
+            return wsInfo;
         }
 
     }
@@ -204,8 +228,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse
                             FROM `wh_material_inventory`  WHERE Id IN @ids ";
 
 
-        const string GetMaterialByIdsSql = @"SELECT  
+        const string GetMaterialByMaterialCodeSql = @"SELECT   
                                             /**select**/
                                            FROM `proc_material` /**where**/  ";
+
+        const string GetSupplierlByMaterialCodeSql = @"SELECT /**select**/ FROM wh_supplier ws /**innerjoin**/ /**leftjoin**/ /**where**/";
     }
 }

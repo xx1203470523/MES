@@ -43,6 +43,6 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<InteContainerEntity>> GetPagedInfoAsync(InteContainerPagedQuery pagedQuery);
+        Task<PagedInfo<InteContainerView>> GetPagedInfoAsync(InteContainerPagedQuery pagedQuery);
     }
 }

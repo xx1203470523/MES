@@ -159,6 +159,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteContainerSaveDto, InteContainerEntity>();
             CreateMap<InteContainerPagedQueryDto, InteContainerPagedQuery>();
 
+            CreateMap<InteContainerView, InteContainerDto>();
             CreateMap<InteContainerEntity, InteContainerDto>();
             #endregion
 
@@ -166,6 +167,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteJobEntity, InteJobDto>();
             CreateMap<InteJobPagedQueryDto, InteJobPagedQuery>();
             CreateMap<InteJobBusinessRelationCreateDto, InteJobBusinessRelationEntity>();
+            CreateMap<InteJobPagedQueryDto, InteJobPagedQuery>();
             #endregion
         }
 

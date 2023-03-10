@@ -9,10 +9,10 @@
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="11.5.1" />
-    <PackageReference Include="Hymson.Authentication.JwtBearer" Version="1.6.8" />
-    <PackageReference Include="Hymson.Sequences" Version="1.7.1" />
-    <PackageReference Include="Hymson.Snowflake" Version="1.6.8" />
-    <PackageReference Include="Hymson.Web.Framework" Version="1.6.8" />
+    <PackageReference Include="Hymson.Authentication.JwtBearer" Version="1.7.7" />
+    <PackageReference Include="Hymson.Sequences" Version="1.7.7" />
+    <PackageReference Include="Hymson.Snowflake" Version="1.7.7" />
+    <PackageReference Include="Hymson.Web.Framework" Version="1.7.7" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
   </ItemGroup>

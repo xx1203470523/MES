@@ -6,6 +6,7 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -20,14 +21,16 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// 
         /// </summary>
         private readonly ConnectionOptions _connectionOptions;
+        private readonly IMemoryCache _memoryCache;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public EquEquipmentRepository(IOptions<ConnectionOptions> connectionOptions)
+        public EquEquipmentRepository(IOptions<ConnectionOptions> connectionOptions,IMemoryCache memoryCache)
         {
             _connectionOptions = connectionOptions.Value;
+            _memoryCache = memoryCache;
         }
 
         /// <summary>
@@ -114,8 +117,13 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// <returns></returns>
         public async Task<IEnumerable<EquEquipmentEntity>> GetByGroupIdAsync(long equipmentGroupId)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<EquEquipmentEntity>(GetByGroupIdSql, new { equipmentGroupId });
+            var key = $"equ_equipment_{equipmentGroupId}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                return await conn.QueryAsync<EquEquipmentEntity>(GetByGroupIdSql, new { equipmentGroupId });
+            });
+
         }
 
         /// <summary>

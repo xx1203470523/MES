@@ -101,11 +101,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 参数
         /// </summary>
         public string Parameter { get; set; }
-
-       /// <summary>
-        /// 备注
-        /// </summary>
-        public string Remark { get; set; }   
     }
 
     /// <summary>

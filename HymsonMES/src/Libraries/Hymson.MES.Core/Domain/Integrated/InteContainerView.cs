@@ -5,32 +5,37 @@ using Hymson.MES.Core.Enums.Integrated;
 namespace Hymson.MES.Core.Domain.Integrated
 {
     /// <summary>
-    /// 容器维护，数据实体对象   
+    /// 数据视图对象（容器维护）
     /// inte_container
     /// @author Czhipu
     /// @date 2023-03-08 09:21:27
     /// </summary>
-    public class InteContainerEntity : BaseEntity
+    public class InteContainerView : BaseEntity
     {
         /// <summary>
-        /// 站点ID 
+        /// 物料/物料组名称
         /// </summary>
-        public long? SiteId { get; set; }
+        public string Name { get; set; } = "";
 
         /// <summary>
-        /// 定义方式;0-物料，1-物料组
+        /// 版本
         /// </summary>
-        public DefinitionMethodEnum DefinitionMethod { get; set; }
+        public string Version { get; set; } = "";
 
         /// <summary>
         /// 物料id
         /// </summary>
         public long MaterialId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料组Id
         /// </summary>
         public long MaterialGroupId { get; set; }
+
+        /// <summary>
+        /// 定义方式;0-物料，1-物料组
+        /// </summary>
+        public DefinitionMethodEnum DefinitionMethod { get; set; }
 
         /// <summary>
         /// 包装等级（分为一级/二级/三级）
@@ -42,37 +47,37 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// </summary>
         public SysDataStatusEnum Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 最大值
         /// </summary>
         public decimal Maximum { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 最小值
         /// </summary>
         public decimal Minimum { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 高度(mm)
         /// </summary>
         public decimal? Height { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 长度(mm)
         /// </summary>
         public decimal? Length { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 宽度(mm)
         /// </summary>
         public decimal? Width { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 最大填充重量(KG)
         /// </summary>
         public decimal? MaxFillWeight { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 重量(KG)
         /// </summary>
         public decimal? Weight { get; set; }

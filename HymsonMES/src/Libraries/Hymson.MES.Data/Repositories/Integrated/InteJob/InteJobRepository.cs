@@ -36,11 +36,19 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("SiteId,Id,Code,Name,ClassProgram,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted");
+            if (param.SiteId != null) { sqlBuilder.Where("SiteId = @SiteId"); }
+            if (!string.IsNullOrWhiteSpace(param.Code))
+            {
+                param.Code = $"%{param.Code}%";
+                sqlBuilder.Where("Code like @Code");
+            }
+            if (!string.IsNullOrWhiteSpace(param.Name))
+            {
+                param.Code = $"%{param.Name}%";
+                sqlBuilder.Where("Name like @Name");
+            }
 
-            if (!string.IsNullOrWhiteSpace(param.Code)) { sqlBuilder.Where("Code like '%@Code%'"); }
-            if (!string.IsNullOrWhiteSpace(param.Name)) { sqlBuilder.Where("Name like '%@Name%'"); }
 
             var offSet = (param.PageIndex - 1) * param.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });

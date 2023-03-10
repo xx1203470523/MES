@@ -12,7 +12,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob.Query
         /// <summary>
         /// 所属站点代码 
         /// </summary>
-        public long SiteId { get; set; }
+        public long? SiteId { get; set; }
         /// <summary>
         /// 作业编号 
         /// </summary>

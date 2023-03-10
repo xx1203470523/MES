@@ -32,13 +32,13 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <summary>
         /// 分页查询列表
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("pagelist")]
-        public async Task<PagedInfo<InteJobDto>> QueryPagedInteJobAsync([FromQuery] InteJobPagedQueryDto parm)
+        public async Task<PagedInfo<InteJobDto>> QueryPagedInteJobAsync([FromQuery] InteJobPagedQueryDto param)
         {
-            return await _inteJobService.GetPageListAsync(parm);
+            return await _inteJobService.GetPageListAsync(param);
         }
 
         /// <summary>
@@ -55,25 +55,23 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <summary>
         /// 添加
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("create")]
-        public async Task AddInteJobAsync([FromBody] InteJobCreateDto parm)
+        public async Task AddInteJobAsync([FromBody] InteJobCreateDto param)
         {
-            await _inteJobService.CreateInteJobAsync(parm);
+            await _inteJobService.CreateInteJobAsync(param);
         }
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("update")]
-        public async Task UpdateInteJobAsync([FromBody] InteJobModifyDto parm)
+        [HttpPut]
+        public async Task UpdateInteJobAsync([FromBody] InteJobModifyDto param)
         {
-            await _inteJobService.ModifyInteJobAsync(parm);
+            await _inteJobService.ModifyInteJobAsync(param);
         }
 
         /// <summary>
@@ -81,8 +79,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("delete")]
+        [HttpDelete("{ids}")]
         public async Task DeleteInteJobAsync(string ids)
         {
             await _inteJobService.DeleteRangInteJobAsync(ids);
