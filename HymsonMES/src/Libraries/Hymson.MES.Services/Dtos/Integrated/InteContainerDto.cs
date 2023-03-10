@@ -15,9 +15,14 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public long Id { get; set; }
 
         /// <summary>
-        /// 定义方式;0-物料，1-物料组
+        /// 物料名称/物料组名称
         /// </summary>
-        public DefinitionMethodEnum DefinitionMethod { get; set; }
+        public string Name { get; set; } = "";
+
+        /// <summary>
+        /// 版本
+        /// </summary>
+        public string Version { get; set; } = "";
 
         /// <summary>
         /// 物料id
@@ -28,6 +33,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 物料组Id
         /// </summary>
         public long MaterialGroupId { get; set; }
+
+        /// <summary>
+        /// 定义方式;0-物料，1-物料组
+        /// </summary>
+        public DefinitionMethodEnum DefinitionMethod { get; set; }
 
         /// <summary>
         /// 包装等级（分为一级/二级/三级）
@@ -171,6 +181,29 @@ namespace Hymson.MES.Services.Dtos.Integrated
     /// </summary>
     public class InteContainerPagedQueryDto : PagerInfo
     {
+        /// <summary>
+        /// 物料名称/物料组名称
+        /// </summary>
+        public string? Name { get; set; }
 
+        /// <summary>
+        /// 版本
+        /// </summary>
+        public string? Version { get; set; }
+
+        /// <summary>
+        /// 定义方式;0-物料，1-物料组
+        /// </summary>
+        public DefinitionMethodEnum? DefinitionMethod { get; set; }
+
+        /// <summary>
+        /// 包装等级（分为一级/二级/三级）
+        /// </summary>
+        public LevelEnum? Level { get; set; }
+
+        /// <summary>
+        /// 状态;0-新建 1-启用 2-保留3-废弃
+        /// </summary>
+        public SysDataStatusEnum? Status { get; set; }
     }
 }
