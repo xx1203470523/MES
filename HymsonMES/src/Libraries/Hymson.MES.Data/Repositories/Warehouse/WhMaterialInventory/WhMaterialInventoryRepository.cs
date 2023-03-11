@@ -83,7 +83,8 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
             //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
@@ -198,6 +199,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetSupplierlByMaterialCodeSql);
+            sqlBuilder.OrderBy("ws.UpdatedOn DESC");
             sqlBuilder.Select("ws.Id,ws.Code,ws.Name");
             sqlBuilder.InnerJoin("proc_material_supplier_relation pmsr ON pmsr.SupplierId=ws.Id");
             sqlBuilder.Where("pmsr.MaterialId=@materialId");
@@ -215,7 +217,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
 
     public partial class WhMaterialInventoryRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `wh_material_inventory` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `wh_material_inventory` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `wh_material_inventory` /**where**/ ";
         const string GetWhMaterialInventoryEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
@@ -239,6 +241,6 @@ namespace Hymson.MES.Data.Repositories.Warehouse
                                             /**select**/
                                            FROM `proc_material` /**where**/  ";
 
-        const string GetSupplierlByMaterialCodeSql = @"SELECT /**select**/ FROM wh_supplier ws /**innerjoin**/ /**leftjoin**/ /**where**/";
+        const string GetSupplierlByMaterialCodeSql = @"SELECT /**select**/ FROM wh_supplier ws /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/";
     }
 }

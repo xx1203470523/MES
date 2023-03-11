@@ -36,7 +36,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         public async Task<InteJobBusinessRelationEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<InteJobBusinessRelationEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<InteJobBusinessRelationEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -44,10 +44,10 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InteJobBusinessRelationEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<InteJobBusinessRelationEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<InteJobBusinessRelationEntity>(GetByIdsSql, new { ids = ids});
+            return await conn.QueryAsync<InteJobBusinessRelationEntity>(GetByIdsSql, new { ids = ids });
         }
 
         /// <summary>
@@ -60,7 +60,8 @@ namespace Hymson.MES.Data.Repositories.Integrated
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
             if (query.SiteId > 0)
@@ -71,7 +72,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
             //{
             //    sqlBuilder.Where("BusinessType=@BusinessType");
             //}
-            if (query.BusinessId>0)
+            if (query.BusinessId > 0)
             {
                 sqlBuilder.Where("BusinessId=@BusinessId");
             }
@@ -122,7 +123,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         public async Task<int> InsertRangeAsync(List<InteJobBusinessRelationEntity> inteJobBusinessRelationEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-           return  await conn.ExecuteAsync(InsertSql, inteJobBusinessRelationEntitys);
+            return await conn.ExecuteAsync(InsertSql, inteJobBusinessRelationEntitys);
         }
 
         /// <summary>
@@ -135,8 +136,8 @@ namespace Hymson.MES.Data.Repositories.Integrated
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSql, inteJobBusinessRelationEntity);
         }
-		
-		/// <summary>
+
+        /// <summary>
         /// 批量更新
         /// </summary>
         /// <param name="inteJobBusinessRelationEntitys"></param>
@@ -146,8 +147,8 @@ namespace Hymson.MES.Data.Repositories.Integrated
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSql, inteJobBusinessRelationEntitys);
         }
-		
-		/// <summary>
+
+        /// <summary>
         /// 删除（软删除）
         /// </summary>
         /// <param name="id"></param>
@@ -163,16 +164,16 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeleteRangeAsync(long[] ids) 
+        public async Task<int> DeleteRangeAsync(long[] ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeletesSql, new { ids=ids });
+            return await conn.ExecuteAsync(DeletesSql, new { ids = ids });
         }
     }
 
     public partial class InteJobBusinessRelationRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte__job_business_relation` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte__job_business_relation` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `inte__job_business_relation` /**where**/ ";
         const string GetInteJobBusinessRelationEntitiesSqlTemplate = @"SELECT 
                                             /**select**/

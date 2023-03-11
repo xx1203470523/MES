@@ -36,7 +36,8 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("'Id','SiteId','Code','Name','Type','Source','Status','IsMixLine','Remark','CreatedBy','CreatedOn','UpdatedBy','UpdatedOn','IsDeleted'");
 
             if (param.SiteId != null) { sqlBuilder.Where("SiteId = @SiteId"); ; }
@@ -213,7 +214,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
     /// @date 2023-02-22
     public partial class InteWorkCenterRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_work_center` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_work_center` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `inte_work_center` /**where**/ ";
         const string InsertSql = "INSERT INTO  `inte_work_center` (  'Id','SiteId','Code','Name','Type','Source','Status','IsMixLine','Remark','CreatedBy','CreatedOn','UpdatedBy','UpdatedOn','IsDeleted') VALUES ( @Id,@SiteId,@Code,@Name,@Type,@Source,@Status,@IsMixLine,@Remark,@CreatedBy,@CreatedOn,@UpdatedBy,@UpdatedOn,@IsDeleted) ";
         const string UpdateSql = "UPDATE `inte_work_center` SET  Name=@Name,Type=@Type,Source=@Source,Status=@Status,IsMixLine=@IsMixLine,Remark=@Remark,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id = @Id AND IsDeleted = @IsDeleted ";

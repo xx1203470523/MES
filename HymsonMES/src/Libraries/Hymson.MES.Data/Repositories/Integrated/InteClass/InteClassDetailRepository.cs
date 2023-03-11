@@ -121,6 +121,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             //sqlBuilder.Select("*");
 
             //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
@@ -161,7 +162,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
     /// </summary>
     public partial class InteClassDetailRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_class_detail` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_class_detail` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `inte_class_detail` /**where**/";
         const string GetInteClassDetailEntitiesSqlTemplate = @"SELECT 
                                             /**select**/

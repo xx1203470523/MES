@@ -1,6 +1,5 @@
 ﻿using Dapper;
 using Hymson.Infrastructure;
-using Hymson.Infrastructure.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -185,6 +184,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
             if (pagedQuery.EquipmentType.HasValue == true)
@@ -255,7 +255,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         const string GetByGroupIdSql = "SELECT * FROM `equ_equipment` WHERE `IsDeleted` = 0 AND EquipmentGroupId = @EquipmentGroupId;";
         const string GetBaseListSql = "SELECT * FROM `equ_equipment` WHERE `IsDeleted` = 0;";
         const string GetByEquipmentCodeSql = "SELECT * FROM `equ_equipment` WHERE `IsDeleted` = 0 AND EquipmentCode = @EquipmentCode;";
-        const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `equ_equipment` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows";
+        const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `equ_equipment` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_equipment` /**where**/";
         const string GetEntitiesSqlTemplate = "";
         /// <summary>

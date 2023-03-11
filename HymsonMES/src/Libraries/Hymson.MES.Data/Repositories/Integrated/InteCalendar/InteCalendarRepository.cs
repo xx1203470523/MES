@@ -127,6 +127,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IC.IsDeleted = 0");
+            sqlBuilder.OrderBy("IC.UpdatedOn DESC");
             sqlBuilder.Select("IC.Id, IC.CalendarName, IC.CalendarType, IC.Remark, IC.UseStatus, IC.CreatedBy, IC.CreatedOn, IC.UpdatedBy, IC.UpdatedOn");
             sqlBuilder.Select("IWC.`Code`, IWC.`Name`, EE.EquipmentCode, EE.EquipmentName");
             sqlBuilder.LeftJoin("inte_work_center IWC ON IC.EquOrLineId = IWC.Id");
@@ -197,7 +198,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
                                `Id`, `CalendarName`, `CalendarType`, `EquOrLineId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteCode`, `UseStatus`
                             FROM `inte_calendar`  WHERE Id = @Id ";
 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM inte_calendar IC /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY IC.UpdatedOn DESC LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM inte_calendar IC /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM inte_calendar IC /**leftjoin**/ /**where**/";
 
     }

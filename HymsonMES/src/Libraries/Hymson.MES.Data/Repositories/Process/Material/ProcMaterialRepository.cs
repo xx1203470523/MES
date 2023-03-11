@@ -97,8 +97,9 @@ namespace Hymson.MES.Data.Repositories.Process
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
             if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.MaterialCode))
@@ -295,7 +296,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
     public partial class ProcMaterialRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_material` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_material` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_material` /**where**/ ";
         const string GetProcMaterialEntitiesSqlTemplate = @"SELECT 
                                             /**select**/

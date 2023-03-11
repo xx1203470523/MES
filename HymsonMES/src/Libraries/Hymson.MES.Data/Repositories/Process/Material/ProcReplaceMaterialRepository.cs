@@ -45,7 +45,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -60,9 +60,9 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<int> DeleteTrueByMaterialIdsAsync(long[] materialIds)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteTrueByMaterialIdsSql, new { materialIds= materialIds});
+            return await conn.ExecuteAsync(DeleteTrueByMaterialIdsSql, new { materialIds = materialIds });
         }
-        
+
 
         /// <summary>
         /// 根据ID获取数据
@@ -72,7 +72,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<ProcReplaceMaterialEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcReplaceMaterialEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ProcReplaceMaterialEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -85,14 +85,15 @@ namespace Hymson.MES.Data.Repositories.Process
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
             //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteId))
             //{
             //    sqlBuilder.Where("SiteId=@SiteId");
             //}
-           
+
             var offSet = (procReplaceMaterialPagedQuery.PageIndex - 1) * procReplaceMaterialPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = procReplaceMaterialPagedQuery.PageSize });
@@ -129,7 +130,7 @@ namespace Hymson.MES.Data.Repositories.Process
             return procReplaceMaterialEntities;
         }
 
-        public async Task<IEnumerable<ProcReplaceMaterialView>> GetProcReplaceMaterialViewsAsync(ProcReplaceMaterialQuery procReplaceMaterialQuery) 
+        public async Task<IEnumerable<ProcReplaceMaterialView>> GetProcReplaceMaterialViewsAsync(ProcReplaceMaterialQuery procReplaceMaterialQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcReplaceMaterialViewsSqlTemplate);
@@ -193,7 +194,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
     public partial class ProcReplaceMaterialRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_replace_material` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_replace_material` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_replace_material` /**where**/ ";
         const string GetProcReplaceMaterialEntitiesSqlTemplate = @"SELECT 
                                             /**select**/

@@ -98,8 +98,9 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
-
+        
             if (string.IsNullOrWhiteSpace(pagedQuery.EquipmentGroupCode) == false)
             {
                 pagedQuery.EquipmentGroupCode = $"%{pagedQuery.EquipmentGroupCode}%";
@@ -142,7 +143,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
 
     public partial class EquEquipmentGroupRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_equipment_group` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_equipment_group` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `equ_equipment_group` /**where**/";
         const string GetEquEquipmentGroupEntitiesSqlTemplate = @"SELECT 
                                             /**select**/

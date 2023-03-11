@@ -83,7 +83,8 @@ namespace Hymson.MES.Data.Repositories.Equipment
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
             if (EquFaultReasonPagedQuery.SiteId != 0)
@@ -195,7 +196,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
     public partial class EquFaultReasonRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_fault_reason` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_fault_reason` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `equ_fault_reason` /**where**/ ";
         const string GetEquFaultReasonEntitiesSqlTemplate = @"SELECT 
                                             /**select**/

@@ -1,13 +1,8 @@
 ﻿using Dapper;
 using Hymson.Infrastructure;
-using Hymson.Infrastructure.Constants;
-using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Command;
-using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
-using Hymson.MES.Data.Repositories.Process.Resource;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -86,7 +81,7 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeleteSql, command);
         }
-        
+
 
         /// <summary>
         /// 判断是否存在（编码）
@@ -163,9 +158,9 @@ namespace Hymson.MES.Data.Repositories.Process
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedListSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedListCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
             //sqlBuilder.Where("SiteId = @SiteId");
-           
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
             if (!string.IsNullOrWhiteSpace(query.PrintName))
@@ -212,9 +207,10 @@ namespace Hymson.MES.Data.Repositories.Process
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
             //sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
-           
+
             if (string.IsNullOrWhiteSpace(pagedQuery.PrintName) == false)
             {
                 pagedQuery.PrintName = $"%{pagedQuery.PrintName}%";
@@ -223,7 +219,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-           
+
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
             sqlBuilder.AddParameters(pagedQuery);
 
@@ -251,10 +247,10 @@ namespace Hymson.MES.Data.Repositories.Process
         //const string GetByGroupIdSql = "SELECT * FROM `proc_printer` WHERE `IsDeleted` = 0 AND EquipmentGroupId = @EquipmentGroupId;";
         const string GetBaseListSql = "SELECT * FROM `proc_printer` WHERE `IsDeleted` = 0;";
         const string GetByPrintNameSql = "SELECT * FROM `proc_printer` WHERE `IsDeleted` = 0 AND PrintName = @PrintName;";
-        const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `proc_printer` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows";
+        const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `proc_printer` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_printer` /**where**/";
         const string GetEntitiesSqlTemplate = "";
-        const string GetPagedListSqlTemplate = "SELECT /**select**/ FROM proc_printer /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows";
+        const string GetPagedListSqlTemplate = "SELECT /**select**/ FROM proc_printer /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
         const string GetPagedListCountSqlTemplate = "SELECT COUNT(*) FROM proc_printer /**where**/";
 
         /// <summary>

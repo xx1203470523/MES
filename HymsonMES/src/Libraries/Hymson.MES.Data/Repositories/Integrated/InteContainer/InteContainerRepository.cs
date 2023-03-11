@@ -86,6 +86,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IC.IsDeleted = 0");
             sqlBuilder.Where("IC.SiteId = @SiteId");
+            sqlBuilder.OrderBy("IC.UpdatedOn DESC");
 
             sqlBuilder.Select("IC.Id, IC.Remark, IC.Status, IC.DefinitionMethod, IC.Level, IC.Maximum, IC.Minimum, IC.UpdatedBy, IC.UpdatedOn");
             sqlBuilder.Select("(CASE IC.DefinitionMethod WHEN 1 THEN M.MaterialName WHEN 2 THEN MG.GroupName ELSE '' END) AS Name, M.Version");
@@ -136,7 +137,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
     /// </summary>
     public partial class InteContainerRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM inte_container IC /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY IC.UpdatedOn DESC LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM inte_container IC /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM inte_container IC /**where**/";
 
         const string InsertSql = "INSERT INTO `inte_container`( `Id`, `DefinitionMethod`, `MaterialId`, `MaterialGroupId`, Level, `Status`, `Maximum`, `Minimum`, `Height`, `Length`, `Width`, `MaxFillWeight`, `Weight`, Remark, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, SiteId) VALUES (   @Id, @DefinitionMethod, @MaterialId, @MaterialGroupId, @Level, @Status, @Maximum, @Minimum, @Height, @Length, @Width, @MaxFillWeight, @Weight, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId)  ";

@@ -46,7 +46,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -72,7 +72,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<ProcBomDetailReplaceMaterialEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcBomDetailReplaceMaterialEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ProcBomDetailReplaceMaterialEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -80,10 +80,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcBomDetailReplaceMaterialEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ProcBomDetailReplaceMaterialEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcBomDetailReplaceMaterialEntity>(GetByIdsSql, new { ids = ids});
+            return await conn.QueryAsync<ProcBomDetailReplaceMaterialEntity>(GetByIdsSql, new { ids = ids });
         }
 
         /// <summary>
@@ -96,8 +96,9 @@ namespace Hymson.MES.Data.Repositories.Process
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.Where("SiteId=@SiteId");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
             var offSet = (procBomDetailReplaceMaterialPagedQuery.PageIndex - 1) * procBomDetailReplaceMaterialPagedQuery.PageSize;
@@ -175,7 +176,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
     public partial class ProcBomDetailReplaceMaterialRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_bom_detail_replace_material` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_bom_detail_replace_material` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_bom_detail_replace_material` /**where**/ ";
         const string GetProcBomDetailReplaceMaterialEntitiesSqlTemplate = @"SELECT 
                                             /**select**/

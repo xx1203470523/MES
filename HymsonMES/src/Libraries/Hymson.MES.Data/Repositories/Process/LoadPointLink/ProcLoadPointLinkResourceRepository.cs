@@ -45,7 +45,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -72,7 +72,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<ProcLoadPointLinkResourceEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcLoadPointLinkResourceEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ProcLoadPointLinkResourceEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -80,10 +80,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcLoadPointLinkResourceEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ProcLoadPointLinkResourceEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcLoadPointLinkResourceEntity>(GetByIdsSql, new { ids = ids});
+            return await conn.QueryAsync<ProcLoadPointLinkResourceEntity>(GetByIdsSql, new { ids = ids });
         }
 
         /// <summary>
@@ -107,14 +107,15 @@ namespace Hymson.MES.Data.Repositories.Process
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
             //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteId))
             //{
             //    sqlBuilder.Where("SiteId=@SiteId");
             //}
-           
+
             var offSet = (procLoadPointLinkResourcePagedQuery.PageIndex - 1) * procLoadPointLinkResourcePagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = procLoadPointLinkResourcePagedQuery.PageSize });
@@ -190,7 +191,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
     public partial class ProcLoadPointLinkResourceRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_load_point_link_resource` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_load_point_link_resource` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_load_point_link_resource` /**where**/ ";
         const string GetProcLoadPointLinkResourceEntitiesSqlTemplate = @"SELECT 
                                             /**select**/

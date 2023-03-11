@@ -11,12 +11,8 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Warehouse;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using Mysqlx.Crud;
-using Org.BouncyCastle.Crypto;
 
 namespace Hymson.MES.Data.Repositories.Warehouse
 {
@@ -87,7 +83,8 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
             if (!string.IsNullOrWhiteSpace(whSupplierPagedQuery.Code))
@@ -196,7 +193,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
 
     public partial class WhSupplierRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `wh_supplier` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `wh_supplier` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `wh_supplier` /**where**/ ";
         const string GetWhSupplierEntitiesSqlTemplate = @"SELECT  
                                              /**select**/

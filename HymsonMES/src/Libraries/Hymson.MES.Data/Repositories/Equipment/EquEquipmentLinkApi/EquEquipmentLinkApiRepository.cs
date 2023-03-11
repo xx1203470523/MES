@@ -164,7 +164,9 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
+
             if (string.IsNullOrWhiteSpace(pagedQuery.SiteCode) == false)
             {
                 sqlBuilder.Where("SiteCode = @SiteCode");
@@ -198,7 +200,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         const string GetByIdSql = "SELECT * FROM `equ_equipment_link_api` WHERE `Id` = @Id;";
         const string GetByEquipmentIdSql = "SELECT * FROM `equ_equipment_link_api` WHERE `EquipmentId` = @EquipmentId;";
         const string GetByEquipmentSql = "SELECT * FROM `equ_equipment_link_api` WHERE `EquipmentId` = @EquipmentId;";
-        const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `equ_equipment_link_api` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows";
+        const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `equ_equipment_link_api` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_equipment_link_api` /**where**/";
         const string GetEntitiesSqlTemplate = "";
     }

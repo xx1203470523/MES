@@ -35,8 +35,9 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.Select("SiteId,Id,Code,Name,ClassProgram,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
+            sqlBuilder.Select("SiteId,Id,Code, Name, ClassProgram, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted");
             if (param.SiteId != null) { sqlBuilder.Where("SiteId = @SiteId"); }
             if (!string.IsNullOrWhiteSpace(param.Code))
             {
@@ -157,7 +158,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob
     /// @date 2023-02-21
     public partial class InteJobRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_job` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_job` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `inte_job` /**where**/ ";
         const string InsertSql = "INSERT INTO  `inte_job` (  'SiteId','Id','Code','Name','ClassProgram','Remark','CreatedBy','CreatedOn','UpdatedBy','UpdatedOn','IsDeleted') VALUES ( @SiteId,@Id,@Code,@Name,@ClassProgram,@Remark,@CreatedBy,@CreatedOn,@UpdatedBy,@UpdatedOn,@IsDeleted) ";
         const string UpdateSql = "UPDATE `inte_job` SET  Name=@Name,ClassProgram=@ClassProgram,Remark=@Remark,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn,IsDeleted=@IsDeleted WHERE Id = @Id AND IsDeleted = @IsDeleted ";

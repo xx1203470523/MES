@@ -35,9 +35,11 @@ namespace Hymson.MES.Data.Repositories.Quality
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteCode = @SiteCode");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
-            sqlBuilder.Where(" SiteCode= @SiteCode");
+
             if (!string.IsNullOrWhiteSpace(param.UnqualifiedGroup))
             {
                 sqlBuilder.Where("UnqualifiedGroup like '%@UnqualifiedGroup%'");
@@ -226,7 +228,7 @@ namespace Hymson.MES.Data.Repositories.Quality
 
     public partial class QualUnqualifiedGroupRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `qual_unqualified_group` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `qual_unqualified_group` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `qual_unqualified_group` /**where**/ ";
         const string GetQualUnqualifiedGroupEntitiesSqlTemplate = @"SELECT 
                                             /**select**/

@@ -98,6 +98,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Where("Type = @Type");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
             if (string.IsNullOrWhiteSpace(pagedQuery.SparePartTypeCode) == false)
@@ -148,7 +149,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
     /// </summary>
     public partial class EquSparePartTypeRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_sparepart_type` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_sparepart_type` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `equ_sparepart_type` /**where**/";
         const string GetEquSparePartTypeEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
