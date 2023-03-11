@@ -194,20 +194,20 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="materialCode"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<WhSupplierInfoView>> GetWhSupplierByMaterialIdAsync(long materialId, string supplierCode = "")
+        public async Task<IEnumerable<WhSupplierInfoView>> GetWhSupplierByMaterialIdAsync(long materialId, long supplierId = 0)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetSupplierlByMaterialCodeSql);
             sqlBuilder.Select("ws.Id,ws.Code,ws.Name");
             sqlBuilder.InnerJoin("proc_material_supplier_relation pmsr ON pmsr.SupplierId=ws.Id");
             sqlBuilder.Where("pmsr.MaterialId=@materialId");
-            if (!string.IsNullOrWhiteSpace(supplierCode))
+            if (supplierId > 0)
             {
-                sqlBuilder.Where("ws.SupplierCode=@supplierCode");
+                sqlBuilder.Where("ws.Id=@supplierId");
             }
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var wsInfo = await conn.QueryAsync<WhSupplierInfoView>(template.RawSql, new { materialId, supplierCode });
+            var wsInfo = await conn.QueryAsync<WhSupplierInfoView>(template.RawSql, new { materialId, supplierId });
             return wsInfo;
         }
 

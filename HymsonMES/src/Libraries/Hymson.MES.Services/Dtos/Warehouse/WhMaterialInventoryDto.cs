@@ -231,14 +231,14 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// </summary>
         public decimal QuantityResidue { get; set; }
 
-        /// <summary>
-        /// 供应商ID
-        /// </summary>
+        ///// <summary>
+        ///// 供应商ID
+        ///// </summary>
         public long SupplierId { get; set; }
         /// <summary>
         /// 供应商编码
         /// </summary>
-        public string SupplierCode { get; set; }
+       // public string SupplierCode { get; set; }
     }
 
     /// <summary>

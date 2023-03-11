@@ -206,9 +206,9 @@
         #region 车间库存接收  15100
         public const string MES15100 = "基础参数错误";
         public const string MES15101 = "物料不存在";
-        public const string MES15102 = "物料：{MaterialCode}未关联到供应商";
-        public const string MES15103 = "数量需大于0";
-
+        public const string MES15102 = "物料条码：{MaterialCode}未关联到供应商";
+        public const string MES15103 = "物料条码：{MaterialCode}数量需大于0";
+        public const string MES15104 = " 条码：{MaterialCode}再车间库存中已存在！";
 
         #endregion
         #endregion

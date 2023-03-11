@@ -82,7 +82,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
                 if (item.QuantityResidue <= 0)
                 {
-                    throw new BusinessException(nameof(ErrorCode.MES15103));
+                    throw new BusinessException(nameof(ErrorCode.MES15103)).WithData("MateialCode", item.MaterialCode); ;
                 }
                 //验证DTO
                 //await _validationCreateRules.ValidateAndThrowAsync(item);
@@ -94,13 +94,20 @@ namespace Hymson.MES.Services.Services.Warehouse
                 {
                     throw new BusinessException(nameof(ErrorCode.MES15101));
                 }
-                var supplierInfo = await _whMaterialInventoryRepository.GetWhSupplierByMaterialIdAsync(materialInfo.Id, item.SupplierCode);
-                if (materialInfo == null || supplierInfo.Count() <= 0)
+                //var supplierInfo = await _whMaterialInventoryRepository.GetWhSupplierByMaterialIdAsync(materialInfo.Id, item.SupplierId);
+                //if (materialInfo == null || supplierInfo.Count() <= 0)
+                //{
+                //    throw new BusinessException(nameof(ErrorCode.MES15102)).WithData("MateialCode", item.MaterialCode);
+                //}
+
+                var isMaterialBarCode = await GetMaterialBarCodeAnyAsync(item.MaterialBarCode);
+                if (isMaterialBarCode)
                 {
-                    throw new BusinessException(nameof(ErrorCode.MES15102)).WithData("MateialCode", item.MaterialCode);
+                    throw new BusinessException(nameof(ErrorCode.MES15104)).WithData("MateialCode", item.MaterialCode);
                 }
+
                 var whMaterialInventoryEntity = new WhMaterialInventoryEntity();
-                whMaterialInventoryEntity.SupplierId = supplierInfo.FirstOrDefault().Id;//item.SupplierId;//
+                whMaterialInventoryEntity.SupplierId = item.SupplierId;// supplierInfo.FirstOrDefault().Id;//item.SupplierId;//
                 whMaterialInventoryEntity.MaterialId = materialInfo.Id;
                 whMaterialInventoryEntity.MaterialBarCode = item.MaterialBarCode;
                 whMaterialInventoryEntity.Batch = item.Batch;
