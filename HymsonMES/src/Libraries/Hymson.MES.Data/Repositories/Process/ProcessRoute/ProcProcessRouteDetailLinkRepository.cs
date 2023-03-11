@@ -179,7 +179,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
     public partial class ProcProcessRouteDetailLinkRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_process_route_detail_link` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_process_route_detail_link` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_process_route_detail_link` /**where**/ ";
         const string GetListSqlTemplate = @"SELECT 
                                             /**select**/

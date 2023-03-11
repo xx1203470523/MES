@@ -204,7 +204,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
     public partial class ProcBomDetailRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_bom_detail` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_bom_detail` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_bom_detail` /**where**/ ";
         const string GetProcBomDetailEntitiesSqlTemplate = @"SELECT  /**select**/  FROM `proc_bom_detail` /**where**/  ";
 
@@ -231,7 +231,7 @@ namespace Hymson.MES.Data.Repositories.Process
                             LEFT JOIN proc_procedure c on a.ProcedureId = c.Id
                             WHERE a.IsDeleted =0
                             AND a.BomId=@id
-                            ORDER by a.CreatedOn DESC ";
+                            ORDER by a.UpdatedOn DESC ";
         /// <summary>
         /// 查询替代物料列表
         /// </summary>
@@ -244,6 +244,6 @@ namespace Hymson.MES.Data.Repositories.Process
                             LEFT JOIN proc_material c on a.ReplaceMaterialId = c.Id
                             WHERE a.IsDeleted =0
                             AND a.BomId=@id
-                            ORDER by a.CreatedOn DESC ";
+                            ORDER by a.UpdatedOn DESC ";
     }
 }

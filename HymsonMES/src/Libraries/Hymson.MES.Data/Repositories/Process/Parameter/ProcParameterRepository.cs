@@ -196,7 +196,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
     public partial class ProcParameterRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_parameter` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_parameter` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_parameter` /**where**/ ";
         const string GetProcParameterEntitiesSqlTemplate = @"SELECT 
                                             /**select**/

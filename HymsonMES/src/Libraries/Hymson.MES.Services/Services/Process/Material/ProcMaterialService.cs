@@ -79,14 +79,14 @@ namespace Hymson.MES.Services.Services.Process
             //判断编号是否已存在
             var haveEntity = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery()
             {
-                SiteId= _currentSite.SiteId,
+                SiteId = _currentSite.SiteId,
                 MaterialCode = procMaterialCreateDto.MaterialCode,
                 Version = procMaterialCreateDto.Version
             });
             //存在则抛异常
             if (haveEntity != null && haveEntity.Count() > 0)
             {
-                throw new CustomerValidationException( nameof(ErrorCode.MES10201) ).WithData("materialCode", procMaterialCreateDto.MaterialCode).WithData("version", procMaterialCreateDto.Version);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10201)).WithData("materialCode", procMaterialCreateDto.MaterialCode).WithData("version", procMaterialCreateDto.Version);
             }
 
             #endregion
@@ -94,12 +94,12 @@ namespace Hymson.MES.Services.Services.Process
             #region 组装数据
             //DTO转换实体
             var procMaterialEntity = procMaterialCreateDto.ToEntity<ProcMaterialEntity>();
-            procMaterialEntity.Id= IdGenProvider.Instance.CreateId();
+            procMaterialEntity.Id = IdGenProvider.Instance.CreateId();
             procMaterialEntity.CreatedBy = _currentUser.UserName;
             procMaterialEntity.UpdatedBy = _currentUser.UserName;
             procMaterialEntity.CreatedOn = HymsonClock.Now();
             procMaterialEntity.UpdatedOn = HymsonClock.Now();
-            procMaterialEntity.SiteId = _currentSite.SiteId??0;
+            procMaterialEntity.SiteId = _currentSite.SiteId ?? 0;
 
             //替代品数据
             List<ProcReplaceMaterialEntity> addProcReplaceList = new List<ProcReplaceMaterialEntity>();
@@ -107,8 +107,8 @@ namespace Hymson.MES.Services.Services.Process
             {
                 foreach (var item in procMaterialCreateDto.DynamicList)
                 {
-                    ProcReplaceMaterialEntity procReplaceMaterial=item.ToEntity<ProcReplaceMaterialEntity>();
-                    procReplaceMaterial.Id= IdGenProvider.Instance.CreateId();
+                    ProcReplaceMaterialEntity procReplaceMaterial = item.ToEntity<ProcReplaceMaterialEntity>();
+                    procReplaceMaterial.Id = IdGenProvider.Instance.CreateId();
                     procReplaceMaterial.IsUse = item.IsEnabled;
                     procReplaceMaterial.ReplaceMaterialId = item.Id;
                     procReplaceMaterial.MaterialId = procMaterialEntity.Id;
@@ -175,12 +175,11 @@ namespace Hymson.MES.Services.Services.Process
 
             //var statusArr = new int[] { 2, 3 }; //可下达和保留 时无法删除
             //判断这些ID 对应的物料是否在 可下达和保留中  （1:新建;2:可下达;3:保留;4:废除）
-            var entitys =  await _procMaterialRepository.GetByIdsAsync(idsArr);
-            if (entitys.Where(x => (SysDataStatusEnum.Enable|SysDataStatusEnum.Retain).HasFlag(x.Status)).ToList().Count>0) 
+            var entitys = await _procMaterialRepository.GetByIdsAsync(idsArr);
+            if (entitys.Any(a => a.Status == SysDataStatusEnum.Enable || a.Status == SysDataStatusEnum.Retain) == true)
             {
                 throw new BusinessException(nameof(ErrorCode.MES10212));
             }
-
             #endregion
 
             return await _procMaterialRepository.DeletesAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
@@ -208,7 +207,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="pagedInfo"></param>
         /// <returns></returns>
-        private static List<ProcMaterialDto> PrepareProcMaterialDtos(PagedInfo<ProcMaterialEntity>   pagedInfo)
+        private static List<ProcMaterialDto> PrepareProcMaterialDtos(PagedInfo<ProcMaterialEntity> pagedInfo)
         {
             var procMaterialDtos = new List<ProcMaterialDto>();
             foreach (var procMaterialEntity in pagedInfo.Data)
@@ -225,7 +224,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="procMaterialPagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcMaterialDto>> GetPageListForGroupAsync(ProcMaterialPagedQueryDto procMaterialPagedQueryDto) 
+        public async Task<PagedInfo<ProcMaterialDto>> GetPageListForGroupAsync(ProcMaterialPagedQueryDto procMaterialPagedQueryDto)
         {
             procMaterialPagedQueryDto.SiteId = _currentSite.SiteId ?? 0;
             var procMaterialPagedQuery = procMaterialPagedQueryDto.ToQuery<ProcMaterialPagedQuery>();
@@ -252,7 +251,7 @@ namespace Hymson.MES.Services.Services.Process
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(procMaterialModifyDto);
 
-            var modelOrigin = await _procMaterialRepository.GetByIdAsync(procMaterialModifyDto.Id, _currentSite.SiteId??0);
+            var modelOrigin = await _procMaterialRepository.GetByIdAsync(procMaterialModifyDto.Id, _currentSite.SiteId ?? 0);
             if (modelOrigin == null)
             {
                 throw new NotFoundException(nameof(ErrorCode.MES10204));
@@ -277,7 +276,7 @@ namespace Hymson.MES.Services.Services.Process
                 MaterialCode = procMaterialEntity.MaterialCode,
                 Version = procMaterialEntity.Version
             });
-            if (existsList != null && existsList.Where(x => x.Id != procMaterialEntity.Id).Any()) 
+            if (existsList != null && existsList.Where(x => x.Id != procMaterialEntity.Id).Any())
             {
                 throw new BusinessException(nameof(ErrorCode.MES10201)).WithData("materialCode", procMaterialEntity.MaterialCode).WithData("version", procMaterialEntity.Version);
             }
@@ -319,7 +318,7 @@ namespace Hymson.MES.Services.Services.Process
 
                 response = await _procMaterialRepository.UpdateAsync(new ProcMaterialEntity()
                 {
-                    Id= procMaterialEntity.Id,
+                    Id = procMaterialEntity.Id,
                     GroupId = procMaterialEntity.GroupId,
                     MaterialName = procMaterialEntity.MaterialName,
                     Status = procMaterialEntity.Status,
@@ -351,7 +350,7 @@ namespace Hymson.MES.Services.Services.Process
                 //替代组设置数据
                 if (addProcReplaceList != null && addProcReplaceList.Count > 0)
                 {
-                    if ((await _procReplaceMaterialRepository.InsertsAsync(addProcReplaceList))<=0)
+                    if ((await _procReplaceMaterialRepository.InsertsAsync(addProcReplaceList)) <= 0)
                     {
                         throw new BusinessException(nameof(ErrorCode.MES10209));
                     }
@@ -371,20 +370,20 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ProcMaterialViewDto> QueryProcMaterialByIdAsync(long id) 
+        public async Task<ProcMaterialViewDto> QueryProcMaterialByIdAsync(long id)
         {
-            var procMaterialView = await _procMaterialRepository.GetByIdAsync(id, _currentSite.SiteId??0);   
-            if (procMaterialView != null) 
+            var procMaterialView = await _procMaterialRepository.GetByIdAsync(id, _currentSite.SiteId ?? 0);
+            if (procMaterialView != null)
             {
                 var procMaterialViewDto = procMaterialView.ToModel<ProcMaterialViewDto>();
 
-                 //查询替代物料
-                var replaceMaterialViews=  await _procReplaceMaterialRepository.GetProcReplaceMaterialViewsAsync(new ProcReplaceMaterialQuery
+                //查询替代物料
+                var replaceMaterialViews = await _procReplaceMaterialRepository.GetProcReplaceMaterialViewsAsync(new ProcReplaceMaterialQuery
                 {
                     SiteId = procMaterialView.SiteId,
                     MaterialId = procMaterialView.Id
-                });                
-                foreach (var replaceMaterialView in replaceMaterialViews) 
+                });
+                foreach (var replaceMaterialView in replaceMaterialViews)
                 {
                     procMaterialViewDto.ReplaceMaterialList.Add(replaceMaterialView.ToModel<ProcMaterialReplaceViewDto>());
                 }

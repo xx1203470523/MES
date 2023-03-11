@@ -8,11 +8,6 @@ namespace Hymson.MES.Core.Enums
     public enum OperateTypeEnum : sbyte
     {
         /// <summary>
-        /// 未知操作
-        /// </summary>
-        [Description("未知操作")]
-        None = 0,
-        /// <summary>
         /// 新增
         /// </summary>
         [Description("新增")]

@@ -269,7 +269,7 @@ namespace Hymson.MES.Data.Repositories.Process
                                 g.Remark, g.CreatedBy, g.CreatedOn, g.UpdatedBy, g.UpdatedOn
                                 FROM `proc_parameter_link_type` g 
                                 LEFT JOIN proc_parameter o ON g.ParameterID = o.Id 
-            /**where**/ LIMIT @Offset,@Rows ";
+            /**where**/ ORDER BY g.UpdatedOn DESC LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = @"SELECT COUNT(1) 
                 FROM `proc_parameter_link_type` g 
                 LEFT JOIN proc_parameter o ON g.ParameterID = o.Id 
@@ -281,7 +281,7 @@ namespace Hymson.MES.Data.Repositories.Process
                                 o.CreatedOn, o.UpdatedBy, o.UpdatedOn 
                                 FROM `proc_parameter` g 
                                 LEFT JOIN proc_parameter_link_type o ON o.ParameterID = g.Id AND o.IsDeleted=0 AND o.ParameterType = @ParameterType 
-            /**where**/ LIMIT @Offset,@Rows ";
+            /**where**/ ORDER BY g.UpdatedOn DESC LIMIT @Offset,@Rows ";
         const string GetPagedProcParameterLinkTypeByTypeCountSqlTemplate = @"SELECT COUNT(1) 
                         FROM `proc_parameter` g 
                         LEFT JOIN proc_parameter_link_type o ON o.ParameterID = g.Id AND o.IsDeleted=0 AND o.ParameterType = @ParameterType 
