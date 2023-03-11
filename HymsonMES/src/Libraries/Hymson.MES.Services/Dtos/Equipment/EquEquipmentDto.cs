@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Constants;
+using Hymson.MES.Core.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace Hymson.MES.Services.Dtos.Equipment
@@ -17,17 +18,27 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 编码（设备注册）
         /// </summary>
-        public string EquipmentCode { get; set; } = "";
+        public string EquipmentCode { get; set; }
 
         /// <summary>
         /// 名称（设备注册）
         /// </summary>
-        public string EquipmentName { get; set; } = "";
+        public string EquipmentName { get; set; }
+
+        /// <summary>
+        /// 存放位置
+        /// </summary>
+        public string Location { get; set; }
+
+        /// <summary>
+        /// 使用状态
+        /// </summary>
+        public EquipmentUseStatusEnum UseStatus { get; set; }
 
         /// <summary>
         /// 设备描述
         /// </summary>
-        public string EquipmentDesc { get; set; } = "";
+        public string? EquipmentDesc { get; set; }
 
         /// <summary>
         /// 工作中心工厂id
@@ -45,59 +56,49 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public long? WorkCenterLineId { get; set; }
 
         /// <summary>
-        /// 存放位置
-        /// </summary>
-        public string Location { get; set; } = "";
-
-        /// <summary>
         /// 设备类型
         /// </summary>
-        public int EquipmentType { get; set; }
+        public EquipmentTypeEnum? EquipmentType { get; set; }
 
         /// <summary>
         /// 使用部门
         /// </summary>
-        public int UseDepartment { get; set; }
-
-        /// <summary>
-        /// 使用状态
-        /// </summary>
-        public int UseStatus { get; set; }
+        public DepartmentTypeEnum? UseDepartment { get; set; }
 
         /// <summary>
         /// 入厂日期
         /// </summary>
-        public string EntryDate { get; set; } = "";
+        public string? EntryDate { get; set; }
 
         /// <summary>
         /// 质保期限（月）
         /// </summary>
-        public int QualTime { get; set; }
+        public int? QualTime { get; set; }
 
         /// <summary>
         /// 厂商
         /// </summary>
-        public string Manufacturer { get; set; } = "";
+        public string? Manufacturer { get; set; }
 
         /// <summary>
         /// 供应商
         /// </summary>
-        public string Supplier { get; set; } = "";
+        public string? Supplier { get; set; }
 
         /// <summary>
         /// 功率
         /// </summary>
-        public string Power { get; set; } = "";
+        public string? Power { get; set; }
 
         /// <summary>
         /// 能耗等级
         /// </summary>
-        public string EnergyLevel { get; set; } = "";
+        public string? EnergyLevel { get; set; }
 
         /// <summary>
         /// ip地址
         /// </summary>
-        public string Ip { get; set; } = "";
+        public string? Ip { get; set; }
 
         /// <summary>
         /// 节拍时间(秒)
@@ -167,7 +168,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 描述 :使用状态 
         /// 空值 : false  
         /// </summary>
-        public int UseStatus { get; set; }
+        public EquipmentUseStatusEnum UseStatus { get; set; }
 
         /// <summary>
         /// 描述 :功率 
@@ -251,13 +252,13 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 描述 :设备类型 
         /// 空值 : true  
         /// </summary>
-        public int EquipmentType { get; set; }
+        public EquipmentTypeEnum EquipmentType { get; set; }
 
         /// <summary>
         /// 描述 :使用部门 
         /// 空值 : true  
         /// </summary>
-        public int UseDepartment { get; set; }
+        public DepartmentTypeEnum UseDepartment { get; set; }
 
         /// <summary>
         /// 描述 :入场日期 
@@ -488,7 +489,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 设备类型
         /// </summary>
-        public int EquipmentType { get; set; }
+        public EquipmentTypeEnum EquipmentType { get; set; }
 
         /// <summary>
         /// 集合（设备注册）
