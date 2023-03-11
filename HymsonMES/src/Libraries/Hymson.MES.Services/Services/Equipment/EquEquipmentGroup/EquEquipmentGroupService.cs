@@ -80,11 +80,15 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
             using (var trans = TransactionHelper.GetTransactionScope())
             {
                 rows += await _equEquipmentGroupRepository.InsertAsync(entity);
-                rows += await _equEquipmentRepository.UpdateEquipmentGroupIdAsync(new UpdateEquipmentGroupIdCommand
+                if (createDto.EquipmentIDs.Any() == true)
                 {
-                    EquipmentGroupId = entity.Id,
-                    EquipmentIds = createDto.EquipmentIDs
-                });
+                    rows += await _equEquipmentRepository.UpdateEquipmentGroupIdAsync(new UpdateEquipmentGroupIdCommand
+                    {
+                        EquipmentGroupId = entity.Id,
+                        EquipmentIds = createDto.EquipmentIDs
+                    });
+                }
+
                 trans.Complete();
             }
             return rows;

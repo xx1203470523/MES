@@ -261,7 +261,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// <summary>
         /// 
         /// </summary>
-        const string UpdateEquipmentGroupIdSql = "UPDATE `equ_equipment` SET EquipmentGroupId = @EquipmentGroupId WHERE Id = @Id ";
+        const string UpdateEquipmentGroupIdSql = "UPDATE `equ_equipment` SET EquipmentGroupId = @EquipmentGroupId WHERE Id = @EquipmentIds ";
         const string ClearEquipmentGroupIdSql = "UPDATE `equ_equipment` SET EquipmentGroupId = 0 WHERE EquipmentGroupId = @equipmentGroupId ";
     }
 }

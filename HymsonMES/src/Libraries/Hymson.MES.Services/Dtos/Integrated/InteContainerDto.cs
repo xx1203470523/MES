@@ -108,7 +108,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 主键
         /// </summary>
-        public long Id { get; set; }
+        public long? Id { get; set; }
 
         /// <summary>
         /// 定义方式;0-物料，1-物料组
@@ -173,7 +173,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; } = "";
+        public string? Remark { get; set; }
     }
 
     /// <summary>
