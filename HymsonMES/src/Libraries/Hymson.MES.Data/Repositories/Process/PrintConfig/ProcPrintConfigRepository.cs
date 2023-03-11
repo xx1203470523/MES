@@ -251,10 +251,10 @@ namespace Hymson.MES.Data.Repositories.Process
         //const string GetByGroupIdSql = "SELECT * FROM `proc_printer` WHERE `IsDeleted` = 0 AND EquipmentGroupId = @EquipmentGroupId;";
         const string GetBaseListSql = "SELECT * FROM `proc_printer` WHERE `IsDeleted` = 0;";
         const string GetByPrintNameSql = "SELECT * FROM `proc_printer` WHERE `IsDeleted` = 0 AND PrintName = @PrintName;";
-        const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `proc_printer` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows";
+        const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `proc_printer` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_printer` /**where**/";
         const string GetEntitiesSqlTemplate = "";
-        const string GetPagedListSqlTemplate = "SELECT /**select**/ FROM proc_printer /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows";
+        const string GetPagedListSqlTemplate = "SELECT /**select**/ FROM proc_printer /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows";
         const string GetPagedListCountSqlTemplate = "SELECT COUNT(*) FROM proc_printer /**where**/";
 
         /// <summary>

@@ -197,7 +197,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
                                `Id`, `CalendarName`, `CalendarType`, `EquOrLineId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteCode`, `UseStatus`
                             FROM `inte_calendar`  WHERE Id = @Id ";
 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM inte_calendar IC /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM inte_calendar IC /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY IC.UpdatedOn DESC LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM inte_calendar IC /**leftjoin**/ /**where**/";
 
     }

@@ -242,7 +242,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
     public partial class ProcMaterialGroupRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_material_group` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_material_group` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_material_group` /**where**/ ";
         const string GetPagedCustomInfoDataSqlTemplate = @"SELECT 
 g.Id,
@@ -261,7 +261,7 @@ o.MaterialName,
 o.Version
                                                             FROM `proc_material_group` g
                                                             LEFT JOIN proc_material o on o.GroupId = g.Id
-/**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+/**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY g.UpdatedOn DESC LIMIT @Offset,@Rows ";
         const string GetPagedCustomInfoCountSqlTemplate = @"SELECT COUNT(1) 
                                                 FROM `proc_material_group` g
                                                 LEFT JOIN proc_material o on o.GroupId = g.Id  /**where**/ ";

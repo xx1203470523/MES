@@ -125,7 +125,7 @@ namespace Hymson.MES.Data.Repositories.Process.MaskCode
         const string UpdateSql = "UPDATE `proc_maskcode` SET Name = @Name, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id;";
         const string DeleteSql = "UPDATE `proc_maskcode` SET `IsDeleted` = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE `Id` = @Ids;";
         const string GetByIdSql = "SELECT `Id`, `SiteId`, `Code`, `Name`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn` FROM `proc_maskcode` WHERE `IsDeleted` = @IsDeleted AND `Id` = @id;";
-        const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `proc_maskcode` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows";
+        const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `proc_maskcode` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_maskcode` /**where**/";
         const string GetEntitiesSqlTemplate = "";
     }

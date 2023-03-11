@@ -190,7 +190,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
     public partial class ProcLoadPointLinkMaterialRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_load_point_link_material` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_load_point_link_material` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_load_point_link_material` /**where**/ ";
         const string GetProcLoadPointLinkMaterialEntitiesSqlTemplate = @"SELECT 
                                             /**select**/

@@ -175,7 +175,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
                 FROM equ_fault_phenomenon EFP LEFT JOIN equ_equipment_group EEG ON EFP.EquipmentGroupId = EEG.Id 
                 WHERE EFP.Id = @Id ";
 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM equ_fault_phenomenon EFP /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM equ_fault_phenomenon EFP /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY EFP.UpdatedOn DESC LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM equ_fault_phenomenon EFP /**innerjoin**/ /**leftjoin**/ /**where**/";
 
     }

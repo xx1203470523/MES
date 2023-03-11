@@ -172,7 +172,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
 
     public partial class InteJobBusinessRelationRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte__job_business_relation` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte__job_business_relation` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `inte__job_business_relation` /**where**/ ";
         const string GetInteJobBusinessRelationEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
