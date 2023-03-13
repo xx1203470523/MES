@@ -215,11 +215,13 @@ namespace Hymson.MES.Services.Services.Process
                 int response = 0;
                 if (procBomEntity.IsCurrentVersion)
                 {
-                    var currentProcBom = (await _procBomRepository.GetProcBomEntitiesAsync(new ProcBomQuery()
+                    var currentProcBoms = await _procBomRepository.GetProcBomEntitiesAsync(new ProcBomQuery()
                     {
                         SiteId = _currentSite.SiteId ?? 0,
                         BomCode = procBomEntity.BomCode,
-                    })).Where(x => x.IsCurrentVersion = true).First(); ;//a => a.SiteCode == parm.SiteCode && a.BomCode == procBom.BomCode && a.IsCurrentVersion == true
+                    });
+
+                    var currentProcBom = currentProcBoms.Count()>0? currentProcBoms.Where(x => x.IsCurrentVersion = true).First():null;//a => a.SiteCode == parm.SiteCode && a.BomCode == procBom.BomCode && a.IsCurrentVersion == true
                     if (currentProcBom != null)
                     {
                         await _procBomRepository.UpdateIsCurrentVersionIsFalseAsync(new long[] { currentProcBom.Id });
@@ -282,7 +284,7 @@ namespace Hymson.MES.Services.Services.Process
 
             //判断需要删除的Bom是否是启用状态
             var bomList = await _procBomRepository.GetByIdsAsync(ids);
-            if (bomList.Any(x => x.Status == (int)SysDataStatusEnum.Enable))
+            if (bomList.Any(x => x.Status == SysDataStatusEnum.Enable))
             {
                 throw new BusinessException(nameof(ErrorCode.MES10611));
             }
@@ -469,11 +471,13 @@ namespace Hymson.MES.Services.Services.Process
                 int response = 0;
                 if (procBomEntity.IsCurrentVersion)
                 {
-                    var currentProcBom = (await _procBomRepository.GetProcBomEntitiesAsync(new ProcBomQuery()
+                    var procBoms = await _procBomRepository.GetProcBomEntitiesAsync(new ProcBomQuery()
                     {
                         SiteId = siteId,
                         BomCode = bomCode,
-                    })).Where(x => x.IsCurrentVersion = true).First(); ;//a => a.SiteCode == parm.SiteCode && a.BomCode == procBom.BomCode && a.IsCurrentVersion == true
+                    });
+
+                    var currentProcBom = procBoms.Count()>0? procBoms.Where(x => x.IsCurrentVersion = true).First():null;//a => a.SiteCode == parm.SiteCode && a.BomCode == procBom.BomCode && a.IsCurrentVersion == true
                     if (currentProcBom != null)
                     {
                         await _procBomRepository.UpdateIsCurrentVersionIsFalseAsync(new long[] { currentProcBom.Id });

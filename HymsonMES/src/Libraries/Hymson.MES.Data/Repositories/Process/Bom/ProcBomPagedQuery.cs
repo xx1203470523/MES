@@ -7,6 +7,7 @@
  */
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Constants;
+using Hymson.MES.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,7 +41,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 状态
         /// </summary>
-        public int? Status { get; set; } = DbDefaultValueConstant.IntDefaultValue;
+        public SysDataStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 版本

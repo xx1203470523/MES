@@ -105,7 +105,7 @@ namespace Hymson.MES.Data.Repositories.Process
                 procBomPagedQuery.Version = $"%{procBomPagedQuery.Version}%";
                 sqlBuilder.Where(" Version like @Version ");
             }
-            if (procBomPagedQuery.Status > DbDefaultValueConstant.IntDefaultValue)
+            if (procBomPagedQuery.Status.HasValue)
             {
                 sqlBuilder.Where(" Status = @Status ");
             }

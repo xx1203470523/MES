@@ -83,7 +83,7 @@ namespace Hymson.MES.Services.Services.Process
 
             // 判断物料是否已被使用
             var procMaterials = await _procMaterialRepository.GetByIdsAsync(procMaterialIds);
-            if (procMaterials.Where(x => x.GroupId != 0).Count() > 0)
+            if (procMaterials.Count()>0 && procMaterials.Where(x => x.GroupId != 0).Count() > 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10217));
             }
@@ -265,7 +265,7 @@ namespace Hymson.MES.Services.Services.Process
 
             // 判断物料是否已被使用
             var procMaterials = await _procMaterialRepository.GetByIdsAsync(procMaterialIds);
-            if (procMaterials.Where(x => x.GroupId != 0 && x.GroupId != procMaterialGroupEntity.Id).Count() > 0)
+            if (procMaterials.Count()>0 && procMaterials.Where(x => x.GroupId != 0 && x.GroupId != procMaterialGroupEntity.Id).Count() > 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10217));
             }

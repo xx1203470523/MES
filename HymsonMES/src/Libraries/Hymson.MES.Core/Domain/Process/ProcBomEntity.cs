@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Process
 {
@@ -31,7 +32,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :状态 
         /// 空值 : false  
         /// </summary>
-        public int Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
         
         /// <summary>
         /// 描述 :版本 
@@ -49,6 +50,6 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :说明 
         /// 空值 : true  
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
         }
 }

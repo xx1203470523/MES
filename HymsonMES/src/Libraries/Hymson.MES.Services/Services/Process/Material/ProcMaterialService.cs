@@ -276,7 +276,7 @@ namespace Hymson.MES.Services.Services.Process
                 MaterialCode = procMaterialEntity.MaterialCode,
                 Version = procMaterialEntity.Version
             });
-            if (existsList != null && existsList.Where(x => x.Id != procMaterialEntity.Id).Any())
+            if (existsList != null && existsList.Count()>0 && existsList.Where(x => x.Id != procMaterialEntity.Id).Any())
             {
                 throw new BusinessException(nameof(ErrorCode.MES10201)).WithData("materialCode", procMaterialEntity.MaterialCode).WithData("version", procMaterialEntity.Version);
             }
