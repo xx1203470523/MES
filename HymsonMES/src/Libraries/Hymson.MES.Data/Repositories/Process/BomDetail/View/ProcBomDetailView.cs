@@ -57,7 +57,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 工序名称
         /// </summary>
-        public string Name { get; set; }
+        public string ProcedureName { get; set; }
 
         /// <summary>
         /// 是否主物料，1：主物料

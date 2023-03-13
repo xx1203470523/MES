@@ -84,7 +84,7 @@ namespace Hymson.MES.Services.Services.Process
         {
             if (procBomCreateDto == null)
             {
-                throw new ValidationException(ErrorCode.MES10503);
+                throw new ValidationException(nameof(ErrorCode.MES10503));
             }
 
             var list = procBomCreateDto.MaterialList.ToList();
@@ -117,7 +117,7 @@ namespace Hymson.MES.Services.Services.Process
             });
             if (exists != null && exists.Count() > 0)
             {
-                throw new BusinessException(ErrorCode.MES10601).WithData("bomCode", procBomEntity.BomCode).WithData("version", procBomEntity.Version);
+                throw new BusinessException(nameof(ErrorCode.MES10601)).WithData("bomCode", procBomEntity.BomCode).WithData("version", procBomEntity.Version);
             }
 
             var materialList = procBomCreateDto.MaterialList.ToList();
@@ -127,11 +127,11 @@ namespace Hymson.MES.Services.Services.Process
             {
                 if (materialList.Any(a => string.IsNullOrWhiteSpace(a.MaterialCode)))
                 {
-                    throw new ValidationException(ErrorCode.MES10603);
+                    throw new ValidationException(nameof(ErrorCode.MES10603));
                 }
                 if (materialList.Any(a => a.IsMain != 1 && string.IsNullOrWhiteSpace(a.ReplaceMaterialId)))
                 {
-                    throw new ValidationException(ErrorCode.MES10604);
+                    throw new ValidationException(nameof(ErrorCode.MES10604));
                     //apiResult.Code = (int)ResultCode.PARAM_ERROR;
                     //apiResult.Msg = $"替代物料编码不能为空!";
                     //return apiResult;
@@ -139,21 +139,21 @@ namespace Hymson.MES.Services.Services.Process
                 var mainList = materialList.Where(a => a.IsMain == 1).ToList();
                 if (mainList.Any(a => string.IsNullOrWhiteSpace(a.Code) || a.ProcedureId == "0"))
                 {
-                    throw new ValidationException(ErrorCode.MES10605);
+                    throw new ValidationException(nameof(ErrorCode.MES10605));
                     //apiResult.Code = (int)ResultCode.PARAM_ERROR;
                     //apiResult.Msg = $"工序不能为空!";
                     //return apiResult;
                 }
                 if (mainList.GroupBy(m => new { m.MaterialId, m.ProcedureId }).Where(g => g.Count() > 1).Count() > 0)
                 {
-                    throw new ValidationException(ErrorCode.MES10606);
+                    throw new ValidationException(nameof(ErrorCode.MES10606));
                     //apiResult.Code = (int)ResultCode.PARAM_ERROR;
                     //apiResult.Msg = $"主物料编码+工序不能重复!";
                     //return apiResult;
                 }
                 if (materialList.Any(a => a.MaterialId == a.ReplaceMaterialId))
                 {
-                    throw new ValidationException(ErrorCode.MES10607);
+                    throw new ValidationException(nameof(ErrorCode.MES10607));
                     //apiResult.Code = (int)ResultCode.PARAM_ERROR;
                     //apiResult.Msg = $"替代物料不能跟主物料重复!";
                     //return apiResult;
@@ -162,7 +162,7 @@ namespace Hymson.MES.Services.Services.Process
                 var replaceList = materialList.Where(a => a.IsMain == 0).ToList();
                 if (replaceList.GroupBy(m => new { m.MaterialId, m.ReplaceMaterialId }).Where(g => g.Count() > 1).Count() > 0)
                 {
-                    throw new ValidationException(ErrorCode.MES10608);
+                    throw new ValidationException(nameof(ErrorCode.MES10608));
                     //apiResult.Code = (int)ResultCode.PARAM_ERROR;
                     //apiResult.Msg = $"主物料关联的替代物料不能重复!";
                     //return apiResult;
@@ -230,7 +230,7 @@ namespace Hymson.MES.Services.Services.Process
 
                 if (response == 0)
                 {
-                    throw new BusinessException(ErrorCode.MES10602);
+                    throw new BusinessException(nameof(ErrorCode.MES10602));
                 }
 
                 if (bomDetails.Count > 0)
@@ -238,7 +238,7 @@ namespace Hymson.MES.Services.Services.Process
                     response = await _procBomDetailRepository.InsertsAsync(bomDetails);
                     if (response == 0)
                     {
-                        throw new BusinessException(ErrorCode.MES10602);
+                        throw new BusinessException(nameof(ErrorCode.MES10602));
                     }
                 }
                 if (bomReplaceDetails.Count > 0)
@@ -246,7 +246,7 @@ namespace Hymson.MES.Services.Services.Process
                     response = await _procBomDetailReplaceMaterialRepository.InsertsAsync(bomReplaceDetails);
                     if (response == 0)
                     {
-                        throw new BusinessException(ErrorCode.MES10602);
+                        throw new BusinessException(nameof(ErrorCode.MES10602));
                     }
                 }
 
@@ -277,14 +277,14 @@ namespace Hymson.MES.Services.Services.Process
 
             if (ids.Length < 1)
             {
-                throw new ValidationException(ErrorCode.MES10610);
+                throw new ValidationException(nameof(ErrorCode.MES10610));
             }
 
             //判断需要删除的Bom是否是启用状态
             var bomList = await _procBomRepository.GetByIdsAsync(ids);
             if (bomList.Any(x => x.Status == (int)SysDataStatusEnum.Enable))
             {
-                throw new BusinessException(ErrorCode.MES10611);
+                throw new BusinessException(nameof(ErrorCode.MES10611));
             }
 
             return await _procBomRepository.DeletesAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = updateBy });
@@ -332,7 +332,7 @@ namespace Hymson.MES.Services.Services.Process
         {
             if (procBomModifyDto == null)
             {
-                throw new ValidationException(ErrorCode.MES10100);
+                throw new ValidationException(nameof(ErrorCode.MES10100));
             }
 
             var list = procBomModifyDto.MaterialList.ToList();
@@ -357,7 +357,7 @@ namespace Hymson.MES.Services.Services.Process
             var modelOrigin = await _procBomRepository.GetByIdAsync(procBomEntity.Id);
             if (modelOrigin == null)
             {
-                throw new ValidationException(ErrorCode.MES10610);
+                throw new ValidationException(nameof(ErrorCode.MES10610));
             }
 
             var bomCode = modelOrigin.BomCode.ToUpperInvariant();
@@ -380,11 +380,11 @@ namespace Hymson.MES.Services.Services.Process
             {
                 if (materialList.Any(a => string.IsNullOrWhiteSpace(a.MaterialCode)))
                 {
-                    throw new ValidationException(ErrorCode.MES10603);
+                    throw new ValidationException(nameof(ErrorCode.MES10603));
                 }
                 if (materialList.Any(a => a.IsMain != 1 && string.IsNullOrWhiteSpace(a.ReplaceMaterialId)))
                 {
-                    throw new ValidationException(ErrorCode.MES10604);
+                    throw new ValidationException(nameof(ErrorCode.MES10604));
                     //apiResult.Code = (int)ResultCode.PARAM_ERROR;
                     //apiResult.Msg = $"替代物料编码不能为空!";
                     //return apiResult;
@@ -392,21 +392,21 @@ namespace Hymson.MES.Services.Services.Process
                 var mainList = materialList.Where(a => a.IsMain == 1).ToList();
                 if (mainList.Any(a => string.IsNullOrWhiteSpace(a.Code) || a.ProcedureId == "0"))
                 {
-                    throw new ValidationException(ErrorCode.MES10605);
+                    throw new ValidationException(nameof(ErrorCode.MES10605));
                     //apiResult.Code = (int)ResultCode.PARAM_ERROR;
                     //apiResult.Msg = $"工序不能为空!";
                     //return apiResult;
                 }
                 if (mainList.GroupBy(m => new { m.MaterialId, m.ProcedureId }).Where(g => g.Count() > 1).Count() > 0)
                 {
-                    throw new ValidationException(ErrorCode.MES10606);
+                    throw new ValidationException(nameof(ErrorCode.MES10606));
                     //apiResult.Code = (int)ResultCode.PARAM_ERROR;
                     //apiResult.Msg = $"主物料编码+工序不能重复!";
                     //return apiResult;
                 }
                 if (materialList.Any(a => a.MaterialId == a.ReplaceMaterialId))
                 {
-                    throw new ValidationException(ErrorCode.MES10607);
+                    throw new ValidationException(nameof(ErrorCode.MES10607));
                     //apiResult.Code = (int)ResultCode.PARAM_ERROR;
                     //apiResult.Msg = $"替代物料不能跟主物料重复!";
                     //return apiResult;
@@ -415,7 +415,7 @@ namespace Hymson.MES.Services.Services.Process
                 var replaceList = materialList.Where(a => a.IsMain == 0).ToList();
                 if (replaceList.GroupBy(m => new { m.MaterialId, m.ReplaceMaterialId }).Where(g => g.Count() > 1).Count() > 0)
                 {
-                    throw new ValidationException(ErrorCode.MES10608);
+                    throw new ValidationException(nameof(ErrorCode.MES10608));
                     //apiResult.Code = (int)ResultCode.PARAM_ERROR;
                     //apiResult.Msg = $"主物料关联的替代物料不能重复!";
                     //return apiResult;
@@ -485,7 +485,7 @@ namespace Hymson.MES.Services.Services.Process
 
                 if (response == 0)
                 {
-                    throw new BusinessException(ErrorCode.MES10609);
+                    throw new BusinessException(nameof(ErrorCode.MES10609));
                 }
 
                 DeleteCommand command = new DeleteCommand
@@ -503,7 +503,7 @@ namespace Hymson.MES.Services.Services.Process
 
                     if (response == 0)
                     {
-                        throw new BusinessException(ErrorCode.MES10609);
+                        throw new BusinessException(nameof(ErrorCode.MES10609));
                     }
                 }
                 if (bomReplaceDetails.Count > 0)
@@ -511,7 +511,7 @@ namespace Hymson.MES.Services.Services.Process
                     response = await _procBomDetailReplaceMaterialRepository.InsertsAsync(bomReplaceDetails);
                     if (response == 0)
                     {
-                        throw new BusinessException(ErrorCode.MES10609);
+                        throw new BusinessException(nameof(ErrorCode.MES10609));
                     }
                 }
 

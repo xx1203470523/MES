@@ -22,7 +22,7 @@ namespace Hymson.MES.Services.Dtos.Process
     {
         public string MaterialId { get; set; }
 
-        public string ReplaceMaterialId { get; set; }
+        public string? ReplaceMaterialId { get; set; }
 
         /// <summary>
         /// 物料编码
@@ -42,8 +42,8 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 参考点
         /// </summary>
-        public string ReferencePoint { get; set; }
-        public decimal Sequence { get; set; }
+        public string? ReferencePoint { get; set; }
+        //public decimal Sequence { get; set; }
 
         public string ProcedureId { get; set; }
 
