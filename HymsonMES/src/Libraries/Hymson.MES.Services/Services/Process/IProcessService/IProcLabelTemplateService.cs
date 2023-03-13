@@ -51,9 +51,9 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="idsAr"></param>
         /// <returns></returns>
-        Task<int> DeletesProcLabelTemplateAsync(string ids);
+        Task<int> DeletesProcLabelTemplateAsync(long[] idsAr);
 
         /// <summary>
         /// 根据ID查询

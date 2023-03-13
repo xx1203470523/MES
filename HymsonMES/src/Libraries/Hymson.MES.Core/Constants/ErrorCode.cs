@@ -56,6 +56,9 @@
         public const string MES10320 = "所属资源类型ID不能为空";
         public const string MES10321 = "工序名称超长";
         #endregion
+        #region 标签模板
+        public const string MES10340 = "模板名称已经存在!";
+        #endregion
 
         #region 工序 10400
         public const string MES10401 = "工序编码不能为空";
@@ -226,5 +229,6 @@
         //public const string MES30100 = "MES30100";
         //public const string MES30101 = "MES30101";
         #endregion
+       
     }
 }
