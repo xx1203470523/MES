@@ -110,7 +110,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 操作类型 1:add；2:edit；3:view；
         /// </summary>
-        public OperateTypeEnum OperateType { get; set; } = OperateTypeEnum.None;
+        public OperateTypeEnum OperateType { get; set; } = OperateTypeEnum.Add;
 
         /// <summary>
         /// 设备组Id

@@ -94,8 +94,9 @@ namespace Hymson.MES.Data.Repositories.Process
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
             if (!string.IsNullOrWhiteSpace(procMaterialGroupPagedQuery.GroupCode))
@@ -140,6 +141,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("g.IsDeleted=0");
             // sqlBuilder.Select("*");
             sqlBuilder.Where("g.SiteId = @SiteId");
+            sqlBuilder.OrderBy("g.UpdatedOn DESC");
 
             if (!string.IsNullOrWhiteSpace(procMaterialGroupCustomPagedQuery.GroupCode))
             {
@@ -242,7 +244,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
     public partial class ProcMaterialGroupRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_material_group` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_material_group` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_material_group` /**where**/ ";
         const string GetPagedCustomInfoDataSqlTemplate = @"SELECT 
 g.Id,
@@ -261,7 +263,7 @@ o.MaterialName,
 o.Version
                                                             FROM `proc_material_group` g
                                                             LEFT JOIN proc_material o on o.GroupId = g.Id
-/**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+/**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedCustomInfoCountSqlTemplate = @"SELECT COUNT(1) 
                                                 FROM `proc_material_group` g
                                                 LEFT JOIN proc_material o on o.GroupId = g.Id  /**where**/ ";

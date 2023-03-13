@@ -106,10 +106,11 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
         /// <returns></returns>
         public async Task<PagedInfo<InteContainerDto>> GetPagedListAsync(InteContainerPagedQueryDto pagedQueryDto)
         {
-            var inteContainerPagedQuery = pagedQueryDto.ToQuery<InteContainerPagedQuery>();
-            var pagedInfo = await _inteContainerRepository.GetPagedInfoAsync(inteContainerPagedQuery);
+            var pagedQuery = pagedQueryDto.ToQuery<InteContainerPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId;
+            var pagedInfo = await _inteContainerRepository.GetPagedInfoAsync(pagedQuery);
 
-            // 实体到DTO转换 装载数据// 实体到DTO转换 装载数据
+            // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<InteContainerDto>());
             return new PagedInfo<InteContainerDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }

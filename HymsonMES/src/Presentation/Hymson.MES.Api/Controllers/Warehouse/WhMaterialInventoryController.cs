@@ -54,15 +54,16 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         }
 
         /// <summary>
-        /// 查询详情（物料库存）
+        /// 查询是否已存在物料条码
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="materialBarCode"></param>
         /// <returns></returns>
-        [HttpGet("{id}")]
-        public async Task<WhMaterialInventoryDto> QueryWhMaterialInventoryByIdAsync(long id)
+        [HttpGet("getMaterialBarCodeAny/{materialBarCode}")]
+        public async Task<bool> GetMaterialBarCodeAnyAsync(string materialBarCode)
         {
-            return await _whMaterialInventoryService.QueryWhMaterialInventoryByIdAsync(id);
+            return await _whMaterialInventoryService.GetMaterialBarCodeAnyAsync(materialBarCode);
         }
+
 
         /// <summary>
         /// 添加（物料库存）
@@ -73,7 +74,21 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         [Route("create")]
         public async Task AddWhMaterialInventoryAsync([FromBody] WhMaterialInventoryCreateDto parm)
         {
-             await _whMaterialInventoryService.CreateWhMaterialInventoryAsync(parm);
+            await _whMaterialInventoryService.CreateWhMaterialInventoryAsync(parm);
+        }
+
+
+
+        /// <summary>
+        /// 批量添加（物料库存）
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("createList")]
+        public async Task AddWhMaterialInventoryListAsync([FromBody] List<WhMaterialInventoryListCreateDto> parm)
+        {
+            await _whMaterialInventoryService.CreateWhMaterialInventoryListAsync(parm);
         }
 
         /// <summary>
@@ -85,7 +100,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         [Route("update")]
         public async Task UpdateWhMaterialInventoryAsync([FromBody] WhMaterialInventoryModifyDto parm)
         {
-             await _whMaterialInventoryService.ModifyWhMaterialInventoryAsync(parm);
+            await _whMaterialInventoryService.ModifyWhMaterialInventoryAsync(parm);
         }
 
         /// <summary>
@@ -100,6 +115,15 @@ namespace Hymson.MES.Api.Controllers.Warehouse
             //long[] idsArr = StringExtension.SpitLongArrary(ids);
             await _whMaterialInventoryService.DeletesWhMaterialInventoryAsync(ids);
         }
-
+        /// <summary>
+        /// 查询物料与供应商
+        /// </summary>
+        /// <param name="materialCode"></param>
+        /// <returns></returns>
+        [HttpGet("{materialCode}")]
+        public async Task<ProcMaterialInfoViewDto> GetMaterialAndSupplierByMateialCodeIdAsync(string materialCode)
+        {
+            return await _whMaterialInventoryService.GetMaterialAndSupplierByMateialCodeIdAsync(materialCode);
+        }
     }
 }

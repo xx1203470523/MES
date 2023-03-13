@@ -47,7 +47,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -59,10 +59,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeleteBomIDAsync(DeleteCommand command) 
+        public async Task<int> DeleteBomIDAsync(DeleteCommand command)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteBomIDsSql, new { command.UserId, command.DeleteOn, bomIds = command.Ids,command });
+            return await conn.ExecuteAsync(DeleteBomIDsSql, new { command.UserId, command.DeleteOn, bomIds = command.Ids, command });
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<ProcBomDetailEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcBomDetailEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ProcBomDetailEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -81,10 +81,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcBomDetailEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ProcBomDetailEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcBomDetailEntity>(GetByIdsSql, new { ids = ids});
+            return await conn.QueryAsync<ProcBomDetailEntity>(GetByIdsSql, new { ids = ids });
         }
 
         /// <summary>
@@ -121,7 +121,8 @@ namespace Hymson.MES.Data.Repositories.Process
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
             if (procBomDetailPagedQuery.SiteId > 0)
@@ -204,7 +205,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
     public partial class ProcBomDetailRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_bom_detail` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_bom_detail` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_bom_detail` /**where**/ ";
         const string GetProcBomDetailEntitiesSqlTemplate = @"SELECT  /**select**/  FROM `proc_bom_detail` /**where**/  ";
 
@@ -231,7 +232,7 @@ namespace Hymson.MES.Data.Repositories.Process
                             LEFT JOIN proc_procedure c on a.ProcedureId = c.Id
                             WHERE a.IsDeleted =0
                             AND a.BomId=@id
-                            ORDER by a.CreatedOn DESC ";
+                            ORDER by a.UpdatedOn DESC ";
         /// <summary>
         /// 查询替代物料列表
         /// </summary>
@@ -244,6 +245,6 @@ namespace Hymson.MES.Data.Repositories.Process
                             LEFT JOIN proc_material c on a.ReplaceMaterialId = c.Id
                             WHERE a.IsDeleted =0
                             AND a.BomId=@id
-                            ORDER by a.CreatedOn DESC ";
+                            ORDER by a.UpdatedOn DESC ";
     }
 }

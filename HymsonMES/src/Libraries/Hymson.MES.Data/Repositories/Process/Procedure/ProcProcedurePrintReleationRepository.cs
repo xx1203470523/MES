@@ -38,8 +38,10 @@ namespace Hymson.MES.Data.Repositories.Process
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
+
             if (query.SiteId > 0)
             {
                 sqlBuilder.Where("SiteId = @SiteId");
@@ -92,7 +94,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<ProcProcedurePrintRelationEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcProcedurePrintRelationEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ProcProcedurePrintRelationEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -100,10 +102,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcProcedurePrintRelationEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ProcProcedurePrintRelationEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcProcedurePrintRelationEntity>(GetByIdsSql, new { ids = ids});
+            return await conn.QueryAsync<ProcProcedurePrintRelationEntity>(GetByIdsSql, new { ids = ids });
         }
 
         /// <summary>
@@ -141,8 +143,8 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSql, procProcedurePrintReleationEntity);
         }
-		
-		/// <summary>
+
+        /// <summary>
         /// 批量更新
         /// </summary>
         /// <param name="procProcedurePrintReleationEntitys"></param>
@@ -158,16 +160,16 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeleteRangeAsync(long[] ids) 
+        public async Task<int> DeleteRangeAsync(long[] ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeletesSql, new { ids=ids });
+            return await conn.ExecuteAsync(DeletesSql, new { ids = ids });
         }
     }
 
     public partial class ProcProcedurePrintRelationRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_procedure_print_relation` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_procedure_print_relation` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_procedure_print_relation` /**where**/ ";
         const string GetProcProcedurePrintReleationEntitiesSqlTemplate = @"SELECT 
                                             /**select**/

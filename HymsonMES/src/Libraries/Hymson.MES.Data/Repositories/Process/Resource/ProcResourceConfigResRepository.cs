@@ -37,9 +37,10 @@ namespace Hymson.MES.Data.Repositories.Process
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("ResourceId = @ResourceId");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
-            sqlBuilder.Where("ResourceId=@ResourceId");
 
             //TODO 按UpdatedOn倒序排列
             var offSet = (query.PageIndex - 1) * query.PageSize;
@@ -71,7 +72,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeletesRangeAsync(long[] idsArr) 
+        public async Task<int> DeletesRangeAsync(long[] idsArr)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeleteSql, idsArr);
@@ -113,7 +114,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
     public partial class ProcResourceConfigResRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_resource_config_res` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_resource_config_res` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_resource_config_res` /**where**/";
 
         const string InsertSql = "INSERT INTO `proc_resource_config_res`(  `Id`, `SiteId`, `ResourceId`, `SetType`, `Value`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @ResourceId, @SetType, @Value, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";

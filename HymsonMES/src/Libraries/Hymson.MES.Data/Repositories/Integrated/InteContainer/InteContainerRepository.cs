@@ -79,13 +79,46 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<InteContainerEntity>> GetPagedInfoAsync(InteContainerPagedQuery pagedQuery)
+        public async Task<PagedInfo<InteContainerView>> GetPagedInfoAsync(InteContainerPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Select("*");
+            sqlBuilder.Where("IC.IsDeleted = 0");
+            sqlBuilder.Where("IC.SiteId = @SiteId");
+            sqlBuilder.OrderBy("IC.UpdatedOn DESC");
+
+            sqlBuilder.Select("IC.Id, IC.Remark, IC.Status, IC.DefinitionMethod, IC.Level, IC.Maximum, IC.Minimum, IC.UpdatedBy, IC.UpdatedOn");
+            sqlBuilder.Select("(CASE IC.DefinitionMethod WHEN 1 THEN M.MaterialName WHEN 2 THEN MG.GroupName ELSE '' END) AS Name, M.Version");
+            sqlBuilder.LeftJoin("proc_material M ON IC.MaterialId = M.Id");
+            sqlBuilder.LeftJoin("proc_material_group MG ON IC.MaterialGroupId = MG.Id");
+
+            if (pagedQuery.DefinitionMethod.HasValue == true)
+            {
+                sqlBuilder.Where("IC.DefinitionMethod = @DefinitionMethod");
+            }
+
+            if (pagedQuery.Level.HasValue == true)
+            {
+                sqlBuilder.Where("IC.Level = @Level");
+            }
+
+            if (pagedQuery.Status.HasValue == true)
+            {
+                sqlBuilder.Where("IC.Status = @Status");
+            }
+
+            if (string.IsNullOrWhiteSpace(pagedQuery.Name) == false)
+            {
+                pagedQuery.Name = $"%{pagedQuery.Name}%";
+                sqlBuilder.Where("M.MaterialName LIKE @Name OR MG.GroupName LIKE @Name");
+            }
+
+            if (string.IsNullOrWhiteSpace(pagedQuery.Version) == false)
+            {
+                pagedQuery.Version = $"%{pagedQuery.Version}%";
+                sqlBuilder.Where("M.Version LIKE @Version");
+            }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -93,9 +126,9 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
             sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var entities = await conn.QueryAsync<InteContainerEntity>(templateData.RawSql, templateData.Parameters);
+            var entities = await conn.QueryAsync<InteContainerView>(templateData.RawSql, templateData.Parameters);
             var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
-            return new PagedInfo<InteContainerEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
+            return new PagedInfo<InteContainerView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
     }
 
@@ -104,15 +137,12 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
     /// </summary>
     public partial class InteContainerRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_container` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `inte_container` /**where**/";
-        const string GetInteContainerEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM `inte_container` /**where**/  ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM inte_container IC /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM inte_container IC /**where**/";
 
-        const string InsertSql = "INSERT INTO `inte_container`(  `Id`, `DefinitionMethod`, `MaterialId`, `MaterialGroupId`, Level, `Status`, `Maximum`, `Minimum`, `Height`, `Length`, `Width`, `MaxFillWeight`, `Weight`, Remark, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @DefinitionMethod, @MaterialId, @MaterialGroupId, @Level, @Status, @Maximum, @Minimum, @Height, @Length, @Width, @MaxFillWeight, @Weight, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `inte_container`( `Id`, `DefinitionMethod`, `MaterialId`, `MaterialGroupId`, Level, `Status`, `Maximum`, `Minimum`, `Height`, `Length`, `Width`, `MaxFillWeight`, `Weight`, Remark, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, SiteId) VALUES (   @Id, @DefinitionMethod, @MaterialId, @MaterialGroupId, @Level, @Status, @Maximum, @Minimum, @Height, @Length, @Width, @MaxFillWeight, @Weight, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId)  ";
         const string UpdateSql = "UPDATE `inte_container` SET DefinitionMethod = @DefinitionMethod, MaterialId = @MaterialId, MaterialGroupId = @MaterialGroupId, Level = @Level, Status = @Status, Maximum = @Maximum, Minimum = @Minimum, Height = @Height, Length = @Length, Width = @Width, MaxFillWeight = @MaxFillWeight, Weight = @Weight, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE inte_container SET `IsDeleted` = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE `Id` = @Ids;";
+        const string DeleteSql = "UPDATE inte_container SET `IsDeleted` = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids;";
         const string GetByIdSql = @"SELECT 
                                `Id`, `DefinitionMethod`, `MaterialId`, `MaterialGroupId`, Level, `Status`, `Maximum`, `Minimum`, `Height`, `Length`, `Width`, `MaxFillWeight`, `Weight`, Remark, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `inte_container`  WHERE Id = @Id ";

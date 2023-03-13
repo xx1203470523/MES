@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 using static Dapper.SqlMapper;
@@ -16,9 +17,11 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
     public partial class EquEquipmentGroupRepository : IEquEquipmentGroupRepository
     {
         private readonly ConnectionOptions _connectionOptions;
+        private readonly IMemoryCache _memoryCache;
 
-        public EquEquipmentGroupRepository(IOptions<ConnectionOptions> connectionOptions)
+        public EquEquipmentGroupRepository(IOptions<ConnectionOptions> connectionOptions,IMemoryCache memoryCache)
         {
+            _memoryCache = memoryCache;
             _connectionOptions = connectionOptions.Value;
         }
 
@@ -75,8 +78,12 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
         /// <returns></returns>
         public async Task<EquEquipmentGroupEntity> GetByIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<EquEquipmentGroupEntity>(GetByIdSql, new { IsDeleted = 0, Id = id });
+            var key = $"equ_equipment_group_{id}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) => {
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                return await conn.QueryFirstOrDefaultAsync<EquEquipmentGroupEntity>(GetByIdSql, new { IsDeleted = 0, Id = id });
+            });
+            
         }
 
         /// <summary>
@@ -91,8 +98,9 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
-
+        
             if (string.IsNullOrWhiteSpace(pagedQuery.EquipmentGroupCode) == false)
             {
                 pagedQuery.EquipmentGroupCode = $"%{pagedQuery.EquipmentGroupCode}%";
@@ -135,7 +143,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
 
     public partial class EquEquipmentGroupRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_equipment_group` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_equipment_group` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `equ_equipment_group` /**where**/";
         const string GetEquEquipmentGroupEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
@@ -143,7 +151,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
 
         const string InsertSql = "INSERT INTO `equ_equipment_group`(  `Id`, `EquipmentGroupCode`, `EquipmentGroupName`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteId`) VALUES (   @Id, @EquipmentGroupCode, @EquipmentGroupName, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteId )  ";
         const string UpdateSql = "UPDATE `equ_equipment_group` SET EquipmentGroupName = @EquipmentGroupName, Remark = @Remark WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `equ_equipment_group` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id = @Ids ";
+        const string DeleteSql = "UPDATE `equ_equipment_group` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids;";
         const string GetByIdSql = @"SELECT 
                                `Id`, `EquipmentGroupCode`, `EquipmentGroupName`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteId`
                             FROM `equ_equipment_group`  WHERE IsDeleted = @IsDeleted AND Id = @Id ";

@@ -6,6 +6,8 @@
  *build datetime: 2023-03-06 03:27:59
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Warehouse;
+using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services.Dtos.Warehouse;
 using System;
 using System.Collections.Generic;
@@ -28,11 +30,27 @@ namespace Hymson.MES.Services.Services.Warehouse
         Task<PagedInfo<WhMaterialInventoryDto>> GetPageListAsync(WhMaterialInventoryPagedQueryDto whMaterialInventoryPagedQueryDto);
 
         /// <summary>
+        /// 查询是否已存在物料条码
+        /// </summary>
+        /// <param name="materialBarCode"></param>
+        /// <returns></returns>
+        Task<bool> GetMaterialBarCodeAnyAsync(string materialBarCode);
+
+        /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="whMaterialInventoryDto"></param>
+        /// <param name="whMaterialInventoryCreateDto"></param>
         /// <returns></returns>
         Task CreateWhMaterialInventoryAsync(WhMaterialInventoryCreateDto whMaterialInventoryCreateDto);
+
+
+        /// <summary>
+        ///批量新增
+        /// </summary>
+        /// <param name="whMaterialInventoryCreateDto"></param>
+        /// <returns></returns>
+
+        Task CreateWhMaterialInventoryListAsync(List<WhMaterialInventoryListCreateDto> whMaterialInventoryCreateDto);
 
         /// <summary>
         /// 修改
@@ -61,5 +79,15 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <param name="id"></param>
         /// <returns></returns>
         Task<WhMaterialInventoryDto> QueryWhMaterialInventoryByIdAsync(long id);
+
+
+
+        /// <summary>
+        /// 根据物料编码获取物料与供应商数据
+        /// </summary>
+        /// <param name="materialCode"></param>
+        /// <returns></returns>
+        Task<ProcMaterialInfoViewDto> GetMaterialAndSupplierByMateialCodeIdAsync(string materialCode);
+
     }
 }

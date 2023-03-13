@@ -8,11 +8,6 @@ namespace Hymson.MES.Core.Enums
     public enum EquipmentPartTypeEnum : sbyte
     {
         /// <summary>
-        /// 未知设备
-        /// </summary>
-        [Description("未知设备")]
-        None = 0,
-        /// <summary>
         /// 备件
         /// </summary>
         [Description("备件")]

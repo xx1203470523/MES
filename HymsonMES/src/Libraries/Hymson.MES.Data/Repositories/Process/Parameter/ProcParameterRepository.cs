@@ -45,7 +45,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -60,7 +60,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<ProcParameterEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcParameterEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ProcParameterEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -68,10 +68,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcParameterEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ProcParameterEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcParameterEntity>(GetByIdsSql, new { ids = ids});
+            return await conn.QueryAsync<ProcParameterEntity>(GetByIdsSql, new { ids = ids });
         }
 
         /// <summary>
@@ -84,7 +84,8 @@ namespace Hymson.MES.Data.Repositories.Process
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
             if (procParameterPagedQuery.SiteId != 0)
@@ -133,7 +134,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
 
-            if (procParameterQuery.SiteId!=0)
+            if (procParameterQuery.SiteId != 0)
             {
                 sqlBuilder.Where(" SiteId=@SiteId ");
             }
@@ -196,7 +197,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
     public partial class ProcParameterRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_parameter` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_parameter` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_parameter` /**where**/ ";
         const string GetProcParameterEntitiesSqlTemplate = @"SELECT 
                                             /**select**/

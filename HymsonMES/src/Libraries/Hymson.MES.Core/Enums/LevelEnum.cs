@@ -8,11 +8,6 @@ namespace Hymson.MES.Core.Enums
     public enum LevelEnum : sbyte
     {
         /// <summary>
-        /// 未知
-        /// </summary>
-        [Description("未知")]
-        None = 0,
-        /// <summary>
         /// 一级
         /// </summary>
         [Description("一级")]

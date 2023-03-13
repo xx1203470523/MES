@@ -83,13 +83,15 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
             //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
+
 
             var offSet = (whMaterialInventoryPagedQuery.PageIndex - 1) * whMaterialInventoryPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -113,6 +115,13 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetWhMaterialInventoryEntitiesSqlTemplate);
+            //sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Select("*");
+            if (!string.IsNullOrWhiteSpace(whMaterialInventoryQuery.MaterialBarCode))
+            {
+                sqlBuilder.Where("MaterialBarCode=@MaterialBarCode");
+            }
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var whMaterialInventoryEntities = await conn.QueryAsync<WhMaterialInventoryEntity>(template.RawSql, whMaterialInventoryQuery);
             return whMaterialInventoryEntities;
@@ -168,23 +177,47 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="materialCode"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcMaterialInfoView>> GetProcMaterialByMaterialCodeAsync(string materialCode)
+        public async Task<ProcMaterialInfoView> GetProcMaterialByMaterialCodeAsync(string materialCode)
         {
             var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetMaterialByIdsSql);
+            var template = sqlBuilder.AddTemplate(GetMaterialByMaterialCodeSql);
             sqlBuilder.Select("*");
             sqlBuilder.Where("MaterialCode=@materialCode");
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var pmInfo = await conn.QueryAsync<ProcMaterialInfoView>(template.RawSql, new { materialCode });
+            var pmInfo = await conn.QueryFirstOrDefaultAsync<ProcMaterialInfoView>(template.RawSql, new { materialCode });
             return pmInfo;
+        }
+
+
+        /// <summary>
+        /// 根据物料编码获取供应商信息
+        /// </summary>
+        /// <param name="materialCode"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<WhSupplierInfoView>> GetWhSupplierByMaterialIdAsync(long materialId, long supplierId = 0)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetSupplierlByMaterialCodeSql);
+            sqlBuilder.OrderBy("ws.UpdatedOn DESC");
+            sqlBuilder.Select("ws.Id,ws.Code,ws.Name");
+            sqlBuilder.InnerJoin("proc_material_supplier_relation pmsr ON pmsr.SupplierId=ws.Id");
+            sqlBuilder.Where("pmsr.MaterialId=@materialId");
+            if (supplierId > 0)
+            {
+                sqlBuilder.Where("ws.Id=@supplierId");
+            }
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var wsInfo = await conn.QueryAsync<WhSupplierInfoView>(template.RawSql, new { materialId, supplierId });
+            return wsInfo;
         }
 
     }
 
     public partial class WhMaterialInventoryRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `wh_material_inventory` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `wh_material_inventory` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `wh_material_inventory` /**where**/ ";
         const string GetWhMaterialInventoryEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
@@ -204,8 +237,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse
                             FROM `wh_material_inventory`  WHERE Id IN @ids ";
 
 
-        const string GetMaterialByIdsSql = @"SELECT  
+        const string GetMaterialByMaterialCodeSql = @"SELECT   
                                             /**select**/
                                            FROM `proc_material` /**where**/  ";
+
+        const string GetSupplierlByMaterialCodeSql = @"SELECT /**select**/ FROM wh_supplier ws /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/";
     }
 }
