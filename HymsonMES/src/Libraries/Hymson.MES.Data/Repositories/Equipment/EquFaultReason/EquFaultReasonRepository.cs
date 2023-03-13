@@ -197,10 +197,10 @@ namespace Hymson.MES.Data.Repositories.Equipment
     public partial class EquFaultReasonRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_fault_reason` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `equ_fault_reason` /**where**/ ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `equ_fault_reason` /**innerjoin**/ /**leftjoin**/ /**where**/ ";
         const string GetEquFaultReasonEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
-                                           FROM `equ_fault_reason` /**where**/  ";
+                                           FROM `equ_fault_reason` /**innerjoin**/ /**leftjoin**/ /**where**/  ";
 
         const string InsertSql = "INSERT INTO `equ_fault_reason`(  `Id`, `SiteId`, `FaultReasonCode`, `FaultReasonName`, `UseStatus`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @FaultReasonCode, @FaultReasonName, @UseStatus, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `equ_fault_reason`(  `Id`, `SiteId`, `FaultReasonCode`, `FaultReasonName`, `UseStatus`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @FaultReasonCode, @FaultReasonName, @UseStatus, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
