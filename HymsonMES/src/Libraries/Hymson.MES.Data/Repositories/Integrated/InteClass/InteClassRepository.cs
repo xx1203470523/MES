@@ -134,7 +134,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
     /// <summary>
     /// 
     /// </summary>
-    public partial class InteClassRepositoryFEAT
+    public partial class InteClassRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_class` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `inte_class` /**where**/";
