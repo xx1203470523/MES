@@ -164,6 +164,8 @@ namespace Hymson.MES.Services.Mapper
 
             #region InteJob
             CreateMap<InteJobEntity, InteJobDto>();
+            CreateMap<InteJobCreateDto, InteJobEntity>();
+            CreateMap<InteJobModifyDto, InteJobEntity>();
             CreateMap<InteJobPagedQueryDto, InteJobPagedQuery>();
             CreateMap<InteJobBusinessRelationCreateDto, InteJobBusinessRelationEntity>();
             CreateMap<InteJobPagedQueryDto, InteJobPagedQuery>();

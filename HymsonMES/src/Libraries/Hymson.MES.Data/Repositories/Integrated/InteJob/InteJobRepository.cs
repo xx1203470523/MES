@@ -36,6 +36,14 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
+            if (string.IsNullOrEmpty(param.Sorting))
+            {
+                sqlBuilder.OrderBy("UpdatedOn DESC");
+            }
+            else
+            {
+                sqlBuilder.OrderBy(param.Sorting);
+            }
             sqlBuilder.Select("SiteId,Id,Code,Name,ClassProgram,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted");
             if (param.SiteId != null) { sqlBuilder.Where("SiteId = @SiteId"); }
             if (!string.IsNullOrWhiteSpace(param.Code))
@@ -157,14 +165,14 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob
     /// @date 2023-02-21
     public partial class InteJobRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_job` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_job` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `inte_job` /**where**/ ";
-        const string InsertSql = "INSERT INTO  `inte_job` (  'SiteId','Id','Code','Name','ClassProgram','Remark','CreatedBy','CreatedOn','UpdatedBy','UpdatedOn','IsDeleted') VALUES ( @SiteId,@Id,@Code,@Name,@ClassProgram,@Remark,@CreatedBy,@CreatedOn,@UpdatedBy,@UpdatedOn,@IsDeleted) ";
+        const string InsertSql = "INSERT INTO  `inte_job` ( SiteId,Id,Code,Name,ClassProgram,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted) VALUES ( @SiteId,@Id,@Code,@Name,@ClassProgram,@Remark,@CreatedBy,@CreatedOn,@UpdatedBy,@UpdatedOn,@IsDeleted) ";
         const string UpdateSql = "UPDATE `inte_job` SET  Name=@Name,ClassProgram=@ClassProgram,Remark=@Remark,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn,IsDeleted=@IsDeleted WHERE Id = @Id AND IsDeleted = @IsDeleted ";
         const string UpdateRangSql = "UPDATE `inte_job` SET Name=@Name,ClassProgram=@ClassProgram,Remark=@Remark,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn,IsDeleted=@IsDeleted WHERE Id = @Id AND IsDeleted = @IsDeleted ";
         const string DeleteRangSql = "UPDATE `inte_job` SET IsDeleted = '1', UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id in @ids AND IsDeleted=0";
-        const string GetByIdSql = @"SELECT 'SiteId','Id','Code','Name','ClassProgram','Remark','CreatedBy','CreatedOn','UpdatedBy','UpdatedOn','IsDeleted' FROM `inte_job`  WHERE Id = @Id AND IsDeleted=0  ";
+        const string GetByIdSql = @"SELECT SiteId,Id,Code,Name,ClassProgram,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted FROM `inte_job`  WHERE Id = @Id AND IsDeleted=0  ";
         const string GetByIdsSql = @"SELECT  * FROM `inte_job`  WHERE Id IN @ids AND IsDeleted=0  ";
-        const string GetByCodeSql = @"SELECT 'SiteId','Id','Code','Name','ClassProgram','Remark','CreatedBy','CreatedOn','UpdatedBy','UpdatedOn','IsDeleted' FROM `inte_job`  WHERE Code = @Code  AND SiteId=@Site AND IsDeleted=0 ";
+        const string GetByCodeSql = @"SELECT SiteId,Id,Code,Name,ClassProgram,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted FROM `inte_job`  WHERE Code = @Code  AND SiteId=@Site AND IsDeleted=0 ";
     }
 }
