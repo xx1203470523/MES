@@ -71,9 +71,8 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <param name="query"></param>
         /// <returns></returns>
         [HttpGet("material/list")]
-        public async Task<List<ProcBomDetailView>> GetProcBomMaterialAsync(ProcBomMaterialQueryDto query)
+        public async Task<List<ProcBomDetailView>> GetProcBomMaterialAsync(long bomId)
         {
-            var bomId = query?.BomId ?? 0;
             return await _procBomService.GetProcBomMaterialAsync(bomId);
         }
 

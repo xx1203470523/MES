@@ -73,11 +73,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
     public record InteJobCreateDto : BaseEntityDto
     {
         /// <summary>
-        /// 所属站点代码 
-        /// </summary>
-        public string SiteId { get; set; }
-
-        /// <summary>
         /// 作业编号 
         /// </summary>
         public string Code { get; set; }

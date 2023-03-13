@@ -38,7 +38,7 @@ namespace Hymson.MES.Services.Services.Integrated.IIntegratedService
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<int> DeleteRangInteJobAsync(string ids);
+        Task<int> DeleteRangInteJobAsync(long[] ids);
 
 
         /// <summary>

@@ -202,7 +202,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         const string GetByHardwareCodeSql = "SELECT * FROM `equ_equipment_link_hardware` WHERE `HardwareCode` = @HardwareCode AND `HardwareType` = @HardwareType;";
         const string GetByEquipmentSql = "SELECT * FROM `equ_equipment_link_hardware` WHERE `EquipmentId` = @EquipmentId;";
         const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `equ_equipment_link_hardware` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_equipment_link_hardware` /**where**/";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_equipment_link_hardware` /**innerjoin**/ /**leftjoin**/ /**where**/";
         const string GetEntitiesSqlTemplate = "";
     }
 }
