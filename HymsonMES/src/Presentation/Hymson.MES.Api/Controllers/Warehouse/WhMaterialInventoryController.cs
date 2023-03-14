@@ -47,9 +47,8 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("pagelist")] 
+        [Route("pagelist")]
         public async Task<PagedInfo<WhMaterialInventoryPageListViewDto>> QueryPagedWhMaterialInventoryAsync(WhMaterialInventoryPagedQueryDto parm)
-        {
         {
             return await _whMaterialInventoryService.GetPageListAsync(parm);
         }
