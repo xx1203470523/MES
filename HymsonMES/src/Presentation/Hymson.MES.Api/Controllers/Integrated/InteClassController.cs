@@ -89,6 +89,5 @@ namespace Hymson.MES.Api.Controllers.Integrated
             return await _inteClassService.GetDetailAsync(id);
         }
 
-
     }
 }

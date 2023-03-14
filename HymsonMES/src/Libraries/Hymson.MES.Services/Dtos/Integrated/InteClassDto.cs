@@ -1,5 +1,5 @@
 ﻿using Hymson.Infrastructure;
-using System.ComponentModel.DataAnnotations;
+using Hymson.MES.Core.Enums.Integrated;
 
 namespace Hymson.MES.Services.Dtos.Integrated
 {
@@ -55,7 +55,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 描述 :班次类型（字典名称：manu_class_type） 
         /// 空值 : false  
         /// </summary>
-        public int ClassType { get; set; }
+        public ClassTypeEnum ClassType { get; set; }
 
         /// <summary>
         /// 描述 :描述 
@@ -108,6 +108,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         ///班次类型（字典名称：manu_class_type）
         /// </summary>
-        public int? ClassType { get; set; }
+        public ClassTypeEnum? ClassType { get; set; }
     }
 }

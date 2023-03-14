@@ -1,3 +1,4 @@
+using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
@@ -29,6 +30,11 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
+        /// 
+        /// </summary>
+        private readonly AbstractValidator<InteClassSaveDto> _validationSaveRules;
+
+        /// <summary>
         /// 仓储（班制维护）
         /// </summary>
         private readonly IInteClassRepository _inteClassRepository;
@@ -43,14 +49,17 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
         /// </summary>
         /// <param name="currentSite"></param>
         /// <param name="currentUser"></param>
+        /// <param name="validationSaveRules"></param>
         /// <param name="inteClassRepository"></param>
         /// <param name="inteClassDetailRepository"></param>
         public InteClassService(ICurrentUser currentUser, ICurrentSite currentSite,
+            AbstractValidator<InteClassSaveDto> validationSaveRules,
             IInteClassRepository inteClassRepository,
             IInteClassDetailRepository inteClassDetailRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _validationSaveRules = validationSaveRules;
             _inteClassRepository = inteClassRepository;
             _inteClassDetailRepository = inteClassDetailRepository;
         }
@@ -64,7 +73,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
         public async Task<int> CreateAsync(InteClassSaveDto createDto)
         {
             // 验证DTO
-
+            //await validationSaveRules.ValidateAndThrowAsync(createDto);
 
             // DTO转换实体
             var entity = createDto.ToEntity<InteClassEntity>();

@@ -98,7 +98,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
                 sqlBuilder.Where("ClassName LIKE @ClassName");
             }
 
-            if (pagedQuery.ClassType > DbDefaultValueConstant.IntDefaultValue)
+            if (pagedQuery.ClassType.HasValue == true)
             {
                 sqlBuilder.Where("ClassType = @ClassType");
             }

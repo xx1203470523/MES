@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Integrated;
 
 namespace Hymson.MES.Data.Repositories.Integrated.InteClass.Query
 {
@@ -20,7 +21,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass.Query
         /// <summary>
         ///班次类型（字典名称：manu_class_type）
         /// </summary>
-        public int ClassType { get; set; }
+        public ClassTypeEnum? ClassType { get; set; }
 
     }
 }
