@@ -63,7 +63,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public string Remark { get; set; }
 
-
         /// <summary>
         /// 最后修改人
         /// </summary>
@@ -73,6 +72,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 修改时间
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<InteClassDetailCreateDto> DetailList { get; set; } = new();
     }
 
     /// <summary>
