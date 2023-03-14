@@ -144,7 +144,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
     public partial class EquEquipmentGroupRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_equipment_group` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `equ_equipment_group` /**innerjoin**/ /**leftjoin**/ /**where**/";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_equipment_group` /**innerjoin**/ /**leftjoin**/ /**where**/";
         const string GetEquEquipmentGroupEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `equ_equipment_group` /**innerjoin**/ /**leftjoin**/ /**where**/  ";

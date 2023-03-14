@@ -26,13 +26,12 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         ///描述
         /// </summary>
-        public string Remark { get; set; } = "";
-
+        public string? Remark { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public List<InteClassDetailCreateDto> DetailList { get; set; } = new();
+        public List<InteClassDetailSaveDto> DetailList { get; set; } = new();
     }
 
     /// <summary>
@@ -76,7 +75,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 
         /// </summary>
-        public List<InteClassDetailCreateDto> DetailList { get; set; } = new();
+        public List<InteClassDetailSaveDto> DetailList { get; set; } = new();
     }
 
     /// <summary>

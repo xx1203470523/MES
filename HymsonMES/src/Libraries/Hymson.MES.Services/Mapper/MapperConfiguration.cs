@@ -144,8 +144,7 @@ namespace Hymson.MES.Services.Mapper
             #endregion
 
             #region InteClassDetail
-            CreateMap<InteClassDetailCreateDto, InteClassDetailEntity>();
-            CreateMap<InteClassDetailModifyDto, InteClassDetailEntity>();
+            CreateMap<InteClassDetailSaveDto, InteClassDetailEntity>();
             #endregion
 
             #region InteClass

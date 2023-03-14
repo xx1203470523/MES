@@ -163,12 +163,12 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
     public partial class InteClassDetailRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_class_detail` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `inte_class_detail` /**innerjoin**/ /**leftjoin**/ /**where**/";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `inte_class_detail` /**innerjoin**/ /**leftjoin**/ /**where**/";
         const string GetInteClassDetailEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `inte_class_detail` /**innerjoin**/ /**leftjoin**/ /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `inte_class_detail`(  `Id`, `ClassId`, `DetailClassType`, `ProjectContent`, `StartTime`, `EndTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteCode`) VALUES (   @Id, @ClassId, @DetailClassType, @ProjectContent, @StartTime, @EndTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteCode )  ";
+        const string InsertSql = "INSERT INTO `inte_class_detail`(  `Id`, `ClassId`, `DetailClassType`, `ProjectContent`, `StartTime`, `EndTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteId`) VALUES (   @Id, @ClassId, @DetailClassType, @ProjectContent, @StartTime, @EndTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteId )  ";
         const string UpdateSql = "UPDATE `inte_class_detail` SET   ClassId = @ClassId, DetailClassType = @DetailClassType, ProjectContent = @ProjectContent, StartTime = @StartTime, EndTime = @EndTime, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, Remark = @Remark, SiteCode = @SiteCode  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `inte_class_detail` SET IsDeleted = '1' WHERE Id = @Id ";
         const string GetByIdSql = @"SELECT 

@@ -212,7 +212,7 @@ namespace Hymson.MES.Data.Repositories.Process
     public partial class ProcProcessRouteRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_process_route` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_process_route` /**where**/ ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_process_route` /**where**/ ";
         const string GetProcProcessRouteEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `proc_process_route` /**where**/  ";

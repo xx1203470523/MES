@@ -21,6 +21,11 @@ namespace Hymson.MES.Core.Enums
         /// 包装
         /// </summary>
         [Description("包装")]
-        Packing = 3
+        Packing = 3,
+        /// <summary>
+        /// 特殊
+        /// </summary>
+        [Description("特殊")]
+        Special = 4
     }
 }
