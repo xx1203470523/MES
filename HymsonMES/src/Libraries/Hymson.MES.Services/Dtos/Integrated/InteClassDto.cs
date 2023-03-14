@@ -21,7 +21,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         ///班次类型（字典名称：manu_class_type）
         /// </summary>
-        public int ClassType { get; set; }
+        public ClassTypeEnum ClassType { get; set; }
 
         /// <summary>
         ///描述
@@ -63,7 +63,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public string Remark { get; set; }
 
-
         /// <summary>
         /// 最后修改人
         /// </summary>
@@ -73,6 +72,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 修改时间
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<InteClassDetailCreateDto> DetailList { get; set; } = new();
     }
 
     /// <summary>

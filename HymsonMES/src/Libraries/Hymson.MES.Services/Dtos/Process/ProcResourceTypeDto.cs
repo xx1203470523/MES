@@ -120,7 +120,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
         /// <summary>
         /// 关联的资源Id
