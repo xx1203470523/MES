@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Integrated;
 
 namespace Hymson.MES.Core.Domain.Integrated
 {
@@ -19,7 +20,7 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// 描述 :班次（字典名称：manu_detail_class_type） 
         /// 空值 : false  
         /// </summary>
-        public string DetailClassType { get; set; }
+        public DetailClassTypeEnum DetailClassType { get; set; }
 
         /// <summary>
         /// 描述 :项目内容 
@@ -31,13 +32,13 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// 描述 :开始时间 
         /// 空值 : false  
         /// </summary>
-        public DateTime StartTime { get; set; }
+        public string StartTime { get; set; }
 
         /// <summary>
         /// 描述 :结束时间 
         /// 空值 : false  
         /// </summary>
-        public DateTime EndTime { get; set; }
+        public string EndTime { get; set; }
 
         /// <summary>
         /// 描述 :描述 
