@@ -158,7 +158,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
     public partial class EquSparePartRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_sparepart` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `equ_sparepart` /**innerjoin**/ /**leftjoin**/ /**where**/";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_sparepart` /**innerjoin**/ /**leftjoin**/ /**where**/";
         const string GetEquSparePartEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `equ_sparepart` /**innerjoin**/ /**leftjoin**/ /**where**/  ";

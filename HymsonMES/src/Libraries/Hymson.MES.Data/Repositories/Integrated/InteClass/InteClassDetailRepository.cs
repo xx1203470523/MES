@@ -163,7 +163,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
     public partial class InteClassDetailRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_class_detail` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `inte_class_detail` /**innerjoin**/ /**leftjoin**/ /**where**/";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `inte_class_detail` /**innerjoin**/ /**leftjoin**/ /**where**/";
         const string GetInteClassDetailEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `inte_class_detail` /**innerjoin**/ /**leftjoin**/ /**where**/  ";

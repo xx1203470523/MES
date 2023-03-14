@@ -170,7 +170,7 @@ namespace Hymson.MES.Data.Repositories.Process
     public partial class ProcProcedurePrintRelationRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_procedure_print_relation` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_procedure_print_relation` /**where**/ ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_procedure_print_relation` /**where**/ ";
         const string GetProcProcedurePrintReleationEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `proc_procedure_print_relation` /**where**/  ";

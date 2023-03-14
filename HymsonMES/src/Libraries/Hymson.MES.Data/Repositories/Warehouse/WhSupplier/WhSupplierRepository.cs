@@ -194,7 +194,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
     public partial class WhSupplierRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `wh_supplier` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `wh_supplier` /**where**/ ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `wh_supplier` /**where**/ ";
         const string GetWhSupplierEntitiesSqlTemplate = @"SELECT  
                                              /**select**/
                                             FROM  `wh_supplier`  /**where**/   ";
