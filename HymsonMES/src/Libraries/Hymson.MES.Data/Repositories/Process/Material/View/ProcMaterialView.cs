@@ -16,6 +16,12 @@ namespace Hymson.MES.Data.Repositories.Process
         public string? GroupName { get; set; }
 
         /// <summary>
+        /// 描述 :编码 (工艺路线)
+        /// 空值 : true  
+        /// </summary>
+        public string? ProcessRouteCode { get; set; }
+
+        /// <summary>
         /// 描述 :名称 (工艺路线)
         /// 空值 : true  
         /// </summary>
@@ -28,15 +34,21 @@ namespace Hymson.MES.Data.Repositories.Process
         public string? ProcessRouteVersion { get; set; }
 
         /// <summary>
-        /// 描述 :名称（工序Bom）
+        /// 描述 :编码（Bom）
         /// 空值 : true  
         /// </summary>
-        public string? ProcedureBomName { get; set; }
+        public string? BomCode { get; set; }
 
         /// <summary>
-        /// 描述 :版本（工序Bom）
+        /// 描述 :名称（Bom）
         /// 空值 : true  
         /// </summary>
-        public string? ProcedureBomVersion { get; set; }
+        public string? BomName { get; set; }
+
+        /// <summary>
+        /// 描述 :版本（Bom）
+        /// 空值 : true  
+        /// </summary>
+        public string? BomVersion { get; set; }
     }
 }

@@ -327,7 +327,7 @@ namespace Hymson.MES.Services.Services.Process
                     Remark = procMaterialEntity.Remark,
                     BuyType = procMaterialEntity.BuyType,
                     ProcessRouteId = procMaterialEntity.ProcessRouteId,
-                    ProcedureBomId = procMaterialEntity.ProcedureBomId,
+                    BomId = procMaterialEntity.BomId,
                     Batch = procMaterialEntity.Batch,
                     Unit = procMaterialEntity.Unit,
                     SerialNumber = procMaterialEntity.SerialNumber,
@@ -337,6 +337,7 @@ namespace Hymson.MES.Services.Services.Process
                     ValidationMaskGroup = procMaterialEntity.ValidationMaskGroup,
                     UpdatedBy = procMaterialEntity.UpdatedBy,
                     UpdatedOn = procMaterialEntity.UpdatedOn,
+                    ConsumeRatio= procMaterialEntity.ConsumeRatio,
                 });
 
                 if (response == 0)
