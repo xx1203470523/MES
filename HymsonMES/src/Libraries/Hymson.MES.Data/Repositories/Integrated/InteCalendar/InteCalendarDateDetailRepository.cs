@@ -145,10 +145,10 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
     public partial class InteCalendarDateDetailRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_calendar` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `inte_calendar` /**where**/";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `inte_calendar` /**innerjoin**/ /**leftjoin**/ /**where**/";
         const string GetInteCalendarEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
-                                           FROM `inte_calendar` /**where**/  ";
+                                           FROM `inte_calendar` /**innerjoin**/ /**leftjoin**/ /**where**/  ";
 
         const string InsertSql = "INSERT INTO `inte_calendar`(  `Id`, `CalendarName`, `CalendarType`, `EquOrLineId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteCode`, `UseStatus`) VALUES (   @Id, @CalendarName, @CalendarType, @EquOrLineId, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteCode, @UseStatus )  ";
         const string UpdateSql = "UPDATE `inte_calendar` SET   CalendarName = @CalendarName, CalendarType = @CalendarType, EquOrLineId = @EquOrLineId, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, Remark = @Remark, SiteCode = @SiteCode, UseStatus = @UseStatus  WHERE Id = @Id ";

@@ -1,12 +1,15 @@
 ﻿namespace Hymson.MES.Core.Constants
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class ErrorCode
     {
         #region  用户端错误 
         public const string MES10100 = "请求实体不能为空";
         public const string MES10101 = "站点码获取失败，请重新登录！";
         public const string MES10102 = "删除失败Id 不能为空!";
-
+        public const string MES10103 = "请求参数格式错误!";
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";
@@ -57,12 +60,16 @@
         public const string MES10321 = "工序名称超长";
         #endregion
 
+        #region 标签模板
+        public const string MES10340 = "模板名称已经存在!";
+        #endregion
+
         #region 工序 10400
         public const string MES10401 = "工序编码不能为空";
         public const string MES10402 = "工序编码超长";
         public const string MES10403 = "工序名称不能为空";
         public const string MES10404 = "工序名称超长";
-        public const string MES10405 = "编码:{0}已存在！";
+        public const string MES10405 = "编码:{Code}已存在！";
 
         public const string MES10430 = $"不能删除启用和保留状态的工艺路线！";
         public const string MES10431 = $"此工艺路线在系统中已经存在!";
@@ -245,5 +252,6 @@
         //public const string MES30100 = "MES30100";
         //public const string MES30101 = "MES30101";
         #endregion
+
     }
 }

@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Integrated;
 
 namespace Hymson.MES.Core.Domain.Integrated
 {
@@ -19,7 +20,7 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// 描述 :班次类型（字典名称：manu_class_type） 
         /// 空值 : false  
         /// </summary>
-        public int ClassType { get; set; }
+        public ClassTypeEnum ClassType { get; set; }
 
         /// <summary>
         /// 描述 :描述 

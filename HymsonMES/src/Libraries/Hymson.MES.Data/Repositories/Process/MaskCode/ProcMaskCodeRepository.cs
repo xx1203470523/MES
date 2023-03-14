@@ -124,10 +124,10 @@ namespace Hymson.MES.Data.Repositories.Process.MaskCode
         /// </summary>
         const string InsertSql = "INSERT INTO `proc_maskcode`(`Id`, `SiteId`, `Code`, `Name`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @Code, @Name, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted);";
         const string UpdateSql = "UPDATE `proc_maskcode` SET Name = @Name, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id;";
-        const string DeleteSql = "UPDATE `proc_maskcode` SET `IsDeleted` = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE `Id` = @Ids;";
+        const string DeleteSql = "UPDATE `proc_maskcode` SET `IsDeleted` = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids;";
         const string GetByIdSql = "SELECT `Id`, `SiteId`, `Code`, `Name`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn` FROM `proc_maskcode` WHERE `IsDeleted` = @IsDeleted AND `Id` = @id;";
         const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `proc_maskcode` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_maskcode` /**where**/";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_maskcode` /**innerjoin**/ /**leftjoin**/ /**where**/";
         const string GetEntitiesSqlTemplate = "";
     }
 }

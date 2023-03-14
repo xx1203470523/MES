@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +39,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 状态
         /// </summary>
-        public int Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
        /// <summary>
         /// 版本
@@ -53,7 +54,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
        /// <summary>
         /// 创建人
@@ -102,7 +103,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 状态
         /// </summary>
-        public int Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
        /// <summary>
         /// 版本
@@ -117,7 +118,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
         /// <summary>
         /// 物料集合，包含替代物料
@@ -143,7 +144,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 状态
         /// </summary>
-        public int Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
        /// <summary>
         /// 是否当前版本
@@ -153,7 +154,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
         /// <summary>
         /// 物料集合，包含替代物料
@@ -186,7 +187,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 状态
         /// </summary>
-        public int? Status { get; set; }
+        public SysDataStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 版本

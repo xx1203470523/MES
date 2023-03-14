@@ -79,8 +79,8 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [HttpDelete("{ids}")]
-        public async Task DeleteInteJobAsync(string ids)
+        [HttpDelete]
+        public async Task DeleteInteJobAsync(long[] ids)
         {
             await _inteJobService.DeleteRangInteJobAsync(ids);
         }

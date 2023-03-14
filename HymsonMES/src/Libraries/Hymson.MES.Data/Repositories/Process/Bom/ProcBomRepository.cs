@@ -105,7 +105,7 @@ namespace Hymson.MES.Data.Repositories.Process
                 procBomPagedQuery.Version = $"%{procBomPagedQuery.Version}%";
                 sqlBuilder.Where(" Version like @Version ");
             }
-            if (procBomPagedQuery.Status > DbDefaultValueConstant.IntDefaultValue)
+            if (procBomPagedQuery.Status.HasValue)
             {
                 sqlBuilder.Where(" Status = @Status ");
             }
@@ -209,7 +209,7 @@ namespace Hymson.MES.Data.Repositories.Process
     public partial class ProcBomRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_bom` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_bom` /**where**/ ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_bom` /**where**/ ";
         const string GetProcBomEntitiesSqlTemplate = @"SELECT  /**select**/ FROM `proc_bom` /**where**/  ";
 
         const string InsertSql = "INSERT INTO `proc_bom`( `Id`, `SiteId`, `BomCode`, `BomName`, `Status`, `Version`, `IsCurrentVersion`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @BomCode, @BomName, @Status, @Version, @IsCurrentVersion, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";

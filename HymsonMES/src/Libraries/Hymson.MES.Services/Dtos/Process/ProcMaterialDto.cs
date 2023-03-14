@@ -80,9 +80,9 @@ namespace Hymson.MES.Services.Dtos.Process
         public long? ProcessRouteId { get; set; }
 
        /// <summary>
-        /// 工序BomID
+        /// BomID
         /// </summary>
-        public long? ProcedureBomId { get; set; }
+        public long? BomId { get; set; }
 
        /// <summary>
         /// 批次大小
@@ -138,6 +138,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 是否逻辑删除
         /// </summary>
         public bool? IsDeleted { get; set; }
+
+        /// <summary>
+        /// 消耗系数
+        /// </summary>
+        public decimal? ConsumeRatio { get; set; }
     }
 
 
@@ -194,9 +199,9 @@ namespace Hymson.MES.Services.Dtos.Process
         public long? ProcessRouteId { get; set; }
 
         /// <summary>
-        /// 工序BomID
+        /// BomID
         /// </summary>
-        public long? ProcedureBomId { get; set; }
+        public long? BomId { get; set; }
 
         /// <summary>
         /// 批次大小
@@ -232,6 +237,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 是否默认版本
         /// </summary>
         public bool IsDefaultVersion { get; set; } = false;
+
+        /// <summary>
+        /// 消耗系数
+        /// </summary>
+        public decimal? ConsumeRatio { get; set; }
 
         /// <summary>
         /// 替代品集合
@@ -346,9 +356,9 @@ namespace Hymson.MES.Services.Dtos.Process
         public long? ProcessRouteId { get; set; }
 
        /// <summary>
-        /// 工序BomID
+        /// BomID
         /// </summary>
-        public long? ProcedureBomId { get; set; }
+        public long? BomId { get; set; }
 
         /// <summary>
         /// 批次大小
@@ -379,6 +389,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 消耗公差
         /// </summary>
         public int? ConsumptionTolerance { get; set; }
+
+        /// <summary>
+        /// 消耗系数
+        /// </summary>
+        public decimal? ConsumeRatio { get; set; }
 
         /// <summary>
         /// 替代品集合
@@ -440,6 +455,12 @@ namespace Hymson.MES.Services.Dtos.Process
         public string? GroupName { get; set; }
 
         /// <summary>
+        /// 描述 :编码 (工艺路线)
+        /// 空值 : true  
+        /// </summary>
+        public string? ProcessRouteCode { get; set; }
+
+        /// <summary>
         /// 描述 :名称 (工艺路线)
         /// 空值 : true  
         /// </summary>
@@ -452,16 +473,22 @@ namespace Hymson.MES.Services.Dtos.Process
         public string? ProcessRouteVersion { get; set; }
 
         /// <summary>
-        /// 描述 :名称（工序Bom）
+        /// 描述 :编码（工序Bom）
         /// 空值 : true  
         /// </summary>
-        public string? ProcedureBomName { get; set; }
+        public string? BomCode { get; set; }
 
         /// <summary>
-        /// 描述 :版本（工序Bom）
+        /// 描述 :名称（Bom）
         /// 空值 : true  
         /// </summary>
-        public string? ProcedureBomVersion { get; set; }
+        public string? BomName { get; set; }
+
+        /// <summary>
+        /// 描述 :版本（Bom）
+        /// 空值 : true  
+        /// </summary>
+        public string? BomVersion { get; set; }
 
         public List<ProcMaterialReplaceViewDto> ReplaceMaterialList { get; set; }=new List<ProcMaterialReplaceViewDto>();
     }

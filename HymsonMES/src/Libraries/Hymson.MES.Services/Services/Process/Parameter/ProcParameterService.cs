@@ -179,11 +179,12 @@ namespace Hymson.MES.Services.Services.Process
                 throw new BusinessException(nameof(ErrorCode.MES10504));
             }
             //判断编号是否已经存在
-            var exists = (await _procParameterRepository.GetProcParameterEntitiesAsync(new ProcParameterQuery()
+            var procParams = await _procParameterRepository.GetProcParameterEntitiesAsync(new ProcParameterQuery()
             {
                 SiteId = procParameterEntity.SiteId,
                 ParameterCode = procParameterEntity.ParameterCode,
-            })).Where(x=>x.Id!= procParameterEntity.Id).ToList();
+            });
+            var exists = procParams.Count()>0? procParams.Where(x=>x.Id!= procParameterEntity.Id).ToList():null;
             if (exists != null && exists.Count() > 0)
             {
                 throw new BusinessException(nameof(ErrorCode.MES10502)).WithData("parameterCode", procParameterEntity.ParameterCode);

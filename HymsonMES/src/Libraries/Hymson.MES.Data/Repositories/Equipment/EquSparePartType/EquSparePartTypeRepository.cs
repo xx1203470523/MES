@@ -150,14 +150,14 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
     public partial class EquSparePartTypeRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_sparepart_type` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `equ_sparepart_type` /**where**/";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_sparepart_type` /**innerjoin**/ /**leftjoin**/ /**where**/";
         const string GetEquSparePartTypeEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
-                                           FROM `equ_sparepart_type` /**where**/  ";
+                                           FROM `equ_sparepart_type` /**innerjoin**/ /**leftjoin**/ /**where**/  ";
 
         const string InsertSql = "INSERT INTO `equ_sparepart_type`(  `Id`, `SparePartTypeCode`, `SparePartTypeName`, Type, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @SparePartTypeCode, @SparePartTypeName, @Type, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string UpdateSql = "UPDATE `equ_sparepart_type` SET  SparePartTypeName = @SparePartTypeName, Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `equ_sparepart_type` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id = @Ids ";
+        const string DeleteSql = "UPDATE `equ_sparepart_type` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids;";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SparePartTypeCode`, `SparePartTypeName`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `equ_sparepart_type` WHERE Id = @Id ";

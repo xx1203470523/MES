@@ -3,7 +3,7 @@
 namespace Hymson.MES.Core.Enums
 {
     /// <summary>
-    /// 物料内/外序列号枚举
+    /// 物料数据收集方式枚举
     /// </summary>
     public enum MaterialSerialNumberEnum : sbyte
     {
@@ -16,6 +16,11 @@ namespace Hymson.MES.Core.Enums
         /// 外部
         /// </summary>
         [Description("外部")]
-        Outside = 2
+        Outside = 2,
+        /// <summary>
+        /// 批次
+        /// </summary>
+        [Description("批次")]
+        Batch = 3
     }
 }

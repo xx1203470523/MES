@@ -224,6 +224,7 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Integrated
+            services.AddSingleton<AbstractValidator<InteClassSaveDto>, InteClassSaveValidator>();
             services.AddSingleton<AbstractValidator<InteJobCreateDto>, InteJobCreateValidator>();
             services.AddSingleton<AbstractValidator<InteJobModifyDto>, InteJobModifyValidator>();
             services.AddSingleton<AbstractValidator<InteWorkCenterCreateDto>, InteWorkCenterCreateValidator>();

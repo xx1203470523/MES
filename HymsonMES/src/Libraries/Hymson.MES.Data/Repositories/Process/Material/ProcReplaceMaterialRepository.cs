@@ -195,7 +195,7 @@ namespace Hymson.MES.Data.Repositories.Process
     public partial class ProcReplaceMaterialRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_replace_material` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_replace_material` /**where**/ ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_replace_material` /**where**/ ";
         const string GetProcReplaceMaterialEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `proc_replace_material` /**where**/  ";

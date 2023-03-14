@@ -115,11 +115,10 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeleteRangInteJobAsync(string ids)
+        public async Task<int> DeleteRangInteJobAsync(long[] ids)
         {
-            long[] idsArr = StringExtension.SpitLongArrary(ids);
             var userId = _currentUser.UserName;
-            return await _inteJobRepository.DeleteRangAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = userId });
+            return await _inteJobRepository.DeleteRangAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = userId });
         }
 
         /// <summary>

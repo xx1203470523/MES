@@ -6,6 +6,7 @@
  *build datetime: 2023-03-09 02:51:26
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
 
@@ -95,11 +96,21 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("delete")]
-        public async Task DeleteProcLabelTemplateAsync(string ids)
+        public async Task DeleteProcLabelTemplateAsync(DeleteDto deleteDto)
         {
             //long[] idsArr = StringExtension.SpitLongArrary(ids);
-            await _procLabelTemplateService.DeletesProcLabelTemplateAsync(ids);
+            await _procLabelTemplateService.DeletesProcLabelTemplateAsync(deleteDto.Ids);
         }
+        ///// <summary>
+        ///// 下载模板文件
+        ///// </summary>
+        ///// <param name="url"></param>
+        //[HttpGet("{url}")]
+        //[Route("downloadFile")]
+        //public void downloadFile(string url)
+        //{
+            
+        //}
 
-    }
+}
 }

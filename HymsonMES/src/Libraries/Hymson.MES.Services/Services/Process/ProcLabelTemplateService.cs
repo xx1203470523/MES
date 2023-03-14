@@ -55,6 +55,13 @@ namespace Hymson.MES.Services.Services.Process
 
             //DTO转换实体
             var procLabelTemplateEntity = procLabelTemplateCreateDto.ToEntity<ProcLabelTemplateEntity>();
+
+            //验证模板名称是否重复
+            var foo = await QueryProcLabelTemplateByNameAsync(procLabelTemplateEntity.Name);
+            if (foo!=null)
+            {
+                throw new BusinessException(nameof(ErrorCode.MES10340)).WithData("Name", procLabelTemplateEntity.Name);
+            }
             procLabelTemplateEntity.Id= IdGenProvider.Instance.CreateId();
             procLabelTemplateEntity.CreatedBy = _currentUser.UserName;
             procLabelTemplateEntity.UpdatedBy = _currentUser.UserName;
@@ -80,9 +87,9 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesProcLabelTemplateAsync(string ids)
+        public async Task<int> DeletesProcLabelTemplateAsync(long[] idsArr)
         {
-            var idsArr = StringExtension.SpitLongArrary(ids);
+          //  var idsArr = StringExtension.SpitLongArrary(ids);
             return await _procLabelTemplateRepository.DeletesAsync(idsArr);
         }
 
@@ -130,6 +137,13 @@ namespace Hymson.MES.Services.Services.Process
 
             //DTO转换实体
             var procLabelTemplateEntity = procLabelTemplateModifyDto.ToEntity<ProcLabelTemplateEntity>();
+            //验证模板名称是否重复
+            var foo = await QueryProcLabelTemplateByNameAsync(procLabelTemplateEntity.Name);
+            if (foo != null&&foo.Id!=procLabelTemplateEntity.Id)
+            {
+                throw new BusinessException(nameof(ErrorCode.MES10340)).WithData("Name", procLabelTemplateEntity.Name);
+            }
+
             procLabelTemplateEntity.UpdatedBy = _currentUser.UserName;
             procLabelTemplateEntity.UpdatedOn = HymsonClock.Now();
 
@@ -149,6 +163,11 @@ namespace Hymson.MES.Services.Services.Process
                return procLabelTemplateEntity.ToModel<ProcLabelTemplateDto>();
            }
             return null;
+        }
+        private async Task<ProcLabelTemplateEntity> QueryProcLabelTemplateByNameAsync(string name)
+        {
+            return await _procLabelTemplateRepository.GetByNameAsync(name);
+            
         }
     }
 }

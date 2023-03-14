@@ -206,7 +206,7 @@ namespace Hymson.MES.Data.Repositories.Process
     public partial class ProcBomDetailRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_bom_detail` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_bom_detail` /**where**/ ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_bom_detail` /**where**/ ";
         const string GetProcBomDetailEntitiesSqlTemplate = @"SELECT  /**select**/  FROM `proc_bom_detail` /**where**/  ";
 
         const string InsertSql = "INSERT INTO `proc_bom_detail`(`Id`, `SiteId`, `BomId`, `ProcedureId`, `MaterialId`, `ReferencePoint`, `Usages`, `Loss`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @BomId, @ProcedureId, @MaterialId, @ReferencePoint, @Usages, @Loss, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
@@ -226,7 +226,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetListMainSql = @"SELECT 
                                           a.`Id`,a.MaterialId, 0 as BomDetailId,  a.`Usages`, a.`Loss`,a.`ReferencePoint`, a.`ProcedureId`, 
                      1 as IsMain, b.MaterialCode, b.MaterialName,
-                     b.Version, c.Name, c.Code 
+                     b.Version, c.Name as ProcedureName, c.Code 
                             FROM `proc_bom_detail` a
                             INNER JOIN proc_material b on a.MaterialId = b.Id 
                             LEFT JOIN proc_procedure c on a.ProcedureId = c.Id
@@ -239,7 +239,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetListReplaceSql = @"SELECT 
                                           a.`Id`,b.MaterialId, a.BomDetailId,
                                           a.`ReplaceMaterialId`, a.`Usages`, a.`Loss`,  a.`ReferencePoint`,b.ProcedureId, 0 as IsMain,
-                     c.MaterialCode, c.MaterialName,c.Version, "" as Name, "" as Code
+                     c.MaterialCode, c.MaterialName,c.Version,  '' as ProcedureName, '' as Code
                             FROM `proc_bom_detail_replace_material` a
                             INNER JOIN proc_bom_detail b on a.BomDetailId = b.Id 
                             LEFT JOIN proc_material c on a.ReplaceMaterialId = c.Id

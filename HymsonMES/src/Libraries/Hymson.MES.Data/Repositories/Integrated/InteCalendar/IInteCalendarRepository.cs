@@ -25,13 +25,6 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
         Task<int> UpdateAsync(InteCalendarEntity entity);
 
         /// <summary>
-        /// 删除
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<int> DeleteAsync(long id);
-
-        /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="command"></param>

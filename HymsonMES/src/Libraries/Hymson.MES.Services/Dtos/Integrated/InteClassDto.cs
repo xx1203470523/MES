@@ -1,5 +1,5 @@
 ﻿using Hymson.Infrastructure;
-using System.ComponentModel.DataAnnotations;
+using Hymson.MES.Core.Enums.Integrated;
 
 namespace Hymson.MES.Services.Dtos.Integrated
 {
@@ -21,18 +21,17 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         ///班次类型（字典名称：manu_class_type）
         /// </summary>
-        public int ClassType { get; set; }
+        public ClassTypeEnum ClassType { get; set; }
 
         /// <summary>
         ///描述
         /// </summary>
-        public string Remark { get; set; } = "";
-
+        public string? Remark { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public List<InteClassDetailCreateDto> DetailList { get; set; } = new();
+        public List<InteClassDetailSaveDto> DetailList { get; set; } = new();
     }
 
     /// <summary>
@@ -55,14 +54,13 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 描述 :班次类型（字典名称：manu_class_type） 
         /// 空值 : false  
         /// </summary>
-        public int ClassType { get; set; }
+        public ClassTypeEnum ClassType { get; set; }
 
         /// <summary>
         /// 描述 :描述 
         /// 空值 : true  
         /// </summary>
         public string Remark { get; set; }
-
 
         /// <summary>
         /// 最后修改人
@@ -73,6 +71,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 修改时间
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<InteClassDetailSaveDto> DetailList { get; set; } = new();
     }
 
     /// <summary>
@@ -108,6 +111,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         ///班次类型（字典名称：manu_class_type）
         /// </summary>
-        public int? ClassType { get; set; }
+        public ClassTypeEnum? ClassType { get; set; }
     }
 }
