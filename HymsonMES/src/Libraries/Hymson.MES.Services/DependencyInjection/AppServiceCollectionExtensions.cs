@@ -132,6 +132,7 @@ namespace Microsoft.Extensions.DependencyInjection
             #region Warehouse 
             services.AddSingleton<IWhSupplierService, WhSupplierService>();
             services.AddSingleton<IWhMaterialInventoryService, WhMaterialInventoryService>();
+            services.AddSingleton<IWhMaterialStandingbookService, WhMaterialStandingbookService>();
 
 
             #endregion
@@ -242,6 +243,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<WhSupplierModifyDto>, WhSupplierModifyValidator>();
             services.AddSingleton<AbstractValidator<WhMaterialInventoryCreateDto>, WhMaterialInventoryCreateValidator>();
             services.AddSingleton<AbstractValidator<WhMaterialInventoryModifyDto>, WhMaterialInventoryModifyValidator>();
+            services.AddSingleton<AbstractValidator<WhMaterialStandingbookCreateDto>, WhMaterialStandingbookCreateValidator>();
+            services.AddSingleton<AbstractValidator<WhMaterialStandingbookModifyDto>, WhMaterialStandingbookModifyValidator>();
 
 
             #endregion

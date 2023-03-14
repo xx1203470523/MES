@@ -41,6 +41,7 @@ namespace Hymson.MES.Services.Mapper
             CreateEquipmentMaps();
             CreateIntegratedMaps();
             CreateProcessMaps();
+            CreateWarehouseMaps();
         }
 
         /// <summary>
@@ -300,11 +301,11 @@ namespace Hymson.MES.Services.Mapper
             #region PrintConfig
             CreateMap<ProcPrinterDto, ProcPrinterEntity>();
             CreateMap<ProcPrinterEntity, ProcPrinterDto>();
-                                                           
+
             CreateMap<ProcPrinterPagedQueryDto, ProcPrinterPagedQuery>();
             #endregion
             #region LabelTemplate
-            CreateMap<ProcLabelTemplateEntity, ProcLabelTemplateDto>(); 
+            CreateMap<ProcLabelTemplateEntity, ProcLabelTemplateDto>();
             CreateMap<ProcLabelTemplateDto, ProcLabelTemplateEntity>();
             CreateMap<ProcLabelTemplateModifyDto, ProcLabelTemplateEntity>();
             CreateMap<ProcLabelTemplateCreateDto, ProcLabelTemplateEntity>();
@@ -312,18 +313,36 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcLabelTemplatePagedQueryDto, ProcLabelTemplatePagedQuery>();
             #endregion
 
+
+
+        }
+
+        /// <summary>
+        /// 库存
+        /// </summary>
+        protected virtual void CreateWarehouseMaps()
+        {
             #region Warehouse
             CreateMap<WhSupplierCreateDto, WhSupplierEntity>();
             CreateMap<WhSupplierModifyDto, WhSupplierEntity>();
             CreateMap<WhSupplierPagedQueryDto, WhSupplierPagedQuery>();
             CreateMap<WhSupplierEntity, WhSupplierDto>();
+            #endregion
 
+            #region WhMaterialInventory
             CreateMap<WhMaterialInventoryCreateDto, WhMaterialInventoryEntity>();
             CreateMap<WhMaterialInventoryModifyDto, WhMaterialInventoryEntity>();
             CreateMap<WhMaterialInventoryPagedQueryDto, WhMaterialInventoryPagedQuery>();
             CreateMap<WhMaterialInventoryEntity, WhMaterialInventoryDto>();
+            CreateMap<WhMaterialInventoryPageListView, WhMaterialInventoryPageListViewDto>();
             #endregion
-          
+
+            #region WhMaterialStandingbook
+            CreateMap<WhMaterialStandingbookCreateDto, WhMaterialStandingbookEntity>();
+            CreateMap<WhMaterialStandingbookModifyDto, WhMaterialStandingbookEntity>();
+            CreateMap<WhMaterialStandingbookPagedQueryDto, WhMaterialStandingbookPagedQuery>();
+            CreateMap<WhMaterialStandingbookEntity, WhMaterialStandingbookDto>();
+            #endregion
 
         }
 
