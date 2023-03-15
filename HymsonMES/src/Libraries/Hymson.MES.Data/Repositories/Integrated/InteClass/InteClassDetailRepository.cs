@@ -74,7 +74,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         public async Task<int> DeleteByClassIdAsync(long classId)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, new { Id = new { classId } });
+            return await conn.ExecuteAsync(DeleteByClassId, new { classId });
         }
 
         /// <summary>
@@ -171,11 +171,12 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         const string InsertSql = "INSERT INTO `inte_class_detail`(  `Id`, `ClassId`, `DetailClassType`, `ProjectContent`, `StartTime`, `EndTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteId`) VALUES (   @Id, @ClassId, @DetailClassType, @ProjectContent, @StartTime, @EndTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteId )  ";
         const string UpdateSql = "UPDATE `inte_class_detail` SET   ClassId = @ClassId, DetailClassType = @DetailClassType, ProjectContent = @ProjectContent, StartTime = @StartTime, EndTime = @EndTime, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, Remark = @Remark, SiteCode = @SiteCode  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `inte_class_detail` SET IsDeleted = '1' WHERE Id = @Id ";
+        const string DeleteByClassId = "DELETE FROM `inte_class_detail` WHERE ClassId = @classId ";
         const string GetByIdSql = @"SELECT 
                                `Id`, `ClassId`, `DetailClassType`, `ProjectContent`, `StartTime`, `EndTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteId`
                             FROM `inte_class_detail`  WHERE Id = @Id ";
         const string GetListByClassId = @"SELECT 
-                               `Id`, `ClassId`, `DetailClassType`, `ProjectContent`, `StartTime`, `EndTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteId`
+                               `Id`, `ClassId`, `DetailClassType`, `ProjectContent`, `StartTime`, `EndTime`
                             FROM `inte_class_detail`  WHERE ClassId = @ClassId ";
     }
 }

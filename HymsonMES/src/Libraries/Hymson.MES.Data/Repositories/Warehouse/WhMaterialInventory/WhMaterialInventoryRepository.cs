@@ -78,20 +78,43 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="whMaterialInventoryPagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<WhMaterialInventoryEntity>> GetPagedInfoAsync(WhMaterialInventoryPagedQuery whMaterialInventoryPagedQuery)
+        public async Task<PagedInfo<WhMaterialInventoryPageListView>> GetPagedInfoAsync(WhMaterialInventoryPagedQuery whMaterialInventoryPagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.OrderBy("UpdatedOn DESC");
-            sqlBuilder.Select("*");
-
+            sqlBuilder.Select(@" wmi.MaterialBarCode,wmi.Batch, wmi.QuantityResidue,wmi.DueDate,wmi.Source,wmi.CreatedOn,wmi.Status,
+                                pm.Unit, pm.MaterialCode, pm.MaterialName, pm.Version, ws.Code as SupplierCode, ws.Name as SupplierName");
+            sqlBuilder.InnerJoin(" wh_supplier ws ON  ws.Id= wmi.SupplierId");
+            sqlBuilder.InnerJoin(" proc_material pm ON  pm.Id= wmi.MaterialId");
+            sqlBuilder.Where(" wmi.IsDeleted = 0");
+            sqlBuilder.OrderBy(" wmi.UpdatedOn DESC");
             //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
 
+            if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.Batch))
+            {
+                sqlBuilder.Where(" wmi.Batch=@Batch");
+            }
+            if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.MaterialBarCode))
+            {
+                sqlBuilder.Where(" wmi.MaterialBarCode=@MaterialBarCode");
+            }
+            if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.MaterialCode))
+            {
+                sqlBuilder.Where(" wmi.MaterialId=@MaterialCode");
+            }
+            if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.Version))
+            {
+                sqlBuilder.Where(" pm.Version=@Version");
+            }
+            if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.Status))
+            {
+                //Enum.GetValues(whMaterialInventoryPagedQuery.Status)
+                sqlBuilder.Where(" wmi.Status=@Status");
+            }
 
             var offSet = (whMaterialInventoryPagedQuery.PageIndex - 1) * whMaterialInventoryPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -99,11 +122,12 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             sqlBuilder.AddParameters(whMaterialInventoryPagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var whMaterialInventoryEntitiesTask = conn.QueryAsync<WhMaterialInventoryEntity>(templateData.RawSql, templateData.Parameters);
+            var whMaterialInventoryEntitiesTask = conn.QueryAsync<WhMaterialInventoryPageListView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var whMaterialInventoryEntities = await whMaterialInventoryEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<WhMaterialInventoryEntity>(whMaterialInventoryEntities, whMaterialInventoryPagedQuery.PageIndex, whMaterialInventoryPagedQuery.PageSize, totalCount);
+            var pageList = new PagedInfo<WhMaterialInventoryPageListView>(whMaterialInventoryEntities, whMaterialInventoryPagedQuery.PageIndex, whMaterialInventoryPagedQuery.PageSize, totalCount);
+            return pageList;
         }
 
         /// <summary>
@@ -217,8 +241,8 @@ namespace Hymson.MES.Data.Repositories.Warehouse
 
     public partial class WhMaterialInventoryRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `wh_material_inventory` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `wh_material_inventory` /**where**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `wh_material_inventory` wmi /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `wh_material_inventory` wmi /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/";
         const string GetWhMaterialInventoryEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `wh_material_inventory` /**where**/  ";

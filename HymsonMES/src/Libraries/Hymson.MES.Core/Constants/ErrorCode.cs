@@ -197,7 +197,7 @@
 
         //库存
         #region 供应商库存  15000
-        public const string MES15000 = "基础参数错误";
+        public const string MES15000 = "库存供应商错误";
         public const string MES15001 = "站点码获取失败，请重新登录！";
         public const string MES15002 = "此供应商编码{Code}在系统已经存在！";
         public const string MES15003 = "请求实体不能为空！";
@@ -211,11 +211,30 @@
 
         //库存
         #region 车间库存接收  15100
-        public const string MES15100 = "基础参数错误";
+        public const string MES15100 = "物料库存错误";
         public const string MES15101 = "物料不存在";
         public const string MES15102 = "物料条码：{MaterialCode}未关联到供应商";
         public const string MES15103 = "物料条码：{MaterialCode}数量需大于0";
-        public const string MES15104 = " 条码：{MaterialCode}再车间库存中已存在！";
+        public const string MES15104 = " 条码：{MaterialCode}在车间库存中已存在！";
+
+        #endregion
+
+        #region 车间库存接收  15200
+        public const string MES15200 = "物料台账错误";
+        public const string MES15201 = "物料编码不能为空";
+        public const string MES15202 = "物料版本不能为空";
+        public const string MES15203 = "物料条码不能为空";
+        public const string MES15204 = "物料批次不能为空";
+        public const string MES15205 = "物料数量不能为空";
+        public const string MES15206 = "物料流程类型不能为空";
+        public const string MES15207 = "物料流程类型不符合规则：1.物料接收/2.物料退料/3.物料加载";
+        public const string MES15208 = "物料来源不能为空";
+        public const string MES15209 = "物料来源不符合规则：1.手动录入/2.WMS/3.上料点编号";
+        public const string MES152010 = "物料超出，一次最多扫描100个";
+        public const string MES152011 = "物料不存在";
+        public const string MES152012 = "物料条码：{MaterialCode}未关联到供应商";
+        public const string MES152013 = "物料条码：{MaterialCode}数量需大于0";
+        public const string MES152014 = " 条码：{MaterialCode}在车间库存中已存在！";
 
         #endregion
         #endregion
