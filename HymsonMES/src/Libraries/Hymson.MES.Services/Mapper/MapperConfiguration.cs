@@ -46,6 +46,7 @@ namespace Hymson.MES.Services.Mapper
             CreateIntegratedMaps();
             CreateProcessMaps();
             CreateQualityMaps();
+            CreateWarehouseMaps();
         }
 
         /// <summary>
