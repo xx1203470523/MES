@@ -19,6 +19,7 @@ using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 using MySql.Data.MySqlClient;
 //using Hymson.Utils.Extensions;
 using System.Transactions;
@@ -36,13 +37,21 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// 物料库存 仓储
         /// </summary>
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
+        private readonly IWhMaterialStandingbookRepository _whMaterialStandingbookRepository;
         private readonly AbstractValidator<WhMaterialInventoryCreateDto> _validationCreateRules;
         private readonly AbstractValidator<WhMaterialInventoryModifyDto> _validationModifyRules;
         private readonly ICurrentSite _currentSite;
-        public WhMaterialInventoryService(ICurrentUser currentUser, IWhMaterialInventoryRepository whMaterialInventoryRepository, AbstractValidator<WhMaterialInventoryCreateDto> validationCreateRules, AbstractValidator<WhMaterialInventoryModifyDto> validationModifyRules, ICurrentSite currentSite)
+        public WhMaterialInventoryService(ICurrentUser currentUser,
+            IWhMaterialInventoryRepository whMaterialInventoryRepository,
+            IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
+            AbstractValidator<WhMaterialInventoryCreateDto> validationCreateRules,
+            AbstractValidator<WhMaterialInventoryModifyDto> validationModifyRules,
+            ICurrentSite currentSite)
         {
             _currentUser = currentUser;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
+            _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
+
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _currentSite = currentSite;
@@ -79,15 +88,17 @@ namespace Hymson.MES.Services.Services.Warehouse
         public async Task CreateWhMaterialInventoryListAsync(List<WhMaterialInventoryListCreateDto> whMaterialInventoryCreateDto)
         {
             var list = new List<WhMaterialInventoryEntity>();
+            var listStandingbook = new List<WhMaterialStandingbookEntity>();
             foreach (var item in whMaterialInventoryCreateDto)
             {
+                #region 校验
+                //验证DTO
+                //await _validationCreateListRules.ValidateAndThrowAsync(item);
+
                 if (item.QuantityResidue <= 0)
                 {
                     throw new BusinessException(nameof(ErrorCode.MES15103)).WithData("MateialCode", item.MaterialCode); ;
                 }
-                //验证DTO
-                //await _validationCreateRules.ValidateAndThrowAsync(item);
-
                 //DTO转换实体 
                 //var whMaterialInventoryEntity = item.ToEntity<WhMaterialInventoryEntity>();
                 var materialInfo = await _whMaterialInventoryRepository.GetProcMaterialByMaterialCodeAsync(item.MaterialCode);
@@ -107,6 +118,10 @@ namespace Hymson.MES.Services.Services.Warehouse
                     throw new BusinessException(nameof(ErrorCode.MES15104)).WithData("MateialCode", item.MaterialCode);
                 }
 
+                #endregion
+
+                #region 数据组装
+                //物料库存
                 var whMaterialInventoryEntity = new WhMaterialInventoryEntity();
                 whMaterialInventoryEntity.SupplierId = item.SupplierId;// supplierInfo.FirstOrDefault().Id;//item.SupplierId;//
                 whMaterialInventoryEntity.MaterialId = materialInfo.Id;
@@ -114,7 +129,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 whMaterialInventoryEntity.Batch = item.Batch;
                 whMaterialInventoryEntity.QuantityResidue = item.QuantityResidue;
                 whMaterialInventoryEntity.Status = (int)WhMaterialInventoryStatusEnum.ToBeUsed;
-                whMaterialInventoryEntity.DueDate = HymsonClock.Now().AddMonths(1);
+                whMaterialInventoryEntity.DueDate = item.DueDate;
                 whMaterialInventoryEntity.Source = item.Source;
                 whMaterialInventoryEntity.SiteId = _currentSite.SiteId ?? 0;
 
@@ -125,10 +140,51 @@ namespace Hymson.MES.Services.Services.Warehouse
                 whMaterialInventoryEntity.CreatedOn = HymsonClock.Now();
                 whMaterialInventoryEntity.UpdatedOn = HymsonClock.Now();
                 list.Add(whMaterialInventoryEntity);
+
+
+                //台账数据
+                var whMaterialStandingbookEntity = new WhMaterialStandingbookEntity();
+                whMaterialStandingbookEntity.MaterialCode = materialInfo.MaterialCode;
+                whMaterialStandingbookEntity.MaterialName = materialInfo.MaterialName;
+                string version = materialInfo.Version;
+                if (!string.IsNullOrWhiteSpace(item.Version))
+                {
+                    version = item.Version;
+                }
+                whMaterialStandingbookEntity.MaterialVersion = version;
+                whMaterialStandingbookEntity.MaterialBarCode = item.MaterialBarCode;
+                whMaterialStandingbookEntity.Batch = item.Batch;
+                whMaterialStandingbookEntity.Quantity = item.QuantityResidue;
+                whMaterialStandingbookEntity.Unit = materialInfo.Unit ?? "";
+                whMaterialStandingbookEntity.Type = item.Type; //(int)WhMaterialInventorySourceEnum.MaterialReceiving;
+                whMaterialStandingbookEntity.Source = item.Source;
+                whMaterialStandingbookEntity.SiteId = _currentSite.SiteId ?? 0;
+
+
+                whMaterialStandingbookEntity.Id = IdGenProvider.Instance.CreateId();
+                whMaterialStandingbookEntity.CreatedBy = _currentUser.UserName;
+                whMaterialStandingbookEntity.UpdatedBy = _currentUser.UserName;
+                whMaterialStandingbookEntity.CreatedOn = HymsonClock.Now();
+                whMaterialStandingbookEntity.UpdatedOn = HymsonClock.Now();
+
+                listStandingbook.Add(whMaterialStandingbookEntity);
+                #endregion
             }
 
-            //入库
-            await _whMaterialInventoryRepository.InsertsAsync(list);
+            #region 入库
+            // 保存实体
+            var rows = 0;
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                rows += await _whMaterialInventoryRepository.InsertsAsync(list);
+                rows += await _whMaterialStandingbookRepository.InsertsAsync(listStandingbook);
+                trans.Complete();
+            }
+            if (rows == 0)
+            {
+                throw new BusinessException(nameof(ErrorCode.MES15105));
+            }
+            #endregion
         }
 
         /// <summary>

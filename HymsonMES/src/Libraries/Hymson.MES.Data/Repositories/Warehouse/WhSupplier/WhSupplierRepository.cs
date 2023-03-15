@@ -89,13 +89,13 @@ namespace Hymson.MES.Data.Repositories.Warehouse
 
             if (!string.IsNullOrWhiteSpace(whSupplierPagedQuery.Code))
             {
-                //whSupplierPagedQuery.Code = $"%{whSupplierPagedQuery.Code}%";
-                sqlBuilder.Where("Code=@Code");
+                whSupplierPagedQuery.Code = $"%{whSupplierPagedQuery.Code}%";
+                sqlBuilder.Where("Code like @Code");
             }
             if (!string.IsNullOrWhiteSpace(whSupplierPagedQuery.Name))
             {
-                //whSupplierPagedQuery.Name = $"%{whSupplierPagedQuery.Name}%";
-                sqlBuilder.Where("Name=@Name");
+                whSupplierPagedQuery.Name = $"%{whSupplierPagedQuery.Name}%";
+                sqlBuilder.Where("Name like @Name");
             }
 
 

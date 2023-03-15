@@ -111,6 +111,12 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
 
         public string Version { get; set; }
+
+        /// <summary>
+        /// 单位
+        /// </summary>
+
+        public string Unit { get; set; }
     }
 
     /// <summary>

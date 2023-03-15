@@ -337,10 +337,27 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         ///// 供应商ID
         ///// </summary>
         public long SupplierId { get; set; }
+
+
+        /// <summary>
+        /// 物料版本
+        /// </summary>
+        public string Version { get; set; }
+
+        /// <summary>
+        /// 转类型
+        /// </summary>
+        public int Type { get; set; }
+
+        /// <summary>
+        /// 有效期/到期日
+        /// </summary>
+        public DateTime? DueDate { get; set; } = DateTime.Now.AddMonths(1);
+
         /// <summary>
         /// 供应商编码
         /// </summary>
-       // public string SupplierCode { get; set; }
+        // public string SupplierCode { get; set; }
     }
 
     /// <summary>

@@ -216,6 +216,7 @@
         public const string MES15102 = "物料条码：{MaterialCode}未关联到供应商";
         public const string MES15103 = "物料条码：{MaterialCode}数量需大于0";
         public const string MES15104 = " 条码：{MaterialCode}在车间库存中已存在！";
+        public const string MES15105 = " 增加库存失败";
 
         #endregion
 
@@ -235,6 +236,7 @@
         public const string MES152012 = "物料条码：{MaterialCode}未关联到供应商";
         public const string MES152013 = "物料条码：{MaterialCode}数量需大于0";
         public const string MES152014 = " 条码：{MaterialCode}在车间库存中已存在！";
+        public const string MES152015 = " 供应商不能为空";
 
         #endregion
         #endregion

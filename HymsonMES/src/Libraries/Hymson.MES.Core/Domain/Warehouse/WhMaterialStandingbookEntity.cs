@@ -28,51 +28,51 @@ namespace Hymson.MES.Core.Domain.Warehouse
         /// </summary>
         public string MaterialCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料名称（D）
         /// </summary>
         public string MaterialName { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料版本（D）
         /// </summary>
         public string MaterialVersion { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料条码
         /// </summary>
         public string MaterialBarCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 批次
         /// </summary>
         public string Batch { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 数量
         /// </summary>
         public decimal Quantity { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 单位;来自物料模块的计量单位
         /// </summary>
         public string Unit { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 流转类型;物料接收/物料退料/物料加载
         /// </summary>
-        public bool Type { get; set; }
+        public int Type { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 来源/目标;手动录入/WMS/上料点编号
         /// </summary>
-        public bool Source { get; set; }
+        public int Source { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
 
-       
+
     }
 }
