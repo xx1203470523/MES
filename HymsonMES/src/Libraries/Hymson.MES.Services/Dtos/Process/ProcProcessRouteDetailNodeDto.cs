@@ -43,7 +43,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 抽检类型
         /// </summary>
-        public string CheckType { get; set; }
+        public int CheckType { get; set; }
 
        /// <summary>
         /// 抽检比例

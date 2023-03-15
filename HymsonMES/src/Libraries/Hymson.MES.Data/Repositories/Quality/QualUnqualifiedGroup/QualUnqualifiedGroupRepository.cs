@@ -36,19 +36,29 @@ namespace Hymson.MES.Data.Repositories.Quality
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("SiteCode = @SiteCode");
+            sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
+            if (string.IsNullOrEmpty(param.Sorting))
+            {
+                sqlBuilder.OrderBy("UpdatedOn DESC");
+            }
+            else
+            {
+                sqlBuilder.OrderBy(param.Sorting);
+            }
             if (!string.IsNullOrWhiteSpace(param.UnqualifiedGroup))
             {
-                sqlBuilder.Where("UnqualifiedGroup like '%@UnqualifiedGroup%'");
+                param.UnqualifiedGroup = $"%{param.UnqualifiedGroup}%";
+                sqlBuilder.Where("UnqualifiedGroup like @UnqualifiedGroup");
             }
-
             if (!string.IsNullOrWhiteSpace(param.UnqualifiedGroupName))
             {
-                sqlBuilder.Where("UnqualifiedGroupName like '%@UnqualifiedGroupName%'");
+                param.UnqualifiedGroupName = $"%{param.UnqualifiedGroupName}%";
+                sqlBuilder.Where("UnqualifiedGroupName like @UnqualifiedGroupName");
             }
+
 
             var offSet = (param.PageIndex - 1) * param.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -234,25 +244,25 @@ namespace Hymson.MES.Data.Repositories.Quality
                                             /**select**/
                                            FROM `qual_unqualified_group` /**where**/  ";
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteCode`, `UnqualifiedGroup`, `UnqualifiedGroupName`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                               Id, SiteId, UnqualifiedGroup, UnqualifiedGroupName, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted
                                 FROM `qual_unqualified_group`  WHERE Id = @Id  AND IsDeleted=0 ";
         const string GetByCodeSql = @"SELECT 
-                               `Id`, `SiteCode`, `UnqualifiedGroup`, `UnqualifiedGroupName`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                                FROM `qual_unqualified_group`  WHERE UnqualifiedGroup = @Code AND SiteCode = @SiteCode  AND IsDeleted = 0";
+                              Id, SiteId, UnqualifiedGroup, UnqualifiedGroupName, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted
+                                FROM `qual_unqualified_group`  WHERE UnqualifiedGroup = @Code AND SiteId = @Site  AND IsDeleted = 0";
         const string GetQualUnqualifiedCodeProcedureRelationSqlTemplate = @"SELECT  QUGP.Id,QUGP.UnqualifiedGroupId,QUGP.ProcedureId,PP.Code AS ProcedureCode,PP.Name AS UnqualifiedCodeName,QUGP.CreatedBy,QUGP.CreatedOn,QUGP.UpdatedBy,QUGP.UpdatedOn
                                                                             FROM qual_unqualified_group_procedure_relation  QUGP LEFT JOIN proc_procedure PP ON QUGP.ProcedureId=PP.Id AND PP.IsDeleted=0 WHERE  QUGP.UnqualifiedGroupId=@Id AND QUGP.IsDeleted = 0";
-        const string GetQualUnqualifiedCodeGroupRelationSqlTemplate = @"SELECT  QUCGR.Id,QUCGR.UnqualifiedGroupId,QUC.UnqualifiedCode,QUC.UnqualifiedCodeName,QUCGR.CreatedBy,QUCGR.CreatedOn,QUCGR.UpdatedBy,QUCGR.UpdatedOn
+        const string GetQualUnqualifiedCodeGroupRelationSqlTemplate = @"SELECT  QUCGR.Id,QUCGR.UnqualifiedGroupId,QUCGR.UnqualifiedCodeId,QUC.UnqualifiedCode,QUC.UnqualifiedCodeName,QUCGR.CreatedBy,QUCGR.CreatedOn,QUCGR.UpdatedBy,QUCGR.UpdatedOn
                                                                         FROM qual_unqualified_code_group_relation QUCGR    LEFT JOIN   qual_unqualified_code QUC on QUC.Id=QUCGR.UnqualifiedCodeId AND QUC.IsDeleted=0
                                                                         WHERE QUCGR.UnqualifiedGroupId=@Id AND QUCGR.IsDeleted=0";
-        const string InsertSql = "INSERT INTO `qual_unqualified_group`(  `Id`, `SiteCode`, `UnqualifiedGroup`, `UnqualifiedGroupName`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @UnqualifiedGroup, @UnqualifiedGroupName, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `qual_unqualified_group`(  `Id`, `SiteCode`, `UnqualifiedGroup`, `UnqualifiedGroupName`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @UnqualifiedGroup, @UnqualifiedGroupName, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertQualUnqualifiedCodeGroupRelationSql = @"INSERT INTO `qual_unqualified_code_group_relation`(`Id`, `SiteCode`, `UnqualifiedCodeId`, `UnqualifiedGroupId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) 
-                                                                   VALUES (@Id, @SiteCode, @UnqualifiedCodeId, @UnqualifiedGroupId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted)";
-        const string InsertQualUnqualifiedGroupProcedureRelationSql = @"INSERT INTO `qual_unqualified_group_procedure_relation`(`Id`, `SiteCode`, `UnqualifiedGroupId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) 
-                                                                        VALUES(@Id, @SiteCode, @UnqualifiedGroupId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertSql = "INSERT INTO `qual_unqualified_group`(  `Id`, `SiteId`, `UnqualifiedGroup`, `UnqualifiedGroupName`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @UnqualifiedGroup, @UnqualifiedGroupName, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsSql = "INSERT INTO `qual_unqualified_group`(  `Id`, `SiteId`, `UnqualifiedGroup`, `UnqualifiedGroupName`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @UnqualifiedGroup, @UnqualifiedGroupName, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertQualUnqualifiedCodeGroupRelationSql = @"INSERT INTO `qual_unqualified_code_group_relation`(`Id`, `SiteId`, `UnqualifiedCodeId`, `UnqualifiedGroupId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) 
+                                                                   VALUES (@Id, @SiteId, @UnqualifiedCodeId, @UnqualifiedGroupId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted)";
+        const string InsertQualUnqualifiedGroupProcedureRelationSql = @"INSERT INTO `qual_unqualified_group_procedure_relation`(`Id`, `SiteId`, `UnqualifiedGroupId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) 
+                                                                        VALUES(@Id, @SiteId, @UnqualifiedGroupId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
         const string UpdateSql = "UPDATE `qual_unqualified_group`  SET    UnqualifiedGroupName = @UnqualifiedGroupName, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `qual_unqualified_group` SET    UnqualifiedGroupName = @UnqualifiedGroupName, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE `qual_unqualified_group` SET IsDeleted = '1', UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id in @ids AND IsDeleted=0 ";
+        const string DeletesSql = "UPDATE `qual_unqualified_group` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id in @ids AND IsDeleted=0 ";
         const string DelteQualUnqualifiedCodeGroupRelationSql = "DELETE  FROM qual_unqualified_code_group_relation WHERE  UnqualifiedGroupId = @UnqualifiedGroupId AND IsDeleted=0";
         const string RealDelteQualUnqualifiedGroupProcedureRelationSql = "DELETE  FROM qual_unqualified_group_procedure_relation WHERE  UnqualifiedGroupId = @UnqualifiedGroupId AND IsDeleted=0";
     }

@@ -56,6 +56,7 @@ namespace Hymson.MES.Services.Services.Quality
         public async Task<PagedInfo<QualUnqualifiedGroupDto>> GetPageListAsync(QualUnqualifiedGroupPagedQueryDto param)
         {
             var qualUnqualifiedGroupPagedQuery = param.ToQuery<QualUnqualifiedGroupPagedQuery>();
+            qualUnqualifiedGroupPagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _qualUnqualifiedGroupRepository.GetPagedInfoAsync(qualUnqualifiedGroupPagedQuery);
 
             //实体到DTO转换 装载数据
@@ -72,11 +73,11 @@ namespace Hymson.MES.Services.Services.Quality
         {
             if (param == null)
             {
-                throw new ValidationException(nameof( ErrorCode.MES10100));
+                throw new ValidationException(nameof(ErrorCode.MES10100));
             }
             await _validationCreateRules.ValidateAndThrowAsync(param);
 
-            var qualUnqualifiedGroupEntity = await _qualUnqualifiedGroupRepository.GetByCodeAsync(new QualUnqualifiedGroupByCodeQuery { Code = param.UnqualifiedGroup, Site = _currentSite.Name });
+            var qualUnqualifiedGroupEntity = await _qualUnqualifiedGroupRepository.GetByCodeAsync(new QualUnqualifiedGroupByCodeQuery { Code = param.UnqualifiedGroup, Site = _currentSite.SiteId ?? 0 });
             if (qualUnqualifiedGroupEntity != null)
             {
                 throw new BusinessException(nameof(ErrorCode.MES11206)).WithData("code", param.UnqualifiedGroup);
@@ -87,7 +88,7 @@ namespace Hymson.MES.Services.Services.Quality
             qualUnqualifiedGroupEntity.Id = IdGenProvider.Instance.CreateId();
             qualUnqualifiedGroupEntity.CreatedBy = userId;
             qualUnqualifiedGroupEntity.UpdatedBy = userId;
-            // TODO    qualUnqualifiedGroupEntity.SiteCode = _currentSite.Name;
+            qualUnqualifiedGroupEntity.SiteId = _currentSite.SiteId ?? 0;
 
             List<QualUnqualifiedCodeGroupRelation> qualUnqualifiedCodeGroupRelationlist = new List<QualUnqualifiedCodeGroupRelation>();
             if (param.UnqualifiedCodeIds != null && param.UnqualifiedCodeIds.Any())
@@ -96,7 +97,8 @@ namespace Hymson.MES.Services.Services.Quality
                 {
                     qualUnqualifiedCodeGroupRelationlist.Add(new QualUnqualifiedCodeGroupRelation
                     {
-                        // TODO    SiteCode = _currentSite.Name,
+                        Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId??0,
                         UnqualifiedGroupId = qualUnqualifiedGroupEntity.Id,
                         UnqualifiedCodeId = item,
                         CreatedBy = userId,
@@ -106,13 +108,14 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             List<QualUnqualifiedGroupProcedureRelation> qualUnqualifiedGroupProcedureRelationList = new List<QualUnqualifiedGroupProcedureRelation>();
-            if (param.UnqualifiedCodeIds != null && param.UnqualifiedCodeIds.Any())
+            if (param.ProcedureIds != null && param.ProcedureIds.Any())
             {
-                foreach (var item in param.UnqualifiedCodeIds)
+                foreach (var item in param.ProcedureIds)
                 {
                     qualUnqualifiedGroupProcedureRelationList.Add(new QualUnqualifiedGroupProcedureRelation
                     {
-                        // TODO    SiteCode = _currentSite.Name,
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = _currentSite.SiteId ?? 0,
                         UnqualifiedGroupId = qualUnqualifiedGroupEntity.Id,
                         ProcedureId = item,
                         CreatedBy = userId,
@@ -141,11 +144,10 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesQualUnqualifiedGroupAsync(string ids)
+        public async Task<int> DeletesQualUnqualifiedGroupAsync(long[] ids)
         {
-            long[] idsArr = StringExtension.SpitLongArrary(ids);
             var userId = _currentUser.UserName;
-            return await _qualUnqualifiedGroupRepository.DeleteRangAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = userId });
+            return await _qualUnqualifiedGroupRepository.DeleteRangAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = userId });
         }
 
         /// <summary>
@@ -242,60 +244,79 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task<QualUnqualifiedGroupDto> QueryQualUnqualifiedGroupByIdAsync(long id)
         {
-            var qualUnqualifiedGroupTask = _qualUnqualifiedGroupRepository.GetByIdAsync(id);
-            var qalUnqualifiedCodeProcedureRelationTask = _qualUnqualifiedGroupRepository.GetQualUnqualifiedCodeProcedureRelationAsync(id);
-            var qualUnqualifiedCodeGroupRelationTask = _qualUnqualifiedGroupRepository.GetQualUnqualifiedCodeGroupRelationAsync(id);
-            var qualUnqualifiedGroupEntity = await qualUnqualifiedGroupTask;
-            var qualUnqualifiedCodeProcedureRelationList = await qalUnqualifiedCodeProcedureRelationTask;
-            var qualUnqualifiedCodeGroupRelationList = await qualUnqualifiedCodeGroupRelationTask;
-            QualUnqualifiedGroupDto qualUnqualifiedGroupDto = new QualUnqualifiedGroupDto();
+            var qualUnqualifiedGroupEntity = await _qualUnqualifiedGroupRepository.GetByIdAsync(id);
 
             if (qualUnqualifiedGroupEntity != null)
             {
-                qualUnqualifiedGroupDto = qualUnqualifiedGroupEntity.ToModel<QualUnqualifiedGroupDto>();
-
-                if (qualUnqualifiedCodeProcedureRelationList != null && qualUnqualifiedCodeProcedureRelationList.Any())
-                {
-                    qualUnqualifiedGroupDto.QualUnqualifiedGroupCodeRelationList = new List<QualUnqualifiedGroupCodeRelationDto>();
-                    foreach (var item in qualUnqualifiedCodeGroupRelationList)
-                    {
-                        qualUnqualifiedGroupDto.QualUnqualifiedGroupCodeRelationList.Add(new QualUnqualifiedGroupCodeRelationDto()
-                        {
-                            Id = item.Id,
-                            UnqualifiedGroupId = item.UnqualifiedGroupId,
-                            UnqualifiedCode = item.UnqualifiedCode,
-                            UnqualifiedCodeName = item.UnqualifiedCodeName,
-                            CreatedBy = item.CreatedBy,
-                            CreatedOn = item.CreatedOn,
-                            UpdatedBy = item.UpdatedBy,
-                            UpdatedOn = item.UpdatedOn,
-                        });
-                    }
-                }
-                if (qualUnqualifiedCodeProcedureRelationList != null && qualUnqualifiedCodeProcedureRelationList.Any())
-                {
-                    qualUnqualifiedGroupDto.QualUnqualifiedGroupProcedureRelationList = new List<QualUnqualifiedGroupProcedureRelationDto>();
-                    foreach (var item in qualUnqualifiedCodeProcedureRelationList)
-                    {
-                        qualUnqualifiedGroupDto.QualUnqualifiedGroupProcedureRelationList.Add(new QualUnqualifiedGroupProcedureRelationDto()
-                        {
-                            Id = item.Id,
-                            UnqualifiedGroupId = item.UnqualifiedGroupId,
-                            ProcedureCode = item.ProcedureCode,
-                            ProcedureName = item.ProcedureName,
-                            CreatedBy = item.CreatedBy,
-                            CreatedOn = item.CreatedOn,
-                            UpdatedBy = item.UpdatedBy,
-                            UpdatedOn = item.UpdatedOn,
-                        });
-                    }
-                }
+                var qualUnqualifiedGroupDto = qualUnqualifiedGroupEntity.ToModel<QualUnqualifiedGroupDto>();
                 return qualUnqualifiedGroupDto;
             }
             else
             {
                 return null;
             }
+        }
+
+        /// <summary>
+        /// 获取不合格组中不合格代码
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<List<QualUnqualifiedGroupCodeRelationDto>> GetQualUnqualifiedCodeGroupRelationByIdAsync(long id)
+        {
+            var qualUnqualifiedCodeGroupRelationList = await _qualUnqualifiedGroupRepository.GetQualUnqualifiedCodeGroupRelationAsync(id);
+            var qualUnqualifiedGroupCodeRelationList = new List<QualUnqualifiedGroupCodeRelationDto>();
+            if (qualUnqualifiedCodeGroupRelationList != null && qualUnqualifiedCodeGroupRelationList.Any())
+            {
+
+                foreach (var item in qualUnqualifiedCodeGroupRelationList)
+                {
+                    qualUnqualifiedGroupCodeRelationList.Add(new QualUnqualifiedGroupCodeRelationDto()
+                    {
+                        Id = item.Id,
+                        UnqualifiedGroupId = item.UnqualifiedGroupId,
+                        UnqualifiedId=item.UnqualifiedCodeId,
+                        UnqualifiedCode = item.UnqualifiedCode,
+                        UnqualifiedCodeName = item.UnqualifiedCodeName,
+                        CreatedBy = item.CreatedBy,
+                        CreatedOn = item.CreatedOn,
+                        UpdatedBy = item.UpdatedBy,
+                        UpdatedOn = item.UpdatedOn,
+                    });
+                }
+            }
+            return qualUnqualifiedGroupCodeRelationList;
+        }
+
+        /// <summary>
+        /// 获取不合格组中工序
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<List<QualUnqualifiedGroupProcedureRelationDto>>  GetQualUnqualifiedCodeProcedureRelationByIdAsync(long id)
+        {
+            var qualUnqualifiedCodeProcedureRelationList = await _qualUnqualifiedGroupRepository.GetQualUnqualifiedCodeProcedureRelationAsync(id);
+            var qualUnqualifiedGroupProcedureRelationList = new List<QualUnqualifiedGroupProcedureRelationDto>();
+            if (qualUnqualifiedCodeProcedureRelationList != null && qualUnqualifiedCodeProcedureRelationList.Any())
+            {
+
+                foreach (var item in qualUnqualifiedCodeProcedureRelationList)
+                {
+                    qualUnqualifiedGroupProcedureRelationList.Add(new QualUnqualifiedGroupProcedureRelationDto()
+                    {
+                        Id = item.Id,
+                        UnqualifiedGroupId = item.UnqualifiedGroupId,
+                        ProcedureId = item.ProcedureId,
+                        ProcedureName = item.ProcedureName,
+                        ProcedureCode = item.ProcedureCode,
+                        CreatedBy = item.CreatedBy,
+                        CreatedOn = item.CreatedOn,
+                        UpdatedBy = item.UpdatedBy,
+                        UpdatedOn = item.UpdatedOn,
+                    });
+                }
+            }
+            return qualUnqualifiedGroupProcedureRelationList;
         }
     }
 }

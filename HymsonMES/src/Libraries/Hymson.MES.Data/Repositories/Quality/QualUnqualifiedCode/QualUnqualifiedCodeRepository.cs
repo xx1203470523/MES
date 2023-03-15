@@ -116,49 +116,58 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="pram"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<QualUnqualifiedCodeEntity>> GetPagedInfoAsync(QualUnqualifiedCodePagedQuery pram)
+        public async Task<PagedInfo<QualUnqualifiedCodeEntity>> GetPagedInfoAsync(QualUnqualifiedCodePagedQuery param)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("SiteCode = @SiteCode");
-            sqlBuilder.OrderBy("UpdatedOn DESC");
+            sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
 
-            if (!string.IsNullOrWhiteSpace(pram.UnqualifiedCode))
+            if (string.IsNullOrEmpty(param.Sorting))
             {
-                sqlBuilder.Where("UnqualifiedCode like '%@UnqualifiedCode%'");
+                sqlBuilder.OrderBy("UpdatedOn DESC");
+            }
+            else
+            {
+                sqlBuilder.OrderBy(param.Sorting);
             }
 
-            if (!string.IsNullOrWhiteSpace(pram.UnqualifiedCodeName))
+            if (!string.IsNullOrWhiteSpace(param.UnqualifiedCode))
             {
-                sqlBuilder.Where("UnqualifiedCodeName like '%@UnqualifiedCodeName%'");
+                param.UnqualifiedCode = $"%{param.UnqualifiedCode}%";
+                sqlBuilder.Where("UnqualifiedCode like @UnqualifiedCode");
+            }
+            if (!string.IsNullOrWhiteSpace(param.UnqualifiedCodeName))
+            {
+                param.UnqualifiedCodeName = $"%{param.UnqualifiedCodeName}%";
+                sqlBuilder.Where("UnqualifiedCodeName like @UnqualifiedCodeName");
             }
 
-            if (!string.IsNullOrWhiteSpace(pram.Status))
+            if (param.Status != null)
             {
                 sqlBuilder.Where("Status=@Status");
             }
 
-            if (pram.Type != null)
+            if (param.Type != null)
             {
                 sqlBuilder.Where("Type=@Type");
             }
 
-            var offSet = (pram.PageIndex - 1) * pram.PageSize;
+            var offSet = (param.PageIndex - 1) * param.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = pram.PageSize });
-            sqlBuilder.AddParameters(pram);
+            sqlBuilder.AddParameters(new { Rows = param.PageSize });
+            sqlBuilder.AddParameters(param);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var qualUnqualifiedCodeEntitiesTask = conn.QueryAsync<QualUnqualifiedCodeEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var qualUnqualifiedCodeEntities = await qualUnqualifiedCodeEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<QualUnqualifiedCodeEntity>(qualUnqualifiedCodeEntities, pram.PageIndex, pram.PageSize, totalCount);
+            return new PagedInfo<QualUnqualifiedCodeEntity>(qualUnqualifiedCodeEntities, param.PageIndex, param.PageSize, totalCount);
         }
 
         /// <summary>
@@ -188,19 +197,19 @@ namespace Hymson.MES.Data.Repositories.Quality
                                                                         LEFT JOIN qual_unqualified_code_group_relation QUCGR ON QUC.Id=QUCGR.UnqualifiedCodeId AND QUCGR.IsDeleted=0
                                                                         LEFT JOIN qual_unqualified_group QUG on QUCGR.UnqualifiedGroupId=QUG.Id AND QUG.IsDeleted=0
                                                                         WHERE QUC.Id=@Id AND QUC.IsDeleted=0";
-        const string InsertSql = "INSERT INTO `qual_unqualified_code`(  `Id`, `SiteCode`, `UnqualifiedCode`, `UnqualifiedCodeName`, `Status`, `Type`, `Degree`, `ProcessRouteId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @UnqualifiedCode, @UnqualifiedCodeName, @Status, @Type, @Degree, @ProcessRouteId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `qual_unqualified_code`(  `Id`, `SiteCode`, `UnqualifiedCode`, `UnqualifiedCodeName`, `Status`, `Type`, `Degree`, `ProcessRouteId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @UnqualifiedCode, @UnqualifiedCodeName, @Status, @Type, @Degree, @ProcessRouteId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `qual_unqualified_code`(  `Id`, `SiteId`, `UnqualifiedCode`, `UnqualifiedCodeName`, `Status`, `Type`, `Degree`, `ProcessRouteId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @UnqualifiedCode, @UnqualifiedCodeName, @Status, @Type, @Degree, @ProcessRouteId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsSql = "INSERT INTO `qual_unqualified_code`(  `Id`, `SiteId`, `UnqualifiedCode`, `UnqualifiedCodeName`, `Status`, `Type`, `Degree`, `ProcessRouteId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @UnqualifiedCode, @UnqualifiedCodeName, @Status, @Type, @Degree, @ProcessRouteId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string UpdateSql = "UPDATE `qual_unqualified_code` SET    UnqualifiedCode = @UnqualifiedCode, UnqualifiedCodeName = @UnqualifiedCodeName, Status = @Status, Type = @Type, Degree = @Degree, ProcessRouteId = @ProcessRouteId, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id AND IsDeleted = @IsDeleted ";
         const string UpdatesSql = "UPDATE `qual_unqualified_code` SET   UnqualifiedCode = @UnqualifiedCode, UnqualifiedCodeName = @UnqualifiedCodeName, Status = @Status, Type = @Type, Degree = @Degree, ProcessRouteId = @ProcessRouteId, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn   WHERE Id = @Id AND IsDeleted = @IsDeleted ";
-        const string DeleteRangSql = "UPDATE `qual_unqualified_code` SET IsDeleted = '1', UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id in @ids ";
+        const string DeleteRangSql = "UPDATE `qual_unqualified_code` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id in @ids ";
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteCode`, `UnqualifiedCode`, `UnqualifiedCodeName`, `Status`, `Type`, `Degree`, `ProcessRouteId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                             Id, SiteId, UnqualifiedCode, UnqualifiedCodeName, Status, Type, Degree, ProcessRouteId, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted
                             FROM `qual_unqualified_code`  WHERE Id = @Id AND IsDeleted=0";
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteCode`, `UnqualifiedCode`, `UnqualifiedCodeName`, `Status`, `Type`, `Degree`, `ProcessRouteId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                                          Id, SiteId, UnqualifiedCode, UnqualifiedCodeName, Status, Type, Degree, ProcessRouteId, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted
                             FROM `qual_unqualified_code`  WHERE Id IN @ids AND IsDeleted=0  ";
         const string GetByCodeSql = @"SELECT 
-                               `Id`, `SiteCode`, `UnqualifiedCode`, `UnqualifiedCodeName`, `Status`, `Type`, `Degree`, `ProcessRouteId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `qual_unqualified_code`  WHERE UnqualifiedCode = @UnqualifiedCode  AND Site=@Site AND IsDeleted=0 ";
+                               Id, SiteId, UnqualifiedCode, UnqualifiedCodeName, Status, Type, Degree, ProcessRouteId, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted
+                            FROM `qual_unqualified_code`  WHERE UnqualifiedCode = @Code  AND SiteId=@Site AND IsDeleted=0 ";
     }
 }

@@ -1,4 +1,6 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.QualUnqualifiedCode;
 
 namespace Hymson.MES.Services.Dtos.Quality
 {
@@ -25,24 +27,27 @@ namespace Hymson.MES.Services.Dtos.Quality
         public string UnqualifiedCodeName { get; set; }
 
         /// <summary>
-        /// 状态
+        /// 描述 :状态 
+        /// 空值 : true  
         /// </summary>
-        public short Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
-        /// 类型
+        /// 描述 :类型 
+        /// 空值 : true  
         /// </summary>
-        public short Type { get; set; }
+        public QualUnqualifiedCodeTypeEnum Type { get; set; }
 
         /// <summary>
-        /// 等级
+        /// 描述 :等级 
+        /// 空值 : true  
         /// </summary>
-        public short Degree { get; set; }
+        public QualUnqualifiedCodeDegreeEnum Degree { get; set; }
 
         /// <summary>
         /// 不合格工艺路线（所属工艺路线ID）
         /// </summary>
-        public string ProcessRouteId { get; set; }
+        public long ProcessRouteId { get; set; }
 
         /// <summary>
         /// 说明
@@ -69,10 +74,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
 
-        /// <summary>
-        /// 不合代码关联不合格代码组
-        /// </summary>
-        public List<UnqualifiedCodeGroupRelationDto> UnqualifiedCodeGroupRelationList { get; set; }
+
     }
 
     public record UnqualifiedCodeGroupRelationDto
@@ -137,12 +139,12 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 类型
         /// </summary>
-        public short Type { get; set; }
+        public  QualUnqualifiedCodeTypeEnum ? Type { get; set; }
 
         /// <summary>
         /// 等级
         /// </summary>
-        public short Degree { get; set; }
+        public QualUnqualifiedCodeDegreeEnum? Degree { get; set; }
 
         /// <summary>
         /// 说明
@@ -152,7 +154,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 不合格代码组
         /// </summary>
-        public List<long> UnqualifiedGroupIds { get; set; }
+        public long[]? UnqualifiedGroupIds { get; set; }
     }
 
 
@@ -173,20 +175,22 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public string UnqualifiedCodeName { get; set; }
 
+
         /// <summary>
-        /// 状态
+        /// 描述 :状态 
+        /// 空值 : true  
         /// </summary>
-        public short Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 类型
         /// </summary>
-        public short Type { get; set; }
+        public QualUnqualifiedCodeTypeEnum? Type { get; set; }
 
         /// <summary>
         /// 等级
         /// </summary>
-        public short Degree { get; set; }
+        public QualUnqualifiedCodeDegreeEnum? Degree { get; set; }
 
 
         /// <summary>
@@ -197,7 +201,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 不合格代码组
         /// </summary>
-        public long[] UnqualifiedGroupIds { get; set; }
+        public long[]? UnqualifiedGroupIds { get; set; }
     }
 
     /// <summary>
@@ -210,21 +214,27 @@ namespace Hymson.MES.Services.Dtos.Quality
         // <summary>
         /// 不合格代码
         /// </summary>
-        public string UnqualifiedCode { get; set; }
+        public string? UnqualifiedCode { get; set; }
 
         /// <summary>
         /// 不合格代码名称
         /// </summary>
-        public string UnqualifiedCodeName { get; set; }
+        public string? UnqualifiedCodeName { get; set; }
 
         /// <summary>
-        /// 状态
+        /// 描述 :状态 
+        /// 空值 : true  
         /// </summary>
-        public string Status { get; set; }
+        public SysDataStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 类型
         /// </summary>
-        public short? Type { get; set; }
+        public QualUnqualifiedCodeTypeEnum? Type { get; set; }
+
+        /// <summary>
+        /// 等级
+        /// </summary>
+        public QualUnqualifiedCodeDegreeEnum? Degree { get; set; }
     }
 }

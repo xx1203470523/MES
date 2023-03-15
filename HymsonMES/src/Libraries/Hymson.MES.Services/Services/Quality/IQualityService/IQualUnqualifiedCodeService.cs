@@ -25,6 +25,13 @@ namespace Hymson.MES.Services.Services.Quality.IQualityService
         Task<QualUnqualifiedCodeDto> QueryQualUnqualifiedCodeByIdAsync(long id);
 
         /// <summary>
+        /// 获取不合格代码组
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<List<UnqualifiedCodeGroupRelationDto>> GetQualUnqualifiedCodeGroupRelationByIdAsync(long id);
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="qualUnqualifiedCodeCreateDto"></param>
@@ -43,6 +50,6 @@ namespace Hymson.MES.Services.Services.Quality.IQualityService
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<int> DeletesQualUnqualifiedCodeAsync(string ids);
+        Task<int> DeletesQualUnqualifiedCodeAsync(long[] ids);
     }
 }

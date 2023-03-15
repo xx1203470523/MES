@@ -3,6 +3,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
@@ -20,10 +21,13 @@ using Hymson.MES.Data.Repositories.Process.MaskCode.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Process.ResourceType.View;
+using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
+using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Dtos.Warehouse;
 
 namespace Hymson.MES.Services.Mapper
@@ -41,7 +45,7 @@ namespace Hymson.MES.Services.Mapper
             CreateEquipmentMaps();
             CreateIntegratedMaps();
             CreateProcessMaps();
-            CreateWarehouseMaps();
+            CreateQualityMaps();
         }
 
         /// <summary>
@@ -340,7 +344,6 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<WhMaterialInventoryEntity, WhMaterialInventoryDto>();
             CreateMap<WhMaterialInventoryPageListView, WhMaterialInventoryPageListViewDto>();
             #endregion
-
             #region WhMaterialStandingbook
             CreateMap<WhMaterialStandingbookCreateDto, WhMaterialStandingbookEntity>();
             CreateMap<WhMaterialStandingbookModifyDto, WhMaterialStandingbookEntity>();
@@ -350,6 +353,25 @@ namespace Hymson.MES.Services.Mapper
 
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        protected virtual void CreateQualityMaps()
+        {
+            #region QualUnqualifiedCode
+            CreateMap<QualUnqualifiedCodeEntity, QualUnqualifiedCodeDto>();
+            CreateMap<QualUnqualifiedCodeCreateDto, QualUnqualifiedCodeEntity>();
+            CreateMap<QualUnqualifiedCodeModifyDto, QualUnqualifiedCodeEntity>();
+            CreateMap<QualUnqualifiedCodePagedQueryDto, QualUnqualifiedCodePagedQuery>();
+            #endregion
+
+            #region QualUnqualifiedCode
+            CreateMap<QualUnqualifiedGroupEntity, QualUnqualifiedGroupDto>();
+            CreateMap<QualUnqualifiedGroupCreateDto, QualUnqualifiedGroupEntity>();
+            CreateMap<QualUnqualifiedGroupModifyDto, QualUnqualifiedGroupEntity>();
+            CreateMap<QualUnqualifiedGroupPagedQueryDto, QualUnqualifiedGroupPagedQuery>();
+            #endregion
+        }
         /// <summary>
         /// 排序，决定了加载的顺序
         /// </summary>

@@ -53,16 +53,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 是否逻辑删除
         /// </summary>
         public bool? IsDeleted { get; set; }
-
-        /// <summary>
-        /// 不合格组关联不合格
-        /// </summary>
-        public List<QualUnqualifiedGroupCodeRelationDto> QualUnqualifiedGroupCodeRelationList { get; set; }
-
-        /// <summary>
-        /// 不合格组关联
-        /// </summary>
-        public List<QualUnqualifiedGroupProcedureRelationDto> QualUnqualifiedGroupProcedureRelationList { get; set; }
+  
     }
 
     /// <summary>
@@ -81,6 +72,12 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 不合格代码组id
         /// </summary>
         public long UnqualifiedGroupId { get; set; }
+
+
+        // <summary>
+        /// 不合格代码
+        /// </summary>
+        public long UnqualifiedId { get; set; }
 
         // <summary>
         /// 不合格代码
@@ -129,6 +126,12 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 不合格代码组id
         /// </summary>
         public long UnqualifiedGroupId { get; set; }
+
+
+        // <summary>
+        /// 工序id
+        /// </summary>
+        public long ProcedureId { get; set; }
 
         // <summary>
         /// 工序编码
@@ -186,12 +189,12 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 不和代码id
         /// </summary>
-        public List<long> UnqualifiedCodeIds { get; set; }
+        public List<long>? UnqualifiedCodeIds { get; set; }
 
         /// <summary>
         /// 工序id
         /// </summary>
-        public List<long> ProcedureIds { get; set; }
+        public List<long>? ProcedureIds { get; set; }
     }
 
     /// <summary>
@@ -236,11 +239,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 不合格组
         /// </summary>
-        public string UnqualifiedGroup { get; set; }
+        public string? UnqualifiedGroup { get; set; }
 
         /// <summary>
         /// 不合格组名称
         /// </summary>
-        public string UnqualifiedGroupName { get; set; }
+        public string? UnqualifiedGroupName { get; set; }
     }
 }

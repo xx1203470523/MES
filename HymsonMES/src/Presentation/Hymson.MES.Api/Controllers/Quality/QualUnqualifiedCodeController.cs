@@ -34,7 +34,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Route("pagelist")]
         public async Task<PagedInfo<QualUnqualifiedCodeDto>> QueryPagedQualUnqualifiedCodeAsync([FromQuery] QualUnqualifiedCodePagedQueryDto parm)
         {
@@ -53,12 +53,22 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
         /// <summary>
+        /// 查询详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}/unqualifiedGroupList")]
+        public async Task<List<UnqualifiedCodeGroupRelationDto>> GetQualUnqualifiedCodeGroupRelationByIdAsync(long id)
+        {
+            return await _qualUnqualifiedCodeService.GetQualUnqualifiedCodeGroupRelationByIdAsync(id);
+        }
+
+        /// <summary>
         /// 添加
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("create")]
         public async Task AddQualUnqualifiedCodeAsync([FromBody] QualUnqualifiedCodeCreateDto parm)
         {
             await _qualUnqualifiedCodeService.CreateQualUnqualifiedCodeAsync(parm);
@@ -69,8 +79,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("update")]
+        [HttpPut]
         public async Task UpdateQualUnqualifiedCodeAsync([FromBody] QualUnqualifiedCodeModifyDto parm)
         {
             await _qualUnqualifiedCodeService.ModifyQualUnqualifiedCodeAsync(parm);
@@ -81,9 +90,8 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("delete")]
-        public async Task DeleteQualUnqualifiedCodeAsync(string ids)
+        [HttpDelete]
+        public async Task DeleteQualUnqualifiedCodeAsync(long[] ids)
         {
             await _qualUnqualifiedCodeService.DeletesQualUnqualifiedCodeAsync(ids);
         }

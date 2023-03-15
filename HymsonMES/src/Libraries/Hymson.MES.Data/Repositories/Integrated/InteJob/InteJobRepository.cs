@@ -170,7 +170,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob
         const string InsertSql = "INSERT INTO  `inte_job` ( SiteId,Id,Code,Name,ClassProgram,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted) VALUES ( @SiteId,@Id,@Code,@Name,@ClassProgram,@Remark,@CreatedBy,@CreatedOn,@UpdatedBy,@UpdatedOn,@IsDeleted) ";
         const string UpdateSql = "UPDATE `inte_job` SET  Name=@Name,ClassProgram=@ClassProgram,Remark=@Remark,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn,IsDeleted=@IsDeleted WHERE Id = @Id AND IsDeleted = @IsDeleted ";
         const string UpdateRangSql = "UPDATE `inte_job` SET Name=@Name,ClassProgram=@ClassProgram,Remark=@Remark,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn,IsDeleted=@IsDeleted WHERE Id = @Id AND IsDeleted = @IsDeleted ";
-        const string DeleteRangSql = "UPDATE `inte_job` SET IsDeleted = '1', UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id in @ids AND IsDeleted=0";
+        const string DeleteRangSql = "UPDATE `inte_job` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id in @ids AND IsDeleted=0";
         const string GetByIdSql = @"SELECT SiteId,Id,Code,Name,ClassProgram,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted FROM `inte_job`  WHERE Id = @Id AND IsDeleted=0  ";
         const string GetByIdsSql = @"SELECT  * FROM `inte_job`  WHERE Id IN @ids AND IsDeleted=0  ";
         const string GetByCodeSql = @"SELECT SiteId,Id,Code,Name,ClassProgram,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted FROM `inte_job`  WHERE Code = @Code  AND SiteId=@Site AND IsDeleted=0 ";

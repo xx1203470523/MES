@@ -4,7 +4,6 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
-using Hymson.Localization.Domain.Query;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
@@ -13,7 +12,6 @@ using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
-using Hymson.MES.Data.Repositories.Integrated.InteJob;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
@@ -39,10 +37,12 @@ namespace Hymson.MES.Services.Services.Process
         /// 当前登录用户对象
         /// </summary>
         private readonly ICurrentUser _currentUser;
+
         /// <summary>
         /// 当前站点
         /// </summary>
         private readonly ICurrentSite _currentSite;
+
         /// <summary>
         /// 资源仓储
         /// </summary>
@@ -72,6 +72,7 @@ namespace Hymson.MES.Services.Services.Process
         /// 工序配置作业表仓储
         /// </summary>
         private readonly IInteJobBusinessRelationRepository _jobBusinessRelationRepository;
+
         /// <summary>
         /// 作业表仓储
         /// </summary>
@@ -371,10 +372,18 @@ namespace Hymson.MES.Services.Services.Process
                     }
                 });
 
+                var equNumber = parm.EquList.ToLookup(w => w.EquipmentId).ToDictionary(d => d.Key, d => d);
+                if (equNumber.Keys.Count < parm.EquList.Count)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10314));
+                }
+
+                /*
                 if (parm.EquList.GroupBy(x => x.EquipmentId).Where(g => g.Count() > 2).Count() > 1)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10306));
                 }
+                */
 
                 var ismianCount = parm.EquList.Where(a => a.IsMain == true).ToList().Count;
                 if (ismianCount > 1)
@@ -491,7 +500,7 @@ namespace Hymson.MES.Services.Services.Process
                         JobId = item.JobId,
                         IsUse = item.IsUse,
                         Parameter = item.Parameter,
-                        Remark =  "",
+                        Remark = "",
                         SiteId = _currentSite.SiteId ?? 0,
                         CreatedBy = userName,
                         UpdatedBy = userName
@@ -582,10 +591,18 @@ namespace Hymson.MES.Services.Services.Process
                     }
                 });
 
+                var equNumber = param.EquList.ToLookup(w => w.EquipmentId).ToDictionary(d => d.Key, d => d);
+                if (equNumber.Keys.Count < param.EquList.Count)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10314));
+                }
+
+                /*
                 if (param.EquList.GroupBy(x => x.EquipmentId).Where(g => g.Count() > 2).Count() > 1)
                 {
                     throw new Exception(nameof(ErrorCode.MES10314));
                 }
+                */
 
                 //判断打印机是否重复配置  数据库中 已经存储的情况
                 var parmEquIds = param.EquList.Select(x => x.EquipmentId).ToArray();

@@ -1,4 +1,6 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.QualUnqualifiedCode;
 
 namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query
 {
@@ -24,13 +26,19 @@ namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query
         public string UnqualifiedCodeName { get; set; }
 
         /// <summary>
-        /// 状态
+        /// 描述 :状态 
+        /// 空值 : true  
         /// </summary>
-        public string Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 类型
         /// </summary>
-        public short? Type { get; set; }
+        public QualUnqualifiedCodeTypeEnum? Type { get; set; }
+
+        /// <summary>
+        /// 等级
+        /// </summary>
+        public QualUnqualifiedCodeDegreeEnum? Degree { get; set; }
     }
 }
