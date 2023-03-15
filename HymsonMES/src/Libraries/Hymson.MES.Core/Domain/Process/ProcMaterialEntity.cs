@@ -90,10 +90,10 @@ namespace Hymson.MES.Core.Domain.Process
         public long? ProcessRouteId { get; set; }
         
         /// <summary>
-        /// 描述 :工序BomID 
+        /// 描述 :BomID 
         /// 空值 : true  
         /// </summary>
-        public long? ProcedureBomId { get; set; }
+        public long? BomId { get; set; }
         
         /// <summary>
         /// 描述 :批次大小 
@@ -108,7 +108,7 @@ namespace Hymson.MES.Core.Domain.Process
         public string? Unit { get; set; }
         
         /// <summary>
-        /// 描述 :内/外序列号 
+        /// 描述 :数据收集方式
         /// 空值 : true  
         /// </summary>
         public MaterialSerialNumberEnum? SerialNumber { get; set; }
@@ -131,6 +131,9 @@ namespace Hymson.MES.Core.Domain.Process
         /// </summary>
         public int? ConsumptionTolerance { get; set; }
 
-       
-        }
+       /// <summary>
+       /// 消耗系数
+       /// </summary>
+        public decimal? ConsumeRatio { get;set; }
+    }
 }

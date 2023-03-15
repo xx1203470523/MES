@@ -147,7 +147,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
     public partial class InteCalendarDateRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_calendar` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `inte_calendar` /**innerjoin**/ /**leftjoin**/ /**where**/";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `inte_calendar` /**innerjoin**/ /**leftjoin**/ /**where**/";
         const string GetInteCalendarEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `inte_calendar` /**innerjoin**/ /**leftjoin**/ /**where**/  ";

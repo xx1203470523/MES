@@ -37,7 +37,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :抽检类型 
         /// 空值 : true  
         /// </summary>
-        public string CheckType { get; set; }
+        public int? CheckType { get; set; }
         
         /// <summary>
         /// 描述 :抽检比例 

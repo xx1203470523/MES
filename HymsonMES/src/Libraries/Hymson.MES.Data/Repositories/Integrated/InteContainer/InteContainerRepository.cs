@@ -138,7 +138,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
     public partial class InteContainerRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM inte_container IC /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM inte_container IC /**innerjoin**/ /**leftjoin**/ /**where**/";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM inte_container IC /**innerjoin**/ /**leftjoin**/ /**where**/";
 
         const string InsertSql = "INSERT INTO `inte_container`( `Id`, `DefinitionMethod`, `MaterialId`, `MaterialGroupId`, Level, `Status`, `Maximum`, `Minimum`, `Height`, `Length`, `Width`, `MaxFillWeight`, `Weight`, Remark, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, SiteId) VALUES (   @Id, @DefinitionMethod, @MaterialId, @MaterialGroupId, @Level, @Status, @Maximum, @Minimum, @Height, @Length, @Width, @MaxFillWeight, @Weight, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId)  ";
         const string UpdateSql = "UPDATE `inte_container` SET DefinitionMethod = @DefinitionMethod, MaterialId = @MaterialId, MaterialGroupId = @MaterialGroupId, Level = @Level, Status = @Status, Maximum = @Maximum, Minimum = @Minimum, Height = @Height, Length = @Length, Width = @Width, MaxFillWeight = @MaxFillWeight, Weight = @Weight, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";

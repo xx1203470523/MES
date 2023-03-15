@@ -130,7 +130,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 包装等级（字典数据）
         /// </summary>
-        public int PackingLevel { get; set; }
+        public int? PackingLevel { get; set; }
 
         /// <summary>
         /// 所属资源类型ID

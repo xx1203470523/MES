@@ -119,7 +119,7 @@ namespace Hymson.MES.Services.Services.Process
             {
                 //实体转换
                 var nodeViewDto = node.ToModel<ProcProcessRouteDetailNodeViewDto>();
-                nodeViewDto.ProcessType = (int)ProcessRouteTypeEnum.ProductionRoute;
+                nodeViewDto.ProcessType = node.Type;
                 detailNodeViewDtos.Add(nodeViewDto);
             }
             model.Nodes = detailNodeViewDtos;

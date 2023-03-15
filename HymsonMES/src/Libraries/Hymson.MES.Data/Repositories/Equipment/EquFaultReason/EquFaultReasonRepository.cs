@@ -197,7 +197,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
     public partial class EquFaultReasonRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_fault_reason` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `equ_fault_reason` /**innerjoin**/ /**leftjoin**/ /**where**/ ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_fault_reason` /**innerjoin**/ /**leftjoin**/ /**where**/ ";
         const string GetEquFaultReasonEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `equ_fault_reason` /**innerjoin**/ /**leftjoin**/ /**where**/  ";

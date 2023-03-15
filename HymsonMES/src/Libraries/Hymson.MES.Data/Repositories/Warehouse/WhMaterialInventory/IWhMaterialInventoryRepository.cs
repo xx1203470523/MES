@@ -91,7 +91,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="whMaterialInventoryPagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<WhMaterialInventoryEntity>> GetPagedInfoAsync(WhMaterialInventoryPagedQuery whMaterialInventoryPagedQuery);
+        Task<PagedInfo<WhMaterialInventoryPageListView>> GetPagedInfoAsync(WhMaterialInventoryPagedQuery whMaterialInventoryPagedQuery);
 
 
 

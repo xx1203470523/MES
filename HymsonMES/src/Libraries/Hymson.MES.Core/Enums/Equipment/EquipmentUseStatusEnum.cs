@@ -5,7 +5,7 @@ namespace Hymson.MES.Core.Enums
     /// <summary>
     /// 设备使用状态
     /// </summary>
-    public enum EquipmentUseStatusEnum : sbyte
+    public enum EquipmentUseStatusEnum : sbyte 
     {
         /// <summary>
         /// 投产

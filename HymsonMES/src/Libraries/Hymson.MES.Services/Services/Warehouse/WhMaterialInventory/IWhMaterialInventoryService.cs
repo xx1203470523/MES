@@ -27,7 +27,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// </summary>
         /// <param name="whMaterialInventoryPagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<WhMaterialInventoryDto>> GetPageListAsync(WhMaterialInventoryPagedQueryDto whMaterialInventoryPagedQueryDto);
+        Task<PagedInfo<WhMaterialInventoryPageListViewDto>> GetPageListAsync(WhMaterialInventoryPagedQueryDto whMaterialInventoryPagedQueryDto);
 
         /// <summary>
         /// 查询是否已存在物料条码

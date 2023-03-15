@@ -239,7 +239,7 @@ namespace Hymson.MES.Data.Repositories.Quality
     public partial class QualUnqualifiedGroupRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `qual_unqualified_group` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `qual_unqualified_group` /**where**/ ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `qual_unqualified_group` /**where**/ ";
         const string GetQualUnqualifiedGroupEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `qual_unqualified_group` /**where**/  ";

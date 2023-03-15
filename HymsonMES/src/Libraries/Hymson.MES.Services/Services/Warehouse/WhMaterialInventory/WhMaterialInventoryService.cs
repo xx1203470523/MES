@@ -14,6 +14,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Warehouse;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.Snowflake;
@@ -112,8 +113,8 @@ namespace Hymson.MES.Services.Services.Warehouse
                 whMaterialInventoryEntity.MaterialBarCode = item.MaterialBarCode;
                 whMaterialInventoryEntity.Batch = item.Batch;
                 whMaterialInventoryEntity.QuantityResidue = item.QuantityResidue;
-                whMaterialInventoryEntity.Status = 0;
-                whMaterialInventoryEntity.DueDate = null;
+                whMaterialInventoryEntity.Status = (int)WhMaterialInventoryStatusEnum.ToBeUsed;
+                whMaterialInventoryEntity.DueDate = HymsonClock.Now().AddMonths(1);
                 whMaterialInventoryEntity.Source = item.Source;
                 whMaterialInventoryEntity.SiteId = _currentSite.SiteId ?? 0;
 
@@ -156,14 +157,14 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// </summary>
         /// <param name="whMaterialInventoryPagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<WhMaterialInventoryDto>> GetPageListAsync(WhMaterialInventoryPagedQueryDto whMaterialInventoryPagedQueryDto)
+        public async Task<PagedInfo<WhMaterialInventoryPageListViewDto>> GetPageListAsync(WhMaterialInventoryPagedQueryDto whMaterialInventoryPagedQueryDto)
         {
             var whMaterialInventoryPagedQuery = whMaterialInventoryPagedQueryDto.ToQuery<WhMaterialInventoryPagedQuery>();
             var pagedInfo = await _whMaterialInventoryRepository.GetPagedInfoAsync(whMaterialInventoryPagedQuery);
 
             //实体到DTO转换 装载数据
-            List<WhMaterialInventoryDto> whMaterialInventoryDtos = PrepareWhMaterialInventoryDtos(pagedInfo);
-            return new PagedInfo<WhMaterialInventoryDto>(whMaterialInventoryDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            List<WhMaterialInventoryPageListViewDto> whMaterialInventoryDtos = PrepareWhMaterialInventoryDtos(pagedInfo);
+            return new PagedInfo<WhMaterialInventoryPageListViewDto>(whMaterialInventoryDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
         /// <summary>
@@ -171,12 +172,12 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// </summary>
         /// <param name="pagedInfo"></param>
         /// <returns></returns>
-        private static List<WhMaterialInventoryDto> PrepareWhMaterialInventoryDtos(PagedInfo<WhMaterialInventoryEntity> pagedInfo)
+        private static List<WhMaterialInventoryPageListViewDto> PrepareWhMaterialInventoryDtos(PagedInfo<WhMaterialInventoryPageListView> pagedInfo)
         {
-            var whMaterialInventoryDtos = new List<WhMaterialInventoryDto>();
+            var whMaterialInventoryDtos = new List<WhMaterialInventoryPageListViewDto>();
             foreach (var whMaterialInventoryEntity in pagedInfo.Data)
             {
-                var whMaterialInventoryDto = whMaterialInventoryEntity.ToModel<WhMaterialInventoryDto>();
+                var whMaterialInventoryDto = whMaterialInventoryEntity.ToModel<WhMaterialInventoryPageListViewDto>();
                 whMaterialInventoryDtos.Add(whMaterialInventoryDto);
             }
 

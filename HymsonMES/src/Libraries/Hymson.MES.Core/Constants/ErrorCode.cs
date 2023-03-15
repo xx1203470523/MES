@@ -1,12 +1,15 @@
 ﻿namespace Hymson.MES.Core.Constants
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class ErrorCode
     {
         #region  用户端错误 
         public const string MES10100 = "请求实体不能为空";
         public const string MES10101 = "站点码获取失败，请重新登录！";
         public const string MES10102 = "删除失败Id 不能为空!";
-
+        public const string MES10103 = "请求参数格式错误!";
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";
@@ -56,6 +59,7 @@
         public const string MES10320 = "所属资源类型ID不能为空";
         public const string MES10321 = "工序名称超长";
         #endregion
+
         #region 标签模板
         public const string MES10340 = "模板名称已经存在!";
         #endregion
@@ -65,7 +69,7 @@
         public const string MES10402 = "工序编码超长";
         public const string MES10403 = "工序名称不能为空";
         public const string MES10404 = "工序名称超长";
-        public const string MES10405 = "编码:{0}已存在！";
+        public const string MES10405 = "编码:{Code}已存在！";
 
         public const string MES10430 = $"不能删除启用和保留状态的工艺路线！";
         public const string MES10431 = $"此工艺路线在系统中已经存在!";
@@ -193,7 +197,7 @@
 
         //库存
         #region 供应商库存  15000
-        public const string MES15000 = "基础参数错误";
+        public const string MES15000 = "库存供应商错误";
         public const string MES15001 = "站点码获取失败，请重新登录！";
         public const string MES15002 = "此供应商编码{Code}在系统已经存在！";
         public const string MES15003 = "请求实体不能为空！";
@@ -207,11 +211,30 @@
 
         //库存
         #region 车间库存接收  15100
-        public const string MES15100 = "基础参数错误";
+        public const string MES15100 = "物料库存错误";
         public const string MES15101 = "物料不存在";
         public const string MES15102 = "物料条码：{MaterialCode}未关联到供应商";
         public const string MES15103 = "物料条码：{MaterialCode}数量需大于0";
-        public const string MES15104 = " 条码：{MaterialCode}再车间库存中已存在！";
+        public const string MES15104 = " 条码：{MaterialCode}在车间库存中已存在！";
+
+        #endregion
+
+        #region 车间库存接收  15200
+        public const string MES15200 = "物料台账错误";
+        public const string MES15201 = "物料编码不能为空";
+        public const string MES15202 = "物料版本不能为空";
+        public const string MES15203 = "物料条码不能为空";
+        public const string MES15204 = "物料批次不能为空";
+        public const string MES15205 = "物料数量不能为空";
+        public const string MES15206 = "物料流程类型不能为空";
+        public const string MES15207 = "物料流程类型不符合规则：1.物料接收/2.物料退料/3.物料加载";
+        public const string MES15208 = "物料来源不能为空";
+        public const string MES15209 = "物料来源不符合规则：1.手动录入/2.WMS/3.上料点编号";
+        public const string MES152010 = "物料超出，一次最多扫描100个";
+        public const string MES152011 = "物料不存在";
+        public const string MES152012 = "物料条码：{MaterialCode}未关联到供应商";
+        public const string MES152013 = "物料条码：{MaterialCode}数量需大于0";
+        public const string MES152014 = " 条码：{MaterialCode}在车间库存中已存在！";
 
         #endregion
         #endregion
@@ -229,6 +252,6 @@
         //public const string MES30100 = "MES30100";
         //public const string MES30101 = "MES30101";
         #endregion
-       
+
     }
 }
