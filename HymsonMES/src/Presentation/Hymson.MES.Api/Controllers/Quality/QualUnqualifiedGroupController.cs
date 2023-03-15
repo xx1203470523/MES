@@ -32,7 +32,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Route("pagelist")]
         public async Task<PagedInfo<QualUnqualifiedGroupDto>> QueryPagedQualUnqualifiedGroupAsync([FromQuery] QualUnqualifiedGroupPagedQueryDto parm)
         {
@@ -51,24 +51,45 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
         /// <summary>
+        /// 查询详情（不合格代码组工序）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}/unqualifiedCodeList")]
+        public async Task<List<QualUnqualifiedGroupCodeRelationDto>> QueryQualUnqualifiedCodeGroupRelationByIdAsync(long id)
+        {
+            return await _qualUnqualifiedGroupService.GetQualUnqualifiedCodeGroupRelationByIdAsync(id);
+        }
+
+        /// <summary>
+        /// 查询详情（不合格代码组不合格代码）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}/procedureList")]
+        public async Task<List<QualUnqualifiedGroupProcedureRelationDto>> QueryQualUnqualifiedCodeProcedureRelationpByIdAsync(long id)
+        {
+            return await _qualUnqualifiedGroupService.GetQualUnqualifiedCodeProcedureRelationByIdAsync(id);
+        }
+
+        /// <summary>
         /// 添加（不合格代码组）
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("create")]
         public async Task AddQualUnqualifiedGroupAsync([FromBody] QualUnqualifiedGroupCreateDto parm)
         {
             await _qualUnqualifiedGroupService.CreateQualUnqualifiedGroupAsync(parm);
         }
 
+       
         /// <summary>
         /// 更新（不合格代码组）
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("update")]
+        [HttpPut]
         public async Task UpdateQualUnqualifiedGroupAsync([FromBody] QualUnqualifiedGroupModifyDto parm)
         {
             await _qualUnqualifiedGroupService.ModifyQualUnqualifiedGroupAsync(parm);
@@ -79,9 +100,8 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("delete")]
-        public async Task DeleteQualUnqualifiedGroupAsync(string ids)
+        [HttpDelete]
+        public async Task DeleteQualUnqualifiedGroupAsync(long[] ids)
         {
             await _qualUnqualifiedGroupService.DeletesQualUnqualifiedGroupAsync(ids);
         }

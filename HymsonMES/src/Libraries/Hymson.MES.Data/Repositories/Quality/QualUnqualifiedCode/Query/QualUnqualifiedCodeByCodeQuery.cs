@@ -14,7 +14,7 @@ namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query
         /// <summary>
         /// 工厂
         /// </summary>
-        public string Site { get; set; }
+        public long? Site { get; set; }
 
         /// <summary>
         /// 编码

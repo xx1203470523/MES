@@ -36,7 +36,7 @@ namespace Hymson.MES.Services.Services.Quality.IQualityService
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<int> DeletesQualUnqualifiedGroupAsync(string ids);
+        Task<int> DeletesQualUnqualifiedGroupAsync(long[] ids);
 
         /// <summary>
         /// 根据ID查询
@@ -44,5 +44,19 @@ namespace Hymson.MES.Services.Services.Quality.IQualityService
         /// <param name="id"></param>
         /// <returns></returns>
         Task<QualUnqualifiedGroupDto> QueryQualUnqualifiedGroupByIdAsync(long id);
+
+        /// <summary>
+        /// 获取不合格组中不合格代码
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<List<QualUnqualifiedGroupCodeRelationDto>> GetQualUnqualifiedCodeGroupRelationByIdAsync(long id);
+
+        /// <summary>
+        /// 获取不合格组中工序
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<List<QualUnqualifiedGroupProcedureRelationDto>> GetQualUnqualifiedCodeProcedureRelationByIdAsync(long id);
     }
 }

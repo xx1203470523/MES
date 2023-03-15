@@ -8,7 +8,7 @@
         /// <summary>
         /// 工厂
         /// </summary>
-        public string Site { get; set; }
+        public long Site { get; set; }
 
         /// <summary>
         /// 编码

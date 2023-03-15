@@ -17,11 +17,11 @@ namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.Query
         /// <summary>
         /// 不合格组
         /// </summary>
-        public string UnqualifiedGroup { get; set; }
+        public string? UnqualifiedGroup { get; set; }
 
         /// <summary>
         /// 不合格组名称
         /// </summary>
-        public string UnqualifiedGroupName { get; set; }
+        public string? UnqualifiedGroupName { get; set; }
     }
 }

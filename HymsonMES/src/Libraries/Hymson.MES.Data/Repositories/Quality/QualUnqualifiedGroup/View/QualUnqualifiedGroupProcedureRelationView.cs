@@ -24,6 +24,11 @@ namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.View
         public long UnqualifiedGroupId { get; set; }
 
         // <summary>
+        /// 不合格代码工序
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        // <summary>
         /// 工序编码
         /// </summary>
         public string ProcedureCode { get; set; }
