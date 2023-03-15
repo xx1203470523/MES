@@ -148,7 +148,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 工序编码
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
         /// <summary>
         /// 工序名称
@@ -158,17 +158,17 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 工序类型
         /// </summary>
-        public string ProcessType { get; set; }
+        public int? ProcessType { get; set; }
 
         /// <summary>
         /// 抽检类型
         /// </summary>
-        public string CheckType { get; set; }
+        public int CheckType { get; set; }
 
         /// <summary>
         /// 抽检比例
         /// </summary>
-        public int CheckRate { get; set; }
+        public int? CheckRate { get; set; }
 
         /// <summary>
         /// 是否报工
@@ -248,12 +248,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 是否当前版本
         /// </summary>
-        public bool? IsCurrentVersion { get; set; } 
+        public bool? IsCurrentVersion { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// 工序集合
