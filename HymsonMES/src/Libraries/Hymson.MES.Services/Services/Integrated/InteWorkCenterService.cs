@@ -75,55 +75,71 @@ namespace Hymson.MES.Services.Services.Integrated
         {
             InteWorkCenterDto inteWorkCenterDto = new InteWorkCenterDto();
             var inteWorkCenterEntity = await _inteWorkCenterRepository.GetByIdAsync(id);
-            if (inteWorkCenterEntity == null)
+            if (inteWorkCenterEntity != null)
             {
-                return null;
-            }
-            inteWorkCenterEntity.ToModel<InteWorkCenterDto>();
-            var getInteWorkCenterRelationTask = _inteWorkCenterRepository.GetInteWorkCenterRelationAsync(id);
-            var getInteWorkCenterResourceRelationTask = _inteWorkCenterRepository.GetInteWorkCenterResourceRelatioAsync(id);
-            var inteWorkCenterRelationList = await getInteWorkCenterRelationTask;
-            var inteWorkCenterResourceRelationList = await getInteWorkCenterResourceRelationTask;
-            if (inteWorkCenterRelationList != null && inteWorkCenterRelationList.Any())
-            {
-                inteWorkCenterDto.WorkCenterRelationList = new List<InteWorkCenterRelationDto>();
-                foreach (var inteWorkCenterRelation in inteWorkCenterRelationList)
-                {
-                    inteWorkCenterDto.WorkCenterRelationList.Add(new InteWorkCenterRelationDto
-                    {
-                        Id=inteWorkCenterRelation.Id,
-                        WorkCenterId = inteWorkCenterRelation.WorkCenterId,
-                        SubWorkCenterId = inteWorkCenterRelation.SubWorkCenterId,
-                        WorkCenterCode = inteWorkCenterRelation.WorkCenterCode,
-                        WorkCenterName = inteWorkCenterRelation.WorkCenterName,
-                        CreatedBy = inteWorkCenterRelation.CreatedBy,
-                        CreatedOn = inteWorkCenterRelation.CreatedOn,
-                        UpdatedBy = inteWorkCenterRelation.UpdatedBy,
-                        UpdatedOn = inteWorkCenterRelation.UpdatedOn,
-                    });
-                }
-            }
-            if (inteWorkCenterResourceRelationList != null && inteWorkCenterResourceRelationList.Any())
-            {
-                inteWorkCenterDto.WorkCenterResourceRelationList = new List<InteWorkCenterResourceRelationDto>();
-                foreach (var inteWorkCenterResourceRelation in inteWorkCenterResourceRelationList)
-                {
-                    inteWorkCenterDto.WorkCenterResourceRelationList.Add(new InteWorkCenterResourceRelationDto
-                    {
-                        Id = inteWorkCenterResourceRelation.Id,
-                        WorkCenterId = inteWorkCenterResourceRelation.WorkCenterId,
-                        ResourceCode = inteWorkCenterResourceRelation.ResourceCode,
-                        ResourceName = inteWorkCenterResourceRelation.ResourceName,
-                        ResourceId = inteWorkCenterResourceRelation.ResourceId,
-                        CreatedBy = inteWorkCenterResourceRelation.CreatedBy,
-                        CreatedOn = inteWorkCenterResourceRelation.CreatedOn,
-                        UpdatedBy = inteWorkCenterResourceRelation.UpdatedBy,
-                        UpdatedOn = inteWorkCenterResourceRelation.UpdatedOn,
-                    });
-                }
+                inteWorkCenterDto = inteWorkCenterEntity.ToModel<InteWorkCenterDto>();
             }
             return inteWorkCenterDto;
         }
+
+        /// <summary>
+        /// 获取关联资源
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<List<InteWorkCenterResourceRelationDto>> GetInteWorkCenterResourceRelatioByIdAsync(long id)
+        {
+            var inteWorkCenterRelationList = await _inteWorkCenterRepository.GetInteWorkCenterResourceRelatioAsync(id);
+
+            var workCenterResourceRelationList = new List<InteWorkCenterResourceRelationDto>();
+            foreach (var inteWorkCenterResourceRelation in inteWorkCenterRelationList)
+            {
+                workCenterResourceRelationList.Add(new InteWorkCenterResourceRelationDto
+                {
+                    Id = inteWorkCenterResourceRelation.Id,
+                    WorkCenterId = inteWorkCenterResourceRelation.WorkCenterId,
+                    ResourceCode = inteWorkCenterResourceRelation.ResourceCode,
+                    ResourceName = inteWorkCenterResourceRelation.ResourceName,
+                    ResourceId = inteWorkCenterResourceRelation.ResourceId,
+                    CreatedBy = inteWorkCenterResourceRelation.CreatedBy,
+                    CreatedOn = inteWorkCenterResourceRelation.CreatedOn,
+                    UpdatedBy = inteWorkCenterResourceRelation.UpdatedBy,
+                    UpdatedOn = inteWorkCenterResourceRelation.UpdatedOn,
+                });
+            }
+            return workCenterResourceRelationList;
+        }
+
+
+        /// <summary>
+        /// 获取关联工作中心
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<List<InteWorkCenterRelationDto>> GetInteWorkCenterRelationByIdAsync(long id)
+        {
+            var inteWorkCenterRelationList = await _inteWorkCenterRepository.GetInteWorkCenterRelationAsync(id);
+
+            var workCenterRelationList = new List<InteWorkCenterRelationDto>();
+            foreach (var inteWorkCenterRelation in inteWorkCenterRelationList)
+            {
+                workCenterRelationList.Add(new InteWorkCenterRelationDto
+                {
+                    Id = inteWorkCenterRelation.Id,
+                    WorkCenterId = inteWorkCenterRelation.WorkCenterId,
+                    SubWorkCenterId = inteWorkCenterRelation.SubWorkCenterId,
+                    WorkCenterCode = inteWorkCenterRelation.WorkCenterCode,
+                    WorkCenterName = inteWorkCenterRelation.WorkCenterName,
+                    CreatedBy = inteWorkCenterRelation.CreatedBy,
+                    CreatedOn = inteWorkCenterRelation.CreatedOn,
+                    UpdatedBy = inteWorkCenterRelation.UpdatedBy,
+                    UpdatedOn = inteWorkCenterRelation.UpdatedOn,
+                });
+            }
+            return workCenterRelationList;
+        }
+
+
 
         /// <summary>
         /// 新增
@@ -165,6 +181,7 @@ namespace Hymson.MES.Services.Services.Integrated
                     {
                         inteWorkCenterRelations.Add(new InteWorkCenterRelation
                         {
+                            Id = IdGenProvider.Instance.CreateId(),
                             WorkCenterId = inteWorkCenterEntity.Id,
                             SubWorkCenterId = id,
                             CreatedBy = userId,
@@ -181,6 +198,7 @@ namespace Hymson.MES.Services.Services.Integrated
                     {
                         inteWorkCenterResourceRelations.Add(new InteWorkCenterResourceRelation
                         {
+                            Id = IdGenProvider.Instance.CreateId(),
                             WorkCenterId = inteWorkCenterEntity.Id,
                             ResourceId = id,
                             CreatedBy = userId,
@@ -201,11 +219,10 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeleteRangInteWorkCenterAsync(string ids)
+        public async Task<int> DeleteRangInteWorkCenterAsync(long[] ids)
         {
-            long[] idsArr = StringExtension.SpitLongArrary(ids);
             var userId = _currentUser.UserName;
-            return await _inteWorkCenterRepository.DeleteRangAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = userId });
+            return await _inteWorkCenterRepository.DeleteRangAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = userId });
         }
 
         /// <summary>

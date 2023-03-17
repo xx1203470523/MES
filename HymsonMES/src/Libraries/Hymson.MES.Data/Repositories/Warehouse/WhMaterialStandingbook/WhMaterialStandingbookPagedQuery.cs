@@ -20,5 +20,24 @@ namespace Hymson.MES.Data.Repositories.Warehouse
     public class WhMaterialStandingbookPagedQuery : PagerInfo
     {
 
+        /// <summary>
+        /// 物料条码
+        /// </summary>
+        public string? MaterialBarCode { get; set; }
+
+        /// <summary>
+        /// 批次
+        /// </summary>
+        public string? Batch { get; set; }
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string? MaterialCode { get; set; } = "";
+
+        /// <summary>
+        /// 物料版本
+        /// </summary>
+        public string? MaterialVersion { get; set; } 
     }
 }

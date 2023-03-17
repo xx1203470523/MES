@@ -63,12 +63,12 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 流转类型;物料接收/物料退料/物料加载
         /// </summary>
-        public bool Type { get; set; }
+        public int Type { get; set; }
 
         /// <summary>
         /// 来源/目标;手动录入/WMS/上料点编号
         /// </summary>
-        public bool Source { get; set; }
+        public int Source { get; set; }
 
         /// <summary>
         /// 创建人
@@ -240,12 +240,12 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 流转类型;物料接收/物料退料/物料加载
         /// </summary>
-        public bool Type { get; set; }
+        public int Type { get; set; }
 
         /// <summary>
         /// 来源/目标;手动录入/WMS/上料点编号
         /// </summary>
-        public bool Source { get; set; }
+        public int Source { get; set; }
 
         /// <summary>
         /// 创建人
@@ -291,5 +291,26 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         ///// 空值 : false  
         ///// </summary>
         //public string SiteCode { get; set; }
+
+
+        /// <summary>
+        /// 物料条码
+        /// </summary>
+        public string? MaterialBarCode { get; set; }
+
+        /// <summary>
+        /// 批次
+        /// </summary>
+        public string? Batch { get; set; }
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string? MaterialCode { get; set; } = "";
+
+        /// <summary>
+        /// 物料版本
+        /// </summary>
+        public string? MaterialVersion { get; set; } 
     }
 }

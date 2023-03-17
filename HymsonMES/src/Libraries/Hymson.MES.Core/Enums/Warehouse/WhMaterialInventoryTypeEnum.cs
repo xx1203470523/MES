@@ -5,7 +5,7 @@ namespace Hymson.MES.Core.Enums
     /// <summary>
     /// 物料库存来源类型
     /// </summary>
-    public enum WhMaterialInventorySourceEnum : sbyte
+    public enum WhMaterialInventoryTypeEnum : sbyte
     {
         /// <summary>
         /// 物料接收
