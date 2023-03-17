@@ -110,7 +110,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             {
                 sqlBuilder.Where(" pm.Version=@Version");
             }
-            if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.Status))
+            if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.Status.ToString()))
             {
                 //Enum.GetValues(whMaterialInventoryPagedQuery.Status)
                 sqlBuilder.Where(" wmi.Status=@Status");

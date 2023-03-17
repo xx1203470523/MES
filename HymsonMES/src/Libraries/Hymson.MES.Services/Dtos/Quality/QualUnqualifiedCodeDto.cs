@@ -152,6 +152,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         public string Remark { get; set; }
 
         /// <summary>
+        /// 工艺路线
+        /// </summary>
+        public long? ProcessRouteId { get; set; }
+
+        /// <summary>
         /// 不合格代码组
         /// </summary>
         public long[]? UnqualifiedGroupIds { get; set; }
@@ -197,6 +202,12 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 说明
         /// </summary>
         public string Remark { get; set; }
+
+        /// <summary>
+        /// 工艺路线
+        /// </summary>
+        public long ProcessRouteId { get; set; }
+
 
         /// <summary>
         /// 不合格代码组

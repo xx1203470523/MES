@@ -37,15 +37,31 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.OrderBy("UpdatedOn DESC");
-            sqlBuilder.Select("'Id','SiteId','Code','Name','Type','Source','Status','IsMixLine','Remark','CreatedBy','CreatedOn','UpdatedBy','UpdatedOn','IsDeleted'");
+            if (string.IsNullOrEmpty(param.Sorting))
+            {
+                sqlBuilder.OrderBy("UpdatedOn DESC");
+            }
+            else
+            {
+                sqlBuilder.OrderBy(param.Sorting);
+            }
+            sqlBuilder.Select("Id,SiteId,Code,Name,Type,Source,Status,IsMixLine,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted");
 
             if (param.SiteId != null) { sqlBuilder.Where("SiteId = @SiteId"); ; }
             if (param.Type != null) { sqlBuilder.Where("Type = @Type"); ; }
             if (param.Source != null) { sqlBuilder.Where("Source = @Source"); ; }
             if (param.Status != null) { sqlBuilder.Where("Status = @Status"); ; }
-            if (!string.IsNullOrWhiteSpace(param.Code)) { sqlBuilder.Where("Code like '%@Code%'"); }
-            if (!string.IsNullOrWhiteSpace(param.Name)) { sqlBuilder.Where("Name like '%@Name%'"); }
+            if (!string.IsNullOrWhiteSpace(param.Code))
+            {
+                param.Code = $"%{param.Code}%";
+                sqlBuilder.Where("Code like @Code");
+            }
+            if (!string.IsNullOrWhiteSpace(param.Name))
+            {
+                param.Code = $"%{param.Name}%";
+                sqlBuilder.Where("Name like @Name");
+            }
+
 
             var offSet = (param.PageIndex - 1) * param.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -219,9 +235,9 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         const string InsertSql = "INSERT INTO  `inte_work_center` (  'Id','SiteId','Code','Name','Type','Source','Status','IsMixLine','Remark','CreatedBy','CreatedOn','UpdatedBy','UpdatedOn','IsDeleted') VALUES ( @Id,@SiteId,@Code,@Name,@Type,@Source,@Status,@IsMixLine,@Remark,@CreatedBy,@CreatedOn,@UpdatedBy,@UpdatedOn,@IsDeleted) ";
         const string UpdateSql = "UPDATE `inte_work_center` SET  Name=@Name,Type=@Type,Source=@Source,Status=@Status,IsMixLine=@IsMixLine,Remark=@Remark,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id = @Id AND IsDeleted = @IsDeleted ";
         const string UpdateRangSql = "UPDATE `inte_work_center` SET Name=@Name,Type=@Type,Source=@Source,Status=@Status,IsMixLine=@IsMixLine,Remark=@Remark,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id = @Id AND IsDeleted = @IsDeleted ";
-        const string DeleteRangSql = "UPDATE `inte_work_center` SET IsDeleted = '1', UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id in @ids AND IsDeleted=0";
-        const string GetByIdSql = @"SELECT 'Id','SiteId','Code','Name','Type','Source','Status','IsMixLine','Remark','CreatedBy','CreatedOn','UpdatedBy','UpdatedOn','IsDeleted' FROM `inte_work_center`  WHERE Id = @Id AND IsDeleted=0  ";
-        const string GetByCodeSql = @"SELECT 'Id','SiteId','Code','Name','Type','Source','Status','IsMixLine','Remark','CreatedBy','CreatedOn','UpdatedBy','UpdatedOn','IsDeleted' FROM `inte_work_center`  WHERE Code = @Code  AND SiteId=@Site AND IsDeleted=0 ";
+        const string DeleteRangSql = "UPDATE `inte_work_center` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id in @ids AND IsDeleted=0";
+        const string GetByIdSql = @"SELECT 'Id,SiteId,Code,Name,Type,Source,Status,IsMixLine,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted FROM `inte_work_center`  WHERE Id = @Id AND IsDeleted=0  ";
+        const string GetByCodeSql = @"SELECT Id,SiteId,Code,Name,Type,Source,Status,IsMixLine,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted FROM `inte_work_center`  WHERE Code = @Code  AND SiteId=@Site AND IsDeleted=0 ";
 
         const string InsertInteWorkCenterRelationRangSql = "INSERT INTO  `inte_work_center_relation` (  'Id','WorkCenterId','SubWorkCenterId','Remark','CreatedBy','CreatedOn','UpdatedBy','UpdatedOn','IsDeleted','SiteId') VALUES ( @Id,@WorkCenterId,@SubWorkCenterId,@Remark,@CreatedBy,@CreatedOn,@UpdatedBy,@UpdatedOn,@IsDeleted,@SiteId) ";
         const string RealDelteInteWorkCenterRelationSql = "DELETE  FROM `inte_work_center_relation` WHERE  WorkCenterId = @Id AND IsDeleted=0";

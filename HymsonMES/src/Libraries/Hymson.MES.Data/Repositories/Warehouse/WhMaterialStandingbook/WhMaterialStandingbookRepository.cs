@@ -44,10 +44,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] ids) 
+        public async Task<int> DeletesAsync(long[] ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeletesSql, new { ids=ids });
+            return await conn.ExecuteAsync(DeletesSql, new { ids = ids });
 
         }
 
@@ -59,7 +59,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         public async Task<WhMaterialStandingbookEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<WhMaterialStandingbookEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<WhMaterialStandingbookEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -67,10 +67,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<WhMaterialStandingbookEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<WhMaterialStandingbookEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<WhMaterialStandingbookEntity>(GetByIdsSql, new { ids = ids});
+            return await conn.QueryAsync<WhMaterialStandingbookEntity>(GetByIdsSql, new { ids = ids });
         }
 
         /// <summary>
@@ -85,12 +85,30 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
-
+            sqlBuilder.OrderBy(" CreatedOn DESC");
             //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
-           
+
+
+            if (!string.IsNullOrWhiteSpace(whMaterialStandingbookPagedQuery.Batch))
+            {
+                sqlBuilder.Where(" Batch=@Batch");
+            }
+            if (!string.IsNullOrWhiteSpace(whMaterialStandingbookPagedQuery.MaterialBarCode))
+            {
+                sqlBuilder.Where(" MaterialBarCode=@MaterialBarCode");
+            }
+            if (!string.IsNullOrWhiteSpace(whMaterialStandingbookPagedQuery.MaterialCode))
+            {
+                sqlBuilder.Where(" MaterialCode=@MaterialCode");
+            }
+            if (!string.IsNullOrWhiteSpace(whMaterialStandingbookPagedQuery.MaterialVersion))
+            {
+                sqlBuilder.Where(" MaterialVersion=@MaterialVersion");
+            }
+
             var offSet = (whMaterialStandingbookPagedQuery.PageIndex - 1) * whMaterialStandingbookPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = whMaterialStandingbookPagedQuery.PageSize });
@@ -166,8 +184,8 @@ namespace Hymson.MES.Data.Repositories.Warehouse
 
     public partial class WhMaterialStandingbookRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `wh_material_standingbook` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `wh_material_standingbook` /**where**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `wh_material_standingbook`  /**innerjoin**/ /**leftjoin**/ /**where**/  /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `wh_material_standingbook`  /**where**/ ";
         const string GetWhMaterialStandingbookEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `wh_material_standingbook` /**where**/  ";
