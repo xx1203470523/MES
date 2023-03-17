@@ -46,7 +46,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Route("pagelist")]
         public async Task<PagedInfo<WhMaterialStandingbookDto>> QueryPagedWhMaterialStandingbookAsync([FromQuery] WhMaterialStandingbookPagedQueryDto parm)
         {
