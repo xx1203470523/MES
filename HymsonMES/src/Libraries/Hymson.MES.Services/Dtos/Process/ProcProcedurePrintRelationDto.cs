@@ -94,7 +94,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 所属模板ID
         /// </summary>
-        public long? TemplateId { get; set; }
+        public long TemplateId { get; set; }
 
        /// <summary>
         /// 份数
@@ -206,6 +206,10 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long? TemplateId { get; set; }
 
+        /// <summary>
+        /// 打印模板名称
+        /// </summary>
+        public string TemplateName { get; set; }
         /// <summary>
         /// 份数
         /// </summary>
