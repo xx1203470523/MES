@@ -75,7 +75,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task<QualUnqualifiedCodeDto> QueryQualUnqualifiedCodeByIdAsync(long id)
         {
-            var qualUnqualifiedCodeEntity =  await  _qualUnqualifiedCodeRepository.GetByIdAsync(id);
+            var qualUnqualifiedCodeEntity = await _qualUnqualifiedCodeRepository.GetByIdAsync(id);
 
             QualUnqualifiedCodeDto qualUnqualifiedCodeDto = new QualUnqualifiedCodeDto();
             if (qualUnqualifiedCodeEntity != null)
@@ -153,6 +153,7 @@ namespace Hymson.MES.Services.Services.Quality
                 {
                     list.Add(new QualUnqualifiedCodeGroupRelation
                     {
+                        Id = IdGenProvider.Instance.CreateId(),
                         UnqualifiedGroupId = item,
                         UnqualifiedCodeId = qualUnqualifiedCodeEntity.Id,
                         CreatedBy = userId,
@@ -209,6 +210,7 @@ namespace Hymson.MES.Services.Services.Quality
                 {
                     list.Add(new QualUnqualifiedCodeGroupRelation
                     {
+                        Id = IdGenProvider.Instance.CreateId(),
                         UnqualifiedGroupId = qualUnqualifiedCodeEntity.Id,
                         UnqualifiedCodeId = item,
                         CreatedBy = userId,

@@ -78,16 +78,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 是否逻辑删除 
         /// </summary>
         public byte IsDeleted { get; set; }
-
-        /// <summary>
-        /// 关联工作中心
-        /// </summary>
-        public  List<InteWorkCenterRelationDto> WorkCenterRelationList { get; set; }
-
-        /// <summary>
-        /// 关联资源
-        /// </summary>
-        public List<InteWorkCenterResourceRelationDto> WorkCenterResourceRelationList { get; set; }
     }
 
     /// <summary>

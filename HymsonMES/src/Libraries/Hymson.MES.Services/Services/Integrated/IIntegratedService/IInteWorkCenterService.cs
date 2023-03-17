@@ -26,6 +26,20 @@ namespace Hymson.MES.Services.Services.Integrated.IIntegratedService
         Task<InteWorkCenterDto> QueryInteWorkCenterByIdAsync(long id);
 
         /// <summary>
+        /// 获取关联资源
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<List<InteWorkCenterResourceRelationDto>> GetInteWorkCenterResourceRelatioByIdAsync(long id);
+
+        /// <summary>
+        /// 获取关联工作中心
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<List<InteWorkCenterRelationDto>> GetInteWorkCenterRelationByIdAsync(long id);
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="param">新增参数</param>
@@ -37,7 +51,7 @@ namespace Hymson.MES.Services.Services.Integrated.IIntegratedService
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<int> DeleteRangInteWorkCenterAsync(string ids);
+        Task<int> DeleteRangInteWorkCenterAsync(long[] ids);
 
 
         /// <summary>

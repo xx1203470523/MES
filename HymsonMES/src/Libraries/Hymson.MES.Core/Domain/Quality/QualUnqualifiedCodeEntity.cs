@@ -51,7 +51,7 @@ namespace Hymson.MES.Core.Domain.Quality
         /// 描述 :不合格工艺路线（所属工艺路线ID） 
         /// 空值 : true  
         /// </summary>
-        public long ProcessRouteId { get; set; }
+        public long? ProcessRouteId { get; set; }
 
         /// <summary>
         /// 描述 :说明 
