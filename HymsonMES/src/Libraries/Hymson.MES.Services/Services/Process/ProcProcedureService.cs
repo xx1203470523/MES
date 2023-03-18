@@ -67,6 +67,10 @@ namespace Hymson.MES.Services.Services.Process
         /// 作业表仓储
         /// </summary>
         private readonly IInteJobRepository _inteJobRepository;
+        /// <summary>
+        /// 仓库标签模板 仓储
+        /// </summary>
+        private readonly IProcLabelTemplateRepository _procLabelTemplateRepository;
 
         private readonly AbstractValidator<ProcProcedureCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcProcedureModifyDto> _validationModifyRules;
@@ -82,6 +86,7 @@ namespace Hymson.MES.Services.Services.Process
             IProcProcedurePrintRelationRepository procedurePrintRelationRepository,
             IProcMaterialRepository procMaterialRepository,
             IInteJobRepository inteJobRepository,
+            IProcLabelTemplateRepository procLabelTemplateRepository,
             AbstractValidator<ProcProcedureCreateDto> validationCreateRules,
             AbstractValidator<ProcProcedureModifyDto> validationModifyRules)
         {
@@ -93,6 +98,7 @@ namespace Hymson.MES.Services.Services.Process
             _procedurePrintRelationRepository = procedurePrintRelationRepository;
             _procMaterialRepository = procMaterialRepository;
             _inteJobRepository = inteJobRepository;
+            _procLabelTemplateRepository = procLabelTemplateRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
         }
@@ -180,10 +186,14 @@ namespace Hymson.MES.Services.Services.Process
             {
                 var materialIds = pagedInfo.Data.ToList().Select(a => a.MaterialId).ToArray();
                 var materialLsit = await _procMaterialRepository.GetByIdsAsync(materialIds);
+
+                var templateIds = pagedInfo.Data.ToList().Select(a => a.TemplateId).ToArray();
+                var templateLsit = await  _procLabelTemplateRepository.GetByIdsAsync(templateIds);
                 foreach (var entity in pagedInfo.Data)
                 {
                     var printReleationDto = entity.ToModel<ProcProcedurePrintRelationDto>();
                     var material = materialLsit.FirstOrDefault(a => a.Id == printReleationDto.MaterialId)?.ToModel<ProcMaterialDto>();
+                    var template = templateLsit.FirstOrDefault(a => a.Id == printReleationDto.TemplateId)?.ToModel<ProcLabelTemplateDto>();
                     var queryEntity = new QueryProcProcedurePrintReleationDto
                     {
                         TemplateId = entity.TemplateId,
@@ -191,7 +201,8 @@ namespace Hymson.MES.Services.Services.Process
                         MaterialId = entity.MaterialId,
                         Version = entity.Version,
                         MaterialCode = material?.MaterialCode ?? "",
-                        MaterialName = material?.MaterialName ?? ""
+                        MaterialName = material?.MaterialName ?? "",
+                       TemplateName= template?.Name??""
                     };
                     dtos.Add(queryEntity);
                     //TODO 模板 by wangkeming 

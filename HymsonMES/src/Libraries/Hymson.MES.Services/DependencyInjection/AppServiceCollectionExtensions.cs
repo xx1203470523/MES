@@ -82,6 +82,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteJobService, InteJobService>();
             services.AddSingleton<IInteContainerService, InteContainerService>();
             services.AddSingleton<IInteWorkCenterService, InteWorkCenterService>();
+
+            #region CodeRule
+            services.AddSingleton<IInteCodeRulesService, InteCodeRulesService>();
+            services.AddSingleton<IInteCodeRulesMakeService, InteCodeRulesMakeService>();
+            #endregion
             #endregion
 
             #region Process
@@ -229,6 +234,14 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<InteJobModifyDto>, InteJobModifyValidator>();
             services.AddSingleton<AbstractValidator<InteWorkCenterCreateDto>, InteWorkCenterCreateValidator>();
             services.AddSingleton<AbstractValidator<InteWorkCenterModifyDto>, InteWorkCenterModifyValidator>();
+
+            #region CodeRule
+            services.AddSingleton<AbstractValidator<InteCodeRulesCreateDto>, InteCodeRulesCreateValidator>();
+            services.AddSingleton<AbstractValidator<InteCodeRulesModifyDto>, InteCodeRulesModifyValidator>();
+
+            services.AddSingleton<AbstractValidator<InteCodeRulesMakeCreateDto>, InteCodeRulesMakeCreateValidator>();
+            services.AddSingleton<AbstractValidator<InteCodeRulesMakeModifyDto>, InteCodeRulesMakeModifyValidator>();
+            #endregion
             #endregion
 
             #region Quality

@@ -81,6 +81,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteJobBusinessRelationRepository, InteJobBusinessRelationRepository>();
             services.AddSingleton<IInteJobRepository, InteJobRepository>();
             services.AddSingleton<IInteWorkCenterRepository, InteWorkCenterRepository>();
+
+            #region CodeRule
+            services.AddSingleton<IInteCodeRulesRepository, InteCodeRulesRepository>();
+            services.AddSingleton<IInteCodeRulesMakeRepository, InteCodeRulesMakeRepository>();
+            #endregion
             #endregion
 
             #region Process
