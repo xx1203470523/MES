@@ -180,7 +180,7 @@ namespace Microsoft.Extensions.DependencyInjection
             #region PlanWorkOrder
             services.AddSingleton<IPlanWorkOrderRepository, PlanWorkOrderRepository>();
             #endregion
-
+            #endregion
 
             return services;
         }

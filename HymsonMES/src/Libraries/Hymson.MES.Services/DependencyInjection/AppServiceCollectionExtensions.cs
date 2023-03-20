@@ -19,6 +19,8 @@ using Hymson.MES.Services.Services.Integrated.IIntegratedService;
 using Hymson.MES.Services.Services.Integrated.InteCalendar;
 using Hymson.MES.Services.Services.Integrated.InteClass;
 using Hymson.MES.Services.Services.Integrated.InteContainer;
+using Hymson.MES.Services.Services.Manufacture;
+using Hymson.MES.Services.Services.Plan;
 using Hymson.MES.Services.Services.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.MES.Services.Services.Process.MaskCode;
@@ -27,6 +29,8 @@ using Hymson.MES.Services.Services.Quality.IQualityService;
 using Hymson.MES.Services.Services.Warehouse;
 using Hymson.MES.Services.Validators.Equipment;
 using Hymson.MES.Services.Validators.Integrated;
+using Hymson.MES.Services.Validators.Manufacture;
+using Hymson.MES.Services.Validators.Plan;
 using Hymson.MES.Services.Validators.Process;
 using Hymson.MES.Services.Validators.Quality;
 using Hymson.MES.Services.Validators.Warehouse;
@@ -151,9 +155,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region Plan
             #region PlanWorkOrder
-
-            #endregion
             services.AddSingleton<IPlanWorkOrderService, PlanWorkOrderService>();
+            #endregion
             #endregion
 
             return services;
