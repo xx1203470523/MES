@@ -112,7 +112,10 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// </summary>
         public long SiteId { get; set; }
 
-       
+        /// <summary>
+        /// 是否锁定
+        /// </summary>
+        public YesOrNoEnum IsLocked { get; set; }
     }
 
 
@@ -180,6 +183,11 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// 工厂
         /// </summary>
         public long SiteId { get; set; }
+
+        /// <summary>
+        /// 是否锁定
+        /// </summary>
+        public YesOrNoEnum IsLocked { get; set; }
     }
 
     /// <summary>
@@ -252,6 +260,10 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// </summary>
         public long SiteId { get; set; }
 
+        /// <summary>
+        /// 是否锁定
+        /// </summary>
+        public YesOrNoEnum IsLocked { get; set; }
     }
 
     /// <summary>

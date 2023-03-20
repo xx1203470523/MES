@@ -13,9 +13,9 @@ namespace Hymson.MES.Core.Enums
         [Description("未开始")]
         NotStarted = 1,
         /// <summary>
-        /// 下达
+        /// 已下达
         /// </summary>
-        [Description("下达")]
+        [Description("已下达")]
         SendDown = 2,
         /// <summary>
         /// 生产中
@@ -23,15 +23,15 @@ namespace Hymson.MES.Core.Enums
         [Description("生产中")]
         InProduction = 3,
         /// <summary>
-        /// 完成
+        /// 已完成
         /// </summary>
-        [Description("完成")]
+        [Description("已完成")]
         Finish = 4,
         /// <summary>
-        /// 锁定
+        /// 已关闭
         /// </summary>
-        [Description("锁定")]
-        Lock = 5,
+        [Description("已关闭")]
+        Closed = 5,
         /// <summary>
         /// 暂停中
         /// </summary>

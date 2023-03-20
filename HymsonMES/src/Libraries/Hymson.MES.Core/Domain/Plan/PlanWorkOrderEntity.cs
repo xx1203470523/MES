@@ -85,6 +85,9 @@ namespace Hymson.MES.Core.Domain.Plan
         /// </summary>
         public long SiteId { get; set; }
 
-       
+        /// <summary>
+        /// 是否锁定
+        /// </summary>
+        public YesOrNoEnum IsLocked { get; set; }
     }
 }
