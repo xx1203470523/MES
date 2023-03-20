@@ -28,6 +28,56 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 分页查询
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ManuSfcProduceView>> GetPagedInfoAsync(ManuSfcProducePagedQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
+
+            sqlBuilder.Where("msp.IsDeleted = 0");
+            sqlBuilder.Where("msp.SiteId = @SiteId");
+            sqlBuilder.OrderBy("msp.UpdatedOn DESC");
+
+            sqlBuilder.Select("msp.Id,msp.Lock,msp.Sfc,msp.LockProductionId,msp.Status,pwo.OrderCode,pp.Code,pp.Name,pm.MaterialCode,pm.MaterialName,pm.Version ");
+
+            sqlBuilder.LeftJoin("proc_material pm  on msp.ProductId =pm.Id  and pm.IsDeleted=0");
+            sqlBuilder.LeftJoin("plan_work_order pwo on msp.WorkOrderId =pwo.Id  and pwo.IsDeleted=0");
+            sqlBuilder.LeftJoin("proc_procedure pp on msp.ProcedureId =pp.Id and pp.IsDeleted =0");
+            if (query.Status.HasValue)
+            {
+                sqlBuilder.Where("msp.Status=@Status");
+            }
+            if (string.IsNullOrWhiteSpace(query.Sfc))
+            {
+                sqlBuilder.Where("msp.Sfc=@Sfc");
+            }
+            if (string.IsNullOrWhiteSpace(query.OrderCode))
+            {
+                sqlBuilder.Where("pwo.OrderCode=@OrderCode");
+            }
+            if (string.IsNullOrWhiteSpace(query.Code))
+            {
+                sqlBuilder.Where("pp.Code=@Code");
+            }
+
+            var offSet = (query.PageIndex - 1) * query.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = query.PageSize });
+            sqlBuilder.AddParameters(query);
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var manuSfcProduceEntitiesTask = conn.QueryAsync<ManuSfcProduceView>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var manuSfcProduceEntities = await manuSfcProduceEntitiesTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<ManuSfcProduceView>(manuSfcProduceEntities, query.PageIndex, query.PageSize, totalCount);
+        }
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -47,37 +97,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ManuSfcProduceEntity>(GetByIdsSql, new { ids = ids});
-        }
-
-        /// <summary>
-        /// 分页查询
-        /// </summary>
-        /// <param name="manuSfcProducePagedQuery"></param>
-        /// <returns></returns>
-        public async Task<PagedInfo<ManuSfcProduceEntity>> GetPagedInfoAsync(ManuSfcProducePagedQuery manuSfcProducePagedQuery)
-        {
-            var sqlBuilder = new SqlBuilder();
-            var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
-            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.Select("*");
-
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-           
-            var offSet = (manuSfcProducePagedQuery.PageIndex - 1) * manuSfcProducePagedQuery.PageSize;
-            sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = manuSfcProducePagedQuery.PageSize });
-            sqlBuilder.AddParameters(manuSfcProducePagedQuery);
-
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var manuSfcProduceEntitiesTask = conn.QueryAsync<ManuSfcProduceEntity>(templateData.RawSql, templateData.Parameters);
-            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
-            var manuSfcProduceEntities = await manuSfcProduceEntitiesTask;
-            var totalCount = await totalCountTask;
-            return new PagedInfo<ManuSfcProduceEntity>(manuSfcProduceEntities, manuSfcProducePagedQuery.PageIndex, manuSfcProducePagedQuery.PageSize, totalCount);
         }
 
         /// <summary>

@@ -16,6 +16,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     public interface IManuSfcProduceRepository
     {
         /// <summary>
+        /// 分页查询
+        /// </summary>
+        /// <param name="manuSfcProducePagedQuery"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ManuSfcProduceView>> GetPagedInfoAsync(ManuSfcProducePagedQuery manuSfcProducePagedQuery);
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -35,13 +42,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuSfcProduceQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuSfcProduceEntity>> GetManuSfcProduceEntitiesAsync(ManuSfcProduceQuery manuSfcProduceQuery);
-
-        /// <summary>
-        /// 分页查询
-        /// </summary>
-        /// <param name="manuSfcProducePagedQuery"></param>
-        /// <returns></returns>
-        Task<PagedInfo<ManuSfcProduceEntity>> GetPagedInfoAsync(ManuSfcProducePagedQuery manuSfcProducePagedQuery);
 
         /// <summary>
         /// 新增

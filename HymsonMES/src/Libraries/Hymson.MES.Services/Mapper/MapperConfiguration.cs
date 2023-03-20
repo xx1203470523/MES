@@ -18,6 +18,7 @@ using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
+using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
@@ -28,6 +29,7 @@ using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Dtos.Warehouse;
@@ -392,6 +394,16 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualUnqualifiedGroupCreateDto, QualUnqualifiedGroupEntity>();
             CreateMap<QualUnqualifiedGroupModifyDto, QualUnqualifiedGroupEntity>();
             CreateMap<QualUnqualifiedGroupPagedQueryDto, QualUnqualifiedGroupPagedQuery>();
+            #endregion
+        }
+
+        /// <summary>
+        /// 生产模块
+        /// </summary>
+        protected virtual void CreateManufactureMaps()
+        {
+            #region QualityLock
+            CreateMap<ManuSfcProducePagedQueryDto, ManuSfcProducePagedQuery>();
             #endregion
         }
         /// <summary>
