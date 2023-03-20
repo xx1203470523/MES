@@ -18,9 +18,9 @@ namespace Hymson.MES.Core.Enums
         [Description("测试工单")]
         Test = 2,
         /// <summary>
-        /// 量产
+        /// 量产工单
         /// </summary>
-        [Description("量产")]
+        [Description("量产工单")]
         Output = 3,
     }
 }
