@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Dtos.Warehouse;
@@ -17,6 +18,7 @@ using Hymson.MES.Services.Services.Integrated.IIntegratedService;
 using Hymson.MES.Services.Services.Integrated.InteCalendar;
 using Hymson.MES.Services.Services.Integrated.InteClass;
 using Hymson.MES.Services.Services.Integrated.InteContainer;
+using Hymson.MES.Services.Services.Plan;
 using Hymson.MES.Services.Services.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.MES.Services.Services.Process.MaskCode;
@@ -25,6 +27,7 @@ using Hymson.MES.Services.Services.Quality.IQualityService;
 using Hymson.MES.Services.Services.Warehouse;
 using Hymson.MES.Services.Validators.Equipment;
 using Hymson.MES.Services.Validators.Integrated;
+using Hymson.MES.Services.Validators.Plan;
 using Hymson.MES.Services.Validators.Process;
 using Hymson.MES.Services.Validators.Quality;
 using Hymson.MES.Services.Validators.Warehouse;
@@ -140,6 +143,13 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IWhMaterialStandingbookService, WhMaterialStandingbookService>();
 
 
+            #endregion
+
+            #region Plan
+            #region PlanWorkOrder
+
+            #endregion
+            services.AddSingleton<IPlanWorkOrderService, PlanWorkOrderService>();
             #endregion
 
             return services;
@@ -263,6 +273,14 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<WhMaterialStandingbookCreateDto>, WhMaterialStandingbookCreateValidator>();
             services.AddSingleton<AbstractValidator<WhMaterialStandingbookModifyDto>, WhMaterialStandingbookModifyValidator>();
 
+
+            #endregion
+
+            #region Plan
+            #region PlanWorkOrder
+            services.AddSingleton<AbstractValidator<PlanWorkOrderCreateDto>, PlanWorkOrderCreateValidator>();
+            services.AddSingleton<AbstractValidator<PlanWorkOrderModifyDto>, PlanWorkOrderModifyValidator>();
+            #endregion
 
             #endregion
 
