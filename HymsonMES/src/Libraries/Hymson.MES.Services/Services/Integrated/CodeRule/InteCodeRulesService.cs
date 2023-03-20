@@ -92,11 +92,10 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeletesInteCodeRulesAsync(string ids)
+        public async Task<int> DeletesInteCodeRulesAsync(long[] idsArr)
         {
-            var idsArr = StringExtension.SpitLongArrary(ids);
             return await _inteCodeRulesRepository.DeletesAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
         }
 

@@ -51,9 +51,9 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="idsArr"></param>
         /// <returns></returns>
-        Task<int> DeletesInteCodeRulesAsync(string ids);
+        Task<int> DeletesInteCodeRulesAsync(long[] idsArr);
 
         /// <summary>
         /// 根据ID查询
