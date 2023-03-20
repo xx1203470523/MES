@@ -43,7 +43,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :所属模板ID 
         /// 空值 : true  
         /// </summary>
-        public long? TemplateId { get; set; }
+        public long TemplateId { get; set; }
 
         /// <summary>
         /// 站点id

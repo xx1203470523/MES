@@ -10,24 +10,26 @@ namespace Hymson.MES.Core.Enums.Integrated
     /// <summary>
     /// 工作中心类型
     /// </summary>
-    public enum WorkCenterType : short
+    public enum WorkCenterTypeEnum : short
     {
         /// <summary>
         /// 工厂
         /// </summary>
         [Description("工厂")]
-        Factory = 0,
-
-        /// <summary>
-        /// 产线
-        /// </summary>
-        [Description("产线")]
-        Line = 1,
+        Factory = 1,
 
         /// <summary>
         /// 车间
         /// </summary>
         [Description("车间")]
-        Farm = 2
+        Farm = 2,
+
+        /// <summary>
+        /// 产线
+        /// </summary>
+        [Description("产线")]
+        Line = 3,
+
+  
     }
 }

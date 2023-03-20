@@ -33,13 +33,13 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// 描述 :类型(工厂/车间/产线) 
         /// 空值 : false  
         /// </summary>
-        public WorkCenterType Type { get; set; }
+        public WorkCenterTypeEnum Type { get; set; }
 
         /// <summary>
         /// 描述 :数据来源 
         /// 空值 : false  
         /// </summary>
-        public WorkCenterSource Source { get; set; }
+        public WorkCenterSourceEnum Source { get; set; }
 
         /// <summary>
         /// 描述 :状态 
@@ -51,7 +51,7 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// 描述 :是否混线 
         /// 空值 : false  
         /// </summary>
-        public bool IsMixLine { get; set; }
+        public bool? IsMixLine { get; set; }
 
         /// <summary>
         /// 描述 :说明 
