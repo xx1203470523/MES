@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Hymson.MES.Core.Enums.Integrated
 {
-    public enum WorkCenterSource:short
+    public enum WorkCenterSourceEnum:short
     {
         /// <summary>
         /// 工厂

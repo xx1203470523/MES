@@ -18,8 +18,8 @@ namespace Hymson.MES.Services.Validators.Integrated
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12104));
             RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES12105));
             RuleFor(x => x.Type).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12106));
-            RuleFor(x => x.Source).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12107));
-            RuleFor(x => x.IsMixLine).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12108));
+          //  RuleFor(x => x.Source).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12107));
+           // RuleFor(x => x.IsMixLine).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12108));
             RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES12109));
         }
     }
@@ -37,8 +37,8 @@ namespace Hymson.MES.Services.Validators.Integrated
             RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES12105));
             RuleFor(x => x.Type).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12106));
             RuleFor(x => x.Status).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12110));
-            RuleFor(x => x.Source).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12107));
-            RuleFor(x => x.IsMixLine).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12108));
+           // RuleFor(x => x.Source).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12107));
+           // RuleFor(x => x.IsMixLine).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12108));
             RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES12109));
         }
     }

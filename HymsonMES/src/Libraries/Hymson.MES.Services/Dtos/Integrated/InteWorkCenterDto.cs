@@ -1,4 +1,6 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Integrated;
 
 namespace Hymson.MES.Services.Dtos.Integrated
 {
@@ -32,17 +34,17 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 类型(工厂/车间/产线) 
         /// </summary>
-        public short Type { get; set; }
+        public WorkCenterTypeEnum? Type { get; set; }
 
         /// <summary>
         /// 数据来源 
         /// </summary>
-        public short Source { get; set; }
+        public WorkCenterSourceEnum? Source { get; set; }
 
         /// <summary>
         /// 状态 
         /// </summary>
-        public short Status { get; set; }
+        public SysDataStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 是否混线 
@@ -205,12 +207,12 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 类型(工厂/车间/产线) 
         /// </summary>
-        public short Type { get; set; }
+        public WorkCenterTypeEnum? Type { get; set; }
 
         /// <summary>
         /// 数据来源 
         /// </summary>
-        public short Source { get; set; }
+        public WorkCenterSourceEnum? Source { get; set; }
 
         /// <summary>
         /// 是否混线 
@@ -225,12 +227,12 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 工作中心
         /// </summary>
-        public List<long> WorkCenterIds { get; set; }
+        public List<long>? WorkCenterIds { get; set; }
 
         /// <summary>
         /// 资源
         /// </summary>
-        public List<long> ResourceIds { get; set; }
+        public List<long>? ResourceIds { get; set; }
     }
 
     /// <summary>
@@ -253,37 +255,37 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 类型(工厂/车间/产线) 
         /// </summary>
-        public short Type { get; set; }
+        public WorkCenterTypeEnum? Type { get; set; }
 
         /// <summary>
         /// 数据来源 
         /// </summary>
-        public short Source { get; set; }
+        public WorkCenterSourceEnum? Source { get; set; }
 
         /// <summary>
         /// 状态 
         /// </summary>
-        public short Status { get; set; }
+        public SysDataStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 是否混线 
         /// </summary>
-        public bool IsMixLine { get; set; }
+        public bool? IsMixLine { get; set; }
 
         /// <summary>
         /// 说明 
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
         /// <summary>
         /// 工作中心
         /// </summary>
-        public List<long> WorkCenterIds { get; set; }
+        public List<long>? WorkCenterIds { get; set; }
 
         /// <summary>
         /// 资源
         /// </summary>
-        public List<long> ResourceIds { get; set; }
+        public List<long>? ResourceIds { get; set; }
     }
 
     /// <summary>
@@ -301,26 +303,26 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 工作中心代码 
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
         /// <summary>
         /// 工作中心名称 
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// 类型(工厂/车间/产线) 
         /// </summary>
-        public short? Type { get; set; }
+        public WorkCenterTypeEnum? Type { get; set; }
 
         /// <summary>
         /// 数据来源 
         /// </summary>
-        public short? Source { get; set; }
+        public WorkCenterSourceEnum? Source { get; set; }
 
         /// <summary>
         /// 状态 
         /// </summary>
-        public short? Status { get; set; }
+        public SysDataStatusEnum? Status { get; set; }
     }
 }

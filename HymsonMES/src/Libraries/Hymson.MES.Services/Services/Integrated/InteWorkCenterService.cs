@@ -172,7 +172,7 @@ namespace Hymson.MES.Services.Services.Integrated
             inteWorkCenterEntity.SiteId = _currentSite.SiteId ?? 0;
             List<InteWorkCenterRelation> inteWorkCenterRelations = new List<InteWorkCenterRelation>();
             List<InteWorkCenterResourceRelation> inteWorkCenterResourceRelations = new List<InteWorkCenterResourceRelation>();
-            if (param.Type == (short)WorkCenterType.Factory || param.Type == (short)WorkCenterType.Farm)
+            if (param.Type == WorkCenterTypeEnum.Factory || param.Type == WorkCenterTypeEnum.Farm)
             {
 
                 if (param.WorkCenterIds != null && param.WorkCenterIds.Any())
@@ -247,7 +247,7 @@ namespace Hymson.MES.Services.Services.Integrated
             }
             else
             {
-                if ((short)entity.Type != param.Type)
+                if (entity.Type != param.Type)
                 {
                     var getInteWorkCenterRelationTask = _inteWorkCenterRepository.GetInteWorkCenterRelationAsync(param.Id);
                     var getInteWorkCenterResourceRelationTask = _inteWorkCenterRepository.GetInteWorkCenterResourceRelatioAsync(param.Id);
@@ -269,7 +269,7 @@ namespace Hymson.MES.Services.Services.Integrated
 
             List<InteWorkCenterRelation> inteWorkCenterRelations = new List<InteWorkCenterRelation>();
             List<InteWorkCenterResourceRelation> inteWorkCenterResourceRelations = new List<InteWorkCenterResourceRelation>();
-            if (param.Type == (short)WorkCenterType.Factory || param.Type == (short)WorkCenterType.Farm)
+            if (param.Type ==WorkCenterTypeEnum.Factory || param.Type == WorkCenterTypeEnum.Farm)
             {
 
                 if (param.WorkCenterIds != null && param.WorkCenterIds.Any())
@@ -278,6 +278,7 @@ namespace Hymson.MES.Services.Services.Integrated
                     {
                         inteWorkCenterRelations.Add(new InteWorkCenterRelation
                         {
+                            Id = IdGenProvider.Instance.CreateId(),
                             WorkCenterId = inteWorkCenterEntity.Id,
                             SubWorkCenterId = id,
                             CreatedBy = userId,
@@ -288,12 +289,13 @@ namespace Hymson.MES.Services.Services.Integrated
             }
             else
             {
-                if (param.WorkCenterIds != null && param.WorkCenterIds.Any())
+                if (param.ResourceIds != null && param.ResourceIds.Any())
                 {
-                    foreach (var id in param.WorkCenterIds)
+                    foreach (var id in param.ResourceIds)
                     {
                         inteWorkCenterResourceRelations.Add(new InteWorkCenterResourceRelation
                         {
+                            Id = IdGenProvider.Instance.CreateId(),
                             WorkCenterId = inteWorkCenterEntity.Id,
                             ResourceId = id,
                             CreatedBy = userId,
