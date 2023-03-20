@@ -29,6 +29,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// 构造函数（条码生产信息（物理删除））
         /// </summary>
         /// <param name="manuSfcProduceService"></param>
+        /// <param name="logger"></param>
         public ManuSfcProduceController(IManuSfcProduceService manuSfcProduceService, ILogger<ManuSfcProduceController> logger)
         {
             _manuSfcProduceService = manuSfcProduceService;
@@ -40,9 +41,9 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Route("pagelist")]
-        public async Task<PagedInfo<ManuSfcProduceDto>> QueryPagedManuSfcProduceAsync([FromQuery] ManuSfcProducePagedQueryDto parm)
+        public async Task<PagedInfo<ManuSfcProduceViewDto>> QueryPagedManuSfcProduceAsync([FromQuery] ManuSfcProducePagedQueryDto parm)
         {
             return await _manuSfcProduceService.GetPageListAsync(parm);
         }

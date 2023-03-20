@@ -6,6 +6,7 @@
  *build datetime: 2023-03-18 05:37:27
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,29 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public class ManuSfcProducePagedQuery : PagerInfo
     {
+        /// <summary>
+        /// 站点编码 
+        /// </summary>
+        public long? SiteId { get; set; }
 
-    }
+        /// <summary>
+        ///产品条码
+        /// </summary>
+        public string? Sfc { get; set; }
+
+        /// <summary>
+        /// 条码状态
+        /// </summary>
+        public SfcProduceStatusEnum? Status { get; set; }
+
+        /// <summary>
+        /// 工单
+        /// </summary>
+        public string? OrderCode { get; set; }
+
+        /// <summary>
+        /// 工序
+        /// </summary>
+        public string? Code { get; set; }
+}
 }

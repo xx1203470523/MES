@@ -25,7 +25,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="manuSfcProducePagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<ManuSfcProduceDto>> GetPageListAsync(ManuSfcProducePagedQueryDto manuSfcProducePagedQueryDto);
+        Task<PagedInfo<ManuSfcProduceViewDto>> GetPageListAsync(ManuSfcProducePagedQueryDto manuSfcProducePagedQueryDto);
 
         /// <summary>
         /// 新增

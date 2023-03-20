@@ -7,11 +7,7 @@
  */
 
 using Hymson.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Services.Dtos.Manufacture
 {
@@ -133,6 +129,26 @@ namespace Hymson.MES.Services.Dtos.Manufacture
        
     }
 
+    /// <summary>
+    /// 质量锁定操作实体
+    /// </summary>
+    public record ManuSfcProduceLockDto
+    {
+        /// <summary>
+        /// 操作类型
+        /// </summary>
+        public QualityLockEnum OperationType { get; set; }
+
+        /// <summary>
+        /// 将来锁，锁定的工序id
+        /// </summary>
+        public long? LockProductionId { get; set; }
+
+        /// <summary>
+        /// 条码列表
+        /// </summary>
+        public string[] Sfcs { get; set; }
+    }
 
     /// <summary>
     /// 条码生产信息（物理删除）新增Dto
@@ -144,112 +160,112 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 条码
         /// </summary>
         public string Sfc { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 产品id
         /// </summary>
         public long ProductId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工单id
         /// </summary>
         public long WorkOrderId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 条码数据id
         /// </summary>
         public long BarCodeInfoId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工艺路线
         /// </summary>
         public long ProcessRouteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工作中心
         /// </summary>
         public long WorkCenterId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// BOMId
         /// </summary>
         public long ProductBOMId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 设备Id
         /// </summary>
         public long EquipmentId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 资源id
         /// </summary>
         public long ResourceId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工序id
         /// </summary>
         public long ProcedureId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态;1：排队；2：活动；
         /// </summary>
         public bool Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 锁;1：未锁定；2：即时锁；3：将来锁；
         /// </summary>
         public string Lock { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 未来锁工序id
         /// </summary>
         public string LockProductionId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否可疑
         /// </summary>
         public bool? IsSuspicious { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 复投次数;复投次数
         /// </summary>
         public int RepeatedCount { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 删除标识
         /// </summary>
         public long IsDeleted { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
 
-       
+
     }
 
     /// <summary>
@@ -366,9 +382,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
-
-       
-
     }
 
     /// <summary>
@@ -376,10 +389,85 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     /// </summary>
     public class ManuSfcProducePagedQueryDto : PagerInfo
     {
-        ///// <summary>
-        ///// 描述 :站点编码 
-        ///// 空值 : false  
-        ///// </summary>
-        //public string SiteCode { get; set; }
+        /// <summary>
+        ///产品条码
+        /// </summary>
+        public string? Sfc { get; set; }
+
+        /// <summary>
+        /// 条码状态
+        /// </summary>
+        public SfcProduceStatusEnum? Status { get; set; }
+
+        /// <summary>
+        /// 工单
+        /// </summary>
+        public string? OrderCode { get; set; }
+
+        /// <summary>
+        /// 工序
+        /// </summary>
+        public string? Code { get; set; }
+    }
+
+    /// <summary>
+    /// 分页查询返回实体
+    /// </summary>
+   public class ManuSfcProduceViewDto
+    {
+        /// <summary>
+        ///  唯一标识
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string Sfc { get; set; }
+
+        /// <summary>
+        /// 锁;1：未锁定；2：即时锁；3：将来锁；
+        /// </summary>
+        public int? Lock { get; set; }
+
+        /// <summary>
+        /// 未来锁工序id
+        /// </summary>
+        public long? LockProductionId { get; set; }
+
+        /// <summary>
+        /// 状态;1：排队；2：活动；
+        /// </summary>
+        public int Status { get; set; }
+
+        /// <summary>
+        /// 工单
+        /// </summary>
+        public string OrderCode { get; set; }
+
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 产品编码
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 产品名称
+        /// </summary>
+        public string MaterialName { get; set; }
+
+        /// <summary>
+        /// 产品版本
+        /// </summary>
+        public string Version { get; set; }
     }
 }
