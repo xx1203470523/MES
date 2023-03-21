@@ -240,6 +240,13 @@
 
         #endregion
 
+        #region 质量锁定 15300
+        public const string MES15300 = "将来锁定工序必填";
+        public const string MES15301 = "条码已报废/删除，不可再操作锁定/取消锁定！";
+        public const string MES15302 = "将来锁定操作必须是同一工单下的条码！";
+        #endregion
+
+
         #region 工单  16000
         public const string MES16000 = "工单错误";
         public const string MES16001 = "此工单编码{orderCode}在系统已经存在！";
