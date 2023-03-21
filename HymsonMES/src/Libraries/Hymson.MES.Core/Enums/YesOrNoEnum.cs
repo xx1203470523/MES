@@ -13,11 +13,11 @@ namespace Hymson.MES.Core.Enums
         /// 是
         /// </summary>
         [Description("是")]
-        No = 1,
+        Yes = 1,
         /// <summary>
         /// 否
         /// </summary>
         [Description("否")]
-        Yes = 2,
+        No= 2,
     }
 }

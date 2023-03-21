@@ -2,6 +2,7 @@
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Domain.Warehouse;
@@ -19,6 +20,7 @@ using Hymson.MES.Data.Repositories.Integrated.InteContainer.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
@@ -30,6 +32,7 @@ using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;
+using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Dtos.Warehouse;
@@ -51,6 +54,7 @@ namespace Hymson.MES.Services.Mapper
             CreateProcessMaps();
             CreateQualityMaps();
             CreateWarehouseMaps();
+            CreatePlanMaps();
         }
 
         /// <summary>
@@ -406,6 +410,22 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuSfcProducePagedQueryDto, ManuSfcProducePagedQuery>();
             #endregion
         }
+
+        /// <summary>
+        /// 计划模块
+        /// </summary>
+        protected virtual void CreatePlanMaps() 
+        {
+            #region WorkOrder
+            CreateMap<PlanWorkOrderCreateDto, PlanWorkOrderEntity>();
+            CreateMap<PlanWorkOrderModifyDto, PlanWorkOrderEntity>();
+            CreateMap<PlanWorkOrderPagedQueryDto, PlanWorkOrderPagedQuery>();
+            CreateMap<PlanWorkOrderEntity, PlanWorkOrderDto>();
+            CreateMap<PlanWorkOrderEntity, PlanWorkOrderDetailView>();
+
+            #endregion
+        }
+
         /// <summary>
         /// 排序，决定了加载的顺序
         /// </summary>

@@ -58,7 +58,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<PlanWorkOrderDto> QueryPlanWorkOrderByIdAsync(long id)
+        public async Task<PlanWorkOrderDetailView> QueryPlanWorkOrderByIdAsync(long id)
         {
             return await _planWorkOrderService.QueryPlanWorkOrderByIdAsync(id);
         }

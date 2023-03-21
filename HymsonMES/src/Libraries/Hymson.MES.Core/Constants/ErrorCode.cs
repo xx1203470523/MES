@@ -239,6 +239,15 @@
         public const string MES152015 = " 供应商不能为空";
 
         #endregion
+
+        #region 工单  16000
+        public const string MES16000 = "工单错误";
+        public const string MES16001 = "此工单编码{orderCode}在系统已经存在！";
+        public const string MES16002 = "添加生产工单失败！";
+        public const string MES16003 = "没有查找到该数据！请检查数据是否还存在";
+        public const string MES16004 = "修改生产工单失败！";
+        #endregion
+
         #endregion
 
         #region 系统执行出错 业务逻辑出错
