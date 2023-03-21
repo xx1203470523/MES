@@ -14,8 +14,11 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Plan;
+using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using System.Transactions;
@@ -36,20 +39,29 @@ namespace Hymson.MES.Services.Services.Plan
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
         private readonly AbstractValidator<PlanWorkOrderCreateDto> _validationCreateRules;
         private readonly AbstractValidator<PlanWorkOrderModifyDto> _validationModifyRules;
+        private readonly IProcMaterialRepository _procMaterialRepository;
+        private readonly IProcBomRepository _procBomRepository;
+        private readonly IProcProcessRouteRepository _procProcessRouteRepository;
+        private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
 
-        public PlanWorkOrderService(ICurrentUser currentUser, ICurrentSite currentSite, IPlanWorkOrderRepository planWorkOrderRepository, AbstractValidator<PlanWorkOrderCreateDto> validationCreateRules, AbstractValidator<PlanWorkOrderModifyDto> validationModifyRules)
+        public PlanWorkOrderService(ICurrentUser currentUser, ICurrentSite currentSite, IPlanWorkOrderRepository planWorkOrderRepository, AbstractValidator<PlanWorkOrderCreateDto> validationCreateRules, AbstractValidator<PlanWorkOrderModifyDto> validationModifyRules, IProcMaterialRepository procMaterialRepository, IProcBomRepository procBomRepository, IProcProcessRouteRepository procProcessRouteRepository, IInteWorkCenterRepository inteWorkCenterRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _planWorkOrderRepository = planWorkOrderRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
+
+            _procMaterialRepository = procMaterialRepository;
+            _procBomRepository = procBomRepository;
+            _procProcessRouteRepository = procProcessRouteRepository;
+            _inteWorkCenterRepository = inteWorkCenterRepository;
         }
 
         /// <summary>
         /// 创建
         /// </summary>
-        /// <param name="planWorkOrderDto"></param>
+        /// <param name="planWorkOrderCreateDto"></param>
         /// <returns></returns>
         public async Task CreatePlanWorkOrderAsync(PlanWorkOrderCreateDto planWorkOrderCreateDto)
         {
@@ -62,6 +74,18 @@ namespace Hymson.MES.Services.Services.Plan
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(planWorkOrderCreateDto);
 
+            planWorkOrderCreateDto.OrderCode = planWorkOrderCreateDto.OrderCode.ToUpper();
+            //判断编号是否已存在
+            var haveEntity = await _planWorkOrderRepository.GetEqualPlanWorkOrderEntitiesAsync(new PlanWorkOrderQuery()
+            {
+                SiteId = _currentSite.SiteId??0,
+                OrderCode = planWorkOrderCreateDto.OrderCode
+            });
+            if (haveEntity != null&& haveEntity.Count()>0) 
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16001)).WithData("orderCode", planWorkOrderCreateDto.OrderCode);
+            }
+
             //DTO转换实体
             var planWorkOrderEntity = planWorkOrderCreateDto.ToEntity<PlanWorkOrderEntity>();
             planWorkOrderEntity.Id= IdGenProvider.Instance.CreateId();
@@ -72,7 +96,12 @@ namespace Hymson.MES.Services.Services.Plan
             planWorkOrderEntity.SiteId = _currentSite.SiteId ?? 0;
 
             //入库
-            await _planWorkOrderRepository.InsertAsync(planWorkOrderEntity);
+            var response = await _planWorkOrderRepository.InsertAsync(planWorkOrderEntity);
+
+            if (response == 0)
+            {
+                throw new BusinessException(nameof(ErrorCode.MES16002));
+            }
         }
 
         /// <summary>
@@ -134,15 +163,37 @@ namespace Hymson.MES.Services.Services.Plan
         /// <returns></returns>
         public async Task ModifyPlanWorkOrderAsync(PlanWorkOrderModifyDto planWorkOrderModifyDto)
         {
+            if (_currentSite.SiteId == 0) 
+            {
+                throw new BusinessException(nameof(ErrorCode.MES10101));
+            }
+
              //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(planWorkOrderModifyDto);
+
+            //获取当前最新的数据  进行状态判断
+            var current= _planWorkOrderRepository.GetByIdAsync(planWorkOrderModifyDto.Id);
+            if (current != null)
+            {
+                //判断当前状态  TODO
+
+            }
+            else 
+            {
+                throw new BusinessException(nameof(ErrorCode.MES16003));
+            }
+
 
             //DTO转换实体
             var planWorkOrderEntity = planWorkOrderModifyDto.ToEntity<PlanWorkOrderEntity>();
             planWorkOrderEntity.UpdatedBy = _currentUser.UserName;
             planWorkOrderEntity.UpdatedOn = HymsonClock.Now();
 
-            await _planWorkOrderRepository.UpdateAsync(planWorkOrderEntity);
+            var response= await _planWorkOrderRepository.UpdateAsync(planWorkOrderEntity);
+            if (response == 0) 
+            {
+                throw new BusinessException(nameof(ErrorCode.MES16004));
+            }
         }
 
         /// <summary>
@@ -150,12 +201,45 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<PlanWorkOrderDto> QueryPlanWorkOrderByIdAsync(long id) 
+        public async Task<PlanWorkOrderDetailView> QueryPlanWorkOrderByIdAsync(long id) 
         {
            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(id);
            if (planWorkOrderEntity != null) 
            {
-               return planWorkOrderEntity.ToModel<PlanWorkOrderDto>();
+                var planWorkOrderDetailView= planWorkOrderEntity.ToModel<PlanWorkOrderDetailView>();
+
+                //关联物料
+                var material= await _procMaterialRepository.GetByIdAsync(planWorkOrderEntity.ProductId, planWorkOrderEntity.SiteId);
+                if (material != null)
+                {
+                    planWorkOrderDetailView.MaterialCode = material.MaterialCode;
+                    planWorkOrderDetailView.MaterialVersion= material.Version;
+                }
+
+                //关联BOM
+                var bom = await _procBomRepository.GetByIdAsync(planWorkOrderEntity.ProductBOMId??0);
+                if (bom != null)
+                {
+                    planWorkOrderDetailView.BomCode = bom.BomCode;
+                    planWorkOrderDetailView.BomVersion = bom.Version;
+                }
+
+                //关联BOM
+                var processRoute = await _procProcessRouteRepository.GetByIdAsync(planWorkOrderEntity.ProcessRouteId ?? 0);
+                if (processRoute != null)
+                {
+                    planWorkOrderDetailView.ProcessRouteCode = processRoute.Code;
+                    planWorkOrderDetailView.ProcessRouteVersion = processRoute.Version;
+                }
+
+                //关联工作中心
+                var workCenter = await _inteWorkCenterRepository.GetByIdAsync(planWorkOrderEntity.WorkCenterId ?? 0);
+                if (processRoute != null)
+                {
+                    planWorkOrderDetailView.WorkCenterCode = workCenter.Code;
+                }
+
+                return planWorkOrderDetailView;
            }
             return null;
         }
