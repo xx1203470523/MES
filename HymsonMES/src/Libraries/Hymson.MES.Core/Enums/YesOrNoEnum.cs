@@ -10,14 +10,14 @@ namespace Hymson.MES.Core.Enums
     public enum YesOrNoEnum : sbyte
     {
         /// <summary>
-        /// 否
-        /// </summary>
-        [Description("否")]
-        Yes = 0,
-        /// <summary>
         /// 是
         /// </summary>
         [Description("是")]
-        No = 1
+        Yes = 1,
+        /// <summary>
+        /// 否
+        /// </summary>
+        [Description("否")]
+        No= 2,
     }
 }

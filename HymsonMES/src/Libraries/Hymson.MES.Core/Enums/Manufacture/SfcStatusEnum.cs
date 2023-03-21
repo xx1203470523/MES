@@ -7,10 +7,10 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.Core.Enums.manu
+namespace Hymson.MES.Core.Enums
 {
     /// <summary>
-    /// 条码状态枚举
+    /// manu_sfc_info条码状态枚举
     /// </summary>
     public enum SfcStatusEnum : sbyte
     {

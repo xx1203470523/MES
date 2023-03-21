@@ -14,6 +14,8 @@ using Hymson.MES.Data.Repositories.Integrated.InteClass;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer;
 using Hymson.MES.Data.Repositories.Integrated.InteJob;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter;
+using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
@@ -159,6 +161,14 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IQualUnqualifiedGroupRepository, QualUnqualifiedGroupRepository>();
             #endregion
 
+
+            #region Manufacture
+
+            services.AddSingleton<IManuSfcProduceRepository, ManuSfcProduceRepository>();
+            services.AddSingleton<IManuSfcInfoRepository, ManuSfcInfoRepository>();
+
+            #endregion
+
             #region Warehouse 
             services.AddSingleton<IWhSupplierRepository, WhSupplierRepository>();
             services.AddSingleton<IWhMaterialInventoryRepository, WhMaterialInventoryRepository>();
@@ -167,6 +177,12 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #endregion
 
+            #region plan
+
+            #region PlanWorkOrder
+            services.AddSingleton<IPlanWorkOrderRepository, PlanWorkOrderRepository>();
+            #endregion
+            #endregion
 
             return services;
         }
