@@ -287,10 +287,24 @@ namespace Hymson.MES.Services.Dtos.Integrated
     /// </summary>
     public class InteCodeRulesPagedQueryDto : PagerInfo
     {
-        ///// <summary>
-        ///// 描述 :站点编码 
-        ///// 空值 : false  
-        ///// </summary>
-        //public string SiteCode { get; set; }
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string? MaterialCode { get; set; }
+
+        /// <summary>
+        /// 版本
+        /// </summary>
+        public string? Version { get; set; }
+        /// <summary>
+        /// 物料描述
+        /// </summary>
+        public string? Remark { get; set; }
+
+        /// <summary>
+        /// 编码类型;1：过程控制序列码；2：包装序列码；
+        /// </summary>
+        public CodeRuleCodeTypeEnum? CodeType { get; set; }
+
     }
 }
