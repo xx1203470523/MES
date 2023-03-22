@@ -228,6 +228,16 @@ namespace Hymson.MES.Data.Repositories.Plan
             return await conn.ExecuteAsync(UpdateWorkOrderStatussSql, parms);
         }
 
+        /// <summary>
+        /// 修改工单是否锁定
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        public async Task<int> ModifyWorkOrderLockedAsync(List<PlanWorkOrderEntity> parms)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateWorkOrderLockedsSql, parms);
+        }
     }
 
     public partial class PlanWorkOrderRepository
@@ -274,5 +284,7 @@ namespace Hymson.MES.Data.Repositories.Plan
     FROM `plan_work_order`  WHERE Id IN @ids ";
 
         const string UpdateWorkOrderStatussSql = @"UPDATE `plan_work_order` SET Status = @Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+
+        const string UpdateWorkOrderLockedsSql = @"UPDATE `plan_work_order` SET IsLocked = @IsLocked, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
     }
 }
