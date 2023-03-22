@@ -55,6 +55,7 @@ namespace Hymson.MES.Services.Mapper
             CreateQualityMaps();
             CreateWarehouseMaps();
             CreatePlanMaps();
+            CreateManufactureMaps();
         }
 
         /// <summary>

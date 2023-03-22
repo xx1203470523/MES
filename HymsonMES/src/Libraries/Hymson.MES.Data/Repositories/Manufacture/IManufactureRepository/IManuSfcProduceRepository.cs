@@ -23,6 +23,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<PagedInfo<ManuSfcProduceView>> GetPagedInfoAsync(ManuSfcProducePagedQuery manuSfcProducePagedQuery);
 
         /// <summary>
+        /// 质量锁定
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> QualityLockAsync(QualityLockCommand command);
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
