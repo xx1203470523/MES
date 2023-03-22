@@ -414,7 +414,7 @@ namespace Hymson.MES.Services.Mapper
         /// <summary>
         /// 计划模块
         /// </summary>
-        protected virtual void CreatePlanMaps() 
+        protected virtual void CreatePlanMaps()
         {
             #region WorkOrder
             CreateMap<PlanWorkOrderCreateDto, PlanWorkOrderEntity>();
@@ -424,6 +424,16 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<PlanWorkOrderEntity, PlanWorkOrderDetailView>();
 
             #endregion
+
+            #region PlanSfcReceive
+            CreateMap<PlanSfcReceiveCreateDto, PlanSfcReceiveView>();
+            CreateMap<PlanSfcReceiveModifyDto, PlanSfcReceiveView>();
+            CreateMap<PlanSfcReceivePagedQueryDto, PlanSfcReceivePagedQuery>();
+            CreateMap<PlanSfcReceiveView, PlanSfcReceiveDto>();
+            #endregion
+
+
+
         }
 
         /// <summary>

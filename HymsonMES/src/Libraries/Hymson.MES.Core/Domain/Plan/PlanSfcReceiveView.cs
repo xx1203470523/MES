@@ -21,43 +21,38 @@ namespace Hymson.MES.Core.Domain.Plan
     /// @author pengxin
     /// @date 2023-03-21 04:33:58
     /// </summary>
-    public class PlanSfcInfoView : BaseEntity
+    public class PlanSfcReceiveView : BaseEntity
     {
-        /// <summary>
-        /// 条码
-        /// </summary>
-        public string SFC { get; set; }
 
         /// <summary>
-        /// 工单id
+        /// 工单号
         /// </summary>
-        public long WorkOrderId { get; set; }
+        public string OrderCode { get; set; }
 
         /// <summary>
-        /// 产品id
+        /// 工单类型
         /// </summary>
-        public long ProductId { get; set; }
+        public string Type { get; set; }
 
         /// <summary>
-        /// 数量
+        /// 物料编码
         /// </summary>
-        public decimal Qty { get; set; }
+        public string MaterialCode { get; set; }
 
         /// <summary>
-        /// 状态;1：在制；2：完成；3：已入库；4：报废；
+        /// 物料名称
         /// </summary>
-        public bool? Status { get; set; }
+        public string MaterialName { get; set; }
 
         /// <summary>
-        /// 是否在用
+        /// 工单数量
         /// </summary>
-        public long? IsUsed { get; set; }
+        public string Qty { get; set; }
 
         /// <summary>
-        /// 站点Id
+        /// 关联工单号
         /// </summary>
-        public long SiteId { get; set; }
-
+        public string RelevanceOrderCode { get; set; }
 
     }
 }

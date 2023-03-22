@@ -12,6 +12,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Snowflake;
@@ -35,7 +36,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly AbstractValidator<ManuSfcInfoCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ManuSfcInfoModifyDto> _validationModifyRules;
 
-        public ManuSfcInfoService(ICurrentUser currentUser,IManuSfcInfoRepository manuSfcInfoRepository, AbstractValidator<ManuSfcInfoCreateDto> validationCreateRules, AbstractValidator<ManuSfcInfoModifyDto> validationModifyRules)
+        public ManuSfcInfoService(ICurrentUser currentUser, IManuSfcInfoRepository manuSfcInfoRepository, AbstractValidator<ManuSfcInfoCreateDto> validationCreateRules, AbstractValidator<ManuSfcInfoModifyDto> validationModifyRules)
         {
             _currentUser = currentUser;
             _manuSfcInfoRepository = manuSfcInfoRepository;
@@ -55,7 +56,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             //DTO转换实体
             var manuSfcInfoEntity = manuSfcInfoCreateDto.ToEntity<ManuSfcInfoEntity>();
-            manuSfcInfoEntity.Id= IdGenProvider.Instance.CreateId();
+            manuSfcInfoEntity.Id = IdGenProvider.Instance.CreateId();
             manuSfcInfoEntity.CreatedBy = _currentUser.UserName;
             manuSfcInfoEntity.UpdatedBy = _currentUser.UserName;
             manuSfcInfoEntity.CreatedOn = HymsonClock.Now();
@@ -80,10 +81,9 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesManuSfcInfoAsync(string ids)
+        public async Task<int> DeletesManuSfcInfoAsync(long[] idsArr)
         {
-            var idsArr = StringExtension.SpitLongArrary(ids);
-            return await _manuSfcInfoRepository.DeletesAsync(idsArr);
+            return await _manuSfcInfoRepository.DeletesAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="pagedInfo"></param>
         /// <returns></returns>
-        private static List<ManuSfcInfoDto> PrepareManuSfcInfoDtos(PagedInfo<ManuSfcInfoEntity>   pagedInfo)
+        private static List<ManuSfcInfoDto> PrepareManuSfcInfoDtos(PagedInfo<ManuSfcInfoEntity> pagedInfo)
         {
             var manuSfcInfoDtos = new List<ManuSfcInfoDto>();
             foreach (var manuSfcInfoEntity in pagedInfo.Data)
@@ -125,7 +125,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task ModifyManuSfcInfoAsync(ManuSfcInfoModifyDto manuSfcInfoModifyDto)
         {
-             //验证DTO
+            //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(manuSfcInfoModifyDto);
 
             //DTO转换实体
@@ -141,13 +141,13 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ManuSfcInfoDto> QueryManuSfcInfoByIdAsync(long id) 
+        public async Task<ManuSfcInfoDto> QueryManuSfcInfoByIdAsync(long id)
         {
-           var manuSfcInfoEntity = await _manuSfcInfoRepository.GetByIdAsync(id);
-           if (manuSfcInfoEntity != null) 
-           {
-               return manuSfcInfoEntity.ToModel<ManuSfcInfoDto>();
-           }
+            var manuSfcInfoEntity = await _manuSfcInfoRepository.GetByIdAsync(id);
+            if (manuSfcInfoEntity != null)
+            {
+                return manuSfcInfoEntity.ToModel<ManuSfcInfoDto>();
+            }
             return null;
         }
     }

@@ -17,8 +17,18 @@ namespace Hymson.MES.Data.Repositories.Plan
     /// <summary>
     /// 条码接收 分页参数
     /// </summary>
-    public class PlanSfcInfoPagedQuery : PagerInfo
+    public class PlanSfcReceivePagedQuery : PagerInfo 
     {
+
+        /// <summary>
+        /// 工单号
+        /// </summary>
+        public string? WorkOrderCode { get; set; }
+
+        /// <summary>
+        /// 工单类型
+        /// </summary>
+        public long WorkOrderType { get; set; }
 
     }
 }

@@ -17,7 +17,16 @@ namespace Hymson.MES.Data.Repositories.Plan
     /// <summary>
     /// 条码接收 查询参数
     /// </summary>
-    public class PlanSfcInfoQuery
+    public class PlanSfcReceiveQuery
     {
+        /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long WorkOrderId { get; set; }
+
+        /// <summary>
+        /// SFC
+        /// </summary>
+        public string? SFC { get; set; }
     }
 }
