@@ -165,6 +165,8 @@ namespace Microsoft.Extensions.DependencyInjection
             #region Manufacture
 
             services.AddSingleton<IManuSfcProduceRepository, ManuSfcProduceRepository>();
+            services.AddSingleton<IManuSfcInfoRepository, ManuSfcInfoRepository>();
+
             #endregion
 
             #region Warehouse 
