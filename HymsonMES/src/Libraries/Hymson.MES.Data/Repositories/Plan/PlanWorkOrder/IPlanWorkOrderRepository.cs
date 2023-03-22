@@ -98,6 +98,13 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="planWorkOrderPagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<PlanWorkOrderEntity>> GetPagedInfoAsync(PlanWorkOrderPagedQuery planWorkOrderPagedQuery);
+        Task<PagedInfo<PlanWorkOrderListDetailView>> GetPagedInfoAsync(PlanWorkOrderPagedQuery planWorkOrderPagedQuery);
+
+        /// <summary>
+        /// 修改工单状态
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        Task<int> ModifyWorkOrderStatusAsync(List<PlanWorkOrderEntity> parms);
     }
 }

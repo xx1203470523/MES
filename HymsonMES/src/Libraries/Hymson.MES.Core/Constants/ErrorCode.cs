@@ -242,8 +242,10 @@
 
         #region 质量锁定 15300
         public const string MES15300 = "将来锁定工序必填";
-        public const string MES15301 = "条码已报废/删除，不可再操作锁定/取消锁定！";
-        public const string MES15302 = "将来锁定操作必须是同一工单下的条码！";
+        public const string MES15301= "产品条码不能为空";
+        public const string MES15302 = "条码已报废/删除，不可再操作锁定/取消锁定！";
+        public const string MES15303 = "将来锁定操作必须是同一工单下的条码！";
+        public const string MES15304 = "条码{sfcs}不是在制品!";
         #endregion
 
 
@@ -253,6 +255,8 @@
         public const string MES16002 = "添加生产工单失败！";
         public const string MES16003 = "没有查找到该数据！请检查数据是否还存在";
         public const string MES16004 = "修改生产工单失败！";
+        public const string MES16005 = "修改生产工单状态失败！";
+        public const string MES16006 = "修改生产工单状态失败：有工单不为未开始,不允许重复下达";
         #endregion
 
         #region 条码接收

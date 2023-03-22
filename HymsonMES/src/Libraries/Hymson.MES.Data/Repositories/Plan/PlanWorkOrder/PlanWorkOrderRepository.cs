@@ -80,30 +80,56 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="planWorkOrderPagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<PlanWorkOrderEntity>> GetPagedInfoAsync(PlanWorkOrderPagedQuery planWorkOrderPagedQuery)
+        public async Task<PagedInfo<PlanWorkOrderListDetailView>> GetPagedInfoAsync(PlanWorkOrderPagedQuery planWorkOrderPagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.Select("*");
+            sqlBuilder.Where("wo.IsDeleted=0");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-           
+            if (!string.IsNullOrWhiteSpace(planWorkOrderPagedQuery.OrderCode))
+            {
+                planWorkOrderPagedQuery.OrderCode= $"%{planWorkOrderPagedQuery.OrderCode}%";
+                sqlBuilder.Where(" wo.OrderCode like @OrderCode ");
+            }
+            if (!string.IsNullOrWhiteSpace(planWorkOrderPagedQuery.MaterialCode))
+            {
+                planWorkOrderPagedQuery.MaterialCode = $"%{planWorkOrderPagedQuery.MaterialCode}%";
+                sqlBuilder.Where(" m.MaterialCode like @MaterialCode ");
+            }
+            if (!string.IsNullOrWhiteSpace(planWorkOrderPagedQuery.WorkCenterCode))
+            {
+                planWorkOrderPagedQuery.WorkCenterCode = $"%{planWorkOrderPagedQuery.WorkCenterCode}%";
+                sqlBuilder.Where(" wc.Code like @WorkCenterCode ");
+            }
+            if (planWorkOrderPagedQuery.Status.HasValue)
+            {
+                sqlBuilder.Where(" wo.Status = @Status ");
+            }
+            if (planWorkOrderPagedQuery.IsLocked.HasValue)
+            {
+                sqlBuilder.Where(" wo.IsLocked = @IsLocked ");
+            }
+            if (planWorkOrderPagedQuery.PlanStartTimeS.HasValue)
+            {
+                sqlBuilder.Where(" wo.PlanStartTime>= @PlanStartTimeS ");
+            }
+            if (planWorkOrderPagedQuery.PlanStartTimeE.HasValue)
+            {
+                sqlBuilder.Where(" wo.PlanStartTime< @PlanStartTimeE ");
+            }
+
             var offSet = (planWorkOrderPagedQuery.PageIndex - 1) * planWorkOrderPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = planWorkOrderPagedQuery.PageSize });
             sqlBuilder.AddParameters(planWorkOrderPagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var planWorkOrderEntitiesTask = conn.QueryAsync<PlanWorkOrderEntity>(templateData.RawSql, templateData.Parameters);
+            var planWorkOrderEntitiesTask = conn.QueryAsync<PlanWorkOrderListDetailView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
-            var planWorkOrderEntities = await planWorkOrderEntitiesTask;
+            var planWorkOrderViews = await planWorkOrderEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<PlanWorkOrderEntity>(planWorkOrderEntities, planWorkOrderPagedQuery.PageIndex, planWorkOrderPagedQuery.PageSize, totalCount);
+            return new PagedInfo<PlanWorkOrderListDetailView>(planWorkOrderViews, planWorkOrderPagedQuery.PageIndex, planWorkOrderPagedQuery.PageSize, totalCount);
         }
 
         /// <summary>
@@ -191,12 +217,45 @@ namespace Hymson.MES.Data.Repositories.Plan
             return await conn.ExecuteAsync(UpdatesSql, planWorkOrderEntitys);
         }
 
+        /// <summary>
+        /// 修改工单状态
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        public async Task<int> ModifyWorkOrderStatusAsync(List<PlanWorkOrderEntity> parms) 
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateWorkOrderStatussSql, parms);
+        }
+
     }
 
     public partial class PlanWorkOrderRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `plan_work_order` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `plan_work_order` /**where**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT 
+                          wo.`Id`, wo.`OrderCode`, wo.`ProductId`, wo.`WorkCenterType`, wo.`WorkCenterId`, wo.`ProcessRouteId`, wo.`ProductBOMId`, wo.`Type`, wo.`Qty`, wo.`Status`, wo.`OverScale`, wo.`PlanStartTime`, wo.`PlanEndTime`, wo.`IsLocked`, wo.`Remark`, wo.`CreatedBy`, wo.`CreatedOn`, wo.`UpdatedBy`, wo.`UpdatedOn`, wo.`IsDeleted`, wo.`SiteId`,
+                          
+                          wor.InputQty,wor.FinishProductQuantity,wor.RealStart,wor.RealEnd,
+                          m.MaterialCode, m.MaterialName,m.Version as MaterialVersion,
+                          b.BomCode,b.Version as BomVersion,
+                          pr.`Code` as ProcessRouteCode ,pr.Version as ProcessRouteVersion,
+                          wc.`Code`  as WorkCenterCode
+                         FROM `plan_work_order` wo 
+                         LEFT JOIN plan_work_order_record wor on wo.Id=wor.WorkOrderId
+                         LEFT JOIN proc_material m on wo.ProductId=m.Id
+                         LEFT JOIN proc_bom b on wo.ProductBOMId=b.Id
+                         LEFT JOIN proc_process_route pr on wo.ProcessRouteId=pr.Id
+                         LEFT JOIN inte_work_center wc on wo.WorkCenterId=wc.Id
+                            
+                        /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = @"SELECT COUNT(1) 
+                         FROM `plan_work_order` wo 
+                         LEFT JOIN plan_work_order_record wor on wo.Id=wor.WorkOrderId
+                         LEFT JOIN proc_material m on wo.ProductId=m.Id
+                         LEFT JOIN proc_bom b on wo.ProductBOMId=b.Id
+                         LEFT JOIN proc_process_route pr on wo.ProcessRouteId=pr.Id
+                         LEFT JOIN inte_work_center wc on wo.WorkCenterId=wc.Id
+                        /**where**/ ";
         const string GetPlanWorkOrderEntitiesSqlTemplate = @"SELECT
     /**select**/
     FROM `plan_work_order` /**where**/  ";
@@ -213,5 +272,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string GetByIdsSql = @"SELECT
       `Id`, `OrderCode`, `ProductId`, `WorkCenterType`, `WorkCenterId`, `ProcessRouteId`, `ProductBOMId`, `Type`, `Qty`, `Status`, `OverScale`, `PlanStartTime`, `PlanEndTime`, `IsLocked`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
     FROM `plan_work_order`  WHERE Id IN @ids ";
+
+        const string UpdateWorkOrderStatussSql = @"UPDATE `plan_work_order` SET Status = @Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
     }
 }

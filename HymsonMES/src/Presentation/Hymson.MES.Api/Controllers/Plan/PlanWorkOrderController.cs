@@ -47,7 +47,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <returns></returns>
         [HttpGet]
         [Route("pagelist")]
-        public async Task<PagedInfo<PlanWorkOrderDto>> QueryPagedPlanWorkOrderAsync([FromQuery] PlanWorkOrderPagedQueryDto parm)
+        public async Task<PagedInfo<PlanWorkOrderListDetailViewDto>> QueryPagedPlanWorkOrderAsync([FromQuery] PlanWorkOrderPagedQueryDto parm)
         {
             return await _planWorkOrderService.GetPageListAsync(parm);
         }
@@ -58,7 +58,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<PlanWorkOrderDetailView> QueryPlanWorkOrderByIdAsync(long id)
+        public async Task<PlanWorkOrderDetailViewDto> QueryPlanWorkOrderByIdAsync(long id)
         {
             return await _planWorkOrderService.QueryPlanWorkOrderByIdAsync(id);
         }
@@ -99,5 +99,27 @@ namespace Hymson.MES.Api.Controllers.Plan
             await _planWorkOrderService.DeletesPlanWorkOrderAsync(ids);
         }
 
+        /// <summary>
+        /// 修改订单状态
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("changWorkOrderStatus")]
+        public async Task ChangWorkOrderStatusAsync(List<PlanWorkOrderChangeStatusDto> parms) 
+        {
+            await _planWorkOrderService.ModifyWorkOrderStatusAsync(parms);
+        }
+
+        /// <summary>
+        /// 改变锁定
+        /// </summary>
+        /// <param name="parms"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("changWorkOrderLocked")]
+        public async Task LockedAsync(PlanWorkOrderLockedDto parms) 
+        {
+            
+        }
     }
 }

@@ -301,12 +301,73 @@ namespace Hymson.MES.Services.Dtos.Plan
     /// </summary>
     public class PlanWorkOrderPagedQueryDto : PagerInfo
     {
+        /// <summary>
+        /// 工单号
+        /// </summary>
+        public string? OrderCode { get; set; }
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string? MaterialCode { get; set; }
+
+        /// <summary>
+        /// 工作中心代码
+        /// </summary>
+        public string? WorkCenterCode { get; set; }
+
+        /// <summary>
+        /// 工单状态;1：未开始；2：下达；3：生产中；4：完成；5：锁定；6：暂停中；
+        /// </summary>
+        public PlanWorkOrderStatusEnum? Status { get; set; }
+
+        /// <summary>
+        /// 是否锁定
+        /// </summary>
+        public YesOrNoEnum? IsLocked { get; set; }
+
+        /// <summary>
+        /// 计划开始时间  字符串 ：时间范围，逗号分割
+        /// </summary>
+        public string? PlanStartTime { get; set; }
+
+        public DateTime? PlanStartTimeS 
+        { 
+            get
+            {
+                if (!string.IsNullOrEmpty(this.PlanStartTime))
+                {
+                    var dateArr = this.PlanStartTime.Split(',');
+                    return dateArr.Length > 0 ? Convert.ToDateTime(dateArr[0]) : null;
+                }
+                else 
+                {
+                    return null;
+                }
+            } 
+        }
+
+        public DateTime? PlanStartTimeE 
+        { 
+            get
+            {
+                if (!string.IsNullOrEmpty(this.PlanStartTime))
+                {
+                    var dateArr = this.PlanStartTime.Split(',');
+                    return dateArr.Length > 1 ? Convert.ToDateTime(dateArr[1]) : null;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
     }
 
     /// <summary>
     /// 工单信息表Dto
     /// </summary>
-    public record PlanWorkOrderDetailView : BaseEntityDto
+    public record PlanWorkOrderDetailViewDto : BaseEntityDto
     {
         /// <summary>
         /// 主键
@@ -447,7 +508,7 @@ namespace Hymson.MES.Services.Dtos.Plan
     /// <summary>
     /// 工单信息表Dto
     /// </summary>
-    public record PlanWorkOrderListDetailView : BaseEntityDto
+    public record PlanWorkOrderListDetailViewDto : BaseEntityDto
     {
         /// <summary>
         /// 主键
@@ -612,4 +673,20 @@ namespace Hymson.MES.Services.Dtos.Plan
         public DateTime? RealEnd { get; set; }
     }
 
+    /// <summary>
+    /// 更改工单状态
+    /// </summary>
+    public record PlanWorkOrderChangeStatusDto 
+    {
+        public long Id { get; set; }
+
+        public PlanWorkOrderStatusEnum Status { get; set; }
+    }
+
+    public record PlanWorkOrderLockedDto
+    {
+        public long Id { get; set; }
+
+        public YesOrNoEnum IsLocked { get; set; }
+    }
 }
