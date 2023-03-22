@@ -44,5 +44,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 工序
         /// </summary>
         public string? Code { get; set; }
-}
+
+        /// <summary>
+        /// 条码列表
+        /// </summary>
+        public string[]? Sfcs { get; set; }
+    }
 }
