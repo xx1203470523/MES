@@ -22,36 +22,41 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public string Sfc { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工单id
         /// </summary>
         public long WorkOrderId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 关联工单id
+        /// </summary>
+        public long? RelevanceWorkOrderId { get; set; }
+
+        /// <summary>
         /// 产品id
         /// </summary>
         public long ProductId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 数量
         /// </summary>
         public decimal Qty { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态;1：在制；2：完成；3：已入库；4：报废；
         /// </summary>
-        public bool? Status { get; set; }
+        public int? Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否在用
         /// </summary>
-        public long? IsUse { get; set; }
+        public long? IsUsed { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
 
-       
+
     }
 }

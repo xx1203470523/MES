@@ -93,11 +93,10 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpDelete]
         [Route("delete")]
-        public async Task DeleteManuSfcInfoAsync(string ids)
+        public async Task DeleteManuSfcInfoAsync([FromBody] long[] ids)
         {
-            //long[] idsArr = StringExtension.SpitLongArrary(ids);
             await _manuSfcInfoService.DeletesManuSfcInfoAsync(ids);
         }
 

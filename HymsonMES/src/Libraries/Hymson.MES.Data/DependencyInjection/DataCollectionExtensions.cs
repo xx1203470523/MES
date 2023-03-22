@@ -166,7 +166,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<IManuSfcProduceRepository, ManuSfcProduceRepository>();
             services.AddSingleton<IManuSfcInfoRepository, ManuSfcInfoRepository>();
-
+            services.AddSingleton<IManuSfcStepRepository, ManuSfcStepRepository>();
             #endregion
 
             #region Warehouse 
@@ -181,6 +181,10 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region PlanWorkOrder
             services.AddSingleton<IPlanWorkOrderRepository, PlanWorkOrderRepository>();
+            #endregion
+
+            #region PlanSfcReceive
+            services.AddSingleton<IPlanSfcReceiveRepository, PlanSfcReceiveRepository>(); 
             #endregion
             #endregion
 

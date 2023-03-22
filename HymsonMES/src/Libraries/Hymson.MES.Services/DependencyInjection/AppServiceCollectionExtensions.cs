@@ -20,6 +20,7 @@ using Hymson.MES.Services.Services.Integrated.InteCalendar;
 using Hymson.MES.Services.Services.Integrated.InteClass;
 using Hymson.MES.Services.Services.Integrated.InteContainer;
 using Hymson.MES.Services.Services.Manufacture;
+using Hymson.MES.Services.Services.Manufacture.ManuFeeding;
 using Hymson.MES.Services.Services.Plan;
 using Hymson.MES.Services.Services.Process;
 using Hymson.MES.Services.Services.Process.IProcessService;
@@ -141,7 +142,7 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Manufacture
-
+            services.AddSingleton<IManuFeedingService, ManuFeedingService>();
             services.AddSingleton<IManuSfcProduceService, ManuSfcProduceService>();
             services.AddSingleton<IManuSfcInfoService, ManuSfcInfoService>();
             #endregion
@@ -151,12 +152,15 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IWhMaterialInventoryService, WhMaterialInventoryService>();
             services.AddSingleton<IWhMaterialStandingbookService, WhMaterialStandingbookService>();
 
-
             #endregion
 
             #region Plan
             #region PlanWorkOrder
             services.AddSingleton<IPlanWorkOrderService, PlanWorkOrderService>();
+            #endregion
+
+            #region PlanSfcReceive
+            services.AddSingleton<IPlanSfcReceiveService, PlanSfcReceiveService>();
             #endregion
             #endregion
 
@@ -299,6 +303,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<PlanWorkOrderModifyDto>, PlanWorkOrderModifyValidator>();
             #endregion
 
+            #region PlanSfcReceive
+            services.AddSingleton<AbstractValidator<PlanSfcReceiveCreateDto>, PlanSfcReceiveCreateValidator>();
+            services.AddSingleton<AbstractValidator<PlanSfcReceiveModifyDto>, PlanSfcReceiveModifyValidator>();
+            #endregion
             #endregion
 
             return services;

@@ -7,6 +7,7 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Data.Repositories.Common.Command;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +27,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuSfcInfoEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ManuSfcInfoEntity manuSfcInfoEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -40,7 +41,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuSfcInfoEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ManuSfcInfoEntity manuSfcInfoEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -54,13 +55,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<int> DeletesAsync(long[] ids);
+        Task<int> DeletesAsync(DeleteCommand param);
 
         /// <summary>
         /// 根据ID获取数据
@@ -68,7 +69,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ManuSfcInfoEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -82,7 +83,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuSfcInfoQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuSfcInfoEntity>> GetManuSfcInfoEntitiesAsync(ManuSfcInfoQuery manuSfcInfoQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>

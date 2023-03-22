@@ -52,7 +52,12 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public long ProductBOMId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 当前数量
+        /// </summary>
+        public decimal Qty { get; set; }
+
+        /// <summary>
         /// 设备Id
         /// </summary>
         public long EquipmentId { get; set; }

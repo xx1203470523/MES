@@ -6,6 +6,7 @@
  *build datetime: 2023-03-21 04:33:58
  */
 using FluentValidation;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Services.Dtos.Plan;
 using System;
 using System.Collections.Generic;
@@ -18,21 +19,23 @@ namespace Hymson.MES.Services.Validators.Plan
     /// <summary>
     /// 条码接收 更新 验证
     /// </summary>
-    internal class PlanSfcInfoCreateValidator: AbstractValidator<PlanSfcInfoCreateDto>
+    internal class PlanSfcReceiveCreateValidator : AbstractValidator<PlanSfcReceiveCreateDto>
     {
-        public PlanSfcInfoCreateValidator()
+        public PlanSfcReceiveCreateValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
+            RuleFor(x => x.ReceiveType).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16101));
+            RuleFor(x => x.WorkOrderId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16102));
+            //RuleFor(x => x.relevanceWorkOrderId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16103));
+            RuleFor(x => x.SFC).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16104));
         }
     }
 
     /// <summary>
     /// 条码接收 修改 验证
     /// </summary>
-    internal class PlanSfcInfoModifyValidator : AbstractValidator<PlanSfcInfoModifyDto>
+    internal class PlanSfcReceiveModifyValidator : AbstractValidator<PlanSfcReceiveModifyDto>
     {
-        public PlanSfcInfoModifyValidator()
+        public PlanSfcReceiveModifyValidator()
         {
             //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");
             //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");

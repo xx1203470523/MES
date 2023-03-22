@@ -3,7 +3,7 @@
  *
  *describe: 条码步骤表    实体类 | 代码由框架生成  如果数据库字段发生变化,则手动调整
  *builder:  zhaoqing
- *build datetime: 2023-03-18 05:41:06
+ *build datetime: 2023-03-22 05:17:57
  */
 using Hymson.Infrastructure;
 
@@ -13,14 +13,14 @@ namespace Hymson.MES.Core.Domain.Manufacture
     /// 条码步骤表，数据实体对象   
     /// manu_sfc_step
     /// @author zhaoqing
-    /// @date 2023-03-18 05:41:06
+    /// @date 2023-03-22 05:17:57
     /// </summary>
     public class ManuSfcStepEntity : BaseEntity
     {
         /// <summary>
         /// 条码
         /// </summary>
-        public string Sfc { get; set; }
+        public string SFC { get; set; }
 
        /// <summary>
         /// 产品信息
@@ -65,28 +65,26 @@ namespace Hymson.MES.Core.Domain.Manufacture
        /// <summary>
         /// 步骤类型;1：创建；2：复用；3：进站；4：出站；5：将来锁定；6：及时锁定；7：解锁；8：完成；9：报废；10：异常标识；11：删除；12：拆解；13：合并；14：转换；
         /// </summary>
-        public bool Type { get; set; }
+        public int Type { get; set; }
 
        /// <summary>
         /// 当前状态;1：排队；2：激活；3：完工；
         /// </summary>
-        public bool Status { get; set; }
+        public int Status { get; set; }
 
        /// <summary>
-        /// 锁;1：未锁定；2：即使锁：3：未来锁；
+        /// 锁;1：未锁定；2：即时锁：3：未来锁；
         /// </summary>
-        public bool? Lock { get; set; }
+        public int? Lock { get; set; }
 
        /// <summary>
         /// 是否复用
         /// </summary>
-        public bool? IsMultiplex { get; set; }
+        public int? IsMultiplex { get; set; }
 
        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
-
-       
     }
 }
