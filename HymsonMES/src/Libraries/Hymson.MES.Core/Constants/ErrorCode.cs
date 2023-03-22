@@ -253,6 +253,8 @@
         public const string MES16002 = "添加生产工单失败！";
         public const string MES16003 = "没有查找到该数据！请检查数据是否还存在";
         public const string MES16004 = "修改生产工单失败！";
+        public const string MES16005 = "修改生产工单状态失败！";
+        public const string MES16006 = "修改生产工单状态失败：有工单不为未开始,不允许重复下达";
         #endregion
 
         #endregion

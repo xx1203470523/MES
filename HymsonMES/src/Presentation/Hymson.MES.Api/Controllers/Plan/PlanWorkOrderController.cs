@@ -99,5 +99,27 @@ namespace Hymson.MES.Api.Controllers.Plan
             await _planWorkOrderService.DeletesPlanWorkOrderAsync(ids);
         }
 
+        /// <summary>
+        /// 修改订单状态
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("changWorkOrderStatus")]
+        public async Task ChangWorkOrderStatusAsync(List<PlanWorkOrderChangeStatusDto> parms) 
+        {
+            await _planWorkOrderService.ModifyWorkOrderStatusAsync(parms);
+        }
+
+        /// <summary>
+        /// 改变锁定
+        /// </summary>
+        /// <param name="parms"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("changWorkOrderLocked")]
+        public async Task LockedAsync(PlanWorkOrderLockedDto parms) 
+        {
+            
+        }
     }
 }

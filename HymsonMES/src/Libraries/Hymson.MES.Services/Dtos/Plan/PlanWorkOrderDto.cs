@@ -673,4 +673,20 @@ namespace Hymson.MES.Services.Dtos.Plan
         public DateTime? RealEnd { get; set; }
     }
 
+    /// <summary>
+    /// 更改工单状态
+    /// </summary>
+    public record PlanWorkOrderChangeStatusDto 
+    {
+        public long Id { get; set; }
+
+        public PlanWorkOrderStatusEnum Status { get; set; }
+    }
+
+    public record PlanWorkOrderLockedDto
+    {
+        public long Id { get; set; }
+
+        public YesOrNoEnum IsLocked { get; set; }
+    }
 }
