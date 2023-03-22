@@ -23,19 +23,19 @@ namespace Hymson.MES.Api.Controllers.Plan
     [Authorize]
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class PlanSfcInfoController : ControllerBase
+    public class PlanSfcReceiveController : ControllerBase
     {
         /// <summary>
         /// 接口（条码接收）
         /// </summary>
-        private readonly IPlanSfcInfoService _planSfcInfoService;
-        private readonly ILogger<PlanSfcInfoController> _logger;
+        private readonly IPlanSfcReceiveService _planSfcInfoService;
+        private readonly ILogger<PlanSfcReceiveController> _logger;
 
         /// <summary>
         /// 构造函数（条码接收）
         /// </summary>
         /// <param name="planSfcInfoService"></param>
-        public PlanSfcInfoController(IPlanSfcInfoService planSfcInfoService, ILogger<PlanSfcInfoController> logger)
+        public PlanSfcReceiveController(IPlanSfcReceiveService planSfcInfoService, ILogger<PlanSfcReceiveController> logger)
         {
             _planSfcInfoService = planSfcInfoService;
             _logger = logger;
@@ -46,22 +46,11 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Route("pagelist")]
-        public async Task<PagedInfo<PlanSfcInfoDto>> QueryPagedPlanSfcInfoAsync([FromQuery] PlanSfcInfoPagedQueryDto parm)
+        public async Task<PagedInfo<PlanSfcReceiveDto>> QueryPagedPlanSfcInfoAsync([FromQuery] PlanSfcReceivePagedQueryDto parm)
         {
             return await _planSfcInfoService.GetPageListAsync(parm);
-        }
-
-        /// <summary>
-        /// 查询详情（条码接收）
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpGet("{id}")]
-        public async Task<PlanSfcInfoDto> QueryPlanSfcInfoByIdAsync(long id)
-        {
-            return await _planSfcInfoService.QueryPlanSfcInfoByIdAsync(id);
         }
 
         /// <summary>
@@ -71,33 +60,21 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        public async Task AddPlanSfcInfoAsync([FromBody] PlanSfcInfoCreateDto parm)
+        public async Task AddPlanSfcInfoAsync([FromBody] PlanSfcReceiveCreateDto parm)
         {
-             await _planSfcInfoService.CreatePlanSfcInfoAsync(parm);
+            await _planSfcInfoService.CreatePlanSfcInfoAsync(parm);
         }
 
-        /// <summary>
-        /// 更新（条码接收）
-        /// </summary>
-        /// <param name="parm"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("update")]
-        public async Task UpdatePlanSfcInfoAsync([FromBody] PlanSfcInfoModifyDto parm)
-        {
-             await _planSfcInfoService.ModifyPlanSfcInfoAsync(parm);
-        }
 
         /// <summary>
         /// 删除（条码接收）
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpDelete]
         [Route("delete")]
-        public async Task DeletePlanSfcInfoAsync(string ids)
+        public async Task DeletePlanSfcInfoAsync(long[] ids)
         {
-            //long[] idsArr = StringExtension.SpitLongArrary(ids);
             await _planSfcInfoService.DeletesPlanSfcInfoAsync(ids);
         }
 

@@ -13,6 +13,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Plan;
@@ -21,6 +22,7 @@ using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using IdGen;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Plan
@@ -242,6 +244,62 @@ namespace Hymson.MES.Services.Services.Plan
                 return planWorkOrderDetailView;
            }
             return null;
+        }
+
+        /// <summary>
+        /// 修改工单状态
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        public async Task ModifyWorkOrderStatusAsync(List<PlanWorkOrderChangeStatusDto> parms) 
+        {
+            if (parms == null || parms.Count == 0) 
+            {
+                throw new BusinessException(nameof(ErrorCode.MES10100));
+            }
+
+            #region//判断订单是否可以继续修改状态 TODO
+            //查询需要改变的工单
+            var workOrders= await _planWorkOrderRepository.GetByIdsAsync(parms.Select(x => x.Id).ToArray());
+
+            if (parms.First().Status == PlanWorkOrderStatusEnum.SendDown) //需要修改为已下达的
+            {
+                foreach (var item in workOrders)
+                {
+                    if (item.Status != PlanWorkOrderStatusEnum.NotStarted)//判断是否有不是未开始的则无法更改状态
+                    {
+                        throw new BusinessException(nameof(ErrorCode.MES16006));
+                    }
+                }
+            }
+           
+            #endregion
+
+            List<PlanWorkOrderEntity> planWorkOrderEntities = new List<PlanWorkOrderEntity>();
+            foreach (var item in parms)
+            {
+                planWorkOrderEntities.Add(new PlanWorkOrderEntity()
+                {
+                    Id = item.Id,
+                    Status = item.Status,
+
+                    UpdatedBy=_currentUser.UserName,
+                    UpdatedOn= HymsonClock.Now()
+                 });
+            }
+
+            using (TransactionScope ts = new TransactionScope())
+            {
+                var response = await _planWorkOrderRepository.ModifyWorkOrderStatusAsync(planWorkOrderEntities);
+                if (response == parms.Count)
+                {
+                    ts.Complete();
+                }
+                else 
+                {
+                    throw new BusinessException(nameof(ErrorCode.MES16005));
+                }
+            }
         }
     }
 }

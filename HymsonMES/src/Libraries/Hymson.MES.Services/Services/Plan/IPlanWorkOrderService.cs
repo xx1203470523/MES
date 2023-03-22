@@ -61,5 +61,12 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="id"></param>
         /// <returns></returns>
         Task<PlanWorkOrderDetailViewDto> QueryPlanWorkOrderByIdAsync(long id);
+
+        /// <summary>
+        /// 修改工单状态
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        Task ModifyWorkOrderStatusAsync(List<PlanWorkOrderChangeStatusDto> parms);
     }
 }

@@ -255,6 +255,23 @@
         public const string MES16002 = "添加生产工单失败！";
         public const string MES16003 = "没有查找到该数据！请检查数据是否还存在";
         public const string MES16004 = "修改生产工单失败！";
+        public const string MES16005 = "修改生产工单状态失败！";
+        public const string MES16006 = "修改生产工单状态失败：有工单不为未开始,不允许重复下达";
+        #endregion
+
+        #region 条码接收
+        public const string MES16100 = "条码接收错误";
+        public const string MES16101 = "接收类型不能为空";
+        public const string MES16102 = "工单不能为空";
+        public const string MES16103 = "供应商条码接收,关联工单不能为空";
+        public const string MES16104 = "SFC/SN不能为空";
+        public const string MES16105 = "SFC/SN：{SFC}已存在";
+
+        public const string MES16106 = "工单:{OrderCode}状态不可用";
+        public const string MES16107 = "工单:{OrderCode}与SFC/SN:{SFC}不匹配";
+        public const string MES16108 = "工单:{OrderCode}与关联工单产品不匹配";
+        public const string MES16109 = "工单:{OrderCode}与关联工单不能一样"; 
+
         #endregion
 
         #endregion
