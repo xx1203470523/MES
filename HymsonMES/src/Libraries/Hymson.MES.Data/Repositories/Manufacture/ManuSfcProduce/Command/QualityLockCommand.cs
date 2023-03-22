@@ -18,9 +18,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         //public QualityLockEnum OperationType { get; set; }
 
         /// <summary>
-        /// 状态
+        /// 锁
         /// </summary>
-        public int Status { get; set; }
+        public int Lock { get; set; }
 
         /// <summary>
         /// 将来锁，锁定的工序id

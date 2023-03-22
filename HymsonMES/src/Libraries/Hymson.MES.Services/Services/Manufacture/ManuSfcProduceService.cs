@@ -14,11 +14,13 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 using System.Linq;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -42,6 +44,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// 条码生产信息（物理删除） 仓储
         /// </summary>
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
+
+        /// <summary>
+        /// 条码步骤表仓储 仓储
+        /// </summary>
+        private readonly IManuSfcStepRepository _manuSfcStepRepository;
         private readonly AbstractValidator<ManuSfcProduceCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ManuSfcProduceModifyDto> _validationModifyRules;
 
@@ -50,12 +57,14 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         public ManuSfcProduceService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuSfcProduceRepository manuSfcProduceRepository,
+            IManuSfcStepRepository manuSfcStepRepository,
             AbstractValidator<ManuSfcProduceCreateDto> validationCreateRules,
             AbstractValidator<ManuSfcProduceModifyDto> validationModifyRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _manuSfcProduceRepository = manuSfcProduceRepository;
+            _manuSfcStepRepository = manuSfcStepRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
         }
@@ -171,19 +180,68 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             #endregion
 
+            #region  组装数据
             /* 1.即时锁定：将条码更新为“锁定”状态；
                2.将来锁定：保存列表中的条码信息，及指定锁定的工序，供条码过站校验时调用；
                3.取消锁定：产品条码已经是锁定状态：将条码更新到锁定前状态
               指定将来锁定工序，且条码还没流转到指定工序：关闭将来锁定的工序指定，即取消将来锁定*/
             var lockCommand = new QualityLockCommand
             {
-                Status = (int)parm.OperationType,
+                Lock = (int)parm.OperationType,
                 Sfcs=   parm.Sfcs,
                 LockProductionId= parm.LockProductionId,
                 UserId = _currentUser.UserName,
                 UpdatedOn = HymsonClock.Now()
             };
-            await _manuSfcProduceRepository.QualityLockAsync(lockCommand);
+
+            int type = 0;
+            if (parm.OperationType == QualityLockEnum.Unlock)
+            {
+                type =(int) ManuSfcStepTypeEnum.Unlock;
+            }
+            if (parm.OperationType == QualityLockEnum.InstantLock)
+            {
+                type = (int)ManuSfcStepTypeEnum.InstantLock;
+            }
+            if (parm.OperationType == QualityLockEnum.FutureLock)
+            {
+                type = (int)ManuSfcStepTypeEnum.FutureLock;
+            }
+
+            var sfcStepList = new List<ManuSfcStepEntity>();
+            foreach(var sfc in sfcList)
+            {
+                sfcStepList.Add(new ManuSfcStepEntity
+                {
+                    Id= IdGenProvider.Instance.CreateId(),
+                    SFC=sfc.Sfc,
+                    ProductId= sfc.ProductId,
+                    WorkOrdeId=sfc.WorkOrderId,
+                    WorkCenterId=sfc.WorkCenterId,
+                    ProductBOMId=sfc.ProductBOMId,
+                    Qty=sfc.Qty,
+                    EquipmentId= sfc.EquipmentId,
+                    ResourceId= sfc.ResourceId,
+                    ProcedureId= sfc.ProcedureId,
+                    Type= type,
+                    Status= sfc.Status,
+                    Lock= lockCommand.Lock,
+                    SiteId=_currentSite.SiteId??0,
+                    CreatedBy= sfc.CreatedBy,
+                    UpdatedBy= sfc.UpdatedBy
+                });
+            }
+            #endregion
+
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                //插入操作数据
+                await  _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
+
+                //修改状态
+                await _manuSfcProduceRepository.QualityLockAsync(lockCommand);
+                trans.Complete();
+            }
         }
 
         /// <summary>

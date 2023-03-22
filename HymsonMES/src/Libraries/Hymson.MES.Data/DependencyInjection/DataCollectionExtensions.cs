@@ -166,7 +166,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<IManuSfcProduceRepository, ManuSfcProduceRepository>();
             services.AddSingleton<IManuSfcInfoRepository, ManuSfcInfoRepository>();
-
+            services.AddSingleton<IManuSfcStepRepository, ManuSfcStepRepository>();
             #endregion
 
             #region Warehouse 
