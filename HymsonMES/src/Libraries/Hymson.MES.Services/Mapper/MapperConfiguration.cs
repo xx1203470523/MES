@@ -421,8 +421,8 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<PlanWorkOrderModifyDto, PlanWorkOrderEntity>();
             CreateMap<PlanWorkOrderPagedQueryDto, PlanWorkOrderPagedQuery>();
             CreateMap<PlanWorkOrderEntity, PlanWorkOrderDto>();
-            CreateMap<PlanWorkOrderEntity, PlanWorkOrderDetailView>();
-
+            CreateMap<PlanWorkOrderEntity, PlanWorkOrderDetailViewDto>();
+            CreateMap<PlanWorkOrderListDetailView, PlanWorkOrderListDetailViewDto>();
             #endregion
         }
 

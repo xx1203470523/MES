@@ -25,7 +25,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="planWorkOrderPagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<PlanWorkOrderDto>> GetPageListAsync(PlanWorkOrderPagedQueryDto planWorkOrderPagedQueryDto);
+        Task<PagedInfo<PlanWorkOrderListDetailViewDto>> GetPageListAsync(PlanWorkOrderPagedQueryDto planWorkOrderPagedQueryDto);
 
         /// <summary>
         /// 新增
@@ -60,6 +60,6 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<PlanWorkOrderDetailView> QueryPlanWorkOrderByIdAsync(long id);
+        Task<PlanWorkOrderDetailViewDto> QueryPlanWorkOrderByIdAsync(long id);
     }
 }

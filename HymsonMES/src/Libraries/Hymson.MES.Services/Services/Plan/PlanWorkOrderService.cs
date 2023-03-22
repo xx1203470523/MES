@@ -129,14 +129,14 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="planWorkOrderPagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<PlanWorkOrderDto>> GetPageListAsync(PlanWorkOrderPagedQueryDto planWorkOrderPagedQueryDto)
+        public async Task<PagedInfo<PlanWorkOrderListDetailViewDto>> GetPageListAsync(PlanWorkOrderPagedQueryDto planWorkOrderPagedQueryDto)
         {
             var planWorkOrderPagedQuery = planWorkOrderPagedQueryDto.ToQuery<PlanWorkOrderPagedQuery>();
             var pagedInfo = await _planWorkOrderRepository.GetPagedInfoAsync(planWorkOrderPagedQuery);
 
             //实体到DTO转换 装载数据
-            List<PlanWorkOrderDto> planWorkOrderDtos = PreparePlanWorkOrderDtos(pagedInfo);
-            return new PagedInfo<PlanWorkOrderDto>(planWorkOrderDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            List<PlanWorkOrderListDetailViewDto> planWorkOrderDtos = PreparePlanWorkOrderDtos(pagedInfo);
+            return new PagedInfo<PlanWorkOrderListDetailViewDto>(planWorkOrderDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
         /// <summary>
@@ -144,12 +144,12 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="pagedInfo"></param>
         /// <returns></returns>
-        private static List<PlanWorkOrderDto> PreparePlanWorkOrderDtos(PagedInfo<PlanWorkOrderEntity>   pagedInfo)
+        private static List<PlanWorkOrderListDetailViewDto> PreparePlanWorkOrderDtos(PagedInfo<PlanWorkOrderListDetailView>   pagedInfo)
         {
-            var planWorkOrderDtos = new List<PlanWorkOrderDto>();
+            var planWorkOrderDtos = new List<PlanWorkOrderListDetailViewDto>();
             foreach (var planWorkOrderEntity in pagedInfo.Data)
             {
-                var planWorkOrderDto = planWorkOrderEntity.ToModel<PlanWorkOrderDto>();
+                var planWorkOrderDto = planWorkOrderEntity.ToModel<PlanWorkOrderListDetailViewDto>();
                 planWorkOrderDtos.Add(planWorkOrderDto);
             }
 
@@ -201,12 +201,12 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<PlanWorkOrderDetailView> QueryPlanWorkOrderByIdAsync(long id) 
+        public async Task<PlanWorkOrderDetailViewDto> QueryPlanWorkOrderByIdAsync(long id) 
         {
            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(id);
            if (planWorkOrderEntity != null) 
            {
-                var planWorkOrderDetailView= planWorkOrderEntity.ToModel<PlanWorkOrderDetailView>();
+                var planWorkOrderDetailView= planWorkOrderEntity.ToModel<PlanWorkOrderDetailViewDto>();
 
                 //关联物料
                 var material= await _procMaterialRepository.GetByIdAsync(planWorkOrderEntity.ProductId, planWorkOrderEntity.SiteId);
