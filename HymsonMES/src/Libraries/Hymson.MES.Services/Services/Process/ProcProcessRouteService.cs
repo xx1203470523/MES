@@ -120,15 +120,11 @@ namespace Hymson.MES.Services.Services.Process
                 //实体转换
                 var nodeViewDto = node.ToModel<ProcProcessRouteDetailNodeViewDto>();
                 nodeViewDto.ProcessType = node.Type;
+                nodeViewDto.Code = ConvertProcedureCode(nodeViewDto.ProcedureId, nodeViewDto.Code);
+                nodeViewDto.Name = ConvertProcedureName(nodeViewDto.ProcedureId, nodeViewDto.Name);
                 detailNodeViewDtos.Add(nodeViewDto);
             }
             model.Nodes = detailNodeViewDtos;
-
-            foreach (var item in model.Nodes)
-            {
-                item.Code = ConvertProcedureCode(item.ProcedureId, item.Code);
-                item.Name = ConvertProcedureName(item.ProcedureId, item.Name);
-            }
 
             var linkQuery = new ProcProcessRouteDetailLinkQuery { ProcessRouteId = id };
             var links = await _procProcessRouteLinkRepository.GetListAsync(linkQuery);
@@ -141,6 +137,32 @@ namespace Hymson.MES.Services.Services.Process
             }
             model.Links = linkDtos;
             return model;
+        }
+
+        /// <summary>
+        /// 根据ID查询工艺路线工序列表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<List<ProcProcessRouteDetailNodeViewDto>> GetNodesByRouteId(long id)
+        {
+            var nodeQuery = new ProcProcessRouteDetailNodeQuery { ProcessRouteId = id };
+            var nodes = await _procProcessRouteNodeRepository.GetListAsync(nodeQuery);
+            var detailNodeViewDtos = new List<ProcProcessRouteDetailNodeViewDto>();
+            foreach (var node in nodes)
+            {
+                //实体转换
+                var nodeViewDto = node.ToModel<ProcProcessRouteDetailNodeViewDto>();
+                nodeViewDto.ProcessType = node.Type;
+                nodeViewDto.Code = ConvertProcedureCode(nodeViewDto.ProcedureId, nodeViewDto.Code);
+                nodeViewDto.Name = ConvertProcedureName(nodeViewDto.ProcedureId, nodeViewDto.Name);
+                if (!string.IsNullOrWhiteSpace(nodeViewDto.Code))
+                {
+                    detailNodeViewDtos.Add(nodeViewDto);
+                }
+            }
+
+            return detailNodeViewDtos;
         }
 
         /// <summary>
@@ -192,7 +214,7 @@ namespace Hymson.MES.Services.Services.Process
             var links = ConvertProcessRouteLinkList(parm.DynamicData.Links, procProcessRouteEntity);
 
             // 判断是否存在多个首工序
-            var firstProcessCount = nodes.Where(w => w.IsFirstProcess == true).Count();
+            var firstProcessCount = nodes.Where(w => w.IsFirstProcess == (int)YesOrNoEnum.Yes).Count();
             if (firstProcessCount == 0)
             {
                 throw new ValidationException(nameof(ErrorCode.MES10435));
@@ -260,7 +282,7 @@ namespace Hymson.MES.Services.Services.Process
             var links = ConvertProcessRouteLinkList(parm.DynamicData.Links, procProcessRouteEntity);
 
             // 判断是否存在多个首工序
-            var firstProcessCount = nodes.Where(w => w.IsFirstProcess == true).Count();
+            var firstProcessCount = nodes.Where(w => w.IsFirstProcess == (int)YesOrNoEnum.Yes).Count();
             if (firstProcessCount == 0)
             {
                 throw new ValidationException(nameof(ErrorCode.MES10435));
@@ -277,7 +299,7 @@ namespace Hymson.MES.Services.Services.Process
                 Code = processRoute.Code,
                 SiteId = _currentSite.SiteId ?? 0,
                 Version = processRoute.Version,
-                Id= processRoute.Id,
+                Id = processRoute.Id,
             };
             if (await _procProcessRouteRepository.IsExistsAsync(query))
             {

@@ -246,6 +246,11 @@
         public const string MES15302 = "条码已报废/删除，不可再操作锁定/取消锁定！";
         public const string MES15303 = "将来锁定操作必须是同一工单下的条码！";
         public const string MES15304 = "条码{sfcs}不是在制品!";
+        public const string MES15305 = "条码数量上限为100行";
+        public const string MES15306= "选中的条码状态与选择的操作类型不匹配！";
+        public const string MES15307 = "扫描的条码状态都必须是“锁定”或者有未关闭的将来锁定指令存在";
+        //public const string MES15308= " 当前条码状态为{operationType}，与选择的操作类型不匹配";
+        public const string MES15308= "将来锁定操作必须是同一工单下的条码！";
         #endregion
 
 
@@ -261,6 +266,9 @@
         public const string MES16008 = "工单没有被锁定,不需要解锁";
         public const string MES16009 = "锁定生产工单失败！";
         public const string MES16010 = "解锁生产工单失败！";
+        public const string MES16011 = "修改生产工单状态失败：有工单不为生产中,不允许完工";
+        public const string MES16012 = "修改生产工单状态失败：有工单不为完工,不允许关闭";
+        public const string MES16013 = "工单状态不为未开始,不允许删除";
         #endregion
 
         #region 条码接收

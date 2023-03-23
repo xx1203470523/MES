@@ -80,6 +80,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return new PagedInfo<ManuSfcProduceView>(manuSfcProduceEntities, query.PageIndex, query.PageSize, totalCount);
         }
 
+
         /// <summary>
         /// 查询List
         /// </summary>

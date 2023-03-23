@@ -23,7 +23,7 @@ namespace Hymson.MES.Core.Enums
         [Description("将来锁")]
         FutureLock = 3,
         /// <summary>
-        /// 取消锁定
+        /// 取消锁定，未锁定
         /// </summary>
         [Description("取消锁定")]
         Unlock = 1
