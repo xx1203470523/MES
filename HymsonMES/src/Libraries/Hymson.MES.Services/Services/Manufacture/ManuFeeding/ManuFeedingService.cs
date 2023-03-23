@@ -71,7 +71,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                     MaterialId = i,
                     MaterialCode = $"MaterialCode-{i}",
                     MaterialName = $"MaterialName-{i}",
-                    Version = $"v-{i}"
+                    Version = $"v-{i}",
+                    Children = new List<ManuFeedingMaterialItemDto>()
                 };
 
                 for (int j = 1; j < 4; j++)
