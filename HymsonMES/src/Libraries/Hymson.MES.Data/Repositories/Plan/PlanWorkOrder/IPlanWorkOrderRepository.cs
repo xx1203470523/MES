@@ -8,6 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +34,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="planWorkOrderEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertsAsync(List<PlanWorkOrderEntity> planWorkOrderEntitys);
+        Task<int> InsertsAsync(IEnumerable<PlanWorkOrderEntity> planWorkOrderEntitys);
 
         /// <summary>
         /// 更新
@@ -47,7 +48,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="planWorkOrderEntitys"></param>
         /// <returns></returns>
-        Task<int> UpdatesAsync(List<PlanWorkOrderEntity> planWorkOrderEntitys);
+        Task<int> UpdatesAsync(IEnumerable<PlanWorkOrderEntity> planWorkOrderEntitys);
 
         /// <summary>
         /// 删除
@@ -105,13 +106,13 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        Task<int> ModifyWorkOrderStatusAsync(List<PlanWorkOrderEntity> parms);
+        Task<int> ModifyWorkOrderStatusAsync(IEnumerable<PlanWorkOrderEntity> parms);
 
         /// <summary>
         /// 修改工单是否锁定
         /// </summary>
         /// <param name="parms"></param>
         /// <returns></returns>
-        Task<int> ModifyWorkOrderLockedAsync(List<PlanWorkOrderEntity> parms);
+        Task<int> ModifyWorkOrderLockedAsync(IEnumerable<PlanWorkOrderEntity> parms);
     }
 }

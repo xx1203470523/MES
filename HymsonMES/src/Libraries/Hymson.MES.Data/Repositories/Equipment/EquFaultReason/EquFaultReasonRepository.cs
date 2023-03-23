@@ -164,7 +164,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="EquFaultReasonEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(List<EquFaultReasonEntity> EquFaultReasonEntitys)
+        public async Task<int> InsertsAsync(IEnumerable<EquFaultReasonEntity> EquFaultReasonEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertsSql, EquFaultReasonEntitys);
@@ -186,7 +186,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="EquFaultReasonEntitys"></param>
         /// <returns></returns>
-        public async Task<int> UpdatesAsync(List<EquFaultReasonEntity> EquFaultReasonEntitys)
+        public async Task<int> UpdatesAsync(IEnumerable<EquFaultReasonEntity> EquFaultReasonEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdatesSql, EquFaultReasonEntitys);

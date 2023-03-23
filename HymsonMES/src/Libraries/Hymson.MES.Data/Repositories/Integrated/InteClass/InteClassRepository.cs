@@ -32,7 +32,6 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
             _connectionOptions = connectionOptions.Value;
         }
 
-
         /// <summary>
         /// 新增
         /// </summary>
@@ -98,7 +97,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
                 sqlBuilder.Where("ClassName LIKE @ClassName");
             }
 
-            if (pagedQuery.ClassType.HasValue == true)
+            if (pagedQuery.ClassType.HasValue)
             {
                 sqlBuilder.Where("ClassType = @ClassType");
             }

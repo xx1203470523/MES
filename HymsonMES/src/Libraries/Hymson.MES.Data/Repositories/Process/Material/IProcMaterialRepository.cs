@@ -47,7 +47,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procMaterialEntitys"></param>
         /// <returns></returns>
-        Task<int> UpdateProcMaterialGroupAsync(List<ProcMaterialEntity> procMaterialEntitys);
+        Task<int> UpdateProcMaterialGroupAsync(IEnumerable<ProcMaterialEntity> procMaterialEntitys);
 
         /// <summary>
         /// 更新某物料组下的物料为未绑定的

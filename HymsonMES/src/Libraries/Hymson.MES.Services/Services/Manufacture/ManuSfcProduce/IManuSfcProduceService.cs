@@ -13,7 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.Services.Services.Manufacture
+namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
 {
     /// <summary>
     /// 条码生产信息（物理删除） service接口

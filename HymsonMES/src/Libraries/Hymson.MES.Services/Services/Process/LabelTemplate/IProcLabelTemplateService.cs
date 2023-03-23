@@ -13,7 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.Services.Services.Process
+namespace Hymson.MES.Services.Services.Process.LabelTemplate
 {
     /// <summary>
     /// 仓库标签模板 service接口

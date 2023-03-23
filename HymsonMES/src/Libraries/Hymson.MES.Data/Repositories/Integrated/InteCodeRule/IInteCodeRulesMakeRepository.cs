@@ -33,7 +33,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="inteCodeRulesMakeEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertsAsync(List<InteCodeRulesMakeEntity> inteCodeRulesMakeEntitys);
+        Task<int> InsertsAsync(IEnumerable<InteCodeRulesMakeEntity> inteCodeRulesMakeEntitys);
 
         /// <summary>
         /// 更新
@@ -47,7 +47,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="inteCodeRulesMakeEntitys"></param>
         /// <returns></returns>
-        Task<int> UpdatesAsync(List<InteCodeRulesMakeEntity> inteCodeRulesMakeEntitys);
+        Task<int> UpdatesAsync(IEnumerable<InteCodeRulesMakeEntity> inteCodeRulesMakeEntitys);
 
         /// <summary>
         /// 删除

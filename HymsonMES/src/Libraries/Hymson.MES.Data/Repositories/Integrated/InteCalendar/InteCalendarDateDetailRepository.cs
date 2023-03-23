@@ -23,7 +23,6 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
             _connectionOptions = connectionOptions.Value;
         }
 
-
         /// <summary>
         /// 新增
         /// </summary>
@@ -41,7 +40,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangeAsync(List<InteCalendarDateDetailEntity> entitys)
+        public async Task<int> InsertRangeAsync(IEnumerable<InteCalendarDateDetailEntity> entitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertSql, entitys);

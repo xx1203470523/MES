@@ -11,7 +11,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -50,7 +50,6 @@ namespace Hymson.MES.Data.Repositories.Plan
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeletesSql, param);
-
         }
 
         /// <summary>
@@ -188,7 +187,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="planWorkOrderEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(List<PlanWorkOrderEntity> planWorkOrderEntitys)
+        public async Task<int> InsertsAsync(IEnumerable<PlanWorkOrderEntity> planWorkOrderEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertsSql, planWorkOrderEntitys);
@@ -210,7 +209,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="planWorkOrderEntitys"></param>
         /// <returns></returns>
-        public async Task<int> UpdatesAsync(List<PlanWorkOrderEntity>
+        public async Task<int> UpdatesAsync(IEnumerable<PlanWorkOrderEntity>
     planWorkOrderEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
@@ -222,7 +221,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        public async Task<int> ModifyWorkOrderStatusAsync(List<PlanWorkOrderEntity> parms) 
+        public async Task<int> ModifyWorkOrderStatusAsync(IEnumerable<PlanWorkOrderEntity> parms) 
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateWorkOrderStatussSql, parms);
@@ -233,7 +232,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        public async Task<int> ModifyWorkOrderLockedAsync(List<PlanWorkOrderEntity> parms)
+        public async Task<int> ModifyWorkOrderLockedAsync(IEnumerable<PlanWorkOrderEntity> parms)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateWorkOrderLockedsSql, parms);

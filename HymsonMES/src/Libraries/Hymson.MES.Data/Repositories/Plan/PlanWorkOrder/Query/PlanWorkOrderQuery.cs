@@ -12,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.Data.Repositories.Plan
+namespace Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query
 {
     /// <summary>
     /// 工单信息表 查询参数

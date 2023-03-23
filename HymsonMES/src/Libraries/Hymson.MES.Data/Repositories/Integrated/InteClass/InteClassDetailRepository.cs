@@ -20,7 +20,6 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
             _connectionOptions = connectionOptions.Value;
         }
 
-
         /// <summary>
         /// 新增
         /// </summary>
@@ -34,11 +33,11 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         }
 
         /// <summary>
-        /// 
+        /// 批量插入
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangeAsync(List<InteClassDetailEntity> entitys)
+        public async Task<int> InsertRangeAsync(IEnumerable<InteClassDetailEntity> entitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertSql, entitys);

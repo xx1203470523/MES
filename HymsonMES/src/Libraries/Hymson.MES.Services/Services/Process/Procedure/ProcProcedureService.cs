@@ -22,13 +22,12 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
-using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using System.Transactions;
 
-namespace Hymson.MES.Services.Services.Process
+namespace Hymson.MES.Services.Services.Process.Procedure
 {
     /// <summary>
     /// 工序表 服务
@@ -188,7 +187,7 @@ namespace Hymson.MES.Services.Services.Process
                 var materialLsit = await _procMaterialRepository.GetByIdsAsync(materialIds);
 
                 var templateIds = pagedInfo.Data.ToList().Select(a => a.TemplateId).ToArray();
-                var templateLsit = await  _procLabelTemplateRepository.GetByIdsAsync(templateIds);
+                var templateLsit = await _procLabelTemplateRepository.GetByIdsAsync(templateIds);
                 foreach (var entity in pagedInfo.Data)
                 {
                     var printReleationDto = entity.ToModel<ProcProcedurePrintRelationDto>();
@@ -202,10 +201,9 @@ namespace Hymson.MES.Services.Services.Process
                         Version = entity.Version,
                         MaterialCode = material?.MaterialCode ?? "",
                         MaterialName = material?.MaterialName ?? "",
-                       TemplateName= template?.Name??""
+                        TemplateName = template?.Name ?? ""
                     };
                     dtos.Add(queryEntity);
-                    //TODO 模板 by wangkeming 
                 }
             }
 

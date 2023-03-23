@@ -119,7 +119,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangAsync(List<InteJobEntity> param)
+        public async Task<int> InsertRangAsync(IEnumerable<InteJobEntity> param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateRangSql, param);
@@ -141,7 +141,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> UpdateRangAsync(List<InteJobEntity> param)
+        public async Task<int> UpdateRangAsync(IEnumerable<InteJobEntity> param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateRangSql, param);

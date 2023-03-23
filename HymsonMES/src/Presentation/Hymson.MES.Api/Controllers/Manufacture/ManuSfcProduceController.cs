@@ -5,7 +5,7 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Manufacture;
-using Hymson.MES.Services.Services.Manufacture;
+using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Manufacture

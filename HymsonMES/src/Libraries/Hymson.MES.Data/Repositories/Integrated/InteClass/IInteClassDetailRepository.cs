@@ -21,7 +21,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> InsertRangeAsync(List<InteClassDetailEntity> entitys);
+        Task<int> InsertRangeAsync(IEnumerable<InteClassDetailEntity> entitys);
 
         /// <summary>
         /// 更新

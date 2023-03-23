@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.Services.Services.Process.IProcessService
+namespace Hymson.MES.Services.Services.Process.PrintConfig
 {
     /// <summary>
     /// 打印配置接口service
@@ -35,7 +35,7 @@ namespace Hymson.MES.Services.Services.Process.IProcessService
         /// <returns></returns>
         Task<PagedInfo<ProcPrinterDto>> GetListAsync(ProcPrinterPagedQueryDto query);
 
-       
+
         /// <summary>
         /// 添加资源数据
         /// </summary>

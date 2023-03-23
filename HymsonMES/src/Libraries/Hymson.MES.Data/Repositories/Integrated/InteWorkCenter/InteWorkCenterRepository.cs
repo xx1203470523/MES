@@ -114,7 +114,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangAsync(List<InteWorkCenterEntity> param)
+        public async Task<int> InsertRangAsync(IEnumerable<InteWorkCenterEntity> param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertSql, param);
@@ -136,7 +136,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> UpdateRangAsync(List<InteWorkCenterEntity> param)
+        public async Task<int> UpdateRangAsync(IEnumerable<InteWorkCenterEntity> param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateRangSql, param);
@@ -159,7 +159,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> InsertInteWorkCenterRelationRangAsync(List<InteWorkCenterRelation> param)
+        public async Task<int> InsertInteWorkCenterRelationRangAsync(IEnumerable<InteWorkCenterRelation> param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertInteWorkCenterRelationRangSql, param);
@@ -194,7 +194,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> InsertInteWorkCenterResourceRelationRangAsync(List<InteWorkCenterResourceRelation> param)
+        public async Task<int> InsertInteWorkCenterResourceRelationRangAsync(IEnumerable<InteWorkCenterResourceRelation> param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InteWorkCenterResourceRelationRangSql, param);

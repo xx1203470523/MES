@@ -144,7 +144,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procLabelTemplateEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(List<ProcLabelTemplateEntity> procLabelTemplateEntitys)
+        public async Task<int> InsertsAsync(IEnumerable<ProcLabelTemplateEntity> procLabelTemplateEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertsSql, procLabelTemplateEntitys);
@@ -166,7 +166,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procLabelTemplateEntitys"></param>
         /// <returns></returns>
-        public async Task<int> UpdatesAsync(List<ProcLabelTemplateEntity> procLabelTemplateEntitys)
+        public async Task<int> UpdatesAsync(IEnumerable<ProcLabelTemplateEntity> procLabelTemplateEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdatesSql, procLabelTemplateEntitys);

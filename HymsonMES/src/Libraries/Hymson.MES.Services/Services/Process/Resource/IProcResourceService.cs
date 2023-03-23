@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.Services.Services.Process.IProcessService
+namespace Hymson.MES.Services.Services.Process.Resource
 {
     /// <summary>
     /// 资源接口service

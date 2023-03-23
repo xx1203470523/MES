@@ -276,7 +276,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procMaterialEntitys"></param>
         /// <returns></returns>
-        public async Task<int> UpdateProcMaterialGroupAsync(List<ProcMaterialEntity> procMaterialEntitys)
+        public async Task<int> UpdateProcMaterialGroupAsync(IEnumerable<ProcMaterialEntity> procMaterialEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateProcMaterialGroupSql, procMaterialEntitys);

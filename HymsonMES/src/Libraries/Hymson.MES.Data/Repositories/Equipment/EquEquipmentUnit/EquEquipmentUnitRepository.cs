@@ -88,12 +88,12 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
-            if (pagedQuery.Type.HasValue == true)
+            if (pagedQuery.Type.HasValue)
             {
                 sqlBuilder.Where("Type = @Type");
             }
 
-            if (pagedQuery.Status.HasValue == true)
+            if (pagedQuery.Status.HasValue)
             {
                 sqlBuilder.Where("Status = @Status");
             }

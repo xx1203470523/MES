@@ -83,7 +83,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procResourceConfigRess"></param>
         /// <returns></returns>
-        public async Task InsertRangeAsync(List<ProcResourceConfigResEntity> procResourceConfigRess)
+        public async Task InsertRangeAsync(IEnumerable<ProcResourceConfigResEntity> procResourceConfigRess)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             await conn.ExecuteAsync(InsertSql, procResourceConfigRess);
@@ -94,7 +94,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procResourceConfigRess"></param>
         /// <returns></returns>
-        public async Task<int> UpdateRangeAsync(List<ProcResourceConfigResEntity> procResourceConfigRess)
+        public async Task<int> UpdateRangeAsync(IEnumerable<ProcResourceConfigResEntity> procResourceConfigRess)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSql, procResourceConfigRess);

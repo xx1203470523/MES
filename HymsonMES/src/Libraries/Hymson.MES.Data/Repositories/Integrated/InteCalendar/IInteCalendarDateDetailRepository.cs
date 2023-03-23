@@ -19,7 +19,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> InsertRangeAsync(List<InteCalendarDateDetailEntity> entitys);
+        Task<int> InsertRangeAsync(IEnumerable<InteCalendarDateDetailEntity> entitys);
 
         /// <summary>
         /// 更新

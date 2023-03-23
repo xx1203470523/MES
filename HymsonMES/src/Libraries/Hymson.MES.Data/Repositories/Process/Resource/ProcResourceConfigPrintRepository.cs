@@ -76,7 +76,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procResourceConfigPrints"></param>
         /// <returns></returns>
-        public async Task InsertRangeAsync(List<ProcResourceConfigPrintEntity> procResourceConfigPrints)
+        public async Task InsertRangeAsync(IEnumerable<ProcResourceConfigPrintEntity> procResourceConfigPrints)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             await conn.ExecuteAsync(InsertSql, procResourceConfigPrints);

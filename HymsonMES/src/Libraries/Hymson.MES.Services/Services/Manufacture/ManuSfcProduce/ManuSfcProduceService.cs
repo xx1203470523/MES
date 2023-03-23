@@ -18,6 +18,7 @@ using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -201,7 +202,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 Lock = (int)parm.OperationType,
                 Sfcs = parm.Sfcs,
-                LockProductionId = parm.LockProductionId,
+                LockProductionId = parm.LockProductionId??0,
                 UserId = _currentUser.UserName,
                 UpdatedOn = HymsonClock.Now()
             };
@@ -322,11 +323,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task<ManuSfcProduceDto> QueryManuSfcProduceByIdAsync(long id)
         {
             var manuSfcProduceEntity = await _manuSfcProduceRepository.GetByIdAsync(id);
-            if (manuSfcProduceEntity != null)
+            if (manuSfcProduceEntity == null)
             {
-                return manuSfcProduceEntity.ToModel<ManuSfcProduceDto>();
+                return null;
             }
-            return null;
+            return manuSfcProduceEntity.ToModel<ManuSfcProduceDto>();
         }
     }
 }

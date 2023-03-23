@@ -17,7 +17,6 @@ using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
-using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.Snowflake;
 using Hymson.Utils.Tools;
 using Hymson.Utils;
@@ -28,9 +27,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
 
-namespace Hymson.MES.Services.Services.Process
+namespace Hymson.MES.Services.Services.Process.PrintConfig
 {
-   
+
     public class ProcPrintConfigService : IProcPrintConfigService
     {
         /// <summary>
@@ -137,7 +136,7 @@ namespace Hymson.MES.Services.Services.Process
             //验证DTO
             //var dto = new ProcResourceTypeDto();
             //await _validationRules.ValidateAndThrowAsync(dto);
-            if (param == null||string.IsNullOrEmpty(param.PrintName))
+            if (param == null || string.IsNullOrEmpty(param.PrintName))
             {
                 throw new ValidationException(nameof(ErrorCode.MES10100));
             }
@@ -146,7 +145,7 @@ namespace Hymson.MES.Services.Services.Process
             var siteId = _currentSite.SiteId ?? 0;
             //DTO转换实体
             var id = IdGenProvider.Instance.CreateId();
-           
+
             var entity = new ProcPrinterEntity
             {
                 Id = id,
@@ -158,17 +157,17 @@ namespace Hymson.MES.Services.Services.Process
                 PrintIp = param.PrintIp ?? ""
             };
 
-           
+
             var foo = await _printConfigRepository.GetByPrintNameAsync(param.PrintName);
             if (foo != null)
             {
                 throw new BusinessException(nameof(ErrorCode.MES10306)).WithData("PrintName", param.PrintName);
             }
 
-         
+
             //入库
             await _printConfigRepository.InsertAsync(entity);
-          
+
         }
 
         /// <summary>
@@ -210,12 +209,12 @@ namespace Hymson.MES.Services.Services.Process
             //    return apiResult;
             //}
 
-           
+
             //更新
             await _printConfigRepository.UpdateAsync(updateEntity);
-               
-              
-           
+
+
+
         }
 
         /// <summary>

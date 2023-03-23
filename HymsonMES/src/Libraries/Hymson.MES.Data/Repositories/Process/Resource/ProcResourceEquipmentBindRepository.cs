@@ -88,7 +88,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="bindEntitys"></param>
         /// <returns></returns>
-        public async Task InsertRangeAsync(List<ProcResourceEquipmentBindEntity> bindEntitys)
+        public async Task InsertRangeAsync(IEnumerable<ProcResourceEquipmentBindEntity> bindEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
            await conn.ExecuteAsync(InsertSql, bindEntitys);
@@ -99,7 +99,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procResourceEquipmentBinds"></param>
         /// <returns></returns>
-        public async Task<int> UpdateRangeAsync(List<ProcResourceEquipmentBindEntity> procResourceEquipmentBinds)
+        public async Task<int> UpdateRangeAsync(IEnumerable<ProcResourceEquipmentBindEntity> procResourceEquipmentBinds)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSql, procResourceEquipmentBinds);

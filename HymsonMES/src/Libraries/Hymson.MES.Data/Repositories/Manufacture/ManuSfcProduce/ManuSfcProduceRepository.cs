@@ -218,6 +218,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                             FROM `manu_sfc_produce`  WHERE Id IN @ids ";
 
         //质量锁定sql
-        const string UpdateQualityLockSql = "update  manu_sfc_produce set Lock=@Lock,LockProductionId=@LockProductionId,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn where SFC in  @Sfcs";
+        const string UpdateQualityLockSql = "update  manu_sfc_produce set `Lock`=@Lock,LockProductionId=@LockProductionId,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn where SFC in  @Sfcs";
     }
 }

@@ -9,7 +9,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 
-namespace Hymson.MES.Services.Services.Process.IProcessService
+namespace Hymson.MES.Services.Services.Process.Procedure
 {
     /// <summary>
     /// 工序表 service接口

@@ -29,7 +29,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
             _connectionOptions = connectionOptions.Value;
         }
 
-
         /// <summary>
         /// 新增
         /// </summary>
@@ -113,7 +112,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
                 sqlBuilder.Where("SparePartTypeName LIKE @SparePartTypeName");
             }
 
-            if (pagedQuery.Status.HasValue == true)
+            if (pagedQuery.Status.HasValue)
             {
                 sqlBuilder.Where("Status = @Status");
             }

@@ -28,7 +28,6 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
             _connectionOptions = connectionOptions.Value;
         }
 
-
         /// <summary>
         /// 新增
         /// </summary>
@@ -93,28 +92,28 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
             sqlBuilder.LeftJoin("proc_material M ON IC.MaterialId = M.Id");
             sqlBuilder.LeftJoin("proc_material_group MG ON IC.MaterialGroupId = MG.Id");
 
-            if (pagedQuery.DefinitionMethod.HasValue == true)
+            if (pagedQuery.DefinitionMethod.HasValue)
             {
                 sqlBuilder.Where("IC.DefinitionMethod = @DefinitionMethod");
             }
 
-            if (pagedQuery.Level.HasValue == true)
+            if (pagedQuery.Level.HasValue)
             {
                 sqlBuilder.Where("IC.Level = @Level");
             }
 
-            if (pagedQuery.Status.HasValue == true)
+            if (pagedQuery.Status.HasValue)
             {
                 sqlBuilder.Where("IC.Status = @Status");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.Name) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Name) )
             {
                 pagedQuery.Name = $"%{pagedQuery.Name}%";
                 sqlBuilder.Where("M.MaterialName LIKE @Name OR MG.GroupName LIKE @Name");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.Version) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Version) )
             {
                 pagedQuery.Version = $"%{pagedQuery.Version}%";
                 sqlBuilder.Where("M.Version LIKE @Version");

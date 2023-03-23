@@ -5,6 +5,7 @@
  *builder:  zhaoqing
  *build datetime: 2023-02-10 11:20:47
  */
+using FluentValidation.Validators;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 
@@ -34,14 +35,14 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procResourceEquipmentBinds"></param>
         /// <returns></returns>
-        Task InsertRangeAsync(List<ProcResourceEquipmentBindEntity> procResourceEquipmentBinds);
+        Task InsertRangeAsync(IEnumerable<ProcResourceEquipmentBindEntity> procResourceEquipmentBinds);
 
         /// <summary>
         /// 更新
         /// </summary>
         /// <param name="procResourceEquipmentBinds"></param>
         /// <returns></returns>
-        Task<int> UpdateRangeAsync(List<ProcResourceEquipmentBindEntity> procResourceEquipmentBinds);
+        Task<int> UpdateRangeAsync(IEnumerable<ProcResourceEquipmentBindEntity> procResourceEquipmentBinds);
 
         /// <summary>
         /// 批量删除

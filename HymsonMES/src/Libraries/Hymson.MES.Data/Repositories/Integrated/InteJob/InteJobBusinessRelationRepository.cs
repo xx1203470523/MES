@@ -120,7 +120,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="inteJobBusinessRelationEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangeAsync(List<InteJobBusinessRelationEntity> inteJobBusinessRelationEntitys)
+        public async Task<int> InsertRangeAsync(IEnumerable<InteJobBusinessRelationEntity> inteJobBusinessRelationEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertSql, inteJobBusinessRelationEntitys);
@@ -142,7 +142,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="inteJobBusinessRelationEntitys"></param>
         /// <returns></returns>
-        public async Task<int> UpdateRangeAsync(List<InteJobBusinessRelationEntity> inteJobBusinessRelationEntitys)
+        public async Task<int> UpdateRangeAsync(IEnumerable<InteJobBusinessRelationEntity> inteJobBusinessRelationEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSql, inteJobBusinessRelationEntitys);

@@ -22,7 +22,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> InsertRangeAsync(List<EquEquipmentLinkHardwareEntity> entitys);
+        Task<int> InsertRangeAsync(IEnumerable<EquEquipmentLinkHardwareEntity> entitys);
 
         /// <summary>
         /// 
@@ -36,7 +36,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> UpdateRangeAsync(List<EquEquipmentLinkHardwareEntity> entitys);
+        Task<int> UpdateRangeAsync(IEnumerable<EquEquipmentLinkHardwareEntity> entitys);
 
         /// <summary>
         /// 

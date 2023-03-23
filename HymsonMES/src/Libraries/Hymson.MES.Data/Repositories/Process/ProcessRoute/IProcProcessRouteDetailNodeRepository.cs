@@ -46,14 +46,14 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procProcessRouteDetailNodeEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertRangeAsync(List<ProcProcessRouteDetailNodeEntity> procProcessRouteDetailNodeEntitys);
+        Task<int> InsertRangeAsync(IEnumerable<ProcProcessRouteDetailNodeEntity> procProcessRouteDetailNodeEntitys);
 
         /// <summary>
         /// 批量更新 
         /// </summary>
         /// <param name="procProcessRouteDetailNodeEntitys"></param>
         /// <returns></returns>
-        Task<int> UpdateRangeAsync(List<ProcProcessRouteDetailNodeEntity> procProcessRouteDetailNodeEntitys);
+        Task<int> UpdateRangeAsync(IEnumerable<ProcProcessRouteDetailNodeEntity> procProcessRouteDetailNodeEntitys);
 
         /// <summary>
         /// 批量删除

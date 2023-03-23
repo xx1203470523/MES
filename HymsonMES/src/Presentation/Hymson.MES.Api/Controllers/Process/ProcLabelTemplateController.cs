@@ -8,8 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
-using Hymson.MES.Services.Services.Process;
-
+using Hymson.MES.Services.Services.Process.LabelTemplate;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Extensions;

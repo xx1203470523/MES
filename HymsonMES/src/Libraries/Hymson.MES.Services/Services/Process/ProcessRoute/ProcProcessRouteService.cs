@@ -17,13 +17,12 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
-using Hymson.MES.Services.Services.Process.IProcessService;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using System.Transactions;
 
-namespace Hymson.MES.Services.Services.Process
+namespace Hymson.MES.Services.Services.Process.ProcessRoute
 {
     /// <summary>
     /// 工艺路线表 服务

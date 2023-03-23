@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.Services.Services.Process.IProcessService
+namespace Hymson.MES.Services.Services.Process.ResourceType
 {
     /// <summary>
     /// 资源类型接口service

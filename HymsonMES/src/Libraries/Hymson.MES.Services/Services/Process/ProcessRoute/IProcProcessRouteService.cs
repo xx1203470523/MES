@@ -13,7 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.Services.Services.Process.IProcessService
+namespace Hymson.MES.Services.Services.Process.ProcessRoute
 {
     /// <summary>
     /// 工艺路线表 service接口

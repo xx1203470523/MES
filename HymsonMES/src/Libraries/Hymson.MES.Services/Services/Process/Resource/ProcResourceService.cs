@@ -17,7 +17,7 @@ using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
-using Hymson.MES.Services.Services.Process.IProcessService;
+using Hymson.MES.Services.Services.Process.Resource;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -318,7 +318,7 @@ namespace Hymson.MES.Services.Services.Process
             #region 验证
             if (parm == null)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10100));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
 
             //验证DTO
@@ -332,7 +332,7 @@ namespace Hymson.MES.Services.Services.Process
             };
             if (await _resourceRepository.IsExistsAsync(query))
             {
-                throw new BusinessException(nameof(ErrorCode.MES10308)).WithData("ResCode", parm.ResCode);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10308)).WithData("ResCode", parm.ResCode);
             }
 
             if (parm.ResTypeId > 0)
@@ -340,7 +340,7 @@ namespace Hymson.MES.Services.Services.Process
                 var resourceType = await _resourceTypeRepository.GetByIdAsync(parm.ResTypeId ?? 0);
                 if (resourceType == null)
                 {
-                    throw new ValidationException(nameof(ErrorCode.MES10310));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10310));
                 }
             }
 
