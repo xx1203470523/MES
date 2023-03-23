@@ -111,15 +111,15 @@ namespace Hymson.MES.Api.Controllers.Plan
         }
 
         /// <summary>
-        /// 改变锁定
+        /// 改变锁定/解锁
         /// </summary>
         /// <param name="parms"></param>
         /// <returns></returns>
         [HttpPut]
-        [Route("changWorkOrderLocked")]
-        public async Task LockedAsync(PlanWorkOrderLockedDto parms) 
+        [Route("changLocked")]
+        public async Task ChangLockedAsync(List<PlanWorkOrderLockedDto> parms) 
         {
-            
+            await _planWorkOrderService.ModifyWorkOrderLockedAsync(parms);
         }
     }
 }

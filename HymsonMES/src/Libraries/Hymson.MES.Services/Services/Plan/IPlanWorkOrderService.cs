@@ -68,5 +68,13 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="parm"></param>
         /// <returns></returns>
         Task ModifyWorkOrderStatusAsync(List<PlanWorkOrderChangeStatusDto> parms);
+
+        /// <summary>
+        /// 修改工单是否锁定
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        Task ModifyWorkOrderLockedAsync(List<PlanWorkOrderLockedDto> parms);
+
     }
 }
