@@ -49,6 +49,18 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         /// <summary>
+        /// 质量锁定
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("lock")]
+        public async Task QualityLockAsync(ManuSfcProduceLockDto parm)
+        {
+            await _manuSfcProduceService.QualityLockAsync(parm);
+        }
+
+        /// <summary>
         /// 查询详情（条码生产信息（物理删除））
         /// </summary>
         /// <param name="id"></param>
@@ -68,7 +80,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [Route("create")]
         public async Task AddManuSfcProduceAsync([FromBody] ManuSfcProduceCreateDto parm)
         {
-             await _manuSfcProduceService.CreateManuSfcProduceAsync(parm);
+            await _manuSfcProduceService.CreateManuSfcProduceAsync(parm);
         }
 
         /// <summary>

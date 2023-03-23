@@ -192,7 +192,7 @@ namespace Hymson.MES.Services.Services.Process
             var links = ConvertProcessRouteLinkList(parm.DynamicData.Links, procProcessRouteEntity);
 
             // 判断是否存在多个首工序
-            var firstProcessCount = nodes.Where(w => w.IsFirstProcess == true).Count();
+            var firstProcessCount = nodes.Where(w => w.IsFirstProcess==(int)YesOrNoEnum.Yes).Count();
             if (firstProcessCount == 0)
             {
                 throw new ValidationException(nameof(ErrorCode.MES10435));
@@ -260,7 +260,7 @@ namespace Hymson.MES.Services.Services.Process
             var links = ConvertProcessRouteLinkList(parm.DynamicData.Links, procProcessRouteEntity);
 
             // 判断是否存在多个首工序
-            var firstProcessCount = nodes.Where(w => w.IsFirstProcess == true).Count();
+            var firstProcessCount = nodes.Where(w => w.IsFirstProcess == (int)YesOrNoEnum.Yes).Count();
             if (firstProcessCount == 0)
             {
                 throw new ValidationException(nameof(ErrorCode.MES10435));

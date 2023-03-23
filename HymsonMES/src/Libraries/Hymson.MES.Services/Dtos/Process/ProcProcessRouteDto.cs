@@ -173,12 +173,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 是否报工
         /// </summary>
-        public bool IsWorkReport { get; set; }
+        public int IsWorkReport { get; set; }
 
         /// <summary>
         /// 是否首工序
         /// </summary>
-        public bool IsFirstProcess { get; set; }
+        public int IsFirstProcess { get; set; }
 
         /// <summary>
         /// 扩展信息

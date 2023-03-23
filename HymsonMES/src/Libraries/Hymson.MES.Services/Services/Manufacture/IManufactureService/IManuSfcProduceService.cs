@@ -28,16 +28,23 @@ namespace Hymson.MES.Services.Services.Manufacture
         Task<PagedInfo<ManuSfcProduceViewDto>> GetPageListAsync(ManuSfcProducePagedQueryDto manuSfcProducePagedQueryDto);
 
         /// <summary>
+        /// 质量锁定
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        Task QualityLockAsync(ManuSfcProduceLockDto parm);
+
+        /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="manuSfcProduceDto"></param>
+        /// <param name="manuSfcProduceCreateDto"></param>
         /// <returns></returns>
         Task CreateManuSfcProduceAsync(ManuSfcProduceCreateDto manuSfcProduceCreateDto);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="manuSfcProduceDto"></param>
+        /// <param name="manuSfcProduceModifyDto"></param>
         /// <returns></returns>
         Task ModifyManuSfcProduceAsync(ManuSfcProduceModifyDto manuSfcProduceModifyDto);
 
