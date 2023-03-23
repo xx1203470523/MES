@@ -23,19 +23,19 @@ namespace Hymson.MES.Core.Enums
         [Description("生产中")]
         InProduction = 3,
         /// <summary>
-        /// 已完成
+        /// 已完工
         /// </summary>
-        [Description("已完成")]
+        [Description("已完工")]
         Finish = 4,
         /// <summary>
         /// 已关闭
         /// </summary>
         [Description("已关闭")]
         Closed = 5,
-        /// <summary>
-        /// 暂停中
-        /// </summary>
-        [Description("暂停中")]
-        Pending = 6,
+        ///// <summary>
+        ///// 暂停中    //采用锁定字段，该选项去掉
+        ///// </summary>
+        //[Description("暂停中")]
+        //Pending = 6,
     }
 }

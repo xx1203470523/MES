@@ -123,6 +123,16 @@ namespace Hymson.MES.Services.Services.Plan
         /// <returns></returns>
         public async Task<int> DeletesPlanWorkOrderAsync(long[] idsArr)
         {
+            //检查工单状态
+            var workOrders = await _planWorkOrderRepository.GetByIdsAsync(idsArr);
+            foreach (var item in workOrders)
+            {
+                if (item.Status!= PlanWorkOrderStatusEnum.NotStarted) 
+                {
+                    throw new BusinessException(nameof(ErrorCode.MES16013));
+                }
+            }
+
             return await _planWorkOrderRepository.DeletesAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
         }
 
@@ -272,7 +282,27 @@ namespace Hymson.MES.Services.Services.Plan
                     }
                 }
             }
-           
+            if (parms.First().Status == PlanWorkOrderStatusEnum.Finish) //需要修改为完工的
+            {
+                foreach (var item in workOrders)
+                {
+                    if (item.Status != PlanWorkOrderStatusEnum.InProduction)//判断是否有不是生产中的则无法更改状态
+                    {
+                        throw new BusinessException(nameof(ErrorCode.MES16011));
+                    }
+                }
+            }
+            if (parms.First().Status == PlanWorkOrderStatusEnum.Closed) //需要修改为关闭的
+            {
+                foreach (var item in workOrders)
+                {
+                    if (item.Status != PlanWorkOrderStatusEnum.Finish)//判断是否有不是完工的则无法更改状态
+                    {
+                        throw new BusinessException(nameof(ErrorCode.MES16012));
+                    }
+                }
+            }
+
             #endregion
 
             List<PlanWorkOrderEntity> planWorkOrderEntities = new List<PlanWorkOrderEntity>();

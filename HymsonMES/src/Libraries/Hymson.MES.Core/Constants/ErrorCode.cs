@@ -261,6 +261,9 @@
         public const string MES16008 = "工单没有被锁定,不需要解锁";
         public const string MES16009 = "锁定生产工单失败！";
         public const string MES16010 = "解锁生产工单失败！";
+        public const string MES16011 = "修改生产工单状态失败：有工单不为生产中,不允许完工";
+        public const string MES16012 = "修改生产工单状态失败：有工单不为完工,不允许关闭";
+        public const string MES16013 = "工单状态不为未开始,不允许删除";
         #endregion
 
         #region 条码接收
