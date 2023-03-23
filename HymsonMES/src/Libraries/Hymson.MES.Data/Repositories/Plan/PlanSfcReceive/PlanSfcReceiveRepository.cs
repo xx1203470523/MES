@@ -86,17 +86,12 @@ namespace Hymson.MES.Data.Repositories.Plan
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Select(" msi.Id,pwo.OrderCode,pwo.Type,pm.MaterialCode,pm.MaterialName,pwo.Qty,pwoR.OrderCode AS relevanceOrderCode,msi.CreatedBy,msi.CreatedOn");
+            sqlBuilder.Select(" msi.Id,msi.SFC,pwo.OrderCode,pwo.Type,pm.MaterialCode,pm.MaterialName,pwo.Qty,pwoR.OrderCode AS relevanceOrderCode,msi.CreatedBy,msi.CreatedOn");
             sqlBuilder.InnerJoin(" plan_work_order pwo ON pwo.Id=msi.WorkOrderId");
             sqlBuilder.InnerJoin(" proc_material pm ON pm.Id=msi.ProductId");
             sqlBuilder.LeftJoin(" plan_work_order pwoR ON pwoR.Id=msi.RelevanceWorkOrderId");
 
-            //sqlBuilder.Where("IsDeleted=0");
-
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
+            sqlBuilder.Where(" msi.IsDeleted=0");
 
             if (!string.IsNullOrWhiteSpace(planSfcInfoPagedQuery.WorkOrderCode))
             {

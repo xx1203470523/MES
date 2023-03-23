@@ -28,6 +28,10 @@ namespace Hymson.MES.Services.Dtos.Plan
 
 
         /// <summary>
+        /// SFC 
+        /// </summary>
+        public string SFC { get; set; }
+        /// <summary>
         /// 工单号
         /// </summary>
         public string OrderCode { get; set; }

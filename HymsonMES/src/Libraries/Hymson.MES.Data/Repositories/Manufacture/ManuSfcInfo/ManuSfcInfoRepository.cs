@@ -48,7 +48,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeletesSql, param);
+            try
+            {
+                return await conn.ExecuteAsync(DeletesSql, param);
+
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
 
         }
 
