@@ -62,6 +62,18 @@ namespace Hymson.MES.Api.Controllers.Process
         }
 
         /// <summary>
+        /// 根据ID查询工艺路线工序列表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("nodeList")]
+        public async Task<List<ProcProcessRouteDetailNodeViewDto>> GetNodesByRouteId(long id)
+        {
+            return await _procProcessRouteService.GetNodesByRouteId(id);
+        }
+
+        /// <summary>
         /// 添加（工艺路线表）
         /// </summary>
         /// <param name="parm"></param>
