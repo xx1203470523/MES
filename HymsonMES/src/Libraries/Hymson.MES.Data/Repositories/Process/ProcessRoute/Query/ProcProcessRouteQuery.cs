@@ -21,7 +21,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 状态列表
         /// </summary>
-        public string[] StatusArr { get; set; }
+        public int[] StatusArr { get; set; }
         /// <summary>
         /// 工艺路线代码
         /// </summary>

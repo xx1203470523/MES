@@ -343,7 +343,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             #region 参数校验
             //有生产中工单引用当前工艺路线，不能删除！
             // // 状态（0:新建;1:启用;2:保留;3:废除）
-            var statusArr = new string[] { SysDataStatusEnum.Enable.ToString(), SysDataStatusEnum.Retain.ToString() };
+            var statusArr = new int[] { (int)SysDataStatusEnum.Enable, (int)SysDataStatusEnum.Retain };
             var query = new ProcProcessRouteQuery
             {
                 Ids = idsArr,
