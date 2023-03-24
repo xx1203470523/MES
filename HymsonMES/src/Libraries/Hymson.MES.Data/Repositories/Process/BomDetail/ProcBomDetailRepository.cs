@@ -11,11 +11,8 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Process;
-using Hymson.Utils;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using Org.BouncyCastle.Crypto;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -85,6 +82,17 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ProcBomDetailEntity>(GetByIdsSql, new { ids = ids });
+        }
+
+        /// <summary>
+        /// 根据BomID查询物料
+        /// </summary>
+        /// <param name="bomIds"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcBomDetailEntity>> GetByBomIdsAsync(IEnumerable<long> bomIds)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcBomDetailEntity>(GetByBomIds, new { bomIds });
         }
 
         /// <summary>
@@ -246,5 +254,6 @@ namespace Hymson.MES.Data.Repositories.Process
                             WHERE a.IsDeleted =0
                             AND a.BomId=@id
                             ORDER by a.UpdatedOn DESC ";
+        const string GetByBomIds = @"SELECT MaterialId FROM proc_bom_detail WHERE BomId IN @bomIds ";
     }
 }

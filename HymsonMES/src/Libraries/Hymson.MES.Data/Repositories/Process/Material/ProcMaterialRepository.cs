@@ -8,14 +8,11 @@
 
 using Dapper;
 using Hymson.Infrastructure;
-using Hymson.Infrastructure.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using System;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -352,7 +349,6 @@ namespace Hymson.MES.Data.Repositories.Process
                                         `Id`, `SiteId`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `BomId`, `Batch`, `Unit`, `SerialNumber`, `ValidationMaskGroup`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`,ConsumeRatio
                             FROM `proc_material`
                             WHERE IsDeleted = 0 and GroupId IN @groupIds ";
-
         const string UpdateSameMaterialCodeToNoVersionSql = "UPDATE `proc_material` SET IsDefaultVersion= 0 WHERE MaterialCode= @MaterialCode ";
 
         /// <summary>
