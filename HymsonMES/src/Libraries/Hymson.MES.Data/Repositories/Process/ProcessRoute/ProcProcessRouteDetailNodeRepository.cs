@@ -76,7 +76,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procProcessRouteDetailNodeEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangeAsync(List<ProcProcessRouteDetailNodeEntity> procProcessRouteDetailNodeEntitys)
+        public async Task<int> InsertRangeAsync(IEnumerable<ProcProcessRouteDetailNodeEntity> procProcessRouteDetailNodeEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertSql, procProcessRouteDetailNodeEntitys);
@@ -87,7 +87,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procProcessRouteDetailNodeEntitys"></param>
         /// <returns></returns>
-        public async Task<int> UpdateRangeAsync(List<ProcProcessRouteDetailNodeEntity> procProcessRouteDetailNodeEntitys)
+        public async Task<int> UpdateRangeAsync(IEnumerable<ProcProcessRouteDetailNodeEntity> procProcessRouteDetailNodeEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSql, procProcessRouteDetailNodeEntitys);

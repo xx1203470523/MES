@@ -3,7 +3,7 @@
 namespace Hymson.MES.Core.Enums
 {
     /// <summary>
-    /// manu_sfc_produce 条码生产状态
+    /// manu_sfc_produce 条码生产状态:排队、活动、完成、NC 
     /// </summary>
     public enum SfcProduceStatusEnum : sbyte
     {

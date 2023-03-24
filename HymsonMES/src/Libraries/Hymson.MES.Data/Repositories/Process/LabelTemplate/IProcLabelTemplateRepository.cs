@@ -32,7 +32,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procLabelTemplateEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertsAsync(List<ProcLabelTemplateEntity> procLabelTemplateEntitys);
+        Task<int> InsertsAsync(IEnumerable<ProcLabelTemplateEntity> procLabelTemplateEntitys);
 
         /// <summary>
         /// 更新
@@ -46,7 +46,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procLabelTemplateEntitys"></param>
         /// <returns></returns>
-        Task<int> UpdatesAsync(List<ProcLabelTemplateEntity> procLabelTemplateEntitys);
+        Task<int> UpdatesAsync(IEnumerable<ProcLabelTemplateEntity> procLabelTemplateEntitys);
 
         /// <summary>
         /// 删除

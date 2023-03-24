@@ -32,7 +32,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procProcedurePrintReleationEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertRangeAsync(List<ProcProcedurePrintRelationEntity> procProcedurePrintReleationEntitys);
+        Task<int> InsertRangeAsync(IEnumerable<ProcProcedurePrintRelationEntity> procProcedurePrintReleationEntitys);
 
         /// <summary>
         /// 删除（软删除）
@@ -81,7 +81,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procProcedurePrintReleationEntitys"></param>
         /// <returns></returns>
-        Task<int> UpdateRangeAsync(List<ProcProcedurePrintRelationEntity> procProcedurePrintReleationEntitys);
+        Task<int> UpdateRangeAsync(IEnumerable<ProcProcedurePrintRelationEntity> procProcedurePrintReleationEntitys);
 
         /// <summary>
         /// 批量删除

@@ -21,6 +21,7 @@ using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
@@ -415,7 +416,7 @@ namespace Hymson.MES.Services.Mapper
         /// <summary>
         /// 计划模块
         /// </summary>
-        protected virtual void CreatePlanMaps() 
+        protected virtual void CreatePlanMaps()
         {
             #region WorkOrder
             CreateMap<PlanWorkOrderCreateDto, PlanWorkOrderEntity>();
@@ -425,6 +426,16 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<PlanWorkOrderEntity, PlanWorkOrderDetailViewDto>();
             CreateMap<PlanWorkOrderListDetailView, PlanWorkOrderListDetailViewDto>();
             #endregion
+
+            #region PlanSfcReceive
+            CreateMap<PlanSfcReceiveCreateDto, PlanSfcReceiveView>();
+            CreateMap<PlanSfcReceiveModifyDto, PlanSfcReceiveView>();
+            CreateMap<PlanSfcReceivePagedQueryDto, PlanSfcReceivePagedQuery>();
+            CreateMap<PlanSfcReceiveView, PlanSfcReceiveDto>();
+            #endregion
+
+
+
         }
 
         /// <summary>

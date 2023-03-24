@@ -17,6 +17,7 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Process;
@@ -123,6 +124,16 @@ namespace Hymson.MES.Services.Services.Plan
         /// <returns></returns>
         public async Task<int> DeletesPlanWorkOrderAsync(long[] idsArr)
         {
+            //检查工单状态
+            var workOrders = await _planWorkOrderRepository.GetByIdsAsync(idsArr);
+            foreach (var item in workOrders)
+            {
+                if (item.Status!= PlanWorkOrderStatusEnum.NotStarted) 
+                {
+                    throw new BusinessException(nameof(ErrorCode.MES16013));
+                }
+            }
+
             return await _planWorkOrderRepository.DeletesAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
         }
 
@@ -272,7 +283,27 @@ namespace Hymson.MES.Services.Services.Plan
                     }
                 }
             }
-           
+            if (parms.First().Status == PlanWorkOrderStatusEnum.Finish) //需要修改为完工的
+            {
+                foreach (var item in workOrders)
+                {
+                    if (item.Status != PlanWorkOrderStatusEnum.InProduction)//判断是否有不是生产中的则无法更改状态
+                    {
+                        throw new BusinessException(nameof(ErrorCode.MES16011));
+                    }
+                }
+            }
+            if (parms.First().Status == PlanWorkOrderStatusEnum.Closed) //需要修改为关闭的
+            {
+                foreach (var item in workOrders)
+                {
+                    if (item.Status != PlanWorkOrderStatusEnum.Finish)//判断是否有不是完工的则无法更改状态
+                    {
+                        throw new BusinessException(nameof(ErrorCode.MES16012));
+                    }
+                }
+            }
+
             #endregion
 
             List<PlanWorkOrderEntity> planWorkOrderEntities = new List<PlanWorkOrderEntity>();
@@ -298,6 +329,73 @@ namespace Hymson.MES.Services.Services.Plan
                 else 
                 {
                     throw new BusinessException(nameof(ErrorCode.MES16005));
+                }
+            }
+        }
+
+        /// <summary>
+        /// 修改工单是否锁定
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        public async Task ModifyWorkOrderLockedAsync(List<PlanWorkOrderLockedDto> parms)
+        {
+            if (parms == null || parms.Count == 0)
+            {
+                throw new BusinessException(nameof(ErrorCode.MES10100));
+            }
+
+            #region//判断订单是否可以继续修改为锁定/解锁
+            //查询需要改变的工单
+            var workOrders = await _planWorkOrderRepository.GetByIdsAsync(parms.Select(x => x.Id).ToArray());
+
+            if (parms.First().IsLocked == YesOrNoEnum.Yes) //需要修改为锁定
+            {
+                foreach (var item in workOrders)
+                {
+                    if (item.Status != PlanWorkOrderStatusEnum.InProduction)//判断是否有不是生产中的则无法更改为锁定
+                    {
+                        throw new BusinessException(nameof(ErrorCode.MES16007));
+                    }
+                }
+            }
+            else  //解锁操作
+            {
+                foreach (var item in workOrders)
+                {
+                    if (item.IsLocked != YesOrNoEnum.Yes)//判断是否是锁定中
+                    {
+                        throw new BusinessException(nameof(ErrorCode.MES16008));
+                    }
+                }
+            }
+
+            #endregion
+
+            List<PlanWorkOrderEntity> planWorkOrderEntities = new List<PlanWorkOrderEntity>();
+            foreach (var item in parms)
+            {
+                planWorkOrderEntities.Add(new PlanWorkOrderEntity()
+                {
+                    Id = item.Id,
+                    IsLocked = item.IsLocked,
+
+                    UpdatedBy = _currentUser.UserName,
+                    UpdatedOn = HymsonClock.Now()
+                });
+            }
+
+            using (TransactionScope ts = new TransactionScope())
+            {
+                var response = await _planWorkOrderRepository.ModifyWorkOrderLockedAsync(planWorkOrderEntities);
+                if (response == parms.Count)
+                {
+                    ts.Complete();
+                }
+                else
+                {
+                    var errCode= parms.First().IsLocked == YesOrNoEnum.Yes ? ErrorCode.MES16009 : ErrorCode.MES16010;
+                    throw new BusinessException(nameof(errCode));
                 }
             }
         }

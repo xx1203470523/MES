@@ -27,14 +27,14 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procResourceConfigRess"></param>
         /// <returns></returns>
-        Task InsertRangeAsync(List<ProcResourceConfigResEntity> procResourceConfigRess);
+        Task InsertRangeAsync(IEnumerable<ProcResourceConfigResEntity> procResourceConfigRess);
 
         /// <summary>
         /// 更新
         /// </summary>
         /// <param name="procResourceConfigRes"></param>
         /// <returns></returns>
-        Task<int> UpdateRangeAsync(List<ProcResourceConfigResEntity> procResourceConfigRes);
+        Task<int> UpdateRangeAsync(IEnumerable<ProcResourceConfigResEntity> procResourceConfigRes);
 
         /// <summary>
         /// 删除

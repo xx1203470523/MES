@@ -678,15 +678,29 @@ namespace Hymson.MES.Services.Dtos.Plan
     /// </summary>
     public record PlanWorkOrderChangeStatusDto 
     {
+        /// <summary>
+        /// 工单ID
+        /// </summary>
         public long Id { get; set; }
 
+        /// <summary>
+        /// 工单状态
+        /// 需要改变为什么状态
+        /// </summary>
         public PlanWorkOrderStatusEnum Status { get; set; }
     }
 
     public record PlanWorkOrderLockedDto
     {
+        /// <summary>
+        /// 工单ID
+        /// </summary>
         public long Id { get; set; }
 
+        /// <summary>
+        /// 是否锁定
+        /// 需要改变为 锁定/解锁
+        /// </summary>
         public YesOrNoEnum IsLocked { get; set; }
     }
 }

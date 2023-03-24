@@ -3,7 +3,6 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Kafka.Debezium.Options;
 using Hymson.Kafka.Debezium;
-using Hymson.MES.Api.Filters;
 using Hymson.WebApi.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -12,8 +11,9 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Globalization;
 using System.Reflection;
-using static K4os.Compression.LZ4.Engine.Pubternal;
 using Hymson.MES.Api.HostedServices;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Hymson.Web.Framework.Filters;
 
 namespace Hymson.MES.Api
 {
@@ -34,6 +34,8 @@ namespace Hymson.MES.Api
             builder.Services.AddControllers(options =>
             {
                 options.Filters.Add(typeof(HttpGlobalExceptionFilter));
+                options.Filters.Add(typeof(HttpGlobalActionFilter));
+                options.Filters.Add(new AuthorizeFilter());
             }).AddJsonOptions((jsonOptions) => {
                 jsonOptions.JsonSerializerOptions.Converters.Add(new CustomInt64Converter());
             }); ;
@@ -80,7 +82,8 @@ namespace Hymson.MES.Api
                 new CultureInfo("ja-JP"),
                 new CultureInfo("fr-FR"),
                 new CultureInfo("zh"),
-                new CultureInfo("zh-CN")
+                new CultureInfo("zh-CN"),
+                new CultureInfo("en")
             };
             var options = new RequestLocalizationOptions
             {

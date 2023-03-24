@@ -20,10 +20,17 @@ using Hymson.MES.Services.Services.Integrated.InteCalendar;
 using Hymson.MES.Services.Services.Integrated.InteClass;
 using Hymson.MES.Services.Services.Integrated.InteContainer;
 using Hymson.MES.Services.Services.Manufacture;
+using Hymson.MES.Services.Services.Manufacture.ManuFeeding;
+using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Hymson.MES.Services.Services.Plan;
 using Hymson.MES.Services.Services.Process;
-using Hymson.MES.Services.Services.Process.IProcessService;
+using Hymson.MES.Services.Services.Process.LabelTemplate;
 using Hymson.MES.Services.Services.Process.MaskCode;
+using Hymson.MES.Services.Services.Process.PrintConfig;
+using Hymson.MES.Services.Services.Process.Procedure;
+using Hymson.MES.Services.Services.Process.ProcessRoute;
+using Hymson.MES.Services.Services.Process.Resource;
+using Hymson.MES.Services.Services.Process.ResourceType;
 using Hymson.MES.Services.Services.Quality;
 using Hymson.MES.Services.Services.Quality.IQualityService;
 using Hymson.MES.Services.Services.Warehouse;
@@ -141,7 +148,7 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Manufacture
-
+            services.AddSingleton<IManuFeedingService, ManuFeedingService>();
             services.AddSingleton<IManuSfcProduceService, ManuSfcProduceService>();
             services.AddSingleton<IManuSfcInfoService, ManuSfcInfoService>();
             #endregion
@@ -151,12 +158,15 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IWhMaterialInventoryService, WhMaterialInventoryService>();
             services.AddSingleton<IWhMaterialStandingbookService, WhMaterialStandingbookService>();
 
-
             #endregion
 
             #region Plan
             #region PlanWorkOrder
             services.AddSingleton<IPlanWorkOrderService, PlanWorkOrderService>();
+            #endregion
+
+            #region PlanSfcReceive
+            services.AddSingleton<IPlanSfcReceiveService, PlanSfcReceiveService>();
             #endregion
             #endregion
 
@@ -299,6 +309,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<PlanWorkOrderModifyDto>, PlanWorkOrderModifyValidator>();
             #endregion
 
+            #region PlanSfcReceive
+            services.AddSingleton<AbstractValidator<PlanSfcReceiveCreateDto>, PlanSfcReceiveCreateValidator>();
+            services.AddSingleton<AbstractValidator<PlanSfcReceiveModifyDto>, PlanSfcReceiveModifyValidator>();
+            #endregion
             #endregion
 
             return services;

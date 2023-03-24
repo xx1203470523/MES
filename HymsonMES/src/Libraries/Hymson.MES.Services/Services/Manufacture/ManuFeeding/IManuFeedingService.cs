@@ -1,0 +1,55 @@
+using Hymson.MES.Services.Dtos.Manufacture;
+
+namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
+{
+    /// <summary>
+    /// 服务接口（容器维护）
+    /// </summary>
+    public interface IManuFeedingService
+    {
+        /// <summary>
+        /// 查询资源（物料加载）
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuFeedingResourceDto>> GetFeedingResourceListAsync(ManuFeedingResourceQueryDto queryDto);
+
+        /// <summary>
+        /// 查询物料（物料加载）
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuFeedingMaterialDto>> GetFeedingMaterialListAsync(ManuFeedingMaterialQueryDto queryDto);
+
+        /*
+        /// <summary>
+        /// 添加（容器维护）
+        /// </summary>
+        /// <param name="createDto"></param>
+        /// <returns></returns>
+        Task<int> CreateAsync(InteContainerSaveDto createDto);
+
+        /// <summary>
+        /// 更新（容器维护）
+        /// </summary>
+        /// <param name="modifyDto"></param>
+        /// <returns></returns>
+        Task<int> ModifyAsync(InteContainerSaveDto modifyDto);
+
+        /// <summary>
+        /// 删除（容器维护）
+        /// </summary>
+        /// <param name="idsArr"></param>
+        /// <returns></returns>
+        Task<int> DeletesAsync(long[] idsArr);
+
+        /// <summary>
+        /// 获取分页数据（容器维护）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<InteContainerDto>> GetPagedListAsync(InteContainerPagedQueryDto pagedQueryDto);
+        */
+
+    }
+}

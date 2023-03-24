@@ -28,7 +28,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
             _connectionOptions = connectionOptions.Value;
         }
 
-
         /// <summary>
         /// 新增（设备故障现象）
         /// </summary>
@@ -142,7 +141,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
                 sqlBuilder.Where("EEG.EquipmentGroupName LIKE @EquipmentGroupName");
             }
 
-            if (pagedQuery.UseStatus.HasValue == true)
+            if (pagedQuery.UseStatus.HasValue)
             {
                 sqlBuilder.Where("EFP.UseStatus = @UseStatus");
             }

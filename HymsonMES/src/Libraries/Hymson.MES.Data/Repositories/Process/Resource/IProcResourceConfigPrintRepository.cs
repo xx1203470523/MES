@@ -41,7 +41,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procResourceConfigPrints"></param>
         /// <returns></returns>
-        Task InsertRangeAsync(List<ProcResourceConfigPrintEntity> procResourceConfigPrints);
+        Task InsertRangeAsync(IEnumerable<ProcResourceConfigPrintEntity> procResourceConfigPrints);
 
         /// <summary>
         /// 更新

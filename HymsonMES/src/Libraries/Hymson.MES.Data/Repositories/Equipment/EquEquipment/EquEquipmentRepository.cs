@@ -187,40 +187,40 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
-            if (pagedQuery.EquipmentType.HasValue == true)
+            if (pagedQuery.EquipmentType.HasValue)           
             {
                 sqlBuilder.Where("EquipmentType = @EquipmentType");
             }
 
-            if (pagedQuery.UseStatus.HasValue == true)
+            if (pagedQuery.UseStatus.HasValue)
             {
                 sqlBuilder.Where("UseStatus = @UseStatus");
             }
 
-            if (pagedQuery.UseDepartment.HasValue == true)
+            if (pagedQuery.UseDepartment.HasValue)
             {
                 sqlBuilder.Where("UseDepartment = @UseDepartment");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.EquipmentCode) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentCode))
             {
                 pagedQuery.EquipmentCode = $"%{pagedQuery.EquipmentCode}%";
                 sqlBuilder.Where("EquipmentCode LIKE @EquipmentCode");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.EquipmentName) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentName))
             {
                 pagedQuery.EquipmentName = $"%{pagedQuery.EquipmentName}%";
                 sqlBuilder.Where("EquipmentName LIKE @EquipmentName");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.WorkCenterShopName) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.WorkCenterShopName) )
             {
                 pagedQuery.WorkCenterShopName = $"%{pagedQuery.WorkCenterShopName}%";
                 sqlBuilder.Where("WorkCenterShopName LIKE @WorkCenterShopName");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.Location) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Location))
             {
                 pagedQuery.Location = $"%{pagedQuery.Location}%";
                 sqlBuilder.Where("Location LIKE @Location");

@@ -246,6 +246,11 @@
         public const string MES15302 = "条码已报废/删除，不可再操作锁定/取消锁定！";
         public const string MES15303 = "将来锁定操作必须是同一工单下的条码！";
         public const string MES15304 = "条码{sfcs}不是在制品!";
+        public const string MES15305 = "条码数量上限为100行";
+        public const string MES15306= "选中的条码状态与选择的操作类型不匹配！";
+        public const string MES15307 = "扫描的条码状态都必须是“锁定”或者有未关闭的将来锁定指令存在";
+        //public const string MES15308= " 当前条码状态为{operationType}，与选择的操作类型不匹配";
+        public const string MES15308= "将来锁定操作必须是同一工单下的条码！";
         #endregion
 
 
@@ -257,6 +262,28 @@
         public const string MES16004 = "修改生产工单失败！";
         public const string MES16005 = "修改生产工单状态失败！";
         public const string MES16006 = "修改生产工单状态失败：有工单不为未开始,不允许重复下达";
+        public const string MES16007 = "工单不为生产中,不允许锁定";
+        public const string MES16008 = "工单没有被锁定,不需要解锁";
+        public const string MES16009 = "锁定生产工单失败！";
+        public const string MES16010 = "解锁生产工单失败！";
+        public const string MES16011 = "修改生产工单状态失败：有工单不为生产中,不允许完工";
+        public const string MES16012 = "修改生产工单状态失败：有工单不为完工,不允许关闭";
+        public const string MES16013 = "工单状态不为未开始,不允许删除";
+        #endregion
+
+        #region 条码接收
+        public const string MES16100 = "条码接收错误";
+        public const string MES16101 = "接收类型不能为空";
+        public const string MES16102 = "工单不能为空";
+        public const string MES16103 = "供应商条码接收,关联工单不能为空";
+        public const string MES16104 = "SFC/SN不能为空";
+        public const string MES16105 = "SFC/SN：{SFC}已存在";
+
+        public const string MES16106 = "工单:{OrderCode}状态不可用";
+        public const string MES16107 = "工单:{OrderCode}与SFC/SN:{SFC}不匹配";
+        public const string MES16108 = "工单:{OrderCode}与关联工单产品不匹配";
+        public const string MES16109 = "工单:{OrderCode}与关联工单不能一样"; 
+
         #endregion
 
         #endregion

@@ -4,7 +4,7 @@ using Hymson.MES.Services.Services.Integrated.InteContainer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Hymson.MES.Api.Controllers.Process
+namespace Hymson.MES.Api.Controllers.Integrated
 {
     /// <summary>
     /// ¿ØÖÆÆ÷£¨ÈÝÆ÷Î¬»¤£©

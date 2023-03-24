@@ -44,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangeAsync(List<EquEquipmentLinkHardwareEntity> entitys)
+        public async Task<int> InsertRangeAsync(IEnumerable<EquEquipmentLinkHardwareEntity> entitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertSql, entitys);
@@ -66,7 +66,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateRangeAsync(List<EquEquipmentLinkHardwareEntity> entitys)
+        public async Task<int> UpdateRangeAsync(IEnumerable<EquEquipmentLinkHardwareEntity> entitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSql, entitys);

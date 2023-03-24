@@ -60,7 +60,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="inteJobBusinessRelationEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertRangeAsync(List<InteJobBusinessRelationEntity> inteJobBusinessRelationEntitys);
+        Task<int> InsertRangeAsync(IEnumerable<InteJobBusinessRelationEntity> inteJobBusinessRelationEntitys);
 
         /// <summary>
         /// 更新
@@ -74,7 +74,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="inteJobBusinessRelationEntitys"></param>
         /// <returns></returns>
-        Task<int> UpdateRangeAsync(List<InteJobBusinessRelationEntity> inteJobBusinessRelationEntitys);
+        Task<int> UpdateRangeAsync(IEnumerable<InteJobBusinessRelationEntity> inteJobBusinessRelationEntitys);
 
         /// <summary>
         /// 删除

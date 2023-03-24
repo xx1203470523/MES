@@ -7,6 +7,7 @@
  */
 
 using Dapper;
+using FluentValidation.Validators;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
@@ -69,7 +70,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procProcedurePrintReleationEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangeAsync(List<ProcProcedurePrintRelationEntity> procProcedurePrintReleationEntitys)
+        public async Task<int> InsertRangeAsync(IEnumerable<ProcProcedurePrintRelationEntity> procProcedurePrintReleationEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertSql, procProcedurePrintReleationEntitys);
@@ -149,7 +150,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procProcedurePrintReleationEntitys"></param>
         /// <returns></returns>
-        public async Task<int> UpdateRangeAsync(List<ProcProcedurePrintRelationEntity> procProcedurePrintReleationEntitys)
+        public async Task<int> UpdateRangeAsync(IEnumerable<ProcProcedurePrintRelationEntity> procProcedurePrintReleationEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSql, procProcedurePrintReleationEntitys);

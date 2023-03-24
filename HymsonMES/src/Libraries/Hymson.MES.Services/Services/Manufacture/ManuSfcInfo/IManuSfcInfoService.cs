@@ -53,7 +53,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<int> DeletesManuSfcInfoAsync(string ids);
+        Task<int> DeletesManuSfcInfoAsync(long[] idsArr);
 
         /// <summary>
         /// 根据ID查询

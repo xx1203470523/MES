@@ -60,7 +60,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procProcessRouteDetailLinkEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertRangeAsync(List<ProcProcessRouteDetailLinkEntity> procProcessRouteDetailLinkEntitys);
+        Task<int> InsertRangeAsync(IEnumerable<ProcProcessRouteDetailLinkEntity> procProcessRouteDetailLinkEntitys);
 
         /// <summary>
         /// 更新
@@ -74,7 +74,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procProcessRouteDetailLinkEntitys"></param>
         /// <returns></returns>
-        Task<int> UpdateRangeAsync(List<ProcProcessRouteDetailLinkEntity> procProcessRouteDetailLinkEntitys);
+        Task<int> UpdateRangeAsync(IEnumerable<ProcProcessRouteDetailLinkEntity> procProcessRouteDetailLinkEntitys);
 
         /// <summary>
         /// 删除

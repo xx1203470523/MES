@@ -33,7 +33,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="EquFaultReasonEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertsAsync(List<EquFaultReasonEntity> EquFaultReasonEntitys);
+        Task<int> InsertsAsync(IEnumerable<EquFaultReasonEntity> EquFaultReasonEntitys);
 
         /// <summary>
         /// 更新
@@ -47,7 +47,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="EquFaultReasonEntitys"></param>
         /// <returns></returns>
-        Task<int> UpdatesAsync(List<EquFaultReasonEntity> EquFaultReasonEntitys);
+        Task<int> UpdatesAsync(IEnumerable<EquFaultReasonEntity> EquFaultReasonEntitys);
 
         /// <summary>
         /// 删除

@@ -49,7 +49,6 @@ namespace Hymson.MES.Data.Repositories.Integrated
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeletesSql, param);
-
         }
 
         /// <summary>
@@ -135,7 +134,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="inteCodeRulesMakeEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(List<InteCodeRulesMakeEntity> inteCodeRulesMakeEntitys)
+        public async Task<int> InsertsAsync(IEnumerable<InteCodeRulesMakeEntity> inteCodeRulesMakeEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertsSql, inteCodeRulesMakeEntitys);
@@ -157,12 +156,11 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="inteCodeRulesMakeEntitys"></param>
         /// <returns></returns>
-        public async Task<int> UpdatesAsync(List<InteCodeRulesMakeEntity> inteCodeRulesMakeEntitys)
+        public async Task<int> UpdatesAsync(IEnumerable<InteCodeRulesMakeEntity> inteCodeRulesMakeEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdatesSql, inteCodeRulesMakeEntitys);
         }
-
     }
 
     public partial class InteCodeRulesMakeRepository

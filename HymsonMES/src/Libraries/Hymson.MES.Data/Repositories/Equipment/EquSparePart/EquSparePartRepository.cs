@@ -29,7 +29,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
             _connectionOptions = connectionOptions.Value;
         }
 
-
         /// <summary>
         /// 新增
         /// </summary>

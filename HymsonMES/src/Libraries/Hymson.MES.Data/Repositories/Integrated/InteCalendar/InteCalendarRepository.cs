@@ -26,7 +26,6 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
             _connectionOptions = connectionOptions.Value;
         }
 
-
         /// <summary>
         /// 新增
         /// </summary>

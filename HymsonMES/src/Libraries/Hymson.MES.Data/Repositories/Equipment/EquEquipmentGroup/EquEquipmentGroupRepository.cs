@@ -25,7 +25,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
             _connectionOptions = connectionOptions.Value;
         }
 
-
         /// <summary>
         /// 新增
         /// </summary>
@@ -138,7 +137,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
             var equEquipmentGroupEntities = await conn.QueryAsync<EquEquipmentGroupEntity>(template.RawSql, equEquipmentGroupQuery);
             return equEquipmentGroupEntities;
         }
-
     }
 
     public partial class EquEquipmentGroupRepository
