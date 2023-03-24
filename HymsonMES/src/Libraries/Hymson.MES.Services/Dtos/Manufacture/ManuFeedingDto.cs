@@ -3,9 +3,9 @@
 namespace Hymson.MES.Services.Dtos.Manufacture
 {
     /// <summary>
-    /// 
+    /// 资源查询对象
     /// </summary>
-    public class ManuFeedingMaterialQueryDto
+    public class ManuFeedingResourceQueryDto
     {
         /// <summary>
         /// 查询来源
@@ -13,9 +13,36 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public FeedingSourceEnum Source { get; set; } = FeedingSourceEnum.Resource;
 
         /// <summary>
-        /// 设备编码/资源编码
+        /// 资源编码/物料编码
         /// </summary>
-        public string Code { get; set; } = "";
+        public string Code { get; set; }
+    }
+
+    /// <summary>
+    /// 物料资源
+    /// </summary>
+    public class ManuFeedingResourceDto
+    {
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 资源编码
+        /// </summary>
+        public string ResourceCode { get; set; }
+    }
+
+    /// <summary>
+    /// 物料查询对象
+    /// </summary>
+    public class ManuFeedingMaterialQueryDto
+    {
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
     }
 
     /// <summary>
@@ -55,6 +82,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     public class ManuFeedingMaterialItemDto
     {
         /// <summary>
+        /// ID
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
         /// 物料ID
         /// </summary>
         public long MaterialId { get; set; }
@@ -83,5 +115,31 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 更新时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
+    }
+
+    /// <summary>
+    /// 保存对象（物料加载）
+    /// </summary>
+    public class ManuFeedingMaterialSaveDto
+    {
+        /// <summary>
+        /// 物料ID
+        /// </summary>
+        public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 物料条码
+        /// </summary>
+        public string BarCode { get; set; }
+
+        /// <summary>
+        /// 初始数量
+        /// </summary>
+        public decimal InitQty { get; set; }
+
+        /// <summary>
+        /// 剩余数量
+        /// </summary>
+        public decimal Qty { get; set; }
     }
 }

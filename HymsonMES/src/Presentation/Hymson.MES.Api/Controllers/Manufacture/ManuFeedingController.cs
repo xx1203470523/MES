@@ -1,4 +1,3 @@
-using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuFeeding;
 using Microsoft.AspNetCore.Authorization;
@@ -31,15 +30,16 @@ namespace Hymson.MES.Api.Controllers.Manufacture
             _manuFeedingService = manuFeedingService;
         }
 
+
         /// <summary>
-        /// 查询类型（物料加载）
+        /// 查询资源（物料加载）
         /// </summary>
-        /// <param name="code">设备编码/资源编码</param>
+        /// <param name="queryDto"></param>
         /// <returns></returns>
-        [HttpGet("{code}")]
-        public async Task<FeedingSourceEnum> GetFeedingSourceAsync(string code)
+        [HttpGet("resource")]
+        public async Task<IEnumerable<ManuFeedingResourceDto>> GetFeedingResourceListAsync([FromQuery] ManuFeedingResourceQueryDto queryDto)
         {
-            return await _manuFeedingService.GetFeedingSourceAsync(code);
+            return await _manuFeedingService.GetFeedingResourceListAsync(queryDto);
         }
 
         /// <summary>
@@ -47,10 +47,10 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
-        [HttpGet("list")]
-        public async Task<IEnumerable<ManuFeedingMaterialDto>> GetFeedingListeAsync([FromQuery] ManuFeedingMaterialQueryDto queryDto)
+        [HttpGet("material")]
+        public async Task<IEnumerable<ManuFeedingMaterialDto>> GetFeedingMaterialListAsync([FromQuery] ManuFeedingMaterialQueryDto queryDto)
         {
-            return await _manuFeedingService.GetFeedingListeAsync(queryDto);
+            return await _manuFeedingService.GetFeedingMaterialListAsync(queryDto);
         }
 
         /*
@@ -62,9 +62,11 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [HttpPost]
         public async Task CreateAsync(InteContainerSaveDto createDto)
         {
-            await _inteContainerService.CreateAsync(createDto);
+            await _manuFeedingService.CreateAsync(createDto);
         }
+        */
 
+        /*
         /// <summary>
         /// 更新（容器维护）
         /// </summary>
