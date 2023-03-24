@@ -94,8 +94,9 @@ namespace Hymson.MES.Services.Services.Plan
             var manuSfcInfoCreate = new ManuSfcInfoEntity();
             var manuSfcInfoUpdate = new ManuSfcInfoEntity();
             //物料/供应商条码接收？
-            if (planSfcInfoCreateDto.ReceiveType == PlanSFCReceiveTypeEnum.SupplierSfc)
+            if (planSfcInfoCreateDto.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)
             {
+                #region 物料条码接收 处理
                 if (planSfcInfoCreateDto.WorkOrderId == planSfcInfoCreateDto.RelevanceWorkOrderId)
                 {
                     throw new BusinessException(nameof(ErrorCode.MES16109)).WithData("OrderCode", workOrderInfo.OrderCode);
@@ -116,10 +117,14 @@ namespace Hymson.MES.Services.Services.Plan
                     throw new BusinessException(nameof(ErrorCode.MES16108)).WithData("OrderCode", workOrderInfo.OrderCode);
                 }
                 //创建
-                manuSfcInfoCreate = planSfcInfo;
+                manuSfcInfoCreate.Sfc = planSfcInfo.Sfc;
                 manuSfcInfoCreate.WorkOrderId = planSfcInfoCreateDto.WorkOrderId;
+                manuSfcInfoCreate.ProductId = planSfcInfo.ProductId;
+                manuSfcInfoCreate.Qty = 1;// workOrderInfo.Qty;
                 manuSfcInfoCreate.Status = (int)SfcStatusEnum.InProcess;
+                manuSfcInfoCreate.IsUsed = 0;
                 manuSfcInfoCreate.RelevanceWorkOrderId = planSfcInfo.WorkOrderId;
+                manuSfcInfoCreate.SiteId = _currentSite.SiteId ?? 0;
 
                 manuSfcInfoCreate.Id = IdGenProvider.Instance.CreateId();
                 manuSfcInfoCreate.CreatedBy = _currentUser.UserName;
@@ -132,10 +137,11 @@ namespace Hymson.MES.Services.Services.Plan
                 manuSfcInfoUpdate.Status = (int)SfcStatusEnum.Received;
                 manuSfcInfoUpdate.UpdatedBy = _currentUser.UserName;
                 manuSfcInfoUpdate.UpdatedOn = HymsonClock.Now();
+                #endregion
             }
             else
             {
-
+                #region 供应商条码接收处理
                 //验证条码
                 var sfcInfo = await _planSfcInfoRepository.GetBySFCAsync(planSfcInfoCreateDto.SFC);
                 if (sfcInfo != null)
@@ -156,24 +162,25 @@ namespace Hymson.MES.Services.Services.Plan
                 manuSfcInfoCreate.UpdatedBy = _currentUser.UserName;
                 manuSfcInfoCreate.CreatedOn = HymsonClock.Now();
                 manuSfcInfoCreate.UpdatedOn = HymsonClock.Now();
+                #endregion
             }
 
             #endregion
 
             #region 入库
             var response = 0;
-            if (planSfcInfoCreateDto.ReceiveType == PlanSFCReceiveTypeEnum.SupplierSfc)
+            if (planSfcInfoCreateDto.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)
             {
                 using (var trans = TransactionHelper.GetTransactionScope())
                 {
-                    response += await _manuSfcInfoRepository.InsertAsync(manuSfcInfoCreate);
-                    response += await _manuSfcInfoRepository.UpdateAsync(manuSfcInfoUpdate);
+                    response += await _planSfcInfoRepository.InsertAsync(manuSfcInfoCreate);
+                    response += await _planSfcInfoRepository.UpdateAsync(manuSfcInfoUpdate);
                     trans.Complete();
                 }
             }
             else
             {
-                response = await _manuSfcInfoRepository.InsertAsync(manuSfcInfoCreate);
+                response = await _planSfcInfoRepository.InsertAsync(manuSfcInfoCreate);
             }
             if (response == 0)
             {
@@ -193,7 +200,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// <returns></returns>
         public async Task<int> DeletesPlanSfcInfoAsync(long[] idsArr)
         {
-            return await _manuSfcInfoRepository.DeletesAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
+            return await _planSfcInfoRepository.DeletesAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
         }
 
         /// <summary>

@@ -8,6 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Plan;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -78,17 +79,24 @@ namespace Hymson.MES.Data.Repositories.Integrated
         Task<IEnumerable<InteCodeRulesEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
-        /// 获取List
+        /// 获取List like
         /// </summary>
         /// <param name="inteCodeRulesQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<InteCodeRulesEntity>> GetInteCodeRulesEntitiesAsync(InteCodeRulesQuery inteCodeRulesQuery);
-        
+
+        /// <summary>
+        /// 获取List equal
+        /// </summary>
+        /// <param name="inteCodeRulesQuery"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteCodeRulesEntity>> GetInteCodeRulesEntitiesEqualAsync(InteCodeRulesQuery inteCodeRulesQuery);
+
         /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="inteCodeRulesPagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<InteCodeRulesEntity>> GetPagedInfoAsync(InteCodeRulesPagedQuery inteCodeRulesPagedQuery);
+        Task<PagedInfo<InteCodeRulesPageView>> GetPagedInfoAsync(InteCodeRulesPagedQuery inteCodeRulesPagedQuery);
     }
 }

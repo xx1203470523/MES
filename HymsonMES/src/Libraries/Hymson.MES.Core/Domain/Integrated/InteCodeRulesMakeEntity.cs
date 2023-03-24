@@ -25,6 +25,11 @@ namespace Hymson.MES.Core.Domain.Integrated
     public class InteCodeRulesMakeEntity : BaseEntity
     {
         /// <summary>
+        /// 编码规则ID
+        /// </summary>
+        public long CodeRulesId { get; set; }
+
+        /// <summary>
         /// 序号
         /// </summary>
         public int Seq { get; set; }

@@ -81,15 +81,15 @@ namespace Hymson.MES.Services.Services.Warehouse
 
 
         /// <summary>
-        /// 创建
+        /// 批量创建
         /// </summary>
-        /// <param name="whMaterialInventoryDto"></param>
+        /// <param name="whMaterialInventoryLists"></param>
         /// <returns></returns> 
-        public async Task CreateWhMaterialInventoryListAsync(List<WhMaterialInventoryListCreateDto> whMaterialInventoryCreateDto)
+        public async Task CreateWhMaterialInventoryListAsync(List<WhMaterialInventoryListCreateDto> whMaterialInventoryLists)
         {
             var list = new List<WhMaterialInventoryEntity>();
             var listStandingbook = new List<WhMaterialStandingbookEntity>();
-            foreach (var item in whMaterialInventoryCreateDto)
+            foreach (var item in whMaterialInventoryLists)
             {
                 #region 校验
                 //验证DTO
