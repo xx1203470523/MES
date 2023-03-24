@@ -12,6 +12,8 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -78,34 +80,51 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="inteCodeRulesPagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<InteCodeRulesEntity>> GetPagedInfoAsync(InteCodeRulesPagedQuery inteCodeRulesPagedQuery)
+        public async Task<PagedInfo<InteCodeRulesPageView>> GetPagedInfoAsync(InteCodeRulesPagedQuery inteCodeRulesPagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.Select("*");
+            sqlBuilder.Where("cr.IsDeleted=0");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-           
+            if (!string.IsNullOrWhiteSpace(inteCodeRulesPagedQuery.MaterialCode))
+            {
+                inteCodeRulesPagedQuery.MaterialCode = $"%{inteCodeRulesPagedQuery.MaterialCode}%";
+                sqlBuilder.Where(" m.MaterialCode like @MaterialCode ");
+            }
+
+            if (!string.IsNullOrWhiteSpace(inteCodeRulesPagedQuery.MaterialVersion))
+            {
+                inteCodeRulesPagedQuery.MaterialVersion = $"%{inteCodeRulesPagedQuery.MaterialVersion}%";
+                sqlBuilder.Where(" m.Version like @MaterialVersion ");
+            }
+
+            if (!string.IsNullOrWhiteSpace(inteCodeRulesPagedQuery.Remark))
+            {
+                inteCodeRulesPagedQuery.Remark = $"%{inteCodeRulesPagedQuery.Remark}%";
+                sqlBuilder.Where(" cr.Remark like @Remark ");
+            }
+
+            if (inteCodeRulesPagedQuery.CodeType.HasValue)
+            {
+                sqlBuilder.Where(" cr.CodeType = @CodeType ");
+            }
+
             var offSet = (inteCodeRulesPagedQuery.PageIndex - 1) * inteCodeRulesPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = inteCodeRulesPagedQuery.PageSize });
             sqlBuilder.AddParameters(inteCodeRulesPagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var inteCodeRulesEntitiesTask = conn.QueryAsync<InteCodeRulesEntity>(templateData.RawSql, templateData.Parameters);
+            var inteCodeRulesEntitiesTask = conn.QueryAsync<InteCodeRulesPageView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var inteCodeRulesEntities = await inteCodeRulesEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<InteCodeRulesEntity>(inteCodeRulesEntities, inteCodeRulesPagedQuery.PageIndex, inteCodeRulesPagedQuery.PageSize, totalCount);
+            return new PagedInfo<InteCodeRulesPageView>(inteCodeRulesEntities, inteCodeRulesPagedQuery.PageIndex, inteCodeRulesPagedQuery.PageSize, totalCount);
         }
 
         /// <summary>
-        /// 查询List
+        /// 查询List like
         /// </summary>
         /// <param name="inteCodeRulesQuery"></param>
         /// <returns></returns>
@@ -113,6 +132,29 @@ namespace Hymson.MES.Data.Repositories.Integrated
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetInteCodeRulesEntitiesSqlTemplate);
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var inteCodeRulesEntities = await conn.QueryAsync<InteCodeRulesEntity>(template.RawSql, inteCodeRulesQuery);
+            return inteCodeRulesEntities;
+        }
+
+        /// <summary>
+        /// 查询List 查询条件为等于的
+        /// </summary>
+        /// <param name="inteCodeRulesQuery"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteCodeRulesEntity>> GetInteCodeRulesEntitiesEqualAsync(InteCodeRulesQuery inteCodeRulesQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetInteCodeRulesEntitiesSqlTemplate);
+
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Select("*");
+
+            if (inteCodeRulesQuery.ProductId>0) 
+            {
+                sqlBuilder.Where(" ProductId=@ProductId ");
+            }
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var inteCodeRulesEntities = await conn.QueryAsync<InteCodeRulesEntity>(template.RawSql, inteCodeRulesQuery);
             return inteCodeRulesEntities;
@@ -166,16 +208,24 @@ namespace Hymson.MES.Data.Repositories.Integrated
 
     public partial class InteCodeRulesRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_code_rules` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `inte_code_rules` /**where**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT 
+                                        cr.*,
+                                        m.MaterialCode, m.MaterialName,m.Version as MaterialVersion
+                                    FROM `inte_code_rules` cr
+                                    LEFT JOIN proc_material m on cr.ProductId=m.Id
+                                    /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = @"SELECT COUNT(1) 
+                                            FROM `inte_code_rules` cr
+                                            LEFT JOIN proc_material m on cr.ProductId=m.Id  
+                                            /**where**/ ";
         const string GetInteCodeRulesEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `inte_code_rules` /**where**/  ";
 
         const string InsertSql = "INSERT INTO `inte_code_rules`(  `Id`, `ProductId`, `CodeType`, `PackType`, `Base`, `IgnoreChar`, `Increment`, `OrderLength`, `ResetType`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (   @Id, @ProductId, @CodeType, @PackType, @Base, @IgnoreChar, @Increment, @OrderLength, @ResetType, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `inte_code_rules`(  `Id`, `ProductId`, `CodeType`, `PackType`, `Base`, `IgnoreChar`, `Increment`, `OrderLength`, `ResetType`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (   @Id, @ProductId, @CodeType, @PackType, @Base, @IgnoreChar, @Increment, @OrderLength, @ResetType, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted )  ";
-        const string UpdateSql = "UPDATE `inte_code_rules` SET   ProductId = @ProductId, CodeType = @CodeType, PackType = @PackType, Base = @Base, IgnoreChar = @IgnoreChar, Increment = @Increment, OrderLength = @OrderLength, ResetType = @ResetType, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `inte_code_rules` SET   ProductId = @ProductId, CodeType = @CodeType, PackType = @PackType, Base = @Base, IgnoreChar = @IgnoreChar, Increment = @Increment, OrderLength = @OrderLength, ResetType = @ResetType, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `inte_code_rules` SET   ProductId = @ProductId, CodeType = @CodeType, PackType = @PackType, Base = @Base, IgnoreChar = @IgnoreChar, Increment = @Increment, OrderLength = @OrderLength, ResetType = @ResetType, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `inte_code_rules` SET   ProductId = @ProductId, CodeType = @CodeType, PackType = @PackType, Base = @Base, IgnoreChar = @IgnoreChar, Increment = @Increment, OrderLength = @OrderLength, ResetType = @ResetType, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `inte_code_rules` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `inte_code_rules` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids ";
         const string GetByIdSql = @"SELECT 

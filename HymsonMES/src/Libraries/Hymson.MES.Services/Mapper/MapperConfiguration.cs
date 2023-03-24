@@ -201,6 +201,9 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteCodeRulesPagedQueryDto, InteCodeRulesPagedQuery>();
             CreateMap<InteCodeRulesEntity, InteCodeRulesDto>();
 
+            CreateMap<InteCodeRulesPageView, InteCodeRulesPageViewDto>();
+            CreateMap<InteCodeRulesEntity, InteCodeRulesDetailViewDto>();
+
             CreateMap<InteCodeRulesMakeCreateDto, InteCodeRulesMakeEntity>();
             CreateMap<InteCodeRulesMakeModifyDto, InteCodeRulesMakeEntity>();
             CreateMap<InteCodeRulesMakePagedQueryDto, InteCodeRulesMakePagedQuery>();

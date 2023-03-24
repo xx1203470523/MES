@@ -19,5 +19,10 @@ namespace Hymson.MES.Data.Repositories.Integrated
     /// </summary>
     public class InteCodeRulesQuery
     {
+        /// <summary>
+        /// 产品id  物料
+        /// </summary>
+        public long ProductId { get; set; }
+
     }
 }

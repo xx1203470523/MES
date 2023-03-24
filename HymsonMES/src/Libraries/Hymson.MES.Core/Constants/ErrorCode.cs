@@ -178,6 +178,13 @@
         public const string MES12112 = "工作中心已经关联数据,允许修改.";
         #endregion
 
+
+        #region 编码规则 12400
+        public const string MES12400 = "代码规则维护错误";
+        public const string MES12401 = "代码规则中物料Id[{productId}]已经存在";
+
+        #endregion
+
         //设备
         #region 故障原因 13000
         public const string MES13000 = "基础故障原因错误";
@@ -282,7 +289,7 @@
         public const string MES16106 = "工单:{OrderCode}状态不可用";
         public const string MES16107 = "工单:{OrderCode}与SFC/SN:{SFC}不匹配";
         public const string MES16108 = "工单:{OrderCode}与关联工单产品不匹配";
-        public const string MES16109 = "工单:{OrderCode}与关联工单不能一样"; 
+        public const string MES16109 = "工单:{OrderCode}与关联工单不能一样";
 
         #endregion
 

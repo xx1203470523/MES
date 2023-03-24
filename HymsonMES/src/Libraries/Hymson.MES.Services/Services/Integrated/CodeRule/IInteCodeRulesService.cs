@@ -25,7 +25,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="inteCodeRulesPagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<InteCodeRulesDto>> GetPageListAsync(InteCodeRulesPagedQueryDto inteCodeRulesPagedQueryDto);
+        Task<PagedInfo<InteCodeRulesPageViewDto>> GetPageListAsync(InteCodeRulesPagedQueryDto inteCodeRulesPagedQueryDto);
 
         /// <summary>
         /// 新增
@@ -60,6 +60,6 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<InteCodeRulesDto> QueryInteCodeRulesByIdAsync(long id);
+        Task<InteCodeRulesDetailViewDto> QueryInteCodeRulesByIdAsync(long id);
     }
 }
