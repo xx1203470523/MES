@@ -2,6 +2,7 @@ using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Sequences;
@@ -30,6 +31,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         private readonly IProcResourceRepository _procResourceRepository;
 
         /// <summary>
+        ///  仓储（工作中心资源关联）
+        /// </summary>
+        private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="currentUser"></param>
@@ -37,13 +43,16 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// <param name="sequenceService"></param>
         /// <param name="inteContainerRepository"></param>
         /// <param name="procResourceRepository"></param>
+        /// <param name="inteWorkCenterRepository"></param>
         public ManuFeedingService(ICurrentUser currentUser, ICurrentSite currentSite, ISequenceService sequenceService,
-            IProcResourceRepository procResourceRepository)
+            IProcResourceRepository procResourceRepository,
+            IInteWorkCenterRepository inteWorkCenterRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             //_inteContainerRepository = inteContainerRepository;
             _procResourceRepository = procResourceRepository;
+            _inteWorkCenterRepository = inteWorkCenterRepository;
         }
 
 
@@ -59,7 +68,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             {
                 case FeedingSourceEnum.Equipment:
                     resources.AddRange(await _procResourceRepository.GetByEquipmentCodeAsync(queryDto.Code));
-
                     break;
                 default:
                 case FeedingSourceEnum.Resource:
@@ -78,6 +86,16 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         public async Task<IEnumerable<ManuFeedingMaterialDto>> GetFeedingMaterialListAsync(ManuFeedingMaterialQueryDto queryDto)
         {
             List<ManuFeedingMaterialDto> list = new();
+
+            // 读取资源绑定的工作中心
+            var workCenter = await _inteWorkCenterRepository.GetByResourceIdAsync(queryDto.ResourceId);
+            //if (workCenter == null) return list;
+
+            // 查询工单
+
+            // 查询BOM
+
+            // 查询物料
 
             // TODO
             for (int i = 1; i < 4; i++)
@@ -107,7 +125,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 list.Add(item);
             }
 
-            await Task.CompletedTask;
             return list;
         }
 

@@ -1,9 +1,11 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.View;
+using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository
 {
@@ -33,6 +35,13 @@ namespace Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository
         /// <param name="param"></param>
         /// <returns></returns>
         Task<InteWorkCenterEntity> GetByCodeAsync(EntityByCodeQuery param);
+
+        /// <summary>
+        /// 根据资源ID获取数据
+        /// </summary>
+        /// <param name="resourceId"></param>
+        /// <returns></returns>
+        Task<InteWorkCenterEntity> GetByResourceIdAsync(long resourceId);
 
         /// <summary>
         /// 新增
