@@ -113,22 +113,27 @@ namespace Hymson.MES.Services.Services.Manufacture
             #region 验证
             if (parm == null)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10100));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
 
             if (parm.Sfcs == null || parm.Sfcs.Length < 1)
             {
-                throw new ValidationException(nameof(ErrorCode.MES15301));
+                throw new CustomerValidationException(nameof(ErrorCode.MES15301));
             }
 
             if (parm.Sfcs.Length > 100)
             {
-                throw new ValidationException(nameof(ErrorCode.MES15305));
+                throw new CustomerValidationException(nameof(ErrorCode.MES15305));
             }
 
             //查询条码信息,
             //校验条码状态，如果为报废或者删除，则提示：“条码已报废 / 删除，不可再操作锁定 / 取消锁定！
             var sfcs = parm.Sfcs.Distinct().ToArray();
+            //if (sfcs.Length < parm.Sfcs.Length)
+            //{
+            //    //重复条码提示,产品条码XXXX在列表中已存在，请勿重复选择！
+            //}
+
             var query = new ManuSfcProduceQuery { Sfcs = sfcs };
             var sfcInfo = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(query);
             var sfcList = sfcInfo.ToList();
@@ -149,21 +154,21 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 if (!parm.LockProductionId.HasValue)
                 {
-                    throw new ValidationException(nameof(ErrorCode.MES15300));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15300));
                 }
 
                 //当操作类型为“将来锁定”时，扫描的条码状态都必须不是“锁定”，且没有未关闭的将来锁定指令存在（即已指定将来锁定工序，但暂未执行锁定）
                 var sfcLocks = sfcInfo.Where(a => a.Lock != (int)QualityLockEnum.Unlock);
                 if (sfcLocks.Any())
                 {
-                    throw new ValidationException(nameof(ErrorCode.MES15306));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15306));
                 }
 
                 //将来锁的工单一致
                 var workOrders = sfcInfo.Select(a => a.WorkOrderId).Distinct().ToList();
                 if (workOrders.Count > 1)
                 {
-                    throw new ValidationException(nameof(ErrorCode.MES15308));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15308));
                 }
 
                 //判断工序,产品条码 > 工单 > 工艺路线 > 工序
@@ -177,17 +182,17 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var sfcLocks = sfcInfo.Where(a => a.Lock == (int)QualityLockEnum.InstantLock);
                 if (sfcLocks.Any())
                 {
-                    throw new ValidationException(nameof(ErrorCode.MES15306));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15306));
                 }
             }
 
             //当操作类型为“取消锁定”时，扫描的条码状态都必须是“锁定”或者有未关闭的将来锁定指令存在（即已指定将来锁定工序，但暂未执行锁定）
             if (parm.OperationType == QualityLockEnum.Unlock)
             {
-                var sfcLocks = sfcInfo.Where(a => a.Lock != (int)QualityLockEnum.Unlock);
+                var sfcLocks = sfcInfo.Where(a => a.Lock == (int)QualityLockEnum.Unlock);
                 if (sfcLocks.Any())
                 {
-                    throw new ValidationException(nameof(ErrorCode.MES15307));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15307));
                 }
             }
             #endregion
@@ -202,7 +207,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 Lock = (int)parm.OperationType,
                 Sfcs = parm.Sfcs,
-                LockProductionId = parm.LockProductionId??0,
+                LockProductionId = parm.LockProductionId ?? 0,
                 UserId = _currentUser.UserName,
                 UpdatedOn = HymsonClock.Now()
             };
