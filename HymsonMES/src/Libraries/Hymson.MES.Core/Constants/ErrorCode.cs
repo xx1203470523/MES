@@ -242,15 +242,15 @@
 
         #region 质量锁定 15300
         public const string MES15300 = "将来锁定工序必填";
-        public const string MES15301= "产品条码不能为空";
+        public const string MES15301 = "产品条码不能为空";
         public const string MES15302 = "条码已报废/删除，不可再操作锁定/取消锁定！";
         public const string MES15303 = "将来锁定操作必须是同一工单下的条码！";
         public const string MES15304 = "条码{sfcs}不是在制品!";
         public const string MES15305 = "条码数量上限为100行";
-        public const string MES15306= "选中的条码状态与选择的操作类型不匹配！";
+        public const string MES15306 = "选中的条码状态与选择的操作类型不匹配！";
         public const string MES15307 = "扫描的条码状态都必须是“锁定”或者有未关闭的将来锁定指令存在";
         //public const string MES15308= " 当前条码状态为{operationType}，与选择的操作类型不匹配";
-        public const string MES15308= "将来锁定操作必须是同一工单下的条码！";
+        public const string MES15308 = "将来锁定操作必须是同一工单下的条码！";
         #endregion
 
 
@@ -271,18 +271,18 @@
         public const string MES16013 = "工单状态不为未开始,不允许删除";
         #endregion
 
-        #region 条码接收
+        #region 条码接收 16100
         public const string MES16100 = "条码接收错误";
         public const string MES16101 = "接收类型不能为空";
         public const string MES16102 = "工单不能为空";
-        public const string MES16103 = "供应商条码接收,关联工单不能为空";
-        public const string MES16104 = "SFC/SN不能为空";
-        public const string MES16105 = "SFC/SN：{SFC}已存在";
+        public const string MES16103 = "关联工单不能为空";
+        public const string MES16104 = "SN不能为空";
+        public const string MES16105 = "SN：{SFC}已存在";
 
         public const string MES16106 = "工单:{OrderCode}状态不可用";
-        public const string MES16107 = "工单:{OrderCode}与SFC/SN:{SFC}不匹配";
+        public const string MES16107 = "工单:{OrderCode}没有匹配的SN:{SFC}";
         public const string MES16108 = "工单:{OrderCode}与关联工单产品不匹配";
-        public const string MES16109 = "工单:{OrderCode}与关联工单不能一样"; 
+        public const string MES16109 = "工单:{OrderCode}与关联工单不能一样";
 
         #endregion
 
