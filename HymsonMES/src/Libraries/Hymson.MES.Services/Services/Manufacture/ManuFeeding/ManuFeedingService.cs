@@ -1,11 +1,11 @@
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.Data.Repositories.Integrated.InteContainer;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Sequences;
 using Hymson.Utils;
-using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
 {
@@ -25,9 +25,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
-        /// 容器维护 仓储
+        ///  仓储（资源）
         /// </summary>
-        //private readonly IInteContainerRepository _inteContainerRepository;
+        private readonly IProcResourceRepository _procResourceRepository;
 
         /// <summary>
         /// 
@@ -36,22 +36,38 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// <param name="currentSite"></param>
         /// <param name="sequenceService"></param>
         /// <param name="inteContainerRepository"></param>
-        public ManuFeedingService(ICurrentUser currentUser, ICurrentSite currentSite, ISequenceService sequenceService)
+        /// <param name="procResourceRepository"></param>
+        public ManuFeedingService(ICurrentUser currentUser, ICurrentSite currentSite, ISequenceService sequenceService,
+            IProcResourceRepository procResourceRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             //_inteContainerRepository = inteContainerRepository;
+            _procResourceRepository = procResourceRepository;
         }
 
 
         /// <summary>
-        /// 查询类型（物料加载）
+        /// 查询资源（物料加载）
         /// </summary>
-        /// <param name="code"></param>
+        /// <param name="queryDto"></param>
         /// <returns></returns>
-        public async Task<FeedingSourceEnum> GetFeedingSourceAsync(string code)
+        public async Task<IEnumerable<ManuFeedingResourceDto>> GetFeedingResourceListAsync(ManuFeedingResourceQueryDto queryDto)
         {
-            return await Task.FromResult(FeedingSourceEnum.Resource);
+            List<ProcResourceEntity> resources = new();
+            switch (queryDto.Source)
+            {
+                case FeedingSourceEnum.Equipment:
+                    resources.AddRange(await _procResourceRepository.GetByEquipmentCodeAsync(queryDto.Code));
+
+                    break;
+                default:
+                case FeedingSourceEnum.Resource:
+                    resources.AddRange(await _procResourceRepository.GetByResourceCodeAsync(queryDto.Code));
+                    break;
+            }
+
+            return resources.Select(s => new ManuFeedingResourceDto { ResourceId = s.Id, ResourceCode = s.ResCode });
         }
 
         /// <summary>
@@ -59,7 +75,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuFeedingMaterialDto>> GetFeedingListeAsync(ManuFeedingMaterialQueryDto queryDto)
+        public async Task<IEnumerable<ManuFeedingMaterialDto>> GetFeedingMaterialListAsync(ManuFeedingMaterialQueryDto queryDto)
         {
             List<ManuFeedingMaterialDto> list = new();
 
@@ -70,7 +86,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 {
                     MaterialId = i,
                     MaterialCode = $"MaterialCode-{i}",
-                    MaterialName = $"MaterialName-{i}",
+                    MaterialName = $"{queryDto.ResourceId}",
                     Version = $"v-{i}",
                     Children = new List<ManuFeedingMaterialItemDto>()
                 };
@@ -94,6 +110,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             await Task.CompletedTask;
             return list;
         }
+
 
         /*
         /// <summary>

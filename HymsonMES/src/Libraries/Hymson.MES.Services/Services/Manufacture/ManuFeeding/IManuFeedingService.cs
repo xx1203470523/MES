@@ -1,4 +1,3 @@
-using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
@@ -9,18 +8,18 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
     public interface IManuFeedingService
     {
         /// <summary>
-        /// 查询类型（物料加载）
+        /// 查询资源（物料加载）
         /// </summary>
-        /// <param name="code"></param>
+        /// <param name="queryDto"></param>
         /// <returns></returns>
-        Task<FeedingSourceEnum> GetFeedingSourceAsync(string code);
+        Task<IEnumerable<ManuFeedingResourceDto>> GetFeedingResourceListAsync(ManuFeedingResourceQueryDto queryDto);
 
         /// <summary>
         /// 查询物料（物料加载）
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuFeedingMaterialDto>> GetFeedingListeAsync(ManuFeedingMaterialQueryDto queryDto);
+        Task<IEnumerable<ManuFeedingMaterialDto>> GetFeedingMaterialListAsync(ManuFeedingMaterialQueryDto queryDto);
 
         /*
         /// <summary>
