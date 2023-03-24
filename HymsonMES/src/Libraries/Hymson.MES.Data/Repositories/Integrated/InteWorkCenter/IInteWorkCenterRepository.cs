@@ -46,7 +46,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> InsertRangAsync(List<InteWorkCenterEntity> param);
+        Task<int> InsertRangAsync(IEnumerable<InteWorkCenterEntity> param);
 
         /// <summary>
         /// 更新
@@ -60,7 +60,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> UpdateRangAsync(List<InteWorkCenterEntity> param);
+        Task<int> UpdateRangAsync(IEnumerable<InteWorkCenterEntity> param);
 
         /// <summary>
         /// 批量删除
@@ -74,7 +74,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> InsertInteWorkCenterRelationRangAsync(List<InteWorkCenterRelation> param);
+        Task<int> InsertInteWorkCenterRelationRangAsync(IEnumerable<InteWorkCenterRelation> param);
 
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository
         /// <returns></returns>
         Task<IEnumerable<InteWorkCenterRelationView>> GetInteWorkCenterRelationAsync(long id);
 
-        Task<int> InsertInteWorkCenterResourceRelationRangAsync(List<InteWorkCenterResourceRelation> param);
+        Task<int> InsertInteWorkCenterResourceRelationRangAsync(IEnumerable<InteWorkCenterResourceRelation> param);
 
         /// <summary>
         /// 批量删除
@@ -106,7 +106,6 @@ namespace Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository
         /// </summary>
         /// <param name="Id"></param>
         /// <returns></returns>
-         Task<IEnumerable<InteWorkCenterResourceRelationView>> GetInteWorkCenterResourceRelatioAsync(long id);
-     
+        Task<IEnumerable<InteWorkCenterResourceRelationView>> GetInteWorkCenterResourceRelatioAsync(long id);
     }
 }
