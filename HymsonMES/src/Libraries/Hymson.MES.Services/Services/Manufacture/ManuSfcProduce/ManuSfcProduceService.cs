@@ -79,6 +79,10 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
             var manuSfcProducePagedQuery = manuSfcProducePagedQueryDto.ToQuery<ManuSfcProducePagedQuery>();
             manuSfcProducePagedQuery.SiteId = _currentSite.SiteId;
+            if (!string.IsNullOrWhiteSpace(manuSfcProducePagedQueryDto.Sfcs))
+            {
+                manuSfcProducePagedQuery.SfcArray = manuSfcProducePagedQueryDto.Sfcs.Split(',');
+            }
             var pagedInfo = await _manuSfcProduceRepository.GetPagedInfoAsync(manuSfcProducePagedQuery);
 
             //实体到DTO转换 装载数据

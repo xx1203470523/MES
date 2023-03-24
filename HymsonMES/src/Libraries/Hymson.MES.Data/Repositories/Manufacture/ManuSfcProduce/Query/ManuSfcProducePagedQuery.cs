@@ -48,6 +48,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 条码列表
         /// </summary>
-        public string[]? Sfcs { get; set; }
+        public string[]? SfcArray { get; set; }
     }
 }
