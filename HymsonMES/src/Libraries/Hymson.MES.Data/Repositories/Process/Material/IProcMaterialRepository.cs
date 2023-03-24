@@ -8,11 +8,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -27,7 +22,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procMaterialEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ProcMaterialEntity procMaterialEntity);
-        
+
         /// <summary>
         /// 更新
         /// </summary>
@@ -76,7 +71,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <param name="siteCode"></param>
         /// <returns></returns>
-        Task<ProcMaterialView> GetByIdAsync(long id,long SiteId);
+        Task<ProcMaterialView> GetByIdAsync(long id, long SiteId);
 
         /// <summary>
         /// 根据IDs批量获取数据
@@ -98,7 +93,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procMaterialQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcMaterialEntity>> GetProcMaterialEntitiesAsync(ProcMaterialQuery procMaterialQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>

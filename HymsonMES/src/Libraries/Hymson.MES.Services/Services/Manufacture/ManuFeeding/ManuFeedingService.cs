@@ -3,6 +3,7 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
+using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Sequences;
@@ -36,23 +37,54 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
 
         /// <summary>
+        ///  仓储（上料点物料关联）
+        /// </summary>
+        private readonly IProcLoadPointLinkMaterialRepository _procLoadPointLinkMaterialRepository;
+
+        /// <summary>
+        ///  仓储（工单）
+        /// </summary>
+        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
+
+        /// <summary>
+        ///  仓储（Bom明细）
+        /// </summary>
+        private readonly IProcBomDetailRepository _procBomDetailRepository;
+
+        /// <summary>
+        ///  仓储（物料）
+        /// </summary>
+        private readonly IProcMaterialRepository _procMaterialRepository;
+
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="sequenceService"></param>
-        /// <param name="inteContainerRepository"></param>
         /// <param name="procResourceRepository"></param>
         /// <param name="inteWorkCenterRepository"></param>
+        /// <param name="procLoadPointLinkMaterialRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
+        /// <param name="procBomDetailRepository"></param>
+        /// <param name="procMaterialRepository"></param>
         public ManuFeedingService(ICurrentUser currentUser, ICurrentSite currentSite, ISequenceService sequenceService,
             IProcResourceRepository procResourceRepository,
-            IInteWorkCenterRepository inteWorkCenterRepository)
+            IInteWorkCenterRepository inteWorkCenterRepository,
+            IProcLoadPointLinkMaterialRepository procLoadPointLinkMaterialRepository,
+            IPlanWorkOrderRepository planWorkOrderRepository,
+            IProcBomDetailRepository procBomDetailRepository,
+            IProcMaterialRepository procMaterialRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            //_inteContainerRepository = inteContainerRepository;
             _procResourceRepository = procResourceRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
+            _procLoadPointLinkMaterialRepository = procLoadPointLinkMaterialRepository;
+            _planWorkOrderRepository = planWorkOrderRepository;
+            _procBomDetailRepository = procBomDetailRepository;
+            _procMaterialRepository = procMaterialRepository;
         }
 
 
@@ -86,16 +118,34 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         public async Task<IEnumerable<ManuFeedingMaterialDto>> GetFeedingMaterialListAsync(ManuFeedingMaterialQueryDto queryDto)
         {
             List<ManuFeedingMaterialDto> list = new();
+            IEnumerable<long>? materialIds = null;
 
-            // 读取资源绑定的工作中心
+            // 读取资源绑定的产线
             var workCenter = await _inteWorkCenterRepository.GetByResourceIdAsync(queryDto.ResourceId);
-            //if (workCenter == null) return list;
+            if (workCenter == null)
+            {
+                materialIds = await GetMaterialIdsByResourceIdAsync(queryDto.ResourceId);
+            }
+            // 混线
+            else if (workCenter.IsMixLine == true)
+            {
+                materialIds = await GetMaterialIdsByResourceIdAsync(queryDto.ResourceId);
+            }
+            // 不混线
+            else if (workCenter.IsMixLine == false)
+            {
+                materialIds = await GetMaterialIdsByWorkCenterIdAsync(workCenter.Id);
+            }
 
-            // 查询工单
+            // 查询不到物料
+            if (materialIds == null) return list;
 
-            // 查询BOM
-
-            // 查询物料
+            // 通过物料ID获取物料集合
+            var materials = await _procMaterialRepository.GetByIdsAsync(materialIds.ToArray());
+            foreach (var item in materials)
+            {
+                // TODO
+            }
 
             // TODO
             for (int i = 1; i < 4; i++)
@@ -165,6 +215,51 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             return await _inteContainerRepository.UpdateAsync(entity);
         }
         */
+
+
+
+
+
+        #region 内部方法
+        /// <summary>
+        /// 通过资源ID获取物料ID集合
+        /// </summary>
+        /// <param name="resourceId"></param>
+        /// <returns></returns>
+        private async Task<IEnumerable<long>?> GetMaterialIdsByResourceIdAsync(long resourceId)
+        {
+            var linkMaterials = await _procLoadPointLinkMaterialRepository.GetByResourceIdAsync(resourceId);
+            if (linkMaterials == null) return null;
+
+            return linkMaterials.Select(s => s.MaterialId);
+        }
+
+        /// <summary>
+        /// 通过工作中心ID获取物料ID集合
+        /// </summary>
+        /// <param name="workCenterId"></param>
+        /// <returns></returns>
+        private async Task<IEnumerable<long>?> GetMaterialIdsByWorkCenterIdAsync(long workCenterId)
+        {
+            // 通过车间查询工单
+            var workOrdersOfFarm = await _planWorkOrderRepository.GetByWorkFarmIdAsync(workCenterId);
+
+            // 通过产线查询工单
+            var workOrdersOfLine = await _planWorkOrderRepository.GetByWorkFarmIdAsync(workCenterId);
+
+            // 合并结果
+            var workOrders = workOrdersOfFarm.Union(workOrdersOfLine);
+            if (workOrders == null) return null;
+
+            // 通过工单查询BOM
+            var bomIds = workOrders.Select(s => s.ProductBOMId);
+            var materials = await _procBomDetailRepository.GetByBomIdsAsync(bomIds);
+            if (materials == null) return null;
+
+            return materials.Select(s => s.MaterialId);
+        }
+
+        #endregion
 
     }
 }

@@ -53,7 +53,7 @@ namespace Hymson.MES.Core.Domain.Plan
        /// <summary>
         /// 产品bom
         /// </summary>
-        public long? ProductBOMId { get; set; }
+        public long ProductBOMId { get; set; }
 
        /// <summary>
         /// 工单类型

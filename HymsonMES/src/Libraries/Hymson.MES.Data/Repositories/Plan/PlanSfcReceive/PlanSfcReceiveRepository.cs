@@ -11,6 +11,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Warehouse;
@@ -32,25 +33,14 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
 
         /// <summary>
-        /// 删除（软删除）
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<int> DeleteAsync(long id)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, new { Id = id });
-        }
-
-        /// <summary>
         /// 批量删除（软删除）
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] ids)
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeletesSql, new { ids = ids });
+            return await conn.ExecuteAsync(DeletesSql, param);
 
         }
 
@@ -63,17 +53,6 @@ namespace Hymson.MES.Data.Repositories.Plan
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<PlanSfcReceiveView>(GetByIdSql, new { Id = id });
-        }
-
-        /// <summary>
-        /// 根据IDs批量获取数据
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<PlanSfcReceiveView>> GetByIdsAsync(long[] ids)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<PlanSfcReceiveView>(GetByIdsSql, new { ids = ids });
         }
 
         /// <summary>
@@ -118,39 +97,14 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
 
         /// <summary>
-        /// 查询List
-        /// </summary>
-        /// <param name="planSfcInfoQuery"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<PlanSfcReceiveView>> GetPlanSfcInfoEntitiesAsync(PlanSfcReceiveQuery planSfcInfoQuery)
-        {
-            var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetPlanSfcInfoEntitiesSqlTemplate);
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var planSfcInfoEntities = await conn.QueryAsync<PlanSfcReceiveView>(template.RawSql, planSfcInfoQuery);
-            return planSfcInfoEntities;
-        }
-
-        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="planSfcInfoEntity"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(PlanSfcReceiveView planSfcInfoEntity)
+        public async Task<int> InsertAsync(ManuSfcInfoEntity planSfcInfoEntity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertSql, planSfcInfoEntity);
-        }
-
-        /// <summary>
-        /// 批量新增
-        /// </summary>
-        /// <param name="planSfcInfoEntitys"></param>
-        /// <returns></returns>
-        public async Task<int> InsertsAsync(List<PlanSfcReceiveView> planSfcInfoEntitys)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertsSql, planSfcInfoEntitys);
         }
 
         /// <summary>
@@ -158,23 +112,11 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="planSfcInfoEntity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(PlanSfcReceiveView planSfcInfoEntity)
+        public async Task<int> UpdateAsync(ManuSfcInfoEntity planSfcInfoEntity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateSql, planSfcInfoEntity);
+            return await conn.ExecuteAsync(UpdateSql, new { planSfcInfoEntity.Id, planSfcInfoEntity.RelevanceWorkOrderId, planSfcInfoEntity.Status, planSfcInfoEntity.UpdatedBy, planSfcInfoEntity.UpdatedOn });
         }
-
-        /// <summary>
-        /// 批量更新
-        /// </summary>
-        /// <param name="planSfcInfoEntitys"></param>
-        /// <returns></returns>
-        public async Task<int> UpdatesAsync(List<PlanSfcReceiveView> planSfcInfoEntitys)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdatesSql, planSfcInfoEntitys);
-        }
-
 
         /// <summary>
         /// 根据SFC获取数据
@@ -187,7 +129,6 @@ namespace Hymson.MES.Data.Repositories.Plan
             return await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(GetBySFCSql, new { SFC = SFC });
         }
 
-
         /// <summary>
         /// 获取条码数据
         /// </summary>
@@ -198,6 +139,7 @@ namespace Hymson.MES.Data.Repositories.Plan
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetPlanSfcInfoEntitiesSqlTemplate);
             sqlBuilder.Select("*");
+            sqlBuilder.Where(" IsDeleted=0");
 
             if (!string.IsNullOrWhiteSpace(query.SFC))
             {
@@ -212,18 +154,6 @@ namespace Hymson.MES.Data.Repositories.Plan
             return planSfcInfo;
         }
 
-        /// <summary>
-        /// 新增
-        /// </summary>
-        /// <param name="manuSfcInfoEntity"></param>
-        /// <returns></returns>
-        public async Task<int> InsertAsync(ManuSfcInfoEntity manuSfcInfoEntity)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertSql, manuSfcInfoEntity);
-        }
-
-
     }
 
     public partial class PlanSfcReceiveRepository
@@ -236,9 +166,10 @@ namespace Hymson.MES.Data.Repositories.Plan
 
         const string InsertSql = "INSERT INTO `manu_sfc_info`(  `Id`, `SFC`, `WorkOrderId`, `RelevanceWorkOrderId`, `ProductId`, `Qty`, `Status`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`) VALUES (   @Id, @SFC, @WorkOrderId, @RelevanceWorkOrderId, @ProductId, @Qty, @Status, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @SiteId )  ";
         const string InsertsSql = "INSERT INTO `manu_sfc_info`(  `Id`, `SFC`, `WorkOrderId`, `RelevanceWorkOrderId`, `ProductId`, `Qty`, `Status`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`) VALUES (   @Id, @SFC, @WorkOrderId, @RelevanceWorkOrderId, @ProductId, @Qty, @Status, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @SiteId )  ";
-        const string UpdateSql = "UPDATE `manu_sfc_info` SET   SFC = @SFC, WorkOrderId = @WorkOrderId, RelevanceWorkOrderId = @RelevanceWorkOrderId, ProductId = @ProductId, Qty = @Qty, Status = @Status, IsUsed = @IsUsed, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId  WHERE Id = @Id ";
+        //const string UpdateSql = "UPDATE `manu_sfc_info` SET   SFC = @SFC, WorkOrderId = @WorkOrderId, RelevanceWorkOrderId = @RelevanceWorkOrderId, ProductId = @ProductId, Qty = @Qty, Status = @Status, IsUsed = @IsUsed, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `manu_sfc_info` SET    RelevanceWorkOrderId = @RelevanceWorkOrderId,  Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `manu_sfc_info` SET   SFC = @SFC, WorkOrderId = @WorkOrderId, RelevanceWorkOrderId = @RelevanceWorkOrderId, ProductId = @ProductId, Qty = @Qty, Status = @Status, IsUsed = @IsUsed, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId  WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `manu_sfc_info` SET IsDeleted = '1' WHERE Id = @Id ";
+        const string DeleteSql = "UPDATE `manu_sfc_info` SET IsDeleted =Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `manu_sfc_info`  SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids ";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SFC`, `WorkOrderId`, `RelevanceWorkOrderId`, `ProductId`, `Qty`, `Status`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`

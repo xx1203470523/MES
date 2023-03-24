@@ -7,8 +7,10 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +30,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="planWorkOrderEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(PlanWorkOrderEntity planWorkOrderEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -42,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="planWorkOrderEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(PlanWorkOrderEntity planWorkOrderEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -56,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -70,13 +72,27 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="id"></param>
         /// <returns></returns>
         Task<PlanWorkOrderEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<IEnumerable<PlanWorkOrderEntity>> GetByIdsAsync(long[] ids);
+
+        /// <summary>
+        /// 根据车间ID获取工单数据
+        /// </summary>
+        /// <param name="workFarmId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<PlanWorkOrderEntity>> GetByWorkFarmIdAsync(long workFarmId);
+
+        /// <summary>
+        /// 根据产线ID获取工单数据
+        /// </summary>
+        /// <param name="workLineId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<PlanWorkOrderEntity>> GetByWorkLineIdAsync(long workLineId);
 
         /// <summary>
         /// 获取List 

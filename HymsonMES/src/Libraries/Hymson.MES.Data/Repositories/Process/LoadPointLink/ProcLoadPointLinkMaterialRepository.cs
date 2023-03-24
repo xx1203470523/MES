@@ -11,7 +11,6 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -95,6 +94,17 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ProcLoadPointLinkMaterialView>(GetLoadPointLinkMaterialByIdsSql, new { ids = ids });
+        }
+
+        /// <summary>
+        /// 根据IDs批量获取数据
+        /// </summary>
+        /// <param name="resourceId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcLoadPointLinkMaterialEntity>> GetByResourceIdAsync(long resourceId)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcLoadPointLinkMaterialEntity>(GetByResourceId, new { resourceId });
         }
 
         /// <summary>
@@ -210,6 +220,9 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `SerialNo`, `LoadPointId`, `MaterialId`, `Version`, `ReferencePoint`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_load_point_link_material`  WHERE Id IN @ids ";
+        const string GetByResourceId = @"SELECT PLPLM.* FROM proc_load_point_link_material PLPLM
+                                LEFT JOIN proc_load_point_link_resource PLPLR ON PLPLR.LoadPointId = PLPLM.LoadPointId
+                                WHERE PLPLR.ResourceId = @resourceId ";
         const string GetLoadPointLinkMaterialByIdsSql = @"SELECT 
                                          a.Id, a.MaterialId, a.ReferencePoint, b.MaterialCode, b.MaterialName, b.Version
                             FROM `proc_load_point_link_material` a

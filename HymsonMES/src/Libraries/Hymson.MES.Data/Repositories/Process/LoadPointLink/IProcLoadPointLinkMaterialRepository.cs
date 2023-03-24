@@ -27,7 +27,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procLoadPointLinkMaterialEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ProcLoadPointLinkMaterialEntity procLoadPointLinkMaterialEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -41,7 +41,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procLoadPointLinkMaterialEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ProcLoadPointLinkMaterialEntity procLoadPointLinkMaterialEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -75,7 +75,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<ProcLoadPointLinkMaterialEntity> GetByIdAsync(long id);    
+        Task<ProcLoadPointLinkMaterialEntity> GetByIdAsync(long id);
 
         /// <summary>
         /// 根据IDs批量获取数据
@@ -83,7 +83,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcLoadPointLinkMaterialEntity>> GetByIdsAsync(long[] ids);
-        
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -92,12 +92,19 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<IEnumerable<ProcLoadPointLinkMaterialView>> GetLoadPointLinkMaterialAsync(long[] ids);
 
         /// <summary>
+        /// 根据IDs批量获取数据
+        /// </summary>
+        /// <param name="resourceId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcLoadPointLinkMaterialEntity>> GetByResourceIdAsync(long resourceId);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="procLoadPointLinkMaterialQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcLoadPointLinkMaterialEntity>> GetProcLoadPointLinkMaterialEntitiesAsync(ProcLoadPointLinkMaterialQuery procLoadPointLinkMaterialQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>

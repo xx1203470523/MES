@@ -8,11 +8,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -83,6 +78,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcBomDetailEntity>> GetByIdsAsync(long[] ids);
+
+        /// <summary>
+        /// 根据BomID查询物料
+        /// </summary>
+        /// <param name="bomIds"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcBomDetailEntity>> GetByBomIdsAsync(IEnumerable<long> bomIds);
 
         /// <summary>
         /// 查询主物料表列表
