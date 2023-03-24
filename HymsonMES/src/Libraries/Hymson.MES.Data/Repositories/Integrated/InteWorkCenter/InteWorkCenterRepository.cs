@@ -47,10 +47,10 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
             }
             sqlBuilder.Select("Id,SiteId,Code,Name,Type,Source,Status,IsMixLine,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted");
 
-            if (param.SiteId != null) { sqlBuilder.Where("SiteId = @SiteId"); ; }
-            if (param.Type != null) { sqlBuilder.Where("Type = @Type"); ; }
-            if (param.Source != null) { sqlBuilder.Where("Source = @Source"); ; }
-            if (param.Status != null) { sqlBuilder.Where("Status = @Status"); ; }
+            if (param.SiteId.HasValue) { sqlBuilder.Where("SiteId = @SiteId"); }
+            if (param.Type.HasValue) { sqlBuilder.Where("Type = @Type"); }
+            if (param.Source.HasValue) { sqlBuilder.Where("Source = @Source"); }
+            if (param.Status.HasValue) { sqlBuilder.Where("Status = @Status"); }
             if (!string.IsNullOrWhiteSpace(param.Code))
             {
                 param.Code = $"%{param.Code}%";
@@ -96,6 +96,17 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<InteWorkCenterEntity>(GetByCodeSql, param);
+        }
+
+        /// <summary>
+        /// 根据资源ID获取数据
+        /// </summary>
+        /// <param name="resourceId"></param>
+        /// <returns></returns>
+        public async Task<InteWorkCenterEntity> GetByResourceIdAsync(long resourceId)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<InteWorkCenterEntity>(GetByResourceId, new { resourceId });
         }
 
         /// <summary>
@@ -238,6 +249,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         const string DeleteRangSql = "UPDATE `inte_work_center` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id in @ids AND IsDeleted=0";
         const string GetByIdSql = @"SELECT Id,SiteId,Code,Name,Type,Source,Status,IsMixLine,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted FROM `inte_work_center`  WHERE Id = @Id AND IsDeleted=0  ";
         const string GetByCodeSql = @"SELECT Id,SiteId,Code,Name,Type,Source,Status,IsMixLine,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted FROM `inte_work_center`  WHERE Code = @Code  AND SiteId=@Site AND IsDeleted=0 ";
+        const string GetByResourceId = "SELECT IWC.* FROM inte_work_center_resource_relation IWCRR LEFT JOIN inte_work_center IWC ON IWCRR.WorkCenterId = IWC.Id WHERE IWC.IsDeleted = 0 AND IWCRR.ResourceId = @resourceId";
 
         const string InsertInteWorkCenterRelationRangSql = "INSERT INTO  `inte_work_center_relation` (  Id,WorkCenterId,SubWorkCenterId,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted,SiteId) VALUES ( @Id,@WorkCenterId,@SubWorkCenterId,@Remark,@CreatedBy,@CreatedOn,@UpdatedBy,@UpdatedOn,@IsDeleted,@SiteId) ";
         const string RealDelteInteWorkCenterRelationSql = "DELETE  FROM `inte_work_center_relation` WHERE  WorkCenterId = @Id AND IsDeleted=0";

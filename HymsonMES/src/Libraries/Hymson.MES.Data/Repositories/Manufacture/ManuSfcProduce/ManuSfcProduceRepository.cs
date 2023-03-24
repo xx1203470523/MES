@@ -52,18 +52,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             }
             if (!string.IsNullOrWhiteSpace(query.Sfc))
             {
+                query.Sfc = $"%{query.Sfc}%";
                 sqlBuilder.Where("msp.Sfc=@Sfc");
             }
-            if (query.Sfcs != null && query.Sfcs.Length > 0)
+            if (query.SfcArray != null && query.SfcArray.Length > 0)
             {
-                sqlBuilder.Where("msp.Sfc in @Sfcs");
+                sqlBuilder.Where("msp.Sfc in @SfcArray");
             }
             if (!string.IsNullOrWhiteSpace(query.OrderCode))
             {
+                query.OrderCode = $"%{query.OrderCode}%";
                 sqlBuilder.Where("pwo.OrderCode=@OrderCode");
             }
             if (!string.IsNullOrWhiteSpace(query.Code))
             {
+                query.Code = $"%{query.Code}%";
                 sqlBuilder.Where("pp.Code=@Code");
             }
 

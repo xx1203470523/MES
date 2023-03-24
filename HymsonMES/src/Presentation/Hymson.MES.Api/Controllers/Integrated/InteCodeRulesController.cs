@@ -47,7 +47,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpGet]
         [Route("pagelist")]
-        public async Task<PagedInfo<InteCodeRulesDto>> QueryPagedInteCodeRulesAsync([FromQuery] InteCodeRulesPagedQueryDto parm)
+        public async Task<PagedInfo<InteCodeRulesPageViewDto>> QueryPagedInteCodeRulesAsync([FromQuery] InteCodeRulesPagedQueryDto parm)
         {
             return await _inteCodeRulesService.GetPageListAsync(parm);
         }
@@ -58,7 +58,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<InteCodeRulesDto> QueryInteCodeRulesByIdAsync(long id)
+        public async Task<InteCodeRulesDetailViewDto> QueryInteCodeRulesByIdAsync(long id)
         {
             return await _inteCodeRulesService.QueryInteCodeRulesByIdAsync(id);
         }

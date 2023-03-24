@@ -26,7 +26,12 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 编码规则ID
+        /// </summary>
+        public long CodeRulesId { get; set; }
+
+        /// <summary>
         /// 序号
         /// </summary>
         public int Seq { get; set; }
@@ -90,7 +95,12 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 编码规则ID
+        /// </summary>
+        public long CodeRulesId { get; set; }
+
+        /// <summary>
         /// 序号
         /// </summary>
         public int Seq { get; set; }
@@ -153,7 +163,12 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 编码规则ID
+        /// </summary>
+        public long CodeRulesId { get; set; }
+
+        /// <summary>
         /// 序号
         /// </summary>
         public int Seq { get; set; }
@@ -212,10 +227,5 @@ namespace Hymson.MES.Services.Dtos.Integrated
     /// </summary>
     public class InteCodeRulesMakePagedQueryDto : PagerInfo
     {
-        ///// <summary>
-        ///// 描述 :站点编码 
-        ///// 空值 : false  
-        ///// </summary>
-        //public string SiteCode { get; set; }
     }
 }

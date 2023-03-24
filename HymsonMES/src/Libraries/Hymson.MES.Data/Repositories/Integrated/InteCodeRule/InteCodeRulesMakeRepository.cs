@@ -171,17 +171,17 @@ namespace Hymson.MES.Data.Repositories.Integrated
                                             /**select**/
                                            FROM `inte_code_rules_make` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `inte_code_rules_make`(  `Id`, `Seq`, `ValueTakingType`, `SegmentedValue`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (   @Id, @Seq, @ValueTakingType, @SegmentedValue, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `inte_code_rules_make`(  `Id`, `Seq`, `ValueTakingType`, `SegmentedValue`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (   @Id, @Seq, @ValueTakingType, @SegmentedValue, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted )  ";
-        const string UpdateSql = "UPDATE `inte_code_rules_make` SET   Seq = @Seq, ValueTakingType = @ValueTakingType, SegmentedValue = @SegmentedValue, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `inte_code_rules_make` SET   Seq = @Seq, ValueTakingType = @ValueTakingType, SegmentedValue = @SegmentedValue, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string InsertSql = "INSERT INTO `inte_code_rules_make`(  `Id`, CodeRulesId, `Seq`, `ValueTakingType`, `SegmentedValue`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (   @Id, @Seq, @ValueTakingType, @SegmentedValue, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted )  ";
+        const string InsertsSql = "INSERT INTO `inte_code_rules_make`(  `Id`,  CodeRulesId, `Seq`, `ValueTakingType`, `SegmentedValue`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (   @Id, @Seq, @ValueTakingType, @SegmentedValue, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted )  ";
+        const string UpdateSql = "UPDATE `inte_code_rules_make` SET  CodeRulesId=@CodeRulesId,  Seq = @Seq, ValueTakingType = @ValueTakingType, SegmentedValue = @SegmentedValue, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `inte_code_rules_make` SET  CodeRulesId=@CodeRulesId, Seq = @Seq, ValueTakingType = @ValueTakingType, SegmentedValue = @SegmentedValue, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `inte_code_rules_make` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `inte_code_rules_make` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids ";
         const string GetByIdSql = @"SELECT 
-                               `Id`, `Seq`, `ValueTakingType`, `SegmentedValue`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`
+                               `Id`, CodeRulesId, `Seq`, `ValueTakingType`, `SegmentedValue`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`
                             FROM `inte_code_rules_make`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `Seq`, `ValueTakingType`, `SegmentedValue`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`
+                                          `Id`, CodeRulesId, `Seq`, `ValueTakingType`, `SegmentedValue`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`
                             FROM `inte_code_rules_make`  WHERE Id IN @ids ";
     }
 }

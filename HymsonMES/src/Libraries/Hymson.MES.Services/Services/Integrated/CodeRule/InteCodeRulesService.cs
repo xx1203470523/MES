@@ -15,6 +15,8 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -37,7 +39,9 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly AbstractValidator<InteCodeRulesCreateDto> _validationCreateRules;
         private readonly AbstractValidator<InteCodeRulesModifyDto> _validationModifyRules;
 
-        public InteCodeRulesService(ICurrentUser currentUser, ICurrentSite currentSite, IInteCodeRulesRepository inteCodeRulesRepository, AbstractValidator<InteCodeRulesCreateDto> validationCreateRules, AbstractValidator<InteCodeRulesModifyDto> validationModifyRules)
+        private readonly IProcMaterialRepository _procMaterialRepository;
+
+        public InteCodeRulesService(ICurrentUser currentUser, ICurrentSite currentSite, IInteCodeRulesRepository inteCodeRulesRepository, AbstractValidator<InteCodeRulesCreateDto> validationCreateRules, AbstractValidator<InteCodeRulesModifyDto> validationModifyRules, IProcMaterialRepository procMaterialRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -45,6 +49,8 @@ namespace Hymson.MES.Services.Services.Integrated
             _inteCodeRulesRepository = inteCodeRulesRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
+
+            _procMaterialRepository = procMaterialRepository;
         }
 
         /// <summary>
@@ -57,7 +63,7 @@ namespace Hymson.MES.Services.Services.Integrated
             //// 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
+                throw new BusinessException(nameof(ErrorCode.MES10101));
             }
 
             //验证DTO
@@ -73,7 +79,11 @@ namespace Hymson.MES.Services.Services.Integrated
             inteCodeRulesEntity.SiteId = _currentSite.SiteId ?? 0;
 
             //判断是否已经存在该物料数据
-
+            var hasCodeRulesEntities= await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery { ProductId= inteCodeRulesCreateDto.ProductId });
+            if (hasCodeRulesEntities != null && hasCodeRulesEntities.Any()) 
+            {
+                throw new BusinessException(nameof(ErrorCode.MES12401)).WithData("productId", inteCodeRulesCreateDto.ProductId);
+            }
 
             //入库
             await _inteCodeRulesRepository.InsertAsync(inteCodeRulesEntity);
@@ -104,14 +114,14 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="inteCodeRulesPagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<InteCodeRulesDto>> GetPageListAsync(InteCodeRulesPagedQueryDto inteCodeRulesPagedQueryDto)
+        public async Task<PagedInfo<InteCodeRulesPageViewDto>> GetPageListAsync(InteCodeRulesPagedQueryDto inteCodeRulesPagedQueryDto)
         {
             var inteCodeRulesPagedQuery = inteCodeRulesPagedQueryDto.ToQuery<InteCodeRulesPagedQuery>();
             var pagedInfo = await _inteCodeRulesRepository.GetPagedInfoAsync(inteCodeRulesPagedQuery);
 
             //实体到DTO转换 装载数据
-            List<InteCodeRulesDto> inteCodeRulesDtos = PrepareInteCodeRulesDtos(pagedInfo);
-            return new PagedInfo<InteCodeRulesDto>(inteCodeRulesDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            List<InteCodeRulesPageViewDto> inteCodeRulesDtos = PrepareInteCodeRulesDtos(pagedInfo);
+            return new PagedInfo<InteCodeRulesPageViewDto>(inteCodeRulesDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
         /// <summary>
@@ -119,12 +129,12 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="pagedInfo"></param>
         /// <returns></returns>
-        private static List<InteCodeRulesDto> PrepareInteCodeRulesDtos(PagedInfo<InteCodeRulesEntity>   pagedInfo)
+        private static List<InteCodeRulesPageViewDto> PrepareInteCodeRulesDtos(PagedInfo<InteCodeRulesPageView>   pagedInfo)
         {
-            var inteCodeRulesDtos = new List<InteCodeRulesDto>();
+            var inteCodeRulesDtos = new List<InteCodeRulesPageViewDto>();
             foreach (var inteCodeRulesEntity in pagedInfo.Data)
             {
-                var inteCodeRulesDto = inteCodeRulesEntity.ToModel<InteCodeRulesDto>();
+                var inteCodeRulesDto = inteCodeRulesEntity.ToModel<InteCodeRulesPageViewDto>();
                 inteCodeRulesDtos.Add(inteCodeRulesDto);
             }
 
@@ -154,12 +164,22 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<InteCodeRulesDto> QueryInteCodeRulesByIdAsync(long id) 
+        public async Task<InteCodeRulesDetailViewDto> QueryInteCodeRulesByIdAsync(long id) 
         {
            var inteCodeRulesEntity = await _inteCodeRulesRepository.GetByIdAsync(id);
            if (inteCodeRulesEntity != null) 
            {
-               return inteCodeRulesEntity.ToModel<InteCodeRulesDto>();
+                var inteCodeRulesDetailViewDto = inteCodeRulesEntity.ToModel<InteCodeRulesDetailViewDto>();
+                //查询关联数据
+                var material= await _procMaterialRepository.GetByIdAsync(inteCodeRulesEntity.ProductId, _currentSite.SiteId??0);
+                if (material != null) 
+                {
+                    inteCodeRulesDetailViewDto.MaterialCode=material.MaterialCode;
+                    inteCodeRulesDetailViewDto.MaterialName = material.MaterialName;
+                    inteCodeRulesDetailViewDto.MaterialVersion = material.Version;
+                }
+
+                return inteCodeRulesDetailViewDto;
            }
             return null;
         }
