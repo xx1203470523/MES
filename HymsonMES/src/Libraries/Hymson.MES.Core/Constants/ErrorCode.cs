@@ -183,6 +183,8 @@
         public const string MES12400 = "代码规则维护错误";
         public const string MES12401 = "代码规则中物料Id[{productId}]已经存在";
 
+        public const string MES12402 = "代码规则新增失败";
+
         #endregion
 
         //设备

@@ -18,8 +18,10 @@ using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using System.Security.Policy;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Integrated
@@ -36,21 +38,27 @@ namespace Hymson.MES.Services.Services.Integrated
         /// 编码规则 仓储
         /// </summary>
         private readonly IInteCodeRulesRepository _inteCodeRulesRepository;
+        private readonly ISequenceService _sequenceService;
         private readonly AbstractValidator<InteCodeRulesCreateDto> _validationCreateRules;
         private readonly AbstractValidator<InteCodeRulesModifyDto> _validationModifyRules;
 
         private readonly IProcMaterialRepository _procMaterialRepository;
 
-        public InteCodeRulesService(ICurrentUser currentUser, ICurrentSite currentSite, IInteCodeRulesRepository inteCodeRulesRepository, AbstractValidator<InteCodeRulesCreateDto> validationCreateRules, AbstractValidator<InteCodeRulesModifyDto> validationModifyRules, IProcMaterialRepository procMaterialRepository)
+        private readonly IInteCodeRulesMakeRepository _inteCodeRulesMakeRepository;
+
+        public InteCodeRulesService(ICurrentUser currentUser, ICurrentSite currentSite, IInteCodeRulesRepository inteCodeRulesRepository, 
+ISequenceService sequenceService,AbstractValidator<InteCodeRulesCreateDto> validationCreateRules, AbstractValidator<InteCodeRulesModifyDto> validationModifyRules, IProcMaterialRepository procMaterialRepository, IInteCodeRulesMakeRepository inteCodeRulesMakeRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
 
             _inteCodeRulesRepository = inteCodeRulesRepository;
+            this._sequenceService = sequenceService;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
 
             _procMaterialRepository = procMaterialRepository;
+            _inteCodeRulesMakeRepository= inteCodeRulesMakeRepository;
         }
 
         /// <summary>
@@ -85,9 +93,46 @@ namespace Hymson.MES.Services.Services.Integrated
                 throw new BusinessException(nameof(ErrorCode.MES12401)).WithData("productId", inteCodeRulesCreateDto.ProductId);
             }
 
-            //入库
-            await _inteCodeRulesRepository.InsertAsync(inteCodeRulesEntity);
-        }
+            List<InteCodeRulesMakeEntity> inteCodeRulesMakeEntitys = new List<InteCodeRulesMakeEntity>();
+            if (inteCodeRulesCreateDto.CodeRulesMakes != null) 
+            {
+                //转换物料组成
+                foreach (var item in inteCodeRulesCreateDto.CodeRulesMakes)
+                {
+                    var inteCodeRulesMakeEntity = item.ToEntity<InteCodeRulesMakeEntity>();
+                    inteCodeRulesMakeEntity.Id= IdGenProvider.Instance.CreateId();
+                    inteCodeRulesMakeEntity.CodeRulesId = inteCodeRulesEntity.Id;
+                    inteCodeRulesMakeEntity.CreatedBy= _currentUser.UserName;
+                    inteCodeRulesMakeEntity.CreatedOn = HymsonClock.Now();
+                    inteCodeRulesMakeEntity.SiteId = _currentSite.SiteId ?? 0;
+
+                    inteCodeRulesMakeEntitys.Add(inteCodeRulesMakeEntity);
+                }
+            }
+
+            using (TransactionScope ts = new TransactionScope())
+            {
+                int response = 0;
+                //入库
+                response = await _inteCodeRulesRepository.InsertAsync(inteCodeRulesEntity);
+                if (response <= 0)
+                {
+                    throw new BusinessException(nameof(ErrorCode.MES12402));
+                }
+
+                if (inteCodeRulesMakeEntitys.Count > 0) 
+                {
+                    //编码组成
+                    response= await _inteCodeRulesMakeRepository.InsertsAsync(inteCodeRulesMakeEntitys);
+                    if (response < inteCodeRulesMakeEntitys.Count) 
+                    {
+                        throw new BusinessException(nameof(ErrorCode.MES12402));
+                    }
+                }
+
+                ts.Complete();
+            }
+    }
 
         /// <summary>
         /// 删除
@@ -156,7 +201,49 @@ namespace Hymson.MES.Services.Services.Integrated
             inteCodeRulesEntity.UpdatedBy = _currentUser.UserName;
             inteCodeRulesEntity.UpdatedOn = HymsonClock.Now();
 
-            await _inteCodeRulesRepository.UpdateAsync(inteCodeRulesEntity);
+            List<InteCodeRulesMakeEntity> inteCodeRulesMakeEntitys = new List<InteCodeRulesMakeEntity>();
+            if (inteCodeRulesModifyDto.CodeRulesMakes != null)
+            {
+                //转换物料组成
+                foreach (var item in inteCodeRulesModifyDto.CodeRulesMakes)
+                {
+                    var inteCodeRulesMakeEntity = item.ToEntity<InteCodeRulesMakeEntity>();
+                    inteCodeRulesMakeEntity.Id = IdGenProvider.Instance.CreateId();
+                    inteCodeRulesMakeEntity.CodeRulesId= inteCodeRulesEntity.Id;
+                    inteCodeRulesMakeEntity.CreatedBy = _currentUser.UserName;
+                    inteCodeRulesMakeEntity.CreatedOn = HymsonClock.Now();
+                    inteCodeRulesMakeEntity.SiteId = _currentSite.SiteId ?? 0;
+
+                    inteCodeRulesMakeEntitys.Add(inteCodeRulesMakeEntity);
+                }
+            }
+
+            using (TransactionScope ts = new TransactionScope())
+            {
+                int response = 0;
+                response = await _inteCodeRulesRepository.UpdateAsync(inteCodeRulesEntity);
+
+                if (response <= 0)
+                {
+                    throw new BusinessException(nameof(ErrorCode.MES12402));
+                }
+
+                await _inteCodeRulesMakeRepository.DeleteByCodeRulesIdAsync(inteCodeRulesEntity.Id);
+
+                if (inteCodeRulesMakeEntitys.Count > 0)
+                {
+                    //编码组成
+                    response = await _inteCodeRulesMakeRepository.InsertsAsync(inteCodeRulesMakeEntitys);
+                    if (response < inteCodeRulesMakeEntitys.Count)
+                    {
+                        throw new BusinessException(nameof(ErrorCode.MES12402));
+                    }
+                }
+
+                ts.Complete();
+            }
+
+            
         }
 
         /// <summary>
@@ -178,6 +265,21 @@ namespace Hymson.MES.Services.Services.Integrated
                     inteCodeRulesDetailViewDto.MaterialName = material.MaterialName;
                     inteCodeRulesDetailViewDto.MaterialVersion = material.Version;
                 }
+
+                //查询关联的编码规则组成
+                var inteCodeRulesMakeEntitys= await _inteCodeRulesMakeRepository.GetInteCodeRulesMakeEntitiesAsync(new InteCodeRulesMakeQuery { CodeRulesId= inteCodeRulesEntity.Id });
+
+                List<InteCodeRulesMakeDto> inteCodeRulesDtos = new List<InteCodeRulesMakeDto>();
+                if (inteCodeRulesMakeEntitys != null && inteCodeRulesMakeEntitys.Count() > 0) 
+                {
+                    //转换
+                    foreach (var item in inteCodeRulesMakeEntitys)
+                    {
+                        inteCodeRulesDtos.Add(item.ToModel<InteCodeRulesMakeDto>());
+                    }
+                }
+
+                inteCodeRulesDetailViewDto.CodeRulesMakes = inteCodeRulesDtos;
 
                 return inteCodeRulesDetailViewDto;
            }

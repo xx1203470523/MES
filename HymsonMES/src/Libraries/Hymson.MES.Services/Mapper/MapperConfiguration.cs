@@ -208,6 +208,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteCodeRulesMakeModifyDto, InteCodeRulesMakeEntity>();
             CreateMap<InteCodeRulesMakePagedQueryDto, InteCodeRulesMakePagedQuery>();
             CreateMap<InteCodeRulesMakeEntity, InteCodeRulesMakeDto>();
+            CreateMap<InteCodeRulesMakeDto, InteCodeRulesMakeEntity>();
             #endregion
         }
 

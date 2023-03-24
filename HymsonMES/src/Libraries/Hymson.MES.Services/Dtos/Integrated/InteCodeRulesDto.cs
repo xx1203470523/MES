@@ -155,6 +155,12 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public string? Remark { get; set; }
 
+
+        /// <summary>
+        /// 编码规则
+        /// </summary>
+        public List<InteCodeRulesMakeDto> CodeRulesMakes { get;set;}
+
     }
 
     /// <summary>
@@ -211,6 +217,12 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 手动录入编码规则的描述信息
         /// </summary>
         public string Remark { get; set; }
+
+
+        /// <summary>
+        /// 编码规则
+        /// </summary>
+        public List<InteCodeRulesMakeDto> CodeRulesMakes { get; set; }
     }
 
     /// <summary>
@@ -396,5 +408,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 物料版本
         /// </summary>
         public string MaterialVersion { get; set; }
+
+
+        /// <summary>
+        /// 编码规则
+        /// </summary>
+        public List<InteCodeRulesMakeDto> CodeRulesMakes { get; set; }
     } 
 }

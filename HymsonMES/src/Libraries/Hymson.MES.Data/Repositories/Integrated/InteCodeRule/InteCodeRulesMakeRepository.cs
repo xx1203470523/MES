@@ -41,6 +41,17 @@ namespace Hymson.MES.Data.Repositories.Integrated
         }
 
         /// <summary>
+        /// 根据CodeRulesId删除（真删除）
+        /// </summary>
+        /// <param name="codeRulesId"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteByCodeRulesIdAsync(long codeRulesId)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeleteByCodeRulesIdSql, new { codeRulesId = codeRulesId });
+        }
+
+        /// <summary>
         /// 批量删除（软删除）
         /// </summary>
         /// <param name="ids"></param>
@@ -113,6 +124,13 @@ namespace Hymson.MES.Data.Repositories.Integrated
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetInteCodeRulesMakeEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+
+            if (inteCodeRulesMakeQuery.CodeRulesId>0)
+            {
+                sqlBuilder.Where(" CodeRulesId=@CodeRulesId ");
+            }
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var inteCodeRulesMakeEntities = await conn.QueryAsync<InteCodeRulesMakeEntity>(template.RawSql, inteCodeRulesMakeQuery);
             return inteCodeRulesMakeEntities;
@@ -171,12 +189,13 @@ namespace Hymson.MES.Data.Repositories.Integrated
                                             /**select**/
                                            FROM `inte_code_rules_make` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `inte_code_rules_make`(  `Id`, CodeRulesId, `Seq`, `ValueTakingType`, `SegmentedValue`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (   @Id, @Seq, @ValueTakingType, @SegmentedValue, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `inte_code_rules_make`(  `Id`,  CodeRulesId, `Seq`, `ValueTakingType`, `SegmentedValue`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (   @Id, @Seq, @ValueTakingType, @SegmentedValue, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `inte_code_rules_make`(  `Id`, CodeRulesId, `Seq`, `ValueTakingType`, `SegmentedValue`, `Remark`, `CreatedBy`, `CreatedOn`, `SiteId` ) VALUES (   @Id, @CodeRulesId, @Seq, @ValueTakingType, @SegmentedValue, @Remark, @CreatedBy, @CreatedOn,  @SiteId )  ";
+        const string InsertsSql = "INSERT INTO `inte_code_rules_make`(  `Id`,  CodeRulesId, `Seq`, `ValueTakingType`, `SegmentedValue`, `Remark`, `CreatedBy`, `CreatedOn`, `SiteId` ) VALUES (   @Id, @CodeRulesId, @Seq, @ValueTakingType, @SegmentedValue, @Remark, @CreatedBy, @CreatedOn, @SiteId )  ";
         const string UpdateSql = "UPDATE `inte_code_rules_make` SET  CodeRulesId=@CodeRulesId,  Seq = @Seq, ValueTakingType = @ValueTakingType, SegmentedValue = @SegmentedValue, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `inte_code_rules_make` SET  CodeRulesId=@CodeRulesId, Seq = @Seq, ValueTakingType = @ValueTakingType, SegmentedValue = @SegmentedValue, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `inte_code_rules_make` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `inte_code_rules_make` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids ";
+        const string DeleteByCodeRulesIdSql= "DELETE FROM `inte_code_rules_make` WHERE CodeRulesId = @codeRulesId ";
         const string GetByIdSql = @"SELECT 
                                `Id`, CodeRulesId, `Seq`, `ValueTakingType`, `SegmentedValue`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`
                             FROM `inte_code_rules_make`  WHERE Id = @Id ";

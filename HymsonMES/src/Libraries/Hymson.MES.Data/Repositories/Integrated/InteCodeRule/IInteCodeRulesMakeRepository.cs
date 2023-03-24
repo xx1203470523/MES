@@ -57,6 +57,13 @@ namespace Hymson.MES.Data.Repositories.Integrated
         Task<int> DeleteAsync(long id);
 
         /// <summary>
+        /// 根据CodeRulesId删除（真删除）
+        /// </summary>
+        /// <param name="codeRulesId"></param>
+        /// <returns></returns>
+        Task<int> DeleteByCodeRulesIdAsync(long codeRulesId);
+
+        /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="param"></param>
