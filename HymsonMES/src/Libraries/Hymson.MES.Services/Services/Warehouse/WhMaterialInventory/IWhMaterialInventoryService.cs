@@ -41,7 +41,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// </summary>
         /// <param name="barCode"></param>
         /// <returns></returns>
-        Task<WhMaterialInventoryDto> QueryWhMaterialInventoryByBarCodeAsync(string barCode);
+        Task<IEnumerable<WhMaterialInventoryDto>> QueryWhMaterialInventoryByBarCodeAsync(string barCode);
 
         /// <summary>
         /// 新增

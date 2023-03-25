@@ -77,7 +77,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="barCode"></param>
         /// <returns></returns>
-        Task<WhMaterialInventoryEntity> GetByBarCodeAsync(string barCode);
+        Task<IEnumerable<WhMaterialInventoryEntity>> GetByBarCodeAsync(string barCode);
 
         /// <summary>
         /// 根据IDs批量获取数据

@@ -134,9 +134,9 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long? FeedingPointId { get; set; }
 
         /// <summary>
-        /// 物料ID
+        /// 物料ID/产品ID
         /// </summary>
-        public long MaterialId { get; set; }
+        public long ProductId { get; set; }
 
         /// <summary>
         /// 物料条码

@@ -67,10 +67,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="barCode"></param>
         /// <returns></returns>
-        public async Task<WhMaterialInventoryEntity> GetByBarCodeAsync(string barCode)
+        public async Task<IEnumerable<WhMaterialInventoryEntity>> GetByBarCodeAsync(string barCode)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<WhMaterialInventoryEntity>(GetByBarCode, new { barCode });
+            return await conn.QueryAsync<WhMaterialInventoryEntity>(GetByBarCode, new { barCode });
         }
 
         /// <summary>
