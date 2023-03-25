@@ -1,25 +1,13 @@
-/*
- *creator: Karl
- *
- *describe: BOM明细表    服务 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-02-14 10:38:06
- */
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Infrastructure;
-using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
-using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using Hymson.Utils;
-using Org.BouncyCastle.Crypto;
-using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -36,6 +24,13 @@ namespace Hymson.MES.Services.Services.Process
         private readonly AbstractValidator<ProcBomDetailModifyDto> _validationModifyRules;
         private readonly ICurrentUser _currentUser;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="currentUser"></param>
+        /// <param name="procBomDetailRepository"></param>
+        /// <param name="validationCreateRules"></param>
+        /// <param name="validationModifyRules"></param>
         public ProcBomDetailService(ICurrentUser currentUser, IProcBomDetailRepository procBomDetailRepository, AbstractValidator<ProcBomDetailCreateDto> validationCreateRules, AbstractValidator<ProcBomDetailModifyDto> validationModifyRules)
         {
             _currentUser = currentUser;
@@ -44,10 +39,11 @@ namespace Hymson.MES.Services.Services.Process
             _validationModifyRules = validationModifyRules;
         }
 
+
         /// <summary>
         /// 创建
         /// </summary>
-        /// <param name="procBomDetailDto"></param>
+        /// <param name="procBomDetailCreateDto"></param>
         /// <returns></returns>
         public async Task CreateProcBomDetailAsync(ProcBomDetailCreateDto procBomDetailCreateDto)
         {
@@ -56,7 +52,7 @@ namespace Hymson.MES.Services.Services.Process
 
             //DTO转换实体
             var procBomDetailEntity = procBomDetailCreateDto.ToEntity<ProcBomDetailEntity>();
-            procBomDetailEntity.Id= IdGenProvider.Instance.CreateId();
+            procBomDetailEntity.Id = IdGenProvider.Instance.CreateId();
             procBomDetailEntity.CreatedBy = _currentUser.UserName;
             procBomDetailEntity.UpdatedBy = _currentUser.UserName;
             procBomDetailEntity.CreatedOn = HymsonClock.Now();
@@ -106,7 +102,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="pagedInfo"></param>
         /// <returns></returns>
-        private static List<ProcBomDetailDto> PrepareProcBomDetailDtos(PagedInfo<ProcBomDetailEntity>   pagedInfo)
+        private static List<ProcBomDetailDto> PrepareProcBomDetailDtos(PagedInfo<ProcBomDetailEntity> pagedInfo)
         {
             var procBomDetailDtos = new List<ProcBomDetailDto>();
             foreach (var procBomDetailEntity in pagedInfo.Data)
@@ -121,11 +117,11 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="procBomDetailDto"></param>
+        /// <param name="procBomDetailModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyProcBomDetailAsync(ProcBomDetailModifyDto procBomDetailModifyDto)
         {
-             //验证DTO
+            //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(procBomDetailModifyDto);
 
             //DTO转换实体
@@ -141,14 +137,12 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ProcBomDetailDto> QueryProcBomDetailByIdAsync(long id) 
+        public async Task<ProcBomDetailDto> QueryProcBomDetailByIdAsync(long id)
         {
-           var procBomDetailEntity = await _procBomDetailRepository.GetByIdAsync(id);
-           if (procBomDetailEntity != null) 
-           {
-               return procBomDetailEntity.ToModel<ProcBomDetailDto>();
-           }
-            return null;
+            var procBomDetailEntity = await _procBomDetailRepository.GetByIdAsync(id);
+            if (procBomDetailEntity == null) return null;
+
+            return procBomDetailEntity.ToModel<ProcBomDetailDto>();
         }
     }
 }

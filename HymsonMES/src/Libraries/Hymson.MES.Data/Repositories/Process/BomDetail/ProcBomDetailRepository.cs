@@ -254,6 +254,6 @@ namespace Hymson.MES.Data.Repositories.Process
                             WHERE a.IsDeleted =0
                             AND a.BomId=@id
                             ORDER by a.UpdatedOn DESC ";
-        const string GetByBomIds = @"SELECT MaterialId FROM proc_bom_detail WHERE BomId IN @bomIds ";
+        const string GetByBomIds = @"SELECT MaterialId FROM proc_bom_detail WHERE IsDeleted = 0 AND BomId IN @bomIds ";
     }
 }

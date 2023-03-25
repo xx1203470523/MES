@@ -1,18 +1,6 @@
-/*
- *creator: Karl
- *
- *describe: BOM表    服务接口 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-02-14 10:04:25
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -31,14 +19,14 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="procBomDto"></param>
+        /// <param name="procBomCreateDto"></param>
         /// <returns></returns>
         Task CreateProcBomAsync(ProcBomCreateDto procBomCreateDto);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="procBomDto"></param>
+        /// <param name="procBomModifyDto"></param>
         /// <returns></returns>
         Task ModifyProcBomAsync(ProcBomModifyDto procBomModifyDto);
 

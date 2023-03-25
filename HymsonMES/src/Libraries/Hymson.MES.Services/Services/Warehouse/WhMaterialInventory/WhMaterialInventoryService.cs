@@ -5,7 +5,6 @@
  *builder:  pengxin
  *build datetime: 2023-03-06 03:27:59
  */
-using Dapper;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -20,9 +19,7 @@ using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using MySql.Data.MySqlClient;
 //using Hymson.Utils.Extensions;
-using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Warehouse
 {
@@ -41,6 +38,16 @@ namespace Hymson.MES.Services.Services.Warehouse
         private readonly AbstractValidator<WhMaterialInventoryCreateDto> _validationCreateRules;
         private readonly AbstractValidator<WhMaterialInventoryModifyDto> _validationModifyRules;
         private readonly ICurrentSite _currentSite;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="currentUser"></param>
+        /// <param name="whMaterialInventoryRepository"></param>
+        /// <param name="whMaterialStandingbookRepository"></param>
+        /// <param name="validationCreateRules"></param>
+        /// <param name="validationModifyRules"></param>
+        /// <param name="currentSite"></param>
         public WhMaterialInventoryService(ICurrentUser currentUser,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
@@ -57,10 +64,11 @@ namespace Hymson.MES.Services.Services.Warehouse
             _currentSite = currentSite;
         }
 
+
         /// <summary>
         /// 创建
         /// </summary>
-        /// <param name="whMaterialInventoryDto"></param>
+        /// <param name="whMaterialInventoryCreateDto"></param>
         /// <returns></returns>
         public async Task CreateWhMaterialInventoryAsync(WhMaterialInventoryCreateDto whMaterialInventoryCreateDto)
         {
@@ -78,7 +86,6 @@ namespace Hymson.MES.Services.Services.Warehouse
             //入库
             await _whMaterialInventoryRepository.InsertAsync(whMaterialInventoryEntity);
         }
-
 
         /// <summary>
         /// 批量创建
@@ -255,11 +262,10 @@ namespace Hymson.MES.Services.Services.Warehouse
             return pagedInfo.Any();
         }
 
-
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="whMaterialInventoryDto"></param>
+        /// <param name="whMaterialInventoryModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyWhMaterialInventoryAsync(WhMaterialInventoryModifyDto whMaterialInventoryModifyDto)
         {
@@ -290,9 +296,22 @@ namespace Hymson.MES.Services.Services.Warehouse
         }
 
         /// <summary>
+        /// 根据物料条码查询
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <returns></returns>
+        public async Task<WhMaterialInventoryDto> QueryWhMaterialInventoryByBarCodeAsync(string barCode)
+        {
+            var whMaterialInventoryEntity = await _whMaterialInventoryRepository.GetByBarCodeAsync(barCode);
+            if (whMaterialInventoryEntity == null) return null;
+
+            return whMaterialInventoryEntity.ToModel<WhMaterialInventoryDto>();
+        }
+
+        /// <summary>
         /// 根据物料编码查询物料与供应商信息
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="materialCode"></param>
         /// <returns></returns>
         public async Task<ProcMaterialInfoViewDto> GetMaterialAndSupplierByMateialCodeIdAsync(string materialCode)
         {

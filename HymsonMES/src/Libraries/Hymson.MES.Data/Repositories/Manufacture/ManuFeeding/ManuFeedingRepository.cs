@@ -61,6 +61,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         }
     }
 
+
     /// <summary>
     /// 
     /// </summary>
@@ -68,6 +69,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
     {
         const string InsertSql = "INSERT INTO `manu_feeding`(  `Id`, `ResourceId`, `FeedingPointId`, `ProductId`, `BarCode`, `InitQty`, `Qty`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @ResourceId, @FeedingPointId, @ProductId, @BarCode, @InitQty, @Qty, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string DeleteSql = "UPDATE manu_feeding SET `IsDeleted` = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids;";
-        const string GetByResourceIdAndMaterialIds = @"SELECT * FROM `manu_feeding` WHERE IsDeleted = 0 AND ResourceId = @ResourceId AND ProductId IN @MaterialIds ";
+        const string GetByResourceIdAndMaterialIds = @"SELECT * FROM `manu_feeding` WHERE IsDeleted = 0 AND ResourceId = @ResourceId AND ProductId IN @MaterialIds; ";
     }
 }

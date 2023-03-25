@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: BOM表    服务 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-02-14 10:04:25
- */
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -19,7 +12,6 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using System.Security.Policy;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process

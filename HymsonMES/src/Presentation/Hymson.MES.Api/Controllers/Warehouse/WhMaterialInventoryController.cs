@@ -64,6 +64,16 @@ namespace Hymson.MES.Api.Controllers.Warehouse
             return await _whMaterialInventoryService.GetMaterialBarCodeAnyAsync(materialBarCode);
         }
 
+        /// <summary>
+        /// 根据物料条码查询
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <returns></returns>
+        [HttpGet("detail/{barCode}")]
+        public async Task<WhMaterialInventoryDto> QueryWhMaterialInventoryByBarCodeAsync(string barCode)
+        {
+            return await _whMaterialInventoryService.QueryWhMaterialInventoryByBarCodeAsync(barCode);
+        }
 
         /// <summary>
         /// 添加（物料库存）

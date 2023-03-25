@@ -210,7 +210,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             return list;
         }
 
-
         /// <summary>
         /// 添加（物料加载）
         /// </summary>
@@ -239,6 +238,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] idsArr)
         {
+            // TODO 需要往manu_feeding_record表也添加一条记录
+
             return await _manuFeedingRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = idsArr,
@@ -276,7 +277,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             var workOrdersOfFarm = await _planWorkOrderRepository.GetByWorkFarmIdAsync(workCenterId);
 
             // 通过产线查询工单
-            var workOrdersOfLine = await _planWorkOrderRepository.GetByWorkFarmIdAsync(workCenterId);
+            var workOrdersOfLine = await _planWorkOrderRepository.GetByWorkLineIdAsync(workCenterId);
 
             // 合并结果
             var workOrders = workOrdersOfFarm.Union(workOrdersOfLine);
