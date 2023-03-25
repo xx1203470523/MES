@@ -2,6 +2,7 @@
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Quality;
@@ -412,6 +413,10 @@ namespace Hymson.MES.Services.Mapper
         /// </summary>
         protected virtual void CreateManufactureMaps()
         {
+            #region ManuFeeding
+            CreateMap<ManuFeedingMaterialSaveDto, ManuFeedingEntity>();
+            #endregion
+
             #region QualityLock
             CreateMap<ManuSfcProducePagedQueryDto, ManuSfcProducePagedQuery>();
             #endregion

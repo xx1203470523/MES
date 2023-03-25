@@ -306,7 +306,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string GetByWorkFarmId = "SELECT PWO.* FROM plan_work_order PWO " +
             "LEFT JOIN inte_work_center_relation IWCR ON IWCR.WorkCenterId = PWO.WorkCenterId " +
             "LEFT JOIN inte_work_center IWC ON IWC.Id = IWCR.SubWorkCenterId " +
-            "WHERE PWO.WorkCenterType = @WorkCenterType AND IWCR.SubWorkCenterId = @workShopId ";
+            "WHERE PWO.WorkCenterType = @WorkCenterType AND IWCR.SubWorkCenterId = @workFarmId ";
         const string GetByWorkLineId = "SELECT * FROM plan_work_order WHERE WorkCenterType = @WorkCenterType AND WorkCenterId = @workLineId ";
 
         const string UpdateWorkOrderStatussSql = @"UPDATE `plan_work_order` SET Status = @Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";

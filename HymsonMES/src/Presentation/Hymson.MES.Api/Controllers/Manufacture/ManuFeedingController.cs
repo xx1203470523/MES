@@ -53,30 +53,27 @@ namespace Hymson.MES.Api.Controllers.Manufacture
             return await _manuFeedingService.GetFeedingMaterialListAsync(queryDto);
         }
 
-        /*
         /// <summary>
         /// 添加（物料加载）
         /// </summary>
-        /// <param name="createDto"></param>
+        /// <param name="saveDto"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task CreateAsync(InteContainerSaveDto createDto)
+        public async Task CreateAsync(ManuFeedingMaterialSaveDto saveDto)
         {
-            await _manuFeedingService.CreateAsync(createDto);
+            await _manuFeedingService.CreateAsync(saveDto);
         }
-        */
 
-        /*
         /// <summary>
-        /// 更新（容器维护）
+        /// 删除（物料加载）
         /// </summary>
-        /// <param name="modifyDto"></param>
+        /// <param name="ids"></param>
         /// <returns></returns>
-        [HttpPut]
-        public async Task ModifyAsync(InteContainerSaveDto modifyDto)
+        [HttpDelete]
+        public async Task DeletesAsync(long[] ids)
         {
-            await _inteContainerService.ModifyAsync(modifyDto);
+            await _manuFeedingService.DeletesAsync(ids);
         }
-        */
+
     }
 }

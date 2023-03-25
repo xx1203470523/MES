@@ -1,12 +1,18 @@
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Infrastructure.Mapper;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
+using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding;
+using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Sequences;
+using Hymson.Snowflake;
 using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
@@ -56,6 +62,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// </summary>
         private readonly IProcMaterialRepository _procMaterialRepository;
 
+        /// <summary>
+        ///  仓储（物料加载）
+        /// </summary>
+        private readonly IManuFeedingRepository _manuFeedingRepository;
+
 
         /// <summary>
         /// 
@@ -69,13 +80,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="procBomDetailRepository"></param>
         /// <param name="procMaterialRepository"></param>
+        /// <param name="manuFeedingRepository"></param>
         public ManuFeedingService(ICurrentUser currentUser, ICurrentSite currentSite, ISequenceService sequenceService,
             IProcResourceRepository procResourceRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
             IProcLoadPointLinkMaterialRepository procLoadPointLinkMaterialRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IProcBomDetailRepository procBomDetailRepository,
-            IProcMaterialRepository procMaterialRepository)
+            IProcMaterialRepository procMaterialRepository,
+            IManuFeedingRepository manuFeedingRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -85,6 +98,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             _planWorkOrderRepository = planWorkOrderRepository;
             _procBomDetailRepository = procBomDetailRepository;
             _procMaterialRepository = procMaterialRepository;
+            _manuFeedingRepository = manuFeedingRepository;
         }
 
 
@@ -122,6 +136,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
 
             // 读取资源绑定的产线
             var workCenter = await _inteWorkCenterRepository.GetByResourceIdAsync(queryDto.ResourceId);
+            if (workCenter == null) return list;
+
+            /*
             if (workCenter == null)
             {
                 materialIds = await GetMaterialIdsByResourceIdAsync(queryDto.ResourceId);
@@ -136,85 +153,99 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             {
                 materialIds = await GetMaterialIdsByWorkCenterIdAsync(workCenter.Id);
             }
+            else
+            {
+                return list;
+            }
+            */
+
+            // 通过产线->工单->BOM->查询物料
+            materialIds = await GetMaterialIdsByWorkCenterIdAsync(workCenter.Id);
 
             // 查询不到物料
-            if (materialIds == null) return list;
+            if (materialIds == null || materialIds.Any() == false) return list;
 
             // 通过物料ID获取物料集合
             var materials = await _procMaterialRepository.GetByIdsAsync(materialIds.ToArray());
+
+            // 通过物料ID获取物料库存信息
+            var manuFeedings = await _manuFeedingRepository.GetByResourceIdAndMaterialIdsAsync(new ManuFeedingQuery
+            {
+                ResourceId = queryDto.ResourceId,
+                MaterialIds = materialIds,
+            });
+
+            // 通过物料分组
+            var manuFeedingsDictionary = manuFeedings.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
+
+            // 填充返回集合
             foreach (var item in materials)
             {
-                // TODO
-            }
-
-            // TODO
-            for (int i = 1; i < 4; i++)
-            {
-                var item = new ManuFeedingMaterialDto
+                var material = new ManuFeedingMaterialDto
                 {
-                    MaterialId = i,
-                    MaterialCode = $"MaterialCode-{i}",
-                    MaterialName = $"{queryDto.ResourceId}",
-                    Version = $"v-{i}",
+                    MaterialId = item.Id,
+                    MaterialCode = item.MaterialCode,
+                    MaterialName = item.MaterialName,
+                    Version = item.Version ?? "-",
                     Children = new List<ManuFeedingMaterialItemDto>()
                 };
 
-                for (int j = 1; j < 4; j++)
+                if (manuFeedingsDictionary.TryGetValue(material.MaterialId, out var feedingEntities) == true)
                 {
-                    item.Children.Add(new ManuFeedingMaterialItemDto
+                    material.Children.AddRange(feedingEntities.Select(s => new ManuFeedingMaterialItemDto
                     {
-                        MaterialId = i,
-                        BarCode = $"BarCode-{j}",
-                        InitQty = new Random().Next(50, 100),
-                        Qty = new Random().Next(0, 20),
-                        UpdatedBy = _currentUser.UserName,
-                        UpdatedOn = HymsonClock.Now()
-                    });
+                        Id = s.Id,
+                        MaterialId = s.ProductId,
+                        BarCode = s.BarCode,
+                        InitQty = s.InitQty,
+                        Qty = s.Qty,
+                        UpdatedBy = s.UpdatedBy ?? "-",
+                        UpdatedOn = s.UpdatedOn ?? HymsonClock.Now()
+                    }));
                 }
 
-                list.Add(item);
+                list.Add(material);
             }
 
             return list;
         }
 
 
-        /*
         /// <summary>
-        /// 添加（容器维护）
+        /// 添加（物料加载）
         /// </summary>
-        /// <param name="createDto"></param>
+        /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(InteContainerSaveDto createDto)
+        public async Task<int> CreateAsync(ManuFeedingMaterialSaveDto saveDto)
         {
             //验证DTO
-            //await _validationCreateRules.ValidateAndThrowAsync(createDto);
+            //await _validationCreateRules.ValidateAndThrowAsync(saveDto);
 
             // DTO转换实体
-            var entity = createDto.ToEntity<InteContainerEntity>();
+            var entity = saveDto.ToEntity<ManuFeedingEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
             entity.SiteId = _currentSite.SiteId ?? 0;
 
             // 保存实体
-            return await _inteContainerRepository.InsertAsync(entity); ;
+            return await _manuFeedingRepository.InsertAsync(entity); ;
         }
 
         /// <summary>
-        /// 更新（容器维护）
+        /// 删除（物料加载）
         /// </summary>
-        /// <param name="modifyDto"></param>
+        /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> ModifyAsync(InteContainerSaveDto modifyDto)
+        public async Task<int> DeletesAsync(long[] idsArr)
         {
-            var entity = modifyDto.ToEntity<InteContainerEntity>();
-            entity.UpdatedBy = _currentUser.UserName;
-
-            // 更新实体
-            return await _inteContainerRepository.UpdateAsync(entity);
+            return await _manuFeedingRepository.DeletesAsync(new DeleteCommand
+            {
+                Ids = idsArr,
+                UserId = _currentUser.UserName,
+                DeleteOn = HymsonClock.Now()
+            });
         }
-        */
 
 
 
@@ -222,7 +253,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
 
         #region 内部方法
         /// <summary>
-        /// 通过资源ID获取物料ID集合
+        /// 通过资源ID关联上料点获取物料ID集合
         /// </summary>
         /// <param name="resourceId"></param>
         /// <returns></returns>
@@ -258,7 +289,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
 
             return materials.Select(s => s.MaterialId);
         }
-
         #endregion
 
     }

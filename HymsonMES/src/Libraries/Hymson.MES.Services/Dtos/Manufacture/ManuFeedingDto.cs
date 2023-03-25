@@ -1,4 +1,5 @@
-﻿using Hymson.MES.Core.Enums.Manufacture;
+﻿using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Manufacture;
 
 namespace Hymson.MES.Services.Dtos.Manufacture
 {
@@ -120,7 +121,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     /// <summary>
     /// 保存对象（物料加载）
     /// </summary>
-    public class ManuFeedingMaterialSaveDto
+    public record ManuFeedingMaterialSaveDto : BaseEntityDto
     {
         /// <summary>
         /// 物料ID
@@ -128,18 +129,18 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long ResourceId { get; set; }
 
         /// <summary>
+        /// 上料点ID
+        /// </summary>
+        public long? FeedingPointId { get; set; }
+
+        /// <summary>
+        /// 物料ID
+        /// </summary>
+        public long MaterialId { get; set; }
+
+        /// <summary>
         /// 物料条码
         /// </summary>
         public string BarCode { get; set; }
-
-        /// <summary>
-        /// 初始数量
-        /// </summary>
-        public decimal InitQty { get; set; }
-
-        /// <summary>
-        /// 剩余数量
-        /// </summary>
-        public decimal Qty { get; set; }
     }
 }
