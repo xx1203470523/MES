@@ -34,6 +34,8 @@
         public const string MES10219 = "此物料组不存在！";
         public const string MES10220 = "修改物料组失败！";
         public const string MES10221 = "已被分配物料，不允许删除！";
+        public const string MES10222 = "插入物料供应商关联表失败！";
+
         #endregion
 
         #region 资源 10300

@@ -247,6 +247,8 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 替代品集合
         /// </summary>
         public List<ProcMaterialReplaceDto>? DynamicList { get; set; } = new List<ProcMaterialReplaceDto>();
+
+        public List<ProcMaterialSupplierRelationCreateDto>?  MaterialSupplierList { get; set; } = new List<ProcMaterialSupplierRelationCreateDto>();
     }
 
     /// <summary>
@@ -400,6 +402,10 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public List<ProcMaterialReplaceDto>? DynamicList { get; set; } = new List<ProcMaterialReplaceDto>();
 
+        /// <summary>
+        /// 供应商
+        /// </summary>
+        public List<ProcMaterialSupplierRelationCreateDto>? MaterialSupplierList { get; set; } = new List<ProcMaterialSupplierRelationCreateDto>();
     }
 
     /// <summary>
@@ -539,4 +545,46 @@ namespace Hymson.MES.Services.Dtos.Process
         //public OperateTypeEnum OperationType { get; set; }
     }
 
+    /// <summary>
+    /// 物料关联供应商 视图
+    /// </summary>
+    public record ProcMaterialSupplierViewDto : BaseEntityDto
+    {
+        //
+        // 摘要:
+        //     唯一标识
+        public long Id { get; set; }
+
+        ////
+        //// 摘要:
+        ////     创建人
+        //public string CreatedBy { get; set; } = "";
+
+        ////
+        //// 摘要:
+        ////     创建时间
+        //public DateTime CreatedOn { get; set; }
+
+        /// <summary>
+        /// 物料ID
+        /// </summary>
+        public long MaterialId { get; set; }
+
+        /// <summary>
+        /// 供应商ID
+        /// </summary>
+        public long SupplierId { get; set; }
+
+        /// <summary>
+        /// 描述 :供应商编码 
+        /// 空值 : false  
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 描述 :供应商名称 
+        /// 空值 : false  
+        /// </summary>
+        public string Name { get; set; }
+    }
 }

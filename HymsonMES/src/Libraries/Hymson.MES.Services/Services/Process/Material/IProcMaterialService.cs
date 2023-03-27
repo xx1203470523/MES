@@ -63,5 +63,12 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcMaterialViewDto> QueryProcMaterialByIdAsync(long id);
+
+        /// <summary>
+        /// 根据物料ID查询对应的关联供应商
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<List<ProcMaterialSupplierViewDto>> QueryProcMaterialSupplierByMaterialIdAsync(long id);
     }
 }

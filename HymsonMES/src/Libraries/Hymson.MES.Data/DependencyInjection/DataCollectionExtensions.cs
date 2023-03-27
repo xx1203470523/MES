@@ -101,6 +101,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcReplaceMaterialRepository, ProcReplaceMaterialRepository>();
 
             services.AddSingleton<IProcMaterialGroupRepository, ProcMaterialGroupRepository>();
+
+            services.AddSingleton<IProcMaterialSupplierRelationRepository, ProcMaterialSupplierRelationRepository>();
             #endregion
 
             #region Parameter

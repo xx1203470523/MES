@@ -21,6 +21,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils;
 using Org.BouncyCastle.Crypto;
+using System.Runtime.Intrinsics.X86;
 using System.Security.Policy;
 using System.Transactions;
 
@@ -39,11 +40,12 @@ namespace Hymson.MES.Services.Services.Process
         private readonly AbstractValidator<ProcMaterialModifyDto> _validationModifyRules;
 
         private readonly IProcReplaceMaterialRepository _procReplaceMaterialRepository;
+        private readonly IProcMaterialSupplierRelationRepository _procMaterialSupplierRelationRepository;
 
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
 
-        public ProcMaterialService(ICurrentUser currentUser, IProcMaterialRepository procMaterialRepository, AbstractValidator<ProcMaterialCreateDto> validationCreateRules, AbstractValidator<ProcMaterialModifyDto> validationModifyRules, IProcReplaceMaterialRepository procReplaceMaterialRepository, ICurrentSite currentSite)
+        public ProcMaterialService(ICurrentUser currentUser, IProcMaterialRepository procMaterialRepository, AbstractValidator<ProcMaterialCreateDto> validationCreateRules, AbstractValidator<ProcMaterialModifyDto> validationModifyRules, IProcReplaceMaterialRepository procReplaceMaterialRepository, ICurrentSite currentSite, IProcMaterialSupplierRelationRepository procMaterialSupplierRelationRepository)
         {
             _currentUser = currentUser;
             _procMaterialRepository = procMaterialRepository;
@@ -52,6 +54,7 @@ namespace Hymson.MES.Services.Services.Process
 
             _procReplaceMaterialRepository = procReplaceMaterialRepository;
             _currentSite = currentSite;
+            _procMaterialSupplierRelationRepository = procMaterialSupplierRelationRepository;
         }
 
         /// <summary>
@@ -118,6 +121,24 @@ namespace Hymson.MES.Services.Services.Process
                     addProcReplaceList.Add(procReplaceMaterial);
                 }
             }
+
+            //供应商
+            List<ProcMaterialSupplierRelationEntity> addMaterialSupplierList = new List<ProcMaterialSupplierRelationEntity>();
+            if (procMaterialCreateDto.MaterialSupplierList != null && procMaterialCreateDto.MaterialSupplierList.Count > 0)
+            {
+                foreach (var item in procMaterialCreateDto.MaterialSupplierList)
+                {
+                    ProcMaterialSupplierRelationEntity materialSupplier = new ProcMaterialSupplierRelationEntity();
+                    materialSupplier.Id = IdGenProvider.Instance.CreateId();
+                    materialSupplier.SupplierId = item.SupplierId;
+                    materialSupplier.MaterialId = procMaterialEntity.Id;
+
+                    materialSupplier.CreatedBy = _currentUser.UserName;
+                    materialSupplier.CreatedOn = HymsonClock.Now();
+                    addMaterialSupplierList.Add(materialSupplier);
+                }
+            }
+
             #endregion
 
             #region 保存到数据库
@@ -138,6 +159,16 @@ namespace Hymson.MES.Services.Services.Process
                     response = await _procReplaceMaterialRepository.InsertsAsync(addProcReplaceList);
 
                     if (response != procMaterialCreateDto.DynamicList.Count)
+                    {
+                        throw new BusinessException(nameof(ErrorCode.MES10202));
+                    }
+                }
+
+                if (procMaterialCreateDto.MaterialSupplierList != null && procMaterialCreateDto.MaterialSupplierList.Count > 0) 
+                {
+                    response = await _procMaterialSupplierRelationRepository.InsertsAsync(addMaterialSupplierList);
+
+                    if (response != procMaterialCreateDto.MaterialSupplierList.Count)
                     {
                         throw new BusinessException(nameof(ErrorCode.MES10202));
                     }
@@ -301,6 +332,23 @@ namespace Hymson.MES.Services.Services.Process
                     addProcReplaceList.Add(procReplaceMaterial);
                 }
             }
+
+            //供应商
+            List<ProcMaterialSupplierRelationEntity> addMaterialSupplierList = new List<ProcMaterialSupplierRelationEntity>();
+            if (procMaterialModifyDto.MaterialSupplierList != null && procMaterialModifyDto.MaterialSupplierList.Count > 0)
+            {
+                foreach (var item in procMaterialModifyDto.MaterialSupplierList)
+                {
+                    ProcMaterialSupplierRelationEntity materialSupplier = new ProcMaterialSupplierRelationEntity();
+                    materialSupplier.Id = IdGenProvider.Instance.CreateId();
+                    materialSupplier.SupplierId = item.SupplierId;
+                    materialSupplier.MaterialId = procMaterialEntity.Id;
+
+                    materialSupplier.CreatedBy = _currentUser.UserName;
+                    materialSupplier.CreatedOn = HymsonClock.Now();
+                    addMaterialSupplierList.Add(materialSupplier);
+                }
+            }
             #endregion 
 
             #region 操作数据库
@@ -357,13 +405,26 @@ namespace Hymson.MES.Services.Services.Process
                     }
                 }
 
+
+                //先真删除关联供应商
+                response = await _procMaterialSupplierRelationRepository.DeleteTrueByMaterialIdsAsync(new long[] { procMaterialEntity.Id });
+
+                if (procMaterialModifyDto.MaterialSupplierList != null && procMaterialModifyDto.MaterialSupplierList.Count > 0)
+                {
+                    response = await _procMaterialSupplierRelationRepository.InsertsAsync(addMaterialSupplierList);
+
+                    if (response != procMaterialModifyDto.MaterialSupplierList.Count)
+                    {
+                        throw new BusinessException(nameof(ErrorCode.MES10222));
+                    }
+                }
+
                 ts.Complete();
             }
 
 
             #endregion
 
-            //await _procMaterialRepository.UpdateAsync(procMaterialEntity);
         }
 
         /// <summary>
@@ -392,6 +453,25 @@ namespace Hymson.MES.Services.Services.Process
                 return procMaterialViewDto;
             }
             return null;
+        }
+
+        /// <summary>
+        /// 根据物料ID查询对应的关联供应商
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<List<ProcMaterialSupplierViewDto>> QueryProcMaterialSupplierByMaterialIdAsync(long id)
+        {
+            List<ProcMaterialSupplierViewDto> list = new List<ProcMaterialSupplierViewDto>();
+
+            //查询关联的供应商
+            var materialSuppliers = await _procMaterialSupplierRelationRepository.GetByMaterialIdAsync(id);
+            foreach (var item in materialSuppliers)
+            {
+                list.Add(item.ToModel<ProcMaterialSupplierViewDto>());
+            }
+
+            return list;
         }
 
         #region 业务扩展方法
