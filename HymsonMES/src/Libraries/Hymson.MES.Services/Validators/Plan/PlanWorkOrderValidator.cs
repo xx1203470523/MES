@@ -6,6 +6,7 @@
  *build datetime: 2023-03-20 10:07:17
  */
 using FluentValidation;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Services.Dtos.Plan;
 using System;
 using System.Collections.Generic;
@@ -22,8 +23,23 @@ namespace Hymson.MES.Services.Validators.Plan
     {
         public PlanWorkOrderCreateValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
+            RuleFor(x => x.OrderCode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16020));
+            RuleFor(x => x.ProductId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16021));
+            RuleFor(x => x.Qty).GreaterThanOrEqualTo(0).WithErrorCode(nameof(ErrorCode.MES16022));
+            RuleFor(x => x.ProductBOMId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16023));
+            RuleFor(x => x.ProcessRouteId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16024));
+            RuleFor(x => x.WorkCenterId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16025));
+            RuleFor(x => x.Type).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16026));
+            RuleFor(x => x.PlanStartTime).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16027));
+            RuleFor(x => x.PlanEndTime).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16028));
+
+            RuleFor(x => x.PlanStartTime).LessThanOrEqualTo(x=>x.PlanEndTime).WithErrorCode(nameof(ErrorCode.MES16029));
+            //RuleFor(x => x.PlanStartTime).Must((x,planStatTime)=>x.PlanStartTime<=x.PlanEndTime).WithErrorCode(nameof(ErrorCode.MES16028));
+
+            RuleFor(x => x.OrderCode).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES16030));
+            RuleFor(x => x.Remark).MaximumLength(500).WithErrorCode(nameof(ErrorCode.MES16031));
+            RuleFor(x => x.OverScale).GreaterThanOrEqualTo(0).WithErrorCode(nameof(ErrorCode.MES16034));
+
         }
     }
 
@@ -34,8 +50,26 @@ namespace Hymson.MES.Services.Validators.Plan
     {
         public PlanWorkOrderModifyValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
+            RuleFor(x => x.Id).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16032));
+            RuleFor(x => x.Status).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16033));
+
+            RuleFor(x => x.OrderCode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16020));
+            RuleFor(x => x.ProductId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16021));
+            RuleFor(x => x.Qty).GreaterThanOrEqualTo(0).WithErrorCode(nameof(ErrorCode.MES16022));
+            RuleFor(x => x.ProductBOMId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16023));
+            RuleFor(x => x.ProcessRouteId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16024));
+            RuleFor(x => x.WorkCenterId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16025));
+            RuleFor(x => x.Type).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16026));
+            RuleFor(x => x.PlanStartTime).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16027));
+            RuleFor(x => x.PlanEndTime).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16028));
+
+            RuleFor(x => x.PlanStartTime).LessThanOrEqualTo(x => x.PlanEndTime).WithErrorCode(nameof(ErrorCode.MES16029));
+            //RuleFor(x => x.PlanStartTime).Must((x,planStatTime)=>x.PlanStartTime<=x.PlanEndTime).WithErrorCode(nameof(ErrorCode.MES16028));
+
+            RuleFor(x => x.OrderCode).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES16030));
+            RuleFor(x => x.Remark).MaximumLength(500).WithErrorCode(nameof(ErrorCode.MES16031));
+
+            RuleFor(x => x.OverScale).GreaterThanOrEqualTo(0).WithErrorCode(nameof(ErrorCode.MES16034));
         }
     }
 }

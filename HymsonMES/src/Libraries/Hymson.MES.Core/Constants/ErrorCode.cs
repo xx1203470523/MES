@@ -185,6 +185,25 @@
 
         public const string MES12402 = "代码规则新增失败";
 
+        public const string MES12410 = "物料 不能为空！";
+        public const string MES12411 = "编码类型 不能为空！";
+        public const string MES12412 = "基数 不能为空！";
+        public const string MES12413 = "增量 必须大于0！";
+        public const string MES12414 = "序列长度 不能小于0！";
+        public const string MES12415 = "重置序号 不能为空！";
+
+        public const string MES12416 = "编码规则组成 不能为空！";
+
+        public const string MES12417 = "忽略字符 超过最大长度,最大长度为100！";
+        public const string MES12418 = "编码规则描述 超过最大长度,最大长度为255！";
+        public const string MES12419 = "编码规则Id 不能为空！";
+
+        public const string MES12430 = "编码规则组成序号 不能为空！";
+        public const string MES12431 = "编码规则组成取值方式 不能为空！";
+        public const string MES12432 = "编码规则组成分段值 不能为空！";
+        public const string MES12433 = "编码规则组成分段值 超过最大长度 ，最大长度为100！";
+        public const string MES12434 = "编码规则组成备注 超过最大长度 ，最大长度为255！";
+
         #endregion
 
         //设备
@@ -278,6 +297,25 @@
         public const string MES16011 = "修改生产工单状态失败：有工单不为生产中,不允许完工";
         public const string MES16012 = "修改生产工单状态失败：有工单不为完工,不允许关闭";
         public const string MES16013 = "工单状态不为未开始,不允许删除";
+
+        public const string MES16020 = "工单号 不能为空！";
+        public const string MES16021 = "物料编码 不能为空！";
+        public const string MES16022 = "数量 不能小于0！";
+        public const string MES16023 = "产品Bom 不能为空！";
+        public const string MES16024 = "工艺路线 不能为空！";
+        public const string MES16025 = "工作中心 不能为空！";
+        public const string MES16026 = "工单类型 不能为空！";
+        public const string MES16027 = "计划开始时间 不能为空！";
+        public const string MES16028 = "计划结束时间 不能为空！";
+        public const string MES16029 = "计划开始时间必须要小于等于计划结束时间！";
+        public const string MES16030 = "工单号 超过最大长度，最大长度为100！";
+        public const string MES16031 = "备注 超过最大长度，最大长度为500！";
+
+        public const string MES16032 = "工单Id 不能为空！";
+        public const string MES16033 = "工单状态 不能为空！";
+
+        public const string MES16034 = "超生产比例 不能小于0！";
+
         #endregion
 
         #region 条码接收 16100

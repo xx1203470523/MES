@@ -202,7 +202,7 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// <summary>
         /// 超生产比例;默认是0，若允许超产，则写超产的%比例
         /// </summary>
-        public decimal OverScale { get; set; }
+        public decimal OverScale { get; set; } = 0;
 
         /// <summary>
         /// 备注
@@ -275,11 +275,6 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// </summary>
         public DateTime? PlanEndTime { get; set; }
 
-       /// <summary>
-        /// 工厂
-        /// </summary>
-        public long SiteId { get; set; }
-
         /// <summary>
         /// 是否锁定
         /// </summary>
@@ -288,7 +283,7 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// <summary>
         /// 超生产比例;默认是0，若允许超产，则写超产的%比例
         /// </summary>
-        public decimal OverScale { get; set; }
+        public decimal OverScale { get; set; } = 0;
 
         /// <summary>
         /// 备注

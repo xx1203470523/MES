@@ -6,6 +6,7 @@
  *build datetime: 2023-03-17 05:02:19
  */
 using FluentValidation;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Services.Dtos.Integrated;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,13 @@ namespace Hymson.MES.Services.Validators.Integrated
     {
         public InteCodeRulesMakeCreateValidator()
         {
+            RuleFor(x => x.Seq).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12430));
+            RuleFor(x => x.ValueTakingType).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12431));
+            RuleFor(x => x.SegmentedValue).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12432));
+
+            RuleFor(x => x.SegmentedValue).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES12433));
+            RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES12434));
+
             //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");
             //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
         }
@@ -34,8 +42,9 @@ namespace Hymson.MES.Services.Validators.Integrated
     {
         public InteCodeRulesMakeModifyValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
+            
+
         }
     }
+
 }

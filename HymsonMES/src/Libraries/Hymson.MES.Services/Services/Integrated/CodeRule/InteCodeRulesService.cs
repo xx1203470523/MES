@@ -46,8 +46,10 @@ namespace Hymson.MES.Services.Services.Integrated
 
         private readonly IInteCodeRulesMakeRepository _inteCodeRulesMakeRepository;
 
+        private readonly AbstractValidator<InteCodeRulesMakeCreateDto> _validationMakeCreateRules;
+
         public InteCodeRulesService(ICurrentUser currentUser, ICurrentSite currentSite, IInteCodeRulesRepository inteCodeRulesRepository, 
-ISequenceService sequenceService,AbstractValidator<InteCodeRulesCreateDto> validationCreateRules, AbstractValidator<InteCodeRulesModifyDto> validationModifyRules, IProcMaterialRepository procMaterialRepository, IInteCodeRulesMakeRepository inteCodeRulesMakeRepository)
+ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> validationCreateRules, AbstractValidator<InteCodeRulesModifyDto> validationModifyRules, IProcMaterialRepository procMaterialRepository, IInteCodeRulesMakeRepository inteCodeRulesMakeRepository, AbstractValidator<InteCodeRulesMakeCreateDto> validationMakeCreateRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -58,7 +60,8 @@ ISequenceService sequenceService,AbstractValidator<InteCodeRulesCreateDto> valid
             _validationModifyRules = validationModifyRules;
 
             _procMaterialRepository = procMaterialRepository;
-            _inteCodeRulesMakeRepository= inteCodeRulesMakeRepository;
+            _inteCodeRulesMakeRepository = inteCodeRulesMakeRepository;
+            _validationMakeCreateRules = validationMakeCreateRules;
         }
 
         /// <summary>
@@ -76,6 +79,10 @@ ISequenceService sequenceService,AbstractValidator<InteCodeRulesCreateDto> valid
 
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(inteCodeRulesCreateDto);
+            foreach (var item in inteCodeRulesCreateDto.CodeRulesMakes)
+            {
+                await _validationMakeCreateRules.ValidateAndThrowAsync(item);
+            }
 
             //DTO转换实体
             var inteCodeRulesEntity = inteCodeRulesCreateDto.ToEntity<InteCodeRulesEntity>();
@@ -195,6 +202,10 @@ ISequenceService sequenceService,AbstractValidator<InteCodeRulesCreateDto> valid
         {
              //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(inteCodeRulesModifyDto);
+            foreach (var item in inteCodeRulesModifyDto.CodeRulesMakes)
+            {
+                await _validationMakeCreateRules.ValidateAndThrowAsync(item);
+            }
 
             //DTO转换实体
             var inteCodeRulesEntity = inteCodeRulesModifyDto.ToEntity<InteCodeRulesEntity>();

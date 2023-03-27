@@ -159,7 +159,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 编码规则
         /// </summary>
-        public List<InteCodeRulesMakeDto> CodeRulesMakes { get;set;}
+        public List<InteCodeRulesMakeCreateDto> CodeRulesMakes { get;set;}
 
     }
 
@@ -222,7 +222,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 编码规则
         /// </summary>
-        public List<InteCodeRulesMakeDto> CodeRulesMakes { get; set; }
+        public List<InteCodeRulesMakeCreateDto> CodeRulesMakes { get; set; }
     }
 
     /// <summary>
