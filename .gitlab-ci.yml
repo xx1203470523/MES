@@ -14,4 +14,4 @@ sonarqube-check:
       - "sudo /root/.dotnet/tools/dotnet-sonarscanner end /d:sonar.login=\"$SONAR_TOKEN\""
   allow_failure: true
   only:
-    - dev
+    - main
