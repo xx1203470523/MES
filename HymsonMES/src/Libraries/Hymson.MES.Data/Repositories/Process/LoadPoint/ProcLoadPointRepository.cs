@@ -1,18 +1,8 @@
-/*
- *creator: Karl
- *
- *describe: 上料点表 仓储类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-02-17 08:57:53
- */
-
 using Dapper;
 using Hymson.Infrastructure;
-using Hymson.Infrastructure.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -23,12 +13,20 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public partial class ProcLoadPointRepository : IProcLoadPointRepository
     {
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly ConnectionOptions _connectionOptions;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
         public ProcLoadPointRepository(IOptions<ConnectionOptions> connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
         }
+
 
         /// <summary>
         /// 删除（软删除）
@@ -73,6 +71,17 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ProcLoadPointEntity>(GetByIdsSql, new { ids = ids });
+        }
+
+        /// <summary>
+        /// 根据IDs批量获取数据
+        /// </summary>
+        /// <param name="resourceId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcLoadPointEntity>> GetByResourceIdAsync(long resourceId)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcLoadPointEntity>(GetByResourceId, new { resourceId });
         }
 
         /// <summary>
@@ -188,6 +197,9 @@ namespace Hymson.MES.Data.Repositories.Process
 
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class ProcLoadPointRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_load_point` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
@@ -208,5 +220,8 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `LoadPoint`, `LoadPointName`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_load_point`  WHERE Id IN @ids ";
+        const string GetByResourceId = @"SELECT PLP.* FROM proc_load_point PLP
+                                LEFT JOIN proc_load_point_link_resource PLPLR ON PLPLR.LoadPointId = PLP.Id
+                                WHERE PLPLR.ResourceId = @resourceId ";
     }
 }

@@ -36,7 +36,29 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     }
 
     /// <summary>
-    /// 物料查询对象
+    /// 查询对象（上料点）
+    /// </summary>
+    public class ManuFeedingLoadPointQueryDto
+    {
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
+    }
+
+    /// <summary>
+    /// 查询对象（工单）
+    /// </summary>
+    public class ManuFeedingWorkOrderQueryDto
+    {
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
+    }
+
+    /// <summary>
+    /// 查询对象（物料）
     /// </summary>
     public class ManuFeedingMaterialQueryDto
     {
@@ -44,6 +66,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 资源ID
         /// </summary>
         public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 工单ID
+        /// </summary>
+        public long? WorkOrderId { get; set; }
     }
 
     /// <summary>

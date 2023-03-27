@@ -1,11 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 上料点关联物料表 仓储类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-02-18 09:31:10
- */
-
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
@@ -21,12 +13,20 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public partial class ProcLoadPointLinkMaterialRepository : IProcLoadPointLinkMaterialRepository
     {
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly ConnectionOptions _connectionOptions;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
         public ProcLoadPointLinkMaterialRepository(IOptions<ConnectionOptions> connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
         }
+
 
         /// <summary>
         /// 删除（软删除）
@@ -196,9 +196,12 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdatesSql, procLoadPointLinkMaterialEntitys);
         }
-
     }
 
+
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class ProcLoadPointLinkMaterialRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_load_point_link_material` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
@@ -230,6 +233,6 @@ namespace Hymson.MES.Data.Repositories.Process
                             WHERE a.IsDeleted =0 
                             AND a.LoadPointId IN @ids  
                             order by a.CreatedOn Desc ";
-
     }
+
 }

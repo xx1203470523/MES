@@ -1,7 +1,9 @@
+using Google.Protobuf.WellKnownTypes;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -10,6 +12,7 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Sequences;
 using Hymson.Snowflake;
@@ -41,6 +44,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         ///  仓储（工作中心资源关联）
         /// </summary>
         private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
+
+        /// <summary>
+        ///  仓储（上料点）
+        /// </summary>
+        private readonly IProcLoadPointRepository _procLoadPointRepository;
 
         /// <summary>
         ///  仓储（上料点物料关联）
@@ -76,6 +84,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// <param name="sequenceService"></param>
         /// <param name="procResourceRepository"></param>
         /// <param name="inteWorkCenterRepository"></param>
+        /// <param name="procLoadPointRepository"></param>
         /// <param name="procLoadPointLinkMaterialRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="procBomDetailRepository"></param>
@@ -84,6 +93,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         public ManuFeedingService(ICurrentUser currentUser, ICurrentSite currentSite, ISequenceService sequenceService,
             IProcResourceRepository procResourceRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
+            IProcLoadPointRepository procLoadPointRepository,
             IProcLoadPointLinkMaterialRepository procLoadPointLinkMaterialRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IProcBomDetailRepository procBomDetailRepository,
@@ -94,6 +104,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             _currentSite = currentSite;
             _procResourceRepository = procResourceRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
+            _procLoadPointRepository = procLoadPointRepository;
             _procLoadPointLinkMaterialRepository = procLoadPointLinkMaterialRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _procBomDetailRepository = procBomDetailRepository;
@@ -107,7 +118,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuFeedingResourceDto>> GetFeedingResourceListAsync(ManuFeedingResourceQueryDto queryDto)
+        public async Task<IEnumerable<SelectOptionDto>> GetFeedingResourceListAsync(ManuFeedingResourceQueryDto queryDto)
         {
             List<ProcResourceEntity> resources = new();
             switch (queryDto.Source)
@@ -121,7 +132,58 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                     break;
             }
 
-            return resources.Select(s => new ManuFeedingResourceDto { ResourceId = s.Id, ResourceCode = s.ResCode });
+            return resources.Select(s => new SelectOptionDto
+            {
+                Key = $"{s.Id}",
+                Label = s.ResCode,
+                Value = $"{s.Id}"
+            });
+        }
+
+        /// <summary>
+        /// 查询上料点（物料加载）
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<SelectOptionDto>> GetFeedingLoadPointListAsync(ManuFeedingLoadPointQueryDto queryDto)
+        {
+            List<SelectOptionDto> list = new();
+
+            // 通过资源->上料点
+            var loadPoints = await _procLoadPointRepository.GetByResourceIdAsync(queryDto.ResourceId);
+            if (loadPoints == null) return list;
+
+            return loadPoints.Select(s => new SelectOptionDto
+            {
+                Key = $"{s.Id}",
+                Label = s.LoadPoint,
+                Value = $"{s.Id}"
+            });
+        }
+
+        /// <summary>
+        /// 查询工单（物料加载）
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<SelectOptionDto>> GetFeedingWorkOrderListAsync(ManuFeedingWorkOrderQueryDto queryDto)
+        {
+            List<SelectOptionDto> list = new();
+
+            // 读取资源绑定的产线
+            var workCenter = await _inteWorkCenterRepository.GetByResourceIdAsync(queryDto.ResourceId);
+            if (workCenter == null) return list;
+
+            // 通过产线->工单
+            var workOrders = await GetWorkOrderByWorkCenterIdAsync(workCenter.Id);
+            if (workOrders == null) return list;
+
+            return workOrders.Select(s => new SelectOptionDto
+            {
+                Key = $"{s.Id}",
+                Label = s.OrderCode,
+                Value = $"{s.Id}"
+            });
         }
 
         /// <summary>
@@ -267,11 +329,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         }
 
         /// <summary>
-        /// 通过工作中心ID获取物料ID集合
+        /// 通过工作中心ID获取工单集合
         /// </summary>
         /// <param name="workCenterId"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<long>?> GetMaterialIdsByWorkCenterIdAsync(long workCenterId)
+        private async Task<IEnumerable<PlanWorkOrderEntity>?> GetWorkOrderByWorkCenterIdAsync(long workCenterId)
         {
             // 通过车间查询工单
             var workOrdersOfFarm = await _planWorkOrderRepository.GetByWorkFarmIdAsync(workCenterId);
@@ -281,6 +343,17 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
 
             // 合并结果
             var workOrders = workOrdersOfFarm.Union(workOrdersOfLine);
+            return workOrders;
+        }
+
+        /// <summary>
+        /// 通过工作中心ID获取物料ID集合
+        /// </summary>
+        /// <param name="workCenterId"></param>
+        /// <returns></returns>
+        private async Task<IEnumerable<long>?> GetMaterialIdsByWorkCenterIdAsync(long workCenterId)
+        {
+            var workOrders = await GetWorkOrderByWorkCenterIdAsync(workCenterId);
             if (workOrders == null) return null;
 
             // 通过工单查询BOM
