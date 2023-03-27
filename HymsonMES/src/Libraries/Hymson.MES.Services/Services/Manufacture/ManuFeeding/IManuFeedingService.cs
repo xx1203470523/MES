@@ -1,3 +1,4 @@
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
@@ -12,7 +13,21 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuFeedingResourceDto>> GetFeedingResourceListAsync(ManuFeedingResourceQueryDto queryDto);
+        Task<IEnumerable<SelectOptionDto>> GetFeedingResourceListAsync(ManuFeedingResourceQueryDto queryDto);
+
+        /// <summary>
+        /// 查询上料点（物料加载）
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        Task<IEnumerable<SelectOptionDto>> GetFeedingLoadPointListAsync(ManuFeedingLoadPointQueryDto queryDto);
+
+        /// <summary>
+        /// 查询工单（物料加载）
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        Task<IEnumerable<SelectOptionDto>> GetFeedingWorkOrderListAsync(ManuFeedingWorkOrderQueryDto queryDto);
 
         /// <summary>
         /// 查询物料（物料加载）

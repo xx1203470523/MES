@@ -300,10 +300,12 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// </summary>
         /// <param name="barCode"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<WhMaterialInventoryDto>> QueryWhMaterialInventoryByBarCodeAsync(string barCode)
+        public async Task<WhMaterialInventoryDto?> QueryWhMaterialInventoryByBarCodeAsync(string barCode)
         {
-            var entities = await _whMaterialInventoryRepository.GetByBarCodeAsync(barCode);
-            return entities.Select(s => s.ToModel<WhMaterialInventoryDto>());
+            var entity = await _whMaterialInventoryRepository.GetByBarCodeAsync(barCode);
+            if (entity == null) return null;
+
+            return entity.ToModel<WhMaterialInventoryDto>();
         }
 
         /// <summary>

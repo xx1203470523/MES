@@ -1,3 +1,4 @@
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuFeeding;
 using Microsoft.AspNetCore.Authorization;
@@ -37,9 +38,31 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="queryDto"></param>
         /// <returns></returns>
         [HttpGet("resource")]
-        public async Task<IEnumerable<ManuFeedingResourceDto>> GetFeedingResourceListAsync([FromQuery] ManuFeedingResourceQueryDto queryDto)
+        public async Task<IEnumerable<SelectOptionDto>> GetFeedingResourceListAsync([FromQuery] ManuFeedingResourceQueryDto queryDto)
         {
             return await _manuFeedingService.GetFeedingResourceListAsync(queryDto);
+        }
+
+        /// <summary>
+        /// 查工单（物料加载）
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        [HttpGet("loadPoint")]
+        public async Task<IEnumerable<SelectOptionDto>> GetFeedingLoadPointListAsync([FromQuery] ManuFeedingLoadPointQueryDto queryDto)
+        {
+            return await _manuFeedingService.GetFeedingLoadPointListAsync(queryDto);
+        }
+
+        /// <summary>
+        /// 查工单（物料加载）
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        [HttpGet("workOder")]
+        public async Task<IEnumerable<SelectOptionDto>> GetFeedingWorkOrderListAsync([FromQuery] ManuFeedingWorkOrderQueryDto queryDto)
+        {
+            return await _manuFeedingService.GetFeedingWorkOrderListAsync(queryDto);
         }
 
         /// <summary>

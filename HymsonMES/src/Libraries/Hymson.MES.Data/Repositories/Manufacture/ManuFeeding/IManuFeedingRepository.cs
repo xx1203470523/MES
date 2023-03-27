@@ -24,6 +24,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         Task<int> DeletesAsync(DeleteCommand command);
 
         /// <summary>
+        /// 批量删除
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<int> DeleteByIdsAsync(long[] ids);
+
+        /// <summary>
+        /// 获取加载数据列表
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuFeedingEntity>> GetByIdsAsync(long[] ids);
+
+        /// <summary>
         /// 获取加载数据列表
         /// </summary>
         /// <param name="query"></param>

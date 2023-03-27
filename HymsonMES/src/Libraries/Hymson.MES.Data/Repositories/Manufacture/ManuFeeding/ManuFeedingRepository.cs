@@ -50,6 +50,28 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         }
 
         /// <summary>
+        /// 批量删除
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteByIdsAsync(long[] ids)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeleteByIds, new { ids });
+        }
+
+        /// <summary>
+        /// 获取加载数据列表
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuFeedingEntity>> GetByIdsAsync(long[] ids)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ManuFeedingEntity>(GetByIds, new { ids });
+        }
+
+        /// <summary>
         /// 获取加载数据列表
         /// </summary>
         /// <param name="query"></param>
@@ -69,6 +91,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
     {
         const string InsertSql = "INSERT INTO `manu_feeding`(  `Id`, `ResourceId`, `FeedingPointId`, `ProductId`, `BarCode`, `InitQty`, `Qty`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @ResourceId, @FeedingPointId, @ProductId, @BarCode, @InitQty, @Qty, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string DeleteSql = "UPDATE manu_feeding SET `IsDeleted` = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids;";
-        const string GetByResourceIdAndMaterialIds = @"SELECT * FROM `manu_feeding` WHERE IsDeleted = 0 AND ResourceId = @ResourceId AND ProductId IN @MaterialIds; ";
+        const string DeleteByIds = "DELETE FROM manu_feeding WHERE Id IN @ids; ";
+        const string GetByIds = "SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND Id IN @ids; ";
+        const string GetByResourceIdAndMaterialIds = "SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND ResourceId = @ResourceId AND ProductId IN @MaterialIds; ";
     }
 }

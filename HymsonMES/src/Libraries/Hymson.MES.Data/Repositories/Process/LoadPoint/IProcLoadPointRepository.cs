@@ -7,7 +7,9 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +29,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procLoadPointEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ProcLoadPointEntity procLoadPointEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -41,7 +43,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procLoadPointEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ProcLoadPointEntity procLoadPointEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -69,7 +71,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcLoadPointEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -78,12 +80,19 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<IEnumerable<ProcLoadPointEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
+        /// 根据IDs批量获取数据
+        /// </summary>
+        /// <param name="resourceId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcLoadPointEntity>> GetByResourceIdAsync(long resourceId);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="procLoadPointQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcLoadPointEntity>> GetProcLoadPointEntitiesAsync(ProcLoadPointQuery procLoadPointQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>

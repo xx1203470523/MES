@@ -166,6 +166,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region Manufacture
             services.AddSingleton<IManuFeedingRepository, ManuFeedingRepository>();
+            services.AddSingleton<IManuFeedingRecordRepository, ManuFeedingRecordRepository>();
             services.AddSingleton<IManuSfcProduceRepository, ManuSfcProduceRepository>();
             services.AddSingleton<IManuSfcInfoRepository, ManuSfcInfoRepository>();
             services.AddSingleton<IManuSfcStepRepository, ManuSfcStepRepository>();
@@ -186,7 +187,7 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region PlanSfcReceive
-            services.AddSingleton<IPlanSfcReceiveRepository, PlanSfcReceiveRepository>(); 
+            services.AddSingleton<IPlanSfcReceiveRepository, PlanSfcReceiveRepository>();
             #endregion
             #endregion
 

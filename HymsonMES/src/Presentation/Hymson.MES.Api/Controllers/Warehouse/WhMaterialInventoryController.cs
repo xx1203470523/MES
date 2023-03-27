@@ -70,7 +70,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <param name="barCode"></param>
         /// <returns></returns>
         [HttpGet("barCode/{barCode}")]
-        public async Task<IEnumerable<WhMaterialInventoryDto>> QueryWhMaterialInventoryByBarCodeAsync(string barCode)
+        public async Task<WhMaterialInventoryDto?> QueryWhMaterialInventoryByBarCodeAsync(string barCode)
         {
             return await _whMaterialInventoryService.QueryWhMaterialInventoryByBarCodeAsync(barCode);
         }
