@@ -97,10 +97,21 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 描述 :状态 
         /// 空值 : false  
         /// </summary>
-        public int? Status { get; set; } 
+        public int? Status { get; set; }
     }
 
-    public record ProcResourceViewDto: ProcResourceDto
+    /// <summary>
+    /// 资源维护表：根据工序查询资源列表
+    /// </summary>
+    public class ProcResourceProcedurePagedQueryDto : PagerInfo
+    {
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public long? ProcedureId { get; set; }
+    }
+
+    public record ProcResourceViewDto : ProcResourceDto
     {
         /// <summary>
         /// 资源
@@ -116,7 +127,7 @@ namespace Hymson.MES.Services.Dtos.Process
     /// <summary>
     /// 资源新增实体类
     /// </summary>
-    public record ProcResourceCreateDto:BaseEntityDto
+    public record ProcResourceCreateDto : BaseEntityDto
     {
         /// <summary>
         /// 资源代码

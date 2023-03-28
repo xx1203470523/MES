@@ -61,4 +61,21 @@ namespace Hymson.MES.Data.Repositories.Process.Resource
         /// </summary>
         public int? Status { get; set; }
     }
+
+
+    /// <summary>
+    /// 资源维护表：根据工序查询资源列表
+    /// </summary>
+    public class ProcResourceProcedurePagedQuery : PagerInfo
+    {
+        /// <summary>
+        /// 站点编码 
+        /// </summary>
+        public long? SiteId { get; set; }
+
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public long? ProcedureId { get; set; }
+    }
 }
