@@ -338,7 +338,11 @@
         #region 条码生成 MES16200
         public const string MES16200 = "条码生成失败";
         public const string MES16201 = "条码流水超过设定长度";
-        public const string MES16202 = "条码流水超过设定长度";
+        public const string MES16202 = "基数只有 10,16,32";
+        public const string MES16203 = "未找到条码生成规则";
+        public const string MES16204 = "{base}进制字符串全部忽略,无法生成条码";
+        public const string MES16205 = "通配符{value}未实现";
+        public const string MES16206 = "流水号转换只实现了16,32进制";
         #endregion
         #endregion
 

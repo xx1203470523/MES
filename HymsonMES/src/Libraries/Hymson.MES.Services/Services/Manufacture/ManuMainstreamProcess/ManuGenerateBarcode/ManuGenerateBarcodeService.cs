@@ -1,14 +1,11 @@
 ﻿using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Equipment;
-using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGenerateBarcodeDto;
 using Hymson.Sequences;
 using Hymson.Utils;
-using IdGen;
-using System.Collections.Generic;
+using System.Data;
 using System.Text;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode
@@ -23,7 +20,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         private readonly IInteCodeRulesMakeRepository _inteCodeRulesMakeRepository;
 
         /// <summary>
-        /// 
+        /// 条码生成
         /// </summary>
         /// <param name="sequenceService"></param>
         /// <param name="inteCodeRulesMakeRepository"></param>
@@ -43,7 +40,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         public async Task<IEnumerable<string>> GenerateBarcodeSerialNumber(BarcodeSerialNumberDto param)
         {
             List<string> list = new List<string>();
-            var serialList = await _sequenceService.GetSerialNumbersAsync(param.ResetType, param.Id.ToString(), param.Count, 0, 9999);
+            var serialList = await _sequenceService.GetSerialNumbersAsync(param.ResetType, param.CodeRuleKey, param.Count, 0, 9999);
             foreach (var item in serialList)
             {
                 var number = item * param.Increment + param.StartNumber;
@@ -60,7 +57,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                         str = ConvertNumber(number, param.IgnoreChar, 32);
                         break;
                     default:
-                        throw new BusinessException(nameof(ErrorCode.MES16201));
+                        throw new BusinessException(nameof(ErrorCode.MES16202));
                 }
                 if (str.Length > param.OrderLength)
                 {
@@ -82,6 +79,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         private string ConvertNumber(int number, string ignoreChar, int type)
         {
             List<string> list = new List<string>();
+            if (type != 16 && type != 32)
+            {
+                throw new BusinessException(nameof(ErrorCode.MES16206));
+            }
             if (type == 16)
             {
                 list = new List<string>() { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F" };
@@ -91,9 +92,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                 list = new List<string>() { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F" ,
                     "G", "H", "I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y"};
             }
-            var ignoreCharArray = ignoreChar.Split(";");
+            var ignoreCharArray = string.IsNullOrWhiteSpace(ignoreChar) ? new string[0] : ignoreChar.Split(";");
             list.RemoveAll(match => ignoreCharArray.Contains(match));
-            if (!list.Any()) { }
+            if (list == null || !list.Any())
+            {
+                throw new BusinessException(nameof(ErrorCode.MES16204)).WithData("base", type);
+            }
             int remainder = number % list.Count;
             int quotient = number / list.Count;
             StringBuilder stringBuilder = new StringBuilder();
@@ -106,21 +110,21 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         }
 
         /// <summary>
-        /// 生成条码
+        /// 条码生成
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="count"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<string>> GenerateBarcodeList(long id, int count)
+        /// <exception cref="BusinessException">未找到生成规则</exception>
+        public async Task<IEnumerable<string>> GenerateBarcodeList(GenerateBarcodeDto param)
         {
-            var getCodeRulesTask = _inteCodeRulesRepository.GetByIdAsync(id);
+            var getCodeRulesTask = _inteCodeRulesRepository.GetByIdAsync(param.CodeRuleId);
             var getCodeRulesMakeListTask = _inteCodeRulesMakeRepository.GetInteCodeRulesMakeEntitiesAsync(new InteCodeRulesMakeQuery { CodeRulesId = id });
             var codeRulesMakeList = await getCodeRulesMakeListTask;
             var codeRule = await getCodeRulesTask;
             var barcodeSerialNumberList = GenerateBarcodeSerialNumber(new BarcodeSerialNumberDto
             {
-                Id = id,
-                Count = count,
+                CodeRuleKey = param.IsTest ? param.CodeRuleId.ToString() + "Test" : param.CodeRuleId.ToString(),
+                Count = param.Count,
                 Base = codeRule.Base,
                 Increment = codeRule.Increment,
                 OrderLength = codeRule.OrderLength,
@@ -128,8 +132,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                 StartNumber = codeRule.StartNumber
             }).ToString();
 
-            if (barcodeSerialNumberList.Any())
+
+            if (barcodeSerialNumberList == null || !barcodeSerialNumberList.Any())
             {
+                throw new BusinessException(nameof(ErrorCode.MES16203));
             }
             List<string> list = new List<string>();
             foreach (var item in barcodeSerialNumberList)
@@ -151,6 +157,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                         else if (rule.SegmentedValue == "%YYMMDD%")
                         {
                             stringBuilder.Append(item);
+                        }
+                        else
+                        {
+                            throw new BusinessException(nameof(ErrorCode.MES16205)).WithData("value", rule.SegmentedValue);
                         }
                     }
                 }

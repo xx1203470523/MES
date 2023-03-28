@@ -11,7 +11,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGene
         /// <summary>
         /// 
         /// </summary>
-        public long Id { get; set; }
+        public string CodeRuleKey { get; set; }
 
         /// <summary>
         /// 起始
