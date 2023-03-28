@@ -101,6 +101,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcReplaceMaterialRepository, ProcReplaceMaterialRepository>();
 
             services.AddSingleton<IProcMaterialGroupRepository, ProcMaterialGroupRepository>();
+
+            services.AddSingleton<IProcMaterialSupplierRelationRepository, ProcMaterialSupplierRelationRepository>();
             #endregion
 
             #region Parameter
@@ -164,8 +166,11 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region Manufacture
             services.AddSingleton<IManuFeedingRepository, ManuFeedingRepository>();
-            services.AddSingleton<IManuSfcProduceRepository, ManuSfcProduceRepository>();
+            services.AddSingleton<IManuFeedingRecordRepository, ManuFeedingRecordRepository>();
+            services.AddSingleton<IManuProductBadRecordRepository, ManuProductBadRecordRepository>();
+            services.AddSingleton<IManuSfcCirculationRepository, ManuSfcCirculationRepository>();
             services.AddSingleton<IManuSfcInfoRepository, ManuSfcInfoRepository>();
+            services.AddSingleton<IManuSfcProduceRepository, ManuSfcProduceRepository>();
             services.AddSingleton<IManuSfcStepRepository, ManuSfcStepRepository>();
             #endregion
 
@@ -184,7 +189,7 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region PlanSfcReceive
-            services.AddSingleton<IPlanSfcReceiveRepository, PlanSfcReceiveRepository>(); 
+            services.AddSingleton<IPlanSfcReceiveRepository, PlanSfcReceiveRepository>();
             #endregion
             #endregion
 

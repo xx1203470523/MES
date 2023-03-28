@@ -76,6 +76,17 @@ namespace Hymson.MES.Api.Controllers.Process
         }
 
         /// <summary>
+        /// 查询物料关联的供应商信息（物料维护）
+        /// </summary>
+        /// <param name="materialId"></param>
+        /// <returns></returns>
+        [HttpGet("materialSupplier/{materialId}")]
+        public async Task<List<ProcMaterialSupplierViewDto>> QueryProcMaterialSupplierByMaterialIdAsync(long materialId)
+        {
+            return await _procMaterialService.QueryProcMaterialSupplierByMaterialIdAsync(materialId);
+        }
+
+        /// <summary>
         /// 添加（物料维护）
         /// </summary>
         /// <param name="parm"></param>

@@ -141,7 +141,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuSfcProduceEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangeAsync(List<ManuSfcProduceEntity> manuSfcProduceEntitys)
+        public async Task<int> InsertRangeAsync(IEnumerable<ManuSfcProduceEntity> manuSfcProduceEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertSql, manuSfcProduceEntitys);
@@ -174,7 +174,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuSfcProduceEntitys"></param>
         /// <returns></returns>
-        public async Task<int> UpdateRangeAsync(List<ManuSfcProduceEntity> manuSfcProduceEntitys)
+        public async Task<int> UpdateRangeAsync(IEnumerable<ManuSfcProduceEntity> manuSfcProduceEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSql, manuSfcProduceEntitys);

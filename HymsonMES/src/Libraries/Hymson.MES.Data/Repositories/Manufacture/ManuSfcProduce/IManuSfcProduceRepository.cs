@@ -62,7 +62,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuSfcProduceEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertRangeAsync(List<ManuSfcProduceEntity> manuSfcProduceEntitys);
+        Task<int> InsertRangeAsync(IEnumerable<ManuSfcProduceEntity> manuSfcProduceEntitys);
 
         /// <summary>
         /// 更新
@@ -76,7 +76,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuSfcProduceEntitys"></param>
         /// <returns></returns>
-        Task<int> UpdateRangeAsync(List<ManuSfcProduceEntity> manuSfcProduceEntitys);
+        Task<int> UpdateRangeAsync(IEnumerable<ManuSfcProduceEntity> manuSfcProduceEntitys);
 
         /// <summary>
         /// 删除

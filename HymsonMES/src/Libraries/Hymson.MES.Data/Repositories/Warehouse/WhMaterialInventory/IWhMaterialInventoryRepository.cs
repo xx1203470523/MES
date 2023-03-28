@@ -9,6 +9,7 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
@@ -52,6 +53,13 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         Task<int> UpdatesAsync(List<WhMaterialInventoryEntity> whMaterialInventoryEntitys);
 
         /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> UpdatePointByBarCodeAsync(UpdateStatusByBarCodeCommand command);
+
+        /// <summary>
         /// 删除
         /// </summary>
         /// <param name="id"></param>
@@ -77,7 +85,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="barCode"></param>
         /// <returns></returns>
-        Task<IEnumerable<WhMaterialInventoryEntity>> GetByBarCodeAsync(string barCode);
+        Task<WhMaterialInventoryEntity> GetByBarCodeAsync(string barCode);
 
         /// <summary>
         /// 根据IDs批量获取数据

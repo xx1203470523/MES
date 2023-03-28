@@ -244,6 +244,12 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<CustomProcMaterialGroupPagedQueryDto, ProcMaterialGroupCustomPagedQuery>();
             CreateMap<CustomProcMaterialGroupView, CustomProcMaterialGroupViewDto>();
 
+            //物料供应商关系
+            CreateMap<ProcMaterialSupplierRelationCreateDto, ProcMaterialSupplierRelationEntity>();
+            CreateMap<ProcMaterialSupplierRelationDto, ProcMaterialSupplierRelationEntity>();
+            CreateMap<ProcMaterialSupplierRelationPagedQueryDto, ProcMaterialSupplierRelationPagedQuery>();
+            CreateMap<ProcMaterialSupplierRelationEntity, ProcMaterialSupplierRelationDto>();
+            CreateMap<ProcMaterialSupplierView, ProcMaterialSupplierViewDto>();
             #endregion
 
             #region Parameter
