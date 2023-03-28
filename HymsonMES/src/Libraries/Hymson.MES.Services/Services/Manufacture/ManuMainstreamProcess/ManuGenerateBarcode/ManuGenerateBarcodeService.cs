@@ -170,11 +170,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                         // TODO  暂时使用这种写法  王克明
                         if (rule.SegmentedValue == "%ACTIVITY%")
                         {
-                            stringBuilder.Append(HymsonClock.Now().ToString("yyMMdd"));
+                            stringBuilder.Append(item);
                         }
                         else if (rule.SegmentedValue == "%YYMMDD%")
                         {
-                            stringBuilder.Append(item);
+                            stringBuilder.Append(HymsonClock.Now().ToString("yyMMdd"));
                         }
                         else
                         {
