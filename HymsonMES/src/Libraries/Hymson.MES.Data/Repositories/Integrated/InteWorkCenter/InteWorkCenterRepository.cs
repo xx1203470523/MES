@@ -58,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
             }
             if (!string.IsNullOrWhiteSpace(param.Name))
             {
-                param.Code = $"%{param.Name}%";
+                param.Name = $"%{param.Name}%";
                 sqlBuilder.Where("Name like @Name");
             }
 

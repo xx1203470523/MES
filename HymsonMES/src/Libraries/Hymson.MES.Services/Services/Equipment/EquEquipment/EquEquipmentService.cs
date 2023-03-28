@@ -258,7 +258,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// 查询列表（设备注册）
         /// </summary>
         /// <returns></returns>
-        public async Task<List<EquEquipmentDictionaryDto>> GetEquEquipmentDictionaryAsync()
+        public async Task<IEnumerable<EquEquipmentDictionaryDto>> GetEquEquipmentDictionaryAsync()
         {
             var dics = new List<EquEquipmentDictionaryDto> { };
             var list = await _equEquipmentRepository.GetBaseListAsync();
@@ -287,7 +287,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// <returns></returns>
         public async Task<EquEquipmentDto> GetDetailAsync(long id)
         {
-            return (await _equEquipmentRepository.GetViewByIdAsync(id)).ToModel<EquEquipmentDto>();
+            return (await _equEquipmentRepository.GetByIdAsync(id)).ToModel<EquEquipmentDto>();
         }
 
         /// <summary>
@@ -377,7 +377,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// <param name="apiLinks"></param>
         /// <param name="hardwareLinks"></param>
         /// <returns></returns>
-        public static (List<EquEquipmentLinkApiEntity> Apis, List<EquEquipmentLinkHardwareEntity> Hardwares) ConvertToTupleList(EquEquipmentEntity entity, List<EquEquipmentLinkApiCreateDto> apiLinks, List<EquEquipmentLinkHardwareCreateDto> hardwareLinks)
+        public static (IEnumerable<EquEquipmentLinkApiEntity> Apis, IEnumerable<EquEquipmentLinkHardwareEntity> Hardwares) ConvertToTupleList(EquEquipmentEntity entity, List<EquEquipmentLinkApiCreateDto> apiLinks, List<EquEquipmentLinkHardwareCreateDto> hardwareLinks)
         {
             // 绑定Api
             List<EquEquipmentLinkApiEntity> linkApiList = new();

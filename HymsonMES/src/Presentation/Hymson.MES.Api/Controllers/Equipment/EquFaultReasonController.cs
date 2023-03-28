@@ -1,17 +1,8 @@
-/*
- *creator: pengxin
- *
- *describe: 设备故障原因表    控制器 | 代码由框架生成  
- *builder:  pengxin
- *build datetime: 2023-02-28 15:15:20
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment;
-using Hymson.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Extensions; 
 
 namespace Hymson.MES.Api.Controllers.Equipment
 {

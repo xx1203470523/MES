@@ -42,7 +42,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// 查询列表（设备注册）
         /// </summary>
         /// <returns></returns>
-        Task<List<EquEquipmentDictionaryDto>> GetEquEquipmentDictionaryAsync();
+        Task<IEnumerable<EquEquipmentDictionaryDto>> GetEquEquipmentDictionaryAsync();
 
         /// <summary>
         /// 查询详情（设备注册）

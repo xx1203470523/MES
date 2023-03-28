@@ -128,17 +128,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<EquEquipmentView> GetViewByIdAsync(long id)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<EquEquipmentView>(GetByIdSql, new { id });
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="equipmentCode"></param>
         /// <returns></returns>
         public async Task<EquEquipmentEntity> GetByEquipmentCodeAsync(string equipmentCode)

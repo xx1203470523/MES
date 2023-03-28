@@ -19,11 +19,17 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
         private readonly ConnectionOptions _connectionOptions;
         private readonly IMemoryCache _memoryCache;
 
-        public EquEquipmentGroupRepository(IOptions<ConnectionOptions> connectionOptions,IMemoryCache memoryCache)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
+        /// <param name="memoryCache"></param>
+        public EquEquipmentGroupRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
         {
             _memoryCache = memoryCache;
             _connectionOptions = connectionOptions.Value;
         }
+
 
         /// <summary>
         /// 新增
@@ -78,11 +84,11 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
         public async Task<EquEquipmentGroupEntity> GetByIdAsync(long id)
         {
             var key = $"equ_equipment_group_{id}";
-            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) => {
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
                 using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
                 return await conn.QueryFirstOrDefaultAsync<EquEquipmentGroupEntity>(GetByIdSql, new { IsDeleted = 0, Id = id });
             });
-            
         }
 
         /// <summary>
@@ -99,7 +105,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
             sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
-        
+
             if (string.IsNullOrWhiteSpace(pagedQuery.EquipmentGroupCode) == false)
             {
                 pagedQuery.EquipmentGroupCode = $"%{pagedQuery.EquipmentGroupCode}%";
@@ -123,29 +129,15 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
 
             return new PagedInfo<EquEquipmentGroupEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
-
-        /// <summary>
-        /// 查询List
-        /// </summary>
-        /// <param name="equEquipmentGroupQuery"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<EquEquipmentGroupEntity>> GetEntitiesAsync(EquEquipmentGroupQuery equEquipmentGroupQuery)
-        {
-            var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetEquEquipmentGroupEntitiesSqlTemplate);
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var equEquipmentGroupEntities = await conn.QueryAsync<EquEquipmentGroupEntity>(template.RawSql, equEquipmentGroupQuery);
-            return equEquipmentGroupEntities;
-        }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class EquEquipmentGroupRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_equipment_group` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_equipment_group` /**innerjoin**/ /**leftjoin**/ /**where**/";
-        const string GetEquEquipmentGroupEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM `equ_equipment_group` /**innerjoin**/ /**leftjoin**/ /**where**/  ";
 
         const string InsertSql = "INSERT INTO `equ_equipment_group`(  `Id`, `EquipmentGroupCode`, `EquipmentGroupName`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteId`) VALUES (   @Id, @EquipmentGroupCode, @EquipmentGroupName, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteId )  ";
         const string UpdateSql = "UPDATE `equ_equipment_group` SET EquipmentGroupName = @EquipmentGroupName, Remark = @Remark WHERE Id = @Id ";

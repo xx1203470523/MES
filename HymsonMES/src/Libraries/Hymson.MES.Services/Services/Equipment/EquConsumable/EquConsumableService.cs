@@ -63,7 +63,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
             entity.Id = IdGenProvider.Instance.CreateId();
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
-            entity.Type = (int)EquipmentPartTypeEnum.Consumable; // 工装
+            entity.Type = EquipmentPartTypeEnum.Consumable; // 工装
 
             // 入库
             return await _equConsumableRepository.InsertAsync(entity);
@@ -119,7 +119,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
         public async Task<PagedInfo<EquConsumableDto>> GetPagedListAsync(EquConsumablePagedQueryDto equSparePartPagedQueryDto)
         {
             var pagedQuery = equSparePartPagedQueryDto.ToQuery<EquSparePartPagedQuery>();
-            pagedQuery.Type = (int)EquipmentPartTypeEnum.Consumable; // 工装
+            pagedQuery.Type = EquipmentPartTypeEnum.Consumable; // 工装
             var pagedInfo = await _equConsumableRepository.GetPagedInfoAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据

@@ -1,10 +1,3 @@
-/*
- *creator: pengxin
- *
- *describe: 设备故障原因表    服务 | 代码由框架生成
- *builder:  pengxin
- *build datetime: 2023-02-28 15:15:20
- */
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -18,7 +11,6 @@ using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Equipment
 {
@@ -126,7 +118,7 @@ namespace Hymson.MES.Services.Services.Equipment
             var pagedInfo = await _EquFaultReasonRepository.GetPagedInfoAsync(EquFaultReasonPagedQuery);
 
             //实体到DTO转换 装载数据
-            List<EquFaultReasonDto> EquFaultReasonDtos = PrepareEquFaultReasonDtos(pagedInfo);
+            List<EquFaultReasonDto> EquFaultReasonDtos = PrepareEquFaultReasonDtos(pagedInfo).ToList();
             return new PagedInfo<EquFaultReasonDto>(EquFaultReasonDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
@@ -135,7 +127,7 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="pagedInfo"></param>
         /// <returns></returns>
-        private static List<EquFaultReasonDto> PrepareEquFaultReasonDtos(PagedInfo<EquFaultReasonEntity> pagedInfo)
+        private static IEnumerable<EquFaultReasonDto> PrepareEquFaultReasonDtos(PagedInfo<EquFaultReasonEntity> pagedInfo)
         {
             var EquFaultReasonDtos = new List<EquFaultReasonDto>();
             foreach (var EquFaultReasonEntity in pagedInfo.Data)
