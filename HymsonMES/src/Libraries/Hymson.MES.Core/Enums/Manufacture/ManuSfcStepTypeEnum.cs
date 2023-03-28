@@ -10,9 +10,9 @@ namespace Hymson.MES.Core.Enums.Manufacture
     /// <summary>
     /// 条码步骤表:步骤类型
     /// </summary>
-    public enum ManuSfcStepTypeEnum : sbyte
+    public enum ManuSfcStepTypeEnum : short
     {
-        //步骤类型;1：创建；2：复用；3：进站；4：出站；5：将来锁定；6：及时锁定；7：解锁；8：完成；9：报废；10：异常标识；11：删除；12：拆解；13：合并；14：转换；
+        //步骤类型;1：创建；2：复用；3：进站；4：出站；5：将来锁定；6：及时锁定；7：解锁；8：完成；9：报废；10：NG标识；11：删除；12：拆解；13：合并；14：转换；
         /// <summary>
         /// 创建
         /// </summary>
@@ -47,6 +47,36 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 解锁
         /// </summary>
         [Description("解锁")]
-        Unlock = 7
+        Unlock = 7,
+        /// <summary>
+        /// 完成
+        /// </summary>
+        [Description("完成")]
+        Complete = 8,
+        /// <summary>
+        /// 报废
+        /// </summary>
+        [Description("报废")]
+        Discard = 9,
+        /// <summary>
+        /// NG标识
+        /// </summary>
+        [Description("NG标识")]
+        NGMark = 10,
+        /// <summary>
+        /// 拆解
+        /// </summary>
+        [Description("拆解")]
+        Split = 11,
+        /// <summary>
+        /// 合并
+        /// </summary>
+        [Description("合并")]
+        Merge = 12,
+        /// <summary>
+        /// 转换
+        /// </summary>
+        [Description("转换")]
+        Change = 13
     }
 }

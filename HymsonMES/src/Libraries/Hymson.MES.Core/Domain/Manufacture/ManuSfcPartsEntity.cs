@@ -18,40 +18,33 @@ namespace Hymson.MES.Core.Domain.Manufacture
     public class ManuSfcPartsEntity : BaseEntity
     {
         /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
         /// 工序id
         /// </summary>
-        public string OperationId { get; set; }
+        public long ProcedureId { get; set; }
 
        /// <summary>
         /// 资源id
         /// </summary>
-        public string ResourceId { get; set; }
+        public long ResourceId { get; set; }
 
        /// <summary>
         /// 设备id
         /// </summary>
-        public string EquipmentId { get; set; }
+        public long? EquipmentId { get; set; }
 
        /// <summary>
         /// 主条码
         /// </summary>
-        public string Sfc { get; set; }
+        public string SFC { get; set; }
 
        /// <summary>
         /// 零部件信息id
         /// </summary>
         public long PartsBarCodeId { get; set; }
-
-       /// <summary>
-        /// 绑定
-        /// </summary>
-        public bool IsBind { get; set; }
-
-       /// <summary>
-        /// 站点Id
-        /// </summary>
-        public long SiteId { get; set; }
-
-       
     }
 }

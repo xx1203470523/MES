@@ -21,4 +21,9 @@
     <ProjectReference Include="..\Hymson.MES.Data\Hymson.MES.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\Manufacture\ManuMainstreamProcess\Consume\" />
+    <Folder Include="Services\Manufacture\ManuMainstreamProcess\Package\" />
+  </ItemGroup>
+
 </Project>

@@ -48,7 +48,7 @@ namespace Hymson.MES.Services.Services.Integrated
 
         private readonly AbstractValidator<InteCodeRulesMakeCreateDto> _validationMakeCreateRules;
 
-        public InteCodeRulesService(ICurrentUser currentUser, ICurrentSite currentSite, IInteCodeRulesRepository inteCodeRulesRepository, 
+        public InteCodeRulesService(ICurrentUser currentUser, ICurrentSite currentSite, IInteCodeRulesRepository inteCodeRulesRepository,
 ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> validationCreateRules, AbstractValidator<InteCodeRulesModifyDto> validationModifyRules, IProcMaterialRepository procMaterialRepository, IInteCodeRulesMakeRepository inteCodeRulesMakeRepository, AbstractValidator<InteCodeRulesMakeCreateDto> validationMakeCreateRules)
         {
             _currentUser = currentUser;
@@ -86,7 +86,7 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
 
             //DTO转换实体
             var inteCodeRulesEntity = inteCodeRulesCreateDto.ToEntity<InteCodeRulesEntity>();
-            inteCodeRulesEntity.Id= IdGenProvider.Instance.CreateId();
+            inteCodeRulesEntity.Id = IdGenProvider.Instance.CreateId();
             inteCodeRulesEntity.CreatedBy = _currentUser.UserName;
             inteCodeRulesEntity.UpdatedBy = _currentUser.UserName;
             inteCodeRulesEntity.CreatedOn = HymsonClock.Now();
@@ -94,22 +94,22 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
             inteCodeRulesEntity.SiteId = _currentSite.SiteId ?? 0;
 
             //判断是否已经存在该物料数据
-            var hasCodeRulesEntities= await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery { ProductId= inteCodeRulesCreateDto.ProductId });
-            if (hasCodeRulesEntities != null && hasCodeRulesEntities.Any()) 
+            var hasCodeRulesEntities = await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery { ProductId = inteCodeRulesCreateDto.ProductId });
+            if (hasCodeRulesEntities != null && hasCodeRulesEntities.Any())
             {
                 throw new BusinessException(nameof(ErrorCode.MES12401)).WithData("productId", inteCodeRulesCreateDto.ProductId);
             }
 
             List<InteCodeRulesMakeEntity> inteCodeRulesMakeEntitys = new List<InteCodeRulesMakeEntity>();
-            if (inteCodeRulesCreateDto.CodeRulesMakes != null) 
+            if (inteCodeRulesCreateDto.CodeRulesMakes != null)
             {
                 //转换物料组成
                 foreach (var item in inteCodeRulesCreateDto.CodeRulesMakes)
                 {
                     var inteCodeRulesMakeEntity = item.ToEntity<InteCodeRulesMakeEntity>();
-                    inteCodeRulesMakeEntity.Id= IdGenProvider.Instance.CreateId();
+                    inteCodeRulesMakeEntity.Id = IdGenProvider.Instance.CreateId();
                     inteCodeRulesMakeEntity.CodeRulesId = inteCodeRulesEntity.Id;
-                    inteCodeRulesMakeEntity.CreatedBy= _currentUser.UserName;
+                    inteCodeRulesMakeEntity.CreatedBy = _currentUser.UserName;
                     inteCodeRulesMakeEntity.CreatedOn = HymsonClock.Now();
                     inteCodeRulesMakeEntity.SiteId = _currentSite.SiteId ?? 0;
 
@@ -127,11 +127,11 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
                     throw new BusinessException(nameof(ErrorCode.MES12402));
                 }
 
-                if (inteCodeRulesMakeEntitys.Count > 0) 
+                if (inteCodeRulesMakeEntitys.Count > 0)
                 {
                     //编码组成
-                    response= await _inteCodeRulesMakeRepository.InsertsAsync(inteCodeRulesMakeEntitys);
-                    if (response < inteCodeRulesMakeEntitys.Count) 
+                    response = await _inteCodeRulesMakeRepository.InsertsAsync(inteCodeRulesMakeEntitys);
+                    if (response < inteCodeRulesMakeEntitys.Count)
                     {
                         throw new BusinessException(nameof(ErrorCode.MES12402));
                     }
@@ -139,7 +139,7 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
 
                 ts.Complete();
             }
-    }
+        }
 
         /// <summary>
         /// 删除
@@ -181,7 +181,7 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
         /// </summary>
         /// <param name="pagedInfo"></param>
         /// <returns></returns>
-        private static List<InteCodeRulesPageViewDto> PrepareInteCodeRulesDtos(PagedInfo<InteCodeRulesPageView>   pagedInfo)
+        private static List<InteCodeRulesPageViewDto> PrepareInteCodeRulesDtos(PagedInfo<InteCodeRulesPageView> pagedInfo)
         {
             var inteCodeRulesDtos = new List<InteCodeRulesPageViewDto>();
             foreach (var inteCodeRulesEntity in pagedInfo.Data)
@@ -200,7 +200,7 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
         /// <returns></returns>
         public async Task ModifyInteCodeRulesAsync(InteCodeRulesModifyDto inteCodeRulesModifyDto)
         {
-             //验证DTO
+            //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(inteCodeRulesModifyDto);
             foreach (var item in inteCodeRulesModifyDto.CodeRulesMakes)
             {
@@ -220,7 +220,7 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
                 {
                     var inteCodeRulesMakeEntity = item.ToEntity<InteCodeRulesMakeEntity>();
                     inteCodeRulesMakeEntity.Id = IdGenProvider.Instance.CreateId();
-                    inteCodeRulesMakeEntity.CodeRulesId= inteCodeRulesEntity.Id;
+                    inteCodeRulesMakeEntity.CodeRulesId = inteCodeRulesEntity.Id;
                     inteCodeRulesMakeEntity.CreatedBy = _currentUser.UserName;
                     inteCodeRulesMakeEntity.CreatedOn = HymsonClock.Now();
                     inteCodeRulesMakeEntity.SiteId = _currentSite.SiteId ?? 0;
@@ -254,7 +254,7 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
                 ts.Complete();
             }
 
-            
+
         }
 
         /// <summary>
@@ -262,26 +262,26 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<InteCodeRulesDetailViewDto> QueryInteCodeRulesByIdAsync(long id) 
+        public async Task<InteCodeRulesDetailViewDto> QueryInteCodeRulesByIdAsync(long id)
         {
-           var inteCodeRulesEntity = await _inteCodeRulesRepository.GetByIdAsync(id);
-           if (inteCodeRulesEntity != null) 
-           {
+            var inteCodeRulesEntity = await _inteCodeRulesRepository.GetByIdAsync(id);
+            if (inteCodeRulesEntity != null)
+            {
                 var inteCodeRulesDetailViewDto = inteCodeRulesEntity.ToModel<InteCodeRulesDetailViewDto>();
                 //查询关联数据
-                var material= await _procMaterialRepository.GetByIdAsync(inteCodeRulesEntity.ProductId, _currentSite.SiteId??0);
-                if (material != null) 
+                var material = await _procMaterialRepository.GetByIdAsync(inteCodeRulesEntity.ProductId, _currentSite.SiteId ?? 0);
+                if (material != null)
                 {
-                    inteCodeRulesDetailViewDto.MaterialCode=material.MaterialCode;
+                    inteCodeRulesDetailViewDto.MaterialCode = material.MaterialCode;
                     inteCodeRulesDetailViewDto.MaterialName = material.MaterialName;
                     inteCodeRulesDetailViewDto.MaterialVersion = material.Version;
                 }
 
                 //查询关联的编码规则组成
-                var inteCodeRulesMakeEntitys= await _inteCodeRulesMakeRepository.GetInteCodeRulesMakeEntitiesAsync(new InteCodeRulesMakeQuery { CodeRulesId= inteCodeRulesEntity.Id });
+                var inteCodeRulesMakeEntitys = await _inteCodeRulesMakeRepository.GetInteCodeRulesMakeEntitiesAsync(new InteCodeRulesMakeQuery { CodeRulesId = inteCodeRulesEntity.Id });
 
                 List<InteCodeRulesMakeDto> inteCodeRulesDtos = new List<InteCodeRulesMakeDto>();
-                if (inteCodeRulesMakeEntitys != null && inteCodeRulesMakeEntitys.Count() > 0) 
+                if (inteCodeRulesMakeEntitys != null && inteCodeRulesMakeEntitys.Count() > 0)
                 {
                     //转换
                     foreach (var item in inteCodeRulesMakeEntitys)
@@ -293,7 +293,7 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
                 inteCodeRulesDetailViewDto.CodeRulesMakes = inteCodeRulesDtos;
 
                 return inteCodeRulesDetailViewDto;
-           }
+            }
             return null;
         }
     }

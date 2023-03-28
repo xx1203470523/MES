@@ -144,7 +144,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (sfcList.Count < sfcs.Length)
             {
                 //比较有哪些条码查询不到就不是在制品
-                var sfcInfos = sfcList.Select(a => a.Sfc).ToArray();
+                var sfcInfos = sfcList.Select(a => a.SFC).ToArray();
                 var nprocessedSfcs = sfcs.Except(sfcInfos).ToArray();
 
                 if (nprocessedSfcs != null && nprocessedSfcs.Length > 0)
@@ -216,18 +216,18 @@ namespace Hymson.MES.Services.Services.Manufacture
                 UpdatedOn = HymsonClock.Now()
             };
 
-            int type = 0;
+            ManuSfcStepTypeEnum type = ManuSfcStepTypeEnum.Unlock;
             if (parm.OperationType == QualityLockEnum.Unlock)
             {
-                type = (int)ManuSfcStepTypeEnum.Unlock;
+                type = ManuSfcStepTypeEnum.Unlock;
             }
             if (parm.OperationType == QualityLockEnum.InstantLock)
             {
-                type = (int)ManuSfcStepTypeEnum.InstantLock;
+                type = ManuSfcStepTypeEnum.InstantLock;
             }
             if (parm.OperationType == QualityLockEnum.FutureLock)
             {
-                type = (int)ManuSfcStepTypeEnum.FutureLock;
+                type = ManuSfcStepTypeEnum.FutureLock;
             }
 
             var sfcStepList = new List<ManuSfcStepEntity>();
@@ -236,17 +236,17 @@ namespace Hymson.MES.Services.Services.Manufacture
                 sfcStepList.Add(new ManuSfcStepEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SFC = sfc.Sfc,
+                    SFC = sfc.SFC,
                     ProductId = sfc.ProductId,
                     WorkOrdeId = sfc.WorkOrderId,
                     WorkCenterId = sfc.WorkCenterId,
-                    ProductBOMId = sfc.ProductBOMId,
+                    ProductBOMId = sfc.BOMId,
                     Qty = sfc.Qty,
                     EquipmentId = sfc.EquipmentId,
                     ResourceId = sfc.ResourceId,
                     ProcedureId = sfc.ProcedureId,
-                    Type = type,
-                    Status = sfc.Status,
+                    Operatetype = type,
+                    CurrentStatus = sfc.Status,
                     Lock = lockCommand.Lock,
                     SiteId = _currentSite.SiteId ?? 0,
                     CreatedBy = sfc.CreatedBy,

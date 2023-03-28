@@ -18,9 +18,14 @@ namespace Hymson.MES.Core.Domain.Manufacture
     public class ManuSfcInfoEntity : BaseEntity
     {
         /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
         /// 条码
         /// </summary>
-        public string Sfc { get; set; }
+        public string SFC { get; set; }
 
         /// <summary>
         /// 工单id
@@ -51,12 +56,5 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 是否在用
         /// </summary>
         public long? IsUsed { get; set; }
-
-        /// <summary>
-        /// 站点Id
-        /// </summary>
-        public long SiteId { get; set; }
-
-
     }
 }

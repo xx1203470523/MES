@@ -117,7 +117,7 @@ namespace Hymson.MES.Services.Services.Plan
                     throw new BusinessException(nameof(ErrorCode.MES16108)).WithData("OrderCode", workOrderInfo.OrderCode);
                 }
                 //创建
-                manuSfcInfoCreate.Sfc = planSfcInfo.Sfc;
+                manuSfcInfoCreate.SFC = planSfcInfo.SFC;
                 manuSfcInfoCreate.WorkOrderId = planSfcInfoCreateDto.WorkOrderId;
                 manuSfcInfoCreate.ProductId = planSfcInfo.ProductId;
                 manuSfcInfoCreate.Qty = 1;// workOrderInfo.Qty;
@@ -148,7 +148,7 @@ namespace Hymson.MES.Services.Services.Plan
                 {
                     throw new BusinessException(nameof(ErrorCode.MES16105)).WithData("SFC", planSfcInfoCreateDto.SFC);
                 }
-                manuSfcInfoCreate.Sfc = planSfcInfoCreateDto.SFC;
+                manuSfcInfoCreate.SFC = planSfcInfoCreateDto.SFC;
                 manuSfcInfoCreate.WorkOrderId = planSfcInfoCreateDto.WorkOrderId;
                 manuSfcInfoCreate.ProductId = workOrderInfo.ProductId;
                 manuSfcInfoCreate.Qty = 1;// workOrderInfo.Qty;

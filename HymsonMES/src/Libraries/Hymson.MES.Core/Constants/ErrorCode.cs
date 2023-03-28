@@ -333,6 +333,11 @@
 
         #endregion
 
+        #region 条码生成 MES16200
+        public const string MES16200 = "条码生成失败";
+        public const string MES16201 = "条码流水超过设定长度";
+        public const string MES16202 = "条码流水超过设定长度";
+        #endregion
         #endregion
 
         #region 系统执行出错 业务逻辑出错
