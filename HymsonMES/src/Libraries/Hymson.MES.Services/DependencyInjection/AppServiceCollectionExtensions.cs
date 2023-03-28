@@ -21,6 +21,7 @@ using Hymson.MES.Services.Services.Integrated.InteClass;
 using Hymson.MES.Services.Services.Integrated.InteContainer;
 using Hymson.MES.Services.Services.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuFeeding;
+using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode;
 using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Hymson.MES.Services.Services.Plan;
 using Hymson.MES.Services.Services.Process;
@@ -151,6 +152,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuFeedingService, ManuFeedingService>();
             services.AddSingleton<IManuSfcProduceService, ManuSfcProduceService>();
             services.AddSingleton<IManuSfcInfoService, ManuSfcInfoService>();
+            services.AddSingleton<IManuGenerateBarcodeService, ManuGenerateBarcodeService>();
             #endregion
 
             #region Warehouse 
