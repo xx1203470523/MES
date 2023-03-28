@@ -1,17 +1,5 @@
-/*
- *creator: Karl
- *
- *describe: 上料点表    服务接口 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-02-17 08:57:53
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -30,14 +18,14 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="procLoadPointDto"></param>
+        /// <param name="procLoadPointCreateDto"></param>
         /// <returns></returns>
         Task CreateProcLoadPointAsync(ProcLoadPointCreateDto procLoadPointCreateDto);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="procLoadPointDto"></param>
+        /// <param name="procLoadPointModifyDto"></param>
         /// <returns></returns>
         Task ModifyProcLoadPointAsync(ProcLoadPointModifyDto procLoadPointModifyDto);
 

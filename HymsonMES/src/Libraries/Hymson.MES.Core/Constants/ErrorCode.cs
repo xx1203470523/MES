@@ -127,6 +127,8 @@
         public const string MES10707 = "请选择数据!";
         public const string MES10708 = "删除数据失败!";
         public const string MES10709 = "删除数据失败!无法删除保留或者启用的数据！";
+        public const string MES10710 = "关联物料页签物料不能重复!";
+        public const string MES10711 = "关联资源页签资源不能重复!";
         #endregion
 
         #region 不合格代码 11100
