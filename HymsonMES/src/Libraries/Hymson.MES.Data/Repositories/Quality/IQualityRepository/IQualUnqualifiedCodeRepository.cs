@@ -33,6 +33,13 @@ namespace Hymson.MES.Data.Repositories.Quality.IQualityRepository
         Task<QualUnqualifiedCodeEntity> GetByIdAsync(long id);
 
         /// <summary>
+        /// 根据id获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<QualUnqualifiedCodeEntity>> GetByIdsAsync(long[] ids);
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="parm"></param>

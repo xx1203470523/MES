@@ -50,6 +50,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> UpdatesAsync(List<ManuSfcInfoEntity> manuSfcInfoEntitys);
 
         /// <summary>
+        /// 批量更新条码状态
+        /// </summary>
+        /// <param name="manuSfcInfoEntity"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAsync(ManuSfcInfoUpdateCommand command);
+
+        /// <summary>
         /// 删除
         /// </summary>
         /// <param name="id"></param>

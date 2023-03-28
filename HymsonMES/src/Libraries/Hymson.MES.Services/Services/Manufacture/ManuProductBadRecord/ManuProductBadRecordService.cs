@@ -13,11 +13,18 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Quality;
+using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
+using Org.BouncyCastle.Crypto.Generators;
+using System.Security.Policy;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -40,6 +47,22 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// 产品不良录入 仓储
         /// </summary>
         private readonly IManuProductBadRecordRepository _manuProductBadRecordRepository;
+
+        /// <summary>
+        /// 不合格代码仓储
+        /// </summary>
+        private readonly IQualUnqualifiedCodeRepository _qualUnqualifiedCodeRepository;
+
+        /// <summary>
+        /// 条码生产信息（物理删除） 仓储
+        /// </summary>
+        private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
+
+        /// <summary>
+        /// 条码信息表 仓储
+        /// </summary>
+        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
+
         private readonly AbstractValidator<ManuProductBadRecordCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ManuProductBadRecordModifyDto> _validationModifyRules;
 
@@ -48,34 +71,96 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         public ManuProductBadRecordService(ICurrentUser currentUser, ICurrentSite currentSite,
         IManuProductBadRecordRepository manuProductBadRecordRepository,
+        IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
+        IManuSfcProduceRepository manuSfcProduceRepository,
+        IManuSfcInfoRepository manuSfcInfoRepository,
         AbstractValidator<ManuProductBadRecordCreateDto> validationCreateRules,
         AbstractValidator<ManuProductBadRecordModifyDto> validationModifyRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _manuSfcProduceRepository = manuSfcProduceRepository;
+            _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
+            _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
         }
 
         /// <summary>
-        /// 创建
+        /// 产品不良录入
         /// </summary>
-        /// <param name="manuProductBadRecordCreateDto"></param>
+        /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task CreateManuProductBadRecordAsync(ManuProductBadRecordCreateDto manuProductBadRecordCreateDto)
+        public async Task CreateManuProductBadRecordAsync(ManuProductBadRecordCreateDto createDto)
         {
             //验证DTO
-            await _validationCreateRules.ValidateAndThrowAsync(manuProductBadRecordCreateDto);
+            //await _validationCreateRules.ValidateAndThrowAsync(manuProductBadRecordCreateDto);
 
-            //DTO转换实体
-            var manuProductBadRecordEntity = manuProductBadRecordCreateDto.ToEntity<ManuProductBadRecordEntity>();
-            manuProductBadRecordEntity.Id = IdGenProvider.Instance.CreateId();
-            manuProductBadRecordEntity.CreatedBy = _currentUser.UserName;
-            manuProductBadRecordEntity.UpdatedBy = _currentUser.UserName;
+            var manuSfcProducePagedQuery = new ManuSfcProduceQuery
+            {
+                Sfcs = createDto.SFCs
+            };
+            //获取条码列表
+            var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
 
-            //入库
-            await _manuProductBadRecordRepository.InsertAsync(manuProductBadRecordEntity);
+            //获取不合格代码列表
+            var qualUnqualifiedCodes = await _qualUnqualifiedCodeRepository.GetByIdsAsync(createDto.UnqualifiedIds);
+
+            var manuProductBadRecords = new List<ManuProductBadRecordEntity>();
+
+            foreach (var item in manuSfcs)
+            {
+                foreach (var unqualified in qualUnqualifiedCodes)
+                {
+                    manuProductBadRecords.Add(new ManuProductBadRecordEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = _currentSite.SiteId ?? 0,
+                        FoundBadOperationId = createDto.FoundBadOperationId,
+                        OutflowOperationId = createDto.OutflowOperationId,
+                        UnqualifiedId = unqualified.Id,
+                        SFC = item.SFC,
+                        Qty = item.Qty,
+                        Status = ProductBadRecordStatusEnum.Open,
+                        Source = ProductBadRecordSourceEnum.BadManualEntry,
+                        CreatedBy = _currentUser.UserName,
+                        UpdatedBy = _currentUser.UserName
+                    });
+                }
+            }
+
+            //TODO
+            // 1）如添加不合格代码包含缺陷类型，则将条码置于不合格代码对应不合格工艺路线首工序排队，原工序的状态清除；
+            //同时如有多条不合格工艺路线需手动选择；
+            //2）如添加不合格代码均为标记类型，则不改变当前条码的状态；
+            //3）如添加不合格代码为“SCRAP”，需将条码状态更新为“报废
+
+            //报废不合格代码
+            var scrapCode = qualUnqualifiedCodes.FirstOrDefault(a => a.UnqualifiedCode == "SCRAP");
+            var rows = 0;
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                if (scrapCode != null)
+                {
+                    var sfcs = manuSfcs.Select(a => a.SFC).ToArray();
+                    var updateCommand = new ManuSfcInfoUpdateCommand
+                    {
+                        SFCs = sfcs,
+                        UserId = _currentUser.UserName,
+                        UpdatedOn = HymsonClock.Now(),
+                        Status = SfcStatusEnum.Scrapping
+                    };
+                    rows += await _manuSfcInfoRepository.UpdateStatusAsync(updateCommand);
+                }
+
+                if (manuProductBadRecords.Any())
+                {
+                    //入库
+                    rows += await _manuProductBadRecordRepository.InsertRangeAsync(manuProductBadRecords);
+                }
+                trans.Complete();
+            }
         }
 
         /// <summary>
