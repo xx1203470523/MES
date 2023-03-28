@@ -1,3 +1,4 @@
+using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
@@ -29,6 +30,11 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
+        /// 验证器
+        /// </summary>
+        private readonly AbstractValidator<InteContainerSaveDto> _validationSaveRules;
+
+        /// <summary>
         /// 容器维护 仓储
         /// </summary>
         private readonly IInteContainerRepository _inteContainerRepository;
@@ -39,12 +45,15 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="sequenceService"></param>
+        /// <param name="validationSaveRules"></param>
         /// <param name="inteContainerRepository"></param>
         public InteContainerService(ICurrentUser currentUser, ICurrentSite currentSite, ISequenceService sequenceService,
+            AbstractValidator<InteContainerSaveDto> validationSaveRules,
             IInteContainerRepository inteContainerRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _validationSaveRules = validationSaveRules;
             _inteContainerRepository = inteContainerRepository;
         }
 
@@ -56,8 +65,8 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
         /// <returns></returns>
         public async Task<int> CreateAsync(InteContainerSaveDto createDto)
         {
-            //验证DTO
-            //await _validationCreateRules.ValidateAndThrowAsync(createDto);
+            // 验证DTO
+            await _validationSaveRules.ValidateAndThrowAsync(createDto);
 
             // DTO转换实体
             var entity = createDto.ToEntity<InteContainerEntity>();
@@ -77,6 +86,10 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
         /// <returns></returns>
         public async Task<int> ModifyAsync(InteContainerSaveDto modifyDto)
         {
+            // 验证DTO
+            await _validationSaveRules.ValidateAndThrowAsync(modifyDto);
+
+            // DTO转换实体
             var entity = modifyDto.ToEntity<InteContainerEntity>();
             entity.UpdatedBy = _currentUser.UserName;
 
@@ -123,11 +136,24 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
         public async Task<InteContainerDto> GetDetailAsync(long id)
         {
             var inteContainerEntity = await _inteContainerRepository.GetByIdAsync(id);
-            if (inteContainerEntity != null)
-            {
-                return inteContainerEntity.ToModel<InteContainerDto>();
-            }
-            return null;
+            if (inteContainerEntity == null) return null;
+
+            return inteContainerEntity.ToModel<InteContainerDto>();
         }
+
+
+
+        /// <summary>
+        /// 验证对象
+        /// </summary>
+        /// <param name="dto"></param>
+        private static void ValidationSaveDto(InteContainerSaveDto dto)
+        {
+            if (dto == null)
+            {
+
+            }
+        }
+
     }
 }
