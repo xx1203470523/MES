@@ -1,5 +1,5 @@
 using Hymson.Infrastructure;
-using Hymson.Infrastructure.Constants;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query
 {
@@ -11,7 +11,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query
         /// <summary>
         /// 备件/工装
         /// </summary>
-        public int Type { get; set; } = DbDefaultValueConstant.IntDefaultValue;
+        public EquipmentPartTypeEnum Type { get; set; }
 
         /// <summary>
         /// 站点编码 

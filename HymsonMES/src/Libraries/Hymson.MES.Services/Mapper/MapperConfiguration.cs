@@ -83,7 +83,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquEquipmentSaveDto, EquEquipmentEntity>();
             CreateMap<EquEquipmentPagedQueryDto, EquEquipmentPagedQuery>();
 
-            CreateMap<EquEquipmentView, EquEquipmentDto>();
+            CreateMap<EquEquipmentEntity, EquEquipmentDto>();
             CreateMap<EquEquipmentEntity, EquEquipmentListDto>();
             #endregion
 

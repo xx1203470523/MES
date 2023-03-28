@@ -46,13 +46,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
         Task<EquEquipmentGroupEntity> GetByIdAsync(long id);
         
         /// <summary>
-        /// 获取List
-        /// </summary>
-        /// <param name="equEquipmentGroupQuery"></param>
-        /// <returns></returns>
-        Task<IEnumerable<EquEquipmentGroupEntity>> GetEntitiesAsync(EquEquipmentGroupQuery equEquipmentGroupQuery);
-        
-        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="equEquipmentGroupPagedQuery"></param>

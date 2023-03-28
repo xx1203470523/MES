@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Integrated;
 
 namespace Hymson.MES.Core.Domain.Integrated
 {
@@ -42,6 +43,6 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// 描述 :启用状态 
         /// 空值 : true  
         /// </summary>
-        public int UseStatus { get; set; }
+        public CalendarUseStatusEnum UseStatus { get; set; }
     }
 }
