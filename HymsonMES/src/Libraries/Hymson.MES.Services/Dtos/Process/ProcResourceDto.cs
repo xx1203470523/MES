@@ -106,7 +106,7 @@ namespace Hymson.MES.Services.Dtos.Process
     public class ProcResourceProcedurePagedQueryDto : PagerInfo
     {
         /// <summary>
-        /// 工序编码
+        /// 工序id
         /// </summary>
         public long? ProcedureId { get; set; }
     }

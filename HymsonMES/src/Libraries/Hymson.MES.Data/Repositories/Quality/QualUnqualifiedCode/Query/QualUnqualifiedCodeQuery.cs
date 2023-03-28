@@ -13,5 +13,14 @@ namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query
     /// </summary>
     public class QualUnqualifiedCodeQuery
     {
+        /// <summary>
+        /// 工厂
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 不合格代码组id
+        /// </summary>
+        public long? UnqualifiedGroupId { get; set; }
     }
 }

@@ -197,8 +197,8 @@ namespace Hymson.MES.Services.Services.Process
             var procResourceDtos = new List<ProcResourceDto>();
             foreach (var entity in pagedInfo.Data)
             {
-                var resourceTypeDto = entity.ToModel<ProcResourceDto>();
-                procResourceDtos.Add(resourceTypeDto);
+                var resourceDto = entity.ToModel<ProcResourceDto>();
+                procResourceDtos.Add(resourceDto);
             }
             return new PagedInfo<ProcResourceDto>(procResourceDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
@@ -809,7 +809,7 @@ namespace Hymson.MES.Services.Services.Process
         {
             if (idsArr.Length < 1)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10102));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10102));
             }
 
             //不能删除启用状态的资源

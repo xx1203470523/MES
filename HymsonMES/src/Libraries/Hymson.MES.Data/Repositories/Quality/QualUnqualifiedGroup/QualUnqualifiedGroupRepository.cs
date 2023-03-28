@@ -78,10 +78,16 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualUnqualifiedGroupEntity>> GetQualUnqualifiedGroupEntitiesAsync(QualUnqualifiedGroupQuery param)
+        public async Task<IEnumerable<QualUnqualifiedGroupEntity>> GetListByProcedureIdAsync(QualUnqualifiedGroupQuery param)
         {
             var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetQualUnqualifiedGroupEntitiesSqlTemplate);
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("ug.*");
+            sqlBuilder.Where("ug.IsDeleted=0");
+            sqlBuilder.Where($"ug.SiteId =@SiteId");
+            sqlBuilder.LeftJoin("qual_unqualified_group_procedure_relation pr on ug.Id =pr.UnqualifiedGroupId ");
+            sqlBuilder.Where("pr.ProcedureId=@ProcedureId");
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var qualUnqualifiedGroupEntities = await conn.QueryAsync<QualUnqualifiedGroupEntity>(template.RawSql, param);
             return qualUnqualifiedGroupEntities;
@@ -240,9 +246,7 @@ namespace Hymson.MES.Data.Repositories.Quality
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `qual_unqualified_group` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `qual_unqualified_group` /**where**/ ";
-        const string GetQualUnqualifiedGroupEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM `qual_unqualified_group` /**where**/  ";
+        const string GetEntitiesSqlTemplate = @"SELECT    /**select**/  FROM `qual_unqualified_group` ug  /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/  /**where**/  ";
         const string GetByIdSql = @"SELECT 
                                Id, SiteId, UnqualifiedGroup, UnqualifiedGroupName, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted
                                 FROM `qual_unqualified_group`  WHERE Id = @Id  AND IsDeleted=0 ";

@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Quality;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Services.Services.Quality.IQualityService
 {
@@ -16,6 +17,13 @@ namespace Hymson.MES.Services.Services.Quality.IQualityService
         /// <param name="qualUnqualifiedGroupPagedQueryDto"></param>
         /// <returns></returns>
         Task<PagedInfo<QualUnqualifiedGroupDto>> GetPageListAsync(QualUnqualifiedGroupPagedQueryDto qualUnqualifiedGroupPagedQueryDto);
+
+        /// <summary>
+        /// 查询工序下的不合格组列表
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        Task<IEnumerable<QualUnqualifiedGroupDto>> GetListByProcedureIdAsync([FromQuery] QualUnqualifiedGroupQueryDto queryDto);
 
         /// <summary>
         /// 新增

@@ -11,11 +11,13 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
+using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.Query;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Quality.IQualityService;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -85,7 +87,6 @@ namespace Hymson.MES.Services.Services.Quality
             return qualUnqualifiedCodeDto;
         }
 
-
         /// <summary>
         /// 获取不合格代码组
         /// </summary>
@@ -116,6 +117,29 @@ namespace Hymson.MES.Services.Services.Quality
             return nqualifiedCodeGroupRelationList;
         }
 
+        /// <summary>
+        /// 根据不合格代码组id查询不合格代码列表
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualUnqualifiedCodeDto>> GetListByGroupIdAsync(long groupId)
+        {
+            var query = new QualUnqualifiedCodeQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                UnqualifiedGroupId = groupId
+            };
+            var list = await _qualUnqualifiedCodeRepository.GetListByGroupIdAsync(query);
+
+            //实体到DTO转换 装载数据
+            var qualUnqualifiedCodes = new List<QualUnqualifiedCodeDto>();
+            foreach (var entity in list)
+            {
+                var unqualifiedCodeDto = entity.ToModel<QualUnqualifiedCodeDto>();
+                qualUnqualifiedCodes.Add(unqualifiedCodeDto);
+            }
+            return qualUnqualifiedCodes;
+        }
 
         /// <summary>
         /// 新增
