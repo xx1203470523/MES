@@ -7,6 +7,7 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums.Integrated;
+using Hymson.Sequences.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -62,9 +63,13 @@ namespace Hymson.MES.Core.Domain.Integrated
        /// <summary>
         /// 重置序号;1：从不；2：每天；3：每周；4：每月；5：每年；
         /// </summary>
-        public CodeRuleResetTypeEnum ResetType { get; set; }
+        public SerialNumberTypeEnum ResetType { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 手动录入编码规则的描述信息
+        /// </summary>
+        public int StartNumber { get; set; }
+        /// <summary>
         /// 手动录入编码规则的描述信息
         /// </summary>
         public string Remark { get; set; }
@@ -73,7 +78,5 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
-
-       
     }
 }
