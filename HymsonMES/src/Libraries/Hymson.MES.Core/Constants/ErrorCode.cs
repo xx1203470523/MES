@@ -182,7 +182,6 @@
         public const string MES12112 = "工作中心已经关联数据,允许修改.";
         #endregion
 
-
         #region 编码规则 12400
         public const string MES12400 = "代码规则维护错误";
         public const string MES12401 = "代码规则中物料Id[{productId}]已经存在";
@@ -210,6 +209,12 @@
 
         #endregion
 
+        #region 容器维护 12500
+        public const string MES12500 = "容器维护错误";
+        public const string MES12501 = "最大数量不能小于最小数量{Minimum}";
+        public const string MES12502 = "最大数量不能小于最小数量";
+        #endregion
+
         //设备
         #region 故障原因 13000
         public const string MES13000 = "基础故障原因错误";
@@ -225,7 +230,6 @@
         public const string MES13010 = "故障原因名称不能为空";
 
         #endregion
-
 
         //库存
         #region 供应商库存  15000
