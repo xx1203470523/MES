@@ -1,21 +1,26 @@
 ﻿using Hymson.Localization.Services;
 using Hymson.MES.Services.Dtos.Common;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Hymson.MES.Api.Controllers
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [Route("api/v1/[controller]")]
     [ApiController]
     public class CommonController : ControllerBase
     {
         private readonly IEnumService _enumService;
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="enumService"></param>
         public CommonController(IEnumService enumService)
         {
             _enumService = enumService;
         }
+
         /// <summary>
         /// 获取枚举
         /// </summary>
@@ -27,35 +32,24 @@ namespace Hymson.MES.Api.Controllers
             return _enumService.GetEnumTypes();
         }
 
-
         /// <summary>
         /// 获取枚举
         /// </summary>
         /// <returns></returns>
         [Route("enumsList")]
         [HttpGet]
-        public Dictionary<string, List<EnumDto>> GetEnumTypes2()
+        public Dictionary<string, IEnumerable<EnumDto>> GetEnumTypesList()
         {
-            var dicts = _enumService.GetEnumTypes();
+            Dictionary<string, IEnumerable<EnumDto>> keyValuePairs = new();
 
-            Dictionary<string, List<EnumDto>> keyValuePairs1 = new Dictionary<string, List<EnumDto>>();
+            var dicts = _enumService.GetEnumTypes();
             foreach (var dict in dicts)
             {
-                var list = new List<EnumDto>();
-                var key = dict.Key;
-                var items = dict.Value;
-                foreach (var item in items)
-                {
-                    list.Add(new EnumDto
-                    {
-                        Value = item.Key,
-                        Label = item.Value
-                    });
-                }
-                keyValuePairs1.Add(key, list);
+                keyValuePairs.Add(dict.Key, dict.Value.Select(s => new EnumDto { Value = s.Key, Label = s.Value }));
             }
 
-         return keyValuePairs1;
+            return keyValuePairs;
         }
+
     }
 }
