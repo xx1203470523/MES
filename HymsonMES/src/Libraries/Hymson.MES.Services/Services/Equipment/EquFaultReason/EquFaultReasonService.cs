@@ -120,7 +120,7 @@ namespace Hymson.MES.Services.Services.Equipment
             var pagedInfo = await _EquFaultReasonRepository.GetPagedInfoAsync(EquFaultReasonPagedQuery);
 
             //实体到DTO转换 装载数据
-            List<EquFaultReasonDto> EquFaultReasonDtos = PrepareEquFaultReasonDtos(pagedInfo);
+            List<EquFaultReasonDto> EquFaultReasonDtos = PrepareEquFaultReasonDtos(pagedInfo).ToList();
             return new PagedInfo<EquFaultReasonDto>(EquFaultReasonDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
