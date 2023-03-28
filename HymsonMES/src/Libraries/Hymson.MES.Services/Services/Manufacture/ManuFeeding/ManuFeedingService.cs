@@ -241,7 +241,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             */
 
             // 通过产线->工单->BOM->查询物料
-            materialIds = await GetMaterialIdsByWorkCenterIdAsync(workCenter.Id);
+            materialIds = await GetMaterialIdsByWorkCenterIdAsync(workCenter.Id, queryDto.WorkOrderId);
 
             // 查询不到物料
             if (materialIds == null || materialIds.Any() == false) return list;
@@ -441,11 +441,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// 通过工作中心ID获取物料ID集合
         /// </summary>
         /// <param name="workCenterId"></param>
+        /// <param name="workOrderId"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<long>?> GetMaterialIdsByWorkCenterIdAsync(long workCenterId)
+        private async Task<IEnumerable<long>?> GetMaterialIdsByWorkCenterIdAsync(long workCenterId, long? workOrderId)
         {
             var workOrders = await GetWorkOrderByWorkCenterIdAsync(workCenterId);
             if (workOrders == null) return null;
+
+            // 保留指定的工单
+            if (workOrderId.HasValue == true) workOrders = workOrders.Where(w => w.Id == workOrderId.Value);
 
             // 通过工单查询BOM
             var bomIds = workOrders.Select(s => s.ProductBOMId);
