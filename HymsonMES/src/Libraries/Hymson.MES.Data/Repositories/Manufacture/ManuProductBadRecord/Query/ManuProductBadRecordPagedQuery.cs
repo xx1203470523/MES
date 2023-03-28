@@ -19,6 +19,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public class ManuProductBadRecordPagedQuery : PagerInfo
     {
-
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long? SiteId { get; set; }
     }
 }

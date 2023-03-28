@@ -104,7 +104,7 @@ namespace Hymson.MES.Services.Services.Warehouse
 
                 if (item.QuantityResidue <= 0)
                 {
-                    throw new BusinessException(nameof(ErrorCode.MES15103)).WithData("MateialCode", item.MaterialCode); ;
+                    throw new BusinessException(nameof(ErrorCode.MES15103)).WithData("MaterialCode", item.MaterialCode); ;
                 }
                 //DTO转换实体 
                 //var whMaterialInventoryEntity = item.ToEntity<WhMaterialInventoryEntity>();
@@ -116,13 +116,13 @@ namespace Hymson.MES.Services.Services.Warehouse
                 //var supplierInfo = await _whMaterialInventoryRepository.GetWhSupplierByMaterialIdAsync(materialInfo.Id, item.SupplierId);
                 //if (materialInfo == null || supplierInfo.Count() <= 0)
                 //{
-                //    throw new BusinessException(nameof(ErrorCode.MES15102)).WithData("MateialCode", item.MaterialCode);
+                //    throw new BusinessException(nameof(ErrorCode.MES15102)).WithData("MaterialCode", item.MaterialCode);
                 //}
 
                 var isMaterialBarCode = await GetMaterialBarCodeAnyAsync(item.MaterialBarCode);
                 if (isMaterialBarCode)
                 {
-                    throw new BusinessException(nameof(ErrorCode.MES15104)).WithData("MateialCode", item.MaterialCode);
+                    throw new BusinessException(nameof(ErrorCode.MES15104)).WithData("MaterialCode", item.MaterialCode);
                 }
 
                 #endregion
@@ -321,9 +321,9 @@ namespace Hymson.MES.Services.Services.Warehouse
                 throw new BusinessException(nameof(ErrorCode.MES15101));
             }
             var supplierInfo = await _whMaterialInventoryRepository.GetWhSupplierByMaterialIdAsync(materialInfo.Id);
-            if (materialInfo == null)
+            if (!supplierInfo.IsEmpty())
             {
-                throw new BusinessException(nameof(ErrorCode.MES15102)).WithData("MateialCode", materialCode);
+                throw new BusinessException(nameof(ErrorCode.MES15102)).WithData("MaterialCode", materialCode);
             }
             ProcMaterialInfoViewDto dto = new ProcMaterialInfoViewDto();
             dto.MaterialInfo = materialInfo;

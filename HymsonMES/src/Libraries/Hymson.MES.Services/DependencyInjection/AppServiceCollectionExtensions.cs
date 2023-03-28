@@ -153,6 +153,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuSfcProduceService, ManuSfcProduceService>();
             services.AddSingleton<IManuSfcInfoService, ManuSfcInfoService>();
             services.AddSingleton<IManuGenerateBarcodeService, ManuGenerateBarcodeService>();
+            services.AddSingleton<IManuProductBadRecordService, ManuProductBadRecordService>();
             #endregion
 
             #region Warehouse 
@@ -291,6 +292,9 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<AbstractValidator<ManuSfcInfoCreateDto>, ManuSfcInfoCreateValidator>();
             services.AddSingleton<AbstractValidator<ManuSfcInfoModifyDto>, ManuSfcInfoModifyValidator>();
+
+            services.AddSingleton<AbstractValidator<ManuProductBadRecordCreateDto>, ManuProductBadRecordCreateValidator>();
+            services.AddSingleton<AbstractValidator<ManuProductBadRecordModifyDto>, ManuProductBadRecordModifyValidator>();
             #endregion
 
             #region Warehouse 

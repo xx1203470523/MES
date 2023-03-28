@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Quality.IQualityService;
 using Microsoft.AspNetCore.Mvc;
@@ -37,6 +38,18 @@ namespace Hymson.MES.Api.Controllers.Quality
         public async Task<PagedInfo<QualUnqualifiedGroupDto>> QueryPagedQualUnqualifiedGroupAsync([FromQuery] QualUnqualifiedGroupPagedQueryDto parm)
         {
             return await _qualUnqualifiedGroupService.GetPageListAsync(parm);
+        }
+
+        /// <summary>
+        /// 获取分页数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        [Route("listByProcedure")]
+        [HttpGet]
+        public async Task<IEnumerable<QualUnqualifiedGroupDto>> GetListByProcedureIdAsync([FromQuery] QualUnqualifiedGroupQueryDto query)
+        {
+            return await _qualUnqualifiedGroupService.GetListByProcedureIdAsync(query);
         }
 
         /// <summary>

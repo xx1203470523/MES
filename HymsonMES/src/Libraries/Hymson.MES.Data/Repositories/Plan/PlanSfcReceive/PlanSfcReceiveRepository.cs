@@ -56,6 +56,17 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
 
         /// <summary>
+        /// 根据IDs批量获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcInfoEntity>> GetByIdsAsync(long[] ids)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ManuSfcInfoEntity>(GetByIdsSql, new { ids = ids });
+        }
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="planSfcInfoPagedQuery"></param>

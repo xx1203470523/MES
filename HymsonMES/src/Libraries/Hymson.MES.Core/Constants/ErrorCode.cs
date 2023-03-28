@@ -332,7 +332,8 @@
         public const string MES16107 = "工单:{OrderCode}没有匹配的SN:{SFC}";
         public const string MES16108 = "工单:{OrderCode}与关联工单产品不匹配";
         public const string MES16109 = "工单:{OrderCode}与关联工单不能一样";
-
+        public const string MES16110 = "扫描条码失败";
+        public const string MES16111 = "条码:{SFC}已使用，不允许删除";
         #endregion
 
         #region 条码生成 MES16200

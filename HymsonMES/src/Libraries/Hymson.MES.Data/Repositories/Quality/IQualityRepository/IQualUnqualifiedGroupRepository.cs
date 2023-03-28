@@ -73,7 +73,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<IEnumerable<QualUnqualifiedGroupEntity>> GetQualUnqualifiedGroupEntitiesAsync(QualUnqualifiedGroupQuery param);
+        Task<IEnumerable<QualUnqualifiedGroupEntity>> GetListByProcedureIdAsync(QualUnqualifiedGroupQuery param);
 
         /// <summary>
         /// 分页查询

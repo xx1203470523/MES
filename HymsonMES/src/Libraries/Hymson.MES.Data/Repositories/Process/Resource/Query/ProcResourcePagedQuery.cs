@@ -69,7 +69,7 @@ namespace Hymson.MES.Data.Repositories.Process.Resource
     public class ProcResourceProcedurePagedQuery : PagerInfo
     {
         /// <summary>
-        /// 站点编码 
+        /// 站点id
         /// </summary>
         public long? SiteId { get; set; }
 

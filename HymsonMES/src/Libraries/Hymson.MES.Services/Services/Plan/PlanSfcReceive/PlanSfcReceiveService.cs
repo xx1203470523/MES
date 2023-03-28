@@ -184,7 +184,7 @@ namespace Hymson.MES.Services.Services.Plan
             }
             if (response == 0)
             {
-                throw new BusinessException(nameof(ErrorCode.MES16002));
+                throw new BusinessException(nameof(ErrorCode.MES16110));
             }
             #endregion
 
@@ -200,6 +200,13 @@ namespace Hymson.MES.Services.Services.Plan
         /// <returns></returns>
         public async Task<int> DeletesPlanSfcInfoAsync(long[] idsArr)
         {
+
+            var sfcList = await _planSfcInfoRepository.GetByIdsAsync(idsArr);
+            if (sfcList.Any())
+            {
+                var msgSfcs = string.Join(",", sfcList.Where(it => it.IsUsed > 0).Select(it => it.SFC).ToArray());
+                throw new BusinessException(nameof(ErrorCode.MES16111)).WithData("SFC", msgSfcs);
+            }
             return await _planSfcInfoRepository.DeletesAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
         }
 

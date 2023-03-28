@@ -8,13 +8,16 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.Query;
+using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Quality.IQualityService;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -65,6 +68,30 @@ namespace Hymson.MES.Services.Services.Quality
         }
 
         /// <summary>
+        /// 查询工序下的不合格组列表
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualUnqualifiedGroupDto>> GetListByProcedureIdAsync([FromQuery] QualUnqualifiedGroupQueryDto queryDto)
+        {
+            var query = new QualUnqualifiedGroupQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                ProcedureId = queryDto.ProcedureId
+            };
+            var list = await _qualUnqualifiedGroupRepository.GetListByProcedureIdAsync(query);
+
+            //实体到DTO转换 装载数据
+            var unqualifiedGroupDtos = new List<QualUnqualifiedGroupDto>();
+            foreach (var entity in list)
+            {
+                var groupDto = entity.ToModel<QualUnqualifiedGroupDto>();
+                unqualifiedGroupDtos.Add(groupDto);
+            }
+            return unqualifiedGroupDtos;
+        }
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="param"></param>
@@ -98,7 +125,7 @@ namespace Hymson.MES.Services.Services.Quality
                     qualUnqualifiedCodeGroupRelationlist.Add(new QualUnqualifiedCodeGroupRelation
                     {
                         Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId??0,
+                        SiteId = _currentSite.SiteId ?? 0,
                         UnqualifiedGroupId = qualUnqualifiedGroupEntity.Id,
                         UnqualifiedCodeId = item,
                         CreatedBy = userId,
@@ -275,7 +302,7 @@ namespace Hymson.MES.Services.Services.Quality
                     {
                         Id = item.Id,
                         UnqualifiedGroupId = item.UnqualifiedGroupId,
-                        UnqualifiedId=item.UnqualifiedCodeId,
+                        UnqualifiedId = item.UnqualifiedCodeId,
                         UnqualifiedCode = item.UnqualifiedCode,
                         UnqualifiedCodeName = item.UnqualifiedCodeName,
                         CreatedBy = item.CreatedBy,
@@ -293,7 +320,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<List<QualUnqualifiedGroupProcedureRelationDto>>  GetQualUnqualifiedCodeProcedureRelationByIdAsync(long id)
+        public async Task<List<QualUnqualifiedGroupProcedureRelationDto>> GetQualUnqualifiedCodeProcedureRelationByIdAsync(long id)
         {
             var qualUnqualifiedCodeProcedureRelationList = await _qualUnqualifiedGroupRepository.GetQualUnqualifiedCodeProcedureRelationAsync(id);
             var qualUnqualifiedGroupProcedureRelationList = new List<QualUnqualifiedGroupProcedureRelationDto>();
