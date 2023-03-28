@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Constants;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Equipment
 {
@@ -49,7 +50,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 备件/工装
         /// </summary>
-        public int Type { get; set; }
+        public EquipmentPartTypeEnum Type { get; set; }
 
         /// <summary>
         /// 状态

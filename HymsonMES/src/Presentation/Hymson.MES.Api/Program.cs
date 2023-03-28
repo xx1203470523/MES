@@ -39,15 +39,14 @@ namespace Hymson.MES.Api
             }).AddJsonOptions((jsonOptions) => {
                 jsonOptions.JsonSerializerOptions.Converters.Add(new CustomInt64Converter());
             }); ;
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
             builder.Services.AddMemoryCache();
             builder.Services.AddKafkaForDebeziumService();
             builder.Services.Configure<KafkaForDebeziumOptions>(builder.Configuration.GetSection(nameof(KafkaForDebeziumOptions)));
             builder.Services.AddSingleton<IKafkaEventHandler<BinlogData>, ClearCacheEventHandler>();
 #if DEBUG
-            builder.Services.AddHostedService<WorkService>();
+            //builder.Services.AddHostedService<WorkService>();
 #endif
             AddSwaggerGen(builder.Services);
 
@@ -108,6 +107,7 @@ namespace Hymson.MES.Api
         private static void AddSwaggerGen(IServiceCollection services)
         {
 #if DEBUG
+            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new OpenApiInfo

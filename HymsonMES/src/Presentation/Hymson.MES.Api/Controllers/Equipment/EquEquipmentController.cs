@@ -96,7 +96,7 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// </summary>
         /// <returns></returns>
         [HttpGet("dictionary")]
-        public async Task<List<EquEquipmentDictionaryDto>> QueryEquEquipmentDictionaryAsync()
+        public async Task<IEnumerable<EquEquipmentDictionaryDto>> QueryEquEquipmentDictionaryAsync()
         {
             return await _equEquipmentService.GetEquEquipmentDictionaryAsync();
         }

@@ -53,7 +53,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob
             }
             if (!string.IsNullOrWhiteSpace(param.Name))
             {
-                param.Code = $"%{param.Name}%";
+                param.Name = $"%{param.Name}%";
                 sqlBuilder.Where("Name like @Name");
             }
 

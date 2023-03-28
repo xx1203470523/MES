@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Integrated;
 using System.ComponentModel.DataAnnotations;
 
 namespace Hymson.MES.Services.Dtos.Integrated
@@ -69,7 +70,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 是否启用
         /// </summary>
-        public bool UseStatus { get; set; } = false;
+        public CalendarUseStatusEnum UseStatus { get; set; }
     }
 
     /// <summary>

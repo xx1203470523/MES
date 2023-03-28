@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Integrated;
 
 namespace Hymson.MES.Core.Domain.Integrated
 {
@@ -19,7 +20,7 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// 描述 :日历类型（字典名称：inte_calendar_type） 
         /// 空值 : false  
         /// </summary>
-        public int CalendarType { get; set; }
+        public CalendarTypeEnum CalendarType { get; set; }
 
         /// <summary>
         /// 描述 :设备或者线体id 

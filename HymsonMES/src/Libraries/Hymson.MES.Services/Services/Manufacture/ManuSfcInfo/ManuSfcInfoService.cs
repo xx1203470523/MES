@@ -121,7 +121,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="manuSfcInfoDto"></param>
+        /// <param name="manuSfcInfoModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyManuSfcInfoAsync(ManuSfcInfoModifyDto manuSfcInfoModifyDto)
         {

@@ -61,12 +61,12 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 主键
         /// </summary>
-        public long Id { get; set; }
+        public long? Id { get; set; }
 
         /// <summary>
         /// 编码规则ID
         /// </summary>
-        public long CodeRulesId { get; set; }
+        public long? CodeRulesId { get; set; }
 
         /// <summary>
         /// 序号
@@ -86,7 +86,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
        /// <summary>
         /// 描述
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
     }
 

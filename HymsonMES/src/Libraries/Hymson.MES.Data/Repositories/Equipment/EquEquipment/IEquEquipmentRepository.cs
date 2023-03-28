@@ -72,13 +72,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<EquEquipmentView> GetViewByIdAsync(long id);
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="equipmentCode"></param>
         /// <returns></returns>
         Task<EquEquipmentEntity> GetByEquipmentCodeAsync(string equipmentCode);

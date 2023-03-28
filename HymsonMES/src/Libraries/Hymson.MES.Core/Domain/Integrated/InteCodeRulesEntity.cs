@@ -66,9 +66,10 @@ namespace Hymson.MES.Core.Domain.Integrated
         public SerialNumberTypeEnum ResetType { get; set; }
 
         /// <summary>
-        /// 手动录入编码规则的描述信息
+        /// 初始值
         /// </summary>
         public int StartNumber { get; set; }
+
         /// <summary>
         /// 手动录入编码规则的描述信息
         /// </summary>
