@@ -180,6 +180,26 @@ namespace Hymson.MES.Data.Repositories.Quality
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<QualUnqualifiedCodeGroupRelationView>(GetQualUnqualifiedCodeGroupRelationSqlTemplate, new { Id = id });
         }
+
+        /// <summary>
+        /// 根据不合格代码组id查询不合格代码列表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualUnqualifiedCodeEntity>> GetListByGroupIdAsync(QualUnqualifiedCodeQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetListByGroupIdTemplate);
+            sqlBuilder.Select("uc.*");
+            sqlBuilder.Where("uc.IsDeleted=0");
+            sqlBuilder.Where($"uc.SiteId =@SiteId");
+            sqlBuilder.LeftJoin("qual_unqualified_code_group_relation gr on uc.Id =gr.UnqualifiedCodeId and gr.IsDeleted =0  ");
+            sqlBuilder.Where("gr.UnqualifiedGroupId=@UnqualifiedGroupId");
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var qualUnqualifiedCodes = await conn.QueryAsync<QualUnqualifiedCodeEntity>(template.RawSql, query);
+            return qualUnqualifiedCodes;
+        }
     }
 
     /// <summary>
@@ -191,6 +211,8 @@ namespace Hymson.MES.Data.Repositories.Quality
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `qual_unqualified_code` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `qual_unqualified_code` /**where**/ ";
+
+        const string GetListByGroupIdTemplate = @"SELECT /**select**/ FROM `qual_unqualified_code` uc  /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/  ";
 
         const string GetQualUnqualifiedCodeGroupRelationSqlTemplate = @"SELECT  QUCGR.Id,QUCGR.UnqualifiedGroupId,QUG.UnqualifiedGroup,QUG.UnqualifiedGroupName,QUCGR.CreatedBy,QUCGR.CreatedOn,QUCGR.UpdatedBy,QUCGR.UpdatedOn
                                                                         FROM qual_unqualified_code QUC 

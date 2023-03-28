@@ -246,4 +246,15 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public string? UnqualifiedGroupName { get; set; }
     }
+
+    /// <summary>
+    /// 不合格组查询对象
+    /// </summary>
+    public class QualUnqualifiedGroupQueryDto
+    {
+        /// <summary>
+        /// 工序id
+        /// </summary>
+        public long? ProcedureId { get; set; }
+    }
 }
