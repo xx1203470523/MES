@@ -6,6 +6,7 @@
  *build datetime: 2023-03-18 05:37:27
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Manufacture
 {
@@ -18,9 +19,14 @@ namespace Hymson.MES.Core.Domain.Manufacture
     public class ManuSfcProduceEntity : BaseEntity
     {
         /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
         /// 条码
         /// </summary>
-        public string Sfc { get; set; }
+        public string SFC { get; set; }
 
        /// <summary>
         /// 产品id
@@ -50,7 +56,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
        /// <summary>
         /// BOMId
         /// </summary>
-        public long ProductBOMId { get; set; }
+        public long BOMId { get; set; }
 
         /// <summary>
         /// 当前数量
@@ -75,7 +81,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
        /// <summary>
         /// 状态;1：排队；2：活动；
         /// </summary>
-        public int Status { get; set; }
+        public SfcProduceStatusEnum Status { get; set; }
 
        /// <summary>
         /// 锁;1：未锁定；2：即时锁；3：将来锁；
@@ -96,12 +102,5 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 复投次数;复投次数
         /// </summary>
         public int RepeatedCount { get; set; }
-
-       /// <summary>
-        /// 站点Id
-        /// </summary>
-        public long SiteId { get; set; }
-
-       
     }
 }

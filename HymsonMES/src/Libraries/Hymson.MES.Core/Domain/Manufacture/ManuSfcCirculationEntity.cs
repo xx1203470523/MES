@@ -6,12 +6,7 @@
  *build datetime: 2023-03-27 03:50:00
  */
 using Hymson.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+using Hymson.MES.Core.Enums.Manufacture;
 
 namespace Hymson.MES.Core.Domain.Manufacture
 {
@@ -66,7 +61,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 流转后条码信息
         /// </summary>
-        public long CirculationBarCode { get; set; }
+        public string CirculationBarCode { get; set; }
 
         /// <summary>
         /// 流转后工单id
@@ -79,10 +74,8 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public long CirculationProductId { get; set; }
 
         /// <summary>
-        /// 流转类型;1：拆分；2：合并；3：转换；
+        /// 流转类型;1：拆分；2：合并；3：转换; 4.消耗
         /// </summary>
-        public string Type { get; set; }
-
-
+        public SfcCirculationTypeEnum Type { get; set; }
     }
 }
