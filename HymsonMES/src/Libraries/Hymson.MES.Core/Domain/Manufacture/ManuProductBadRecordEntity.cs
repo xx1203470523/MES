@@ -6,6 +6,7 @@
  *build datetime: 2023-03-27 03:49:17
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Manufacture;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -56,12 +57,12 @@ namespace Hymson.MES.Core.Domain.Manufacture
        /// <summary>
         /// 不合格记录开关;1、开启  2、关闭
         /// </summary>
-        public bool? Status { get; set; }
+        public ProductBadRecordStatusEnum? Status { get; set; }
 
        /// <summary>
         /// 不良来源;·1、设备复投不良  2、人工录入不良
         /// </summary>
-        public bool? Source { get; set; }
+        public ProductBadRecordSourceEnum? Source { get; set; }
 
        /// <summary>
         /// 说明
