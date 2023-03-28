@@ -377,7 +377,7 @@ namespace Hymson.MES.Services.Services.Process
                     }
                 });
                 //判断打印机是否重复配置  数据库中 已经存储的情况
-                if (parm.PrintList.GroupBy(x => x.PrintId).Where(g => g.Count() > 2).Count() > 1)
+                if (parm.PrintList.GroupBy(x => x.PrintId).Where(g => g.Count() >= 2).Count() >= 1)
                 {
                     throw new ValidationException(nameof(ErrorCode.MES10313));
                 }
@@ -401,7 +401,7 @@ namespace Hymson.MES.Services.Services.Process
                 }
 
                 /*
-                if (parm.EquList.GroupBy(x => x.EquipmentId).Where(g => g.Count() > 2).Count() > 1)
+                if (parm.EquList.GroupBy(x => x.EquipmentId).Where(g => g.Count() >= 2).Count() >= 1)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10306));
                 }
@@ -596,7 +596,7 @@ namespace Hymson.MES.Services.Services.Process
                     }
                 });
                 //判断打印机是否重复配置  数据库中 已经存储的情况
-                if (param.PrintList.GroupBy(x => x.PrintId).Where(g => g.Count() > 2).Count() > 1)
+                if (param.PrintList.GroupBy(x => x.PrintId).Where(g => g.Count() >= 2).Count() >= 1)
                 {
                     throw new ValidationException(nameof(ErrorCode.MES10313));
                 }
@@ -620,7 +620,7 @@ namespace Hymson.MES.Services.Services.Process
                 }
 
                 /*
-                if (param.EquList.GroupBy(x => x.EquipmentId).Where(g => g.Count() > 2).Count() > 1)
+                if (param.EquList.GroupBy(x => x.EquipmentId).Where(g => g.Count() >= 2).Count() >= 1)
                 {
                     throw new Exception(nameof(ErrorCode.MES10314));
                 }
@@ -863,7 +863,7 @@ namespace Hymson.MES.Services.Services.Process
 
         //    if (param.PrintList != null && param.PrintList.Count > 0)
         //    {
-        //        if (param.PrintList.Where(x => x.OperationType != 3).GroupBy(x => x.PrintId).Where(g => g.Count() > 2).Count() > 1)
+        //        if (param.PrintList.Where(x => x.OperationType != 3).GroupBy(x => x.PrintId).Where(g => g.Count() >= 2).Count() >= 1)
         //        {
         //            throw new ValidationException(ErrorCode.MES10313);
         //        }
@@ -909,7 +909,7 @@ namespace Hymson.MES.Services.Services.Process
         //    //判断是否勾选了多个主设备，只能有一个主设备
         //    if (param.EquList != null && param.EquList.Count > 0)
         //    {
-        //        if (param.EquList.Where(x => x.OperationType != 3).GroupBy(x => x.EquipmentId).Where(g => g.Count() > 2).Count() > 1)
+        //        if (param.EquList.Where(x => x.OperationType != 3).GroupBy(x => x.EquipmentId).Where(g => g.Count() >= 2).Count() >= 1)
         //        {
         //            throw new Exception(ErrorCode.MES10314);
         //        }

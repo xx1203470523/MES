@@ -40,7 +40,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         public async Task<IEnumerable<string>> GenerateBarcodeSerialNumberAsync(BarcodeSerialNumberDto param)
         {
             List<string> list = new List<string>();
-            var serialList = await _sequenceService.GetSerialNumbersAsync(param.ResetType, param.CodeRuleKey, param.Count, 0, 9999);
+            var serialList = await _sequenceService.GetSerialNumbersAsync(param.ResetType, param.CodeRuleKey, param.Count, 0, 9);
             foreach (var item in serialList)
             {
                 var number = item * param.Increment + param.StartNumber;
@@ -98,14 +98,32 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
             {
                 throw new BusinessException(nameof(ErrorCode.MES16204)).WithData("base", type);
             }
-            int remainder = number % list.Count;
-            int quotient = number / list.Count;
+            return Convert(number, list);
+        }
+
+        /// <summary>
+        /// 进制转换
+        /// </summary>
+        /// <param name="number"></param>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        private string Convert(int number, List<string> list)
+        {
             StringBuilder stringBuilder = new StringBuilder();
-            foreach (var item in quotient.ToString())
+            int remainder = number % list.Count;
+            stringBuilder.Insert(0, list[remainder]);
+            int quotient = number / list.Count;
+            if (quotient >= list.Count)
             {
-                stringBuilder.Append(list[item]);
+                stringBuilder.Insert(0, Convert(remainder, list));
             }
-            stringBuilder.Append(list[remainder]);
+            else
+            {
+                if (quotient != 0)
+                {
+                    stringBuilder.Insert(0, list[quotient]);
+                }
+            }
             return stringBuilder.ToString();
         }
 

@@ -127,6 +127,8 @@
         public const string MES10707 = "请选择数据!";
         public const string MES10708 = "删除数据失败!";
         public const string MES10709 = "删除数据失败!无法删除保留或者启用的数据！";
+        public const string MES10710 = "关联物料页签物料不能重复!";
+        public const string MES10711 = "关联资源页签资源不能重复!";
         #endregion
 
         #region 不合格代码 11100
@@ -332,7 +334,8 @@
         public const string MES16107 = "工单:{OrderCode}没有匹配的SN:{SFC}";
         public const string MES16108 = "工单:{OrderCode}与关联工单产品不匹配";
         public const string MES16109 = "工单:{OrderCode}与关联工单不能一样";
-
+        public const string MES16110 = "扫描条码失败";
+        public const string MES16111 = "条码:{SFC}已使用，不允许删除";
         #endregion
 
         #region 条码生成 MES16200

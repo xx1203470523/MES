@@ -1,16 +1,8 @@
-/*
- *creator: Karl
- *
- *describe: 上料点表    控制器 | 代码由框架生成  
- *builder:  Karl
- *build datetime: 2023-02-17 08:57:53
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Extensions;
 
 namespace Hymson.MES.Api.Controllers.Process
 {
@@ -34,11 +26,13 @@ namespace Hymson.MES.Api.Controllers.Process
         /// 构造函数（上料点表）
         /// </summary>
         /// <param name="procLoadPointService"></param>
+        /// <param name="logger"></param>
         public ProcLoadPointController(IProcLoadPointService procLoadPointService, ILogger<ProcLoadPointController> logger)
         {
             _procLoadPointService = procLoadPointService;
             _logger = logger;
         }
+
 
         /// <summary>
         /// 分页查询列表（上料点表）

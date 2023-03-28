@@ -26,9 +26,7 @@ namespace Hymson.MES.Services.Services.Equipment
         private readonly AbstractValidator<EquFaultReasonCreateDto> _validationCreateRules;
         private readonly AbstractValidator<EquFaultReasonModifyDto> _validationModifyRules;
 
-        /// <summary>
-        /// 
-        /// </summary>
+
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
 
@@ -59,7 +57,7 @@ namespace Hymson.MES.Services.Services.Equipment
             EquFaultReasonEntity.CreatedOn = HymsonClock.Now();
             EquFaultReasonEntity.UpdatedOn = HymsonClock.Now();
             EquFaultReasonEntity.FaultReasonCode = EquFaultReasonEntity.FaultReasonCode.ToUpper();
-            EquFaultReasonEntity.SiteId = 1;//TODO _currentSite.SiteId;
+            EquFaultReasonEntity.SiteId = _currentSite.SiteId ?? 0;
 
             //判断编号是否已经存在
             var exists = await _EquFaultReasonRepository.GetEquFaultReasonEntitiesAsync(new EquFaultReasonQuery()
@@ -188,22 +186,9 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <returns></returns>
         public async Task<EquFaultReasonDto> QueryEquFaultReasonByIdAsync(long id)
         {
-            var siteId = 1;//TODO _currentSite.SiteId;
-
             var EquFaultReasonEntity = await _EquFaultReasonRepository.GetByIdAsync(id);
-            if (EquFaultReasonEntity != null)
-            {
-                var dto = EquFaultReasonEntity.ToModel<CustomEquFaultReasonDto>();
-                //var linkTypes =  await _EquFaultReasonLinkTypeRepository.GetEquFaultReasonLinkTypeEntitiesAsync(new EquFaultReasonLinkTypeQuery()
-                // {
-                //    SiteId = siteId,
-                //    FaultReasonID= dto.Id
-                //});
-                //dto.Type = $"{linkTypes.GroupBy(x => x.FaultReasonType).Select(x => x.Key).ToList().Sum()}";
-
-                return dto;
-            }
-            return null;
+            var dto = EquFaultReasonEntity.ToModel<CustomEquFaultReasonDto>();
+            return dto;
         }
     }
 }
