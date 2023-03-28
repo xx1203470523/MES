@@ -13,7 +13,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
     /// <summary>
     /// 条码生成
     /// </summary>
-    public class ManuGenerateBarcodeService
+    public class ManuGenerateBarcodeService : IManuGenerateBarcodeService
     {
         private readonly ISequenceService _sequenceService;
         private readonly IInteCodeRulesRepository _inteCodeRulesRepository;
@@ -37,7 +37,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<string>> GenerateBarcodeSerialNumber(BarcodeSerialNumberDto param)
+        public async Task<IEnumerable<string>> GenerateBarcodeSerialNumberAsync(BarcodeSerialNumberDto param)
         {
             List<string> list = new List<string>();
             var serialList = await _sequenceService.GetSerialNumbersAsync(param.ResetType, param.CodeRuleKey, param.Count, 0, 9999);
@@ -115,13 +115,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         /// <param name="param"></param>
         /// <returns></returns>
         /// <exception cref="BusinessException">未找到生成规则</exception>
-        public async Task<IEnumerable<string>> GenerateBarcodeList(GenerateBarcodeDto param)
+        public async Task<IEnumerable<string>> GenerateBarcodeListAsync(GenerateBarcodeDto param)
         {
             var getCodeRulesTask = _inteCodeRulesRepository.GetByIdAsync(param.CodeRuleId);
-            var getCodeRulesMakeListTask = _inteCodeRulesMakeRepository.GetInteCodeRulesMakeEntitiesAsync(new InteCodeRulesMakeQuery { CodeRulesId = id });
+            var getCodeRulesMakeListTask = _inteCodeRulesMakeRepository.GetInteCodeRulesMakeEntitiesAsync(new InteCodeRulesMakeQuery { CodeRulesId = param.CodeRuleId });
             var codeRulesMakeList = await getCodeRulesMakeListTask;
             var codeRule = await getCodeRulesTask;
-            var barcodeSerialNumberList = GenerateBarcodeSerialNumber(new BarcodeSerialNumberDto
+            var barcodeSerialNumberList = await GenerateBarcodeSerialNumberAsync(new BarcodeSerialNumberDto
             {
                 CodeRuleKey = param.IsTest ? param.CodeRuleId.ToString() + "Test" : param.CodeRuleId.ToString(),
                 Count = param.Count,
@@ -130,7 +130,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                 OrderLength = codeRule.OrderLength,
                 ResetType = codeRule.ResetType,
                 StartNumber = codeRule.StartNumber
-            }).ToString();
+            });
 
 
             if (barcodeSerialNumberList == null || !barcodeSerialNumberList.Any())

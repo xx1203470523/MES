@@ -344,6 +344,7 @@
         public const string MES16205 = "通配符{value}未实现";
         public const string MES16206 = "流水号转换只实现了16,32进制";
         #endregion
+
         #endregion
 
         #region 系统执行出错 业务逻辑出错
