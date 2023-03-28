@@ -98,6 +98,11 @@ namespace Hymson.MES.Data.Repositories.Process
             return procResource != null && procResource.Any();
         }
 
+        /// <summary>
+        /// 获取资源分页列表(关联资源类型)
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public async Task<PagedInfo<ProcResourceView>> GetPageListAsync(ProcResourcePagedQuery query)
         {
             var sqlBuilder = new SqlBuilder();
@@ -137,6 +142,40 @@ namespace Hymson.MES.Data.Repositories.Process
             var procResourceEntities = await procResourceEntitiesTask;
             var totalCount = await totalCountTask;
             return new PagedInfo<ProcResourceView>(procResourceEntities, query.PageIndex, query.PageSize, totalCount);
+        }
+
+        /// <summary>
+        /// 获取资源分页列表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ProcResourceEntity>> GettPageListByProcedureIdAsync(ProcResourceProcedurePagedQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoJoinDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoJoinCountSqlTemplate);
+            sqlBuilder.Where("r.IsDeleted = 0");
+            sqlBuilder.Where("r.SiteId = @SiteId");
+            sqlBuilder.OrderBy("r.UpdatedOn DESC");
+            sqlBuilder.Select("r.*");
+            sqlBuilder.LeftJoin("proc_resource_type t on r.ResTypeId = t.Id");
+            sqlBuilder.LeftJoin("proc_procedure p on p.ResourceTypeId =t.Id");
+
+            if (query.ProcedureId.HasValue)
+            {
+                sqlBuilder.Where("p.Id = @ProcedureId");
+            }
+            var offSet = (query.PageIndex - 1) * query.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = query.PageSize });
+            sqlBuilder.AddParameters(query);
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var procResourceEntitiesTask = conn.QueryAsync<ProcResourceEntity>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var procResourceEntities = await procResourceEntitiesTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<ProcResourceEntity>(procResourceEntities, query.PageIndex, query.PageSize, totalCount);
         }
 
         /// <summary>
@@ -296,6 +335,9 @@ namespace Hymson.MES.Data.Repositories.Process
 
         const string GetPagedListSqlTemplate = "SELECT /**select**/ FROM proc_resource /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
         const string GetPagedListCountSqlTemplate = "SELECT COUNT(*) FROM proc_resource /**where**/";
+
+        const string GetPagedInfoJoinDataSqlTemplate = @"SELECT /**select**/ FROM proc_resource r /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoJoinCountSqlTemplate = "SELECT COUNT(*) FROM proc_resource r /**innerjoin**/ /**leftjoin**/ /**where**/ ";
 
         const string GetListSqlTemplate = "SELECT /**select**/ FROM proc_resource  /**where**/  ";
 

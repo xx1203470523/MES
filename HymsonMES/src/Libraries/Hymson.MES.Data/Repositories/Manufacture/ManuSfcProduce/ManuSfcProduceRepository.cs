@@ -46,6 +46,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.LeftJoin("proc_material pm  on msp.ProductId =pm.Id  and pm.IsDeleted=0");
             sqlBuilder.LeftJoin("plan_work_order pwo on msp.WorkOrderId =pwo.Id  and pwo.IsDeleted=0");
             sqlBuilder.LeftJoin("proc_procedure pp on msp.ProcedureId =pp.Id and pp.IsDeleted =0");
+
+            //状态
             if (query.Status.HasValue)
             {
                 sqlBuilder.Where("msp.Status=@Status");
@@ -59,15 +61,22 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("msp.Sfc in @SfcArray");
             }
+            //工单
             if (!string.IsNullOrWhiteSpace(query.OrderCode))
             {
                 query.OrderCode = $"%{query.OrderCode}%";
                 sqlBuilder.Where("pwo.OrderCode=@OrderCode");
             }
+            //工序
             if (!string.IsNullOrWhiteSpace(query.Code))
             {
                 query.Code = $"%{query.Code}%";
                 sqlBuilder.Where("pp.Code=@Code");
+            }
+            //资源-》资源类型
+            if (query.ResourceTypeId.HasValue)
+            {
+                sqlBuilder.Where("pp.ResourceTypeId=@ResTypeId");
             }
 
             var offSet = (query.PageIndex - 1) * query.PageSize;

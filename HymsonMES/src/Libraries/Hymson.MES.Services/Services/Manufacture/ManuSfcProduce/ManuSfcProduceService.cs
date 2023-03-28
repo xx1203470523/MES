@@ -16,6 +16,7 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
@@ -47,6 +48,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
         /// <summary>
+        /// 资源仓储
+        /// </summary>
+        private readonly IProcResourceRepository _resourceRepository;
+
+        /// <summary>
         /// 条码步骤表仓储 仓储
         /// </summary>
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
@@ -59,6 +65,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         public ManuSfcProduceService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcStepRepository manuSfcStepRepository,
+            IProcResourceRepository resourceRepository,
             AbstractValidator<ManuSfcProduceCreateDto> validationCreateRules,
             AbstractValidator<ManuSfcProduceModifyDto> validationModifyRules)
         {
@@ -66,6 +73,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _currentSite = currentSite;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
+            _resourceRepository = resourceRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
         }
@@ -79,10 +87,20 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
             var manuSfcProducePagedQuery = manuSfcProducePagedQueryDto.ToQuery<ManuSfcProducePagedQuery>();
             manuSfcProducePagedQuery.SiteId = _currentSite.SiteId;
+
+            //查询多个条码
             if (!string.IsNullOrWhiteSpace(manuSfcProducePagedQueryDto.Sfcs))
             {
                 manuSfcProducePagedQuery.SfcArray = manuSfcProducePagedQueryDto.Sfcs.Split(',');
             }
+
+            //根据资源查询
+            if (manuSfcProducePagedQueryDto.ResourceId.HasValue)
+            {
+                var resource = await _resourceRepository.GetByIdAsync(manuSfcProducePagedQueryDto.ResourceId.Value);
+                manuSfcProducePagedQuery.ResourceTypeId = resource.ResTypeId;
+            }
+
             var pagedInfo = await _manuSfcProduceRepository.GetPagedInfoAsync(manuSfcProducePagedQuery);
 
             //实体到DTO转换 装载数据

@@ -183,6 +183,28 @@ namespace Hymson.MES.Services.Services.Process
         }
 
         /// <summary>
+        /// 根据工序id查询资源列表(工序 > 资源类型 > 资源)
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ProcResourceDto>> GettPageListByProcedureIdAsync(ProcResourceProcedurePagedQueryDto query)
+        {
+            var resourcePagedQuery = query.ToQuery<ProcResourceProcedurePagedQuery>();
+            resourcePagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            var pagedInfo = await _resourceRepository.GettPageListByProcedureIdAsync(resourcePagedQuery);
+
+            //实体到DTO转换 装载数据
+            var procResourceDtos = new List<ProcResourceDto>();
+            foreach (var entity in pagedInfo.Data)
+            {
+                var resourceTypeDto = entity.ToModel<ProcResourceDto>();
+                procResourceDtos.Add(resourceTypeDto);
+            }
+            return new PagedInfo<ProcResourceDto>(procResourceDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+
+        /// <summary>
         /// 资源关联打印机数据
         /// </summary>
         /// <param name="query"></param>
