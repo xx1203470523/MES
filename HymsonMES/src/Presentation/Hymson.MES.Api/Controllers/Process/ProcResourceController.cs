@@ -86,6 +86,18 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
+        /// 获取分页数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        [Route("listByProcedure")]
+        [HttpGet]
+        public async Task<PagedInfo<ProcResourceDto>> GettPageListByProcedureIdAsync([FromQuery] ProcResourceProcedurePagedQueryDto query)
+        {
+            return await _procResourceService.GettPageListByProcedureIdAsync(query);
+        }
+
+        /// <summary>
         /// 资源关联打印机数据
         /// </summary>
         /// <param name="query"></param>

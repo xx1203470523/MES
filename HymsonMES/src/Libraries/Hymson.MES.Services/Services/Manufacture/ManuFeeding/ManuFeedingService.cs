@@ -1,6 +1,8 @@
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
@@ -15,6 +17,7 @@ using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
+using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -301,12 +304,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             //验证DTO
             //await _validationCreateRules.ValidateAndThrowAsync(saveDto);
 
-            var inventory = await _whMaterialInventoryRepository.GetByBarCodeAsync(saveDto.BarCode);
-            if (inventory == null)
-            {
-                // TODO
-                return 0;
-            }
+            var inventory = await _whMaterialInventoryRepository.GetByBarCodeAsync(saveDto.BarCode) ?? throw new CustomerValidationException(nameof(ErrorCode.MES17101)).WithData("barCode", saveDto.BarCode);
 
             // DTO转换实体
             var entity = saveDto.ToEntity<ManuFeedingEntity>();

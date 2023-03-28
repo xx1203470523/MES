@@ -325,6 +325,8 @@ namespace Hymson.MES.Services.Mapper
 
             CreateMap<ProcResourceEquipmentBindView, ProcResourceEquipmentBindViewDto>();
             CreateMap<ProcResourceEquipmentBindPagedQueryDto, ProcResourceEquipmentBindPagedQuery>();
+
+            CreateMap<ProcResourceProcedurePagedQueryDto, ProcResourceProcedurePagedQuery>();
             #endregion
 
             #region Procedure

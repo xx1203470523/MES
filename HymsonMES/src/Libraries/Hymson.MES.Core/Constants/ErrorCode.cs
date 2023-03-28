@@ -345,6 +345,10 @@
         public const string MES16206 = "流水号转换只实现了16,32进制";
         #endregion
 
+        #region 生产
+        public const string MES17101 = "物料条码:{barCode}不存在！";
+        #endregion
+
         #endregion
 
         #region 系统执行出错 业务逻辑出错
@@ -353,7 +357,6 @@
         //public const string MES20101 = "MES20101";
 
         #endregion
-
 
         #region 调用第三方服务出错
         //public const string MES30001 = "MES30001";

@@ -43,6 +43,13 @@ namespace Hymson.MES.Services.Services.Process.Resource
         Task<List<ProcResourceDto>> GetListForGroupAsync(ProcResourcePagedQueryDto query);
 
         /// <summary>
+        /// 根据工序id查询资源列表(工序 > 资源类型 > 资源)
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ProcResourceDto>> GettPageListByProcedureIdAsync(ProcResourceProcedurePagedQueryDto query);
+
+        /// <summary>
         /// 资源关联打印机数据
         /// </summary>
         /// <param name="query"></param>
