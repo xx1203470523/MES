@@ -100,7 +100,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
             entity.SiteId = _currentSite.SiteId;
 
             #region 参数校验
-            if (createDto.UseStatus == true)
+            if (createDto.UseStatus == CalendarUseStatusEnum.Enable)
             {
                 var isExists = await _inteCalendarRepository.IsExistsAsync(entity.EquOrLineId);
                 if (isExists == true)
@@ -185,7 +185,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
             var entity = modifyDto.ToEntity<InteCalendarEntity>();
             entity.UpdatedBy = _currentUser.UserName;
 
-            entity.UseStatus = modifyDto.UseStatus == true ? (byte)CalendarUseStatusEnum.Enable : (byte)CalendarUseStatusEnum.NotEnabled;
+            entity.UseStatus = modifyDto.UseStatus;
 
             #region 参数校验
             var calendar = await _inteCalendarRepository.GetByIdAsync(entity.Id);
@@ -198,8 +198,8 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
                 //return responseDto;
             }
 
-            var enable = (int)CalendarUseStatusEnum.Enable;
-            if (calendar.UseStatus == enable && modifyDto.UseStatus == true)
+            var enable = CalendarUseStatusEnum.Enable;
+            if (calendar.UseStatus == enable && modifyDto.UseStatus == CalendarUseStatusEnum.Enable)
             {
                 // TODO 错误码
                 return 0;
@@ -208,7 +208,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
                 //return responseDto;
             }
 
-            if (modifyDto.UseStatus == true)
+            if (modifyDto.UseStatus == CalendarUseStatusEnum.Enable)
             {
                 var isExists = await _inteCalendarRepository.IsExistsAsync(entity.EquOrLineId, modifyDto.Id);
                 if (isExists == true)
@@ -321,7 +321,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s =>
             {
-                if (s.CalendarType == (int)CalendarTypeEnum.Equipment)
+                if (s.CalendarType == CalendarTypeEnum.Equipment)
                 {
                     s.Code = s.EquipmentCode;
                     s.Name = s.EquipmentName;
@@ -356,7 +356,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
                 CalendarType = calendar.CalendarType,
                 EquOrLineId = calendar.EquOrLineId,
                 Remark = calendar.Remark,
-                UseStatus = calendar.UseStatus == (int)CalendarUseStatusEnum.Enable,
+                UseStatus = calendar.UseStatus == CalendarUseStatusEnum.Enable,
                 CalendarDataList = new List<QueryInteCalendarDetailDto>()
             };
 

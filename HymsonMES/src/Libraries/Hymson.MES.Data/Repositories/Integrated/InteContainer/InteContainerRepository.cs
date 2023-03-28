@@ -107,13 +107,13 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
                 sqlBuilder.Where("IC.Status = @Status");
             }
 
-            if (!string.IsNullOrWhiteSpace(pagedQuery.Name) )
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Name))
             {
                 pagedQuery.Name = $"%{pagedQuery.Name}%";
-                sqlBuilder.Where("M.MaterialName LIKE @Name OR MG.GroupName LIKE @Name");
+                sqlBuilder.Where("(M.MaterialName LIKE @Name OR MG.GroupName LIKE @Name)");
             }
 
-            if (!string.IsNullOrWhiteSpace(pagedQuery.Version) )
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Version))
             {
                 pagedQuery.Version = $"%{pagedQuery.Version}%";
                 sqlBuilder.Where("M.Version LIKE @Version");

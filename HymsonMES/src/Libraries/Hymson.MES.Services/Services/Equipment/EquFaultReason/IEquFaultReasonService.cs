@@ -1,19 +1,7 @@
-/*
- *creator: pengxin
- *
- *describe: 设备故障原因表    服务接口 | 代码由框架生成
- *builder:  pengxin
- *build datetime: 2023-02-28 15:15:20
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Hymson.MES.Services.Services.Equipment 
+namespace Hymson.MES.Services.Services.Equipment
 {
     /// <summary>
     /// 设备故障原因表 service接口
@@ -30,14 +18,14 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="EquFaultReasonDto"></param>
+        /// <param name="EquFaultReasonCreateDto"></param>
         /// <returns></returns>
         Task<int> CreateEquFaultReasonAsync(EquFaultReasonCreateDto EquFaultReasonCreateDto);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="EquFaultReasonDto"></param>
+        /// <param name="EquFaultReasonModifyDto"></param>
         /// <returns></returns>
         Task ModifyEquFaultReasonAsync(EquFaultReasonModifyDto EquFaultReasonModifyDto);
 
@@ -51,7 +39,7 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="idsArr"></param>
         /// <returns></returns>
         Task<int> DeletesEquFaultReasonAsync(long[] idsArr);
 
