@@ -439,6 +439,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 资源id
         /// </summary>
         public long? ResourceId { get; set; }
+
+        /// <summary>
+        /// 锁定状态
+        /// </summary>
+        public int? Lock { get; set; }
     }
 
     /// <summary>

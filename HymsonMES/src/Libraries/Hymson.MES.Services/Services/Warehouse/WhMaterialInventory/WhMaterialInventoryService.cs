@@ -321,7 +321,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 throw new BusinessException(nameof(ErrorCode.MES15101));
             }
             var supplierInfo = await _whMaterialInventoryRepository.GetWhSupplierByMaterialIdAsync(materialInfo.Id);
-            if (!supplierInfo.IsEmpty())
+            if (!supplierInfo.Any())
             {
                 throw new BusinessException(nameof(ErrorCode.MES15102)).WithData("MaterialCode", materialCode);
             }

@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Equipment
 {
@@ -25,7 +26,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// 描述 :使用状态 0-禁用 1-启用 
         /// 空值 : false  
         /// </summary>
-        public int UseStatus { get; set; }
+        public SysDataStatusEnum UseStatus { get; set; }
 
         /// <summary>
         /// 描述 :设备故障先 
@@ -34,12 +35,15 @@ namespace Hymson.MES.Core.Domain.Equipment
         public string Remark { get; set; } = "";
 
         /// <summary>
-        /// 描述 :所属站点代码 
-        /// 空值 : false  
+        /// 最后修改人
         /// </summary>
-        public long SiteId { get; set; }
+        public string UpdatedBy { get; set; } = "";
 
-        
+        /// <summary>
+        /// 修改时间
+        /// </summary>
+        public DateTime? UpdatedOn { get; set; }
+
         /// <summary>
         /// 设备组名称
         /// </summary>

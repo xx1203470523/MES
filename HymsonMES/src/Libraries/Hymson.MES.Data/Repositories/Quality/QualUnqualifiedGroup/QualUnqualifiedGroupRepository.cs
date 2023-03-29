@@ -246,7 +246,7 @@ namespace Hymson.MES.Data.Repositories.Quality
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `qual_unqualified_group` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `qual_unqualified_group` /**where**/ ";
-        const string GetEntitiesSqlTemplate = @"SELECT    /**select**/  FROM `qual_unqualified_group` ug  /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/  /**where**/  ";
+        const string GetEntitiesSqlTemplate = @"SELECT    /**select**/  FROM `qual_unqualified_group` ug  /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/  ";
         const string GetByIdSql = @"SELECT 
                                Id, SiteId, UnqualifiedGroup, UnqualifiedGroupName, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted
                                 FROM `qual_unqualified_group`  WHERE Id = @Id  AND IsDeleted=0 ";
