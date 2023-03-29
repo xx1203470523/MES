@@ -197,6 +197,19 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<InteWorkCenterRelationView>(GetInteWorkCenterRelationSqlTemplate, new { Id = id });
         }
+
+        /// <summary>
+        /// 根据下级工作中心Id获取上级工作中心
+        /// (只获取一级)
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<InteWorkCenterEntity> GetHigherInteWorkCenterAsync(long id)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<InteWorkCenterEntity>(GetHigherInteWorkCenterSql, new { Id = id });
+        }
+
         #endregion
 
         #region 关联资源
@@ -263,5 +276,9 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
                                                                     FROM  inte_work_center_resource_relation IWRR 
                                                                      LEFT JOIN proc_resource PR ON IWRR.ResourceId=PR.Id AND PR.IsDeleted=0 
                                                                    WHERE IWRR.IsDeleted=0 AND  IWRR.WorkCenterId=@Id";
+        const string GetHigherInteWorkCenterSql = @"select wc.*
+                                                From  inte_work_center_relation  wcr 
+                                                left join inte_work_center wc on wc.Id=wcr.WorkCenterId
+                                                Where wcr.SubWorkCenterId = @Id ";
     }
 }

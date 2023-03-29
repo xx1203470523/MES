@@ -457,7 +457,13 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<PlanSfcReceiveView, PlanSfcReceiveDto>();
             #endregion
 
-
+            #region WorkOrderActivation
+            CreateMap<PlanWorkOrderActivationCreateDto, PlanWorkOrderActivationEntity>();
+            CreateMap<PlanWorkOrderActivationModifyDto, PlanWorkOrderActivationEntity>();
+            CreateMap<PlanWorkOrderActivationPagedQueryDto, PlanWorkOrderActivationPagedQuery>();
+            CreateMap<PlanWorkOrderActivationEntity, PlanWorkOrderActivationDto>();
+            CreateMap<PlanWorkOrderActivationListDetailView, PlanWorkOrderActivationListDetailViewDto>();
+            #endregion
 
         }
 
