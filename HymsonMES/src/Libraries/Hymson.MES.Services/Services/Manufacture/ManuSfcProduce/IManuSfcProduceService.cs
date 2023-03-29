@@ -35,6 +35,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
         Task QualityLockAsync(ManuSfcProduceLockDto parm);
 
         /// <summary>
+        /// 条码报废
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        Task SfcScrapAsync(ManuSfScrapDto parm);
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="manuSfcProduceCreateDto"></param>

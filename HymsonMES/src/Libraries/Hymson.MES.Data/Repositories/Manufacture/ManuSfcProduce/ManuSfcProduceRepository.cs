@@ -76,7 +76,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             //资源-》资源类型
             if (query.ResourceTypeId.HasValue)
             {
-                sqlBuilder.Where("pp.ResourceTypeId=@ResTypeId");
+                sqlBuilder.Where("pp.ResourceTypeId=@ResourceTypeId");
             }
 
             var offSet = (query.PageIndex - 1) * query.PageSize;

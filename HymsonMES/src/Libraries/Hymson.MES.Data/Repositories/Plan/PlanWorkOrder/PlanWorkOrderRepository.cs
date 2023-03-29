@@ -1,11 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 工单信息表 仓储类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-03-20 10:07:17
- */
-
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Plan;
@@ -13,7 +5,6 @@ using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
-using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -24,12 +15,20 @@ namespace Hymson.MES.Data.Repositories.Plan
     /// </summary>
     public partial class PlanWorkOrderRepository : IPlanWorkOrderRepository
     {
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly ConnectionOptions _connectionOptions;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
         public PlanWorkOrderRepository(IOptions<ConnectionOptions> connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
         }
+
 
         /// <summary>
         /// 删除（软删除）
@@ -87,7 +86,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
 
         /// <summary>
-        /// 根据产线ID获取工单数据
+        /// 根据产线ID获取工单数据（激活的工单）
         /// </summary>
         /// <param name="workLineId"></param>
         /// <returns></returns>
@@ -246,7 +245,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         public async Task<int> ModifyWorkOrderStatusAsync(IEnumerable<PlanWorkOrderEntity> parms)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateWorkOrderStatussSql, parms);
+            return await conn.ExecuteAsync(UpdateWorkOrderStatusSql, parms);
         }
 
         /// <summary>
@@ -257,10 +256,15 @@ namespace Hymson.MES.Data.Repositories.Plan
         public async Task<int> ModifyWorkOrderLockedAsync(IEnumerable<PlanWorkOrderEntity> parms)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateWorkOrderLockedsSql, parms);
+            return await conn.ExecuteAsync(UpdateWorkOrderLockedSql, parms);
         }
+
     }
 
+
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class PlanWorkOrderRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT 
@@ -307,10 +311,11 @@ namespace Hymson.MES.Data.Repositories.Plan
             "LEFT JOIN inte_work_center_relation IWCR ON IWCR.WorkCenterId = PWO.WorkCenterId " +
             "LEFT JOIN inte_work_center IWC ON IWC.Id = IWCR.SubWorkCenterId " +
             "WHERE PWO.IsDeleted = 0 AND PWO.WorkCenterType = @WorkCenterType AND IWCR.SubWorkCenterId = @workFarmId ";
-        const string GetByWorkLineId = "SELECT * FROM plan_work_order WHERE IsDeleted = 0 AND WorkCenterType = @WorkCenterType AND WorkCenterId = @workLineId ";
+        const string GetByWorkLineId = "SELECT PWO.* FROM plan_work_order_activation PWOA " +
+            "LEFT JOIN plan_work_order PWO ON PWO.Id = PWOA.WorkOrderId " +
+            "WHERE PWO.IsDeleted = 0 AND PWO.WorkCenterType = @WorkCenterType AND PWOA.LineId = @workLineId ";
+        const string UpdateWorkOrderStatusSql = @"UPDATE `plan_work_order` SET Status = @Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdateWorkOrderLockedSql = @"UPDATE `plan_work_order` SET IsLocked = @IsLocked, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
 
-        const string UpdateWorkOrderStatussSql = @"UPDATE `plan_work_order` SET Status = @Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
-
-        const string UpdateWorkOrderLockedsSql = @"UPDATE `plan_work_order` SET IsLocked = @IsLocked, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
     }
 }

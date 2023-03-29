@@ -182,7 +182,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #endregion
 
-            #region plan
+            #region Plan
+            //services.AddSingleton<IPlanWorkOrderActivationRepository, PlanWorkOrderActivationRepository>();
 
             #region PlanWorkOrder
             services.AddSingleton<IPlanWorkOrderRepository, PlanWorkOrderRepository>();

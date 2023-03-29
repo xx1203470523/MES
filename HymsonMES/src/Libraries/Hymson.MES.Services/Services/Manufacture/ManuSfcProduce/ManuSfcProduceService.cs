@@ -56,6 +56,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// 条码步骤表仓储 仓储
         /// </summary>
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
+
+        /// <summary>
+        /// 条码信息表 仓储
+        /// </summary>
+        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
         private readonly AbstractValidator<ManuSfcProduceCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ManuSfcProduceModifyDto> _validationModifyRules;
 
@@ -66,6 +71,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcStepRepository manuSfcStepRepository,
             IProcResourceRepository resourceRepository,
+            IManuSfcInfoRepository manuSfcInfoRepository,
             AbstractValidator<ManuSfcProduceCreateDto> validationCreateRules,
             AbstractValidator<ManuSfcProduceModifyDto> validationModifyRules)
         {
@@ -74,6 +80,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _resourceRepository = resourceRepository;
+            _manuSfcInfoRepository = manuSfcInfoRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
         }
@@ -283,6 +290,80 @@ namespace Hymson.MES.Services.Services.Manufacture
                 trans.Complete();
             }
         }
+
+        /// <summary>
+        /// 条码报废
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        public async Task SfcScrapAsync(ManuSfScrapDto parm)
+        {
+            #region 验证
+            if (parm == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            }
+
+            if (parm.Sfcs == null || parm.Sfcs.Length < 1)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15401));
+            }
+            #endregion
+
+            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = parm.Sfcs };
+            //获取条码列表
+            var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
+
+            #region  组装数据
+
+            //1.插入数据操作类型为报废
+            var sfcStepList = new List<ManuSfcStepEntity>();
+            foreach (var sfc in manuSfcs)
+            {
+                sfcStepList.Add(new ManuSfcStepEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SFC = sfc.SFC,
+                    ProductId = sfc.ProductId,
+                    WorkOrdeId = sfc.WorkOrderId,
+                    WorkCenterId = sfc.WorkCenterId,
+                    ProductBOMId = sfc.BOMId,
+                    Qty = sfc.Qty,
+                    EquipmentId = sfc.EquipmentId,
+                    ResourceId = sfc.ResourceId,
+                    ProcedureId = sfc.ProcedureId,
+                    Operatetype = ManuSfcStepTypeEnum.Discard,
+                    CurrentStatus = sfc.Status,
+                    SiteId = _currentSite.SiteId ?? 0,
+                    CreatedBy = sfc.CreatedBy,
+                    UpdatedBy = sfc.UpdatedBy
+                });
+            }
+
+            //2.删除条码在制信息，物理删除
+
+            //3.条码信息表，修改成报废
+            var sfcs = manuSfcs.Select(a => a.SFC).ToArray();
+            var updateCommand = new ManuSfcInfoUpdateCommand
+            {
+                SFCs = sfcs,
+                UserId = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now(),
+                Status = SfcStatusEnum.Scrapping
+            };
+            #endregion
+
+            //入库
+            var rows = 0;
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                rows += await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
+
+                rows += await _manuSfcInfoRepository.UpdateStatusAsync(updateCommand);
+                trans.Complete();
+            }
+        }
+
 
         /// <summary>
         /// 创建
