@@ -196,7 +196,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             var workCenter = await _inteWorkCenterRepository.GetByResourceIdAsync(queryDto.ResourceId);
             if (workCenter == null) return list;
 
-            // 通过产线->工单
+            // 通过产线->激活的工单
             var workOrders = await GetWorkOrderByWorkCenterIdAsync(workCenter.Id);
             if (workOrders == null) return list;
 
@@ -420,19 +420,23 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// <summary>
         /// 通过工作中心ID获取工单集合
         /// </summary>
-        /// <param name="workCenterId"></param>
+        /// <param name="workCenterId">产线ID</param>
         /// <returns></returns>
         private async Task<IEnumerable<PlanWorkOrderEntity>?> GetWorkOrderByWorkCenterIdAsync(long workCenterId)
         {
             // 通过车间查询工单
-            var workOrdersOfFarm = await _planWorkOrderRepository.GetByWorkFarmIdAsync(workCenterId);
+            //var workOrdersOfFarm = await _planWorkOrderRepository.GetByWorkFarmIdAsync(workCenterId);
 
             // 通过产线查询工单
             var workOrdersOfLine = await _planWorkOrderRepository.GetByWorkLineIdAsync(workCenterId);
 
+            /*
             // 合并结果
             var workOrders = workOrdersOfFarm.Union(workOrdersOfLine);
             return workOrders;
+            */
+
+            return workOrdersOfLine;
         }
 
         /// <summary>
