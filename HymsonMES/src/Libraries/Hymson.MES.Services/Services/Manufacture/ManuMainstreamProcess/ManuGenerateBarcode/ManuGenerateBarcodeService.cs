@@ -39,20 +39,30 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         /// <returns></returns>
         public async Task<IEnumerable<string>> GenerateBarcodeSerialNumberAsync(BarcodeSerialNumberDto param)
         {
+            List<int> serialList = new List<int>();
+            if (param.Count == 1)
+            {
+                var seq = await _sequenceService.GetSerialNumberAsync(param.ResetType, param.CodeRuleKey, param.Increment, param.StartNumber, 9);
+                serialList.Add(seq);
+            }
+            else
+            {
+                serialList =( await _sequenceService.GetSerialNumbersAsync(param.ResetType, param.CodeRuleKey, param.Count, param.Increment, param.StartNumber, 9)).ToList();
+            }
+
             List<string> list = new List<string>();
-            var serialList = await _sequenceService.GetSerialNumbersAsync(param.ResetType, param.CodeRuleKey, param.Count, 0, 9);
             foreach (var item in serialList)
             {
-                var number = item * param.Increment + param.StartNumber;
+                //var number = item * param.Increment + param.StartNumber;
                 var str = string.Empty;
                 switch (param.Base)
                 {
                     case 10:
-                        str = number.ToString();
+                        str = item.ToString();
                         break;
                     case 16:
                     case 32:
-                        str = ConvertNumber(number, param.IgnoreChar, param.Base);
+                        str = ConvertNumber(item, param.IgnoreChar, param.Base);
                         break;
                     default:
                         throw new BusinessException(nameof(ErrorCode.MES16202));
