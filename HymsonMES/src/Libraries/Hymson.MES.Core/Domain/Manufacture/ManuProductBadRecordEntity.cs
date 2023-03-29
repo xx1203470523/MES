@@ -68,7 +68,5 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 说明
         /// </summary>
         public string Remark { get; set; }
-
-       
     }
 }

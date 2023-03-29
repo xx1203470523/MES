@@ -285,6 +285,10 @@
         public const string MES15308 = "将来锁定操作必须是同一工单下的条码！";
         #endregion
 
+        #region 质量录入 15400
+        public const string MES15400 = "将来锁定工序必填";
+        public const string MES15401 = "产品条码不能为空";
+        #endregion
 
         #region 工单  16000
         public const string MES16000 = "工单错误";

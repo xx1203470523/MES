@@ -8,6 +8,7 @@
 
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 
 namespace Hymson.MES.Services.Dtos.Manufacture
 {
@@ -150,6 +151,26 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public string[] Sfcs { get; set; }
     }
 
+    /// <summary>
+    /// 报废/取消报废操作实体
+    /// </summary>
+    public record ManuSfScrapDto
+    {
+        /// <summary>
+        /// 操作类型（报废/取消报废）
+        /// </summary>
+        public ScrapOperateTypeEnum OperationType { get; set; }
+
+        /// <summary>
+        /// 条码列表
+        /// </summary>
+        public string[] Sfcs { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+    }
     /// <summary>
     /// 条码生产信息（物理删除）新增Dto
     /// </summary>

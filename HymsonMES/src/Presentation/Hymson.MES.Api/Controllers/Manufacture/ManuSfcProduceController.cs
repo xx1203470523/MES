@@ -61,6 +61,18 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         /// <summary>
+        /// 条码报废
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("scrap")]
+        public async Task SfcScrapAsync(ManuSfScrapDto parm)
+        {
+            await _manuSfcProduceService.SfcScrapAsync(parm);
+        }
+
+        /// <summary>
         /// 查询详情（条码生产信息（物理删除））
         /// </summary>
         /// <param name="id"></param>

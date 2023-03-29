@@ -97,10 +97,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             //验证DTO
             //await _validationCreateRules.ValidateAndThrowAsync(manuProductBadRecordCreateDto);
 
-            var manuSfcProducePagedQuery = new ManuSfcProduceQuery
-            {
-                Sfcs = createDto.SFCs
-            };
+            var manuSfcProducePagedQuery = new ManuSfcProduceQuery {Sfcs = createDto.SFCs };
             //获取条码列表
             var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
 
@@ -124,6 +121,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         Qty = item.Qty,
                         Status = ProductBadRecordStatusEnum.Open,
                         Source = ProductBadRecordSourceEnum.BadManualEntry,
+                        Remark=createDto.Remark??"",
                         CreatedBy = _currentUser.UserName,
                         UpdatedBy = _currentUser.UserName
                     });
@@ -138,10 +136,10 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             //报废不合格代码
             var scrapCode = qualUnqualifiedCodes.FirstOrDefault(a => a.UnqualifiedCode == "SCRAP");
-            var rows = 0;
-            using (var trans = TransactionHelper.GetTransactionScope())
+            if (scrapCode != null)
             {
-                if (scrapCode != null)
+                var rows = 0;
+                using (var trans = TransactionHelper.GetTransactionScope())
                 {
                     var sfcs = manuSfcs.Select(a => a.SFC).ToArray();
                     var updateCommand = new ManuSfcInfoUpdateCommand
@@ -152,14 +150,22 @@ namespace Hymson.MES.Services.Services.Manufacture
                         Status = SfcStatusEnum.Scrapping
                     };
                     rows += await _manuSfcInfoRepository.UpdateStatusAsync(updateCommand);
-                }
 
+                    if (manuProductBadRecords.Any())
+                    {
+                        //入库
+                        rows += await _manuProductBadRecordRepository.InsertRangeAsync(manuProductBadRecords);
+                    }
+                    trans.Complete();
+                }
+            }
+            else
+            {
                 if (manuProductBadRecords.Any())
                 {
                     //入库
-                    rows += await _manuProductBadRecordRepository.InsertRangeAsync(manuProductBadRecords);
+                    await _manuProductBadRecordRepository.InsertRangeAsync(manuProductBadRecords);
                 }
-                trans.Complete();
             }
         }
 
