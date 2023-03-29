@@ -42,7 +42,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
             List<int> serialList = new List<int>();
             if (param.Count == 1)
             {
-                var seq = await _sequenceService.GetSerialNumberAsync(param.ResetType, param.CodeRuleKey, param.Increment, param.StartNumber, 9);
+                var seq = await _sequenceService.GetSerialNumberAsync(param.ResetType, param.CodeRuleKey, param.StartNumber, param.Increment, 9);
                 serialList.Add(seq);
             }
             else
