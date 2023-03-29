@@ -25,7 +25,21 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
+        [Route("GenerateBarcodeByCodeRuleId")]
         public async Task<IEnumerable<string>> GenerateBarcodeAsync(GenerateBarcodeDto parm)
+        {
+            return await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(parm);
+        }
+
+
+        /// <summary>
+        /// 生成条码
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("GenerateBarcodeByCodeRuleData")]
+        public async Task<IEnumerable<string>> GenerateBarcodeAsync(CodeRuleDto parm)
         {
             return await _manuGenerateBarcodeService.GenerateBarcodeListAsync(parm);
         }

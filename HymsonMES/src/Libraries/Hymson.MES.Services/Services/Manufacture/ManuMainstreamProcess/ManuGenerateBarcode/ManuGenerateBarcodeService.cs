@@ -133,7 +133,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         /// <param name="param"></param>
         /// <returns></returns>
         /// <exception cref="BusinessException">未找到生成规则</exception>
-        public async Task<IEnumerable<string>> GenerateBarcodeListAsync(GenerateBarcodeDto param)
+        public async Task<IEnumerable<string>> GenerateBarcodeListByIdAsync(GenerateBarcodeDto param)
         {
             var getCodeRulesTask = _inteCodeRulesRepository.GetByIdAsync(param.CodeRuleId);
             var getCodeRulesMakeListTask = _inteCodeRulesMakeRepository.GetInteCodeRulesMakeEntitiesAsync(new InteCodeRulesMakeQuery { CodeRulesId = param.CodeRuleId });
@@ -149,7 +149,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                 ResetType = codeRule.ResetType,
                 StartNumber = codeRule.StartNumber
             });
-
 
             if (barcodeSerialNumberList == null || !barcodeSerialNumberList.Any())
             {
@@ -170,11 +169,67 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                         // TODO  暂时使用这种写法  王克明
                         if (rule.SegmentedValue == "%ACTIVITY%")
                         {
-                            stringBuilder.Append(HymsonClock.Now().ToString("yyMMdd"));
+                            stringBuilder.Append(item);
                         }
                         else if (rule.SegmentedValue == "%YYMMDD%")
                         {
+                            stringBuilder.Append(HymsonClock.Now().ToString("yyMMdd"));
+                        }
+                        else
+                        {
+                            throw new BusinessException(nameof(ErrorCode.MES16205)).WithData("value", rule.SegmentedValue);
+                        }
+                    }
+                }
+                list.Add(stringBuilder.ToString());
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// 条码生成
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException">未找到生成规则</exception>
+        public async Task<IEnumerable<string>> GenerateBarcodeListAsync(CodeRuleDto param)
+        {
+        
+            var barcodeSerialNumberList = await GenerateBarcodeSerialNumberAsync(new BarcodeSerialNumberDto
+            {
+                CodeRuleKey = param.IsTest ? param.ProductId.ToString() + "Test" : param.ProductId.ToString(),
+                Count = param.Count,
+                Base = param.Base,
+                Increment = param.Increment,
+                OrderLength = param.OrderLength,
+                ResetType = param.ResetType,
+                StartNumber = param.StartNumber
+            });
+
+            if (barcodeSerialNumberList == null || !barcodeSerialNumberList.Any())
+            {
+                throw new BusinessException(nameof(ErrorCode.MES16203));
+            }
+            List<string> list = new List<string>();
+            foreach (var item in barcodeSerialNumberList)
+            {
+                StringBuilder stringBuilder = new StringBuilder();
+                foreach (var rule in param.CodeRulesMakeList.OrderBy(x => x.Seq))
+                {
+                    if (rule.ValueTakingType == CodeValueTakingTypeEnum.FixedValue)
+                    {
+                        stringBuilder.Append(rule.SegmentedValue);
+                    }
+                    else
+                    {
+                        // TODO  暂时使用这种写法  王克明
+                        if (rule.SegmentedValue == "%ACTIVITY%")
+                        {
                             stringBuilder.Append(item);
+                        }
+                        else if (rule.SegmentedValue == "%YYMMDD%")
+                        {
+                            stringBuilder.Append(HymsonClock.Now().ToString("yyMMdd"));
                         }
                         else
                         {
