@@ -47,7 +47,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
             }
             else
             {
-                serialList =( await _sequenceService.GetSerialNumbersAsync(param.ResetType, param.CodeRuleKey, param.Count, param.Increment, param.StartNumber, 9)).ToList();
+                serialList =( await _sequenceService.GetSerialNumbersAsync(param.ResetType, param.CodeRuleKey, param.Count, param.StartNumber, param.Increment, 9)).ToList();
             }
 
             List<string> list = new List<string>();
@@ -67,7 +67,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                     default:
                         throw new BusinessException(nameof(ErrorCode.MES16202));
                 }
-                if (str.Length > param.OrderLength)
+                if (param.OrderLength>0&& str.Length > param.OrderLength)
                 {
                     throw new BusinessException(nameof(ErrorCode.MES16201));
                 }
@@ -123,7 +123,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
             int quotient = number / list.Count;
             if (quotient >= list.Count)
             {
-                stringBuilder.Insert(0, Convert(remainder, list));
+                stringBuilder.Insert(0, Convert(quotient, list));
             }
             else
             {

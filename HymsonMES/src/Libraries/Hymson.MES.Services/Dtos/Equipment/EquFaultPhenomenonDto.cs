@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Services.Dtos.Equipment
 {
@@ -10,7 +11,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 主键id
         /// </summary>
-        public long Id { get; set; }
+        public long? Id { get; set; }
 
         /// <summary>
         /// 故障现象代码
@@ -30,7 +31,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 使用状态 0-禁用 1-启用
         /// </summary>
-        public int UseStatus { get; set; }
+        public SysDataStatusEnum UseStatus { get; set; }
 
         /// <summary>
         /// 设备故障先
@@ -67,13 +68,22 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 使用状态 0-禁用 1-启用
         /// </summary>
-        public int UseStatus { get; set; }
+        public SysDataStatusEnum UseStatus { get; set; }
 
         /// <summary>
         /// 设备故障先
         /// </summary>
         public string Remark { get; set; } = "";
 
+        /// <summary>
+        /// 最后修改人
+        /// </summary>
+        public string UpdatedBy { get; set; } = "";
+
+        /// <summary>
+        /// 修改时间
+        /// </summary>
+        public DateTime? UpdatedOn { get; set; }
 
         /// <summary>
         /// 设备组名称
@@ -99,7 +109,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 使用状态 0-禁用 1-启用
         /// </summary>
-        public int? UseStatus { get; set; }
+        public SysDataStatusEnum? UseStatus { get; set; }
 
         /// <summary>
         /// 设备组名称
