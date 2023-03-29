@@ -39,7 +39,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGene
         /// <summary>
         /// 数量
         /// </summary>
-        public int Count { get; set; }
+        public int Count { get; set; } = 1;
 
         /// <summary>
         /// 产品id

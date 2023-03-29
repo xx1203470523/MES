@@ -25,7 +25,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("GenerateBarcodeByCodeRuleId")]
+        [Route("generateBarcodeByCodeRuleId")]
         public async Task<IEnumerable<string>> GenerateBarcodeAsync(GenerateBarcodeDto parm)
         {
             return await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(parm);
@@ -38,7 +38,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("GenerateBarcodeByCodeRuleData")]
+        [Route("generateBarcodeByCodeRuleData")]
         public async Task<IEnumerable<string>> GenerateBarcodeAsync(CodeRuleDto parm)
         {
             return await _manuGenerateBarcodeService.GenerateBarcodeListAsync(parm);
