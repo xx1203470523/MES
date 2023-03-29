@@ -24,7 +24,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGene
         public int Count { get; set; }
 
         /// <summary>
-        /// 起始
+        /// 是否测试
         /// </summary>
         public bool IsTest { get; set; } = false;
     }
@@ -32,7 +32,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGene
     public class CodeRuleDto
     {
         /// <summary>
-        /// 起始
+        /// 是否测试
         /// </summary>
         public bool IsTest { get; set; } = false;
 
