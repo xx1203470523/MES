@@ -106,9 +106,14 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long FoundBadOperationId { get; set; }
 
-       /// <summary>
-        /// 流出不良工序
+        /// <summary>
+        /// 发现不良资源
         /// </summary>
+        public long? FoundBadResourceId { get; set; }
+
+       /// <summary>
+       /// 流出不良工序
+       /// </summary>
         public long OutflowOperationId { get; set; }
 
        /// <summary>
@@ -119,7 +124,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
        /// <summary>
         /// 产品条码列表
         /// </summary>
-        public string[] SFCs { get; set; }
+        public string[] Sfcs { get; set; }
 
         /// <summary>
         /// 不合格工艺路线id

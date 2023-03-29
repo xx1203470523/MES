@@ -89,7 +89,6 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("create")]
         public async Task AddManuSfcProduceAsync([FromBody] ManuSfcProduceCreateDto parm)
         {
             await _manuSfcProduceService.CreateManuSfcProduceAsync(parm);
@@ -100,8 +99,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("update")]
+        [HttpPut]
         public async Task UpdateManuSfcProduceAsync([FromBody] ManuSfcProduceModifyDto parm)
         {
             await _manuSfcProduceService.ModifyManuSfcProduceAsync(parm);
@@ -112,8 +110,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("delete")]
+        [HttpDelete]
         public async Task DeleteManuSfcProduceAsync(string ids)
         {
             await _manuSfcProduceService.DeletesManuSfcProduceAsync(ids);
