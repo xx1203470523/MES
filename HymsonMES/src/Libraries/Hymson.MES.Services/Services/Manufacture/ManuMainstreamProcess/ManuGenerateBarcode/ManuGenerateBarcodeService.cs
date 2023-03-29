@@ -51,10 +51,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                         str = number.ToString();
                         break;
                     case 16:
-                        str = ConvertNumber(number, param.IgnoreChar, 16);
-                        break;
                     case 32:
-                        str = ConvertNumber(number, param.IgnoreChar, 32);
+                        str = ConvertNumber(number, param.IgnoreChar, param.Base);
                         break;
                     default:
                         throw new BusinessException(nameof(ErrorCode.MES16202));
@@ -89,8 +87,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
             }
             if (type == 32)
             {
-                list = new List<string>() { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F" ,
-                    "G", "H", "I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y"};
+                list = new List<string>() { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F",
+                    "G", "H","J","K","L","M","N","P","Q","R","T","U","V","W","X","Y"};
             }
             var ignoreCharArray = string.IsNullOrWhiteSpace(ignoreChar) ? new string[0] : ignoreChar.Split(";");
             list.RemoveAll(match => ignoreCharArray.Contains(match));
@@ -194,7 +192,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         /// <exception cref="BusinessException">未找到生成规则</exception>
         public async Task<IEnumerable<string>> GenerateBarcodeListAsync(CodeRuleDto param)
         {
-        
+
             var barcodeSerialNumberList = await GenerateBarcodeSerialNumberAsync(new BarcodeSerialNumberDto
             {
                 CodeRuleKey = param.IsTest ? param.ProductId.ToString() + "Test" : param.ProductId.ToString(),

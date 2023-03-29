@@ -21,5 +21,10 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob.Query
         /// 作业名称 
         /// </summary>
         public string? Name { get; set; }
+
+        /// <summary>
+        /// 类程序 
+        /// </summary>
+        public string? ClassProgram { get; set; }
     }
 }

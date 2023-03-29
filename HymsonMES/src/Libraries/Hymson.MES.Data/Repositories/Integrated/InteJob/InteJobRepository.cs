@@ -56,7 +56,11 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob
                 param.Name = $"%{param.Name}%";
                 sqlBuilder.Where("Name like @Name");
             }
-
+            if (!string.IsNullOrWhiteSpace(param.ClassProgram))
+            {
+                param.ClassProgram = $"%{param.ClassProgram}%";
+                sqlBuilder.Where("ClassProgram like @ClassProgram");
+            }
 
             var offSet = (param.PageIndex - 1) * param.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
