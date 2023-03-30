@@ -9,6 +9,7 @@
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
@@ -134,7 +135,8 @@ namespace Hymson.MES.Data.Repositories.Plan
             }
             else 
             {
-                sqlBuilder.Where(" wo.Status != 5 ");//不要显示状态为已关闭的
+                planWorkOrderActivationPagedQuery.Status = PlanWorkOrderStatusEnum.Closed;
+                sqlBuilder.Where(" wo.Status != @Status ");//不要显示状态为已关闭的
             }
             if (planWorkOrderActivationPagedQuery.IsLocked.HasValue)
             {

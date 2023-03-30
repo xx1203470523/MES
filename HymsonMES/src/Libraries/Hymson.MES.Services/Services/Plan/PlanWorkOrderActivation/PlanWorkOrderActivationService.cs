@@ -13,6 +13,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
@@ -43,8 +44,9 @@ namespace Hymson.MES.Services.Services.Plan
 
         private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
+        private readonly IPlanWorkOrderActivationRecordRepository _planWorkOrderActivationRecordRepository;
 
-        public PlanWorkOrderActivationService(ICurrentUser currentUser, ICurrentSite currentSite, IPlanWorkOrderActivationRepository planWorkOrderActivationRepository, AbstractValidator<PlanWorkOrderActivationCreateDto> validationCreateRules, AbstractValidator<PlanWorkOrderActivationModifyDto> validationModifyRules, IInteWorkCenterRepository inteWorkCenterRepository, IPlanWorkOrderRepository planWorkOrderRepository)
+        public PlanWorkOrderActivationService(ICurrentUser currentUser, ICurrentSite currentSite, IPlanWorkOrderActivationRepository planWorkOrderActivationRepository, AbstractValidator<PlanWorkOrderActivationCreateDto> validationCreateRules, AbstractValidator<PlanWorkOrderActivationModifyDto> validationModifyRules, IInteWorkCenterRepository inteWorkCenterRepository, IPlanWorkOrderRepository planWorkOrderRepository, IPlanWorkOrderActivationRecordRepository planWorkOrderActivationRecordRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -54,6 +56,7 @@ namespace Hymson.MES.Services.Services.Plan
 
             _inteWorkCenterRepository = inteWorkCenterRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
+            _planWorkOrderActivationRecordRepository = planWorkOrderActivationRecordRepository;
         }
 
         /// <summary>
@@ -209,10 +212,28 @@ namespace Hymson.MES.Services.Services.Plan
             //取消激活
             if (!activationWorkOrderDto.IsNeedActivation) 
             {
-                await _planWorkOrderActivationRepository.DeleteTrueAsync(workOrderActivation.Id);//真删除
+                using (TransactionScope ts = new TransactionScope())
+                {
+                    await _planWorkOrderActivationRepository.DeleteTrueAsync(workOrderActivation.Id);//真删除
 
-                //TODO 记录下激活状态变化
+                    //记录下激活状态变化
+                    await _planWorkOrderActivationRecordRepository.InsertAsync(new PlanWorkOrderActivationRecordEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        CreatedBy = _currentUser.UserName,
+                        UpdatedBy = _currentUser.UserName,
+                        CreatedOn = HymsonClock.Now(),
+                        UpdatedOn = HymsonClock.Now(),
+                        SiteId = _currentSite.SiteId ?? 0,
 
+                        WorkOrderId = activationWorkOrderDto.Id,
+                        LineId = activationWorkOrderDto.LineId,
+
+                        ActivateType = PlanWorkOrderActivateTypeEnum.CancelActivate
+                    });
+
+                    ts.Complete();
+                }
                 return;
             }
 
@@ -284,14 +305,42 @@ namespace Hymson.MES.Services.Services.Plan
 
                         //TODO  修改工单状态还需要在 工单记录表中记录
 
-                        //TODO 记录下激活状态变化
+                        //记录下激活状态变化
+                        await _planWorkOrderActivationRecordRepository.InsertAsync(new PlanWorkOrderActivationRecordEntity
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            CreatedBy = _currentUser.UserName,
+                            UpdatedBy = _currentUser.UserName,
+                            CreatedOn = HymsonClock.Now(),
+                            UpdatedOn = HymsonClock.Now(),
+                            SiteId = _currentSite.SiteId ?? 0,
+
+                            WorkOrderId = activationWorkOrderDto.Id,
+                            LineId = activationWorkOrderDto.LineId,
+
+                            ActivateType = PlanWorkOrderActivateTypeEnum.Activate
+                        });
 
                         break;
                     case Core.Enums.PlanWorkOrderStatusEnum.InProduction:
                     case Core.Enums.PlanWorkOrderStatusEnum.Finish:
                         await _planWorkOrderActivationRepository.InsertAsync(planWorkOrderActivationEntity);
 
-                        //TODO 记录下激活状态变化
+                        //记录下激活状态变化
+                        await _planWorkOrderActivationRecordRepository.InsertAsync(new PlanWorkOrderActivationRecordEntity
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            CreatedBy = _currentUser.UserName,
+                            UpdatedBy = _currentUser.UserName,
+                            CreatedOn = HymsonClock.Now(),
+                            UpdatedOn = HymsonClock.Now(),
+                            SiteId = _currentSite.SiteId ?? 0,
+
+                            WorkOrderId = activationWorkOrderDto.Id,
+                            LineId = activationWorkOrderDto.LineId,
+
+                            ActivateType = PlanWorkOrderActivateTypeEnum.Activate
+                        });
 
                         break;
                     //case Core.Enums.PlanWorkOrderStatusEnum.Closed:
