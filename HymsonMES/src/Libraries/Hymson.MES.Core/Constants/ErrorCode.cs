@@ -310,6 +310,7 @@
         public const string MES16011 = "修改生产工单状态失败：有工单不为生产中,不允许完工";
         public const string MES16012 = "修改生产工单状态失败：有工单不为完工,不允许关闭";
         public const string MES16013 = "工单状态不为未开始,不允许删除";
+        public const string MES16014 = "有工单不存在";
 
         public const string MES16020 = "工单号 不能为空！";
         public const string MES16021 = "物料编码 不能为空！";

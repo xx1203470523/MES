@@ -45,8 +45,9 @@ namespace Hymson.MES.Services.Services.Plan
         private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
         private readonly IPlanWorkOrderActivationRecordRepository _planWorkOrderActivationRecordRepository;
+        private readonly IPlanWorkOrderStatusRecordRepository _planWorkOrderStatusRecordRepository;
 
-        public PlanWorkOrderActivationService(ICurrentUser currentUser, ICurrentSite currentSite, IPlanWorkOrderActivationRepository planWorkOrderActivationRepository, AbstractValidator<PlanWorkOrderActivationCreateDto> validationCreateRules, AbstractValidator<PlanWorkOrderActivationModifyDto> validationModifyRules, IInteWorkCenterRepository inteWorkCenterRepository, IPlanWorkOrderRepository planWorkOrderRepository, IPlanWorkOrderActivationRecordRepository planWorkOrderActivationRecordRepository)
+        public PlanWorkOrderActivationService(ICurrentUser currentUser, ICurrentSite currentSite, IPlanWorkOrderActivationRepository planWorkOrderActivationRepository, AbstractValidator<PlanWorkOrderActivationCreateDto> validationCreateRules, AbstractValidator<PlanWorkOrderActivationModifyDto> validationModifyRules, IInteWorkCenterRepository inteWorkCenterRepository, IPlanWorkOrderRepository planWorkOrderRepository, IPlanWorkOrderActivationRecordRepository planWorkOrderActivationRecordRepository, IPlanWorkOrderStatusRecordRepository planWorkOrderStatusRecordRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -57,6 +58,7 @@ namespace Hymson.MES.Services.Services.Plan
             _inteWorkCenterRepository = inteWorkCenterRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _planWorkOrderActivationRecordRepository = planWorkOrderActivationRecordRepository;
+            _planWorkOrderStatusRecordRepository = planWorkOrderStatusRecordRepository;
         }
 
         /// <summary>
@@ -281,6 +283,16 @@ namespace Hymson.MES.Services.Services.Plan
                 LineId = activationWorkOrderDto.LineId
             };
 
+            //组装工单状态变化记录
+            var record = AutoMapperConfiguration.Mapper.Map<PlanWorkOrderStatusRecordEntity>(workOrder);
+            record.Id = IdGenProvider.Instance.CreateId();
+            record.CreatedBy = _currentUser.UserName;
+            record.UpdatedBy = _currentUser.UserName;
+            record.CreatedOn = HymsonClock.Now();
+            record.UpdatedOn = HymsonClock.Now();
+            record.SiteId = _currentSite.SiteId ?? 0;
+            record.IsDeleted = 0;
+
             using (TransactionScope ts = new TransactionScope()) 
             {
                 switch (workOrder.Status)
@@ -290,20 +302,6 @@ namespace Hymson.MES.Services.Services.Plan
                         break;
                     case Core.Enums.PlanWorkOrderStatusEnum.SendDown:
                         await _planWorkOrderActivationRepository.InsertAsync(planWorkOrderActivationEntity);
-                        
-                        //修改工单状态为生产中
-                        List<PlanWorkOrderEntity> planWorkOrderEntities = new List<PlanWorkOrderEntity>();
-                        planWorkOrderEntities.Add(new PlanWorkOrderEntity()
-                        {
-                            Id = activationWorkOrderDto.Id,
-                            Status = Core.Enums.PlanWorkOrderStatusEnum.InProduction,
-
-                            UpdatedBy = _currentUser.UserName,
-                            UpdatedOn = HymsonClock.Now()
-                        });
-                        await _planWorkOrderRepository.ModifyWorkOrderStatusAsync(planWorkOrderEntities);
-
-                        //TODO  修改工单状态还需要在 工单记录表中记录
 
                         //记录下激活状态变化
                         await _planWorkOrderActivationRecordRepository.InsertAsync(new PlanWorkOrderActivationRecordEntity
@@ -320,6 +318,22 @@ namespace Hymson.MES.Services.Services.Plan
 
                             ActivateType = PlanWorkOrderActivateTypeEnum.Activate
                         });
+
+
+                        //修改工单状态为生产中
+                        List<PlanWorkOrderEntity> planWorkOrderEntities = new List<PlanWorkOrderEntity>();
+                        planWorkOrderEntities.Add(new PlanWorkOrderEntity()
+                        {
+                            Id = activationWorkOrderDto.Id,
+                            Status = Core.Enums.PlanWorkOrderStatusEnum.InProduction,
+
+                            UpdatedBy = _currentUser.UserName,
+                            UpdatedOn = HymsonClock.Now()
+                        });
+                        await _planWorkOrderRepository.ModifyWorkOrderStatusAsync(planWorkOrderEntities);
+
+                        //TODO  修改工单状态还需要在 工单记录表中记录
+                        await _planWorkOrderStatusRecordRepository.InsertAsync(record);
 
                         break;
                     case Core.Enums.PlanWorkOrderStatusEnum.InProduction:

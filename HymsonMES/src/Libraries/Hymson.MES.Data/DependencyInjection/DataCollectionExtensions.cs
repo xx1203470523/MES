@@ -187,6 +187,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region PlanWorkOrder
             services.AddSingleton<IPlanWorkOrderRepository, PlanWorkOrderRepository>();
+            services.AddSingleton<IPlanWorkOrderStatusRecordRepository, PlanWorkOrderStatusRecordRepository>();
             #endregion
 
             #region PlanSfcReceive
