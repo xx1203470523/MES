@@ -41,7 +41,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Route("pagelist")]
         public async Task<PagedInfo<ManuProductBadRecordDto>> QueryPagedManuProductBadRecordAsync([FromQuery] ManuProductBadRecordPagedQueryDto parm)
         {
@@ -67,7 +67,18 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [HttpPost]
         public async Task AddManuProductBadRecordAsync([FromBody] ManuProductBadRecordCreateDto parm)
         {
-             await _manuProductBadRecordService.CreateManuProductBadRecordAsync(parm);
+            await _manuProductBadRecordService.CreateManuProductBadRecordAsync(parm);
+        }
+        /// <summary>
+        /// 查询条码的不合格代码信息
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("badRecords")]
+        public async Task<IEnumerable<ManuProductBadRecordViewDto>> GetBadRecordsBySfcAsync([FromQuery] ManuProductBadRecordQueryDto parm)
+        {
+            return await _manuProductBadRecordService.GetBadRecordsBySfcAsync(parm);
         }
 
         /// <summary>

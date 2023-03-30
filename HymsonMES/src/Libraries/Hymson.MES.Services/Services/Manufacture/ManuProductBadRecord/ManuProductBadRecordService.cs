@@ -97,7 +97,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             //验证DTO
             //await _validationCreateRules.ValidateAndThrowAsync(manuProductBadRecordCreateDto);
 
-            var manuSfcProducePagedQuery = new ManuSfcProduceQuery {Sfcs = createDto.Sfcs };
+            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = createDto.Sfcs };
             //获取条码列表
             var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
 
@@ -119,14 +119,14 @@ namespace Hymson.MES.Services.Services.Manufacture
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = _currentSite.SiteId ?? 0,
                         FoundBadOperationId = createDto.FoundBadOperationId,
-                        FoundBadResourceId= badResourceId,
+                        FoundBadResourceId = badResourceId,
                         OutflowOperationId = createDto.OutflowOperationId,
                         UnqualifiedId = unqualified.Id,
                         SFC = item.SFC,
                         Qty = item.Qty,
                         Status = ProductBadRecordStatusEnum.Open,
                         Source = ProductBadRecordSourceEnum.BadManualEntry,
-                        Remark=createDto.Remark??"",
+                        Remark = createDto.Remark ?? "",
                         CreatedBy = _currentUser.UserName,
                         UpdatedBy = _currentUser.UserName
                     });
@@ -173,6 +173,40 @@ namespace Hymson.MES.Services.Services.Manufacture
                     await _manuProductBadRecordRepository.InsertRangeAsync(manuProductBadRecords);
                 }
             }
+        }
+
+        /// <summary>
+        /// 查询条码的不合格代码信息
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuProductBadRecordViewDto>> GetBadRecordsBySfcAsync(ManuProductBadRecordQueryDto queryDto)
+        {
+            var query = new ManuProductBadRecordQuery
+            {
+                SFC=queryDto.SFC,
+                Status=queryDto.Status,
+                Type=   queryDto.Type,
+                SiteId=_currentSite.SiteId??0
+            };
+            var manuProductBads = await _manuProductBadRecordRepository.GetBadRecordsBySfcAsync(query);
+
+            //实体到DTO转换 装载数据
+            var manuProductBadRecordDtos = new List<ManuProductBadRecordViewDto>();
+            foreach (var manuProductBad in manuProductBads)
+            {
+                manuProductBadRecordDtos.Add(new ManuProductBadRecordViewDto
+                {
+                    UnqualifiedId=manuProductBad.UnqualifiedId,
+                    UnqualifiedCode=manuProductBad.UnqualifiedCode,
+                    UnqualifiedCodeName=manuProductBad.UnqualifiedCodeName,
+                    ResCode= manuProductBad.ResCode,
+                    ResName= manuProductBad.ResName,
+                    ProcessRouteId= manuProductBad.ProcessRouteId
+                });
+            }
+
+            return manuProductBadRecordDtos;
         }
 
         /// <summary>

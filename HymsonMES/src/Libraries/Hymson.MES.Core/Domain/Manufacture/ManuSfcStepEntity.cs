@@ -89,5 +89,10 @@ namespace Hymson.MES.Core.Domain.Manufacture
        /// 锁;1：未锁定；2：即时锁：3：未来锁；
        /// </summary>
         public int? Lock { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string Remark { get; set; }
     }
 }

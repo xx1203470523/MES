@@ -13,6 +13,7 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using System.Collections;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -37,6 +38,39 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<ManuProductBadRecordEntity>(GetByIdSql, new { Id=id});
+        }
+
+        /// <summary>
+        /// 查询条码的不合格代码信息
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuProductBadRecordView>> GetBadRecordsBySfcAsync(ManuProductBadRecordQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+             sqlBuilder.Where("br.SiteId = @SiteId");
+            sqlBuilder.Where("br.IsDeleted =0");
+
+            sqlBuilder.Select("uc.UnqualifiedCode,uc.UnqualifiedCodeName,br.UnqualifiedId,pr.ResCode,pr.ResName,uc.ProcessRouteId");
+            sqlBuilder.LeftJoin("qual_unqualified_code uc on br.UnqualifiedId =uc.Id");
+            sqlBuilder.LeftJoin("proc_resource pr on pr.Id =br.FoundBadResourceId");
+
+            if (!string.IsNullOrWhiteSpace(query.SFC))
+            {
+                sqlBuilder.Where("br.SFC=@SFC");
+            }
+            if (query.Status.HasValue)
+            {
+                sqlBuilder.Where("br.Status =@Status");
+            }
+            if (query.Type.HasValue)
+            {
+                sqlBuilder.Where("uc.Type =@Type");
+            }
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var manuSfcProduceEntities = await conn.QueryAsync<ManuProductBadRecordView>(template.RawSql, query);
+            return manuSfcProduceEntities;
         }
 
         /// <summary>
@@ -158,6 +192,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetManuProductBadRecordEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `manu_product_bad_record` /**where**/  ";
+
+        const string GetEntitiesSqlTemplate = @"SELECT /**select**/  FROM `manu_product_bad_record` br  /**innerjoin**/ /**leftjoin**/ /**where**/ ";
 
         const string InsertSql = "INSERT INTO `manu_product_bad_record`(  `Id`, `SiteId`, `FoundBadOperationId`, `FoundBadResourceId`,`OutflowOperationId`, `UnqualifiedId`, `SFC`, `Qty`, `Status`, `Source`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @FoundBadOperationId,@FoundBadResourceId, @OutflowOperationId, @UnqualifiedId, @SFC, @Qty, @Status, @Source, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string UpdateSql = "UPDATE `manu_product_bad_record` SET   SiteId = @SiteId, FoundBadOperationId = @FoundBadOperationId, OutflowOperationId = @OutflowOperationId, UnqualifiedId = @UnqualifiedId, SFC = @SFC, Qty = @Qty, Status = @Status, Source = @Source, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";

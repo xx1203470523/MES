@@ -7,6 +7,8 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Core.Enums.QualUnqualifiedCode;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -238,5 +240,56 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         ///// 空值 : false  
         ///// </summary>
         //public string SiteCode { get; set; }
+    }
+
+    public class ManuProductBadRecordQueryDto
+    {
+        /// <summary>
+        /// 不合格记录开关;1、开启  2、关闭
+        /// </summary>
+        public ProductBadRecordStatusEnum? Status { get; set; }
+
+        /// <summary>
+        /// 产品条码
+        /// </summary>
+        public string SFC { get; set; }
+
+        /// <summary>
+        /// 不合格代码类型
+        /// </summary>
+        public QualUnqualifiedCodeTypeEnum? Type { get; set; }
+    }
+
+    public class ManuProductBadRecordViewDto
+    {
+        /// <summary>
+        /// 不合格代码Id
+        /// </summary>
+        public long? UnqualifiedId { get; set; }
+
+        /// <summary>
+        /// 不合格代码
+        /// </summary>
+        public string UnqualifiedCode { get; set; }
+
+        /// <summary>
+        /// 不合格代码名称
+        /// </summary>
+        public string UnqualifiedCodeName { get; set; }
+
+        /// <summary>
+        /// 资源编码
+        /// </summary>
+        public string ResCode { get; set; }
+
+        /// <summary>
+        /// 资源名称
+        /// </summary>
+        public string ResName { get; set; }
+
+        /// <summary>
+        /// 不合格工艺路线Id
+        /// </summary>
+        public long? ProcessRouteId { get; set; }
     }
 }

@@ -35,6 +35,13 @@ namespace Hymson.MES.Services.Services.Manufacture
         Task CreateManuProductBadRecordAsync(ManuProductBadRecordCreateDto manuProductBadRecordCreateDto);
 
         /// <summary>
+        /// 查询条码的不合格代码信息
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuProductBadRecordViewDto>> GetBadRecordsBySfcAsync(ManuProductBadRecordQueryDto queryDto);
+
+        /// <summary>
         /// 修改
         /// </summary>
         /// <param name="manuProductBadRecordModifyDto"></param>

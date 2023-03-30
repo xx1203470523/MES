@@ -326,7 +326,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
 
             #region  组装数据
-            var sfcStepList = GetSfcStepList(manuSfcs);
+            var sfcStepList = GetSfcStepList(manuSfcs,parm.Remark??"");
 
             var sfcs = manuSfcs.Select(a => a.SFC).ToArray();
             var updateCommand = new ManuSfcInfoUpdateCommand
@@ -359,8 +359,9 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// 获取条码步骤数据
         /// </summary>
         /// <param name="manuSfcs"></param>
+        /// <param name="remark"></param>
         /// <returns></returns>
-        private List<ManuSfcStepEntity> GetSfcStepList(IEnumerable<ManuSfcProduceEntity> manuSfcs)
+        private List<ManuSfcStepEntity> GetSfcStepList(IEnumerable<ManuSfcProduceEntity> manuSfcs,string remark)
         {
             var sfcStepList = new List<ManuSfcStepEntity>();
             foreach (var sfc in manuSfcs)
@@ -380,6 +381,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Type = ManuSfcStepTypeEnum.Discard,
                     Status = sfc.Status,
                     Lock=sfc.Lock,
+                    Remark= remark,
                     SiteId = _currentSite.SiteId ?? 0,
                     CreatedBy = sfc.CreatedBy,
                     UpdatedBy = sfc.UpdatedBy

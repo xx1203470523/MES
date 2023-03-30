@@ -16,13 +16,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public interface IManuProductBadRecordRepository
     {
-	    /// <summary>
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ManuProductBadRecordEntity> GetByIdAsync(long id);
-    
+
+        /// <summary>
+        /// 查询条码的不合格代码信息
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuProductBadRecordView>> GetBadRecordsBySfcAsync(ManuProductBadRecordQuery query);
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -36,21 +43,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuProductBadRecordQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuProductBadRecordEntity>> GetManuProductBadRecordEntitiesAsync(ManuProductBadRecordQuery manuProductBadRecordQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="manuProductBadRecordPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuProductBadRecordEntity>> GetPagedInfoAsync(ManuProductBadRecordPagedQuery manuProductBadRecordPagedQuery);
-		
+
         /// <summary>
         /// 新增
         /// </summary>
         /// <param name="manuProductBadRecordEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ManuProductBadRecordEntity manuProductBadRecordEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -64,14 +71,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuProductBadRecordEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ManuProductBadRecordEntity manuProductBadRecordEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
         /// <param name="manuProductBadRecordEntitys"></param>
         /// <returns></returns>
         Task<int> UpdateRangeAsync(IEnumerable<ManuProductBadRecordEntity> manuProductBadRecordEntitys);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
