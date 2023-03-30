@@ -53,6 +53,17 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
 
         /// <summary>
+        /// 删除（硬删除）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteTrueAsync(long id)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeleteTrueSql, new { Id = id });
+        }
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -121,6 +132,10 @@ namespace Hymson.MES.Data.Repositories.Plan
             {
                 sqlBuilder.Where(" wo.Status = @Status ");
             }
+            else 
+            {
+                sqlBuilder.Where(" wo.Status != 5 ");//不要显示状态为已关闭的
+            }
             if (planWorkOrderActivationPagedQuery.IsLocked.HasValue)
             {
                 sqlBuilder.Where(" wo.IsLocked = @IsLocked ");
@@ -156,6 +171,20 @@ namespace Hymson.MES.Data.Repositories.Plan
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetPlanWorkOrderActivationEntitiesSqlTemplate);
+
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Select("*");
+
+            if (planWorkOrderActivationQuery.WorkOrderId.HasValue) 
+            {
+                sqlBuilder.Where(" WorkOrderId = @WorkOrderId ");
+            }
+            if (planWorkOrderActivationQuery.LineId.HasValue)
+            {
+                sqlBuilder.Where(" LineId = @LineId ");
+            }
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var planWorkOrderActivationEntities = await conn.QueryAsync<PlanWorkOrderActivationEntity>(template.RawSql, planWorkOrderActivationQuery);
             return planWorkOrderActivationEntities;
@@ -212,7 +241,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string GetPagedInfoDataSqlTemplate = @"SELECT 
                           wo.`Id`, wo.`OrderCode`, wo.`ProductId`, wo.`WorkCenterType`, wo.`WorkCenterId`, wo.`ProcessRouteId`, wo.`ProductBOMId`, wo.`Type`, wo.`Qty`, wo.`Status`, wo.`OverScale`, wo.`PlanStartTime`, wo.`PlanEndTime`, wo.`IsLocked`, wo.`Remark`, wo.`CreatedBy`, wo.`CreatedOn`, wo.`UpdatedBy`, wo.`UpdatedOn`, wo.`IsDeleted`, wo.`SiteId`,
 
-                          woa.Id,
+                          woa.Id as workOrderActivationId,
 
                           wor.InputQty,wor.FinishProductQuantity,wor.RealStart,wor.RealEnd,
                           m.MaterialCode, m.MaterialName,m.Version as MaterialVersion,
@@ -226,7 +255,7 @@ namespace Hymson.MES.Data.Repositories.Plan
                          LEFT JOIN proc_bom b on wo.ProductBOMId=b.Id
                          LEFT JOIN proc_process_route pr on wo.ProcessRouteId=pr.Id
                          LEFT JOIN inte_work_center wc on wo.WorkCenterId=wc.Id
-                            
+                         
                         /**where**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = @"SELECT COUNT(1) 
                          FROM `plan_work_order` wo 
@@ -253,5 +282,6 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string GetByIdsSql = @"SELECT
       `Id`, `SiteId`, `WorkOrderId`, `LineId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
     FROM `plan_work_order_activation`  WHERE Id IN @ids ";
+        const string DeleteTrueSql = @"DELETE FROM  plan_work_order_activation where Id=@Id ";
     }
     }

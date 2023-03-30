@@ -271,7 +271,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// <summary>
         /// 修改工单状态
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="parms"></param>
         /// <returns></returns>
         public async Task ModifyWorkOrderStatusAsync(List<PlanWorkOrderChangeStatusDto> parms)
         {

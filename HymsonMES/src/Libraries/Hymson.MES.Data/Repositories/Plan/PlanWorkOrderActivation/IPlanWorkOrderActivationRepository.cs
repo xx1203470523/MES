@@ -64,6 +64,13 @@ namespace Hymson.MES.Data.Repositories.Plan
         Task<int> DeletesAsync(DeleteCommand param);
 
         /// <summary>
+        /// 删除（硬删除）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<int> DeleteTrueAsync(long id);
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>

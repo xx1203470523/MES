@@ -61,5 +61,13 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="id"></param>
         /// <returns></returns>
         Task<PlanWorkOrderActivationDto> QueryPlanWorkOrderActivationByIdAsync(long id);
+
+
+        /// <summary>
+        /// 激活/取消激活 工单
+        /// </summary>
+        /// <param name="activationWorkOrderDto"></param>
+        /// <returns></returns>
+        Task ActivationWorkOrder(ActivationWorkOrderDto activationWorkOrderDto);
     }
 }

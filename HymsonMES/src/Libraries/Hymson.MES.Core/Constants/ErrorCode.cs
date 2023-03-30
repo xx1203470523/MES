@@ -365,6 +365,12 @@
         public const string MES16401 = "查询工单激活必须选择线体！";
         public const string MES16402 = "当前选择的线体不存在！";
         public const string MES16403 = "当前选择的不是线体！";
+        public const string MES16404 = "当前工单已不存在！";
+        public const string MES16405 = "工单[{orderCode}]状态为未开始，不允许激活！";
+        public const string MES16406 = "工单[{orderCode}]已经是激活状态，无需再次激活！";
+        public const string MES16407 = "工单[{orderCode}]不是激活状态，无需取消激活！";
+        public const string MES16408 = "工单[{orderCode}]已被锁定，不允许激活！";
+        public const string MES16409 = "当前线体不允许混线，请先取消激活工单[{orderCode}]！";
         #endregion
         #endregion
 
