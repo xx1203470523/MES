@@ -196,6 +196,11 @@ namespace Microsoft.Extensions.DependencyInjection
             #region PlanWorkOrderActivation
             services.AddSingleton<IPlanWorkOrderActivationRepository, PlanWorkOrderActivationRepository>();
             #endregion
+
+            #region PlanSfcPrint
+            services.AddSingleton<IPlanSfcPrintRepository, PlanSfcPrintRepository>();
+
+            #endregion
             #endregion
 
             return services;
