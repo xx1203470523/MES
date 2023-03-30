@@ -2,7 +2,9 @@ using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer;
@@ -75,8 +77,21 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
             entity.UpdatedBy = _currentUser.UserName;
             entity.SiteId = _currentSite.SiteId ?? 0;
 
+            // 验证是否相同物料或者物料组已经设置过
+            var entityByRelation = await _inteContainerRepository.GetByRelationIdAsync(new InteContainerQuery
+            {
+                DefinitionMethod = entity.DefinitionMethod,
+                MaterialId = entity.MaterialId,
+                MaterialGroupId = entity.MaterialGroupId
+            });
+
+            if (entityByRelation != null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12503));
+            }
+
             // 保存实体
-            return await _inteContainerRepository.InsertAsync(entity); ;
+            return await _inteContainerRepository.InsertAsync(entity);
         }
 
         /// <summary>
@@ -92,6 +107,19 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
             // DTO转换实体
             var entity = modifyDto.ToEntity<InteContainerEntity>();
             entity.UpdatedBy = _currentUser.UserName;
+
+            // 验证是否相同物料或者物料组已经设置过
+            var entityByRelation = await _inteContainerRepository.GetByRelationIdAsync(new InteContainerQuery
+            {
+                DefinitionMethod = entity.DefinitionMethod,
+                MaterialId = entity.MaterialId,
+                MaterialGroupId = entity.MaterialGroupId
+            });
+
+            if (entityByRelation != null && entityByRelation.Id != entity.Id)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12503));
+            }
 
             // 更新实体
             return await _inteContainerRepository.UpdateAsync(entity);

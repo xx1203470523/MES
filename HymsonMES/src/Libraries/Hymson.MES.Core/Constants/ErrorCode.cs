@@ -213,6 +213,7 @@
         public const string MES12500 = "容器维护错误";
         public const string MES12501 = "最大数量不能小于最小数量{Minimum}";
         public const string MES12502 = "最大数量不能小于最小数量";
+        public const string MES12503 = "同一物料/物料组只允许设置一次";
         #endregion
 
         //设备

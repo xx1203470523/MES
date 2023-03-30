@@ -1,6 +1,7 @@
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer.Query;
@@ -71,6 +72,20 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<InteContainerEntity>(GetByIdSql, new { Id = id });
+        }
+
+        /// <summary>
+        /// 通过关联ID获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<InteContainerEntity> GetByRelationIdAsync(InteContainerQuery query)
+        {
+            var sql = GetByMaterialIdSql;
+            if (query.DefinitionMethod == DefinitionMethodEnum.MaterialGroup) sql = GetByMaterialGroupIdSql;
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<InteContainerEntity>(sql, query);
         }
 
         /// <summary>
@@ -145,5 +160,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
         const string GetByIdSql = @"SELECT 
                                `Id`, `DefinitionMethod`, `MaterialId`, `MaterialGroupId`, Level, `Status`, `Maximum`, `Minimum`, `Height`, `Length`, `Width`, `MaxFillWeight`, `Weight`, Remark, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `inte_container`  WHERE Id = @Id ";
+        const string GetByMaterialIdSql = @"SELECT * FROM inte_container WHERE IsDeleted = 0 AND DefinitionMethod = @DefinitionMethod AND MaterialId = @MaterialId ";
+        const string GetByMaterialGroupIdSql = @"SELECT * FROM inte_container WHERE IsDeleted = 0 AND DefinitionMethod = @DefinitionMethod AND MaterialGroupId = @MaterialGroupId ";
     }
 }
