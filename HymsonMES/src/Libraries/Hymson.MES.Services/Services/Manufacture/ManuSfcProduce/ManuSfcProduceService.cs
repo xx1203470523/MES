@@ -23,7 +23,10 @@ using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using IdGen;
 using System.Linq;
+using System.Reflection.Emit;
+using System.Security.Policy;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -156,12 +159,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             //查询条码信息,
-            //校验条码状态，如果为报废或者删除，则提示：“条码已报废 / 删除，不可再操作锁定 / 取消锁定！
             var sfcs = parm.Sfcs.Distinct().ToArray();
-            //if (sfcs.Length < parm.Sfcs.Length)
-            //{
-            //    //重复条码提示,产品条码XXXX在列表中已存在，请勿重复选择！
-            //}
 
             var query = new ManuSfcProduceQuery { Sfcs = sfcs };
             var sfcInfo = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(query);
@@ -270,8 +268,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                     EquipmentId = sfc.EquipmentId,
                     ResourceId = sfc.ResourceId,
                     ProcedureId = sfc.ProcedureId,
-                    Operatetype = type,
-                    CurrentStatus = sfc.Status,
+                    Type = type,
+                    Status = sfc.Status,
                     Lock = lockCommand.Lock,
                     SiteId = _currentSite.SiteId ?? 0,
                     CreatedBy = sfc.CreatedBy,
@@ -296,7 +294,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        public async Task SfcScrapAsync(ManuSfScrapDto parm)
+        public async Task QualityScrapAsync(ManuSfScrapDto parm)
         {
             #region 验证
             if (parm == null)
@@ -306,17 +304,64 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             if (parm.Sfcs == null || parm.Sfcs.Length < 1)
             {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15400));
+            }
+
+            //类型为报废时判断条码是否已经报废,若已经报废提示:存在已报废的条码，不可再次报废
+            var sfcInfoQuery = new ManuSfcInfoQuery
+            {
+                Sfcs = parm.Sfcs,
+                Status = SfcStatusEnum.Scrapping
+            };
+            var scrapSfcs = await _manuSfcInfoRepository.GetManuSfcInfoEntitiesAsync(sfcInfoQuery);
+            if (scrapSfcs.Any())
+            {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15401));
             }
             #endregion
 
+            //TODO取消报废逻辑
             var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = parm.Sfcs };
             //获取条码列表
             var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
 
             #region  组装数据
+            var sfcStepList = GetSfcStepList(manuSfcs);
 
-            //1.插入数据操作类型为报废
+            var sfcs = manuSfcs.Select(a => a.SFC).ToArray();
+            var updateCommand = new ManuSfcInfoUpdateCommand
+            {
+                Sfcs = sfcs,
+                UserId = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now(),
+                Status = SfcStatusEnum.Scrapping
+            };
+            #endregion
+
+            //入库
+            var rows = 0;
+
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                //1.插入数据操作类型为报废
+                rows += await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
+
+                //2.删除条码在制信息，物理删除
+                rows += await _manuSfcProduceRepository.DeletePhysicalRangeAsync(sfcs);
+
+                //3.条码信息表，修改成报废
+                rows += await _manuSfcInfoRepository.UpdateStatusAsync(updateCommand);
+                trans.Complete();
+            }
+        }
+
+        /// <summary>
+        /// 获取条码步骤数据
+        /// </summary>
+        /// <param name="manuSfcs"></param>
+        /// <returns></returns>
+        private List<ManuSfcStepEntity> GetSfcStepList(IEnumerable<ManuSfcProduceEntity> manuSfcs)
+        {
             var sfcStepList = new List<ManuSfcStepEntity>();
             foreach (var sfc in manuSfcs)
             {
@@ -332,38 +377,16 @@ namespace Hymson.MES.Services.Services.Manufacture
                     EquipmentId = sfc.EquipmentId,
                     ResourceId = sfc.ResourceId,
                     ProcedureId = sfc.ProcedureId,
-                    Operatetype = ManuSfcStepTypeEnum.Discard,
-                    CurrentStatus = sfc.Status,
+                    Type = ManuSfcStepTypeEnum.Discard,
+                    Status = sfc.Status,
+                    Lock=sfc.Lock,
                     SiteId = _currentSite.SiteId ?? 0,
                     CreatedBy = sfc.CreatedBy,
                     UpdatedBy = sfc.UpdatedBy
                 });
             }
-
-            //2.删除条码在制信息，物理删除
-
-            //3.条码信息表，修改成报废
-            var sfcs = manuSfcs.Select(a => a.SFC).ToArray();
-            var updateCommand = new ManuSfcInfoUpdateCommand
-            {
-                SFCs = sfcs,
-                UserId = _currentUser.UserName,
-                UpdatedOn = HymsonClock.Now(),
-                Status = SfcStatusEnum.Scrapping
-            };
-            #endregion
-
-            //入库
-            var rows = 0;
-            using (var trans = TransactionHelper.GetTransactionScope())
-            {
-                rows += await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
-
-                rows += await _manuSfcInfoRepository.UpdateStatusAsync(updateCommand);
-                trans.Complete();
-            }
+            return sfcStepList;
         }
-
 
         /// <summary>
         /// 创建

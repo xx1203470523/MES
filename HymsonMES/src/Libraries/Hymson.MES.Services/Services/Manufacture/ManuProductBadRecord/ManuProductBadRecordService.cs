@@ -147,9 +147,10 @@ namespace Hymson.MES.Services.Services.Manufacture
                 using (var trans = TransactionHelper.GetTransactionScope())
                 {
                     var sfcs = manuSfcs.Select(a => a.SFC).ToArray();
+                    //TODO 走报废流程
                     var updateCommand = new ManuSfcInfoUpdateCommand
                     {
-                        SFCs = sfcs,
+                        Sfcs = sfcs,
                         UserId = _currentUser.UserName,
                         UpdatedOn = HymsonClock.Now(),
                         Status = SfcStatusEnum.Scrapping

@@ -67,9 +67,9 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("scrap")]
-        public async Task SfcScrapAsync(ManuSfScrapDto parm)
+        public async Task QualityScrapAsync(ManuSfScrapDto parm)
         {
-            await _manuSfcProduceService.SfcScrapAsync(parm);
+            await _manuSfcProduceService.QualityScrapAsync(parm);
         }
 
         /// <summary>

@@ -290,8 +290,8 @@
         #endregion
 
         #region 质量录入 15400
-        public const string MES15400 = "将来锁定工序必填";
-        public const string MES15401 = "产品条码不能为空";
+        public const string MES15400 = "产品条码不能为空";
+        public const string MES15401 = "存在已报废的条码，不可再次报废";
         #endregion
 
         #region 工单  16000

@@ -91,5 +91,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<int> DeleteRangeAsync(long[] ids);
+
+        /// <summary>
+        /// 批量删除（物理删除）条码信息
+        /// </summary>
+        /// <param name="sfcs"></param>
+        /// <returns></returns>
+        Task<int> DeletePhysicalRangeAsync(string[] sfcs);
     }
 }
