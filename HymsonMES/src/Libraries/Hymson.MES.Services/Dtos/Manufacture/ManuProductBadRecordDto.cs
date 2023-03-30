@@ -109,7 +109,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 发现不良资源
         /// </summary>
-        public long? FoundBadResourceId { get; set; }
+        public string? FoundBadResourceId { get; set; }
 
        /// <summary>
        /// 流出不良工序

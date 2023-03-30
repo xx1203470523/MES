@@ -213,6 +213,7 @@
         public const string MES12500 = "容器维护错误";
         public const string MES12501 = "最大数量不能小于最小数量{Minimum}";
         public const string MES12502 = "最大数量不能小于最小数量";
+        public const string MES12503 = "同一物料/物料组只允许设置一次";
         #endregion
 
         //设备
@@ -290,8 +291,8 @@
         #endregion
 
         #region 质量录入 15400
-        public const string MES15400 = "将来锁定工序必填";
-        public const string MES15401 = "产品条码不能为空";
+        public const string MES15400 = "产品条码不能为空";
+        public const string MES15401 = "存在已报废的条码，不可再次报废";
         #endregion
 
         #region 工单  16000

@@ -12,7 +12,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 产品条码列表
         /// </summary>
-        public string[] SFCs { get; set; }
+        public string[] Sfcs { get; set; }
 
         /// <summary>
         /// 操作人员

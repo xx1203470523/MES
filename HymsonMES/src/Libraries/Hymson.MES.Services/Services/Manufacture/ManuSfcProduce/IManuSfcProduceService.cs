@@ -39,7 +39,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        Task SfcScrapAsync(ManuSfScrapDto parm);
+        Task QualityScrapAsync(ManuSfScrapDto parm);
 
         /// <summary>
         /// 新增

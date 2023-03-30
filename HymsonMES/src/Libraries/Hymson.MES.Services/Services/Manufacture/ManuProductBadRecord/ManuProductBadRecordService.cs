@@ -105,7 +105,11 @@ namespace Hymson.MES.Services.Services.Manufacture
             var qualUnqualifiedCodes = await _qualUnqualifiedCodeRepository.GetByIdsAsync(createDto.UnqualifiedIds);
 
             var manuProductBadRecords = new List<ManuProductBadRecordEntity>();
-
+            long badResourceId = 0;
+            if (!string.IsNullOrWhiteSpace(createDto.FoundBadResourceId))
+            {
+                badResourceId = createDto.FoundBadResourceId.ParseToLong();
+            }
             foreach (var item in manuSfcs)
             {
                 foreach (var unqualified in qualUnqualifiedCodes)
@@ -115,7 +119,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = _currentSite.SiteId ?? 0,
                         FoundBadOperationId = createDto.FoundBadOperationId,
-                        FoundBadResourceId= createDto.FoundBadResourceId,
+                        FoundBadResourceId= badResourceId,
                         OutflowOperationId = createDto.OutflowOperationId,
                         UnqualifiedId = unqualified.Id,
                         SFC = item.SFC,
@@ -143,9 +147,10 @@ namespace Hymson.MES.Services.Services.Manufacture
                 using (var trans = TransactionHelper.GetTransactionScope())
                 {
                     var sfcs = manuSfcs.Select(a => a.SFC).ToArray();
+                    //TODO 走报废流程
                     var updateCommand = new ManuSfcInfoUpdateCommand
                     {
-                        SFCs = sfcs,
+                        Sfcs = sfcs,
                         UserId = _currentUser.UserName,
                         UpdatedOn = HymsonClock.Now(),
                         Status = SfcStatusEnum.Scrapping
