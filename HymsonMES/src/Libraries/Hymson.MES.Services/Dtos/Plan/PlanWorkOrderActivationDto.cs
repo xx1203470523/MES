@@ -258,6 +258,27 @@ namespace Hymson.MES.Services.Dtos.Plan
     }
 
     /// <summary>
+    /// 激活/取消激活 工单
+    /// </summary>
+    public class ActivationWorkOrderDto 
+    {
+        /// <summary>
+        /// 工单ID
+        /// </summary>
+        public long Id { get; set; }
+        
+        /// <summary>
+        /// 是否需要激活   true 需要激活  false 需要取消激活
+        /// </summary>
+        public bool IsNeedActivation { get; set; }
+
+        /// <summary>
+        /// 线体ID
+        /// </summary>
+        public long LineId { get; set; }
+    }
+
+    /// <summary>
     /// 工单激活相关 视图
     /// </summary>
     public record PlanWorkOrderActivationListDetailViewDto : BaseEntityDto

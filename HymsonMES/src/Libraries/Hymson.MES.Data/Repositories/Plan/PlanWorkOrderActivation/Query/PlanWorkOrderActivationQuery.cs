@@ -19,5 +19,19 @@ namespace Hymson.MES.Data.Repositories.Plan
     /// </summary>
     public class PlanWorkOrderActivationQuery
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public long SiteId { get; set; }    
+
+        /// <summary>
+        /// 工单id
+        /// </summary>
+        public long? WorkOrderId { get; set; }
+
+        /// <summary>
+        /// 线体id
+        /// </summary>
+        public long? LineId { get; set; }
     }
 }

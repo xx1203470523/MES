@@ -11,6 +11,7 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Kafka.Debezium;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
@@ -44,6 +45,7 @@ namespace Hymson.MES.Services.Services.Plan
         private readonly IProcBomRepository _procBomRepository;
         private readonly IProcProcessRouteRepository _procProcessRouteRepository;
         private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
+        private readonly IPlanWorkOrderStatusRecordRepository _planWorkOrderStatusRecordRepository;
 
         /// <summary>
         /// 
@@ -57,7 +59,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="procBomRepository"></param>
         /// <param name="procProcessRouteRepository"></param>
         /// <param name="inteWorkCenterRepository"></param>
-        public PlanWorkOrderService(ICurrentUser currentUser, ICurrentSite currentSite, IPlanWorkOrderRepository planWorkOrderRepository, AbstractValidator<PlanWorkOrderCreateDto> validationCreateRules, AbstractValidator<PlanWorkOrderModifyDto> validationModifyRules, IProcMaterialRepository procMaterialRepository, IProcBomRepository procBomRepository, IProcProcessRouteRepository procProcessRouteRepository, IInteWorkCenterRepository inteWorkCenterRepository)
+        public PlanWorkOrderService(ICurrentUser currentUser, ICurrentSite currentSite, IPlanWorkOrderRepository planWorkOrderRepository, AbstractValidator<PlanWorkOrderCreateDto> validationCreateRules, AbstractValidator<PlanWorkOrderModifyDto> validationModifyRules, IProcMaterialRepository procMaterialRepository, IProcBomRepository procBomRepository, IProcProcessRouteRepository procProcessRouteRepository, IInteWorkCenterRepository inteWorkCenterRepository, IPlanWorkOrderStatusRecordRepository planWorkOrderStatusRecordRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -69,6 +71,7 @@ namespace Hymson.MES.Services.Services.Plan
             _procBomRepository = procBomRepository;
             _procProcessRouteRepository = procProcessRouteRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
+            _planWorkOrderStatusRecordRepository = planWorkOrderStatusRecordRepository;
         }
 
 
@@ -271,7 +274,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// <summary>
         /// 修改工单状态
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="parms"></param>
         /// <returns></returns>
         public async Task ModifyWorkOrderStatusAsync(List<PlanWorkOrderChangeStatusDto> parms)
         {
@@ -280,9 +283,14 @@ namespace Hymson.MES.Services.Services.Plan
                 throw new BusinessException(nameof(ErrorCode.MES10100));
             }
 
-            #region//判断订单是否可以继续修改状态 TODO
             //查询需要改变的工单
             var workOrders = await _planWorkOrderRepository.GetByIdsAsync(parms.Select(x => x.Id).ToArray());
+            if (workOrders==null || workOrders.Count()==0 || workOrders.Any(x => x.IsDeleted > 0) || workOrders.Count()!= parms.Count()) 
+            {
+                throw new BusinessException(nameof(ErrorCode.MES16014));
+            }
+
+            #region//判断订单是否可以继续修改状态 
 
             if (parms.First().Status == PlanWorkOrderStatusEnum.SendDown) //需要修改为已下达的
             {
@@ -330,17 +338,36 @@ namespace Hymson.MES.Services.Services.Plan
                 });
             }
 
+            //组装工单状态变化记录
+            List<PlanWorkOrderStatusRecordEntity> planWorkOrderStatusRecordEntities= new List<PlanWorkOrderStatusRecordEntity>();
+            foreach (var item in workOrders)
+            {
+                var record=AutoMapperConfiguration.Mapper.Map<PlanWorkOrderStatusRecordEntity>(item);
+                record.Id = IdGenProvider.Instance.CreateId();
+                record.CreatedBy = _currentUser.UserName;
+                record.UpdatedBy = _currentUser.UserName;
+                record.CreatedOn = HymsonClock.Now();
+                record.UpdatedOn = HymsonClock.Now();
+                record.SiteId = _currentSite.SiteId ?? 0;
+                record.IsDeleted = 0;
+
+                planWorkOrderStatusRecordEntities.Add(record);
+            }
+
             using (TransactionScope ts = new TransactionScope())
             {
                 var response = await _planWorkOrderRepository.ModifyWorkOrderStatusAsync(planWorkOrderEntities);
-                if (response == parms.Count)
-                {
+
+                await _planWorkOrderStatusRecordRepository.InsertsAsync(planWorkOrderStatusRecordEntities);
+
+                //if (response == parms.Count)
+                //{
                     ts.Complete();
-                }
-                else
-                {
-                    throw new BusinessException(nameof(ErrorCode.MES16005));
-                }
+                //}
+                //else
+                //{
+                //    throw new BusinessException(nameof(ErrorCode.MES16005));
+                //}
             }
         }
 
@@ -359,6 +386,10 @@ namespace Hymson.MES.Services.Services.Plan
             #region//判断订单是否可以继续修改为锁定/解锁
             //查询需要改变的工单
             var workOrders = await _planWorkOrderRepository.GetByIdsAsync(parms.Select(x => x.Id).ToArray());
+            if (workOrders == null || workOrders.Count() == 0 || workOrders.Any(x => x.IsDeleted > 0) || workOrders.Count() != parms.Count())
+            {
+                throw new BusinessException(nameof(ErrorCode.MES16014));
+            }
 
             if (parms.First().IsLocked == YesOrNoEnum.Yes) //需要修改为锁定
             {
@@ -396,9 +427,28 @@ namespace Hymson.MES.Services.Services.Plan
                 });
             }
 
+            //组装工单状态变化记录
+            List<PlanWorkOrderStatusRecordEntity> planWorkOrderStatusRecordEntities = new List<PlanWorkOrderStatusRecordEntity>();
+            foreach (var item in workOrders)
+            {
+                var record = AutoMapperConfiguration.Mapper.Map<PlanWorkOrderStatusRecordEntity>(item);
+                record.Id = IdGenProvider.Instance.CreateId();
+                record.CreatedBy = _currentUser.UserName;
+                record.UpdatedBy = _currentUser.UserName;
+                record.CreatedOn = HymsonClock.Now();
+                record.UpdatedOn = HymsonClock.Now();
+                record.SiteId = _currentSite.SiteId ?? 0;
+                record.IsDeleted = 0;
+
+                planWorkOrderStatusRecordEntities.Add(record);
+            }
+
             using (TransactionScope ts = new TransactionScope())
             {
                 var response = await _planWorkOrderRepository.ModifyWorkOrderLockedAsync(planWorkOrderEntities);
+
+                await _planWorkOrderStatusRecordRepository.InsertsAsync(planWorkOrderStatusRecordEntities);//新增工单变化记录表
+
                 if (response == parms.Count)
                 {
                     ts.Complete();

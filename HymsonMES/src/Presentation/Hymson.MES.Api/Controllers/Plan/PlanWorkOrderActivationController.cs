@@ -99,5 +99,17 @@ namespace Hymson.MES.Api.Controllers.Plan
             await _planWorkOrderActivationService.DeletesPlanWorkOrderActivationAsync(ids);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="activationWorkOrderDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("activationWorkOrder")]
+        public async Task ActivationWorkOrderAsync(ActivationWorkOrderDto activationWorkOrderDto) 
+        {
+            await _planWorkOrderActivationService.ActivationWorkOrder(activationWorkOrderDto);
+        }
+
     }
 }

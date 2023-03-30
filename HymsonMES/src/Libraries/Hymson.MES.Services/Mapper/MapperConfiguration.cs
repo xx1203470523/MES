@@ -448,6 +448,8 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<PlanWorkOrderEntity, PlanWorkOrderDto>();
             CreateMap<PlanWorkOrderEntity, PlanWorkOrderDetailViewDto>();
             CreateMap<PlanWorkOrderListDetailView, PlanWorkOrderListDetailViewDto>();
+
+            CreateMap<PlanWorkOrderEntity, PlanWorkOrderStatusRecordEntity>();
             #endregion
 
             #region PlanSfcReceive

@@ -13,12 +13,14 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Services.Dtos.Plan;
+using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using System.Transactions;
@@ -41,8 +43,11 @@ namespace Hymson.MES.Services.Services.Plan
         private readonly AbstractValidator<PlanWorkOrderActivationModifyDto> _validationModifyRules;
 
         private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
+        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
+        private readonly IPlanWorkOrderActivationRecordRepository _planWorkOrderActivationRecordRepository;
+        private readonly IPlanWorkOrderStatusRecordRepository _planWorkOrderStatusRecordRepository;
 
-        public PlanWorkOrderActivationService(ICurrentUser currentUser, ICurrentSite currentSite, IPlanWorkOrderActivationRepository planWorkOrderActivationRepository, AbstractValidator<PlanWorkOrderActivationCreateDto> validationCreateRules, AbstractValidator<PlanWorkOrderActivationModifyDto> validationModifyRules, IInteWorkCenterRepository inteWorkCenterRepository)
+        public PlanWorkOrderActivationService(ICurrentUser currentUser, ICurrentSite currentSite, IPlanWorkOrderActivationRepository planWorkOrderActivationRepository, AbstractValidator<PlanWorkOrderActivationCreateDto> validationCreateRules, AbstractValidator<PlanWorkOrderActivationModifyDto> validationModifyRules, IInteWorkCenterRepository inteWorkCenterRepository, IPlanWorkOrderRepository planWorkOrderRepository, IPlanWorkOrderActivationRecordRepository planWorkOrderActivationRecordRepository, IPlanWorkOrderStatusRecordRepository planWorkOrderStatusRecordRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -51,6 +56,9 @@ namespace Hymson.MES.Services.Services.Plan
             _validationModifyRules = validationModifyRules;
 
             _inteWorkCenterRepository = inteWorkCenterRepository;
+            _planWorkOrderRepository = planWorkOrderRepository;
+            _planWorkOrderActivationRecordRepository = planWorkOrderActivationRecordRepository;
+            _planWorkOrderStatusRecordRepository = planWorkOrderStatusRecordRepository;
         }
 
         /// <summary>
@@ -160,6 +168,207 @@ namespace Hymson.MES.Services.Services.Plan
 
             return planWorkOrderActivationDtos;
         }
+
+        /// <summary>
+        /// 激活/取消激活 工单
+        /// </summary>
+        /// <param name="activationWorkOrderDto"></param>
+        /// <returns></returns>
+        public async Task ActivationWorkOrder(ActivationWorkOrderDto activationWorkOrderDto) 
+        {
+            //查询当前线体
+            var line = await _inteWorkCenterRepository.GetByIdAsync(activationWorkOrderDto.LineId);
+            if (line == null)
+            {
+                throw new BusinessException(nameof(ErrorCode.MES16402));
+            }
+            if (line.Type != WorkCenterTypeEnum.Line)
+            {
+                throw new BusinessException(nameof(ErrorCode.MES16403));
+            }
+
+            //查询当前工单信息
+            var workOrder = await _planWorkOrderRepository.GetByIdAsync(activationWorkOrderDto.Id);
+            if (workOrder == null || workOrder.Id <= 0)
+            {
+                throw new BusinessException(nameof(ErrorCode.MES16404));
+            }
+
+            //查询当前工单是否已经被激活
+            var workOrderActivation = (await _planWorkOrderActivationRepository.GetPlanWorkOrderActivationEntitiesAsync(new PlanWorkOrderActivationQuery()
+            {
+                WorkOrderId = workOrder.Id,
+                SiteId=_currentSite.SiteId??0
+            })).FirstOrDefault();
+
+            var isActivationed = workOrderActivation != null;//是否已经激活
+            if (isActivationed && isActivationed == activationWorkOrderDto.IsNeedActivation)
+            {
+                throw new BusinessException(nameof(ErrorCode.MES16406)).WithData("orderCode", workOrder.OrderCode);
+            }
+            else if (!isActivationed && isActivationed == activationWorkOrderDto.IsNeedActivation) 
+            {
+                throw new BusinessException(nameof(ErrorCode.MES16407)).WithData("orderCode", workOrder.OrderCode);
+            }
+
+            //取消激活
+            if (!activationWorkOrderDto.IsNeedActivation) 
+            {
+                using (TransactionScope ts = new TransactionScope())
+                {
+                    await _planWorkOrderActivationRepository.DeleteTrueAsync(workOrderActivation.Id);//真删除
+
+                    //记录下激活状态变化
+                    await _planWorkOrderActivationRecordRepository.InsertAsync(new PlanWorkOrderActivationRecordEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        CreatedBy = _currentUser.UserName,
+                        UpdatedBy = _currentUser.UserName,
+                        CreatedOn = HymsonClock.Now(),
+                        UpdatedOn = HymsonClock.Now(),
+                        SiteId = _currentSite.SiteId ?? 0,
+
+                        WorkOrderId = activationWorkOrderDto.Id,
+                        LineId = activationWorkOrderDto.LineId,
+
+                        ActivateType = PlanWorkOrderActivateTypeEnum.CancelActivate
+                    });
+
+                    ts.Complete();
+                }
+                return;
+            }
+
+            if (line.IsMixLine.Value)
+            {//混线
+                await DoActivationWorkOrder(workOrder, activationWorkOrderDto);
+            }
+            else 
+            {//不混线
+                //判断当前线体是否有无激活的工单
+                var hasActivation= (await _planWorkOrderActivationRepository.GetPlanWorkOrderActivationEntitiesAsync(new PlanWorkOrderActivationQuery { LineId = activationWorkOrderDto.LineId, SiteId = _currentSite.SiteId ?? 0 })).FirstOrDefault();
+                if (hasActivation != null) 
+                {
+                    var activationWorkOrder = await _planWorkOrderRepository.GetByIdAsync(hasActivation.Id);
+                    throw new BusinessException(nameof(ErrorCode.MES16409)).WithData("orderCode", activationWorkOrder.OrderCode);
+                }
+
+                await DoActivationWorkOrder(workOrder, activationWorkOrderDto);
+            }
+        }
+
+        /// <summary>
+        /// 激活工单
+        /// </summary>
+        /// <param name="workOrder"></param>
+        /// <param name="activationWorkOrderDto"></param>
+        /// <returns></returns>
+        private async Task DoActivationWorkOrder(PlanWorkOrderEntity workOrder, ActivationWorkOrderDto activationWorkOrderDto) 
+        {
+            if (workOrder.IsLocked == Core.Enums.YesOrNoEnum.Yes)
+            {
+                throw new BusinessException(nameof(ErrorCode.MES16408)).WithData("orderCode", workOrder.OrderCode);
+            }
+
+            var planWorkOrderActivationEntity = new PlanWorkOrderActivationEntity()
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                CreatedBy = _currentUser.UserName,
+                UpdatedBy = _currentUser.UserName,
+                CreatedOn = HymsonClock.Now(),
+                UpdatedOn = HymsonClock.Now(),
+                SiteId = _currentSite.SiteId ?? 0,
+
+                WorkOrderId = activationWorkOrderDto.Id,
+                LineId = activationWorkOrderDto.LineId
+            };
+
+            //组装工单状态变化记录
+            var record = AutoMapperConfiguration.Mapper.Map<PlanWorkOrderStatusRecordEntity>(workOrder);
+            record.Id = IdGenProvider.Instance.CreateId();
+            record.CreatedBy = _currentUser.UserName;
+            record.UpdatedBy = _currentUser.UserName;
+            record.CreatedOn = HymsonClock.Now();
+            record.UpdatedOn = HymsonClock.Now();
+            record.SiteId = _currentSite.SiteId ?? 0;
+            record.IsDeleted = 0;
+
+            using (TransactionScope ts = new TransactionScope()) 
+            {
+                switch (workOrder.Status)
+                {
+                    case Core.Enums.PlanWorkOrderStatusEnum.NotStarted:
+                        throw new BusinessException(nameof(ErrorCode.MES16405)).WithData("orderCode", workOrder.OrderCode);
+                        break;
+                    case Core.Enums.PlanWorkOrderStatusEnum.SendDown:
+                        await _planWorkOrderActivationRepository.InsertAsync(planWorkOrderActivationEntity);
+
+                        //记录下激活状态变化
+                        await _planWorkOrderActivationRecordRepository.InsertAsync(new PlanWorkOrderActivationRecordEntity
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            CreatedBy = _currentUser.UserName,
+                            UpdatedBy = _currentUser.UserName,
+                            CreatedOn = HymsonClock.Now(),
+                            UpdatedOn = HymsonClock.Now(),
+                            SiteId = _currentSite.SiteId ?? 0,
+
+                            WorkOrderId = activationWorkOrderDto.Id,
+                            LineId = activationWorkOrderDto.LineId,
+
+                            ActivateType = PlanWorkOrderActivateTypeEnum.Activate
+                        });
+
+
+                        //修改工单状态为生产中
+                        List<PlanWorkOrderEntity> planWorkOrderEntities = new List<PlanWorkOrderEntity>();
+                        planWorkOrderEntities.Add(new PlanWorkOrderEntity()
+                        {
+                            Id = activationWorkOrderDto.Id,
+                            Status = Core.Enums.PlanWorkOrderStatusEnum.InProduction,
+
+                            UpdatedBy = _currentUser.UserName,
+                            UpdatedOn = HymsonClock.Now()
+                        });
+                        await _planWorkOrderRepository.ModifyWorkOrderStatusAsync(planWorkOrderEntities);
+
+                        //TODO  修改工单状态还需要在 工单记录表中记录
+                        await _planWorkOrderStatusRecordRepository.InsertAsync(record);
+
+                        break;
+                    case Core.Enums.PlanWorkOrderStatusEnum.InProduction:
+                    case Core.Enums.PlanWorkOrderStatusEnum.Finish:
+                        await _planWorkOrderActivationRepository.InsertAsync(planWorkOrderActivationEntity);
+
+                        //记录下激活状态变化
+                        await _planWorkOrderActivationRecordRepository.InsertAsync(new PlanWorkOrderActivationRecordEntity
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            CreatedBy = _currentUser.UserName,
+                            UpdatedBy = _currentUser.UserName,
+                            CreatedOn = HymsonClock.Now(),
+                            UpdatedOn = HymsonClock.Now(),
+                            SiteId = _currentSite.SiteId ?? 0,
+
+                            WorkOrderId = activationWorkOrderDto.Id,
+                            LineId = activationWorkOrderDto.LineId,
+
+                            ActivateType = PlanWorkOrderActivateTypeEnum.Activate
+                        });
+
+                        break;
+                    //case Core.Enums.PlanWorkOrderStatusEnum.Closed:
+                    //    break;
+                    default:
+                        break;
+                }
+
+                ts.Complete();
+            }
+                
+
+        }
+
 
         /// <summary>
         /// 修改

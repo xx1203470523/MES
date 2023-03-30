@@ -1,9 +1,9 @@
 /*
  *creator: Karl
  *
- *describe: 工单激活仓储类 | 代码由框架生成
+ *describe: 工单变更改记录表仓储类 | 代码由框架生成
  *builder:  Karl
- *build datetime: 2023-03-29 10:23:51
+ *build datetime: 2023-03-30 03:46:15
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Plan;
@@ -17,37 +17,37 @@ using System.Threading.Tasks;
 namespace Hymson.MES.Data.Repositories.Plan
 {
     /// <summary>
-    /// 工单激活仓储接口
+    /// 工单变更改记录表仓储接口
     /// </summary>
-    public interface IPlanWorkOrderActivationRepository
+    public interface IPlanWorkOrderStatusRecordRepository
     {
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="planWorkOrderActivationEntity"></param>
+        /// <param name="planWorkOrderStatusRecordEntity"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(PlanWorkOrderActivationEntity planWorkOrderActivationEntity);
+        Task<int> InsertAsync(PlanWorkOrderStatusRecordEntity planWorkOrderStatusRecordEntity);
         
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="planWorkOrderActivationEntitys"></param>
+        /// <param name="planWorkOrderStatusRecordEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertsAsync(List<PlanWorkOrderActivationEntity> planWorkOrderActivationEntitys);
+        Task<int> InsertsAsync(List<PlanWorkOrderStatusRecordEntity> planWorkOrderStatusRecordEntitys);
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="planWorkOrderActivationEntity"></param>
+        /// <param name="planWorkOrderStatusRecordEntity"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(PlanWorkOrderActivationEntity planWorkOrderActivationEntity);
+        Task<int> UpdateAsync(PlanWorkOrderStatusRecordEntity planWorkOrderStatusRecordEntity);
         
         /// <summary>
         /// 批量更新 
         /// </summary>
-        /// <param name="planWorkOrderActivationEntitys"></param>
+        /// <param name="planWorkOrderStatusRecordEntitys"></param>
         /// <returns></returns>
-        Task<int> UpdatesAsync(List<PlanWorkOrderActivationEntity> planWorkOrderActivationEntitys);
+        Task<int> UpdatesAsync(List<PlanWorkOrderStatusRecordEntity> planWorkOrderStatusRecordEntitys);
 
         /// <summary>
         /// 删除
@@ -64,38 +64,31 @@ namespace Hymson.MES.Data.Repositories.Plan
         Task<int> DeletesAsync(DeleteCommand param);
 
         /// <summary>
-        /// 删除（硬删除）
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<int> DeleteTrueAsync(long id);
-
-        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<PlanWorkOrderActivationEntity> GetByIdAsync(long id);
+        Task<PlanWorkOrderStatusRecordEntity> GetByIdAsync(long id);
     
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<PlanWorkOrderActivationEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<PlanWorkOrderStatusRecordEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
         /// 获取List
         /// </summary>
-        /// <param name="planWorkOrderActivationQuery"></param>
+        /// <param name="planWorkOrderStatusRecordQuery"></param>
         /// <returns></returns>
-        Task<IEnumerable<PlanWorkOrderActivationEntity>> GetPlanWorkOrderActivationEntitiesAsync(PlanWorkOrderActivationQuery planWorkOrderActivationQuery);
+        Task<IEnumerable<PlanWorkOrderStatusRecordEntity>> GetPlanWorkOrderStatusRecordEntitiesAsync(PlanWorkOrderStatusRecordQuery planWorkOrderStatusRecordQuery);
         
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="planWorkOrderActivationPagedQuery"></param>
+        /// <param name="planWorkOrderStatusRecordPagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<PlanWorkOrderActivationListDetailView>> GetPagedInfoAsync(PlanWorkOrderActivationPagedQuery planWorkOrderActivationPagedQuery);
+        Task<PagedInfo<PlanWorkOrderStatusRecordEntity>> GetPagedInfoAsync(PlanWorkOrderStatusRecordPagedQuery planWorkOrderStatusRecordPagedQuery);
     }
 }
