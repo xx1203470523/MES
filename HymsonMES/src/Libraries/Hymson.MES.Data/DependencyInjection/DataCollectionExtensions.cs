@@ -192,6 +192,11 @@ namespace Microsoft.Extensions.DependencyInjection
             #region PlanSfcReceive
             services.AddSingleton<IPlanSfcReceiveRepository, PlanSfcReceiveRepository>();
             #endregion
+
+            #region PlanSfcPrint
+            services.AddSingleton<IPlanSfcPrintRepository, PlanSfcPrintRepository>();
+
+            #endregion
             #endregion
 
             return services;

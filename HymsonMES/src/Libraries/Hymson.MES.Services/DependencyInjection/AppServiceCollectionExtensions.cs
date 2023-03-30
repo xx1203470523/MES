@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -171,6 +172,11 @@ namespace Microsoft.Extensions.DependencyInjection
             #region PlanSfcReceive
             services.AddSingleton<IPlanSfcReceiveService, PlanSfcReceiveService>();
             #endregion
+
+            #region PlanSfcPrint
+            services.AddSingleton<IPlanSfcPrintService, PlanSfcPrintService>();
+
+            #endregion
             #endregion
 
             return services;
@@ -322,6 +328,12 @@ namespace Microsoft.Extensions.DependencyInjection
             #region PlanSfcReceive
             services.AddSingleton<AbstractValidator<PlanSfcReceiveCreateDto>, PlanSfcReceiveCreateValidator>();
             services.AddSingleton<AbstractValidator<PlanSfcReceiveModifyDto>, PlanSfcReceiveModifyValidator>();
+            #endregion
+
+            #region PlanSfcPrint
+            services.AddSingleton<AbstractValidator<PlanSfcPrintCreateDto>, PlanSfcPrintCreateValidator>();
+            services.AddSingleton<AbstractValidator<PlanSfcPrintModifyDto>, PlanSfcPrintModifyValidator>();
+
             #endregion
             #endregion
 

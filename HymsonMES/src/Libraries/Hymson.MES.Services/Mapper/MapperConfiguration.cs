@@ -457,7 +457,12 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<PlanSfcReceiveView, PlanSfcReceiveDto>();
             #endregion
 
-
+            #region PlanSfcPrint
+            CreateMap<PlanSfcPrintCreateDto, PlanSfcPrintView>();
+            CreateMap<PlanSfcPrintModifyDto, PlanSfcPrintView>();
+            CreateMap<PlanSfcPrintPagedQueryDto, PlanSfcPrintPagedQuery>();
+            CreateMap<PlanSfcPrintView, PlanSfcPrintDto>();
+            #endregion
 
         }
 
