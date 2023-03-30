@@ -39,6 +39,13 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
         Task<InteContainerEntity> GetByIdAsync(long id);
 
         /// <summary>
+        /// 通过关联ID获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<InteContainerEntity> GetByRelationIdAsync(InteContainerQuery query);
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="pagedQuery"></param>

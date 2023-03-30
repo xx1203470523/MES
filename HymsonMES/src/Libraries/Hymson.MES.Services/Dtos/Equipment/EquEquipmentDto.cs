@@ -252,13 +252,13 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 描述 :设备类型 
         /// 空值 : true  
         /// </summary>
-        public EquipmentTypeEnum EquipmentType { get; set; }
+        public EquipmentTypeEnum? EquipmentType { get; set; }
 
         /// <summary>
         /// 描述 :使用部门 
         /// 空值 : true  
         /// </summary>
-        public DepartmentTypeEnum UseDepartment { get; set; }
+        public DepartmentTypeEnum? UseDepartment { get; set; }
 
         /// <summary>
         /// 描述 :入场日期 
@@ -405,13 +405,13 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 描述 :设备类型 
         /// 空值 : true  
         /// </summary>
-        public EquipmentTypeEnum EquipmentType { get; set; }
+        public EquipmentTypeEnum? EquipmentType { get; set; }
 
         /// <summary>
         /// 描述 :使用部门 
         /// 空值 : true  
         /// </summary>
-        public DepartmentTypeEnum UseDepartment { get; set; }
+        public DepartmentTypeEnum? UseDepartment { get; set; }
 
         /// <summary>
         /// 描述 :入场日期 

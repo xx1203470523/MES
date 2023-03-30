@@ -1,0 +1,257 @@
+/*
+ *creator: Karl
+ *
+ *describe: 工单激活 仓储类 | 代码由框架生成
+ *builder:  Karl
+ *build datetime: 2023-03-29 10:23:51
+ */
+
+using Dapper;
+using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
+using Microsoft.Extensions.Options;
+using MySql.Data.MySqlClient;
+
+namespace Hymson.MES.Data.Repositories.Plan
+{
+    /// <summary>
+    /// 工单激活仓储
+    /// </summary>
+    public partial class PlanWorkOrderActivationRepository : IPlanWorkOrderActivationRepository
+    {
+        private readonly ConnectionOptions _connectionOptions;
+
+        public PlanWorkOrderActivationRepository(IOptions<ConnectionOptions> connectionOptions)
+        {
+            _connectionOptions = connectionOptions.Value;
+        }
+
+        /// <summary>
+        /// 删除（软删除）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteAsync(long id)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeleteSql, new { Id = id });
+        }
+
+        /// <summary>
+        /// 批量删除（软删除）
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<int> DeletesAsync(DeleteCommand param) 
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeletesSql, param);
+
+        }
+
+        /// <summary>
+        /// 根据ID获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<PlanWorkOrderActivationEntity> GetByIdAsync(long id)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderActivationEntity>(GetByIdSql, new { Id=id});
+        }
+
+        /// <summary>
+        /// 根据IDs批量获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<PlanWorkOrderActivationEntity>> GetByIdsAsync(long[] ids) 
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<PlanWorkOrderActivationEntity>(GetByIdsSql, new { ids = ids});
+        }
+
+        /// <summary>
+        /// 分页查询
+        /// </summary>
+        /// <param name="planWorkOrderActivationPagedQuery"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<PlanWorkOrderActivationListDetailView>> GetPagedInfoAsync(PlanWorkOrderActivationPagedQuery planWorkOrderActivationPagedQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
+            sqlBuilder.Where("wo.IsDeleted=0");
+
+            if (planWorkOrderActivationPagedQuery.WorkCenterIds!=null&& planWorkOrderActivationPagedQuery.WorkCenterIds.Count>0) 
+            {
+                sqlBuilder.Where(" wo.WorkCenterId in @WorkCenterIds ");
+            }
+            if (planWorkOrderActivationPagedQuery.IsActivation.HasValue)
+            {
+                if ((bool)planWorkOrderActivationPagedQuery.IsActivation)
+                {
+                    sqlBuilder.Where(" woa.Id is not null ");
+                }
+                else 
+                {
+                    sqlBuilder.Where(" woa.Id is null ");
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(planWorkOrderActivationPagedQuery.OrderCode))
+            {
+                planWorkOrderActivationPagedQuery.OrderCode = $"%{planWorkOrderActivationPagedQuery.OrderCode}%";
+                sqlBuilder.Where(" wo.OrderCode like @OrderCode ");
+            }
+            if (!string.IsNullOrWhiteSpace(planWorkOrderActivationPagedQuery.MaterialCode))
+            {
+                planWorkOrderActivationPagedQuery.MaterialCode = $"%{planWorkOrderActivationPagedQuery.MaterialCode}%";
+                sqlBuilder.Where(" m.MaterialCode like @MaterialCode ");
+            }
+            if (!string.IsNullOrWhiteSpace(planWorkOrderActivationPagedQuery.WorkCenterCode))
+            {
+                planWorkOrderActivationPagedQuery.WorkCenterCode = $"%{planWorkOrderActivationPagedQuery.WorkCenterCode}%";
+                sqlBuilder.Where(" wc.Code like @WorkCenterCode ");
+            }
+            if (planWorkOrderActivationPagedQuery.Status.HasValue)
+            {
+                sqlBuilder.Where(" wo.Status = @Status ");
+            }
+            if (planWorkOrderActivationPagedQuery.IsLocked.HasValue)
+            {
+                sqlBuilder.Where(" wo.IsLocked = @IsLocked ");
+            }
+            if (planWorkOrderActivationPagedQuery.PlanStartTimeS.HasValue)
+            {
+                sqlBuilder.Where(" wo.PlanStartTime>= @PlanStartTimeS ");
+            }
+            if (planWorkOrderActivationPagedQuery.PlanStartTimeE.HasValue)
+            {
+                sqlBuilder.Where(" wo.PlanStartTime< @PlanStartTimeE ");
+            }
+
+            var offSet = (planWorkOrderActivationPagedQuery.PageIndex - 1) * planWorkOrderActivationPagedQuery.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = planWorkOrderActivationPagedQuery.PageSize });
+            sqlBuilder.AddParameters(planWorkOrderActivationPagedQuery);
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var planWorkOrderActivationEntitiesTask = conn.QueryAsync<PlanWorkOrderActivationListDetailView>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var planWorkOrderActivationEntities = await planWorkOrderActivationEntitiesTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<PlanWorkOrderActivationListDetailView>(planWorkOrderActivationEntities, planWorkOrderActivationPagedQuery.PageIndex, planWorkOrderActivationPagedQuery.PageSize, totalCount);
+        }
+
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="planWorkOrderActivationQuery"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<PlanWorkOrderActivationEntity>> GetPlanWorkOrderActivationEntitiesAsync(PlanWorkOrderActivationQuery planWorkOrderActivationQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetPlanWorkOrderActivationEntitiesSqlTemplate);
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var planWorkOrderActivationEntities = await conn.QueryAsync<PlanWorkOrderActivationEntity>(template.RawSql, planWorkOrderActivationQuery);
+            return planWorkOrderActivationEntities;
+        }
+
+        /// <summary>
+        /// 新增
+        /// </summary>
+        /// <param name="planWorkOrderActivationEntity"></param>
+        /// <returns></returns>
+        public async Task<int> InsertAsync(PlanWorkOrderActivationEntity planWorkOrderActivationEntity)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(InsertSql, planWorkOrderActivationEntity);
+        }
+
+        /// <summary>
+        /// 批量新增
+        /// </summary>
+        /// <param name="planWorkOrderActivationEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> InsertsAsync(List<PlanWorkOrderActivationEntity> planWorkOrderActivationEntitys)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(InsertsSql, planWorkOrderActivationEntitys);
+        }
+
+        /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="planWorkOrderActivationEntity"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateAsync(PlanWorkOrderActivationEntity planWorkOrderActivationEntity)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateSql, planWorkOrderActivationEntity);
+        }
+
+        /// <summary>
+        /// 批量更新
+        /// </summary>
+        /// <param name="planWorkOrderActivationEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> UpdatesAsync(List<PlanWorkOrderActivationEntity> planWorkOrderActivationEntitys)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdatesSql, planWorkOrderActivationEntitys);
+        }
+
+    }
+
+    public partial class PlanWorkOrderActivationRepository
+    {
+        const string GetPagedInfoDataSqlTemplate = @"SELECT 
+                          wo.`Id`, wo.`OrderCode`, wo.`ProductId`, wo.`WorkCenterType`, wo.`WorkCenterId`, wo.`ProcessRouteId`, wo.`ProductBOMId`, wo.`Type`, wo.`Qty`, wo.`Status`, wo.`OverScale`, wo.`PlanStartTime`, wo.`PlanEndTime`, wo.`IsLocked`, wo.`Remark`, wo.`CreatedBy`, wo.`CreatedOn`, wo.`UpdatedBy`, wo.`UpdatedOn`, wo.`IsDeleted`, wo.`SiteId`,
+
+                          woa.Id,
+
+                          wor.InputQty,wor.FinishProductQuantity,wor.RealStart,wor.RealEnd,
+                          m.MaterialCode, m.MaterialName,m.Version as MaterialVersion,
+                          b.BomCode,b.Version as BomVersion,
+                          pr.`Code` as ProcessRouteCode ,pr.Version as ProcessRouteVersion,
+                          wc.`Code`  as WorkCenterCode
+                         FROM `plan_work_order` wo 
+                         LEFT JOIN plan_work_order_activation woa ON wo.Id= woa.WorkOrderId
+                         LEFT JOIN plan_work_order_record wor on wo.Id=wor.WorkOrderId
+                         LEFT JOIN proc_material m on wo.ProductId=m.Id
+                         LEFT JOIN proc_bom b on wo.ProductBOMId=b.Id
+                         LEFT JOIN proc_process_route pr on wo.ProcessRouteId=pr.Id
+                         LEFT JOIN inte_work_center wc on wo.WorkCenterId=wc.Id
+                            
+                        /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = @"SELECT COUNT(1) 
+                         FROM `plan_work_order` wo 
+                         LEFT JOIN plan_work_order_activation woa ON wo.Id= woa.WorkOrderId
+                         LEFT JOIN plan_work_order_record wor on wo.Id=wor.WorkOrderId
+                         LEFT JOIN proc_material m on wo.ProductId=m.Id
+                         LEFT JOIN proc_bom b on wo.ProductBOMId=b.Id
+                         LEFT JOIN proc_process_route pr on wo.ProcessRouteId=pr.Id
+                         LEFT JOIN inte_work_center wc on wo.WorkCenterId=wc.Id
+                        /**where**/ ";
+        const string GetPlanWorkOrderActivationEntitiesSqlTemplate = @"SELECT
+    /**select**/
+    FROM `plan_work_order_activation` /**where**/  ";
+
+        const string InsertSql = "INSERT INTO `plan_work_order_activation`(  `Id`, `SiteId`, `WorkOrderId`, `LineId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @WorkOrderId, @LineId, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsSql = "INSERT INTO `plan_work_order_activation`(  `Id`, `SiteId`, `WorkOrderId`, `LineId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @WorkOrderId, @LineId, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+    const string UpdateSql = "UPDATE `plan_work_order_activation` SET   SiteId = @SiteId, WorkOrderId = @WorkOrderId, LineId = @LineId, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `plan_work_order_activation` SET   SiteId = @SiteId, WorkOrderId = @WorkOrderId, LineId = @LineId, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string DeleteSql = "UPDATE `plan_work_order_activation` SET IsDeleted = Id WHERE Id = @Id ";
+        const string DeletesSql = "UPDATE `plan_work_order_activation`  SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids ";
+        const string GetByIdSql = @"SELECT
+      `Id`, `SiteId`, `WorkOrderId`, `LineId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+    FROM `plan_work_order_activation`  WHERE Id = @Id ";
+        const string GetByIdsSql = @"SELECT
+      `Id`, `SiteId`, `WorkOrderId`, `LineId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+    FROM `plan_work_order_activation`  WHERE Id IN @ids ";
+    }
+    }

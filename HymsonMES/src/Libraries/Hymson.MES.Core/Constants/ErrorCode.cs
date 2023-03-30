@@ -213,6 +213,7 @@
         public const string MES12500 = "容器维护错误";
         public const string MES12501 = "最大数量不能小于最小数量{Minimum}";
         public const string MES12502 = "最大数量不能小于最小数量";
+        public const string MES12503 = "同一物料/物料组只允许设置一次";
         #endregion
 
         //设备
@@ -360,6 +361,12 @@
         public const string MES17101 = "物料条码:{barCode}不存在！";
         #endregion
 
+        #region 工单激活 MES16400
+        public const string MES16400 = "工单激活错误";
+        public const string MES16401 = "查询工单激活必须选择线体！";
+        public const string MES16402 = "当前选择的线体不存在！";
+        public const string MES16403 = "当前选择的不是线体！";
+        #endregion
         #endregion
 
         #region 系统执行出错 业务逻辑出错

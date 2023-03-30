@@ -75,16 +75,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
             }
 
             // 保存实体
-            try
-            {
-                return await _equFaultPhenomenonRepository.InsertAsync(entity);
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-            return 0;
+            return await _equFaultPhenomenonRepository.InsertAsync(entity);
         }
 
         /// <summary>

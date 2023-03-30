@@ -97,7 +97,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             //验证DTO
             //await _validationCreateRules.ValidateAndThrowAsync(manuProductBadRecordCreateDto);
 
-            var manuSfcProducePagedQuery = new ManuSfcProduceQuery {Sfcs = createDto.SFCs };
+            var manuSfcProducePagedQuery = new ManuSfcProduceQuery {Sfcs = createDto.Sfcs };
             //获取条码列表
             var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
 
@@ -105,7 +105,11 @@ namespace Hymson.MES.Services.Services.Manufacture
             var qualUnqualifiedCodes = await _qualUnqualifiedCodeRepository.GetByIdsAsync(createDto.UnqualifiedIds);
 
             var manuProductBadRecords = new List<ManuProductBadRecordEntity>();
-
+            long badResourceId = 0;
+            if (!string.IsNullOrWhiteSpace(createDto.FoundBadResourceId))
+            {
+                badResourceId = createDto.FoundBadResourceId.ParseToLong();
+            }
             foreach (var item in manuSfcs)
             {
                 foreach (var unqualified in qualUnqualifiedCodes)
@@ -115,6 +119,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = _currentSite.SiteId ?? 0,
                         FoundBadOperationId = createDto.FoundBadOperationId,
+                        FoundBadResourceId= badResourceId,
                         OutflowOperationId = createDto.OutflowOperationId,
                         UnqualifiedId = unqualified.Id,
                         SFC = item.SFC,

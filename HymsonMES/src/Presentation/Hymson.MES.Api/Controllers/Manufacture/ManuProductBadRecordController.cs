@@ -65,7 +65,6 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("create")]
         public async Task AddManuProductBadRecordAsync([FromBody] ManuProductBadRecordCreateDto parm)
         {
              await _manuProductBadRecordService.CreateManuProductBadRecordAsync(parm);
@@ -76,8 +75,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("update")]
+        [HttpPut]
         public async Task UpdateManuProductBadRecordAsync([FromBody] ManuProductBadRecordModifyDto parm)
         {
             await _manuProductBadRecordService.ModifyManuProductBadRecordAsync(parm);
@@ -88,8 +86,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// </summary>
         /// <param name="deleteDto"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("delete")]
+        [HttpDelete]
         public async Task DeleteManuProductBadRecordAsync(DeleteDto deleteDto)
         {
             await _manuProductBadRecordService.DeletesManuProductBadRecordAsync(deleteDto.Ids);

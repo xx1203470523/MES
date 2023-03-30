@@ -26,7 +26,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public EquEquipmentRepository(IOptions<ConnectionOptions> connectionOptions,IMemoryCache memoryCache)
+        public EquEquipmentRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
         {
             _connectionOptions = connectionOptions.Value;
             _memoryCache = memoryCache;
@@ -171,48 +171,49 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("SiteId = @SiteId");
-            sqlBuilder.OrderBy("UpdatedOn DESC");
-            sqlBuilder.Select("*");
+            sqlBuilder.LeftJoin("inte_work_center IWC ON IWC.Id = EE.WorkCenterShopId");
+            sqlBuilder.Where("EE.IsDeleted = 0");
+            sqlBuilder.Where("EE.SiteId = @SiteId");
+            sqlBuilder.OrderBy("EE.UpdatedOn DESC");
+            sqlBuilder.Select("EE.*");
 
-            if (pagedQuery.EquipmentType.HasValue)           
+            if (pagedQuery.EquipmentType.HasValue)
             {
-                sqlBuilder.Where("EquipmentType = @EquipmentType");
+                sqlBuilder.Where("EE.EquipmentType = @EquipmentType");
             }
 
             if (pagedQuery.UseStatus.HasValue)
             {
-                sqlBuilder.Where("UseStatus = @UseStatus");
+                sqlBuilder.Where("EE.UseStatus = @UseStatus");
             }
 
             if (pagedQuery.UseDepartment.HasValue)
             {
-                sqlBuilder.Where("UseDepartment = @UseDepartment");
+                sqlBuilder.Where("EE.UseDepartment = @UseDepartment");
             }
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentCode))
             {
                 pagedQuery.EquipmentCode = $"%{pagedQuery.EquipmentCode}%";
-                sqlBuilder.Where("EquipmentCode LIKE @EquipmentCode");
+                sqlBuilder.Where("EE.EquipmentCode LIKE @EquipmentCode");
             }
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentName))
             {
                 pagedQuery.EquipmentName = $"%{pagedQuery.EquipmentName}%";
-                sqlBuilder.Where("EquipmentName LIKE @EquipmentName");
+                sqlBuilder.Where("EE.EquipmentName LIKE @EquipmentName");
             }
 
-            if (!string.IsNullOrWhiteSpace(pagedQuery.WorkCenterShopName) )
+            if (!string.IsNullOrWhiteSpace(pagedQuery.WorkCenterShopName))
             {
                 pagedQuery.WorkCenterShopName = $"%{pagedQuery.WorkCenterShopName}%";
-                sqlBuilder.Where("WorkCenterShopName LIKE @WorkCenterShopName");
+                sqlBuilder.Where("IWC.Name LIKE @WorkCenterShopName");
             }
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.Location))
             {
                 pagedQuery.Location = $"%{pagedQuery.Location}%";
-                sqlBuilder.Where("Location LIKE @Location");
+                sqlBuilder.Where("EE.Location LIKE @Location");
             }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
@@ -244,8 +245,8 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         const string GetByGroupIdSql = "SELECT * FROM `equ_equipment` WHERE `IsDeleted` = 0 AND EquipmentGroupId = @EquipmentGroupId;";
         const string GetBaseListSql = "SELECT * FROM `equ_equipment` WHERE `IsDeleted` = 0;";
         const string GetByEquipmentCodeSql = "SELECT * FROM `equ_equipment` WHERE `IsDeleted` = 0 AND EquipmentCode = @EquipmentCode;";
-        const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `equ_equipment` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_equipment` /**innerjoin**/ /**leftjoin**/ /**where**/";
+        const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM equ_equipment EE /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM equ_equipment EE /**innerjoin**/ /**leftjoin**/ /**where**/";
         const string GetEntitiesSqlTemplate = "";
         /// <summary>
         /// 

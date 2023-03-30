@@ -52,10 +52,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("msp.Status=@Status");
             }
+            if (query.Lock.HasValue)
+            {
+                sqlBuilder.Where("msp.Lock=@Lock");
+            }
             if (!string.IsNullOrWhiteSpace(query.Sfc))
             {
                 query.Sfc = $"%{query.Sfc}%";
-                sqlBuilder.Where("msp.Sfc=@Sfc");
+                sqlBuilder.Where("msp.Sfc like @Sfc");
             }
             if (query.SfcArray != null && query.SfcArray.Length > 0)
             {
@@ -65,13 +69,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             if (!string.IsNullOrWhiteSpace(query.OrderCode))
             {
                 query.OrderCode = $"%{query.OrderCode}%";
-                sqlBuilder.Where("pwo.OrderCode=@OrderCode");
+                sqlBuilder.Where("pwo.OrderCode like @OrderCode");
             }
             //工序
             if (!string.IsNullOrWhiteSpace(query.Code))
             {
                 query.Code = $"%{query.Code}%";
-                sqlBuilder.Where("pp.Code=@Code");
+                sqlBuilder.Where("pp.Code like @Code");
             }
             //资源-》资源类型
             if (query.ResourceTypeId.HasValue)

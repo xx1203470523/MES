@@ -102,6 +102,15 @@ namespace Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository
 
         Task<int> InsertInteWorkCenterResourceRelationRangAsync(IEnumerable<InteWorkCenterResourceRelation> param);
 
+
+        /// <summary>
+        /// 根据下级工作中心Id获取上级工作中心
+        /// (只获取一级)
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<InteWorkCenterEntity> GetHigherInteWorkCenterAsync(long id);
+
         /// <summary>
         /// 批量删除
         /// </summary>

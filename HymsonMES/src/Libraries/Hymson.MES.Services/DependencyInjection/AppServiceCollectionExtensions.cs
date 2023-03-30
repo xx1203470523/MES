@@ -173,10 +173,14 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IPlanSfcReceiveService, PlanSfcReceiveService>();
             #endregion
 
+            #region PlanWorkOrderActivation
+            services.AddSingleton<IPlanWorkOrderActivationService, PlanWorkOrderActivationService>();
+            #endregion
+
             #region PlanSfcPrint
             services.AddSingleton<IPlanSfcPrintService, PlanSfcPrintService>();
 
-            #endregion
+
             #endregion
 
             return services;
@@ -328,6 +332,11 @@ namespace Microsoft.Extensions.DependencyInjection
             #region PlanSfcReceive
             services.AddSingleton<AbstractValidator<PlanSfcReceiveCreateDto>, PlanSfcReceiveCreateValidator>();
             services.AddSingleton<AbstractValidator<PlanSfcReceiveModifyDto>, PlanSfcReceiveModifyValidator>();
+            #endregion
+
+            #region PlanWorkOrderActivation
+            services.AddSingleton<AbstractValidator<PlanWorkOrderActivationCreateDto>, PlanWorkOrderActivationCreateValidator>();
+            services.AddSingleton<AbstractValidator<PlanWorkOrderActivationModifyDto>, PlanWorkOrderActivationModifyValidator>();
             #endregion
 
             #region PlanSfcPrint

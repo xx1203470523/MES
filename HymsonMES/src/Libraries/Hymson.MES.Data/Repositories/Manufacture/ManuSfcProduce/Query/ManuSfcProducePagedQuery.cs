@@ -54,5 +54,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 资源类型Id
         /// </summary>
         public long? ResourceTypeId { get; set; }
+
+        /// <summary>
+        /// 锁定状态
+        /// </summary>
+        public int? Lock { get; set; }
     }
 }
