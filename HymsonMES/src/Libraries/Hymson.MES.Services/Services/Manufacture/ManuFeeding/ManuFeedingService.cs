@@ -320,6 +320,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
+                // TODO 需要插入 wh_material_standingbook 表记录
+
                 // 将状态恢复为"使用中"
                 rows += await _whMaterialInventoryRepository.UpdatePointByBarCodeAsync(new UpdateStatusByBarCodeCommand
                 {
@@ -354,6 +356,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 {
                     entity.UpdatedBy = _currentUser.UserName;
                     entity.UpdatedOn = now;
+
+                    // TODO 需要插入 wh_material_standingbook 表记录
 
                     // 将状态恢复为"待使用"
                     rows += await _whMaterialInventoryRepository.UpdatePointByBarCodeAsync(new UpdateStatusByBarCodeCommand
