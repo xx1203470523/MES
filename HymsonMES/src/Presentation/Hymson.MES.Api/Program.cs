@@ -1,19 +1,19 @@
 using AutoMapper;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
-using Hymson.Kafka.Debezium.Options;
 using Hymson.Kafka.Debezium;
+using Hymson.Kafka.Debezium.Options;
+using Hymson.MES.Api.HostedServices;
+using Hymson.Web.Framework.Filters;
 using Hymson.WebApi.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Globalization;
 using System.Reflection;
-using Hymson.MES.Api.HostedServices;
-using Microsoft.AspNetCore.Mvc.Authorization;
-using Hymson.Web.Framework.Filters;
 
 namespace Hymson.MES.Api
 {

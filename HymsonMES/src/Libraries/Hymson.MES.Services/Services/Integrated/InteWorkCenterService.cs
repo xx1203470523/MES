@@ -222,6 +222,14 @@ namespace Hymson.MES.Services.Services.Integrated
         public async Task<int> DeleteRangInteWorkCenterAsync(long[] ids)
         {
             var userId = _currentUser.UserName;
+
+            // 启用状态或保留状态不可删除
+            var workCenters = await _inteWorkCenterRepository.GetByIdsAsync(ids);
+            if (workCenters.Any(a => a.Status == SysDataStatusEnum.Enable || a.Status == SysDataStatusEnum.Retain))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12113));
+            }
+
             return await _inteWorkCenterRepository.DeleteRangAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = userId });
         }
 
@@ -269,7 +277,7 @@ namespace Hymson.MES.Services.Services.Integrated
 
             List<InteWorkCenterRelation> inteWorkCenterRelations = new List<InteWorkCenterRelation>();
             List<InteWorkCenterResourceRelation> inteWorkCenterResourceRelations = new List<InteWorkCenterResourceRelation>();
-            if (param.Type ==WorkCenterTypeEnum.Factory || param.Type == WorkCenterTypeEnum.Farm)
+            if (param.Type == WorkCenterTypeEnum.Factory || param.Type == WorkCenterTypeEnum.Farm)
             {
 
                 if (param.WorkCenterIds != null && param.WorkCenterIds.Any())
