@@ -135,7 +135,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 whMaterialInventoryEntity.MaterialBarCode = item.MaterialBarCode;
                 whMaterialInventoryEntity.Batch = item.Batch;
                 whMaterialInventoryEntity.QuantityResidue = item.QuantityResidue;
-                whMaterialInventoryEntity.Status = (int)WhMaterialInventoryStatusEnum.ToBeUsed;
+                whMaterialInventoryEntity.Status = WhMaterialInventoryStatusEnum.ToBeUsed;
                 whMaterialInventoryEntity.DueDate = item.DueDate;
                 whMaterialInventoryEntity.Source = item.Source;
                 whMaterialInventoryEntity.SiteId = _currentSite.SiteId ?? 0;

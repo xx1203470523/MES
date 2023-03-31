@@ -377,6 +377,7 @@ namespace Hymson.MES.Services.Services.Process
                     ProcessRouteId = procMaterialEntity.ProcessRouteId,
                     BomId = procMaterialEntity.BomId,
                     Batch = procMaterialEntity.Batch,
+                    PackageNum = procMaterialEntity.PackageNum,
                     Unit = procMaterialEntity.Unit,
                     SerialNumber = procMaterialEntity.SerialNumber,
                     BaseTime = procMaterialEntity.BaseTime,

@@ -89,9 +89,14 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public int Batch { get; set; }
 
-       /// <summary>
-        /// 计量单位(字典定义)
+        /// <summary>
+        /// 标包数量
         /// </summary>
+        public int PackageNum { get; set; }
+
+       /// <summary>
+       /// 计量单位(字典定义)
+       /// </summary>
         public string? Unit { get; set; }
 
        /// <summary>
@@ -207,6 +212,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 批次大小
         /// </summary>
         public int Batch { get; set; }
+
+        /// <summary>
+        /// 标包数量
+        /// </summary>
+        public int PackageNum { get; set; }
 
         /// <summary>
         /// 计量单位(字典定义)
@@ -366,6 +376,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 批次大小
         /// </summary>
         public int Batch { get; set; }
+
+        /// <summary>
+        /// 标包数量
+        /// </summary>
+        public int PackageNum { get; set; }
 
         /// <summary>
         /// 计量单位(字典定义)

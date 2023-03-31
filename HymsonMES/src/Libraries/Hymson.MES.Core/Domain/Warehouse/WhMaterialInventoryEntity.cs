@@ -6,12 +6,7 @@
  *build datetime: 2023-03-06 03:27:59
  */
 using Hymson.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Warehouse
 {
@@ -51,7 +46,7 @@ namespace Hymson.MES.Core.Domain.Warehouse
         /// <summary>
         /// 状态;待使用/使用中/锁定
         /// </summary>
-        public int Status { get; set; }
+        public WhMaterialInventoryStatusEnum Status { get; set; }
 
         /// <summary>
         /// 有效期/到期日
@@ -61,7 +56,7 @@ namespace Hymson.MES.Core.Domain.Warehouse
         /// <summary>
         /// 来源/目标;手动录入/WMS/上料点编号
         /// </summary>
-        public int Source { get; set; }
+        public WhMaterialInventorySourceEnum Source { get; set; }
 
         /// <summary>
         /// 站点Id
