@@ -7,12 +7,6 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Core.Domain.Warehouse
 {
@@ -52,7 +46,7 @@ namespace Hymson.MES.Core.Domain.Warehouse
         /// <summary>
         /// 状态;待使用/使用中/锁定
         /// </summary>
-        public int Status { get; set; }
+        public WhMaterialInventoryStatusEnum Status { get; set; }
 
         /// <summary>
         /// 有效期/到期日

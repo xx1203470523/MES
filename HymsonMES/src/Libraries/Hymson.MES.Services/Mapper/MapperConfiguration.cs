@@ -387,6 +387,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<WhMaterialInventoryEntity, WhMaterialInventoryDto>();
             CreateMap<WhMaterialInventoryPageListView, WhMaterialInventoryPageListViewDto>();
             #endregion
+
             #region WhMaterialStandingbook
             CreateMap<WhMaterialStandingbookCreateDto, WhMaterialStandingbookEntity>();
             CreateMap<WhMaterialStandingbookModifyDto, WhMaterialStandingbookEntity>();
