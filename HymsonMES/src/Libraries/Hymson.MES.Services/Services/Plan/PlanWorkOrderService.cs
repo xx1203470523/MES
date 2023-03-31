@@ -261,7 +261,7 @@ namespace Hymson.MES.Services.Services.Plan
 
                 //关联工作中心
                 var workCenter = await _inteWorkCenterRepository.GetByIdAsync(planWorkOrderEntity.WorkCenterId ?? 0);
-                if (processRoute != null)
+                if (workCenter != null)
                 {
                     planWorkOrderDetailView.WorkCenterCode = workCenter.Code;
                 }
