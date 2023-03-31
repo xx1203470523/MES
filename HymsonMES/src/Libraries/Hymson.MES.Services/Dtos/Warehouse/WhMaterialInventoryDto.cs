@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Warehouse;
 using System;
 using System.Collections.Generic;
@@ -315,7 +316,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 来源
         /// </summary>
-        public int Source { get; set; }
+        public WhMaterialInventorySourceEnum Source { get; set; }
         /// <summary>
         /// 物料编码
         /// </summary>
@@ -347,7 +348,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 转类型
         /// </summary>
-        public int Type { get; set; }
+        public WhMaterialInventoryTypeEnum Type { get; set; }
 
         /// <summary>
         /// 有效期/到期日
