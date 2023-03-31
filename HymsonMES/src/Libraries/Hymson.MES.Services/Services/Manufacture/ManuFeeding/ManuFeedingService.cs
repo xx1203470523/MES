@@ -379,11 +379,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             var entities = await _manuFeedingRepository.GetByIdsAsync(idsArr);
             if (entities.Any() == false) return 0;
 
+            var feeds = await _manuFeedingRepository.GetByIdsAsync(idsArr);
+
             // 查询条码
-            var inventorys = await _whMaterialInventoryRepository.GetByIdsAsync(idsArr);
+            var inventorys = await _whMaterialInventoryRepository.GetByBarCodesAsync(feeds.Select(s => s.BarCode).ToArray());
 
             // 查询物料
-            var materials = await _procMaterialRepository.GetByIdsAsync(inventorys.Select(s => s.MaterialId).ToArray());
+            var materials = await _procMaterialRepository.GetByIdsAsync(feeds.Select(s => s.ProductId).ToArray());
 
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
