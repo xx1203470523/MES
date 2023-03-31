@@ -42,6 +42,13 @@ namespace Hymson.MES.Services.Services.Manufacture
         Task<IEnumerable<ManuProductBadRecordViewDto>> GetBadRecordsBySfcAsync(ManuProductBadRecordQueryDto queryDto);
 
         /// <summary>
+        /// 取消标识
+        /// </summary>
+        /// <param name="cancelDto"></param>
+        /// <returns></returns>
+        Task CancelSfcIdentificationAsync(CancelSfcIdentificationDto cancelDto);
+
+        /// <summary>
         /// 修改
         /// </summary>
         /// <param name="manuProductBadRecordModifyDto"></param>

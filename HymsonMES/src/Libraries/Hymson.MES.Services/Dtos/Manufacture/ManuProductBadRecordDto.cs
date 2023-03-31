@@ -260,6 +260,35 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public QualUnqualifiedCodeTypeEnum? Type { get; set; }
     }
 
+    public class CancelSfcIdentificationDto
+    {
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+
+        /// <summary>
+        /// 不合格代码信息
+        /// </summary>
+       public List<UnqualifiedList>  UnqualifiedLists { get; set; }
+    }
+
+    public class UnqualifiedList
+    {
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string Sfc{ get; set; }
+        /// <summary>
+        /// 不合格代码
+        /// </summary>
+        public long UnqualifiedId { get; set; }
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+    }
+
     public class ManuProductBadRecordViewDto
     {
         /// <summary>
@@ -291,5 +320,10 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 不合格工艺路线Id
         /// </summary>
         public long? ProcessRouteId { get; set; }
+        
+        /// <summary>
+        /// 描述
+        /// </summary>
+        public string Remark { get; set; }
     }
 }

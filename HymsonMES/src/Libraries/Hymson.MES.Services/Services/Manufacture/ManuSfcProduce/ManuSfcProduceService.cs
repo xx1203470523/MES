@@ -324,9 +324,13 @@ namespace Hymson.MES.Services.Services.Manufacture
             var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = parm.Sfcs };
             //获取条码列表
             var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
+            if (!manuSfcs.Any())
+            {
+                return;
+            }
 
             #region  组装数据
-            var sfcStepList = GetSfcStepList(manuSfcs,parm.Remark??"");
+            var sfcStepList = GetSfcStepList(manuSfcs, parm.Remark ?? "");
 
             var sfcs = manuSfcs.Select(a => a.SFC).ToArray();
             var updateCommand = new ManuSfcInfoUpdateCommand
@@ -340,7 +344,6 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             //入库
             var rows = 0;
-
             using (var trans = TransactionHelper.GetTransactionScope())
             {
                 //1.插入数据操作类型为报废
@@ -361,7 +364,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="manuSfcs"></param>
         /// <param name="remark"></param>
         /// <returns></returns>
-        private List<ManuSfcStepEntity> GetSfcStepList(IEnumerable<ManuSfcProduceEntity> manuSfcs,string remark)
+        private List<ManuSfcStepEntity> GetSfcStepList(IEnumerable<ManuSfcProduceEntity> manuSfcs, string remark)
         {
             var sfcStepList = new List<ManuSfcStepEntity>();
             foreach (var sfc in manuSfcs)
@@ -380,8 +383,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ProcedureId = sfc.ProcedureId,
                     Type = ManuSfcStepTypeEnum.Discard,
                     Status = sfc.Status,
-                    Lock=sfc.Lock,
-                    Remark= remark,
+                    Lock = sfc.Lock,
+                    Remark = remark,
                     SiteId = _currentSite.SiteId ?? 0,
                     CreatedBy = sfc.CreatedBy,
                     UpdatedBy = sfc.UpdatedBy

@@ -7,6 +7,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
+using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Manufacture
@@ -69,6 +70,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         {
             await _manuProductBadRecordService.CreateManuProductBadRecordAsync(parm);
         }
+
         /// <summary>
         /// 查询条码的不合格代码信息
         /// </summary>
@@ -79,6 +81,18 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         public async Task<IEnumerable<ManuProductBadRecordViewDto>> GetBadRecordsBySfcAsync([FromQuery] ManuProductBadRecordQueryDto parm)
         {
             return await _manuProductBadRecordService.GetBadRecordsBySfcAsync(parm);
+        }
+
+        /// <summary>
+        /// 条码报废
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("cancelIdentify")]
+        public async Task CancelSfcIdentification(CancelSfcIdentificationDto parm)
+        {
+            await _manuProductBadRecordService.CancelSfcIdentificationAsync(parm);
         }
 
         /// <summary>

@@ -11,6 +11,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Command;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 using System.Collections;
@@ -183,6 +184,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeleteSql,command);
         }
+
+        /// <summary>
+        /// 关闭条码不合格标识和缺陷
+        /// </summary>
+        /// <param name="manuSfcInfoEntity"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateStatusAsync(List<ManuProductBadRecordCommand> commands)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateStatusSql, commands);
+        }
     }
 
     public partial class ManuProductBadRecordRepository
@@ -204,5 +216,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `FoundBadOperationId`, `OutflowOperationId`, `UnqualifiedId`, `SFC`, `Qty`, `Status`, `Source`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_product_bad_record`  WHERE Id IN @ids ";
+
+        const string UpdateStatusSql = "UPDATE `manu_product_bad_record` SET Remark = @Remark,Status=@Status,UpdatedBy=@UserId,UpdatedOn=@UpdatedOn WHERE SFC =@Sfc  AND UnqualifiedId=@UnqualifiedId";
     }
 }

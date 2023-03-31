@@ -8,6 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Command;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -85,5 +86,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> DeleteRangeAsync(DeleteCommand command);
+
+        /// <summary>
+        /// 关闭条码不合格标识和缺陷
+        /// </summary>
+        /// <param name="manuSfcInfoEntity"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAsync(List<ManuProductBadRecordCommand> commands);
     }
 }

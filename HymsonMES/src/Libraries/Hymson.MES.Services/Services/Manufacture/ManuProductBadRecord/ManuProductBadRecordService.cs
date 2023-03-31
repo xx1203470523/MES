@@ -17,9 +17,11 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Command;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
 using Hymson.MES.Services.Dtos.Manufacture;
+using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -44,6 +46,20 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
+        /// 条码生产信息（物理删除） 仓储
+        /// </summary>
+        private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
+
+        /// <summary>
+        /// 条码信息表 仓储
+        /// </summary>
+        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
+        /// <summary>
+        /// 条码步骤表仓储 仓储
+        /// </summary>
+        private readonly IManuSfcStepRepository _manuSfcStepRepository;
+
+        /// <summary>
         /// 产品不良录入 仓储
         /// </summary>
         private readonly IManuProductBadRecordRepository _manuProductBadRecordRepository;
@@ -53,16 +69,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         private readonly IQualUnqualifiedCodeRepository _qualUnqualifiedCodeRepository;
 
-        /// <summary>
-        /// 条码生产信息（物理删除） 仓储
-        /// </summary>
-        private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
-
-        /// <summary>
-        /// 条码信息表 仓储
-        /// </summary>
-        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
-
         private readonly AbstractValidator<ManuProductBadRecordCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ManuProductBadRecordModifyDto> _validationModifyRules;
 
@@ -70,10 +76,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// 构造函数
         /// </summary>
         public ManuProductBadRecordService(ICurrentUser currentUser, ICurrentSite currentSite,
-        IManuProductBadRecordRepository manuProductBadRecordRepository,
-        IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
         IManuSfcProduceRepository manuSfcProduceRepository,
         IManuSfcInfoRepository manuSfcInfoRepository,
+        IManuSfcStepRepository manuSfcStepRepository,
+        IManuProductBadRecordRepository manuProductBadRecordRepository,
+        IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
         AbstractValidator<ManuProductBadRecordCreateDto> validationCreateRules,
         AbstractValidator<ManuProductBadRecordModifyDto> validationModifyRules)
         {
@@ -81,6 +88,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _currentSite = currentSite;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcInfoRepository = manuSfcInfoRepository;
+            _manuSfcStepRepository = manuSfcStepRepository;
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
             _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
             _validationCreateRules = validationCreateRules;
@@ -94,6 +102,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task CreateManuProductBadRecordAsync(ManuProductBadRecordCreateDto createDto)
         {
+            if (createDto == null)
+            {
+                throw new ValidationException(nameof(ErrorCode.MES10100));
+            }
+
             //验证DTO
             //await _validationCreateRules.ValidateAndThrowAsync(manuProductBadRecordCreateDto);
 
@@ -184,10 +197,10 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
             var query = new ManuProductBadRecordQuery
             {
-                SFC=queryDto.SFC,
-                Status=queryDto.Status,
-                Type=   queryDto.Type,
-                SiteId=_currentSite.SiteId??0
+                SFC = queryDto.SFC,
+                Status = queryDto.Status,
+                Type = queryDto.Type,
+                SiteId = _currentSite.SiteId ?? 0
             };
             var manuProductBads = await _manuProductBadRecordRepository.GetBadRecordsBySfcAsync(query);
 
@@ -197,16 +210,106 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 manuProductBadRecordDtos.Add(new ManuProductBadRecordViewDto
                 {
-                    UnqualifiedId=manuProductBad.UnqualifiedId,
-                    UnqualifiedCode=manuProductBad.UnqualifiedCode,
-                    UnqualifiedCodeName=manuProductBad.UnqualifiedCodeName,
-                    ResCode= manuProductBad.ResCode,
-                    ResName= manuProductBad.ResName,
-                    ProcessRouteId= manuProductBad.ProcessRouteId
+                    UnqualifiedId = manuProductBad.UnqualifiedId,
+                    UnqualifiedCode = manuProductBad.UnqualifiedCode,
+                    UnqualifiedCodeName = manuProductBad.UnqualifiedCodeName,
+                    ResCode = manuProductBad.ResCode,
+                    ResName = manuProductBad.ResName,
+                    ProcessRouteId = manuProductBad.ProcessRouteId,
+                    Remark=""
                 });
             }
 
             return manuProductBadRecordDtos;
+        }
+
+        /// <summary>
+        /// 取消标识
+        /// </summary>
+        /// <param name="cancelDto"></param>
+        /// <returns></returns>
+        public async Task CancelSfcIdentificationAsync(CancelSfcIdentificationDto cancelDto)
+        {
+            if (cancelDto == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            }
+
+            if (!cancelDto.UnqualifiedLists.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15400));
+            }
+            #region  组装数据
+
+            var sfcs = cancelDto.UnqualifiedLists.Select(x => x.Sfc).Distinct().ToArray();
+            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = sfcs };
+            //获取条码列表
+            var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
+
+            var sfcStepList = new List<ManuSfcStepEntity>();
+            if (manuSfcs.Any())
+            {
+                sfcStepList.Add(GetSfcStepList(manuSfcs.ToList()[0], cancelDto.Remark??""));
+            }
+
+            var updateCommandList = new List<ManuProductBadRecordCommand>();
+            foreach (var unqualified in cancelDto.UnqualifiedLists)
+            {
+                updateCommandList.Add(new ManuProductBadRecordCommand
+                {
+                    Sfc = unqualified.Sfc,
+                    UnqualifiedId = unqualified.UnqualifiedId,
+                    Remark = unqualified.Remark??"",
+                    Status = ProductBadRecordStatusEnum.Close,
+                    UserId = _currentUser.UserName,
+                    UpdatedOn = HymsonClock.Now(),
+                });
+            }
+            #endregion
+
+            //入库
+            var rows = 0;
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                //1.记录数据
+                rows += await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
+
+                //2.修改状态为关闭
+                 rows += await _manuProductBadRecordRepository.UpdateStatusAsync(updateCommandList);
+
+                trans.Complete();
+            }
+        }
+
+        /// <summary>
+        /// 获取条码步骤数据
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <param name="remark"></param>
+        /// <returns></returns>
+        private ManuSfcStepEntity GetSfcStepList(ManuSfcProduceEntity sfc, string remark)
+        {
+            var sfcStepList = new List<ManuSfcStepEntity>();
+            return new ManuSfcStepEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SFC = sfc.SFC,
+                ProductId = sfc.ProductId,
+                WorkOrdeId = sfc.WorkOrderId,
+                WorkCenterId = sfc.WorkCenterId,
+                ProductBOMId = sfc.BOMId,
+                Qty = sfc.Qty,
+                EquipmentId = sfc.EquipmentId,
+                ResourceId = sfc.ResourceId,
+                ProcedureId = sfc.ProcedureId,
+                Type = ManuSfcStepTypeEnum.Discard,
+                Status = sfc.Status,
+                Lock = sfc.Lock,
+                Remark = remark,
+                SiteId = _currentSite.SiteId ?? 0,
+                CreatedBy = sfc.CreatedBy,
+                UpdatedBy = sfc.UpdatedBy
+            };
         }
 
         /// <summary>
