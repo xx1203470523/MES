@@ -7,11 +7,7 @@
  */
 
 using Hymson.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Services.Dtos.Equipment
 {
@@ -43,7 +39,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 故障原因状态（字典定义）
         /// </summary>
-        public string UseStatus { get; set; }
+        public SysDataStatusEnum? UseStatus { get; set; }
 
         /// <summary>
         /// 说明
@@ -115,7 +111,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 故障原因状态（字典定义）
         /// </summary>
-        public string UseStatus { get; set; } = "";
+        public SysDataStatusEnum UseStatus { get; set; }
 
         /// <summary>
         /// 说明
@@ -152,7 +148,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 故障原因状态（字典定义）
         /// </summary>
-        public string UseStatus { get; set; } = "";
+        public SysDataStatusEnum UseStatus { get; set; }
 
         /// <summary>
         /// 说明
@@ -166,29 +162,24 @@ namespace Hymson.MES.Services.Dtos.Equipment
     /// </summary>
     public class EquFaultReasonPagedQueryDto : PagerInfo
     {
-        ///// <summary>
-        ///// 所属站点代码
-        ///// </summary>
-        //public long SiteId { get; set; }
-
-        //
-        // 摘要:
-        //     站点id
-        public long? SiteId { get; set; }
-
         /// <summary>
         /// 编码（设备故障原因）
         /// </summary>
-        public string FaultReasonCode { get; set; } = "";
+        public string? FaultReasonCode { get; set; }
 
         /// <summary>
         /// 名称（设备故障原因）
         /// </summary>
-        public string FaultReasonName { get; set; } = "";
+        public string? FaultReasonName { get; set; }
+
+        /// <summary>
+        /// 故障原因状态（字典定义）
+        /// </summary>
+        public SysDataStatusEnum? UseStatus { get; set; }
 
         /// <summary>
         /// 描述（设备故障原因）
         /// </summary>
-        public string Remark { get; set; } = "";
+        public string? Remark { get; set; }
     }
 }

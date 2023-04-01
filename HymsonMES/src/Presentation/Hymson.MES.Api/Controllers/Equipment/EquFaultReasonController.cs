@@ -26,20 +26,22 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// 构造函数（设备故障原因表）
         /// </summary>
         /// <param name="EquFaultReasonService"></param>
+        /// <param name="logger"></param>
         public EquFaultReasonController(IEquFaultReasonService EquFaultReasonService, ILogger<EquFaultReasonController> logger)
         {
             _EquFaultReasonService = EquFaultReasonService;
             _logger = logger;
         }
 
+
         /// <summary>
         /// 分页查询列表（设备故障原因表）
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Route("pagelist")]
-        public async Task<PagedInfo<EquFaultReasonDto>> QueryPagedEquFaultReasonAsync(EquFaultReasonPagedQueryDto parm)
+        public async Task<PagedInfo<EquFaultReasonDto>> QueryPagedEquFaultReasonAsync([FromQuery] EquFaultReasonPagedQueryDto parm)
         {
             return await _EquFaultReasonService.GetPageListAsync(parm);
         }

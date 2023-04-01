@@ -112,9 +112,8 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <returns></returns>
         public async Task<PagedInfo<EquFaultReasonDto>> GetPageListAsync(EquFaultReasonPagedQueryDto EquFaultReasonPagedQueryDto)
         {
-            EquFaultReasonPagedQueryDto.SiteId = 1;//TODO   _currentSite.SiteId;
-
             var EquFaultReasonPagedQuery = EquFaultReasonPagedQueryDto.ToQuery<EquFaultReasonPagedQuery>();
+            EquFaultReasonPagedQuery.SiteId = _currentSite.SiteId;
             var pagedInfo = await _EquFaultReasonRepository.GetPagedInfoAsync(EquFaultReasonPagedQuery);
 
             //实体到DTO转换 装载数据
