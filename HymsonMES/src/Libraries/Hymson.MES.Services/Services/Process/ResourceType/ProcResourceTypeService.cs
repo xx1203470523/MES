@@ -13,7 +13,6 @@ using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using System.ComponentModel.DataAnnotations;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process.ResourceType
@@ -206,7 +205,7 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
             //DTO转换实体
             var updateEntity = new ProcResourceTypeUpdateCommand
             {
-                Id = param?.Id??0,
+                Id = param?.Id ?? 0,
                 Remark = param?.Remark ?? "",
                 ResTypeName = param?.ResTypeName ?? "",
                 UpdatedBy = userName
@@ -219,7 +218,7 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
                 resourceIds = new List<long>();
             }
             updateCommand.UpdatedBy = userName;
-            updateCommand.ResTypeId = param?.Id??0;
+            updateCommand.ResTypeId = param?.Id ?? 0;
             updateCommand.IdsArr = resourceIds.ToArray();
 
             //var resources = _procResourceRepository.GetProcResrouces(ids, parm.Id);
@@ -254,11 +253,10 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
         /// <returns></returns>
         public async Task<int> DeleteProcResourceTypeAsync(long[] idsArr)
         {
-            if (idsArr.Length < 1)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10102));
-            }
+            if (idsArr.Length < 1) throw new CustomerValidationException(nameof(ErrorCode.MES10102));
 
+            /*
+             * 测试于帅动要求可以删除
             //查询资源类型是否关联资源
             var siteId = _currentSite.SiteId ?? 0;
             var query = new ProcResourceQuery
@@ -266,19 +264,33 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
                 SiteId = siteId,
                 IdsArr = idsArr
             };
+
             var resourceList = await _resourceRepository.GetByResTypeIdsAsync(query);
             if (resourceList != null && resourceList.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10312));
             }
+            */
 
-            var command = new DeleteCommand
+            var rows = 0;
+            var nowTime = HymsonClock.Now();
+            using (var trans = TransactionHelper.GetTransactionScope())
             {
-                UserId = _currentUser.UserName,
-                DeleteOn = HymsonClock.Now(),
-                Ids = idsArr
-            };
-            return await _resourceTypeRepository.DeleteRangeAsync(command);
+                rows += await _resourceRepository.ClearResourceTypeIdsAsync(new ClearResourceTypeIdsCommand
+                {
+                    UpdatedBy = _currentUser.UserName,
+                    UpdatedOn = nowTime,
+                    ResourceTypeIds = idsArr
+                });
+                rows += await _resourceTypeRepository.DeleteRangeAsync(new DeleteCommand
+                {
+                    UserId = _currentUser.UserName,
+                    DeleteOn = nowTime,
+                    Ids = idsArr
+                });
+                trans.Complete();
+            }
+            return rows;
         }
     }
 }

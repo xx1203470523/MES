@@ -299,8 +299,20 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<int> ResetResTypeAsync(ProcResourceUpdateCommand entity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdatedByResTypeSql, entity); ;
+            return await conn.ExecuteAsync(UpdatedByResTypeSql, entity);
         }
+
+        /// <summary>
+        /// 清空资源的资源类型
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> ClearResourceTypeIdsAsync(ClearResourceTypeIdsCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(ClearResourceTypeIds, command);
+        }
+
 
         /// <summary>
         /// 批量删除
@@ -347,5 +359,6 @@ namespace Hymson.MES.Data.Repositories.Process
 
         const string UpdateResTypeSql = "UPDATE `proc_resource` SET ResTypeId = @ResTypeId,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id in @Ids;";
         const string UpdatedByResTypeSql = "UPDATE `proc_resource` SET ResTypeId =0,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE ResTypeId = @ResTypeId;";
+        const string ClearResourceTypeIds = "UPDATE proc_resource SET ResTypeId = 0, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE ResTypeId IN @ResourceTypeIds; ";
     }
 }
