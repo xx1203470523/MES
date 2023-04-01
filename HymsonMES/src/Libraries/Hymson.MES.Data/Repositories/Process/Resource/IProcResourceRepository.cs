@@ -106,6 +106,13 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<int> ResetResTypeAsync(ProcResourceUpdateCommand entity);
 
         /// <summary>
+        /// 清空资源的资源类型
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> ClearResourceTypeIdsAsync(ClearResourceTypeIdsCommand command);
+
+        /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="command"></param>
