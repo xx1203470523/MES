@@ -26,10 +26,45 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// 构造函数（设备故障原因表）
         /// </summary>
         /// <param name="EquFaultReasonService"></param>
+        /// <param name="logger"></param>
         public EquFaultReasonController(IEquFaultReasonService EquFaultReasonService, ILogger<EquFaultReasonController> logger)
         {
             _EquFaultReasonService = EquFaultReasonService;
             _logger = logger;
+        }
+
+
+        /// <summary>
+        /// 添加（设备故障原因表）
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task AddEquFaultReasonAsync(EquFaultReasonSaveDto parm)
+        {
+            await _EquFaultReasonService.CreateEquFaultReasonAsync(parm);
+        }
+
+        /// <summary>
+        /// 更新（设备故障原因表）
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpPut]
+        public async Task UpdateEquFaultReasonAsync(EquFaultReasonSaveDto parm)
+        {
+            await _EquFaultReasonService.ModifyEquFaultReasonAsync(parm);
+        }
+
+        /// <summary>
+        /// 删除（设备故障原因表）
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        public async Task DeleteEquFaultReasonAsync(long[] ids)
+        {
+            await _EquFaultReasonService.DeletesEquFaultReasonAsync(ids);
         }
 
         /// <summary>
@@ -37,9 +72,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("pagelist")]
-        public async Task<PagedInfo<EquFaultReasonDto>> QueryPagedEquFaultReasonAsync(EquFaultReasonPagedQueryDto parm)
+        [HttpGet]
+        [Route("page")]
+        public async Task<PagedInfo<EquFaultReasonDto>> QueryPagedEquFaultReasonAsync([FromQuery] EquFaultReasonPagedQueryDto parm)
         {
             return await _EquFaultReasonService.GetPageListAsync(parm);
         }
@@ -53,43 +88,6 @@ namespace Hymson.MES.Api.Controllers.Equipment
         public async Task<EquFaultReasonDto> QueryEquFaultReasonByIdAsync(long id)
         {
             return await _EquFaultReasonService.QueryEquFaultReasonByIdAsync(id);
-        }
-
-        /// <summary>
-        /// 添加（设备故障原因表）
-        /// </summary>
-        /// <param name="parm"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("create")]
-        public async Task<int> AddEquFaultReasonAsync([FromBody] EquFaultReasonCreateDto parm)
-        {
-            return await _EquFaultReasonService.CreateEquFaultReasonAsync(parm);
-        }
-
-        /// <summary>
-        /// 更新（设备故障原因表）
-        /// </summary>
-        /// <param name="parm"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("update")]
-        public async Task UpdateEquFaultReasonAsync([FromBody] EquFaultReasonModifyDto parm)
-        {
-            await _EquFaultReasonService.ModifyEquFaultReasonAsync(parm);
-        }
-
-        /// <summary>
-        /// 删除（设备故障原因表）
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("delete")]
-        public async Task<int> DeleteEquFaultReasonAsync([FromBody] long[] ids)
-        {
-            //long[] idsArr = StringExtension.SpitLongArrary(ids);
-            return await _EquFaultReasonService.DeletesEquFaultReasonAsync(ids);
         }
 
     }

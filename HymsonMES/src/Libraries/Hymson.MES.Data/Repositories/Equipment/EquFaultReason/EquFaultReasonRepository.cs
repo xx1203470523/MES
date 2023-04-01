@@ -87,10 +87,11 @@ namespace Hymson.MES.Data.Repositories.Equipment
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
-            if (EquFaultReasonPagedQuery.SiteId != 0)
+            if (EquFaultReasonPagedQuery.UseStatus.HasValue)
             {
-                sqlBuilder.Where(" SiteId=@SiteId ");
+                sqlBuilder.Where("UseStatus = @UseStatus");
             }
+
             if (!string.IsNullOrWhiteSpace(EquFaultReasonPagedQuery.FaultReasonCode))
             {
                 EquFaultReasonPagedQuery.FaultReasonCode = $"%{EquFaultReasonPagedQuery.FaultReasonCode}%";

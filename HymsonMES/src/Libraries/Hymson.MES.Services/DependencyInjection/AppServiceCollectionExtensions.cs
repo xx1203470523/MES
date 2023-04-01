@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -173,15 +172,6 @@ namespace Microsoft.Extensions.DependencyInjection
             #region PlanSfcReceive
             services.AddSingleton<IPlanSfcReceiveService, PlanSfcReceiveService>();
             #endregion
-
-            #region PlanWorkOrderActivation
-            services.AddSingleton<IPlanWorkOrderActivationService, PlanWorkOrderActivationService>();
-            #endregion
-
-            #region PlanSfcPrint
-            services.AddSingleton<IPlanSfcPrintService, PlanSfcPrintService>();
-
-            #endregion
             #endregion
 
             return services;
@@ -210,9 +200,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             #region Equipment
             services.AddSingleton<AbstractValidator<EquEquipmentUnitSaveDto>, EquipmentUnitCreateValidator>();
-
-            services.AddSingleton<AbstractValidator<EquFaultReasonCreateDto>, EquFaultReasonCreateValidator>();
-            services.AddSingleton<AbstractValidator<EquFaultReasonModifyDto>, EquFaultReasonModifyValidator>();
+            services.AddSingleton<AbstractValidator<EquFaultReasonSaveDto>, EquFaultReasonCreateValidator>();
             #endregion
 
             #region Process
@@ -336,17 +324,6 @@ namespace Microsoft.Extensions.DependencyInjection
             #region PlanSfcReceive
             services.AddSingleton<AbstractValidator<PlanSfcReceiveCreateDto>, PlanSfcReceiveCreateValidator>();
             services.AddSingleton<AbstractValidator<PlanSfcReceiveModifyDto>, PlanSfcReceiveModifyValidator>();
-            #endregion
-
-            #region PlanWorkOrderActivation
-            services.AddSingleton<AbstractValidator<PlanWorkOrderActivationCreateDto>, PlanWorkOrderActivationCreateValidator>();
-            services.AddSingleton<AbstractValidator<PlanWorkOrderActivationModifyDto>, PlanWorkOrderActivationModifyValidator>();
-            #endregion
-
-            #region PlanSfcPrint
-            services.AddSingleton<AbstractValidator<PlanSfcPrintCreateDto>, PlanSfcPrintCreateValidator>();
-            services.AddSingleton<AbstractValidator<PlanSfcPrintModifyDto>, PlanSfcPrintModifyValidator>();
-
             #endregion
             #endregion
 

@@ -140,8 +140,7 @@ namespace Hymson.MES.Services.Mapper
             #endregion
 
             #region EquFaultReason
-            CreateMap<EquFaultReasonCreateDto, EquFaultReasonEntity>();
-            CreateMap<EquFaultReasonModifyDto, EquFaultReasonEntity>();
+            CreateMap<EquFaultReasonSaveDto, EquFaultReasonEntity>();
             CreateMap<EquFaultReasonPagedQueryDto, EquFaultReasonPagedQuery>();
             CreateMap<EquFaultReasonEntity, EquFaultReasonDto>();
             CreateMap<EquFaultReasonEntity, CustomEquFaultReasonDto>();
