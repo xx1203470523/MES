@@ -260,6 +260,9 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public QualUnqualifiedCodeTypeEnum? Type { get; set; }
     }
 
+    /// <summary>
+    /// 取消标识
+    /// </summary>
     public class CancelSfcIdentificationDto
     {
         /// <summary>
@@ -289,6 +292,21 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public string? Remark { get; set; }
     }
 
+    /// <summary>
+    /// 不良复判
+    /// </summary>
+    public class BadReJudgmentDto
+    {
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string Sfc { get; set; }
+
+        /// <summary>
+        /// 不合格工艺路线id
+        /// </summary>
+        public long? BadProcessRouteId { get; set; }
+    }
     public class ManuProductBadRecordViewDto
     {
         /// <summary>

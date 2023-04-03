@@ -15,9 +15,11 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Core.Enums.QualUnqualifiedCode;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -147,27 +149,42 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             //TODO
-            // 1）如添加不合格代码包含缺陷类型，则将条码置于不合格代码对应不合格工艺路线首工序排队，原工序的状态清除；
-            //同时如有多条不合格工艺路线需手动选择；
+            // 1）如添加不合格代码包含缺陷类型，则将条码置于不合格代码对应不合格工艺路线首工序排队，原工序的状态清除；同时如有多条不合格工艺路线需手动选择；
             //2）如添加不合格代码均为标记类型，则不改变当前条码的状态；
             //3）如添加不合格代码为“SCRAP”，需将条码状态更新为“报废
+
+            var codes = qualUnqualifiedCodes.Where(x => x.Type == QualUnqualifiedCodeTypeEnum.Defect);
+            if (codes.Any())
+            {
+
+            }
 
             //报废不合格代码
             var scrapCode = qualUnqualifiedCodes.FirstOrDefault(a => a.UnqualifiedCode == "SCRAP");
             if (scrapCode != null)
             {
                 var rows = 0;
+                var sfcs = manuSfcs.Select(a => a.SFC).ToArray();
+                var updateCommand = new ManuSfcInfoUpdateCommand
+                {
+                    Sfcs = sfcs,
+                    UserId = _currentUser.UserName,
+                    UpdatedOn = HymsonClock.Now(),
+                    Status = SfcStatusEnum.Scrapping
+                };
+                var isScrapCommand = new UpdateIsScrapCommand
+                {
+                    Sfcs = sfcs,
+                    UserId = _currentUser.UserName,
+                    UpdatedOn = HymsonClock.Now(),
+                    IsScrap = TrueOrFalseEnum.Yes
+                };
                 using (var trans = TransactionHelper.GetTransactionScope())
                 {
-                    var sfcs = manuSfcs.Select(a => a.SFC).ToArray();
-                    //TODO 走报废流程
-                    var updateCommand = new ManuSfcInfoUpdateCommand
-                    {
-                        Sfcs = sfcs,
-                        UserId = _currentUser.UserName,
-                        UpdatedOn = HymsonClock.Now(),
-                        Status = SfcStatusEnum.Scrapping
-                    };
+                    //走报废流程
+                    //修改在制品状态
+                    rows += await _manuSfcProduceRepository.UpdateIsScrapAsync(isScrapCommand);
+                    //修改条码状态
                     rows += await _manuSfcInfoRepository.UpdateStatusAsync(updateCommand);
 
                     if (manuProductBadRecords.Any())
@@ -216,11 +233,24 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ResCode = manuProductBad.ResCode,
                     ResName = manuProductBad.ResName,
                     ProcessRouteId = manuProductBad.ProcessRouteId,
-                    Remark=""
+                    Remark = ""
                 });
             }
 
+            //根据条码和不合格代码和资源去重显示
+            manuProductBadRecordDtos= manuProductBadRecordDtos.DistinctBy(x=>x.UnqualifiedId).ToList();
             return manuProductBadRecordDtos;
+        }
+
+        /// <summary>
+        /// 不良复判
+        /// </summary>
+        /// <param name="badReJudgmentDto"></param>
+        /// <returns></returns>
+        public async Task BadReJudgmentAsync(BadReJudgmentDto badReJudgmentDto)
+        {
+            //判断是否关闭所有不合格代码
+            //判断当前工序是否末工序
         }
 
         /// <summary>
@@ -249,7 +279,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var sfcStepList = new List<ManuSfcStepEntity>();
             if (manuSfcs.Any())
             {
-                sfcStepList.Add(GetSfcStepList(manuSfcs.ToList()[0], cancelDto.Remark??""));
+                sfcStepList.Add(GetSfcStepList(manuSfcs.ToList()[0], cancelDto.Remark ?? ""));
             }
 
             var updateCommandList = new List<ManuProductBadRecordCommand>();
@@ -259,7 +289,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     Sfc = unqualified.Sfc,
                     UnqualifiedId = unqualified.UnqualifiedId,
-                    Remark = unqualified.Remark??"",
+                    Remark = unqualified.Remark ?? "",
                     Status = ProductBadRecordStatusEnum.Close,
                     UserId = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now(),
@@ -275,7 +305,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 rows += await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
 
                 //2.修改状态为关闭
-                 rows += await _manuProductBadRecordRepository.UpdateStatusAsync(updateCommandList);
+                rows += await _manuProductBadRecordRepository.UpdateStatusAsync(updateCommandList);
 
                 trans.Complete();
             }

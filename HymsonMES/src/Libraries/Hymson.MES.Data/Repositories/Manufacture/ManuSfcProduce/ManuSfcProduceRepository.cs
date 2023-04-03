@@ -10,6 +10,7 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -225,6 +226,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.ExecuteAsync(DeletePhysicalRangeSql, new { Sfcs = sfcs });
         }
 
+        /// <summary>
+        /// 批量更新条码IsScrap
+        /// </summary>
+        /// <param name="manuSfcInfoEntity"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateIsScrapAsync(UpdateIsScrapCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateIsScrapSql, command);
+        }
+
     }
 
     public partial class ManuSfcProduceRepository
@@ -247,5 +259,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string DeletePhysicalRangeSql = "delete from manu_sfc_produce where SFC in @Sfcs";
         //质量锁定sql
         const string UpdateQualityLockSql = "update  manu_sfc_produce set `Lock`=@Lock,LockProductionId=@LockProductionId,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn where SFC in  @Sfcs";
+        const string UpdateIsScrapSql = "UPDATE `manu_sfc_produce` SET IsScrap = @IsScrap, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE SFC in @Sfcs ";
     }
 }

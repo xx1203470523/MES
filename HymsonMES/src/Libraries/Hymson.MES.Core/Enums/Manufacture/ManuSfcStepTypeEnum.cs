@@ -77,6 +77,10 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 转换
         /// </summary>
         [Description("转换")]
-        Change = 13
+        Change = 13,
+        /// 取消报废
+        /// </summary>
+        [Description("取消报废")]
+       CancelDiscard = 14,
     }
 }

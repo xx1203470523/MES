@@ -84,6 +84,18 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         /// <summary>
+        /// 不良复判
+        /// </summary>
+        /// <param name="badReJudgmentDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("badReJudgment")]
+        public async Task BadReJudgmentAsync(BadReJudgmentDto badReJudgmentDto)
+        {
+            await _manuProductBadRecordService.BadReJudgmentAsync(badReJudgmentDto);
+        }
+
+        /// <summary>
         /// 条码报废
         /// </summary>
         /// <param name="parm"></param>

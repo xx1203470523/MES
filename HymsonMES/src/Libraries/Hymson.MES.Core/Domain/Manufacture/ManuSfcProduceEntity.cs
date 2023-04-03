@@ -102,5 +102,10 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 复投次数;复投次数
         /// </summary>
         public int RepeatedCount { get; set; }
+
+        /// <summary>
+        /// 是否报废
+        /// </summary>
+        public TrueOrFalseEnum? IsScrap { get; set; }
     }
 }
