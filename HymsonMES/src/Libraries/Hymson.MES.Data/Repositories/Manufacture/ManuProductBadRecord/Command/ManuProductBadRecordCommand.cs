@@ -10,6 +10,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Command
     public class ManuProductBadRecordCommand
     {
         /// <summary>
+        /// 站点id
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
         /// 产品条码
         /// </summary>
         public string Sfc { get; set; }

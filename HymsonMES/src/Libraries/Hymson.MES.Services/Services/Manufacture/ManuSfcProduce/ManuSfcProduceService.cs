@@ -187,7 +187,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                 if (nprocessedSfcs != null && nprocessedSfcs.Length > 0)
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15304)).WithData("Sfcs", string.Join("','", nprocessedSfcs));
+                    throw new BusinessException(nameof(ErrorCode.MES15304)).WithData("Sfcs", string.Join("','", nprocessedSfcs));
                 }
             }
 
@@ -350,27 +350,17 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var noScrapSfcs = manuSfcs.Where(x => x.IsScrap == TrueOrFalseEnum.No).ToList();
                 if (noScrapSfcs.Any())
                 {
-                    var sfcStr = "";
-                    noScrapSfcs.ForEach(item =>
-                    {
-                        sfcStr = item.SFC + ",";
-                    });
-
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15403)).WithData("Sfcs", sfcStr.Trim(','));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15403)).WithData("sfcs", string.Join("','", noScrapSfcs));
                 }
 
                 //取消报废， 验证工单是否已经激活，若已经取消激活，不能取消报废条码
                 var orderIds = manuSfcs.Select(x => x.WorkOrderId).Distinct().ToArray();
                 var activeOrders = await _planWorkOrderActivationRepository.GetByIdsAsync(orderIds);
-                var orderCodes = "";
                 if (activeOrders == null)
                 {
                     var orders = await _planWorkOrderRepository.GetByIdsAsync(orderIds);
-                    orders.ToList().ForEach(x =>
-                    {
-                        orderCodes = x.OrderCode + ",";
-                    });
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15404)).WithData("Orders", orderCodes.Trim(','));
+                    var orderCodes = orders.Select(x => x.OrderCode).ToArray();
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15404)).WithData("orders", string.Join("','", orderCodes));
                 }
 
                 var activeOrderList = activeOrders.ToList();
@@ -380,11 +370,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                     //找出相同元素(即交集)
                     var diffOrderIds = orderIds.Where(c => !activeOrderIds.Contains(c)).ToArray();
                     var orders = await _planWorkOrderRepository.GetByIdsAsync(diffOrderIds);
-                    orders.ToList().ForEach(x =>
-                    {
-                        orderCodes = x.OrderCode + ",";
-                    });
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15404)).WithData("Orders", orderCodes.Trim(','));
+                    var orderCodesStr= string.Join(",",orders.Select(x => x.OrderCode).ToArray());
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15404)).WithData("orders",orderCodesStr);
                 }
             }
 

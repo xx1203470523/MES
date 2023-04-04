@@ -295,8 +295,8 @@
         public const string MES15400 = "产品条码不能为空";
         public const string MES15401 = "存在已报废的条码，不可再次报废!";
         public const string MES15402= "条码不是在制品,不可再执行当前操作!";
-        public const string MES15403 = "条码{Sfcs}状态不是报废,不可再执行当前操作!";
-        public const string MES15404 = "工单{Orders}不是激活状态,不可再执行当前操作!";
+        public const string MES15403 = "条码{sfcs}状态不是报废,不可再执行当前操作!";
+        public const string MES15404 = "工单{orders}不是激活状态,不可再执行当前操作!";
         #endregion
 
         #region 工单  16000

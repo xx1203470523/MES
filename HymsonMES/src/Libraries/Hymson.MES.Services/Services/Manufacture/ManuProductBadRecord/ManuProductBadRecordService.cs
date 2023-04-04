@@ -287,6 +287,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 updateCommandList.Add(new ManuProductBadRecordCommand
                 {
+                    SiteId=_currentSite.SiteId??0,
                     Sfc = unqualified.Sfc,
                     UnqualifiedId = unqualified.UnqualifiedId,
                     Remark = unqualified.Remark ?? "",
