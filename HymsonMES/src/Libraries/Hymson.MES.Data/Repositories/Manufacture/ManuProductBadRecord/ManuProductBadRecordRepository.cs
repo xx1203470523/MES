@@ -190,7 +190,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuSfcInfoEntity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateStatusAsync(List<ManuProductBadRecordCommand> commands)
+        public async Task<int> UpdateStatusRangeAsync(List<ManuProductBadRecordCommand> commands)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateStatusSql, commands);

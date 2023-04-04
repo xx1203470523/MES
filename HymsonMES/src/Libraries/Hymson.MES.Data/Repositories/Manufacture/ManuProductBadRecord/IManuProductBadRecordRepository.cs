@@ -92,6 +92,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuSfcInfoEntity"></param>
         /// <returns></returns>
-        Task<int> UpdateStatusAsync(List<ManuProductBadRecordCommand> commands);
+        Task<int> UpdateStatusRangeAsync(List<ManuProductBadRecordCommand> commands);
     }
 }
