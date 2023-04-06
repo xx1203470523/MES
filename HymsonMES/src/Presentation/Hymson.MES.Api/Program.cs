@@ -51,7 +51,7 @@ namespace Hymson.MES.Api
             //builder.Services.AddHostedService<WorkService>();
 #endif
             AddSwaggerGen(builder.Services);
-            //TESTA
+            //TESTAAAA
             builder.Services.AddJwtBearerService(builder.Configuration);
             builder.Services.AddAppService(builder.Configuration);
             builder.Services.AddSqlLocalization(builder.Configuration);
