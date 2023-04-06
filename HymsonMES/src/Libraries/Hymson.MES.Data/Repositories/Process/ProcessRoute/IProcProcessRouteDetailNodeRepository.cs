@@ -28,6 +28,13 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<ProcProcessRouteDetailNodeEntity> GetByIdAsync(long id);
 
         /// <summary>
+        /// 根据ID获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<ProcProcessRouteDetailNodeEntity> GetFirstProcedureByProcessRouteIdAsync(long processRouteId);
+
+        /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
         /// <param name="ids"></param>

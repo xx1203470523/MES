@@ -13,6 +13,7 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using System.Security.Policy;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -60,6 +61,17 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<ProcMaterialView>(GetByIdSql, new { Id = id, SiteId = SiteId });
+        }
+
+        /// <summary>
+        ///  根据ID获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ProcMaterialEntity> GetByIdAsync(long id)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<ProcMaterialEntity>(GetMaterialByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -337,6 +349,10 @@ namespace Hymson.MES.Data.Repositories.Process
                             LEFT JOIN proc_process_route p on g.ProcessRouteId = p.Id
                             LEFT JOIN proc_bom q on g.BomId = q.Id 
                             WHERE g.Id = @Id and g.SiteId=@SiteId ";
+        const string GetMaterialByIdSql = @"SELECT 
+                                        `Id`, `SiteId`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `BomId`, `Batch`, `Unit`, `SerialNumber`, `ValidationMaskGroup`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, ConsumeRatio
+                            FROM `proc_material`
+                            WHERE Id = Id";
         const string GetByIdsSql = @"SELECT 
                                         `Id`, `SiteId`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `BomId`, `Batch`, `Unit`, `SerialNumber`, `ValidationMaskGroup`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, ConsumeRatio
                             FROM `proc_material`

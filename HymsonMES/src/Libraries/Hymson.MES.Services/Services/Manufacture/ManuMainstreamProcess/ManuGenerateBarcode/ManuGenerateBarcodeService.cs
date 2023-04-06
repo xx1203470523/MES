@@ -80,9 +80,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         /// <summary>
         /// 流水转换
         /// </summary>
-        /// <param name="number"></param>
-        /// <param name="ignoreChar"></param>
-        /// <param name="type"></param>
+        /// <param name="number">转换流水号</param>
+        /// <param name="ignoreChar">忽略字符</param>
+        /// <param name="type">进制类型 16|32</param>
         /// <returns></returns>
         private string ConvertNumber(int number, string ignoreChar, int type)
         {
@@ -112,8 +112,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         /// <summary>
         /// 进制转换
         /// </summary>
-        /// <param name="number"></param>
-        /// <param name="list"></param>
+        /// <param name="number">转换数字</param>
+        /// <param name="list">转换进制字符</param>
         /// <returns></returns>
         private string Convert(int number, List<string> list)
         {

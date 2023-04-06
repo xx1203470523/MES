@@ -153,7 +153,6 @@
         public const string MES11206 = "不合格代码{code}已经存在";
         #endregion
 
-        //综合
         #region 作业12000
         public const string MES12000 = "作业维护错误";
         public const string MES12001 = "作业{code}已经存在";
@@ -215,7 +214,6 @@
         public const string MES12502 = "最大数量不能小于最小数量";
         #endregion
 
-        //设备
         #region 故障原因 13000
         public const string MES13000 = "基础故障原因错误";
         public const string MES13001 = "站点码获取失败，请重新登录！";
@@ -231,7 +229,6 @@
 
         #endregion
 
-        //库存
         #region 供应商库存  15000
         public const string MES15000 = "库存供应商错误";
         public const string MES15001 = "站点码获取失败，请重新登录！";
@@ -245,7 +242,6 @@
 
         #endregion
 
-        //库存
         #region 车间库存接收  15100
         public const string MES15100 = "物料库存错误";
         public const string MES15101 = "物料不存在";
@@ -354,6 +350,20 @@
         public const string MES16204 = "{base}进制字符串全部忽略,无法生成条码";
         public const string MES16205 = "通配符{value}未实现";
         public const string MES16206 = "流水号转换只实现了16,32进制";
+        #endregion
+
+        #region 生产通用 MES16300
+        public const string MES16300 = "生产中异常。";
+        public const string MES16301 = "工单不存在。";
+        public const string MES16302 = "工单{ordercode}已经被锁定，无法继续生产。";
+        public const string MES16303 = "工单{ordercode}状态不为已下达|生产中|已完工，无法继续生产。";
+        public const string MES16304 = "获取首工序失败。";
+        #endregion
+
+        #region 生产通用 MES16400
+        public const string MES16400 = "下达条码失败。";
+        public const string MES16401 = "产品{product}未维护编码规则,无法下达条码。";
+        public const string MES16402 = "产品{product}批次大写为0,无法下达条码。";
         #endregion
 
         #region 生产

@@ -38,9 +38,14 @@ namespace Hymson.MES.Core.Domain.Manufacture
        /// <summary>
         /// 工单号
         /// </summary>
-        public long WorkOrdeId { get; set; }
+        public long WorkOrderId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 工单路线
+        /// </summary>
+        public long ProcessRouteId { get; set; }
+
+        /// <summary>
         /// 工作中心
         /// </summary>
         public long? WorkCenterId { get; set; }
@@ -48,7 +53,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
        /// <summary>
         /// BOMId
         /// </summary>
-        public long? ProductBOMId { get; set; }
+        public long? BOMId { get; set; }
 
        /// <summary>
         /// 当前数量

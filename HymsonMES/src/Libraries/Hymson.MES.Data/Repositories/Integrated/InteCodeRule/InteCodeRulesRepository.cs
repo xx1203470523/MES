@@ -65,6 +65,17 @@ namespace Hymson.MES.Data.Repositories.Integrated
         }
 
         /// <summary>
+        /// 根据ID获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<InteCodeRulesEntity> GetInteCodeRulesByProductIdAsync(long productId)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<InteCodeRulesEntity>(GetInteCodeRulesByProductIdSql, new { ProductId = productId });
+        }
+
+        /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
         /// <param name="ids"></param>
@@ -231,6 +242,9 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string GetByIdSql = @"SELECT 
                                `Id`, `ProductId`, `CodeType`, `PackType`, `Base`, `IgnoreChar`, `Increment`, `OrderLength`, `ResetType`, StartNumber, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`
                             FROM `inte_code_rules`  WHERE Id = @Id ";
+        const string GetInteCodeRulesByProductIdSql = @"SELECT 
+                               `Id`, `ProductId`, `CodeType`, `PackType`, `Base`, `IgnoreChar`, `Increment`, `OrderLength`, `ResetType`, StartNumber, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`
+                            FROM `inte_code_rules`  WHERE ProductId = @ProductId ";
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `ProductId`, `CodeType`, `PackType`, `Base`, `IgnoreChar`, `Increment`, `OrderLength`, `ResetType`, StartNumber, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`
                             FROM `inte_code_rules`  WHERE Id IN @ids ";

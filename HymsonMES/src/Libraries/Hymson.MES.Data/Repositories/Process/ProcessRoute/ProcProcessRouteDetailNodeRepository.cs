@@ -61,6 +61,17 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 根据ID获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ProcProcessRouteDetailNodeEntity> GetFirstProcedureByProcessRouteIdAsync(long processRouteId)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<ProcProcessRouteDetailNodeEntity>(GetFirstProcedureByProcessRouteIdSql, new { Id = processRouteId });
+        }
+
+        /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
         /// <param name="ids"></param>
@@ -124,6 +135,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string UpdateSql = "UPDATE `proc_process_route_detail_node` SET    ProcessRouteId = @ProcessRouteId, SerialNo = @SerialNo, ProcedureId = @ProcedureId, CheckType = @CheckType, CheckRate = @CheckRate, IsWorkReport = @IsWorkReport, PackingLevel = @PackingLevel, IsFirstProcess = @IsFirstProcess, Status = @Status, Extra1 = @Extra1, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_process_route_detail_node` SET IsDeleted = '1' WHERE Id in @ids";
         const string GetByIdSql = @"SELECT * FROM `proc_process_route_detail_node`  WHERE Id = @Id ";
+        const string GetFirstProcedureByProcessRouteIdSql = @"SELECT * FROM `proc_process_route_detail_node`  WHERE ProcessRouteId = @ProcessRouteId and  IsFirstProcess=1";
         const string GetByIdsSql = @"SELECT * FROM `proc_process_route_detail_node`  WHERE Id IN @ids ";
         const string DeleteByProcessRouteIdSql = "delete from `proc_process_route_detail_node` WHERE ProcessRouteId = @ProcessRouteId ";
     }
