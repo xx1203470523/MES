@@ -41,7 +41,7 @@ namespace Hymson.MES.Api
             }).AddJsonOptions((jsonOptions) => {
                 jsonOptions.JsonSerializerOptions.Converters.Add(new CustomInt64Converter());
             }); ;
-            
+            //Test karl
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddMemoryCache();
             builder.Services.AddKafkaForDebeziumService();
