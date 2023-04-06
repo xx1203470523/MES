@@ -23,13 +23,11 @@ namespace Hymson.MES.Api
     public class Program
     {
         /// <summary>
-        /// aaa
+        /// 
         /// </summary>
         /// <param name="args"></param>
         public static void Main(string[] args)
         {
-
-
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
@@ -51,7 +49,7 @@ namespace Hymson.MES.Api
             //builder.Services.AddHostedService<WorkService>();
 #endif
             AddSwaggerGen(builder.Services);
-            //TESTAAAA
+      
             builder.Services.AddJwtBearerService(builder.Configuration);
             builder.Services.AddAppService(builder.Configuration);
             builder.Services.AddSqlLocalization(builder.Configuration);
