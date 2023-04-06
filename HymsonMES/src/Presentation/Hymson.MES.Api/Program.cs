@@ -23,7 +23,7 @@ namespace Hymson.MES.Api
     public class Program
     {
         /// <summary>
-        /// 
+        /// aaa
         /// </summary>
         /// <param name="args"></param>
         public static void Main(string[] args)
