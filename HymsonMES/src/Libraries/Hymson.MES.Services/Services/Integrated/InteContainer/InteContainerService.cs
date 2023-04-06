@@ -76,7 +76,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
             entity.SiteId = _currentSite.SiteId ?? 0;
-
+            //aaa
             // 验证是否相同物料或者物料组已经设置过
             var entityByRelation = await _inteContainerRepository.GetByRelationIdAsync(new InteContainerQuery
             {
