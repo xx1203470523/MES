@@ -202,11 +202,11 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// <summary>
         /// 工单号
         /// </summary>
-        public string? WorkOrderCode { get; set; }
+        public string? OrderCode { get; set; } = "";
 
         /// <summary>
         /// 工单类型
         /// </summary>
-        public long WorkOrderType { get; set; }
+        public long? Type { get; set; } = 0;
     }
 }

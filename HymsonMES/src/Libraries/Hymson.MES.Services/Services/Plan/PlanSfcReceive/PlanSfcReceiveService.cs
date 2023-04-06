@@ -85,7 +85,7 @@ namespace Hymson.MES.Services.Services.Plan
             //}
             //验证工单
             var workOrderInfo = await _planWorkOrderRepository.GetByIdAsync(planSfcInfoCreateDto.WorkOrderId);
-            if (workOrderInfo.Status == PlanWorkOrderStatusEnum.Closed)
+            if (workOrderInfo.Status != PlanWorkOrderStatusEnum.NotStarted)
             {
                 throw new BusinessException(nameof(ErrorCode.MES16106)).WithData("OrderCode", workOrderInfo.OrderCode);
             }
@@ -107,10 +107,16 @@ namespace Hymson.MES.Services.Services.Plan
                     throw new BusinessException(nameof(ErrorCode.MES16103));
                 }
 
+                var relevanceWorkOrderInfo = await _planWorkOrderRepository.GetByIdAsync(planSfcInfoCreateDto.RelevanceWorkOrderId);
+                if (relevanceWorkOrderInfo.Status != PlanWorkOrderStatusEnum.Closed)
+                {
+                    throw new BusinessException(nameof(ErrorCode.MES16106)).WithData("OrderCode", relevanceWorkOrderInfo.OrderCode);
+                }
+
                 var planSfcInfo = await _planSfcInfoRepository.GetPlanSfcInfoAsync(new PlanSfcReceiveQuery { SFC = planSfcInfoCreateDto.SFC, WorkOrderId = planSfcInfoCreateDto.RelevanceWorkOrderId });
                 if (planSfcInfo == null)
                 {
-                    throw new BusinessException(nameof(ErrorCode.MES16107)).WithData("OrderCode", workOrderInfo.OrderCode).WithData("SFC", planSfcInfoCreateDto.SFC);
+                    throw new BusinessException(nameof(ErrorCode.MES16112));
                 }
                 if (planSfcInfo.ProductId != workOrderInfo.ProductId)
                 {

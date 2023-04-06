@@ -290,7 +290,7 @@
         #region 质量录入 15400
         public const string MES15400 = "产品条码不能为空";
         public const string MES15401 = "存在已报废的条码,不可再次报废!";
-        public const string MES15402= "条码不是在制品,不可再执行当前操作!";
+        public const string MES15402 = "条码不是在制品,不可再执行当前操作!";
         public const string MES15403 = "条码{sfcs}状态不是报废,不可再执行当前操作!";
         public const string MES15404 = "工单{orders}不是激活状态,不可再执行当前操作!";
         public const string MES15405 = "不合格缺陷信息不能为空!";
@@ -347,6 +347,8 @@
         public const string MES16109 = "工单:{OrderCode}与关联工单不能一样";
         public const string MES16110 = "扫描条码失败";
         public const string MES16111 = "条码:{SFC}已使用，不允许删除";
+        public const string MES16112 = "扫描SN与关联工单号不符，请重新扫描！";
+
         #endregion
 
         #region 条码生成 MES16200
