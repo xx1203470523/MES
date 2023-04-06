@@ -83,15 +83,15 @@ namespace Hymson.MES.Data.Repositories.Plan
 
             sqlBuilder.Where(" msi.IsDeleted=0");
 
-            if (!string.IsNullOrWhiteSpace(planSfcInfoPagedQuery.WorkOrderCode))
+            if (!string.IsNullOrWhiteSpace(planSfcInfoPagedQuery.OrderCode))
             {
-                //planSfcInfoPagedQuery.WorkOrderCode = $"%{planSfcInfoPagedQuery.WorkOrderCode}%";
-                //sqlBuilder.Where("WorkOrderCode like @WorkOrderCode");
-                sqlBuilder.Where(" pwo.WorkOrderCode=@WorkOrderCode");
+                //planSfcInfoPagedQuery.OrderCode = $"%{planSfcInfoPagedQuery.OrderCode}%";
+                //sqlBuilder.Where("OrderCode like @OrderCode");
+                sqlBuilder.Where(" pwo.OrderCode=@OrderCode");
             }
-            if (planSfcInfoPagedQuery.WorkOrderType > 0)
+            if (planSfcInfoPagedQuery.Type > 0)
             {
-                sqlBuilder.Where(" pwo.WorkOrderType=@WorkOrderType");
+                sqlBuilder.Where(" pwo.Type=@Type");
             }
 
             var offSet = (planSfcInfoPagedQuery.PageIndex - 1) * planSfcInfoPagedQuery.PageSize;
@@ -170,7 +170,7 @@ namespace Hymson.MES.Data.Repositories.Plan
     public partial class PlanSfcReceiveRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_info` msi /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_sfc_info` msi /**where**/ ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_sfc_info` msi /**innerjoin**/ /**leftjoin**/ /**where**/";
         const string GetPlanSfcInfoEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `manu_sfc_info` /**where**/  ";
