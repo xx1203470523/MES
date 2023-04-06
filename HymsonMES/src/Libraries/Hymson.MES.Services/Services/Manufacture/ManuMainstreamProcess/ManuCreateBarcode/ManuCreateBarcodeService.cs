@@ -131,13 +131,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                     SFC = item,
                     ProductId = planWorkOrderEntity.ProductId,
                     WorkOrderId = planWorkOrderEntity.Id,
-                    ProcessRouteId = planWorkOrderEntity.ProcessRouteId ?? 0,
+                    ProductBOMId = planWorkOrderEntity.ProductBOMId,
                     WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
-                    BOMId = planWorkOrderEntity.ProductBOMId,
                     Qty = qty,
                     ProcedureId = processRouteFirstProcedure.ProcedureId,
-                    Operatetype = ManuSfcStepTypeEnum.Create,
-                    CurrentStatus = SfcProduceStatusEnum.lineUp,
+                    Type = ManuSfcStepTypeEnum.Create,
+                    Status = SfcProduceStatusEnum.lineUp,
                     CreatedBy = _currentUser.UserName,
                     UpdatedBy = _currentUser.UserName
                 });

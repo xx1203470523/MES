@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Quality;
 using Hymson.MES.Services.Services.Quality.IQualityService;
+using Hymson.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Extensions;
 
@@ -51,18 +52,6 @@ namespace Hymson.MES.Api.Controllers.Quality
         public async Task<QualUnqualifiedCodeDto> QueryQualUnqualifiedCodeByIdAsync(long id)
         {
             return await _qualUnqualifiedCodeService.QueryQualUnqualifiedCodeByIdAsync(id);
-        }
-
-        /// <summary>
-        /// 查询详情
-        /// </summary>
-        /// <param name="queryDto"></param>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("listByIds")]
-        public async Task<IEnumerable<QualUnqualifiedCodeDto>> GetListByIdsAsync([FromQuery] QualUnqualifiedCodeQueryDto queryDto)
-        {
-            return await _qualUnqualifiedCodeService.GetListByIdsAsync(queryDto.Ids);
         }
 
         /// <summary>

@@ -142,25 +142,6 @@ namespace Hymson.MES.Services.Services.Quality
         }
 
         /// <summary>
-        /// 根据不合格代码Id查询不合格代码列表
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<QualUnqualifiedCodeDto>> GetListByIdsAsync(long[] ids)
-        {
-            var list = await _qualUnqualifiedCodeRepository.GetByIdsAsync(ids);
-
-            //实体到DTO转换 装载数据
-            var qualUnqualifiedCodes = new List<QualUnqualifiedCodeDto>();
-            foreach (var entity in list)
-            {
-                var unqualifiedCodeDto = entity.ToModel<QualUnqualifiedCodeDto>();
-                qualUnqualifiedCodes.Add(unqualifiedCodeDto);
-            }
-            return qualUnqualifiedCodes;
-        }
-
-        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="param">新增参数</param>

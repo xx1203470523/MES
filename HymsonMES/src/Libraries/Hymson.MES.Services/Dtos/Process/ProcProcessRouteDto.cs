@@ -332,4 +332,9 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public int? IsCurrentVersion { get; set; }
     }
+
+    public class ProcProcessRouteQueryDto
+    {
+        public long[] Ids { get; set; }
+    }
 }

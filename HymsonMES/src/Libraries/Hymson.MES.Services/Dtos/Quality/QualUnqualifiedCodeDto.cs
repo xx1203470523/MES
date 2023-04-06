@@ -247,9 +247,4 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public QualUnqualifiedCodeDegreeEnum? Degree { get; set; }
     }
-
-    public class QualUnqualifiedCodeQueryDto
-    {
-        public long[] Ids { get; set; }
-    }
 }

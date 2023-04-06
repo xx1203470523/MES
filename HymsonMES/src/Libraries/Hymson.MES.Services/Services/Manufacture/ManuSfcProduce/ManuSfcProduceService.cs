@@ -278,13 +278,13 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ProductId = sfc.ProductId,
                     WorkOrderId = sfc.WorkOrderId,
                     WorkCenterId = sfc.WorkCenterId,
-                    BOMId = sfc.BOMId,
+                    ProductBOMId = sfc.BOMId,
                     Qty = sfc.Qty,
                     EquipmentId = sfc.EquipmentId,
                     ResourceId = sfc.ResourceId,
                     ProcedureId = sfc.ProcedureId,
-                    Operatetype = type,
-                    CurrentStatus = sfc.Status,
+                    Type = type,
+                    Status = sfc.Status,
                     Lock = lockCommand.Lock,
                     SiteId = _currentSite.SiteId ?? 0,
                     CreatedBy = sfc.CreatedBy,
@@ -407,10 +407,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES15402));
             }
 
-            var noScrapSfcs = manuSfcs.Where(x => x.IsScrap == TrueOrFalseEnum.No).ToList();
+            var noScrapSfcs = manuSfcs.Where(x => x.IsScrap == TrueOrFalseEnum.No).Select(x=>x.SFC).ToArray();
             if (noScrapSfcs.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES15403)).WithData("sfcs", string.Join("','", noScrapSfcs));
+                var strs = string.Join("','", noScrapSfcs);
+                throw new CustomerValidationException(nameof(ErrorCode.MES15403)).WithData("sfcs", strs);
             }
 
             //取消报废， 验证工单是否已经激活，若已经取消激活，不能取消报废条码
@@ -489,13 +490,13 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ProductId = sfc.ProductId,
                     WorkOrderId = sfc.WorkOrderId,
                     WorkCenterId = sfc.WorkCenterId,
-                    BOMId = sfc.BOMId,
+                    ProductBOMId = sfc.BOMId,
                     Qty = sfc.Qty,
                     EquipmentId = sfc.EquipmentId,
                     ResourceId = sfc.ResourceId,
                     ProcedureId = sfc.ProcedureId,
-                    Operatetype = type,
-                    CurrentStatus = sfc.Status,
+                    Type = type,
+                    Status = sfc.Status,
                     Lock = sfc.Lock,
                     Remark = remark,
                     SiteId = _currentSite.SiteId ?? 0,
