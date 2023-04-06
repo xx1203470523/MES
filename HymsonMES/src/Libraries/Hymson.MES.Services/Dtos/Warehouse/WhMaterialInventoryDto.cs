@@ -7,12 +7,8 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Warehouse;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Dtos.Warehouse
 {
@@ -90,7 +86,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 状态;待使用/使用中/锁定
         /// </summary>
-        public int Status { get; set; }
+        public WhMaterialInventoryStatusEnum Status { get; set; }
 
         /// <summary>
         /// 有效期/到期日
@@ -100,7 +96,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 来源/目标;手动录入/WMS/上料点编号
         /// </summary>
-        public int Source { get; set; }
+        public WhMaterialInventorySourceEnum Source { get; set; }
 
         /// <summary>
         /// 站点Id
@@ -174,7 +170,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 状态;待使用/使用中/锁定
         /// </summary>
-        public int Status { get; set; }
+        public WhMaterialInventoryStatusEnum Status { get; set; }
 
         /// <summary>
         /// 有效期/到期日
@@ -184,7 +180,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 来源/目标;手动录入/WMS/上料点编号
         /// </summary>
-        public int Source { get; set; }
+        public WhMaterialInventorySourceEnum Source { get; set; }
 
         /// <summary>
         /// 创建人
@@ -258,7 +254,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 状态;待使用/使用中/锁定
         /// </summary>
-        public bool Status { get; set; }
+        public WhMaterialInventoryStatusEnum Status { get; set; }
 
         /// <summary>
         /// 有效期/到期日
@@ -268,7 +264,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 来源/目标;手动录入/WMS/上料点编号
         /// </summary>
-        public bool Source { get; set; }
+        public WhMaterialInventorySourceEnum Source { get; set; }
 
         /// <summary>
         /// 创建人
@@ -315,7 +311,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 来源
         /// </summary>
-        public int Source { get; set; }
+        public WhMaterialInventorySourceEnum Source { get; set; }
         /// <summary>
         /// 物料编码
         /// </summary>
@@ -347,7 +343,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 转类型
         /// </summary>
-        public int Type { get; set; }
+        public WhMaterialInventoryTypeEnum Type { get; set; }
 
         /// <summary>
         /// 有效期/到期日
@@ -398,7 +394,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 状态;待使用/使用中/锁定
         /// </summary>
-        public bool Status { get; set; }
+        public WhMaterialInventoryStatusEnum Status { get; set; }
 
         /// <summary>
         /// 有效期/到期日
@@ -408,7 +404,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 来源/目标;手动录入/WMS/上料点编号
         /// </summary>
-        public bool Source { get; set; }
+        public WhMaterialInventorySourceEnum Source { get; set; }
 
         /// <summary>
         /// 创建人
@@ -475,7 +471,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 状态
         /// </summary>
-        public int? Status { get; set; }
+        public WhMaterialInventoryStatusEnum? Status { get; set; }
 
     }
 }

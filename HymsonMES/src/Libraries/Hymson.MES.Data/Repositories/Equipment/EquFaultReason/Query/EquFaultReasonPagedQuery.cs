@@ -6,11 +6,7 @@
  *build datetime: 2023-02-28 15:15:20
  */
 using Hymson.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Data.Repositories.Equipment
 {
@@ -19,11 +15,6 @@ namespace Hymson.MES.Data.Repositories.Equipment
     /// </summary>
     public class EquFaultReasonPagedQuery : PagerInfo  
     {
-        ///// <summary>
-        ///// 所属站点代码
-        ///// </summary>
-        //public long SiteId { get; set; }
-
         //
         // 摘要:
         //     站点id
@@ -38,6 +29,11 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// 名称（设备故障原因）
         /// </summary>
         public string FaultReasonName { get; set; }
+
+        /// <summary>
+        /// 故障原因状态（字典定义）
+        /// </summary>
+        public SysDataStatusEnum? UseStatus { get; set; }
 
         /// <summary>
         /// 描述（设备故障原因）

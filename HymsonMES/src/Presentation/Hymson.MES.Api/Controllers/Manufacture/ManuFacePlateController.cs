@@ -1,0 +1,105 @@
+/*
+ *creator: Karl
+ *
+ *describe: 操作面板    控制器 | 代码由框架生成  
+ *builder:  Karl
+ *build datetime: 2023-04-01 02:05:24
+ */
+using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Manufacture;
+using Hymson.MES.Services.Services.Manufacture;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Hymson.MES.Api.Controllers.Manufacture
+{
+    /// <summary>
+    /// 控制器（操作面板）
+    /// @author Karl
+    /// @date 2023-04-01 02:05:24
+    /// </summary>
+    [Authorize]
+    [ApiController]
+    [Route("api/v1/[controller]")]
+    public class ManuFacePlateController : ControllerBase
+    {
+        /// <summary>
+        /// 接口（操作面板）
+        /// </summary>
+        private readonly IManuFacePlateService _manuFacePlateService;
+        private readonly ILogger<ManuFacePlateController> _logger;
+
+        /// <summary>
+        /// 构造函数（操作面板）
+        /// </summary>
+        /// <param name="manuFacePlateService"></param>
+        public ManuFacePlateController(IManuFacePlateService manuFacePlateService, ILogger<ManuFacePlateController> logger)
+        {
+            _manuFacePlateService = manuFacePlateService;
+            _logger = logger;
+        }
+
+        #region 框架生成方法
+
+        /// <summary>
+        /// 分页查询列表（操作面板）
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("pagelist")]
+        public async Task<PagedInfo<ManuFacePlateDto>> QueryPagedManuFacePlateAsync([FromQuery] ManuFacePlatePagedQueryDto parm)
+        {
+            return await _manuFacePlateService.GetPagedListAsync(parm);
+        }
+
+        /// <summary>
+        /// 查询详情（操作面板）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        public async Task<ManuFacePlateDto> QueryManuFacePlateByIdAsync(long id)
+        {
+            return await _manuFacePlateService.QueryManuFacePlateByIdAsync(id);
+        }
+
+        /// <summary>
+        /// 添加（操作面板）
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("create")]
+        public async Task AddManuFacePlateAsync([FromBody] ManuFacePlateCreateDto parm)
+        {
+             await _manuFacePlateService.CreateManuFacePlateAsync(parm);
+        }
+
+        /// <summary>
+        /// 更新（操作面板）
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("update")]
+        public async Task UpdateManuFacePlateAsync([FromBody] ManuFacePlateModifyDto parm)
+        {
+             await _manuFacePlateService.ModifyManuFacePlateAsync(parm);
+        }
+
+        /// <summary>
+        /// 删除（操作面板）
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("delete")]
+        public async Task DeleteManuFacePlateAsync([FromBody] long[] ids)
+        {
+            await _manuFacePlateService.DeletesManuFacePlateAsync(ids);
+        }
+
+        #endregion
+    }
+}

@@ -7,6 +7,8 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Core.Enums.QualUnqualifiedCode;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -106,9 +108,14 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long FoundBadOperationId { get; set; }
 
-       /// <summary>
-        /// 流出不良工序
+        /// <summary>
+        /// 发现不良资源
         /// </summary>
+        public string? FoundBadResourceId { get; set; }
+
+       /// <summary>
+       /// 流出不良工序
+       /// </summary>
         public long OutflowOperationId { get; set; }
 
        /// <summary>
@@ -119,7 +126,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
        /// <summary>
         /// 产品条码列表
         /// </summary>
-        public string[] SFCs { get; set; }
+        public string[] Sfcs { get; set; }
 
         /// <summary>
         /// 不合格工艺路线id
@@ -233,5 +240,131 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         ///// 空值 : false  
         ///// </summary>
         //public string SiteCode { get; set; }
+    }
+
+    public class ManuProductBadRecordQueryDto
+    {
+        /// <summary>
+        /// 不合格记录开关;1、开启  2、关闭
+        /// </summary>
+        public ProductBadRecordStatusEnum? Status { get; set; }
+
+        /// <summary>
+        /// 产品条码
+        /// </summary>
+        public string SFC { get; set; }
+
+        /// <summary>
+        /// 不合格代码类型
+        /// </summary>
+        public QualUnqualifiedCodeTypeEnum? Type { get; set; }
+    }
+
+    /// <summary>
+    /// 取消标识
+    /// </summary>
+    public class CancelSfcIdentificationDto
+    {
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+
+        /// <summary>
+        /// 不合格代码信息
+        /// </summary>
+       public List<UnqualifiedList>  UnqualifiedLists { get; set; }
+    }
+
+    public class UnqualifiedList
+    {
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string Sfc{ get; set; }
+        /// <summary>
+        /// 不合格代码
+        /// </summary>
+        public long UnqualifiedId { get; set; }
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+    }
+
+    /// <summary>
+    /// 不良复判
+    /// </summary>
+    public class BadReJudgmentDto
+    {
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string Sfc { get; set; }
+
+        /// <summary>
+        /// 不合格工艺路线id
+        /// </summary>
+        public long? BadProcessRouteId { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+
+        /// <summary>
+        /// 不合格代码信息
+        /// </summary>
+        public List<UnqualifiedDefectList> UnqualifiedLists { get; set; }
+    }
+
+    public class UnqualifiedDefectList
+    {
+        /// <summary>
+        /// 不合格代码
+        /// </summary>
+        public long UnqualifiedId { get; set; }
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+    }
+
+    public class ManuProductBadRecordViewDto
+    {
+        /// <summary>
+        /// 不合格代码Id
+        /// </summary>
+        public long? UnqualifiedId { get; set; }
+
+        /// <summary>
+        /// 不合格代码
+        /// </summary>
+        public string UnqualifiedCode { get; set; }
+
+        /// <summary>
+        /// 不合格代码名称
+        /// </summary>
+        public string UnqualifiedCodeName { get; set; }
+
+        /// <summary>
+        /// 资源编码
+        /// </summary>
+        public string ResCode { get; set; }
+
+        /// <summary>
+        /// 资源名称
+        /// </summary>
+        public string ResName { get; set; }
+
+        /// <summary>
+        /// 不合格工艺路线Id
+        /// </summary>
+        public long? ProcessRouteId { get; set; }
+        
+        /// <summary>
+        /// 描述
+        /// </summary>
+        public string Remark { get; set; }
     }
 }

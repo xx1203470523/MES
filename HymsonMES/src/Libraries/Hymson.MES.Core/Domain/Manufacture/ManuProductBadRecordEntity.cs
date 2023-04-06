@@ -34,7 +34,12 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public long? FoundBadOperationId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 发现不良资源
+        /// </summary>
+        public long? FoundBadResourceId { get; set; }
+
+        /// <summary>
         /// 流出不良工序
         /// </summary>
         public long? OutflowOperationId { get; set; }

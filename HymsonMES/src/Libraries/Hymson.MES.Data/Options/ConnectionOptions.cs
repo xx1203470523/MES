@@ -9,5 +9,7 @@
         /// MES连接字符串
         /// </summary>
         public string MESConnectionString { get; set; } = "";
+
+
     }
 }

@@ -7,6 +7,7 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -91,5 +92,19 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<int> DeleteRangeAsync(long[] ids);
+
+        /// <summary>
+        /// 批量删除（物理删除）条码信息
+        /// </summary>
+        /// <param name="sfcs"></param>
+        /// <returns></returns>
+        Task<int> DeletePhysicalRangeAsync(string[] sfcs);
+
+        /// <summary>
+        /// 批量更新条码IsScrap
+        /// </summary>
+        /// <param name="manuSfcInfoEntity"></param>
+        /// <returns></returns>
+        Task<int> UpdateIsScrapAsync(UpdateIsScrapCommand command);
     }
 }

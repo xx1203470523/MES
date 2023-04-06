@@ -7,6 +7,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
+using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Manufacture
@@ -41,7 +42,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Route("pagelist")]
         public async Task<PagedInfo<ManuProductBadRecordDto>> QueryPagedManuProductBadRecordAsync([FromQuery] ManuProductBadRecordPagedQueryDto parm)
         {
@@ -65,10 +66,45 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("create")]
         public async Task AddManuProductBadRecordAsync([FromBody] ManuProductBadRecordCreateDto parm)
         {
-             await _manuProductBadRecordService.CreateManuProductBadRecordAsync(parm);
+            await _manuProductBadRecordService.CreateManuProductBadRecordAsync(parm);
+        }
+
+        /// <summary>
+        /// 查询条码的不合格代码信息
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("badRecords")]
+        public async Task<IEnumerable<ManuProductBadRecordViewDto>> GetBadRecordsBySfcAsync([FromQuery] ManuProductBadRecordQueryDto parm)
+        {
+            return await _manuProductBadRecordService.GetBadRecordsBySfcAsync(parm);
+        }
+
+        /// <summary>
+        /// 不良复判
+        /// </summary>
+        /// <param name="badReJudgmentDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("badReJudgment")]
+        public async Task BadReJudgmentAsync(BadReJudgmentDto badReJudgmentDto)
+        {
+            await _manuProductBadRecordService.BadReJudgmentAsync(badReJudgmentDto);
+        }
+
+        /// <summary>
+        /// 条码报废
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("cancelIdentify")]
+        public async Task CancelSfcIdentification(CancelSfcIdentificationDto parm)
+        {
+            await _manuProductBadRecordService.CancelSfcIdentificationAsync(parm);
         }
 
         /// <summary>
@@ -76,8 +112,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("update")]
+        [HttpPut]
         public async Task UpdateManuProductBadRecordAsync([FromBody] ManuProductBadRecordModifyDto parm)
         {
             await _manuProductBadRecordService.ModifyManuProductBadRecordAsync(parm);
@@ -88,8 +123,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// </summary>
         /// <param name="deleteDto"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("delete")]
+        [HttpDelete]
         public async Task DeleteManuProductBadRecordAsync(DeleteDto deleteDto)
         {
             await _manuProductBadRecordService.DeletesManuProductBadRecordAsync(deleteDto.Ids);

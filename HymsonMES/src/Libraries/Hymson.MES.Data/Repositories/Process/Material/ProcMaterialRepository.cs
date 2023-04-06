@@ -60,7 +60,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<ProcMaterialView> GetByIdAsync(long id, long SiteId)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcMaterialView>(GetByIdSql, new { Id = id, SiteId = SiteId });
+            return await conn.QueryFirstOrDefaultAsync<ProcMaterialView>(GetViewByIdSql, new { Id = id, SiteId = SiteId });
         }
 
         /// <summary>
@@ -311,11 +311,11 @@ namespace Hymson.MES.Data.Repositories.Process
                                             /**select**/
                                            FROM `proc_material` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `proc_material`(  `Id`, `SiteId`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `BomId`, `Batch`, `Unit`, `SerialNumber`, `ValidationMaskGroup`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `ConsumeRatio` ) VALUES (   @Id, @SiteId, @GroupId, @MaterialCode, @MaterialName, @Status, @Origin, @Version, @IsDefaultVersion, @Remark, @BuyType, @ProcessRouteId, @BomId, @Batch, @Unit, @SerialNumber, @ValidationMaskGroup, @BaseTime, @ConsumptionTolerance, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @ConsumeRatio )  ";
-        const string UpdateSql = "UPDATE `proc_material` SET  GroupId = @GroupId, MaterialName = @MaterialName, Status = @Status, Origin = @Origin, Version = @Version, Remark = @Remark, BuyType = @BuyType, ProcessRouteId = @ProcessRouteId, BomId = @BomId, Batch = @Batch, Unit = @Unit, SerialNumber = @SerialNumber, BaseTime = @BaseTime, ConsumptionTolerance = @ConsumptionTolerance, IsDefaultVersion=@IsDefaultVersion, ValidationMaskGroup=@ValidationMaskGroup, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn , ConsumeRatio=@ConsumeRatio  WHERE Id = @Id ";
+        const string InsertSql = "INSERT INTO `proc_material`(  `Id`, `SiteId`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `BomId`, `Batch`, PackageNum, `Unit`, `SerialNumber`, `ValidationMaskGroup`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `ConsumeRatio` ) VALUES (   @Id, @SiteId, @GroupId, @MaterialCode, @MaterialName, @Status, @Origin, @Version, @IsDefaultVersion, @Remark, @BuyType, @ProcessRouteId, @BomId, @Batch, @PackageNum, @Unit, @SerialNumber, @ValidationMaskGroup, @BaseTime, @ConsumptionTolerance, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @ConsumeRatio )  ";
+        const string UpdateSql = "UPDATE `proc_material` SET  GroupId = @GroupId, MaterialName = @MaterialName, Status = @Status, Origin = @Origin, Version = @Version, Remark = @Remark, BuyType = @BuyType, ProcessRouteId = @ProcessRouteId, BomId = @BomId, Batch = @Batch, PackageNum = @PackageNum, Unit = @Unit, SerialNumber = @SerialNumber, BaseTime = @BaseTime, ConsumptionTolerance = @ConsumptionTolerance, IsDefaultVersion=@IsDefaultVersion, ValidationMaskGroup=@ValidationMaskGroup, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn , ConsumeRatio=@ConsumeRatio  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_material` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_material` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids ";
-        const string GetByIdSql = @"SELECT 
+        const string GetViewByIdSql = @"SELECT 
                                         g.`Id`,
                                         g.`SiteId`,
                                         o.GroupName,
@@ -335,6 +335,7 @@ namespace Hymson.MES.Data.Repositories.Process
                                         q.BomName as BomName, 
                                         q.Version as BomVersion, 
                                         g.Batch as Batch, 
+                                        g.PackageNum as PackageNum,
                                         g.Unit as Unit, 
                                         g.SerialNumber,
                                         g.ValidationMaskGroup,
@@ -354,7 +355,7 @@ namespace Hymson.MES.Data.Repositories.Process
                             FROM `proc_material`
                             WHERE Id = Id";
         const string GetByIdsSql = @"SELECT 
-                                        `Id`, `SiteId`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `BomId`, `Batch`, `Unit`, `SerialNumber`, `ValidationMaskGroup`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, ConsumeRatio
+                                        `Id`, `SiteId`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `BomId`, `Batch`, PackageNum, `Unit`, `SerialNumber`, `ValidationMaskGroup`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, ConsumeRatio
                             FROM `proc_material`
                             WHERE Id IN @ids ";
 
@@ -362,7 +363,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 根据物料组ID查询物料
         /// </summary>
         const string GetByGroupIdSql = @"SELECT 
-                                        `Id`, `SiteId`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `BomId`, `Batch`, `Unit`, `SerialNumber`, `ValidationMaskGroup`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`,ConsumeRatio
+                                        `Id`, `SiteId`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `BomId`, `Batch`, PackageNum, `Unit`, `SerialNumber`, `ValidationMaskGroup`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`,ConsumeRatio
                             FROM `proc_material`
                             WHERE IsDeleted = 0 and GroupId IN @groupIds ";
         const string UpdateSameMaterialCodeToNoVersionSql = "UPDATE `proc_material` SET IsDefaultVersion= 0 WHERE MaterialCode= @MaterialCode ";

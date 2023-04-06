@@ -111,7 +111,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<EquFaultPhenomenonEntity>> GetPagedInfoAsync(EquFaultPhenomenonPagedQuery pagedQuery)
+        public async Task<PagedInfo<EquFaultPhenomenonView>> GetPagedInfoAsync(EquFaultPhenomenonPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
@@ -120,7 +120,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
             sqlBuilder.Where("EFP.SiteId = @SiteId");
             sqlBuilder.OrderBy("EFP.UpdatedOn DESC");
 
-            sqlBuilder.Select("EFP.Id, EFP.FaultPhenomenonCode, EFP.FaultPhenomenonName, EFP.EquipmentGroupId, EFP.UseStatus, EFP.CreatedBy, EFP.CreatedOn, EFP.UpdatedBy, EFP.UpdatedOn, EEG.EquipmentGroupName");
+            sqlBuilder.Select("EFP.Id, EFP.FaultPhenomenonCode, EFP.FaultPhenomenonName, EFP.EquipmentGroupId, EFP.UseStatus, EFP.UpdatedBy, EFP.UpdatedOn, EEG.EquipmentGroupName");
             sqlBuilder.LeftJoin("equ_equipment_group EEG ON EFP.EquipmentGroupId = EEG.Id");
 
             if (string.IsNullOrWhiteSpace(pagedQuery.FaultPhenomenonCode) == false)
@@ -152,9 +152,9 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
             sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var entities = await conn.QueryAsync<EquFaultPhenomenonEntity>(templateData.RawSql, templateData.Parameters);
+            var entities = await conn.QueryAsync<EquFaultPhenomenonView>(templateData.RawSql, templateData.Parameters);
             var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
-            return new PagedInfo<EquFaultPhenomenonEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
+            return new PagedInfo<EquFaultPhenomenonView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
     }
 
@@ -163,12 +163,12 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
     /// </summary>
     public partial class EquFaultPhenomenonRepository
     {
-        const string InsertSql = "INSERT INTO `equ_fault_phenomenon`( `Id`, `FaultPhenomenonCode`, `FaultPhenomenonName`, `EquipmentGroupId`, `UseStatus`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteCode`) VALUES (   @Id, @FaultPhenomenonCode, @FaultPhenomenonName, @EquipmentGroupId, @UseStatus, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteCode )  ";
+        const string InsertSql = "INSERT INTO `equ_fault_phenomenon`( `Id`, `FaultPhenomenonCode`, `FaultPhenomenonName`, `EquipmentGroupId`, `UseStatus`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteId`) VALUES (   @Id, @FaultPhenomenonCode, @FaultPhenomenonName, @EquipmentGroupId, @UseStatus, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteId )  ";
         const string UpdateSql = "UPDATE `equ_fault_phenomenon` SET FaultPhenomenonName = @FaultPhenomenonName, EquipmentGroupId = @EquipmentGroupId, UseStatus = @UseStatus, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, Remark = @Remark WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `equ_fault_phenomenon` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids;";
         const string IsExistsSql = "SELECT Id FROM equ_fault_phenomenon WHERE `IsDeleted` = 0 AND FaultPhenomenonCode = @faultPhenomenonCode LIMIT 1";
         const string GetByIdSql = @"SELECT 
-                               `Id`, `FaultPhenomenonCode`, `FaultPhenomenonName`, `EquipmentGroupId`, `UseStatus`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteCode`
+                               `Id`, `FaultPhenomenonCode`, `FaultPhenomenonName`, `EquipmentGroupId`, `UseStatus`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteId`
                             FROM `equ_fault_phenomenon`  WHERE Id = @Id ";
         const string GetViewById = @"SELECT 
                 EFP.Id, EFP.FaultPhenomenonCode, EFP.FaultPhenomenonName, EFP.EquipmentGroupId, EFP.UseStatus, EFP.CreatedBy, EFP.CreatedOn, EFP.UpdatedBy, EFP.UpdatedOn, EEG.EquipmentGroupName

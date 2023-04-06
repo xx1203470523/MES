@@ -64,6 +64,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         /// </summary>
         /// <param name="equFaultPhenomenonPagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquFaultPhenomenonEntity>> GetPagedInfoAsync(EquFaultPhenomenonPagedQuery equFaultPhenomenonPagedQuery);
+        Task<PagedInfo<EquFaultPhenomenonView>> GetPagedInfoAsync(EquFaultPhenomenonPagedQuery equFaultPhenomenonPagedQuery);
     }
 }

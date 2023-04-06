@@ -30,6 +30,13 @@ namespace Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository
         Task<InteWorkCenterEntity> GetByIdAsync(long id);
 
         /// <summary>
+        /// 根据ID获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteWorkCenterEntity>> GetByIdsAsync(long[] ids);
+
+        /// <summary>
         /// 根据编码获取数据
         /// </summary>
         /// <param name="param"></param>
@@ -101,6 +108,15 @@ namespace Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository
         Task<IEnumerable<InteWorkCenterRelationView>> GetInteWorkCenterRelationAsync(long id);
 
         Task<int> InsertInteWorkCenterResourceRelationRangAsync(IEnumerable<InteWorkCenterResourceRelation> param);
+
+
+        /// <summary>
+        /// 根据下级工作中心Id获取上级工作中心
+        /// (只获取一级)
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<InteWorkCenterEntity> GetHigherInteWorkCenterAsync(long id);
 
         /// <summary>
         /// 批量删除

@@ -10,6 +10,7 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -52,10 +53,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("msp.Status=@Status");
             }
+            if (query.Lock.HasValue)
+            {
+                sqlBuilder.Where("msp.Lock=@Lock");
+            }
             if (!string.IsNullOrWhiteSpace(query.Sfc))
             {
                 query.Sfc = $"%{query.Sfc}%";
-                sqlBuilder.Where("msp.Sfc=@Sfc");
+                sqlBuilder.Where("msp.Sfc like @Sfc");
             }
             if (query.SfcArray != null && query.SfcArray.Length > 0)
             {
@@ -65,13 +70,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             if (!string.IsNullOrWhiteSpace(query.OrderCode))
             {
                 query.OrderCode = $"%{query.OrderCode}%";
-                sqlBuilder.Where("pwo.OrderCode=@OrderCode");
+                sqlBuilder.Where("pwo.OrderCode like @OrderCode");
             }
             //工序
             if (!string.IsNullOrWhiteSpace(query.Code))
             {
                 query.Code = $"%{query.Code}%";
-                sqlBuilder.Where("pp.Code=@Code");
+                sqlBuilder.Where("pp.Code like @Code");
             }
             //资源-》资源类型
             if (query.ResourceTypeId.HasValue)
@@ -209,6 +214,29 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeleteRangeSql, new { ids=ids });
         }
+
+        /// <summary>
+        /// 批量删除（物理删除）条码信息
+        /// </summary>
+        /// <param name="sfcs"></param>
+        /// <returns></returns>
+        public async Task<int> DeletePhysicalRangeAsync(string[] sfcs)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeletePhysicalRangeSql, new { Sfcs = sfcs });
+        }
+
+        /// <summary>
+        /// 批量更新条码IsScrap
+        /// </summary>
+        /// <param name="manuSfcInfoEntity"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateIsScrapAsync(UpdateIsScrapCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateIsScrapSql, command);
+        }
+
     }
 
     public partial class ManuSfcProduceRepository
@@ -228,7 +256,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                           `Id`, `Sfc`, `ProductId`, `WorkOrderId`, `BarCodeInfoId`, `ProcessRouteId`, `WorkCenterId`, `ProductBOMId`, `EquipmentId`, `ResourceId`, `ProcedureId`, `Status`, `Lock`, `LockProductionId`, `IsSuspicious`, `RepeatedCount`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `manu_sfc_produce`  WHERE Id IN @ids ";
 
+        const string DeletePhysicalRangeSql = "delete from manu_sfc_produce where SFC in @Sfcs";
         //质量锁定sql
         const string UpdateQualityLockSql = "update  manu_sfc_produce set `Lock`=@Lock,LockProductionId=@LockProductionId,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn where SFC in  @Sfcs";
+        const string UpdateIsScrapSql = "UPDATE `manu_sfc_produce` SET IsScrap = @IsScrap, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE SFC in @Sfcs ";
     }
 }

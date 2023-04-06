@@ -159,7 +159,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 操作类型（报废/取消报废）
         /// </summary>
-        public ScrapOperateTypeEnum OperationType { get; set; }
+       // public ScrapOperateTypeEnum OperationType { get; set; }
 
         /// <summary>
         /// 条码列表
@@ -439,6 +439,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 资源id
         /// </summary>
         public long? ResourceId { get; set; }
+
+        /// <summary>
+        /// 锁定状态
+        /// </summary>
+        public int? Lock { get; set; }
     }
 
     /// <summary>

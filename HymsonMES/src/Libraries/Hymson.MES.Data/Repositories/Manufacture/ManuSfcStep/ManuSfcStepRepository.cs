@@ -112,10 +112,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuSfcStepEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangeAsync(List<ManuSfcStepEntity> manuSfcStepEntitys)
+        public async Task<int> InsertRangeAsync(IEnumerable<ManuSfcStepEntity> manuSfcStepEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertsSql, manuSfcStepEntitys);
+            return await conn.ExecuteAsync(InsertSql, manuSfcStepEntitys);
         }
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuSfcStepEntitys"></param>
         /// <returns></returns>
-        public async Task<int> UpdateRangeAsync(List<ManuSfcStepEntity> manuSfcStepEntitys)
+        public async Task<int> UpdateRangeAsync(IEnumerable<ManuSfcStepEntity> manuSfcStepEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSql, manuSfcStepEntitys);
@@ -160,8 +160,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                             /**select**/
                                            FROM `manu_sfc_step` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `manu_sfc_step`(  `Id`, `SFC`, `ProductId`, `WorkOrdeId`, `WorkCenterId`, `ProductBOMId`, `Qty`, `EquipmentId`, `ResourceId`, `ProcedureId`, `Type`, `Status`, `Lock`, `IsMultiplex`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @SFC, @ProductId, @WorkOrdeId, @WorkCenterId, @ProductBOMId, @Qty, @EquipmentId, @ResourceId, @ProcedureId, @Type, @Status, @Lock, @IsMultiplex, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
-        const string InsertsSql = "INSERT INTO `manu_sfc_step`(  `Id`, `SFC`, `ProductId`, `WorkOrdeId`, `WorkCenterId`, `ProductBOMId`, `Qty`, `EquipmentId`, `ResourceId`, `ProcedureId`, `Type`, `Status`, `Lock`, `IsMultiplex`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @SFC, @ProductId, @WorkOrdeId, @WorkCenterId, @ProductBOMId, @Qty, @EquipmentId, @ResourceId, @ProcedureId, @Type, @Status, @Lock, @IsMultiplex, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
+        const string InsertSql = "INSERT INTO manu_sfc_step(Id, SFC, ProductId, WorkOrdeId, WorkCenterId, ProductBOMId, Qty, EquipmentId, ResourceId, ProcedureId, `Type`, Status, `Lock`, IsMultiplex,Remark,CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted, SiteId) VALUES (   @Id, @SFC, @ProductId, @WorkOrdeId, @WorkCenterId, @ProductBOMId, @Qty, @EquipmentId, @ResourceId, @ProcedureId, @Type, @Status, @Lock, @IsMultiplex,@Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string UpdateSql = "UPDATE `manu_sfc_step` SET   SFC = @SFC, ProductId = @ProductId, WorkOrdeId = @WorkOrdeId, WorkCenterId = @WorkCenterId, ProductBOMId = @ProductBOMId, Qty = @Qty, EquipmentId = @EquipmentId, ResourceId = @ResourceId, ProcedureId = @ProcedureId, Type = @Type, Status = @Status, Lock = @Lock, IsMultiplex = @IsMultiplex, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `manu_sfc_step` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids";
         const string GetByIdSql = @"SELECT 

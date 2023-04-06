@@ -6,6 +6,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
@@ -17,7 +18,6 @@ using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
-using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -90,6 +90,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// </summary>
         private readonly IManuFeedingRecordRepository _manuFeedingRecordRepository;
 
+        /// <summary>
+        ///  仓储（物料台账）
+        /// </summary>
+        private readonly IWhMaterialStandingbookRepository _whMaterialStandingbookRepository;
+
 
 
         /// <summary>
@@ -108,6 +113,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="manuFeedingRepository"></param>
         /// <param name="manuFeedingRecordRepository"></param>
+        /// <param name="whMaterialStandingbookRepository"></param>
         public ManuFeedingService(ICurrentUser currentUser, ICurrentSite currentSite, ISequenceService sequenceService,
             IProcResourceRepository procResourceRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
@@ -118,7 +124,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             IProcMaterialRepository procMaterialRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IManuFeedingRepository manuFeedingRepository,
-            IManuFeedingRecordRepository manuFeedingRecordRepository)
+            IManuFeedingRecordRepository manuFeedingRecordRepository,
+            IWhMaterialStandingbookRepository whMaterialStandingbookRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -132,6 +139,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _manuFeedingRepository = manuFeedingRepository;
             _manuFeedingRecordRepository = manuFeedingRecordRepository;
+            _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
         }
 
 
@@ -304,7 +312,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             //验证DTO
             //await _validationCreateRules.ValidateAndThrowAsync(saveDto);
 
-            var inventory = await _whMaterialInventoryRepository.GetByBarCodeAsync(saveDto.BarCode) ?? throw new CustomerValidationException(nameof(ErrorCode.MES17101)).WithData("barCode", saveDto.BarCode);
+            // 查询条码
+            var inventory = await _whMaterialInventoryRepository.GetByBarCodeAsync(saveDto.BarCode);
+
+            // 查询物料
+            var material = await _procMaterialRepository.GetByIdAsync(saveDto.ProductId) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10204));
 
             // DTO转换实体
             var entity = saveDto.ToEntity<ManuFeedingEntity>();
@@ -320,6 +332,26 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
+                // 添加物料台账记录
+                rows += await _whMaterialStandingbookRepository.InsertAsync(new WhMaterialStandingbookEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = entity.SiteId,
+                    MaterialCode = material.MaterialCode,
+                    MaterialName = material.MaterialName,
+                    MaterialVersion = material.Version ?? "",
+                    MaterialBarCode = saveDto.BarCode,
+                    Batch = inventory.Batch,
+                    Quantity = entity.InitQty,
+                    Unit = material.Unit ?? "",
+                    Type = WhMaterialInventoryTypeEnum.MaterialLoading,
+                    Source = inventory.Source,
+                    CreatedBy = entity.CreatedBy,
+                    CreatedOn = entity.CreatedOn,
+                    UpdatedBy = entity.UpdatedBy,
+                    UpdatedOn = entity.UpdatedOn
+                });
+
                 // 将状态恢复为"使用中"
                 rows += await _whMaterialInventoryRepository.UpdatePointByBarCodeAsync(new UpdateStatusByBarCodeCommand
                 {
@@ -329,6 +361,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                     UpdatedBy = entity.CreatedBy,
                     UpdatedOn = entity.CreatedOn
                 });
+
                 rows += await _manuFeedingRepository.InsertAsync(entity);
                 rows += await _manuFeedingRecordRepository.InsertAsync(GetManuFeedingRecord(entity, FeedingDirectionTypeEnum.Load));
                 trans.Complete();
@@ -346,6 +379,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             var entities = await _manuFeedingRepository.GetByIdsAsync(idsArr);
             if (entities.Any() == false) return 0;
 
+            var feeds = await _manuFeedingRepository.GetByIdsAsync(idsArr);
+
+            // 查询条码
+            var inventorys = await _whMaterialInventoryRepository.GetByBarCodesAsync(feeds.Select(s => s.BarCode).ToArray());
+
+            // 查询物料
+            var materials = await _procMaterialRepository.GetByIdsAsync(feeds.Select(s => s.ProductId).ToArray());
+
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
@@ -354,6 +395,32 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 {
                     entity.UpdatedBy = _currentUser.UserName;
                     entity.UpdatedOn = now;
+
+                    var inventory = inventorys.FirstOrDefault(w => w.MaterialBarCode == entity.BarCode);
+                    if (inventory == null) continue;
+
+                    var material = materials.FirstOrDefault(w => w.Id == entity.ProductId);
+                    if (material == null) continue;
+
+                    // 添加物料台账记录
+                    rows += await _whMaterialStandingbookRepository.InsertAsync(new WhMaterialStandingbookEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = entity.SiteId,
+                        MaterialCode = material.MaterialCode,
+                        MaterialName = material.MaterialName,
+                        MaterialVersion = material.Version ?? "",
+                        MaterialBarCode = entity.BarCode,
+                        Batch = inventory.Batch,
+                        Quantity = entity.InitQty,
+                        Unit = material.Unit ?? "",
+                        Type = WhMaterialInventoryTypeEnum.MaterialReturn,
+                        Source = inventory.Source,
+                        CreatedBy = entity.CreatedBy,
+                        CreatedOn = entity.CreatedOn,
+                        UpdatedBy = entity.UpdatedBy,
+                        UpdatedOn = entity.UpdatedOn
+                    });
 
                     // 将状态恢复为"待使用"
                     rows += await _whMaterialInventoryRepository.UpdatePointByBarCodeAsync(new UpdateStatusByBarCodeCommand
@@ -364,6 +431,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                         UpdatedBy = entity.UpdatedBy,
                         UpdatedOn = entity.UpdatedOn
                     });
+
                     rows += await _manuFeedingRepository.DeleteByIdsAsync(idsArr);
                     rows += await _manuFeedingRecordRepository.InsertAsync(GetManuFeedingRecord(entity, FeedingDirectionTypeEnum.Unload));
                 }

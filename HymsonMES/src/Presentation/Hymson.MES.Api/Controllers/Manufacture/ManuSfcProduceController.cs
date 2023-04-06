@@ -67,9 +67,21 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("scrap")]
-        public async Task SfcScrapAsync(ManuSfScrapDto parm)
+        public async Task QualityScrapAsync(ManuSfScrapDto parm)
         {
-            await _manuSfcProduceService.SfcScrapAsync(parm);
+            await _manuSfcProduceService.QualityScrapAsync(parm);
+        }
+
+        /// <summary>
+        /// 条码取消报废
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("cancelScrap")]
+        public async Task QualityCancelScrapAsync(ManuSfScrapDto parm)
+        {
+            await _manuSfcProduceService.QualityCancelScrapAsync(parm);
         }
 
         /// <summary>
@@ -89,7 +101,6 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("create")]
         public async Task AddManuSfcProduceAsync([FromBody] ManuSfcProduceCreateDto parm)
         {
             await _manuSfcProduceService.CreateManuSfcProduceAsync(parm);
@@ -100,8 +111,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("update")]
+        [HttpPut]
         public async Task UpdateManuSfcProduceAsync([FromBody] ManuSfcProduceModifyDto parm)
         {
             await _manuSfcProduceService.ModifyManuSfcProduceAsync(parm);
@@ -112,8 +122,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("delete")]
+        [HttpDelete]
         public async Task DeleteManuSfcProduceAsync(string ids)
         {
             await _manuSfcProduceService.DeletesManuSfcProduceAsync(ids);

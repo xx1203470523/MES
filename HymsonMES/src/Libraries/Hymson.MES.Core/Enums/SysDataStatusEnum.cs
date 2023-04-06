@@ -2,6 +2,9 @@
 
 namespace Hymson.MES.Core.Enums
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public enum SysDataStatusEnum : sbyte
     {
         /// <summary>

@@ -20,14 +20,14 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="EquFaultReasonCreateDto"></param>
         /// <returns></returns>
-        Task<int> CreateEquFaultReasonAsync(EquFaultReasonCreateDto EquFaultReasonCreateDto);
+        Task<int> CreateEquFaultReasonAsync(EquFaultReasonSaveDto EquFaultReasonCreateDto);
 
         /// <summary>
         /// 修改
         /// </summary>
         /// <param name="EquFaultReasonModifyDto"></param>
         /// <returns></returns>
-        Task ModifyEquFaultReasonAsync(EquFaultReasonModifyDto EquFaultReasonModifyDto);
+        Task ModifyEquFaultReasonAsync(EquFaultReasonSaveDto EquFaultReasonModifyDto);
 
         /// <summary>
         /// 删除

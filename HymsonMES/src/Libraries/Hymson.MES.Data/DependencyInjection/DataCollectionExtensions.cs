@@ -172,6 +172,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuSfcInfoRepository, ManuSfcInfoRepository>();
             services.AddSingleton<IManuSfcProduceRepository, ManuSfcProduceRepository>();
             services.AddSingleton<IManuSfcStepRepository, ManuSfcStepRepository>();
+            services.AddSingleton<IManuFacePlateRepository, ManuFacePlateRepository>();
+            services.AddSingleton<IManuFacePlateProductionRepository, ManuFacePlateProductionRepository>();
+            services.AddSingleton<IManuFacePlateButtonRepository, ManuFacePlateButtonRepository>();
+            services.AddSingleton<IManuFacePlateButtonJobRelationRepository, ManuFacePlateButtonJobRelationRepository>();
             #endregion
 
             #region Warehouse 
@@ -187,10 +191,21 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region PlanWorkOrder
             services.AddSingleton<IPlanWorkOrderRepository, PlanWorkOrderRepository>();
+            services.AddSingleton<IPlanWorkOrderStatusRecordRepository, PlanWorkOrderStatusRecordRepository>();
             #endregion
 
             #region PlanSfcReceive
             services.AddSingleton<IPlanSfcReceiveRepository, PlanSfcReceiveRepository>();
+            #endregion
+
+            #region PlanWorkOrderActivation
+            services.AddSingleton<IPlanWorkOrderActivationRepository, PlanWorkOrderActivationRepository>();
+            services.AddSingleton<IPlanWorkOrderActivationRecordRepository, PlanWorkOrderActivationRecordRepository>();
+            #endregion
+
+            #region PlanSfcPrint
+            services.AddSingleton<IPlanSfcPrintRepository, PlanSfcPrintRepository>();
+
             #endregion
             #endregion
 

@@ -154,6 +154,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuSfcInfoService, ManuSfcInfoService>();
             services.AddSingleton<IManuGenerateBarcodeService, ManuGenerateBarcodeService>();
             services.AddSingleton<IManuProductBadRecordService, ManuProductBadRecordService>();
+            services.AddSingleton<IManuFacePlateService, ManuFacePlateService>();
+            services.AddSingleton<IManuFacePlateButtonService, ManuFacePlateButtonService>();
             #endregion
 
             #region Warehouse 
@@ -199,9 +201,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             #region Equipment
             services.AddSingleton<AbstractValidator<EquEquipmentUnitSaveDto>, EquipmentUnitCreateValidator>();
-
-            services.AddSingleton<AbstractValidator<EquFaultReasonCreateDto>, EquFaultReasonCreateValidator>();
-            services.AddSingleton<AbstractValidator<EquFaultReasonModifyDto>, EquFaultReasonModifyValidator>();
+            services.AddSingleton<AbstractValidator<EquFaultReasonSaveDto>, EquFaultReasonCreateValidator>();
             #endregion
 
             #region Process
@@ -296,6 +296,12 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<AbstractValidator<ManuProductBadRecordCreateDto>, ManuProductBadRecordCreateValidator>();
             services.AddSingleton<AbstractValidator<ManuProductBadRecordModifyDto>, ManuProductBadRecordModifyValidator>();
+
+            services.AddSingleton<AbstractValidator<ManuFacePlateCreateDto>, ManuFacePlateCreateValidator>();
+            services.AddSingleton<AbstractValidator<ManuFacePlateModifyDto>, ManuFacePlateModifyValidator>();
+
+            services.AddSingleton<AbstractValidator<ManuFacePlateButtonCreateDto>, ManuFacePlateButtonCreateValidator>();
+            services.AddSingleton<AbstractValidator<ManuFacePlateButtonModifyDto>, ManuFacePlateButtonModifyValidator>();
             #endregion
 
             #region Warehouse 

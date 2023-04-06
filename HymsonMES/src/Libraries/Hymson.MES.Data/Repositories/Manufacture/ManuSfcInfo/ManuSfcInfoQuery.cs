@@ -6,6 +6,7 @@
  *build datetime: 2023-03-21 04:00:29
  */
 
+using Hymson.MES.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,5 +20,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public class ManuSfcInfoQuery
     {
+        /// <summary>
+        /// 条码列表
+        /// </summary>
+        public string[] Sfcs { get; set; }
+
+        /// <summary>
+        /// 条码状态
+        /// </summary>
+        public SfcStatusEnum? Status { get; set; }
     }
 }

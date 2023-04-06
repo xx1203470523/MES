@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Equipment
 {
@@ -31,7 +32,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// 描述 :使用状态 0-禁用 1-启用 
         /// 空值 : false  
         /// </summary>
-        public int UseStatus { get; set; }
+        public SysDataStatusEnum UseStatus { get; set; }
 
         /// <summary>
         /// 描述 :设备故障先 

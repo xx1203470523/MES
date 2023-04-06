@@ -106,6 +106,6 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 是否报废
         /// </summary>
-        public bool? IsScrap { get; set; }
+        public TrueOrFalseEnum? IsScrap { get; set; }
     }
 }

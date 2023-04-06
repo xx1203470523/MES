@@ -179,6 +179,7 @@
         public const string MES12110 = "工作中心状态不能为空.";
         public const string MES12111 = "工作中心修改的数据不存在.";
         public const string MES12112 = "工作中心已经关联数据,允许修改.";
+        public const string MES12113 = "启用状态或保留状态不可删除.";
         #endregion
 
         #region 编码规则 12400
@@ -212,6 +213,7 @@
         public const string MES12500 = "容器维护错误";
         public const string MES12501 = "最大数量不能小于最小数量{Minimum}";
         public const string MES12502 = "最大数量不能小于最小数量";
+        public const string MES12503 = "同一物料/物料组只允许设置一次";
         #endregion
 
         #region 故障原因 13000
@@ -286,8 +288,12 @@
         #endregion
 
         #region 质量录入 15400
-        public const string MES15400 = "将来锁定工序必填";
-        public const string MES15401 = "产品条码不能为空";
+        public const string MES15400 = "产品条码不能为空";
+        public const string MES15401 = "存在已报废的条码,不可再次报废!";
+        public const string MES15402= "条码不是在制品,不可再执行当前操作!";
+        public const string MES15403 = "条码{sfcs}状态不是报废,不可再执行当前操作!";
+        public const string MES15404 = "工单{orders}不是激活状态,不可再执行当前操作!";
+        public const string MES15405 = "不合格缺陷信息不能为空!";
         #endregion
 
         #region 工单  16000
@@ -305,6 +311,7 @@
         public const string MES16011 = "修改生产工单状态失败：有工单不为生产中,不允许完工";
         public const string MES16012 = "修改生产工单状态失败：有工单不为完工,不允许关闭";
         public const string MES16013 = "工单状态不为未开始,不允许删除";
+        public const string MES16014 = "有工单不存在";
 
         public const string MES16020 = "工单号 不能为空！";
         public const string MES16021 = "物料编码 不能为空！";
@@ -360,16 +367,28 @@
         public const string MES16304 = "获取首工序失败。";
         #endregion
 
-        #region 生产通用 MES16400
-        public const string MES16400 = "下达条码失败。";
-        public const string MES16401 = "产品{product}未维护编码规则,无法下达条码。";
-        public const string MES16402 = "产品{product}批次大写为0,无法下达条码。";
-        #endregion
-
         #region 生产
         public const string MES17101 = "物料条码:{barCode}不存在！";
         #endregion
 
+        #region 工单激活 MES16400
+        public const string MES16400 = "工单激活错误";
+        public const string MES16401 = "查询工单激活必须选择线体！";
+        public const string MES16402 = "当前选择的线体不存在！";
+        public const string MES16403 = "当前选择的不是线体！";
+        public const string MES16404 = "当前工单已不存在！";
+        public const string MES16405 = "工单[{orderCode}]状态为未开始，不允许激活！";
+        public const string MES16406 = "工单[{orderCode}]已经是激活状态，无需再次激活！";
+        public const string MES16407 = "工单[{orderCode}]不是激活状态，无需取消激活！";
+        public const string MES16408 = "工单[{orderCode}]已被锁定，不允许激活！";
+        public const string MES16409 = "当前线体不允许混线，请先取消激活工单[{orderCode}]！";
+        #endregion
+
+        #region 条码下达 MES16500
+        public const string MES16500 = "下达条码失败。";
+        public const string MES16501 = "产品{product}未维护编码规则,无法下达条码。";
+        public const string MES16502 = "产品{product}批次大写为0,无法下达条码。";
+        #endregion
         #endregion
 
         #region 系统执行出错 业务逻辑出错

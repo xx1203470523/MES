@@ -57,11 +57,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
             var inteCodeRulesEntity = await _inteCodeRulesRepository.GetInteCodeRulesByProductIdAsync(planWorkOrderEntity.ProductId);
             if (inteCodeRulesEntity == null)
             {
-                throw new BusinessException(nameof(ErrorCode.MES16401)).WithData("product", procMaterialEntity.MaterialCode);
+                throw new BusinessException(nameof(ErrorCode.MES16501)).WithData("product", procMaterialEntity.MaterialCode);
             }
             if (procMaterialEntity.Batch == 0)
             {
-                throw new BusinessException(nameof(ErrorCode.MES16402)).WithData("product", procMaterialEntity.MaterialCode);
+                throw new BusinessException(nameof(ErrorCode.MES16502)).WithData("product", procMaterialEntity.MaterialCode);
             }
             var discuss = (int)Math.Ceiling(param.Qty / procMaterialEntity.Batch);
             var barcodeList = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new GenerateBarcodeDto
@@ -119,7 +119,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                     ProcedureId = processRouteFirstProcedure.ProcedureId,
                     Status = SfcProduceStatusEnum.lineUp,
                     RepeatedCount = 0,
-                    IsScrap = false,
+                    IsScrap = TrueOrFalseEnum.No,
                     CreatedBy = _currentUser.UserName,
                     UpdatedBy = _currentUser.UserName
                 });

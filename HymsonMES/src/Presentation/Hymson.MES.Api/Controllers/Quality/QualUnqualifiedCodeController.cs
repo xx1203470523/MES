@@ -67,13 +67,13 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <summary>
         /// 根据不合格代码组id查询不合格代码列表
         /// </summary>
-        /// <param name="groupId"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
         [Route("listByGroupId/{id}")]
         [HttpGet]
-        public async Task<IEnumerable<QualUnqualifiedCodeDto>> GetListByGroupIdAsync(long groupId)
+        public async Task<IEnumerable<QualUnqualifiedCodeDto>> GetListByGroupIdAsync(long id)
         {
-            return await _qualUnqualifiedCodeService.GetListByGroupIdAsync(groupId);
+            return await _qualUnqualifiedCodeService.GetListByGroupIdAsync(id);
         }
 
         /// <summary>

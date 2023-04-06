@@ -102,6 +102,11 @@ namespace Hymson.MES.Core.Domain.Process
         public int Batch { get; set; }
         
         /// <summary>
+        /// 标包数量
+        /// </summary>
+        public int PackageNum { get; set; }
+
+        /// <summary>
         /// 描述 :计量单位(字典定义) 
         /// 空值 : true  
         /// </summary>

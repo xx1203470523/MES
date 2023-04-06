@@ -7,11 +7,7 @@
  */
 
 using Hymson.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Services.Dtos.Warehouse
 {
@@ -63,12 +59,12 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 流转类型;物料接收/物料退料/物料加载
         /// </summary>
-        public int Type { get; set; }
+        public WhMaterialInventoryTypeEnum Type { get; set; }
 
         /// <summary>
         /// 来源/目标;手动录入/WMS/上料点编号
         /// </summary>
-        public int Source { get; set; }
+        public WhMaterialInventorySourceEnum Source { get; set; }
 
         /// <summary>
         /// 创建人
@@ -152,12 +148,12 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 流转类型;物料接收/物料退料/物料加载
         /// </summary>
-        public int Type { get; set; }
+        public WhMaterialInventoryTypeEnum Type { get; set; }
 
         /// <summary>
         /// 来源/目标;手动录入/WMS/上料点编号
         /// </summary>
-        public int Source { get; set; }
+        public WhMaterialInventorySourceEnum Source { get; set; }
 
         /// <summary>
         /// 创建人
@@ -240,12 +236,12 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 流转类型;物料接收/物料退料/物料加载
         /// </summary>
-        public int Type { get; set; }
+        public WhMaterialInventoryTypeEnum Type { get; set; }
 
         /// <summary>
         /// 来源/目标;手动录入/WMS/上料点编号
         /// </summary>
-        public int Source { get; set; }
+        public WhMaterialInventorySourceEnum Source { get; set; }
 
         /// <summary>
         /// 创建人

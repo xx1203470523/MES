@@ -88,6 +88,17 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         }
 
         /// <summary>
+        /// 根据ID获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteWorkCenterEntity>> GetByIdsAsync(long[] ids)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<InteWorkCenterEntity>(GetByIdsSql, new { ids });
+        }
+
+        /// <summary>
         /// 根据编码获取数据
         /// </summary>
         /// <param name="param"></param>
@@ -197,6 +208,19 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<InteWorkCenterRelationView>(GetInteWorkCenterRelationSqlTemplate, new { Id = id });
         }
+
+        /// <summary>
+        /// 根据下级工作中心Id获取上级工作中心
+        /// (只获取一级)
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<InteWorkCenterEntity> GetHigherInteWorkCenterAsync(long id)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<InteWorkCenterEntity>(GetHigherInteWorkCenterSql, new { Id = id });
+        }
+
         #endregion
 
         #region 关联资源
@@ -248,6 +272,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         const string UpdateRangSql = "UPDATE `inte_work_center` SET Name=@Name,Type=@Type,Source=@Source,Status=@Status,IsMixLine=@IsMixLine,Remark=@Remark,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id = @Id AND IsDeleted = @IsDeleted ";
         const string DeleteRangSql = "UPDATE `inte_work_center` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id in @ids AND IsDeleted=0";
         const string GetByIdSql = @"SELECT Id,SiteId,Code,Name,Type,Source,Status,IsMixLine,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted FROM `inte_work_center`  WHERE Id = @Id AND IsDeleted=0  ";
+        const string GetByIdsSql = @"SELECT * FROM inte_work_center WHERE IsDeleted = 0 AND Id IN @ids ";
         const string GetByCodeSql = @"SELECT Id,SiteId,Code,Name,Type,Source,Status,IsMixLine,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted FROM `inte_work_center`  WHERE Code = @Code  AND SiteId=@Site AND IsDeleted=0 ";
         const string GetByResourceId = "SELECT IWC.* FROM inte_work_center_resource_relation IWCRR LEFT JOIN inte_work_center IWC ON IWCRR.WorkCenterId = IWC.Id WHERE IWC.IsDeleted = 0 AND IWCRR.ResourceId = @resourceId";
 
@@ -263,5 +288,9 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
                                                                     FROM  inte_work_center_resource_relation IWRR 
                                                                      LEFT JOIN proc_resource PR ON IWRR.ResourceId=PR.Id AND PR.IsDeleted=0 
                                                                    WHERE IWRR.IsDeleted=0 AND  IWRR.WorkCenterId=@Id";
+        const string GetHigherInteWorkCenterSql = @"select wc.*
+                                                From  inte_work_center_relation  wcr 
+                                                left join inte_work_center wc on wc.Id=wcr.WorkCenterId
+                                                Where wcr.SubWorkCenterId = @Id ";
     }
 }

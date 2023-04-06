@@ -140,8 +140,7 @@ namespace Hymson.MES.Services.Mapper
             #endregion
 
             #region EquFaultReason
-            CreateMap<EquFaultReasonCreateDto, EquFaultReasonEntity>();
-            CreateMap<EquFaultReasonModifyDto, EquFaultReasonEntity>();
+            CreateMap<EquFaultReasonSaveDto, EquFaultReasonEntity>();
             CreateMap<EquFaultReasonPagedQueryDto, EquFaultReasonPagedQuery>();
             CreateMap<EquFaultReasonEntity, EquFaultReasonDto>();
             CreateMap<EquFaultReasonEntity, CustomEquFaultReasonDto>();
@@ -387,6 +386,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<WhMaterialInventoryEntity, WhMaterialInventoryDto>();
             CreateMap<WhMaterialInventoryPageListView, WhMaterialInventoryPageListViewDto>();
             #endregion
+
             #region WhMaterialStandingbook
             CreateMap<WhMaterialStandingbookCreateDto, WhMaterialStandingbookEntity>();
             CreateMap<WhMaterialStandingbookModifyDto, WhMaterialStandingbookEntity>();
@@ -448,6 +448,8 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<PlanWorkOrderEntity, PlanWorkOrderDto>();
             CreateMap<PlanWorkOrderEntity, PlanWorkOrderDetailViewDto>();
             CreateMap<PlanWorkOrderListDetailView, PlanWorkOrderListDetailViewDto>();
+
+            CreateMap<PlanWorkOrderEntity, PlanWorkOrderStatusRecordEntity>();
             #endregion
 
             #region PlanSfcReceive
@@ -457,7 +459,19 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<PlanSfcReceiveView, PlanSfcReceiveDto>();
             #endregion
 
-
+            #region WorkOrderActivation
+            CreateMap<PlanWorkOrderActivationCreateDto, PlanWorkOrderActivationEntity>();
+            CreateMap<PlanWorkOrderActivationModifyDto, PlanWorkOrderActivationEntity>();
+            CreateMap<PlanWorkOrderActivationPagedQueryDto, PlanWorkOrderActivationPagedQuery>();
+            CreateMap<PlanWorkOrderActivationEntity, PlanWorkOrderActivationDto>();
+            CreateMap<PlanWorkOrderActivationListDetailView, PlanWorkOrderActivationListDetailViewDto>();
+            #endregion
+            #region PlanSfcPrint
+            CreateMap<PlanSfcPrintCreateDto, PlanSfcPrintView>();
+            CreateMap<PlanSfcPrintModifyDto, PlanSfcPrintView>();
+            CreateMap<PlanSfcPrintPagedQueryDto, PlanSfcPrintPagedQuery>();
+            CreateMap<PlanSfcPrintView, PlanSfcPrintDto>();
+            #endregion
 
         }
 
