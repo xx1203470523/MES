@@ -162,7 +162,6 @@ namespace Hymson.MES.Services.Dtos.Quality
         public long[]? UnqualifiedGroupIds { get; set; }
     }
 
-
     /// <summary>
     /// 不合格代码更新Dto
     /// @author wangkeming
@@ -247,5 +246,10 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 等级
         /// </summary>
         public QualUnqualifiedCodeDegreeEnum? Degree { get; set; }
+    }
+
+    public class QualUnqualifiedCodeQueryDto
+    {
+        public long[] Ids { get; set; }
     }
 }

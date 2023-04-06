@@ -56,6 +56,18 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <summary>
         /// 查询详情
         /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("listByIds")]
+        public async Task<IEnumerable<QualUnqualifiedCodeDto>> GetListByIdsAsync([FromQuery] QualUnqualifiedCodeQueryDto queryDto)
+        {
+            return await _qualUnqualifiedCodeService.GetListByIdsAsync(queryDto.Ids);
+        }
+
+        /// <summary>
+        /// 查询详情
+        /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}/unqualifiedGroupList")]
