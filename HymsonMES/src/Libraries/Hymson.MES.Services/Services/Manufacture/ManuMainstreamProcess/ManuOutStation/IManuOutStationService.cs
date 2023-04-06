@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation
+﻿namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation
 {
-    internal class IManuOutStationService
-    {
+    /// <summary>
+    /// 出站
+    /// </summary>
+    public interface IManuOutStationService
+    { 
+    
     }
 }
