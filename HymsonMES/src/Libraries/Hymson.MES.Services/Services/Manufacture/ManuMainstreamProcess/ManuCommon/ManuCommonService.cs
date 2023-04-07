@@ -206,35 +206,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             return procProcedureEntity;
         }
 
-        /// <summary>
-        /// 检查是否测试工序
-        /// </summary>
-        /// <param name="procedure"></param>
-        /// <returns></returns>
-        public async Task IsTestProcedure(string procedure)
-        {
-            await Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// 检查前工序是否可选工序
-        /// </summary>
-        /// <param name="procedure"></param>
-        /// <returns></returns>
-        public async Task IsChoosableProcedure(string procedure)
-        {
-            await Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// 检验该节点是否有挂在其他作业
-        /// </summary>
-        /// <param name="procedure"></param>
-        /// <returns></returns>
-        public async Task IsMountOtherProcedure(string procedure)
-        {
-            await Task.CompletedTask;
-        }
 
     }
 }

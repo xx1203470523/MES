@@ -7,11 +7,7 @@
  */
 
 using Hymson.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Hymson.MES.Core.Enums.Process;
 
 namespace Hymson.MES.Services.Dtos.Process
 {
@@ -163,7 +159,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 抽检类型
         /// </summary>
-        public int CheckType { get; set; }
+        public ProcessRouteInspectTypeEnum CheckType { get; set; }
 
         /// <summary>
         /// 抽检比例

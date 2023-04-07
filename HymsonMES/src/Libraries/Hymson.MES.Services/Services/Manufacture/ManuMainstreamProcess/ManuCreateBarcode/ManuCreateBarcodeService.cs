@@ -114,7 +114,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                     BarCodeInfoId = manuSfcEntity.Id,
                     ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
                     WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
-                    BOMId = planWorkOrderEntity.ProductBOMId,
+                    ProductBOMId = planWorkOrderEntity.ProductBOMId,
                     Qty = qty,
                     ProcedureId = processRouteFirstProcedure.ProcedureId,
                     Status = SfcProduceStatusEnum.lineUp,
