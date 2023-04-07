@@ -131,7 +131,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                     SFC = item,
                     ProductId = planWorkOrderEntity.ProductId,
                     WorkOrderId = planWorkOrderEntity.Id,
-                    ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
                     ProductBOMId = planWorkOrderEntity.ProductBOMId,
                     WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
                     Qty = qty,
