@@ -116,7 +116,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             // 产品编码是否和工序对应
             if (sfcProduceEntity.ProcedureId != procedureId) throw new BusinessException(nameof(ErrorCode.MES16308));
 
-            // 产品编码是否在当前活动工序
+            // 当前工序是否是活动状态
             if (sfcProduceEntity.Status != SfcProduceStatusEnum.Activity) throw new BusinessException(nameof(ErrorCode.MES16309));
 
             return sfcProduceEntity;
@@ -213,6 +213,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             return procProcedureEntity;
         }
 
+     
 
     }
 }

@@ -18,4 +18,20 @@
         /// </summary>
         public string SFC { get; set; }
     }
+
+    /// <summary>
+    /// 扣料Dto
+    /// </summary>
+    public class MaterialDeductDto
+    {
+        /// <summary>
+        /// 物料ID
+        /// </summary>
+        public long MaterialId { get; set; }
+        /// <summary>
+        /// 数量（扣减）
+        /// </summary>
+        public decimal Qty { get; set; }
+
+    }
 }

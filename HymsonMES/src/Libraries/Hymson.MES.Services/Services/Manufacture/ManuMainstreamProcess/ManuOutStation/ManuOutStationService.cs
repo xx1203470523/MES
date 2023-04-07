@@ -1,9 +1,12 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
@@ -46,6 +49,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// </summary>
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
+        /// <summary>
+        /// 仓储接口（BOM明细）
+        /// </summary>
+        private readonly IProcBomDetailRepository _procBomDetailRepository;
+
+        /// <summary>
+        /// 仓储接口（物料维护）
+        /// </summary>
+        private readonly IProcMaterialRepository _procMaterialRepository;
 
 
         /// <summary>
@@ -57,11 +69,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// <param name="manuSfcStepRepository"></param>
         /// <param name="manuSfcInfoRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="procBomDetailRepository"></param>
+        /// <param name="procMaterialRepository"></param>
         public ManuOutStationService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonService manuCommonService,
             IManuSfcStepRepository manuSfcStepRepository,
             IManuSfcInfoRepository manuSfcInfoRepository,
-            IManuSfcProduceRepository manuSfcProduceRepository)
+            IManuSfcProduceRepository manuSfcProduceRepository,
+            IProcBomDetailRepository procBomDetailRepository,
+            IProcMaterialRepository procMaterialRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -69,6 +85,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
+            _procBomDetailRepository = procBomDetailRepository;
+            _procMaterialRepository = procMaterialRepository;
         }
 
 
@@ -119,6 +137,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
 
             // TODO 是否合格的校验？？
             var result = true;
+
+            // TODO 扣料？？？
 
             if (result)
             {
@@ -175,6 +195,53 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             }
         }
 
+        /// <summary>
+        /// 扣料
+        /// </summary>
+        /// <param name="productBOMId"></param>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        public async Task DeductAsync(long productBOMId, long procedureId)
+        {
+            // 获取条码对应的工序BOM
+            var bomMaterials = await _procBomDetailRepository.GetByBomIdAsync(productBOMId);
+
+            // 未设置BOM
+            if (bomMaterials == null || bomMaterials.Any() == false) throw new BusinessException(nameof(ErrorCode.MES10612));
+
+            // 取得特定工序的BOM
+            var deductList = new List<MaterialDeductDto> { };
+            bomMaterials = bomMaterials.Where(w => w.ProcedureId == procedureId);
+
+            // 统计扣料数据
+            MaterialDeductDto deduct = new();
+            foreach (var item in bomMaterials)
+            {
+                // 扣减数量
+                deduct.MaterialId = item.MaterialId;
+                deduct.Qty = item.Usages * item.Loss;
+
+                // TODO 1.确认收集方式是否批次 item.ReferencePoint
+                if (item.ReferencePoint != "TODO 是批次")
+                {
+                    var materialEntity = await _procMaterialRepository.GetByIdAsync(item.MaterialId);
+                    if (materialEntity == null) continue;
+
+                    // 2.确认主物料的收集方式
+                    if (materialEntity.SerialNumber != MaterialSerialNumberEnum.Batch) continue;
+
+                    // 如有设置消耗系数
+                    if (materialEntity.ConsumeRatio.HasValue == true) deduct.Qty *= materialEntity.ConsumeRatio.Value;
+                }
+
+                // 添加到待扣料集合
+                deductList.Add(deduct);
+            }
+
+            // TODO 扣料
+
+
+        }
 
     }
 }

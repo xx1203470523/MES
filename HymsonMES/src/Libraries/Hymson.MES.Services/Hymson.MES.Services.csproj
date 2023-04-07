@@ -16,6 +16,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Dtos\Manufacture\ManuMainstreamProcessDto\ManuOutStation\**" />
+    <Compile Remove="Services\Manufacture\ManuMainstreamProcess\Consume\**" />
+    <Compile Remove="Services\Manufacture\ManuMainstreamProcess\Package\**" />
+    <EmbeddedResource Remove="Dtos\Manufacture\ManuMainstreamProcessDto\ManuOutStation\**" />
+    <EmbeddedResource Remove="Services\Manufacture\ManuMainstreamProcess\Consume\**" />
+    <EmbeddedResource Remove="Services\Manufacture\ManuMainstreamProcess\Package\**" />
+    <None Remove="Dtos\Manufacture\ManuMainstreamProcessDto\ManuOutStation\**" />
+    <None Remove="Services\Manufacture\ManuMainstreamProcess\Consume\**" />
+    <None Remove="Services\Manufacture\ManuMainstreamProcess\Package\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FluentValidation" Version="11.5.1" />
     <PackageReference Include="Hymson.Authentication.JwtBearer" Version="1.9.7" />
     <PackageReference Include="Hymson.Kafka.Debezium" Version="1.9.7" />
@@ -28,12 +40,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Hymson.MES.Data\Hymson.MES.Data.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Dtos\Manufacture\ManuMainstreamProcessDto\ManuOutStation\" />
-    <Folder Include="Services\Manufacture\ManuMainstreamProcess\Consume\" />
-    <Folder Include="Services\Manufacture\ManuMainstreamProcess\Package\" />
   </ItemGroup>
 
 </Project>
