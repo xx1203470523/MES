@@ -4,7 +4,7 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuOutStation;
+using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
 using Hymson.Utils;
@@ -75,42 +75,35 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// <summary>
         /// 出站
         /// </summary>
-        /// <param name="outDto"></param>
-        public async Task ExecuteAsync(SFCOutStationDto outDto)
+        /// <param name="dto"></param>
+        public async Task ExecuteAsync(SFCOutStationDto dto)
         {
             // 获取生产条码信息（附带条码合法性校验）
-            var sfcEntity = await _manuCommonService.GetProduceSPCWithCheckAsync(outDto.SFC);
+            var sfcProduceEntity = await _manuCommonService.GetProduceSPCWithCheckAsync(dto.SFC);
 
             // 获取生产工单
-            var workOrderEntity = await _manuCommonService.GetProduceWorkOrderByIdAsync(sfcEntity.WorkOrderId);
-
-            // 检查是否测试工序
-
-            // 检查前工序是否可选工序
-
-            // 检验该节点是否有挂在其他作业
-
+            var workOrderEntity = await _manuCommonService.GetProduceWorkOrderByIdAsync(sfcProduceEntity.WorkOrderId);
 
             // 更新时间
-            sfcEntity.UpdatedBy = _currentUser.UserName;
-            sfcEntity.UpdatedOn = HymsonClock.Now();
+            sfcProduceEntity.UpdatedBy = _currentUser.UserName;
+            sfcProduceEntity.UpdatedOn = HymsonClock.Now();
 
             // 初始化步骤
             var sfcStep = new ManuSfcStepEntity
             {
                 SiteId = _currentSite.SiteId ?? 0,
-                SFC = sfcEntity.SFC,
-                ProductId = sfcEntity.ProductId,
-                WorkOrderId = sfcEntity.WorkOrderId,
-                WorkCenterId = sfcEntity.WorkCenterId,
-                ProductBOMId = sfcEntity.BOMId,
-                Qty = sfcEntity.Qty,
-                EquipmentId = sfcEntity.EquipmentId,
-                ResourceId = sfcEntity.ResourceId,
-                CreatedBy = sfcEntity.UpdatedBy,
-                CreatedOn = sfcEntity.UpdatedOn.Value,
-                UpdatedBy = sfcEntity.UpdatedBy,
-                UpdatedOn = sfcEntity.UpdatedOn.Value,
+                SFC = sfcProduceEntity.SFC,
+                ProductId = sfcProduceEntity.ProductId,
+                WorkOrderId = sfcProduceEntity.WorkOrderId,
+                WorkCenterId = sfcProduceEntity.WorkCenterId,
+                ProductBOMId = sfcProduceEntity.ProductBOMId,
+                Qty = sfcProduceEntity.Qty,
+                EquipmentId = sfcProduceEntity.EquipmentId,
+                ResourceId = sfcProduceEntity.ResourceId,
+                CreatedBy = sfcProduceEntity.UpdatedBy,
+                CreatedOn = sfcProduceEntity.UpdatedOn.Value,
+                UpdatedBy = sfcProduceEntity.UpdatedBy,
+                UpdatedOn = sfcProduceEntity.UpdatedOn.Value,
             };
 
 
@@ -119,17 +112,17 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
 
             if (result)
             {
-                var sfcInfo = await _manuSfcInfoRepository.GetBySPCAsync(sfcEntity.SFC);
+                var sfcInfo = await _manuSfcInfoRepository.GetBySPCAsync(sfcProduceEntity.SFC);
 
                 // 合格品出站
                 // 获取下一个工序（如果没有了，就表示完工）
-                var nextProcedure = await _manuCommonService.GetNextProcedureAsync(workOrderEntity.ProcessRouteId, sfcEntity.ProcedureId);
+                var nextProcedure = await _manuCommonService.GetNextProcedureAsync(workOrderEntity.ProcessRouteId, sfcProduceEntity.ProcedureId);
                 if (nextProcedure == null)
                 {
                     // 完工
 
                     // 删除 manu_sfc_produce
-                    await _manuSfcProduceRepository.DeletePhysicalAsync(sfcEntity.SFC);
+                    await _manuSfcProduceRepository.DeletePhysicalAsync(sfcProduceEntity.SFC);
 
                     // TODO 删除 manu_sfc_produce_business
 
@@ -147,9 +140,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                     // 未完工
 
                     // 修改 manu_sfc_produce 为排队, 工序修改为下一工序的id
-                    sfcEntity.Status = SfcProduceStatusEnum.lineUp;
-                    sfcEntity.ProcedureId = nextProcedure.Id;
-                    await _manuSfcProduceRepository.UpdateAsync(sfcEntity);
+                    sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
+                    sfcProduceEntity.ProcedureId = nextProcedure.Id;
+                    await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
 
                     // 插入 manu_sfc_step 状态为 进站
                     sfcStep.Type = ManuSfcStepTypeEnum.InStock;
@@ -165,21 +158,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 await _manuSfcStepRepository.InsertAsync(sfcStep);
 
                 // RepeatedCount+1， IsSuspicious改为 true, Status修改为 活动
-                sfcEntity.RepeatedCount += 1;
-                sfcEntity.IsSuspicious = true;
-                sfcEntity.Status = SfcProduceStatusEnum.Activity;
-                await _manuSfcProduceRepository.UpdateAsync(sfcEntity);
+                sfcProduceEntity.RepeatedCount += 1;
+                sfcProduceEntity.IsSuspicious = true;
+                sfcProduceEntity.Status = SfcProduceStatusEnum.Activity;
+                await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
             }
         }
 
-
-        //  开始
-
-        // 质检
-
-        // 自动过站逻辑
-
-        // 状态更改
 
     }
 }

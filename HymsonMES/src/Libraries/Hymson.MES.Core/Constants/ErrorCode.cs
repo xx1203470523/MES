@@ -350,6 +350,9 @@
         public const string MES16110 = "扫描条码失败";
         public const string MES16111 = "条码:{SFC}已使用，不允许删除";
         public const string MES16112 = "扫描SN与关联工单号不符，请重新扫描！";
+        public const string MES16113 = "请配置当前工单产品的编码规则！";
+        public const string MES16114 = "扫描SN与工单产品编码规则不符！基数为:{Base}位";
+        public const string MES16115 = "扫描SN与工单产品编码规则不符！需包含{ValuesType}值:{SegmentedValue}";
 
         #endregion
 

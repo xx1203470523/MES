@@ -62,6 +62,11 @@ namespace Hymson.MES.Services.Dtos.Plan
         public string RelevanceOrderCode { get; set; }
 
         /// <summary>
+        /// 是否在用
+        /// </summary>
+        public long IsUsed { get; set; }
+
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }

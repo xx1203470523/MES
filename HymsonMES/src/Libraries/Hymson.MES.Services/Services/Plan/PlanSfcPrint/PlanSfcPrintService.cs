@@ -113,7 +113,7 @@ namespace Hymson.MES.Services.Services.Plan
         {
 
             var sfcList = await _planSfcInfoRepository.GetByIdsAsync(idsArr);
-            if (sfcList.Any())
+            if (sfcList.Where(it => it.IsUsed > 0).Any())
             {
                 var msgSfcs = string.Join(",", sfcList.Where(it => it.IsUsed > 0).Select(it => it.SFC).ToArray());
                 throw new BusinessException(nameof(ErrorCode.MES16111)).WithData("SFC", msgSfcs);

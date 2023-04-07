@@ -3,14 +3,15 @@
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation
 {
     /// <summary>
-    /// 出站
+    /// 开始
     /// </summary>
-    public interface IManuOutStationService
+    public interface IManuStartupService
     {
         /// <summary>
-        /// 出站
+        /// 开始
         /// </summary>
         /// <param name="dto"></param>
-        Task ExecuteAsync(SFCOutStationDto dto);
+        /// <returns></returns>
+        Task ExecuteAsync(SFCWorkDto dto);
     }
 }

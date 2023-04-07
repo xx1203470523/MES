@@ -14,6 +14,9 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         public string ReplaceMaterialId { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public long BomDetailId { get; set; }
 
         /// <summary>
