@@ -4,7 +4,7 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuOutStation;
+using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
 using Hymson.Utils;
@@ -75,11 +75,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// <summary>
         /// 出站
         /// </summary>
-        /// <param name="outDto"></param>
-        public async Task ExecuteAsync(SFCOutStationDto outDto)
+        /// <param name="dto"></param>
+        public async Task ExecuteAsync(SFCOutStationDto dto)
         {
             // 获取生产条码信息（附带条码合法性校验）
-            var sfcProduceEntity = await _manuCommonService.GetProduceSPCWithCheckAsync(outDto.SFC);
+            var sfcProduceEntity = await _manuCommonService.GetProduceSPCWithCheckAsync(dto.SFC);
 
             // 获取生产工单
             var workOrderEntity = await _manuCommonService.GetProduceWorkOrderByIdAsync(sfcProduceEntity.WorkOrderId);

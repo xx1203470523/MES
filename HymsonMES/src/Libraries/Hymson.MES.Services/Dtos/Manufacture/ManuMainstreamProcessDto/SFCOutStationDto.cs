@@ -1,4 +1,4 @@
-﻿namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuOutStation
+﻿namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto
 {
     /// <summary>
     /// 

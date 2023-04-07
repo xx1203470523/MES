@@ -4,7 +4,7 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuOutStation;
+using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
 using Hymson.Utils;
@@ -89,11 +89,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// <summary>
         /// 开始
         /// </summary>
-        /// <param name="outDto"></param>
-        public async Task ExecuteAsync(SFCOutStationDto outDto)
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task ExecuteAsync(SFCWorkDto dto)
         {
             // 获取生产条码信息（附带条码合法性校验）
-            var sfcProduceEntity = await _manuCommonService.GetProduceSPCWithCheckAsync(outDto.SFC);
+            var sfcProduceEntity = await _manuCommonService.GetProduceSPCWithCheckAsync(dto.SFC);
 
             // 获取生产工单（附带工单状态校验）
             var workOrderEntity = await _manuCommonService.GetProduceWorkOrderByIdAsync(sfcProduceEntity.WorkOrderId);
@@ -121,7 +122,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 // 是否在当前工序排队
                 // TODO
             }
-
+            
             // TODO 检验该节点是否有挂在其他作业
 
             // 更改状态，将条码由"排队"改为"活动"

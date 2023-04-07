@@ -3,12 +3,12 @@
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation
 {
     /// <summary>
-    /// 开始
+    /// 中止
     /// </summary>
-    public interface IManuStartupService
+    public interface IManuStopService
     {
         /// <summary>
-        /// 开始
+        /// 中止
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>

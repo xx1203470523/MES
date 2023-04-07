@@ -31,6 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Dtos\Manufacture\ManuMainstreamProcessDto\ManuOutStation\" />
     <Folder Include="Services\Manufacture\ManuMainstreamProcess\Consume\" />
     <Folder Include="Services\Manufacture\ManuMainstreamProcess\Package\" />
   </ItemGroup>
