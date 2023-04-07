@@ -22,9 +22,7 @@ using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using System.Collections.Generic;
 //using Hymson.Utils.Extensions;
-using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Plan
 {
@@ -127,7 +125,7 @@ namespace Hymson.MES.Services.Services.Plan
                 manuSfcInfoCreate.WorkOrderId = planSfcInfoCreateDto.WorkOrderId;
                 manuSfcInfoCreate.ProductId = planSfcInfo.ProductId;
                 manuSfcInfoCreate.Qty = 1;// workOrderInfo.Qty;
-                manuSfcInfoCreate.Status = (int)SfcStatusEnum.InProcess;
+                manuSfcInfoCreate.Status = SfcStatusEnum.InProcess;
                 manuSfcInfoCreate.IsUsed = 0;
                 manuSfcInfoCreate.RelevanceWorkOrderId = planSfcInfo.WorkOrderId;
                 manuSfcInfoCreate.SiteId = _currentSite.SiteId ?? 0;
@@ -140,7 +138,7 @@ namespace Hymson.MES.Services.Services.Plan
 
                 //修改
                 manuSfcInfoUpdate = planSfcInfo;
-                manuSfcInfoUpdate.Status = (int)SfcStatusEnum.Received;
+                manuSfcInfoUpdate.Status = SfcStatusEnum.Received;
                 manuSfcInfoUpdate.UpdatedBy = _currentUser.UserName;
                 manuSfcInfoUpdate.UpdatedOn = HymsonClock.Now();
                 #endregion
@@ -158,7 +156,7 @@ namespace Hymson.MES.Services.Services.Plan
                 manuSfcInfoCreate.WorkOrderId = planSfcInfoCreateDto.WorkOrderId;
                 manuSfcInfoCreate.ProductId = workOrderInfo.ProductId;
                 manuSfcInfoCreate.Qty = 1;// workOrderInfo.Qty;
-                manuSfcInfoCreate.Status = (int)SfcStatusEnum.InProcess;
+                manuSfcInfoCreate.Status = SfcStatusEnum.InProcess;
                 manuSfcInfoCreate.IsUsed = 0;
                 manuSfcInfoCreate.RelevanceWorkOrderId = 0;
                 manuSfcInfoCreate.SiteId = _currentSite.SiteId ?? 0;
@@ -206,7 +204,6 @@ namespace Hymson.MES.Services.Services.Plan
         /// <returns></returns>
         public async Task<int> DeletesPlanSfcInfoAsync(long[] idsArr)
         {
-
             var sfcList = await _planSfcInfoRepository.GetByIdsAsync(idsArr);
             if (sfcList.Any())
             {

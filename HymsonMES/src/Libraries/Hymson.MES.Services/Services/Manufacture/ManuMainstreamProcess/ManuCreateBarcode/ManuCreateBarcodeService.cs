@@ -69,7 +69,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                 CodeRuleId = inteCodeRulesEntity.Id,
                 Count = discuss
             });
-            var processRouteFirstProcedure = await _manuCommonService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId ?? 0);
+            var processRouteFirstProcedure = await _manuCommonService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
             List<ManuSfcEntity> manuSfcList = new List<ManuSfcEntity>();
             List<ManuSfcInfo1Entity> manuSfcInfoList = new List<ManuSfcInfo1Entity>();
             List<ManuSfcProduceEntity> manuSfcProduceList = new List<ManuSfcProduceEntity>();
@@ -112,7 +112,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                     ProductId = planWorkOrderEntity.ProductId,
                     WorkOrderId = planWorkOrderEntity.Id,
                     BarCodeInfoId = manuSfcEntity.Id,
-                    ProcessRouteId = planWorkOrderEntity.ProcessRouteId ?? 0,
+                    ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
                     WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
                     BOMId = planWorkOrderEntity.ProductBOMId,
                     Qty = qty,
@@ -131,6 +131,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                     SFC = item,
                     ProductId = planWorkOrderEntity.ProductId,
                     WorkOrderId = planWorkOrderEntity.Id,
+                    ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
                     ProductBOMId = planWorkOrderEntity.ProductBOMId,
                     WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
                     Qty = qty,

@@ -48,7 +48,7 @@ namespace Hymson.MES.Core.Domain.Plan
        /// <summary>
         /// 工艺路线
         /// </summary>
-        public long? ProcessRouteId { get; set; }
+        public long ProcessRouteId { get; set; }
 
        /// <summary>
         /// 产品bom

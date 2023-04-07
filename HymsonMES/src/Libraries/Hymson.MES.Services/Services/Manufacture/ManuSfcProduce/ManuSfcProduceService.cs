@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 条码生产信息（物理删除）    服务 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-03-18 05:37:27
- */
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -407,7 +400,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES15402));
             }
 
-            var noScrapSfcs = manuSfcs.Where(x => x.IsScrap == TrueOrFalseEnum.No).Select(x=>x.SFC).ToArray();
+            var noScrapSfcs = manuSfcs.Where(x => x.IsScrap == TrueOrFalseEnum.No).Select(x => x.SFC).ToArray();
             if (noScrapSfcs.Any())
             {
                 var strs = string.Join("','", noScrapSfcs);

@@ -63,6 +63,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 根据SPC获取数据
+        /// </summary>
+        /// <param name="spc"></param>
+        /// <returns></returns>
+        public async Task<ManuSfcInfoEntity> GetBySPCAsync(string spc)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(GetBySPC, new { spc });
+        }
+
+        /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
         /// <param name="ids"></param>
@@ -205,5 +216,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SFC`, `WorkOrderId`, `RelevanceWorkOrderId`, `ProductId`, `Qty`, `Status`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`
                             FROM `manu_sfc_info`  WHERE Id IN @ids ";
+        const string GetBySPC = @"SELECT * FROM manu_sfc_info WHERE SFC = @spc ";
     }
 }
