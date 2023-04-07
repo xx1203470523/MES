@@ -73,7 +73,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
 
 
         /// <summary>
-        /// 执行
+        /// 出站
         /// </summary>
         /// <param name="outDto"></param>
         public async Task ExecuteAsync(SFCOutStationDto outDto)
@@ -83,6 +83,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
 
             // 获取生产工单
             var workOrderEntity = await _manuCommonService.GetProduceWorkOrderByIdAsync(sfcEntity.WorkOrderId);
+
+            // 检查是否测试工序
+
+            // 检查前工序是否可选工序
+
+            // 检验该节点是否有挂在其他作业
+
 
             // 更新时间
             sfcEntity.UpdatedBy = _currentUser.UserName;
@@ -115,7 +122,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 var sfcInfo = await _manuSfcInfoRepository.GetBySPCAsync(sfcEntity.SFC);
 
                 // 合格品出站
-                // 判断是否最后工序（完工）
+                // 获取下一个工序（如果没有了，就表示完工）
                 var nextProcedure = await _manuCommonService.GetNextProcedureAsync(workOrderEntity.ProcessRouteId, sfcEntity.ProcedureId);
                 if (nextProcedure == null)
                 {
@@ -165,6 +172,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             }
         }
 
+
+        //  开始
+
+        // 质检
+
+        // 自动过站逻辑
 
         // 状态更改
 
