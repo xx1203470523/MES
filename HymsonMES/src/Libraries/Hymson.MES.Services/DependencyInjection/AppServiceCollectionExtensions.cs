@@ -157,6 +157,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuProductBadRecordService, ManuProductBadRecordService>();
             services.AddSingleton<IManuFacePlateService, ManuFacePlateService>();
             services.AddSingleton<IManuFacePlateButtonService, ManuFacePlateButtonService>();
+
+            services.AddSingleton<IInProductDismantleService, InProductDismantleService>();
             #endregion
 
             #region Warehouse 
