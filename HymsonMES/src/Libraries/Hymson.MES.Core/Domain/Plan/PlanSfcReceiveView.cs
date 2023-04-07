@@ -58,5 +58,12 @@ namespace Hymson.MES.Core.Domain.Plan
         /// </summary>
         public string RelevanceOrderCode { get; set; }
 
+        /// <summary>
+        /// 是否在用
+        /// </summary>
+        public long IsUsed { get; set; }
+
+
+
     }
 }

@@ -6,6 +6,7 @@
  *build datetime: 2023-03-18 05:40:43
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Manufacture
 {
@@ -50,7 +51,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 状态;1：在制；2：完成；3：已入库；4：报废；
         /// </summary>
-        public int? Status { get; set; }
+        public SfcStatusEnum Status { get; set; }
 
         /// <summary>
         /// 是否在用
