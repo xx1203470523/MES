@@ -273,7 +273,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             #region  组装数据
 
             //获取条码列表
-            var sfcs = new string[]{ badReJudgmentDto.Sfc };
+            var sfcs = new string[] { badReJudgmentDto.Sfc };
             var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = sfcs };
             var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
             if (!manuSfcs.Any())
@@ -396,13 +396,13 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ProductId = sfc.ProductId,
                 WorkOrderId = sfc.WorkOrderId,
                 WorkCenterId = sfc.WorkCenterId,
-                BOMId = sfc.BOMId,
+                ProductBOMId = sfc.ProductBOMId,
                 Qty = sfc.Qty,
                 EquipmentId = sfc.EquipmentId,
                 ResourceId = sfc.ResourceId,
                 ProcedureId = sfc.ProcedureId,
-                Operatetype = type,
-                CurrentStatus = sfc.Status,
+                Type = type,
+                Status = sfc.Status,
                 Lock = sfc.Lock,
                 Remark = remark,
                 SiteId = _currentSite.SiteId ?? 0,

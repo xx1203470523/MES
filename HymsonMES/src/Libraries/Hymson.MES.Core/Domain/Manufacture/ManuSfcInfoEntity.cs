@@ -51,7 +51,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 状态;1：在制；2：完成；3：已入库；4：报废；
         /// </summary>
-        public SfcStatusEnum Status { get; set; }
+        public SfcStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 是否在用

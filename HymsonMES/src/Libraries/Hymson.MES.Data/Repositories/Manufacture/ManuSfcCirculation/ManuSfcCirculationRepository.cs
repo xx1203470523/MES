@@ -37,7 +37,18 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<ManuSfcCirculationEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ManuSfcCirculationEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ManuSfcCirculationEntity>(GetByIdSql, new { Id = id });
+        }
+
+        /// <summary>
+        /// 根据SFC获取数据
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        public async Task<ManuSfcCirculationEntity> GetBySFCAsync(string sfc)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<ManuSfcCirculationEntity>(GetBySFCSql, new { sfc });
         }
 
         /// <summary>
@@ -45,10 +56,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcCirculationEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ManuSfcCirculationEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ManuSfcCirculationEntity>(GetByIdsSql, new { ids = ids});
+            return await conn.QueryAsync<ManuSfcCirculationEntity>(GetByIdsSql, new { ids = ids });
         }
 
         /// <summary>
@@ -68,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
-           
+
             var offSet = (manuSfcCirculationPagedQuery.PageIndex - 1) * manuSfcCirculationPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = manuSfcCirculationPagedQuery.PageSize });
@@ -128,8 +139,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSql, manuSfcCirculationEntity);
         }
-		
-		/// <summary>
+
+        /// <summary>
         /// 批量更新
         /// </summary>
         /// <param name="manuSfcCirculationEntitys"></param>
@@ -145,10 +156,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeleteRangeAsync(DeleteCommand command) 
+        public async Task<int> DeleteRangeAsync(DeleteCommand command)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql,command);
+            return await conn.ExecuteAsync(DeleteSql, command);
         }
     }
 
@@ -167,6 +178,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `EquipmentId`, `FeedingPointId`, `SFC`, `WorkOrderId`, `ProductId`, `CirculationBarCode`, `CirculationWorkOrderId`, `CirculationProductId`, `Type`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_sfc_circulation`  WHERE Id = @Id ";
+        const string GetBySFCSql = @"SELECT * FROM manu_sfc_circulation WHERE IsDeleted = 0 AND SFC = @sfc ";
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `EquipmentId`, `FeedingPointId`, `SFC`, `WorkOrderId`, `ProductId`, `CirculationBarCode`, `CirculationWorkOrderId`, `CirculationProductId`, `Type`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_sfc_circulation`  WHERE Id IN @ids ";

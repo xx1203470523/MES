@@ -17,17 +17,13 @@ using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using System.Collections.Generic;
-using System.Text;
 //using Hymson.Utils.Extensions;
-using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Plan
 {
@@ -250,7 +246,6 @@ namespace Hymson.MES.Services.Services.Plan
         /// <returns></returns>
         public async Task<int> DeletesPlanSfcInfoAsync(long[] idsArr)
         {
-
             var sfcList = await _planSfcInfoRepository.GetByIdsAsync(idsArr);
             if (sfcList.Where(it => it.IsUsed > 0).Any())
             {

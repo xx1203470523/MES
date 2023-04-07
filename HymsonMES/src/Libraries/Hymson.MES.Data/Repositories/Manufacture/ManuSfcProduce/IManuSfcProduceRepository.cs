@@ -45,6 +45,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<IEnumerable<ManuSfcProduceEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
+        /// 根据SPC获取数据
+        /// </summary>
+        /// <param name="spc"></param>
+        /// <returns></returns>
+        Task<ManuSfcProduceEntity> GetBySPCAsync(string spc);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="manuSfcProduceQuery"></param>
@@ -92,6 +99,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<int> DeleteRangeAsync(long[] ids);
+
+        /// <summary>
+        /// 删除（物理删除）条码信息
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        Task<int> DeletePhysicalAsync(string sfc);
 
         /// <summary>
         /// 批量删除（物理删除）条码信息
