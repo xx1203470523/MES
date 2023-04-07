@@ -73,13 +73,23 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
 
 
         /// <summary>
-        /// 出站
+        /// 执行（完成）
         /// </summary>
         /// <param name="dto"></param>
-        public async Task ExecuteAsync(SFCOutStationDto dto)
+        public async Task CompleteAsync(SFCWorkDto dto)
         {
-            // 获取生产条码信息（附带条码合法性校验）
-            var sfcProduceEntity = await _manuCommonService.GetProduceSPCWithCheckAsync(dto.SFC);
+            await Task.CompletedTask;
+        }
+
+
+        /// <summary>
+        /// 执行（出站）
+        /// </summary>
+        /// <param name="dto"></param>
+        public async Task ExecuteAsync(SFCWorkDto dto)
+        {
+            // 获取生产条码信息（附带条码合法性校验 + 工序活动状态校验）
+            var sfcProduceEntity = await _manuCommonService.GetProduceSPCWithCheckAsync(dto.SFC, dto.ProcedureId);
 
             // 获取生产工单
             var workOrderEntity = await _manuCommonService.GetProduceWorkOrderByIdAsync(sfcProduceEntity.WorkOrderId);

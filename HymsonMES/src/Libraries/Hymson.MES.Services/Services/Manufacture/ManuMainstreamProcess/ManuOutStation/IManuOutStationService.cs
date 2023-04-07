@@ -8,9 +8,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStat
     public interface IManuOutStationService
     {
         /// <summary>
-        /// 出站
+        /// 执行（出站）
         /// </summary>
         /// <param name="dto"></param>
-        Task ExecuteAsync(SFCOutStationDto dto);
+        Task ExecuteAsync(SFCWorkDto dto);
     }
 }

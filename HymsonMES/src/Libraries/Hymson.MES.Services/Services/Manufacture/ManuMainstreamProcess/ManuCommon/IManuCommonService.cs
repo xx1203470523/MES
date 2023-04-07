@@ -14,8 +14,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// 条码合法性校验
         /// </summary>
         /// <param name="spc"></param>
+        /// <param name="procedureId"></param>
         /// <returns></returns>
-        Task<ManuSfcProduceEntity> GetProduceSPCWithCheckAsync(string spc);
+        Task<ManuSfcProduceEntity> GetProduceSPCWithCheckAsync(string spc, long procedureId);
 
         /// <summary>
         /// 获取生产工单

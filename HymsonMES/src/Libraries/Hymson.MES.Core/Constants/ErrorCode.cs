@@ -375,6 +375,8 @@
         public const string MES16305 = "条码格式不合法。";
         public const string MES16306 = "条码不存在。";
         public const string MES16307 = "SFC状态不合法，不允许操作。";
+        public const string MES16308 = "SFC不在当前工序排队，请检查。";
+        public const string MES16309 = "SFC状态非活动，请先置于活动。";
         #endregion
 
         #region 生产
