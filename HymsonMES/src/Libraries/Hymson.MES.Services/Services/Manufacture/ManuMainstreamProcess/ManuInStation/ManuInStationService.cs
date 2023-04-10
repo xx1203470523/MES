@@ -1,5 +1,7 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -104,8 +106,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
             // 检查是否测试工序
             if (procedureEntity.Type == ProcedureTypeEnum.Test)
             {
-                // 是否，超过复投次数，标识为NG
-                // TODO
+                // 超过复投次数，标识为NG
+                if (sfcProduceEntity.RepeatedCount > procedureEntity.Cycle) throw new BusinessException(nameof(ErrorCode.MES16036));
+                sfcProduceEntity.RepeatedCount++;
             }
 
             // 获取工艺路线里面的工序扩展信息

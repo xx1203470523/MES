@@ -333,6 +333,7 @@
 
         public const string MES16034 = "超生产比例 不能小于0！";
         public const string MES16035 = "SFC对应工单状态为非生产中状态，不可执行操作！";
+        public const string MES16036 = "SFC超过最大复投次数，不允许生产！";
         #endregion
 
         #region 条码接收 16100
