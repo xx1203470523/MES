@@ -43,6 +43,7 @@ using Hymson.MES.Services.Validators.Process;
 using Hymson.MES.Services.Validators.Quality;
 using Hymson.MES.Services.Validators.Warehouse;
 using Microsoft.Extensions.Configuration;
+using static Hymson.MES.Services.Validators.Manufacture.ManuFacePlateProductionValidator;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -302,6 +303,9 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<AbstractValidator<ManuFacePlateButtonCreateDto>, ManuFacePlateButtonCreateValidator>();
             services.AddSingleton<AbstractValidator<ManuFacePlateButtonModifyDto>, ManuFacePlateButtonModifyValidator>();
+
+            services.AddSingleton<AbstractValidator<ManuFacePlateProductionCreateDto>, ManuFacePlateProductionCreateValidator>();
+            services.AddSingleton<AbstractValidator<ManuFacePlateProductionModifyDto>, ManuFacePlateProductionModifyValidator>();
             #endregion
 
             #region Warehouse 

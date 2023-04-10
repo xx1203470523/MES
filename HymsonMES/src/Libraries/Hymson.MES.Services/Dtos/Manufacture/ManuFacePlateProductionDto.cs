@@ -34,8 +34,16 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 资源id
         /// </summary>
         public long ResourceId { get; set; }
+        /// <summary>
+        /// 资源编码
+        /// </summary>
+        public string ResourceCode { get; set; }
+        /// <summary>
+        /// 资源名称
+        /// </summary>
+        public string ResourceName { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否修改资源
         /// </summary>
         public bool IsResourceEdit { get; set; }
@@ -45,7 +53,16 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public string ProcedureId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string ProcedureCode { get; set; }
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string ProcedureName { get; set; }
+
+        /// <summary>
         /// 是否修改工序
         /// </summary>
         public bool IsProcedureEdit { get; set; }
@@ -89,8 +106,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 是否显示合格数量
         /// </summary>
         public bool IsShowQualifiedQty { get; set; }
-
-       /// <summary>
+        /// <summary>
+        /// 显示合格颜色
+        /// </summary>
+        public bool IsShowQualifiedColour { get; set; }
+        /// <summary>
         /// 合格颜色
         /// </summary>
         public string QualifiedColour { get; set; }
@@ -100,7 +120,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public bool IsShowUnqualifiedQty { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 显示不合格颜色
+        /// </summary>
+        public bool IsShowUnqualifiedColour { get; set; }
+        /// <summary>
         /// 报警颜色
         /// </summary>
         public string UnqualifiedColour { get; set; }
@@ -154,30 +178,30 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
-        /// 面板Id
-        /// </summary>
-        public long FacePlateId { get; set; }
+       ///// <summary>
+       // /// 面板Id
+       // /// </summary>
+       // public long? FacePlateId { get; set; }
 
        /// <summary>
         /// 资源id
         /// </summary>
-        public long ResourceId { get; set; }
+        public long? ResourceId { get; set; }
 
        /// <summary>
         /// 是否修改资源
         /// </summary>
-        public bool IsResourceEdit { get; set; }
+        public bool? IsResourceEdit { get; set; }
 
        /// <summary>
         /// 工序id
         /// </summary>
-        public string ProcedureId { get; set; }
+        public string? ProcedureId { get; set; }
 
        /// <summary>
         /// 是否修改工序
         /// </summary>
-        public bool IsProcedureEdit { get; set; }
+        public bool? IsProcedureEdit { get; set; }
 
        /// <summary>
         /// 是否有成功提示音
@@ -187,12 +211,12 @@ namespace Hymson.MES.Services.Dtos.Manufacture
        /// <summary>
         /// 成功提示音地址
         /// </summary>
-        public string SuccessBeepUrl { get; set; }
+        public string? SuccessBeepUrl { get; set; }
 
        /// <summary>
         /// 成功提示音时间（ms）
         /// </summary>
-        public decimal SuccessBeepTime { get; set; }
+        public decimal? SuccessBeepTime { get; set; }
 
        /// <summary>
         /// 是否有错误提示音
@@ -202,7 +226,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
        /// <summary>
         /// 错误提示音地址
         /// </summary>
-        public string ErrorBeepUrl { get; set; }
+        public string? ErrorBeepUrl { get; set; }
 
        /// <summary>
         /// 错误提示音时间（ms）
@@ -212,57 +236,57 @@ namespace Hymson.MES.Services.Dtos.Manufacture
        /// <summary>
         /// 是否绑定工单
         /// </summary>
-        public bool IsShowBindWorkOrder { get; set; }
+        public bool? IsShowBindWorkOrder { get; set; }
 
        /// <summary>
         /// 是否显示合格数量
         /// </summary>
-        public bool IsShowQualifiedQty { get; set; }
+        public bool? IsShowQualifiedQty { get; set; }
 
        /// <summary>
         /// 合格颜色
         /// </summary>
-        public string QualifiedColour { get; set; }
+        public string? QualifiedColour { get; set; }
 
        /// <summary>
         /// 是否显示不合格数量
         /// </summary>
-        public bool IsShowUnqualifiedQty { get; set; }
+        public bool? IsShowUnqualifiedQty { get; set; }
 
        /// <summary>
         /// 报警颜色
         /// </summary>
-        public string UnqualifiedColour { get; set; }
+        public string? UnqualifiedColour { get; set; }
 
        /// <summary>
         /// 是否显示日志
         /// </summary>
-        public bool IsShowLog { get; set; }
+        public bool? IsShowLog { get; set; }
 
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
+       ///// <summary>
+       // /// 创建人
+       // /// </summary>
+       // public string CreatedBy { get; set; }
 
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
+       ///// <summary>
+       // /// 创建时间
+       // /// </summary>
+       // public DateTime CreatedOn { get; set; }
 
-       /// <summary>
-        /// 更新人
-        /// </summary>
-        public string UpdatedBy { get; set; }
+       ///// <summary>
+       // /// 更新人
+       // /// </summary>
+       // public string UpdatedBy { get; set; }
 
-       /// <summary>
-        /// 更新时间
-        /// </summary>
-        public DateTime UpdatedOn { get; set; }
+       ///// <summary>
+       // /// 更新时间
+       // /// </summary>
+       // public DateTime UpdatedOn { get; set; }
 
-       /// <summary>
-        /// 删除标识
-        /// </summary>
-        public long IsDeleted { get; set; }
+       ///// <summary>
+       // /// 删除标识
+       // /// </summary>
+       // public long IsDeleted { get; set; }
 
        
     }
@@ -290,22 +314,22 @@ namespace Hymson.MES.Services.Dtos.Manufacture
        /// <summary>
         /// 资源id
         /// </summary>
-        public long ResourceId { get; set; }
+        public long? ResourceId { get; set; }
 
        /// <summary>
         /// 是否修改资源
         /// </summary>
-        public bool IsResourceEdit { get; set; }
+        public bool? IsResourceEdit { get; set; }
 
        /// <summary>
         /// 工序id
         /// </summary>
-        public string ProcedureId { get; set; }
+        public string? ProcedureId { get; set; }
 
        /// <summary>
         /// 是否修改工序
         /// </summary>
-        public bool IsProcedureEdit { get; set; }
+        public bool? IsProcedureEdit { get; set; }
 
        /// <summary>
         /// 是否有成功提示音
@@ -315,9 +339,9 @@ namespace Hymson.MES.Services.Dtos.Manufacture
        /// <summary>
         /// 成功提示音地址
         /// </summary>
-        public string SuccessBeepUrl { get; set; }
+        public string? SuccessBeepUrl { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 成功提示音时间（ms）
         /// </summary>
         public decimal SuccessBeepTime { get; set; }
@@ -330,7 +354,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
        /// <summary>
         /// 错误提示音地址
         /// </summary>
-        public string ErrorBeepUrl { get; set; }
+        public string? ErrorBeepUrl { get; set; }
 
        /// <summary>
         /// 错误提示音时间（ms）
@@ -340,60 +364,57 @@ namespace Hymson.MES.Services.Dtos.Manufacture
        /// <summary>
         /// 是否绑定工单
         /// </summary>
-        public bool IsShowBindWorkOrder { get; set; }
+        public bool? IsShowBindWorkOrder { get; set; }
 
        /// <summary>
         /// 是否显示合格数量
         /// </summary>
-        public bool IsShowQualifiedQty { get; set; }
+        public bool? IsShowQualifiedQty { get; set; }
 
        /// <summary>
         /// 合格颜色
         /// </summary>
-        public string QualifiedColour { get; set; }
+        public string? QualifiedColour { get; set; }
 
        /// <summary>
         /// 是否显示不合格数量
         /// </summary>
-        public bool IsShowUnqualifiedQty { get; set; }
+        public bool? IsShowUnqualifiedQty { get; set; }
 
        /// <summary>
         /// 报警颜色
         /// </summary>
-        public string UnqualifiedColour { get; set; }
+        public string? UnqualifiedColour { get; set; }
 
        /// <summary>
         /// 是否显示日志
         /// </summary>
-        public bool IsShowLog { get; set; }
+        public bool? IsShowLog { get; set; }
 
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
+       ///// <summary>
+       // /// 创建人
+       // /// </summary>
+       // public string CreatedBy { get; set; }
 
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
+       ///// <summary>
+       // /// 创建时间
+       // /// </summary>
+       // public DateTime CreatedOn { get; set; }
 
-       /// <summary>
-        /// 更新人
-        /// </summary>
-        public string UpdatedBy { get; set; }
+       ///// <summary>
+       // /// 更新人
+       // /// </summary>
+       // public string UpdatedBy { get; set; }
 
-       /// <summary>
-        /// 更新时间
-        /// </summary>
-        public DateTime UpdatedOn { get; set; }
+       ///// <summary>
+       // /// 更新时间
+       // /// </summary>
+       // public DateTime UpdatedOn { get; set; }
 
-       /// <summary>
-        /// 删除标识
-        /// </summary>
-        public long IsDeleted { get; set; }
-
-       
-
+       ///// <summary>
+       // /// 删除标识
+       // /// </summary>
+       // public long IsDeleted { get; set; }
     }
 
     /// <summary>

@@ -8,6 +8,7 @@
 
 using Dapper;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -82,13 +83,31 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.Select("*");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
+            sqlBuilder.Select("Id,Code, Name, Type, Status, ConversationTime, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-           
+            if (manuFacePlatePagedQuery.Type.HasValue)
+            {
+                sqlBuilder.Where("Type = @Type");
+            }
+
+            if (manuFacePlatePagedQuery.Status.HasValue)
+            {
+                sqlBuilder.Where("Status = @Status");
+            }
+
+            if (string.IsNullOrWhiteSpace(manuFacePlatePagedQuery.Code) == false)
+            {
+                manuFacePlatePagedQuery.Code = $"%{manuFacePlatePagedQuery.Code}%";
+                sqlBuilder.Where("Code LIKE @Code");
+            }
+
+            if (string.IsNullOrWhiteSpace(manuFacePlatePagedQuery.Name) == false)
+            {
+                manuFacePlatePagedQuery.Name = $"%{manuFacePlatePagedQuery.Name}%";
+                sqlBuilder.Where("Name LIKE @Name");
+            }
+
             var offSet = (manuFacePlatePagedQuery.PageIndex - 1) * manuFacePlatePagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = manuFacePlatePagedQuery.PageSize });
@@ -187,6 +206,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `Code`, `Name`, `Type`, `Status`, `ConversationTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `manu_face_plate`  WHERE Id IN @Ids ";
+
+        const string GetDetailByIdSql = @" SELECT t1.`Id`,t1.`Code`,t1.`Name`,t1.`Type`,t1.`Status`,t1.ConversationTime,t2.FacePlateId,t2.ResourceId,t2.IsResourceEdit,t2.ProcedureId,t2.IsProcedureEdit,t2.IsSuccessBeep,t2.SuccessBeepUrl,t2.SuccessBeepTime,
+                        t2.IsErrorBeep,t2.ErrorBeepUrl,t2.ErrorBeepTime,t2.IsShowBindWorkOrder,t2.IsShowQualifiedQty,t2.QualifiedColour,t2.IsShowUnqualifiedQty,t2.UnqualifiedColour,t2.IsShowLog FROM manu_face_plate t1 LEFT JOIN manu_face_plate_production t2 on t1.Id=t2.FacePlateId and t2.IsDeleted=0
+                        where t1.IsDeleted=0 and t1.Id=  @Id ";
         #endregion
     }
 }
