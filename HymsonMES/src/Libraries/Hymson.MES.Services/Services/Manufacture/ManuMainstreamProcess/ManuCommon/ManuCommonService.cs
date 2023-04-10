@@ -199,10 +199,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             {
                 ProcessRouteId = processRouteId,
                 ProcedureId = procedureId
-            }) ?? throw new BusinessException(nameof(ErrorCode.MES10440));
+            });
+            if (processRouteDetailLink == null || processRouteDetailLink.Any() == false) throw new BusinessException(nameof(ErrorCode.MES10440));
+
+            // TODO 根据规则取下一工序
+            var routeDetail = processRouteDetailLink.FirstOrDefault();
+            if (routeDetail == null) throw new BusinessException(nameof(ErrorCode.MES10440));
 
             // 获取下一工序
-            var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(processRouteDetailLink.ProcessRouteDetailId);
+            var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(routeDetail.ProcessRouteDetailId);
             if (procProcedureEntity == null)
             {
                 return null;

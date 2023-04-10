@@ -20,7 +20,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<ProcProcessRouteDetailLinkEntity> GetProcessRouteDetailLinkAsync(ProcProcessRouteDetailLinkQuery query);
+        Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetProcessRouteDetailLinkAsync(ProcProcessRouteDetailLinkQuery query);
 
         /// <summary>
         /// 根据IDs批量获取数据

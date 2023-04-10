@@ -42,7 +42,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where("msp.SiteId = @SiteId");
             sqlBuilder.OrderBy("msp.UpdatedOn DESC");
 
-            sqlBuilder.Select("msp.Id,msp.Lock,msp.Sfc,msp.LockProductionId,msp.Status,pwo.OrderCode,pp.Code,pp.Name,pm.MaterialCode,pm.MaterialName,pm.Version ");
+            sqlBuilder.Select("msp.ProductBOMId,msp.Id,msp.Lock,msp.Sfc,msp.LockProductionId,msp.Status,pwo.OrderCode,pp.Code,pp.Name,pm.MaterialCode,pm.MaterialName,pm.Version ");
 
             sqlBuilder.LeftJoin("proc_material pm  on msp.ProductId =pm.Id  and pm.IsDeleted=0");
             sqlBuilder.LeftJoin("plan_work_order pwo on msp.WorkOrderId =pwo.Id  and pwo.IsDeleted=0");

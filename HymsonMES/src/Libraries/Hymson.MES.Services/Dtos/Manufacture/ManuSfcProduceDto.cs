@@ -472,6 +472,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long? LockProductionId { get; set; }
 
         /// <summary>
+        /// BOMId
+        /// </summary>
+        public long? ProductBOMId { get; set; }
+
+        /// <summary>
         /// 状态;1：排队；2：活动；
         /// </summary>
         public int Status { get; set; }

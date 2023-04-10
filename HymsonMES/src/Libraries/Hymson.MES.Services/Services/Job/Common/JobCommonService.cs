@@ -1,6 +1,7 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Services.Dtos.Common;
 
 namespace Hymson.MES.Services.Services.Job.Common
 {
@@ -42,12 +43,12 @@ namespace Hymson.MES.Services.Services.Job.Common
         /// <summary>
         /// 读取挂载的作业并执行
         /// </summary>
-        /// <param name="facePlateButtonId"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task ExecuteJobAsync(long facePlateButtonId)
+        public async Task ExecuteJobAsync(JobDto dto)
         {
             // 根据面板ID和按钮ID找出绑定的作业job
-            var buttonJobs = await _manuFacePlateButtonJobRelationRepository.GetByFacePlateButtonIdAsync(facePlateButtonId);
+            var buttonJobs = await _manuFacePlateButtonJobRelationRepository.GetByFacePlateButtonIdAsync(dto.FacePlateButtonId);
             if (buttonJobs.Any() == false) return;
 
 

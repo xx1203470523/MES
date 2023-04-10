@@ -43,10 +43,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<ProcProcessRouteDetailLinkEntity> GetProcessRouteDetailLinkAsync(ProcProcessRouteDetailLinkQuery query)
+        public async Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetProcessRouteDetailLinkAsync(ProcProcessRouteDetailLinkQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcProcessRouteDetailLinkEntity>(GetProcedureIDsSql, query);
+            return await conn.QueryAsync<ProcProcessRouteDetailLinkEntity>(GetProcedureIDsSql, query);
         }
 
         /// <summary>
