@@ -13,7 +13,7 @@ using Hymson.Utils;
 namespace Hymson.MES.Services.Services.Job.Manufacture
 {
     /// <summary>
-    /// 进站
+    /// 开始
     /// </summary>
     public class ManuStartService 
     {
