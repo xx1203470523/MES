@@ -39,11 +39,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
         /// <summary>
-        /// 仓储接口（面板按钮作业关系）
-        /// </summary>
-        private readonly IManuFacePlateButtonJobRelationRepository _manuFacePlateButtonJobRelationRepository;
-
-        /// <summary>
         /// 仓储接口（工单信息）
         /// </summary>
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
@@ -76,7 +71,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="currentSite"></param>
         /// <param name="manuSfcInfoRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
-        /// <param name="manuFacePlateButtonJobRelationRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="planWorkOrderActivationRepository"></param>
         /// <param name="procProcessRouteDetailNodeRepository"></param>
@@ -85,7 +79,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         public ManuCommonService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuSfcInfoRepository manuSfcInfoRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
-            IManuFacePlateButtonJobRelationRepository manuFacePlateButtonJobRelationRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
@@ -96,7 +89,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             _currentSite = currentSite;
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
-            _manuFacePlateButtonJobRelationRepository = manuFacePlateButtonJobRelationRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
@@ -221,22 +213,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             return procProcedureEntity;
         }
 
-        /// <summary>
-        /// 读取挂载的作业并执行
-        /// </summary>
-        /// <param name="facePlateButtonId"></param>
-        /// <returns></returns>
-        public async Task ExecuteJobAsync(long facePlateButtonId)
-        {
-            // 根据面板ID和按钮ID找出绑定的作业job
-            var buttonJobs = await _manuFacePlateButtonJobRelationRepository.GetByFacePlateButtonIdAsync(facePlateButtonId);
-            if (buttonJobs.Any() == false) return;
-
-
-            // TODO
-
-            await Task.CompletedTask;
-        }
 
     }
 }

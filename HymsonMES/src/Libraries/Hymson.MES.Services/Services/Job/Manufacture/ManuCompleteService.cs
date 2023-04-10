@@ -6,6 +6,7 @@ using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Common;
+using Hymson.MES.Services.Services.Job.Common;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Utils;
 
@@ -25,6 +26,11 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// 当前对象（站点）
         /// </summary>
         private readonly ICurrentSite _currentSite;
+
+        /// <summary>
+        /// 服务接口（作业通用）
+        /// </summary>
+        private readonly IJobCommonService _jobCommonService;
 
         /// <summary>
         /// 服务接口（生产通用）
@@ -61,6 +67,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
+        /// <param name="jobCommonService"></param>
         /// <param name="manuCommonService"></param>
         /// <param name="manuSfcStepRepository"></param>
         /// <param name="manuSfcInfoRepository"></param>
@@ -68,6 +75,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <param name="procBomDetailRepository"></param>
         /// <param name="procMaterialRepository"></param>
         public ManuCompleteService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IJobCommonService jobCommonService,
             IManuCommonService manuCommonService,
             IManuSfcStepRepository manuSfcStepRepository,
             IManuSfcInfoRepository manuSfcInfoRepository,
@@ -77,6 +85,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _jobCommonService = jobCommonService;
             _manuCommonService = manuCommonService;
             _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcInfoRepository = manuSfcInfoRepository;
@@ -193,7 +202,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             // TODO 判断BOM物料绑定？？
 
             // 读取挂载的作业并执行
-            await _manuCommonService.ExecuteJobAsync(dto.FacePlateId, dto.FacePlateButtonId);
+            await _jobCommonService.ExecuteJobAsync(dto.FacePlateButtonId);
 
             // 更改状态，固定抽检，随机抽检
 

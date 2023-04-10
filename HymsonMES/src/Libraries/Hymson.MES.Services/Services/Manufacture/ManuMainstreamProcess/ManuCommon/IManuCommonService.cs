@@ -42,12 +42,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <returns></returns>
         Task<ProcProcedureEntity?> GetNextProcedureAsync(long processRouteId, long procedureId);
 
-        /// <summary>
-        /// 读取挂载的作业并执行
-        /// </summary>
-        /// <param name="facePlateButtonId"></param>
-        /// <returns></returns>
-        Task ExecuteJobAsync(long facePlateButtonId);
 
     }
 }
