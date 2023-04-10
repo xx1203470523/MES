@@ -15,7 +15,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
     /// <summary>
     /// 开始
     /// </summary>
-    public class ManuStartService 
+    public class ManuStartService
     {
         /// <summary>
         /// 当前对象（登录用户）
@@ -78,8 +78,11 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <returns></returns>
         public async Task ExecuteAsync(JobDto dto)
         {
-            // 获取生产条码信息（附带条码合法性校验 + 工序活动状态校验）
-            var sfcProduceEntity = await _manuCommonService.GetProduceSPCWithCheckAsync(dto.SFC, dto.ProcedureId);
+            // 获取生产条码信息（附带条码合法性校验）
+            var sfcProduceEntity = await _manuCommonService.GetProduceSPCAsync(dto.SFC, dto.ProcedureId);
+
+            // 当前工序是否是活动状态
+            if (sfcProduceEntity.Status != SfcProduceStatusEnum.lineUp) throw new BusinessException(nameof(ErrorCode.MES16308));
 
             // 获取生产工单（附带工单状态校验）
             var workOrderEntity = await _manuCommonService.GetProduceWorkOrderByIdAsync(sfcProduceEntity.WorkOrderId);
@@ -105,7 +108,6 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             // 检查前工序是否可选工序
             if (procedureExtend.CheckType == ProcessRouteInspectTypeEnum.RandomInspection)
             {
-                // 是否在当前工序排队
                 // TODO
             }
 

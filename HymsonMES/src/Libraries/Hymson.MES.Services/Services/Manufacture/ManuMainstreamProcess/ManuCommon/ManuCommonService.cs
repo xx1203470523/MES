@@ -102,7 +102,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="spc"></param>
         /// <param name="procedureId"></param>
         /// <returns></returns>
-        public async Task<ManuSfcProduceEntity> GetProduceSPCWithCheckAsync(string spc, long procedureId)
+        public async Task<ManuSfcProduceEntity> GetProduceSPCAsync(string spc, long procedureId)
         {
             if (string.IsNullOrWhiteSpace(spc) == true
                 || spc.Contains(' ') == true) throw new BusinessException(nameof(ErrorCode.MES16305));
@@ -110,11 +110,24 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             var sfcProduceEntity = await _manuSfcProduceRepository.GetBySPCAsync(spc);
             if (sfcProduceEntity == null) throw new BusinessException(nameof(ErrorCode.MES16306));
 
-            // 当前工序是否是活动状态
-            if (sfcProduceEntity.Status != SfcProduceStatusEnum.Activity) throw new BusinessException(nameof(ErrorCode.MES16309));
-
             // 产品编码是否和工序对应
             if (sfcProduceEntity.ProcedureId != procedureId) throw new BusinessException(nameof(ErrorCode.MES16308));
+
+            return sfcProduceEntity;
+        }
+
+        /// <summary>
+        /// 获取生产条码信息（附带条码合法性校验 + 工序活动状态校验）
+        /// </summary>
+        /// <param name="spc"></param>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        public async Task<ManuSfcProduceEntity> GetProduceSPCWithCheckAsync(string spc, long procedureId)
+        {
+            var sfcProduceEntity = await GetProduceSPCAsync(spc, procedureId);
+
+            // 当前工序是否是活动状态
+            if (sfcProduceEntity.Status != SfcProduceStatusEnum.Activity) throw new BusinessException(nameof(ErrorCode.MES16309));
 
             return sfcProduceEntity;
         }

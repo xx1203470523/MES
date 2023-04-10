@@ -1,9 +1,11 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
+using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Job.Manufacture
 {
@@ -94,7 +96,8 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
 
             // TODO 获取条码对应的工序BOM
             //var bomEntity = await _procBomRepository.GetByIdAsync(sfcEntity.ProductBOMId);
-            var bomMaterials = await _procBomDetailRepository.GetListMainAsync(sfcProduceEntity.ProductBOMId);
+            //var bomMaterials = await _procBomDetailRepository.GetListMainAsync(sfcProduceEntity.ProductBOMId);
+            var bomMaterials = await _procBomDetailRepository.GetByBomIdAsync(sfcProduceEntity.ProductBOMId);
 
             // TODO 这里要区分是  内/外部序列码，批次
 
@@ -103,7 +106,10 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
 
             // TODO 检验该节点是否有挂在其他作业
 
-
+            // 更改状态
+            sfcProduceEntity.UpdatedBy = _currentUser.UserName;
+            sfcProduceEntity.UpdatedOn = HymsonClock.Now();
+            await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
         }
 
     }

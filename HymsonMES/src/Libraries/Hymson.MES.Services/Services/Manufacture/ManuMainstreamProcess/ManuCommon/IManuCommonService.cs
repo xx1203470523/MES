@@ -11,7 +11,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
     public interface IManuCommonService
     {
         /// <summary>
-        /// 条码合法性校验
+        /// 获取生产条码信息（附带条码合法性校验）
+        /// </summary>
+        /// <param name="spc"></param>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        Task<ManuSfcProduceEntity> GetProduceSPCAsync(string spc, long procedureId);
+
+        /// <summary>
+        /// 获取生产条码信息（附带条码合法性校验 + 工序活动状态校验）
         /// </summary>
         /// <param name="spc"></param>
         /// <param name="procedureId"></param>
