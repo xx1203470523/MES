@@ -100,11 +100,15 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             var bomMaterials = await _procBomDetailRepository.GetByBomIdAsync(sfcProduceEntity.ProductBOMId);
 
             // TODO 这里要区分是  内/外部序列码，批次
+            foreach (var item in bomMaterials)
+            {
 
+            }
 
             // TODO 组件条码是否已绑定SFC
 
-            // TODO 检验该节点是否有挂在其他作业
+            // 读取挂载的作业并执行
+            await _manuCommonService.ExecuteJobAsync(dto.FacePlateId, dto.FacePlateButtonId);
 
             // 更改状态
             sfcProduceEntity.UpdatedBy = _currentUser.UserName;

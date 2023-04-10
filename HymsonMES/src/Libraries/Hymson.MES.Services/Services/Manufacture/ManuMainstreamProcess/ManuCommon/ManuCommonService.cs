@@ -212,7 +212,18 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             return procProcedureEntity;
         }
 
-        // TODO 检验该节点是否有挂在其他作业
+        /// <summary>
+        /// 读取挂载的作业并执行
+        /// </summary>
+        /// <param name="facePlateId"></param>
+        /// <param name="facePlateButtonId"></param>
+        /// <returns></returns>
+        public async Task ExecuteJobAsync(long facePlateId, long facePlateButtonId)
+        {
+            // TODO 根据面板ID和按钮ID找出绑定的作业job
+
+            await Task.CompletedTask;
+        }
 
     }
 }

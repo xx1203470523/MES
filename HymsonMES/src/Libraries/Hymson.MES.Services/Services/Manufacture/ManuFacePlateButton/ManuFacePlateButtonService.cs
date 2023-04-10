@@ -15,6 +15,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto;
 using Hymson.Snowflake;
@@ -173,7 +174,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task ClickAsync(SFCButtonDto dto)
+        public async Task ClickAsync(JobDto dto)
         {
             // TODO 根据面板ID和按钮ID找出绑定的作业job
 

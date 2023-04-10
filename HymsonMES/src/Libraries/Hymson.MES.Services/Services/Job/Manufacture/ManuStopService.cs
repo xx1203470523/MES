@@ -61,6 +61,9 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             // 获取生产条码信息（附带条码合法性校验 + 工序活动状态校验）
             var sfcProduceEntity = await _manuCommonService.GetProduceSPCWithCheckAsync(dto.SFC, dto.ProcedureId, new SfcProduceStatusEnum[] { SfcProduceStatusEnum.Activity });
 
+            // 读取挂载的作业并执行
+            await _manuCommonService.ExecuteJobAsync(dto.FacePlateId, dto.FacePlateButtonId);
+
             // 更改状态，将条码由"活动"改为"排队"
             sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
             sfcProduceEntity.UpdatedBy = _currentUser.UserName;

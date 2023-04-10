@@ -6,8 +6,8 @@
  *build datetime: 2023-04-01 02:58:19
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
-using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto;
 using Hymson.MES.Services.Services.Manufacture;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -108,7 +108,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPut("button")]
-        public async Task ClickAsync(SFCButtonDto dto)
+        public async Task ClickAsync(JobDto dto)
         {
             await _manuFacePlateButtonService.ClickAsync(dto);
         }

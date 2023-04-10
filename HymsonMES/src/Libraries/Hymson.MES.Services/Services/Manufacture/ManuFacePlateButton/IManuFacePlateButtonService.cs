@@ -6,6 +6,7 @@
  *build datetime: 2023-04-01 02:58:19
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto;
 
@@ -64,7 +65,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task ClickAsync(SFCButtonDto dto);
+        Task ClickAsync(JobDto dto);
 
     }
 }

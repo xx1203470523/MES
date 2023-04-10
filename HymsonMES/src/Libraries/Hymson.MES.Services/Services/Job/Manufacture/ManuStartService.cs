@@ -108,7 +108,8 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
                 // TODO
             }
 
-            // TODO 检验该节点是否有挂在其他作业
+            // 读取挂载的作业并执行
+            await _manuCommonService.ExecuteJobAsync(dto.FacePlateId, dto.FacePlateButtonId);
 
             // 更改状态，将条码由"排队"改为"活动"
             sfcProduceEntity.Status = SfcProduceStatusEnum.Activity;
