@@ -12,7 +12,6 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
@@ -21,15 +20,10 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Manufacture;
-using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using IdGen;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Security.Policy;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
