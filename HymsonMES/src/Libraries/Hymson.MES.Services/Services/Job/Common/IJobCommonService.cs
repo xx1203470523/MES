@@ -1,4 +1,6 @@
-﻿namespace Hymson.MES.Services.Services.Job.Common
+﻿using Hymson.MES.Services.Dtos.Common;
+
+namespace Hymson.MES.Services.Services.Job.Common
 {
     /// <summary>
     /// 生产共用
@@ -8,9 +10,9 @@
         /// <summary>
         /// 读取挂载的作业并执行
         /// </summary>
-        /// <param name="facePlateButtonId"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        Task ExecuteJobAsync(long facePlateButtonId);
+        Task ExecuteJobAsync(JobDto dto);
 
     }
 }
