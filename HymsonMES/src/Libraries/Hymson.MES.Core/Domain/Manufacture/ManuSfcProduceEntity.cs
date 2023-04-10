@@ -56,7 +56,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
        /// <summary>
         /// BOMId
         /// </summary>
-        public long BOMId { get; set; }
+        public long ProductBOMId { get; set; }
 
         /// <summary>
         /// 当前数量

@@ -252,7 +252,7 @@ namespace Hymson.MES.Services.Services.Plan
                 }
 
                 //关联BOM
-                var processRoute = await _procProcessRouteRepository.GetByIdAsync(planWorkOrderEntity.ProcessRouteId ?? 0);
+                var processRoute = await _procProcessRouteRepository.GetByIdAsync(planWorkOrderEntity.ProcessRouteId);
                 if (processRoute != null)
                 {
                     planWorkOrderDetailView.ProcessRouteCode = processRoute.Code;

@@ -7,6 +7,7 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Manufacture;
+using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -55,6 +56,22 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<ManuFacePlateDto> QueryManuFacePlateByIdAsync(long id);
+        Task<QueryManuFacePlateDto> QueryManuFacePlateByIdAsync(long id);
+
+
+        /// <summary>
+        /// 新增
+        /// </summary>
+        /// <param name="addManuFacePlateDto"></param>
+        /// <returns></returns>
+        Task AddManuFacePlateAsync(AddManuFacePlateDto addManuFacePlateDto);
+
+        /// <summary>
+        /// 修改
+        /// </summary>
+        /// <param name="updateManuFacePlateDto"></param>
+        /// <returns></returns>
+        Task UpdateManuFacePlateAsync(UpdateManuFacePlateDto updateManuFacePlateDto);
+
     }
 }

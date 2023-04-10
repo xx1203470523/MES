@@ -17,6 +17,7 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -363,6 +364,25 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
                 Ids = idsArr
             };
             return await _procProcessRouteRepository.DeleteRangeAsync(command);
+        }
+
+        /// <summary>
+        /// 根据不合个工艺路线Id查询不合格工艺路线列表
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcProcessRouteDto>> GetListByIdsAsync(long[] ids)
+        {
+            var list = await _procProcessRouteRepository.GetByIdsAsync(ids);
+
+            //实体到DTO转换 装载数据
+            var processRouteDtos = new List<ProcProcessRouteDto>();
+            foreach (var entity in list)
+            {
+                var processRouteDto = entity.ToModel<ProcProcessRouteDto>();
+                processRouteDtos.Add(processRouteDto);
+            }
+            return processRouteDtos;
         }
 
         #region 业务扩展方法

@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 using System;
@@ -45,7 +46,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 类型
         /// </summary>
-        public int Type { get; set; }
+        public ProcedureTypeEnum Type { get; set; }
 
         /// <summary>
         /// 包装等级（字典数据）
@@ -101,8 +102,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 是否逻辑删除
         /// </summary>
         public bool? IsDeleted { get; set; }
-
-
     }
 
     public record ProcProcedureCreateDto : BaseEntityDto

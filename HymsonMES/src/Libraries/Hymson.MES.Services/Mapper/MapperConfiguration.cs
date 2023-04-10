@@ -434,6 +434,22 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuProductBadRecordEntity, ManuProductBadRecordDto>();
             CreateMap<ManuProductBadRecordCreateDto, ManuProductBadRecordEntity>();
             #endregion
+
+            #region ManuFacePlate
+            //FacePlate
+            CreateMap<ManuFacePlatePagedQueryDto, ManuFacePlatePagedQuery>();
+            CreateMap<ManuFacePlateEntity, ManuFacePlateDto>();
+            CreateMap<ManuFacePlateCreateDto, ManuFacePlateEntity>();
+            CreateMap<ManuFacePlateModifyDto, ManuFacePlateEntity>();
+            //Production
+            CreateMap<ManuFacePlateProductionCreateDto, ManuFacePlateProductionEntity>();
+            CreateMap<ManuFacePlateProductionModifyDto, ManuFacePlateProductionEntity>();
+            CreateMap<ManuFacePlateProductionEntity, ManuFacePlateProductionDto>();
+            //Repair
+            CreateMap<ManuFacePlateRepairCreateDto, ManuFacePlateRepairEntity>();
+            CreateMap<ManuFacePlateRepairModifyDto, ManuFacePlateRepairEntity>();
+            CreateMap<ManuFacePlateRepairEntity, ManuFacePlateRepairDto>();
+            #endregion
         }
 
         /// <summary>

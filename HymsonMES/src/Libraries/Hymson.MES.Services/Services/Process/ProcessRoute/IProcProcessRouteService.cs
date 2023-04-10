@@ -61,5 +61,12 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
         /// <param name="idsAr"></param>
         /// <returns></returns>
         Task<int> DeleteProcProcessRouteAsync(long[] idsAr);
+
+        /// <summary>
+        /// 根据不合个工艺路线Id查询不合格工艺路线列表
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+         Task<IEnumerable<ProcProcessRouteDto>> GetListByIdsAsync(long[] ids);
     }
 }

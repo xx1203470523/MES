@@ -6,6 +6,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Process.ProcessRoute;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -59,6 +60,18 @@ namespace Hymson.MES.Api.Controllers.Process
         public async Task<CustomProcessRouteDto> GetCustomProcProcessRouteAsync(long id)
         {
             return await _procProcessRouteService.GetCustomProcProcessRouteAsync(id);
+        }
+
+        /// <summary>
+        /// 根据id查询不合格工艺路线列表
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("listByIds")]
+        public async Task<IEnumerable<ProcProcessRouteDto>> GetListByIdsAsync(ProcProcessRouteQueryDto queryDto)
+        {
+            return await _procProcessRouteService.GetListByIdsAsync(queryDto.Ids);
         }
 
         /// <summary>

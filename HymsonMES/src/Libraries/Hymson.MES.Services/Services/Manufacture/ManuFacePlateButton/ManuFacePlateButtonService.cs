@@ -16,6 +16,7 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
+using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using System.Transactions;
@@ -130,7 +131,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="manuFacePlateButtonDto"></param>
+        /// <param name="manuFacePlateButtonModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyManuFacePlateButtonAsync(ManuFacePlateButtonModifyDto manuFacePlateButtonModifyDto)
         {
@@ -164,6 +165,21 @@ namespace Hymson.MES.Services.Services.Manufacture
                return manuFacePlateButtonEntity.ToModel<ManuFacePlateButtonDto>();
            }
             return null;
+        }
+
+
+        /// <summary>
+        /// 按钮（点击）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task ClickAsync(SFCButtonDto dto)
+        {
+            // TODO 根据面板ID和按钮ID找出绑定的作业job
+
+
+            // TODO: 业务逻辑
+            await Task.CompletedTask;
         }
     }
 }

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Process;
 
 namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto
 {
@@ -33,7 +30,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuComm
         /// 描述 :抽检类型 
         /// 空值 : true  
         /// </summary>
-        public int? CheckType { get; set; }
+        public ProcessRouteInspectTypeEnum? CheckType { get; set; }
 
         /// <summary>
         /// 描述 :抽检比例 
@@ -64,7 +61,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuComm
         /// 描述 :类型 
         /// 空值 : false  
         /// </summary>
-        public int Type { get; set; }
+        public ProcedureTypeEnum Type { get; set; }
 
         /// <summary>
         /// 描述 :包装等级（字典数据） 

@@ -1,12 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation
 {
-    internal class IManuOutStationService
+    /// <summary>
+    /// 出站
+    /// </summary>
+    public interface IManuOutStationService
     {
+        /// <summary>
+        /// 执行（出站）
+        /// </summary>
+        /// <param name="dto"></param>
+        Task ExecuteAsync(SFCWorkDto dto);
     }
 }
