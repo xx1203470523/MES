@@ -1,7 +1,10 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
+using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace Hymson.MES.Services.Services.Job.Common
 {
@@ -21,6 +24,11 @@ namespace Hymson.MES.Services.Services.Job.Common
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
+        /// 注入反射获取依赖对象
+        /// </summary>
+        private readonly IServiceProvider _serviceProvider;
+
+        /// <summary>
         /// 仓储接口（面板按钮作业关系）
         /// </summary>
         private readonly IManuFacePlateButtonJobRelationRepository _manuFacePlateButtonJobRelationRepository;
@@ -30,12 +38,15 @@ namespace Hymson.MES.Services.Services.Job.Common
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
+        /// <param name="serviceProvider"></param>
         /// <param name="manuFacePlateButtonJobRelationRepository"></param>
         public JobCommonService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IServiceProvider serviceProvider,
             IManuFacePlateButtonJobRelationRepository manuFacePlateButtonJobRelationRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _serviceProvider = serviceProvider;
             _manuFacePlateButtonJobRelationRepository = manuFacePlateButtonJobRelationRepository;
         }
 
@@ -52,7 +63,27 @@ namespace Hymson.MES.Services.Services.Job.Common
             if (buttonJobs.Any() == false) return;
 
 
+            InteJobEntity entity = new();
+
             // TODO
+            Assembly assembly = Assembly.Load(new AssemblyName("Hymson.MES.Services"));
+            if (assembly == null) return;
+
+            Type classType = assembly.GetType(entity.ClassProgram);
+            if (classType == null) return;
+
+            /*
+            var obj = Activator.CreateInstance(classType, new object[] {
+                    _currentUser,
+                    _currentSite,
+                _manuCommonService,
+                _manuSfcProduceRepository});
+            */
+
+            /*
+            var serviceScope = _serviceProvider.CreateScope();
+            var obj = serviceScope.ServiceProvider.GetService(classType);
+            */
 
             await Task.CompletedTask;
         }
