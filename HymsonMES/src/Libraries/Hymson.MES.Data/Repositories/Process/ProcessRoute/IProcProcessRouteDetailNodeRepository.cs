@@ -1,17 +1,4 @@
-/*
- *creator: Karl
- *
- *describe: 工艺路线工序节点明细表仓储类 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-02-14 10:17:40
- */
-using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -26,6 +13,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcProcessRouteDetailNodeEntity> GetByIdAsync(long id);
+
+        /// <summary>
+        /// 查询节点明细
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ProcProcessRouteDetailNodeEntity> GetByProcessRouteIdAsync(ProcProcessRouteDetailNodeQuery query);
 
         /// <summary>
         /// 根据ID获取数据

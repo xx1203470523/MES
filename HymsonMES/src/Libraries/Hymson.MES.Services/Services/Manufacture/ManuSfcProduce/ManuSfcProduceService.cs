@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 条码生产信息（物理删除）    服务 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-03-18 05:37:27
- */
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -12,7 +5,6 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
@@ -21,15 +13,10 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Manufacture;
-using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using IdGen;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Security.Policy;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -138,6 +125,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Sfc = item.Sfc,
                     Lock = item.Lock,
                     LockProductionId = item.LockProductionId,
+                    ProductBOMId=item.ProductBOMId,
                     Status = item.Status,
                     OrderCode = item.OrderCode,
                     Code = item.Code,
@@ -278,7 +266,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ProductId = sfc.ProductId,
                     WorkOrderId = sfc.WorkOrderId,
                     WorkCenterId = sfc.WorkCenterId,
-                    ProductBOMId = sfc.BOMId,
+                    ProductBOMId = sfc.ProductBOMId,
                     Qty = sfc.Qty,
                     EquipmentId = sfc.EquipmentId,
                     ResourceId = sfc.ResourceId,
@@ -407,7 +395,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES15402));
             }
 
-            var noScrapSfcs = manuSfcs.Where(x => x.IsScrap == TrueOrFalseEnum.No).Select(x=>x.SFC).ToArray();
+            var noScrapSfcs = manuSfcs.Where(x => x.IsScrap == TrueOrFalseEnum.No).Select(x => x.SFC).ToArray();
             if (noScrapSfcs.Any())
             {
                 var strs = string.Join("','", noScrapSfcs);
@@ -490,7 +478,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ProductId = sfc.ProductId,
                     WorkOrderId = sfc.WorkOrderId,
                     WorkCenterId = sfc.WorkCenterId,
-                    ProductBOMId = sfc.BOMId,
+                    ProductBOMId = sfc.ProductBOMId,
                     Qty = sfc.Qty,
                     EquipmentId = sfc.EquipmentId,
                     ResourceId = sfc.ResourceId,

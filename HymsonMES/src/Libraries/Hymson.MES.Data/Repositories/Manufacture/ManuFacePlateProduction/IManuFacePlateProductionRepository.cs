@@ -37,7 +37,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuFacePlateProductionEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ManuFacePlateProductionEntity manuFacePlateProductionEntity);
-        
+
+        /// <summary>
+        /// 根据FacePlateId更新
+        /// </summary>
+        /// <param name="manuFacePlateProductionEntity"></param>
+        /// <returns></returns>
+        Task<int> UpdateByFacePlateIdAsync(ManuFacePlateProductionEntity manuFacePlateProductionEntity);
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -87,6 +94,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuFacePlateProductionPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuFacePlateProductionEntity>> GetPagedInfoAsync(ManuFacePlateProductionPagedQuery manuFacePlateProductionPagedQuery);
+        /// <summary>
+        /// 通过FacePlateId获取明细
+        /// </summary>
+        /// <param name="facePlateId"></param>
+        /// <returns></returns>
+        Task<ManuFacePlateProductionEntity> GetByFacePlateIdAsync(long facePlateId);
         #endregion
     }
 }

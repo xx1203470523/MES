@@ -12,7 +12,6 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -21,7 +20,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public partial class ManuFacePlateButtonJobRelationRepository :BaseRepository, IManuFacePlateButtonJobRelationRepository
     {
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
         public ManuFacePlateButtonJobRelationRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
         {
         }
@@ -58,6 +60,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ManuFacePlateButtonJobRelationEntity>(GetByIdSql, new { Id=id});
+        }
+
+        /// <summary>
+        /// 根据FacePlateId获取数据
+        /// </summary>
+        /// <param name="facePlateButtonId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuFacePlateButtonJobRelationEntity>> GetByFacePlateButtonIdAsync(long facePlateButtonId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuFacePlateButtonJobRelationEntity>(GetByFacePlateButtonIdSql, new { facePlateButtonId });
         }
 
         /// <summary>
@@ -184,6 +197,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteId`, `FacePlateButtonId`, `JobId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_face_plate_button_job_relation`  WHERE Id = @Id ";
+        const string GetByFacePlateButtonIdSql = "SELECT * FROM manu_face_plate_button_job_relation WHERE IsDeleted = 0 AND FacePlateButtonId = @facePlateButtonId; ";
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `FacePlateButtonId`, `JobId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_face_plate_button_job_relation`  WHERE Id IN @Ids ";

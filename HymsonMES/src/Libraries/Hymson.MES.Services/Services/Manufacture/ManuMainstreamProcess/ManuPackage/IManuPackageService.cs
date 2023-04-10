@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPackage
+﻿namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPackage
 {
-    internal class IManuPackageService
+    /// <summary>
+    /// 组装
+    /// </summary>
+    public interface IManuPackageService
     {
+        /// <summary>
+        /// 执行（组装）
+        /// </summary>
+        Task ExecuteAsync();
     }
 }

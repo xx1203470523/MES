@@ -15,16 +15,16 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using System.Collections.Generic;
 //using Hymson.Utils.Extensions;
-using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Plan
 {
@@ -43,12 +43,15 @@ namespace Hymson.MES.Services.Services.Plan
         private readonly IPlanSfcReceiveRepository _planSfcInfoRepository;
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
         private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
+        private readonly IInteCodeRulesRepository _inteCodeRulesRepository;
+        private readonly IInteCodeRulesMakeRepository _inteCodeRulesMakeRepository;
 
         private readonly AbstractValidator<PlanSfcReceiveCreateDto> _validationCreateRules;
         private readonly AbstractValidator<PlanSfcReceiveModifyDto> _validationModifyRules;
 
         public PlanSfcReceiveService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IPlanSfcReceiveRepository planSfcInfoRepository, IPlanWorkOrderRepository planWorkOrderRepository, IManuSfcInfoRepository manuSfcInfoRepository,
+            IPlanSfcReceiveRepository planSfcInfoRepository, IPlanWorkOrderRepository planWorkOrderRepository,
+            IManuSfcInfoRepository manuSfcInfoRepository, IInteCodeRulesRepository inteCodeRulesRepository, IInteCodeRulesMakeRepository inteCodeRulesMakeRepository,
         AbstractValidator<PlanSfcReceiveCreateDto> validationCreateRules, AbstractValidator<PlanSfcReceiveModifyDto> validationModifyRules)
         {
             _currentUser = currentUser;
@@ -56,6 +59,8 @@ namespace Hymson.MES.Services.Services.Plan
             _planSfcInfoRepository = planSfcInfoRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _manuSfcInfoRepository = manuSfcInfoRepository;
+            _inteCodeRulesRepository = inteCodeRulesRepository;
+            _inteCodeRulesMakeRepository = inteCodeRulesMakeRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
         }
@@ -90,6 +95,8 @@ namespace Hymson.MES.Services.Services.Plan
                 throw new BusinessException(nameof(ErrorCode.MES16106)).WithData("OrderCode", workOrderInfo.OrderCode);
             }
 
+            //验证条码规则
+            await VerifyCodeRule(workOrderInfo.ProductId, planSfcInfoCreateDto.SFC);
 
             var manuSfcInfoCreate = new ManuSfcInfoEntity();
             var manuSfcInfoUpdate = new ManuSfcInfoEntity();
@@ -127,7 +134,7 @@ namespace Hymson.MES.Services.Services.Plan
                 manuSfcInfoCreate.WorkOrderId = planSfcInfoCreateDto.WorkOrderId;
                 manuSfcInfoCreate.ProductId = planSfcInfo.ProductId;
                 manuSfcInfoCreate.Qty = 1;// workOrderInfo.Qty;
-                manuSfcInfoCreate.Status = (int)SfcStatusEnum.InProcess;
+                manuSfcInfoCreate.Status = SfcStatusEnum.InProcess;
                 manuSfcInfoCreate.IsUsed = 0;
                 manuSfcInfoCreate.RelevanceWorkOrderId = planSfcInfo.WorkOrderId;
                 manuSfcInfoCreate.SiteId = _currentSite.SiteId ?? 0;
@@ -140,7 +147,7 @@ namespace Hymson.MES.Services.Services.Plan
 
                 //修改
                 manuSfcInfoUpdate = planSfcInfo;
-                manuSfcInfoUpdate.Status = (int)SfcStatusEnum.Received;
+                manuSfcInfoUpdate.Status = SfcStatusEnum.Received;
                 manuSfcInfoUpdate.UpdatedBy = _currentUser.UserName;
                 manuSfcInfoUpdate.UpdatedOn = HymsonClock.Now();
                 #endregion
@@ -158,7 +165,7 @@ namespace Hymson.MES.Services.Services.Plan
                 manuSfcInfoCreate.WorkOrderId = planSfcInfoCreateDto.WorkOrderId;
                 manuSfcInfoCreate.ProductId = workOrderInfo.ProductId;
                 manuSfcInfoCreate.Qty = 1;// workOrderInfo.Qty;
-                manuSfcInfoCreate.Status = (int)SfcStatusEnum.InProcess;
+                manuSfcInfoCreate.Status = SfcStatusEnum.InProcess;
                 manuSfcInfoCreate.IsUsed = 0;
                 manuSfcInfoCreate.RelevanceWorkOrderId = 0;
                 manuSfcInfoCreate.SiteId = _currentSite.SiteId ?? 0;
@@ -196,7 +203,41 @@ namespace Hymson.MES.Services.Services.Plan
 
         }
 
+        /// <summary>
+        /// 验证条码规则
+        /// </summary>
+        /// <param name="productId"></param>
+        /// <param name="sfc"></param>
+        /// <exception cref="BusinessException"></exception>
+        private async Task<bool> VerifyCodeRule(long productId, string sfc)
+        {
 
+            var getCodeRulesTask = await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery { ProductId = productId });
+            if (getCodeRulesTask.Count() == 0)
+            {
+                throw new BusinessException(nameof(ErrorCode.MES16113));
+            }
+            var getCodeRules = getCodeRulesTask.FirstOrDefault();
+
+            if (sfc.Length != getCodeRules.Base)
+            {
+                throw new BusinessException(nameof(ErrorCode.MES16114)).WithData("Base", getCodeRules.Base);
+            }
+
+            var getCodeRulesMakeListTask = _inteCodeRulesMakeRepository.GetInteCodeRulesMakeEntitiesAsync(new InteCodeRulesMakeQuery { CodeRulesId = getCodeRules.Id });
+            var codeRulesMakeList = await getCodeRulesMakeListTask;
+            foreach (var rule in codeRulesMakeList.OrderBy(x => x.Seq))
+            {
+                if (rule.ValueTakingType == CodeValueTakingTypeEnum.FixedValue)
+                {
+                    if (!sfc.Contains(rule.SegmentedValue))
+                    {
+                        throw new BusinessException(nameof(ErrorCode.MES16115)).WithData("ValuesType", CodeValueTakingTypeEnum.FixedValue.ToString()).WithData("SegmentedValue", rule.SegmentedValue);
+                    };
+                }
+            }
+            return true;
+        }
 
 
         /// <summary>
@@ -206,9 +247,8 @@ namespace Hymson.MES.Services.Services.Plan
         /// <returns></returns>
         public async Task<int> DeletesPlanSfcInfoAsync(long[] idsArr)
         {
-
             var sfcList = await _planSfcInfoRepository.GetByIdsAsync(idsArr);
-            if (sfcList.Any())
+            if (sfcList.Where(it => it.IsUsed > 0).Any())
             {
                 var msgSfcs = string.Join(",", sfcList.Where(it => it.IsUsed > 0).Select(it => it.SFC).ToArray());
                 throw new BusinessException(nameof(ErrorCode.MES16111)).WithData("SFC", msgSfcs);

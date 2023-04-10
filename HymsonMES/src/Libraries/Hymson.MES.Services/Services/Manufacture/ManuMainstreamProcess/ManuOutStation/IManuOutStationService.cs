@@ -4,7 +4,7 @@
     /// 出站
     /// </summary>
     public interface IManuOutStationService
-    { 
-    
+    {
+
     }
 }

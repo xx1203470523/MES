@@ -19,7 +19,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// <summary>
     /// 生产过站面板仓储
     /// </summary>
-    public partial class ManuFacePlateProductionRepository :BaseRepository, IManuFacePlateProductionRepository
+    public partial class ManuFacePlateProductionRepository : BaseRepository, IManuFacePlateProductionRepository
     {
 
         public ManuFacePlateProductionRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
@@ -59,6 +59,18 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ManuFacePlateProductionEntity>(GetByIdSql, new { Id=id});
         }
+
+        /// <summary>
+        /// 根据FacePlateId获取数据
+        /// </summary>
+        /// <param name="facePlateId"></param>
+        /// <returns></returns>
+        public async Task<ManuFacePlateProductionEntity> GetByFacePlateIdAsync(long facePlateId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ManuFacePlateProductionEntity>(GetByFacePlateIdSql, new { FacePlateId = facePlateId });
+        }
+
 
         /// <summary>
         /// 根据IDs批量获取数据
@@ -150,6 +162,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="manuFacePlateProductionEntity"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateByFacePlateIdAsync(ManuFacePlateProductionEntity manuFacePlateProductionEntity)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateByFacePlateIdSql, manuFacePlateProductionEntity);
+        }
+
+        /// <summary>
         /// 批量更新
         /// </summary>
         /// <param name="manuFacePlateProductionEntitys"></param>
@@ -187,6 +210,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `FacePlateId`, `ResourceId`, `IsResourceEdit`, `ProcedureId`, `IsProcedureEdit`, `IsSuccessBeep`, `SuccessBeepUrl`, `SuccessBeepTime`, `IsErrorBeep`, `ErrorBeepUrl`, `ErrorBeepTime`, `IsShowBindWorkOrder`, `IsShowQualifiedQty`, `QualifiedColour`, `IsShowUnqualifiedQty`, `UnqualifiedColour`, `IsShowLog`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_face_plate_production`  WHERE Id IN @Ids ";
+
+        const string GetByFacePlateIdSql = @"SELECT 
+                               `Id`, `SiteId`, `FacePlateId`, `ResourceId`, `IsResourceEdit`, `ProcedureId`, `IsProcedureEdit`, `IsSuccessBeep`, `SuccessBeepUrl`, `SuccessBeepTime`, `IsErrorBeep`, `ErrorBeepUrl`, `ErrorBeepTime`, `IsShowBindWorkOrder`, `IsShowQualifiedQty`, `QualifiedColour`, `IsShowUnqualifiedQty`, `UnqualifiedColour`, `IsShowLog`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `manu_face_plate_production`  WHERE FacePlateId = @FacePlateId ";
+
+        const string UpdateByFacePlateIdSql = "UPDATE `manu_face_plate_production` SET   SiteId = @SiteId, FacePlateId = @FacePlateId, ResourceId = @ResourceId, IsResourceEdit = @IsResourceEdit, ProcedureId = @ProcedureId, IsProcedureEdit = @IsProcedureEdit, IsSuccessBeep = @IsSuccessBeep, SuccessBeepUrl = @SuccessBeepUrl, SuccessBeepTime = @SuccessBeepTime, IsErrorBeep = @IsErrorBeep, ErrorBeepUrl = @ErrorBeepUrl, ErrorBeepTime = @ErrorBeepTime, IsShowBindWorkOrder = @IsShowBindWorkOrder, IsShowQualifiedQty = @IsShowQualifiedQty, QualifiedColour = @QualifiedColour, IsShowUnqualifiedQty = @IsShowUnqualifiedQty, UnqualifiedColour = @UnqualifiedColour, IsShowLog = @IsShowLog, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE FacePlateId = @FacePlateId ";
         #endregion
     }
 }

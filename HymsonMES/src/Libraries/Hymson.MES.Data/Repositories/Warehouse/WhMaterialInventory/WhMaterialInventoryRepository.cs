@@ -126,7 +126,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             }
             if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.MaterialCode))
             {
-                sqlBuilder.Where(" wmi.MaterialId=@MaterialCode");
+                sqlBuilder.Where(" pm.MaterialCode=@MaterialCode");
             }
             if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.Version))
             {

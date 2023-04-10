@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -14,6 +15,9 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         public string ReplaceMaterialId { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public long BomDetailId { get; set; }
 
         /// <summary>
@@ -32,12 +36,17 @@ namespace Hymson.MES.Data.Repositories.Process
         public string Version { get; set; }
 
         /// <summary>
+        /// 数据收集方式
+        /// </summary>
+        public MaterialSerialNumberEnum? SerialNumber { get; set; }
+
+        /// <summary>
         /// 用量
         /// </summary>
         public decimal Usages { get; set; }
 
         /// <summary>
-        ///    损耗
+        /// 损耗
         /// </summary>
         public decimal? Loss { get; set; }
 
@@ -46,8 +55,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         public string ReferencePoint { get; set; }
 
-        //工序id
-        public string ProcedureId { get; set; }
+        /// <summary>
+        /// 工序id
+        /// </summary>
+        public long ProcedureId { get; set; }
 
         /// <summary>
         /// 工序代码

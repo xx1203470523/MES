@@ -1,16 +1,7 @@
-/*
- *creator: Karl
- *
- *describe: 工艺路线工序节点关系明细表(前节点多条就存多条) 仓储类 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-02-14 10:17:52
- */
-
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
-using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -21,12 +12,20 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public partial class ProcProcessRouteDetailLinkRepository : IProcProcessRouteDetailLinkRepository
     {
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly ConnectionOptions _connectionOptions;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
         public ProcProcessRouteDetailLinkRepository(IOptions<ConnectionOptions> connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
         }
+
 
         /// <summary>
         /// 根据ID获取数据
@@ -37,6 +36,17 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<ProcProcessRouteDetailLinkEntity>(GetByIdSql, new { Id = id });
+        }
+
+        /// <summary>
+        /// 获某工序对应的下一工序
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetProcessRouteDetailLinkAsync(ProcProcessRouteDetailLinkQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcProcessRouteDetailLinkEntity>(GetProcedureIDsSql, query);
         }
 
         /// <summary>
@@ -178,6 +188,9 @@ namespace Hymson.MES.Data.Repositories.Process
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class ProcProcessRouteDetailLinkRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_process_route_detail_link` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
@@ -197,5 +210,6 @@ namespace Hymson.MES.Data.Repositories.Process
                                           `Id`, `SiteId`, `SerialNo`, `ProcessRouteId`, `PreProcessRouteDetailId`, `ProcessRouteDetailId`, `Extra1`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_process_route_detail_link`  WHERE Id IN @ids ";
         const string DeleteByProcessRouteIdSql = "delete from `proc_process_route_detail_link` WHERE ProcessRouteId = @ProcessRouteId ";
+        const string GetProcedureIDsSql = "SELECT * FROM proc_process_route_detail_link WHERE ProcessRouteId = @ProcessRouteId AND PreProcessRouteDetailId = @ProcedureId; ";
     }
 }

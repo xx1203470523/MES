@@ -43,6 +43,17 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 查询详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ProcResourceEntity> GetResByIdAsync(long id)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<ProcResourceEntity>(GetResByIdsSql, new { Id = id });
+        }
+
+        /// <summary>
         /// 查询某些资源类型下关联的资源列表
         /// </summary>
         /// <param name="query"></param>
@@ -339,6 +350,7 @@ namespace Hymson.MES.Data.Repositories.Process
             "LEFT JOIN equ_equipment E ON REB.EquipmentId = E.Id " +
             "LEFT JOIN proc_resource R ON REB.ResourceId = R.Id " +
             "WHERE E.IsDeleted = 0 AND R.IsDeleted = 0 AND E.EquipmentCode = @equipmentCode";
+        const string GetResByIdsSql = "select * from proc_resource where  Id  =@Id";
 
         const string ExistsSql = "SELECT Id FROM proc_resource WHERE `IsDeleted`= 0 AND ResCode=@ResCode and SiteId=@SiteId LIMIT 1";
 

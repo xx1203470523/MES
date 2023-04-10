@@ -16,6 +16,11 @@ namespace Hymson.MES.Core.Enums
         /// 活动
         /// </summary>
         [Description("活动")]
-        Activity = 2
+        Activity = 2,
+        /// <summary>
+        /// 完工
+        /// </summary>
+        [Description("完工")]
+        Complete = 3
     }
 }

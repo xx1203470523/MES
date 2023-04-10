@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -23,6 +22,7 @@ using Hymson.MES.Services.Services.Integrated.InteContainer;
 using Hymson.MES.Services.Services.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuFeeding;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode;
+using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Hymson.MES.Services.Services.Plan;
 using Hymson.MES.Services.Services.Process;
@@ -44,6 +44,7 @@ using Hymson.MES.Services.Validators.Process;
 using Hymson.MES.Services.Validators.Quality;
 using Hymson.MES.Services.Validators.Warehouse;
 using Microsoft.Extensions.Configuration;
+using static Hymson.MES.Services.Validators.Manufacture.ManuFacePlateProductionValidator;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -150,6 +151,7 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Manufacture
+            services.AddSingleton<IManuCommonService, ManuCommonService>();
             services.AddSingleton<IManuFeedingService, ManuFeedingService>();
             services.AddSingleton<IManuSfcProduceService, ManuSfcProduceService>();
             services.AddSingleton<IManuSfcInfoService, ManuSfcInfoService>();
@@ -157,6 +159,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuProductBadRecordService, ManuProductBadRecordService>();
             services.AddSingleton<IManuFacePlateService, ManuFacePlateService>();
             services.AddSingleton<IManuFacePlateButtonService, ManuFacePlateButtonService>();
+
+            services.AddSingleton<IInProductDismantleService, InProductDismantleService>();
             #endregion
 
             #region Warehouse 
@@ -312,6 +316,9 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<AbstractValidator<ManuFacePlateButtonCreateDto>, ManuFacePlateButtonCreateValidator>();
             services.AddSingleton<AbstractValidator<ManuFacePlateButtonModifyDto>, ManuFacePlateButtonModifyValidator>();
+
+            services.AddSingleton<AbstractValidator<ManuFacePlateProductionCreateDto>, ManuFacePlateProductionCreateValidator>();
+            services.AddSingleton<AbstractValidator<ManuFacePlateProductionModifyDto>, ManuFacePlateProductionModifyValidator>();
             #endregion
 
             #region Warehouse 

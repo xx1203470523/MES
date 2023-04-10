@@ -1,17 +1,5 @@
-/*
- *creator: Karl
- *
- *describe: 工艺路线工序节点关系明细表(前节点多条就存多条)仓储类 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-02-14 10:17:52
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -26,6 +14,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcProcessRouteDetailLinkEntity> GetByIdAsync(long id);
+
+        /// <summary>
+        /// 获某工序对应的下一工序
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetProcessRouteDetailLinkAsync(ProcProcessRouteDetailLinkQuery query);
 
         /// <summary>
         /// 根据IDs批量获取数据
