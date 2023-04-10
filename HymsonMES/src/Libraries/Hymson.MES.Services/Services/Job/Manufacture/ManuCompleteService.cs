@@ -1,17 +1,16 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
-using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto;
+using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
-using Hymson.Utils;
 
-namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuStop
+namespace Hymson.MES.Services.Services.Job.Manufacture
 {
     /// <summary>
-    /// 中止
+    /// 完成
     /// </summary>
-    public class ManuStopService : IManuStopService
+    public class ManuCompleteService
     {
         /// <summary>
         /// 当前对象（登录用户）
@@ -34,41 +33,48 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuSto
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
         /// <summary>
+        /// 仓储接口（工序维护）
+        /// </summary>
+        private readonly IProcProcedureRepository _procProcedureRepository;
+
+        /// <summary>
+        /// 仓储接口（工艺路线节点）
+        /// </summary>
+        private readonly IProcProcessRouteDetailNodeRepository _procProcessRouteDetailNodeRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="manuCommonService"></param>
         /// <param name="manuSfcProduceRepository"></param>
-        public ManuStopService(ICurrentUser currentUser, ICurrentSite currentSite,
+        /// <param name="procProcedureRepository"></param>
+        /// <param name="procProcessRouteDetailNodeRepository"></param>
+        public ManuCompleteService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonService manuCommonService,
-            IManuSfcProduceRepository manuSfcProduceRepository)
+            IManuSfcProduceRepository manuSfcProduceRepository,
+            IProcProcedureRepository procProcedureRepository,
+            IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _manuCommonService = manuCommonService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
+            _procProcedureRepository = procProcedureRepository;
+            _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
         }
 
 
         /// <summary>
-        /// 执行（中止）
+        /// 执行（完成）
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task ExecuteAsync(SFCWorkDto dto)
+        public async Task ExecuteAsync(JobDto dto)
         {
-            // 获取生产条码信息（附带条码合法性校验 + 工序活动状态校验）
-            var sfcProduceEntity = await _manuCommonService.GetProduceSPCWithCheckAsync(dto.SFC, dto.ProcedureId);
-
-            // 更改状态，将条码由"活动"改为"排队"
-            sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
-            sfcProduceEntity.UpdatedBy = _currentUser.UserName;
-            sfcProduceEntity.UpdatedOn = HymsonClock.Now();
-            await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
+           
         }
-
-
 
     }
 }

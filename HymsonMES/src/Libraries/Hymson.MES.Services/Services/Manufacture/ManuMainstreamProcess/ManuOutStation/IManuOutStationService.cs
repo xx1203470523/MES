@@ -1,4 +1,4 @@
-﻿using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto;
+﻿using Hymson.MES.Services.Dtos.Common;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation
 {
@@ -11,6 +11,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStat
         /// 执行（出站）
         /// </summary>
         /// <param name="dto"></param>
-        Task ExecuteAsync(SFCWorkDto dto);
+        Task ExecuteAsync(JobDto dto);
     }
 }
