@@ -13,6 +13,7 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using static Dapper.SqlBuilder;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -58,6 +59,28 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<ProcProcessRouteDetailNodeEntity>(GetByIdSql, new { Id = id });
+        }
+
+        /// <summary>
+        /// 查询节点明细
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<ProcProcessRouteDetailNodeEntity> GetByProcessRouteIdAsync(ProcProcessRouteDetailNodeQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<ProcProcessRouteDetailNodeEntity>(GetByProcessRouteIdSql, query);
+        }
+
+        /// <summary>
+        /// 根据ID获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ProcProcessRouteDetailNodeEntity> GetFirstProcedureByProcessRouteIdAsync(long processRouteId)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<ProcProcessRouteDetailNodeEntity>(GetFirstProcedureByProcessRouteIdSql, new { Id = processRouteId });
         }
 
         /// <summary>
@@ -116,6 +139,9 @@ namespace Hymson.MES.Data.Repositories.Process
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class ProcProcessRouteDetailNodeRepository
     {
         const string GetListSqlTemplate = @"select a.*,b.Code,b.Name,b.Type from proc_process_route_detail_node a left join proc_procedure b on a.ProcedureId=b.Id  /**where**/  ";
@@ -124,6 +150,8 @@ namespace Hymson.MES.Data.Repositories.Process
         const string UpdateSql = "UPDATE `proc_process_route_detail_node` SET    ProcessRouteId = @ProcessRouteId, SerialNo = @SerialNo, ProcedureId = @ProcedureId, CheckType = @CheckType, CheckRate = @CheckRate, IsWorkReport = @IsWorkReport, PackingLevel = @PackingLevel, IsFirstProcess = @IsFirstProcess, Status = @Status, Extra1 = @Extra1, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_process_route_detail_node` SET IsDeleted = '1' WHERE Id in @ids";
         const string GetByIdSql = @"SELECT * FROM `proc_process_route_detail_node`  WHERE Id = @Id ";
+        const string GetByProcessRouteIdSql = "SELECT * FROM proc_process_route_detail_node WHERE ProcessRouteId = @ProcessRouteId AND ProcedureId = @ProcedureId";
+        const string GetFirstProcedureByProcessRouteIdSql = @"SELECT * FROM `proc_process_route_detail_node`  WHERE ProcessRouteId = @ProcessRouteId and  IsFirstProcess=1";
         const string GetByIdsSql = @"SELECT * FROM `proc_process_route_detail_node`  WHERE Id IN @ids ";
         const string DeleteByProcessRouteIdSql = "delete from `proc_process_route_detail_node` WHERE ProcessRouteId = @ProcessRouteId ";
     }

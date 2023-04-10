@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 条码生产信息（物理删除）    服务 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-03-18 05:37:27
- */
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -187,7 +180,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                 if (nprocessedSfcs != null && nprocessedSfcs.Length > 0)
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15304)).WithData("Sfcs", string.Join("','", nprocessedSfcs));
+                    throw new BusinessException(nameof(ErrorCode.MES15304)).WithData("Sfcs", string.Join("','", nprocessedSfcs));
                 }
             }
 
@@ -276,9 +269,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Id = IdGenProvider.Instance.CreateId(),
                     SFC = sfc.SFC,
                     ProductId = sfc.ProductId,
-                    WorkOrdeId = sfc.WorkOrderId,
+                    WorkOrderId = sfc.WorkOrderId,
                     WorkCenterId = sfc.WorkCenterId,
-                    ProductBOMId = sfc.BOMId,
+                    ProductBOMId = sfc.ProductBOMId,
                     Qty = sfc.Qty,
                     EquipmentId = sfc.EquipmentId,
                     ResourceId = sfc.ResourceId,
@@ -331,75 +324,21 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES15402));
             }
 
-            if (parm.OperationType == ScrapOperateTypeEnum.Scrapping)
+            var sfcInfoQuery = new ManuSfcInfoQuery
             {
-                var sfcInfoQuery = new ManuSfcInfoQuery
-                {
-                    Sfcs = parm.Sfcs,
-                    Status = SfcStatusEnum.Scrapping
-                };
-                var scrapSfcs = await _manuSfcInfoRepository.GetManuSfcInfoEntitiesAsync(sfcInfoQuery);
-                //类型为报废时判断条码是否已经报废,若已经报废提示:存在已报废的条码，不可再次报废
-                if (scrapSfcs.Any())
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15401));
-                }
-            }
-            else
+                Sfcs = parm.Sfcs,
+                Status = SfcStatusEnum.Scrapping
+            };
+            var scrapSfcs = await _manuSfcInfoRepository.GetManuSfcInfoEntitiesAsync(sfcInfoQuery);
+            //类型为报废时判断条码是否已经报废,若已经报废提示:存在已报废的条码，不可再次报废
+            if (scrapSfcs.Any())
             {
-                var noScrapSfcs = manuSfcs.Where(x => x.IsScrap == TrueOrFalseEnum.No).ToList();
-                if (noScrapSfcs.Any())
-                {
-                    var sfcStr = "";
-                    noScrapSfcs.ForEach(item =>
-                    {
-                        sfcStr = item.SFC + ",";
-                    });
-
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15403)).WithData("Sfcs", sfcStr.Trim(','));
-                }
-
-                //取消报废， 验证工单是否已经激活，若已经取消激活，不能取消报废条码
-                var orderIds = manuSfcs.Select(x => x.WorkOrderId).Distinct().ToArray();
-                var activeOrders = await _planWorkOrderActivationRepository.GetByIdsAsync(orderIds);
-                var orderCodes = "";
-                if (activeOrders == null)
-                {
-                    var orders = await _planWorkOrderRepository.GetByIdsAsync(orderIds);
-                    orders.ToList().ForEach(x =>
-                    {
-                        orderCodes = x.OrderCode + ",";
-                    });
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15404)).WithData("Orders", orderCodes.Trim(','));
-                }
-
-                var activeOrderList = activeOrders.ToList();
-                if (activeOrderList.Count < orderIds.Length)
-                {
-                    var activeOrderIds = activeOrderList.Select(x => x.WorkOrderId).ToArray();
-                    //找出相同元素(即交集)
-                    var diffOrderIds = orderIds.Where(c => !activeOrderIds.Contains(c)).ToArray();
-                    var orders = await _planWorkOrderRepository.GetByIdsAsync(diffOrderIds);
-                    orders.ToList().ForEach(x =>
-                    {
-                        orderCodes = x.OrderCode + ",";
-                    });
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15404)).WithData("Orders", orderCodes.Trim(','));
-                }
+                throw new CustomerValidationException(nameof(ErrorCode.MES15401));
             }
-
             #endregion
 
             #region  组装数据
-            var sfcStepList = new List<ManuSfcStepEntity>();
-            if (parm.OperationType == ScrapOperateTypeEnum.Scrapping)
-            {
-                sfcStepList = GetSfcStepList(manuSfcs, parm.Remark ?? "", ManuSfcStepTypeEnum.Discard);
-            }
-            else
-            {
-                sfcStepList = GetSfcStepList(manuSfcs, parm.Remark ?? "", ManuSfcStepTypeEnum.CancelDiscard);
-            }
+            var sfcStepList = GetSfcStepList(manuSfcs, parm.Remark ?? "", ManuSfcStepTypeEnum.Discard);
 
             var sfcs = manuSfcs.Select(a => a.SFC).ToArray();
             var isScrapCommand = new UpdateIsScrapCommand
@@ -407,14 +346,14 @@ namespace Hymson.MES.Services.Services.Manufacture
                 Sfcs = sfcs,
                 UserId = _currentUser.UserName,
                 UpdatedOn = HymsonClock.Now(),
-                IsScrap = parm.OperationType == ScrapOperateTypeEnum.Scrapping ? TrueOrFalseEnum.Yes : TrueOrFalseEnum.No
+                IsScrap = TrueOrFalseEnum.Yes
             };
             var manuSfcInfoUpdate = new ManuSfcInfoUpdateCommand
             {
                 Sfcs = sfcs,
                 UserId = _currentUser.UserName,
                 UpdatedOn = HymsonClock.Now(),
-                Status = parm.OperationType == ScrapOperateTypeEnum.Scrapping ? SfcStatusEnum.Scrapping : SfcStatusEnum.InProcess
+                Status = SfcStatusEnum.Scrapping
             };
             #endregion
 
@@ -423,6 +362,98 @@ namespace Hymson.MES.Services.Services.Manufacture
             using (var trans = TransactionHelper.GetTransactionScope())
             {
                 //1.插入数据操作类型为报废
+                rows += await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
+
+                //2.修改在制品表,IsScrap
+                rows += await _manuSfcProduceRepository.UpdateIsScrapAsync(isScrapCommand);
+
+                //3.条码信息表
+                rows += await _manuSfcInfoRepository.UpdateStatusAsync(manuSfcInfoUpdate);
+                trans.Complete();
+            }
+        }
+
+        /// <summary>
+        /// 条码取消报废
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        public async Task QualityCancelScrapAsync(ManuSfScrapDto parm)
+        {
+            #region 验证
+            if (parm == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            }
+
+            if (parm.Sfcs == null || parm.Sfcs.Length < 1)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15400));
+            }
+
+            var sfc = parm.Sfcs.Distinct();
+            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = parm.Sfcs };
+            //获取条码列表
+            var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
+            if (!manuSfcs.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15402));
+            }
+
+            var noScrapSfcs = manuSfcs.Where(x => x.IsScrap == TrueOrFalseEnum.No).Select(x => x.SFC).ToArray();
+            if (noScrapSfcs.Any())
+            {
+                var strs = string.Join("','", noScrapSfcs);
+                throw new CustomerValidationException(nameof(ErrorCode.MES15403)).WithData("sfcs", strs);
+            }
+
+            //取消报废， 验证工单是否已经激活，若已经取消激活，不能取消报废条码
+            var orderIds = manuSfcs.Select(x => x.WorkOrderId).Distinct().ToArray();
+            var activeOrders = await _planWorkOrderActivationRepository.GetByIdsAsync(orderIds);
+            if (activeOrders == null)
+            {
+                var orders = await _planWorkOrderRepository.GetByIdsAsync(orderIds);
+                var orderCodes = orders.Select(x => x.OrderCode).ToArray();
+                throw new CustomerValidationException(nameof(ErrorCode.MES15404)).WithData("orders", string.Join("','", orderCodes));
+            }
+
+            var activeOrderList = activeOrders.ToList();
+            if (activeOrderList.Count < orderIds.Length)
+            {
+                var activeOrderIds = activeOrderList.Select(x => x.WorkOrderId).ToArray();
+                //找出相同元素(即交集)
+                var diffOrderIds = orderIds.Where(c => !activeOrderIds.Contains(c)).ToArray();
+                var orders = await _planWorkOrderRepository.GetByIdsAsync(diffOrderIds);
+                var orderCodesStr = string.Join(",", orders.Select(x => x.OrderCode).ToArray());
+                throw new CustomerValidationException(nameof(ErrorCode.MES15404)).WithData("orders", orderCodesStr);
+            }
+            #endregion
+
+            #region  组装数据
+            var sfcStepList = GetSfcStepList(manuSfcs, parm.Remark ?? "", ManuSfcStepTypeEnum.CancelDiscard);
+
+            var sfcs = manuSfcs.Select(a => a.SFC).ToArray();
+            var isScrapCommand = new UpdateIsScrapCommand
+            {
+                Sfcs = sfcs,
+                UserId = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now(),
+                IsScrap = TrueOrFalseEnum.No
+            };
+            var manuSfcInfoUpdate = new ManuSfcInfoUpdateCommand
+            {
+                Sfcs = sfcs,
+                UserId = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now(),
+                Status = SfcStatusEnum.InProcess
+            };
+            #endregion
+
+            //入库
+            var rows = 0;
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                //1.插入数据操作类型为取消报废
                 rows += await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
 
                 //2.修改在制品表,IsScrap
@@ -450,9 +481,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Id = IdGenProvider.Instance.CreateId(),
                     SFC = sfc.SFC,
                     ProductId = sfc.ProductId,
-                    WorkOrdeId = sfc.WorkOrderId,
+                    WorkOrderId = sfc.WorkOrderId,
                     WorkCenterId = sfc.WorkCenterId,
-                    ProductBOMId = sfc.BOMId,
+                    ProductBOMId = sfc.ProductBOMId,
                     Qty = sfc.Qty,
                     EquipmentId = sfc.EquipmentId,
                     ResourceId = sfc.ResourceId,

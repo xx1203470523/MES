@@ -306,7 +306,30 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 不合格工艺路线id
         /// </summary>
         public long? BadProcessRouteId { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+
+        /// <summary>
+        /// 不合格代码信息
+        /// </summary>
+        public List<UnqualifiedDefectList> UnqualifiedLists { get; set; }
     }
+
+    public class UnqualifiedDefectList
+    {
+        /// <summary>
+        /// 不合格代码
+        /// </summary>
+        public long UnqualifiedId { get; set; }
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+    }
+
     public class ManuProductBadRecordViewDto
     {
         /// <summary>

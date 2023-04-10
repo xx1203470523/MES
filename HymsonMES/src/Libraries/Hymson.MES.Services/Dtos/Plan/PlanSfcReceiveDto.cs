@@ -62,6 +62,11 @@ namespace Hymson.MES.Services.Dtos.Plan
         public string RelevanceOrderCode { get; set; }
 
         /// <summary>
+        /// 是否在用
+        /// </summary>
+        public long IsUsed { get; set; }
+
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
@@ -202,11 +207,11 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// <summary>
         /// 工单号
         /// </summary>
-        public string? WorkOrderCode { get; set; }
+        public string? OrderCode { get; set; } = "";
 
         /// <summary>
         /// 工单类型
         /// </summary>
-        public long WorkOrderType { get; set; }
+        public long? Type { get; set; } = 0;
     }
 }

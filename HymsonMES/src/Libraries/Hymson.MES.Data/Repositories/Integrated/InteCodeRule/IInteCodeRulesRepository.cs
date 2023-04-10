@@ -28,7 +28,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="inteCodeRulesEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(InteCodeRulesEntity inteCodeRulesEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -42,7 +42,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="inteCodeRulesEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(InteCodeRulesEntity inteCodeRulesEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -70,7 +70,14 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="id"></param>
         /// <returns></returns>
         Task<InteCodeRulesEntity> GetByIdAsync(long id);
-    
+
+        /// <summary>
+        /// 根据ID获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<InteCodeRulesEntity> GetInteCodeRulesByProductIdAsync(long productId);
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>

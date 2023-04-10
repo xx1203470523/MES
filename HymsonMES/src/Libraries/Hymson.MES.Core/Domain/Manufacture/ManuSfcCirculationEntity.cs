@@ -77,5 +77,20 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 流转类型;1：拆分；2：合并；3：转换; 4.消耗
         /// </summary>
         public SfcCirculationTypeEnum Type { get; set; }
+
+
+        /// <summary>
+        /// 拆解人
+        /// </summary>
+        public string DisassembledBy { get; set; }
+
+        /// <summary>
+        /// 拆解时间
+        /// </summary>
+        public DateTime? DisassembledOn { get; set; }
+        /// <summary>
+        /// 换件id
+        /// </summary>
+        public long? SubstituteId { get; set; }
     }
 }

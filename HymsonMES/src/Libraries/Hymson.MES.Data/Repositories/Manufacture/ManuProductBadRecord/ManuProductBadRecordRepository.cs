@@ -190,7 +190,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuSfcInfoEntity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateStatusAsync(List<ManuProductBadRecordCommand> commands)
+        public async Task<int> UpdateStatusRangeAsync(List<ManuProductBadRecordCommand> commands)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateStatusSql, commands);
@@ -217,6 +217,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                           `Id`, `SiteId`, `FoundBadOperationId`, `OutflowOperationId`, `UnqualifiedId`, `SFC`, `Qty`, `Status`, `Source`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_product_bad_record`  WHERE Id IN @ids ";
 
-        const string UpdateStatusSql = "UPDATE `manu_product_bad_record` SET Remark = @Remark,Status=@Status,UpdatedBy=@UserId,UpdatedOn=@UpdatedOn WHERE SFC =@Sfc  AND UnqualifiedId=@UnqualifiedId";
+        const string UpdateStatusSql = "UPDATE `manu_product_bad_record` SET Remark = @Remark,Status=@Status,UpdatedBy=@UserId,UpdatedOn=@UpdatedOn WHERE SFC=@Sfc  AND UnqualifiedId=@UnqualifiedId  and  Status!=@Status ";
     }
 }

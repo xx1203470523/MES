@@ -238,7 +238,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             //根据条码和不合格代码和资源去重显示
-            manuProductBadRecordDtos= manuProductBadRecordDtos.DistinctBy(x=>x.UnqualifiedId).ToList();
+            manuProductBadRecordDtos = manuProductBadRecordDtos.DistinctBy(x => x.UnqualifiedId).ToList();
             return manuProductBadRecordDtos;
         }
 
@@ -249,8 +249,72 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task BadReJudgmentAsync(BadReJudgmentDto badReJudgmentDto)
         {
+            #region
+            if (badReJudgmentDto == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            }
+
+            if (string.IsNullOrWhiteSpace(badReJudgmentDto.Sfc))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15400));
+            }
+
+            if (!badReJudgmentDto.UnqualifiedLists.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15405));
+            }
+            #endregion
+
+            //TODO 放到不合格工艺路线指定工序排队
             //判断是否关闭所有不合格代码
             //判断当前工序是否末工序
+
+            #region  组装数据
+
+            //获取条码列表
+            var sfcs = new string[] { badReJudgmentDto.Sfc };
+            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = sfcs };
+            var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
+            if (!manuSfcs.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15402));
+            }
+
+            var sfcStepList = new List<ManuSfcStepEntity>();
+            if (manuSfcs.Any())
+            {
+                sfcStepList.Add(GetSfcStepList(manuSfcs.ToList()[0], ManuSfcStepTypeEnum.CloseDefect, badReJudgmentDto.Remark ?? ""));
+            }
+
+            var updateCommandList = new List<ManuProductBadRecordCommand>();
+            foreach (var unqualified in badReJudgmentDto.UnqualifiedLists)
+            {
+                updateCommandList.Add(new ManuProductBadRecordCommand
+                {
+                    SiteId = _currentSite.SiteId ?? 0,
+                    Sfc = badReJudgmentDto.Sfc,
+                    UnqualifiedId = unqualified.UnqualifiedId,
+                    Remark = unqualified.Remark ?? "",
+                    Status = ProductBadRecordStatusEnum.Close,
+                    UserId = _currentUser.UserName,
+                    UpdatedOn = HymsonClock.Now(),
+                });
+            }
+            #endregion
+
+            //入库
+            var rows = 0;
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                //1.记录数据
+                rows += await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
+
+                //2.修改状态为关闭
+                rows += await _manuProductBadRecordRepository.UpdateStatusRangeAsync(updateCommandList);
+
+                trans.Complete();
+            }
         }
 
         /// <summary>
@@ -269,17 +333,22 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15400));
             }
+
             #region  组装数据
 
+            //获取条码列表
             var sfcs = cancelDto.UnqualifiedLists.Select(x => x.Sfc).Distinct().ToArray();
             var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = sfcs };
-            //获取条码列表
             var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
+            if (!manuSfcs.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15402));
+            }
 
             var sfcStepList = new List<ManuSfcStepEntity>();
             if (manuSfcs.Any())
             {
-                sfcStepList.Add(GetSfcStepList(manuSfcs.ToList()[0], cancelDto.Remark ?? ""));
+                sfcStepList.Add(GetSfcStepList(manuSfcs.ToList()[0], ManuSfcStepTypeEnum.CloseIdentification, cancelDto.Remark ?? ""));
             }
 
             var updateCommandList = new List<ManuProductBadRecordCommand>();
@@ -287,6 +356,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 updateCommandList.Add(new ManuProductBadRecordCommand
                 {
+                    SiteId = _currentSite.SiteId ?? 0,
                     Sfc = unqualified.Sfc,
                     UnqualifiedId = unqualified.UnqualifiedId,
                     Remark = unqualified.Remark ?? "",
@@ -305,7 +375,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 rows += await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
 
                 //2.修改状态为关闭
-                rows += await _manuProductBadRecordRepository.UpdateStatusAsync(updateCommandList);
+                rows += await _manuProductBadRecordRepository.UpdateStatusRangeAsync(updateCommandList);
 
                 trans.Complete();
             }
@@ -317,22 +387,21 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="sfc"></param>
         /// <param name="remark"></param>
         /// <returns></returns>
-        private ManuSfcStepEntity GetSfcStepList(ManuSfcProduceEntity sfc, string remark)
+        private ManuSfcStepEntity GetSfcStepList(ManuSfcProduceEntity sfc, ManuSfcStepTypeEnum type, string remark = "")
         {
-            var sfcStepList = new List<ManuSfcStepEntity>();
             return new ManuSfcStepEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SFC = sfc.SFC,
                 ProductId = sfc.ProductId,
-                WorkOrdeId = sfc.WorkOrderId,
+                WorkOrderId = sfc.WorkOrderId,
                 WorkCenterId = sfc.WorkCenterId,
-                ProductBOMId = sfc.BOMId,
+                ProductBOMId = sfc.ProductBOMId,
                 Qty = sfc.Qty,
                 EquipmentId = sfc.EquipmentId,
                 ResourceId = sfc.ResourceId,
                 ProcedureId = sfc.ProcedureId,
-                Type = ManuSfcStepTypeEnum.Discard,
+                Type = type,
                 Status = sfc.Status,
                 Lock = sfc.Lock,
                 Remark = remark,

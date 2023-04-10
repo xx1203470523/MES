@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Process;
 
 namespace Hymson.MES.Core.Domain.Process
 {
@@ -37,7 +38,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :抽检类型 
         /// 空值 : true  
         /// </summary>
-        public int? CheckType { get; set; }
+        public ProcessRouteInspectTypeEnum? CheckType { get; set; }
         
         /// <summary>
         /// 描述 :抽检比例 

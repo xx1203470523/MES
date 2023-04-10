@@ -3,7 +3,7 @@
 namespace Hymson.MES.Core.Enums
 {
     /// <summary>
-    /// 
+    /// 系统通用状态实体
     /// </summary>
     public enum SysDataStatusEnum : sbyte
     {

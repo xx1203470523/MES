@@ -23,6 +23,10 @@ namespace Hymson.MES.Data.Repositories.Process
     {
         private readonly ConnectionOptions _connectionOptions;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
         public ProcBomDetailRepository(IOptions<ConnectionOptions> connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
@@ -87,12 +91,23 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 根据BomID查询物料
         /// </summary>
+        /// <param name="bomId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcBomDetailEntity>> GetByBomIdAsync(long bomId)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcBomDetailEntity>(GetByBomIdSql, new { bomId });
+        }
+
+        /// <summary>
+        /// 根据BomID查询物料
+        /// </summary>
         /// <param name="bomIds"></param>
         /// <returns></returns>
         public async Task<IEnumerable<ProcBomDetailEntity>> GetByBomIdsAsync(IEnumerable<long> bomIds)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcBomDetailEntity>(GetByBomIds, new { bomIds });
+            return await conn.QueryAsync<ProcBomDetailEntity>(GetByBomIdsSql, new { bomIds });
         }
 
         /// <summary>
@@ -103,7 +118,6 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<IEnumerable<ProcBomDetailView>> GetListMainAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-
             return await conn.QueryAsync<ProcBomDetailView>(GetListMainSql, new { id = id });
         }
 
@@ -234,7 +248,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetListMainSql = @"SELECT 
                                           a.`Id`,a.MaterialId, 0 as BomDetailId,  a.`Usages`, a.`Loss`,a.`ReferencePoint`, a.`ProcedureId`, 
                      1 as IsMain, b.MaterialCode, b.MaterialName,
-                     b.Version, c.Name as ProcedureName, c.Code 
+                     b.Version, b.SerialNumber, c.Name as ProcedureName, c.Code 
                             FROM `proc_bom_detail` a
                             INNER JOIN proc_material b on a.MaterialId = b.Id 
                             LEFT JOIN proc_procedure c on a.ProcedureId = c.Id
@@ -254,6 +268,8 @@ namespace Hymson.MES.Data.Repositories.Process
                             WHERE a.IsDeleted =0
                             AND a.BomId=@id
                             ORDER by a.UpdatedOn DESC ";
-        const string GetByBomIds = @"SELECT MaterialId FROM proc_bom_detail WHERE IsDeleted = 0 AND BomId IN @bomIds ";
+        const string GetByBomIdSql = @"SELECT * FROM proc_bom_detail WHERE IsDeleted = 0 AND BomId = @bomId ";
+        const string GetByBomIdsSql = @"SELECT * FROM proc_bom_detail WHERE IsDeleted = 0 AND BomId IN @bomIds ";
+
     }
 }

@@ -73,6 +73,18 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         /// <summary>
+        /// 条码取消报废
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("cancelScrap")]
+        public async Task QualityCancelScrapAsync(ManuSfScrapDto parm)
+        {
+            await _manuSfcProduceService.QualityCancelScrapAsync(parm);
+        }
+
+        /// <summary>
         /// 查询详情（条码生产信息（物理删除））
         /// </summary>
         /// <param name="id"></param>

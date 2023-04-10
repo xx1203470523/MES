@@ -45,6 +45,6 @@ namespace Hymson.MES.Core.Domain.Manufacture
        /// <summary>
         /// 零部件信息id
         /// </summary>
-        public long PartsBarCodeId { get; set; }
+        public string  PartsBarCode { get; set; }
     }
 }

@@ -82,5 +82,13 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// </summary>
         [Description("取消报废")]
        CancelDiscard = 14,
+        /// 关闭标识
+        /// </summary>
+        [Description("关闭标识")]
+        CloseIdentification = 15,
+        /// 关闭缺陷
+        /// </summary>
+        [Description("关闭缺陷")]
+        CloseDefect = 16
     }
 }
