@@ -7,6 +7,7 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Manufacture;
+using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto;
 using Hymson.MES.Services.Services.Manufacture;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -73,7 +74,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [Route("create")]
         public async Task AddManuFacePlateAsync([FromBody] AddManuFacePlateDto parm)
         {
-             await _manuFacePlateService.AddManuFacePlateAsync(parm);
+            await _manuFacePlateService.AddManuFacePlateAsync(parm);
         }
 
         /// <summary>
@@ -85,7 +86,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [Route("update")]
         public async Task UpdateManuFacePlateAsync([FromBody] UpdateManuFacePlateDto parm)
         {
-             await _manuFacePlateService.UpdateManuFacePlateAsync(parm);
+            await _manuFacePlateService.UpdateManuFacePlateAsync(parm);
         }
 
         /// <summary>
