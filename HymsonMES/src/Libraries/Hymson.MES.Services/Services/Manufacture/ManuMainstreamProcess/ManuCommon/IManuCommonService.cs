@@ -1,6 +1,7 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon
@@ -11,20 +12,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
     public interface IManuCommonService
     {
         /// <summary>
-        /// 获取生产条码信息（附带条码合法性校验）
-        /// </summary>
-        /// <param name="spc"></param>
-        /// <param name="procedureId"></param>
-        /// <returns></returns>
-        Task<ManuSfcProduceEntity> GetProduceSPCAsync(string spc, long procedureId);
-
-        /// <summary>
         /// 获取生产条码信息（附带条码合法性校验 + 工序活动状态校验）
         /// </summary>
         /// <param name="spc"></param>
         /// <param name="procedureId"></param>
+        /// <param name="allowStatus"></param>
         /// <returns></returns>
-        Task<ManuSfcProduceEntity> GetProduceSPCWithCheckAsync(string spc, long procedureId);
+        Task<ManuSfcProduceEntity> GetProduceSPCWithCheckAsync(string spc, long procedureId, SfcProduceStatusEnum[] allowStatus);
 
         /// <summary>
         /// 获取生产工单

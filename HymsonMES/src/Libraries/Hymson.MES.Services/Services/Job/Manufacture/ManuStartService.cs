@@ -79,10 +79,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         public async Task ExecuteAsync(JobDto dto)
         {
             // 获取生产条码信息（附带条码合法性校验）
-            var sfcProduceEntity = await _manuCommonService.GetProduceSPCAsync(dto.SFC, dto.ProcedureId);
-
-            // 当前工序是否是活动状态
-            if (sfcProduceEntity.Status != SfcProduceStatusEnum.lineUp) throw new BusinessException(nameof(ErrorCode.MES16308));
+            var sfcProduceEntity = await _manuCommonService.GetProduceSPCWithCheckAsync(dto.SFC, dto.ProcedureId, new SfcProduceStatusEnum[] { SfcProduceStatusEnum.lineUp });
 
             // 获取生产工单（附带工单状态校验）
             var workOrderEntity = await _manuCommonService.GetProduceWorkOrderByIdAsync(sfcProduceEntity.WorkOrderId);
