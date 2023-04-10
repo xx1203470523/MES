@@ -45,10 +45,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <summary>
         /// 读取挂载的作业并执行
         /// </summary>
-        /// <param name="facePlateId"></param>
         /// <param name="facePlateButtonId"></param>
         /// <returns></returns>
-        Task ExecuteJobAsync(long facePlateId, long facePlateButtonId);
+        Task ExecuteJobAsync(long facePlateButtonId);
 
     }
 }
