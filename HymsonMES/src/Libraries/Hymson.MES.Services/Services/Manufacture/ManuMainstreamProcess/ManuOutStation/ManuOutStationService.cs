@@ -222,17 +222,21 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 deduct.Qty = item.Usages * item.Loss;
 
                 // TODO 1.确认收集方式是否批次 item.ReferencePoint
-                if (item.ReferencePoint != "TODO 是批次")
+                if (item.ReferencePoint == "TODO 收集方式是批次")
                 {
-                    var materialEntity = await _procMaterialRepository.GetByIdAsync(item.MaterialId);
-                    if (materialEntity == null) continue;
-
-                    // 2.确认主物料的收集方式
-                    if (materialEntity.SerialNumber != MaterialSerialNumberEnum.Batch) continue;
-
-                    // 如有设置消耗系数
-                    if (materialEntity.ConsumeRatio.HasValue == true) deduct.Qty *= materialEntity.ConsumeRatio.Value;
+                    // 添加到待扣料集合
+                    deductList.Add(deduct);
+                    continue;
                 }
+
+                var materialEntity = await _procMaterialRepository.GetByIdAsync(item.MaterialId);
+                if (materialEntity == null) continue;
+
+                // 2.确认主物料的收集方式，不是"批次"就结束
+                if (materialEntity.SerialNumber != MaterialSerialNumberEnum.Batch) continue;
+
+                // 如有设置消耗系数
+                if (materialEntity.ConsumeRatio.HasValue == true) deduct.Qty *= materialEntity.ConsumeRatio.Value;
 
                 // 添加到待扣料集合
                 deductList.Add(deduct);
@@ -240,6 +244,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
 
             // TODO 扣料
 
+            // 判断在线库存物料是否满足要求（物料编码，数量，状态）
+
+            // 扣料并关联主条码
+
+            // 判断BOM物料绑定？？
 
         }
 

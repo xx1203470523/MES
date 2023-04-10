@@ -211,7 +211,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             return procProcedureEntity;
         }
 
-
+        // TODO 检验该节点是否有挂在其他作业
 
     }
 }

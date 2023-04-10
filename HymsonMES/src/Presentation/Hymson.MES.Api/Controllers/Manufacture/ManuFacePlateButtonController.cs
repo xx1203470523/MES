@@ -7,6 +7,7 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Manufacture;
+using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto;
 using Hymson.MES.Services.Services.Manufacture;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -100,6 +101,17 @@ namespace Hymson.MES.Api.Controllers.Manufacture
             await _manuFacePlateButtonService.DeletesManuFacePlateButtonAsync(ids);
         }
 
+
+        /// <summary>
+        /// 按钮（点击）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut("button")]
+        public async Task ClickAsync(SFCButtonDto dto)
+        {
+            await _manuFacePlateButtonService.ClickAsync(dto);
+        }
         #endregion
     }
 }
