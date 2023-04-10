@@ -1,6 +1,4 @@
-﻿using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto;
-
-namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPackage
+﻿namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPackage
 {
     /// <summary>
     /// 组装
@@ -10,7 +8,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPac
         /// <summary>
         /// 执行（组装）
         /// </summary>
-        /// <param name="dto"></param>
-        Task ExecuteAsync(SFCWorkDto dto);
+        Task ExecuteAsync();
     }
 }

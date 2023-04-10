@@ -19,10 +19,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// <summary>
     /// 操作面板按钮仓储
     /// </summary>
-    public partial class ManuFacePlateButtonRepository :BaseRepository, IManuFacePlateButtonRepository
+    public partial class ManuFacePlateButtonRepository : BaseRepository, IManuFacePlateButtonRepository
     {
 
-        public ManuFacePlateButtonRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        public ManuFacePlateButtonRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
         }
 
@@ -43,7 +43,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -57,7 +57,18 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<ManuFacePlateButtonEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ManuFacePlateButtonEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ManuFacePlateButtonEntity>(GetByIdSql, new { Id = id });
+        }
+
+        /// <summary>
+        /// 根据FacePlateId获取数据
+        /// </summary>
+        /// <param name="facePlateId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuFacePlateButtonEntity>> GetByFacePlateIdAsync(long facePlateId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuFacePlateButtonEntity>(GetByFacePlateIdSql, new { facePlateId });
         }
 
         /// <summary>
@@ -65,10 +76,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuFacePlateButtonEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ManuFacePlateButtonEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<ManuFacePlateButtonEntity>(GetByIdsSql, new { Ids = ids});
+            return await conn.QueryAsync<ManuFacePlateButtonEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -88,7 +99,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
-           
+
             var offSet = (manuFacePlateButtonPagedQuery.PageIndex - 1) * manuFacePlateButtonPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = manuFacePlateButtonPagedQuery.PageSize });
@@ -184,6 +195,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteId`, `FacePlateId`, `Seq`, `Name`, `Percentage`, `Hotkeys`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_face_plate_button`  WHERE Id = @Id ";
+        const string GetByFacePlateIdSql = "SELECT * FROM manu_face_plate_button WHERE IsDeleted = 0 AND FacePlateId = @facePlateId;";
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `FacePlateId`, `Seq`, `Name`, `Percentage`, `Hotkeys`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_face_plate_button`  WHERE Id IN @Ids ";

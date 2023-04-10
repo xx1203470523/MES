@@ -220,7 +220,9 @@ namespace Hymson.MES.Services.Services.Quality
                 {
                     qualUnqualifiedCodeGroupRelationlist.Add(new QualUnqualifiedCodeGroupRelation
                     {
-                        // TODO      SiteCode = _currentSite.Name,
+                        Id=IdGenProvider.Instance.CreateId(),
+                        SiteId=_currentSite.SiteId??0,
+
                         UnqualifiedGroupId = qualUnqualifiedGroupEntity.Id,
                         UnqualifiedCodeId = item,
                         CreatedBy = userId,
@@ -230,13 +232,15 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             List<QualUnqualifiedGroupProcedureRelation> qualUnqualifiedGroupProcedureRelationList = new List<QualUnqualifiedGroupProcedureRelation>();
-            if (param.UnqualifiedCodeIds != null && param.UnqualifiedCodeIds.Any())
+            if (param.ProcedureIds != null && param.ProcedureIds.Any())
             {
-                foreach (var item in param.UnqualifiedCodeIds)
+                foreach (var item in param.ProcedureIds)
                 {
                     qualUnqualifiedGroupProcedureRelationList.Add(new QualUnqualifiedGroupProcedureRelation
                     {
-                        // TODO    SiteCode = _currentSite.Name,
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = _currentSite.SiteId ?? 0,
+
                         UnqualifiedGroupId = qualUnqualifiedGroupEntity.Id,
                         ProcedureId = item,
                         CreatedBy = userId,

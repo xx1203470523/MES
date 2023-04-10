@@ -63,8 +63,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// </summary>
         private readonly IProcProcedureRepository _procProcedureRepository;
 
+
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
@@ -97,12 +98,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
 
 
         /// <summary>
-        /// 获取生产条码信息（附带条码合法性校验）
+        /// 获取生产条码信息（附带条码合法性校验 + 工序活动状态校验）
         /// </summary>
         /// <param name="spc"></param>
         /// <param name="procedureId"></param>
+        /// <param name="allowStatus"></param>
         /// <returns></returns>
-        public async Task<ManuSfcProduceEntity> GetProduceSPCWithCheckAsync(string spc, long procedureId)
+        public async Task<ManuSfcProduceEntity> GetProduceSPCWithCheckAsync(string spc, long procedureId, SfcProduceStatusEnum[] allowStatus)
         {
             if (string.IsNullOrWhiteSpace(spc) == true
                 || spc.Contains(' ') == true) throw new BusinessException(nameof(ErrorCode.MES16305));
@@ -111,7 +113,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             if (sfcProduceEntity == null) throw new BusinessException(nameof(ErrorCode.MES16306));
 
             // 当前工序是否是活动状态
-            if (sfcProduceEntity.Status != SfcProduceStatusEnum.Activity) throw new BusinessException(nameof(ErrorCode.MES16309));
+            if (allowStatus.Length > 0 && allowStatus.Contains(sfcProduceEntity.Status) == false) throw new BusinessException(nameof(ErrorCode.MES16309));
 
             // 产品编码是否和工序对应
             if (sfcProduceEntity.ProcedureId != procedureId) throw new BusinessException(nameof(ErrorCode.MES16308));
@@ -197,10 +199,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             {
                 ProcessRouteId = processRouteId,
                 ProcedureId = procedureId
-            }) ?? throw new BusinessException(nameof(ErrorCode.MES10440));
+            });
+            if (processRouteDetailLink == null || processRouteDetailLink.Any() == false) throw new BusinessException(nameof(ErrorCode.MES10440));
+
+            // TODO 根据规则取下一工序
+            var routeDetail = processRouteDetailLink.FirstOrDefault();
+            if (routeDetail == null) throw new BusinessException(nameof(ErrorCode.MES10440));
 
             // 获取下一工序
-            var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(processRouteDetailLink.ProcessRouteDetailId);
+            var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(routeDetail.ProcessRouteDetailId);
             if (procProcedureEntity == null)
             {
                 return null;
@@ -211,7 +218,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             return procProcedureEntity;
         }
 
-        // TODO 检验该节点是否有挂在其他作业
 
     }
 }

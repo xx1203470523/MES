@@ -6,7 +6,9 @@
  *build datetime: 2023-04-01 02:58:19
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
+using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -56,5 +58,14 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ManuFacePlateButtonDto> QueryManuFacePlateButtonByIdAsync(long id);
+
+
+        /// <summary>
+        /// 按钮（点击）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task ClickAsync(JobDto dto);
+
     }
 }

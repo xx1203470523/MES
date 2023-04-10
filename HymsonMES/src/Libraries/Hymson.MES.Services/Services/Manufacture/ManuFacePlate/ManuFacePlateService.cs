@@ -9,16 +9,14 @@ using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
-using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Manufacture;
-using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -149,7 +147,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="manuFacePlateDto"></param>
+        /// <param name="manuFacePlateModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyManuFacePlateAsync(ManuFacePlateModifyDto manuFacePlateModifyDto)
         {
@@ -265,6 +263,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             return queryProcDto;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="addManuFacePlateDto"></param>
+        /// <returns></returns>
+        /// <exception cref="ValidationException"></exception>
         public async Task AddManuFacePlateAsync(AddManuFacePlateDto addManuFacePlateDto)
         {
             // 判断是否有获取到站点码 
@@ -333,6 +337,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="updateManuFacePlateDto"></param>
+        /// <returns></returns>
+        /// <exception cref="ValidationException"></exception>
         public async Task UpdateManuFacePlateAsync(UpdateManuFacePlateDto updateManuFacePlateDto)
         {
             // 判断是否有获取到站点码 
@@ -385,5 +395,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ts.Complete();
             }
         }
+
+
     }
 }
