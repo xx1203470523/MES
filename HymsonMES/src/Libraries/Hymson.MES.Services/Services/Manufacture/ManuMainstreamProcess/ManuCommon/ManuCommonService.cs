@@ -110,14 +110,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             var sfcProduceEntity = await _manuSfcProduceRepository.GetBySPCAsync(spc);
             if (sfcProduceEntity == null) throw new BusinessException(nameof(ErrorCode.MES16306));
 
-            // TODO 这个Status需要判断吗？
-            if (sfcProduceEntity.Status != SfcProduceStatusEnum.Activity) throw new BusinessException(nameof(ErrorCode.MES16307));
+            // 当前工序是否是活动状态
+            if (sfcProduceEntity.Status != SfcProduceStatusEnum.Activity) throw new BusinessException(nameof(ErrorCode.MES16309));
 
             // 产品编码是否和工序对应
             if (sfcProduceEntity.ProcedureId != procedureId) throw new BusinessException(nameof(ErrorCode.MES16308));
-
-            // 当前工序是否是活动状态
-            if (sfcProduceEntity.Status != SfcProduceStatusEnum.Activity) throw new BusinessException(nameof(ErrorCode.MES16309));
 
             return sfcProduceEntity;
         }
@@ -207,13 +204,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             if (procProcedureEntity == null)
             {
                 return null;
-                //throw new BusinessException(nameof(ErrorCode.MES10406));
+                // 结束工序读取不到数据
+                // throw new BusinessException(nameof(ErrorCode.MES10605));
             }
 
             return procProcedureEntity;
         }
 
-     
+
 
     }
 }
