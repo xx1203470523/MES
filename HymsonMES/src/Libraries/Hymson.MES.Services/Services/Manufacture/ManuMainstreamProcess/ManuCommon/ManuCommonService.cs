@@ -217,24 +217,26 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             {
                 ProcessRouteId = manuSfcProduce.ProcessRouteId,
                 ProcedureId = manuSfcProduce.ProcedureId
-            });
+            }) ?? throw new BusinessException(nameof(ErrorCode.MES10440));
 
-            // 固定抽检
-            if (procedureExtend.CheckType == ProcessRouteInspectTypeEnum.FixedScale)
+            // 抽检类型
+            //ProcProcessRouteDetailLinkEntity routeDetail;
+            switch (procedureExtend.CheckType)
             {
-                // 读取工序抽检次数
-                var cacheKey = $"{manuSfcProduce.ProcessRouteId}-{manuSfcProduce.ProcedureId}-{manuSfcProduce.ResourceId}";
-                if (_memoryCache.TryGetValue(cacheKey, out int count) == false) count = 0;
+                // 固定抽检
+                case ProcessRouteInspectTypeEnum.FixedScale:
+                    // 读取工序抽检次数
+                    var cacheKey = $"{manuSfcProduce.ProcessRouteId}-{manuSfcProduce.ProcedureId}-{manuSfcProduce.ResourceId}";
+                    if (_memoryCache.TryGetValue(cacheKey, out int count) == false) count = 0;
 
-                if (count >= procedureExtend.CheckRate)
-                {
-                    // TODO
-                }
-            }
-            // 随机
-            else
-            {
-                // 可跳过？
+
+                    break;
+                case ProcessRouteInspectTypeEnum.None:
+                case ProcessRouteInspectTypeEnum.RandomInspection:
+                case ProcessRouteInspectTypeEnum.SpecialSamplingInspection:
+                default:
+                    //routeDetail = processRouteDetailLink.FirstOrDefault();
+                    break;
             }
 
             // TODO 根据规则取下一工序
