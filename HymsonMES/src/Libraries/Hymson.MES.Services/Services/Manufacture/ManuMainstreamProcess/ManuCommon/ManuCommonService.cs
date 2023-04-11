@@ -31,7 +31,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <summary>
         /// 仓储接口（条码信息）
         /// </summary>
-        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
+        private readonly IManuSfcRepository _manuSfcRepository;
 
         /// <summary>
         /// 仓储接口（条码生产信息）
@@ -77,7 +77,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="procProcessRouteDetailLinkRepository"></param>
         /// <param name="procProcedureRepository"></param>
         public ManuCommonService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IManuSfcInfoRepository manuSfcInfoRepository,
+            IManuSfcRepository manuSfcRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
@@ -87,7 +87,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _manuSfcInfoRepository = manuSfcInfoRepository;
+            _manuSfcRepository = manuSfcRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;

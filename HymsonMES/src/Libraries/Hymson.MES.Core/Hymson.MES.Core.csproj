@@ -21,6 +21,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Domain\Manufacture\ManuSfcInfoEntity.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Hymson.Infrastructure" Version="1.9.7" />
     <PackageReference Include="Hymson.Kafka.Debezium" Version="1.9.7" />
     <PackageReference Include="Hymson.Sequences" Version="1.9.7" />

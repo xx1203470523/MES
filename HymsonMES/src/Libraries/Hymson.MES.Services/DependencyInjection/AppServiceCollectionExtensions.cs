@@ -155,7 +155,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuCommonService, ManuCommonService>();
             services.AddSingleton<IManuFeedingService, ManuFeedingService>();
             services.AddSingleton<IManuSfcProduceService, ManuSfcProduceService>();
-            services.AddSingleton<IManuSfcInfoService, ManuSfcInfoService>();
+            //services.AddSingleton<IManuSfcInfoService, ManuSfcInfoService>();
             services.AddSingleton<IManuGenerateBarcodeService, ManuGenerateBarcodeService>();
             services.AddSingleton<IManuProductBadRecordService, ManuProductBadRecordService>();
             services.AddSingleton<IManuFacePlateService, ManuFacePlateService>();

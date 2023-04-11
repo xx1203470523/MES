@@ -68,8 +68,5 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             sfcProduceEntity.UpdatedOn = HymsonClock.Now();
             await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
         }
-
-
-
     }
 }

@@ -33,40 +33,6 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
 
         /// <summary>
-        /// 批量删除（软删除）
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeletesSql, param);
-
-        }
-
-        /// <summary>
-        /// 根据ID获取数据
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<PlanSfcPrintView> GetByIdAsync(long id)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<PlanSfcPrintView>(GetByIdSql, new { Id = id });
-        }
-
-        /// <summary>
-        /// 根据IDs批量获取数据
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcInfoEntity>> GetByIdsAsync(long[] ids)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ManuSfcInfoEntity>(GetByIdsSql, new { ids = ids });
-        }
-
-        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="planSfcInfoPagedQuery"></param>
@@ -115,65 +81,6 @@ namespace Hymson.MES.Data.Repositories.Plan
             var totalCount = await totalCountTask;
             return new PagedInfo<PlanSfcPrintView>(planSfcInfoEntities, planSfcInfoPagedQuery.PageIndex, planSfcInfoPagedQuery.PageSize, totalCount);
         }
-
-        /// <summary>
-        /// 新增
-        /// </summary>
-        /// <param name="planSfcInfoEntity"></param>
-        /// <returns></returns>
-        public async Task<int> InsertAsync(ManuSfcInfoEntity planSfcInfoEntity)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertSql, planSfcInfoEntity);
-        }
-
-        /// <summary>
-        /// 更新
-        /// </summary>
-        /// <param name="planSfcInfoEntity"></param>
-        /// <returns></returns>
-        public async Task<int> UpdateAsync(ManuSfcInfoEntity planSfcInfoEntity)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateSql, new { planSfcInfoEntity.Id, planSfcInfoEntity.RelevanceWorkOrderId, planSfcInfoEntity.Status, planSfcInfoEntity.UpdatedBy, planSfcInfoEntity.UpdatedOn });
-        }
-
-        /// <summary>
-        /// 根据SFC获取数据
-        /// </summary>
-        /// <param name="SFC"></param>
-        /// <returns></returns>
-        public async Task<ManuSfcInfoEntity> GetBySFCAsync(string SFC)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(GetBySFCSql, new { SFC = SFC });
-        }
-
-        /// <summary>
-        /// 获取条码数据
-        /// </summary>
-        /// <param name="SFC"></param>
-        /// <returns></returns>
-        public async Task<ManuSfcInfoEntity> GetPlanSfcInfoAsync(PlanSfcPrintQuery query)
-        {
-            var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetPlanSfcInfoEntitiesSqlTemplate);
-            sqlBuilder.Select("*");
-            sqlBuilder.Where(" IsDeleted=0");
-
-            if (!string.IsNullOrWhiteSpace(query.SFC))
-            {
-                sqlBuilder.Where(" Sfc=@SFC");
-            }
-            if (query.WorkOrderId > 0)
-            {
-                sqlBuilder.Where(" WorkOrderId=@WorkOrderId");
-            }
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var planSfcInfo = await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(template.RawSql, query);
-            return planSfcInfo;
-        }
-
     }
 
     public partial class PlanSfcPrintRepository

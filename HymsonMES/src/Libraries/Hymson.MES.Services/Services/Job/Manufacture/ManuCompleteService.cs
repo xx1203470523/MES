@@ -38,7 +38,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <summary>
         /// 仓储接口（条码信息）
         /// </summary>
-        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
+        private readonly IManuSfcRepository _manuSfcRepository;
 
         /// <summary>
         /// 仓储接口（条码生产信息）
@@ -52,19 +52,19 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <param name="currentSite"></param>
         /// <param name="manuCommonService"></param>
         /// <param name="manuSfcStepRepository"></param>
-        /// <param name="manuSfcInfoRepository"></param>
+        /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
         public ManuCompleteService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonService manuCommonService,
             IManuSfcStepRepository manuSfcStepRepository,
-            IManuSfcInfoRepository manuSfcInfoRepository,
+            IManuSfcRepository manuSfcRepository,
             IManuSfcProduceRepository manuSfcProduceRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _manuCommonService = manuCommonService;
             _manuSfcStepRepository = manuSfcStepRepository;
-            _manuSfcInfoRepository = manuSfcInfoRepository;
+            _manuSfcRepository = manuSfcRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
         }
 
@@ -112,7 +112,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
 
             if (result)
             {
-                var sfcInfo = await _manuSfcInfoRepository.GetBySPCAsync(sfcProduceEntity.SFC);
+                var sfcInfo = await _manuSfcRepository.GetBySFCAsync(sfcProduceEntity.SFC);
 
                 // 合格品出站
                 // 获取下一个工序（如果没有了，就表示完工）
@@ -133,7 +133,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
 
                     // TODO manu_sfc_info 修改为 完成或者入库
                     sfcInfo.Status = SfcStatusEnum.Complete;
-                    await _manuSfcInfoRepository.UpdateAsync(sfcInfo);
+                    await _manuSfcRepository.UpdateAsync(sfcInfo);
                 }
                 else
                 {

@@ -6,12 +6,16 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCreateBarcodeDto;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGenerateBarcodeDto;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Snowflake;
+using Hymson.Utils;
 using Hymson.Utils.Tools;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCreateBarcode
@@ -29,13 +33,23 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         private readonly IProcMaterialRepository _procMaterialRepository;
         private readonly IInteCodeRulesRepository _inteCodeRulesRepository;
         private readonly IManuGenerateBarcodeService _manuGenerateBarcodeService;
+        private readonly IManuSfcRepository _manuSfcRepository;
+        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
+        private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
+        private readonly IManuSfcStepRepository _manuSfcStepRepository;
+        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
         public ManuCreateBarcodeService(ICurrentUser currentUser,
-            ICurrentSite currentSite,
-            IManuCommonService manuCommonService,
-            IProcMaterialRepository procMaterialRepository,
-            IInteCodeRulesRepository inteCodeRulesRepository,
-            IManuGenerateBarcodeService manuGenerateBarcodeService)
+             ICurrentSite currentSite,
+             IManuCommonService manuCommonService,
+             IProcMaterialRepository procMaterialRepository,
+             IInteCodeRulesRepository inteCodeRulesRepository,
+             IManuGenerateBarcodeService manuGenerateBarcodeService,
+             IManuSfcRepository manuSfcRepository,
+             IManuSfcInfoRepository manuSfcInfoRepository,
+             IManuSfcProduceRepository manuSfcProduceRepository,
+             IManuSfcStepRepository manuSfcStepRepository,
+             IPlanWorkOrderRepository planWorkOrderRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -43,6 +57,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
             _procMaterialRepository = procMaterialRepository;
             _inteCodeRulesRepository = inteCodeRulesRepository;
             _manuGenerateBarcodeService = manuGenerateBarcodeService;
+            _manuSfcRepository = manuSfcRepository;
+            _manuSfcInfoRepository = manuSfcInfoRepository;
+            _manuSfcProduceRepository = manuSfcProduceRepository;
+            _manuSfcStepRepository = manuSfcStepRepository;
+            _planWorkOrderRepository = planWorkOrderRepository;
         }
 
         /// <summary>
@@ -142,7 +161,23 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                 });
             }
             using var ts = TransactionHelper.GetTransactionScope();
+            var row = await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderId(new UpdatePassDownQuantityCommand
+            {
+                WorkOrderId = planWorkOrderEntity.Id,
+                PlanQuantity = planWorkOrderEntity.Qty * (1 + planWorkOrderEntity.OverScale),
+                PassDownQuantity = param.Qty,
+                UserName = _currentUser.UserName,
+                UpdateDate = HymsonClock.Now()
+            });
 
+            if (row == 0)
+            {
+                throw new BusinessException(nameof(ErrorCode.MES16503)).WithData("workorder", planWorkOrderEntity.OrderCode);
+            }
+            await _manuSfcRepository.InsertRangeAsync(manuSfcList);
+            await _manuSfcInfoRepository.InsertsAsync(manuSfcInfoList);
+            await _manuSfcProduceRepository.InsertRangeAsync(manuSfcProduceList);
+            await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
             ts.Complete();
         }
 

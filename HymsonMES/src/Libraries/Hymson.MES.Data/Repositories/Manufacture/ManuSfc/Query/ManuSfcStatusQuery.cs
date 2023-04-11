@@ -7,18 +7,13 @@
  */
 
 using Hymson.MES.Core.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Hymson.MES.Data.Repositories.Manufacture
+namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query
 {
     /// <summary>
     /// 条码信息表 查询参数
     /// </summary>
-    public class ManuSfcInfoQuery
+    public class ManuSfcStatusQuery
     {
         /// <summary>
         /// 条码列表

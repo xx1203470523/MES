@@ -38,7 +38,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <summary>
         /// 仓储接口（条码信息）
         /// </summary>
-        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
+        private readonly IManuSfcRepository _manuSfcRepository;
 
         /// <summary>
         /// 仓储接口（条码生产信息）
@@ -69,7 +69,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         public ManuPackageService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonService manuCommonService,
             IManuSfcStepRepository manuSfcStepRepository,
-            IManuSfcInfoRepository manuSfcInfoRepository,
+            IManuSfcRepository manuSfcRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IProcBomRepository procBomRepository,
             IProcBomDetailRepository procBomDetailRepository)
@@ -78,7 +78,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             _currentSite = currentSite;
             _manuCommonService = manuCommonService;
             _manuSfcStepRepository = manuSfcStepRepository;
-            _manuSfcInfoRepository = manuSfcInfoRepository;
+            _manuSfcRepository = manuSfcRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _procBomRepository = procBomRepository;
             _procBomDetailRepository = procBomDetailRepository;
