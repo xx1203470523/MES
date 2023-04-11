@@ -55,7 +55,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<QueryManuFacePlateDto> QueryManuFacePlateByIdAsync(long id);
+        Task<ManuFacePlateQueryDto> QueryManuFacePlateByIdAsync(long id);
 
 
         /// <summary>

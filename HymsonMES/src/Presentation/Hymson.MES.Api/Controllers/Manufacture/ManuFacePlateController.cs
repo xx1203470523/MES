@@ -59,7 +59,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<QueryManuFacePlateDto> QueryManuFacePlateByIdAsync(long id)
+        public async Task<ManuFacePlateQueryDto> QueryManuFacePlateByIdAsync(long id)
         {
             return await _manuFacePlateService.QueryManuFacePlateByIdAsync(id);
         }
