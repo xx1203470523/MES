@@ -9,9 +9,9 @@ sonarqube-check:
   script: 
       - "export PATH=\"$PATH:$HOME/.dotnet/tools\""
       - "dotnet dev-certs https --trust"
-      - "sudo /root/.dotnet/tools/dotnet-sonarscanner begin /k:\"imtc_HymsonMES_AYcNk_nlkS0_Qwo3RoC1\" /d:sonar.login=\"$SONAR_TOKEN\" /d:\"sonar.host.url=$SONAR_HOST_URL\" "
-      - "sudo dotnet build ./HymsonMES/HymsonMES.sln"
-      - "sudo /root/.dotnet/tools/dotnet-sonarscanner end /d:sonar.login=\"$SONAR_TOKEN\""
+      - "/root/.dotnet/tools/dotnet-sonarscanner begin /k:\"imtc_HymsonMES_AYcNk_nlkS0_Qwo3RoC1\" /d:sonar.login=\"$SONAR_TOKEN\" /d:\"sonar.host.url=$SONAR_HOST_URL\" "
+      - "dotnet build ./HymsonMES/HymsonMES.sln"
+      - "/root/.dotnet/tools/dotnet-sonarscanner end /d:sonar.login=\"$SONAR_TOKEN\""
   allow_failure: true
   only:
     - dev
