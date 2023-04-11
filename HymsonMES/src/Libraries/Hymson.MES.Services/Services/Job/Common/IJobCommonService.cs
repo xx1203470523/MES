@@ -13,7 +13,7 @@ namespace Hymson.MES.Services.Services.Job.Common
         /// <param name="classNames"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task ExecuteJobAsync(IEnumerable<string> classNames, JobDto dto);
+        Task<Dictionary<string, int>> ExecuteJobAsync(IEnumerable<string> classNames, JobDto dto);
 
     }
 }

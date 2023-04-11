@@ -12,7 +12,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
         /// </summary>
         /// <param name="bo"></param>
         /// <returns></returns>
-        Task InStationAsync(ManufactureBO bo);
+        Task<int> InStationAsync(ManufactureBO bo);
 
     }
 }
