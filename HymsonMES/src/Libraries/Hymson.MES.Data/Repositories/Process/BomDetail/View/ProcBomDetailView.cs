@@ -35,10 +35,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         public string Version { get; set; }
 
-        /// <summary>
-        /// 数据收集方式
-        /// </summary>
-        public MaterialSerialNumberEnum? SerialNumber { get; set; }
+        ///// <summary>
+        ///// 数据收集方式
+        ///// </summary>
+        //public MaterialSerialNumberEnum? SerialNumber { get; set; }
 
         /// <summary>
         /// 用量
@@ -60,6 +60,23 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         public long ProcedureId { get; set; }
 
+
+        /// <summary>
+        /// 数据收集方式 
+        /// </summary>
+        public MaterialSerialNumberEnum? DataCollectionWay { get; set; }
+
+        /// <summary>
+        /// 是否启用替代物料
+        /// </summary>
+        public bool IsEnableReplace { get; set; }
+
+        /// <summary>
+        /// 序号
+        /// </summary>
+        public int Seq { get; set; }
+
+
         /// <summary>
         /// 工序代码
         /// </summary>
@@ -74,5 +91,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 是否主物料，1：主物料
         /// </summary>
         public int IsMain { get; set; }
+
+
     }
 }
