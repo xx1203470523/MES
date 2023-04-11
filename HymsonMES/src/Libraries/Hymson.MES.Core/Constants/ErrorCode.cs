@@ -382,6 +382,17 @@
 
         #region 生产
         public const string MES17101 = "物料条码:{barCode}不存在！";
+
+        #region 面板维护
+        public const string MES17201 = "面板类型不能为空";
+        public const string MES17202 = "面板编码不能为空";
+        public const string MES17203 = "面板名称不能为空";
+        public const string MES17204 = "面板状态不能为空";
+        public const string MES17205 = "面板编码已经存在";
+        public const string MES17206 = "面板编码最大长度为255";
+        public const string MES17207 = "面板名称最大长度为255";
+        #endregion
+
         #endregion
 
         #region 工单激活 MES16400

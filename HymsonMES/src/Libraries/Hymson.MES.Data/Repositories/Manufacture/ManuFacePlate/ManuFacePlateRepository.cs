@@ -20,10 +20,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// <summary>
     /// 操作面板仓储
     /// </summary>
-    public partial class ManuFacePlateRepository :BaseRepository, IManuFacePlateRepository
+    public partial class ManuFacePlateRepository : BaseRepository, IManuFacePlateRepository
     {
 
-        public ManuFacePlateRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        public ManuFacePlateRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
         }
 
@@ -44,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -58,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<ManuFacePlateEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ManuFacePlateEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ManuFacePlateEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -66,10 +66,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuFacePlateEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ManuFacePlateEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<ManuFacePlateEntity>(GetByIdsSql, new { Ids = ids});
+            return await conn.QueryAsync<ManuFacePlateEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -81,6 +81,18 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ManuFacePlateEntity>(GetByCodeSql, new { Code = code });
+        }
+
+        /// <summary>
+        /// 判断条码是否已经存在且未删除
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="id">修改时的ID</param>
+        /// <returns></returns>
+        public async Task<bool> IsExists(string code, long id)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteScalarAsync(IsExistsSql, new { Code = code, Id = id }) != null;
         }
 
         /// <summary>
@@ -221,10 +233,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetDetailByIdSql = @" SELECT t1.`Id`,t1.`Code`,t1.`Name`,t1.`Type`,t1.`Status`,t1.ConversationTime,t2.FacePlateId,t2.ResourceId,t2.IsResourceEdit,t2.ProcedureId,t2.IsProcedureEdit,t2.IsSuccessBeep,t2.SuccessBeepUrl,t2.SuccessBeepTime,
                         t2.IsErrorBeep,t2.ErrorBeepUrl,t2.ErrorBeepTime,t2.IsShowBindWorkOrder,t2.IsShowQualifiedQty,t2.QualifiedColour,t2.IsShowUnqualifiedQty,t2.UnqualifiedColour,t2.IsShowLog FROM manu_face_plate t1 LEFT JOIN manu_face_plate_production t2 on t1.Id=t2.FacePlateId and t2.IsDeleted=0
                         where t1.IsDeleted=0 and t1.Id=  @Id ";
-        #endregion
 
         const string GetByCodeSql = @"SELECT 
                                `Id`, `Code`, `Name`, `Type`, `Status`, `ConversationTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `manu_face_plate`  WHERE Code = @Code  and IsDeleted=0 ";
+
+        const string IsExistsSql = "SELECT Id FROM manu_face_plate WHERE `IsDeleted` = 0 AND Code = @Code AND Id != @id LIMIT 1";
+        #endregion
     }
 }

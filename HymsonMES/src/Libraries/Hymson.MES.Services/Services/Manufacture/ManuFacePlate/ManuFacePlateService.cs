@@ -31,6 +31,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
 
+        #region Repository
         /// <summary>
         /// 操作面板 仓储
         /// </summary>
@@ -51,7 +52,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
         public ManuFacePlateService(ICurrentUser currentUser, ICurrentSite currentSite, IManuFacePlateRepository manuFacePlateRepository, IManuFacePlateProductionRepository manuFacePlateProductionRepository,
             IProcProcedureRepository procProcedureRepository, IProcResourceRepository procResourceRepository, IManuFacePlateRepairRepository manuFacePlateRepairRepository, IManuFacePlateContainerPackRepository manuFacePlateContainerPackRepository,
-        AbstractValidator<ManuFacePlateCreateDto> validationCreateRules, AbstractValidator<ManuFacePlateModifyDto> validationModifyRules,
+            AbstractValidator<ManuFacePlateCreateDto> validationCreateRules, AbstractValidator<ManuFacePlateModifyDto> validationModifyRules,
             AbstractValidator<ManuFacePlateProductionCreateDto> validationProductionCreateRules, AbstractValidator<ManuFacePlateProductionModifyDto> validationProductionModifyRules,
             AbstractValidator<ManuFacePlateRepairCreateDto> validationRepairCreateRules, AbstractValidator<ManuFacePlateRepairModifyDto> validationRepairModifyRules,
             AbstractValidator<ManuFacePlateContainerPackCreateDto> validationContainerPackCreateRules, AbstractValidator<ManuFacePlateContainerPackModifyDto> validationContainerPackModifyRules)
@@ -73,6 +74,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _validationContainerPackCreateRules = validationContainerPackCreateRules;
             _validationContainerPackModifyRules = validationContainerPackModifyRules;
         }
+        #endregion
 
         /// <summary>
         /// 创建
