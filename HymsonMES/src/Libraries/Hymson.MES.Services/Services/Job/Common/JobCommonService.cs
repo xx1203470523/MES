@@ -3,6 +3,7 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
+using Hymson.MES.Services.Services.Job.Manufacture;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -62,28 +63,24 @@ namespace Hymson.MES.Services.Services.Job.Common
             var buttonJobs = await _manuFacePlateButtonJobRelationRepository.GetByFacePlateButtonIdAsync(dto.FacePlateButtonId);
             if (buttonJobs.Any() == false) return;
 
+            // TODO 根据buttonJobs读取对于的job对象
+            List<InteJobEntity> jobs = new();
 
-            InteJobEntity entity = new();
+            // 获取实现了 IMyInterface 接口的所有类的 Type 对象
+            Type[] types = Assembly.GetExecutingAssembly().GetTypes()
+                .Where(t => t.GetInterfaces().Contains(typeof(IManufactureJobService))).ToArray();
 
-            // TODO
-            Assembly assembly = Assembly.Load(new AssemblyName("Hymson.MES.Services"));
-            if (assembly == null) return;
+            // 输出这些类的名称
+            foreach (Type type in types)
+            {
+                if (jobs.Any(a => a.Code == type.Name) == false) continue;
 
-            Type classType = assembly.GetType(entity.ClassProgram);
-            if (classType == null) return;
+                // 创建该类的实例，并调用 执行 方法
+                IManufactureJobService obj = (IManufactureJobService)Activator.CreateInstance(type);
+                if (obj == null) continue;
 
-            /*
-            var obj = Activator.CreateInstance(classType, new object[] {
-                    _currentUser,
-                    _currentSite,
-                _manuCommonService,
-                _manuSfcProduceRepository});
-            */
-
-            /*
-            var serviceScope = _serviceProvider.CreateScope();
-            var obj = serviceScope.ServiceProvider.GetService(classType);
-            */
+                await obj.ExecuteAsync(dto);
+            }
 
             await Task.CompletedTask;
         }

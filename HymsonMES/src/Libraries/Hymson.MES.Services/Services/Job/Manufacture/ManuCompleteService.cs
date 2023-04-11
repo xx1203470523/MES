@@ -13,7 +13,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
     /// <summary>
     /// 完成
     /// </summary>
-    public class ManuCompleteService
+    public class ManuCompleteService: IManufactureJobService
     {
         /// <summary>
         /// 当前对象（登录用户）
@@ -54,8 +54,6 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <param name="manuSfcStepRepository"></param>
         /// <param name="manuSfcInfoRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
-        /// <param name="procBomDetailRepository"></param>
-        /// <param name="procMaterialRepository"></param>
         public ManuCompleteService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonService manuCommonService,
             IManuSfcStepRepository manuSfcStepRepository,
