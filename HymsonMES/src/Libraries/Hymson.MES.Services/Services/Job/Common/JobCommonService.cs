@@ -1,10 +1,9 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
-using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Job.Manufacture;
-using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
 namespace Hymson.MES.Services.Services.Job.Common
@@ -35,20 +34,28 @@ namespace Hymson.MES.Services.Services.Job.Common
         private readonly IManuFacePlateButtonJobRelationRepository _manuFacePlateButtonJobRelationRepository;
 
         /// <summary>
+        /// 仓储接口（作业）
+        /// </summary>
+        private readonly IInteJobRepository _inteJobRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="serviceProvider"></param>
         /// <param name="manuFacePlateButtonJobRelationRepository"></param>
+        /// <param name="inteJobRepository"></param>
         public JobCommonService(ICurrentUser currentUser, ICurrentSite currentSite,
             IServiceProvider serviceProvider,
-            IManuFacePlateButtonJobRelationRepository manuFacePlateButtonJobRelationRepository)
+            IManuFacePlateButtonJobRelationRepository manuFacePlateButtonJobRelationRepository,
+            IInteJobRepository inteJobRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _serviceProvider = serviceProvider;
             _manuFacePlateButtonJobRelationRepository = manuFacePlateButtonJobRelationRepository;
+            _inteJobRepository = inteJobRepository;
         }
 
 
@@ -63,10 +70,10 @@ namespace Hymson.MES.Services.Services.Job.Common
             var buttonJobs = await _manuFacePlateButtonJobRelationRepository.GetByFacePlateButtonIdAsync(dto.FacePlateButtonId);
             if (buttonJobs.Any() == false) return;
 
-            // TODO 根据buttonJobs读取对于的job对象
-            List<InteJobEntity> jobs = new();
+            // 根据buttonJobs读取对于的job对象
+            var jobs = await _inteJobRepository.GetByIdsAsync(buttonJobs.Select(s => s.JobId).ToArray());
 
-            // 获取实现了 IMyInterface 接口的所有类的 Type 对象
+            // 获取实现了 IManufactureJobService 接口的所有类的 Type 对象
             Type[] types = Assembly.GetExecutingAssembly().GetTypes()
                 .Where(t => t.GetInterfaces().Contains(typeof(IManufactureJobService))).ToArray();
 
