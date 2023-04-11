@@ -109,7 +109,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// </summary>
         /// <param name="code"></param>
         /// <returns></returns>
-        [HttpGet("{code}")]
+        [HttpGet("QueryByCode/{code}")]
         public async Task<QueryManuFacePlateDto> QueryManuFacePlateByCodeAsync(string code)
         {
             return await _manuFacePlateService.QueryManuFacePlateByCodeAsync(code);
