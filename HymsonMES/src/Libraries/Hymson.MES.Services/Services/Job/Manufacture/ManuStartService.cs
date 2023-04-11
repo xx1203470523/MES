@@ -21,7 +21,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
-        /// 服务接口（生产通用）
+        /// 服务接口（进站）
         /// </summary>
         private readonly IManuInStationService _manuInStationService;
 
@@ -47,7 +47,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <returns></returns>
         public async Task ExecuteAsync(JobDto dto)
         {
-            await _manuInStationService.ExecuteAsync(dto);
+            await _manuInStationService.InStationAsync(dto);
         }
 
     }

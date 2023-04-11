@@ -67,7 +67,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
         /// </summary>
         /// <param name="bo"></param>
         /// <returns></returns>
-        public async Task ExecuteAsync(ManufactureBO bo)
+        public async Task InStationAsync(ManufactureBO bo)
         {
             // 获取生产条码信息（附带条码合法性校验）
             var sfcProduceEntity = await _manuCommonService.GetProduceSFCForStartAsync(bo.SFC);
