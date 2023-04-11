@@ -13,6 +13,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -39,6 +40,20 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// 操作面板按钮 仓储
         /// </summary>
         private readonly IManuFacePlateButtonRepository _manuFacePlateButtonRepository;
+
+        /// <summary>
+        /// 仓储接口（面板按钮作业关系）
+        /// </summary>
+        private readonly IManuFacePlateButtonJobRelationRepository _manuFacePlateButtonJobRelationRepository;
+
+        /// <summary>
+        /// 仓储接口（作业）
+        /// </summary>
+        private readonly IInteJobRepository _inteJobRepository;
+
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly AbstractValidator<ManuFacePlateButtonCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ManuFacePlateButtonModifyDto> _validationModifyRules;
 
@@ -49,11 +64,15 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="currentSite"></param>
         /// <param name="jobCommonService"></param>
         /// <param name="manuFacePlateButtonRepository"></param>
+        /// <param name="manuFacePlateButtonJobRelationRepository"></param>
+        /// <param name="inteJobRepository"></param>
         /// <param name="validationCreateRules"></param>
         /// <param name="validationModifyRules"></param>
         public ManuFacePlateButtonService(ICurrentUser currentUser, ICurrentSite currentSite,
             IJobCommonService jobCommonService,
             IManuFacePlateButtonRepository manuFacePlateButtonRepository,
+            IManuFacePlateButtonJobRelationRepository manuFacePlateButtonJobRelationRepository,
+            IInteJobRepository inteJobRepository,
             AbstractValidator<ManuFacePlateButtonCreateDto> validationCreateRules,
             AbstractValidator<ManuFacePlateButtonModifyDto> validationModifyRules)
         {
@@ -61,6 +80,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             _currentSite = currentSite;
             _jobCommonService = jobCommonService;
             _manuFacePlateButtonRepository = manuFacePlateButtonRepository;
+            _manuFacePlateButtonJobRelationRepository = manuFacePlateButtonJobRelationRepository;
+            _inteJobRepository = inteJobRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
         }
@@ -191,9 +212,21 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task ClickAsync(JobDto dto)
+        public async Task<Dictionary<string, string>> ClickAsync(JobDto dto)
         {
-            await _jobCommonService.ExecuteJobAsync(dto);
+            var result = new Dictionary<string, string>(); // 返回结果
+
+            // 根据面板ID和按钮ID找出绑定的作业job
+            var buttonJobs = await _manuFacePlateButtonJobRelationRepository.GetByFacePlateButtonIdAsync(dto.FacePlateButtonId);
+            if (buttonJobs.Any() == false) return result;
+
+            // 根据 buttonJobs 读取对应的job对象
+            var jobs = await _inteJobRepository.GetByIdsAsync(buttonJobs.Select(s => s.JobId).ToArray());
+
+            // 执行Job
+            await _jobCommonService.ExecuteJobAsync(jobs.Select(s => s.Code), dto);
+
+            return result;
         }
     }
 }
