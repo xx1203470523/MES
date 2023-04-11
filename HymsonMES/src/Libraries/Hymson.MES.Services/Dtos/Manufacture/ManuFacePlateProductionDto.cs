@@ -196,7 +196,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
        /// <summary>
         /// 工序id
         /// </summary>
-        public string? ProcedureId { get; set; }
+        public long? ProcedureId { get; set; }
 
        /// <summary>
         /// 是否修改工序
@@ -324,7 +324,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
        /// <summary>
         /// 工序id
         /// </summary>
-        public string? ProcedureId { get; set; }
+        public long? ProcedureId { get; set; }
 
        /// <summary>
         /// 是否修改工序

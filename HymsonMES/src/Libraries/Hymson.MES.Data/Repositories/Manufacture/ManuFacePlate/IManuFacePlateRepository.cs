@@ -82,6 +82,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<ManuFacePlateEntity> GetByCodeAsync(string code);
 
         /// <summary>
+        /// 判断code是否存在且未删除
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<bool> IsExists(string code, long id);
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="manuFacePlateQuery"></param>

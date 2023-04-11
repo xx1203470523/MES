@@ -79,10 +79,21 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         public async Task ExecuteAsync(JobDto dto)
         {
             // 获取生产条码信息（附带条码合法性校验）
-            var sfcProduceEntity = await _manuCommonService.GetProduceSPCWithCheckAsync(dto.SFC, dto.ProcedureId, new SfcProduceStatusEnum[] { SfcProduceStatusEnum.lineUp });
+            var sfcProduceEntity = await _manuCommonService.GetProduceSPCForStartAsync(dto.SFC);
+
+            // 如果工序对应不上
+            if (sfcProduceEntity.ProcedureId != dto.ProcedureId)
+            {
+                // 判断上一个工序是否是随机工序
+                var IsRandomPreProcedure = await _manuCommonService.IsRandomPreProcedure(sfcProduceEntity.ProcessRouteId, sfcProduceEntity.ProcedureId);
+                if (IsRandomPreProcedure == false) throw new BusinessException(nameof(ErrorCode.MES16308));
+
+                // 将SFC对应的工序改为当前工序
+                sfcProduceEntity.ProcessRouteId = dto.ProcedureId;
+            }
 
             // 获取生产工单（附带工单状态校验）
-            var workOrderEntity = await _manuCommonService.GetProduceWorkOrderByIdAsync(sfcProduceEntity.WorkOrderId);
+            _ = await _manuCommonService.GetProduceWorkOrderByIdAsync(sfcProduceEntity.WorkOrderId);
 
             // 获取当前工序信息
             var procedureEntity = await _procProcedureRepository.GetByIdAsync(sfcProduceEntity.ProcedureId);
@@ -93,19 +104,6 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
                 // 超过复投次数，标识为NG
                 if (sfcProduceEntity.RepeatedCount > procedureEntity.Cycle) throw new BusinessException(nameof(ErrorCode.MES16036));
                 sfcProduceEntity.RepeatedCount++;
-            }
-
-            // 获取工艺路线里面的工序扩展信息
-            var procedureExtend = await _procProcessRouteDetailNodeRepository.GetByProcessRouteIdAsync(new ProcProcessRouteDetailNodeQuery
-            {
-                ProcessRouteId = workOrderEntity.ProcessRouteId,
-                ProcedureId = sfcProduceEntity.ProcedureId
-            });
-
-            // 检查前工序是否可选工序
-            if (procedureExtend.CheckType == ProcessRouteInspectTypeEnum.RandomInspection)
-            {
-                // TODO
             }
 
             // 更改状态，将条码由"排队"改为"活动"

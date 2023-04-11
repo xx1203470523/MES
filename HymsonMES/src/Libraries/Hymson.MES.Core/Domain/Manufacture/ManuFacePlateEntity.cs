@@ -29,8 +29,8 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public string Name { get; set; }
 
-       /// <summary>
-        /// 类型;1、生产过站；2、在制品维修
+        /// <summary>
+        /// 类型;1、生产过站；2、在制品维修；3、容器装箱
         /// </summary>
         public ManuFacePlateTypeEnum Type { get; set; }
 

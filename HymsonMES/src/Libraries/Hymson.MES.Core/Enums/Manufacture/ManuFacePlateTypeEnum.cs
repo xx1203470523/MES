@@ -21,6 +21,11 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 在制品维修
         /// </summary>
         [Description("在制品维修")]
-        ProductionRepair = 2
+        ProductionRepair = 2,
+        /// <summary>
+        /// 容器装箱
+        /// </summary>
+        [Description("容器装箱")]
+        ContainerPack = 3
     }
 }

@@ -59,8 +59,8 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("{id}")]
-        public async Task<QueryManuFacePlateDto> QueryManuFacePlateByIdAsync(long id)
+        [HttpGet("querymanufaceplatebyId/{id}")]
+        public async Task<ManuFacePlateQueryDto> QueryManuFacePlateByIdAsync(long id)
         {
             return await _manuFacePlateService.QueryManuFacePlateByIdAsync(id);
         }
@@ -109,8 +109,8 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// </summary>
         /// <param name="code"></param>
         /// <returns></returns>
-        [HttpGet("{code}")]
-        public async Task<QueryManuFacePlateDto> QueryManuFacePlateByCodeAsync(string code)
+        [HttpGet("queryByCode/{code}")]
+        public async Task<ManuFacePlateQueryDto> QueryManuFacePlateByCodeAsync(string code)
         {
             return await _manuFacePlateService.QueryManuFacePlateByCodeAsync(code);
         }

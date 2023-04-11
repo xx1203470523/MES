@@ -84,7 +84,8 @@
         public const string MES10437 = "此工艺路线{Code}+{Version}在系统已经存在！";
         public const string MES10438 = "此工艺路线不存在！";
         public const string MES10439 = $"此工艺路线在系统中不存在!";
-        public const string MES10440 = $"此工艺路线不存在下一工序!";
+        public const string MES10440 = $"获取下一工序失败!";
+        public const string MES10441 = $"不存在空值类型工序!";
         #endregion
 
         #region 参数 10500
@@ -382,6 +383,17 @@
 
         #region 生产
         public const string MES17101 = "物料条码:{barCode}不存在！";
+
+        #region 面板维护
+        public const string MES17201 = "面板类型不能为空";
+        public const string MES17202 = "面板编码不能为空";
+        public const string MES17203 = "面板名称不能为空";
+        public const string MES17204 = "面板状态不能为空";
+        public const string MES17205 = "面板编码已经存在";
+        public const string MES17206 = "面板编码最大长度为255";
+        public const string MES17207 = "面板名称最大长度为255";
+        #endregion
+
         #endregion
 
         #region 工单激活 MES16400
