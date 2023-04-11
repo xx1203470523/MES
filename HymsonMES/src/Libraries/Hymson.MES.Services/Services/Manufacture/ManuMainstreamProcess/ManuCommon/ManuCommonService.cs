@@ -271,6 +271,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <returns></returns>
         public async Task<bool> IsRandomPreProcedure(long processRouteId, long procedureId)
         {
+            // TODO 
+
             return false;
         }
 
