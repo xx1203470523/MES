@@ -102,5 +102,18 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         #endregion
+
+        #region 扩展方法
+        /// <summary>
+        /// 查询详情（操作面板）
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        [HttpGet("{code}")]
+        public async Task<QueryManuFacePlateDto> QueryManuFacePlateByCodeAsync(string code)
+        {
+            return await _manuFacePlateService.QueryManuFacePlateByCodeAsync(code);
+        }
+        #endregion
     }
 }
