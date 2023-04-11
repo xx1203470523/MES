@@ -6,10 +6,12 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon
 {
@@ -27,6 +29,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// 当前对象（站点）
         /// </summary>
         private readonly ICurrentSite _currentSite;
+
+        /// <summary>
+        /// 缓存
+        /// </summary>
+        private readonly IMemoryCache _memoryCache;
 
         /// <summary>
         /// 仓储接口（条码信息）
@@ -69,6 +76,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
+        /// <param name="memoryCache"></param>
         /// <param name="manuSfcInfoRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
@@ -77,6 +85,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="procProcessRouteDetailLinkRepository"></param>
         /// <param name="procProcedureRepository"></param>
         public ManuCommonService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IMemoryCache memoryCache,
             IManuSfcInfoRepository manuSfcInfoRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
@@ -87,6 +96,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _memoryCache = memoryCache;
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
@@ -190,17 +200,42 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <summary>
         /// 获当前工序对应的下一工序
         /// </summary>
-        /// <param name="processRouteId"></param>
-        /// <param name="procedureId"></param>
+        /// <param name="manuSfcProduce"></param>
         /// <returns></returns>
-        public async Task<ProcProcedureEntity?> GetNextProcedureAsync(long processRouteId, long procedureId)
+        public async Task<ProcProcedureEntity?> GetNextProcedureAsync(ManuSfcProduceEntity manuSfcProduce)
         {
+            // 因为可能有分叉，所以返回的下一步工序是集合
             var processRouteDetailLink = await _procProcessRouteDetailLinkRepository.GetProcessRouteDetailLinkAsync(new ProcProcessRouteDetailLinkQuery
             {
-                ProcessRouteId = processRouteId,
-                ProcedureId = procedureId
+                ProcessRouteId = manuSfcProduce.ProcessRouteId,
+                ProcedureId = manuSfcProduce.ProcedureId
             });
             if (processRouteDetailLink == null || processRouteDetailLink.Any() == false) throw new BusinessException(nameof(ErrorCode.MES10440));
+
+            // 获取当前工序在工艺路线里面的扩展信息
+            var procedureExtend = await _procProcessRouteDetailNodeRepository.GetByProcessRouteIdAsync(new ProcProcessRouteDetailNodeQuery
+            {
+                ProcessRouteId = manuSfcProduce.ProcessRouteId,
+                ProcedureId = manuSfcProduce.ProcedureId
+            });
+
+            // 固定抽检
+            if (procedureExtend.CheckType == ProcessRouteInspectTypeEnum.FixedScale)
+            {
+                // 读取工序抽检次数
+                var cacheKey = $"{manuSfcProduce.ProcessRouteId}-{manuSfcProduce.ProcedureId}-{manuSfcProduce.ResourceId}";
+                if (_memoryCache.TryGetValue(cacheKey, out int count) == false) count = 0;
+
+                if (count >= procedureExtend.CheckRate)
+                {
+                    // TODO
+                }
+            }
+            // 随机
+            else
+            {
+                // 可跳过？
+            }
 
             // TODO 根据规则取下一工序
             var routeDetail = processRouteDetailLink.FirstOrDefault();

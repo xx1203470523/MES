@@ -4,7 +4,6 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Common;
-using Hymson.MES.Services.Services.Job.Common;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Utils;
 
@@ -31,24 +30,9 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         private readonly IManuCommonService _manuCommonService;
 
         /// <summary>
-        /// 仓储接口（条码步骤）
-        /// </summary>
-        private readonly IManuSfcStepRepository _manuSfcStepRepository;
-
-        /// <summary>
-        /// 仓储接口（条码信息）
-        /// </summary>
-        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
-
-        /// <summary>
         /// 仓储接口（条码生产信息）
         /// </summary>
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
-
-        /// <summary>
-        /// 仓储接口（BOM）
-        /// </summary>
-        private readonly IProcBomRepository _procBomRepository;
 
         /// <summary>
         /// 仓储接口（BOM明细）
@@ -61,26 +45,17 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="manuCommonService"></param>
-        /// <param name="manuSfcStepRepository"></param>
-        /// <param name="manuSfcInfoRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
-        /// <param name="procBomRepository"></param>
         /// <param name="procBomDetailRepository"></param>
         public ManuPackageService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonService manuCommonService,
-            IManuSfcStepRepository manuSfcStepRepository,
-            IManuSfcInfoRepository manuSfcInfoRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
-            IProcBomRepository procBomRepository,
             IProcBomDetailRepository procBomDetailRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _manuCommonService = manuCommonService;
-            _manuSfcStepRepository = manuSfcStepRepository;
-            _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
-            _procBomRepository = procBomRepository;
             _procBomDetailRepository = procBomDetailRepository;
         }
 

@@ -116,7 +116,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
 
                 // 合格品出站
                 // 获取下一个工序（如果没有了，就表示完工）
-                var nextProcedure = await _manuCommonService.GetNextProcedureAsync(workOrderEntity.ProcessRouteId, sfcProduceEntity.ProcedureId);
+                var nextProcedure = await _manuCommonService.GetNextProcedureAsync(sfcProduceEntity);
                 if (nextProcedure == null)
                 {
                     // 完工

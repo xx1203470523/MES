@@ -37,10 +37,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <summary>
         /// 获当前工序对应的下一工序
         /// </summary>
-        /// <param name="processRouteId"></param>
-        /// <param name="procedureId"></param>
+        /// <param name="manuSfcProduce"></param>
         /// <returns></returns>
-        Task<ProcProcedureEntity?> GetNextProcedureAsync(long processRouteId, long procedureId);
+        Task<ProcProcedureEntity?> GetNextProcedureAsync(ManuSfcProduceEntity manuSfcProduce);
 
 
     }
