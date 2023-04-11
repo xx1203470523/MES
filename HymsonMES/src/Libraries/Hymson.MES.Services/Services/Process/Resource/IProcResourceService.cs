@@ -73,9 +73,9 @@ namespace Hymson.MES.Services.Services.Process.Resource
         /// <summary>
         /// 获取资源关联作业
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="queryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<QueryProcedureJobReleationDto>> GetProcedureConfigJobListAsync(InteJobBusinessRelationPagedQueryDto queryDto);
+        Task<PagedInfo<ProcedureJobReleationDto>> GetProcedureConfigJobListAsync(InteJobBusinessRelationPagedQueryDto queryDto);
 
         /// <summary>
         /// 添加资源数据

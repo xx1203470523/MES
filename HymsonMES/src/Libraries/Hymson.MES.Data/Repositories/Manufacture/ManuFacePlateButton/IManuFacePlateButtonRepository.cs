@@ -23,7 +23,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuFacePlateButtonEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ManuFacePlateButtonEntity manuFacePlateButtonEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -37,7 +37,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuFacePlateButtonEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ManuFacePlateButtonEntity manuFacePlateButtonEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -52,7 +52,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -66,7 +66,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ManuFacePlateButtonEntity> GetByIdAsync(long id);
-    
+
+        /// <summary>
+        /// 根据FacePlateId获取数据
+        /// </summary>
+        /// <param name="facePlateId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuFacePlateButtonEntity>> GetByFacePlateIdAsync(long facePlateId);
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -80,7 +87,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuFacePlateButtonQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuFacePlateButtonEntity>> GetManuFacePlateButtonEntitiesAsync(ManuFacePlateButtonQuery manuFacePlateButtonQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>

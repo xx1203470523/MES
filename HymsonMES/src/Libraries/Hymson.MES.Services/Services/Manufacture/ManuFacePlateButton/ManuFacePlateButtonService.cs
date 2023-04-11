@@ -9,16 +9,16 @@ using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
-using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
+using Hymson.MES.Services.Services.Job.Common;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -31,16 +31,35 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
+        /// 服务接口（作业通用）
+        /// </summary>
+        private readonly IJobCommonService _jobCommonService;
+
+        /// <summary>
         /// 操作面板按钮 仓储
         /// </summary>
         private readonly IManuFacePlateButtonRepository _manuFacePlateButtonRepository;
         private readonly AbstractValidator<ManuFacePlateButtonCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ManuFacePlateButtonModifyDto> _validationModifyRules;
 
-        public ManuFacePlateButtonService(ICurrentUser currentUser, ICurrentSite currentSite, IManuFacePlateButtonRepository manuFacePlateButtonRepository, AbstractValidator<ManuFacePlateButtonCreateDto> validationCreateRules, AbstractValidator<ManuFacePlateButtonModifyDto> validationModifyRules)
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="currentUser"></param>
+        /// <param name="currentSite"></param>
+        /// <param name="jobCommonService"></param>
+        /// <param name="manuFacePlateButtonRepository"></param>
+        /// <param name="validationCreateRules"></param>
+        /// <param name="validationModifyRules"></param>
+        public ManuFacePlateButtonService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IJobCommonService jobCommonService,
+            IManuFacePlateButtonRepository manuFacePlateButtonRepository,
+            AbstractValidator<ManuFacePlateButtonCreateDto> validationCreateRules,
+            AbstractValidator<ManuFacePlateButtonModifyDto> validationModifyRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _jobCommonService = jobCommonService;
             _manuFacePlateButtonRepository = manuFacePlateButtonRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
@@ -64,7 +83,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             //DTO转换实体
             var manuFacePlateButtonEntity = manuFacePlateButtonCreateDto.ToEntity<ManuFacePlateButtonEntity>();
-            manuFacePlateButtonEntity.Id= IdGenProvider.Instance.CreateId();
+            manuFacePlateButtonEntity.Id = IdGenProvider.Instance.CreateId();
             manuFacePlateButtonEntity.CreatedBy = _currentUser.UserName;
             manuFacePlateButtonEntity.UpdatedBy = _currentUser.UserName;
             manuFacePlateButtonEntity.CreatedOn = HymsonClock.Now();
@@ -115,7 +134,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="pagedInfo"></param>
         /// <returns></returns>
-        private static List<ManuFacePlateButtonDto> PrepareManuFacePlateButtonDtos(PagedInfo<ManuFacePlateButtonEntity>   pagedInfo)
+        private static List<ManuFacePlateButtonDto> PrepareManuFacePlateButtonDtos(PagedInfo<ManuFacePlateButtonEntity> pagedInfo)
         {
             var manuFacePlateButtonDtos = new List<ManuFacePlateButtonDto>();
             foreach (var manuFacePlateButtonEntity in pagedInfo.Data)
@@ -130,17 +149,17 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="manuFacePlateButtonDto"></param>
+        /// <param name="manuFacePlateButtonModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyManuFacePlateButtonAsync(ManuFacePlateButtonModifyDto manuFacePlateButtonModifyDto)
         {
-             // 判断是否有获取到站点码 
+            // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0)
             {
                 throw new ValidationException(nameof(ErrorCode.MES10101));
             }
 
-             //验证DTO
+            //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(manuFacePlateButtonModifyDto);
 
             //DTO转换实体
@@ -156,14 +175,25 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ManuFacePlateButtonDto> QueryManuFacePlateButtonByIdAsync(long id) 
+        public async Task<ManuFacePlateButtonDto> QueryManuFacePlateButtonByIdAsync(long id)
         {
-           var manuFacePlateButtonEntity = await _manuFacePlateButtonRepository.GetByIdAsync(id);
-           if (manuFacePlateButtonEntity != null) 
-           {
-               return manuFacePlateButtonEntity.ToModel<ManuFacePlateButtonDto>();
-           }
+            var manuFacePlateButtonEntity = await _manuFacePlateButtonRepository.GetByIdAsync(id);
+            if (manuFacePlateButtonEntity != null)
+            {
+                return manuFacePlateButtonEntity.ToModel<ManuFacePlateButtonDto>();
+            }
             return null;
+        }
+
+
+        /// <summary>
+        /// 按钮（点击）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task ClickAsync(JobDto dto)
+        {
+            await _jobCommonService.ExecuteJobAsync(dto);
         }
     }
 }

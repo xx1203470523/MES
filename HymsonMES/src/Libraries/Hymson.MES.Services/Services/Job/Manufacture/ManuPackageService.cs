@@ -2,16 +2,17 @@
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto;
+using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Utils;
 
-namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuStop
+namespace Hymson.MES.Services.Services.Job.Manufacture
 {
     /// <summary>
-    /// 中止
+    /// 组装
     /// </summary>
-    public class ManuStopService : IManuStopService
+    public class ManuPackageService : IManufactureJobService
     {
         /// <summary>
         /// 当前对象（登录用户）
@@ -34,41 +35,59 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuSto
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
         /// <summary>
+        /// 仓储接口（BOM明细）
+        /// </summary>
+        private readonly IProcBomDetailRepository _procBomDetailRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="manuCommonService"></param>
         /// <param name="manuSfcProduceRepository"></param>
-        public ManuStopService(ICurrentUser currentUser, ICurrentSite currentSite,
+        /// <param name="procBomDetailRepository"></param>
+        public ManuPackageService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonService manuCommonService,
-            IManuSfcProduceRepository manuSfcProduceRepository)
+            IManuSfcProduceRepository manuSfcProduceRepository,
+            IProcBomDetailRepository procBomDetailRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _manuCommonService = manuCommonService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
+            _procBomDetailRepository = procBomDetailRepository;
         }
 
 
         /// <summary>
-        /// 执行（中止）
+        /// 执行（组装）
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task ExecuteAsync(SFCWorkDto dto)
+        public async Task ExecuteAsync(JobDto dto)
         {
             // 获取生产条码信息（附带条码合法性校验 + 工序活动状态校验）
-            var sfcProduceEntity = await _manuCommonService.GetProduceSPCWithCheckAsync(dto.SFC, dto.ProcedureId);
+            var sfcProduceEntity = await _manuCommonService.GetProduceSPCWithCheckAsync(dto.SFC, dto.ProcedureId, new SfcProduceStatusEnum[] { SfcProduceStatusEnum.Activity });
 
-            // 更改状态，将条码由"活动"改为"排队"
-            sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
+            // TODO 获取条码对应的工序BOM
+            //var bomEntity = await _procBomRepository.GetByIdAsync(sfcEntity.ProductBOMId);
+            //var bomMaterials = await _procBomDetailRepository.GetListMainAsync(sfcProduceEntity.ProductBOMId);
+            var bomMaterials = await _procBomDetailRepository.GetByBomIdAsync(sfcProduceEntity.ProductBOMId);
+
+            // TODO 这里要区分是  内/外部序列码，批次
+            foreach (var item in bomMaterials)
+            {
+
+            }
+
+            // TODO 组件条码是否已绑定SFC
+
+            // 更改状态
             sfcProduceEntity.UpdatedBy = _currentUser.UserName;
             sfcProduceEntity.UpdatedOn = HymsonClock.Now();
             await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
         }
-
-
 
     }
 }

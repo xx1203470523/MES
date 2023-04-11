@@ -158,7 +158,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="manuFacePlateDto"></param>
+        /// <param name="manuFacePlateModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyManuFacePlateAsync(ManuFacePlateModifyDto manuFacePlateModifyDto)
         {
@@ -298,6 +298,104 @@ namespace Hymson.MES.Services.Services.Manufacture
             return facePlatQueryDto;
         }
 
+        /// <summary>
+        /// 根据Code查询
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        public async Task<ManuFacePlateQueryDto> QueryManuFacePlateByCodeAsync(string code)
+        {
+            ManuFacePlateQueryDto facePlateQueryDto = new ManuFacePlateQueryDto();
+            var manuFacePlateEntity = await _manuFacePlateRepository.GetByCodeAsync(code);
+            if (manuFacePlateEntity != null)
+            {
+                long resourceId = 0;
+                long procedureId = 0;
+                facePlateQueryDto.FacePlate = manuFacePlateEntity.ToModel<ManuFacePlateDto>();
+                #region 生产过站
+                if (manuFacePlateEntity.Type == Core.Enums.Manufacture.ManuFacePlateTypeEnum.ProducePassingStation)
+                {
+                    var manuFacePlateProductionEntity = await _manuFacePlateProductionRepository.GetByFacePlateIdAsync(manuFacePlateEntity.Id);
+                    if (manuFacePlateProductionEntity != null)
+                    {
+                        resourceId = manuFacePlateProductionEntity.ResourceId;
+                        procedureId = manuFacePlateProductionEntity.ProcedureId;
+
+                        facePlateQueryDto.FacePlateProduction = manuFacePlateProductionEntity.ToModel<ManuFacePlateProductionDto>();
+                        //查询时Production主键使用主表的Id返回
+                        facePlateQueryDto.FacePlateProduction.Id = manuFacePlateEntity.Id;
+                        //颜色不为空就显示
+                        facePlateQueryDto.FacePlateProduction.IsShowQualifiedColour = !string.IsNullOrEmpty(facePlateQueryDto.FacePlateProduction.QualifiedColour);
+                        facePlateQueryDto.FacePlateProduction.IsShowUnqualifiedColour = !string.IsNullOrEmpty(facePlateQueryDto.FacePlateProduction.UnqualifiedColour);
+                    }
+                }
+                #endregion
+
+                #region 在制品维修
+                //在制品维修
+                if (manuFacePlateEntity.Type == Core.Enums.Manufacture.ManuFacePlateTypeEnum.ProductionRepair)
+                {
+                    var manuFacePlateRepairEntity = await _manuFacePlateRepairRepository.GetByFacePlateIdAsync(manuFacePlateEntity.Id);
+                    if (manuFacePlateRepairEntity != null)
+                    {
+                        resourceId = manuFacePlateRepairEntity.ResourceId;
+                        procedureId = manuFacePlateRepairEntity.ProcedureId;
+                        facePlateQueryDto.FacePlateRepair = manuFacePlateRepairEntity.ToModel<ManuFacePlateRepairDto>();
+                    }
+                }
+                #endregion
+
+                #region 填充关联表数据
+                //资源
+                if (resourceId > 0)
+                {
+                    var procResourceEntity = await _procResourceRepository.GetResByIdAsync(resourceId);
+                    if (procResourceEntity != null)
+                    {   //在制品维修
+                        if (manuFacePlateEntity.Type == Core.Enums.Manufacture.ManuFacePlateTypeEnum.ProductionRepair)
+                        {
+                            facePlateQueryDto.FacePlateRepair.ResourceName = procResourceEntity.ResName;
+                            facePlateQueryDto.FacePlateRepair.ResourceCode = procResourceEntity.ResCode;
+                        }
+                        //在制品维修
+                        if (manuFacePlateEntity.Type == Core.Enums.Manufacture.ManuFacePlateTypeEnum.ProducePassingStation)
+                        {
+                            facePlateQueryDto.FacePlateProduction.ResourceName = procResourceEntity.ResName;
+                            facePlateQueryDto.FacePlateProduction.ResourceCode = procResourceEntity.ResCode;
+                        }
+                    }
+                }
+                //工序
+                if (procedureId > 0)
+                {
+                    var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(procedureId);
+                    if (procProcedureEntity != null)
+                    {
+                        //在制品维修
+                        if (manuFacePlateEntity.Type == Core.Enums.Manufacture.ManuFacePlateTypeEnum.ProductionRepair)
+                        {
+                            facePlateQueryDto.FacePlateRepair.ProcedureName = procProcedureEntity.Name;
+                            facePlateQueryDto.FacePlateRepair.ProcedureCode = procProcedureEntity.Code;
+                        }
+                        //在制品维修
+                        if (manuFacePlateEntity.Type == Core.Enums.Manufacture.ManuFacePlateTypeEnum.ProducePassingStation)
+                        {
+                            facePlateQueryDto.FacePlateProduction.ProcedureName = procProcedureEntity.Name;
+                            facePlateQueryDto.FacePlateProduction.ProcedureCode = procProcedureEntity.Code;
+                        }
+                    }
+                }
+                #endregion
+            }
+            return facePlateQueryDto;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="addManuFacePlateDto"></param>
+        /// <returns></returns>
+        /// <exception cref="ValidationException"></exception>
         public async Task AddManuFacePlateAsync(AddManuFacePlateDto addManuFacePlateDto)
         {
             // 判断是否有获取到站点码 
@@ -389,6 +487,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="updateManuFacePlateDto"></param>
+        /// <returns></returns>
+        /// <exception cref="ValidationException"></exception>
         public async Task UpdateManuFacePlateAsync(UpdateManuFacePlateDto updateManuFacePlateDto)
         {
             // 判断是否有获取到站点码 
@@ -457,5 +561,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ts.Complete();
             }
         }
+
+
     }
 }

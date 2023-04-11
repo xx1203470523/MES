@@ -64,7 +64,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGene
         /// <summary>
         /// 忽略字符
         /// </summary>
-        public string IgnoreChar { get; set; }
+        public string? IgnoreChar { get; set; }
 
         /// <summary>
         /// 增量

@@ -182,6 +182,6 @@ namespace Hymson.MES.Data.Repositories.Process
                             FROM `proc_procedure`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `Code`, `Name`, `Status`, `Type`, `PackingLevel`, `ResourceTypeId`, `Cycle`, `IsRepairReturn`, `Version`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `proc_procedure`  WHERE Id IN @ids ";
+                            FROM `proc_procedure`  WHERE Id IN @ids and IsDeleted=0  ";
     }
 }

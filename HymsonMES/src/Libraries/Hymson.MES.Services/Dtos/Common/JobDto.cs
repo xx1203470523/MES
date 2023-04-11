@@ -1,10 +1,21 @@
-﻿namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto
+﻿namespace Hymson.MES.Services.Dtos.Common
 {
     /// <summary>
     /// 作业Dto
     /// </summary>
-    public class SFCWorkDto
+    public class JobDto
     {
+        /// <summary>
+        /// 面板ID
+        /// </summary>
+        public long FacePlateId { get; set; }
+
+        /// <summary>
+        /// 按钮ID
+        /// </summary>
+        public long FacePlateButtonId { get; set; }
+
+
         /// <summary>
         /// 工序ID
         /// </summary>
@@ -17,6 +28,13 @@
         /// 产品条码
         /// </summary>
         public string SFC { get; set; }
+
+        /*
+        /// <summary>
+        /// 额外参数
+        /// </summary>
+        public string Extra { get; set; }
+        */
     }
 
     /// <summary>

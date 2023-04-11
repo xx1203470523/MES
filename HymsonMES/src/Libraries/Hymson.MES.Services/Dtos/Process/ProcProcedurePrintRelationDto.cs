@@ -184,7 +184,7 @@ namespace Hymson.MES.Services.Dtos.Process
     /// <summary>
     /// 工序配置打印查询实体类
     /// </summary>
-    public class QueryProcProcedurePrintReleationDto
+    public class ProcProcedurePrintReleationDto
     {
         ///// <summary>
         ///// 工序配置打印实体类
