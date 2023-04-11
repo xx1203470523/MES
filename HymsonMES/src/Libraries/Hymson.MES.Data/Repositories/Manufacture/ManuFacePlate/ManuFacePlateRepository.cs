@@ -73,6 +73,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 根据code获取数据
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        public async Task<ManuFacePlateEntity> GetByCodeAsync(string code)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ManuFacePlateEntity>(GetByCodeSql, new { Code = code });
+        }
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="manuFacePlatePagedQuery"></param>
@@ -211,5 +222,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                         t2.IsErrorBeep,t2.ErrorBeepUrl,t2.ErrorBeepTime,t2.IsShowBindWorkOrder,t2.IsShowQualifiedQty,t2.QualifiedColour,t2.IsShowUnqualifiedQty,t2.UnqualifiedColour,t2.IsShowLog FROM manu_face_plate t1 LEFT JOIN manu_face_plate_production t2 on t1.Id=t2.FacePlateId and t2.IsDeleted=0
                         where t1.IsDeleted=0 and t1.Id=  @Id ";
         #endregion
+
+        const string GetByCodeSql = @"SELECT 
+                               `Id`, `Code`, `Name`, `Type`, `Status`, `ConversationTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
+                            FROM `manu_face_plate`  WHERE Code = @Code  and IsDeleted=0 ";
     }
 }

@@ -48,9 +48,9 @@
   </ItemGroup>
 	<ItemGroup>
 		
-		<PackageReference Include="Hymson.Kafka.Debezium" Version="1.9.7" />
+		<PackageReference Include="Hymson.Kafka.Debezium" Version="2.0.4" />
 		
-		<PackageReference Include="Hymson.NLog.Console" Version="1.9.7" />
+		<PackageReference Include="Hymson.NLog.Console" Version="2.0.4" />
 		
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
