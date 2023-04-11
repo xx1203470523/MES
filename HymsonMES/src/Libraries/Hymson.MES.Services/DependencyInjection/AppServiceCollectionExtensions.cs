@@ -25,6 +25,9 @@ using Hymson.MES.Services.Services.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuFeeding;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
+using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInStation;
+using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOutStation;
+using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
 using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Hymson.MES.Services.Services.Plan;
 using Hymson.MES.Services.Services.Process;
@@ -161,6 +164,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuFacePlateService, ManuFacePlateService>();
             services.AddSingleton<IManuFacePlateButtonService, ManuFacePlateButtonService>();
 
+
+            services.AddSingleton<IManuInStationService, ManuInStationService>();
+            services.AddSingleton<IManuOutStationService, ManuOutStationService>();
             services.AddSingleton<IInProductDismantleService, InProductDismantleService>();
             #endregion
 

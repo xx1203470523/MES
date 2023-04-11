@@ -4,7 +4,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Services.Dtos.Common;
+using Hymson.MES.Services.BOs.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
 
@@ -62,7 +62,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         }
 
 
-        
+
         /// <summary>
         /// 扣料
         /// </summary>
@@ -78,11 +78,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             if (bomMaterials == null || bomMaterials.Any() == false) throw new BusinessException(nameof(ErrorCode.MES10612));
 
             // 取得特定工序的BOM
-            var deductList = new List<MaterialDeductDto> { };
+            var deductList = new List<MaterialDeductBO> { };
             bomMaterials = bomMaterials.Where(w => w.ProcedureId == procedureId);
 
             // 统计扣料数据
-            MaterialDeductDto deduct = new();
+            MaterialDeductBO deduct = new();
             foreach (var item in bomMaterials)
             {
                 // 扣减数量
