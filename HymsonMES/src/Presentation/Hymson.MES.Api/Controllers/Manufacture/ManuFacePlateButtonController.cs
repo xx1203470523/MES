@@ -108,6 +108,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPut("button")]
+        [AllowAnonymous]
         public async Task ClickAsync(JobDto dto)
         {
             await _manuFacePlateButtonService.ClickAsync(dto);

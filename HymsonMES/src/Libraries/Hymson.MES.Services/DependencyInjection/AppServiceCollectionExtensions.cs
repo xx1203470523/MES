@@ -20,6 +20,7 @@ using Hymson.MES.Services.Services.Integrated.InteCalendar;
 using Hymson.MES.Services.Services.Integrated.InteClass;
 using Hymson.MES.Services.Services.Integrated.InteContainer;
 using Hymson.MES.Services.Services.Job.Common;
+using Hymson.MES.Services.Services.Job.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuFeeding;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode;
@@ -189,7 +190,14 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #endregion
 
+            #region Job
             services.AddSingleton<IJobCommonService, JobCommonService>();
+            services.AddSingleton<IManufactureJobService, ManuCompleteService>();
+            services.AddSingleton<IManufactureJobService, ManuPackageService>();
+            services.AddSingleton<IManufactureJobService, ManuStartService>();
+            services.AddSingleton<IManufactureJobService, ManuStopService>();
+            #endregion
+
             return services;
         }
 

@@ -84,7 +84,8 @@
         public const string MES10437 = "此工艺路线{Code}+{Version}在系统已经存在！";
         public const string MES10438 = "此工艺路线不存在！";
         public const string MES10439 = $"此工艺路线在系统中不存在!";
-        public const string MES10440 = $"此工艺路线不存在下一工序!";
+        public const string MES10440 = $"获取下一工序失败!";
+        public const string MES10441 = $"不存在空值类型工序!";
         #endregion
 
         #region 参数 10500

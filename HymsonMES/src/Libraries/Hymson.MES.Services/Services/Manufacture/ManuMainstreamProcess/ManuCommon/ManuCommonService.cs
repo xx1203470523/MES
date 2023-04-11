@@ -213,46 +213,37 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             if (processRouteDetailLink == null || processRouteDetailLink.Any() == false) throw new BusinessException(nameof(ErrorCode.MES10440));
 
             // 获取当前工序在工艺路线里面的扩展信息
-            var procedureExtend = await _procProcessRouteDetailNodeRepository.GetByProcessRouteIdAsync(new ProcProcessRouteDetailNodeQuery
-            {
-                ProcessRouteId = manuSfcProduce.ProcessRouteId,
-                ProcedureId = manuSfcProduce.ProcedureId
-            });
+            var procedureNodes = await _procProcessRouteDetailNodeRepository.GetByIdsAsync(processRouteDetailLink.Select(s => s.ProcessRouteDetailId).ToArray())
+                ?? throw new BusinessException(nameof(ErrorCode.MES10440));
 
-            // 固定抽检
-            if (procedureExtend.CheckType == ProcessRouteInspectTypeEnum.FixedScale)
+            // 检查是否有"空值"类型的工序
+            var defaultNextProcedure = procedureNodes.FirstOrDefault(f => f.CheckType == ProcessRouteInspectTypeEnum.None)
+                ?? throw new BusinessException(nameof(ErrorCode.MES10441));
+
+            // 有多工序分叉的情况
+            if (procedureNodes.Count() > 1)
             {
-                // 读取工序抽检次数
                 var cacheKey = $"{manuSfcProduce.ProcessRouteId}-{manuSfcProduce.ProcedureId}-{manuSfcProduce.ResourceId}";
                 if (_memoryCache.TryGetValue(cacheKey, out int count) == false) count = 0;
 
-                if (count >= procedureExtend.CheckRate)
+                // 读取工序抽检次数
+                if (defaultNextProcedure.CheckRate == count)
                 {
-                    // TODO
+                    // 如果满足抽检次数，就取出一个非"空值"的随机工序作为下一工序
+                    defaultNextProcedure = procedureNodes.FirstOrDefault(f => f.CheckType != ProcessRouteInspectTypeEnum.None);
+
+                    // TODO 重置计数器
+                }
+                else
+                {
+                    // TODO 计数器+1
                 }
             }
-            // 随机
-            else
-            {
-                // 可跳过？
-            }
-
-            // TODO 根据规则取下一工序
-            var routeDetail = processRouteDetailLink.FirstOrDefault();
-            if (routeDetail == null) throw new BusinessException(nameof(ErrorCode.MES10440));
 
             // 获取下一工序
-            var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(routeDetail.ProcessRouteDetailId);
-            if (procProcedureEntity == null)
-            {
-                return null;
-                // 结束工序读取不到数据
-                // throw new BusinessException(nameof(ErrorCode.MES10605));
-            }
-
-            return procProcedureEntity;
+            if (defaultNextProcedure == null) throw new BusinessException(nameof(ErrorCode.MES10440));
+            return await _procProcedureRepository.GetByIdAsync(defaultNextProcedure.ProcedureId);
         }
-
 
     }
 }

@@ -4,6 +4,7 @@ using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Job.Manufacture;
+using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
 namespace Hymson.MES.Services.Services.Job.Common
@@ -78,13 +79,20 @@ namespace Hymson.MES.Services.Services.Job.Common
                 .Where(t => t.GetInterfaces().Contains(typeof(IManufactureJobService))).ToArray();
 
             // 遍历实现类，执行有绑定在当前按钮下面的job
+            var serviceScope = _serviceProvider.CreateScope();
             foreach (Type type in types)
             {
                 if (jobs.Any(a => a.Code == type.Name) == false) continue;
 
-                // 创建该类的实例，并调用 执行 方法
-                IManufactureJobService obj = (IManufactureJobService)Activator.CreateInstance(type);
+                // 通过依赖注入的方式创建该类的实例，并调用 执行 方法
+                var obj = (IManufactureJobService)serviceScope.ServiceProvider.GetService(type);
                 if (obj == null) continue;
+
+                /*
+                // 创建该类的实例，并调用 执行 方法
+                var obj = (IManufactureJobService)Activator.CreateInstance(type);
+                if (obj == null) continue;
+                */
 
                 await obj.ExecuteAsync(dto);
             }
