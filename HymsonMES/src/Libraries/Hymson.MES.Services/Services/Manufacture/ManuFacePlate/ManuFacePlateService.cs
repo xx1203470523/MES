@@ -264,6 +264,101 @@ namespace Hymson.MES.Services.Services.Manufacture
         }
 
         /// <summary>
+        /// 根据Code查询
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        public async Task<QueryManuFacePlateDto> QueryManuFacePlateByCodeAsync(string code)
+        {
+            QueryManuFacePlateDto queryProcDto = new QueryManuFacePlateDto();
+            var manuFacePlateEntity = await _manuFacePlateRepository.GetByCodeAsync(code);
+            if (manuFacePlateEntity != null)
+            {
+                long resourceId = 0;
+                long procedureId = 0;
+                queryProcDto.FacePlate = manuFacePlateEntity.ToModel<ManuFacePlateDto>();
+                #region 生产过站
+                if (manuFacePlateEntity.Type == Core.Enums.Manufacture.ManuFacePlateTypeEnum.ProducePassingStation)
+                {
+                    var manuFacePlateProductionEntity = await _manuFacePlateProductionRepository.GetByFacePlateIdAsync(manuFacePlateEntity.Id);
+                    if (manuFacePlateProductionEntity != null)
+                    {
+                        resourceId = manuFacePlateProductionEntity.ResourceId;
+                        procedureId = manuFacePlateProductionEntity.ProcedureId;
+
+                        queryProcDto.FacePlateProduction = manuFacePlateProductionEntity.ToModel<ManuFacePlateProductionDto>();
+                        //查询时Production主键使用主表的Id返回
+                        queryProcDto.FacePlateProduction.Id = manuFacePlateEntity.Id;
+                        //颜色不为空就显示
+                        queryProcDto.FacePlateProduction.IsShowQualifiedColour = !string.IsNullOrEmpty(queryProcDto.FacePlateProduction.QualifiedColour);
+                        queryProcDto.FacePlateProduction.IsShowUnqualifiedColour = !string.IsNullOrEmpty(queryProcDto.FacePlateProduction.UnqualifiedColour);
+                    }
+                }
+                #endregion
+
+                #region 在制品维修
+                //在制品维修
+                if (manuFacePlateEntity.Type == Core.Enums.Manufacture.ManuFacePlateTypeEnum.ProductionRepair)
+                {
+                    var manuFacePlateRepairEntity = await _manuFacePlateRepairRepository.GetByFacePlateIdAsync(manuFacePlateEntity.Id);
+                    if (manuFacePlateRepairEntity != null)
+                    {
+                        resourceId = manuFacePlateRepairEntity.ResourceId;
+                        procedureId = manuFacePlateRepairEntity.ProcedureId;
+
+                        queryProcDto.FacePlateRepair = manuFacePlateRepairEntity.ToModel<ManuFacePlateRepairDto>();
+                        //查询时Repair主键使用主表的Id返回
+                        queryProcDto.FacePlateRepair.Id = manuFacePlateEntity.Id;
+                    }
+                }
+                #endregion
+
+                #region 填充关联表数据
+                //资源
+                if (resourceId > 0)
+                {
+                    var procResourceEntity = await _procResourceRepository.GetResByIdAsync(resourceId);
+                    if (procResourceEntity != null)
+                    {   //在制品维修
+                        if (manuFacePlateEntity.Type == Core.Enums.Manufacture.ManuFacePlateTypeEnum.ProductionRepair)
+                        {
+                            queryProcDto.FacePlateRepair.ResourceName = procResourceEntity.ResName;
+                            queryProcDto.FacePlateRepair.ResourceCode = procResourceEntity.ResCode;
+                        }
+                        //在制品维修
+                        if (manuFacePlateEntity.Type == Core.Enums.Manufacture.ManuFacePlateTypeEnum.ProducePassingStation)
+                        {
+                            queryProcDto.FacePlateProduction.ResourceName = procResourceEntity.ResName;
+                            queryProcDto.FacePlateProduction.ResourceCode = procResourceEntity.ResCode;
+                        }
+                    }
+                }
+                //工序
+                if (procedureId > 0)
+                {
+                    var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(procedureId);
+                    if (procProcedureEntity != null)
+                    {
+                        //在制品维修
+                        if (manuFacePlateEntity.Type == Core.Enums.Manufacture.ManuFacePlateTypeEnum.ProductionRepair)
+                        {
+                            queryProcDto.FacePlateRepair.ProcedureName = procProcedureEntity.Name;
+                            queryProcDto.FacePlateRepair.ProcedureCode = procProcedureEntity.Code;
+                        }
+                        //在制品维修
+                        if (manuFacePlateEntity.Type == Core.Enums.Manufacture.ManuFacePlateTypeEnum.ProducePassingStation)
+                        {
+                            queryProcDto.FacePlateProduction.ProcedureName = procProcedureEntity.Name;
+                            queryProcDto.FacePlateProduction.ProcedureCode = procProcedureEntity.Code;
+                        }
+                    }
+                }
+                #endregion
+            }
+            return queryProcDto;
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="addManuFacePlateDto"></param>

@@ -75,6 +75,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<IEnumerable<ManuFacePlateEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
+        /// 根据code获取数据
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        Task<ManuFacePlateEntity> GetByCodeAsync(string code);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="manuFacePlateQuery"></param>
