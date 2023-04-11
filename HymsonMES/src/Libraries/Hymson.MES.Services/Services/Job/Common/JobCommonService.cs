@@ -70,14 +70,14 @@ namespace Hymson.MES.Services.Services.Job.Common
             var buttonJobs = await _manuFacePlateButtonJobRelationRepository.GetByFacePlateButtonIdAsync(dto.FacePlateButtonId);
             if (buttonJobs.Any() == false) return;
 
-            // 根据buttonJobs读取对于的job对象
+            // 根据 buttonJobs 读取对应的job对象
             var jobs = await _inteJobRepository.GetByIdsAsync(buttonJobs.Select(s => s.JobId).ToArray());
 
             // 获取实现了 IManufactureJobService 接口的所有类的 Type 对象
             Type[] types = Assembly.GetExecutingAssembly().GetTypes()
                 .Where(t => t.GetInterfaces().Contains(typeof(IManufactureJobService))).ToArray();
 
-            // 输出这些类的名称
+            // 遍历实现类，执行有绑定在当前按钮下面的job
             foreach (Type type in types)
             {
                 if (jobs.Any(a => a.Code == type.Name) == false) continue;
@@ -88,8 +88,6 @@ namespace Hymson.MES.Services.Services.Job.Common
 
                 await obj.ExecuteAsync(dto);
             }
-
-            await Task.CompletedTask;
         }
 
     }
