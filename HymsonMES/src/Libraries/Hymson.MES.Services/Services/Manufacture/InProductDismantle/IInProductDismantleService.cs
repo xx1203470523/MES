@@ -14,6 +14,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="bomId"></param>
         /// <returns></returns>
-        Task<List<InProductDismantleDto>> GetProcBomDetailAsync(long bomId);
+        Task<List<InProductDismantleDto>> GetProcBomDetailAsync(InProductDismantleQueryDto queryDto);
     }
 }

@@ -32,12 +32,13 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <summary>
         /// 查询Bom维护表详情
         /// </summary>
-        /// <param name="bomId"></param>
+        /// <param name="queryDto"></param>
         /// <returns></returns>
-        [HttpGet("mainmaterials")]
-        public async Task<List<InProductDismantleDto>> GetProcBomDetailAsync(long bomId)
+        [HttpGet]
+        [Route("mainmaterials")]
+        public async Task<List<InProductDismantleDto>> GetProcBomDetailAsync([FromQuery] InProductDismantleQueryDto queryDto)
         {
-            return await _inProductDismantleService.GetProcBomDetailAsync(bomId);
+            return await _inProductDismantleService.GetProcBomDetailAsync(queryDto);
         }
     }
 }
