@@ -167,7 +167,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<QueryProcProcedurePrintReleationDto>> GetProcedureConfigPrintListAsync(ProcProcedurePrintReleationPagedQueryDto queryDto)
+        public async Task<PagedInfo<ProcProcedurePrintReleationDto>> GetProcedureConfigPrintListAsync(ProcProcedurePrintReleationPagedQueryDto queryDto)
         {
             var query = new ProcProcedurePrintReleationPagedQuery()
             {
@@ -180,7 +180,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             var pagedInfo = await _procedurePrintRelationRepository.GetPagedInfoAsync(query);
 
             //实体到DTO转换 装载数据
-            var dtos = new List<QueryProcProcedurePrintReleationDto>();
+            var dtos = new List<ProcProcedurePrintReleationDto>();
             if (pagedInfo.Data != null && pagedInfo.Data.Any())
             {
                 var materialIds = pagedInfo.Data.ToList().Select(a => a.MaterialId).ToArray();
@@ -193,7 +193,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                     var printReleationDto = entity.ToModel<ProcProcedurePrintRelationDto>();
                     var material = materialLsit.FirstOrDefault(a => a.Id == printReleationDto.MaterialId)?.ToModel<ProcMaterialDto>();
                     var template = templateLsit.FirstOrDefault(a => a.Id == printReleationDto.TemplateId)?.ToModel<ProcLabelTemplateDto>();
-                    var queryEntity = new QueryProcProcedurePrintReleationDto
+                    var queryEntity = new ProcProcedurePrintReleationDto
                     {
                         TemplateId = entity.TemplateId,
                         Copy = entity.Copy,
@@ -207,7 +207,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 }
             }
 
-            return new PagedInfo<QueryProcProcedurePrintReleationDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            return new PagedInfo<ProcProcedurePrintReleationDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
         /// <summary>
@@ -215,7 +215,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<QueryProcedureJobReleationDto>> GetProcedureConfigJobListAsync(InteJobBusinessRelationPagedQueryDto queryDto)
+        public async Task<PagedInfo<ProcedureJobReleationDto>> GetProcedureConfigJobListAsync(InteJobBusinessRelationPagedQueryDto queryDto)
         {
             var query = new InteJobBusinessRelationPagedQuery()
             {
@@ -229,7 +229,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             var pagedInfo = await _jobBusinessRelationRepository.GetPagedInfoAsync(query);
 
             //实体到DTO转换 装载数据
-            var dtos = new List<QueryProcedureJobReleationDto>();
+            var dtos = new List<ProcedureJobReleationDto>();
             if (pagedInfo.Data != null && pagedInfo.Data.Any())
             {
                 var jobIds = pagedInfo.Data.Select(a => a.JobId).ToArray();
@@ -238,7 +238,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 foreach (var entity in pagedInfo.Data)
                 {
                     var job = jobList.FirstOrDefault(a => a.Id == entity.JobId);
-                    dtos.Add(new QueryProcedureJobReleationDto()
+                    dtos.Add(new ProcedureJobReleationDto()
                     {
                         LinkPoint = entity.LinkPoint,
                         Parameter = entity.Parameter,
@@ -251,7 +251,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                     });
                 }
             }
-            return new PagedInfo<QueryProcedureJobReleationDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            return new PagedInfo<ProcedureJobReleationDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
         /// <summary>

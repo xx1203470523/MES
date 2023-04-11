@@ -291,7 +291,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 类型
         /// </summary>
-        public int Type { get; set; }
+        public ProcedureTypeEnum Type { get; set; }
 
         /// <summary>
         /// 包装等级（字典数据）
@@ -327,7 +327,7 @@ namespace Hymson.MES.Services.Dtos.Process
     /// <summary>
     /// 工序配置打印查询实体类
     /// </summary>
-    public class QueryProcedureJobReleationDto
+    public class ProcedureJobReleationDto
     {
         /// <summary>
         /// 工序配置工作实体类
