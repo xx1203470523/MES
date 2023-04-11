@@ -222,15 +222,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         public async Task<ProcProcedureEntity?> GetNextProcedureAsync(ManuSfcProduceEntity manuSfcProduce)
         {
             // 因为可能有分叉，所以返回的下一步工序是集合
-            var processRouteDetailLink = await _procProcessRouteDetailLinkRepository.GetProcessRouteDetailLinkAsync(new ProcProcessRouteDetailLinkQuery
+            var netxtProcessRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetNextProcessRouteDetailLinkAsync(new ProcProcessRouteDetailLinkQuery
             {
                 ProcessRouteId = manuSfcProduce.ProcessRouteId,
                 ProcedureId = manuSfcProduce.ProcedureId
             });
-            if (processRouteDetailLink == null || processRouteDetailLink.Any() == false) throw new BusinessException(nameof(ErrorCode.MES10440));
+            if (netxtProcessRouteDetailLinks == null || netxtProcessRouteDetailLinks.Any() == false) throw new BusinessException(nameof(ErrorCode.MES10440));
 
             // 获取当前工序在工艺路线里面的扩展信息
-            var procedureNodes = await _procProcessRouteDetailNodeRepository.GetByIdsAsync(processRouteDetailLink.Select(s => s.ProcessRouteDetailId).ToArray())
+            var procedureNodes = await _procProcessRouteDetailNodeRepository.GetByIdsAsync(netxtProcessRouteDetailLinks.Select(s => s.ProcessRouteDetailId).ToArray())
                 ?? throw new BusinessException(nameof(ErrorCode.MES10440));
 
             // 检查是否有"空值"类型的工序
@@ -265,11 +265,17 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <summary>
         /// 判断上一工序是否随机工序
         /// </summary>
-        /// <param name="processRouteId"></param>
-        /// <param name="procedureId"></param>
+        /// <param name="manuSfcProduce"></param>
         /// <returns></returns>
-        public async Task<bool> IsRandomPreProcedure(long processRouteId, long procedureId)
+        public async Task<bool> IsRandomPreProcedure(ManuSfcProduceEntity manuSfcProduce)
         {
+            // 因为可能有分叉，所以返回的上一步工序是集合
+            var preProcessRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetPreProcessRouteDetailLinkAsync(new ProcProcessRouteDetailLinkQuery
+            {
+                ProcessRouteId = manuSfcProduce.ProcessRouteId,
+                ProcedureId = manuSfcProduce.ProcedureId
+            });
+
             // TODO 
 
             return false;

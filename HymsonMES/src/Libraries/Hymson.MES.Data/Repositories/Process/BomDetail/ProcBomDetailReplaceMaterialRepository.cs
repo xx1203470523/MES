@@ -182,8 +182,8 @@ namespace Hymson.MES.Data.Repositories.Process
                                             /**select**/
                                            FROM `proc_bom_detail_replace_material` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `proc_bom_detail_replace_material`(  `Id`, `SiteId`, `BomId`, `BomDetailId`, `ReplaceMaterialId`, `ReferencePoint`, `Usages`, `Loss`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @BomId, @BomDetailId, @ReplaceMaterialId, @ReferencePoint, @Usages, @Loss, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string UpdateSql = "UPDATE `proc_bom_detail_replace_material` SET BomDetailId = @BomDetailId, ReplaceMaterialId = @ReplaceMaterialId, ReferencePoint = @ReferencePoint, Usages = @Usages, Loss = @Loss, Remark = @Remark,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
+        const string InsertSql = "INSERT INTO `proc_bom_detail_replace_material`(  `Id`, `SiteId`, `BomId`, `BomDetailId`, `ReplaceMaterialId`, `ReferencePoint`, `Usages`, `Loss`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`,DataCollectionWay) VALUES (   @Id, @SiteId, @BomId, @BomDetailId, @ReplaceMaterialId, @ReferencePoint, @Usages, @Loss, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @DataCollectionWay )  ";
+        const string UpdateSql = "UPDATE `proc_bom_detail_replace_material` SET BomDetailId = @BomDetailId, ReplaceMaterialId = @ReplaceMaterialId, ReferencePoint = @ReferencePoint, Usages = @Usages, Loss = @Loss, Remark = @Remark,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn , DataCollectionWay=@DataCollectionWay WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_bom_detail_replace_material` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_bom_detail_replace_material` SET IsDeleted = Id,UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids";
         /// <summary>

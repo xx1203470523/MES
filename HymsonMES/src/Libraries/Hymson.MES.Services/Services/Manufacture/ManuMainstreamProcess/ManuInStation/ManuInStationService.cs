@@ -76,7 +76,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
             if (sfcProduceEntity.ProcedureId != bo.ProcedureId)
             {
                 // 判断上一个工序是否是随机工序
-                var IsRandomPreProcedure = await _manuCommonService.IsRandomPreProcedure(sfcProduceEntity.ProcessRouteId, sfcProduceEntity.ProcedureId);
+                var IsRandomPreProcedure = await _manuCommonService.IsRandomPreProcedure(sfcProduceEntity);
                 if (IsRandomPreProcedure == false) throw new BusinessException(nameof(ErrorCode.MES16308));
 
                 // 将SFC对应的工序改为当前工序

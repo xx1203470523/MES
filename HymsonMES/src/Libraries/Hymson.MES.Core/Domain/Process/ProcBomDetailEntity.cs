@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Process
 {
@@ -56,5 +57,21 @@ namespace Hymson.MES.Core.Domain.Process
         /// 空值 : true  
         /// </summary>
         public string Remark { get; set; }
-        }
+
+
+        /// <summary>
+        /// 数据收集方式 
+        /// </summary>
+        public MaterialSerialNumberEnum? DataCollectionWay { get; set; }
+
+        /// <summary>
+        /// 是否启用替代物料
+        /// </summary>
+        public bool IsEnableReplace { get; set; }
+
+        /// <summary>
+        /// 序号
+        /// </summary>
+        public int Seq { get; set; }
+    }
 }
