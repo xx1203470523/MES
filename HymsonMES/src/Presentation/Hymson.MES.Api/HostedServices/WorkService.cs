@@ -1,4 +1,5 @@
 ﻿using Hymson.ClearCache;
+using Hymson.Infrastructure.Enums;
 using Hymson.Localization.Services;
 
 namespace Hymson.MES.Api
@@ -20,7 +21,10 @@ namespace Hymson.MES.Api
         {
             try
             {
-                await _clearCacheService.ClearCacheAsync(stoppingToken);
+                await _clearCacheService.ClearCacheAsync(new ServiceTypeEnum[] { 
+                 ServiceTypeEnum.User,
+                  ServiceTypeEnum.MES
+                },stoppingToken);
                 //await _resourceService.InitEnumAsync();
                 //await _resourceService.InitErrorCodeAsync(typeof(ErrorCode));
 
