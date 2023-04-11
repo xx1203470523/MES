@@ -78,11 +78,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<ManuSfcInfoEntity> GetByIdAsync(long id);
 
         /// <summary>
-        /// 根据SPC获取数据
+        /// 根据SFC获取数据
         /// </summary>
-        /// <param name="spc"></param>
+        /// <param name="sfc"></param>
         /// <returns></returns>
-        Task<ManuSfcInfoEntity> GetBySPCAsync(string spc);
+        Task<ManuSfcInfoEntity> GetBySFCAsync(string sfc);
 
         /// <summary>
         /// 根据IDs批量获取数据

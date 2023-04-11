@@ -77,7 +77,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         public async Task ExecuteAsync(JobDto dto)
         {
             // 获取生产条码信息（附带条码合法性校验 + 工序活动状态校验）
-            var sfcProduceEntity = await _manuCommonService.GetProduceSPCWithCheckAsync(dto.SFC, dto.ProcedureId);
+            var sfcProduceEntity = await _manuCommonService.GetProduceSFCWithCheckAsync(dto.SFC, dto.ProcedureId);
 
             // 获取生产工单
             var workOrderEntity = await _manuCommonService.GetProduceWorkOrderByIdAsync(sfcProduceEntity.WorkOrderId);
@@ -112,7 +112,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
 
             if (result)
             {
-                var sfcInfo = await _manuSfcInfoRepository.GetBySPCAsync(sfcProduceEntity.SFC);
+                var sfcInfo = await _manuSfcInfoRepository.GetBySFCAsync(sfcProduceEntity.SFC);
 
                 // 合格品出站
                 // 获取下一个工序（如果没有了，就表示完工）

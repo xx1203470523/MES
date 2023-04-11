@@ -139,14 +139,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
-        /// 根据SPC获取数据
+        /// 根据SFC获取数据
         /// </summary>
-        /// <param name="spc"></param>
+        /// <param name="sfc"></param>
         /// <returns></returns>
-        public async Task<ManuSfcProduceEntity> GetBySPCAsync(string spc)
+        public async Task<ManuSfcProduceEntity> GetBySFCAsync(string sfc)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ManuSfcProduceEntity>(GetBySPC, new { spc });
+            return await conn.QueryFirstOrDefaultAsync<ManuSfcProduceEntity>(GetBySFCSql, new { sfc });
         }
 
         /// <summary>
@@ -277,7 +277,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `Sfc`, `ProductId`, `WorkOrderId`, `BarCodeInfoId`, `ProcessRouteId`, `WorkCenterId`, `ProductBOMId`, `EquipmentId`, `ResourceId`, `ProcedureId`, `Status`, `Lock`, `LockProductionId`, `IsSuspicious`, `RepeatedCount`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `manu_sfc_produce`  WHERE Id IN @ids ";
-        const string GetBySPC = @"SELECT * FROM manu_sfc_produce WHERE SFC = @spc ";
+        const string GetBySFCSql = @"SELECT * FROM manu_sfc_produce WHERE SFC = @sfc ";
         const string DeletePhysicalSql = "DELETE FROM manu_sfc_produce WHERE SFC = @sfc";
         const string DeletePhysicalRangeSql = "delete from manu_sfc_produce where SFC in @Sfcs";
         //质量锁定sql
