@@ -59,8 +59,8 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("{id}")]
-        public async Task<QueryManuFacePlateDto> QueryManuFacePlateByIdAsync(long id)
+        [HttpGet("querymanufaceplatebyId/{id}")]
+        public async Task<ManuFacePlateQueryDto> QueryManuFacePlateByIdAsync(long id)
         {
             return await _manuFacePlateService.QueryManuFacePlateByIdAsync(id);
         }
@@ -101,6 +101,19 @@ namespace Hymson.MES.Api.Controllers.Manufacture
             await _manuFacePlateService.DeletesManuFacePlateAsync(ids);
         }
 
+        #endregion
+
+        #region 扩展方法
+        /// <summary>
+        /// 查询详情（操作面板）
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        [HttpGet("queryByCode/{code}")]
+        public async Task<ManuFacePlateQueryDto> QueryManuFacePlateByCodeAsync(string code)
+        {
+            return await _manuFacePlateService.QueryManuFacePlateByCodeAsync(code);
+        }
         #endregion
     }
 }

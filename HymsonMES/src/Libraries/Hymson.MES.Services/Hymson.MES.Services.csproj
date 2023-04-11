@@ -22,17 +22,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Services\Manufacture\ManuSfcInfo\IManuSfcInfoService.cs" />
-    <Compile Remove="Services\Manufacture\ManuSfcInfo\ManuSfcInfoService.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="FluentValidation" Version="11.5.1" />
-    <PackageReference Include="Hymson.Authentication.JwtBearer" Version="1.9.7" />
-    <PackageReference Include="Hymson.Kafka.Debezium" Version="1.9.7" />
-    <PackageReference Include="Hymson.Sequences" Version="1.9.7" />
-    <PackageReference Include="Hymson.Snowflake" Version="1.9.7" />
-    <PackageReference Include="Hymson.Web.Framework" Version="1.9.7" />
+    <PackageReference Include="Hymson.Authentication.JwtBearer" Version="2.0.6" />
+    <PackageReference Include="Hymson.Kafka.Debezium" Version="2.0.6" />
+    <PackageReference Include="Hymson.Sequences" Version="2.0.6" />
+    <PackageReference Include="Hymson.Snowflake" Version="2.0.6" />
+    <PackageReference Include="Hymson.Web.Framework" Version="2.0.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
   </ItemGroup>
@@ -44,7 +39,6 @@
   <ItemGroup>
     <Folder Include="Services\Job\Manufacture\" />
     <Folder Include="Services\Manufacture\ManuMainstreamProcess\Consume\" />
-    <Folder Include="Services\Manufacture\ManuSfcInfo\" />
   </ItemGroup>
 
 </Project>

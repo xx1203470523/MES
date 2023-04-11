@@ -20,30 +20,30 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="manuSfcInfo1Entity"></param>
+        /// <param name="ManuSfcInfoEntity"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(ManuSfcInfo1Entity manuSfcInfo1Entity);
+        Task<int> InsertAsync(ManuSfcInfoEntity ManuSfcInfoEntity);
         
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="manuSfcInfo1Entitys"></param>
+        /// <param name="ManuSfcInfoEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertsAsync(List<ManuSfcInfo1Entity> manuSfcInfo1Entitys);
+        Task<int> InsertsAsync(List<ManuSfcInfoEntity> ManuSfcInfoEntitys);
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="manuSfcInfo1Entity"></param>
+        /// <param name="ManuSfcInfoEntity"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(ManuSfcInfo1Entity manuSfcInfo1Entity);
+        Task<int> UpdateAsync(ManuSfcInfoEntity ManuSfcInfoEntity);
         
         /// <summary>
         /// 批量更新 
         /// </summary>
-        /// <param name="manuSfcInfo1Entitys"></param>
+        /// <param name="ManuSfcInfoEntitys"></param>
         /// <returns></returns>
-        Task<int> UpdatesAsync(List<ManuSfcInfo1Entity> manuSfcInfo1Entitys);
+        Task<int> UpdatesAsync(List<ManuSfcInfoEntity> ManuSfcInfoEntitys);
 
         /// <summary>
         /// 删除  
@@ -65,28 +65,35 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<ManuSfcInfo1Entity> GetByIdAsync(long id);
+        Task<ManuSfcInfoEntity> GetByIdAsync(long id);
     
+        /// <summary>
+        /// 根据SFC获取数据
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        Task<ManuSfcInfoEntity> GetBySFCAsync(string sfc);
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuSfcInfo1Entity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<ManuSfcInfoEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="manuSfcInfo1Query"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuSfcInfo1Entity>> GetManuSfcInfo1EntitiesAsync(ManuSfcInfo1Query manuSfcInfo1Query);
+        Task<IEnumerable<ManuSfcInfoEntity>> GetManuSfcInfo1EntitiesAsync(ManuSfcInfo1Query manuSfcInfo1Query);
         
         /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="manuSfcInfo1PagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<ManuSfcInfo1Entity>> GetPagedInfoAsync(ManuSfcInfo1PagedQuery manuSfcInfo1PagedQuery);
+        Task<PagedInfo<ManuSfcInfoEntity>> GetPagedInfoAsync(ManuSfcInfo1PagedQuery manuSfcInfo1PagedQuery);
         #endregion
     }
 }

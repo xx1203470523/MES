@@ -289,7 +289,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<QueryProcedureJobReleationDto>> GetProcedureConfigJobListAsync(InteJobBusinessRelationPagedQueryDto queryDto)
+        public async Task<PagedInfo<ProcedureJobReleationDto>> GetProcedureConfigJobListAsync(InteJobBusinessRelationPagedQueryDto queryDto)
         {
             var query = new InteJobBusinessRelationPagedQuery()
             {
@@ -304,7 +304,7 @@ namespace Hymson.MES.Services.Services.Process
 
 
             //实体到DTO转换 装载数据
-            var dtos = new List<QueryProcedureJobReleationDto>();
+            var dtos = new List<ProcedureJobReleationDto>();
             if (pagedInfo.Data != null && pagedInfo.Data.Any())
             {
                 var jobIds = pagedInfo.Data.Select(a => a.JobId).ToArray();
@@ -313,7 +313,7 @@ namespace Hymson.MES.Services.Services.Process
                 foreach (var entity in pagedInfo.Data)
                 {
                     var job = jobList.FirstOrDefault(a => a.Id == entity.JobId);
-                    dtos.Add(new QueryProcedureJobReleationDto()
+                    dtos.Add(new ProcedureJobReleationDto()
                     {
                         LinkPoint = entity.LinkPoint,
                         Parameter = entity.Parameter,
@@ -327,7 +327,7 @@ namespace Hymson.MES.Services.Services.Process
                 }
             }
 
-            return new PagedInfo<QueryProcedureJobReleationDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            return new PagedInfo<ProcedureJobReleationDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
         /// <summary>
@@ -369,13 +369,6 @@ namespace Hymson.MES.Services.Services.Process
             //打印机验证
             if (parm.PrintList != null && parm.PrintList.Count > 0)
             {
-                parm.PrintList.ForEach(x =>
-                {
-                    if (x.PrintId == 0)
-                    {
-                        x.PrintId = x.Id.ParseToLong();
-                    }
-                });
                 //判断打印机是否重复配置  数据库中 已经存储的情况
                 if (parm.PrintList.GroupBy(x => x.PrintId).Where(g => g.Count() >= 2).Count() >= 1)
                 {
@@ -386,14 +379,6 @@ namespace Hymson.MES.Services.Services.Process
             //判断是否勾选了多个主设备，只能有一个主设备
             if (parm.EquList != null && parm.EquList.Count > 0)
             {
-                parm.EquList.ForEach(x =>
-                {
-                    if (x.EquipmentId == 0)
-                    {
-                        x.EquipmentId = x.Id.ParseToLong();
-                    }
-                });
-
                 var equNumber = parm.EquList.ToLookup(w => w.EquipmentId).ToDictionary(d => d.Key, d => d);
                 if (equNumber.Keys.Count < parm.EquList.Count)
                 {
@@ -412,18 +397,6 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10307));
                 }
-            }
-
-            //作业设置
-            if (parm.JobList != null && parm.JobList.Count > 0)
-            {
-                parm.JobList.ForEach(x =>
-                {
-                    if (x.JobId == 0)
-                    {
-                        x.JobId = x.Id.ParseToLong();
-                    }
-                });
             }
             #endregion
 
@@ -605,14 +578,6 @@ namespace Hymson.MES.Services.Services.Process
             //判断是否勾选了多个主设备，只能有一个主设备
             if (param.EquList != null && param.EquList.Count > 0)
             {
-                param.EquList.ForEach(x =>
-                {
-                    if (x.EquipmentId == 0)
-                    {
-                        x.EquipmentId = x.Id.ParseToLong();
-                    }
-                });
-
                 var equNumber = param.EquList.ToLookup(w => w.EquipmentId).ToDictionary(d => d.Key, d => d);
                 if (equNumber.Keys.Count < param.EquList.Count)
                 {
@@ -639,18 +604,6 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     throw new ValidationException(nameof(ErrorCode.MES10307));
                 }
-            }
-
-            //作业设置
-            if (param.JobList != null && param.JobList.Count > 0)
-            {
-                param.JobList.ForEach(x =>
-                {
-                    if (x.JobId == 0)
-                    {
-                        x.JobId = x.Id.ParseToLong();
-                    }
-                });
             }
             #endregion
 

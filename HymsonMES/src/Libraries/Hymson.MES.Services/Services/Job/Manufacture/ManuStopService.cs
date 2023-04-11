@@ -3,7 +3,6 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
-using Hymson.MES.Services.Services.Job.Common;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Utils;
 
@@ -60,7 +59,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         public async Task ExecuteAsync(JobDto dto)
         {
             // 获取生产条码信息（附带条码合法性校验 + 工序活动状态校验）
-            var sfcProduceEntity = await _manuCommonService.GetProduceSPCWithCheckAsync(dto.SFC, dto.ProcedureId, new SfcProduceStatusEnum[] { SfcProduceStatusEnum.Activity });
+            var sfcProduceEntity = await _manuCommonService.GetProduceSFCWithCheckAsync(dto.SFC, dto.ProcedureId);
 
             // 更改状态，将条码由"活动"改为"排队"
             sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;

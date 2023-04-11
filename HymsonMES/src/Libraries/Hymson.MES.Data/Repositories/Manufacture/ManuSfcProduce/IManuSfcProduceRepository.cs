@@ -45,11 +45,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<IEnumerable<ManuSfcProduceEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
-        /// 根据SPC获取数据
+        /// 根据SFC获取数据
         /// </summary>
-        /// <param name="spc"></param>
+        /// <param name="sfc"></param>
         /// <returns></returns>
-        Task<ManuSfcProduceEntity> GetBySPCAsync(string spc);
+        Task<ManuSfcProduceEntity> GetBySFCAsync(string sfc);
 
         /// <summary>
         /// 获取List

@@ -6,6 +6,8 @@
  *build datetime: 2023-04-01 02:05:24
  */
 using FluentValidation;
+using Hymson.MES.Core.Constants;
+using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
 
 namespace Hymson.MES.Services.Validators.Manufacture
@@ -13,12 +15,23 @@ namespace Hymson.MES.Services.Validators.Manufacture
     /// <summary>
     /// 操作面板 更新 验证
     /// </summary>
-    internal class ManuFacePlateCreateValidator: AbstractValidator<ManuFacePlateCreateDto>
+    internal class ManuFacePlateCreateValidator : AbstractValidator<ManuFacePlateCreateDto>
     {
-        public ManuFacePlateCreateValidator()
+        private readonly IManuFacePlateRepository _manuFacePlateRepository;
+        public ManuFacePlateCreateValidator(IManuFacePlateRepository manuFacePlateRepository)
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111");
+            _manuFacePlateRepository = manuFacePlateRepository;
+            RuleFor(x => x.Type).NotEmpty().WithErrorCode(nameof(ErrorCode.MES17201));
+            RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES17202));
+            RuleFor(x => x.Code).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES17206));
+            RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES17203));
+            RuleFor(x => x.Name).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES17207));
+            RuleFor(x => x.Status).NotEmpty().WithErrorCode(nameof(ErrorCode.MES17204));
+            RuleFor(x => x).MustAsync(async (manuFacePlate, cancellation) =>
+            {
+                var isExists = await _manuFacePlateRepository.IsExists(manuFacePlate.Code, manuFacePlate.Id);
+                return !isExists;
+            }).WithErrorCode(nameof(ErrorCode.MES17205));
         }
     }
 
@@ -27,10 +40,21 @@ namespace Hymson.MES.Services.Validators.Manufacture
     /// </summary>
     internal class ManuFacePlateModifyValidator : AbstractValidator<ManuFacePlateModifyDto>
     {
-        public ManuFacePlateModifyValidator()
+        private readonly IManuFacePlateRepository _manuFacePlateRepository;
+        public ManuFacePlateModifyValidator(IManuFacePlateRepository manuFacePlateRepository)
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111");
+            _manuFacePlateRepository = manuFacePlateRepository;
+            RuleFor(x => x.Type).NotEmpty().WithErrorCode(nameof(ErrorCode.MES17201));
+            RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES17202));
+            RuleFor(x => x.Code).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES17206));
+            RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES17203));
+            RuleFor(x => x.Name).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES17207));
+            RuleFor(x => x.Status).NotEmpty().WithErrorCode(nameof(ErrorCode.MES17204));
+            RuleFor(x => x).MustAsync(async (manuFacePlate, cancellation) =>
+            {
+                var isExists = await _manuFacePlateRepository.IsExists(manuFacePlate.Code, manuFacePlate.Id);
+                return !isExists;
+            }).WithErrorCode(nameof(ErrorCode.MES17205));
         }
     }
 }

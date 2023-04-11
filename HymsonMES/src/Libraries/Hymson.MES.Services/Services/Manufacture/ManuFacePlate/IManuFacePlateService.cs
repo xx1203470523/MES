@@ -56,8 +56,14 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<QueryManuFacePlateDto> QueryManuFacePlateByIdAsync(long id);
+        Task<ManuFacePlateQueryDto> QueryManuFacePlateByIdAsync(long id);
 
+        /// <summary>
+        /// 根据Code查询
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        Task<ManuFacePlateQueryDto> QueryManuFacePlateByCodeAsync(string code);
 
         /// <summary>
         /// 新增

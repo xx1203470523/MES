@@ -90,7 +90,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
             });
             var processRouteFirstProcedure = await _manuCommonService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
             List<ManuSfcEntity> manuSfcList = new List<ManuSfcEntity>();
-            List<ManuSfcInfo1Entity> manuSfcInfoList = new List<ManuSfcInfo1Entity>();
+            List<ManuSfcInfoEntity> manuSfcInfoList = new List<ManuSfcInfoEntity>();
             List<ManuSfcProduceEntity> manuSfcProduceList = new List<ManuSfcProduceEntity>();
             List<ManuSfcStepEntity> manuSfcStepList = new List<ManuSfcStepEntity>();
 
@@ -111,7 +111,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                 };
                 manuSfcList.Add(manuSfcEntity);
 
-                manuSfcInfoList.Add(new ManuSfcInfo1Entity
+                manuSfcInfoList.Add(new ManuSfcInfoEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = _currentSite.SiteId ?? 0,

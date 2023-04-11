@@ -567,5 +567,20 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             return manuSfcProduceEntity.ToModel<ManuSfcProduceDto>();
         }
+
+        /// <summary>
+        /// 根据SFC查询
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        public async Task<ManuSfcProduceDto> QueryManuSfcProduceBySFCAsync(string sfc)
+        {
+            var manuSfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(sfc);
+            if (manuSfcProduceEntity == null)
+            {
+                return null;
+            }
+            return manuSfcProduceEntity.ToModel<ManuSfcProduceDto>();
+        }
     }
 }

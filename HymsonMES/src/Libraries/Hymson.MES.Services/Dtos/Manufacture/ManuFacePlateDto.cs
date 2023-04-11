@@ -79,8 +79,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
-
-       
     }
 
 
@@ -123,8 +121,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
-
-       
     }
 
     /// <summary>
@@ -162,38 +158,10 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public int ConversationTime { get; set; }
 
-       ///// <summary>
-       // /// 创建人
-       // /// </summary>
-       // public string CreatedBy { get; set; }
-
-       ///// <summary>
-       // /// 创建时间
-       // /// </summary>
-       // public DateTime CreatedOn { get; set; }
-
-       ///// <summary>
-       // /// 更新人
-       // /// </summary>
-       // public string UpdatedBy { get; set; }
-
-       ///// <summary>
-       // /// 更新时间
-       // /// </summary>
-       // public DateTime UpdatedOn { get; set; }
-
-       ///// <summary>
-       // /// 删除标识
-       // /// </summary>
-       // public long IsDeleted { get; set; }
-
        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
-
-       
-
     }
 
     /// <summary>
@@ -225,7 +193,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     /// <summary>
     /// 面板查询DTO
     /// </summary>
-    public class QueryManuFacePlateDto
+    public class ManuFacePlateQueryDto
     {
         /// <summary>
         /// 面板信息
@@ -241,6 +209,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 在制品维修
         /// </summary>
         public ManuFacePlateRepairDto FacePlateRepair { get; set; }
+
+        /// <summary>
+        /// 容器包装配置信息
+        /// </summary>
+        public ManuFacePlateContainerPackDto FacePlateContainerPack { get; set; }
     }
 
     /// <summary>
@@ -264,9 +237,13 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public ManuFacePlateRepairCreateDto FacePlateRepair { get; set; }
 
         /// <summary>
+        /// 容器包装配置信息
+        /// </summary>
+        public ManuFacePlateContainerPackCreateDto FacePlateContainerPack { get; set; }
+
+        /// <summary>
         /// 按钮配置信息
         /// </summary>
-
         public List<ManuFacePlateButtonCreateDto>? FacePlateButtonList { get; set; }
     }
 
@@ -291,9 +268,13 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public ManuFacePlateRepairModifyDto FacePlateRepair { get; set; }
 
         /// <summary>
+        /// 容器包装配置信息
+        /// </summary>
+        public ManuFacePlateContainerPackModifyDto FacePlateContainerPack { get; set; }
+
+        /// <summary>
         /// 按钮配置信息
         /// </summary>
-
         public List<ManuFacePlateButtonModifyDto>? FacePlateButtonList { get; set; }
     }
 

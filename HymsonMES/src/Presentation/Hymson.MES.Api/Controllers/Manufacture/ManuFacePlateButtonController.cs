@@ -74,7 +74,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [Route("create")]
         public async Task AddManuFacePlateButtonAsync([FromBody] ManuFacePlateButtonCreateDto parm)
         {
-             await _manuFacePlateButtonService.CreateManuFacePlateButtonAsync(parm);
+            await _manuFacePlateButtonService.CreateManuFacePlateButtonAsync(parm);
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [Route("update")]
         public async Task UpdateManuFacePlateButtonAsync([FromBody] ManuFacePlateButtonModifyDto parm)
         {
-             await _manuFacePlateButtonService.ModifyManuFacePlateButtonAsync(parm);
+            await _manuFacePlateButtonService.ModifyManuFacePlateButtonAsync(parm);
         }
 
         /// <summary>
@@ -108,9 +108,10 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPut("button")]
-        public async Task ClickAsync(JobDto dto)
+        [AllowAnonymous]
+        public async Task<Dictionary<string, string>> ClickAsync(JobDto dto)
         {
-            await _manuFacePlateButtonService.ClickAsync(dto);
+            return await _manuFacePlateButtonService.ClickAsync(dto);
         }
         #endregion
     }

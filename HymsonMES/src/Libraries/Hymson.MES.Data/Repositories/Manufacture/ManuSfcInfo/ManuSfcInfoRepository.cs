@@ -55,10 +55,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ManuSfcInfo1Entity> GetByIdAsync(long id)
+        public async Task<ManuSfcInfoEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ManuSfcInfo1Entity>(GetByIdSql, new { Id = id });
+            return await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(GetByIdSql, new { Id = id });
+        }
+
+        /// <summary>
+        /// 根据SFC获取数据
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        public async Task<ManuSfcInfoEntity> GetBySFCAsync(string sfc)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(GetBySFCSql, new { sfc });
         }
 
         /// <summary>
@@ -66,10 +77,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcInfo1Entity>> GetByIdsAsync(long[] ids)
+        public async Task<IEnumerable<ManuSfcInfoEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<ManuSfcInfo1Entity>(GetByIdsSql, new { Ids = ids });
+            return await conn.QueryAsync<ManuSfcInfoEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -77,7 +88,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuSfcInfo1PagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ManuSfcInfo1Entity>> GetPagedInfoAsync(ManuSfcInfo1PagedQuery manuSfcInfo1PagedQuery)
+        public async Task<PagedInfo<ManuSfcInfoEntity>> GetPagedInfoAsync(ManuSfcInfo1PagedQuery manuSfcInfo1PagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
@@ -90,11 +101,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.AddParameters(manuSfcInfo1PagedQuery);
 
             using var conn = GetMESDbConnection();
-            var manuSfcInfo1EntitiesTask = conn.QueryAsync<ManuSfcInfo1Entity>(templateData.RawSql, templateData.Parameters);
+            var manuSfcInfo1EntitiesTask = conn.QueryAsync<ManuSfcInfoEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var manuSfcInfo1Entities = await manuSfcInfo1EntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<ManuSfcInfo1Entity>(manuSfcInfo1Entities, manuSfcInfo1PagedQuery.PageIndex, manuSfcInfo1PagedQuery.PageSize, totalCount);
+            return new PagedInfo<ManuSfcInfoEntity>(manuSfcInfo1Entities, manuSfcInfo1PagedQuery.PageIndex, manuSfcInfo1PagedQuery.PageSize, totalCount);
         }
 
         /// <summary>
@@ -102,57 +113,57 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuSfcInfo1Query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcInfo1Entity>> GetManuSfcInfo1EntitiesAsync(ManuSfcInfo1Query manuSfcInfo1Query)
+        public async Task<IEnumerable<ManuSfcInfoEntity>> GetManuSfcInfo1EntitiesAsync(ManuSfcInfo1Query manuSfcInfo1Query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetManuSfcInfo1EntitiesSqlTemplate);
             using var conn = GetMESDbConnection();
-            var manuSfcInfo1Entities = await conn.QueryAsync<ManuSfcInfo1Entity>(template.RawSql, manuSfcInfo1Query);
+            var manuSfcInfo1Entities = await conn.QueryAsync<ManuSfcInfoEntity>(template.RawSql, manuSfcInfo1Query);
             return manuSfcInfo1Entities;
         }
 
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="manuSfcInfo1Entity"></param>
+        /// <param name="ManuSfcInfoEntity"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(ManuSfcInfo1Entity manuSfcInfo1Entity)
+        public async Task<int> InsertAsync(ManuSfcInfoEntity ManuSfcInfoEntity)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertSql, manuSfcInfo1Entity);
+            return await conn.ExecuteAsync(InsertSql, ManuSfcInfoEntity);
         }
 
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="manuSfcInfo1Entitys"></param>
+        /// <param name="ManuSfcInfoEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(List<ManuSfcInfo1Entity> manuSfcInfo1Entitys)
+        public async Task<int> InsertsAsync(List<ManuSfcInfoEntity> ManuSfcInfoEntitys)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertsSql, manuSfcInfo1Entitys);
+            return await conn.ExecuteAsync(InsertsSql, ManuSfcInfoEntitys);
         }
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="manuSfcInfo1Entity"></param>
+        /// <param name="ManuSfcInfoEntity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(ManuSfcInfo1Entity manuSfcInfo1Entity)
+        public async Task<int> UpdateAsync(ManuSfcInfoEntity ManuSfcInfoEntity)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdateSql, manuSfcInfo1Entity);
+            return await conn.ExecuteAsync(UpdateSql, ManuSfcInfoEntity);
         }
 
         /// <summary>
         /// 批量更新
         /// </summary>
-        /// <param name="manuSfcInfo1Entitys"></param>
+        /// <param name="ManuSfcInfoEntitys"></param>
         /// <returns></returns>
-        public async Task<int> UpdatesAsync(List<ManuSfcInfo1Entity> manuSfcInfo1Entitys)
+        public async Task<int> UpdatesAsync(List<ManuSfcInfoEntity> ManuSfcInfoEntitys)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdatesSql, manuSfcInfo1Entitys);
+            return await conn.ExecuteAsync(UpdatesSql, ManuSfcInfoEntitys);
         }
         #endregion
     }
@@ -179,8 +190,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                `Id`, `SiteId`, `SfcId`, `WorkOrderId`, `ProductId`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_sfc_info1`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteId`, `SfcId`, `WorkOrderId`, `ProductId`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `manu_sfc_info1`  WHERE Id IN @Ids ";
+                                          `Id`, `SFC`, `WorkOrderId`, `RelevanceWorkOrderId`, `ProductId`, `Qty`, `Status`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`
+                            FROM `manu_sfc_info`  WHERE Id IN @ids ";
+        const string GetBySFCSql = @"SELECT * FROM manu_sfc_info WHERE SFC = @sfc ";
         #endregion
     }
 }

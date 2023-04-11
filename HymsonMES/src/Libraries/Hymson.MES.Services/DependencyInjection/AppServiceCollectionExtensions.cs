@@ -20,10 +20,14 @@ using Hymson.MES.Services.Services.Integrated.InteCalendar;
 using Hymson.MES.Services.Services.Integrated.InteClass;
 using Hymson.MES.Services.Services.Integrated.InteContainer;
 using Hymson.MES.Services.Services.Job.Common;
+using Hymson.MES.Services.Services.Job.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuFeeding;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
+using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInStation;
+using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOutStation;
+using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
 using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Hymson.MES.Services.Services.Plan;
 using Hymson.MES.Services.Services.Process;
@@ -45,7 +49,6 @@ using Hymson.MES.Services.Validators.Process;
 using Hymson.MES.Services.Validators.Quality;
 using Hymson.MES.Services.Validators.Warehouse;
 using Microsoft.Extensions.Configuration;
-using static Hymson.MES.Services.Validators.Manufacture.ManuFacePlateProductionValidator;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -161,6 +164,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuFacePlateService, ManuFacePlateService>();
             services.AddSingleton<IManuFacePlateButtonService, ManuFacePlateButtonService>();
 
+
+            services.AddSingleton<IManuInStationService, ManuInStationService>();
+            services.AddSingleton<IManuOutStationService, ManuOutStationService>();
             services.AddSingleton<IInProductDismantleService, InProductDismantleService>();
             #endregion
 
@@ -190,7 +196,13 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #endregion
 
+            #region Job
             services.AddSingleton<IJobCommonService, JobCommonService>();
+            services.AddSingleton<IManufactureJobService, ManuCompleteService>();
+            services.AddSingleton<IManufactureJobService, ManuStartService>();
+            services.AddSingleton<IManufactureJobService, ManuStopService>();
+            #endregion
+
             return services;
         }
 
@@ -321,6 +333,12 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<AbstractValidator<ManuFacePlateProductionCreateDto>, ManuFacePlateProductionCreateValidator>();
             services.AddSingleton<AbstractValidator<ManuFacePlateProductionModifyDto>, ManuFacePlateProductionModifyValidator>();
+
+            services.AddSingleton<AbstractValidator<ManuFacePlateRepairCreateDto>, ManuFacePlateRepairCreateValidator>();
+            services.AddSingleton<AbstractValidator<ManuFacePlateRepairModifyDto>, ManuFacePlateRepairModifyValidator>();
+
+            services.AddSingleton<AbstractValidator<ManuFacePlateContainerPackCreateDto>, ManuFacePlateContainerPackCreateValidator>();
+            services.AddSingleton<AbstractValidator<ManuFacePlateContainerPackModifyDto>, ManuFacePlateContainerPackModifyValidator>();
             #endregion
 
             #region Warehouse 

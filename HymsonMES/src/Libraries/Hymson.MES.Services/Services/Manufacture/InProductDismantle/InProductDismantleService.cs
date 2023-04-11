@@ -63,16 +63,20 @@ namespace Hymson.MES.Services.Services.Manufacture
             _procProcedureRepository = procProcedureRepository;
         }
 
-
         /// <summary>
         /// 根据ID查询Bom 详情
         /// </summary>
-        /// <param name="bomId"></param>
+        /// <param name="queryDto"></param>
         /// <returns></returns>
-        public async Task<List<InProductDismantleDto>> GetProcBomDetailAsync(long bomId)
+        public async Task<List<InProductDismantleDto>> GetProcBomDetailAsync(InProductDismantleQueryDto queryDto)
         {
+            if (queryDto == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            }
+
             var bomDetailViews = new List<InProductDismantleDto>();
-            var bomDetails = await _procBomDetailRepository.GetByBomIdAsync(bomId);
+            var bomDetails = await _procBomDetailRepository.GetByBomIdAsync(queryDto.BomId);
             if (!bomDetails.Any())
             {
                 return bomDetailViews;
@@ -91,7 +95,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                 bomDetailViews.Add(new InProductDismantleDto
                 {
-                    Id = detailEntity.Id,
+                    BomDetailId = detailEntity.Id,
                     Usages = detailEntity.Usages,
                     MaterialId = detailEntity.MaterialId,
                     ProcedureId = detailEntity.ProcedureId,
@@ -104,6 +108,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 });
             }
 
+
+            //查询子组件
             return bomDetailViews;
         }
     }

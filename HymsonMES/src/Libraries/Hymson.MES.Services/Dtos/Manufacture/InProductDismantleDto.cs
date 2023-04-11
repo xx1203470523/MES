@@ -8,7 +8,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 主键id
         /// </summary>
-        public long Id { get; set; }
+        public long BomDetailId { get; set; }
 
         /// <summary>
         /// 用量
@@ -97,5 +97,12 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 操作人员
         /// </summary>
         public string UpdatedOn { get; set; }
+    }
+
+    public class InProductDismantleQueryDto
+    {
+        public long BomId { get; set; }
+
+        public InProductDismantleTypeEnum Type { get; set; }
     }
 }
