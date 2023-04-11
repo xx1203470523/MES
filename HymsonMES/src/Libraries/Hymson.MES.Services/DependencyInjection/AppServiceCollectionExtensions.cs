@@ -19,6 +19,7 @@ using Hymson.MES.Services.Services.Integrated.IIntegratedService;
 using Hymson.MES.Services.Services.Integrated.InteCalendar;
 using Hymson.MES.Services.Services.Integrated.InteClass;
 using Hymson.MES.Services.Services.Integrated.InteContainer;
+using Hymson.MES.Services.Services.Job.Common;
 using Hymson.MES.Services.Services.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuFeeding;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode;
@@ -189,6 +190,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #endregion
 
+            services.AddSingleton<IJobCommonService, JobCommonService>();
             return services;
         }
 
