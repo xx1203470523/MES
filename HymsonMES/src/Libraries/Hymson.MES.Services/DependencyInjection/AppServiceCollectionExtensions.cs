@@ -193,7 +193,6 @@ namespace Microsoft.Extensions.DependencyInjection
             #region Job
             services.AddSingleton<IJobCommonService, JobCommonService>();
             services.AddSingleton<IManufactureJobService, ManuCompleteService>();
-            services.AddSingleton<IManufactureJobService, ManuPackageService>();
             services.AddSingleton<IManufactureJobService, ManuStartService>();
             services.AddSingleton<IManufactureJobService, ManuStopService>();
             #endregion

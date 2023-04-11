@@ -164,9 +164,6 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
                 await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
             }
 
-
-            // TODO 条码是否在当前工序活动
-
             // TODO 扣料
 
             // TODO 判断在线库存物料是否满足要求（物料编码，数量，状态）
@@ -174,8 +171,6 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             // TODO 扣料并关联主条码
 
             // TODO 判断BOM物料绑定？？
-
-            // 更改状态，固定抽检，随机抽检
 
         }
 

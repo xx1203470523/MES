@@ -3,7 +3,7 @@
     /// <summary>
     /// 作业Dto
     /// </summary>
-    public class JobDto
+    public class JobDto: ManufactureBO
     {
         /// <summary>
         /// 面板ID
@@ -15,7 +15,13 @@
         /// </summary>
         public long FacePlateButtonId { get; set; }
 
+    }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    public class ManufactureBO
+    {
         /// <summary>
         /// 工序ID
         /// </summary>

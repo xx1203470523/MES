@@ -1,4 +1,6 @@
-﻿namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInStation
+﻿using Hymson.MES.Services.Dtos.Common;
+
+namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInStation
 {
     /// <summary>
     /// 进站
@@ -8,7 +10,9 @@
         /// <summary>
         /// 执行（进站）
         /// </summary>
+        /// <param name="bo"></param>
         /// <returns></returns>
-        Task ExecuteAsync();
+        Task ExecuteAsync(ManufactureBO bo);
+
     }
 }
