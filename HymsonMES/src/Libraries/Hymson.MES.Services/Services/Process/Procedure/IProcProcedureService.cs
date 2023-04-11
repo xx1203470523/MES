@@ -35,14 +35,14 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<QueryProcProcedurePrintReleationDto>> GetProcedureConfigPrintListAsync(ProcProcedurePrintReleationPagedQueryDto queryDto);
+        Task<PagedInfo<ProcProcedurePrintReleationDto>> GetProcedureConfigPrintListAsync(ProcProcedurePrintReleationPagedQueryDto queryDto);
 
         /// <summary>
         /// 获取工序配置Job信息
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<QueryProcedureJobReleationDto>> GetProcedureConfigJobListAsync(InteJobBusinessRelationPagedQueryDto queryDto);
+        Task<PagedInfo<ProcedureJobReleationDto>> GetProcedureConfigJobListAsync(InteJobBusinessRelationPagedQueryDto queryDto);
 
         /// <summary>
         /// 新增

@@ -175,6 +175,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuFacePlateRepository, ManuFacePlateRepository>();
             services.AddSingleton<IManuFacePlateProductionRepository, ManuFacePlateProductionRepository>();
             services.AddSingleton<IManuFacePlateRepairRepository, ManuFacePlateRepairRepository>();
+            services.AddSingleton<IManuFacePlateContainerPackRepository, ManuFacePlateContainerPackRepository>();
             services.AddSingleton<IManuFacePlateButtonRepository, ManuFacePlateButtonRepository>();
             services.AddSingleton<IManuFacePlateButtonJobRelationRepository, ManuFacePlateButtonJobRelationRepository>();
             #endregion

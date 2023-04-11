@@ -449,6 +449,10 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuFacePlateRepairCreateDto, ManuFacePlateRepairEntity>();
             CreateMap<ManuFacePlateRepairModifyDto, ManuFacePlateRepairEntity>();
             CreateMap<ManuFacePlateRepairEntity, ManuFacePlateRepairDto>();
+            //containerPack
+            CreateMap<ManuFacePlateContainerPackCreateDto, ManuFacePlateContainerPackEntity>();
+            CreateMap<ManuFacePlateContainerPackModifyDto, ManuFacePlateContainerPackEntity>();
+            CreateMap<ManuFacePlateContainerPackEntity, ManuFacePlateContainerPackDto>();
             #endregion
         }
 

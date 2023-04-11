@@ -95,7 +95,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
                 sfcProduceEntity.RepeatedCount++;
             }
 
-            // 获取工艺路线里面的工序扩展信息
+            // 获取当前工序在工艺路线里面的扩展信息
             var procedureExtend = await _procProcessRouteDetailNodeRepository.GetByProcessRouteIdAsync(new ProcProcessRouteDetailNodeQuery
             {
                 ProcessRouteId = workOrderEntity.ProcessRouteId,
