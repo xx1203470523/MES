@@ -9,22 +9,14 @@ using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
-using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
-using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Services.Dtos.Plan;
-using Hymson.Snowflake;
 using Hymson.Utils;
-using Hymson.Utils.Tools;
-using System.Collections.Generic;
-//using Hymson.Utils.Extensions;
-using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Plan
 {
@@ -35,27 +27,25 @@ namespace Hymson.MES.Services.Services.Plan
     {
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
-
-
         /// <summary>
         /// 条码打印 仓储
         /// </summary>
         private readonly IPlanSfcPrintRepository _planSfcInfoRepository;
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
-        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
+        private readonly IManuSfcRepository _manuSfcRepository;
 
         private readonly AbstractValidator<PlanSfcPrintCreateDto> _validationCreateRules;
         private readonly AbstractValidator<PlanSfcPrintModifyDto> _validationModifyRules;
 
         public PlanSfcPrintService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IPlanSfcPrintRepository planSfcInfoRepository, IPlanWorkOrderRepository planWorkOrderRepository, IManuSfcInfoRepository manuSfcInfoRepository,
+            IPlanSfcPrintRepository planSfcInfoRepository, IPlanWorkOrderRepository planWorkOrderRepository, IManuSfcRepository manuSfcRepository,
         AbstractValidator<PlanSfcPrintCreateDto> validationCreateRules, AbstractValidator<PlanSfcPrintModifyDto> validationModifyRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _planSfcInfoRepository = planSfcInfoRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
-            _manuSfcInfoRepository = manuSfcInfoRepository;
+            _manuSfcRepository = manuSfcRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
         }
@@ -94,15 +84,8 @@ namespace Hymson.MES.Services.Services.Plan
             #endregion
 
             #region 入库
-
-
-
             #endregion
-
         }
-
-
-
 
         /// <summary>
         /// 批量删除
@@ -112,13 +95,14 @@ namespace Hymson.MES.Services.Services.Plan
         public async Task<int> DeletesPlanSfcInfoAsync(long[] idsArr)
         {
 
-            var sfcList = await _planSfcInfoRepository.GetByIdsAsync(idsArr);
-            if (sfcList.Where(it => it.IsUsed > 0).Any())
-            {
-                var msgSfcs = string.Join(",", sfcList.Where(it => it.IsUsed > 0).Select(it => it.SFC).ToArray());
-                throw new BusinessException(nameof(ErrorCode.MES16111)).WithData("SFC", msgSfcs);
-            }
-            return await _planSfcInfoRepository.DeletesAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
+            var sfcList = await _manuSfcRepository.GetByIdsAsync(idsArr);
+            //if (sfcList.Where(it => it.IsUsed > 0).Any())
+            //{
+            //    var msgSfcs = string.Join(",", sfcList.Where(it => it.IsUsed > 0).Select(it => it.SFC).ToArray());
+            //    throw new BusinessException(nameof(ErrorCode.MES16111)).WithData("SFC", msgSfcs);
+            //}
+            //TODO 这里的验证不能只根据状态来验证 需要查看最新的maun_sfc_step表 是否是新建
+            return await _manuSfcRepository.DeletesAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
         }
 
         /// <summary>

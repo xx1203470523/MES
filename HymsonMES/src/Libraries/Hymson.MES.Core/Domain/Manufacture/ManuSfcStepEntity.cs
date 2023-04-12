@@ -30,12 +30,12 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public string SFC { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 产品信息
         /// </summary>
         public long ProductId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工单号
         /// </summary>
         public long WorkOrderId { get; set; }
@@ -43,52 +43,47 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// BOM id
         /// </summary>
-        public long ? ProductBOMId { get; set; }
+        public long? ProductBOMId { get; set; }
 
         /// <summary>
         /// 工作中心
         /// </summary>
         public long? WorkCenterId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 当前数量
         /// </summary>
         public decimal Qty { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 设备id
         /// </summary>
         public long? EquipmentId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 资源id
         /// </summary>
         public long? ResourceId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工序id
         /// </summary>
         public long? ProcedureId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 步骤类型;1：创建；2：复用；3：进站；4：出站；5：将来锁定；6：及时锁定；7：解锁；8：完成；9：报废；10：异常标识；11：删除；12：拆解；13：合并；14：转换；
         /// </summary>
-        public ManuSfcStepTypeEnum Type { get; set; }
-
-       /// <summary>
-        /// 当前状态;1：排队；2：激活；3：完工；
-        /// </summary>
-        public SfcProduceStatusEnum Status { get; set; }
+        public ManuSfcStepTypeEnum Operatetype { get; set; }
 
         /// <summary>
-        ///  是否复用
+        /// 当前状态;1：排队；2：激活；3：完工；
         /// </summary>
-        public int? IsMultiplex { get; set; }
+        public SfcProduceStatusEnum CurrentStatus { get; set; }
 
-       /// <summary>
-       /// 锁;1：未锁定；2：即时锁：3：未来锁；
-       /// </summary>
-        public int? Lock { get; set; }
+        /// <summary>
+        /// 复投次数
+        /// </summary>
+        public int? RepeatedCount { get; set; }
 
         /// <summary>
         /// 备注

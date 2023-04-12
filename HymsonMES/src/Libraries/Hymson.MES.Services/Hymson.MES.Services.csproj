@@ -16,14 +16,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Dtos\Manufacture\ManuMainstreamProcessDto\ManuOutStation\**" />
-    <Compile Remove="Services\Manufacture\ManuMainstreamProcess\Consume\**" />
     <Compile Remove="Services\Manufacture\ManuMainstreamProcess\Package\**" />
-    <EmbeddedResource Remove="Dtos\Manufacture\ManuMainstreamProcessDto\ManuOutStation\**" />
-    <EmbeddedResource Remove="Services\Manufacture\ManuMainstreamProcess\Consume\**" />
     <EmbeddedResource Remove="Services\Manufacture\ManuMainstreamProcess\Package\**" />
-    <None Remove="Dtos\Manufacture\ManuMainstreamProcessDto\ManuOutStation\**" />
-    <None Remove="Services\Manufacture\ManuMainstreamProcess\Consume\**" />
     <None Remove="Services\Manufacture\ManuMainstreamProcess\Package\**" />
   </ItemGroup>
 
@@ -40,6 +34,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Hymson.MES.Data\Hymson.MES.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Services\Job\Manufacture\" />
+    <Folder Include="Services\Manufacture\ManuMainstreamProcess\Consume\" />
   </ItemGroup>
 
 </Project>

@@ -56,7 +56,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task ExecuteAsync(JobDto dto)
+        public async Task<int> ExecuteAsync(JobDto dto)
         {
             // 获取生产条码信息（附带条码合法性校验 + 工序活动状态校验）
             var sfcProduceEntity = await _manuCommonService.GetProduceSFCWithCheckAsync(dto.SFC, dto.ProcedureId);
@@ -65,10 +65,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
             sfcProduceEntity.UpdatedBy = _currentUser.UserName;
             sfcProduceEntity.UpdatedOn = HymsonClock.Now();
-            await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
+            return await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
         }
-
-
-
     }
 }

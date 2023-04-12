@@ -82,5 +82,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ManuSfcProduceDto> QueryManuSfcProduceByIdAsync(long id);
+
+        /// <summary>
+        /// 根据sfc查询
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        Task<ManuSfcProduceDto> QueryManuSfcProduceBySFCAsync(string sfc);
     }
 }

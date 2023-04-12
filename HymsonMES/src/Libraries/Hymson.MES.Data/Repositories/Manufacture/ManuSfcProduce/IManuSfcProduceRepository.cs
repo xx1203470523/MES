@@ -42,7 +42,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuSfcProduceEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<ManuSfcProduceEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 根据SFC获取数据
@@ -98,7 +98,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<int> DeleteRangeAsync(long[] ids);
+        Task<int> DeleteRangeAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 删除（物理删除）条码信息
@@ -112,7 +112,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfcs"></param>
         /// <returns></returns>
-        Task<int> DeletePhysicalRangeAsync(string[] sfcs);
+        Task<int> DeletePhysicalRangeAsync(IEnumerable<string> sfcs);
 
         /// <summary>
         /// 批量更新条码IsScrap
@@ -120,5 +120,54 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuSfcInfoEntity"></param>
         /// <returns></returns>
         Task<int> UpdateIsScrapAsync(UpdateIsScrapCommand command);
+
+        /// <summary>
+        /// 新增在制品业务
+        /// </summary>
+        /// <param name="manuSfcProduceBusinessEntity"></param>
+        /// <returns></returns>
+        Task<int> InsertSfcProduceBusinessAsync(ManuSfcProduceBusinessEntity manuSfcProduceBusinessEntity);
+
+        /// <summary>
+        /// 批量新增在制品业务
+        /// </summary>
+        /// <param name="manuSfcProduceBusinessEntitys"></param>
+        /// <returns></returns>
+        Task<int> InsertSfcProduceBusinessRangAsync(IEnumerable<ManuSfcProduceBusinessEntity> manuSfcProduceBusinessEntitys);
+
+        /// <summary>
+        /// 更新在制品业务
+        /// </summary>
+        /// <param name="manuSfcProduceBusinessEntity"></param>
+        /// <returns></returns>
+        Task<int> UpdatetSfcProduceBusinessAsync(ManuSfcProduceBusinessEntity manuSfcProduceBusinessEntity);
+
+        /// <summary>
+        /// 批量更新在制品业务
+        /// </summary>
+        /// <param name="manuSfcProduceBusinessEntitys"></param>
+        /// <returns></returns>
+        Task<int> UpdatestSfcProduceBusinessRangAsync(IEnumerable<ManuSfcProduceBusinessEntity> manuSfcProduceBusinessEntitys);
+
+        /// <summary>
+        /// 根据ID获取在制品业务
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<ManuSfcProduceBusinessEntity> GetSfcProduceBusinessBySFCIdAsync(long id);
+
+        /// <summary>
+        /// 根据IDs批量获取在制品业务
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcProduceBusinessEntity>> GetSfcProduceBusinessBySFCIdsAsync(IEnumerable<long> ids);
+
+        /// <summary>
+        /// 批量删除（软删除）
+        /// </summary>
+        /// <param name="sfcInfoIds"></param>
+        /// <returns></returns>
+        Task<int> DeleteSfcProduceBusinesssAsync(IEnumerable<long> sfcInfoIds);
     }
 }

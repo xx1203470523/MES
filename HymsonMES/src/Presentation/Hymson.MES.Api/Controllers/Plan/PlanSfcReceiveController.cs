@@ -8,10 +8,8 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Services.Plan;
-//using Hymson.Utils.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Extensions;
 
 namespace Hymson.MES.Api.Controllers.Plan
 {
@@ -64,19 +62,5 @@ namespace Hymson.MES.Api.Controllers.Plan
         {
             await _planSfcInfoService.CreatePlanSfcInfoAsync(parm);
         }
-
-
-        /// <summary>
-        /// 删除（条码接收）
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        [HttpDelete]
-        [Route("delete")]
-        public async Task DeletePlanSfcInfoAsync(long[] ids)
-        {
-            await _planSfcInfoService.DeletesPlanSfcInfoAsync(ids);
-        }
-
     }
 }

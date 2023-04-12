@@ -19,6 +19,7 @@ using Hymson.MES.Core.Enums.QualUnqualifiedCode;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
@@ -55,7 +56,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <summary>
         /// 条码信息表 仓储
         /// </summary>
-        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
+        private readonly IManuSfcRepository _manuSfcRepository;
         /// <summary>
         /// 条码步骤表仓储 仓储
         /// </summary>
@@ -79,7 +80,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         public ManuProductBadRecordService(ICurrentUser currentUser, ICurrentSite currentSite,
         IManuSfcProduceRepository manuSfcProduceRepository,
-        IManuSfcInfoRepository manuSfcInfoRepository,
+        IManuSfcRepository manuSfcRepository,
         IManuSfcStepRepository manuSfcStepRepository,
         IManuProductBadRecordRepository manuProductBadRecordRepository,
         IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
@@ -89,7 +90,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _currentUser = currentUser;
             _currentSite = currentSite;
             _manuSfcProduceRepository = manuSfcProduceRepository;
-            _manuSfcInfoRepository = manuSfcInfoRepository;
+            _manuSfcRepository = manuSfcRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
             _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
@@ -165,7 +166,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 var rows = 0;
                 var sfcs = manuSfcs.Select(a => a.SFC).ToArray();
-                var updateCommand = new ManuSfcInfoUpdateCommand
+                var updateCommand = new ManuSfcUpdateCommand
                 {
                     Sfcs = sfcs,
                     UserId = _currentUser.UserName,
@@ -185,7 +186,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     //修改在制品状态
                     rows += await _manuSfcProduceRepository.UpdateIsScrapAsync(isScrapCommand);
                     //修改条码状态
-                    rows += await _manuSfcInfoRepository.UpdateStatusAsync(updateCommand);
+                    rows += await _manuSfcRepository.UpdateStatusAsync(updateCommand);
 
                     if (manuProductBadRecords.Any())
                     {
@@ -401,9 +402,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                 EquipmentId = sfc.EquipmentId,
                 ResourceId = sfc.ResourceId,
                 ProcedureId = sfc.ProcedureId,
-                Type = type,
-                Status = sfc.Status,
-                Lock = sfc.Lock,
+                Operatetype = type,
+                CurrentStatus = sfc.Status,
+                //Lock = sfc.Lock,
                 Remark = remark,
                 SiteId = _currentSite.SiteId ?? 0,
                 CreatedBy = sfc.CreatedBy,

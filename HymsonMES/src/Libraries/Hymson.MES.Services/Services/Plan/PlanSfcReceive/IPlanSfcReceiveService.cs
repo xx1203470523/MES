@@ -7,11 +7,6 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Plan;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Services.Plan
 {
@@ -30,15 +25,8 @@ namespace Hymson.MES.Services.Services.Plan
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="planSfcInfoDto"></param>
+        /// <param name="planSfcInfoCreateDto"></param>
         /// <returns></returns>
         Task CreatePlanSfcInfoAsync(PlanSfcReceiveCreateDto planSfcInfoCreateDto);
-
-        /// <summary>
-        /// 批量删除
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        Task<int> DeletesPlanSfcInfoAsync(long[] idsArr);
     }
 }
