@@ -73,12 +73,12 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 步骤类型;1：创建；2：复用；3：进站；4：出站；5：将来锁定；6：及时锁定；7：解锁；8：完成；9：报废；10：异常标识；11：删除；12：拆解；13：合并；14：转换；
         /// </summary>
-        public ManuSfcStepTypeEnum Operatetype { get; set; }
+        public ManuSfcStepTypeEnum Type { get; set; }
 
         /// <summary>
         /// 当前状态;1：排队；2：激活；3：完工；
         /// </summary>
-        public SfcProduceStatusEnum CurrentStatus { get; set; }
+        public SfcProduceStatusEnum Status { get; set; }
 
         /// <summary>
         /// 复投次数

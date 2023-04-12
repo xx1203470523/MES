@@ -39,6 +39,13 @@ namespace Hymson.MES.Data.Repositories.Process.MaskCode
         Task<ProcMaskCodeEntity> GetByIdAsync(long id);
 
         /// <summary>
+        /// 判断是否存在（编码）
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        Task<bool> IsExistsAsync(string code);
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="pagedQuery"></param>

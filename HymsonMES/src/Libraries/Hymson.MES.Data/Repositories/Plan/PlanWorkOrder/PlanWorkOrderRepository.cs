@@ -76,6 +76,17 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
 
         /// <summary>
+        /// 根据IDs批量获取数据  含有物料信息
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<PlanWorkOrderAboutMaterialInfoView>> GetByIdsAboutMaterialInfoAsync(long[] ids)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<PlanWorkOrderAboutMaterialInfoView>(GetByIdsAboutMaterialInfoSql, new { ids = ids });
+        }
+
+        /// <summary>
         /// 根据车间ID获取工单数据
         /// </summary>
         /// <param name="workFarmId"></param>
@@ -319,6 +330,13 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string GetByIdsSql = @"SELECT
       `Id`, `OrderCode`, `ProductId`, `WorkCenterType`, `WorkCenterId`, `ProcessRouteId`, `ProductBOMId`, `Type`, `Qty`, `Status`, `OverScale`, `PlanStartTime`, `PlanEndTime`, `IsLocked`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
     FROM `plan_work_order`  WHERE Id IN @ids ";
+        const string GetByIdsAboutMaterialInfoSql= @"SELECT
+      wo.`Id`, wo.`OrderCode`, wo.`ProductId`, wo.`WorkCenterType`, wo.`WorkCenterId`, wo.`ProcessRouteId`, wo.`ProductBOMId`, wo.`Type`, wo.`Qty`, wo.`Status`, wo.`OverScale`, wo.`PlanStartTime`, wo.`PlanEndTime`, wo.`IsLocked`, wo.`Remark`, wo.`CreatedBy`, wo.`CreatedOn`, wo.`UpdatedBy`, wo.`UpdatedOn`, wo.`IsDeleted`, wo.`SiteId`,
+         m.MaterialCode, m.MaterialName,m.Version as MaterialVersion 
+    FROM `plan_work_order`wo 
+    LEFT JOIN proc_material m on wo.ProductId=m.Id  
+    WHERE wo.Id IN @ids ";
+
         const string GetByWorkFarmId = "SELECT PWO.* FROM plan_work_order PWO " +
             "LEFT JOIN inte_work_center_relation IWCR ON IWCR.WorkCenterId = PWO.WorkCenterId " +
             "LEFT JOIN inte_work_center IWC ON IWC.Id = IWCR.SubWorkCenterId " +

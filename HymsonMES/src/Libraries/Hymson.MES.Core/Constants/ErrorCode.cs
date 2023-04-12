@@ -10,6 +10,7 @@
         public const string MES10101 = "站点码获取失败，请重新登录！";
         public const string MES10102 = "删除失败Id 不能为空!";
         public const string MES10103 = "请求参数格式错误!";
+        public const string MES10104 = "请求数据不存在!";
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";
@@ -132,6 +133,12 @@
         public const string MES10709 = "删除数据失败!无法删除保留或者启用的数据！";
         public const string MES10710 = "关联物料页签物料不能重复!";
         public const string MES10711 = "关联资源页签资源不能重复!";
+        #endregion
+
+        #region 掩码维护 10800
+        public const string MES10800 = "掩码维护错误";
+        public const string MES10801 = "掩码编码不能为空";
+        public const string MES10802 = "此编码【{Code}】在系统中已经存在!";
         #endregion
 
         #region 不合格代码 11100
@@ -431,6 +438,29 @@
         public const string MES16501 = "产品{product}未维护编码规则,无法下达条码。";
         public const string MES16502 = "产品{product}批次大写为0,无法下达条码。";
         public const string MES16503 = "工单{workorder}超过计划数量,下达条码失败。";
+        #endregion
+
+
+        #region 在制品移除添加 16600
+
+        public const string MES16600= "条码不存在或不是在制品!";
+        public const string MES16601= "组件条码不允许重复添加!";
+        public const string MES16602= "数据不存在!";
+        public const string MES16603= "组件库存不存在!";
+        public const string MES16604 = "组件库存不足!";
+        #endregion
+
+        #region 容器包装 MES 16700
+        public const string MES16701 = "容器包装，条码信息未找到";
+        public const string MES16702 = "容器包装，包装码不存在";
+        public const string MES16703 = "容器包装，条码的包装维护记录未找到";
+        #endregion
+
+        #region 绑定工单激活  MES16800
+        public const string MES16800 = "绑定工单激活错误";
+        public const string MES16801 = "当前资源所对应的工作中心不是线体";
+        public const string MES16802 = "有工单没有被激活，无法绑定";
+        public const string MES16803 = "没有找到该资源对应的工作中心";
         #endregion
         #endregion
 

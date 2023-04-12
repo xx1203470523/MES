@@ -16,18 +16,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Services\Manufacture\ManuMainstreamProcess\Consume\**" />
     <Compile Remove="Services\Manufacture\ManuMainstreamProcess\Package\**" />
+    <EmbeddedResource Remove="Services\Manufacture\ManuMainstreamProcess\Consume\**" />
     <EmbeddedResource Remove="Services\Manufacture\ManuMainstreamProcess\Package\**" />
+    <None Remove="Services\Manufacture\ManuMainstreamProcess\Consume\**" />
     <None Remove="Services\Manufacture\ManuMainstreamProcess\Package\**" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="11.5.1" />
-    <PackageReference Include="Hymson.Authentication.JwtBearer" Version="2.0.6" />
-    <PackageReference Include="Hymson.Kafka.Debezium" Version="2.0.6" />
-    <PackageReference Include="Hymson.Sequences" Version="2.0.6" />
-    <PackageReference Include="Hymson.Snowflake" Version="2.0.6" />
-    <PackageReference Include="Hymson.Web.Framework" Version="2.0.6" />
+    <PackageReference Include="Hymson.Authentication.JwtBearer" Version="2.0.7" />
+    <PackageReference Include="Hymson.Kafka.Debezium" Version="2.0.7" />
+    <PackageReference Include="Hymson.Sequences" Version="2.0.7" />
+    <PackageReference Include="Hymson.Snowflake" Version="2.0.7" />
+    <PackageReference Include="Hymson.Web.Framework" Version="2.0.7" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
   </ItemGroup>
@@ -38,7 +41,6 @@
 
   <ItemGroup>
     <Folder Include="Services\Job\Manufacture\" />
-    <Folder Include="Services\Manufacture\ManuMainstreamProcess\Consume\" />
   </ItemGroup>
 
 </Project>

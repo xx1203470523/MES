@@ -194,6 +194,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IPlanSfcPrintService, PlanSfcPrintService>();
             #endregion
 
+            #region PlanWorkOrderBind
+            services.AddSingleton<IPlanWorkOrderBindService, PlanWorkOrderBindService>();
+            #endregion
             #endregion
 
             #region Job
@@ -235,7 +238,6 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Process
-
             #region Material
             services.AddSingleton<AbstractValidator<ProcMaterialCreateDto>, ProcMaterialCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcMaterialModifyDto>, ProcMaterialModifyValidator>();
@@ -268,7 +270,6 @@ namespace Microsoft.Extensions.DependencyInjection
             #region LoadPoint
             services.AddSingleton<AbstractValidator<ProcLoadPointCreateDto>, ProcLoadPointCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcLoadPointModifyDto>, ProcLoadPointModifyValidator>();
-
             #endregion
 
             #region Resource
@@ -285,11 +286,17 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<ProcProcessRouteCreateDto>, ProcProcessRouteCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcProcessRouteModifyDto>, ProcProcessRouteModifyValidator>();
             #endregion
+
             #region LabelTemplate
 
             services.AddSingleton<AbstractValidator<ProcLabelTemplateCreateDto>, ProcLabelTemplateCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcLabelTemplateModifyDto>, ProcLabelTemplateModifyValidator>();
             #endregion
+
+            #region MaskCode
+            services.AddSingleton<AbstractValidator<ProcMaskCodeSaveDto>, ProcMaskCodeValidator>();
+            #endregion
+
             #endregion
 
             #region Integrated
@@ -377,6 +384,12 @@ namespace Microsoft.Extensions.DependencyInjection
             #region PlanSfcPrint
             services.AddSingleton<AbstractValidator<PlanSfcPrintCreateDto>, PlanSfcPrintCreateValidator>();
             services.AddSingleton<AbstractValidator<PlanSfcPrintModifyDto>, PlanSfcPrintModifyValidator>();
+
+            #endregion
+
+            #region PlanWorkOrderBind 
+            services.AddSingleton<AbstractValidator<PlanWorkOrderBindCreateDto>, PlanWorkOrderBindCreateValidator>();
+            services.AddSingleton<AbstractValidator<PlanWorkOrderBindModifyDto>, PlanWorkOrderBindModifyValidator>();
 
             #endregion
 

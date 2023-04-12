@@ -29,7 +29,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procBomDetailReplaceMaterialEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ProcBomDetailReplaceMaterialEntity procBomDetailReplaceMaterialEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -43,7 +43,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procBomDetailReplaceMaterialEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ProcBomDetailReplaceMaterialEntity procBomDetailReplaceMaterialEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -78,7 +78,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcBomDetailReplaceMaterialEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -87,12 +87,19 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<IEnumerable<ProcBomDetailReplaceMaterialEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
+        /// 根据BomID查询替代物料
+        /// </summary>
+        /// <param name="bomId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcBomDetailReplaceMaterialEntity>> GetByBomIdAsync(long bomId);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="procBomDetailReplaceMaterialQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcBomDetailReplaceMaterialEntity>> GetProcBomDetailReplaceMaterialEntitiesAsync(ProcBomDetailReplaceMaterialQuery procBomDetailReplaceMaterialQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>
