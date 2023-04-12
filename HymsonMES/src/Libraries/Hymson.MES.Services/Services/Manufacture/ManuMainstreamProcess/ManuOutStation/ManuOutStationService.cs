@@ -144,8 +144,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 // TODO 删除 manu_sfc_produce_business
 
                 // 插入 manu_sfc_step 状态为 完成
-                sfcStep.Operatetype = ManuSfcStepTypeEnum.Complete;    // TODO 这里的状态？？
-                sfcStep.CurrentStatus = SfcProduceStatusEnum.Complete;  // TODO 这里的状态？？
+                sfcStep.Type = ManuSfcStepTypeEnum.OutStock;    // TODO 这里的状态？？
+                sfcStep.Status = SfcProduceStatusEnum.Complete;  // TODO 这里的状态？？
                 rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
 
                 // TODO manu_sfc_info 修改为 完成或者入库
@@ -164,7 +164,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 rows += await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
 
                 // 插入 manu_sfc_step 状态为 进站
-                sfcStep.Operatetype = ManuSfcStepTypeEnum.InStock;
+                sfcStep.Type = ManuSfcStepTypeEnum.OutStock;
                 rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
             }
 
@@ -179,13 +179,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// <returns></returns>
         private async Task DeductMaterialAsync(long productBOMId, long procedureId)
         {
-            // 获取条码对应的工序BOM
+            // 获取BOM绑定的物料
             var bomMaterials = await _procBomDetailRepository.GetByBomIdAsync(productBOMId);
 
-            // 未设置BOM
+            // 未设置物料
             if (bomMaterials == null || bomMaterials.Any() == false) throw new BusinessException(nameof(ErrorCode.MES10612));
 
-            // 取得特定工序的BOM
+            // 取得特定工序的物料
             var deductList = new List<MaterialDeductBo> { };
             bomMaterials = bomMaterials.Where(w => w.ProcedureId == procedureId);
 
