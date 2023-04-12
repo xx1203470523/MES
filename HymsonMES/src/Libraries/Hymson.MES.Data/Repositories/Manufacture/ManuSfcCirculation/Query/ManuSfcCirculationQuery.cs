@@ -34,5 +34,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query
         /// 流转类型
         /// </summary>
         public SfcCirculationTypeEnum[] CirculationTypes { get; set; }
+
+        /// <summary>
+        /// 工序id
+        /// </summary>
+        public long? ProcedureId { get; set; }
     }
 }

@@ -6,7 +6,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     public class InProductDismantleDto
     {
         /// <summary>
-        /// 主键id
+        /// Bom详情表id
         /// </summary>
         public long BomDetailId { get; set; }
 
@@ -64,6 +64,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     public class ManuSfcCirculationDto
     {
         /// <summary>
+        /// 主键Id
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
         /// 工序
         /// </summary>
         public long? ProcedureId { get; set; }
@@ -120,30 +125,95 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     public class InProductDismantleRemoveDto
     {
         /// <summary>
-        /// 组件条码
+        /// 条码流转表主键id
         /// </summary>
-        public string CirculationBarCode { get; set; }
+        public long Id { get; set; }
 
-        public string Sfc { get; set; }
+        /// <summary>
+        /// 主物料数据收集方式
+        /// </summary>
+        public MaterialSerialNumberEnum? SerialNumber { get; set; }
     }
 
     public class InProductDismantleAddDto
     {
         /// <summary>
-        /// 组件条码
+        /// 主物料数据收集方式
         /// </summary>
-        public string CirculationBarCode { get; set; }
+        public MaterialSerialNumberEnum? SerialNumber { get; set; }
 
-        public string Sfc { get; set; }
-    }
-
-    public class InProductDismantleReplaceDto
-    {
         /// <summary>
         /// 组件条码
         /// </summary>
         public string CirculationBarCode { get; set; }
 
+        /// <summary>
+        /// 组件产品id
+        /// </summary>
+        public long CirculationProductId { get; set; }
+
+        /// <summary>
+        /// 产品条码
+        /// </summary>
         public string Sfc { get; set; }
+
+        /// <summary>
+        /// 当前工序
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 流转后主物料id
+        /// </summary>
+        public long CirculationMainProductId { get; set; }
+    }
+
+    public class InProductDismantleReplaceDto
+    {
+        /// <summary>
+        /// 被替换的数据id
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// Bom详情表id
+        /// </summary>
+        public long BomDetailId { get; set; }
+
+        /// <summary>
+        /// 被替换的组件条码
+        /// </summary>
+        public string CirculationOldBarCode { get; set; }
+
+        /// <summary>
+        /// 组件产品id
+        /// </summary>
+        public long CirculationProductId { get; set; }
+
+        /// <summary>
+        /// 新组件条码
+        /// </summary>
+        public string CirculationBarCode { get; set; }
+
+        /// <summary>
+        /// 产品条码
+        /// </summary>
+        public string Sfc { get; set; }
+
+        /// <summary>
+        /// 当前工序
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 流转后主物料id
+        /// </summary>
+        public long CirculationMainProductId { get; set; }
+
+        /// <summary>
+        /// 主物料数据收集方式
+        /// </summary>
+        public MaterialSerialNumberEnum? SerialNumber { get; set; }
+
     }
 }

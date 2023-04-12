@@ -11,6 +11,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -45,7 +46,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcCirculationEntity>> GetBySfcAsync(ManuSfcCirculationQuery query)
+        public async Task<IEnumerable<ManuSfcCirculationEntity>> GetSfcMoudulesAsync(ManuSfcCirculationQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetManuSfcCirculationEntitiesSqlTemplate);
@@ -62,7 +63,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             if (query.CirculationTypes != null && query.CirculationTypes.Length > 0)
             {
                 sqlBuilder.Where("CirculationType in @CirculationTypes");
-                sqlBuilder.Where("IsDisassemble!=1");        
+                sqlBuilder.Where("IsDisassemble!=1");
+            }
+
+            if (query.ProcedureId.HasValue)
+            {
+                sqlBuilder.Where("ProcedureId=@ProcedureId");
             }
 
             sqlBuilder.AddParameters(query);
@@ -181,6 +187,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeleteSql, command);
         }
+
+        /// <summary>
+        /// 在制品拆解移除
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> DisassemblyUpdateAsync(DisassemblyCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DisassemblyUpdateSql, command);
+        }
     }
 
     public partial class ManuSfcCirculationRepository
@@ -202,5 +219,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `EquipmentId`, `FeedingPointId`, `SFC`, `WorkOrderId`, `ProductId`, `CirculationBarCode`, `CirculationWorkOrderId`, `CirculationProductId`, `Type`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_sfc_circulation`  WHERE Id IN @ids ";
+
+        const string DisassemblyUpdateSql = "UPDATE `manu_sfc_circulation` SET CirculationType=@CirculationType, IsDisassemble=@IsDisassemble,DisassembledBy=UserId,DisassembledOn=UpdatedOn,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn WHERE Id =@Id   ";
     }
 }
