@@ -1,9 +1,9 @@
-﻿namespace Hymson.MES.Services.BOs.Manufacture
+﻿namespace Hymson.MES.Services.Bos.Manufacture
 {
     /// <summary>
     /// 
     /// </summary>
-    public class ManufactureBO
+    public class ManufactureBo
     {
         /// <summary>
         /// 工序ID
@@ -29,7 +29,7 @@
     /// <summary>
     /// 扣料
     /// </summary>
-    public class MaterialDeductBO
+    public class MaterialDeductBo
     {
         /// <summary>
         /// 物料ID

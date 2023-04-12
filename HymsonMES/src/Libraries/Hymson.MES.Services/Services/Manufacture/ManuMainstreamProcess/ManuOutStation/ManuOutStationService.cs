@@ -7,8 +7,7 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Services.BOs.Manufacture;
-using Hymson.MES.Services.Dtos.Common;
+using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
 using Hymson.Utils;
@@ -96,7 +95,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// </summary>
         /// <param name="bo"></param>
         /// <returns></returns>
-        public async Task<int> OutStationAsync(ManufactureBO bo)
+        public async Task<int> OutStationAsync(ManufactureBo bo)
         {
             var rows = 0;
 
@@ -187,11 +186,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             if (bomMaterials == null || bomMaterials.Any() == false) throw new BusinessException(nameof(ErrorCode.MES10612));
 
             // 取得特定工序的BOM
-            var deductList = new List<MaterialDeductBO> { };
+            var deductList = new List<MaterialDeductBo> { };
             bomMaterials = bomMaterials.Where(w => w.ProcedureId == procedureId);
 
             // 统计扣料数据
-            MaterialDeductBO deduct = new();
+            MaterialDeductBo deduct = new();
             foreach (var item in bomMaterials)
             {
                 // 扣减数量

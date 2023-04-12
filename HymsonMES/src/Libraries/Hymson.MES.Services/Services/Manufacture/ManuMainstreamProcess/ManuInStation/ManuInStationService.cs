@@ -5,7 +5,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Services.BOs.Manufacture;
+using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Utils;
 
@@ -67,7 +67,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
         /// </summary>
         /// <param name="bo"></param>
         /// <returns></returns>
-        public async Task<int> InStationAsync(ManufactureBO bo)
+        public async Task<int> InStationAsync(ManufactureBo bo)
         {
             var rows = 0;
 

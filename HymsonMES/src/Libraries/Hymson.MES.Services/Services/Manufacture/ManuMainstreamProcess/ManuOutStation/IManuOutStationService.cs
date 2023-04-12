@@ -1,4 +1,4 @@
-﻿using Hymson.MES.Services.BOs.Manufacture;
+﻿using Hymson.MES.Services.Bos.Manufacture;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation
 {
@@ -12,7 +12,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStat
         /// </summary>
         /// <param name="bo"></param>
         /// <returns></returns>
-        Task<int> OutStationAsync(ManufactureBO bo);
+        Task<int> OutStationAsync(ManufactureBo bo);
 
     }
 }
