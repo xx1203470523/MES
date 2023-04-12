@@ -229,6 +229,28 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         }
 
         /// <summary>
+        /// 更新库存数量(增加库存)
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateIncreaseQuantityResidueAsync(UpdateQuantityCommand updateQuantityCommand)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateIncreaseQuantityResidueSql, updateQuantityCommand);
+        }
+
+        /// <summary>
+        /// 更新库存数量(减少库存)
+        /// </summary>
+        /// <param name="updateQuantityCommand"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateReduceQuantityResidueAsync(UpdateQuantityCommand updateQuantityCommand)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateReduceQuantityResidueSql, updateQuantityCommand);
+        }
+
+        /// <summary>
         /// 根据物料编码获取物料数据
         /// </summary>
         /// <param name="materialCode"></param>
@@ -290,7 +312,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
                                `Id`, `SupplierId`, `MaterialId`, `MaterialBarCode`, `Batch`, `QuantityResidue`, `Status`, `DueDate`, `Source`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `wh_material_inventory`  WHERE Id = @Id ";
         const string GetByBarCode = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND MaterialBarCode = @barCode";
-        const string GetByBarCodes = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND MaterialBarCode = @barCodes";
+        const string GetByBarCodes = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND MaterialBarCode in @barCodes";
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SupplierId`, `MaterialId`, `MaterialBarCode`, `Batch`, `QuantityResidue`, `Status`, `DueDate`, `Source`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `wh_material_inventory`  WHERE Id IN @ids ";
@@ -301,5 +323,9 @@ namespace Hymson.MES.Data.Repositories.Warehouse
                                            FROM `proc_material` /**where**/  ";
 
         const string GetSupplierlByMaterialCodeSql = @"SELECT /**select**/ FROM wh_supplier ws /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/";
+
+        const string UpdateIncreaseQuantityResidueSql = "UPDATE wh_material_inventory SET QuantityResidue =QuantityResidue+ @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
+
+        const string UpdateReduceQuantityResidueSql = "UPDATE wh_material_inventory SET QuantityResidue=QuantityResidue- @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
     }
 }

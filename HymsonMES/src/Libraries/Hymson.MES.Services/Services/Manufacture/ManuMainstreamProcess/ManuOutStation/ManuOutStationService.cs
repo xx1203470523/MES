@@ -55,6 +55,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         private readonly IProcBomDetailRepository _procBomDetailRepository;
 
         /// <summary>
+        /// 仓储接口（BOM替代料明细）
+        /// </summary>
+        private readonly IProcBomDetailReplaceMaterialRepository _procBomDetailReplaceMaterialRepository;
+
+        /// <summary>
         /// 仓储接口（物料维护）
         /// </summary>
         private readonly IProcMaterialRepository _procMaterialRepository;
@@ -77,6 +82,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             IManuSfcRepository manuSfcRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IProcBomDetailRepository procBomDetailRepository,
+            IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository,
             IProcMaterialRepository procMaterialRepository)
         {
             _currentUser = currentUser;
@@ -86,6 +92,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             _manuSfcRepository = manuSfcRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _procBomDetailRepository = procBomDetailRepository;
+            _procBomDetailReplaceMaterialRepository = procBomDetailReplaceMaterialRepository;
             _procMaterialRepository = procMaterialRepository;
         }
 
@@ -180,43 +187,50 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         private async Task DeductMaterialAsync(long productBOMId, long procedureId)
         {
             // 获取BOM绑定的物料
-            var bomMaterials = await _procBomDetailRepository.GetByBomIdAsync(productBOMId);
+            var mainMaterials = await _procBomDetailRepository.GetByBomIdAsync(productBOMId);
 
             // 未设置物料
-            if (bomMaterials == null || bomMaterials.Any() == false) throw new BusinessException(nameof(ErrorCode.MES10612));
+            if (mainMaterials == null || mainMaterials.Any() == false) throw new BusinessException(nameof(ErrorCode.MES10612));
 
             // 取得特定工序的物料
             var deductList = new List<MaterialDeductBo> { };
-            bomMaterials = bomMaterials.Where(w => w.ProcedureId == procedureId);
+            mainMaterials = mainMaterials.Where(w => w.ProcedureId == procedureId);
+
+            // 检查是否有BOM替代料
+            var replaceMaterials = await _procBomDetailReplaceMaterialRepository.GetByBomIdAsync(productBOMId);
+            var replaceMaterialsDic = replaceMaterials.ToLookup(w => w.BomDetailId).ToDictionary(d => d.Key, d => d);
 
             // 统计扣料数据
             MaterialDeductBo deduct = new();
-            foreach (var item in bomMaterials)
+            foreach (var item in mainMaterials)
             {
-                // 扣减数量
                 deduct.MaterialId = item.MaterialId;
                 deduct.Qty = item.Usages * item.Loss;
 
-                // TODO 1.确认收集方式是否批次 item.ReferencePoint
-                if (item.ReferencePoint == "TODO 收集方式是批次")
+                var isEnableReplace = false;
+                // 填充BOM替代料
+                if (isEnableReplace)
                 {
-                    // 添加到待扣料集合
-                    deductList.Add(deduct);
-                    continue;
+                    if (replaceMaterialsDic.TryGetValue(item.Id, out var replaces) == true)
+                    {
+                        deduct.ReplaceBoms = replaces.Select(s => new MaterialDeductItemBo
+                        {
+                            MaterialId = s.ReplaceMaterialId,
+                            Qty = s.Usages * s.Loss
+                        });
+                    }
                 }
+                // 填充物料替代料
+                else
+                {
 
-                var materialEntity = await _procMaterialRepository.GetByIdAsync(item.MaterialId);
-                if (materialEntity == null) continue;
-
-                // 2.确认主物料的收集方式，不是"批次"就结束
-                if (materialEntity.SerialNumber != MaterialSerialNumberEnum.Batch) continue;
-
-                // 如有设置消耗系数
-                if (materialEntity.ConsumeRatio.HasValue == true) deduct.Qty *= materialEntity.ConsumeRatio.Value;
+                }
 
                 // 添加到待扣料集合
                 deductList.Add(deduct);
             }
+
+
 
             // TODO 扣料
 

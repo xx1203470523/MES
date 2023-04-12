@@ -10,6 +10,7 @@
         public const string MES10101 = "站点码获取失败，请重新登录！";
         public const string MES10102 = "删除失败Id 不能为空!";
         public const string MES10103 = "请求参数格式错误!";
+        public const string MES10104 = "请求数据不存在!";
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";
@@ -417,10 +418,21 @@
         public const string MES16502 = "产品{product}批次大写为0,无法下达条码。";
         public const string MES16503= "工单{workorder}超过计划数量,下达条码失败。";
         #endregion
-        #region 容器包装 MES 16600
-        public const string MES16601 = "容器包装，条码信息未找到";
-        public const string MES16602 = "容器包装，包装码不存在";
-        public const string MES16603 = "容器包装，条码的包装维护记录未找到";
+
+
+        #region 在制品移除添加 16600
+
+        public const string MES16600= "条码不存在或不是在制品!";
+        public const string MES16601= "组件条码不允许重复添加!";
+        public const string MES16602= "数据不存在!";
+        public const string MES16603= "组件库存不存在!";
+        public const string MES16604 = "组件库存不足!";
+        #endregion
+
+        #region 容器包装 MES 16700
+        public const string MES16701 = "容器包装，条码信息未找到";
+        public const string MES16702 = "容器包装，包装码不存在";
+        public const string MES16703 = "容器包装，条码的包装维护记录未找到";
         #endregion
         #endregion
 

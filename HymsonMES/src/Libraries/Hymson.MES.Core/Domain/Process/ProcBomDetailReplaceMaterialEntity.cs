@@ -32,7 +32,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :所属BOM替代物料ID（从物料表选择） 
         /// 空值 : true  
         /// </summary>
-        public long? ReplaceMaterialId { get; set; }
+        public long ReplaceMaterialId { get; set; }
         
         /// <summary>
         /// 描述 :参考点 

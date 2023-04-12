@@ -35,10 +35,35 @@
         /// 物料ID
         /// </summary>
         public long MaterialId { get; set; }
+
         /// <summary>
         /// 数量（扣减）
         /// </summary>
         public decimal Qty { get; set; }
 
+        /// <summary>
+        /// 替代料集合（BOM）
+        /// </summary>
+        public IEnumerable<MaterialDeductItemBo> ReplaceMaterial { get; set; }
+
+        /// <summary>
+        /// 替代料集合（物料）
+        /// </summary>
+        public IEnumerable<MaterialDeductItemBo> ReplaceBoms { get; set; }
+    }
+
+    /// <summary>
+    /// 扣料项
+    /// </summary>
+    public class MaterialDeductItemBo
+    {
+        /// <summary>
+        /// 物料ID
+        /// </summary>
+        public long MaterialId { get; set; }
+        /// <summary>
+        /// 数量（扣减）
+        /// </summary>
+        public decimal Qty { get; set; }
     }
 }
