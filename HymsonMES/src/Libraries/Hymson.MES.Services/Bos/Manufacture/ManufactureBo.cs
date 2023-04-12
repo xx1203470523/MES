@@ -1,4 +1,6 @@
-﻿namespace Hymson.MES.Services.Bos.Manufacture
+﻿using Hymson.MES.Core.Enums;
+
+namespace Hymson.MES.Services.Bos.Manufacture
 {
     /// <summary>
     /// 
@@ -29,27 +31,18 @@
     /// <summary>
     /// 扣料
     /// </summary>
-    public class MaterialDeductBo
+    public class MaterialDeductBo : MaterialDeductItemBo
     {
         /// <summary>
-        /// 物料ID
+        /// 数据收集方式 
         /// </summary>
-        public long MaterialId { get; set; }
+        public MaterialSerialNumberEnum? DataCollectionWay { get; set; }
 
         /// <summary>
-        /// 数量（扣减）
+        /// 替代料集合
         /// </summary>
-        public decimal Qty { get; set; }
+        public IEnumerable<MaterialDeductItemBo> ReplaceMaterials { get; set; }
 
-        /// <summary>
-        /// 替代料集合（BOM）
-        /// </summary>
-        public IEnumerable<MaterialDeductItemBo> ReplaceMaterial { get; set; }
-
-        /// <summary>
-        /// 替代料集合（物料）
-        /// </summary>
-        public IEnumerable<MaterialDeductItemBo> ReplaceBoms { get; set; }
     }
 
     /// <summary>
@@ -61,9 +54,20 @@
         /// 物料ID
         /// </summary>
         public long MaterialId { get; set; }
+
         /// <summary>
-        /// 数量（扣减）
+        /// 用量
         /// </summary>
-        public decimal Qty { get; set; }
+        public decimal Usages { get; set; }
+
+        /// <summary>
+        /// 损耗
+        /// </summary>
+        public decimal Loss { get; set; }
+
+        /// <summary>
+        /// 消耗系数
+        /// </summary>
+        public decimal ConsumeRatio { get; set; } = 1;
     }
 }

@@ -46,7 +46,7 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
         /// </summary>
         private readonly IProcPrintConfigRepository _printConfigRepository;
 
-        //private readonly AbstractValidator<ProcPrinterDto> _validationCreateRules;
+        private readonly AbstractValidator<ProcPrinterDto> _validationCreateRules;
         //private readonly AbstractValidator<ProcResourceModifyDto> _validationModifyRules;
 
         /// <summary>
@@ -54,13 +54,13 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
         /// </summary>
         public ProcPrintConfigService(ICurrentUser currentUser, ICurrentSite currentSite,
                   IProcPrintConfigRepository printConfigRepository,
-                  IProcResourceConfigPrintRepository resourceRepository)
+                  IProcResourceConfigPrintRepository resourceRepository, AbstractValidator<ProcPrinterDto> validationRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _resourceRepository = resourceRepository;
             _printConfigRepository = printConfigRepository;
-            //_validationCreateRules = validationCreateRules;
+            _validationCreateRules = validationRules;
             //_validationModifyRules = validationModifyRules;
         }
 
@@ -135,7 +135,7 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
         {
             //验证DTO
             //var dto = new ProcResourceTypeDto();
-            //await _validationRules.ValidateAndThrowAsync(dto);
+            await _validationCreateRules.ValidateAndThrowAsync(param);
             if (param == null || string.IsNullOrEmpty(param.PrintName))
             {
                 throw new ValidationException(nameof(ErrorCode.MES10100));

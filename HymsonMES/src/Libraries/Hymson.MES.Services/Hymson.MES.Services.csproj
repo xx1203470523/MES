@@ -16,8 +16,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Services\Manufacture\ManuMainstreamProcess\Consume\**" />
     <Compile Remove="Services\Manufacture\ManuMainstreamProcess\Package\**" />
+    <EmbeddedResource Remove="Services\Manufacture\ManuMainstreamProcess\Consume\**" />
     <EmbeddedResource Remove="Services\Manufacture\ManuMainstreamProcess\Package\**" />
+    <None Remove="Services\Manufacture\ManuMainstreamProcess\Consume\**" />
     <None Remove="Services\Manufacture\ManuMainstreamProcess\Package\**" />
   </ItemGroup>
 
@@ -38,7 +41,6 @@
 
   <ItemGroup>
     <Folder Include="Services\Job\Manufacture\" />
-    <Folder Include="Services\Manufacture\ManuMainstreamProcess\Consume\" />
   </ItemGroup>
 
 </Project>

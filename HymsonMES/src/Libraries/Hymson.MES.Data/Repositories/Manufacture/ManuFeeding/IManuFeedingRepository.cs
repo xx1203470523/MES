@@ -1,5 +1,6 @@
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
 
 namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
@@ -15,6 +16,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ManuFeedingEntity entity);
+
+        /// <summary>
+        /// 更新数量
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> UpdateQtyByProductIdAsync(UpdateQtyByProductIdCommand command);
 
         /// <summary>
         /// 批量删除（软删除）
@@ -42,7 +50,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuFeedingEntity>> GetByResourceIdAndMaterialIdsAsync(ManuFeedingQuery query);
+        Task<IEnumerable<ManuFeedingEntity>> GetByResourceIdAndMaterialIdAsync(GetByResourceIdAndMaterialIdQuery query);
+
+        /// <summary>
+        /// 获取加载数据列表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuFeedingEntity>> GetByResourceIdAndMaterialIdsAsync(GetByResourceIdAndMaterialIdsQuery query);
 
     }
 }
