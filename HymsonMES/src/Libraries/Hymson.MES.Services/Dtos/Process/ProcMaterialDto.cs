@@ -148,6 +148,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 消耗系数
         /// </summary>
         public decimal? ConsumeRatio { get; set; }
+
+        /// <summary>
+        /// 掩码规则ID
+        /// </summary>
+        public long? MaskCodeId { get; set; }
     }
 
 
@@ -252,6 +257,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 消耗系数
         /// </summary>
         public decimal? ConsumeRatio { get; set; }
+
+        /// <summary>
+        /// 掩码规则ID
+        /// </summary>
+        public long? MaskCodeId { get; set; }
 
         /// <summary>
         /// 替代品集合
@@ -411,6 +421,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 消耗系数
         /// </summary>
         public decimal? ConsumeRatio { get; set; }
+
+        /// <summary>
+        /// 掩码规则ID
+        /// </summary>
+        public long? MaskCodeId { get; set; }
 
         /// <summary>
         /// 替代品集合

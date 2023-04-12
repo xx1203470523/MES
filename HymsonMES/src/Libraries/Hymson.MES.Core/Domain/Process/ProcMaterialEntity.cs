@@ -123,7 +123,12 @@ namespace Hymson.MES.Core.Domain.Process
         /// 空值 : true  
         /// </summary>
         public string? ValidationMaskGroup { get; set; }
-        
+
+        /// <summary>
+        /// 验证规则id
+        /// </summary>
+        public long? MaskCodeId { get; set; }
+
         /// <summary>
         /// 描述 :基于时间(字典定义) 
         /// 空值 : true  

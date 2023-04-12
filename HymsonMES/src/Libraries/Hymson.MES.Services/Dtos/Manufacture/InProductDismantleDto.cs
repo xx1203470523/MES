@@ -58,10 +58,10 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 物料消耗信息
         /// </summary>
-        public List<ManuSfcCirculationDto> Children { get; set; }
+        public List<ManuSfcChildCirculationDto> Children { get; set; }
     }
 
-    public class ManuSfcCirculationDto
+    public class ManuSfcChildCirculationDto
     {
         /// <summary>
         /// 主键Id
@@ -214,6 +214,19 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 主物料数据收集方式
         /// </summary>
         public MaterialSerialNumberEnum? SerialNumber { get; set; }
-
     }
+
+    public class CirculationQueryDto
+    {
+        /// <summary>
+        /// 组件条码
+        /// </summary>
+        public string CirculationBarCode { get; set; }
+
+        /// <summary>
+        /// 产品id
+        /// </summary>
+        public long ProductId { get; set; }
+    }
+
 }

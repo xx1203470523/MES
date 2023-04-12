@@ -422,7 +422,7 @@
         #region 在制品移除添加 16600
 
         public const string MES16600= "条码不存在或不是在制品!";
-        public const string MES16601= "组件条码不允许重复添加!";
+        public const string MES16601= "组件{CirculationBarCode}已绑定,请检查!";
         public const string MES16602= "数据不存在!";
         public const string MES16603= "组件库存不存在!";
         public const string MES16604 = "组件库存不足!";
