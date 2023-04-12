@@ -200,12 +200,12 @@ namespace Hymson.MES.Services.Services.Manufacture
                                         }
                                         else
                                         {
-                                            throw new ValidationException(nameof(ErrorCode.MES16603));
+                                            throw new ValidationException(nameof(ErrorCode.MES16703));
                                         }
                                     }
                                     else
                                     {
-                                        throw new ValidationException(nameof(ErrorCode.MES16603));
+                                        throw new ValidationException(nameof(ErrorCode.MES16703));
                                     }
                                 }
                                 else
@@ -217,7 +217,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     }
                     else
                     {
-                        throw new ValidationException(nameof(ErrorCode.MES16601));
+                        throw new ValidationException(nameof(ErrorCode.MES16701));
                     }
                 }
                 else //已经存在包装码
@@ -241,7 +241,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     }
                     else
                     {
-                        throw new ValidationException(nameof(ErrorCode.MES16602));
+                        throw new ValidationException(nameof(ErrorCode.MES16702));
                     }
 
                 }
