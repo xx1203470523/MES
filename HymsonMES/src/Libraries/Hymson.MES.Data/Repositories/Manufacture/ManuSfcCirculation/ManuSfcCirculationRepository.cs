@@ -43,12 +43,32 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 根据SFC获取数据
         /// </summary>
-        /// <param name="sfc"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<ManuSfcCirculationEntity> GetBySFCAsync(string sfc)
+        public async Task<IEnumerable<ManuSfcCirculationEntity>> GetBySfcAsync(ManuSfcCirculationQuery query)
         {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetManuSfcCirculationEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Where("IsDeleted =0");
+
+            if (!string.IsNullOrWhiteSpace(query.Sfc))
+            {
+                sqlBuilder.Where("SFC=@Sfc");
+            }
+
+            if (query.CirculationTypes != null && query.CirculationTypes.Length > 0)
+            {
+                sqlBuilder.Where("CirculationType in @CirculationTypes");
+                sqlBuilder.Where("IsDisassemble!=1");        
+            }
+
+            sqlBuilder.AddParameters(query);
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ManuSfcCirculationEntity>(GetBySFCSql, new { sfc });
+            return await conn.QueryAsync<ManuSfcCirculationEntity>(templateData.RawSql, templateData.Parameters);
         }
 
         /// <summary>
@@ -178,7 +198,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `EquipmentId`, `FeedingPointId`, `SFC`, `WorkOrderId`, `ProductId`, `CirculationBarCode`, `CirculationWorkOrderId`, `CirculationProductId`, `Type`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_sfc_circulation`  WHERE Id = @Id ";
-        const string GetBySFCSql = @"SELECT * FROM manu_sfc_circulation WHERE IsDeleted = 0 AND SFC = @sfc ";
+        const string GetBySfcSql = @"SELECT * FROM manu_sfc_circulation WHERE IsDeleted = 0 AND SFC = @sfc ";
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `EquipmentId`, `FeedingPointId`, `SFC`, `WorkOrderId`, `ProductId`, `CirculationBarCode`, `CirculationWorkOrderId`, `CirculationProductId`, `Type`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_sfc_circulation`  WHERE Id IN @ids ";

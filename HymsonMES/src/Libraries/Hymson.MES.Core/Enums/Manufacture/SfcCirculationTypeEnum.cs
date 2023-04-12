@@ -12,6 +12,7 @@ namespace Hymson.MES.Core.Enums.Manufacture
     /// </summary>
     public enum SfcCirculationTypeEnum : sbyte
     {
+        //流转类型;1：拆分；2：合并；3：转换;4：消耗;5：拆解;6：组件添加 7.换件
         /// <summary>
         /// 拆分
         /// </summary>
@@ -31,6 +32,21 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 消耗
         /// </summary>
         [Description("消耗")]
-        Consume = 4
+        Consume = 4,
+        /// <summary>
+        /// 拆解
+        /// </summary>
+        [Description("拆解")]
+        Disassembly = 5,
+        /// <summary>
+        /// 组件添加
+        /// </summary>
+        [Description("组件添加")]
+        ModuleAdd= 6,
+        /// <summary>
+        /// 换件
+        /// </summary>
+        [Description("换件")]
+        ModuleReplace = 7
     }
 }
