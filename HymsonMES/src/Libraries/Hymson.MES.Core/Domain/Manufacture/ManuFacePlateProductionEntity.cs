@@ -47,9 +47,14 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public bool IsProcedureEdit { get; set; }
 
-       /// <summary>
-        /// 是否有成功提示音
+        /// <summary>
+        /// 扫描JOBId 多个使用,号分割
         /// </summary>
+        public string ScanJobId { get; set; }
+
+       /// <summary>
+       /// 是否有成功提示音
+       /// </summary>
         public bool? IsSuccessBeep { get; set; }
 
        /// <summary>

@@ -51,10 +51,9 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task ExecuteAsync(JobDto dto)
+        public async Task<int> ExecuteAsync(JobDto dto)
         {
-            await _manuOutStationService.OutStationAsync(dto);
-
+            return await _manuOutStationService.OutStationAsync(dto);
         }
 
     }

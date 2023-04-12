@@ -9,6 +9,8 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
@@ -53,7 +55,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <summary>
         /// 条码信息表 仓储
         /// </summary>
-        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
+        private readonly IManuSfcRepository _manuSfcRepository;
         /// <summary>
         /// 工单激活 仓储
         /// </summary>
@@ -72,7 +74,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcStepRepository manuSfcStepRepository,
             IProcResourceRepository resourceRepository,
-            IManuSfcInfoRepository manuSfcInfoRepository,
+            IManuSfcRepository manuSfcRepository,
             IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             AbstractValidator<ManuSfcProduceCreateDto> validationCreateRules,
@@ -83,7 +85,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _resourceRepository = resourceRepository;
-            _manuSfcInfoRepository = manuSfcInfoRepository;
+            _manuSfcRepository = manuSfcRepository;
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _validationCreateRules = validationCreateRules;
@@ -125,7 +127,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Sfc = item.Sfc,
                     Lock = item.Lock,
                     LockProductionId = item.LockProductionId,
-                    ProductBOMId=item.ProductBOMId,
+                    ProductBOMId = item.ProductBOMId,
                     Status = item.Status,
                     OrderCode = item.OrderCode,
                     Code = item.Code,
@@ -273,7 +275,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ProcedureId = sfc.ProcedureId,
                     Type = type,
                     Status = sfc.Status,
-                    Lock = lockCommand.Lock,
+                    //Lock = lockCommand.Lock,
                     SiteId = _currentSite.SiteId ?? 0,
                     CreatedBy = sfc.CreatedBy,
                     UpdatedBy = sfc.UpdatedBy
@@ -319,12 +321,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES15402));
             }
 
-            var sfcInfoQuery = new ManuSfcInfoQuery
+            var scrapSfcs = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery
             {
                 Sfcs = parm.Sfcs,
                 Status = SfcStatusEnum.Scrapping
-            };
-            var scrapSfcs = await _manuSfcInfoRepository.GetManuSfcInfoEntitiesAsync(sfcInfoQuery);
+            });
             //类型为报废时判断条码是否已经报废,若已经报废提示:存在已报废的条码，不可再次报废
             if (scrapSfcs.Any())
             {
@@ -343,7 +344,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 UpdatedOn = HymsonClock.Now(),
                 IsScrap = TrueOrFalseEnum.Yes
             };
-            var manuSfcInfoUpdate = new ManuSfcInfoUpdateCommand
+            var manuSfcInfoUpdate = new ManuSfcUpdateCommand
             {
                 Sfcs = sfcs,
                 UserId = _currentUser.UserName,
@@ -352,7 +353,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             };
             #endregion
 
-            //入库
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
@@ -363,7 +363,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 rows += await _manuSfcProduceRepository.UpdateIsScrapAsync(isScrapCommand);
 
                 //3.条码信息表
-                rows += await _manuSfcInfoRepository.UpdateStatusAsync(manuSfcInfoUpdate);
+                rows += await _manuSfcRepository.UpdateStatusAsync(manuSfcInfoUpdate);
                 trans.Complete();
             }
         }
@@ -435,7 +435,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 UpdatedOn = HymsonClock.Now(),
                 IsScrap = TrueOrFalseEnum.No
             };
-            var manuSfcInfoUpdate = new ManuSfcInfoUpdateCommand
+            var manuSfcInfoUpdate = new ManuSfcUpdateCommand
             {
                 Sfcs = sfcs,
                 UserId = _currentUser.UserName,
@@ -455,7 +455,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 rows += await _manuSfcProduceRepository.UpdateIsScrapAsync(isScrapCommand);
 
                 //3.条码信息表
-                rows += await _manuSfcInfoRepository.UpdateStatusAsync(manuSfcInfoUpdate);
+                rows += await _manuSfcRepository.UpdateStatusAsync(manuSfcInfoUpdate);
                 trans.Complete();
             }
         }
@@ -485,7 +485,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ProcedureId = sfc.ProcedureId,
                     Type = type,
                     Status = sfc.Status,
-                    Lock = sfc.Lock,
+                    //Lock = sfc.Lock,
                     Remark = remark,
                     SiteId = _currentSite.SiteId ?? 0,
                     CreatedBy = sfc.CreatedBy,

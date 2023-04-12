@@ -72,7 +72,18 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<IEnumerable<ProcResourceEntity>> GetByIdsAsync(ProcResourceQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcResourceEntity>(GetByIdsSql, new { Ids = query.IdsArr, Status = query.Status });
+            return await conn.QueryAsync<ProcResourceEntity>(GetByIdsAndStatusSql, new { Ids = query.IdsArr, Status = query.Status });
+        }
+
+        /// <summary>
+        /// 批量查询
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcResourceEntity>> GetListByIdsAsync(long[] ids)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcResourceEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -344,7 +355,8 @@ namespace Hymson.MES.Data.Repositories.Process
     {
         const string GetByIdSql = "SELECT a.*,b.ResType,b.ResType FROM proc_resource a left join proc_resource_type b on a.ResTypeId=b.Id and b.IsDeleted =0 where a.Id=@Id ";
         const string GetByResTypeIdsSql = "select * from proc_resource where SiteId=@SiteId and ResTypeId in @Ids and IsDeleted =0 ";
-        const string GetByIdsSql = "select * from proc_resource where  Id  in @Ids and Status=@Status";
+        const string GetByIdsAndStatusSql = "select * from proc_resource where  Id  in @Ids and Status=@Status";
+        const string GetByIdsSql = "select * from proc_resource  WHERE Id IN @ids and IsDeleted=0";
         const string GetByResourceCode = "SELECT Id, ResCode FROM proc_resource WHERE IsDeleted = 0 AND ResCode = @resourceCode";
         const string GetByEquipmentCode = "SELECT R.Id, R.ResCode FROM proc_resource_equipment_bind REB " +
             "LEFT JOIN equ_equipment E ON REB.EquipmentId = E.Id " +

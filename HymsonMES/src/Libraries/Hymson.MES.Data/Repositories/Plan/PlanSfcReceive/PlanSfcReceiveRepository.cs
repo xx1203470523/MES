@@ -11,10 +11,6 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Data.Options;
-using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Plan;
-using Hymson.MES.Data.Repositories.Warehouse;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -30,40 +26,6 @@ namespace Hymson.MES.Data.Repositories.Plan
         public PlanSfcReceiveRepository(IOptions<ConnectionOptions> connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
-        }
-
-        /// <summary>
-        /// 批量删除（软删除）
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeletesSql, param);
-
-        }
-
-        /// <summary>
-        /// 根据ID获取数据
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<PlanSfcReceiveView> GetByIdAsync(long id)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<PlanSfcReceiveView>(GetByIdSql, new { Id = id });
-        }
-
-        /// <summary>
-        /// 根据IDs批量获取数据
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcInfoEntity>> GetByIdsAsync(long[] ids)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ManuSfcInfoEntity>(GetByIdsSql, new { ids = ids });
         }
 
         /// <summary>
@@ -107,45 +69,14 @@ namespace Hymson.MES.Data.Repositories.Plan
             return new PagedInfo<PlanSfcReceiveView>(planSfcInfoEntities, planSfcInfoPagedQuery.PageIndex, planSfcInfoPagedQuery.PageSize, totalCount);
         }
 
-        /// <summary>
-        /// 新增
-        /// </summary>
-        /// <param name="planSfcInfoEntity"></param>
-        /// <returns></returns>
-        public async Task<int> InsertAsync(ManuSfcInfoEntity planSfcInfoEntity)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertSql, planSfcInfoEntity);
-        }
 
-        /// <summary>
-        /// 更新
-        /// </summary>
-        /// <param name="planSfcInfoEntity"></param>
-        /// <returns></returns>
-        public async Task<int> UpdateAsync(ManuSfcInfoEntity planSfcInfoEntity)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateSql, new { planSfcInfoEntity.Id, planSfcInfoEntity.RelevanceWorkOrderId, planSfcInfoEntity.Status, planSfcInfoEntity.UpdatedBy, planSfcInfoEntity.UpdatedOn });
-        }
-
-        /// <summary>
-        /// 根据SFC获取数据
-        /// </summary>
-        /// <param name="SFC"></param>
-        /// <returns></returns>
-        public async Task<ManuSfcInfoEntity> GetBySFCAsync(string SFC)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(GetBySFCSql, new { SFC = SFC });
-        }
 
         /// <summary>
         /// 获取条码数据
         /// </summary>
         /// <param name="SFC"></param>
         /// <returns></returns>
-        public async Task<ManuSfcInfoEntity> GetPlanSfcInfoAsync(PlanSfcReceiveQuery query)
+        public async Task<ManuSfcEntity> GetPlanSfcInfoAsync(PlanSfcReceiveQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetPlanSfcInfoEntitiesSqlTemplate);
@@ -161,7 +92,7 @@ namespace Hymson.MES.Data.Repositories.Plan
                 sqlBuilder.Where(" WorkOrderId=@WorkOrderId");
             }
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var planSfcInfo = await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(template.RawSql, query);
+            var planSfcInfo = await conn.QueryFirstOrDefaultAsync<ManuSfcEntity>(template.RawSql, query);
             return planSfcInfo;
         }
 

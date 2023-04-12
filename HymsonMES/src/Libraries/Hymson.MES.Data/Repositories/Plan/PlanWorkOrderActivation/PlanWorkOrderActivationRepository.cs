@@ -12,6 +12,7 @@ using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -46,7 +47,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -72,7 +73,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         public async Task<PlanWorkOrderActivationEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderActivationEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderActivationEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -80,10 +81,10 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<PlanWorkOrderActivationEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<PlanWorkOrderActivationEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<PlanWorkOrderActivationEntity>(GetByIdsSql, new { ids = ids});
+            return await conn.QueryAsync<PlanWorkOrderActivationEntity>(GetByIdsSql, new { ids = ids });
         }
 
         /// <summary>
@@ -98,7 +99,7 @@ namespace Hymson.MES.Data.Repositories.Plan
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("wo.IsDeleted=0");
 
-            if (planWorkOrderActivationPagedQuery.WorkCenterIds!=null&& planWorkOrderActivationPagedQuery.WorkCenterIds.Count>0) 
+            if (planWorkOrderActivationPagedQuery.WorkCenterIds != null && planWorkOrderActivationPagedQuery.WorkCenterIds.Count > 0)
             {
                 sqlBuilder.Where(" wo.WorkCenterId in @WorkCenterIds ");
             }
@@ -108,7 +109,7 @@ namespace Hymson.MES.Data.Repositories.Plan
                 {
                     sqlBuilder.Where(" woa.Id is not null ");
                 }
-                else 
+                else
                 {
                     sqlBuilder.Where(" woa.Id is null ");
                 }
@@ -133,7 +134,7 @@ namespace Hymson.MES.Data.Repositories.Plan
             {
                 sqlBuilder.Where(" wo.Status = @Status ");
             }
-            else 
+            else
             {
                 planWorkOrderActivationPagedQuery.Status = PlanWorkOrderStatusEnum.Closed;
                 sqlBuilder.Where(" wo.Status != @Status ");//不要显示状态为已关闭的
@@ -178,7 +179,7 @@ namespace Hymson.MES.Data.Repositories.Plan
             sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
 
-            if (planWorkOrderActivationQuery.WorkOrderId.HasValue) 
+            if (planWorkOrderActivationQuery.WorkOrderId.HasValue)
             {
                 sqlBuilder.Where(" WorkOrderId = @WorkOrderId ");
             }
@@ -235,7 +236,6 @@ namespace Hymson.MES.Data.Repositories.Plan
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdatesSql, planWorkOrderActivationEntitys);
         }
-
     }
 
     public partial class PlanWorkOrderActivationRepository
@@ -274,7 +274,7 @@ namespace Hymson.MES.Data.Repositories.Plan
 
         const string InsertSql = "INSERT INTO `plan_work_order_activation`(  `Id`, `SiteId`, `WorkOrderId`, `LineId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @WorkOrderId, @LineId, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `plan_work_order_activation`(  `Id`, `SiteId`, `WorkOrderId`, `LineId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @WorkOrderId, @LineId, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-    const string UpdateSql = "UPDATE `plan_work_order_activation` SET   SiteId = @SiteId, WorkOrderId = @WorkOrderId, LineId = @LineId, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `plan_work_order_activation` SET   SiteId = @SiteId, WorkOrderId = @WorkOrderId, LineId = @LineId, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `plan_work_order_activation` SET   SiteId = @SiteId, WorkOrderId = @WorkOrderId, LineId = @LineId, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `plan_work_order_activation` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `plan_work_order_activation`  SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids ";
@@ -286,4 +286,4 @@ namespace Hymson.MES.Data.Repositories.Plan
     FROM `plan_work_order_activation`  WHERE Id IN @ids ";
         const string DeleteTrueSql = @"DELETE FROM  plan_work_order_activation where Id=@Id ";
     }
-    }
+}

@@ -1,18 +1,8 @@
-/*
- *creator: Karl
- *
- *describe: BOM明细替代料表 仓储类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-02-14 05:33:28
- */
-
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Process;
-using Hymson.Utils;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -25,10 +15,15 @@ namespace Hymson.MES.Data.Repositories.Process
     {
         private readonly ConnectionOptions _connectionOptions;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
         public ProcBomDetailReplaceMaterialRepository(IOptions<ConnectionOptions> connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
         }
+
 
         /// <summary>
         /// 删除（软删除）
@@ -84,6 +79,17 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ProcBomDetailReplaceMaterialEntity>(GetByIdsSql, new { ids = ids });
+        }
+
+        /// <summary>
+        /// 根据BomID查询替代物料
+        /// </summary>
+        /// <param name="bomId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcBomDetailReplaceMaterialEntity>> GetByBomIdAsync(long bomId)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcBomDetailReplaceMaterialEntity>(GetByBomIdSql, new { bomId });
         }
 
         /// <summary>
@@ -174,6 +180,9 @@ namespace Hymson.MES.Data.Repositories.Process
 
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class ProcBomDetailReplaceMaterialRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_bom_detail_replace_material` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
@@ -192,5 +201,6 @@ namespace Hymson.MES.Data.Repositories.Process
         const string DeleteBomIDsSql = "UPDATE `proc_bom_detail_replace_material` SET IsDeleted =Id,UpdatedBy = @UserId,UpdatedOn = @DeleteOn WHERE BomId in @bomIds ";
         const string GetByIdSql = @"SELECT * FROM `proc_bom_detail_replace_material`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `proc_bom_detail_replace_material`  WHERE Id IN @ids ";
+        const string GetByBomIdSql = "SELECT * FROM proc_bom_detail_replace_material WHERE IsDeleted = 0 AND BomId = @bomId ";
     }
 }

@@ -39,14 +39,25 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 获某工序对应的前一工序
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetPreProcessRouteDetailLinkAsync(ProcProcessRouteDetailLinkQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcProcessRouteDetailLinkEntity>(GetPreProcedureIDsSql, query);
+        }
+
+        /// <summary>
         /// 获某工序对应的下一工序
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetProcessRouteDetailLinkAsync(ProcProcessRouteDetailLinkQuery query)
+        public async Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetNextProcessRouteDetailLinkAsync(ProcProcessRouteDetailLinkQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcProcessRouteDetailLinkEntity>(GetProcedureIDsSql, query);
+            return await conn.QueryAsync<ProcProcessRouteDetailLinkEntity>(GetNextProcedureIDsSql, query);
         }
 
         /// <summary>
@@ -210,6 +221,7 @@ namespace Hymson.MES.Data.Repositories.Process
                                           `Id`, `SiteId`, `SerialNo`, `ProcessRouteId`, `PreProcessRouteDetailId`, `ProcessRouteDetailId`, `Extra1`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_process_route_detail_link`  WHERE Id IN @ids ";
         const string DeleteByProcessRouteIdSql = "delete from `proc_process_route_detail_link` WHERE ProcessRouteId = @ProcessRouteId ";
-        const string GetProcedureIDsSql = "SELECT * FROM proc_process_route_detail_link WHERE ProcessRouteId = @ProcessRouteId AND PreProcessRouteDetailId = @ProcedureId; ";
+        const string GetPreProcedureIDsSql = "SELECT * FROM proc_process_route_detail_link WHERE ProcessRouteId = @ProcessRouteId AND ProcessRouteDetailId = @ProcedureId; ";
+        const string GetNextProcedureIDsSql = "SELECT * FROM proc_process_route_detail_link WHERE ProcessRouteId = @ProcessRouteId AND PreProcessRouteDetailId = @ProcedureId; ";
     }
 }

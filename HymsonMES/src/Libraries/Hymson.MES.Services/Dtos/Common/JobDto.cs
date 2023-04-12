@@ -1,11 +1,11 @@
-﻿using Hymson.MES.Services.BOs.Manufacture;
+﻿using Hymson.MES.Services.Bos.Manufacture;
 
 namespace Hymson.MES.Services.Dtos.Common
 {
     /// <summary>
     /// 作业Dto
     /// </summary>
-    public class JobDto: ManufactureBO
+    public class JobDto: ManufactureBo
     {
         /// <summary>
         /// 面板ID

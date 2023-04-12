@@ -33,10 +33,11 @@ namespace Hymson.MES.Api
                 options.Filters.Add(typeof(HttpGlobalExceptionFilter));
                 options.Filters.Add(typeof(HttpGlobalActionFilter));
                 options.Filters.Add(new AuthorizeFilter());
-            }).AddJsonOptions((jsonOptions) => {
+            }).AddJsonOptions((jsonOptions) =>
+            {
                 jsonOptions.JsonSerializerOptions.Converters.Add(new CustomInt64Converter());
             }); ;
-            //Test karl
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddMemoryCache();
             builder.Services.AddClearCacheService(builder.Configuration);
@@ -44,7 +45,7 @@ namespace Hymson.MES.Api
             builder.Services.AddHostedService<WorkService>();
 #endif
             AddSwaggerGen(builder.Services);
-      
+
             builder.Services.AddJwtBearerService(builder.Configuration);
             builder.Services.AddAppService(builder.Configuration);
             builder.Services.AddSqlLocalization(builder.Configuration);
@@ -94,7 +95,7 @@ namespace Hymson.MES.Api
             app.MapControllers();
             app.Run();
         }
-        //ASDASD
+
         /// <summary>
         /// 
         /// </summary>

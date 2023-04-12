@@ -5,7 +5,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Services.BOs.Manufacture;
+using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Utils;
 
@@ -67,8 +67,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
         /// </summary>
         /// <param name="bo"></param>
         /// <returns></returns>
-        public async Task InStationAsync(ManufactureBO bo)
+        public async Task<int> InStationAsync(ManufactureBo bo)
         {
+            var rows = 0;
+
             // 获取生产条码信息（附带条码合法性校验）
             var sfcProduceEntity = await _manuCommonService.GetProduceSFCForStartAsync(bo.SFC);
 
@@ -76,7 +78,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
             if (sfcProduceEntity.ProcedureId != bo.ProcedureId)
             {
                 // 判断上一个工序是否是随机工序
-                var IsRandomPreProcedure = await _manuCommonService.IsRandomPreProcedure(sfcProduceEntity.ProcessRouteId, sfcProduceEntity.ProcedureId);
+                var IsRandomPreProcedure = await _manuCommonService.IsRandomPreProcedure(sfcProduceEntity);
                 if (IsRandomPreProcedure == false) throw new BusinessException(nameof(ErrorCode.MES16308));
 
                 // 将SFC对应的工序改为当前工序
@@ -101,7 +103,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
             sfcProduceEntity.Status = SfcProduceStatusEnum.Activity;
             sfcProduceEntity.UpdatedBy = _currentUser.UserName;
             sfcProduceEntity.UpdatedOn = HymsonClock.Now();
-            await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
+            rows += await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
+
+            return rows;
         }
 
     }

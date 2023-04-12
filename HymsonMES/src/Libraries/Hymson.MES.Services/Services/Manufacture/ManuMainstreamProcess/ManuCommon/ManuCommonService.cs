@@ -11,6 +11,7 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
+using Hymson.Sequences;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon
@@ -36,9 +37,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         private readonly IMemoryCache _memoryCache;
 
         /// <summary>
-        /// 仓储接口（条码信息）
+        /// 序列号服务
         /// </summary>
-        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
+        private readonly ISequenceService _sequenceService;
 
         /// <summary>
         /// 仓储接口（条码生产信息）
@@ -77,7 +78,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="memoryCache"></param>
-        /// <param name="manuSfcInfoRepository"></param>
+        /// <param name="sequenceService"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="planWorkOrderActivationRepository"></param>
@@ -85,8 +86,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="procProcessRouteDetailLinkRepository"></param>
         /// <param name="procProcedureRepository"></param>
         public ManuCommonService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IMemoryCache memoryCache,
-            IManuSfcInfoRepository manuSfcInfoRepository,
+            IMemoryCache memoryCache, ISequenceService sequenceService,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
@@ -97,7 +97,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             _currentUser = currentUser;
             _currentSite = currentSite;
             _memoryCache = memoryCache;
-            _manuSfcInfoRepository = manuSfcInfoRepository;
+            _sequenceService = sequenceService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
@@ -223,15 +223,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         public async Task<ProcProcedureEntity?> GetNextProcedureAsync(ManuSfcProduceEntity manuSfcProduce)
         {
             // 因为可能有分叉，所以返回的下一步工序是集合
-            var processRouteDetailLink = await _procProcessRouteDetailLinkRepository.GetProcessRouteDetailLinkAsync(new ProcProcessRouteDetailLinkQuery
+            var netxtProcessRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetNextProcessRouteDetailLinkAsync(new ProcProcessRouteDetailLinkQuery
             {
                 ProcessRouteId = manuSfcProduce.ProcessRouteId,
                 ProcedureId = manuSfcProduce.ProcedureId
             });
-            if (processRouteDetailLink == null || processRouteDetailLink.Any() == false) throw new BusinessException(nameof(ErrorCode.MES10440));
+            if (netxtProcessRouteDetailLinks == null || netxtProcessRouteDetailLinks.Any() == false) throw new BusinessException(nameof(ErrorCode.MES10440));
 
             // 获取当前工序在工艺路线里面的扩展信息
-            var procedureNodes = await _procProcessRouteDetailNodeRepository.GetByIdsAsync(processRouteDetailLink.Select(s => s.ProcessRouteDetailId).ToArray())
+            var procedureNodes = await _procProcessRouteDetailNodeRepository.GetByIdsAsync(netxtProcessRouteDetailLinks.Select(s => s.ProcessRouteDetailId).ToArray())
                 ?? throw new BusinessException(nameof(ErrorCode.MES10440));
 
             // 检查是否有"空值"类型的工序
@@ -241,20 +241,17 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             // 有多工序分叉的情况
             if (procedureNodes.Count() > 1)
             {
-                var cacheKey = $"{manuSfcProduce.ProcessRouteId}-{manuSfcProduce.ProcedureId}-{manuSfcProduce.ResourceId}";
-                if (_memoryCache.TryGetValue(cacheKey, out int count) == false) count = 0;
+                // 这个Key太长了
+                //var cacheKey = $"{manuSfcProduce.ProcessRouteId}-{manuSfcProduce.ProcedureId}-{manuSfcProduce.ResourceId}-{manuSfcProduce.WorkOrderId}";
+
+                var cacheKey = $"{manuSfcProduce.ProcedureId}-{manuSfcProduce.WorkOrderId}";
+                var count = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.None, cacheKey);
 
                 // 读取工序抽检次数
-                if (defaultNextProcedure.CheckRate == count)
+                if (count > 0 && count % defaultNextProcedure.CheckRate == 0)
                 {
                     // 如果满足抽检次数，就取出一个非"空值"的随机工序作为下一工序
                     defaultNextProcedure = procedureNodes.FirstOrDefault(f => f.CheckType != ProcessRouteInspectTypeEnum.None);
-
-                    // TODO 重置计数器
-                }
-                else
-                {
-                    // TODO 计数器+1
                 }
             }
 
@@ -266,11 +263,17 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <summary>
         /// 判断上一工序是否随机工序
         /// </summary>
-        /// <param name="processRouteId"></param>
-        /// <param name="procedureId"></param>
+        /// <param name="manuSfcProduce"></param>
         /// <returns></returns>
-        public async Task<bool> IsRandomPreProcedure(long processRouteId, long procedureId)
+        public async Task<bool> IsRandomPreProcedure(ManuSfcProduceEntity manuSfcProduce)
         {
+            // 因为可能有分叉，所以返回的上一步工序是集合
+            var preProcessRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetPreProcessRouteDetailLinkAsync(new ProcProcessRouteDetailLinkQuery
+            {
+                ProcessRouteId = manuSfcProduce.ProcessRouteId,
+                ProcedureId = manuSfcProduce.ProcedureId
+            });
+
             // TODO 
 
             return false;

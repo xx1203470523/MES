@@ -1,4 +1,6 @@
-﻿namespace Hymson.MES.Data.Repositories.Common.Command
+﻿using Hymson.Utils;
+
+namespace Hymson.MES.Data.Repositories.Common.Command
 {
     /// <summary>
     /// 实体（更新）
@@ -13,6 +15,6 @@
         /// <summary>
         /// 更新时间
         /// </summary>
-        public DateTime? UpdatedOn { get; set; }
+        public DateTime? UpdatedOn { get; set; } = HymsonClock.Now();
     }
 }

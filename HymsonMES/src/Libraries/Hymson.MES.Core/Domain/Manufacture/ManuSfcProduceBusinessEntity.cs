@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 
 namespace Hymson.MES.Core.Domain.Manufacture
 {
@@ -24,7 +25,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
        /// <summary>
         /// 业务类型;1、返修业务  2、锁业务
         /// </summary>
-        public SfcProduceStatusEnum BusinessType { get; set; }
+        public ManuSfcProduceBusinessType BusinessType { get; set; }
 
        /// <summary>
         /// 业务内容

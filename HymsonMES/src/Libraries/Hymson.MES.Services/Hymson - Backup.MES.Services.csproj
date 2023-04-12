@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702;1591;8618</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <NoWarn>1701;1702;1591;8618</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Dtos\Manufacture\ManuMainstreamProcessDto\ManuOutStation\**" />
+    <Compile Remove="Services\Manufacture\ManuMainstreamProcess\Consume\**" />
+    <Compile Remove="Services\Manufacture\ManuMainstreamProcess\Package\**" />
+    <EmbeddedResource Remove="Dtos\Manufacture\ManuMainstreamProcessDto\ManuOutStation\**" />
+    <EmbeddedResource Remove="Services\Manufacture\ManuMainstreamProcess\Consume\**" />
+    <EmbeddedResource Remove="Services\Manufacture\ManuMainstreamProcess\Package\**" />
+    <None Remove="Dtos\Manufacture\ManuMainstreamProcessDto\ManuOutStation\**" />
+    <None Remove="Services\Manufacture\ManuMainstreamProcess\Consume\**" />
+    <None Remove="Services\Manufacture\ManuMainstreamProcess\Package\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="11.5.1" />
+    <PackageReference Include="Hymson.Authentication.JwtBearer" Version="1.9.7" />
+    <PackageReference Include="Hymson.Kafka.Debezium" Version="1.9.7" />
+    <PackageReference Include="Hymson.Sequences" Version="1.9.7" />
+    <PackageReference Include="Hymson.Snowflake" Version="1.9.7" />
+    <PackageReference Include="Hymson.Web.Framework" Version="1.9.7" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Hymson.MES.Data\Hymson.MES.Data.csproj" />
+  </ItemGroup>
+
+</Project>

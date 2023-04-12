@@ -16,11 +16,18 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<ProcProcessRouteDetailLinkEntity> GetByIdAsync(long id);
 
         /// <summary>
+        /// 获某工序对应的前一工序
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetPreProcessRouteDetailLinkAsync(ProcProcessRouteDetailLinkQuery query);
+
+        /// <summary>
         /// 获某工序对应的下一工序
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetProcessRouteDetailLinkAsync(ProcProcessRouteDetailLinkQuery query);
+        Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetNextProcessRouteDetailLinkAsync(ProcProcessRouteDetailLinkQuery query);
 
         /// <summary>
         /// 根据IDs批量获取数据
