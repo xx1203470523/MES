@@ -1,7 +1,10 @@
-﻿using Hymson.Authentication;
+﻿using FluentValidation;
+using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
@@ -36,11 +39,16 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
         private readonly ISequenceService _sequenceService;
 
         /// <summary>
+        /// 验证器
+        /// </summary>
+        private readonly AbstractValidator<ProcMaskCodeSaveDto> _validationSaveRules;
+
+        /// <summary>
         /// 
         /// </summary>
         private readonly IProcMaskCodeRepository _procMaskCodeRepository;
         private readonly IProcMaskCodeRuleRepository _procMaskCodeRuleRepository;
-        //private readonly AbstractValidator<ProcMaskCodeSaveDto> _validationCreateRules;
+
 
         /// <summary>
         /// 构造函数
@@ -48,15 +56,18 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
         /// <param name="currentSite"></param>
         /// <param name="currentUser"></param>
         /// <param name="sequenceService"></param>
+        /// <param name="validationSaveRules"></param>
         /// <param name="procMaskCodeRepository"></param>
         /// <param name="procMaskCodeRuleRepository"></param>
         public ProcMaskCodeService(ICurrentUser currentUser, ICurrentSite currentSite, ISequenceService sequenceService,
+            AbstractValidator<ProcMaskCodeSaveDto> validationSaveRules,
             IProcMaskCodeRepository procMaskCodeRepository,
             IProcMaskCodeRuleRepository procMaskCodeRuleRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _sequenceService = sequenceService;
+            _validationSaveRules = validationSaveRules;
             _procMaskCodeRepository = procMaskCodeRepository;
             _procMaskCodeRuleRepository = procMaskCodeRuleRepository;
         }
@@ -69,7 +80,7 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
         public async Task<int> CreateAsync(ProcMaskCodeSaveDto createDto)
         {
             // 验证DTO
-            //await _validationCreateRules.ValidateAndThrowAsync(createDto);
+            await _validationSaveRules.ValidateAndThrowAsync(createDto);
 
             // DTO转换实体
             var entity = createDto.ToEntity<ProcMaskCodeEntity>();
@@ -77,7 +88,12 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
             entity.SiteId = _currentSite.SiteId ?? 0;
+
+            entity.Code = entity.Code.Trim().Replace(" ", string.Empty);
             entity.Code = entity.Code.ToUpper();
+
+            // 编码唯一性验证
+            if (await _procMaskCodeRepository.IsExistsAsync(entity.Code)) throw new CustomerValidationException(nameof(ErrorCode.MES10802)).WithData("Code", entity.Code);
 
             List<ProcMaskCodeRuleEntity> rules = new();
             for (int i = 0; i < createDto.RuleList.Count; i++)
@@ -109,6 +125,9 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
         /// <returns></returns>
         public async Task<int> ModifyAsync(ProcMaskCodeSaveDto modifyDto)
         {
+            // 验证DTO
+            await _validationSaveRules.ValidateAndThrowAsync(modifyDto);
+
             // DTO转换实体
             var entity = modifyDto.ToEntity<ProcMaskCodeEntity>();
             entity.UpdatedBy = _currentUser.UserName;

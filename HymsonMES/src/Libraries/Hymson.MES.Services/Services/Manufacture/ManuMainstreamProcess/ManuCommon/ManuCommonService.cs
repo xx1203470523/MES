@@ -241,7 +241,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             // 有多工序分叉的情况
             if (procedureNodes.Count() > 1)
             {
-                // 会不会上面这个的太长了
+                // 这个Key太长了
                 //var cacheKey = $"{manuSfcProduce.ProcessRouteId}-{manuSfcProduce.ProcedureId}-{manuSfcProduce.ResourceId}-{manuSfcProduce.WorkOrderId}";
 
                 var cacheKey = $"{manuSfcProduce.ProcedureId}-{manuSfcProduce.WorkOrderId}";

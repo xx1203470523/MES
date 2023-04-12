@@ -135,6 +135,12 @@
         public const string MES10711 = "关联资源页签资源不能重复!";
         #endregion
 
+        #region 掩码维护 10800
+        public const string MES10800 = "掩码维护错误";
+        public const string MES10801 = "掩码编码不能为空";
+        public const string MES10802 = "此编码【{Code}】在系统中已经存在!";
+        #endregion
+
         #region 不合格代码 11100
         public const string MES11100 = "不合格代码维护错误";
         public const string MES11101 = "不合格代码编码不能为空";
@@ -416,7 +422,7 @@
         public const string MES16500 = "下达条码失败。";
         public const string MES16501 = "产品{product}未维护编码规则,无法下达条码。";
         public const string MES16502 = "产品{product}批次大写为0,无法下达条码。";
-        public const string MES16503= "工单{workorder}超过计划数量,下达条码失败。";
+        public const string MES16503 = "工单{workorder}超过计划数量,下达条码失败。";
         #endregion
 
 

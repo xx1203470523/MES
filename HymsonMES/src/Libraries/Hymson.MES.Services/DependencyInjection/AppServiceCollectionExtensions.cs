@@ -235,7 +235,6 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Process
-
             #region Material
             services.AddSingleton<AbstractValidator<ProcMaterialCreateDto>, ProcMaterialCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcMaterialModifyDto>, ProcMaterialModifyValidator>();
@@ -268,7 +267,6 @@ namespace Microsoft.Extensions.DependencyInjection
             #region LoadPoint
             services.AddSingleton<AbstractValidator<ProcLoadPointCreateDto>, ProcLoadPointCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcLoadPointModifyDto>, ProcLoadPointModifyValidator>();
-
             #endregion
 
             #region Resource
@@ -285,11 +283,17 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<ProcProcessRouteCreateDto>, ProcProcessRouteCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcProcessRouteModifyDto>, ProcProcessRouteModifyValidator>();
             #endregion
+
             #region LabelTemplate
 
             services.AddSingleton<AbstractValidator<ProcLabelTemplateCreateDto>, ProcLabelTemplateCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcLabelTemplateModifyDto>, ProcLabelTemplateModifyValidator>();
             #endregion
+
+            #region MaskCode
+            services.AddSingleton<AbstractValidator<ProcMaskCodeSaveDto>, ProcMaskCodeValidator>();
+            #endregion
+
             #endregion
 
             #region Integrated
