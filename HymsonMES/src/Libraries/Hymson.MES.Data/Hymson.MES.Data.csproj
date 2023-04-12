@@ -39,6 +39,7 @@
     <Folder Include="Repositories\Manufacture\ManuFacePlateProduction\View\" />
     <Folder Include="Repositories\Manufacture\ManuFacePlate\View\" />
     <Folder Include="Repositories\Manufacture\ManuContainerBarcode\" />
+    <Folder Include="Repositories\Plan\PlanWorkOrderBind\View\" />
     <Folder Include="Repositories\Process\PrintConfig\Command\" />
   </ItemGroup>
 

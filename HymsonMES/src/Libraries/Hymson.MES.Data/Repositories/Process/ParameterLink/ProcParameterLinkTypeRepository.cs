@@ -197,6 +197,8 @@ namespace Hymson.MES.Data.Repositories.Process
             var template = sqlBuilder.AddTemplate(GetProcParameterLinkTypeEntitiesSqlTemplate);
             sqlBuilder.Select("*");
 
+            sqlBuilder.Where(" IsDeleted = 0 ");
+
             if (procParameterLinkTypeQuery.SiteId!=0) 
             {
                 sqlBuilder.Where(" SiteId = @SiteId ");

@@ -386,6 +386,8 @@
         public const string MES16307 = "SFC状态不合法，不允许操作。";
         public const string MES16308 = "SFC不在当前工序排队，请检查。";
         public const string MES16309 = "SFC状态非活动，请先置于活动。";
+        public const string MES16310 = "SFC状态为完成，不允许操作。";
+        public const string MES16311 = "SFC在库存中状态为：{Status}，但不存在在制信息。";
         #endregion
 
         #region 生产
@@ -399,6 +401,19 @@
         public const string MES17205 = "面板编码已经存在";
         public const string MES17206 = "面板编码最大长度为255";
         public const string MES17207 = "面板名称最大长度为255";
+        #endregion
+
+
+        #region 在制维修
+        public const string MES17301 = "工序不能为空";
+        public const string MES17302 = "资源不能为空";
+        public const string MES17303 = "产品条码不能为空";
+        public const string MES17304 = "更改产品条码生产状态失败";
+        public const string MES17305 = "获取维修信息失败";
+        public const string MES17306 = "获取条码生产信息失败";
+        public const string MES17307 = "存在未关闭的缺陷，请检查！";
+        public const string MES17308 = "返回工序失败！";
+
         #endregion
 
         #endregion
@@ -439,6 +454,13 @@
         public const string MES16701 = "容器包装，条码信息未找到";
         public const string MES16702 = "容器包装，包装码不存在";
         public const string MES16703 = "容器包装，条码的包装维护记录未找到";
+        #endregion
+
+        #region 绑定工单激活  MES16800
+        public const string MES16800 = "绑定工单激活错误";
+        public const string MES16801 = "当前资源所对应的工作中心不是线体";
+        public const string MES16802 = "有工单没有被激活，无法绑定";
+        public const string MES16803 = "没有找到该资源对应的工作中心";
         #endregion
         #endregion
 
