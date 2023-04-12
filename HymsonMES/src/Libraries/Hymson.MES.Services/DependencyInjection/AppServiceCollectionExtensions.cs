@@ -194,6 +194,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IPlanSfcPrintService, PlanSfcPrintService>();
             #endregion
 
+            #region PlanWorkOrderBind
+            services.AddSingleton<IPlanWorkOrderBindService, PlanWorkOrderBindService>();
+            #endregion
             #endregion
 
             #region Job
@@ -375,6 +378,12 @@ namespace Microsoft.Extensions.DependencyInjection
             #region PlanSfcPrint
             services.AddSingleton<AbstractValidator<PlanSfcPrintCreateDto>, PlanSfcPrintCreateValidator>();
             services.AddSingleton<AbstractValidator<PlanSfcPrintModifyDto>, PlanSfcPrintModifyValidator>();
+
+            #endregion
+
+            #region PlanWorkOrderBind 
+            services.AddSingleton<AbstractValidator<PlanWorkOrderBindCreateDto>, PlanWorkOrderBindCreateValidator>();
+            services.AddSingleton<AbstractValidator<PlanWorkOrderBindModifyDto>, PlanWorkOrderBindModifyValidator>();
 
             #endregion
 

@@ -416,6 +416,13 @@
         public const string MES16501 = "产品{product}未维护编码规则,无法下达条码。";
         public const string MES16502 = "产品{product}批次大写为0,无法下达条码。";
         #endregion
+
+        #region 绑定工单激活  MES16600
+        public const string MES16600 = "绑定工单激活错误";
+        public const string MES16601 = "当前资源所对应的工作中心不是线体";
+        public const string MES16602 = "有工单没有被激活，无法绑定";
+        public const string MES16603 = "没有找到该资源对应的工作中心";
+        #endregion
         #endregion
 
         #region 系统执行出错 业务逻辑出错

@@ -209,6 +209,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IPlanSfcPrintRepository, PlanSfcPrintRepository>();
 
             #endregion
+
+            #region PlanWorkOrderBind   PlanWorkOrderBindRecord
+            services.AddSingleton<IPlanWorkOrderBindRepository, PlanWorkOrderBindRepository>();
+            services.AddSingleton<IPlanWorkOrderBindRecordRepository, PlanWorkOrderBindRecordRepository>();
+            #endregion
             #endregion
 
             return services;
