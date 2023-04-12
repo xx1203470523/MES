@@ -2,8 +2,8 @@
  *creator: Karl
  *
  *describe: 条码信息表 仓储类 | 代码由框架生成
- *builder:  pengxin
- *build datetime: 2023-03-21 04:00:29
+ *builder:  wangkeming
+ *build datetime: 2023-04-11 02:42:47
  */
 
 using Dapper;
@@ -11,24 +11,23 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Manufacture;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
-    /// <summary>
+    /// <summary>s
     /// 条码信息表仓储
     /// </summary>
-    public partial class ManuSfcInfoRepository : IManuSfcInfoRepository
+    public partial class ManuSfcInfoRepository : BaseRepository, IManuSfcInfoRepository
     {
         private readonly ConnectionOptions _connectionOptions;
-
-        public ManuSfcInfoRepository(IOptions<ConnectionOptions> connectionOptions)
+        public ManuSfcInfoRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
         }
 
+        #region 方法
         /// <summary>
         /// 删除（软删除）
         /// </summary>
@@ -36,7 +35,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> DeleteAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, new { Id = id });
         }
 
@@ -47,7 +46,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> DeletesAsync(DeleteCommand param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
         }
 
@@ -58,7 +57,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<ManuSfcInfoEntity> GetByIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(GetByIdSql, new { Id = id });
         }
 
@@ -80,142 +79,120 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<IEnumerable<ManuSfcInfoEntity>> GetByIdsAsync(long[] ids)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ManuSfcInfoEntity>(GetByIdsSql, new { ids = ids });
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuSfcInfoEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="manuSfcInfoPagedQuery"></param>
+        /// <param name="manuSfcInfo1PagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ManuSfcInfoEntity>> GetPagedInfoAsync(ManuSfcInfoPagedQuery manuSfcInfoPagedQuery)
+        public async Task<PagedInfo<ManuSfcInfoEntity>> GetPagedInfoAsync(ManuSfcInfo1PagedQuery manuSfcInfo1PagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
-
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-
-            var offSet = (manuSfcInfoPagedQuery.PageIndex - 1) * manuSfcInfoPagedQuery.PageSize;
+            var offSet = (manuSfcInfo1PagedQuery.PageIndex - 1) * manuSfcInfo1PagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = manuSfcInfoPagedQuery.PageSize });
-            sqlBuilder.AddParameters(manuSfcInfoPagedQuery);
+            sqlBuilder.AddParameters(new { Rows = manuSfcInfo1PagedQuery.PageSize });
+            sqlBuilder.AddParameters(manuSfcInfo1PagedQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var manuSfcInfoEntitiesTask = conn.QueryAsync<ManuSfcInfoEntity>(templateData.RawSql, templateData.Parameters);
+            using var conn = GetMESDbConnection();
+            var manuSfcInfo1EntitiesTask = conn.QueryAsync<ManuSfcInfoEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
-            var manuSfcInfoEntities = await manuSfcInfoEntitiesTask;
+            var manuSfcInfo1Entities = await manuSfcInfo1EntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<ManuSfcInfoEntity>(manuSfcInfoEntities, manuSfcInfoPagedQuery.PageIndex, manuSfcInfoPagedQuery.PageSize, totalCount);
+            return new PagedInfo<ManuSfcInfoEntity>(manuSfcInfo1Entities, manuSfcInfo1PagedQuery.PageIndex, manuSfcInfo1PagedQuery.PageSize, totalCount);
         }
 
         /// <summary>
         /// 查询List
         /// </summary>
-        /// <param name="manuSfcInfoQuery"></param>
+        /// <param name="manuSfcInfo1Query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcInfoEntity>> GetManuSfcInfoEntitiesAsync(ManuSfcInfoQuery manuSfcInfoQuery)
+        public async Task<IEnumerable<ManuSfcInfoEntity>> GetManuSfcInfo1EntitiesAsync(ManuSfcInfo1Query manuSfcInfo1Query)
         {
             var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetManuSfcInfoEntitiesSqlTemplate);
-            sqlBuilder.Select("*");
-            if (manuSfcInfoQuery.Sfcs != null && manuSfcInfoQuery.Sfcs.Length > 0)
-            {
-                sqlBuilder.Where("Sfc in @Sfcs");
-            }
-            if (manuSfcInfoQuery.Status.HasValue)
-            {
-                sqlBuilder.Where("Status =@Status");
-            }
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var manuSfcInfoEntities = await conn.QueryAsync<ManuSfcInfoEntity>(template.RawSql, manuSfcInfoQuery);
-            return manuSfcInfoEntities;
+            var template = sqlBuilder.AddTemplate(GetManuSfcInfo1EntitiesSqlTemplate);
+            using var conn = GetMESDbConnection();
+            var manuSfcInfo1Entities = await conn.QueryAsync<ManuSfcInfoEntity>(template.RawSql, manuSfcInfo1Query);
+            return manuSfcInfo1Entities;
         }
 
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="manuSfcInfoEntity"></param>
+        /// <param name="ManuSfcInfoEntity"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(ManuSfcInfoEntity manuSfcInfoEntity)
+        public async Task<int> InsertAsync(ManuSfcInfoEntity ManuSfcInfoEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertSql, manuSfcInfoEntity);
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(InsertSql, ManuSfcInfoEntity);
         }
 
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="manuSfcInfoEntitys"></param>
+        /// <param name="ManuSfcInfoEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(List<ManuSfcInfoEntity> manuSfcInfoEntitys)
+        public async Task<int> InsertsAsync(List<ManuSfcInfoEntity> ManuSfcInfoEntitys)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertsSql, manuSfcInfoEntitys);
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(InsertsSql, ManuSfcInfoEntitys);
         }
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="manuSfcInfoEntity"></param>
+        /// <param name="ManuSfcInfoEntity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(ManuSfcInfoEntity manuSfcInfoEntity)
+        public async Task<int> UpdateAsync(ManuSfcInfoEntity ManuSfcInfoEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateSql, manuSfcInfoEntity);
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateSql, ManuSfcInfoEntity);
         }
 
         /// <summary>
         /// 批量更新
         /// </summary>
-        /// <param name="manuSfcInfoEntitys"></param>
+        /// <param name="ManuSfcInfoEntitys"></param>
         /// <returns></returns>
-        public async Task<int> UpdatesAsync(List<ManuSfcInfoEntity> manuSfcInfoEntitys)
+        public async Task<int> UpdatesAsync(List<ManuSfcInfoEntity> ManuSfcInfoEntitys)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdatesSql, manuSfcInfoEntitys);
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdatesSql, ManuSfcInfoEntitys);
         }
-
-        /// <summary>
-        /// 批量更新条码状态
-        /// </summary>
-        /// <param name="manuSfcInfoEntity"></param>
-        /// <returns></returns>
-        public async Task<int> UpdateStatusAsync(ManuSfcInfoUpdateCommand command)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateStatusSql, command);
-        }
-
+        #endregion
     }
 
     public partial class ManuSfcInfoRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_info` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_sfc_info` /**where**/ ";
-        const string GetManuSfcInfoEntitiesSqlTemplate = @"SELECT 
+        #region 
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_info1` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `manu_sfc_info1` /**where**/ ";
+        const string GetManuSfcInfo1EntitiesSqlTemplate = @"SELECT 
                                             /**select**/
-                                           FROM `manu_sfc_info` /**where**/  ";
+                                           FROM `manu_sfc_info1` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `manu_sfc_info`(  `Id`, `SFC`, `WorkOrderId`, `RelevanceWorkOrderId`, `ProductId`, `Qty`, `Status`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`) VALUES (   @Id, @SFC, @WorkOrderId, @RelevanceWorkOrderId, @ProductId, @Qty, @Status, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @SiteId )  ";
-        const string InsertsSql = "INSERT INTO `manu_sfc_info`(  `Id`, `SFC`, `WorkOrderId`, `RelevanceWorkOrderId`, `ProductId`, `Qty`, `Status`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`) VALUES (   @Id, @SFC, @WorkOrderId, @RelevanceWorkOrderId, @ProductId, @Qty, @Status, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @SiteId )  ";
-        const string UpdateSql = "UPDATE `manu_sfc_info` SET   SFC = @SFC, WorkOrderId = @WorkOrderId, RelevanceWorkOrderId = @RelevanceWorkOrderId, ProductId = @ProductId, Qty = @Qty, Status = @Status, IsUsed = @IsUsed, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `manu_sfc_info` SET   SFC = @SFC, WorkOrderId = @WorkOrderId, RelevanceWorkOrderId = @RelevanceWorkOrderId, ProductId = @ProductId, Qty = @Qty, Status = @Status, IsUsed = @IsUsed, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId  WHERE Id = @Id ";
-        const string UpdateStatusSql = "UPDATE `manu_sfc_info` SET Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE SFC in @Sfcs ";
-        const string DeleteSql = "UPDATE `manu_sfc_info` SET IsDeleted = Id WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE `manu_sfc_info`  SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids ";
+        const string InsertSql = "INSERT INTO `manu_sfc_info1`(  `Id`, `SiteId`, `SfcId`, `WorkOrderId`, `ProductId`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcId, @WorkOrderId, @ProductId, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsSql = "INSERT INTO `manu_sfc_info1`(  `Id`, `SiteId`, `SfcId`, `WorkOrderId`, `ProductId`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcId, @WorkOrderId, @ProductId, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+
+        const string UpdateSql = "UPDATE `manu_sfc_info1` SET   SiteId = @SiteId, SfcId = @SfcId, WorkOrderId = @WorkOrderId, ProductId = @ProductId, IsUsed = @IsUsed, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `manu_sfc_info1` SET   SiteId = @SiteId, SfcId = @SfcId, WorkOrderId = @WorkOrderId, ProductId = @ProductId, IsUsed = @IsUsed, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+
+        const string DeleteSql = "UPDATE `manu_sfc_info1` SET IsDeleted = Id WHERE Id = @Id ";
+        const string DeletesSql = "UPDATE `manu_sfc_info1` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
+
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SFC`, `WorkOrderId`, `RelevanceWorkOrderId`, `ProductId`, `Qty`, `Status`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`
-                            FROM `manu_sfc_info`  WHERE Id = @Id ";
+                               `Id`, `SiteId`, `SfcId`, `WorkOrderId`, `ProductId`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `manu_sfc_info1`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SFC`, `WorkOrderId`, `RelevanceWorkOrderId`, `ProductId`, `Qty`, `Status`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`
                             FROM `manu_sfc_info`  WHERE Id IN @ids ";
         const string GetBySFCSql = @"SELECT * FROM manu_sfc_info WHERE SFC = @sfc ";
+        #endregion
     }
 }

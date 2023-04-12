@@ -96,6 +96,17 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         /// <summary>
+        /// 查询详情（条码生产信息（物理删除））
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        [HttpGet("getBySFC/{sfc}")]
+        public async Task<ManuSfcProduceDto> QueryManuSfcProduceBySFCAsync(string sfc)
+        {
+            return await _manuSfcProduceService.QueryManuSfcProduceBySFCAsync(sfc);
+        }
+
+        /// <summary>
         /// 添加（条码生产信息（物理删除））
         /// </summary>
         /// <param name="parm"></param>
@@ -127,6 +138,5 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         {
             await _manuSfcProduceService.DeletesManuSfcProduceAsync(ids);
         }
-
     }
 }

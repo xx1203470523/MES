@@ -58,10 +58,10 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 物料消耗信息
         /// </summary>
-        public List<ManuSfcCirculation> Children { get; set; }
+        public List<ManuSfcCirculationDto> Children { get; set; }
     }
 
-    public class ManuSfcCirculation
+    public class ManuSfcCirculationDto
     {
         /// <summary>
         /// 工序
@@ -96,13 +96,54 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 操作人员
         /// </summary>
-        public string UpdatedOn { get; set; }
+        public DateTime? UpdatedOn { get; set; }
     }
 
     public class InProductDismantleQueryDto
     {
+        /// <summary>
+        /// 产品条码
+        /// </summary>
+        public string Sfc { get; set; }
+
+        /// <summary>
+        /// bomId
+        /// </summary>
         public long BomId { get; set; }
 
+        /// <summary>
+        /// 查看类型
+        /// </summary>
         public InProductDismantleTypeEnum Type { get; set; }
+    }
+
+    public class InProductDismantleRemoveDto
+    {
+        /// <summary>
+        /// 组件条码
+        /// </summary>
+        public string CirculationBarCode { get; set; }
+
+        public string Sfc { get; set; }
+    }
+
+    public class InProductDismantleAddDto
+    {
+        /// <summary>
+        /// 组件条码
+        /// </summary>
+        public string CirculationBarCode { get; set; }
+
+        public string Sfc { get; set; }
+    }
+
+    public class InProductDismantleReplaceDto
+    {
+        /// <summary>
+        /// 组件条码
+        /// </summary>
+        public string CirculationBarCode { get; set; }
+
+        public string Sfc { get; set; }
     }
 }

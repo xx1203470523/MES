@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -56,6 +57,23 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 是否主物料，1：主物料
         /// </summary>
         public int IsMain { get; set; }
+
+
+
+        /// <summary>
+        /// 数据收集方式 
+        /// </summary>
+        public MaterialSerialNumberEnum? DataCollectionWay { get; set; }
+
+        /// <summary>
+        /// 是否启用替代物料
+        /// </summary>
+        public bool? IsEnableReplace { get; set; }=false;
+
+        /// <summary>
+        /// 序号
+        /// </summary>
+        public decimal Seq { get; set; }
     }
 
 
@@ -129,7 +147,21 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public bool? IsDeleted { get; set; }
 
-       
+
+        /// <summary>
+        /// 数据收集方式 
+        /// </summary>
+        public MaterialSerialNumberEnum DataCollectionWay { get; set; }
+
+        /// <summary>
+        /// 是否启用替代物料
+        /// </summary>
+        public bool IsEnableReplace { get; set; }
+
+        /// <summary>
+        /// 序号
+        /// </summary>
+        public int Seq { get; set; }
     }
 
     /// <summary>
@@ -202,7 +234,21 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public bool? IsDeleted { get; set; }
 
-       
+
+        /// <summary>
+        /// 数据收集方式 
+        /// </summary>
+        public MaterialSerialNumberEnum DataCollectionWay { get; set; }
+
+        /// <summary>
+        /// 是否启用替代物料
+        /// </summary>
+        public bool IsEnableReplace { get; set; }
+
+        /// <summary>
+        /// 序号
+        /// </summary>
+        public int Seq { get; set; }
 
     }
 

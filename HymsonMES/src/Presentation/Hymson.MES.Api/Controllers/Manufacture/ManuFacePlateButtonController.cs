@@ -109,7 +109,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPut("button")]
         [AllowAnonymous]
-        public async Task<Dictionary<string, string>> ClickAsync(JobDto dto)
+        public async Task<Dictionary<string, int>> ClickAsync(JobDto dto)
         {
             return await _manuFacePlateButtonService.ClickAsync(dto);
         }

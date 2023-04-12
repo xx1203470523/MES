@@ -29,7 +29,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        Task<ManuSfcCirculationEntity> GetBySFCAsync(string sfc);
+        Task<IEnumerable<ManuSfcCirculationEntity>> GetBySfcAsync(ManuSfcCirculationQuery query);
 
         /// <summary>
         /// 根据IDs批量获取数据

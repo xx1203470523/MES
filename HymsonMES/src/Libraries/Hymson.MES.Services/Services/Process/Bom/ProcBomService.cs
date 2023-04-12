@@ -161,22 +161,26 @@ namespace Hymson.MES.Services.Services.Process
                 }
 
                 long mainId = 0;
-                foreach (var material in materialList)
+                foreach (var item in materialList)
                 {
-                    if (material.IsMain == 1)
+                    if (item.IsMain == 1)
                     {
                         var bomdeail = new ProcBomDetailEntity
                         {
                             Id = IdGenProvider.Instance.CreateId(),
                             SiteId = _currentSite.SiteId ?? 0,
                             BomId = procBomEntity.Id,
-                            MaterialId = material.MaterialId.ParseToLong(),
-                            ProcedureId = material.ProcedureId.ParseToLong(),
-                            ReferencePoint = material.ReferencePoint,
-                            Usages = material.Usages,
-                            Loss = material.Loss ?? 0,
+                            MaterialId = item.MaterialId.ParseToLong(),
+                            ProcedureId = item.ProcedureId.ParseToLong(),
+                            ReferencePoint = item.ReferencePoint,
+                            Usages = item.Usages,
+                            Loss = item.Loss ?? 0,
                             CreatedBy = procBomEntity.CreatedBy,
-                            UpdatedBy = procBomEntity.CreatedBy
+                            UpdatedBy = procBomEntity.CreatedBy,
+
+                            DataCollectionWay = item.DataCollectionWay,
+                            IsEnableReplace = item.IsEnableReplace ?? false,
+                            Seq = (int)item.Seq
                         };
                         mainId = bomdeail.Id;
                         bomDetails.Add(bomdeail);
@@ -189,12 +193,14 @@ namespace Hymson.MES.Services.Services.Process
                             SiteId = _currentSite.SiteId ?? 0,
                             BomId = procBomEntity.Id,
                             BomDetailId = mainId,
-                            ReplaceMaterialId = material.ReplaceMaterialId.ParseToLong(),
-                            ReferencePoint = material.ReferencePoint,
-                            Usages = material.Usages,
-                            Loss = material.Loss ?? 0,
+                            ReplaceMaterialId = item.ReplaceMaterialId.ParseToLong(),
+                            ReferencePoint = item.ReferencePoint,
+                            Usages = item.Usages,
+                            Loss = item.Loss ?? 0,
                             CreatedBy = procBomEntity.CreatedBy,
-                            UpdatedBy = procBomEntity.CreatedBy
+                            UpdatedBy = procBomEntity.CreatedBy,
+
+                            DataCollectionWay = item.DataCollectionWay
                         };
                         bomReplaceDetails.Add(bomReplacedeail);
                     }
@@ -416,22 +422,26 @@ namespace Hymson.MES.Services.Services.Process
                 }
 
                 long mainId = 0;
-                foreach (var material in materialList)
+                foreach (var item in materialList)
                 {
-                    if (material.IsMain == 1)
+                    if (item.IsMain == 1)
                     {
                         var bomdeail = new ProcBomDetailEntity
                         {
                             Id = IdGenProvider.Instance.CreateId(),
                             SiteId = siteId,
                             BomId = procBomEntity.Id,
-                            MaterialId = material.MaterialId.ParseToLong(),
-                            ProcedureId = material.ProcedureId.ParseToLong(),
-                            ReferencePoint = material.ReferencePoint,
-                            Usages = material.Usages,
-                            Loss = material.Loss ?? 0,
+                            MaterialId = item.MaterialId.ParseToLong(),
+                            ProcedureId = item.ProcedureId.ParseToLong(),
+                            ReferencePoint = item.ReferencePoint,
+                            Usages = item.Usages,
+                            Loss = item.Loss ?? 0,
                             CreatedBy = user,
-                            UpdatedBy = user
+                            UpdatedBy = user,
+
+                            DataCollectionWay= item.DataCollectionWay,
+                            IsEnableReplace=item.IsEnableReplace??false,
+                            Seq=(int)item.Seq
                         };
                         mainId = bomdeail.Id;
                         bomDetails.Add(bomdeail);
@@ -444,12 +454,14 @@ namespace Hymson.MES.Services.Services.Process
                             SiteId = siteId,
                             BomId = procBomEntity.Id,
                             BomDetailId = mainId,
-                            ReplaceMaterialId = material.ReplaceMaterialId.ParseToLong(),
-                            ReferencePoint = material.ReferencePoint,
-                            Usages = material.Usages,
-                            Loss = material.Loss ?? 0,
+                            ReplaceMaterialId = item.ReplaceMaterialId.ParseToLong(),
+                            ReferencePoint = item.ReferencePoint,
+                            Usages = item.Usages,
+                            Loss = item.Loss ?? 0,
                             CreatedBy = user,
-                            UpdatedBy = user
+                            UpdatedBy = user,
+
+                            DataCollectionWay = item.DataCollectionWay
                         };
                         bomReplaceDetails.Add(bomReplacedeail);
                     }
@@ -545,6 +557,8 @@ namespace Hymson.MES.Services.Services.Process
 
             if (mainBomDetails.Count() > 0)
             {
+                mainBomDetails=mainBomDetails.OrderBy(x => x.Seq).ToList();
+
                 procBomDetailViews.AddRange(mainBomDetails);
             }
             if (replaceBomDetails.Count() > 0)

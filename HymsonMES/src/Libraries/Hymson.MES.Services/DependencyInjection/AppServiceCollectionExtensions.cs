@@ -25,6 +25,9 @@ using Hymson.MES.Services.Services.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuFeeding;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
+using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInStation;
+using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOutStation;
+using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
 using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Hymson.MES.Services.Services.Plan;
 using Hymson.MES.Services.Services.Process;
@@ -155,12 +158,15 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuCommonService, ManuCommonService>();
             services.AddSingleton<IManuFeedingService, ManuFeedingService>();
             services.AddSingleton<IManuSfcProduceService, ManuSfcProduceService>();
-            services.AddSingleton<IManuSfcInfoService, ManuSfcInfoService>();
+            //services.AddSingleton<IManuSfcInfoService, ManuSfcInfoService>();
             services.AddSingleton<IManuGenerateBarcodeService, ManuGenerateBarcodeService>();
             services.AddSingleton<IManuProductBadRecordService, ManuProductBadRecordService>();
             services.AddSingleton<IManuFacePlateService, ManuFacePlateService>();
             services.AddSingleton<IManuFacePlateButtonService, ManuFacePlateButtonService>();
 
+
+            services.AddSingleton<IManuInStationService, ManuInStationService>();
+            services.AddSingleton<IManuOutStationService, ManuOutStationService>();
             services.AddSingleton<IInProductDismantleService, InProductDismantleService>();
             #endregion
 
@@ -192,10 +198,11 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region Job
             services.AddSingleton<IJobCommonService, JobCommonService>();
-            services.AddSingleton<IManufactureJobService, ManuCompleteService>();
-            services.AddSingleton<IManufactureJobService, ManuPackageService>();
-            services.AddSingleton<IManufactureJobService, ManuStartService>();
-            services.AddSingleton<IManufactureJobService, ManuStopService>();
+            services.AddSingleton<ManuBadRecordService>();
+            services.AddSingleton<ManuPackageService>();
+            services.AddSingleton<ManuCompleteService>();
+            services.AddSingleton<ManuStartService>();
+            services.AddSingleton<ManuStopService>();
             #endregion
 
             return services;

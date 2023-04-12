@@ -2,7 +2,6 @@
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Utils;
@@ -25,38 +24,18 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
-        /// 服务接口（生产通用）
-        /// </summary>
-        private readonly IManuCommonService _manuCommonService;
-
-        /// <summary>
-        /// 仓储接口（条码生产信息）
-        /// </summary>
-        private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
-
-        /// <summary>
-        /// 仓储接口（BOM明细）
-        /// </summary>
-        private readonly IProcBomDetailRepository _procBomDetailRepository;
-
-        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="manuCommonService"></param>
         /// <param name="manuSfcProduceRepository"></param>
-        /// <param name="procBomDetailRepository"></param>
         public ManuPackageService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonService manuCommonService,
-            IManuSfcProduceRepository manuSfcProduceRepository,
-            IProcBomDetailRepository procBomDetailRepository)
+            IManuSfcProduceRepository manuSfcProduceRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _manuCommonService = manuCommonService;
-            _manuSfcProduceRepository = manuSfcProduceRepository;
-            _procBomDetailRepository = procBomDetailRepository;
         }
 
 
@@ -65,29 +44,13 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task ExecuteAsync(JobDto dto)
+        public async Task<int> ExecuteAsync(JobDto dto)
         {
-            // 获取生产条码信息（附带条码合法性校验 + 工序活动状态校验）
-            var sfcProduceEntity = await _manuCommonService.GetProduceSFCWithCheckAsync(dto.SFC, dto.ProcedureId);
-
-            // TODO 获取条码对应的工序BOM
-            //var bomEntity = await _procBomRepository.GetByIdAsync(sfcEntity.ProductBOMId);
-            //var bomMaterials = await _procBomDetailRepository.GetListMainAsync(sfcProduceEntity.ProductBOMId);
-            var bomMaterials = await _procBomDetailRepository.GetByBomIdAsync(sfcProduceEntity.ProductBOMId);
-
-            // TODO 这里要区分是  内/外部序列码，批次
-            foreach (var item in bomMaterials)
-            {
-
-            }
-
-            // TODO 组件条码是否已绑定SFC
-
-            // 更改状态
-            sfcProduceEntity.UpdatedBy = _currentUser.UserName;
-            sfcProduceEntity.UpdatedOn = HymsonClock.Now();
-            await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
+            // TODO
+            return await Task.FromResult(0);
         }
+
+
 
     }
 }

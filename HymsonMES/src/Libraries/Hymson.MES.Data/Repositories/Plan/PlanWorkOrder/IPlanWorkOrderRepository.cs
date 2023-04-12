@@ -9,6 +9,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using MySql.Data.MySqlClient;
 using System;
@@ -130,5 +131,12 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="parms"></param>
         /// <returns></returns>
         Task<int> ModifyWorkOrderLockedAsync(IEnumerable<PlanWorkOrderEntity> parms);
+
+        /// <summary>
+        /// 更新下达数量
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<int> UpdatePassDownQuantityByWorkOrderId(UpdatePassDownQuantityCommand param);
     }
 }

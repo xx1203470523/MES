@@ -12,19 +12,12 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
-using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
-using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Services.Dtos.Plan;
-using Hymson.Snowflake;
-using Hymson.Utils;
-using Hymson.Utils.Tools;
-//using Hymson.Utils.Extensions;
 
 namespace Hymson.MES.Services.Services.Plan
 {
@@ -35,14 +28,12 @@ namespace Hymson.MES.Services.Services.Plan
     {
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
-
-
         /// <summary>
         /// 条码接收 仓储
         /// </summary>
         private readonly IPlanSfcReceiveRepository _planSfcInfoRepository;
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
-        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
+        private readonly IManuSfcRepository _manuSfcRepository;
         private readonly IInteCodeRulesRepository _inteCodeRulesRepository;
         private readonly IInteCodeRulesMakeRepository _inteCodeRulesMakeRepository;
 
@@ -51,14 +42,14 @@ namespace Hymson.MES.Services.Services.Plan
 
         public PlanSfcReceiveService(ICurrentUser currentUser, ICurrentSite currentSite,
             IPlanSfcReceiveRepository planSfcInfoRepository, IPlanWorkOrderRepository planWorkOrderRepository,
-            IManuSfcInfoRepository manuSfcInfoRepository, IInteCodeRulesRepository inteCodeRulesRepository, IInteCodeRulesMakeRepository inteCodeRulesMakeRepository,
+            IManuSfcRepository manuSfcRepository, IInteCodeRulesRepository inteCodeRulesRepository, IInteCodeRulesMakeRepository inteCodeRulesMakeRepository,
         AbstractValidator<PlanSfcReceiveCreateDto> validationCreateRules, AbstractValidator<PlanSfcReceiveModifyDto> validationModifyRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _planSfcInfoRepository = planSfcInfoRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
-            _manuSfcInfoRepository = manuSfcInfoRepository;
+            _manuSfcRepository = manuSfcRepository;
             _inteCodeRulesRepository = inteCodeRulesRepository;
             _inteCodeRulesMakeRepository = inteCodeRulesMakeRepository;
             _validationCreateRules = validationCreateRules;
@@ -72,134 +63,135 @@ namespace Hymson.MES.Services.Services.Plan
         /// <returns></returns>
         public async Task CreatePlanSfcInfoAsync(PlanSfcReceiveCreateDto planSfcInfoCreateDto)
         {
-            #region 验证与数据组装
-            //// 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
-            }
-            //验证DTO
-            await _validationCreateRules.ValidateAndThrowAsync(planSfcInfoCreateDto);
-
-
-            //验证条码
-            //var sfcInfo = await _planSfcInfoRepository.GetBySFCAsync(planSfcInfoCreateDto.SFC);
-            //if (sfcInfo != null)
+            //TODO  逻辑异常 重新写
+            //#region 验证与数据组装
+            ////// 判断是否有获取到站点码 
+            //if (_currentSite.SiteId == 0)
             //{
-            //    throw new BusinessException(nameof(ErrorCode.MES16105)).WithData("SFC", planSfcInfoCreateDto.SFC);
+            //    throw new ValidationException(nameof(ErrorCode.MES10101));
             //}
-            //验证工单
-            var workOrderInfo = await _planWorkOrderRepository.GetByIdAsync(planSfcInfoCreateDto.WorkOrderId);
-            if (workOrderInfo.Status != PlanWorkOrderStatusEnum.NotStarted)
-            {
-                throw new BusinessException(nameof(ErrorCode.MES16106)).WithData("OrderCode", workOrderInfo.OrderCode);
-            }
+            ////验证DTO
+            //await _validationCreateRules.ValidateAndThrowAsync(planSfcInfoCreateDto);
 
-            //验证条码规则
-            await VerifyCodeRule(workOrderInfo.ProductId, planSfcInfoCreateDto.SFC);
 
-            var manuSfcInfoCreate = new ManuSfcInfoEntity();
-            var manuSfcInfoUpdate = new ManuSfcInfoEntity();
-            //物料/供应商条码接收？
-            if (planSfcInfoCreateDto.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)
-            {
-                #region 物料条码接收 处理
-                if (planSfcInfoCreateDto.WorkOrderId == planSfcInfoCreateDto.RelevanceWorkOrderId)
-                {
-                    throw new BusinessException(nameof(ErrorCode.MES16109)).WithData("OrderCode", workOrderInfo.OrderCode);
-                }
+            ////验证条码
+            ////var sfcInfo = await _planSfcInfoRepository.GetBySFCAsync(planSfcInfoCreateDto.SFC);
+            ////if (sfcInfo != null)
+            ////{
+            ////    throw new BusinessException(nameof(ErrorCode.MES16105)).WithData("SFC", planSfcInfoCreateDto.SFC);
+            ////}
+            ////验证工单
+            //var workOrderInfo = await _planWorkOrderRepository.GetByIdAsync(planSfcInfoCreateDto.WorkOrderId);
+            //if (workOrderInfo.Status != PlanWorkOrderStatusEnum.NotStarted)
+            //{
+            //    throw new BusinessException(nameof(ErrorCode.MES16106)).WithData("OrderCode", workOrderInfo.OrderCode);
+            //}
 
-                if (planSfcInfoCreateDto.RelevanceWorkOrderId <= 0)
-                {
-                    throw new BusinessException(nameof(ErrorCode.MES16103));
-                }
+            ////验证条码规则
+            //await VerifyCodeRule(workOrderInfo.ProductId, planSfcInfoCreateDto.SFC);
 
-                var relevanceWorkOrderInfo = await _planWorkOrderRepository.GetByIdAsync(planSfcInfoCreateDto.RelevanceWorkOrderId);
-                if (relevanceWorkOrderInfo.Status != PlanWorkOrderStatusEnum.Closed)
-                {
-                    throw new BusinessException(nameof(ErrorCode.MES16106)).WithData("OrderCode", relevanceWorkOrderInfo.OrderCode);
-                }
+            //var manuSfcInfoCreate = new ManuSfcInfoEntity();
+            //var manuSfcInfoUpdate = new ManuSfcInfoEntity();
+            ////物料/供应商条码接收？
+            //if (planSfcInfoCreateDto.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)
+            //{
+            //    #region 物料条码接收 处理
+            //    if (planSfcInfoCreateDto.WorkOrderId == planSfcInfoCreateDto.RelevanceWorkOrderId)
+            //    {
+            //        throw new BusinessException(nameof(ErrorCode.MES16109)).WithData("OrderCode", workOrderInfo.OrderCode);
+            //    }
 
-                var planSfcInfo = await _planSfcInfoRepository.GetPlanSfcInfoAsync(new PlanSfcReceiveQuery { SFC = planSfcInfoCreateDto.SFC, WorkOrderId = planSfcInfoCreateDto.RelevanceWorkOrderId });
-                if (planSfcInfo == null)
-                {
-                    throw new BusinessException(nameof(ErrorCode.MES16112));
-                }
-                if (planSfcInfo.ProductId != workOrderInfo.ProductId)
-                {
-                    throw new BusinessException(nameof(ErrorCode.MES16108)).WithData("OrderCode", workOrderInfo.OrderCode);
-                }
-                //创建
-                manuSfcInfoCreate.SFC = planSfcInfo.SFC;
-                manuSfcInfoCreate.WorkOrderId = planSfcInfoCreateDto.WorkOrderId;
-                manuSfcInfoCreate.ProductId = planSfcInfo.ProductId;
-                manuSfcInfoCreate.Qty = 1;// workOrderInfo.Qty;
-                manuSfcInfoCreate.Status = SfcStatusEnum.InProcess;
-                manuSfcInfoCreate.IsUsed = 0;
-                manuSfcInfoCreate.RelevanceWorkOrderId = planSfcInfo.WorkOrderId;
-                manuSfcInfoCreate.SiteId = _currentSite.SiteId ?? 0;
+            //    if (planSfcInfoCreateDto.RelevanceWorkOrderId <= 0)
+            //    {
+            //        throw new BusinessException(nameof(ErrorCode.MES16103));
+            //    }
 
-                manuSfcInfoCreate.Id = IdGenProvider.Instance.CreateId();
-                manuSfcInfoCreate.CreatedBy = _currentUser.UserName;
-                manuSfcInfoCreate.UpdatedBy = _currentUser.UserName;
-                manuSfcInfoCreate.CreatedOn = HymsonClock.Now();
-                manuSfcInfoCreate.UpdatedOn = HymsonClock.Now();
+            //    var relevanceWorkOrderInfo = await _planWorkOrderRepository.GetByIdAsync(planSfcInfoCreateDto.RelevanceWorkOrderId);
+            //    if (relevanceWorkOrderInfo.Status != PlanWorkOrderStatusEnum.Closed)
+            //    {
+            //        throw new BusinessException(nameof(ErrorCode.MES16106)).WithData("OrderCode", relevanceWorkOrderInfo.OrderCode);
+            //    }
 
-                //修改
-                manuSfcInfoUpdate = planSfcInfo;
-                manuSfcInfoUpdate.Status = SfcStatusEnum.Received;
-                manuSfcInfoUpdate.UpdatedBy = _currentUser.UserName;
-                manuSfcInfoUpdate.UpdatedOn = HymsonClock.Now();
-                #endregion
-            }
-            else
-            {
-                #region 供应商条码接收处理
-                //验证条码
-                var sfcInfo = await _planSfcInfoRepository.GetBySFCAsync(planSfcInfoCreateDto.SFC);
-                if (sfcInfo != null)
-                {
-                    throw new BusinessException(nameof(ErrorCode.MES16105)).WithData("SFC", planSfcInfoCreateDto.SFC);
-                }
-                manuSfcInfoCreate.SFC = planSfcInfoCreateDto.SFC;
-                manuSfcInfoCreate.WorkOrderId = planSfcInfoCreateDto.WorkOrderId;
-                manuSfcInfoCreate.ProductId = workOrderInfo.ProductId;
-                manuSfcInfoCreate.Qty = 1;// workOrderInfo.Qty;
-                manuSfcInfoCreate.Status = SfcStatusEnum.InProcess;
-                manuSfcInfoCreate.IsUsed = 0;
-                manuSfcInfoCreate.RelevanceWorkOrderId = 0;
-                manuSfcInfoCreate.SiteId = _currentSite.SiteId ?? 0;
+            //    var planSfcInfo = await _planSfcInfoRepository.GetPlanSfcInfoAsync(new PlanSfcReceiveQuery { SFC = planSfcInfoCreateDto.SFC, WorkOrderId = planSfcInfoCreateDto.RelevanceWorkOrderId });
+            //    if (planSfcInfo == null)
+            //    {
+            //        throw new BusinessException(nameof(ErrorCode.MES16112));
+            //    }
+            //    if (planSfcInfo.ProductId != workOrderInfo.ProductId)
+            //    {
+            //        throw new BusinessException(nameof(ErrorCode.MES16108)).WithData("OrderCode", workOrderInfo.OrderCode);
+            //    }
+            //    //创建
+            //    manuSfcInfoCreate.SFC = planSfcInfo.SFC;
+            //    manuSfcInfoCreate.WorkOrderId = planSfcInfoCreateDto.WorkOrderId;
+            //    manuSfcInfoCreate.ProductId = planSfcInfo.ProductId;
+            //    manuSfcInfoCreate.Qty = 1;// workOrderInfo.Qty;
+            //    manuSfcInfoCreate.Status = SfcStatusEnum.InProcess;
+            //    manuSfcInfoCreate.IsUsed = 0;
+            //    manuSfcInfoCreate.RelevanceWorkOrderId = planSfcInfo.WorkOrderId;
+            //    manuSfcInfoCreate.SiteId = _currentSite.SiteId ?? 0;
 
-                manuSfcInfoCreate.Id = IdGenProvider.Instance.CreateId();
-                manuSfcInfoCreate.CreatedBy = _currentUser.UserName;
-                manuSfcInfoCreate.UpdatedBy = _currentUser.UserName;
-                manuSfcInfoCreate.CreatedOn = HymsonClock.Now();
-                manuSfcInfoCreate.UpdatedOn = HymsonClock.Now();
-                #endregion
-            }
+            //    manuSfcInfoCreate.Id = IdGenProvider.Instance.CreateId();
+            //    manuSfcInfoCreate.CreatedBy = _currentUser.UserName;
+            //    manuSfcInfoCreate.UpdatedBy = _currentUser.UserName;
+            //    manuSfcInfoCreate.CreatedOn = HymsonClock.Now();
+            //    manuSfcInfoCreate.UpdatedOn = HymsonClock.Now();
 
-            #endregion
+            //    //修改
+            //    manuSfcInfoUpdate = planSfcInfo;
+            //    manuSfcInfoUpdate.Status = SfcStatusEnum.Received;
+            //    manuSfcInfoUpdate.UpdatedBy = _currentUser.UserName;
+            //    manuSfcInfoUpdate.UpdatedOn = HymsonClock.Now();
+            //    #endregion
+            //}
+            //else
+            //{
+            //    #region 供应商条码接收处理
+            //    //验证条码
+            //    var sfcInfo = await _planSfcInfoRepository.GetBySFCAsync(planSfcInfoCreateDto.SFC);
+            //    if (sfcInfo != null)
+            //    {
+            //        throw new BusinessException(nameof(ErrorCode.MES16105)).WithData("SFC", planSfcInfoCreateDto.SFC);
+            //    }
+            //    manuSfcInfoCreate.SFC = planSfcInfoCreateDto.SFC;
+            //    manuSfcInfoCreate.WorkOrderId = planSfcInfoCreateDto.WorkOrderId;
+            //    manuSfcInfoCreate.ProductId = workOrderInfo.ProductId;
+            //    manuSfcInfoCreate.Qty = 1;// workOrderInfo.Qty;
+            //    manuSfcInfoCreate.Status = SfcStatusEnum.InProcess;
+            //    manuSfcInfoCreate.IsUsed = 0;
+            //    manuSfcInfoCreate.RelevanceWorkOrderId = 0;
+            //    manuSfcInfoCreate.SiteId = _currentSite.SiteId ?? 0;
 
-            #region 入库
-            var response = 0;
-            if (planSfcInfoCreateDto.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)
-            {
-                using (var trans = TransactionHelper.GetTransactionScope())
-                {
-                    response += await _planSfcInfoRepository.InsertAsync(manuSfcInfoCreate);
-                    response += await _planSfcInfoRepository.UpdateAsync(manuSfcInfoUpdate);
-                    trans.Complete();
-                }
-            }
-            else
-            {
-                response = await _planSfcInfoRepository.InsertAsync(manuSfcInfoCreate);
-            }
-            if (response == 0)
-            {
-                throw new BusinessException(nameof(ErrorCode.MES16110));
-            }
-            #endregion
+            //    manuSfcInfoCreate.Id = IdGenProvider.Instance.CreateId();
+            //    manuSfcInfoCreate.CreatedBy = _currentUser.UserName;
+            //    manuSfcInfoCreate.UpdatedBy = _currentUser.UserName;
+            //    manuSfcInfoCreate.CreatedOn = HymsonClock.Now();
+            //    manuSfcInfoCreate.UpdatedOn = HymsonClock.Now();
+            //    #endregion
+            //}
+
+            //#endregion
+
+            //#region 入库
+            //var response = 0;
+            //if (planSfcInfoCreateDto.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)
+            //{
+            //    using (var trans = TransactionHelper.GetTransactionScope())
+            //    {
+            //        response += await _planSfcInfoRepository.InsertAsync(manuSfcInfoCreate);
+            //        response += await _planSfcInfoRepository.UpdateAsync(manuSfcInfoUpdate);
+            //        trans.Complete();
+            //    }
+            //}
+            //else
+            //{
+            //    response = await _planSfcInfoRepository.InsertAsync(manuSfcInfoCreate);
+            //}
+            //if (response == 0)
+            //{
+            //    throw new BusinessException(nameof(ErrorCode.MES16110));
+            //}
+            //#endregion
 
         }
 
@@ -239,22 +231,6 @@ namespace Hymson.MES.Services.Services.Plan
             return true;
         }
 
-
-        /// <summary>
-        /// 批量删除
-        /// </summary>
-        /// <param name="idsArr"></param>
-        /// <returns></returns>
-        public async Task<int> DeletesPlanSfcInfoAsync(long[] idsArr)
-        {
-            var sfcList = await _planSfcInfoRepository.GetByIdsAsync(idsArr);
-            if (sfcList.Where(it => it.IsUsed > 0).Any())
-            {
-                var msgSfcs = string.Join(",", sfcList.Where(it => it.IsUsed > 0).Select(it => it.SFC).ToArray());
-                throw new BusinessException(nameof(ErrorCode.MES16111)).WithData("SFC", msgSfcs);
-            }
-            return await _planSfcInfoRepository.DeletesAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
-        }
 
         /// <summary>
         /// 根据查询条件获取分页数据
