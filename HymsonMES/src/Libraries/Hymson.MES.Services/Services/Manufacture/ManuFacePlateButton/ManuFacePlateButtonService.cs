@@ -11,6 +11,7 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
@@ -224,6 +225,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var jobs = await _inteJobRepository.GetByIdsAsync(buttonJobs.Select(s => s.JobId).ToArray());
 
             // 执行Job
+            //result = await _jobCommonService.ExecuteJobAsync(new List<InteJobEntity> { }.Select(s => s.Code), dto);
             result = await _jobCommonService.ExecuteJobAsync(jobs.Select(s => s.Code), dto);
             return result;
         }

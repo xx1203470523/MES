@@ -60,7 +60,7 @@ namespace Hymson.MES.Services.Services.Job.Common
                 .Where(t => t.GetInterfaces().Contains(typeof(IManufactureJobService))).ToArray();
 
             // 遍历实现类，执行有绑定在当前按钮下面的job
-            var serviceScope = _serviceProvider.CreateScope();
+            var serviceScope = _serviceProvider.CreateAsyncScope();
             foreach (Type type in types)
             {
                 if (classNames.Any(a => a == type.Name) == false) continue;
