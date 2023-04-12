@@ -124,7 +124,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 类型
         /// </summary>
-        public int Type { get; set; }
+        public ProcedureTypeEnum Type { get; set; }
 
         /// <summary>
         /// 包装等级（字典数据）
@@ -180,7 +180,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 类型
         /// </summary>
-        public int? Type { get; set; }
+        public ProcedureTypeEnum? Type { get; set; }
 
         /// <summary>
         /// 描述 :资源类型名称 
