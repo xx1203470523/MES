@@ -417,6 +417,11 @@
         public const string MES16502 = "产品{product}批次大写为0,无法下达条码。";
         public const string MES16503= "工单{workorder}超过计划数量,下达条码失败。";
         #endregion
+        #region 容器包装 MES 16600
+        public const string MES16601 = "容器包装，条码信息未找到";
+        public const string MES16602 = "容器包装，包装码不存在";
+        public const string MES16603 = "容器包装，条码的包装维护记录未找到";
+        #endregion
         #endregion
 
         #region 系统执行出错 业务逻辑出错
