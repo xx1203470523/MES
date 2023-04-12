@@ -441,11 +441,11 @@
         public const string MES16703 = "容器包装，条码的包装维护记录未找到";
         #endregion
 
-        #region 绑定工单激活  MES16600
-        public const string MES16600 = "绑定工单激活错误";
-        public const string MES16601 = "当前资源所对应的工作中心不是线体";
-        public const string MES16602 = "有工单没有被激活，无法绑定";
-        public const string MES16603 = "没有找到该资源对应的工作中心";
+        #region 绑定工单激活  MES16800
+        public const string MES16800 = "绑定工单激活错误";
+        public const string MES16801 = "当前资源所对应的工作中心不是线体";
+        public const string MES16802 = "有工单没有被激活，无法绑定";
+        public const string MES16803 = "没有找到该资源对应的工作中心";
         #endregion
         #endregion
 

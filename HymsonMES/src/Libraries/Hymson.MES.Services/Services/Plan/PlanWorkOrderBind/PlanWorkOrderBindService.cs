@@ -196,12 +196,12 @@ namespace Hymson.MES.Services.Services.Plan
             var workCenterEntity = await _inteWorkCenterRepository.GetByResourceIdAsync(bindActivationWorkOrder.ResourceId);
             if (workCenterEntity == null) 
             {
-                throw new BusinessException(nameof(ErrorCode.MES16603));
+                throw new BusinessException(nameof(ErrorCode.MES16803));
             }
 
             if (workCenterEntity.Type != WorkCenterTypeEnum.Line) 
             {
-                throw new BusinessException(nameof(ErrorCode.MES16601));
+                throw new BusinessException(nameof(ErrorCode.MES16801));
             }
 
             //检查当前这些工单是否是激活
@@ -212,7 +212,7 @@ namespace Hymson.MES.Services.Services.Plan
              });
             if (hasActivationWorkOrders.Count() == bindActivationWorkOrder.WorkOrderIds.Count) 
             {
-                throw new BusinessException(nameof(ErrorCode.MES16602));
+                throw new BusinessException(nameof(ErrorCode.MES16802));
             }
 
             //查询已经绑定在该资源上的工单
