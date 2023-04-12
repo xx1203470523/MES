@@ -527,6 +527,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
             //读取主物料信息
            var material= await _procMaterialRepository.GetByIdAsync(circulationQuery.ProductId);
+            var maskCodeId= material.MaskCodeId;
 
         }
 

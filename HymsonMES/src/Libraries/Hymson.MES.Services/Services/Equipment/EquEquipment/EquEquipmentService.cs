@@ -1,7 +1,9 @@
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
@@ -123,10 +125,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             var isExists = await _equEquipmentRepository.IsExistsAsync(entity.EquipmentCode);
             if (isExists == true)
             {
-                // TODO 返回值
-                return -1;
-                //responseDto.Msg = $"此编码{model.EquipmentCode}在系统已经存在！";
-                //return responseDto;
+                throw new CustomerValidationException(nameof(ErrorCode.MES12600)).WithData("code", entity.EquipmentCode);
             }
             #endregion
 

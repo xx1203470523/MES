@@ -226,6 +226,14 @@
         public const string MES12503 = "同一物料/物料组只允许设置一次";
         #endregion
 
+        #region 设备12600
+        public const string MES12600 = "此编码{code}在系统已经存在!";
+        #endregion
+
+        #region 设备组12700
+        public const string MES12700 = "此编码{code}在系统已经存在!";
+        #endregion
+
         #region 故障原因 13000
         public const string MES13000 = "基础故障原因错误";
         public const string MES13001 = "站点码获取失败，请重新登录！";

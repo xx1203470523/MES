@@ -43,6 +43,28 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
         }
 
         /// <summary>
+        /// 判断是否存在（编码）
+        /// </summary>
+        /// <param name="equipmentCode"></param>
+        /// <returns></returns>
+        public async Task<bool> IsCodeExistsAsync(string equipmentCode)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteScalarAsync(IsCodeExistsSql, new { EquipmentGroupCode= equipmentCode }) != null;
+        }
+
+        /// <summary>
+        /// 根据名称读取数据
+        /// </summary>
+        /// <param name="equipmentCode"></param>
+        /// <returns></returns>
+        public async Task<EquEquipmentGroupEntity> GetByNameAsync(string equipmentCode)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<EquEquipmentGroupEntity>(GetByNameSql, new { equipmentCode });
+        }
+
+        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="entity"></param>
@@ -145,5 +167,8 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
         const string GetByIdSql = @"SELECT 
                                `Id`, `EquipmentGroupCode`, `EquipmentGroupName`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteId`
                             FROM `equ_equipment_group`  WHERE IsDeleted = @IsDeleted AND Id = @Id ";
+
+        const string IsCodeExistsSql = "SELECT Id FROM equ_equipment_group WHERE `IsDeleted` = 0 AND EquipmentGroupCode = @EquipmentGroupCode LIMIT 1";
+        const string GetByNameSql = "SELECT Id FROM equ_equipment_group WHERE `IsDeleted` = 0 AND EquipmentGroupName = @EquipmentGroupName LIMIT 1";
     }
 }

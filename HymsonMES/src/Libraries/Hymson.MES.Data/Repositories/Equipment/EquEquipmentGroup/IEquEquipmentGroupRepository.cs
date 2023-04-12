@@ -16,21 +16,35 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(EquEquipmentGroupEntity entity);
-        
+
         /// <summary>
         /// 更新
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(EquEquipmentGroupEntity entity);
-        
+
+        /// <summary>
+        /// 判断是否存在（编码）
+        /// </summary>
+        /// <param name="equipmentCode"></param>
+        /// <returns></returns>
+        Task<bool> IsCodeExistsAsync(string equipmentCode);
+
+        /// <summary>
+        /// 根据名称读取数据
+        /// </summary>
+        /// <param name="equipmentCode"></param>
+        /// <returns></returns>
+         Task<EquEquipmentGroupEntity> GetByNameAsync(string equipmentCode);
+
         /// <summary>
         /// 删除
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -44,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
         /// <param name="id"></param>
         /// <returns></returns>
         Task<EquEquipmentGroupEntity> GetByIdAsync(long id);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>

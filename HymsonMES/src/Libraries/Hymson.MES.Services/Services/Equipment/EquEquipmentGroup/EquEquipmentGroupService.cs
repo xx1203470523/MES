@@ -1,7 +1,9 @@
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -68,6 +70,10 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         {
             // 验证DTO
             //await _validationCreateRules.ValidateAndThrowAsync(createDto);
+            if (createDto == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            }
 
             // DTO转换实体
             var entity = createDto.ToEntity<EquEquipmentGroupEntity>();
@@ -75,6 +81,14 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
             entity.SiteId = _currentSite.SiteId;
+            entity.EquipmentGroupCode= createDto.EquipmentGroupCode.ToUpperInvariant();
+
+            // 判断编号是否已存在
+            var isExists = await _equEquipmentGroupRepository.IsCodeExistsAsync(entity.EquipmentGroupCode);
+            if (isExists == true)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12700)).WithData("code", entity.EquipmentGroupCode);
+            }
 
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
@@ -103,6 +117,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         {
             // 验证DTO
             //await _validationModifyRules.ValidateAndThrowAsync(modifyDto);
+            //判断名称重复
 
             // DTO转换实体
             var entity = modifyDto.ToEntity<EquEquipmentGroupEntity>();
