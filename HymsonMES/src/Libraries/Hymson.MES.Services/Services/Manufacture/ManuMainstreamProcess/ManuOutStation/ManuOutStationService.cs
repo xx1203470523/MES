@@ -96,8 +96,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// </summary>
         /// <param name="bo"></param>
         /// <returns></returns>
-        public async Task OutStationAsync(ManufactureBO bo)
+        public async Task<int> OutStationAsync(ManufactureBO bo)
         {
+            var rows = 0;
+
             // 获取生产条码信息（附带条码合法性校验 + 工序活动状态校验）
             var sfcProduceEntity = await _manuCommonService.GetProduceSFCWithCheckAsync(bo.SFC, bo.ProcedureId);
 
@@ -138,21 +140,21 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             if (nextProcedure == null)
             {
                 // 删除 manu_sfc_produce
-                await _manuSfcProduceRepository.DeletePhysicalAsync(sfcProduceEntity.SFC);
+                rows += await _manuSfcProduceRepository.DeletePhysicalAsync(sfcProduceEntity.SFC);
 
                 // TODO 删除 manu_sfc_produce_business
 
                 // 插入 manu_sfc_step 状态为 完成
                 sfcStep.Operatetype = ManuSfcStepTypeEnum.Complete;    // TODO 这里的状态？？
                 sfcStep.CurrentStatus = SfcProduceStatusEnum.Complete;  // TODO 这里的状态？？
-                await _manuSfcStepRepository.InsertAsync(sfcStep);
+                rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
 
                 // TODO manu_sfc_info 修改为 完成或者入库
                 // 条码信息
                 var sfcInfo = await _manuSfcRepository.GetBySFCAsync(sfcProduceEntity.SFC);
 
                 sfcInfo.Status = SfcStatusEnum.Complete;
-                await _manuSfcRepository.UpdateAsync(sfcInfo);
+                rows += await _manuSfcRepository.UpdateAsync(sfcInfo);
             }
             // 未完工
             else
@@ -160,12 +162,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 // 修改 manu_sfc_produce 为排队, 工序修改为下一工序的id
                 sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
                 sfcProduceEntity.ProcedureId = nextProcedure.Id;
-                await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
+                rows += await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
 
                 // 插入 manu_sfc_step 状态为 进站
                 sfcStep.Operatetype = ManuSfcStepTypeEnum.InStock;
-                await _manuSfcStepRepository.InsertAsync(sfcStep);
+                rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
             }
+
+            return rows;
         }
 
         /// <summary>

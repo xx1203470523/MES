@@ -12,6 +12,6 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task ExecuteAsync(JobDto dto);
+        Task<int> ExecuteAsync(JobDto dto);
     }
 }

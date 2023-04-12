@@ -1,19 +1,17 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
-using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
-using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
+using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Job.Manufacture
 {
     /// <summary>
-    /// 完成
+    /// 组装
     /// </summary>
-    public class ManuCompleteService : IManufactureJobService
+    public class ManuPackageService : IManufactureJobService
     {
         /// <summary>
         /// 当前对象（登录用户）
@@ -26,35 +24,33 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
-        /// 服务接口（出站）
-        /// </summary>
-        private readonly IManuOutStationService _manuOutStationService;
-
-
-        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="manuOutStationService"></param>
-        public ManuCompleteService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IManuOutStationService manuOutStationService)
+        /// <param name="manuCommonService"></param>
+        /// <param name="manuSfcProduceRepository"></param>
+        public ManuPackageService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IManuCommonService manuCommonService,
+            IManuSfcProduceRepository manuSfcProduceRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _manuOutStationService = manuOutStationService;
         }
 
 
         /// <summary>
-        /// 执行（完成）
+        /// 执行（组装）
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
         public async Task<int> ExecuteAsync(JobDto dto)
         {
-            return await _manuOutStationService.OutStationAsync(dto);
+            // TODO
+            return await Task.FromResult(0);
         }
+
+
 
     }
 }

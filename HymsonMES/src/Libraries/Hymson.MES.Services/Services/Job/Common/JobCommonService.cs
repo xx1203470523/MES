@@ -51,14 +51,16 @@ namespace Hymson.MES.Services.Services.Job.Common
         /// <param name="classNames"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task ExecuteJobAsync(IEnumerable<string> classNames, JobDto dto)
+        public async Task<Dictionary<string, int>> ExecuteJobAsync(IEnumerable<string> classNames, JobDto dto)
         {
+            var result = new Dictionary<string, int>(); // 返回结果
+
             // 获取实现了 IManufactureJobService 接口的所有类的 Type 对象
             Type[] types = Assembly.GetExecutingAssembly().GetTypes()
                 .Where(t => t.GetInterfaces().Contains(typeof(IManufactureJobService))).ToArray();
 
             // 遍历实现类，执行有绑定在当前按钮下面的job
-            var serviceScope = _serviceProvider.CreateScope();
+            var serviceScope = _serviceProvider.CreateAsyncScope();
             foreach (Type type in types)
             {
                 if (classNames.Any(a => a == type.Name) == false) continue;
@@ -73,8 +75,10 @@ namespace Hymson.MES.Services.Services.Job.Common
                 if (obj == null) continue;
                 */
 
-                await obj.ExecuteAsync(dto);
+                result.Add(type.Name, await obj.ExecuteAsync(dto));
             }
+
+            return result;
         }
 
     }

@@ -138,6 +138,5 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         {
             await _manuSfcProduceService.DeletesManuSfcProduceAsync(ids);
         }
-
     }
 }
