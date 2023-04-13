@@ -88,6 +88,7 @@
         public const string MES10439 = $"此工艺路线在系统中不存在!";
         public const string MES10440 = $"获取下一工序失败!";
         public const string MES10441 = $"不存在空值类型工序!";
+        public const string MES10442 = $"获取上一工序失败!";
         #endregion
 
         #region 参数 10500
@@ -227,10 +228,31 @@
         public const string MES12503 = "同一物料/物料组只允许设置一次";
         #endregion
 
+        #region 设备 12600
+        public const string MES12600 = "此编码{Code}在系统已经存在!";
+        public const string MES12601 = "设备编码不能为空";
+        public const string MES12602 = "设备名称不能为空";
+        public const string MES12603 = "请求实体不能为空！";
+        #endregion
+
+        #region 设备组 12700
+        public const string MES12700 = "此编码{Code}在系统已经存在!";
+        public const string MES12701 = "设备组编码不能为空";
+        public const string MES12702 = "设备组名称不能为空";
+        public const string MES12703 = "请求实体不能为空！";
+        #endregion
+
+        #region 故障现象 12900
+        public const string MES12900 = "此编码{Code}在系统已经存在!";
+        public const string MES12901 = "故障现象编码不能为空";
+        public const string MES12902 = "故障现象名称不能为空";
+        public const string MES12903 = "请求实体不能为空！";
+        #endregion
+
         #region 故障原因 13000
         public const string MES13000 = "基础故障原因错误";
         public const string MES13001 = "站点码获取失败，请重新登录！";
-        public const string MES13002 = "此故障原因编码{FaultReasonCode}在系统已经存在！";
+        public const string MES13002 = "此故障原因编码{Code}在系统已经存在！";
         public const string MES13003 = "请求实体不能为空！";
         public const string MES13004 = "此标准故障原因不存在！";
         public const string MES13005 = "删除失败Ids 不能为空";
@@ -239,6 +261,7 @@
         public const string MES13008 = "故障原因状态不能为空";
         public const string MES13009 = "故障原因编码不能为空";
         public const string MES13010 = "故障原因名称不能为空";
+        public const string MES13011 = "此故障原因编码{Code}在系统已经存在！";
 
         #endregion
 
@@ -432,6 +455,9 @@
         public const string MES16409 = "当前线体不允许混线，请先取消激活工单[{orderCode}]！";
         public const string MES16410 = "工单状态未激活，不允许生产！";
         public const string MES16411 = "工单被锁定，不允许生产！";
+        public const string MES16412 = "根据资源查询工单激活必须有资源Id参数！";
+        public const string MES16413 = "没有找到该资源对应的工作中心";
+        public const string MES16414 = "当前资源所对应的工作中心不是线体";
         #endregion
 
         #region 条码下达 MES16500
@@ -444,10 +470,10 @@
 
         #region 在制品移除添加 16600
 
-        public const string MES16600= "条码不存在或不是在制品!";
-        public const string MES16601= "组件条码不允许重复添加!";
-        public const string MES16602= "数据不存在!";
-        public const string MES16603= "组件库存不存在!";
+        public const string MES16600 = "条码不存在或不是在制品!";
+        public const string MES16601 = "组件{CirculationBarCode}已绑定,请检查!";
+        public const string MES16602 = "数据不存在!";
+        public const string MES16603 = "组件库存不存在!";
         public const string MES16604 = "组件库存不足!";
         #endregion
 

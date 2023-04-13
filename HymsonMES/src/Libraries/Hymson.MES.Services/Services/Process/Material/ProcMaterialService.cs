@@ -16,6 +16,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -37,11 +38,18 @@ namespace Hymson.MES.Services.Services.Process
 
         private readonly IProcReplaceMaterialRepository _procReplaceMaterialRepository;
         private readonly IProcMaterialSupplierRelationRepository _procMaterialSupplierRelationRepository;
+        private readonly IProcMaskCodeRepository _procMaskCodeRepository;
 
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
 
-        public ProcMaterialService(ICurrentUser currentUser, IProcMaterialRepository procMaterialRepository, AbstractValidator<ProcMaterialCreateDto> validationCreateRules, AbstractValidator<ProcMaterialModifyDto> validationModifyRules, IProcReplaceMaterialRepository procReplaceMaterialRepository, ICurrentSite currentSite, IProcMaterialSupplierRelationRepository procMaterialSupplierRelationRepository)
+        public ProcMaterialService(ICurrentUser currentUser, IProcMaterialRepository procMaterialRepository, 
+            AbstractValidator<ProcMaterialCreateDto> validationCreateRules, 
+            AbstractValidator<ProcMaterialModifyDto> validationModifyRules,
+            IProcReplaceMaterialRepository procReplaceMaterialRepository,
+            ICurrentSite currentSite, 
+            IProcMaterialSupplierRelationRepository procMaterialSupplierRelationRepository,
+            IProcMaskCodeRepository procMaskCodeRepository)
         {
             _currentUser = currentUser;
             _procMaterialRepository = procMaterialRepository;
@@ -51,12 +59,13 @@ namespace Hymson.MES.Services.Services.Process
             _procReplaceMaterialRepository = procReplaceMaterialRepository;
             _currentSite = currentSite;
             _procMaterialSupplierRelationRepository = procMaterialSupplierRelationRepository;
+            _procMaskCodeRepository= procMaskCodeRepository;
         }
 
         /// <summary>
         /// 创建
         /// </summary>
-        /// <param name="procMaterialDto"></param>
+        /// <param name="procMaterialCreateDto"></param>
         /// <returns></returns>
         public async Task CreateProcMaterialAsync(ProcMaterialCreateDto procMaterialCreateDto)
         {
@@ -265,7 +274,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="procMaterialDto"></param>
+        /// <param name="procMaterialModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyProcMaterialAsync(ProcMaterialModifyDto procMaterialModifyDto)
         {
@@ -379,7 +388,7 @@ namespace Hymson.MES.Services.Services.Process
                     BaseTime = procMaterialEntity.BaseTime,
                     ConsumptionTolerance = procMaterialEntity.ConsumptionTolerance,
                     IsDefaultVersion = procMaterialEntity.IsDefaultVersion,
-                    ValidationMaskGroup = procMaterialEntity.ValidationMaskGroup,
+                    MaskCodeId = procMaterialEntity.MaskCodeId,
                     UpdatedBy = procMaterialEntity.UpdatedBy,
                     UpdatedOn = procMaterialEntity.UpdatedOn,
                     ConsumeRatio= procMaterialEntity.ConsumeRatio,
@@ -435,6 +444,12 @@ namespace Hymson.MES.Services.Services.Process
             if (procMaterialView != null)
             {
                 var procMaterialViewDto = procMaterialView.ToModel<ProcMaterialViewDto>();
+
+                if (procMaterialViewDto.MaskCodeId.HasValue)
+                {
+                   var  maskCodeEntity=await _procMaskCodeRepository.GetByIdAsync(procMaterialViewDto.MaskCodeId.Value);
+                    procMaterialViewDto.ValidationMaskGroup = maskCodeEntity?.Code ?? "";
+                }
 
                 //查询替代物料
                 var replaceMaterialViews = await _procReplaceMaterialRepository.GetProcReplaceMaterialViewsAsync(new ProcReplaceMaterialQuery

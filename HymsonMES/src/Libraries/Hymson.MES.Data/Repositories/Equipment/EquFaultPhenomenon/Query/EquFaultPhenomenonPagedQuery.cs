@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon.Query
 {
@@ -30,7 +31,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon.Query
         /// <summary>
         /// 使用状态 0-禁用 1-启用（设备故障现象）
         /// </summary>
-        public int? UseStatus { get; set; }
+        public SysDataStatusEnum? UseStatus { get; set; }
 
         /// <summary>
         /// 备注
