@@ -228,10 +228,12 @@
 
         #region 设备12600
         public const string MES12600 = "此编码{Code}在系统已经存在!";
+        public const string MES12601 = "设备编码不能为空";
         #endregion
 
         #region 设备组12700
         public const string MES12700 = "此编码{Code}在系统已经存在!";
+        public const string MES12701 = "设备组编码不能为空";
         #endregion
 
         #region 故障原因 13000

@@ -81,6 +81,8 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
         public async Task<int> CreateAsync(ProcMaskCodeSaveDto createDto)
         {
             // 验证DTO
+            createDto.Code = createDto.Code.Trim().Replace(" ", string.Empty);
+            createDto.Code = createDto.Code.ToUpperInvariant();
             await _validationSaveRules.ValidateAndThrowAsync(createDto);
 
             // DTO转换实体
@@ -89,9 +91,6 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
             entity.SiteId = _currentSite.SiteId ?? 0;
-
-            entity.Code = entity.Code.Trim().Replace(" ", string.Empty);
-            entity.Code = entity.Code.ToUpper();
 
             // 编码唯一性验证
             var checkEntity = await _procMaskCodeRepository.GetByCodeAsync(new EntityByCodeQuery { Site = entity.SiteId, Code = entity.Code });

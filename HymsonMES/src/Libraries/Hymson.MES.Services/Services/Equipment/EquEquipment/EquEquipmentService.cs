@@ -1,3 +1,4 @@
+using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
@@ -37,6 +38,11 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
+        /// 验证器
+        /// </summary>
+        private readonly AbstractValidator<EquEquipmentSaveDto> _validationSaveRules;
+
+        /// <summary>
         /// 仓储（设备注册）
         /// </summary>
         private readonly IEquEquipmentRepository _equEquipmentRepository;
@@ -56,16 +62,19 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// </summary>
         /// <param name="currentSite"></param>
         /// <param name="currentUser"></param>
+        /// <param name="validationSaveRules"></param>
         /// <param name="equEquipmentRepository"></param>
         /// <param name="equEquipmentLinkApiRepository"></param>
         /// <param name="equEquipmentLinkHardwareRepository"></param>
         public EquEquipmentService(ICurrentUser currentUser, ICurrentSite currentSite,
+            AbstractValidator<EquEquipmentSaveDto> validationSaveRules,
             IEquEquipmentRepository equEquipmentRepository,
             IEquEquipmentLinkApiRepository equEquipmentLinkApiRepository,
             IEquEquipmentLinkHardwareRepository equEquipmentLinkHardwareRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _validationSaveRules = validationSaveRules;
             _equEquipmentRepository = equEquipmentRepository;
             _equEquipmentLinkApiRepository = equEquipmentLinkApiRepository;
             _equEquipmentLinkHardwareRepository = equEquipmentLinkHardwareRepository;
@@ -80,6 +89,11 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         public async Task<int> CreateAsync(EquEquipmentSaveDto createDto)
         {
             #region 参数处理
+            // 验证DTO
+            createDto.EquipmentCode = createDto.EquipmentCode.Trim().Replace(" ", string.Empty);
+            createDto.EquipmentCode = createDto.EquipmentCode.ToUpperInvariant();
+            await _validationSaveRules.ValidateAndThrowAsync(createDto);
+
             if (string.IsNullOrEmpty(createDto.EntryDate) == true) createDto.EntryDate = SqlDateTime.MinValue.Value.ToString();
 
             // DTO转换实体
@@ -88,7 +102,6 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
             entity.SiteId = _currentSite.SiteId;
-            entity.EquipmentCode = createDto.EquipmentCode.ToUpper();
 
             if (entity.QualTime > 0 && entity.EntryDate > SqlDateTime.MinValue.Value) entity.ExpireDate = entity.EntryDate.AddMonths(entity.QualTime);
 
