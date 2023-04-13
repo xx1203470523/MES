@@ -70,6 +70,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("ProcedureId=@ProcedureId");
             }
+            if (query.CirculationMainProductId.HasValue)
+            {
+                sqlBuilder.Where("CirculationMainProductId=@CirculationMainProductId");
+            }
 
             sqlBuilder.AddParameters(query);
 

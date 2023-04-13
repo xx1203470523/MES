@@ -39,5 +39,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query
         /// 工序id
         /// </summary>
         public long? ProcedureId { get; set; }
+
+        /// <summary>
+        /// 流转后主物料id
+        /// </summary>
+        public long? CirculationMainProductId { get; set; }
     }
 }

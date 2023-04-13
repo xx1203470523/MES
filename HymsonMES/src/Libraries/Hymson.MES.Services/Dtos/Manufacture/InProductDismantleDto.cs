@@ -140,22 +140,17 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 主物料数据收集方式
         /// </summary>
-        public MaterialSerialNumberEnum? SerialNumber { get; set; }
-
-        /// <summary>
-        /// 组件条码
-        /// </summary>
-        public string CirculationBarCode { get; set; }
-
-        /// <summary>
-        /// 组件产品id
-        /// </summary>
-        public long CirculationProductId { get; set; }
+        public MaterialSerialNumberEnum SerialNumber { get; set; }
 
         /// <summary>
         /// 产品条码
         /// </summary>
         public string Sfc { get; set; }
+
+        /// <summary>
+        /// 外部时选择要上的物料
+        /// </summary>
+        public long? ProductId { get; set; }
 
         /// <summary>
         /// 当前工序
@@ -166,34 +161,24 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 流转后主物料id
         /// </summary>
         public long CirculationMainProductId { get; set; }
+
+        /// <summary>
+        /// 组件条码
+        /// </summary>
+        public string CirculationBarCode { get; set; }
     }
 
     public class InProductDismantleReplaceDto
     {
-        /// <summary>
-        /// 被替换的数据id
-        /// </summary>
-        public long Id { get; set; }
-
         /// <summary>
         /// Bom详情表id
         /// </summary>
         public long BomDetailId { get; set; }
 
         /// <summary>
-        /// 被替换的组件条码
+        /// 主物料数据收集方式
         /// </summary>
-        public string CirculationOldBarCode { get; set; }
-
-        /// <summary>
-        /// 组件产品id
-        /// </summary>
-        public long CirculationProductId { get; set; }
-
-        /// <summary>
-        /// 新组件条码
-        /// </summary>
-        public string CirculationBarCode { get; set; }
+        public MaterialSerialNumberEnum? SerialNumber { get; set; }
 
         /// <summary>
         /// 产品条码
@@ -206,14 +191,24 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long ProcedureId { get; set; }
 
         /// <summary>
-        /// 流转后主物料id
+        /// 主物料id
         /// </summary>
         public long CirculationMainProductId { get; set; }
 
         /// <summary>
-        /// 主物料数据收集方式
+        /// 外部时选择要上的物料
         /// </summary>
-        public MaterialSerialNumberEnum? SerialNumber { get; set; }
+        public long? ProductId { get; set; }
+
+        /// <summary>
+        /// 被替换的数据id
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 新组件条码
+        /// </summary>
+        public string CirculationBarCode { get; set; }
     }
 
     public class CirculationQueryDto

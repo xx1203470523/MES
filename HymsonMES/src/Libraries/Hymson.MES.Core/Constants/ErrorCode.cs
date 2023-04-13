@@ -452,10 +452,13 @@
         #region 在制品移除添加 16600
 
         public const string MES16600= "条码不存在或不是在制品!";
-        public const string MES16601= "组件{CirculationBarCode}已绑定,请检查!";
+        public const string MES16601= "组件{CirculationBarCode}同SFC{SFC}已绑定,请检查!";
         public const string MES16602= "数据不存在!";
-        public const string MES16603= "组件库存不存在!";
-        public const string MES16604 = "组件库存不足!";
+        public const string MES16603= "组件条码{barCode}库存不存在!";
+        public const string MES16604 = "组件条码{barCode}库存不足,请检查!";
+        public const string MES16605= "物料掩码规则不存在!";
+        public const string MES16606 = "组件条码{barCode}同掩码规则不符,请检查!";
+        public const string MES16607 = "选择的替换组件不存在!";
         #endregion
 
         #region 容器包装 MES 16700
