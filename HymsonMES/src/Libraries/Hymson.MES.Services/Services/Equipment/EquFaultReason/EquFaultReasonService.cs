@@ -66,7 +66,7 @@ namespace Hymson.MES.Services.Services.Equipment
             EquFaultReasonEntity.SiteId = _currentSite.SiteId;
 
             //判断编号是否已经存在
-            var exists = await _equFaultReasonRepository.GetEquFaultReasonEntitiesAsync(new EquFaultReasonQuery()
+            var exists = await _equFaultReasonRepository.GetEquFaultReasonEntitiesAsync(new EquFaultReasonQuery
             {
                 SiteId = EquFaultReasonEntity.SiteId,
                 FaultReasonCode = EquFaultReasonEntity.FaultReasonCode,

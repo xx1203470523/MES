@@ -6,6 +6,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi;
@@ -121,12 +122,9 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             #endregion
 
             #region 参数校验
-            // 判断编号是否已存在
-            var isExists = await _equEquipmentRepository.IsExistsAsync(entity.EquipmentCode);
-            if (isExists == true)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES12600)).WithData("code", entity.EquipmentCode);
-            }
+            // 编码唯一性验证
+            var checkEntity = await _equEquipmentRepository.GetByCodeAsync(new EntityByCodeQuery { Site = entity.SiteId, Code = entity.EquipmentCode });
+            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES12600)).WithData("Code", entity.EquipmentCode);
             #endregion
 
             var rows = 0;
