@@ -65,6 +65,7 @@
 
         #region 标签模板
         public const string MES10340 = "模板名称已经存在!";
+        public const string MES10341 = "打印机名称重复!";
         #endregion
 
         #region 工序 10400
@@ -87,6 +88,7 @@
         public const string MES10439 = $"此工艺路线在系统中不存在!";
         public const string MES10440 = $"获取下一工序失败!";
         public const string MES10441 = $"不存在空值类型工序!";
+        public const string MES10442 = $"获取上一工序失败!";
         #endregion
 
         #region 参数 10500

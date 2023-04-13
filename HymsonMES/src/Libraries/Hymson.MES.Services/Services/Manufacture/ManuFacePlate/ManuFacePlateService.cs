@@ -385,6 +385,19 @@ namespace Hymson.MES.Services.Services.Manufacture
                     }
                 }
                 #endregion
+                #region 容器包装
+                //在制品维修
+                if (manuFacePlateEntity.Type == Core.Enums.Manufacture.ManuFacePlateTypeEnum.ContainerPack)
+                {
+                    var manuFacePlateRepairEntity = await _manuFacePlateContainerPackRepository.GetByFacePlateIdAsync(manuFacePlateEntity.Id);
+                    if (manuFacePlateRepairEntity != null)
+                    {
+                        resourceId = manuFacePlateRepairEntity.ResourceId;
+                        procedureId = manuFacePlateRepairEntity.ProcedureId;
+                        facePlateQueryDto.FacePlateContainerPack = manuFacePlateRepairEntity.ToModel<ManuFacePlateContainerPackDto>();
+                    }
+                }
+                #endregion
 
                 #region 填充关联表数据
                 //资源
