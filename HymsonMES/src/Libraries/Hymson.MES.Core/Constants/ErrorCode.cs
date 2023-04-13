@@ -65,6 +65,7 @@
 
         #region 标签模板
         public const string MES10340 = "模板名称已经存在!";
+        public const string MES10341 = "打印机名称重复!";
         #endregion
 
         #region 工序 10400
