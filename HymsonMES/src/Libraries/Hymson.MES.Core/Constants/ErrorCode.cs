@@ -226,12 +226,25 @@
         public const string MES12503 = "同一物料/物料组只允许设置一次";
         #endregion
 
-        #region 设备12600
-        public const string MES12600 = "此编码{code}在系统已经存在!";
+        #region 设备 12600
+        public const string MES12600 = "此编码{Code}在系统已经存在!";
+        public const string MES12601 = "设备编码不能为空";
+        public const string MES12602 = "设备名称不能为空";
+        public const string MES12603 = "请求实体不能为空！";
         #endregion
 
-        #region 设备组12700
-        public const string MES12700 = "此编码{code}在系统已经存在!";
+        #region 设备组 12700
+        public const string MES12700 = "此编码{Code}在系统已经存在!";
+        public const string MES12701 = "设备组编码不能为空";
+        public const string MES12702 = "设备组名称不能为空";
+        public const string MES12703 = "请求实体不能为空！";
+        #endregion
+
+        #region 故障现象 12900
+        public const string MES12900 = "此编码{Code}在系统已经存在!";
+        public const string MES12901 = "故障现象编码不能为空";
+        public const string MES12902 = "故障现象名称不能为空";
+        public const string MES12903 = "请求实体不能为空！";
         #endregion
 
         #region 故障原因 13000
@@ -454,10 +467,10 @@
 
         #region 在制品移除添加 16600
 
-        public const string MES16600= "条码不存在或不是在制品!";
-        public const string MES16601= "组件{CirculationBarCode}已绑定,请检查!";
-        public const string MES16602= "数据不存在!";
-        public const string MES16603= "组件库存不存在!";
+        public const string MES16600 = "条码不存在或不是在制品!";
+        public const string MES16601 = "组件{CirculationBarCode}已绑定,请检查!";
+        public const string MES16602 = "数据不存在!";
+        public const string MES16603 = "组件库存不存在!";
         public const string MES16604 = "组件库存不足!";
         #endregion
 

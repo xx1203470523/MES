@@ -1,3 +1,4 @@
+using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
@@ -6,6 +7,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi;
@@ -36,6 +38,11 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
+        /// 验证器
+        /// </summary>
+        private readonly AbstractValidator<EquEquipmentSaveDto> _validationSaveRules;
+
+        /// <summary>
         /// 仓储（设备注册）
         /// </summary>
         private readonly IEquEquipmentRepository _equEquipmentRepository;
@@ -55,16 +62,19 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// </summary>
         /// <param name="currentSite"></param>
         /// <param name="currentUser"></param>
+        /// <param name="validationSaveRules"></param>
         /// <param name="equEquipmentRepository"></param>
         /// <param name="equEquipmentLinkApiRepository"></param>
         /// <param name="equEquipmentLinkHardwareRepository"></param>
         public EquEquipmentService(ICurrentUser currentUser, ICurrentSite currentSite,
+            AbstractValidator<EquEquipmentSaveDto> validationSaveRules,
             IEquEquipmentRepository equEquipmentRepository,
             IEquEquipmentLinkApiRepository equEquipmentLinkApiRepository,
             IEquEquipmentLinkHardwareRepository equEquipmentLinkHardwareRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _validationSaveRules = validationSaveRules;
             _equEquipmentRepository = equEquipmentRepository;
             _equEquipmentLinkApiRepository = equEquipmentLinkApiRepository;
             _equEquipmentLinkHardwareRepository = equEquipmentLinkHardwareRepository;
@@ -79,6 +89,11 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         public async Task<int> CreateAsync(EquEquipmentSaveDto createDto)
         {
             #region 参数处理
+            // 验证DTO
+            createDto.EquipmentCode = createDto.EquipmentCode.Trim().Replace(" ", string.Empty);
+            createDto.EquipmentCode = createDto.EquipmentCode.ToUpperInvariant();
+            await _validationSaveRules.ValidateAndThrowAsync(createDto);
+
             if (string.IsNullOrEmpty(createDto.EntryDate) == true) createDto.EntryDate = SqlDateTime.MinValue.Value.ToString();
 
             // DTO转换实体
@@ -87,7 +102,6 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
             entity.SiteId = _currentSite.SiteId;
-            entity.EquipmentCode = createDto.EquipmentCode.ToUpper();
 
             if (entity.QualTime > 0 && entity.EntryDate > SqlDateTime.MinValue.Value) entity.ExpireDate = entity.EntryDate.AddMonths(entity.QualTime);
 
@@ -121,12 +135,9 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             #endregion
 
             #region 参数校验
-            // 判断编号是否已存在
-            var isExists = await _equEquipmentRepository.IsExistsAsync(entity.EquipmentCode);
-            if (isExists == true)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES12600)).WithData("code", entity.EquipmentCode);
-            }
+            // 编码唯一性验证
+            var checkEntity = await _equEquipmentRepository.GetByCodeAsync(new EntityByCodeQuery { Site = entity.SiteId, Code = entity.EquipmentCode });
+            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES12600)).WithData("Code", entity.EquipmentCode);
             #endregion
 
             var rows = 0;
@@ -187,13 +198,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
 
             #region 参数校验
             var modelOrigin = await _equEquipmentRepository.GetByIdAsync(entity.Id);
-            if (modelOrigin == null)
-            {
-                // TODO 返回值
-                return -1;
-                //responseDto.Msg = "此设备不存在！";
-                //return responseDto;
-            }
+            if (modelOrigin == null) throw new CustomerValidationException(nameof(ErrorCode.MES12603));
             #endregion
 
             var rows = 0;

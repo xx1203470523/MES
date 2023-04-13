@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -40,28 +41,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertSql, entity);
-        }
-
-        /// <summary>
-        /// 判断是否存在（编码）
-        /// </summary>
-        /// <param name="equipmentCode"></param>
-        /// <returns></returns>
-        public async Task<bool> IsCodeExistsAsync(string equipmentCode)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteScalarAsync(IsCodeExistsSql, new { EquipmentGroupCode= equipmentCode }) != null;
-        }
-
-        /// <summary>
-        /// 根据名称读取数据
-        /// </summary>
-        /// <param name="equipmentCode"></param>
-        /// <returns></returns>
-        public async Task<EquEquipmentGroupEntity> GetByNameAsync(string equipmentCode)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<EquEquipmentGroupEntity>(GetByNameSql, new { equipmentCode });
         }
 
         /// <summary>
@@ -111,6 +90,17 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
                 using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
                 return await conn.QueryFirstOrDefaultAsync<EquEquipmentGroupEntity>(GetByIdSql, new { IsDeleted = 0, Id = id });
             });
+        }
+
+        /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<EquEquipmentGroupEntity> GetByCodeAsync(EntityByCodeQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<EquEquipmentGroupEntity>(GetByCodeSql, query);
         }
 
         /// <summary>
@@ -167,8 +157,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
         const string GetByIdSql = @"SELECT 
                                `Id`, `EquipmentGroupCode`, `EquipmentGroupName`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteId`
                             FROM `equ_equipment_group`  WHERE IsDeleted = @IsDeleted AND Id = @Id ";
-
-        const string IsCodeExistsSql = "SELECT Id FROM equ_equipment_group WHERE `IsDeleted` = 0 AND EquipmentGroupCode = @EquipmentGroupCode LIMIT 1";
-        const string GetByNameSql = "SELECT Id FROM equ_equipment_group WHERE `IsDeleted` = 0 AND EquipmentGroupName = @EquipmentGroupName LIMIT 1";
+        const string GetByCodeSql = "SELECT * FROM equ_equipment_group WHERE `IsDeleted` = 0 AND SiteId = @Site AND EquipmentGroupCode = @Code LIMIT 1";
     }
 }

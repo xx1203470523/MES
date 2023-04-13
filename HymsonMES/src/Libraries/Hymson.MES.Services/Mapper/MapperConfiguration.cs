@@ -488,6 +488,7 @@ namespace Hymson.MES.Services.Mapper
 
             CreateMap<PlanWorkOrderActivationAboutResPagedQueryDto, PlanWorkOrderActivationPagedQuery>();
             #endregion
+
             #region PlanSfcPrint
             CreateMap<PlanSfcPrintCreateDto, PlanSfcPrintView>();
             CreateMap<PlanSfcPrintModifyDto, PlanSfcPrintView>();

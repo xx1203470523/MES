@@ -4,6 +4,7 @@ using Hymson.Infrastructure.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Process.MaskCode.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -74,14 +75,14 @@ namespace Hymson.MES.Data.Repositories.Process.MaskCode
         }
 
         /// <summary>
-        /// 判断是否存在（编码）
+        /// 根据Code查询对象
         /// </summary>
-        /// <param name="code"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<bool> IsExistsAsync(string code)
+        public async Task<ProcMaskCodeEntity> GetByCodeAsync(EntityByCodeQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteScalarAsync(IsExistsSql, new { code }) != null;
+            return await conn.QueryFirstOrDefaultAsync<ProcMaskCodeEntity>(GetByCodeSql, query);
         }
 
         /// <summary>
@@ -137,7 +138,7 @@ namespace Hymson.MES.Data.Repositories.Process.MaskCode
         const string UpdateSql = "UPDATE `proc_maskcode` SET Name = @Name, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id;";
         const string DeleteSql = "UPDATE `proc_maskcode` SET `IsDeleted` = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids;";
         const string GetByIdSql = "SELECT `Id`, `SiteId`, `Code`, `Name`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn` FROM `proc_maskcode` WHERE `IsDeleted` = @IsDeleted AND `Id` = @id;";
-        const string IsExistsSql = "SELECT Id FROM proc_maskcode WHERE `IsDeleted` = 0 AND Code = @code LIMIT 1";
+        const string GetByCodeSql = "SELECT * FROM proc_maskcode WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code LIMIT 1";
         const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `proc_maskcode` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_maskcode` /**innerjoin**/ /**leftjoin**/ /**where**/";
     }
