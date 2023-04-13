@@ -439,6 +439,9 @@
         public const string MES16409 = "当前线体不允许混线，请先取消激活工单[{orderCode}]！";
         public const string MES16410 = "工单状态未激活，不允许生产！";
         public const string MES16411 = "工单被锁定，不允许生产！";
+        public const string MES16412 = "根据资源查询工单激活必须有资源Id参数！";
+        public const string MES16413 = "没有找到该资源对应的工作中心";
+        public const string MES16414 = "当前资源所对应的工作中心不是线体";
         #endregion
 
         #region 条码下达 MES16500
