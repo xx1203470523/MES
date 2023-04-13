@@ -15,7 +15,7 @@ namespace Hymson.MES.Services.Validators.Process
         public EquEquipmentValidator()
         {
             RuleFor(x => x.EquipmentCode).NotEmpty().WithErrorCode(ErrorCode.MES12601);
-
+            RuleFor(x => x.EquipmentName).NotEmpty().WithErrorCode(ErrorCode.MES12602);
         }
     }
 }
