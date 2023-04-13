@@ -198,13 +198,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
 
             #region 参数校验
             var modelOrigin = await _equEquipmentRepository.GetByIdAsync(entity.Id);
-            if (modelOrigin == null)
-            {
-                // TODO 返回值
-                return -1;
-                //responseDto.Msg = "此设备不存在！";
-                //return responseDto;
-            }
+            if (modelOrigin == null) throw new CustomerValidationException(nameof(ErrorCode.MES12603));
             #endregion
 
             var rows = 0;
