@@ -486,6 +486,7 @@
         public const string MES16801 = "当前资源所对应的工作中心不是线体";
         public const string MES16802 = "有工单没有被激活，无法绑定";
         public const string MES16803 = "没有找到该资源对应的工作中心";
+        public const string MES16804 = "有工单ID重复";
         #endregion
         #endregion
 
