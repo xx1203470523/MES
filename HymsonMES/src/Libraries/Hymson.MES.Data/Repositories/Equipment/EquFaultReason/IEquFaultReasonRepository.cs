@@ -1,18 +1,7 @@
-/*
- *creator: pengxin
- *
- *describe: 设备故障原因表仓储类 | 代码由框架生成
- *builder:  pengxin
- *build datetime: 2023-02-28 15:15:20
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Repositories.Common.Command;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Hymson.MES.Data.Repositories.Common.Query;
 
 namespace Hymson.MES.Data.Repositories.Equipment
 {
@@ -76,6 +65,13 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<IEnumerable<EquFaultReasonEntity>> GetByIdsAsync(long[] ids);
+
+        /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<EquFaultReasonEntity> GetByCodeAsync(EntityByCodeQuery query);
 
         /// <summary>
         /// 获取List

@@ -250,7 +250,7 @@
         #region 故障原因 13000
         public const string MES13000 = "基础故障原因错误";
         public const string MES13001 = "站点码获取失败，请重新登录！";
-        public const string MES13002 = "此故障原因编码{FaultReasonCode}在系统已经存在！";
+        public const string MES13002 = "此故障原因编码{Code}在系统已经存在！";
         public const string MES13003 = "请求实体不能为空！";
         public const string MES13004 = "此标准故障原因不存在！";
         public const string MES13005 = "删除失败Ids 不能为空";
@@ -259,6 +259,7 @@
         public const string MES13008 = "故障原因状态不能为空";
         public const string MES13009 = "故障原因编码不能为空";
         public const string MES13010 = "故障原因名称不能为空";
+        public const string MES13011 = "此故障原因编码{Code}在系统已经存在！";
 
         #endregion
 
