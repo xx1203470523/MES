@@ -323,7 +323,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             List<ManuSfcCirculationEntity> manuSfcCirculationEntitys = new();
 
             // 需扣减数量 = 用量 * 损耗 * 消耗系数
-            decimal qty = material.Usages * material.Loss + material.ConsumeRatio;
+            decimal qty = material.Usages * material.Loss * material.ConsumeRatio;
             foreach (var item in feedingEntities)
             {
                 // 数量足够
