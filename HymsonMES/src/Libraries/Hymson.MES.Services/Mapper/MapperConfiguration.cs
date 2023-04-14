@@ -454,6 +454,10 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuFacePlateContainerPackModifyDto, ManuFacePlateContainerPackEntity>();
             CreateMap<ManuFacePlateContainerPackEntity, ManuFacePlateContainerPackDto>();
             #endregion
+
+            #region ManuSfcProduce
+            CreateMap<ManuSfcProduceEntity, ManuSfcProduceDto>();
+            #endregion
         }
 
         /// <summary>

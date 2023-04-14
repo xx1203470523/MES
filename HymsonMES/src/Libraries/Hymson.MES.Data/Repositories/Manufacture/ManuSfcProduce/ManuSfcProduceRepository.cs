@@ -148,7 +148,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<ManuSfcProduceEntity> GetBySFCAsync(string sfc)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ManuSfcProduceEntity>(GetBySFCSql, new { sfc });
+            return await conn.QueryFirstOrDefaultAsync<ManuSfcProduceEntity>(GetBySFCSql, new { sfc=sfc });
         }
 
         /// <summary>
