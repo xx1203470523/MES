@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 工序表    服务 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-02-13 09:06:05
- */
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -14,6 +7,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
@@ -451,18 +445,18 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// <returns></returns>
         public async Task<int> DeleteProcProcedureAsync(long[] idsArr)
         {
-            if (idsArr.Length < 1)
-            {
-                throw new NotFoundException(nameof(ErrorCode.MES10102));
-            }
+            if (idsArr.Length < 1) throw new NotFoundException(nameof(ErrorCode.MES10102));
 
-            var command = new DeleteCommand
+            var entitys = await _procProcedureRepository.GetByIdsAsync(idsArr);
+            if (entitys.Any(a => a.Status == SysDataStatusEnum.Enable
+            || a.Status == SysDataStatusEnum.Retain) == true) throw new BusinessException(nameof(ErrorCode.MES10105));
+
+            return await _procProcedureRepository.DeleteRangeAsync(new DeleteCommand
             {
-                UserId = _currentUser.UserName,
+                Ids = idsArr,
                 DeleteOn = HymsonClock.Now(),
-                Ids = idsArr
-            };
-            return await _procProcedureRepository.DeleteRangeAsync(command);
+                UserId = _currentUser.UserName
+            });
         }
     }
 }

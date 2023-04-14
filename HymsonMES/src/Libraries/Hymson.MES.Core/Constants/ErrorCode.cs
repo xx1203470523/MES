@@ -11,6 +11,7 @@
         public const string MES10102 = "删除失败Id 不能为空!";
         public const string MES10103 = "请求参数格式错误!";
         public const string MES10104 = "请求数据不存在!";
+        public const string MES10105 = "有生产中工单引用当前物料，不能删除！";
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";

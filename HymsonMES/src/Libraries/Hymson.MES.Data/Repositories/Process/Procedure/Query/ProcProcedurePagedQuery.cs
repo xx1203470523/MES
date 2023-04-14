@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 工序表 分页查询类 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-02-13 09:06:05
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 
@@ -28,7 +21,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 状态
         /// </summary>
-        public int? Status { get; set; }
+        public SysDataStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 类型
@@ -39,6 +32,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 描述 :资源类型名称 
         /// </summary>
         public string? ResTypeName { get; set; }
+
         /// <summary>
         /// 站点id
         /// </summary>

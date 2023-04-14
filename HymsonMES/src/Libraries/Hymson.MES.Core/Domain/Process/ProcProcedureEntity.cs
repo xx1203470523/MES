@@ -26,7 +26,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :状态 
         /// 空值 : false  
         /// </summary>
-        public int Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
         
         /// <summary>
         /// 描述 :类型 
