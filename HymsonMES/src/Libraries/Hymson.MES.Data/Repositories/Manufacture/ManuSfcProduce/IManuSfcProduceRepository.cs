@@ -121,6 +121,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<int> UpdateIsScrapAsync(UpdateIsScrapCommand command);
 
+
+        /// <summary>
+        /// 更新条码Status
+        /// </summary>
+        /// <param name="manuSfcInfoEntity"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAsync(UpdateStatusCommand command);
+
         /// <summary>
         /// 新增在制品业务
         /// </summary>

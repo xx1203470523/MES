@@ -78,9 +78,9 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long ReturnProcedureId { get; set; }
 
         /// <summary>
-        /// 是否显示产品列表
+        /// 备注
         /// </summary>
-        public bool IsShowProductList { get; set; }
+        public string Remark { get; set; }
 
         /// <summary>
         /// 明细
@@ -200,6 +200,10 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 产品名称
         /// </summary>
         public string MaterialName { get; set; }
+        /// <summary>
+        /// 展示不合格信息
+        /// </summary>
+        public List<ManuFacePlateRepairProductBadInfoDto> badInfoDtos { get; set; }
     }
     /// <summary>
     /// 展示不合格信息
