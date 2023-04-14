@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -74,17 +75,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         }
 
         /// <summary>
-        /// 判断是否存在（编码）
-        /// </summary>
-        /// <param name="faultPhenomenonCode"></param>
-        /// <returns></returns>
-        public async Task<bool> IsExistsAsync(string faultPhenomenonCode)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteScalarAsync(IsExistsSql, new { faultPhenomenonCode }) != null;
-        }
-
-        /// <summary>
         /// 根据ID获取数据（设备故障现象）
         /// </summary>
         /// <param name="id"></param>
@@ -104,6 +94,17 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<EquFaultPhenomenonView>(GetViewById, new { Id = id });
+        }
+
+        /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<EquFaultPhenomenonEntity> GetByCodeAsync(EntityByCodeQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<EquFaultPhenomenonEntity>(GetByCodeSql, query);
         }
 
         /// <summary>
@@ -166,7 +167,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         const string InsertSql = "INSERT INTO `equ_fault_phenomenon`( `Id`, `FaultPhenomenonCode`, `FaultPhenomenonName`, `EquipmentGroupId`, `UseStatus`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteId`) VALUES (   @Id, @FaultPhenomenonCode, @FaultPhenomenonName, @EquipmentGroupId, @UseStatus, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteId )  ";
         const string UpdateSql = "UPDATE `equ_fault_phenomenon` SET FaultPhenomenonName = @FaultPhenomenonName, EquipmentGroupId = @EquipmentGroupId, UseStatus = @UseStatus, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, Remark = @Remark WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `equ_fault_phenomenon` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids;";
-        const string IsExistsSql = "SELECT Id FROM equ_fault_phenomenon WHERE `IsDeleted` = 0 AND FaultPhenomenonCode = @faultPhenomenonCode LIMIT 1";
         const string GetByIdSql = @"SELECT 
                                `Id`, `FaultPhenomenonCode`, `FaultPhenomenonName`, `EquipmentGroupId`, `UseStatus`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteId`
                             FROM `equ_fault_phenomenon`  WHERE Id = @Id ";
@@ -174,7 +174,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
                 EFP.Id, EFP.FaultPhenomenonCode, EFP.FaultPhenomenonName, EFP.EquipmentGroupId, EFP.UseStatus, EFP.CreatedBy, EFP.CreatedOn, EFP.UpdatedBy, EFP.UpdatedOn, EEG.EquipmentGroupName
                 FROM equ_fault_phenomenon EFP LEFT JOIN equ_equipment_group EEG ON EFP.EquipmentGroupId = EEG.Id 
                 WHERE EFP.Id = @Id ";
-
+        const string GetByCodeSql = "SELECT * FROM equ_fault_phenomenon WHERE `IsDeleted` = 0 AND SiteId = @Site AND FaultPhenomenonCode = @Code LIMIT 1";
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM equ_fault_phenomenon EFP /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM equ_fault_phenomenon EFP /**innerjoin**/ /**leftjoin**/ /**where**/ ";
 

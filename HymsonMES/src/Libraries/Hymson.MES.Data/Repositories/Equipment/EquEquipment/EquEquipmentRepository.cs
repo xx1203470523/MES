@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Microsoft.Extensions.Caching.Memory;
@@ -88,17 +89,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         }
 
         /// <summary>
-        /// 判断是否存在（编码）
-        /// </summary>
-        /// <param name="equipmentCode"></param>
-        /// <returns></returns>
-        public async Task<bool> IsExistsAsync(string equipmentCode)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteScalarAsync(IsExistsSql, new { equipmentCode }) != null;
-        }
-
-        /// <summary>
         /// 
         /// </summary>
         /// <param name="id"></param>
@@ -107,6 +97,17 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<EquEquipmentEntity>(GetByIdSql, new { id });
+        }
+
+        /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<EquEquipmentEntity> GetByCodeAsync(EntityByCodeQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<EquEquipmentEntity>(GetByCodeSql, query);
         }
 
         /// <summary>
@@ -240,7 +241,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         const string InsertSql = "INSERT INTO `equ_equipment`(  `Id`, `EquipmentCode`, `EquipmentName`, `EquipmentGroupId`, `EquipmentDesc`, `WorkCenterFactoryId`, `WorkCenterShopId`, `WorkCenterLineId`, `Location`, `EquipmentType`, `UseDepartment`, `EntryDate`, `QualTime`, `ExpireDate`, `Manufacturer`, `Supplier`, `UseStatus`, `Power`, `EnergyLevel`, `Ip`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteId`, `TakeTime`) VALUES (   @Id, @EquipmentCode, @EquipmentName, @EquipmentGroupId, @EquipmentDesc, @WorkCenterFactoryId, @WorkCenterShopId, @WorkCenterLineId, @Location, @EquipmentType, @UseDepartment, @EntryDate, @QualTime, @ExpireDate, @Manufacturer, @Supplier, @UseStatus, @Power, @EnergyLevel, @Ip, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteId, @TakeTime )  ";
         const string UpdateSql = "UPDATE `equ_equipment` SET EquipmentName = @EquipmentName, EquipmentDesc = @EquipmentDesc, WorkCenterFactoryId = @WorkCenterFactoryId, WorkCenterShopId = @WorkCenterShopId, WorkCenterLineId = @WorkCenterLineId, Location = @Location, EquipmentType = @EquipmentType, UseDepartment = @UseDepartment, EntryDate = @EntryDate, QualTime = @QualTime, ExpireDate = @ExpireDate, Manufacturer = @Manufacturer, Supplier = @Supplier, UseStatus = @UseStatus, Power = @Power, EnergyLevel = @EnergyLevel, Ip = @Ip, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, Remark = @Remark, TakeTime = @TakeTime WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `equ_equipment` SET `IsDeleted` = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids;";
-        const string IsExistsSql = "SELECT Id FROM equ_equipment WHERE `IsDeleted` = 0 AND EquipmentCode = @equipmentCode LIMIT 1";
+        const string GetByCodeSql = "SELECT * FROM equ_equipment WHERE `IsDeleted` = 0 AND SiteId = @Site AND EquipmentCode = @Code LIMIT 1";
         const string GetByIdSql = "SELECT * FROM `equ_equipment` WHERE `Id` = @Id;";
         const string GetByGroupIdSql = "SELECT * FROM `equ_equipment` WHERE `IsDeleted` = 0 AND EquipmentGroupId = @EquipmentGroupId;";
         const string GetBaseListSql = "SELECT * FROM `equ_equipment` WHERE `IsDeleted` = 0;";

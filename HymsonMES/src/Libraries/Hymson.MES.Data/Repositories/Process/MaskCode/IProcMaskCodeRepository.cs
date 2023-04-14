@@ -1,6 +1,7 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Process.MaskCode.Query;
 
 namespace Hymson.MES.Data.Repositories.Process.MaskCode
@@ -39,11 +40,11 @@ namespace Hymson.MES.Data.Repositories.Process.MaskCode
         Task<ProcMaskCodeEntity> GetByIdAsync(long id);
 
         /// <summary>
-        /// 判断是否存在（编码）
+        /// 根据Code查询对象
         /// </summary>
-        /// <param name="code"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        Task<bool> IsExistsAsync(string code);
+        Task<ProcMaskCodeEntity> GetByCodeAsync(EntityByCodeQuery query);
 
         /// <summary>
         /// 

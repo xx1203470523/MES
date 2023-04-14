@@ -170,7 +170,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
 
             // 扣料
             //await func(sfcProduceEntity.ProductBOMId, sfcProduceEntity.ProcedureId);
-            var initialMaterials = await GetInitialMaterialsAsync(sfcProduceEntity.ProductBOMId, sfcProduceEntity.ProcedureId);
+            var initialMaterials = await GetInitialMaterialsAsync(sfcProduceEntity);
 
             // 过滤扣料集合
             foreach (var material in initialMaterials)
@@ -235,22 +235,21 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// <summary>
         /// 获取即将扣料的物料数据
         /// </summary>
-        /// <param name="productBOMId"></param>
-        /// <param name="procedureId"></param>
+        /// <param name="sfcProduceEntity"></param>
         /// <returns></returns>
-        private async Task<List<MaterialDeductBo>> GetInitialMaterialsAsync(long productBOMId, long procedureId)
+        private async Task<List<MaterialDeductBo>> GetInitialMaterialsAsync(ManuSfcProduceEntity sfcProduceEntity)
         {
             // 获取BOM绑定的物料
-            var mainMaterials = await _procBomDetailRepository.GetByBomIdAsync(productBOMId);
+            var mainMaterials = await _procBomDetailRepository.GetByBomIdAsync(sfcProduceEntity.ProductBOMId);
 
             // 未设置物料
             if (mainMaterials == null || mainMaterials.Any() == false) throw new BusinessException(nameof(ErrorCode.MES10612));
 
             // 取得特定工序的物料
-            mainMaterials = mainMaterials.Where(w => w.ProcedureId == procedureId);
+            mainMaterials = mainMaterials.Where(w => w.ProcedureId == sfcProduceEntity.ProcedureId);
 
             // 检查是否有BOM替代料
-            var replaceMaterialsForBOM = await _procBomDetailReplaceMaterialRepository.GetByBomIdAsync(productBOMId);
+            var replaceMaterialsForBOM = await _procBomDetailReplaceMaterialRepository.GetByBomIdAsync(sfcProduceEntity.ProductBOMId);
             var replaceMaterialsDic = replaceMaterialsForBOM.ToLookup(w => w.BomDetailId).ToDictionary(d => d.Key, d => d);
 
             // 获取初始扣料数据
@@ -304,7 +303,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         }
 
         /// <summary>
-        /// 进行扣料
+        /// 进行扣料（单一物料）
         /// </summary>
         /// <param name="sfcProduceEntity"></param>
         /// <param name="material"></param>
@@ -320,57 +319,35 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
 
             // 待执行
             List<UpdateQtyByProductIdCommand> updateQtyByProductIdCommands = new();
-            List<ManuSfcCirculationEntity> manuSfcCirculationEntitys = new();
+            List<ManuSfcCirculationEntity> manuSfcCirculationEntities = new();
 
             // 需扣减数量 = 用量 * 损耗 * 消耗系数
-            decimal qty = material.Usages * material.Loss + material.ConsumeRatio;
+            decimal qty = material.Usages * material.Loss * material.ConsumeRatio;
+
+            // 剩余需扣减的数量
+            var residue = qty;
             foreach (var item in feedingEntities)
             {
                 // 数量足够
-                var original = item.Qty;
-                if (qty < item.Qty)
+                if (residue < item.Qty)
                 {
-                    original = qty;
+                    residue -= item.Qty;
                     item.Qty -= qty;
                 }
+                // 数量不够
                 else
                 {
-                    original = item.Qty;
-                    qty -= item.Qty;
+                    residue -= item.Qty;
 
                     // 继续下一个
                     item.Qty = 0;
                 }
+            }
 
-                // 修改物料库存
-                updateQtyByProductIdCommands.Add(new UpdateQtyByProductIdCommand
-                {
-                    ResourceId = sfcProduceEntity.ResourceId,
-                    ProductId = material.MaterialId,
-                    Qty = item.Qty
-                });
+            // 物料库存不够，启用替代料
+            if (residue > 0)
+            {
 
-                // 添加流转信息
-                manuSfcCirculationEntitys.Add(new ManuSfcCirculationEntity
-                {
-                    SiteId = sfcProduceEntity.SiteId,
-                    ProcedureId = sfcProduceEntity.ProductId,
-                    ResourceId = sfcProduceEntity.ResourceId,
-                    EquipmentId = sfcProduceEntity.EquipmentId,
-                    FeedingPointId = item.FeedingPointId,
-                    SFC = sfcProduceEntity.SFC,
-                    WorkOrderId = sfcProduceEntity.WorkCenterId,
-                    ProductId = sfcProduceEntity.ProductId,
-                    CirculationBarCode = item.BarCode,
-                    CirculationWorkOrderId = sfcProduceEntity.WorkCenterId,
-                    CirculationProductId = material.MaterialId,
-                    CirculationQty = original,
-                    CirculationType = SfcCirculationTypeEnum.Consume,
-                    CreatedBy = sfcProduceEntity.UpdatedBy ?? "",
-                    CreatedOn = sfcProduceEntity.UpdatedOn ?? HymsonClock.Now(),
-                    UpdatedBy = sfcProduceEntity.UpdatedBy,
-                    UpdatedOn = sfcProduceEntity.UpdatedOn,
-                });
             }
 
             // 扣减物料库存

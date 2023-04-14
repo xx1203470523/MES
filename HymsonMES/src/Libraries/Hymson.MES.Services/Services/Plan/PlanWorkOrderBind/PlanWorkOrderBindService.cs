@@ -204,8 +204,14 @@ namespace Hymson.MES.Services.Services.Plan
                 throw new BusinessException(nameof(ErrorCode.MES16801));
             }
 
+            //检查当前工单是否重复
+            if (bindActivationWorkOrder.WorkOrderIds.Distinct().Count() != bindActivationWorkOrder.WorkOrderIds.Count())
+            {
+                throw new BusinessException(nameof(ErrorCode.MES16804));
+            }
+
             //检查当前这些工单是否是激活
-             var hasActivationWorkOrders= await _planWorkOrderActivationRepository.GetPlanWorkOrderActivationEntitiesAsync(new PlanWorkOrderActivationQuery() 
+            var hasActivationWorkOrders= await _planWorkOrderActivationRepository.GetPlanWorkOrderActivationEntitiesAsync(new PlanWorkOrderActivationQuery() 
              {
                 SiteId=_currentSite.SiteId??0,
                 LineId= workCenterEntity.Id

@@ -7,6 +7,7 @@
  */
 
 using Dapper;
+using FluentValidation.Validators;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
@@ -62,7 +63,6 @@ namespace Hymson.MES.Data.Repositories.Process
             return await conn.ExecuteAsync(DeleteTrueByMaterialIdsSql, new { materialIds = materialIds });
         }
 
-
         /// <summary>
         /// 根据ID获取数据
         /// </summary>
@@ -72,6 +72,17 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<ProcReplaceMaterialEntity>(GetByIdSql, new { Id = id });
+        }
+
+        /// <summary>
+        /// 根据物料id查询替代料
+        /// </summary>
+        /// <param name="materialId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcReplaceMaterialEntity>> GetByMaterialIdAsync(long materialId)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcReplaceMaterialEntity>(GetByMaterialIdSql, new { MaterialId = materialId });
         }
 
         /// <summary>
@@ -215,5 +226,6 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteId`, `MaterialId`, `ReplaceMaterialId`, `IsUse`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_replace_material`  WHERE Id = @Id ";
+        const string GetByMaterialIdSql = @"SELECT * FROM `proc_replace_material`  WHERE MaterialId = @MaterialId and IsUse=1 ";
     }
 }

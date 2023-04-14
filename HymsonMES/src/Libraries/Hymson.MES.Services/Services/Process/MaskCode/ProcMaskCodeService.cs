@@ -7,6 +7,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Data.Repositories.Process.MaskCode.Query;
 using Hymson.MES.Services.Dtos.Process;
@@ -80,6 +81,8 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
         public async Task<int> CreateAsync(ProcMaskCodeSaveDto createDto)
         {
             // 验证DTO
+            createDto.Code = createDto.Code.Trim().Replace(" ", string.Empty);
+            createDto.Code = createDto.Code.ToUpperInvariant();
             await _validationSaveRules.ValidateAndThrowAsync(createDto);
 
             // DTO转换实体
@@ -89,11 +92,9 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
             entity.UpdatedBy = _currentUser.UserName;
             entity.SiteId = _currentSite.SiteId ?? 0;
 
-            entity.Code = entity.Code.Trim().Replace(" ", string.Empty);
-            entity.Code = entity.Code.ToUpper();
-
             // 编码唯一性验证
-            if (await _procMaskCodeRepository.IsExistsAsync(entity.Code)) throw new CustomerValidationException(nameof(ErrorCode.MES10802)).WithData("Code", entity.Code);
+            var checkEntity = await _procMaskCodeRepository.GetByCodeAsync(new EntityByCodeQuery { Site = entity.SiteId, Code = entity.Code });
+            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES10802)).WithData("Code", entity.Code);
 
             List<ProcMaskCodeRuleEntity> rules = new();
             for (int i = 0; i < createDto.RuleList.Count; i++)
