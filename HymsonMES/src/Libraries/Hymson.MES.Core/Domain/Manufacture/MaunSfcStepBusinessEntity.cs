@@ -6,6 +6,8 @@
  *build datetime: 2023-04-06 08:31:40
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,12 +33,12 @@ namespace Hymson.MES.Core.Domain.Manufacture
        /// <summary>
         /// 条码
         /// </summary>
-        public string SfcInfoId { get; set; }
+        public long SfcStepId { get; set; }
 
        /// <summary>
-        /// 业务类型;2、锁业务；3不良信息业务
+        /// 1、锁业务
         /// </summary>
-        public bool BusinessType { get; set; }
+        public ManuSfcProduceBusinessType BusinessType { get; set; }
 
        /// <summary>
         /// 业务内容

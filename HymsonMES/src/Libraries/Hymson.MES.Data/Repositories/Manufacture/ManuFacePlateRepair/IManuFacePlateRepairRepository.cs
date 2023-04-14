@@ -24,7 +24,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuFacePlateRepairEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ManuFacePlateRepairEntity manuFacePlateRepairEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -60,7 +60,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -74,7 +74,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ManuFacePlateRepairEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -88,7 +88,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuFacePlateRepairQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuFacePlateRepairEntity>> GetManuFacePlateRepairEntitiesAsync(ManuFacePlateRepairQuery manuFacePlateRepairQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>
@@ -101,6 +101,22 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="facePlateId"></param>
         /// <returns></returns>
         Task<ManuFacePlateRepairEntity> GetByFacePlateIdAsync(long facePlateId);
+        #endregion
+
+        #region 维修明细
+        /// <summary>
+        /// 新增维修明细
+        /// </summary>
+        /// <param name="manuFacePlateRepairEntity"></param>
+        /// <returns></returns>
+        Task<int> InsertDetailAsync(ManuSfcRepairDetailEntity manuSfcRepairDetailEntity);
+
+        /// <summary>
+        /// 批量新增维修明细
+        /// </summary>
+        /// <param name="manuFacePlateRepairEntitys"></param>
+        /// <returns></returns>
+        Task<int> InsertsDetailAsync(List<ManuSfcRepairDetailEntity> manuSfcRepairDetailEntities);
         #endregion
     }
 }

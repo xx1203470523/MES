@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 namespace Hymson.MES.Core.Enums.Manufacture
 {
     /// <summary>
-    ///1.3.21 manu_sfc_repair_detail 维修详情表 IsClose
+    /// manu_product_bad_record 产品不良录入表Status
     /// </summary>
-    public enum ManuSfcRepairDetailIsCloseEnum : sbyte
+    public enum ProductBadRecordStatusEnum : sbyte
     {
         /// <summary>
         /// 开启

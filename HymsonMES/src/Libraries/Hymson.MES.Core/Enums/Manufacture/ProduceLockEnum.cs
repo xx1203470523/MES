@@ -8,19 +8,19 @@ using System.Threading.Tasks;
 namespace Hymson.MES.Core.Enums.Manufacture
 {
     /// <summary>
-    ///1.3.21 manu_sfc_repair_detail 维修详情表 IsClose
+    /// 锁类型
     /// </summary>
-    public enum ManuSfcRepairDetailIsCloseEnum : sbyte
+    public enum ProduceLockEnum
     {
         /// <summary>
-        /// 开启
+        /// 即时锁
         /// </summary>
-        [Description("开启")]
-        Open = 1,
+        [Description("即时锁")]
+        InstantLock = 1,
         /// <summary>
-        /// 关闭
+        /// 将来锁
         /// </summary>
-        [Description("关闭")]
-        Close = 2,
+        [Description("将来锁")]
+        FutureLock = 2,
     }
 }

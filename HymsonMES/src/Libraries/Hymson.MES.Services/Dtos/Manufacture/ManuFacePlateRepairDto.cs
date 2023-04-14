@@ -11,6 +11,18 @@ using Hymson.MES.Core.Enums.Manufacture;
 
 namespace Hymson.MES.Services.Dtos.Manufacture
 {
+    //传入
+    /// <summary>
+    /// 在制品维修 获取初始信息
+    /// </summary>
+    public record ManuFacePlateRepairInitialDto
+    {
+        /// <summary>
+        /// 面板Id
+        /// </summary>
+        public long FacePlateId { get; set; }
+
+    }
 
     /// <summary>
     /// 在制品维修 开始维修
@@ -35,6 +47,105 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     }
 
     /// <summary>
+    /// 在制品维修确认提交Dto
+    /// </summary>
+    public record ManuFacePlateRepairConfirmSubmitDto
+    {
+
+        /// <summary>
+        /// SFC
+        /// </summary>
+        public string SFC { get; set; }
+
+        /// <summary>
+        /// 面板Id
+        /// </summary>
+        public long FacePlateId { get; set; }
+
+        /// <summary>
+        /// 资源id
+        /// </summary>
+        public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 工序id
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 工序id
+        /// </summary>
+        public long ReturnProcedureId { get; set; }
+
+        /// <summary>
+        /// 是否显示产品列表
+        /// </summary>
+        public bool IsShowProductList { get; set; }
+
+        /// <summary>
+        /// 明细
+        /// </summary>
+        public IEnumerable<ManuFacePlateRepairConfirmSubmitDetailDto> confirmSubmitDetail { get; set; }
+    }
+    /// <summary>
+    /// 在制品维修确认提交明细to
+    /// </summary>
+    public record ManuFacePlateRepairConfirmSubmitDetailDto
+    {
+        /// <summary>
+        /// 不良录入Id
+        /// </summary>
+        public long BadRecordId { get; set; }
+        /// <summary>
+        /// 维修记录ID
+        /// </summary>
+        public long SfcRepairId { get; set; }
+
+        /// <summary>
+        /// 维修方法
+        /// </summary>
+        public string RepairMethod { get; set; }
+
+        /// <summary>
+        /// 原因分析
+        /// </summary>
+        public string CauseAnalyse { get; set; }
+
+        /// <summary>
+        /// 是否关闭
+        /// </summary>
+        public ProductBadRecordStatusEnum IsClose { get; set; }
+    }
+
+
+    //传出
+    /// <summary>
+    /// 在制品维修 获取初始信息
+    /// </summary>
+    public record ManuFacePlateRepairInitialInfoDto
+    {
+        /// <summary>
+        /// 工序id
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string ProcedureCode { get; set; }
+
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 资源编码
+        /// </summary>
+        public string ResourceCode { get; set; }
+    }
+
+    /// <summary>
     /// 在制维修展示数据
     /// </summary>
     public record ManuFacePlateRepairOpenInfoDto
@@ -52,7 +163,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 返回工序
         /// </summary>
-        public List<ReturnProcedureDto> returnProcedureInfo { get; set; }
+        public List<ManuFacePlateRepairReturnProcedureDto> returnProcedureInfo { get; set; }
 
     }
 
@@ -95,7 +206,10 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     /// </summary>
     public record ManuFacePlateRepairProductBadInfoDto
     {
-
+        /// <summary>
+        /// 不良录入Id
+        /// </summary>
+        public long BadRecordId { get; set; }
         /// <summary>
         /// 不合格代码ID
         /// </summary>
@@ -132,7 +246,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     /// <summary>
     /// 返回工序信息
     /// </summary>
-    public record ReturnProcedureDto
+    public record ManuFacePlateRepairReturnProcedureDto
     {
         /// <summary>
         /// 工序Id
@@ -146,72 +260,8 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     }
 
 
-    /// <summary>
-    /// 在制品维修确认提交Dto
-    /// </summary>
-    public record ConfirmSubmitDto
-    {
 
-        /// <summary>
-        /// SFC
-        /// </summary>
-        public string SFC { get; set; }
 
-        /// <summary>
-        /// 面板Id
-        /// </summary>
-        public long FacePlateId { get; set; }
-
-        /// <summary>
-        /// 资源id
-        /// </summary>
-        public long ResourceId { get; set; }
-
-        /// <summary>
-        /// 工序id
-        /// </summary>
-        public long ProcedureId { get; set; }
-
-        /// <summary>
-        /// 工序id
-        /// </summary>
-        public long ReturnProcedureId { get; set; } 
-
-        /// <summary>
-        /// 是否显示产品列表
-        /// </summary>
-        public bool IsShowProductList { get; set; }
-
-        /// <summary>
-        /// 明细
-        /// </summary>
-        public IEnumerable<ConfirmSubmitDetailDto> confirmSubmitDetail { get; set; }
-    }
-    /// <summary>
-    /// 在制品维修确认提交明细to
-    /// </summary>
-    public record ConfirmSubmitDetailDto
-    {
-        /// <summary>
-        /// 维修记录ID
-        /// </summary>
-        public long SfcRepairId { get; set; }
-
-        /// <summary>
-        /// 维修方法
-        /// </summary>
-        public string RepairMethod { get; set; }
-
-        /// <summary>
-        /// 原因分析
-        /// </summary>
-        public string CauseAnalyse { get; set; }
-
-        /// <summary>
-        /// 是否关闭
-        /// </summary>
-        public ProductBadRecordStatusEnum IsClose { get; set; }
-    }
     /// <summary>
     /// 在制品维修面板Dto
     /// </summary>
