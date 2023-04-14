@@ -153,6 +153,43 @@ namespace Hymson.MES.Services.Services.Plan
         }
 
         /// <summary>
+        /// 根据查询条件获取分页数据--(根据资源先找到线体)
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<PlanWorkOrderActivationListDetailViewDto>> GetPageListAboutResAsync(PlanWorkOrderActivationAboutResPagedQueryDto param)
+        {
+            if (!param.ResourceId.HasValue) 
+            {
+                throw new BusinessException(nameof(ErrorCode.MES16412));
+            }
+
+            //检查当前资源对应的线体
+            var workCenterEntity = await _inteWorkCenterRepository.GetByResourceIdAsync(param.ResourceId.Value);
+            if (workCenterEntity == null)
+            {
+                throw new BusinessException(nameof(ErrorCode.MES16413));
+            }
+
+            if (workCenterEntity.Type != WorkCenterTypeEnum.Line)
+            {
+                throw new BusinessException(nameof(ErrorCode.MES16414));
+            }
+
+            var planWorkOrderActivationPagedQuery = param.ToQuery<PlanWorkOrderActivationPagedQuery>();
+
+            //将对应的工作中心ID放置查询条件中
+            planWorkOrderActivationPagedQuery.WorkCenterIds.Add(workCenterEntity.Id);
+
+            var pagedInfo = await _planWorkOrderActivationRepository.GetPagedInfoAsync(planWorkOrderActivationPagedQuery);
+
+            //实体到DTO转换 装载数据
+            List<PlanWorkOrderActivationListDetailViewDto> planWorkOrderActivationDtos = PreparePlanWorkOrderActivationDtos(pagedInfo);
+            return new PagedInfo<PlanWorkOrderActivationListDetailViewDto>(planWorkOrderActivationDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="pagedInfo"></param>
@@ -249,7 +286,7 @@ namespace Hymson.MES.Services.Services.Plan
                 var hasActivation= (await _planWorkOrderActivationRepository.GetPlanWorkOrderActivationEntitiesAsync(new PlanWorkOrderActivationQuery { LineId = activationWorkOrderDto.LineId, SiteId = _currentSite.SiteId ?? 0 })).FirstOrDefault();
                 if (hasActivation != null) 
                 {
-                    var activationWorkOrder = await _planWorkOrderRepository.GetByIdAsync(hasActivation.Id);
+                    var activationWorkOrder = await _planWorkOrderRepository.GetByIdAsync(hasActivation.WorkOrderId);
                     throw new BusinessException(nameof(ErrorCode.MES16409)).WithData("orderCode", activationWorkOrder.OrderCode);
                 }
 

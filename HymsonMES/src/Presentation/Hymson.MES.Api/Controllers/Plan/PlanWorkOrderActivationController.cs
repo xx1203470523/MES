@@ -53,6 +53,18 @@ namespace Hymson.MES.Api.Controllers.Plan
         }
 
         /// <summary>
+        /// 分页查询列表（工单激活）-- (根据资源先找到线体再查询)
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("pageListAboutRes")]
+        public async Task<PagedInfo<PlanWorkOrderActivationListDetailViewDto>> QueryPagedPlanWorkOrderActivationAboutResAsync([FromQuery] PlanWorkOrderActivationAboutResPagedQueryDto param)
+        {
+            return await _planWorkOrderActivationService.GetPageListAboutResAsync(param);
+        }
+
+        /// <summary>
         /// 查询详情（工单激活）
         /// </summary>
         /// <param name="id"></param>

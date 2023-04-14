@@ -7,6 +7,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
@@ -20,104 +21,81 @@ namespace Hymson.MES.Services.Services.Equipment
     public class EquFaultReasonService : IEquFaultReasonService
     {
         /// <summary>
+        /// 
+        /// </summary>
+        private readonly ICurrentUser _currentUser;
+        private readonly ICurrentSite _currentSite;
+
+        /// <summary>
         /// 设备故障原因表 仓储
         /// </summary>
         private readonly IEquFaultReasonRepository _equFaultReasonRepository;
         private readonly AbstractValidator<EquFaultReasonSaveDto> _validationSaveRules;
 
-        private readonly ICurrentUser _currentUser;
-        private readonly ICurrentSite _currentSite;
-
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="validationCreateRules"></param>
+        /// <param name="validationSaveRules"></param>
         /// <param name="equFaultReasonRepository"></param>
         public EquFaultReasonService(ICurrentUser currentUser, ICurrentSite currentSite,
-            AbstractValidator<EquFaultReasonSaveDto> validationCreateRules,
+            AbstractValidator<EquFaultReasonSaveDto> validationSaveRules,
             IEquFaultReasonRepository equFaultReasonRepository)
         {
             _currentSite = currentSite;
             _currentUser = currentUser;
-            _validationSaveRules = validationCreateRules;
+            _validationSaveRules = validationSaveRules;
             _equFaultReasonRepository = equFaultReasonRepository;
         }
 
         /// <summary>
         /// 创建
         /// </summary>
-        /// <param name="EquFaultReasonCreateDto"></param>
+        /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateEquFaultReasonAsync(EquFaultReasonSaveDto EquFaultReasonCreateDto)
+        public async Task<int> CreateEquFaultReasonAsync(EquFaultReasonSaveDto createDto)
         {
             // 验证DTO
-            await _validationSaveRules.ValidateAndThrowAsync(EquFaultReasonCreateDto);
+            createDto.FaultReasonCode = createDto.FaultReasonCode.Trim().Replace(" ", string.Empty);
+            createDto.FaultReasonCode = createDto.FaultReasonCode.ToUpperInvariant();
+            await _validationSaveRules.ValidateAndThrowAsync(createDto);
 
-            //DTO转换实体
-            var EquFaultReasonEntity = EquFaultReasonCreateDto.ToEntity<EquFaultReasonEntity>();
-            EquFaultReasonEntity.Id = IdGenProvider.Instance.CreateId();
-            EquFaultReasonEntity.CreatedBy = _currentUser.UserName;
-            EquFaultReasonEntity.UpdatedBy = _currentUser.UserName;
-            EquFaultReasonEntity.CreatedOn = HymsonClock.Now();
-            EquFaultReasonEntity.UpdatedOn = HymsonClock.Now();
-            EquFaultReasonEntity.FaultReasonCode = EquFaultReasonEntity.FaultReasonCode.ToUpper();
-            EquFaultReasonEntity.SiteId = _currentSite.SiteId;
+            // DTO转换实体
+            var entity = createDto.ToEntity<EquFaultReasonEntity>();
+            entity.Id = IdGenProvider.Instance.CreateId();
+            entity.CreatedBy = _currentUser.UserName;
+            entity.UpdatedBy = _currentUser.UserName;
+            entity.SiteId = _currentSite.SiteId;
 
-            //判断编号是否已经存在
-            var exists = await _equFaultReasonRepository.GetEquFaultReasonEntitiesAsync(new EquFaultReasonQuery()
-            {
-                SiteId = EquFaultReasonEntity.SiteId,
-                FaultReasonCode = EquFaultReasonEntity.FaultReasonCode,
-            });
-            if (exists != null && exists.Any() == true)
-            {
-                throw new BusinessException(nameof(ErrorCode.MES13002)).WithData("FaultReasonCode", EquFaultReasonEntity.FaultReasonCode);
-            }
+            // 编码唯一性验证
+            var checkEntity = await _equFaultReasonRepository.GetByCodeAsync(new EntityByCodeQuery { Site = entity.SiteId, Code = entity.FaultReasonCode });
+            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES13011)).WithData("Code", entity.FaultReasonCode);
 
-            //入库
-            return await _equFaultReasonRepository.InsertAsync(EquFaultReasonEntity);
+            // 保存实体
+            return await _equFaultReasonRepository.InsertAsync(entity);
         }
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="EquFaultReasonModifyDto"></param>
+        /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task ModifyEquFaultReasonAsync(EquFaultReasonSaveDto EquFaultReasonModifyDto)
+        public async Task ModifyEquFaultReasonAsync(EquFaultReasonSaveDto modifyDto)
         {
-            if (EquFaultReasonModifyDto == null)
-            {
-                throw new ValidationException(ErrorCode.MES13003);
-            }
+            if (modifyDto == null) throw new ValidationException(ErrorCode.MES13003);
 
-            //DTO转换实体
-            var EquFaultReasonEntity = EquFaultReasonModifyDto.ToEntity<EquFaultReasonEntity>();
-            EquFaultReasonEntity.UpdatedBy = _currentUser.UserName;
-            EquFaultReasonEntity.UpdatedOn = HymsonClock.Now();
-            EquFaultReasonEntity.SiteId = _currentSite.SiteId;
+            // 验证DTO
+            await _validationSaveRules.ValidateAndThrowAsync(modifyDto);
 
-            //验证DTO
-            await _validationSaveRules.ValidateAndThrowAsync(EquFaultReasonModifyDto);
+            // DTO转换实体
+            var entity = modifyDto.ToEntity<EquFaultReasonEntity>();
+            entity.UpdatedBy = _currentUser.UserName;
+            entity.UpdatedOn = HymsonClock.Now();
+            entity.SiteId = _currentSite.SiteId;
 
-            var modelOrigin = await _equFaultReasonRepository.GetByIdAsync(EquFaultReasonEntity.Id);
-            if (modelOrigin == null)
-            {
-                throw new BusinessException(nameof(ErrorCode.MES13004));
-            }
-            //判断编号是否已经存在
-            var exists = (await _equFaultReasonRepository.GetEquFaultReasonEntitiesAsync(new EquFaultReasonQuery()
-            {
-                SiteId = EquFaultReasonEntity.SiteId,
-                FaultReasonCode = EquFaultReasonEntity.FaultReasonCode,
-            })).Where(x => x.Id != EquFaultReasonEntity.Id).ToList();
-            if (exists != null && exists.Any() == true)
-            {
-                throw new BusinessException(nameof(ErrorCode.MES13002)).WithData("FaultReasonCode", EquFaultReasonEntity.FaultReasonCode);
-            }
-
-            await _equFaultReasonRepository.UpdateAsync(EquFaultReasonEntity);
+            // 更新实体
+            await _equFaultReasonRepository.UpdateAsync(entity);
         }
 
         /// <summary>

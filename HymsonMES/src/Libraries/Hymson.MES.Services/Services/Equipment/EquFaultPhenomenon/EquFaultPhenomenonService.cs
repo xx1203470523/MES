@@ -1,9 +1,13 @@
+using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon;
 using Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon.Query;
 using Hymson.MES.Services.Dtos.Equipment;
@@ -28,6 +32,11 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
+        /// 验证器
+        /// </summary>
+        private readonly AbstractValidator<EquFaultPhenomenonSaveDto> _validationSaveRules;
+
+        /// <summary>
         /// 仓储（设备故障现象）
         /// </summary>
         private readonly IEquFaultPhenomenonRepository _equFaultPhenomenonRepository;
@@ -37,12 +46,15 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         /// </summary>
         /// <param name="currentSite"></param>
         /// <param name="currentUser"></param>
+        /// <param name="validationSaveRules"></param>
         /// <param name="equFaultPhenomenonRepository"></param>
         public EquFaultPhenomenonService(ICurrentUser currentUser, ICurrentSite currentSite,
+            AbstractValidator<EquFaultPhenomenonSaveDto> validationSaveRules,
             IEquFaultPhenomenonRepository equFaultPhenomenonRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _validationSaveRules = validationSaveRules;
             _equFaultPhenomenonRepository = equFaultPhenomenonRepository;
         }
 
@@ -55,7 +67,9 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         public async Task<int> CreateAsync(EquFaultPhenomenonSaveDto createDto)
         {
             // 验证DTO
-
+            createDto.FaultPhenomenonCode = createDto.FaultPhenomenonCode.Trim().Replace(" ", string.Empty);
+            createDto.FaultPhenomenonCode = createDto.FaultPhenomenonCode.ToUpperInvariant();
+            await _validationSaveRules.ValidateAndThrowAsync(createDto);
 
             // DTO转换实体
             var entity = createDto.ToEntity<EquFaultPhenomenonEntity>();
@@ -64,15 +78,9 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
             entity.UpdatedBy = _currentUser.UserName;
             entity.SiteId = _currentSite.SiteId;
 
-            // 判断编号是否已存在
-            var isExists = await _equFaultPhenomenonRepository.IsExistsAsync(entity.FaultPhenomenonCode);
-            if (isExists == true)
-            {
-                // TODO 返回值
-                return -1;
-                //responseDto.Msg = $"此编码{model.FaultPhenomenonCode}在系统已经存在！";
-                //return responseDto;
-            }
+            // 编码唯一性验证
+            var checkEntity = await _equFaultPhenomenonRepository.GetByCodeAsync(new EntityByCodeQuery { Site = entity.SiteId, Code = entity.FaultPhenomenonCode });
+            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES12900)).WithData("Code", entity.FaultPhenomenonCode);
 
             // 保存实体
             return await _equFaultPhenomenonRepository.InsertAsync(entity);

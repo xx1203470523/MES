@@ -16,6 +16,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public decimal Usages { get; set; }
 
         /// <summary>
+        /// 已装配数量
+        /// </summary>
+        public decimal AssembleCount { get; set; }
+
+        /// <summary>
         /// 物料Id
         /// </summary>
         public long MaterialId { get; set; }
@@ -56,6 +61,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public string Name { get; set; }
 
         /// <summary>
+        /// bom描述信息
+        /// </summary>
+        public string BomRemark { get; set; }
+
+        /// <summary>
         /// 物料消耗信息
         /// </summary>
         public List<ManuSfcChildCirculationDto> Children { get; set; }
@@ -82,6 +92,16 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 组件条码
         /// </summary>
         public string CirculationBarCode { get; set; }
+
+        /// <summary>
+        /// 流转条码数量
+        /// </summary>
+        public decimal CirculationQty { get; set; }
+
+        /// <summary>
+        /// 组件的产品描述信息
+        /// </summary>
+        public string MaterialRemark{get;set;}
 
         /// <summary>
         /// 资源
@@ -138,9 +158,9 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     public class InProductDismantleAddDto
     {
         /// <summary>
-        /// 主物料数据收集方式
+        /// Bom详情表id
         /// </summary>
-        public MaterialSerialNumberEnum SerialNumber { get; set; }
+        public long BomDetailId { get; set; }
 
         /// <summary>
         /// 产品条码
@@ -166,6 +186,8 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 组件条码
         /// </summary>
         public string CirculationBarCode { get; set; }
+
+        public decimal CirculationQty { get; set; }
     }
 
     public class InProductDismantleReplaceDto
@@ -222,6 +244,31 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 产品id
         /// </summary>
         public long ProductId { get; set; }
+    }
+
+    public class BarCodeQueryDto
+    {
+        /// <summary>
+        /// 组件条码
+        /// </summary>
+        public string CirculationBarCode { get; set; }
+
+        /// <summary>
+        /// 产品id
+        /// </summary>
+        public long ProductId { get; set; }
+
+        public string Sfc { get; set; }
+
+        public long ProcedureId { get; set; }
+    }
+
+    public class BarCodeDataCollectionWayQueryDto
+    {
+        public long ProductId { get; set; }
+        public long BomDetailId { get; set; }
+        public long CirculationMainProductId { get; set; }
+        public string CirculationBarCode { get; set; }
     }
 
 }

@@ -94,6 +94,13 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<IEnumerable<ProcBomDetailReplaceMaterialEntity>> GetByBomIdAsync(long bomId);
 
         /// <summary>
+        /// 根据BomDetailId查询替代物料
+        /// </summary>
+        /// <param name="bomDetailId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcBomDetailReplaceMaterialEntity>> GetByBomDetailIdAsync(long bomDetailId);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="procBomDetailReplaceMaterialQuery"></param>
