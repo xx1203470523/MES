@@ -168,6 +168,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuInStationService, ManuInStationService>();
             services.AddSingleton<IManuOutStationService, ManuOutStationService>();
             services.AddSingleton<IInProductDismantleService, InProductDismantleService>();
+            services.AddSingleton<IManuFacePlateRepairService, ManuFacePlateRepairService>();
             #endregion
 
             #region Warehouse 

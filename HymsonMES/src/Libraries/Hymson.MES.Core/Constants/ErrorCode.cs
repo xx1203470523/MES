@@ -421,6 +421,14 @@
         public const string MES17306 = "获取条码生产信息失败";
         public const string MES17307 = "存在未关闭的缺陷，请检查！";
         public const string MES17308 = "返回工序失败！";
+        public const string MES17309 = "当前面板不存在在制维修信息！";
+        public const string MES17310 = "结束维修，保存数据失败！";
+        public const string MES17311 = "未获取到工序信息";
+        public const string MES17312 = "未获取到资源信息";
+        public const string MES17313 = "未获取到工单信息";
+        public const string MES17314 = "未获取到产品信息";
+        public const string MES17315 = "未获取到在制维修信息"; 
+        public const string MES17316 = "未获取到不良录入信息"; 
 
         #endregion
 
@@ -451,10 +459,10 @@
 
         #region 在制品移除添加 16600
 
-        public const string MES16600= "条码不存在或不是在制品!";
-        public const string MES16601= "组件{CirculationBarCode}已绑定,请检查!";
-        public const string MES16602= "数据不存在!";
-        public const string MES16603= "组件库存不存在!";
+        public const string MES16600 = "条码不存在或不是在制品!";
+        public const string MES16601 = "组件{CirculationBarCode}已绑定,请检查!";
+        public const string MES16602 = "数据不存在!";
+        public const string MES16603 = "组件库存不存在!";
         public const string MES16604 = "组件库存不足!";
         #endregion
 
