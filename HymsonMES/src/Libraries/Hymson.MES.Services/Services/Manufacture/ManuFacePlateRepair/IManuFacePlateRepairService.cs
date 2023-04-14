@@ -6,7 +6,16 @@
  *build datetime: 2023-04-12 10:32:46
  */
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Manufacture;
+using Hymson.Snowflake;
+using Hymson.Utils.Tools;
+using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -15,6 +24,38 @@ namespace Hymson.MES.Services.Services.Manufacture
     /// </summary>
     public interface IManuFacePlateRepairService
     {
+        /// <summary>
+        /// 开始维修
+        /// </summary>
+        /// <param name="beginRepairDto"></param>
+        /// <returns></returns>
+        Task<ManuFacePlateRepairOpenInfoDto> BeginManuFacePlateRepairAsync(ManuFacePlateRepairBeginRepairDto beginRepairDto);
+
+        /// <summary>
+        /// 结束维修
+        /// </summary>
+        /// <param name="beginRepairDto"></param>
+        /// <returns></returns>
+        Task EndManuFacePlateRepairAsync(ManuFacePlateRepairBeginRepairDto beginRepairDto);
+
+        /// <summary>
+        /// 确认提交
+        /// </summary>
+        /// <param name="confirmSubmitDto"></param>
+        /// <returns></returns>
+        Task ConfirmSubmitManuFacePlateRepairAsync(ManuFacePlateRepairConfirmSubmitDto confirmSubmitDto);
+
+        /// <summary>
+        /// 获取初始信息
+        /// </summary>
+        /// <param name="facePlateId"></param>
+        /// <returns></returns>
+        Task<ManuFacePlateRepairInitialInfoDto> GetInitialInfoManuFacePlateRepairAsync(long facePlateId); 
+
+
+
+
+
         /// <summary>
         /// 获取分页List
         /// </summary>
