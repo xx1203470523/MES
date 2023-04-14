@@ -43,11 +43,11 @@ namespace Hymson.MES.Services.Services.Process
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
 
-        public ProcMaterialService(ICurrentUser currentUser, IProcMaterialRepository procMaterialRepository, 
-            AbstractValidator<ProcMaterialCreateDto> validationCreateRules, 
+        public ProcMaterialService(ICurrentUser currentUser, IProcMaterialRepository procMaterialRepository,
+            AbstractValidator<ProcMaterialCreateDto> validationCreateRules,
             AbstractValidator<ProcMaterialModifyDto> validationModifyRules,
             IProcReplaceMaterialRepository procReplaceMaterialRepository,
-            ICurrentSite currentSite, 
+            ICurrentSite currentSite,
             IProcMaterialSupplierRelationRepository procMaterialSupplierRelationRepository,
             IProcMaskCodeRepository procMaskCodeRepository)
         {
@@ -59,7 +59,7 @@ namespace Hymson.MES.Services.Services.Process
             _procReplaceMaterialRepository = procReplaceMaterialRepository;
             _currentSite = currentSite;
             _procMaterialSupplierRelationRepository = procMaterialSupplierRelationRepository;
-            _procMaskCodeRepository= procMaskCodeRepository;
+            _procMaskCodeRepository = procMaskCodeRepository;
         }
 
         /// <summary>
@@ -169,7 +169,7 @@ namespace Hymson.MES.Services.Services.Process
                     }
                 }
 
-                if (procMaterialCreateDto.MaterialSupplierList != null && procMaterialCreateDto.MaterialSupplierList.Count > 0) 
+                if (procMaterialCreateDto.MaterialSupplierList != null && procMaterialCreateDto.MaterialSupplierList.Count > 0)
                 {
                     response = await _procMaterialSupplierRelationRepository.InsertsAsync(addMaterialSupplierList);
 
@@ -203,22 +203,20 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<int> DeletesProcMaterialAsync(long[] idsArr)
         {
-            #region 参数校验
-            if (idsArr.Length < 1)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10213));
-            }
+            if (idsArr.Length < 1) throw new ValidationException(nameof(ErrorCode.MES10213));
 
             //var statusArr = new int[] { 2, 3 }; //可下达和保留 时无法删除
             //判断这些ID 对应的物料是否在 可下达和保留中  （1:新建;2:可下达;3:保留;4:废除）
             var entitys = await _procMaterialRepository.GetByIdsAsync(idsArr);
-            if (entitys.Any(a => a.Status == SysDataStatusEnum.Enable || a.Status == SysDataStatusEnum.Retain) == true)
-            {
-                throw new BusinessException(nameof(ErrorCode.MES10212));
-            }
-            #endregion
+            if (entitys.Any(a => a.Status == SysDataStatusEnum.Enable
+            || a.Status == SysDataStatusEnum.Retain) == true) throw new BusinessException(nameof(ErrorCode.MES10212));
 
-            return await _procMaterialRepository.DeletesAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
+            return await _procMaterialRepository.DeletesAsync(new DeleteCommand
+            {
+                Ids = idsArr,
+                DeleteOn = HymsonClock.Now(),
+                UserId = _currentUser.UserName
+            });
         }
 
         /// <summary>
@@ -312,7 +310,7 @@ namespace Hymson.MES.Services.Services.Process
                 MaterialCode = procMaterialEntity.MaterialCode,
                 Version = procMaterialEntity.Version
             });
-            if (existsList != null && existsList.Count()>0 && existsList.Where(x => x.Id != procMaterialEntity.Id).Any())
+            if (existsList != null && existsList.Count() > 0 && existsList.Where(x => x.Id != procMaterialEntity.Id).Any())
             {
                 throw new BusinessException(nameof(ErrorCode.MES10201)).WithData("materialCode", procMaterialEntity.MaterialCode).WithData("version", procMaterialEntity.Version);
             }
@@ -391,7 +389,7 @@ namespace Hymson.MES.Services.Services.Process
                     MaskCodeId = procMaterialEntity.MaskCodeId,
                     UpdatedBy = procMaterialEntity.UpdatedBy,
                     UpdatedOn = procMaterialEntity.UpdatedOn,
-                    ConsumeRatio= procMaterialEntity.ConsumeRatio,
+                    ConsumeRatio = procMaterialEntity.ConsumeRatio,
                 });
 
                 if (response == 0)
@@ -447,7 +445,7 @@ namespace Hymson.MES.Services.Services.Process
 
                 if (procMaterialViewDto.MaskCodeId.HasValue)
                 {
-                   var  maskCodeEntity=await _procMaskCodeRepository.GetByIdAsync(procMaterialViewDto.MaskCodeId.Value);
+                    var maskCodeEntity = await _procMaskCodeRepository.GetByIdAsync(procMaterialViewDto.MaskCodeId.Value);
                     procMaterialViewDto.ValidationMaskGroup = maskCodeEntity?.Code ?? "";
                 }
 

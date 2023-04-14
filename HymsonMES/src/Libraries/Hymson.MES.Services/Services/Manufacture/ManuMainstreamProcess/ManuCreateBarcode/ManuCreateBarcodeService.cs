@@ -154,8 +154,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                     WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
                     Qty = qty,
                     ProcedureId = processRouteFirstProcedure.ProcedureId,
-                    Type = ManuSfcStepTypeEnum.Create,
-                    Status = SfcProduceStatusEnum.lineUp,
+                    Operatetype = ManuSfcStepTypeEnum.Create,
+                    CurrentStatus = SfcProduceStatusEnum.lineUp,
                     CreatedBy = _currentUser.UserName,
                     UpdatedBy = _currentUser.UserName
                 });
