@@ -6,6 +6,7 @@
  *build datetime: 2023-02-13 09:06:05
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -32,7 +33,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 类型
         /// </summary>
-        public int? Type { get; set; }
+        public ProcedureTypeEnum? Type { get; set; }
 
         /// <summary>
         /// 描述 :资源类型名称 

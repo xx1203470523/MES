@@ -353,6 +353,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             // 扣减物料库存
             // TODO 
 
+
+
             return 0;
         }
 
