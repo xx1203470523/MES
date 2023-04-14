@@ -39,6 +39,5 @@
         /// 数量（扣减）
         /// </summary>
         public decimal Qty { get; set; }
-
     }
 }
