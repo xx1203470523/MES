@@ -34,8 +34,20 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 装载条码
         /// </summary>
         public string LadeBarCode { get; set; }
+        /// <summary>
+        /// 工单编码
+        /// </summary>
+        public string WorkOrderCode { get; set; }
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string MaterialCode { get; set; }
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public int Count { get; set; } 
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
