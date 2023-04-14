@@ -10,11 +10,9 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
-using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using Org.BouncyCastle.Crypto;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -278,10 +276,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuSfcProduceBusinessEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertSfcProduceBusinessRangAsync(IEnumerable<ManuSfcProduceBusinessEntity> manuSfcProduceBusinessEntitys)
+        public async Task<int> InsertSfcProduceBusinessRangeAsync(IEnumerable<ManuSfcProduceBusinessEntity> manuSfcProduceBusinessEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertSfcProduceBusinessSql, manuSfcProduceBusinessEntitys);
+        }
+
+        /// <summary>
+        /// 插入或者更新
+        /// </summary>
+        /// <param name="manuSfcProduceBusinessEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> InsertOrUpdateSfcProduceBusinessRangeAsync(IEnumerable<ManuSfcProduceBusinessEntity> manuSfcProduceBusinessEntitys)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(InsertOrUpdateSfcProduceBusinessSql, manuSfcProduceBusinessEntitys);
         }
 
         /// <summary>
@@ -300,7 +309,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuSfcProduceBusinessEntitys"></param>
         /// <returns></returns>
-        public async Task<int> UpdatestSfcProduceBusinessRangAsync(IEnumerable<ManuSfcProduceBusinessEntity> manuSfcProduceBusinessEntitys)
+        public async Task<int> UpdatestSfcProduceBusinessRangeAsync(IEnumerable<ManuSfcProduceBusinessEntity> manuSfcProduceBusinessEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSfcProduceBusinessSql, manuSfcProduceBusinessEntitys);
@@ -318,6 +327,18 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 根据SFC获取在制品业务
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ManuSfcProduceBusinessEntity> GetSfcProduceBusinessBySFCAsync(string sfc)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<ManuSfcProduceBusinessEntity>(GetSfcProduceBusinessBySFCSql, new { SFC = sfc });
+        }
+
+
+        /// <summary>
         /// 根据IDs批量获取在制品业务
         /// </summary>
         /// <param name="sfcInfoIds"></param>
@@ -329,14 +350,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
-        /// 批量删除（软删除）
+        /// 批量删除（物理删除）
         /// </summary>
         /// <param name="sfcInfoIds"></param>
         /// <returns></returns>
-        public async Task<int> DeleteSfcProduceBusinesssAsync(IEnumerable<long> sfcInfoIds)
+        public async Task<int> DeleteSfcProduceBusinesssAsync(DeleteSfcProduceBusinesssCommand command)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(RealDeletesSfcProduceBusinessSql, new { SfcInfoIds = sfcInfoIds });
+            return await conn.ExecuteAsync(RealDeletesSfcProduceBusinessSql, command);
         }
         #endregion
     }
@@ -360,11 +381,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                           `Id`, `Sfc`, `ProductId`, `WorkOrderId`, `BarCodeInfoId`, `ProcessRouteId`, `WorkCenterId`, `ProductBOMId`, `EquipmentId`, `ResourceId`, `ProcedureId`, `Status`, `Lock`, `LockProductionId`, `IsSuspicious`, `RepeatedCount`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `manu_sfc_produce`  WHERE Id IN @ids ";
         const string GetSfcProduceBusinessBySFCIdSql = "SELECT `Id`, `SiteId`, `SfcInfoId`, `BusinessType`, `BusinessContent`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted` FROM manu_sfc_produce_business WHERE SfcInfoId = @SfcInfoId AND IsDeleted=0";
+        const string GetSfcProduceBusinessBySFCSql = @"SELECT SPB.`Id`,  SPB.`SiteId`,  SPB.`SfcInfoId`,  SPB.`BusinessType`,  SPB.`BusinessContent`,  SPB.`CreatedBy`,  SPB.`CreatedOn`,  SPB.`UpdatedBy`, SPB.`UpdatedOn`,  SPB.`IsDeleted` 
+FROM manu_sfc_produce_business SPB  LEFT JOIN manu_sfc SFC ON SPB.SfcInfoId=SFC.Id AND SFC.IsDeleted=0
+WHERE SFC.SFC= @SFC AND SPB.IsDeleted=0";
         const string GetSfcProduceBusinessBySFCIdsSql = "SELECT `Id`, `SiteId`, `SfcInfoId`, `BusinessType`, `BusinessContent`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted` FROM manu_sfc_produce_business WHERE SfcInfoId IN @SfcInfoIds  AND IsDeleted=0";
         const string GetBySFCSql = @"SELECT * FROM manu_sfc_produce WHERE SFC = @sfc ";
         const string DeletePhysicalSql = "DELETE FROM manu_sfc_produce WHERE SFC = @sfc";
-        const string DeletePhysicalRangeSql = "delete from manu_sfc_produce where SFC in @Sfcs";
-        const string RealDeletesSfcProduceBusinessSql = "delete from manu_sfc_produce_business where SfcInfoId IN @SfcInfoIds";
+        const string DeletePhysicalRangeSql = "DELETE FROM manu_sfc_produce WHERE SFC in @Sfcs";
+        const string RealDeletesSfcProduceBusinessSql = "DELETE FROM manu_sfc_produce_business WHERE SfcInfoId IN @SfcInfoIds AND BusinessType=@BusinessType";
+        const string InsertOrUpdateSfcProduceBusinessSql = @"INSERT INTO `manu_sfc_produce_business`(  `Id`, `SiteId`, `SfcInfoId`, `BusinessType`, `BusinessContent`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcInfoId, @BusinessType, @BusinessContent, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted ) ON DUPLICATE KEY UPDATE
+                                                             BusinessContent = @BusinessContent,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  ";
         //质量锁定sql
         const string UpdateQualityLockSql = "update  manu_sfc_produce set `Lock`=@Lock,LockProductionId=@LockProductionId,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn where SFC in  @Sfcs";
         const string UpdateIsScrapSql = "UPDATE `manu_sfc_produce` SET IsScrap = @IsScrap, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE SFC in @Sfcs ";
