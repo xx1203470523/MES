@@ -180,7 +180,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 流转后主物料id
         /// </summary>
-        public long CirculationMainProductId { get; set; }
+        public long? MainProductId { get; set; }
 
         /// <summary>
         /// 组件条码

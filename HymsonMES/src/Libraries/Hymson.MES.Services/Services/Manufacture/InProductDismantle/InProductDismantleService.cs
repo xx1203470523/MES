@@ -384,7 +384,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     ProductId = addDto.ProductId.Value,
                     CirculationBarCode= addDto.CirculationBarCode,
-                    CirculationMainProductId= addDto.CirculationMainProductId,
+                    CirculationMainProductId= addDto.MainProductId ?? 0,
                     BomDetailId= addDto.BomDetailId
                 });
                 if (!serialNumber.HasValue)
@@ -469,7 +469,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     Sfc = addDto.Sfc,
                     ProcedureId = addDto.ProcedureId,
-                    ProductId = addDto.CirculationMainProductId,
+                    ProductId = addDto.MainProductId ?? 0,
                     CirculationBarCode = addDto.CirculationBarCode
                 });
                 if (flag)
@@ -491,7 +491,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ProductId = manuSfcProduce.ProductId,
                 CirculationBarCode = addDto.CirculationBarCode,
                 CirculationProductId = whMaterialInventory.MaterialId,
-                CirculationMainProductId = addDto.CirculationMainProductId,
+                CirculationMainProductId = addDto.MainProductId,
                 CirculationQty = circulationQty,
                 CirculationType = SfcCirculationTypeEnum.ModuleAdd,
                 CreatedBy = _currentUser.UserName,
