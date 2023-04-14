@@ -35,10 +35,47 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="queryDto"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("mainmaterials")]
+        [Route("mainMaterials")]
         public async Task<List<InProductDismantleDto>> GetProcBomDetailAsync([FromQuery] InProductDismantleQueryDto queryDto)
         {
             return await _inProductDismantleService.GetProcBomDetailAsync(queryDto);
         }
+
+        /// <summary>
+        /// 在制品移除
+        /// </summary>
+        /// <param name="removeDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("removeModule")]
+        public async Task RemoveModuleAsync(InProductDismantleRemoveDto removeDto)
+        {
+            await _inProductDismantleService.RemoveModuleAsync(removeDto);
+        }
+
+        /// <summary>
+        /// 在制品拆解添加组件
+        /// </summary>
+        /// <param name="addDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("addModule")]
+        public async Task AddModuleAsync(InProductDismantleAddDto addDto)
+        {
+            await _inProductDismantleService.AddModuleAsync(addDto);
+        }
+
+        /// <summary>
+        /// 在制品拆解换件
+        /// </summary>
+        /// <param name="replaceDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("replaceModule")]
+        public async Task ReplaceModuleAsync(InProductDismantleReplaceDto replaceDto)
+        {
+            await _inProductDismantleService.ReplaceModuleAsync(replaceDto);
+        }
+
     }
 }
