@@ -7,6 +7,7 @@
  */
 using FluentValidation;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -131,7 +132,11 @@ namespace Hymson.MES.Services.Validators.Manufacture
         {
             if (parm.OperationType == QualityLockEnum.InstantLock)
             {
-              
+                var manuSfcProduceBusinessEntity = await _manuSfcProduceRepository.GetSfcProduceBusinessBySFCAsync(parm.SFC);
+                if (manuSfcProduceBusinessEntity == null)
+                {
+                    return true;
+                }
             }
             return true;
         }

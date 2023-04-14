@@ -19,7 +19,7 @@ namespace Hymson.MES.Services.Validators.Integrated
             RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES12005));
             RuleFor(x => x.ClassProgram).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12006));
             RuleFor(x => x.ClassProgram).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES12007));
-            RuleFor(x => x.Remark).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES12008));
+            RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES12008));
         }
     }
 
@@ -36,7 +36,7 @@ namespace Hymson.MES.Services.Validators.Integrated
             RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES12005));
             RuleFor(x => x.ClassProgram).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12006));
             RuleFor(x => x.ClassProgram).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES12007));
-            RuleFor(x => x.Remark).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES12008));
+            RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES12008));
         }
     }
 }

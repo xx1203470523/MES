@@ -41,7 +41,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 状态
         /// </summary>
-        public int Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 类型
@@ -119,12 +119,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 状态
         /// </summary>
-        public int Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 类型
         /// </summary>
-        public int Type { get; set; }
+        public ProcedureTypeEnum Type { get; set; }
 
         /// <summary>
         /// 包装等级（字典数据）
@@ -175,12 +175,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 状态
         /// </summary>
-        public int? Status { get; set; }
+        public SysDataStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 类型
         /// </summary>
-        public int? Type { get; set; }
+        public ProcedureTypeEnum? Type { get; set; }
 
         /// <summary>
         /// 描述 :资源类型名称 
@@ -222,7 +222,7 @@ namespace Hymson.MES.Services.Dtos.Process
     /// <summary>
     /// 工序表新增Dto
     /// </summary>
-    public record AddProcProcedureDto :BaseEntityDto
+    public record AddProcProcedureDto : BaseEntityDto
     {
         /// <summary>
         /// 工序信息
@@ -233,18 +233,18 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 工序打印配置信息
         /// </summary>
 
-       public List<ProcProcedurePrintReleationCreateDto> ProcedurePrintList { get; set; }
+        public List<ProcProcedurePrintReleationCreateDto> ProcedurePrintList { get; set; }
 
         /// <summary>
         /// 工序工作配置信息
         /// </summary>
-       public List<InteJobBusinessRelationCreateDto> ProcedureJobList { get; set; }
+        public List<InteJobBusinessRelationCreateDto> ProcedureJobList { get; set; }
     }
 
     /// <summary>
     /// 工序表修改Dto
     /// </summary>
-    public record UpdateProcProcedureDto:BaseEntityDto
+    public record UpdateProcProcedureDto : BaseEntityDto
     {
         /// <summary>
         /// 工序信息
@@ -286,7 +286,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 状态
         /// </summary>
-        public int Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 类型

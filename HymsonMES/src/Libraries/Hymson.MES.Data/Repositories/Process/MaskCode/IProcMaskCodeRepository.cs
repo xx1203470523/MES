@@ -1,6 +1,7 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Process.MaskCode.Query;
 
 namespace Hymson.MES.Data.Repositories.Process.MaskCode
@@ -37,6 +38,13 @@ namespace Hymson.MES.Data.Repositories.Process.MaskCode
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcMaskCodeEntity> GetByIdAsync(long id);
+
+        /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ProcMaskCodeEntity> GetByCodeAsync(EntityByCodeQuery query);
 
         /// <summary>
         /// 

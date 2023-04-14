@@ -39,7 +39,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// JOBID
         /// </summary>
-        public long ScanJobId { get; set; }
+        public string ScanJobId { get; set; }
         /// <summary>
         /// 是否有成功提示音
         /// </summary>

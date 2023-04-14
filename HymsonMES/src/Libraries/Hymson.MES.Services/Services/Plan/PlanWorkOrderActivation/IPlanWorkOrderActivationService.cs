@@ -28,6 +28,13 @@ namespace Hymson.MES.Services.Services.Plan
         Task<PagedInfo<PlanWorkOrderActivationListDetailViewDto>> GetPageListAsync(PlanWorkOrderActivationPagedQueryDto planWorkOrderActivationPagedQueryDto);
 
         /// <summary>
+        /// 根据查询条件获取分页数据--(根据资源先找到线体)
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<PagedInfo<PlanWorkOrderActivationListDetailViewDto>> GetPageListAboutResAsync(PlanWorkOrderActivationAboutResPagedQueryDto param);
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="planWorkOrderActivationDto"></param>

@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -92,6 +93,17 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
         }
 
         /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<EquEquipmentGroupEntity> GetByCodeAsync(EntityByCodeQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<EquEquipmentGroupEntity>(GetByCodeSql, query);
+        }
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="pagedQuery"></param>
@@ -145,5 +157,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
         const string GetByIdSql = @"SELECT 
                                `Id`, `EquipmentGroupCode`, `EquipmentGroupName`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteId`
                             FROM `equ_equipment_group`  WHERE IsDeleted = @IsDeleted AND Id = @Id ";
+        const string GetByCodeSql = "SELECT * FROM equ_equipment_group WHERE `IsDeleted` = 0 AND SiteId = @Site AND EquipmentGroupCode = @Code LIMIT 1";
     }
 }

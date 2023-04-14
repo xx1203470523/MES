@@ -39,7 +39,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public long? EquipmentId { get; set; }
 
         /// <summary>
-        /// 
+        /// 扣料上料点id
         /// </summary>
         public long? FeedingPointId { get; set; }
 
@@ -51,12 +51,12 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 流转前工单id
         /// </summary>
-        public long? WorkOrderId { get; set; }
+        public long WorkOrderId { get; set; }
 
         /// <summary>
         /// 流转前产品id
         /// </summary>
-        public long? ProductId { get; set; }
+        public long ProductId { get; set; }
 
         /// <summary>
         /// 流转后条码信息
@@ -74,10 +74,24 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public long CirculationProductId { get; set; }
 
         /// <summary>
-        /// 流转类型;1：拆分；2：合并；3：转换; 4.消耗
+        /// 流转后主产品id
         /// </summary>
-        public SfcCirculationTypeEnum Type { get; set; }
+        public long? CirculationMainProductId { get; set; }
 
+        /// <summary>
+        /// 流转条码数量
+        /// </summary>
+        public decimal? CirculationQty { get; set; }
+
+        /// <summary>
+        /// 流转类型;1：拆分；2：合并；3：转换;4：消耗;5：拆解;6：组件添加 7.换件
+        /// </summary>
+        public SfcCirculationTypeEnum CirculationType { get; set; }
+
+        /// <summary>
+        /// 是否拆解
+        /// </summary>
+        public bool? IsDisassemble { get; set; }
 
         /// <summary>
         /// 拆解人
@@ -88,9 +102,12 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 拆解时间
         /// </summary>
         public DateTime? DisassembledOn { get; set; }
+
         /// <summary>
-        /// 换件id
+        /// 换件id manu_sfc_circulation id
         /// </summary>
         public long? SubstituteId { get; set; }
+
+
     }
 }

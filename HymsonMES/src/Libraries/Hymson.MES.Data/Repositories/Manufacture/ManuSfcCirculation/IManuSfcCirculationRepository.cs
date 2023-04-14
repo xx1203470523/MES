@@ -8,6 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
@@ -29,7 +30,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        Task<ManuSfcCirculationEntity> GetBySFCAsync(string sfc);
+        Task<IEnumerable<ManuSfcCirculationEntity>> GetSfcMoudulesAsync(ManuSfcCirculationQuery query);
 
         /// <summary>
         /// 根据IDs批量获取数据
@@ -86,5 +87,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> DeleteRangeAsync(DeleteCommand command);
+
+        /// <summary>
+        /// 在制品拆解移除
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> DisassemblyUpdateAsync(DisassemblyCommand command);
     }
 }

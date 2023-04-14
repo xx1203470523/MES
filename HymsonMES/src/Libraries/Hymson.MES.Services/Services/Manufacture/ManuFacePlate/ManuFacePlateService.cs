@@ -13,12 +13,14 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.Linq;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -41,6 +43,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IManuFacePlateContainerPackRepository _manuFacePlateContainerPackRepository;
         private readonly IProcProcedureRepository _procProcedureRepository;
         private readonly IProcResourceRepository _procResourceRepository;
+        private readonly IInteJobRepository _inteJobRepository;
         private readonly AbstractValidator<ManuFacePlateCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ManuFacePlateModifyDto> _validationModifyRules;
         private readonly AbstractValidator<ManuFacePlateProductionCreateDto> _validationProductionCreateRules;
@@ -55,7 +58,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             AbstractValidator<ManuFacePlateCreateDto> validationCreateRules, AbstractValidator<ManuFacePlateModifyDto> validationModifyRules,
             AbstractValidator<ManuFacePlateProductionCreateDto> validationProductionCreateRules, AbstractValidator<ManuFacePlateProductionModifyDto> validationProductionModifyRules,
             AbstractValidator<ManuFacePlateRepairCreateDto> validationRepairCreateRules, AbstractValidator<ManuFacePlateRepairModifyDto> validationRepairModifyRules,
-            AbstractValidator<ManuFacePlateContainerPackCreateDto> validationContainerPackCreateRules, AbstractValidator<ManuFacePlateContainerPackModifyDto> validationContainerPackModifyRules)
+            AbstractValidator<ManuFacePlateContainerPackCreateDto> validationContainerPackCreateRules, AbstractValidator<ManuFacePlateContainerPackModifyDto> validationContainerPackModifyRules, IInteJobRepository inteJobRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -73,6 +76,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _validationRepairModifyRules = validationRepairModifyRules;
             _validationContainerPackCreateRules = validationContainerPackCreateRules;
             _validationContainerPackModifyRules = validationContainerPackModifyRules;
+            _inteJobRepository = inteJobRepository;
         }
         #endregion
 
@@ -208,6 +212,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                         //颜色不为空就显示
                         facePlatQueryDto.FacePlateProduction.IsShowQualifiedColour = !string.IsNullOrEmpty(facePlatQueryDto.FacePlateProduction.QualifiedColour);
                         facePlatQueryDto.FacePlateProduction.IsShowUnqualifiedColour = !string.IsNullOrEmpty(facePlatQueryDto.FacePlateProduction.UnqualifiedColour);
+                        //填充Job数据
+                        facePlatQueryDto.FacePlateProduction.ScanJobCode = await QueryInteJobCodes(manuFacePlateProductionEntity.ScanJobId);
                     }
                 }
                 #endregion
@@ -239,6 +245,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                         //颜色不为空就显示
                         facePlatQueryDto.FacePlateContainerPack.IsShowQualifiedColour = !string.IsNullOrEmpty(facePlatQueryDto.FacePlateContainerPack.QualifiedColour);
                         facePlatQueryDto.FacePlateContainerPack.IsShowErrorsColour = !string.IsNullOrEmpty(facePlatQueryDto.FacePlateContainerPack.ErrorsColour);
+                        //填充Job数据
+                        facePlatQueryDto.FacePlateContainerPack.ScanJobCode = await QueryInteJobCodes(manuFacePlateContainerPackEntity.ScanJobId);
                     }
                 }
                 #endregion
@@ -301,6 +309,35 @@ namespace Hymson.MES.Services.Services.Manufacture
         }
 
         /// <summary>
+        /// 批量查询Job编码
+        /// </summary>
+        /// <param name="scanJobIdStr"></param>
+        /// <returns>返回使用,逗号分割的Code</returns>
+        private async Task<string> QueryInteJobCodes(string scanJobIdStr)
+        {
+            string jobCodeStr = string.Empty;
+            if (!string.IsNullOrEmpty(scanJobIdStr))
+            {
+                var scanJobIdStrArry = scanJobIdStr.Split(',');
+                List<long> longs = new List<long>();
+                foreach (var jobidStr in scanJobIdStrArry)
+                {
+                    //忽略转换失败的Id
+                    if (long.TryParse(jobidStr, out long jobid))
+                    {
+                        longs.Add(jobid);
+                    }
+                }
+                var inteJobEntity = await _inteJobRepository.GetByIdsAsync(longs.ToArray());
+                if (inteJobEntity != null)
+                {
+                    jobCodeStr = string.Join(",", inteJobEntity.Select(c => c.Code));
+                }
+            }
+            return jobCodeStr;
+        }
+
+        /// <summary>
         /// 根据Code查询
         /// </summary>
         /// <param name="code"></param>
@@ -329,6 +366,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                         //颜色不为空就显示
                         facePlateQueryDto.FacePlateProduction.IsShowQualifiedColour = !string.IsNullOrEmpty(facePlateQueryDto.FacePlateProduction.QualifiedColour);
                         facePlateQueryDto.FacePlateProduction.IsShowUnqualifiedColour = !string.IsNullOrEmpty(facePlateQueryDto.FacePlateProduction.UnqualifiedColour);
+                        //填充Job数据
+                        facePlateQueryDto.FacePlateProduction.ScanJobCode = await QueryInteJobCodes(manuFacePlateProductionEntity.ScanJobId);
                     }
                 }
                 #endregion
@@ -343,6 +382,19 @@ namespace Hymson.MES.Services.Services.Manufacture
                         resourceId = manuFacePlateRepairEntity.ResourceId;
                         procedureId = manuFacePlateRepairEntity.ProcedureId;
                         facePlateQueryDto.FacePlateRepair = manuFacePlateRepairEntity.ToModel<ManuFacePlateRepairDto>();
+                    }
+                }
+                #endregion
+                #region 容器包装
+                //容器包装
+                if (manuFacePlateEntity.Type == Core.Enums.Manufacture.ManuFacePlateTypeEnum.ContainerPack)
+                {
+                    var manuFacePlateRepairEntity = await _manuFacePlateContainerPackRepository.GetByFacePlateIdAsync(manuFacePlateEntity.Id);
+                    if (manuFacePlateRepairEntity != null)
+                    {
+                        resourceId = manuFacePlateRepairEntity.ResourceId;
+                        procedureId = manuFacePlateRepairEntity.ProcedureId;
+                        facePlateQueryDto.FacePlateContainerPack = manuFacePlateRepairEntity.ToModel<ManuFacePlateContainerPackDto>();
                     }
                 }
                 #endregion
@@ -365,6 +417,12 @@ namespace Hymson.MES.Services.Services.Manufacture
                             facePlateQueryDto.FacePlateProduction.ResourceName = procResourceEntity.ResName;
                             facePlateQueryDto.FacePlateProduction.ResourceCode = procResourceEntity.ResCode;
                         }
+                        //容器包装
+                        if (manuFacePlateEntity.Type == Core.Enums.Manufacture.ManuFacePlateTypeEnum.ContainerPack)
+                        {
+                            facePlateQueryDto.FacePlateContainerPack.ResourceName = procResourceEntity.ResName;
+                            facePlateQueryDto.FacePlateContainerPack.ResourceCode = procResourceEntity.ResCode;
+                        }
                     }
                 }
                 //工序
@@ -384,6 +442,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                         {
                             facePlateQueryDto.FacePlateProduction.ProcedureName = procProcedureEntity.Name;
                             facePlateQueryDto.FacePlateProduction.ProcedureCode = procProcedureEntity.Code;
+                        }
+                        if (manuFacePlateEntity.Type == Core.Enums.Manufacture.ManuFacePlateTypeEnum.ContainerPack)
+                        {
+                            facePlateQueryDto.FacePlateContainerPack.ProcedureName = procProcedureEntity.Name;
+                            facePlateQueryDto.FacePlateContainerPack.ProcedureCode = procProcedureEntity.Code;
                         }
                     }
                 }

@@ -73,6 +73,13 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<ProcReplaceMaterialEntity> GetByIdAsync(long id);
 
         /// <summary>
+        /// 根据物料id查询替代料
+        /// </summary>
+        /// <param name="materialId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcReplaceMaterialEntity>> GetByMaterialIdAsync(long materialId);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="procReplaceMaterialQuery"></param>

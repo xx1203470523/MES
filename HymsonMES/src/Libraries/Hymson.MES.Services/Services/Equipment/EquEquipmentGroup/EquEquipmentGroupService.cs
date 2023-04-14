@@ -1,10 +1,13 @@
+using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
-using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup;
@@ -32,6 +35,11 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
+        /// 验证器
+        /// </summary>
+        private readonly AbstractValidator<EquEquipmentGroupSaveDto> _validationSaveRules;
+
+        /// <summary>
         /// 仓储（设备组）
         /// </summary>
         private readonly IEquEquipmentGroupRepository _equEquipmentGroupRepository;
@@ -46,14 +54,17 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         /// </summary>
         /// <param name="currentSite"></param>
         /// <param name="currentUser"></param>
+        /// <param name="validationSaveRules"></param>
         /// <param name="equEquipmentGroupRepository"></param>
         /// <param name="equEquipmentRepository"></param>
         public EquEquipmentGroupService(ICurrentUser currentUser, ICurrentSite currentSite,
+            AbstractValidator<EquEquipmentGroupSaveDto> validationSaveRules,
             IEquEquipmentGroupRepository equEquipmentGroupRepository,
             IEquEquipmentRepository equEquipmentRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _validationSaveRules = validationSaveRules;
             _equEquipmentGroupRepository = equEquipmentGroupRepository;
             _equEquipmentRepository = equEquipmentRepository;
         }
@@ -67,7 +78,11 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         public async Task<int> CreateAsync(EquEquipmentGroupSaveDto createDto)
         {
             // 验证DTO
-            //await _validationCreateRules.ValidateAndThrowAsync(createDto);
+            createDto.EquipmentGroupCode = createDto.EquipmentGroupCode.Trim().Replace(" ", string.Empty);
+            createDto.EquipmentGroupCode = createDto.EquipmentGroupCode.ToUpperInvariant();
+            await _validationSaveRules.ValidateAndThrowAsync(createDto);
+
+            if (createDto == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
 
             // DTO转换实体
             var entity = createDto.ToEntity<EquEquipmentGroupEntity>();
@@ -75,6 +90,10 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
             entity.SiteId = _currentSite.SiteId;
+
+            // 编码唯一性验证
+            var checkEntity = await _equEquipmentGroupRepository.GetByCodeAsync(new EntityByCodeQuery { Site = entity.SiteId, Code = entity.EquipmentGroupCode });
+            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES12700)).WithData("Code", entity.EquipmentGroupCode);
 
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
@@ -103,6 +122,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         {
             // 验证DTO
             //await _validationModifyRules.ValidateAndThrowAsync(modifyDto);
+            //判断名称重复
 
             // DTO转换实体
             var entity = modifyDto.ToEntity<EquEquipmentGroupEntity>();

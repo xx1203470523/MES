@@ -7,11 +7,11 @@
  */
 
 using Dapper;
+using FluentValidation.Validators;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -63,7 +63,6 @@ namespace Hymson.MES.Data.Repositories.Process
             return await conn.ExecuteAsync(DeleteTrueByMaterialIdsSql, new { materialIds = materialIds });
         }
 
-
         /// <summary>
         /// 根据ID获取数据
         /// </summary>
@@ -73,6 +72,17 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<ProcReplaceMaterialEntity>(GetByIdSql, new { Id = id });
+        }
+
+        /// <summary>
+        /// 根据物料id查询替代料
+        /// </summary>
+        /// <param name="materialId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcReplaceMaterialEntity>> GetByMaterialIdAsync(long materialId)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcReplaceMaterialEntity>(GetByMaterialIdSql, new { MaterialId = materialId });
         }
 
         /// <summary>
@@ -134,12 +144,12 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcReplaceMaterialViewsSqlTemplate);
-            sqlBuilder.Where("r.IsDeleted=0");
+            sqlBuilder.Where("r.IsDeleted = 0");
             sqlBuilder.Where("r.SiteId = @SiteId");
 
             if (procReplaceMaterialQuery.MaterialId != 0)
             {
-                sqlBuilder.Where(" r.MaterialId=@MaterialId ");
+                sqlBuilder.Where(" r.MaterialId = @MaterialId ");
             }
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
@@ -200,7 +210,7 @@ namespace Hymson.MES.Data.Repositories.Process
                                             /**select**/
                                            FROM `proc_replace_material` /**where**/  ";
         const string GetProcReplaceMaterialViewsSqlTemplate = @"SELECT 
-                            r.ReplaceMaterialId as Id , m.MaterialName, m.MaterialCode, m.Version, r.IsUse as IsEnabled
+                            r.ReplaceMaterialId as Id , m.MaterialName, m.MaterialCode, m.Version, m.SerialNumber, r.IsUse as IsEnabled
                         FROM `proc_replace_material` r
                         LEFT JOIN proc_material m on r.ReplaceMaterialId=m.id and m.IsDeleted=0
                     /**where**/  
@@ -216,5 +226,6 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteId`, `MaterialId`, `ReplaceMaterialId`, `IsUse`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_replace_material`  WHERE Id = @Id ";
+        const string GetByMaterialIdSql = @"SELECT * FROM `proc_replace_material`  WHERE MaterialId = @MaterialId and IsUse=1 ";
     }
 }

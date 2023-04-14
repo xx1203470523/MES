@@ -2,6 +2,7 @@
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using MySql.Data.MySqlClient;
@@ -51,16 +52,16 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="equipmentCode"></param>
-        /// <returns></returns>
-        Task<bool> IsExistsAsync(string equipmentCode);
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<EquEquipmentEntity> GetByIdAsync(long id);
+
+        /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<EquEquipmentEntity> GetByCodeAsync(EntityByCodeQuery query);
 
         /// <summary>
         /// 

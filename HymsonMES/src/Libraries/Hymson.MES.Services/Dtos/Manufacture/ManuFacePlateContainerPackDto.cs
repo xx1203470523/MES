@@ -62,7 +62,8 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// JobId
         /// </summary>
-        public long ScanJobId { get; set; }
+        public string ScanJobId { get; set; }
+        public string ScanJobCode { get; set; }
 
         /// <summary>
         /// 是否有成功提示音
@@ -217,7 +218,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// JobId
         /// </summary>
-        public long? ScanJobId { get; set; }
+        public string? ScanJobId { get; set; }
 
         /// <summary>
         /// 是否有成功提示音
@@ -371,7 +372,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// JobId
         /// </summary>
-        public long? ScanJobId { get; set; }
+        public string? ScanJobId { get; set; }
 
         /// <summary>
         /// 是否有成功提示音

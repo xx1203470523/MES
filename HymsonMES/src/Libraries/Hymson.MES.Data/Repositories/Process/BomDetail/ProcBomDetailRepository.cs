@@ -269,7 +269,7 @@ namespace Hymson.MES.Data.Repositories.Process
                             WHERE a.IsDeleted =0
                             AND a.BomId=@id
                             ORDER by a.UpdatedOn DESC ";
-        const string GetByBomIdSql = @"SELECT * FROM proc_bom_detail WHERE IsDeleted = 0 AND BomId = @bomId ";
+        const string GetByBomIdSql = @"SELECT * FROM proc_bom_detail WHERE IsDeleted = 0 AND BomId = @bomId order by Seq ";
         const string GetByBomIdsSql = @"SELECT * FROM proc_bom_detail WHERE IsDeleted = 0 AND BomId IN @bomIds ";
 
     }

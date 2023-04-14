@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon.Query;
 
 namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
@@ -39,13 +40,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         Task<int> DeletesAsync(DeleteCommand command);
 
         /// <summary>
-        /// 判断是否存在（编码）
-        /// </summary>
-        /// <param name="faultPhenomenonCode"></param>
-        /// <returns></returns>
-        Task<bool> IsExistsAsync(string faultPhenomenonCode);
-
-        /// <summary>
         /// 根据ID获取数据（设备故障现象）
         /// </summary>
         /// <param name="id"></param>
@@ -58,6 +52,13 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         /// <param name="id"></param>
         /// <returns></returns>
         Task<EquFaultPhenomenonView> GetViewByIdAsync(long id);
+
+        /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<EquFaultPhenomenonEntity> GetByCodeAsync(EntityByCodeQuery query);
 
         /// <summary>
         /// 分页查询（设备故障现象）

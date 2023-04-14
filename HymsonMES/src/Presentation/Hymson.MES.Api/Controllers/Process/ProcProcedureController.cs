@@ -1,8 +1,3 @@
-/*
- *describe: 工序表    控制器 | 代码由框架生成  
- *builder:  zhaoqing
- *build datetime: 2023-02-13 09:06:05
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;

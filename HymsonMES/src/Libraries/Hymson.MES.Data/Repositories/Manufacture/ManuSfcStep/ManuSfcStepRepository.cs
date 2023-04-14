@@ -1,11 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 条码步骤表 仓储类 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-03-22 05:17:57
- */
-
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
@@ -23,6 +15,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     {
         private readonly ConnectionOptions _connectionOptions;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
         public ManuSfcStepRepository(IOptions<ConnectionOptions> connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
@@ -175,6 +171,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         #endregion
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class ManuSfcStepRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_step` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
