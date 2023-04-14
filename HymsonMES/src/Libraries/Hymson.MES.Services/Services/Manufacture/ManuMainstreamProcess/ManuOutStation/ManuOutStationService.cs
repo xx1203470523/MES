@@ -205,8 +205,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 // TODO 删除 manu_sfc_produce_business
 
                 // 插入 manu_sfc_step 状态为 完成
-                sfcStep.Type = ManuSfcStepTypeEnum.OutStock;    // TODO 这里的状态？？
-                sfcStep.Status = SfcProduceStatusEnum.Complete;  // TODO 这里的状态？？
+                sfcStep.Operatetype = ManuSfcStepTypeEnum.OutStock;    // TODO 这里的状态？？
+                sfcStep.CurrentStatus = SfcProduceStatusEnum.Complete;  // TODO 这里的状态？？
                 rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
 
                 // TODO manu_sfc_info 修改为 完成或者入库
@@ -225,7 +225,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 rows += await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
 
                 // 插入 manu_sfc_step 状态为 进站
-                sfcStep.Type = ManuSfcStepTypeEnum.OutStock;
+                sfcStep.Operatetype = ManuSfcStepTypeEnum.OutStock;
                 rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
             }
 
