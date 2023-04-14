@@ -153,15 +153,15 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
                 CreatedBy = userName,
                 UpdatedBy = userName,
                 Remark = param.Remark ?? "",
-                PrintName = param.PrintName,
-                PrintIp = param.PrintIp ?? ""
+                PrintName = param.PrintName.Trim(),
+                PrintIp = param.PrintIp.Trim()
             };
 
 
-            var foo = await _printConfigRepository.GetByPrintNameAsync(param.PrintName);
+            var foo = await _printConfigRepository.GetByPrintNameAsync(param.PrintName.Trim());
             if (foo != null)
             {
-                throw new BusinessException(nameof(ErrorCode.MES10306)).WithData("PrintName", param.PrintName);
+                throw new BusinessException(nameof(ErrorCode.MES10341)).WithData("PrintName", param.PrintName);
             }
 
 
