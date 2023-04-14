@@ -497,6 +497,11 @@
         public const string MES16803 = "没有找到该资源对应的工作中心";
         public const string MES16804 = "有工单ID重复";
         #endregion
+
+        #region 面板操作-生产过站面板 MES16900
+        public const string MES16900 = "面板操作-生产过站面板错误";
+        public const string MES16901 = "没有查找到对应条码的生产信息！";
+        #endregion
         #endregion
 
         #region 系统执行出错 业务逻辑出错
