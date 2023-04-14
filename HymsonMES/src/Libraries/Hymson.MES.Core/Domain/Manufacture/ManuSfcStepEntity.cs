@@ -19,7 +19,6 @@ namespace Hymson.MES.Core.Domain.Manufacture
     /// </summary>
     public class ManuSfcStepEntity : BaseEntity
     {
-
         /// <summary>
         /// 站点Id
         /// </summary>
@@ -84,6 +83,9 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 复投次数
         /// </summary>
         public int? RepeatedCount { get; set; }
+
+
+        public bool? IsRepair { get; set; }
 
         /// <summary>
         /// 备注
