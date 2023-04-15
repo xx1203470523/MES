@@ -125,7 +125,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                 //查找每个主物料是否已经完成组装 --根据装配数量来判断
                 var hasAssembleNum = manuSfcCirculationEntitys.Where(x => x.CirculationMainProductId == mainMaterialId).Sum(x => x.CirculationQty);
-                if (hasAssembleNum == item.Usages)
+                if (hasAssembleNum >= item.Usages)
                 {
                     continue;
                 }
@@ -160,7 +160,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
         /// <exception cref="BusinessException"></exception>
-        public async Task AddPackageCom(ManuFacePlateProductionPackageAddDto addDto) 
+        public async Task<string> AddPackageCom(ManuFacePlateProductionPackageAddDto addDto) 
         {
             #region 验证
             if (addDto == null)
@@ -227,7 +227,8 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                 if (whMaterialInventory.MaterialId != material.Id) 
                 {
-                    throw new BusinessException(nameof(ErrorCode.MES16911));
+                    return nameof(ErrorCode.MES16911);
+                    //throw new BusinessException(nameof(ErrorCode.MES16911));
                 }
 
                 //库存数量，库存状态
@@ -281,7 +282,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 }
                 trans.Complete();
             }
-
+            return "";
         }
 
         /// <summary>
