@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Data.Repositories.Process;
 
 namespace Hymson.MES.Services.Dtos.Manufacture
 {
@@ -439,5 +440,109 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     /// </summary>
     public class ManuFacePlateProductionPagedQueryDto : PagerInfo
     {
+    }
+
+
+    public class ManuFacePlateProductionPackageQueryDto
+    {
+        /// <summary>
+        /// SFC 产品条码
+        /// </summary>
+        public string SFC { get; set; }
+
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long? ResourceId { get; set; }
+    }
+
+    /// <summary>
+    /// 生产过站面板 组装界面信息
+    /// </summary>
+    public class ManuFacePlateProductionPackageDto
+    {
+        /// <summary>
+        /// 主物料ID
+        /// </summary>
+        public string MaterialId { get; set; }
+
+        /// <summary>
+        /// 主物料编码
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 主物料名称
+        /// </summary>
+        public string MaterialName { get; set; }
+
+        /// <summary>
+        /// 主物料版本
+        /// </summary>
+        public string MaterialVersion { get; set; }
+
+        /// <summary>
+        /// 物料需求数量
+        /// </summary>
+        public decimal Usages { get; set; }
+
+        /// <summary>
+        /// 已经装配数量
+        /// </summary>
+        public decimal HasAssembleNum { get; set; }
+
+        /// <summary>
+        /// bom对应的主物料数量
+        /// </summary>
+        public int BomMainMaterialNum { get; set; }
+
+        /// <summary>
+        /// 已经组装到第几个主物料
+        /// </summary>
+        public int CurrentMainMaterialIndex { get; set; }
+
+        /// <summary>
+        /// 替代物料
+        /// </summary>
+        public IEnumerable<ProcBomDetailView> ReplaceMaterialBomDetails { get; set; }
+    }
+
+    public class ManuFacePlateProductionPackageAddDto{
+        /// <summary>
+        /// SFC 产品条码
+        /// </summary>
+        public string SFC { get; set; }
+
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long? ResourceId { get; set; }
+
+        /// <summary>
+        /// 主物料ID
+        /// </summary>
+        public long CirculationMainProductId { get; set; }
+
+        /// <summary>
+        /// 替代物料ID
+        /// </summary>
+        public long CirculationProductId { get; set; }
+
+        /// <summary>
+        /// 物料 条码 
+        /// </summary>
+        public string CirculationBarCode { get; set; }
+
+        //public decimal CirculationQty { get; set; }
     }
 }

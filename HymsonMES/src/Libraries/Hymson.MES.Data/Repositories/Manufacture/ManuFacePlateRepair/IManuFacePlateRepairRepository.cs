@@ -103,7 +103,22 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<ManuFacePlateRepairEntity> GetByFacePlateIdAsync(long facePlateId);
         #endregion
 
-        #region 维修明细
+        #region 维修记录
+        /// <summary>
+        /// 新增维修记录
+        /// </summary>
+        /// <param name="manuSfcRepairRecordEntity"></param>
+        /// <returns></returns> 
+        Task<int> InsertRecordAsync(ManuSfcRepairRecordEntity manuSfcRepairRecordEntity);
+
+        /// <summary>
+        /// 批量新增维修记录
+        /// </summary>
+        /// <param name="manuSfcRepairRecordEntitys"></param>
+        /// <returns></returns> 
+        Task<int> InsertsRecordAsync(List<ManuSfcRepairRecordEntity> manuSfcRepairRecordEntitys);
+
+
         /// <summary>
         /// 新增维修明细
         /// </summary>

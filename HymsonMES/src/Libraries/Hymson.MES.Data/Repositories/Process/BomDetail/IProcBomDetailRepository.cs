@@ -96,16 +96,16 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 查询主物料表列表
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="bomId"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcBomDetailView>> GetListMainAsync(long id);
+        Task<IEnumerable<ProcBomDetailView>> GetListMainAsync(long bomId);
 
         /// <summary>
         /// 查询替代物料列表
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="bomId"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcBomDetailView>> GetListReplaceAsync(long id);
+        Task<IEnumerable<ProcBomDetailView>> GetListReplaceAsync(long bomId);
 
         /// <summary>
         /// 获取List

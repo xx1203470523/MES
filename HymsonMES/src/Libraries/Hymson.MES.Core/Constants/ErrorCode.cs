@@ -510,6 +510,7 @@
         #region 面板操作-生产过站面板 MES16900
         public const string MES16900 = "面板操作-生产过站面板错误";
         public const string MES16901 = "没有查找到对应条码的生产信息！";
+        public const string MES16902 = "无法将主物料ID转为long类型！";
         #endregion
         #endregion
 

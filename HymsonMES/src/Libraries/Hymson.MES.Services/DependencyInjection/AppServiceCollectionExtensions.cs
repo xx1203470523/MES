@@ -173,6 +173,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuContainerBarcodeService, ManuContainerBarcodeService>();
             services.AddSingleton<IManuContainerPackService, ManuContainerPackService>();
             services.AddSingleton<IManuContainerPackRecordService, IManuContainerPackRecordService>();
+
+            services.AddSingleton<IManuFacePlateProductionService, ManuFacePlateProductionService>();
             #endregion
 
             #region Warehouse 
