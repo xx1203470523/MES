@@ -547,13 +547,13 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 根据ID查询Bom 详情
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="bomId"></param>
         /// <returns></returns>
-        public async Task<List<ProcBomDetailView>> GetProcBomMaterialAsync(long id)
+        public async Task<List<ProcBomDetailView>> GetProcBomMaterialAsync(long bomId)
         {
             var procBomDetailViews = new List<ProcBomDetailView>();
-            var mainBomDetails = await _procBomDetailRepository.GetListMainAsync(id);
-            var replaceBomDetails = await _procBomDetailRepository.GetListReplaceAsync(id);
+            var mainBomDetails = await _procBomDetailRepository.GetListMainAsync(bomId);
+            var replaceBomDetails = await _procBomDetailRepository.GetListReplaceAsync(bomId);
 
             if (mainBomDetails.Count() > 0)
             {

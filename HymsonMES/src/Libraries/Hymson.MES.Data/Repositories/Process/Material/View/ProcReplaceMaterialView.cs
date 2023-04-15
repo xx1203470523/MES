@@ -1,5 +1,6 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,5 +38,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 是否启用
         /// </summary>
         public bool IsEnabled { get; set; }
+
+
+
+        /// <summary>
+        /// 数据收集方式 （等同于 DataCollectionWay ）
+        /// </summary>
+        public MaterialSerialNumberEnum? SerialNumber { get; set; }
+
     }
 }

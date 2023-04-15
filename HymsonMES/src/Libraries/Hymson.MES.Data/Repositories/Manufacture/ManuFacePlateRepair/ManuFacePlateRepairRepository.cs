@@ -20,10 +20,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// <summary>
     /// 在制品维修仓储
     /// </summary>
-    public partial class ManuFacePlateRepairRepository :BaseRepository, IManuFacePlateRepairRepository
+    public partial class ManuFacePlateRepairRepository : BaseRepository, IManuFacePlateRepairRepository
     {
 
-        public ManuFacePlateRepairRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        public ManuFacePlateRepairRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
         }
 
@@ -44,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -58,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<ManuFacePlateRepairEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ManuFacePlateRepairEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ManuFacePlateRepairEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -78,10 +78,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuFacePlateRepairEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ManuFacePlateRepairEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<ManuFacePlateRepairEntity>(GetByIdsSql, new { Ids = ids});
+            return await conn.QueryAsync<ManuFacePlateRepairEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
-           
+
             var offSet = (manuFacePlateRepairPagedQuery.PageIndex - 1) * manuFacePlateRepairPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = manuFacePlateRepairPagedQuery.PageSize });
@@ -185,6 +185,54 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
         #endregion
 
+        #region 维修记录
+
+        /// <summary>
+        /// 新增维修记录
+        /// </summary>
+        /// <param name="manuSfcRepairRecordEntity"></param>
+        /// <returns></returns> 
+        public async Task<int> InsertRecordAsync(ManuSfcRepairRecordEntity manuSfcRepairRecordEntity)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(InsertSql, manuSfcRepairRecordEntity);
+        }
+
+        /// <summary>
+        /// 批量新增维修记录
+        /// </summary>
+        /// <param name="manuSfcRepairRecordEntitys"></param>
+        /// <returns></returns> 
+        public async Task<int> InsertsRecordAsync(List<ManuSfcRepairRecordEntity> manuSfcRepairRecordEntitys)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(InsertsSql, manuSfcRepairRecordEntitys);
+        }
+
+
+        /// <summary>
+        /// 新增维修明细
+        /// </summary>
+        /// <param name="manuFacePlateRepairEntity"></param>
+        /// <returns></returns>
+        public async Task<int> InsertDetailAsync(ManuSfcRepairDetailEntity manuSfcRepairDetailEntity)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(InsertDetailSql, manuSfcRepairDetailEntity);
+        }
+
+        /// <summary>
+        /// 批量新增维修明细
+        /// </summary>
+        /// <param name="manuFacePlateRepairEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> InsertsDetailAsync(List<ManuSfcRepairDetailEntity> manuSfcRepairDetailEntities)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(InsertsDetailSql, manuSfcRepairDetailEntities);
+        }
+        #endregion
+
     }
 
     public partial class ManuFacePlateRepairRepository
@@ -217,6 +265,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                             FROM `manu_face_plate_Repair`  WHERE FacePlateId = @FacePlateId ";
 
         const string UpdateByFacePlateIdSql = "UPDATE `manu_face_plate_Repair` SET   SiteId = @SiteId, FacePlateId = @FacePlateId, ResourceId = @ResourceId, IsResourceEdit = @IsResourceEdit, ProcedureId = @ProcedureId, IsProcedureEdit = @IsProcedureEdit,IsShowProductList = @IsShowProductList, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE FacePlateId = @FacePlateId ";
+
+        //维修记录
+        const string InsertRecordSql = "INSERT INTO `manu_sfc_repair_record`(  `Id`, `SiteId`, `SFC`, `WorkOrderId`, `ProductId`, `ResourceId`, `ProcedureId`, `ReturnProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SFC, @WorkOrderId, @ProductId, @ResourceId, @ProcedureId, @ReturnProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsRecordSql = "INSERT INTO `manu_sfc_repair_record`(  `Id`, `SiteId`, `SFC`, `WorkOrderId`, `ProductId`, `ResourceId`, `ProcedureId`, `ReturnProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SFC, @WorkOrderId, @ProductId, @ResourceId, @ProcedureId, @ReturnProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+
+        const string InsertDetailSql = "INSERT INTO `manu_sfc_repair_detail`(  `Id`, `SiteId`, `SfcRepairId`, `ProductBadId`, `RepairMethod`, `CauseAnalyse`, `IsClose`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcRepairId, @ProductBadId, @RepairMethod, @CauseAnalyse, @IsClose, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsDetailSql = "INSERT INTO `manu_sfc_repair_detail`(  `Id`, `SiteId`, `SfcRepairId`, `ProductBadId`, `RepairMethod`, `CauseAnalyse`, `IsClose`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcRepairId, @ProductBadId, @RepairMethod, @CauseAnalyse, @IsClose, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+
+
+
         #endregion
     }
 }

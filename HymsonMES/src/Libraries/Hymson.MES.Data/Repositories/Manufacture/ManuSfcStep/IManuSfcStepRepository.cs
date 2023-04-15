@@ -21,13 +21,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public interface IManuSfcStepRepository
     {
-	    /// <summary>
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ManuSfcStepEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -41,21 +41,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuSfcStepQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuSfcStepEntity>> GetManuSfcStepEntitiesAsync(ManuSfcStepQuery manuSfcStepQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="manuSfcStepPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuSfcStepEntity>> GetPagedInfoAsync(ManuSfcStepPagedQuery manuSfcStepPagedQuery);
-		
+
         /// <summary>
         /// 新增
         /// </summary>
         /// <param name="manuSfcStepEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ManuSfcStepEntity manuSfcStepEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -69,19 +69,33 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuSfcStepEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ManuSfcStepEntity manuSfcStepEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
         /// <param name="manuSfcStepEntitys"></param>
         /// <returns></returns>
         Task<int> UpdateRangeAsync(IEnumerable<ManuSfcStepEntity> manuSfcStepEntitys);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> DeleteRangeAsync(DeleteCommand command);
+
+        /// <summary>
+        /// 插入步骤业务表
+        /// </summary>
+        /// <param name="maunSfcStepBusinessEntitie"></param>
+        /// <returns></returns>
+        Task<int> InsertSfcStepBusinessAsync(MaunSfcStepBusinessEntity maunSfcStepBusinessEntitie);
+
+        /// <summary>
+        /// 批量插入步骤业务表
+        /// </summary>
+        /// <param name="maunSfcStepBusinessEntities"></param>
+        /// <returns></returns>
+        Task<int> InsertSfcStepBusinessRangeAsync(IEnumerable<MaunSfcStepBusinessEntity> maunSfcStepBusinessEntities);
     }
 }

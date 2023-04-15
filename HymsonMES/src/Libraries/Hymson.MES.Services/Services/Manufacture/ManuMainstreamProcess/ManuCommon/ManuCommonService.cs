@@ -241,7 +241,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             // 有多工序分叉的情况
             if (procedureNodes.Count() > 1)
             {
-                // 会不会上面这个的太长了
+                // 这个Key太长了
                 //var cacheKey = $"{manuSfcProduce.ProcessRouteId}-{manuSfcProduce.ProcedureId}-{manuSfcProduce.ResourceId}-{manuSfcProduce.WorkOrderId}";
 
                 var cacheKey = $"{manuSfcProduce.ProcedureId}-{manuSfcProduce.WorkOrderId}";
@@ -273,10 +273,27 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 ProcessRouteId = manuSfcProduce.ProcessRouteId,
                 ProcedureId = manuSfcProduce.ProcedureId
             });
+            if (preProcessRouteDetailLinks == null || preProcessRouteDetailLinks.Any() == false) throw new BusinessException(nameof(ErrorCode.MES10442));
 
-            // TODO 
+            // 获取当前工序在工艺路线里面的扩展信息
+            var procedureNodes = await _procProcessRouteDetailNodeRepository
+                .GetByIdsAsync(preProcessRouteDetailLinks
+                .Where(w => w.PreProcessRouteDetailId.HasValue)
+                .Select(s => s.PreProcessRouteDetailId.Value).ToArray())
+                ?? throw new BusinessException(nameof(ErrorCode.MES10442));
 
-            return false;
+            // 有多工序分叉的情况
+            ProcProcessRouteDetailNodeEntity defaultPreProcedure = procedureNodes.FirstOrDefault();
+            if (preProcessRouteDetailLinks.Count() > 1)
+            {
+                // 下工序找上工序，执照正常流程的工序
+                defaultPreProcedure = procedureNodes.FirstOrDefault(f => f.CheckType == ProcessRouteInspectTypeEnum.None)
+                   ?? throw new BusinessException(nameof(ErrorCode.MES10441));
+            }
+
+            // 获取上一工序
+            if (defaultPreProcedure == null) throw new BusinessException(nameof(ErrorCode.MES10442));
+            return defaultPreProcedure.CheckType == ProcessRouteInspectTypeEnum.RandomInspection;
         }
 
     }

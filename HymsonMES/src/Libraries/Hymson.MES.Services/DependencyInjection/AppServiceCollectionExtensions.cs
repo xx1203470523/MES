@@ -168,6 +168,14 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuInStationService, ManuInStationService>();
             services.AddSingleton<IManuOutStationService, ManuOutStationService>();
             services.AddSingleton<IInProductDismantleService, InProductDismantleService>();
+            services.AddSingleton<IManuFacePlateRepairService, ManuFacePlateRepairService>();
+
+            services.AddSingleton<IManuContainerBarcodeService, ManuContainerBarcodeService>();
+            services.AddSingleton<IManuContainerPackService, ManuContainerPackService>();
+            services.AddSingleton<IManuContainerPackRecordService, ManuContainerPackRecordService>();
+
+            services.AddSingleton<IManuFacePlateProductionService, ManuFacePlateProductionService>();
+
             #endregion
 
             #region Warehouse 
@@ -194,6 +202,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IPlanSfcPrintService, PlanSfcPrintService>();
             #endregion
 
+            #region PlanWorkOrderBind
+            services.AddSingleton<IPlanWorkOrderBindService, PlanWorkOrderBindService>();
+            #endregion
             #endregion
 
             #region Job
@@ -230,12 +241,14 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddValidators(IServiceCollection services)
         {
             #region Equipment
+            services.AddSingleton<AbstractValidator<EquEquipmentSaveDto>, EquEquipmentValidator>();
+            services.AddSingleton<AbstractValidator<EquEquipmentGroupSaveDto>, EquEquipmentGroupValidator>();
             services.AddSingleton<AbstractValidator<EquEquipmentUnitSaveDto>, EquipmentUnitCreateValidator>();
+            services.AddSingleton<AbstractValidator<EquFaultPhenomenonSaveDto>, EquFaultPhenomenonValidator>();
             services.AddSingleton<AbstractValidator<EquFaultReasonSaveDto>, EquFaultReasonCreateValidator>();
             #endregion
 
             #region Process
-
             #region Material
             services.AddSingleton<AbstractValidator<ProcMaterialCreateDto>, ProcMaterialCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcMaterialModifyDto>, ProcMaterialModifyValidator>();
@@ -268,7 +281,6 @@ namespace Microsoft.Extensions.DependencyInjection
             #region LoadPoint
             services.AddSingleton<AbstractValidator<ProcLoadPointCreateDto>, ProcLoadPointCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcLoadPointModifyDto>, ProcLoadPointModifyValidator>();
-
             #endregion
 
             #region Resource
@@ -285,11 +297,18 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<ProcProcessRouteCreateDto>, ProcProcessRouteCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcProcessRouteModifyDto>, ProcProcessRouteModifyValidator>();
             #endregion
+
             #region LabelTemplate
 
             services.AddSingleton<AbstractValidator<ProcLabelTemplateCreateDto>, ProcLabelTemplateCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcLabelTemplateModifyDto>, ProcLabelTemplateModifyValidator>();
+            services.AddSingleton<AbstractValidator<ProcPrinterDto>, ProcPrinterCreateValidator>();
             #endregion
+
+            #region MaskCode
+            services.AddSingleton<AbstractValidator<ProcMaskCodeSaveDto>, ProcMaskCodeValidator>();
+            #endregion
+
             #endregion
 
             #region Integrated
@@ -318,7 +337,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region Manufacture
 
-            services.AddSingleton<AbstractValidator<ManuSfcProduceCreateDto>, ManuSfcProduceCreateValidator>();
+            services.AddSingleton<AbstractValidator<ManuSfcProduceLockDto>, ManuSfcProduceLockValidator>();
             services.AddSingleton<AbstractValidator<ManuSfcProduceModifyDto>, ManuSfcProduceModifyValidator>();
 
             services.AddSingleton<AbstractValidator<ManuSfcInfoCreateDto>, ManuSfcInfoCreateValidator>();
@@ -341,6 +360,14 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<AbstractValidator<ManuFacePlateContainerPackCreateDto>, ManuFacePlateContainerPackCreateValidator>();
             services.AddSingleton<AbstractValidator<ManuFacePlateContainerPackModifyDto>, ManuFacePlateContainerPackModifyValidator>();
+            
+            services.AddSingleton<AbstractValidator<ManuContainerBarcodeCreateDto>, ManuContainerBarcodeCreateValidator>();
+            services.AddSingleton<AbstractValidator<ManuContainerBarcodeModifyDto>, ManuContainerBarcodeModifyValidator>();
+
+            services.AddSingleton<AbstractValidator<ManuContainerPackRecordCreateDto>, ManuContainerPackRecordCreateValidator>();
+            services.AddSingleton<AbstractValidator<ManuContainerPackRecordModifyDto>, ManuContainerPackRecordModifyValidator>();
+            services.AddSingleton<AbstractValidator<ManuContainerPackCreateDto>, ManuContainerPackCreateValidator>();
+            services.AddSingleton<AbstractValidator<ManuContainerPackModifyDto>, ManuContainerPackModifyValidator>();
             #endregion
 
             #region Warehouse 
@@ -377,6 +404,12 @@ namespace Microsoft.Extensions.DependencyInjection
             #region PlanSfcPrint
             services.AddSingleton<AbstractValidator<PlanSfcPrintCreateDto>, PlanSfcPrintCreateValidator>();
             services.AddSingleton<AbstractValidator<PlanSfcPrintModifyDto>, PlanSfcPrintModifyValidator>();
+
+            #endregion
+
+            #region PlanWorkOrderBind 
+            services.AddSingleton<AbstractValidator<PlanWorkOrderBindCreateDto>, PlanWorkOrderBindCreateValidator>();
+            services.AddSingleton<AbstractValidator<PlanWorkOrderBindModifyDto>, PlanWorkOrderBindModifyValidator>();
 
             #endregion
 

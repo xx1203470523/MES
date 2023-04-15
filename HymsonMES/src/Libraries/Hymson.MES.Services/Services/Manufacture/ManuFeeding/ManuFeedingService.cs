@@ -261,7 +261,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             var materials = await _procMaterialRepository.GetByIdsAsync(materialIds.ToArray());
 
             // 通过物料ID获取物料库存信息
-            var manuFeedings = await _manuFeedingRepository.GetByResourceIdAndMaterialIdsAsync(new ManuFeedingQuery
+            var manuFeedings = await _manuFeedingRepository.GetByResourceIdAndMaterialIdsAsync(new GetByResourceIdAndMaterialIdsQuery
             {
                 ResourceId = queryDto.ResourceId,
                 MaterialIds = materialIds,

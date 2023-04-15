@@ -84,16 +84,6 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public SfcProduceStatusEnum Status { get; set; }
 
        /// <summary>
-        /// 锁;1：未锁定；2：即时锁；3：将来锁；
-        /// </summary>
-        public int? Lock { get; set; }
-
-       /// <summary>
-        /// 未来锁工序id
-        /// </summary>
-        public long? LockProductionId { get; set; }
-
-       /// <summary>
         /// 是否可疑
         /// </summary>
         public bool? IsSuspicious { get; set; }

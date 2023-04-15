@@ -113,24 +113,24 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 查询主物料表列表
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="bomId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcBomDetailView>> GetListMainAsync(long id)
+        public async Task<IEnumerable<ProcBomDetailView>> GetListMainAsync(long bomId)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcBomDetailView>(GetListMainSql, new { id = id });
+            return await conn.QueryAsync<ProcBomDetailView>(GetListMainSql, new { bomId = bomId });
         }
 
         /// <summary>
         /// 查询替代物料列表
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="bomId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcBomDetailView>> GetListReplaceAsync(long id)
+        public async Task<IEnumerable<ProcBomDetailView>> GetListReplaceAsync(long bomId)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
 
-            return await conn.QueryAsync<ProcBomDetailView>(GetListReplaceSql, new { id = id });
+            return await conn.QueryAsync<ProcBomDetailView>(GetListReplaceSql, new { bomId = bomId });
         }
 
         /// <summary>
@@ -253,7 +253,7 @@ namespace Hymson.MES.Data.Repositories.Process
                             INNER JOIN proc_material b on a.MaterialId = b.Id 
                             LEFT JOIN proc_procedure c on a.ProcedureId = c.Id
                             WHERE a.IsDeleted =0
-                            AND a.BomId=@id
+                            AND a.BomId=@bomId
                             ORDER by a.UpdatedOn DESC ";
         /// <summary>
         /// 查询替代物料列表
@@ -267,9 +267,9 @@ namespace Hymson.MES.Data.Repositories.Process
                             INNER JOIN proc_bom_detail b on a.BomDetailId = b.Id 
                             LEFT JOIN proc_material c on a.ReplaceMaterialId = c.Id
                             WHERE a.IsDeleted =0
-                            AND a.BomId=@id
+                            AND a.BomId=@bomId
                             ORDER by a.UpdatedOn DESC ";
-        const string GetByBomIdSql = @"SELECT * FROM proc_bom_detail WHERE IsDeleted = 0 AND BomId = @bomId ";
+        const string GetByBomIdSql = @"SELECT * FROM proc_bom_detail WHERE IsDeleted = 0 AND BomId = @bomId order by Seq ";
         const string GetByBomIdsSql = @"SELECT * FROM proc_bom_detail WHERE IsDeleted = 0 AND BomId IN @bomIds ";
 
     }

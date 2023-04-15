@@ -29,10 +29,10 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 发现不良工序Id
         /// </summary>
-        public long? FoundBadOperationId { get; set; }
+        public long FoundBadOperationId { get; set; }
 
         /// <summary>
         /// 发现不良资源
@@ -42,34 +42,34 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 流出不良工序
         /// </summary>
-        public long? OutflowOperationId { get; set; }
+        public long OutflowOperationId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 不合格代码Id
         /// </summary>
-        public long? UnqualifiedId { get; set; }
+        public long UnqualifiedId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 产品条码
         /// </summary>
         public string SFC { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 数量
         /// </summary>
         public decimal? Qty { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 不合格记录开关;1、开启  2、关闭
         /// </summary>
-        public ProductBadRecordStatusEnum? Status { get; set; }
+        public ProductBadRecordStatusEnum Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 不良来源;·1、设备复投不良  2、人工录入不良
         /// </summary>
         public ProductBadRecordSourceEnum? Source { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 说明
         /// </summary>
         public string Remark { get; set; }

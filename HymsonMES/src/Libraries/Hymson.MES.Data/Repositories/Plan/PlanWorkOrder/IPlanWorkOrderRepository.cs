@@ -82,6 +82,13 @@ namespace Hymson.MES.Data.Repositories.Plan
         Task<IEnumerable<PlanWorkOrderEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
+        /// 根据IDs批量获取数据  含有物料信息
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<PlanWorkOrderAboutMaterialInfoView>> GetByIdsAboutMaterialInfoAsync(long[] ids);
+
+        /// <summary>
         /// 根据车间ID获取工单数据
         /// </summary>
         /// <param name="workFarmId"></param>

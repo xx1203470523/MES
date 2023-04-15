@@ -440,6 +440,19 @@ namespace Hymson.MES.Services.Services.Manufacture
                     }
                 }
                 #endregion
+                #region 容器包装
+                //容器包装
+                if (manuFacePlateEntity.Type == Core.Enums.Manufacture.ManuFacePlateTypeEnum.ContainerPack)
+                {
+                    var manuFacePlateRepairEntity = await _manuFacePlateContainerPackRepository.GetByFacePlateIdAsync(manuFacePlateEntity.Id);
+                    if (manuFacePlateRepairEntity != null)
+                    {
+                        resourceId = manuFacePlateRepairEntity.ResourceId;
+                        procedureId = manuFacePlateRepairEntity.ProcedureId;
+                        facePlateQueryDto.FacePlateContainerPack = manuFacePlateRepairEntity.ToModel<ManuFacePlateContainerPackDto>();
+                    }
+                }
+                #endregion
 
                 #region 填充关联表数据
                 //资源
@@ -458,6 +471,12 @@ namespace Hymson.MES.Services.Services.Manufacture
                         {
                             facePlateQueryDto.FacePlateProduction.ResourceName = procResourceEntity.ResName;
                             facePlateQueryDto.FacePlateProduction.ResourceCode = procResourceEntity.ResCode;
+                        }
+                        //容器包装
+                        if (manuFacePlateEntity.Type == Core.Enums.Manufacture.ManuFacePlateTypeEnum.ContainerPack)
+                        {
+                            facePlateQueryDto.FacePlateContainerPack.ResourceName = procResourceEntity.ResName;
+                            facePlateQueryDto.FacePlateContainerPack.ResourceCode = procResourceEntity.ResCode;
                         }
                     }
                 }
@@ -478,6 +497,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                         {
                             facePlateQueryDto.FacePlateProduction.ProcedureName = procProcedureEntity.Name;
                             facePlateQueryDto.FacePlateProduction.ProcedureCode = procProcedureEntity.Code;
+                        }
+                        if (manuFacePlateEntity.Type == Core.Enums.Manufacture.ManuFacePlateTypeEnum.ContainerPack)
+                        {
+                            facePlateQueryDto.FacePlateContainerPack.ProcedureName = procProcedureEntity.Name;
+                            facePlateQueryDto.FacePlateContainerPack.ProcedureCode = procProcedureEntity.Code;
                         }
                     }
                 }

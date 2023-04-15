@@ -463,6 +463,11 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuFacePlateButtonJobRelationCreateDto, ManuFacePlateButtonJobRelationEntity>();
             CreateMap<ManuFacePlateButtonJobRelationEntity, ManuFacePlateButtonJobRelationDto>();
             #endregion
+
+            #region ManuSfcProduce
+            CreateMap<ManuSfcProduceEntity, ManuSfcProduceDto>();
+            #endregion
+
         }
 
         /// <summary>
@@ -494,7 +499,10 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<PlanWorkOrderActivationPagedQueryDto, PlanWorkOrderActivationPagedQuery>();
             CreateMap<PlanWorkOrderActivationEntity, PlanWorkOrderActivationDto>();
             CreateMap<PlanWorkOrderActivationListDetailView, PlanWorkOrderActivationListDetailViewDto>();
+
+            CreateMap<PlanWorkOrderActivationAboutResPagedQueryDto, PlanWorkOrderActivationPagedQuery>();
             #endregion
+
             #region PlanSfcPrint
             CreateMap<PlanSfcPrintCreateDto, PlanSfcPrintView>();
             CreateMap<PlanSfcPrintModifyDto, PlanSfcPrintView>();

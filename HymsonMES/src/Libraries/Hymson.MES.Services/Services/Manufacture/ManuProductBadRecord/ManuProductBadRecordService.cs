@@ -21,15 +21,11 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
-using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
 using Hymson.MES.Services.Dtos.Manufacture;
-using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Org.BouncyCastle.Crypto.Generators;
-using System.Security.Policy;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -402,8 +398,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 EquipmentId = sfc.EquipmentId,
                 ResourceId = sfc.ResourceId,
                 ProcedureId = sfc.ProcedureId,
-                Type = type,
-                Status = sfc.Status,
+                Operatetype = type,
+                CurrentStatus = sfc.Status,
                 //Lock = sfc.Lock,
                 Remark = remark,
                 SiteId = _currentSite.SiteId ?? 0,

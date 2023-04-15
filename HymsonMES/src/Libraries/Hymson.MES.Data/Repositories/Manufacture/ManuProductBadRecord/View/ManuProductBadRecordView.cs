@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hymson.MES.Core.Enums.Manufacture;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,10 +9,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 {
     public class ManuProductBadRecordView
     {
+
+        /// <summary>
+        /// 不良录入ID
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 是否关闭
+        /// </summary>
+        public ProductBadRecordStatusEnum Status { get; set; }
+
         /// <summary>
         /// 不合格代码Id
         /// </summary>
-        public long? UnqualifiedId { get; set; }
+        public long UnqualifiedId { get; set; }
 
         /// <summary>
         /// 不合格代码
