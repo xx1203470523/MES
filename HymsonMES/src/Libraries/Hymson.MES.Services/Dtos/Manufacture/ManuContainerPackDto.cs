@@ -45,7 +45,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 数量
         /// </summary>
-        public int Count { get; set; } 
+        public int Count { get; set; }
 
         /// <summary>
         /// 创建人

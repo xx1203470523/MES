@@ -76,8 +76,18 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     }
     public record ManuContainerBarcodeView
     {
+        /// <summary>
+        /// 容器包装主表实体
+        /// </summary>
         public ManuContainerBarcodeEntity manuContainerBarcodeEntity { get; set; }
+        /// <summary>
+        /// 容器规格实体
+        /// </summary>
         public InteContainerEntity inteContainerEntity { get; set; }
+        /// <summary>
+        /// 该容器的包装集合
+        /// </summary>
+        public List<ManuContainerPackDto> manuContainerPacks { get; set; }
     }
 
 

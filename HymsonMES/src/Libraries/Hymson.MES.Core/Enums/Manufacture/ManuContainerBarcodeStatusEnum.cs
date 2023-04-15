@@ -24,4 +24,22 @@ namespace Hymson.MES.Core.Enums.Manufacture
         Close = 2
 
     }
+    /// <summary>
+    /// 操作类型;1、装载2、移除
+    /// </summary>
+    public enum ManuContainerBarcodeOperateTypeEnum : sbyte
+    {
+        /// <summary>
+        /// 打开
+        /// </summary>
+        [Description("装载")]
+        Load = 1,
+        /// <summary>
+        /// 关闭
+        /// </summary>
+        [Description("移除")]
+        Unload = 2
+
+    }
+
 }
