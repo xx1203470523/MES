@@ -515,6 +515,15 @@
         public const string MES16900 = "面板操作-生产过站面板错误";
         public const string MES16901 = "没有查找到对应条码的生产信息！";
         public const string MES16902 = "无法将主物料ID转为long类型！";
+        public const string MES16903 = "当前工序与条码生产信息中的不一致！";
+        public const string MES16904 = "找不到实际使用的物料信息!";
+        public const string MES16905 = "找不到实际物料{materialCode}对应的数据收集方式!";
+        public const string MES16906 = "物料选择不符合!";
+        public const string MES16907 = "bom没有配置替代物料,物料选择不符合!";
+        public const string MES16908 = "物料条码{barCode}库存不存在!";
+        public const string MES16909 = "物料条码{barCode}库存不足,请检查!";
+        public const string MES16910 = "实际使用的物料为空!";
+        public const string MES16911 = "实际使用的物料与条码不合!";
         #endregion
         #endregion
 
