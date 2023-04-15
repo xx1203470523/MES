@@ -507,6 +507,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public int CurrentMainMaterialIndex { get; set; }
 
         /// <summary>
+        /// 当前bom详情Id (bom下主物料对应的bomdetailId)(不是主物料ID)(表proc_bom_detail对应的ID)
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
         /// 替代物料
         /// </summary>
         public IEnumerable<ProcBomDetailView> ReplaceMaterialBomDetails { get; set; }
@@ -534,9 +539,9 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long CirculationMainProductId { get; set; }
 
         /// <summary>
-        /// 替代物料ID
+        /// 替代物料ID   有值表示使用的是替代物料
         /// </summary>
-        public long CirculationProductId { get; set; }
+        public long? CirculationProductId { get; set; }
 
         /// <summary>
         /// 物料 条码 
@@ -544,5 +549,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public string CirculationBarCode { get; set; }
 
         //public decimal CirculationQty { get; set; }
+
+        public long BomDetailId { get; set; }
     }
 }
