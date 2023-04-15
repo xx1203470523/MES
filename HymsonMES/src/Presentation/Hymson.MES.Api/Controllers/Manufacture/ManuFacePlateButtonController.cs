@@ -66,6 +66,17 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         /// <summary>
+        ///根据ButtonID查询按钮信息和关联JOB
+        /// </summary>
+        /// <param name="buttonId"></param>
+        /// <returns></returns>
+        [HttpGet("queryButtonBybuttonId/{buttonId}")]
+        public async Task<ManuFacePlateButtonDto> QueryManuFacePlateButtonByButtonIdAsync(long buttonId)
+        {
+            return await _manuFacePlateButtonService.QueryManuFacePlateButtonByButtonIdAsync(buttonId);
+        }
+
+        /// <summary>
         /// 添加（操作面板按钮）
         /// </summary>
         /// <param name="parm"></param>

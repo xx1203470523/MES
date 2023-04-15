@@ -50,6 +50,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 删除（硬删除）
+        /// </summary>
+        /// <param name="facePlateId"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteTrueAsync(long facePlateId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteTrueSql, new { FacePlateId = facePlateId });
+        }
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -99,6 +110,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
+            if (manuFacePlateButtonPagedQuery.FacePlateId.HasValue)
+            {
+                sqlBuilder.Where("FacePlateId=@FacePlateId");
+            }
 
             var offSet = (manuFacePlateButtonPagedQuery.PageIndex - 1) * manuFacePlateButtonPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -199,6 +214,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `FacePlateId`, `Seq`, `Name`, `Percentage`, `Hotkeys`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_face_plate_button`  WHERE Id IN @Ids ";
+        const string DeleteTrueSql = "DELETE FROM  `manu_face_plate_button` WHERE FacePlateId = @FacePlateId ";
         #endregion
     }
 }

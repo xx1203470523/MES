@@ -76,9 +76,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long IsDeleted { get; set; }
 
-       
+        /// <summary>
+        /// 按钮对应的JOB
+        /// </summary>
+        public ManuFacePlateButtonJobRelationDto[] ManuFacePlateButtonJobRelations { get; set; }
     }
-
 
     /// <summary>
     /// 操作面板按钮新增Dto
@@ -113,39 +115,17 @@ namespace Hymson.MES.Services.Dtos.Manufacture
        /// <summary>
         /// 百分比
         /// </summary>
-        public decimal Percentage { get; set; }
+        public decimal? Percentage { get; set; }
 
        /// <summary>
         /// 热键
         /// </summary>
-        public HotkeyEnum Hotkeys { get; set; }
+        public HotkeyEnum? Hotkeys { get; set; }
 
-       ///// <summary>
-       // /// 创建人
-       // /// </summary>
-       // public string CreatedBy { get; set; }
-
-       ///// <summary>
-       // /// 创建时间
-       // /// </summary>
-       // public DateTime CreatedOn { get; set; }
-
-       ///// <summary>
-       // /// 更新人
-       // /// </summary>
-       // public string UpdatedBy { get; set; }
-
-       ///// <summary>
-       // /// 更新时间
-       // /// </summary>
-       // public DateTime UpdatedOn { get; set; }
-
-       ///// <summary>
-       // /// 删除标识
-       // /// </summary>
-       // public long IsDeleted { get; set; }
-
-       
+        /// <summary>
+        /// 按钮关联JOb
+        /// </summary>
+        public ManuFacePlateButtonJobRelationModifyDto[] ManuFacePlateButtonJobRelations { get; set; }
     }
 
     /// <summary>
@@ -181,40 +161,17 @@ namespace Hymson.MES.Services.Dtos.Manufacture
        /// <summary>
         /// 百分比
         /// </summary>
-        public decimal Percentage { get; set; }
+        public decimal? Percentage { get; set; }
 
        /// <summary>
         /// 热键
         /// </summary>
-        public HotkeyEnum Hotkeys { get; set; }
+        public HotkeyEnum? Hotkeys { get; set; }
 
-       ///// <summary>
-       // /// 创建人
-       // /// </summary>
-       // public string CreatedBy { get; set; }
-
-       ///// <summary>
-       // /// 创建时间
-       // /// </summary>
-       // public DateTime CreatedOn { get; set; }
-
-       ///// <summary>
-       // /// 更新人
-       // /// </summary>
-       // public string UpdatedBy { get; set; }
-
-       ///// <summary>
-       // /// 更新时间
-       // /// </summary>
-       // public DateTime UpdatedOn { get; set; }
-
-       ///// <summary>
-       // /// 删除标识
-       // /// </summary>
-       // public long IsDeleted { get; set; }
-
-       
-
+        /// <summary>
+        /// 按钮关联JOb
+        /// </summary>
+        public ManuFacePlateButtonJobRelationModifyDto[] ManuFacePlateButtonJobRelations { get; set; }
     }
 
     /// <summary>
@@ -222,5 +179,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     /// </summary>
     public class ManuFacePlateButtonPagedQueryDto : PagerInfo
     {
+        public long? FacePlateId { get; set; }
     }
 }

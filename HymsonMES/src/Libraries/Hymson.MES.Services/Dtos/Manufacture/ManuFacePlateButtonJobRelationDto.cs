@@ -35,7 +35,17 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long JobId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 作业编码
+        /// </summary>
+        public string JobCode { get; set; }
+
+        /// <summary>
+        /// 作业名称
+        /// </summary>
+        public string JobName { get; set; }
+
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
@@ -89,30 +99,30 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long JobId { get; set; }
 
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
+       ///// <summary>
+       // /// 创建人
+       // /// </summary>
+       // public string CreatedBy { get; set; }
 
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
+       ///// <summary>
+       // /// 创建时间
+       // /// </summary>
+       // public DateTime CreatedOn { get; set; }
 
-       /// <summary>
-        /// 更新人
-        /// </summary>
-        public string UpdatedBy { get; set; }
+       ///// <summary>
+       // /// 更新人
+       // /// </summary>
+       // public string UpdatedBy { get; set; }
 
-       /// <summary>
-        /// 更新时间
-        /// </summary>
-        public DateTime UpdatedOn { get; set; }
+       ///// <summary>
+       // /// 更新时间
+       // /// </summary>
+       // public DateTime UpdatedOn { get; set; }
 
-       /// <summary>
-        /// 删除标识
-        /// </summary>
-        public long IsDeleted { get; set; }
+       ///// <summary>
+       // /// 删除标识
+       // /// </summary>
+       // public long IsDeleted { get; set; }
 
        
     }
@@ -142,30 +152,30 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long JobId { get; set; }
 
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
+       ///// <summary>
+       // /// 创建人
+       // /// </summary>
+       // public string CreatedBy { get; set; }
 
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
+       ///// <summary>
+       // /// 创建时间
+       // /// </summary>
+       // public DateTime CreatedOn { get; set; }
 
-       /// <summary>
-        /// 更新人
-        /// </summary>
-        public string UpdatedBy { get; set; }
+       ///// <summary>
+       // /// 更新人
+       // /// </summary>
+       // public string UpdatedBy { get; set; }
 
-       /// <summary>
-        /// 更新时间
-        /// </summary>
-        public DateTime UpdatedOn { get; set; }
+       ///// <summary>
+       // /// 更新时间
+       // /// </summary>
+       // public DateTime UpdatedOn { get; set; }
 
-       /// <summary>
-        /// 删除标识
-        /// </summary>
-        public long IsDeleted { get; set; }
+       ///// <summary>
+       // /// 删除标识
+       // /// </summary>
+       // public long IsDeleted { get; set; }
 
        
 

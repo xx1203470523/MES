@@ -59,6 +59,12 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         Task<ManuFacePlateButtonDto> QueryManuFacePlateButtonByIdAsync(long id);
 
+        /// <summary>
+        /// 根据buttonId查询
+        /// </summary>
+        /// <param name="buttionId"></param>
+        /// <returns></returns>
+        Task<ManuFacePlateButtonDto> QueryManuFacePlateButtonByButtonIdAsync(long buttionId);
 
         /// <summary>
         /// 按钮（点击）
