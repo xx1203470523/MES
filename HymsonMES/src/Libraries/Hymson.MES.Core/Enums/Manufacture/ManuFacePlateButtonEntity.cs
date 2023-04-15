@@ -41,7 +41,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
        /// <summary>
         /// 百分比
         /// </summary>
-        public decimal Percentage { get; set; }
+        public decimal? Percentage { get; set; }
 
        /// <summary>
         /// 热键

@@ -444,8 +444,12 @@
         public const string MES17312 = "未获取到资源信息";
         public const string MES17313 = "未获取到工单信息";
         public const string MES17314 = "未获取到产品信息";
-        public const string MES17315 = "未获取到在制维修信息"; 
-        public const string MES17316 = "未获取到不良录入信息"; 
+        public const string MES17315 = "未获取到在制维修信息";
+        public const string MES17316 = "未获取到不良录入信息";
+        public const string MES17317 = "更新条码生产状态失败";
+        public const string MES17318 = "返回工序不能为空";
+        public const string MES17319 = "作业{key}执行失败";
+
 
         #endregion
 
@@ -479,16 +483,16 @@
 
         #region 在制品移除添加 16600
 
-        public const string MES16600= "条码不存在或不是在制品!";
-        public const string MES16601= "组件{CirculationBarCode}同SFC{SFC}已绑定,请检查!";
-        public const string MES16602= "数据不存在!";
-        public const string MES16603= "组件条码{barCode}库存不存在!";
+        public const string MES16600 = "条码不存在或不是在制品!";
+        public const string MES16601 = "组件{CirculationBarCode}同SFC{SFC}已绑定,请检查!";
+        public const string MES16602 = "数据不存在!";
+        public const string MES16603 = "组件条码{barCode}库存不存在!";
         public const string MES16604 = "组件条码{barCode}库存不足,请检查!";
-        public const string MES16605= "物料掩码规则不存在!";
+        public const string MES16605 = "物料掩码规则不存在!";
         public const string MES16606 = "组件条码{barCode}同掩码规则不符,请检查!";
         public const string MES16607 = "选择的替换组件不存在!";
-        public const string MES16608= "组件条码{barCode}与选择的产品不一致!";
-        public const string MES16609= "找不到条码{barCode}对应物料的数据数据收集方式!";
+        public const string MES16608 = "组件条码{barCode}与选择的产品不一致!";
+        public const string MES16609 = "找不到条码{barCode}对应物料的数据数据收集方式!";
         public const string MES16610 = "组件条码{barCode}对应的批次大小未维护!";
         public const string MES16611 = "组件条码{barCode}的批次大小超出可装载数量!";
         #endregion
@@ -511,6 +515,15 @@
         public const string MES16900 = "面板操作-生产过站面板错误";
         public const string MES16901 = "没有查找到对应条码的生产信息！";
         public const string MES16902 = "无法将主物料ID转为long类型！";
+        public const string MES16903 = "当前工序与条码生产信息中的不一致！";
+        public const string MES16904 = "找不到实际使用的物料信息!";
+        public const string MES16905 = "找不到实际物料{materialCode}对应的数据收集方式!";
+        public const string MES16906 = "物料选择不符合!";
+        public const string MES16907 = "bom没有配置替代物料,物料选择不符合!";
+        public const string MES16908 = "物料条码{barCode}库存不存在!";
+        public const string MES16909 = "物料条码{barCode}库存不足,请检查!";
+        public const string MES16910 = "实际使用的物料为空!";
+        public const string MES16911 = "实际使用的物料与条码不合!";
         #endregion
         #endregion
 

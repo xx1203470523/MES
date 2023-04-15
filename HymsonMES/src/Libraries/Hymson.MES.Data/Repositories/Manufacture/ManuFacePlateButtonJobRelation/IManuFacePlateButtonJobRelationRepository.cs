@@ -61,6 +61,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> DeletesAsync(DeleteCommand param);
 
         /// <summary>
+        /// 硬删除
+        /// </summary>
+        /// <param name="facePlateButtonId"></param>
+        /// <returns></returns>
+        Task<int> DeleteTrueAsync(long facePlateButtonId);
+
+        /// <summary>
+        /// 批量硬删除
+        /// </summary>
+        /// <param name="facePlateButtonIds"></param>
+        /// <returns></returns>
+        Task<int> DeletesTrueAsync(long[] facePlateButtonIds);
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -73,6 +87,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="facePlateButtonId"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuFacePlateButtonJobRelationEntity>> GetByFacePlateButtonIdAsync(long facePlateButtonId);
+
+        /// <summary>
+        /// 根据facePlateButtonIds批量获取数据
+        /// </summary>
+        /// <param name="facePlateButtonIds"></param>
+        /// <returns></returns>
+
+        Task<IEnumerable<ManuFacePlateButtonJobRelationEntity>> GetByFacePlateButtonIdsAsync(long[] facePlateButtonIds);
 
         /// <summary>
         /// 根据IDs批量获取数据

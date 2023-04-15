@@ -106,7 +106,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.OrderBy("UpdatedOn DESC");
+            sqlBuilder.OrderBy("CreatedOn DESC");
             sqlBuilder.Select("Id,Code, Name, Type, Status, ConversationTime, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn");
 
             if (manuFacePlatePagedQuery.Type.HasValue)
@@ -208,7 +208,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     public partial class ManuFacePlateRepository
     {
         #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_face_plate` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_face_plate` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `manu_face_plate` /**where**/ ";
         const string GetManuFacePlateEntitiesSqlTemplate = @"SELECT 
                                             /**select**/

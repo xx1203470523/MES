@@ -36,7 +36,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="beginRepairDto"></param>
         /// <returns></returns>
-        Task EndManuFacePlateRepairAsync(ManuFacePlateRepairBeginRepairDto beginRepairDto);
+        Task<ManuFacePlateRepairOpenInfoDto> EndManuFacePlateRepairAsync(ManuFacePlateRepairBeginRepairDto beginRepairDto);
 
         /// <summary>
         /// 确认提交
@@ -50,7 +50,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="facePlateId"></param>
         /// <returns></returns>
-        Task<ManuFacePlateRepairInitialInfoDto> GetInitialInfoManuFacePlateRepairAsync(long facePlateId); 
+        Task<ManuFacePlateRepairInitialInfoDto> GetInitialInfoManuFacePlateRepairAsync(long facePlateId);
 
 
 
