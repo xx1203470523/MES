@@ -21,6 +21,7 @@ using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Job.Common;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using IdGen;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -147,21 +148,52 @@ namespace Hymson.MES.Services.Services.Manufacture
             var pagedInfo = await _manuFacePlateButtonRepository.GetPagedInfoAsync(manuFacePlateButtonPagedQuery);
 
             //实体到DTO转换 装载数据
-            List<ManuFacePlateButtonDto> manuFacePlateButtonDtos = PrepareManuFacePlateButtonDtos(pagedInfo);
+            IList<ManuFacePlateButtonDto> manuFacePlateButtonDtos = await PrepareManuFacePlateButtonDtos(pagedInfo.Data);
             return new PagedInfo<ManuFacePlateButtonDto>(manuFacePlateButtonDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
         /// <summary>
-        /// 
+        /// 按钮信息组装
         /// </summary>
-        /// <param name="pagedInfo"></param>
+        /// <param name="manuFacePlateButtons"></param>
         /// <returns></returns>
-        private static List<ManuFacePlateButtonDto> PrepareManuFacePlateButtonDtos(PagedInfo<ManuFacePlateButtonEntity> pagedInfo)
+        private async Task<IList<ManuFacePlateButtonDto>> PrepareManuFacePlateButtonDtos(IEnumerable<ManuFacePlateButtonEntity> manuFacePlateButtons)
         {
             var manuFacePlateButtonDtos = new List<ManuFacePlateButtonDto>();
-            foreach (var manuFacePlateButtonEntity in pagedInfo.Data)
+            if (!manuFacePlateButtons.Any())
+            {
+                return manuFacePlateButtonDtos;
+            }
+            //关联的ButtonId
+            var facePalateButtonIds = manuFacePlateButtons.Select(c => c.Id).ToArray();
+            //查询关联的JOB信息
+            var manuFacePlateButtonJobRelationEntitys = await _manuFacePlateButtonJobRelationRepository.GetByFacePlateButtonIdsAsync(facePalateButtonIds.ToArray());
+            var facePalateButtonJobIds = manuFacePlateButtonJobRelationEntitys.Select(c => c.JobId).ToArray();
+            //job信息
+            List<InteJobEntity> inteJobEntitys = new List<InteJobEntity>();
+            if (facePalateButtonJobIds.Any())
+            {
+                var inteJobs = await _inteJobRepository.GetByIdsAsync(facePalateButtonJobIds);
+                inteJobEntitys = inteJobs.ToList();
+            }
+            //按钮关联JOb信息
+            List<ManuFacePlateButtonJobRelationDto> manuFacePlateButtonJobRelationDtos = new();
+            foreach (var manuFacePlateButtonJobRelationEntity in manuFacePlateButtonJobRelationEntitys)
+            {
+                var manuFacePlateButtonJobRelationDto = manuFacePlateButtonJobRelationEntity.ToModel<ManuFacePlateButtonJobRelationDto>();
+                //填充JOB信息
+                var jobEntity = inteJobEntitys.Where(c => c.Id == manuFacePlateButtonJobRelationDto.JobId).FirstOrDefault();
+                if (jobEntity != null)
+                {
+                    manuFacePlateButtonJobRelationDto.JobCode = jobEntity.Code;
+                    manuFacePlateButtonJobRelationDto.JobName = jobEntity.Name;
+                }
+                manuFacePlateButtonJobRelationDtos.Add(manuFacePlateButtonJobRelationDto);
+            }
+            foreach (var manuFacePlateButtonEntity in manuFacePlateButtons)
             {
                 var manuFacePlateButtonDto = manuFacePlateButtonEntity.ToModel<ManuFacePlateButtonDto>();
+                manuFacePlateButtonDto.ManuFacePlateButtonJobRelations = manuFacePlateButtonJobRelationDtos.ToArray();
                 manuFacePlateButtonDtos.Add(manuFacePlateButtonDto);
             }
 
@@ -207,6 +239,62 @@ namespace Hymson.MES.Services.Services.Manufacture
             return null;
         }
 
+        /// <summary>
+        /// 根据facePlateId查询
+        /// </summary>
+        /// <param name="facePlateId"></param>
+        /// <returns></returns>
+        public async Task<IList<ManuFacePlateButtonDto>> QueryManuFacePlateButtonByFacePlateIdAsync(long facePlateId)
+        {
+            var manuFacePlateButtonListEntity = await _manuFacePlateButtonRepository.GetByFacePlateIdAsync(facePlateId);
+            var manuFacePlateButtonDtoList = await PrepareManuFacePlateButtonDtos(manuFacePlateButtonListEntity);
+            return manuFacePlateButtonDtoList;
+        }
+
+        /// <summary>
+        /// 根据buttionid查询按钮信息
+        /// </summary>
+        /// <param name="buttionId"></param>
+        /// <returns></returns>
+        public async Task<ManuFacePlateButtonDto> QueryManuFacePlateButtonByButtonIdAsync(long buttionId)
+        {
+            ManuFacePlateButtonDto manuFacePlateButtonDto = new ManuFacePlateButtonDto();
+            var manuFacePlateButtonEntity = await _manuFacePlateButtonRepository.GetByIdAsync(buttionId);
+            if (manuFacePlateButtonEntity == null)
+            {
+                return manuFacePlateButtonDto;
+            }
+            //关联的ButtonId
+            var facePalateButtonIds = manuFacePlateButtonEntity.Id;
+            //查询关联的JOB信息
+            var manuFacePlateButtonJobRelationEntitys = await _manuFacePlateButtonJobRelationRepository.GetByFacePlateButtonIdAsync(facePalateButtonIds);
+            var facePalateButtonJobIds = manuFacePlateButtonJobRelationEntitys.Select(c => c.JobId).ToArray();
+            //job信息
+            List<InteJobEntity> inteJobEntitys = new List<InteJobEntity>();
+            if (facePalateButtonJobIds.Any())
+            {
+                var inteJobs = await _inteJobRepository.GetByIdsAsync(facePalateButtonJobIds);
+                inteJobEntitys = inteJobs.ToList();
+            }
+            //按钮关联JOb信息
+            List<ManuFacePlateButtonJobRelationDto> manuFacePlateButtonJobRelationDtos = new();
+            foreach (var manuFacePlateButtonJobRelationEntity in manuFacePlateButtonJobRelationEntitys)
+            {
+                var manuFacePlateButtonJobRelationDto = manuFacePlateButtonJobRelationEntity.ToModel<ManuFacePlateButtonJobRelationDto>();
+                //填充JOB信息
+                var jobEntity = inteJobEntitys.Where(c => c.Id == manuFacePlateButtonJobRelationDto.JobId).FirstOrDefault();
+                if (jobEntity != null)
+                {
+                    manuFacePlateButtonJobRelationDto.JobCode = jobEntity.Code;
+                    manuFacePlateButtonJobRelationDto.JobName = jobEntity.Name;
+                }
+                manuFacePlateButtonJobRelationDtos.Add(manuFacePlateButtonJobRelationDto);
+            }
+            manuFacePlateButtonDto = manuFacePlateButtonEntity.ToModel<ManuFacePlateButtonDto>();
+            manuFacePlateButtonDto.ManuFacePlateButtonJobRelations = manuFacePlateButtonJobRelationDtos.ToArray();
+            return manuFacePlateButtonDto;
+
+        }
 
         /// <summary>
         /// 按钮（点击）

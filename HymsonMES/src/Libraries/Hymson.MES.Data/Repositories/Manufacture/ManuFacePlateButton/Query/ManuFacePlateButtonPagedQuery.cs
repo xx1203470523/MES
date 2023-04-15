@@ -14,6 +14,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public class ManuFacePlateButtonPagedQuery : PagerInfo
     {
-
+        public long? FacePlateId { get; set; }
     }
 }

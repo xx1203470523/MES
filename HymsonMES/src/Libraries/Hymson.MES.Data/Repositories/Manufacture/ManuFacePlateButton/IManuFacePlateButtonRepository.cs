@@ -61,6 +61,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> DeletesAsync(DeleteCommand param);
 
         /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="facePlateId"></param>
+        /// <returns></returns>
+        Task<int> DeleteTrueAsync(long facePlateId);
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>

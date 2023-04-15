@@ -185,7 +185,31 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
         #endregion
 
-        #region 维修明细
+        #region 维修记录
+
+        /// <summary>
+        /// 新增维修记录
+        /// </summary>
+        /// <param name="manuSfcRepairRecordEntity"></param>
+        /// <returns></returns> 
+        public async Task<int> InsertRecordAsync(ManuSfcRepairRecordEntity manuSfcRepairRecordEntity)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(InsertSql, manuSfcRepairRecordEntity);
+        }
+
+        /// <summary>
+        /// 批量新增维修记录
+        /// </summary>
+        /// <param name="manuSfcRepairRecordEntitys"></param>
+        /// <returns></returns> 
+        public async Task<int> InsertsRecordAsync(List<ManuSfcRepairRecordEntity> manuSfcRepairRecordEntitys)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(InsertsSql, manuSfcRepairRecordEntitys);
+        }
+
+
         /// <summary>
         /// 新增维修明细
         /// </summary>
@@ -242,9 +266,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string UpdateByFacePlateIdSql = "UPDATE `manu_face_plate_Repair` SET   SiteId = @SiteId, FacePlateId = @FacePlateId, ResourceId = @ResourceId, IsResourceEdit = @IsResourceEdit, ProcedureId = @ProcedureId, IsProcedureEdit = @IsProcedureEdit,IsShowProductList = @IsShowProductList, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE FacePlateId = @FacePlateId ";
 
-        //明细 
+        //维修记录
+        const string InsertRecordSql = "INSERT INTO `manu_sfc_repair_record`(  `Id`, `SiteId`, `SFC`, `WorkOrderId`, `ProductId`, `ResourceId`, `ProcedureId`, `ReturnProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SFC, @WorkOrderId, @ProductId, @ResourceId, @ProcedureId, @ReturnProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsRecordSql = "INSERT INTO `manu_sfc_repair_record`(  `Id`, `SiteId`, `SFC`, `WorkOrderId`, `ProductId`, `ResourceId`, `ProcedureId`, `ReturnProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SFC, @WorkOrderId, @ProductId, @ResourceId, @ProcedureId, @ReturnProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+
         const string InsertDetailSql = "INSERT INTO `manu_sfc_repair_detail`(  `Id`, `SiteId`, `SfcRepairId`, `ProductBadId`, `RepairMethod`, `CauseAnalyse`, `IsClose`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcRepairId, @ProductBadId, @RepairMethod, @CauseAnalyse, @IsClose, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsDetailSql = "INSERT INTO `manu_sfc_repair_detail`(  `Id`, `SiteId`, `SfcRepairId`, `ProductBadId`, `RepairMethod`, `CauseAnalyse`, `IsClose`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcRepairId, @ProductBadId, @RepairMethod, @CauseAnalyse, @IsClose, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+
+
 
         #endregion
     }

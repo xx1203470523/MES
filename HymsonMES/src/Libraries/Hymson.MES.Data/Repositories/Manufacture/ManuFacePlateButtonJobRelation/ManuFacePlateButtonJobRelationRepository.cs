@@ -52,6 +52,28 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 删除（硬删除）
+        /// </summary>
+        /// <param name="facePlateButtonId"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteTrueAsync(long facePlateButtonId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteTrueSql, new { FacePlateButtonId = facePlateButtonId });
+        }
+
+        /// <summary>
+        /// 批量删除（硬删除）
+        /// </summary>
+        /// <param name="facePlateButtonId"></param>
+        /// <returns></returns>
+        public async Task<int> DeletesTrueAsync(long[] facePlateButtonIds)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeletesTrueSql, new { FacePlateButtonIds = facePlateButtonIds });
+        }
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -71,6 +93,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuFacePlateButtonJobRelationEntity>(GetByFacePlateButtonIdSql, new { facePlateButtonId });
+        }
+
+        /// <summary>
+        /// 根据FacePlateIds批量获取数据
+        /// </summary>
+        /// <param name="facePlateButtonId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuFacePlateButtonJobRelationEntity>> GetByFacePlateButtonIdsAsync(long[] facePlateButtonIds)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuFacePlateButtonJobRelationEntity>(GetByFacePlateButtonIdsSql, new { facePlateButtonIds });
         }
 
         /// <summary>
@@ -198,9 +231,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                `Id`, `SiteId`, `FacePlateButtonId`, `JobId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_face_plate_button_job_relation`  WHERE Id = @Id ";
         const string GetByFacePlateButtonIdSql = "SELECT * FROM manu_face_plate_button_job_relation WHERE IsDeleted = 0 AND FacePlateButtonId = @facePlateButtonId; ";
+        const string GetByFacePlateButtonIdsSql = "SELECT * FROM manu_face_plate_button_job_relation WHERE IsDeleted = 0 AND FacePlateButtonId IN @facePlateButtonIds; ";
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `FacePlateButtonId`, `JobId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_face_plate_button_job_relation`  WHERE Id IN @Ids ";
+        const string DeleteTrueSql = "DELETE FROM  `manu_face_plate_button_job_relation` WHERE FacePlateButtonId = @FacePlateButtonId ";
+        const string DeletesTrueSql = "DELETE FROM  `manu_face_plate_button_job_relation` WHERE FacePlateButtonId IN @FacePlateButtonIds ";
         #endregion
     }
 }

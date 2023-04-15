@@ -453,11 +453,21 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuFacePlateContainerPackCreateDto, ManuFacePlateContainerPackEntity>();
             CreateMap<ManuFacePlateContainerPackModifyDto, ManuFacePlateContainerPackEntity>();
             CreateMap<ManuFacePlateContainerPackEntity, ManuFacePlateContainerPackDto>();
+            //button
+            CreateMap<ManuFacePlateButtonPagedQueryDto, ManuFacePlateButtonPagedQuery>();
+            CreateMap<ManuFacePlateButtonModifyDto, ManuFacePlateButtonEntity>();
+            CreateMap<ManuFacePlateButtonCreateDto, ManuFacePlateButtonEntity>();
+            CreateMap<ManuFacePlateButtonEntity, ManuFacePlateButtonDto>();
+            //buttonJobRelation
+            CreateMap<ManuFacePlateButtonJobRelationModifyDto, ManuFacePlateButtonJobRelationEntity>();
+            CreateMap<ManuFacePlateButtonJobRelationCreateDto, ManuFacePlateButtonJobRelationEntity>();
+            CreateMap<ManuFacePlateButtonJobRelationEntity, ManuFacePlateButtonJobRelationDto>();
             #endregion
 
             #region ManuSfcProduce
             CreateMap<ManuSfcProduceEntity, ManuSfcProduceDto>();
             #endregion
+
         }
 
         /// <summary>
