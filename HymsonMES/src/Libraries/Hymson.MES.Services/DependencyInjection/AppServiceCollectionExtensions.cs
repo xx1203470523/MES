@@ -172,9 +172,10 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<IManuContainerBarcodeService, ManuContainerBarcodeService>();
             services.AddSingleton<IManuContainerPackService, ManuContainerPackService>();
-            services.AddSingleton<IManuContainerPackRecordService, IManuContainerPackRecordService>();
+            services.AddSingleton<IManuContainerPackRecordService, ManuContainerPackRecordService>();
 
             services.AddSingleton<IManuFacePlateProductionService, ManuFacePlateProductionService>();
+
             #endregion
 
             #region Warehouse 
@@ -359,6 +360,14 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<AbstractValidator<ManuFacePlateContainerPackCreateDto>, ManuFacePlateContainerPackCreateValidator>();
             services.AddSingleton<AbstractValidator<ManuFacePlateContainerPackModifyDto>, ManuFacePlateContainerPackModifyValidator>();
+            
+            services.AddSingleton<AbstractValidator<ManuContainerBarcodeCreateDto>, ManuContainerBarcodeCreateValidator>();
+            services.AddSingleton<AbstractValidator<ManuContainerBarcodeModifyDto>, ManuContainerBarcodeModifyValidator>();
+
+            services.AddSingleton<AbstractValidator<ManuContainerPackRecordCreateDto>, ManuContainerPackRecordCreateValidator>();
+            services.AddSingleton<AbstractValidator<ManuContainerPackRecordModifyDto>, ManuContainerPackRecordModifyValidator>();
+            services.AddSingleton<AbstractValidator<ManuContainerPackCreateDto>, ManuContainerPackCreateValidator>();
+            services.AddSingleton<AbstractValidator<ManuContainerPackModifyDto>, ManuContainerPackModifyValidator>();
             #endregion
 
             #region Warehouse 

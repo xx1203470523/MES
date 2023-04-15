@@ -458,6 +458,7 @@ namespace Hymson.MES.Services.Mapper
             #region ManuSfcProduce
             CreateMap<ManuSfcProduceEntity, ManuSfcProduceDto>();
             #endregion
+
         }
 
         /// <summary>
