@@ -444,8 +444,12 @@
         public const string MES17312 = "未获取到资源信息";
         public const string MES17313 = "未获取到工单信息";
         public const string MES17314 = "未获取到产品信息";
-        public const string MES17315 = "未获取到在制维修信息"; 
-        public const string MES17316 = "未获取到不良录入信息"; 
+        public const string MES17315 = "未获取到在制维修信息";
+        public const string MES17316 = "未获取到不良录入信息";
+        public const string MES17317 = "更新条码生产状态失败";
+        public const string MES17318 = "返回工序不能为空";
+        public const string MES17319 = "作业{key}执行失败";
+
 
         #endregion
 
@@ -479,16 +483,16 @@
 
         #region 在制品移除添加 16600
 
-        public const string MES16600= "条码不存在或不是在制品!";
-        public const string MES16601= "组件{CirculationBarCode}同SFC{SFC}已绑定,请检查!";
-        public const string MES16602= "数据不存在!";
-        public const string MES16603= "组件条码{barCode}库存不存在!";
+        public const string MES16600 = "条码不存在或不是在制品!";
+        public const string MES16601 = "组件{CirculationBarCode}同SFC{SFC}已绑定,请检查!";
+        public const string MES16602 = "数据不存在!";
+        public const string MES16603 = "组件条码{barCode}库存不存在!";
         public const string MES16604 = "组件条码{barCode}库存不足,请检查!";
-        public const string MES16605= "物料掩码规则不存在!";
+        public const string MES16605 = "物料掩码规则不存在!";
         public const string MES16606 = "组件条码{barCode}同掩码规则不符,请检查!";
         public const string MES16607 = "选择的替换组件不存在!";
-        public const string MES16608= "组件条码{barCode}与选择的产品不一致!";
-        public const string MES16609= "找不到条码{barCode}对应物料的数据数据收集方式!";
+        public const string MES16608 = "组件条码{barCode}与选择的产品不一致!";
+        public const string MES16609 = "找不到条码{barCode}对应物料的数据数据收集方式!";
         public const string MES16610 = "组件条码{barCode}对应的批次大小未维护!";
         public const string MES16611 = "组件条码{barCode}的批次大小超出可装载数量!";
         #endregion
