@@ -299,7 +299,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                     foreach (var manuFacePlateButtonEntity in manuFacePlateButtonEntityList)
                     {
                         var manuFacePlateButtonDto = manuFacePlateButtonEntity.ToModel<ManuFacePlateButtonDto>();
-                        manuFacePlateButtonDto.ManuFacePlateButtonJobRelations = manuFacePlateButtonJobRelationDtos.ToArray();
+                        //筛选对应ButtonId的Relation
+                        var buttonJobRealtions = manuFacePlateButtonJobRelationDtos.Where(c => c.FacePlateButtonId == manuFacePlateButtonDto.Id);
+                        manuFacePlateButtonDto.ManuFacePlateButtonJobRelations = buttonJobRealtions.ToArray();
                         manuFacePlateButtons.Add(manuFacePlateButtonDto);
                     }
                     facePlateQueryDto.ManuFacePlateButtons = manuFacePlateButtons.ToArray();
@@ -601,18 +603,24 @@ namespace Hymson.MES.Services.Services.Manufacture
                     await _validationButtonCreateRules.ValidateAndThrowAsync(manuFacePlateButtonCreateDto);
                     var manuFacePlateButtonEntity = manuFacePlateButtonCreateDto.ToEntity<ManuFacePlateButtonEntity>();
                     manuFacePlateButtonEntity.Id = IdGenProvider.Instance.CreateId();
+                    manuFacePlateButtonEntity.CreatedBy = _currentUser.UserName;
+                    manuFacePlateButtonEntity.CreatedOn = HymsonClock.Now();
                     manuFacePlateButtonEntity.UpdatedBy = _currentUser.UserName;
                     manuFacePlateButtonEntity.UpdatedOn = HymsonClock.Now();
                     manuFacePlateButtonEntity.FacePlateId = manuFacePlateEntity.Id;
+                    manuFacePlateButtonEntity.SiteId = _currentSite.SiteId ?? 0;
                     manuFacePlateButtonEntityList.Add(manuFacePlateButtonEntity);
                     //按钮关联JOb关系表
                     foreach (var manuFacePlateButtonJobRelations in manuFacePlateButtonCreateDto.ManuFacePlateButtonJobRelations)
                     {
                         var manuFacePlateButtonJobRelationEntity = manuFacePlateButtonJobRelations.ToEntity<ManuFacePlateButtonJobRelationEntity>();
                         manuFacePlateButtonJobRelationEntity.Id = IdGenProvider.Instance.CreateId();
+                        manuFacePlateButtonJobRelationEntity.CreatedBy = _currentUser.UserName;
+                        manuFacePlateButtonJobRelationEntity.CreatedOn = HymsonClock.Now();
                         manuFacePlateButtonJobRelationEntity.UpdatedBy = _currentUser.UserName;
                         manuFacePlateButtonJobRelationEntity.UpdatedOn = HymsonClock.Now();
                         manuFacePlateButtonJobRelationEntity.FacePlateButtonId = manuFacePlateButtonEntity.Id;
+                        manuFacePlateButtonJobRelationEntity.SiteId = _currentSite.SiteId ?? 0;
                         manuFacePlateButtonJobRelationEntityList.Add(manuFacePlateButtonJobRelationEntity);
                     }
                 }
@@ -777,12 +785,12 @@ namespace Hymson.MES.Services.Services.Manufacture
                     await _manuFacePlateButtonRepository.InsertsAsync(manuFacePlateButtonEntityList);
                 }
                 //按钮列表关联JOB先删除再添加
+                if (facePlateButtonIds.Any())
+                {
+                    await _manuFacePlateButtonJobRelationRepository.DeletesTrueAsync(facePlateButtonIds.ToArray());
+                }
                 if (manuFacePlateButtonJobRelationEntityList.Count > 0)
                 {
-                    if (facePlateButtonIds.Any())
-                    {
-                        await _manuFacePlateButtonJobRelationRepository.DeletesTrueAsync(facePlateButtonIds.ToArray());
-                    }
                     await _manuFacePlateButtonJobRelationRepository.InsertsAsync(manuFacePlateButtonJobRelationEntityList);
                 }
 
