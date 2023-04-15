@@ -210,7 +210,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteId`, `FacePlateId`, `Seq`, `Name`, `Percentage`, `Hotkeys`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_face_plate_button`  WHERE Id = @Id ";
-        const string GetByFacePlateIdSql = "SELECT * FROM manu_face_plate_button WHERE IsDeleted = 0 AND FacePlateId = @facePlateId;";
+        const string GetByFacePlateIdSql = "SELECT * FROM manu_face_plate_button WHERE IsDeleted = 0 AND FacePlateId = @facePlateId ORDER BY Seq";
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `FacePlateId`, `Seq`, `Name`, `Percentage`, `Hotkeys`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_face_plate_button`  WHERE Id IN @Ids ";

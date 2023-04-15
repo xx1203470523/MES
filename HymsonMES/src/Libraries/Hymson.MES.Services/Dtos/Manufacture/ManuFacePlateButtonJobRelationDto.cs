@@ -20,17 +20,22 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 序列
+        /// </summary>
+        public int Seq { get; set; }
+
+        /// <summary>
         /// 按钮Id
         /// </summary>
         public long FacePlateButtonId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 作业Id
         /// </summary>
         public long JobId { get; set; }
@@ -46,31 +51,34 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public string JobName { get; set; }
 
         /// <summary>
+        /// 是否清除条码
+        /// </summary>
+        public bool IsClear { get; set; }
+
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 删除标识
         /// </summary>
         public long IsDeleted { get; set; }
-
-       
     }
 
 
@@ -84,47 +92,30 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 序列
+        /// </summary>
+        public int Seq { get; set; }
+
+        /// <summary>
         /// 按钮Id
         /// </summary>
         public long FacePlateButtonId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 作业Id
         /// </summary>
         public long JobId { get; set; }
 
-       ///// <summary>
-       // /// 创建人
-       // /// </summary>
-       // public string CreatedBy { get; set; }
-
-       ///// <summary>
-       // /// 创建时间
-       // /// </summary>
-       // public DateTime CreatedOn { get; set; }
-
-       ///// <summary>
-       // /// 更新人
-       // /// </summary>
-       // public string UpdatedBy { get; set; }
-
-       ///// <summary>
-       // /// 更新时间
-       // /// </summary>
-       // public DateTime UpdatedOn { get; set; }
-
-       ///// <summary>
-       // /// 删除标识
-       // /// </summary>
-       // public long IsDeleted { get; set; }
-
-       
+        /// <summary>
+        /// 是否清除条码
+        /// </summary>
+        public bool IsClear { get; set; }
     }
 
     /// <summary>
@@ -137,48 +128,30 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 序列号
+        /// </summary>
+        public int Seq { get; set; }
+
+        /// <summary>
         /// 按钮Id
         /// </summary>
         public long FacePlateButtonId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 作业Id
         /// </summary>
         public long JobId { get; set; }
 
-       ///// <summary>
-       // /// 创建人
-       // /// </summary>
-       // public string CreatedBy { get; set; }
-
-       ///// <summary>
-       // /// 创建时间
-       // /// </summary>
-       // public DateTime CreatedOn { get; set; }
-
-       ///// <summary>
-       // /// 更新人
-       // /// </summary>
-       // public string UpdatedBy { get; set; }
-
-       ///// <summary>
-       // /// 更新时间
-       // /// </summary>
-       // public DateTime UpdatedOn { get; set; }
-
-       ///// <summary>
-       // /// 删除标识
-       // /// </summary>
-       // public long IsDeleted { get; set; }
-
-       
-
+        /// <summary>
+        /// 是否清除条码
+        /// </summary>
+        public bool IsClear { get; set; }
     }
 
     /// <summary>

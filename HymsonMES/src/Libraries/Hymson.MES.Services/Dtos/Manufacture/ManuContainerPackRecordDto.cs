@@ -97,7 +97,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
        /// <summary>
         /// 操作类型;1、装载2、移除
         /// </summary>
-        public bool? OperateType { get; set; }
+        public int OperateType { get; set; }
 
        /// <summary>
         /// 创建人

@@ -193,7 +193,9 @@ namespace Hymson.MES.Services.Services.Manufacture
             foreach (var manuFacePlateButtonEntity in manuFacePlateButtons)
             {
                 var manuFacePlateButtonDto = manuFacePlateButtonEntity.ToModel<ManuFacePlateButtonDto>();
-                manuFacePlateButtonDto.ManuFacePlateButtonJobRelations = manuFacePlateButtonJobRelationDtos.ToArray();
+                //筛选对应ButtonId的Relation
+                var buttonJobRealtions = manuFacePlateButtonJobRelationDtos.Where(c => c.FacePlateButtonId == manuFacePlateButtonDto.Id);
+                manuFacePlateButtonDto.ManuFacePlateButtonJobRelations = buttonJobRealtions.ToArray();
                 manuFacePlateButtonDtos.Add(manuFacePlateButtonDto);
             }
 

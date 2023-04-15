@@ -195,7 +195,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> InsertRecordAsync(ManuSfcRepairRecordEntity manuSfcRepairRecordEntity)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertSql, manuSfcRepairRecordEntity);
+            return await conn.ExecuteAsync(InsertRecordSql, manuSfcRepairRecordEntity);
         }
 
         /// <summary>
@@ -206,7 +206,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> InsertsRecordAsync(List<ManuSfcRepairRecordEntity> manuSfcRepairRecordEntitys)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertsSql, manuSfcRepairRecordEntitys);
+            return await conn.ExecuteAsync(InsertsRecordSql, manuSfcRepairRecordEntitys);
         }
 
 

@@ -30,6 +30,16 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     public record ManuFacePlateRepairBeginRepairDto
     {
         /// <summary>
+        /// 面板ID
+        /// </summary>
+        public long FacePlateId { get; set; }
+
+        /// <summary>
+        /// 按钮ID
+        /// </summary>
+        public long FacePlateButtonId { get; set; }
+
+        /// <summary>
         /// 工序id
         /// </summary>
         public long ProcedureId { get; set; }
@@ -73,7 +83,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long ProcedureId { get; set; }
 
         /// <summary>
-        /// 工序id
+        /// 返回工序id
         /// </summary>
         public long ReturnProcedureId { get; set; }
 
