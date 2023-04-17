@@ -70,7 +70,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public long? ProcedureId { get; set; }
 
         /// <summary>
-        /// 步骤类型;1：创建；2：复用；3：进站；4：出站；5：将来锁定；6：及时锁定；7：解锁；8：完成；9：报废；10：异常标识；11：删除；12：拆解；13：合并；14：转换；
+        /// 步骤类型; 跟枚举的对应不上了，具体以枚举的为准
         /// </summary>
         public ManuSfcStepTypeEnum Operatetype { get; set; }
 
