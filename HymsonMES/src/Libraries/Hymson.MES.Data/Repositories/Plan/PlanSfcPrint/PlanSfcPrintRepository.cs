@@ -1,20 +1,7 @@
-/*
- *creator: Karl
- *
- *describe: 条码打印 仓储类 | 代码由框架生成
- *builder:  pengxin
- *build datetime: 2023-03-21 04:33:58
- */
-
 using Dapper;
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Data.Options;
-using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Plan;
-using Hymson.MES.Data.Repositories.Warehouse;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -25,8 +12,15 @@ namespace Hymson.MES.Data.Repositories.Plan
     /// </summary>
     public partial class PlanSfcPrintRepository : IPlanSfcPrintRepository
     {
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly ConnectionOptions _connectionOptions;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
         public PlanSfcPrintRepository(IOptions<ConnectionOptions> connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
@@ -83,31 +77,12 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class PlanSfcPrintRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_info` msi /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_sfc_info` msi /**where**/ ";
-        const string GetPlanSfcInfoEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM `manu_sfc_info` /**where**/  ";
-
-        const string InsertSql = "INSERT INTO `manu_sfc_info`(  `Id`, `SFC`, `WorkOrderId`, `RelevanceWorkOrderId`, `ProductId`, `Qty`, `Status`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`) VALUES (   @Id, @SFC, @WorkOrderId, @RelevanceWorkOrderId, @ProductId, @Qty, @Status, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @SiteId )  ";
-        const string InsertsSql = "INSERT INTO `manu_sfc_info`(  `Id`, `SFC`, `WorkOrderId`, `RelevanceWorkOrderId`, `ProductId`, `Qty`, `Status`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`) VALUES (   @Id, @SFC, @WorkOrderId, @RelevanceWorkOrderId, @ProductId, @Qty, @Status, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @SiteId )  ";
-        //const string UpdateSql = "UPDATE `manu_sfc_info` SET   SFC = @SFC, WorkOrderId = @WorkOrderId, RelevanceWorkOrderId = @RelevanceWorkOrderId, ProductId = @ProductId, Qty = @Qty, Status = @Status, IsUsed = @IsUsed, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId  WHERE Id = @Id ";
-        const string UpdateSql = "UPDATE `manu_sfc_info` SET    RelevanceWorkOrderId = @RelevanceWorkOrderId,  Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `manu_sfc_info` SET   SFC = @SFC, WorkOrderId = @WorkOrderId, RelevanceWorkOrderId = @RelevanceWorkOrderId, ProductId = @ProductId, Qty = @Qty, Status = @Status, IsUsed = @IsUsed, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId  WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `manu_sfc_info` SET IsDeleted =Id WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE `manu_sfc_info`  SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids ";
-        const string GetByIdSql = @"SELECT 
-                               `Id`, `SFC`, `WorkOrderId`, `RelevanceWorkOrderId`, `ProductId`, `Qty`, `Status`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`
-                            FROM `manu_sfc_info`  WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SFC`, `WorkOrderId`, `RelevanceWorkOrderId`, `ProductId`, `Qty`, `Status`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`
-                            FROM `manu_sfc_info`  WHERE Id IN @ids ";
-
-
-        const string GetBySFCSql = @"SELECT  
-                               `Id`, `SFC`, `WorkOrderId`, `ProductId`, `Qty`, `Status`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`
-                            FROM `manu_sfc_info`  WHERE SFC = @SFC ";
     }
 }

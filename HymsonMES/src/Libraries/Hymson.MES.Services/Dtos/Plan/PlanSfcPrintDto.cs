@@ -103,7 +103,6 @@ namespace Hymson.MES.Services.Dtos.Plan
     /// </summary>
     public record PlanSfcPrintCreateDto : BaseEntityDto
     {
-
         /// <summary>
         /// 条码
         /// </summary>
