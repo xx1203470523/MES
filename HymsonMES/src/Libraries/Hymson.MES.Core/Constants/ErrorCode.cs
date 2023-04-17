@@ -524,6 +524,7 @@
         public const string MES16909 = "物料条码{barCode}库存不足,请检查!";
         public const string MES16910 = "实际使用的物料为空!";
         public const string MES16911 = "实际使用的物料与条码不合!";
+        public const string MES16912 = "条码为空！";
         #endregion
         #endregion
 
