@@ -79,6 +79,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long Id { get; set; }
 
         /// <summary>
+        /// Bom详情表id
+        /// </summary>
+        public long BomDetailId { get; set; }
+
+        /// <summary>
         /// 工序
         /// </summary>
         public long? ProcedureId { get; set; }
@@ -261,6 +266,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public string Sfc { get; set; }
 
         public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 查看类型
+        /// </summary>
+        public InProductDismantleTypeEnum Type { get; set; }
     }
 
     public class BarCodeDataCollectionWayQueryDto

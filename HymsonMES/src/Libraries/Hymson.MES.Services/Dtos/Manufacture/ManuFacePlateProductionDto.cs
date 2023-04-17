@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Process;
 
 namespace Hymson.MES.Services.Dtos.Manufacture
@@ -487,6 +488,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public string MaterialVersion { get; set; }
 
         /// <summary>
+        /// 数据采集方式
+        /// </summary>
+        public MaterialSerialNumberEnum? SerialNumber { get; set; }
+
+        /// <summary>
         /// 物料需求数量
         /// </summary>
         public decimal Usages { get; set; }
@@ -514,7 +520,23 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 替代物料
         /// </summary>
-        public IEnumerable<ProcBomDetailView> ReplaceMaterialBomDetails { get; set; }
+        public List<MainReplaceMaterial> MainReplaceMaterials { get; set; }
+    }
+
+    public class MainReplaceMaterial 
+    {
+        public long MaterialId { get; set; }
+
+        public string MaterialCode { get; set; }
+
+        public string MaterialName { get; set; }
+
+        public string MaterialVersion { get; set; }
+
+        /// <summary>
+        /// 数据采集方式
+        /// </summary>
+        public MaterialSerialNumberEnum? SerialNumber { get; set; }
     }
 
     public class ManuFacePlateProductionPackageAddDto{

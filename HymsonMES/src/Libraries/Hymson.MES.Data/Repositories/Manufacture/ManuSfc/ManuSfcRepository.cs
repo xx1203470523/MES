@@ -1,11 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 条码表 仓储类 | 代码由框架生成
- *builder:  wangkeming
- *build datetime: 2023-04-10 04:55:42
- */
-
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
@@ -24,7 +16,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public partial class ManuSfcRepository : BaseRepository, IManuSfcRepository
     {
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly ConnectionOptions _connectionOptions;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
         public ManuSfcRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
@@ -45,12 +45,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 批量删除（软删除）
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param)
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
-            using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(DeletesSql, param);
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeletesSql, command);
         }
 
         /// <summary>
@@ -78,26 +78,48 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="manuSfcPagedQuery"></param>
+        /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ManuSfcEntity>> GetPagedInfoAsync(ManuSfcPagedQuery manuSfcPagedQuery)
+        public async Task<PagedInfo<ManuSfcPassDownView>> GetPagedListAsync(ManuSfcPassDownPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.Select("*");
-            var offSet = (manuSfcPagedQuery.PageIndex - 1) * manuSfcPagedQuery.PageSize;
-            sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = manuSfcPagedQuery.PageSize });
-            sqlBuilder.AddParameters(manuSfcPagedQuery);
+            sqlBuilder.LeftJoin("manu_sfc_info MSI ON MSI.SFC = MS.SFC");
+            sqlBuilder.LeftJoin("plan_work_order PWO ON PWO.Id = MSI.WorkOrderId");
+            sqlBuilder.LeftJoin("proc_material PM ON PM.Id = MSI.ProductId");
+            sqlBuilder.Where("MS.IsDeleted = 0");
+            sqlBuilder.Where("MS.SiteId = @SiteId");
+            sqlBuilder.OrderBy("MS.UpdatedOn DESC");
+            sqlBuilder.Select("MS.Id, MS.SFC, MS.IsUsed, MS.UpdatedOn, PWO.OrderCode, PM.MaterialCode, PM.MaterialName");
 
-            using var conn = GetMESDbConnection();
-            var manuSfcEntitiesTask = conn.QueryAsync<ManuSfcEntity>(templateData.RawSql, templateData.Parameters);
-            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
-            var manuSfcEntities = await manuSfcEntitiesTask;
-            var totalCount = await totalCountTask;
-            return new PagedInfo<ManuSfcEntity>(manuSfcEntities, manuSfcPagedQuery.PageIndex, manuSfcPagedQuery.PageSize, totalCount);
+            if (pagedQuery.IsUsed.HasValue)
+            {
+                sqlBuilder.Where("MS.IsUsed = @IsUsed");
+            }
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.WorkOrderCode))
+            {
+                pagedQuery.WorkOrderCode = $"%{pagedQuery.WorkOrderCode}%";
+                sqlBuilder.Where("PWO.OrderCode LIKE @WorkOrderCode");
+            }
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.MaterialCode))
+            {
+                pagedQuery.MaterialCode = $"%{pagedQuery.MaterialCode}%";
+                sqlBuilder.Where("PM.MaterialCode LIKE @MaterialCode");
+            }
+
+            var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
+            sqlBuilder.AddParameters(pagedQuery);
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var entities = await conn.QueryAsync<ManuSfcPassDownView>(templateData.RawSql, templateData.Parameters);
+            var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+
+            return new PagedInfo<ManuSfcPassDownView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
         /// <summary>
@@ -197,7 +219,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        public async Task<ManuSfcEntity> GetBySFCAsync(string  sfc)
+        public async Task<ManuSfcEntity> GetBySFCAsync(string sfc)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ManuSfcEntity>(GetBySFCSql, new { SFC = sfc });
@@ -205,11 +227,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         #endregion
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class ManuSfcRepository
     {
-        #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `manu_sfc` /**where**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM manu_sfc MS /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM manu_sfc MS /**innerjoin**/ /**leftjoin**/ /**where**/ ";
         const string GetManuSfcEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `manu_sfc` /**where**/  ";
@@ -217,26 +241,19 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                             sfc.Id ,sfc.SiteId ,sfc.SFC ,sfc.Qty ,sfc.Status ,info.WorkOrderId ,info.ProductId ,info.IsUsed  FROM manu_sfc sfc LEFT JOIN  manu_sfc_info1 info on sfc.Id =info.SfcId  and info.IsUsed =1
                                             /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `manu_sfc`(  `Id`, `SiteId`, `SFC`, `Qty`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SFC, @Qty, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `manu_sfc`(  `Id`, `SiteId`, `SFC`, `Qty`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SFC, @Qty, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `manu_sfc`(  `Id`, `SiteId`, `SFC`, `Qty`, `Status`, IsUsed, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SFC, @Qty, @Status, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsSql = "INSERT INTO `manu_sfc`(  `Id`, `SiteId`, `SFC`, `Qty`, `Status`, IsUsed, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SFC, @Qty, @Status, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
-        const string UpdateSql = "UPDATE `manu_sfc` SET   SiteId = @SiteId, SFC = @SFC, Qty = @Qty, Status = @Status, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `manu_sfc` SET   SiteId = @SiteId, SFC = @SFC, Qty = @Qty, Status = @Status, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `manu_sfc` SET IsUsed = @IsUsed, SFC = @SFC, Qty = @Qty, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `manu_sfc` SET IsUsed = @IsUsed, SFC = @SFC, Qty = @Qty, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdateStatusSql = "UPDATE `manu_sfc` SET Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE SFC in @Sfcs ";
 
         const string DeleteSql = "UPDATE `manu_sfc` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `manu_sfc` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
-        const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteId`, `SFC`, `Qty`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `manu_sfc`  WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteId`, `SFC`, `Qty`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `manu_sfc`  WHERE Id IN @Ids ";
+        const string GetByIdSql = @"SELECT * FROM `manu_sfc`  WHERE Id = @Id ";
+        const string GetByIdsSql = @"SELECT * FROM `manu_sfc`  WHERE Id IN @Ids ";
 
-        const string GetBySFCSql = @"SELECT 
-                               `Id`, `SiteId`, `SFC`, `Qty`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `manu_sfc`  WHERE SFC = @SFC ";
-        #endregion
+        const string GetBySFCSql = @"SELECT * FROM `manu_sfc`  WHERE SFC = @SFC ";
     }
 }

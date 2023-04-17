@@ -53,5 +53,20 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <returns></returns>
         Task<bool> IsRandomPreProcedure(ManuSfcProduceEntity manuSfcProduce);
 
+        /// <summary>
+        /// 获取工艺路线
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcessRouteDetailDto>> GetProcessRoute(long id);
+
+        /// <summary>
+        /// 验证开始工序是否在结束工序之前
+        /// </summary>
+        /// <param name="processRouteId"></param>
+        /// <param name="startProcedureId"></param>
+        /// <param name="endProcedureId"></param>
+        /// <returns></returns>
+        Task<bool> IsProcessStartBeforeEnd(long processRouteId, long startProcedureId, long endProcedureId);
     }
 }

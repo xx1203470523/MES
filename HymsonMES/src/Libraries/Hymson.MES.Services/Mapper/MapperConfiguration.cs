@@ -21,6 +21,7 @@ using Hymson.MES.Data.Repositories.Integrated.InteContainer.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.View;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
@@ -467,6 +468,7 @@ namespace Hymson.MES.Services.Mapper
             #region ManuSfcProduce
             CreateMap<ManuSfcProduceEntity, ManuSfcProduceDto>();
             #endregion
+
             #region ContainerPack
             CreateMap<ManuContainerPackPagedQueryDto, ManuContainerPackPagedQuery>();
             CreateMap<ManuContainerPackEntity, ManuContainerPackDto>();
@@ -481,7 +483,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<CreateManuContainerBarcodeDto, ManuContainerBarcodeEntity>();
 
             CreateMap<ManuContainerPackRecordCreateDto, ManuContainerPackRecordEntity>();
-            
+
 
 
             #endregion
@@ -522,10 +524,8 @@ namespace Hymson.MES.Services.Mapper
             #endregion
 
             #region PlanSfcPrint
-            CreateMap<PlanSfcPrintCreateDto, PlanSfcPrintView>();
-            CreateMap<PlanSfcPrintModifyDto, PlanSfcPrintView>();
-            CreateMap<PlanSfcPrintPagedQueryDto, PlanSfcPrintPagedQuery>();
-            CreateMap<PlanSfcPrintView, PlanSfcPrintDto>();
+            CreateMap<PlanSfcPrintPagedQueryDto, ManuSfcPassDownPagedQuery>();
+            CreateMap<ManuSfcPassDownView, PlanSfcPrintDto>();
             #endregion
 
         }

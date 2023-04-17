@@ -24,6 +24,15 @@ namespace Hymson.MES.Services.Services.Manufacture
     /// </summary>
     public interface IManuFacePlateRepairService
     {
+
+        /// <summary>
+        /// 执行作业
+        /// </summary>
+        /// <param name="manuFacePlateRepairExJobDto"></param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
+        Task<List<ManuFacePlateRepairButJobReturnTypeEnum>> ExecuteexecuteJobAsync(ManuFacePlateRepairExJobDto manuFacePlateRepairExJobDto);
+
         /// <summary>
         /// 开始维修
         /// </summary>

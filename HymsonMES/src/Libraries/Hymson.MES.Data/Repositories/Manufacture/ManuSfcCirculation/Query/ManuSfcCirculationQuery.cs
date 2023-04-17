@@ -6,6 +6,7 @@
  *build datetime: 2023-03-27 03:50:00
  */
 
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using System;
 using System.Collections.Generic;
@@ -44,5 +45,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query
         /// 流转后主物料id
         /// </summary>
         public long? CirculationMainProductId { get; set; }
+
+        /// <summary>
+        /// 是否拆解(0:未拆解，1：拆解)
+        /// </summary>
+        public TrueOrFalseEnum? IsDisassemble { get; set; }
     }
 }
