@@ -33,4 +33,16 @@ namespace Hymson.MES.Services.Validators.Manufacture
             //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111");
         }
     }
+
+    /// <summary>
+    /// 包装时验证
+    /// </summary>
+    internal class CreateManuContainerBarcodeValidator : AbstractValidator<CreateManuContainerBarcodeDto>
+    {
+        public CreateManuContainerBarcodeValidator()
+        {
+            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11");
+            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111");
+        }
+    }
 }

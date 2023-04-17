@@ -478,6 +478,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuContainerBarcodeDto, ManuContainerPackEntity>();
             CreateMap<ManuContainerBarcodeEntity, ManuContainerBarcodeDto>();
             CreateMap<ManuContainerBarcodeModifyDto, ManuContainerBarcodeEntity>();
+            CreateMap<CreateManuContainerBarcodeDto, ManuContainerBarcodeEntity>();
 
             CreateMap<ManuContainerPackRecordCreateDto, ManuContainerPackRecordEntity>();
             
