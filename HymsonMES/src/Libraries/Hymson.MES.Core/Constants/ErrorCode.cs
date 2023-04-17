@@ -497,6 +497,7 @@
         public const string MES16609 = "找不到条码{barCode}对应物料的数据数据收集方式!";
         public const string MES16610 = "组件条码{barCode}对应的批次大小未维护!";
         public const string MES16611 = "组件条码{barCode}的批次大小超出可装载数量!";
+        public const string MES16612 = "当前工序与条码生产信息中的不一致！";
         #endregion
 
         #region 容器包装 MES 16700

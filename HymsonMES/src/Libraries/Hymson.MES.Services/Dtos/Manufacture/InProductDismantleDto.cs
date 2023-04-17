@@ -196,46 +196,14 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 组件条码
         /// </summary>
         public string CirculationBarCode { get; set; }
-
-        public decimal CirculationQty { get; set; }
     }
 
-    public class InProductDismantleReplaceDto
+    public class InProductDismantleReplaceDto: InProductDismantleAddDto
     {
-        /// <summary>
-        /// Bom详情表id
-        /// </summary>
-        public long BomDetailId { get; set; }
-
-        /// <summary>
-        /// 产品条码
-        /// </summary>
-        public string Sfc { get; set; }
-
-        /// <summary>
-        /// 当前工序
-        /// </summary>
-        public long ProcedureId { get; set; }
-
-        /// <summary>
-        /// 主物料id
-        /// </summary>
-        public long MainProductId { get; set; }
-
-        /// <summary>
-        /// 外部时选择要上的物料
-        /// </summary>
-        public long? ProductId { get; set; }
-
         /// <summary>
         /// 被替换的数据id
         /// </summary>
         public long Id { get; set; }
-
-        /// <summary>
-        /// 新组件条码
-        /// </summary>
-        public string CirculationBarCode { get; set; }
     }
 
     public class CirculationQueryDto
