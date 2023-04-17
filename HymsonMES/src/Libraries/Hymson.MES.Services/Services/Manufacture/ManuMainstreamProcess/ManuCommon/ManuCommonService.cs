@@ -2,6 +2,8 @@
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Process;
+using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
@@ -12,7 +14,10 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
 using Hymson.Sequences;
+using Hymson.Snowflake;
 using Microsoft.Extensions.Caching.Memory;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon
 {
@@ -105,7 +110,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
             _procProcedureRepository = procProcedureRepository;
         }
-
 
         /// <summary>
         /// 获取生产条码信息（附带条码合法性校验 + 工序活动状态校验）
@@ -296,5 +300,113 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             return defaultPreProcedure.CheckType == ProcessRouteInspectTypeEnum.RandomInspection;
         }
 
+        /// <summary>
+        /// 验证开始工序是否在结束工序之前
+        /// </summary>
+        /// <param name="processRouteId"></param>
+        /// <param name="startProcedureId"></param>
+        /// <param name="endProcedureId"></param>
+        /// <returns></returns>
+        public async Task<bool> IsProcessStartBeforeEnd(long processRouteId, long startProcedureId, long endProcedureId)
+        {
+            var processRouteDetailList = await GetProcessRoute(processRouteId);
+            var processRouteDetails = processRouteDetailList.Where(x => x.ProcedureIds.Contains(startProcedureId) && x.ProcedureIds.Contains(endProcedureId));
+            if (processRouteDetails != null && processRouteDetails.Any())
+            {
+                foreach (var processRouteDetail in processRouteDetails)
+                {
+                    var startIndex = processRouteDetail.ProcedureIds.ToList().IndexOf(startProcedureId);
+                    var endIndex = processRouteDetail.ProcedureIds.ToList().IndexOf(startProcedureId);
+                    if (startIndex < endIndex)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 获取工艺路线
+        /// </summary>
+        /// <param name="processRouteId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcessRouteDetailDto>> GetProcessRoute(long processRouteId)
+        {
+            var processRouteDetailLinkListTask = _procProcessRouteDetailLinkRepository.GetListAsync(new ProcProcessRouteDetailLinkQuery { ProcessRouteId = processRouteId });
+            var processRouteDetailNodeListTask = _procProcessRouteDetailNodeRepository.GetProcProcessRouteDetailNodesByProcessRouteId(processRouteId);
+            var processRouteDetailLinkList = await processRouteDetailLinkListTask;
+            var processRouteDetailNodeList = await processRouteDetailNodeListTask;
+            ;
+
+            var list = new List<ProcessRouteDetailDto>();
+            if (processRouteDetailLinkList != null && processRouteDetailLinkList.Any()
+                && processRouteDetailNodeList != null && processRouteDetailNodeList.Any())
+            {
+                var firstProcedure = processRouteDetailNodeList.FirstOrDefault(x => x.IsFirstProcess == 1);
+                if (firstProcedure == null)
+                {
+                    //报错
+                }
+                else
+                {
+                    CombinationProcessRoute(list, firstProcedure.ProcedureId, processRouteDetailLinkList);
+                }
+            }
+            return list;
+        }
+        /// <summary>
+        /// 组装工艺路线
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="key"></param>
+        /// <param name="procedureId"></param>
+        /// <param name="procProcessRouteDetailLinkEntities"></param>
+        private void CombinationProcessRoute(IList<ProcessRouteDetailDto> list, long procedureId, IEnumerable<ProcProcessRouteDetailLinkEntity> procProcessRouteDetailLinkEntities, long key = 0)
+        {
+            if (list == null || !list.Any())
+            {
+                key = IdGenProvider.Instance.CreateId();
+                list = new List<ProcessRouteDetailDto>();
+                var processRouteDetail = new ProcessRouteDetailDto();
+                processRouteDetail.key = key;   
+                processRouteDetail.ProcedureIds = new List<long>();
+                processRouteDetail.ProcedureIds.Add(procedureId);
+                list.Add(processRouteDetail);
+            }
+            var procProcessRouteDetailLinkByprocedureIdList = procProcessRouteDetailLinkEntities.Where(x => x.PreProcessRouteDetailId == procedureId);
+            if (procProcessRouteDetailLinkByprocedureIdList != null && procProcessRouteDetailLinkByprocedureIdList.Any())
+            {
+                var processRouteDetail = list.FirstOrDefault(x => x.key == key);
+                if (processRouteDetail != null)
+                {
+                    var procedureIds = processRouteDetail.ProcedureIds.ToList();
+                    int index = 1;
+                    foreach (var item in procProcessRouteDetailLinkByprocedureIdList)
+                    {
+                        if (item.ProcessRouteDetailId != ProcessRoute.LastProcedureId)
+                        {
+                            if (index == 1)
+                            {
+                                processRouteDetail.ProcedureIds.Add(item.ProcessRouteDetailId);
+                                CombinationProcessRoute(list, item.ProcessRouteDetailId, procProcessRouteDetailLinkEntities, key);
+                            }
+                            else
+                            {
+                                var processRouteDetailDto = new ProcessRouteDetailDto()
+                                {
+                                    key = IdGenProvider.Instance.CreateId(),
+                                    ProcedureIds = procedureIds,
+                                };
+                                processRouteDetailDto.ProcedureIds = processRouteDetailDto.ProcedureIds.Append(item.ProcessRouteDetailId).ToList();
+                                list.Add(processRouteDetailDto);
+                                CombinationProcessRoute(list, item.ProcessRouteDetailId, procProcessRouteDetailLinkEntities, processRouteDetailDto.key);
+                            }
+                        }
+                        index++;
+                    }
+                }
+            }
+        }
     }
 }

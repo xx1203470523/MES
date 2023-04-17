@@ -387,7 +387,7 @@
         public const string MES16113 = "请配置当前工单产品的编码规则！";
         public const string MES16114 = "扫描SN与工单产品编码规则不符！基数为:{Base}位";
         public const string MES16115 = "扫描SN与工单产品编码规则不符！需包含{ValuesType}值:{SegmentedValue}";
-
+        public const string MES16116 = "已使用的条码，不允许删除";
         #endregion
 
         #region 条码生成 MES16200
@@ -526,6 +526,7 @@
         public const string MES16909 = "物料条码{barCode}库存不足,请检查!";
         public const string MES16910 = "实际使用的物料为空!";
         public const string MES16911 = "实际使用的物料与条码不合!";
+        public const string MES16912 = "条码为空！";
         #endregion
         #endregion
 

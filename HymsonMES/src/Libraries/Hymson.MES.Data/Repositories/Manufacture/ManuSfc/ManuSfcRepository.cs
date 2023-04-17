@@ -45,12 +45,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 批量删除（软删除）
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param)
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
-            using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(DeletesSql, param);
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeletesSql, command);
         }
 
         /// <summary>

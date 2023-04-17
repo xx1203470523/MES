@@ -1,22 +1,21 @@
-/*
- *creator: Karl
- *
- *describe: 条码打印    服务 | 代码由框架生成
- *builder:  pengxin
- *build datetime: 2023-03-21 04:33:58
- */
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Services.Dtos.Plan;
+using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 
 namespace Hymson.MES.Services.Services.Plan
 {
@@ -25,37 +24,83 @@ namespace Hymson.MES.Services.Services.Plan
     /// </summary>
     public class PlanSfcPrintService : IPlanSfcPrintService
     {
-        private readonly ICurrentUser _currentUser;
-        private readonly ICurrentSite _currentSite;
         /// <summary>
-        /// 条码打印 仓储
+        /// 当前对象（登录用户）
         /// </summary>
-        private readonly IPlanSfcPrintRepository _planSfcInfoRepository;
-        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
+        private readonly ICurrentUser _currentUser;
+
+        /// <summary>
+        /// 当前对象（站点）
+        /// </summary>
+        private readonly ICurrentSite _currentSite;
+
+        /// <summary>
+        /// 验证器
+        /// </summary>
+        private readonly AbstractValidator<PlanSfcPrintCreateDto> _validationCreateRules;
+
+        /// <summary>
+        /// 仓储（条码）
+        /// </summary>
         private readonly IManuSfcRepository _manuSfcRepository;
 
-        private readonly AbstractValidator<PlanSfcPrintCreateDto> _validationCreateRules;
-        private readonly AbstractValidator<PlanSfcPrintModifyDto> _validationModifyRules;
+        /// <summary>
+        /// 仓储（条码信息）
+        /// </summary>
+        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
 
+        /// <summary>
+        /// 仓储（条码在制品）
+        /// </summary>
+        private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
+
+        /// <summary>
+        /// 仓储（条码步骤）
+        /// </summary>
+        private readonly IManuSfcStepRepository _manuSfcStepRepository;
+
+        /// <summary>
+        /// 仓储（工单）
+        /// </summary>
+        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
+
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="currentUser"></param>
+        /// <param name="currentSite"></param>
+        /// <param name="validationCreateRules"></param>
+        /// <param name="manuSfcRepository"></param>
+        /// <param name="manuSfcInfoRepository"></param>
+        /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="manuSfcStepRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
         public PlanSfcPrintService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IPlanSfcPrintRepository planSfcInfoRepository, IPlanWorkOrderRepository planWorkOrderRepository, IManuSfcRepository manuSfcRepository,
-        AbstractValidator<PlanSfcPrintCreateDto> validationCreateRules, AbstractValidator<PlanSfcPrintModifyDto> validationModifyRules)
+            AbstractValidator<PlanSfcPrintCreateDto> validationCreateRules,
+            IManuSfcRepository manuSfcRepository,
+            IManuSfcInfoRepository manuSfcInfoRepository,
+            IManuSfcProduceRepository manuSfcProduceRepository,
+            IManuSfcStepRepository manuSfcStepRepository,
+            IPlanWorkOrderRepository planWorkOrderRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _planSfcInfoRepository = planSfcInfoRepository;
-            _planWorkOrderRepository = planWorkOrderRepository;
-            _manuSfcRepository = manuSfcRepository;
             _validationCreateRules = validationCreateRules;
-            _validationModifyRules = validationModifyRules;
+            _manuSfcRepository = manuSfcRepository;
+            _manuSfcInfoRepository = manuSfcInfoRepository;
+            _manuSfcProduceRepository = manuSfcProduceRepository;
+            _manuSfcStepRepository = manuSfcStepRepository;
+            _planWorkOrderRepository = planWorkOrderRepository;
         }
+
 
         /// <summary>
         /// 创建
         /// </summary>
-        /// <param name="planSfcInfoCreateDto"></param>
+        /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task CreatePlanSfcInfoAsync(PlanSfcPrintCreateDto planSfcInfoCreateDto)
+        public async Task CreateAsync(PlanSfcPrintCreateDto createDto)
         {
             #region 验证与数据组装
             //// 判断是否有获取到站点码 
@@ -64,7 +109,7 @@ namespace Hymson.MES.Services.Services.Plan
                 throw new ValidationException(nameof(ErrorCode.MES10101));
             }
             //验证DTO
-            await _validationCreateRules.ValidateAndThrowAsync(planSfcInfoCreateDto);
+            await _validationCreateRules.ValidateAndThrowAsync(createDto);
 
             //验证条码与工单
 
@@ -92,49 +137,76 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeletesPlanSfcInfoAsync(long[] idsArr)
+        public async Task<int> DeletesAsync(long[] idsArr)
         {
+            var sfcEntities = await _manuSfcRepository.GetByIdsAsync(idsArr);
+            if (sfcEntities.Any(it => it.IsUsed > YesOrNoEnum.Yes) == true) throw new BusinessException(nameof(ErrorCode.MES16116));
 
-            var sfcList = await _manuSfcRepository.GetByIdsAsync(idsArr);
-            //if (sfcList.Where(it => it.IsUsed > 0).Any())
-            //{
-            //    var msgSfcs = string.Join(",", sfcList.Where(it => it.IsUsed > 0).Select(it => it.SFC).ToArray());
-            //    throw new BusinessException(nameof(ErrorCode.MES16111)).WithData("SFC", msgSfcs);
-            //}
-            //TODO 这里的验证不能只根据状态来验证 需要查看最新的maun_sfc_step表 是否是新建
-            return await _manuSfcRepository.DeletesAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
-        }
+            // 条码集合
+            var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcEntities.Select(s => s.Id));
 
-        /// <summary>
-        /// 根据查询条件获取分页数据
-        /// </summary>
-        /// <param name="planSfcInfoPagedQueryDto"></param>
-        /// <returns></returns>
-        public async Task<PagedInfo<PlanSfcPrintDto>> GetPageListAsync(PlanSfcPrintPagedQueryDto planSfcInfoPagedQueryDto)
-        {
-            var planSfcInfoPagedQuery = planSfcInfoPagedQueryDto.ToQuery<PlanSfcPrintPagedQuery>();
-            var pagedInfo = await _planSfcInfoRepository.GetPagedInfoAsync(planSfcInfoPagedQuery);
-
-            //实体到DTO转换 装载数据
-            List<PlanSfcPrintDto> planSfcInfoDtos = PreparePlanSfcInfoDtos(pagedInfo);
-            return new PagedInfo<PlanSfcPrintDto>(planSfcInfoDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="pagedInfo"></param>
-        /// <returns></returns>
-        private static List<PlanSfcPrintDto> PreparePlanSfcInfoDtos(PagedInfo<PlanSfcPrintView> pagedInfo)
-        {
-            var planSfcInfoDtos = new List<PlanSfcPrintDto>();
-            foreach (var planSfcInfoEntity in pagedInfo.Data)
+            var rows = 0;
+            using (var trans = TransactionHelper.GetTransactionScope())
             {
-                var planSfcInfoDto = planSfcInfoEntity.ToModel<PlanSfcPrintDto>();
-                planSfcInfoDtos.Add(planSfcInfoDto);
+                rows += await _manuSfcRepository.DeletesAsync(new DeleteCommand
+                {
+                    Ids = idsArr,
+                    UserId = _currentUser.UserName,
+                    DeleteOn = HymsonClock.Now()
+                });
+                rows += await _manuSfcProduceRepository.DeletePhysicalRangeAsync(sfcEntities.Select(s => s.SFC).ToArray());
+                rows += await _manuSfcStepRepository.InsertRangeAsync(sfcEntities.Select(s => new ManuSfcStepEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    SFC = s.SFC,
+                    Qty = s.Qty,
+                    ProductId = sfcInfoEntities.FirstOrDefault(f => f.SfcId == s.Id)!.ProductId,
+                    WorkOrderId = sfcInfoEntities.FirstOrDefault(f => f.SfcId == s.Id)!.WorkOrderId,
+                    //ProductBOMId = planWorkOrderEntity.ProductBOMId,
+                    //WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
+                    //ProcedureId = processRouteFirstProcedure.ProcedureId,
+                    Operatetype = ManuSfcStepTypeEnum.Delete,
+                    CurrentStatus = SfcProduceStatusEnum.Complete,
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName
+                }));
+                rows += await _planWorkOrderRepository.DeletesAsync(new DeleteCommand
+                {
+                    Ids = sfcInfoEntities.Select(s => s.WorkOrderId).ToArray(),
+                    UserId = _currentUser.UserName,
+                    DeleteOn = HymsonClock.Now()
+                });
+                trans.Complete();
             }
-
-            return planSfcInfoDtos;
+            return rows;
         }
+
+        /// <summary>
+        /// 分页查询列表（条码打印）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<PlanSfcPrintDto>> GetPagedListAsync(PlanSfcPrintPagedQueryDto pagedQueryDto)
+        {
+            var pagedQuery = pagedQueryDto.ToQuery<ManuSfcPassDownPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId;
+            var pagedInfo = await _manuSfcRepository.GetPagedListAsync(pagedQuery);
+
+            // 实体到DTO转换 装载数据
+            var dtos = pagedInfo.Data.Select(s => new PlanSfcPrintDto
+            {
+                Id = s.Id,
+                SFC = s.SFC,
+                IsUsed = s.IsUsed,
+                UpdatedOn = s.UpdatedOn,
+                OrderCode = s.OrderCode,
+                MaterialCode = s.MaterialCode,
+                MaterialName = s.MaterialName
+            });
+            return new PagedInfo<PlanSfcPrintDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+
     }
 }

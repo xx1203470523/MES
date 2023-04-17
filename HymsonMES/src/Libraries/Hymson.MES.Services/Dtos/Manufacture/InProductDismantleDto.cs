@@ -266,6 +266,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public string Sfc { get; set; }
 
         public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 查看类型
+        /// </summary>
+        public InProductDismantleTypeEnum Type { get; set; }
     }
 
     public class BarCodeDataCollectionWayQueryDto

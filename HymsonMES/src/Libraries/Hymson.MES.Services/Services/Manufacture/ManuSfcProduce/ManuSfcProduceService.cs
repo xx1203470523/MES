@@ -12,10 +12,12 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
+using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -62,6 +64,8 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// 工单激活 仓储
         /// </summary>
         private readonly IPlanWorkOrderActivationRepository _planWorkOrderActivationRepository;
+
+        private readonly IManuCommonService _manuCommonService;
         /// <summary>
         /// 工单信息表 仓储
         /// </summary>
@@ -79,6 +83,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             IManuSfcRepository manuSfcRepository,
             IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
+            IManuCommonService manuCommonService,
             AbstractValidator<ManuSfcProduceLockDto> validationLockRules,
             AbstractValidator<ManuSfcProduceModifyDto> validationModifyRules)
         {
@@ -90,6 +95,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuSfcRepository = manuSfcRepository;
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
+            _manuCommonService = manuCommonService;
             _validationLockRules = validationLockRules;
             _validationModifyRules = validationModifyRules;
         }
@@ -156,48 +162,68 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             await _validationLockRules.ValidateAndThrowAsync(parm);
 
-            var sfcList = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery { Sfcs = parm.Sfcs.Distinct().ToArray() });
-      
-            //如果是将来锁，需要选择工序
+
+            var sfcListTask = _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery { Sfcs = parm.Sfcs.Distinct().ToArray() });
+            var sfcProduceBusinesssListTask = _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcProduceBusinessQuery { Sfcs = parm.Sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
+            var sfcList = await sfcListTask;
+            var sfcProduceBusinesssList = await sfcProduceBusinesssListTask;
+
+            //未来锁只能使用一个工单
             if (parm.OperationType == QualityLockEnum.FutureLock)
             {
-                //当操作类型为“将来锁定”时，扫描的条码状态都必须不是“锁定”，且没有未关闭的将来锁定指令存在（即已指定将来锁定工序，但暂未执行锁定）
-                //var sfcLocks = sfcInfo.Where(a => a.Lock != (int)QualityLockEnum.Unlock);
-                //if (sfcLocks.Any())
-                //{
-                //    throw new CustomerValidationException(nameof(ErrorCode.MES15306));
-                //}
-
-                //将来锁的工单一致
-                var workOrders = sfcList.Select(a => a.WorkOrderId).Distinct().ToList();
+                var workOrders = sfcList.Select(x => x.WorkOrderId).Distinct().ToList();
                 if (workOrders.Count > 1)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES15308));
                 }
-
-                //判断工序,产品条码 > 工单 > 工艺路线 > 工序
-                //只能选择列表中产品条码所在工序之后的工序
             }
-
-            //当操作类型为“即时锁定”时，扫描的条码状态都必须不是锁定状态
-            if (parm.OperationType == QualityLockEnum.InstantLock)
+            //TODO  验证未完成 wangkeming
+            foreach (var sfc in parm.Sfcs)
             {
-                //将来锁定改为即时锁定，需要修改锁定类型，去掉将来锁定工序  
-                //var sfcLocks = sfcInfo.Where(a => a.Lock == (int)QualityLockEnum.InstantLock);
-                //if (sfcLocks.Any())
-                //{
-                //    throw new CustomerValidationException(nameof(ErrorCode.MES15306));
-                //}
-            }
+                var sfcEntity = sfcList.FirstOrDefault(x => x.SFC == sfc);
+                if (sfcEntity == null)
+                {
+                    //不是在制在制
+                    continue;
+                }
+                var sfcProduceBusinessEntity = sfcProduceBusinesssList.FirstOrDefault(x => x.SfcInfoId == sfcEntity.Id);
+                switch (parm.OperationType)
+                {
+                    case
+                        QualityLockEnum.FutureLock:
+                        if (sfcProduceBusinessEntity != null)
+                        {
+                            //已经锁定
+                        }
 
-            //当操作类型为“取消锁定”时，扫描的条码状态都必须是“锁定”或者有未关闭的将来锁定指令存在（即已指定将来锁定工序，但暂未执行锁定）
-            if (parm.OperationType == QualityLockEnum.Unlock)
-            {
-                //var sfcLocks = sfcInfo.Where(a => a.Lock == (int)QualityLockEnum.Unlock);
-                //if (sfcLocks.Any())
-                //{
-                //    throw new CustomerValidationException(nameof(ErrorCode.MES15307));
-                //}
+                        //验证工序
+                        if (await _manuCommonService.IsProcessStartBeforeEnd(sfcEntity.ProcessRouteId, sfcEntity.ProcedureId, parm.LockProductionId ?? 0))
+                        {
+
+                        }
+
+                        break;
+                    case
+                        QualityLockEnum.InstantLock:
+                        if (sfcProduceBusinessEntity != null)
+                        {
+                            var sfcProduceLockBo = JsonConvert.DeserializeObject<SfcProduceLockBo>(sfcProduceBusinessEntity.BusinessContent);
+                            if (sfcProduceLockBo.Lock == QualityLockEnum.InstantLock)
+                            {
+                                //已经及时锁 报错
+                            }
+                        }
+                        break;
+                    case
+                        QualityLockEnum.Unlock:
+                        if (sfcProduceBusinessEntity == null)
+                        {
+                            //未锁定
+                        }
+                        break;
+                    default:
+                        break;
+                }
             }
             #endregion
 
