@@ -6,6 +6,7 @@
  *build datetime: 2023-03-27 03:50:00
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 
 namespace Hymson.MES.Core.Domain.Manufacture
@@ -91,7 +92,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 是否拆解
         /// </summary>
-        public bool? IsDisassemble { get; set; }
+        public TrueOrFalseEnum IsDisassemble { get; set; } = TrueOrFalseEnum.No;
 
         /// <summary>
         /// 拆解人
@@ -107,7 +108,5 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 换件id manu_sfc_circulation id
         /// </summary>
         public long? SubstituteId { get; set; }
-
-
     }
 }

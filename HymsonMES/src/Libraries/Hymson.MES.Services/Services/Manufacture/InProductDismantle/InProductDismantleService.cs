@@ -234,6 +234,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     bomDetail.Children.Add(new ManuSfcChildCirculationDto
                     {
                         Id = circulation.Id,
+                        BomDetailId = detailEntity.Id,
                         ProcedureId = bomDetail.ProcedureId,
                         ProductId = bomDetail.MaterialId,
                         CirculationBarCode = circulation.CirculationBarCode,
@@ -301,6 +302,18 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             var query = new ManuSfcCirculationQuery { Sfc = queryDto.Sfc, SiteId = _currentSite.SiteId ?? 0, CirculationTypes = types.ToArray() };
+
+            if (queryDto.Type == InProductDismantleTypeEnum.Remove)
+            {
+                query.IsDisassemble = TrueOrFalseEnum.Yes;
+            }
+
+            if (queryDto.Type == InProductDismantleTypeEnum.Activity)
+            {
+                query.IsDisassemble = TrueOrFalseEnum.No;
+            }
+
+
             return await _circulationRepository.GetSfcMoudulesAsync(query);
         }
 
@@ -383,9 +396,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                 serialNumber = await GetProductSerialNumberAsync(new BarCodeDataCollectionWayQueryDto
                 {
                     ProductId = addDto.ProductId.Value,
-                    CirculationBarCode= addDto.CirculationBarCode,
-                    CirculationMainProductId= addDto.MainProductId ?? 0,
-                    BomDetailId= addDto.BomDetailId
+                    CirculationBarCode = addDto.CirculationBarCode,
+                    CirculationMainProductId = addDto.MainProductId ?? 0,
+                    BomDetailId = addDto.BomDetailId
                 });
                 if (!serialNumber.HasValue)
                 {
