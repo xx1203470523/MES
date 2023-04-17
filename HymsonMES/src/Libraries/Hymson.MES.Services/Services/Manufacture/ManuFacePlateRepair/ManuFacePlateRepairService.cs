@@ -128,24 +128,30 @@ namespace Hymson.MES.Services.Services.Manufacture
             _validationModifyRules = validationModifyRules;
         }
 
-
-
         /// <summary>
-        /// 开始维修
+        /// 执行作业
         /// </summary>
-        /// <param name="beginRepairDto"></param> 
+        /// <param name="manuFacePlateRepairExJobDto"></param>
         /// <returns></returns>
-        public async Task<ManuFacePlateRepairOpenInfoDto> BeginManuFacePlateRepairAsync(ManuFacePlateRepairBeginRepairDto beginRepairDto)
+        /// <exception cref="BusinessException"></exception>
+        public async Task<List<ManuFacePlateRepairButJobReturnTypeEnum>> ExecuteexecuteJobAsync(ManuFacePlateRepairExJobDto manuFacePlateRepairExJobDto)
         {
+
+            #region  验证数据
+            if (string.IsNullOrWhiteSpace(manuFacePlateRepairExJobDto.SFC))
+            {
+                throw new BusinessException(nameof(ErrorCode.MES17303));
+            }
+            #endregion
 
             #region 调用作业
             var jobDto = new JobDto
             {
-                FacePlateId = beginRepairDto.FacePlateId,
-                FacePlateButtonId = beginRepairDto.FacePlateButtonId,
-                ProcedureId = beginRepairDto.ProcedureId,
-                ResourceId = beginRepairDto.ResourceId,
-                SFC = beginRepairDto.SFC
+                FacePlateId = manuFacePlateRepairExJobDto.FacePlateId,
+                FacePlateButtonId = manuFacePlateRepairExJobDto.FacePlateButtonId,
+                ProcedureId = manuFacePlateRepairExJobDto.ProcedureId,
+                ResourceId = manuFacePlateRepairExJobDto.ResourceId,
+                SFC = manuFacePlateRepairExJobDto.SFC
             };
             //调用作业
             var resJob = await _manuFacePlateButtonService.ClickAsync(jobDto);
@@ -158,9 +164,37 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new BusinessException(nameof(ErrorCode.MES17319)).WithData("key", dic.FirstOrDefault().Key);
             }
-            #endregion
 
+            var list = new List<ManuFacePlateRepairButJobReturnTypeEnum>();
+            foreach (var item in resJob)
+            {
+                if (item.Key == ManuFacePlateRepairButJobReturnTypeEnum.BeginRepair.ToString())
+                {
+                    list.Add(ManuFacePlateRepairButJobReturnTypeEnum.BeginRepair);
+                }
+                else if (item.Key == ManuFacePlateRepairButJobReturnTypeEnum.EndRepair.ToString())
+                {
+                    list.Add(ManuFacePlateRepairButJobReturnTypeEnum.EndRepair);
+                }
+            }
+
+            return list;
+            #endregion
+        }
+
+
+        /// <summary>
+        /// 开始维修
+        /// </summary>
+        /// <param name="beginRepairDto"></param> 
+        /// <returns></returns>
+        public async Task<ManuFacePlateRepairOpenInfoDto> BeginManuFacePlateRepairAsync(ManuFacePlateRepairBeginRepairDto beginRepairDto)
+        {
             #region 验证条码更新在制信息
+            if (string.IsNullOrWhiteSpace(beginRepairDto.SFC))
+            {
+                throw new BusinessException(nameof(ErrorCode.MES17303));
+            }
             //验证条码
             var manuSfcProduceEntit = await _manuSfcProduceRepository.GetBySFCAsync(beginRepairDto.SFC);
             if (manuSfcProduceEntit == null)
@@ -181,10 +215,10 @@ namespace Hymson.MES.Services.Services.Manufacture
                 }
             }
             //验证在制信息
-            //if (manuSfcProduceEntit.ProcedureId != beginRepairDto.ProcedureId || manuSfcProduceEntit.Status != SfcProduceStatusEnum.lineUp)
-            //{
-            //    throw new BusinessException(nameof(ErrorCode.MES16308));
-            //}
+            if (manuSfcProduceEntit.ProcedureId != beginRepairDto.ProcedureId || manuSfcProduceEntit.Status != SfcProduceStatusEnum.lineUp)
+            {
+                throw new BusinessException(nameof(ErrorCode.MES16308));
+            }
             #endregion
 
             #region 获取展示信息 
@@ -277,6 +311,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             #endregion
             var manuFacePlateRepairOpenInfoDto = await GetManuFacePlateRepairOpenInfoDto(beginRepairDto.SFC);
+
             #region 启动维修 更新状态
 
             // 更改状态，将条码由"排队"改为"活动"
@@ -415,30 +450,10 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task<ManuFacePlateRepairOpenInfoDto> EndManuFacePlateRepairAsync(ManuFacePlateRepairBeginRepairDto beginRepairDto)
         {
-
-            #region 调用作业 
-            //调用作业
-            var jobDto = new JobDto
+            if (string.IsNullOrWhiteSpace(beginRepairDto.SFC))
             {
-                FacePlateId = beginRepairDto.FacePlateId,
-                FacePlateButtonId = beginRepairDto.FacePlateButtonId,
-                ProcedureId = beginRepairDto.ProcedureId,
-                ResourceId = beginRepairDto.ResourceId,
-                SFC = beginRepairDto.SFC
-            };
-            //调用作业
-            var resJob = await _manuFacePlateButtonService.ClickAsync(jobDto);
-            if (resJob == null || resJob.Count() <= 0)
-            {
-                throw new BusinessException(nameof(ErrorCode.MES17319));
+                throw new BusinessException(nameof(ErrorCode.MES17303));
             }
-            var dic = resJob.Where(it => it.Value <= 0);
-            if (dic.Any())
-            {
-                throw new BusinessException(nameof(ErrorCode.MES17319)).WithData("key", dic.FirstOrDefault().Key);
-            }
-            #endregion
-
             var manuFacePlateRepairOpenInfoDto = await GetManuFacePlateRepairOpenInfoDto(beginRepairDto.SFC);
             return manuFacePlateRepairOpenInfoDto;
         }
@@ -513,7 +528,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 manuSfcRepairDetailEntity.ProductBadId = item.BadRecordId;
                 manuSfcRepairDetailEntity.RepairMethod = item.RepairMethod;
                 manuSfcRepairDetailEntity.CauseAnalyse = item.CauseAnalyse;
-                manuSfcRepairDetailEntity.IsClose = ManuSfcRepairDetailIsCloseEnum.Close;
+                manuSfcRepairDetailEntity.IsClose = ManuSfcRepairDetailIsIsCloseEnum.Close;
 
                 manuSfcRepairDetailEntity.Id = IdGenProvider.Instance.CreateId();
                 manuSfcRepairDetailEntity.CreatedBy = _currentUser.UserName;

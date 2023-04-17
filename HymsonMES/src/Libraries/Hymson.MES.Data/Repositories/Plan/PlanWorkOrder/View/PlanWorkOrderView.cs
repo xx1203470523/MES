@@ -7,13 +7,8 @@
  */
 
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Hymson.MES.Core.Enums.Integrated;
 
 namespace Hymson.MES.Data.Repositories.Plan
 {
@@ -150,6 +145,11 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// 完工数量
         /// </summary>
         public string FinishProductQuantity { get; set; }
+
+        /// <summary>
+        /// 下达数量
+        /// </summary>
+        public string PassDownQuantity { get; set; }
 
         /// <summary>
         /// 实际开始时间

@@ -1,10 +1,6 @@
-﻿using Hymson.Authentication.JwtBearer.Security;
-using Hymson.Authentication;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Hymson.Authentication;
+using Hymson.Authentication.JwtBearer.Security;
+using Hymson.MES.Data.Repositories.Manufacture;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuSfc
 {
@@ -23,10 +19,25 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfc
         /// </summary>
         private readonly ICurrentSite _currentSite;
 
-        public ManuSfcService(ICurrentUser currentUser, ICurrentSite currentSite)
+        /// <summary>
+        /// 仓储（条码）
+        /// </summary>
+        private readonly IManuSfcRepository _manuSfcRepository;
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="currentUser"></param>
+        /// <param name="currentSite"></param>
+        /// <param name="manuSfcRepository"></param>
+        public ManuSfcService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IManuSfcRepository manuSfcRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _manuSfcRepository = manuSfcRepository;
         }
+
+
     }
 }

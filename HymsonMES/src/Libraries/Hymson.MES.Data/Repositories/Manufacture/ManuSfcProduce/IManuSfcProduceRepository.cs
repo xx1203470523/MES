@@ -8,6 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -184,7 +185,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<ManuSfcProduceBusinessEntity> GetSfcProduceBusinessBySFCAsync(string sfc);
+        Task<IEnumerable<ManuSfcProduceBusinessEntity>> GetSfcProduceBusinessListBySFCAsync(SfcProduceBusinessQuery sfc);
 
         /// <summary>
         /// 根据IDs批量获取在制品业务

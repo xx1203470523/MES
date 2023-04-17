@@ -48,6 +48,19 @@ namespace Hymson.MES.Api.Controllers.Manufacture
             _logger = logger;
         }
 
+
+        /// <summary>
+        /// 执行作业
+        /// </summary>
+        /// <param name="manuFacePlateRepairExJobDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("exJob")]
+        public async Task<List<ManuFacePlateRepairButJobReturnTypeEnum>> ExecuteexecuteJobAsync(ManuFacePlateRepairExJobDto manuFacePlateRepairExJobDto)
+        {
+            return await _manuFacePlateRepairService.ExecuteexecuteJobAsync(manuFacePlateRepairExJobDto);
+        }
+
         /// <summary>
         /// 开始维修
         /// </summary>
@@ -97,71 +110,5 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         {
             return await _manuFacePlateRepairService.GetInitialInfoManuFacePlateRepairAsync(facePlateId);
         }
-
-
-
-
-        #region 框架生成方法
-
-        /// <summary>
-        /// 分页查询列表（在制品维修）
-        /// </summary>
-        /// <param name="parm"></param>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("pagelist")]
-        public async Task<PagedInfo<ManuFacePlateRepairDto>> QueryPagedManuFacePlateRepairAsync([FromQuery] ManuFacePlateRepairPagedQueryDto parm)
-        {
-            return await _manuFacePlateRepairService.GetPagedListAsync(parm);
-        }
-
-        /// <summary>
-        /// 查询详情（在制品维修）
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpGet("{id}")]
-        public async Task<ManuFacePlateRepairDto> QueryManuFacePlateRepairByIdAsync(long id)
-        {
-            return await _manuFacePlateRepairService.QueryManuFacePlateRepairByIdAsync(id);
-        }
-
-        /// <summary>
-        /// 添加（在制品维修）
-        /// </summary>
-        /// <param name="parm"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("create")]
-        public async Task AddManuFacePlateRepairAsync([FromBody] ManuFacePlateRepairCreateDto parm)
-        {
-            await _manuFacePlateRepairService.CreateManuFacePlateRepairAsync(parm);
-        }
-
-        /// <summary>
-        /// 更新（在制品维修）
-        /// </summary>
-        /// <param name="parm"></param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("update")]
-        public async Task UpdateManuFacePlateRepairAsync([FromBody] ManuFacePlateRepairModifyDto parm)
-        {
-            await _manuFacePlateRepairService.ModifyManuFacePlateRepairAsync(parm);
-        }
-
-        /// <summary>
-        /// 删除（在制品维修）
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        [HttpDelete]
-        [Route("delete")]
-        public async Task DeleteManuFacePlateRepairAsync([FromBody] long[] ids)
-        {
-            await _manuFacePlateRepairService.DeletesManuFacePlateRepairAsync(ids);
-        }
-
-        #endregion
     }
 }

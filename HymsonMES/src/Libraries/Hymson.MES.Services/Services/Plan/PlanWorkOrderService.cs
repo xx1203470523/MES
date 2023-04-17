@@ -1,17 +1,9 @@
-/*
- *creator: Karl
- *
- *describe: 工单信息表    服务 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-03-20 10:07:17
- */
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
-using Hymson.Kafka.Debezium;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
@@ -154,39 +146,23 @@ namespace Hymson.MES.Services.Services.Plan
         /// <summary>
         /// 根据查询条件获取分页数据
         /// </summary>
-        /// <param name="planWorkOrderPagedQueryDto"></param>
+        /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<PlanWorkOrderListDetailViewDto>> GetPageListAsync(PlanWorkOrderPagedQueryDto planWorkOrderPagedQueryDto)
+        public async Task<PagedInfo<PlanWorkOrderListDetailViewDto>> GetPageListAsync(PlanWorkOrderPagedQueryDto pagedQueryDto)
         {
-            var planWorkOrderPagedQuery = planWorkOrderPagedQueryDto.ToQuery<PlanWorkOrderPagedQuery>();
-            var pagedInfo = await _planWorkOrderRepository.GetPagedInfoAsync(planWorkOrderPagedQuery);
+            var pagedQuery = pagedQueryDto.ToQuery<PlanWorkOrderPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId;
+            var pagedInfo = await _planWorkOrderRepository.GetPagedInfoAsync(pagedQuery);
 
-            //实体到DTO转换 装载数据
-            List<PlanWorkOrderListDetailViewDto> planWorkOrderDtos = PreparePlanWorkOrderDtos(pagedInfo);
-            return new PagedInfo<PlanWorkOrderListDetailViewDto>(planWorkOrderDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="pagedInfo"></param>
-        /// <returns></returns>
-        private static List<PlanWorkOrderListDetailViewDto> PreparePlanWorkOrderDtos(PagedInfo<PlanWorkOrderListDetailView> pagedInfo)
-        {
-            var planWorkOrderDtos = new List<PlanWorkOrderListDetailViewDto>();
-            foreach (var planWorkOrderEntity in pagedInfo.Data)
-            {
-                var planWorkOrderDto = planWorkOrderEntity.ToModel<PlanWorkOrderListDetailViewDto>();
-                planWorkOrderDtos.Add(planWorkOrderDto);
-            }
-
-            return planWorkOrderDtos;
+            // 实体到DTO转换 装载数据
+            var dtos = pagedInfo.Data.Select(s => s.ToModel<PlanWorkOrderListDetailViewDto>());
+            return new PagedInfo<PlanWorkOrderListDetailViewDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="planWorkOrderDto"></param>
+        /// <param name="planWorkOrderModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyPlanWorkOrderAsync(PlanWorkOrderModifyDto planWorkOrderModifyDto)
         {
@@ -285,7 +261,7 @@ namespace Hymson.MES.Services.Services.Plan
 
             //查询需要改变的工单
             var workOrders = await _planWorkOrderRepository.GetByIdsAsync(parms.Select(x => x.Id).ToArray());
-            if (workOrders==null || workOrders.Count()==0 || workOrders.Any(x => x.IsDeleted > 0) || workOrders.Count()!= parms.Count()) 
+            if (workOrders == null || workOrders.Count() == 0 || workOrders.Any(x => x.IsDeleted > 0) || workOrders.Count() != parms.Count())
             {
                 throw new BusinessException(nameof(ErrorCode.MES16014));
             }
@@ -339,10 +315,10 @@ namespace Hymson.MES.Services.Services.Plan
             }
 
             //组装工单状态变化记录
-            List<PlanWorkOrderStatusRecordEntity> planWorkOrderStatusRecordEntities= new List<PlanWorkOrderStatusRecordEntity>();
+            List<PlanWorkOrderStatusRecordEntity> planWorkOrderStatusRecordEntities = new List<PlanWorkOrderStatusRecordEntity>();
             foreach (var item in workOrders)
             {
-                var record=AutoMapperConfiguration.Mapper.Map<PlanWorkOrderStatusRecordEntity>(item);
+                var record = AutoMapperConfiguration.Mapper.Map<PlanWorkOrderStatusRecordEntity>(item);
                 record.Id = IdGenProvider.Instance.CreateId();
                 record.CreatedBy = _currentUser.UserName;
                 record.UpdatedBy = _currentUser.UserName;
@@ -362,7 +338,7 @@ namespace Hymson.MES.Services.Services.Plan
 
                 //if (response == parms.Count)
                 //{
-                    ts.Complete();
+                ts.Complete();
                 //}
                 //else
                 //{

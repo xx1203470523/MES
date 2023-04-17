@@ -10,7 +10,7 @@ namespace Hymson.MES.Core.Enums.Manufacture
     /// <summary>
     ///1.3.21 manu_sfc_repair_detail 维修详情表 IsClose
     /// </summary>
-    public enum ManuSfcRepairDetailIsCloseEnum : sbyte
+    public enum ManuSfcRepairDetailIsIsCloseEnum : sbyte
     {
         /// <summary>
         /// 开启

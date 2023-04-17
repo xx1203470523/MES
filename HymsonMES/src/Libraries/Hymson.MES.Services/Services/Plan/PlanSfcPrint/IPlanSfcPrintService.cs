@@ -1,17 +1,5 @@
-/*
- *creator: Karl
- *
- *describe: 条码打印    服务接口 | 代码由框架生成
- *builder:  pengxin
- *build datetime: 2023-03-21 04:33:58
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Plan;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Services.Plan
 {
@@ -21,24 +9,25 @@ namespace Hymson.MES.Services.Services.Plan
     public interface IPlanSfcPrintService
     {
         /// <summary>
-        /// 获取分页List
-        /// </summary>
-        /// <param name="planSfcInfoPagedQueryDto"></param>
-        /// <returns></returns>
-        Task<PagedInfo<PlanSfcPrintDto>> GetPageListAsync(PlanSfcPrintPagedQueryDto planSfcInfoPagedQueryDto);
-
-        /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="planSfcInfoDto"></param>
+        /// <param name="createDto"></param>
         /// <returns></returns>
-        Task CreatePlanSfcInfoAsync(PlanSfcPrintCreateDto planSfcInfoCreateDto);
+        Task CreateAsync(PlanSfcPrintCreateDto createDto);
 
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="idsArr"></param>
         /// <returns></returns>
-        Task<int> DeletesPlanSfcInfoAsync(long[] idsArr);
+        Task<int> DeletesAsync(long[] idsArr);
+
+        /// <summary>
+        /// 分页查询列表（条码打印）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<PlanSfcPrintDto>> GetPagedListAsync(PlanSfcPrintPagedQueryDto pagedQueryDto);
+
     }
 }

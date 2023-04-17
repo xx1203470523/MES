@@ -29,6 +29,7 @@ using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCreateB
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInStation;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOutStation;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
+using Hymson.MES.Services.Services.Manufacture.ManuSfc;
 using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Hymson.MES.Services.Services.Plan;
 using Hymson.MES.Services.Services.Process;
@@ -158,6 +159,7 @@ namespace Microsoft.Extensions.DependencyInjection
             #region Manufacture
             services.AddSingleton<IManuCommonService, ManuCommonService>();
             services.AddSingleton<IManuFeedingService, ManuFeedingService>();
+            services.AddSingleton<IManuSfcService, ManuSfcService>();
             services.AddSingleton<IManuSfcProduceService, ManuSfcProduceService>();
             services.AddSingleton<IManuCreateBarcodeService, ManuCreateBarcodeService>();
             services.AddSingleton<IManuGenerateBarcodeService, ManuGenerateBarcodeService>();
@@ -361,7 +363,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<AbstractValidator<ManuFacePlateContainerPackCreateDto>, ManuFacePlateContainerPackCreateValidator>();
             services.AddSingleton<AbstractValidator<ManuFacePlateContainerPackModifyDto>, ManuFacePlateContainerPackModifyValidator>();
-            
+
             services.AddSingleton<AbstractValidator<ManuContainerBarcodeCreateDto>, ManuContainerBarcodeCreateValidator>();
             services.AddSingleton<AbstractValidator<ManuContainerBarcodeModifyDto>, ManuContainerBarcodeModifyValidator>();
 
@@ -404,7 +406,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region PlanSfcPrint
             services.AddSingleton<AbstractValidator<PlanSfcPrintCreateDto>, PlanSfcPrintCreateValidator>();
-            services.AddSingleton<AbstractValidator<PlanSfcPrintModifyDto>, PlanSfcPrintModifyValidator>();
 
             #endregion
 

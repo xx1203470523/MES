@@ -164,7 +164,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
             var row = await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderId(new UpdatePassDownQuantityCommand
             {
                 WorkOrderId = planWorkOrderEntity.Id,
-                PlanQuantity = planWorkOrderEntity.Qty * (1 + planWorkOrderEntity.OverScale),
+                PlanQuantity = planWorkOrderEntity.Qty * (1 + planWorkOrderEntity.OverScale/100),
                 PassDownQuantity = param.Qty,
                 UserName = _currentUser.UserName,
                 UpdateDate = HymsonClock.Now()
