@@ -177,7 +177,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     throw new CustomerValidationException(nameof(ErrorCode.MES15308));
                 }
             }
-
+            //TODO  验证未完成 wangkeming
             foreach (var sfc in parm.Sfcs)
             {
                 var sfcEntity = sfcList.FirstOrDefault(x => x.SFC == sfc);
