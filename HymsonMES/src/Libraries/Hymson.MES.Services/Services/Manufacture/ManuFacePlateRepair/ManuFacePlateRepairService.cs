@@ -137,6 +137,9 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task<List<ManuFacePlateRepairButJobReturnTypeEnum>> ExecuteexecuteJobAsync(ManuFacePlateRepairExJobDto manuFacePlateRepairExJobDto)
         {
 
+            //var listTest = new List<ManuFacePlateRepairButJobReturnTypeEnum>();
+            //listTest.Add(ManuFacePlateRepairButJobReturnTypeEnum.BeginRepair);
+            //return listTest;
             #region  验证数据
             if (string.IsNullOrWhiteSpace(manuFacePlateRepairExJobDto.SFC))
             {
@@ -145,6 +148,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             #endregion
 
             #region 调用作业
+            manuFacePlateRepairExJobDto.SFC = manuFacePlateRepairExJobDto.SFC.Trim();
             var jobDto = new JobDto
             {
                 FacePlateId = manuFacePlateRepairExJobDto.FacePlateId,
@@ -157,7 +161,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var resJob = await _manuFacePlateButtonService.ClickAsync(jobDto);
             if (resJob == null || resJob.Count() <= 0)
             {
-                throw new BusinessException(nameof(ErrorCode.MES17319));
+                throw new BusinessException(nameof(ErrorCode.MES17320));
             }
             var dic = resJob.Where(it => it.Value <= 0);
             if (dic.Any())
@@ -170,11 +174,17 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 if (item.Key == ManuFacePlateRepairButJobReturnTypeEnum.BeginRepair.ToString())
                 {
-                    list.Add(ManuFacePlateRepairButJobReturnTypeEnum.BeginRepair);
+                    if (!list.Contains(ManuFacePlateRepairButJobReturnTypeEnum.BeginRepair))
+                        list.Add(ManuFacePlateRepairButJobReturnTypeEnum.BeginRepair);
                 }
                 else if (item.Key == ManuFacePlateRepairButJobReturnTypeEnum.EndRepair.ToString())
                 {
-                    list.Add(ManuFacePlateRepairButJobReturnTypeEnum.EndRepair);
+                    if (!list.Contains(ManuFacePlateRepairButJobReturnTypeEnum.EndRepair))
+                        list.Add(ManuFacePlateRepairButJobReturnTypeEnum.EndRepair);
+                }
+                else
+                {
+                    throw new BusinessException(nameof(ErrorCode.MES17321)).WithData("key", item.Key);
                 }
             }
 
@@ -195,6 +205,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new BusinessException(nameof(ErrorCode.MES17303));
             }
+            beginRepairDto.SFC = beginRepairDto.SFC.Trim();
             //验证条码
             var manuSfcProduceEntit = await _manuSfcProduceRepository.GetBySFCAsync(beginRepairDto.SFC);
             if (manuSfcProduceEntit == null)
@@ -346,7 +357,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new BusinessException(nameof(ErrorCode.MES16310));
             }
             //获取产品信息
-            var manuSfcProduce = await _manuSfcProduceRepository.GetPagedInfoAsync(new ManuSfcProducePagedQuery { PageSize = 1, PageIndex = 1, Sfc = sfc });
+            var manuSfcProduce = await _manuSfcProduceRepository.GetPagedInfoAsync(new ManuSfcProducePagedQuery { PageSize = 1, PageIndex = 1, SiteId = _currentSite.SiteId, Sfc = sfc });
             var manuSfcProduceInfo = manuSfcProduce.Data.FirstOrDefault();
             if (manuSfcProduceInfo == null)
             {
@@ -454,6 +465,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new BusinessException(nameof(ErrorCode.MES17303));
             }
+            beginRepairDto.SFC = beginRepairDto.SFC.Trim();
             var manuFacePlateRepairOpenInfoDto = await GetManuFacePlateRepairOpenInfoDto(beginRepairDto.SFC);
             return manuFacePlateRepairOpenInfoDto;
         }
@@ -471,6 +483,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new BusinessException(nameof(ErrorCode.MES17303));
             }
+            confirmSubmitDto.SFC = confirmSubmitDto.SFC.Trim();
 
             if (confirmSubmitDto.ReturnProcedureId <= 0)
             {
