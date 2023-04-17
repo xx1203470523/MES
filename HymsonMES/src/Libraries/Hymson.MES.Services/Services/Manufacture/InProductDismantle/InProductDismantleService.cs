@@ -5,6 +5,7 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Warehouse;
@@ -24,6 +25,7 @@ using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Services.Dtos.Manufacture;
+using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -444,8 +446,16 @@ namespace Hymson.MES.Services.Services.Manufacture
                         throw new CustomerValidationException(nameof(ErrorCode.MES16608)).WithData("barCode", addDto.CirculationBarCode);
                     }
 
-                    //获取需要上的物料数量
-                    circulationQty = addDto.CirculationQty;
+                    if (serialNumber == MaterialSerialNumberEnum.Inside)
+                    {
+                        circulationQty = ManuSfcCirculation.CirculationQty;
+                    }
+                    else
+                    {
+                        //获取需要上的物料数量
+                        circulationQty = addDto.CirculationQty;
+                    }
+             
                     //库存数量，库存状态
                     if (whMaterialInventory.QuantityResidue < circulationQty)
                     {
@@ -462,10 +472,28 @@ namespace Hymson.MES.Services.Services.Manufacture
                     throw new CustomerValidationException(nameof(ErrorCode.MES16603)).WithData("barCode", addDto.CirculationBarCode);
                 }
 
-                //获取需要上的物料数量
-                circulationQty = addDto.CirculationQty;
+                //根据选择的产品去找类型
+                serialNumber = await GetProductSerialNumberAsync(new BarCodeDataCollectionWayQueryDto
+                {
+                    ProductId = whMaterialInventory.MaterialId,
+                    CirculationBarCode = addDto.CirculationBarCode,
+                    CirculationMainProductId = addDto.MainProductId ?? 0,
+                    BomDetailId = addDto.BomDetailId
+                });
+                if (!serialNumber.HasValue)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16609)).WithData("barCode", addDto.CirculationBarCode);
+                }
 
-                //判断物料是否存在，不存在报错
+                if (serialNumber == MaterialSerialNumberEnum.Inside)
+                {
+                    circulationQty = ManuSfcCirculation.CirculationQty;
+                }
+                else
+                {
+                    //获取需要上的物料数量
+                    circulationQty = addDto.CirculationQty;
+                }
 
                 //库存数量，库存状态
                 if (whMaterialInventory.QuantityResidue < circulationQty)
@@ -806,35 +834,62 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="bomDetailId"></param>
         /// <returns></returns>
-        private async Task<List<ManuSfcChildCirculationDto>> GetBomMaterialsAsync(long bomDetailId)
+        private async Task<List<InProductDismantleDto>> GetBomMaterialsAsync(long bomDetailId)
         {
-            var manuSfcChildCirculations = new List<ManuSfcChildCirculationDto>();
+            var procMaterials = new List<InProductDismantleDto>();
             //读取bom主物料信息
             var bomDetailEntity = await _procBomDetailRepository.GetByIdAsync(bomDetailId);
-            if(bomDetailEntity == null)
+            if (bomDetailEntity == null)
             {
-                return manuSfcChildCirculations;
+                return procMaterials;
             }
 
             long mainProductId = bomDetailEntity.MaterialId;
+            var materialIds = new List<long>
+            {
+                bomDetailEntity.MaterialId
+            };
+
             //读取替代物料
             var replaceMaterials = await _replaceMaterialRepository.GetByBomDetailIdAsync(bomDetailId);
             if (replaceMaterials.Any())
             {
-
+                var replaceMaterialIds = replaceMaterials.Select(item => item.ReplaceMaterialId).ToList();
+                materialIds.AddRange(replaceMaterialIds);
             }
-
-            bool isEnableReplace = bomDetailEntity?.IsEnableReplace ?? false;
-            if (isEnableReplace)
+            else
             {
-                var procReplaces = await _procReplaceMaterialRepository.GetByMaterialIdAsync(mainProductId);
-                if (procReplaces.Any())
+                bool isEnableReplace = bomDetailEntity?.IsEnableReplace ?? false;
+                if (isEnableReplace)
                 {
-
+                    var procReplaces = await _procReplaceMaterialRepository.GetByMaterialIdAsync(mainProductId);
+                    if (procReplaces.Any())
+                    {
+                        var replaceMaterialIds = procReplaces.Select(item => item.ReplaceMaterialId).ToList();
+                        materialIds.AddRange(replaceMaterialIds);
+                    }
                 }
             }
 
-            return manuSfcChildCirculations;
+
+            var procMaterialList = new List<ProcMaterialEntity>();
+            var materials = materialIds.Distinct();
+            procMaterialList = (await _procMaterialRepository.GetByIdsAsync(materials.ToArray())).ToList();
+            if (!procMaterialList.Any())
+            {
+                return procMaterials;
+            }
+
+            procMaterialList.ForEach(item =>
+            {
+                procMaterials.Add(new InProductDismantleDto
+                {
+                    MaterialId = item.Id,
+                    MaterialCode = item.MaterialCode,
+                    MaterialName = item.MaterialName
+                });
+            });
+            return procMaterials;
         }
 
     }
