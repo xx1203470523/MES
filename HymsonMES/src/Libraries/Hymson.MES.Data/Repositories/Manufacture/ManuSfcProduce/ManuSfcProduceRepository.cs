@@ -11,6 +11,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -329,14 +330,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 根据SFC获取在制品业务
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="parm"></param>
         /// <returns></returns>
-        public async Task<ManuSfcProduceBusinessEntity> GetSfcProduceBusinessBySFCAsync(string sfc)
+        public async Task<IEnumerable<ManuSfcProduceBusinessEntity>> GetSfcProduceBusinessListBySFCAsync(SfcProduceBusinessQuery parm)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ManuSfcProduceBusinessEntity>(GetSfcProduceBusinessBySFCSql, new { SFC = sfc });
+            return await conn.QueryAsync<ManuSfcProduceBusinessEntity>(GetSfcProduceBusinessBySFCSql, parm);
         }
-
 
         /// <summary>
         /// 根据IDs批量获取在制品业务
@@ -382,8 +382,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                             FROM `manu_sfc_produce`  WHERE Id IN @ids ";
         const string GetSfcProduceBusinessBySFCIdSql = "SELECT `Id`, `SiteId`, `SfcInfoId`, `BusinessType`, `BusinessContent`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted` FROM manu_sfc_produce_business WHERE SfcInfoId = @SfcInfoId AND IsDeleted=0";
         const string GetSfcProduceBusinessBySFCSql = @"SELECT SPB.`Id`,  SPB.`SiteId`,  SPB.`SfcInfoId`,  SPB.`BusinessType`,  SPB.`BusinessContent`,  SPB.`CreatedBy`,  SPB.`CreatedOn`,  SPB.`UpdatedBy`, SPB.`UpdatedOn`,  SPB.`IsDeleted` 
-FROM manu_sfc_produce_business SPB  LEFT JOIN manu_sfc SFC ON SPB.SfcInfoId=SFC.Id AND SFC.IsDeleted=0
-WHERE SFC.SFC= @SFC AND SPB.IsDeleted=0";
+FROM manu_sfc_produce_business SPB  LEFT JOIN manu_sfc_produce SFC ON SPB.SfcInfoId=SFC.Id 
+WHERE SFC.SFC IN @Sfcs  AND SPB.BusinessType=@BusinessType AND  SPB.IsDeleted=0";
         const string GetSfcProduceBusinessBySFCIdsSql = "SELECT `Id`, `SiteId`, `SfcInfoId`, `BusinessType`, `BusinessContent`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted` FROM manu_sfc_produce_business WHERE SfcInfoId IN @SfcInfoIds  AND IsDeleted=0";
         const string GetBySFCSql = @"SELECT * FROM manu_sfc_produce WHERE SFC = @sfc ";
         const string DeletePhysicalSql = "DELETE FROM manu_sfc_produce WHERE SFC = @sfc";
