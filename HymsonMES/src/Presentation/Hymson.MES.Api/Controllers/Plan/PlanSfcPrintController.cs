@@ -71,7 +71,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <returns></returns>
         [HttpGet]
         [Route("page")]
-        public async Task<PagedInfo<ManuSfcPassDownDto>> GetPagedListAsync([FromQuery] ManuSfcPassDownPagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<PlanSfcPrintDto>> GetPagedListAsync([FromQuery] PlanSfcPrintPagedQueryDto pagedQueryDto)
         {
             return await _planSfcPrintService.GetPagedListAsync(pagedQueryDto);
         }

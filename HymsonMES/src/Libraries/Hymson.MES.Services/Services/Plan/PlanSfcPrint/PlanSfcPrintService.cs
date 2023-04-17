@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 条码打印    服务 | 代码由框架生成
- *builder:  pengxin
- *build datetime: 2023-03-21 04:33:58
- */
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -15,8 +8,6 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Plan;
-using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Utils;
 
@@ -27,39 +18,42 @@ namespace Hymson.MES.Services.Services.Plan
     /// </summary>
     public class PlanSfcPrintService : IPlanSfcPrintService
     {
-        private readonly ICurrentUser _currentUser;
-        private readonly ICurrentSite _currentSite;
         /// <summary>
-        /// 条码打印 仓储
+        /// 当前对象（登录用户）
         /// </summary>
-        private readonly IPlanSfcPrintRepository _planSfcInfoRepository;
-        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
+        private readonly ICurrentUser _currentUser;
+
+        /// <summary>
+        /// 当前对象（站点）
+        /// </summary>
+        private readonly ICurrentSite _currentSite;
+
+        /// <summary>
+        /// 验证器
+        /// </summary>
+        private readonly AbstractValidator<PlanSfcPrintCreateDto> _validationCreateRules;
+
+        /// <summary>
+        /// 仓储（条码）
+        /// </summary>
         private readonly IManuSfcRepository _manuSfcRepository;
 
-        private readonly AbstractValidator<PlanSfcPrintCreateDto> _validationCreateRules;
-        private readonly AbstractValidator<PlanSfcPrintModifyDto> _validationModifyRules;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="planSfcInfoRepository"></param>
-        /// <param name="planWorkOrderRepository"></param>
-        /// <param name="manuSfcRepository"></param>
         /// <param name="validationCreateRules"></param>
-        /// <param name="validationModifyRules"></param>
+        /// <param name="manuSfcRepository"></param>
         public PlanSfcPrintService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IPlanSfcPrintRepository planSfcInfoRepository, IPlanWorkOrderRepository planWorkOrderRepository, IManuSfcRepository manuSfcRepository,
-        AbstractValidator<PlanSfcPrintCreateDto> validationCreateRules, AbstractValidator<PlanSfcPrintModifyDto> validationModifyRules)
+            AbstractValidator<PlanSfcPrintCreateDto> validationCreateRules,
+            IManuSfcRepository manuSfcRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _planSfcInfoRepository = planSfcInfoRepository;
-            _planWorkOrderRepository = planWorkOrderRepository;
-            _manuSfcRepository = manuSfcRepository;
             _validationCreateRules = validationCreateRules;
-            _validationModifyRules = validationModifyRules;
+            _manuSfcRepository = manuSfcRepository;
         }
 
 
@@ -123,14 +117,14 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ManuSfcPassDownDto>> GetPagedListAsync(ManuSfcPassDownPagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<PlanSfcPrintDto>> GetPagedListAsync(PlanSfcPrintPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<ManuSfcPassDownPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId;
             var pagedInfo = await _manuSfcRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
-            var dtos = pagedInfo.Data.Select(s => new ManuSfcPassDownDto
+            var dtos = pagedInfo.Data.Select(s => new PlanSfcPrintDto
             {
                 Id = s.Id,
                 SFC = s.SFC,
@@ -140,7 +134,7 @@ namespace Hymson.MES.Services.Services.Plan
                 MaterialCode = s.MaterialCode,
                 MaterialName = s.MaterialName
             });
-            return new PagedInfo<ManuSfcPassDownDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            return new PagedInfo<PlanSfcPrintDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
 

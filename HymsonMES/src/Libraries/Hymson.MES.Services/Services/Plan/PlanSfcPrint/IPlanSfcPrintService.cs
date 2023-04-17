@@ -1,5 +1,4 @@
 using Hymson.Infrastructure;
-using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Plan;
 
 namespace Hymson.MES.Services.Services.Plan
@@ -28,7 +27,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<ManuSfcPassDownDto>> GetPagedListAsync(ManuSfcPassDownPagedQueryDto pagedQueryDto);
+        Task<PagedInfo<PlanSfcPrintDto>> GetPagedListAsync(PlanSfcPrintPagedQueryDto pagedQueryDto);
 
     }
 }

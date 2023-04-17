@@ -406,7 +406,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region PlanSfcPrint
             services.AddSingleton<AbstractValidator<PlanSfcPrintCreateDto>, PlanSfcPrintCreateValidator>();
-            services.AddSingleton<AbstractValidator<PlanSfcPrintModifyDto>, PlanSfcPrintModifyValidator>();
 
             #endregion
 
