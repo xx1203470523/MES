@@ -387,7 +387,7 @@
         public const string MES16113 = "请配置当前工单产品的编码规则！";
         public const string MES16114 = "扫描SN与工单产品编码规则不符！基数为:{Base}位";
         public const string MES16115 = "扫描SN与工单产品编码规则不符！需包含{ValuesType}值:{SegmentedValue}";
-
+        public const string MES16116 = "已使用的条码，不允许删除";
         #endregion
 
         #region 条码生成 MES16200
