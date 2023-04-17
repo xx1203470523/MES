@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 
 namespace Hymson.MES.Core.Enums
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public enum YesOrNoEnum : sbyte
     {
         /// <summary>
@@ -18,6 +16,6 @@ namespace Hymson.MES.Core.Enums
         /// 否
         /// </summary>
         [Description("否")]
-        No= 2,
+        No = 2,
     }
 }

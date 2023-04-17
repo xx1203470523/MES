@@ -11,7 +11,6 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.View;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -88,9 +87,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="manuSfcPagedQuery"></param>
+        /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<ManuSfcEntity>> GetPagedInfoAsync(ManuSfcPagedQuery manuSfcPagedQuery);
+        Task<PagedInfo<ManuSfcPassDownView>> GetPagedListAsync(ManuSfcPassDownPagedQuery pagedQuery);
 
         /// <summary>
         /// 查询条码信息

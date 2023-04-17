@@ -1,16 +1,8 @@
-/*
- *creator: Karl
- *
- *describe: 工单信息表    控制器 | 代码由框架生成  
- *builder:  Karl
- *build datetime: 2023-03-20 10:07:17
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Services.Plan;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Extensions;
 
 namespace Hymson.MES.Api.Controllers.Plan
 {
@@ -39,6 +31,7 @@ namespace Hymson.MES.Api.Controllers.Plan
             _planWorkOrderService = planWorkOrderService;
             _logger = logger;
         }
+        
 
         /// <summary>
         /// 分页查询列表（工单信息表）
@@ -46,7 +39,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("pagelist")]
+        [Route("page")]
         public async Task<PagedInfo<PlanWorkOrderListDetailViewDto>> QueryPagedPlanWorkOrderAsync([FromQuery] PlanWorkOrderPagedQueryDto parm)
         {
             return await _planWorkOrderService.GetPageListAsync(parm);

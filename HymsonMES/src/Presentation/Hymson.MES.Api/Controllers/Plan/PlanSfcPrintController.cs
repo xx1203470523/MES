@@ -1,17 +1,10 @@
-/*
- *creator: Karl
- *
- *describe: 条码打印    控制器 | 代码由框架生成  
- *builder:  pengxin
- *build datetime: 2023-03-21 04:33:58
- */
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Plan;
+using Hymson.MES.Services.Services.Manufacture.ManuSfc;
 using Hymson.MES.Services.Services.Plan;
-//using Hymson.Utils.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Extensions;
 
 namespace Hymson.MES.Api.Controllers.Plan
 {
@@ -26,20 +19,35 @@ namespace Hymson.MES.Api.Controllers.Plan
     public class PlanSfcPrintController : ControllerBase
     {
         /// <summary>
+        /// 
+        /// </summary>
+        private readonly ILogger<PlanSfcPrintController> _logger;
+
+        /// <summary>
         /// 接口（条码打印）
         /// </summary>
         private readonly IPlanSfcPrintService _planSfcInfoService;
-        private readonly ILogger<PlanSfcPrintController> _logger;
+
+        /// <summary>
+        /// 接口（条码）
+        /// </summary>
+        private readonly IManuSfcService _manuSfcService;
 
         /// <summary>
         /// 构造函数（条码打印）
         /// </summary>
+        /// <param name="logger"></param>
         /// <param name="planSfcInfoService"></param>
-        public PlanSfcPrintController(IPlanSfcPrintService planSfcInfoService, ILogger<PlanSfcPrintController> logger)
+        /// <param name="manuSfcService"></param>
+        public PlanSfcPrintController(ILogger<PlanSfcPrintController> logger,
+            IPlanSfcPrintService planSfcInfoService,
+            IManuSfcService manuSfcService)
         {
-            _planSfcInfoService = planSfcInfoService;
             _logger = logger;
+            _planSfcInfoService = planSfcInfoService;
+            _manuSfcService = manuSfcService;
         }
+
 
         /// <summary>
         /// 分页查询列表（条码打印）
@@ -54,6 +62,20 @@ namespace Hymson.MES.Api.Controllers.Plan
         }
 
         /// <summary>
+        /// 分页查询列表（条码打印）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("page")]
+        public async Task<PagedInfo<ManuSfcPassDownDto>> GetPagedListAsync([FromQuery] ManuSfcPassDownPagedQueryDto pagedQueryDto)
+        {
+            return await _manuSfcService.GetPagedListAsync(pagedQueryDto);
+        }
+
+
+
+        /// <summary>
         /// 添加（条码打印）
         /// </summary>
         /// <param name="parm"></param>
@@ -64,7 +86,6 @@ namespace Hymson.MES.Api.Controllers.Plan
         {
             await _planSfcInfoService.CreatePlanSfcInfoAsync(parm);
         }
-
 
         /// <summary>
         /// 删除（条码打印）

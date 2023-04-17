@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Manufacture;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuSfc
 {
@@ -11,5 +8,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfc
     /// </summary>
     public interface IManuSfcService
     {
+        /// <summary>
+        /// 分页查询列表（条码打印）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ManuSfcPassDownDto>> GetPagedListAsync(ManuSfcPassDownPagedQueryDto pagedQueryDto);
+
     }
 }

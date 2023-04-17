@@ -465,8 +465,10 @@ namespace Hymson.MES.Services.Mapper
             #endregion
 
             #region ManuSfcProduce
+            CreateMap<ManuSfcPassDownPagedQueryDto, ManuSfcPassDownPagedQuery>();
             CreateMap<ManuSfcProduceEntity, ManuSfcProduceDto>();
             #endregion
+
             #region ContainerPack
             CreateMap<ManuContainerPackPagedQueryDto, ManuContainerPackPagedQuery>();
             CreateMap<ManuContainerPackEntity, ManuContainerPackDto>();
@@ -480,7 +482,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuContainerBarcodeModifyDto, ManuContainerBarcodeEntity>();
 
             CreateMap<ManuContainerPackRecordCreateDto, ManuContainerPackRecordEntity>();
-            
+
 
 
             #endregion
