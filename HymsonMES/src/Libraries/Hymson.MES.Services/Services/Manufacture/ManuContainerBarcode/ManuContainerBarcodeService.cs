@@ -64,27 +64,29 @@ namespace Hymson.MES.Services.Services.Manufacture
         
         private readonly AbstractValidator<ManuContainerBarcodeCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ManuContainerBarcodeModifyDto> _validationModifyRules;
+        private readonly AbstractValidator<CreateManuContainerBarcodeDto> _validationCreateManuContainerBarcodeRules;
 
         public ManuContainerBarcodeService(ICurrentUser currentUser, ICurrentSite currentSite, IManuContainerBarcodeRepository manuContainerBarcodeRepository, AbstractValidator<ManuContainerBarcodeCreateDto> validationCreateRules
             , AbstractValidator<ManuContainerBarcodeModifyDto> validationModifyRules
             , IManuContainerPackRepository manuContainerPackRepository
             , IInteContainerRepository ingiContainerRepository
-            ,IManuContainerPackRecordRepository manuContainerPackRecordRepository
-            ,IManuSfcRepository manuSfcRepository
-            ,IManuSfcInfoRepository manuSfcInfoRepository
-            ,IInteCodeRulesRepository inteCodeRulesRepository
+            , IManuContainerPackRecordRepository manuContainerPackRecordRepository
+            , IManuSfcRepository manuSfcRepository
+            , IManuSfcInfoRepository manuSfcInfoRepository
+            , IInteCodeRulesRepository inteCodeRulesRepository
             , IManuGenerateBarcodeService manuGenerateBarcodeService
-            ,IProcMaterialRepository procMaterialRepository
-            ,IPlanWorkOrderRepository planWorkOrderRepository
-            ,IManuContainerPackService manuContainerPack
-            ,IManuContainerPackRecordService manuContainerPackRecordService)
+            , IProcMaterialRepository procMaterialRepository
+            , IPlanWorkOrderRepository planWorkOrderRepository
+            , IManuContainerPackService manuContainerPack
+            , IManuContainerPackRecordService manuContainerPackRecordService
+            ,AbstractValidator<CreateManuContainerBarcodeDto> validationCreateManuContainerBarcodeRules)
         {
             _currentUser = currentUser;
-            _currentSite = currentSite; 
+            _currentSite = currentSite;
             _manuContainerBarcodeRepository = manuContainerBarcodeRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
-            _manuContainerPackRepository = manuContainerPackRepository; 
+            _manuContainerPackRepository = manuContainerPackRepository;
             _inteContainerRepository = ingiContainerRepository;
             _manuContainerPackRecordRepository = manuContainerPackRecordRepository;
             _manuSfcRepository = manuSfcRepository;
@@ -94,15 +96,16 @@ namespace Hymson.MES.Services.Services.Manufacture
             _planWorkOrderRepository = planWorkOrderRepository;
             _manuContainerPack = manuContainerPack;
             _manuContainerPackRecordService = manuContainerPackRecordService;
-            _inteCodeRulesRepository = inteCodeRulesRepository; 
+            _inteCodeRulesRepository = inteCodeRulesRepository;
+            _validationCreateManuContainerBarcodeRules = validationCreateManuContainerBarcodeRules;
         }
 
         /// <summary>
         /// 创建
         /// </summary>
-        /// <param name="manuContainerBarcodeCreateDto"></param>
+        /// <param name="createManuContainerBarcodeDto"></param>
         /// <returns></returns>
-        public async Task<ManuContainerBarcodeView> CreateManuContainerBarcodeAsync(ManuContainerBarcodeCreateDto manuContainerBarcodeCreateDto)
+        public async Task<ManuContainerBarcodeView> CreateManuContainerBarcodeAsync(CreateManuContainerBarcodeDto createManuContainerBarcodeDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0)
@@ -111,10 +114,10 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             //验证DTO
-            await _validationCreateRules.ValidateAndThrowAsync(manuContainerBarcodeCreateDto);
+            await _validationCreateManuContainerBarcodeRules.ValidateAndThrowAsync(createManuContainerBarcodeDto);
 
             //DTO转换实体
-            var manuContainerBarcodeEntity = manuContainerBarcodeCreateDto.ToEntity<ManuContainerBarcodeEntity>();
+            var manuContainerBarcodeEntity = createManuContainerBarcodeDto.ToEntity<ManuContainerBarcodeEntity>();
             manuContainerBarcodeEntity.Id= IdGenProvider.Instance.CreateId();
             manuContainerBarcodeEntity.CreatedBy = _currentUser.UserName;
             manuContainerBarcodeEntity.UpdatedBy = _currentUser.UserName;
@@ -123,7 +126,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuContainerBarcodeEntity.SiteId = _currentSite.SiteId ?? 0;
 
             //获取工单信息
-            var sfcEntity = await _manuSfcRepository.GetBySFCAsync(manuContainerBarcodeCreateDto.BarCode);
+            var sfcEntity = await _manuSfcRepository.GetBySFCAsync(createManuContainerBarcodeDto.BarCode);
             if(sfcEntity==null)
             {
                 throw new ValidationException(nameof(ErrorCode.MES16701));
@@ -144,7 +147,7 @@ namespace Hymson.MES.Services.Services.Manufacture
              *        Y  根据条码查找打开着的包装码 返回view
              *        N  返回这个包装码的view
              */
-            var foo = await _manuContainerPackRepository.GetByLadeBarCodeAsync(manuContainerBarcodeCreateDto.BarCode);
+            var foo = await _manuContainerPackRepository.GetByLadeBarCodeAsync(createManuContainerBarcodeDto.BarCode);
             if(foo != null)
             {
                 var barcodeobj = await _manuContainerBarcodeRepository.GetByIdAsync(foo.ContainerBarCodeId);
@@ -153,7 +156,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             else
             {
                 //新条码&& 没有指定包装
-                if (string.IsNullOrEmpty(manuContainerBarcodeCreateDto.ContainerCode))
+                if (string.IsNullOrEmpty(createManuContainerBarcodeDto.ContainerCode))
                 {
                     //查找相同产品ID及打开着的包装
                     var barcodeobj = await _manuContainerBarcodeRepository.GetByProductIdAsync(sfcinfo.ProductId, (int)ManuContainerBarcodeStatusEnum.Open);
@@ -167,14 +170,14 @@ namespace Hymson.MES.Services.Services.Manufacture
                                 await _manuContainerPack.CreateManuContainerPackAsync(new ManuContainerPackCreateDto()
                                 {
                                     ContainerBarCodeId = barcodeobj.Id,
-                                    LadeBarCode = manuContainerBarcodeCreateDto.BarCode
+                                    LadeBarCode = createManuContainerBarcodeDto.BarCode
 
                                 });
                                 await _manuContainerPackRecordService.CreateManuContainerPackRecordAsync(new ManuContainerPackRecordCreateDto()
                                 {
                                     ContainerBarCodeId = barcodeobj.Id,
                                     OperateType = (int)ManuContainerBarcodeOperateTypeEnum.Load,
-                                    LadeBarCode = manuContainerBarcodeCreateDto.BarCode
+                                    LadeBarCode = createManuContainerBarcodeDto.BarCode
 
                                 });
                                 ts.Complete();
@@ -202,7 +205,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                      * N 创建全新包装
                      */
                     
-                    var barcodeobj = await _manuContainerBarcodeRepository.GetByCodeAsync(manuContainerBarcodeCreateDto.ContainerCode);
+                    var barcodeobj = await _manuContainerBarcodeRepository.GetByCodeAsync(createManuContainerBarcodeDto.ContainerCode);
                     if(barcodeobj?.ProductId== sfcinfo.ProductId)//相同包装
                     {
                         var inte = await _inteContainerRepository.GetByIdAsync(barcodeobj.ContainerId);
@@ -214,14 +217,14 @@ namespace Hymson.MES.Services.Services.Manufacture
                                 await _manuContainerPack.CreateManuContainerPackAsync(new ManuContainerPackCreateDto()
                                 {
                                     ContainerBarCodeId = barcodeobj.Id,
-                                    LadeBarCode = manuContainerBarcodeCreateDto.BarCode
+                                    LadeBarCode = createManuContainerBarcodeDto.BarCode
 
                                 });
                                 await _manuContainerPackRecordService.CreateManuContainerPackRecordAsync(new ManuContainerPackRecordCreateDto()
                                 {
                                     ContainerBarCodeId = barcodeobj.Id,
                                     OperateType = (int)ManuContainerBarcodeOperateTypeEnum.Load,
-                                    LadeBarCode = manuContainerBarcodeCreateDto.BarCode
+                                    LadeBarCode = createManuContainerBarcodeDto.BarCode
 
                                 });
                                 ts.Complete();

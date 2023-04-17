@@ -71,7 +71,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        public async Task<ManuContainerBarcodeView> AddManuContainerBarcodeAsync([FromBody] ManuContainerBarcodeCreateDto parm)
+        public async Task<ManuContainerBarcodeView> AddManuContainerBarcodeAsync([FromBody] CreateManuContainerBarcodeDto parm)
         {
             return await _manuContainerBarcodeService.CreateManuContainerBarcodeAsync(parm);
         }

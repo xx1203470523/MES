@@ -168,6 +168,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long BomDetailId { get; set; }
 
         /// <summary>
+        /// 资源id
+        /// </summary>
+        public long? ResourceId { get; set; }
+
+        /// <summary>
         /// 产品条码
         /// </summary>
         public string Sfc { get; set; }
@@ -175,7 +180,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 外部时选择要上的物料
         /// </summary>
-        public long? ProductId { get; set; }
+        public long? CirculationProductId { get; set; }
 
         /// <summary>
         /// 当前工序
@@ -185,7 +190,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 流转后主物料id
         /// </summary>
-        public long? MainProductId { get; set; }
+        public long? CirculationMainProductId { get; set; }
 
         /// <summary>
         /// 组件条码
@@ -203,11 +208,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long BomDetailId { get; set; }
 
         /// <summary>
-        /// 主物料数据收集方式
-        /// </summary>
-        public MaterialSerialNumberEnum? SerialNumber { get; set; }
-
-        /// <summary>
         /// 产品条码
         /// </summary>
         public string Sfc { get; set; }
@@ -220,7 +220,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 主物料id
         /// </summary>
-        public long CirculationMainProductId { get; set; }
+        public long MainProductId { get; set; }
 
         /// <summary>
         /// 外部时选择要上的物料
