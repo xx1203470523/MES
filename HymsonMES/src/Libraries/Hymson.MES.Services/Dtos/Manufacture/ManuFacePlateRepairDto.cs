@@ -24,10 +24,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
 
     }
 
+
     /// <summary>
-    /// 在制品维修 开始维修
+    /// 在制品维修 执行作业
     /// </summary>
-    public record ManuFacePlateRepairBeginRepairDto
+    public record ManuFacePlateRepairExJobDto
     {
         /// <summary>
         /// 面板ID
@@ -39,6 +40,29 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long FacePlateButtonId { get; set; }
 
+        /// <summary>
+        /// 工序id
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 产品条码
+        /// </summary>
+        public string SFC { get; set; }
+
+    }
+
+
+    /// <summary>
+    /// 在制品维修 开始维修
+    /// </summary>
+    public record ManuFacePlateRepairBeginRepairDto
+    {
         /// <summary>
         /// 工序id
         /// </summary>
