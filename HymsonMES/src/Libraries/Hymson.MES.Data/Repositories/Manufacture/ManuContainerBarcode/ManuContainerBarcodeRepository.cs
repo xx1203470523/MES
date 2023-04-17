@@ -166,7 +166,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.QueryFirstOrDefaultAsync<ManuContainerBarcodeEntity>(GetByCodeSql, new { BarCode = code });
         }
 
-        public async Task<ManuContainerBarcodeEntity> GetByCodeAsync(long pid, int status)
+        public async Task<ManuContainerBarcodeEntity> GetByProductIdAsync(long pid, int status)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ManuContainerBarcodeEntity>(GetByProductIdSql, new { ProductId = pid, Status =status });

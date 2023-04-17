@@ -1,11 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 条码信息表 仓储类 | 代码由框架生成
- *builder:  wangkeming
- *build datetime: 2023-04-11 02:42:47
- */
-
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
@@ -21,11 +13,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public partial class ManuSfcInfoRepository : BaseRepository, IManuSfcInfoRepository
     {
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly ConnectionOptions _connectionOptions;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
         public ManuSfcInfoRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
         }
+
 
         #region 方法
         /// <summary>
@@ -70,6 +71,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(GetBySFCSql, new { sfc });
+        }
+
+        /// <summary>
+        /// 根据SFC获取数据
+        /// </summary>
+        /// <param name="sfcIds"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcInfoEntity>> GetBySFCIdsAsync(IEnumerable<long> sfcIds)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ManuSfcInfoEntity>(GetBySFCIdsSql, new { sfcIds });
         }
 
         /// <summary>
@@ -168,6 +180,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         #endregion
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class ManuSfcInfoRepository
     {
         #region 
@@ -186,13 +201,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string DeleteSql = "UPDATE `manu_sfc_info1` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `manu_sfc_info1` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
-        const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteId`, `SfcId`, `WorkOrderId`, `ProductId`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `manu_sfc_info1`  WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SFC`, `WorkOrderId`, `RelevanceWorkOrderId`, `ProductId`, `Qty`, `Status`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`
-                            FROM `manu_sfc_info`  WHERE Id IN @ids ";
-        const string GetBySFCSql = @"SELECT * FROM manu_sfc_info WHERE SFC = @sfc ";
+        const string GetByIdSql = @"SELECT * FROM manu_sfc_info1 WHERE IsDeleted = 0 AND Id = @Id ";
+        const string GetByIdsSql = @"SELECT * FROM manu_sfc_info1 WHERE IsDeleted = 0 AND Id IN @ids ";
+        const string GetBySFCSql = @"SELECT * FROM manu_sfc_info1 WHERE IsDeleted = 0 AND SFC = @sfc ";
+        const string GetBySFCIdsSql = @"SELECT * FROM manu_sfc_info1 WHERE IsDeleted = 0 AND SfcId IN @sfcIds ";
         #endregion
     }
 }

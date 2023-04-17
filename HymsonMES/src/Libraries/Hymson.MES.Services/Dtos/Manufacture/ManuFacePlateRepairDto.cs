@@ -24,6 +24,40 @@ namespace Hymson.MES.Services.Dtos.Manufacture
 
     }
 
+
+    /// <summary>
+    /// 在制品维修 执行作业
+    /// </summary>
+    public record ManuFacePlateRepairExJobDto
+    {
+        /// <summary>
+        /// 面板ID
+        /// </summary>
+        public long FacePlateId { get; set; }
+
+        /// <summary>
+        /// 按钮ID
+        /// </summary>
+        public long FacePlateButtonId { get; set; }
+
+        /// <summary>
+        /// 工序id
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 产品条码
+        /// </summary>
+        public string SFC { get; set; }
+
+    }
+
+
     /// <summary>
     /// 在制品维修 开始维修
     /// </summary>
@@ -73,14 +107,14 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long ProcedureId { get; set; }
 
         /// <summary>
-        /// 工序id
+        /// 返回工序id
         /// </summary>
         public long ReturnProcedureId { get; set; }
 
         /// <summary>
-        /// 是否显示产品列表
+        /// 备注
         /// </summary>
-        public bool IsShowProductList { get; set; }
+        public string Remark { get; set; }
 
         /// <summary>
         /// 明细
@@ -200,6 +234,10 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 产品名称
         /// </summary>
         public string MaterialName { get; set; }
+        /// <summary>
+        /// 展示不合格信息
+        /// </summary>
+        public List<ManuFacePlateRepairProductBadInfoDto> badInfoDtos { get; set; }
     }
     /// <summary>
     /// 展示不合格信息

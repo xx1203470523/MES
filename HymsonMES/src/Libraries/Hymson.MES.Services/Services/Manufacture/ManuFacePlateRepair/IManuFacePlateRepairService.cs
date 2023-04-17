@@ -24,6 +24,15 @@ namespace Hymson.MES.Services.Services.Manufacture
     /// </summary>
     public interface IManuFacePlateRepairService
     {
+
+        /// <summary>
+        /// 执行作业
+        /// </summary>
+        /// <param name="manuFacePlateRepairExJobDto"></param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
+        Task<List<ManuFacePlateRepairButJobReturnTypeEnum>> ExecuteexecuteJobAsync(ManuFacePlateRepairExJobDto manuFacePlateRepairExJobDto);
+
         /// <summary>
         /// 开始维修
         /// </summary>
@@ -36,7 +45,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="beginRepairDto"></param>
         /// <returns></returns>
-        Task EndManuFacePlateRepairAsync(ManuFacePlateRepairBeginRepairDto beginRepairDto);
+        Task<ManuFacePlateRepairOpenInfoDto> EndManuFacePlateRepairAsync(ManuFacePlateRepairBeginRepairDto beginRepairDto);
 
         /// <summary>
         /// 确认提交
@@ -50,7 +59,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="facePlateId"></param>
         /// <returns></returns>
-        Task<ManuFacePlateRepairInitialInfoDto> GetInitialInfoManuFacePlateRepairAsync(long facePlateId); 
+        Task<ManuFacePlateRepairInitialInfoDto> GetInitialInfoManuFacePlateRepairAsync(long facePlateId);
 
 
 

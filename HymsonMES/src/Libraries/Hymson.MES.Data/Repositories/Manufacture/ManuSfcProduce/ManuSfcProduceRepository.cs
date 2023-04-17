@@ -147,7 +147,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<ManuSfcProduceEntity> GetBySFCAsync(string sfc)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ManuSfcProduceEntity>(GetBySFCSql, new { sfc });
+            return await conn.QueryFirstOrDefaultAsync<ManuSfcProduceEntity>(GetBySFCSql, new { sfc = sfc });
         }
 
         /// <summary>
@@ -259,6 +259,31 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateIsScrapSql, command);
         }
+
+
+        /// <summary>
+        /// 更新条码Status
+        /// </summary>
+        /// <param name="manuSfcInfoEntity"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateStatusAsync(UpdateStatusCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateStatusSql, command);
+        }
+
+        /// <summary>
+        /// 更新工序ProcedureId
+        /// </summary>
+        /// <param name="manuSfcInfoEntity"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateUpdateProcedureIdSqlAsync(UpdateProcedureCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateProcedureIdSql, command);
+        }
+
+
 
         #region 在制品业务
         /// <summary>
@@ -394,5 +419,9 @@ WHERE SFC.SFC IN @Sfcs  AND SPB.BusinessType=@BusinessType AND  SPB.IsDeleted=0"
         //质量锁定sql
         const string UpdateQualityLockSql = "update  manu_sfc_produce set `Lock`=@Lock,LockProductionId=@LockProductionId,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn where SFC in  @Sfcs";
         const string UpdateIsScrapSql = "UPDATE `manu_sfc_produce` SET IsScrap = @IsScrap, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE SFC in @Sfcs ";
+
+        //在制维修 
+        const string UpdateStatusSql = "UPDATE `manu_sfc_produce` SET Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
+        const string UpdateProcedureIdSql = "UPDATE `manu_sfc_produce` SET ProcedureId = @ProcedureId, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
     }
 }

@@ -46,7 +46,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 是否关闭
         /// </summary>
-        public ManuSfcRepairDetailIsCloseEnum IsClose { get; set; }
+        public ManuSfcRepairDetailIsIsCloseEnum IsClose { get; set; }
 
 
     }

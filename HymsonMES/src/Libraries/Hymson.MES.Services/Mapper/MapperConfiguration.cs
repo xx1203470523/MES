@@ -21,6 +21,7 @@ using Hymson.MES.Data.Repositories.Integrated.InteContainer.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.View;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
@@ -453,7 +454,39 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuFacePlateContainerPackCreateDto, ManuFacePlateContainerPackEntity>();
             CreateMap<ManuFacePlateContainerPackModifyDto, ManuFacePlateContainerPackEntity>();
             CreateMap<ManuFacePlateContainerPackEntity, ManuFacePlateContainerPackDto>();
+            //button
+            CreateMap<ManuFacePlateButtonPagedQueryDto, ManuFacePlateButtonPagedQuery>();
+            CreateMap<ManuFacePlateButtonModifyDto, ManuFacePlateButtonEntity>();
+            CreateMap<ManuFacePlateButtonCreateDto, ManuFacePlateButtonEntity>();
+            CreateMap<ManuFacePlateButtonEntity, ManuFacePlateButtonDto>();
+            //buttonJobRelation
+            CreateMap<ManuFacePlateButtonJobRelationModifyDto, ManuFacePlateButtonJobRelationEntity>();
+            CreateMap<ManuFacePlateButtonJobRelationCreateDto, ManuFacePlateButtonJobRelationEntity>();
+            CreateMap<ManuFacePlateButtonJobRelationEntity, ManuFacePlateButtonJobRelationDto>();
             #endregion
+
+            #region ManuSfcProduce
+            CreateMap<ManuSfcProduceEntity, ManuSfcProduceDto>();
+            #endregion
+
+            #region ContainerPack
+            CreateMap<ManuContainerPackPagedQueryDto, ManuContainerPackPagedQuery>();
+            CreateMap<ManuContainerPackEntity, ManuContainerPackDto>();
+            CreateMap<ManuContainerPackCreateDto, ManuContainerPackEntity>();
+            CreateMap<ManuContainerPackModifyDto, ManuContainerPackEntity>();
+
+            CreateMap<ManuContainerBarcodeCreateDto, ManuContainerBarcodeEntity>();
+            CreateMap<ManuContainerBarcodePagedQueryDto, ManuContainerBarcodePagedQuery>();
+            CreateMap<ManuContainerBarcodeDto, ManuContainerPackEntity>();
+            CreateMap<ManuContainerBarcodeEntity, ManuContainerBarcodeDto>();
+            CreateMap<ManuContainerBarcodeModifyDto, ManuContainerBarcodeEntity>();
+
+            CreateMap<ManuContainerPackRecordCreateDto, ManuContainerPackRecordEntity>();
+
+
+
+            #endregion
+
         }
 
         /// <summary>
@@ -490,10 +523,8 @@ namespace Hymson.MES.Services.Mapper
             #endregion
 
             #region PlanSfcPrint
-            CreateMap<PlanSfcPrintCreateDto, PlanSfcPrintView>();
-            CreateMap<PlanSfcPrintModifyDto, PlanSfcPrintView>();
-            CreateMap<PlanSfcPrintPagedQueryDto, PlanSfcPrintPagedQuery>();
-            CreateMap<PlanSfcPrintView, PlanSfcPrintDto>();
+            CreateMap<PlanSfcPrintPagedQueryDto, ManuSfcPassDownPagedQuery>();
+            CreateMap<ManuSfcPassDownView, PlanSfcPrintDto>();
             #endregion
 
         }

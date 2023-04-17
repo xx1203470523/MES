@@ -1,17 +1,5 @@
-/*
- *creator: Karl
- *
- *describe: 工单信息表 分页查询类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-03-20 10:07:17
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query
 {
@@ -20,6 +8,11 @@ namespace Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query
     /// </summary>
     public class PlanWorkOrderPagedQuery : PagerInfo
     {
+        /// <summary>
+        /// 站点编码 
+        /// </summary>
+        public long? SiteId { get; set; }
+
         /// <summary>
         /// 工单号
         /// </summary>

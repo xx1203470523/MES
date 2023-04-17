@@ -25,9 +25,11 @@ using Hymson.MES.Services.Services.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuFeeding;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
+using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCreateBarcode;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInStation;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOutStation;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
+using Hymson.MES.Services.Services.Manufacture.ManuSfc;
 using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Hymson.MES.Services.Services.Plan;
 using Hymson.MES.Services.Services.Process;
@@ -157,8 +159,9 @@ namespace Microsoft.Extensions.DependencyInjection
             #region Manufacture
             services.AddSingleton<IManuCommonService, ManuCommonService>();
             services.AddSingleton<IManuFeedingService, ManuFeedingService>();
+            services.AddSingleton<IManuSfcService, ManuSfcService>();
             services.AddSingleton<IManuSfcProduceService, ManuSfcProduceService>();
-            //services.AddSingleton<IManuSfcInfoService, ManuSfcInfoService>();
+            services.AddSingleton<IManuCreateBarcodeService, ManuCreateBarcodeService>();
             services.AddSingleton<IManuGenerateBarcodeService, ManuGenerateBarcodeService>();
             services.AddSingleton<IManuProductBadRecordService, ManuProductBadRecordService>();
             services.AddSingleton<IManuFacePlateService, ManuFacePlateService>();
@@ -169,6 +172,13 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuOutStationService, ManuOutStationService>();
             services.AddSingleton<IInProductDismantleService, InProductDismantleService>();
             services.AddSingleton<IManuFacePlateRepairService, ManuFacePlateRepairService>();
+
+            services.AddSingleton<IManuContainerBarcodeService, ManuContainerBarcodeService>();
+            services.AddSingleton<IManuContainerPackService, ManuContainerPackService>();
+            services.AddSingleton<IManuContainerPackRecordService, ManuContainerPackRecordService>();
+
+            services.AddSingleton<IManuFacePlateProductionService, ManuFacePlateProductionService>();
+
             #endregion
 
             #region Warehouse 
@@ -353,6 +363,14 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<AbstractValidator<ManuFacePlateContainerPackCreateDto>, ManuFacePlateContainerPackCreateValidator>();
             services.AddSingleton<AbstractValidator<ManuFacePlateContainerPackModifyDto>, ManuFacePlateContainerPackModifyValidator>();
+
+            services.AddSingleton<AbstractValidator<ManuContainerBarcodeCreateDto>, ManuContainerBarcodeCreateValidator>();
+            services.AddSingleton<AbstractValidator<ManuContainerBarcodeModifyDto>, ManuContainerBarcodeModifyValidator>();
+
+            services.AddSingleton<AbstractValidator<ManuContainerPackRecordCreateDto>, ManuContainerPackRecordCreateValidator>();
+            services.AddSingleton<AbstractValidator<ManuContainerPackRecordModifyDto>, ManuContainerPackRecordModifyValidator>();
+            services.AddSingleton<AbstractValidator<ManuContainerPackCreateDto>, ManuContainerPackCreateValidator>();
+            services.AddSingleton<AbstractValidator<ManuContainerPackModifyDto>, ManuContainerPackModifyValidator>();
             #endregion
 
             #region Warehouse 
@@ -388,7 +406,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region PlanSfcPrint
             services.AddSingleton<AbstractValidator<PlanSfcPrintCreateDto>, PlanSfcPrintCreateValidator>();
-            services.AddSingleton<AbstractValidator<PlanSfcPrintModifyDto>, PlanSfcPrintModifyValidator>();
 
             #endregion
 

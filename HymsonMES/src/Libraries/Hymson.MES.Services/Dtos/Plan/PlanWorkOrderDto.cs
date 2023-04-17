@@ -586,9 +586,9 @@ namespace Hymson.MES.Services.Dtos.Plan
         public DateTime UpdatedOn { get; set; }
 
         /// <summary>
-        /// 工厂
+        /// 下达数量
         /// </summary>
-        public long SiteId { get; set; }
+        public string PassDownQuantity { get; set; }
 
         /// <summary>
         /// 是否锁定

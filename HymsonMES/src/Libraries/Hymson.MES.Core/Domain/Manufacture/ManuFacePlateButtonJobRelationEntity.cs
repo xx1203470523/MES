@@ -22,7 +22,12 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 序列号
+        /// </summary>
+        public int Seq { get; set; }
+
+        /// <summary>
         /// 按钮Id
         /// </summary>
         public long FacePlateButtonId { get; set; }
@@ -32,6 +37,10 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public long JobId { get; set; }
 
+        /// <summary>
+        /// 是否清除条码
+        /// </summary>
+        public bool IsClear { get; set; }
        
     }
 }

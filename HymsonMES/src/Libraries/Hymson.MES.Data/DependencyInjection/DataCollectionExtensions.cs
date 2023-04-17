@@ -179,6 +179,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuFacePlateContainerPackRepository, ManuFacePlateContainerPackRepository>();
             services.AddSingleton<IManuFacePlateButtonRepository, ManuFacePlateButtonRepository>();
             services.AddSingleton<IManuFacePlateButtonJobRelationRepository, ManuFacePlateButtonJobRelationRepository>();
+
+            services.AddSingleton<IManuContainerPackRecordRepository, ManuContainerPackRecordRepository>();
+            services.AddSingleton<IManuContainerPackRepository, ManuContainerPackRepository>();
+            services.AddSingleton<IManuContainerBarcodeRepository, ManuContainerBarcodeRepository>();
             #endregion
 
             #region Warehouse 
@@ -206,12 +210,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IPlanWorkOrderActivationRecordRepository, PlanWorkOrderActivationRecordRepository>();
             #endregion
 
-            #region PlanSfcPrint
-            services.AddSingleton<IPlanSfcPrintRepository, PlanSfcPrintRepository>();
-
-            #endregion
-
-            #region PlanWorkOrderBind   PlanWorkOrderBindRecord
+            #region PlanWorkOrderBind/PlanWorkOrderBindRecord
             services.AddSingleton<IPlanWorkOrderBindRepository, PlanWorkOrderBindRepository>();
             services.AddSingleton<IPlanWorkOrderBindRecordRepository, PlanWorkOrderBindRecordRepository>();
             #endregion

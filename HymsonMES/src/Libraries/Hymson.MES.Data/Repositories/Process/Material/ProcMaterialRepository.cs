@@ -353,7 +353,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetMaterialByIdSql = @"SELECT 
                                         `Id`, `SiteId`, `GroupId`, `MaterialCode`,`MaskCodeId`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `BomId`, `Batch`, `Unit`, `SerialNumber`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, ConsumeRatio
                             FROM `proc_material`
-                            WHERE Id = Id";
+                            WHERE Id = @Id";
         const string GetByIdsSql = @"SELECT 
                                         `Id`, `SiteId`, `GroupId`, `MaterialCode`,`MaskCodeId`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `BomId`, `Batch`, PackageNum, `Unit`, `SerialNumber`,`BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, ConsumeRatio
                             FROM `proc_material`

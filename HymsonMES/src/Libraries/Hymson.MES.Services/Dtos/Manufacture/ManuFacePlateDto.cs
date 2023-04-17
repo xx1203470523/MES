@@ -214,6 +214,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 容器包装配置信息
         /// </summary>
         public ManuFacePlateContainerPackDto FacePlateContainerPack { get; set; }
+
+        /// <summary>
+        /// 按钮信息
+        /// </summary>
+        public ManuFacePlateButtonDto[] ManuFacePlateButtons { get; set; }
     }
 
     /// <summary>
