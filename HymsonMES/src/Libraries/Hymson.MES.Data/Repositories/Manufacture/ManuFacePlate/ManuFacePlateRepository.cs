@@ -217,8 +217,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string InsertSql = "INSERT INTO `manu_face_plate`(  `Id`, `Code`, `Name`, `Type`, `Status`, `ConversationTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Type, @Status, @ConversationTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string InsertsSql = "INSERT INTO `manu_face_plate`(  `Id`, `Code`, `Name`, `Type`, `Status`, `ConversationTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Type, @Status, @ConversationTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
 
-        const string UpdateSql = "UPDATE `manu_face_plate` SET   Code = @Code, Name = @Name, Type = @Type, Status = @Status, ConversationTime = @ConversationTime, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `manu_face_plate` SET   Code = @Code, Name = @Name, Type = @Type, Status = @Status, ConversationTime = @ConversationTime, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `manu_face_plate` SET   Code = @Code, Name = @Name, Type = @Type, Status = @Status, ConversationTime = @ConversationTime, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `manu_face_plate` SET   Code = @Code, Name = @Name, Type = @Type, Status = @Status, ConversationTime = @ConversationTime, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `manu_face_plate` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `manu_face_plate` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
@@ -229,10 +229,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `Code`, `Name`, `Type`, `Status`, `ConversationTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `manu_face_plate`  WHERE Id IN @Ids ";
-
-        const string GetDetailByIdSql = @" SELECT t1.`Id`,t1.`Code`,t1.`Name`,t1.`Type`,t1.`Status`,t1.ConversationTime,t2.FacePlateId,t2.ResourceId,t2.IsResourceEdit,t2.ProcedureId,t2.IsProcedureEdit,t2.IsSuccessBeep,t2.SuccessBeepUrl,t2.SuccessBeepTime,
-                        t2.IsErrorBeep,t2.ErrorBeepUrl,t2.ErrorBeepTime,t2.IsShowBindWorkOrder,t2.IsShowQualifiedQty,t2.QualifiedColour,t2.IsShowUnqualifiedQty,t2.UnqualifiedColour,t2.IsShowLog FROM manu_face_plate t1 LEFT JOIN manu_face_plate_production t2 on t1.Id=t2.FacePlateId and t2.IsDeleted=0
-                        where t1.IsDeleted=0 and t1.Id=  @Id ";
 
         const string GetByCodeSql = @"SELECT 
                                `Id`, `Code`, `Name`, `Type`, `Status`, `ConversationTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
