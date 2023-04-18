@@ -136,10 +136,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <exception cref="BusinessException"></exception>
         public async Task<List<ManuFacePlateRepairButJobReturnTypeEnum>> ExecuteexecuteJobAsync(ManuFacePlateRepairExJobDto manuFacePlateRepairExJobDto)
         {
-
-            //var listTest = new List<ManuFacePlateRepairButJobReturnTypeEnum>();
-            //listTest.Add(ManuFacePlateRepairButJobReturnTypeEnum.BeginRepair);
-            //return listTest;
             #region  验证数据
             if (string.IsNullOrWhiteSpace(manuFacePlateRepairExJobDto.SFC))
             {
@@ -438,7 +434,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 procProcedureEntit = await _procProcedureRepository.GetByIdAsync(itemNode.ProcedureId);
                 if (procProcedureEntit != null)
-                    if (procProcedureEntit.IsRepairReturn == 0)
+                    if (procProcedureEntit.IsRepairReturn == 1)
                     {
                         var manuFacePlateRepairReturnProcedureDto = new ManuFacePlateRepairReturnProcedureDto
                         {
