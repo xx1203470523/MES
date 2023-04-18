@@ -13,7 +13,6 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -165,20 +164,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                     }
                     else 
                     {
-                        var needQueryMaterialIds =new List<long>();
-                        var needQueryMaterialInfos=new List<ProcMaterialEntity>();
-                        foreach (var replace in replaceBomDetails)
-                        {
-                            if (!replace.DataCollectionWay.HasValue) 
-                            {
-                                needQueryMaterialIds.Add(replace.ReplaceMaterialId.ParseToLong());
-                            }
-                        }
-                        if (needQueryMaterialIds.Count > 0) 
-                        {
-                            needQueryMaterialInfos = (await _procMaterialRepository.GetByIdsAsync(needQueryMaterialIds.ToArray())).ToList();
-                        }
-
                         foreach (var replace in replaceBomDetails) 
                         {
                             mainReplaceMaterials.Add(new MainReplaceMaterial()
@@ -188,7 +173,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                                 MaterialName = replace.MaterialName,
                                 MaterialVersion = replace.Version,
 
-                                SerialNumber=replace.DataCollectionWay.HasValue? replace.DataCollectionWay.Value: needQueryMaterialInfos.Where(x=>x.Id== replace.ReplaceMaterialId.ParseToLong()).FirstOrDefault()?.SerialNumber
+                                SerialNumber=replace.DataCollectionWay
                             });
                         }
                     }
@@ -216,7 +201,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         }
 
         /// <summary>
-        /// 组装  （废弃）
+        /// 组装
         /// </summary>
         /// <param name="addDto"></param>
         /// <returns></returns>
