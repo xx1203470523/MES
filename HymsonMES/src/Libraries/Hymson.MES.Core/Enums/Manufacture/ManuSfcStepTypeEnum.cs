@@ -78,7 +78,7 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 取消报废
         /// </summary>
         [Description("取消报废")]
-       CancelDiscard = 14,
+        CancelDiscard = 14,
         /// <summary>
         /// 关闭标识
         /// </summary>
@@ -93,6 +93,11 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 删除
         /// </summary>
         [Description("删除")]
-        Delete = 17
+        Delete = 17,
+        /// <summary>
+        /// 维修
+        /// </summary>
+        [Description("维修")]
+        Repair = 18
     }
 }

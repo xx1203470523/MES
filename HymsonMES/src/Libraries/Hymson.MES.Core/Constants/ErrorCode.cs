@@ -332,6 +332,7 @@
         public const string MES15403 = "条码{sfcs}状态不是报废,不可再执行当前操作!";
         public const string MES15404 = "工单{orders}不是激活状态,不可再执行当前操作!";
         public const string MES15405 = "不合格缺陷信息不能为空!";
+        public const string MES15406 = "已存在返修信息!";
         #endregion
 
         #region 工单  16000

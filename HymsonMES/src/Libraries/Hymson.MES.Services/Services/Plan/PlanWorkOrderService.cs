@@ -109,7 +109,7 @@ namespace Hymson.MES.Services.Services.Plan
 
             if (response == 0)
             {
-                throw new BusinessException(nameof(ErrorCode.MES16002));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16002));
             }
         }
 
@@ -136,7 +136,7 @@ namespace Hymson.MES.Services.Services.Plan
             {
                 if (item.Status != PlanWorkOrderStatusEnum.NotStarted)
                 {
-                    throw new BusinessException(nameof(ErrorCode.MES16013));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16013));
                 }
             }
 
@@ -168,7 +168,7 @@ namespace Hymson.MES.Services.Services.Plan
         {
             if (_currentSite.SiteId == 0)
             {
-                throw new BusinessException(nameof(ErrorCode.MES10101));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10101));
             }
 
             //验证DTO
@@ -183,7 +183,7 @@ namespace Hymson.MES.Services.Services.Plan
             }
             else
             {
-                throw new BusinessException(nameof(ErrorCode.MES16003));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16003));
             }
 
 
@@ -195,7 +195,7 @@ namespace Hymson.MES.Services.Services.Plan
             var response = await _planWorkOrderRepository.UpdateAsync(planWorkOrderEntity);
             if (response == 0)
             {
-                throw new BusinessException(nameof(ErrorCode.MES16004));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16004));
             }
         }
 
@@ -256,14 +256,14 @@ namespace Hymson.MES.Services.Services.Plan
         {
             if (parms == null || parms.Count == 0)
             {
-                throw new BusinessException(nameof(ErrorCode.MES10100));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
 
             //查询需要改变的工单
             var workOrders = await _planWorkOrderRepository.GetByIdsAsync(parms.Select(x => x.Id).ToArray());
             if (workOrders == null || workOrders.Count() == 0 || workOrders.Any(x => x.IsDeleted > 0) || workOrders.Count() != parms.Count())
             {
-                throw new BusinessException(nameof(ErrorCode.MES16014));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16014));
             }
 
             #region//判断订单是否可以继续修改状态 
@@ -274,7 +274,7 @@ namespace Hymson.MES.Services.Services.Plan
                 {
                     if (item.Status != PlanWorkOrderStatusEnum.NotStarted)//判断是否有不是未开始的则无法更改状态
                     {
-                        throw new BusinessException(nameof(ErrorCode.MES16006));
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16006));
                     }
                 }
             }
@@ -284,7 +284,7 @@ namespace Hymson.MES.Services.Services.Plan
                 {
                     if (item.Status != PlanWorkOrderStatusEnum.InProduction)//判断是否有不是生产中的则无法更改状态
                     {
-                        throw new BusinessException(nameof(ErrorCode.MES16011));
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16011));
                     }
                 }
             }
@@ -294,7 +294,7 @@ namespace Hymson.MES.Services.Services.Plan
                 {
                     if (item.Status != PlanWorkOrderStatusEnum.Finish)//判断是否有不是完工的则无法更改状态
                     {
-                        throw new BusinessException(nameof(ErrorCode.MES16012));
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16012));
                     }
                 }
             }
@@ -342,7 +342,7 @@ namespace Hymson.MES.Services.Services.Plan
                 //}
                 //else
                 //{
-                //    throw new BusinessException(nameof(ErrorCode.MES16005));
+                //    throw new CustomerValidationException(nameof(ErrorCode.MES16005));
                 //}
             }
         }
@@ -356,7 +356,7 @@ namespace Hymson.MES.Services.Services.Plan
         {
             if (parms == null || parms.Count == 0)
             {
-                throw new BusinessException(nameof(ErrorCode.MES10100));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
 
             #region//判断订单是否可以继续修改为锁定/解锁
@@ -364,7 +364,7 @@ namespace Hymson.MES.Services.Services.Plan
             var workOrders = await _planWorkOrderRepository.GetByIdsAsync(parms.Select(x => x.Id).ToArray());
             if (workOrders == null || workOrders.Count() == 0 || workOrders.Any(x => x.IsDeleted > 0) || workOrders.Count() != parms.Count())
             {
-                throw new BusinessException(nameof(ErrorCode.MES16014));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16014));
             }
 
             if (parms.First().IsLocked == YesOrNoEnum.Yes) //需要修改为锁定
@@ -373,7 +373,7 @@ namespace Hymson.MES.Services.Services.Plan
                 {
                     if (item.Status != PlanWorkOrderStatusEnum.InProduction)//判断是否有不是生产中的则无法更改为锁定
                     {
-                        throw new BusinessException(nameof(ErrorCode.MES16007));
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16007));
                     }
                 }
             }
@@ -383,7 +383,7 @@ namespace Hymson.MES.Services.Services.Plan
                 {
                     if (item.IsLocked != YesOrNoEnum.Yes)//判断是否是锁定中
                     {
-                        throw new BusinessException(nameof(ErrorCode.MES16008));
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16008));
                     }
                 }
             }
@@ -432,7 +432,7 @@ namespace Hymson.MES.Services.Services.Plan
                 else
                 {
                     var errCode = parms.First().IsLocked == YesOrNoEnum.Yes ? ErrorCode.MES16009 : ErrorCode.MES16010;
-                    throw new BusinessException(nameof(errCode));
+                    throw new CustomerValidationException(nameof(errCode));
                 }
             }
         }

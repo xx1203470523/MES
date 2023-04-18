@@ -65,11 +65,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                         str = ConvertNumber(item, param.IgnoreChar, param.Base);
                         break;
                     default:
-                        throw new BusinessException(nameof(ErrorCode.MES16202));
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16202));
                 }
                 if (param.OrderLength>0&& str.Length > param.OrderLength)
                 {
-                    throw new BusinessException(nameof(ErrorCode.MES16201));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16201));
                 }
                 str = str.PadLeft(param.OrderLength, '0');
                 list.Add(str);
@@ -89,7 +89,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
             List<string> list = new List<string>();
             if (type != 16 && type != 32)
             {
-                throw new BusinessException(nameof(ErrorCode.MES16206));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16206));
             }
             if (type == 16)
             {
@@ -104,7 +104,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
             list.RemoveAll(match => ignoreCharArray.Contains(match));
             if (list == null || !list.Any())
             {
-                throw new BusinessException(nameof(ErrorCode.MES16204)).WithData("base", type);
+                throw new CustomerValidationException(nameof(ErrorCode.MES16204)).WithData("base", type);
             }
             return Convert(number, list);
         }
@@ -140,7 +140,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        /// <exception cref="BusinessException">未找到生成规则</exception>
+        /// <exception cref="CustomerValidationException">未找到生成规则</exception>
         public async Task<IEnumerable<string>> GenerateBarcodeListByIdAsync(GenerateBarcodeDto param)
         {
             var getCodeRulesTask = _inteCodeRulesRepository.GetByIdAsync(param.CodeRuleId);
@@ -160,7 +160,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
 
             if (barcodeSerialNumberList == null || !barcodeSerialNumberList.Any())
             {
-                throw new BusinessException(nameof(ErrorCode.MES16203));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16203));
             }
             List<string> list = new List<string>();
             foreach (var item in barcodeSerialNumberList)
@@ -185,7 +185,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                         }
                         else
                         {
-                            throw new BusinessException(nameof(ErrorCode.MES16205)).WithData("value", rule.SegmentedValue);
+                            throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", rule.SegmentedValue);
                         }
                     }
                 }
@@ -199,7 +199,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        /// <exception cref="BusinessException">未找到生成规则</exception>
+        /// <exception cref="CustomerValidationException">未找到生成规则</exception>
         public async Task<IEnumerable<string>> GenerateBarcodeListAsync(CodeRuleDto param)
         {
 
@@ -216,7 +216,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
 
             if (barcodeSerialNumberList == null || !barcodeSerialNumberList.Any())
             {
-                throw new BusinessException(nameof(ErrorCode.MES16203));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16203));
             }
             List<string> list = new List<string>();
             foreach (var item in barcodeSerialNumberList)
@@ -241,7 +241,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                         }
                         else
                         {
-                            throw new BusinessException(nameof(ErrorCode.MES16205)).WithData("value", rule.SegmentedValue);
+                            throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", rule.SegmentedValue);
                         }
                     }
                 }

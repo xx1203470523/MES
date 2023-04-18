@@ -183,9 +183,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 根据SFC获取在制品业务
         /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ManuSfcProduceBusinessEntity> GetSfcProduceBusinessBySFCAsync(SfcProduceBusinessQuery query);
+
+        /// <summary>
+        /// 根据SFC获取在制品业务
+        /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuSfcProduceBusinessEntity>> GetSfcProduceBusinessListBySFCAsync(SfcProduceBusinessQuery sfc);
+        Task<IEnumerable<ManuSfcProduceBusinessEntity>> GetSfcProduceBusinessListBySFCAsync(SfcListProduceBusinessQuery sfc);
 
         /// <summary>
         /// 根据IDs批量获取在制品业务
