@@ -456,6 +456,18 @@ namespace Hymson.MES.Services.Services.Manufacture
                 }
                 #endregion
 
+                #region 按钮信息
+                var manuFacePlateButtonEntityList = (await _manuFacePlateButtonRepository.GetByFacePlateIdAsync(manuFacePlateEntity.Id)).OrderBy(x=>x.Seq).ToList();
+                //按钮信息
+                List<ManuFacePlateButtonDto> manuFacePlateButtons = new();
+                foreach (var manuFacePlateButtonEntity in manuFacePlateButtonEntityList)
+                {
+                    var manuFacePlateButtonDto = manuFacePlateButtonEntity.ToModel<ManuFacePlateButtonDto>();
+                    manuFacePlateButtons.Add(manuFacePlateButtonDto);
+                }
+                facePlateQueryDto.ManuFacePlateButtons = manuFacePlateButtons.ToArray();
+                #endregion
+
                 #region 填充关联表数据
                 //资源
                 if (resourceId > 0)
