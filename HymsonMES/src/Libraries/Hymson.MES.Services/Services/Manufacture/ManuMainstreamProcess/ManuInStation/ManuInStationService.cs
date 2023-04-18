@@ -79,7 +79,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
             {
                 // 判断上一个工序是否是随机工序
                 var IsRandomPreProcedure = await _manuCommonService.IsRandomPreProcedure(sfcProduceEntity);
-                if (IsRandomPreProcedure == false) throw new BusinessException(nameof(ErrorCode.MES16308));
+                if (IsRandomPreProcedure == false) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
 
                 // 将SFC对应的工序改为当前工序
                 sfcProduceEntity.ProcessRouteId = bo.ProcedureId;
@@ -95,7 +95,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
             if (procedureEntity.Type == ProcedureTypeEnum.Test)
             {
                 // 超过复投次数，标识为NG
-                if (sfcProduceEntity.RepeatedCount > procedureEntity.Cycle) throw new BusinessException(nameof(ErrorCode.MES16036));
+                if (sfcProduceEntity.RepeatedCount > procedureEntity.Cycle) throw new CustomerValidationException(nameof(ErrorCode.MES16036));
                 sfcProduceEntity.RepeatedCount++;
             }
 

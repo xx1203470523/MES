@@ -243,7 +243,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             var mainMaterials = await _procBomDetailRepository.GetByBomIdAsync(sfcProduceEntity.ProductBOMId);
 
             // 未设置物料
-            if (mainMaterials == null || mainMaterials.Any() == false) throw new BusinessException(nameof(ErrorCode.MES10612));
+            if (mainMaterials == null || mainMaterials.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES10612));
 
             // 取得特定工序的物料
             mainMaterials = mainMaterials.Where(w => w.ProcedureId == sfcProduceEntity.ProcedureId);
