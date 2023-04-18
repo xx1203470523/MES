@@ -39,7 +39,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("page")]
+        [Route("pagelist")]
         public async Task<PagedInfo<PlanWorkOrderListDetailViewDto>> QueryPagedPlanWorkOrderAsync([FromQuery] PlanWorkOrderPagedQueryDto parm)
         {
             return await _planWorkOrderService.GetPageListAsync(parm);

@@ -25,9 +25,9 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="manuContainerBarcodeCreateDto"></param>
+        /// <param name="createManuContainerBarcodeDto"></param>
         /// <returns></returns>
-        Task<ManuContainerBarcodeView> CreateManuContainerBarcodeAsync(ManuContainerBarcodeCreateDto manuContainerBarcodeCreateDto);
+        Task<ManuContainerBarcodeView> CreateManuContainerBarcodeAsync(CreateManuContainerBarcodeDto createManuContainerBarcodeDto);
 
         /// <summary>
         /// 修改

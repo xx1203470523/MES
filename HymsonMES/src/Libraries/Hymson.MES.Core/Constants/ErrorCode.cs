@@ -450,7 +450,9 @@
         public const string MES17316 = "未获取到不良录入信息";
         public const string MES17317 = "更新条码生产状态失败";
         public const string MES17318 = "返回工序不能为空";
-        public const string MES17319 = "作业{key}执行失败";
+        public const string MES17319 = "作业:{key}执行失败";
+        public const string MES17320 = "作业返回空，请检查作业是否正确配置";
+        public const string MES17321 = "不识别的类型：{key}";
 
 
         #endregion
@@ -497,6 +499,7 @@
         public const string MES16609 = "找不到条码{barCode}对应物料的数据数据收集方式!";
         public const string MES16610 = "组件条码{barCode}对应的批次大小未维护!";
         public const string MES16611 = "组件条码{barCode}的批次大小超出可装载数量!";
+        public const string MES16612 = "当前工序与条码生产信息中的不一致！";
         #endregion
 
         #region 容器包装 MES 16700
@@ -526,6 +529,7 @@
         public const string MES16909 = "物料条码{barCode}库存不足,请检查!";
         public const string MES16910 = "实际使用的物料为空!";
         public const string MES16911 = "实际使用的物料与条码不合!";
+        public const string MES16912 = "条码为空！";
         #endregion
         #endregion
 

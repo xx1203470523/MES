@@ -223,6 +223,27 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     }
 
     /// <summary>
+    /// 创建容器条码使用的DTO
+    /// </summary>
+    public record CreateManuContainerBarcodeDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 包装码
+        /// </summary>
+        public string? ContainerCode { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string BarCode { get; set; }
+
+        /// <summary>
+        /// 面板编码
+        /// </summary>
+        public string? FacePlateCode { get; set; }
+    }
+
+    /// <summary>
     /// 容器条码表分页Dto
     /// </summary>
     public class ManuContainerBarcodePagedQueryDto : PagerInfo
