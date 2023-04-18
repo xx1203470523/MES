@@ -316,7 +316,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             // 执行Job
             //result = await _jobCommonService.ExecuteJobAsync(new List<InteJobEntity> { }.Select(s => s.Code), dto);
-            result = await _jobCommonService.ExecuteJobAsync(jobs.Select(s => s.ClassProgram), dto);
+            result = await _jobCommonService.ExecuteJobAsync(jobs.Select(s => s.ClassProgram), dto.Extra);
             return result;
         }
     }

@@ -1,6 +1,5 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
-using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Job.Manufacture;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -49,9 +48,9 @@ namespace Hymson.MES.Services.Services.Job.Common
         /// 读取挂载的作业并执行
         /// </summary>
         /// <param name="classNames"></param>
-        /// <param name="dto"></param>
+        /// <param name="extra"></param>
         /// <returns></returns>
-        public async Task<Dictionary<string, int>> ExecuteJobAsync(IEnumerable<string> classNames, JobDto dto)
+        public async Task<Dictionary<string, int>> ExecuteJobAsync(IEnumerable<string> classNames, string? extra)
         {
             var result = new Dictionary<string, int>(); // 返回结果
 
@@ -75,7 +74,7 @@ namespace Hymson.MES.Services.Services.Job.Common
                 if (obj == null) continue;
                 */
 
-                result.Add(type.Name, await obj.ExecuteAsync(dto));
+                result.Add(type.Name, await obj.ExecuteAsync(extra));
             }
 
             return result;

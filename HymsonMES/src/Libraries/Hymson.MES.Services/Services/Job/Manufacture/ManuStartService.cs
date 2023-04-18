@@ -1,7 +1,9 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInStation;
+using Newtonsoft.Json;
 
 namespace Hymson.MES.Services.Services.Job.Manufacture
 {
@@ -43,10 +45,15 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <summary>
         /// 执行（开始）
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="extra"></param>
         /// <returns></returns>
-        public async Task<int> ExecuteAsync(JobDto dto)
+        public async Task<int> ExecuteAsync(string? extra)
         {
+            if (string.IsNullOrEmpty(extra) == true) return 0;
+
+            var dto = JsonConvert.DeserializeObject<ManufactureBo>(extra);
+            if (dto == null) return 0;
+
             return await _manuInStationService.InStationAsync(dto);
         }
 

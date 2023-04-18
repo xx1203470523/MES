@@ -34,6 +34,7 @@ using IdGen;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using Mysqlx.Session;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Transactions;
 
@@ -150,9 +151,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 FacePlateId = manuFacePlateRepairExJobDto.FacePlateId,
                 FacePlateButtonId = manuFacePlateRepairExJobDto.FacePlateButtonId,
-                ProcedureId = manuFacePlateRepairExJobDto.ProcedureId,
-                ResourceId = manuFacePlateRepairExJobDto.ResourceId,
-                SFC = manuFacePlateRepairExJobDto.SFC
+                Extra = JsonConvert.SerializeObject(new
+                {
+                    manuFacePlateRepairExJobDto.ProcedureId,
+                    manuFacePlateRepairExJobDto.ResourceId,
+                    manuFacePlateRepairExJobDto.SFC
+                })
             };
             //调用作业
             var resJob = await _manuFacePlateButtonService.ClickAsync(jobDto);

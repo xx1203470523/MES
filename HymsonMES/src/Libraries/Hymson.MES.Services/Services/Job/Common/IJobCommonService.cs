@@ -1,6 +1,4 @@
-﻿using Hymson.MES.Services.Dtos.Common;
-
-namespace Hymson.MES.Services.Services.Job.Common
+﻿namespace Hymson.MES.Services.Services.Job.Common
 {
     /// <summary>
     /// 生产共用
@@ -11,9 +9,9 @@ namespace Hymson.MES.Services.Services.Job.Common
         /// 读取挂载的作业并执行
         /// </summary>
         /// <param name="classNames"></param>
-        /// <param name="dto"></param>
+        /// <param name="extra"></param>
         /// <returns></returns>
-        Task<Dictionary<string, int>> ExecuteJobAsync(IEnumerable<string> classNames, JobDto dto);
+        Task<Dictionary<string, int>> ExecuteJobAsync(IEnumerable<string> classNames, string? extra);
 
     }
 }
