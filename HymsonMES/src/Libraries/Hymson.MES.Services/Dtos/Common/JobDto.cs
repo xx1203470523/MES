@@ -1,11 +1,9 @@
-﻿using Hymson.MES.Services.Bos.Manufacture;
-
-namespace Hymson.MES.Services.Dtos.Common
+﻿namespace Hymson.MES.Services.Dtos.Common
 {
     /// <summary>
     /// 作业Dto
     /// </summary>
-    public class JobDto: ManufactureBo
+    public class JobDto
     {
         /// <summary>
         /// 面板ID
@@ -17,6 +15,10 @@ namespace Hymson.MES.Services.Dtos.Common
         /// </summary>
         public long FacePlateButtonId { get; set; }
 
+        /// <summary>
+        /// 额外数据序列成的字符串
+        /// </summary>
+        public string? Extra { get; set; }
     }
 
 }

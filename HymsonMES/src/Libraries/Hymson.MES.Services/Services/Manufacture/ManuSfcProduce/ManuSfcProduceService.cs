@@ -151,6 +151,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Lock = item.Lock,
                     LockProductionId = item.LockProductionId,
                     ProductBOMId = item.ProductBOMId,
+                    ProcedureId=item.ProcedureId,
                     Status = item.Status,
                     OrderCode = item.OrderCode,
                     Code = item.Code,
@@ -179,7 +180,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
 
             var sfcListTask = _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery { Sfcs = parm.Sfcs.Distinct().ToArray() });
-            var sfcProduceBusinesssListTask = _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcProduceBusinessQuery { Sfcs = parm.Sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
+            var sfcProduceBusinesssListTask = _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = parm.Sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
             var sfcList = await sfcListTask;
             var sfcProduceBusinesssList = await sfcProduceBusinesssListTask;
 

@@ -4,9 +4,11 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
 using Hymson.Utils;
+using Newtonsoft.Json;
 
 namespace Hymson.MES.Services.Services.Job.Manufacture
 {
@@ -49,10 +51,15 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <summary>
         /// 执行（完成）
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="extra"></param>
         /// <returns></returns>
-        public async Task<int> ExecuteAsync(JobDto dto)
+        public async Task<int> ExecuteAsync(string? extra)
         {
+            if (string.IsNullOrEmpty(extra) == true) return 0;
+
+            var dto = JsonConvert.DeserializeObject<ManufactureBo>(extra);
+            if (dto == null) return 0;
+
             return await _manuOutStationService.OutStationAsync(dto);
         }
 

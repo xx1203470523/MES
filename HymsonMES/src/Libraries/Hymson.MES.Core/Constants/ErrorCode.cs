@@ -332,6 +332,7 @@
         public const string MES15403 = "条码{sfcs}状态不是报废,不可再执行当前操作!";
         public const string MES15404 = "工单{orders}不是激活状态,不可再执行当前操作!";
         public const string MES15405 = "不合格缺陷信息不能为空!";
+        public const string MES15406 = "已存在返修信息!";
         #endregion
 
         #region 工单  16000
@@ -501,6 +502,8 @@
         public const string MES16610 = "组件条码{barCode}对应的批次大小未维护!";
         public const string MES16611 = "组件条码{barCode}的批次大小超出可装载数量!";
         public const string MES16612 = "当前工序与条码生产信息中的不一致！";
+        public const string MES16613 = "请选择活动状态下的组件移除！";
+        public const string MES16614 = "请选择活动状态下的组件替换！";
         #endregion
 
         #region 容器包装 MES 16700
