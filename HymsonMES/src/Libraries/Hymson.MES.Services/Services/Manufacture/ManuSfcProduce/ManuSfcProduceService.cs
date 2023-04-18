@@ -151,6 +151,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Lock = item.Lock,
                     LockProductionId = item.LockProductionId,
                     ProductBOMId = item.ProductBOMId,
+                    ProcedureId=item.ProcedureId,
                     Status = item.Status,
                     OrderCode = item.OrderCode,
                     Code = item.Code,

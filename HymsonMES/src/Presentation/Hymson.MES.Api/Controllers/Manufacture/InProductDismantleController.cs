@@ -80,13 +80,13 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <summary>
         /// 获取主物料下的所有物料列表
         /// </summary>
-        /// <param name="bomDetailId">bom详情id</param>
+        /// <param name="id">bom详情id</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("bomMaterials")]
-        public async Task<List<InProductDismantleDto>> GetBomMaterialsAsync(long bomDetailId)
+        [Route("bomMaterials/{id}")]
+        public async Task<List<InProductDismantleDto>> GetBomMaterialsAsync(long id)
         {
-            return await _inProductDismantleService.GetBomMaterialsAsync(bomDetailId);
+            return await _inProductDismantleService.GetBomMaterialsAsync(id);
         }
 
     }
