@@ -201,9 +201,19 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     public class InProductDismantleReplaceDto: InProductDismantleAddDto
     {
         /// <summary>
+        /// 被替换的旧的条码
+        /// </summary>
+        public string OldCirculationBarCode { get; set; }
+
+        /// <summary>
         /// 被替换的数据id
         /// </summary>
         public long Id { get; set; }
+
+        /// <summary>
+        /// 选择的物料数据收集方式
+        /// </summary>
+        public MaterialSerialNumberEnum? SerialNumber { get; set; }
     }
 
     public class CirculationQueryDto

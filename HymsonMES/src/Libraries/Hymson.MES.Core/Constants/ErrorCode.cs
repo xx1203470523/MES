@@ -501,6 +501,8 @@
         public const string MES16610 = "组件条码{barCode}对应的批次大小未维护!";
         public const string MES16611 = "组件条码{barCode}的批次大小超出可装载数量!";
         public const string MES16612 = "当前工序与条码生产信息中的不一致！";
+        public const string MES16613 = "请选择活动状态下的组件移除！";
+        public const string MES16614 = "请选择活动状态下的组件替换！";
         #endregion
 
         #region 容器包装 MES 16700
