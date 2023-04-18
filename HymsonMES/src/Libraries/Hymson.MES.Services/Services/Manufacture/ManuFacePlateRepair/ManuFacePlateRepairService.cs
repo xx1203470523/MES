@@ -33,6 +33,7 @@ using Hymson.Utils.Tools;
 using IdGen;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
+using Mysqlx.Expr;
 using Mysqlx.Session;
 using Newtonsoft.Json;
 using System.Collections.Generic;
@@ -147,28 +148,20 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             #region 调用作业
             manuFacePlateRepairExJobDto.SFC = manuFacePlateRepairExJobDto.SFC.Trim();
-            var jobDto = new JobDto
+            var jobDto = new ButtonRequestDto
             {
                 FacePlateId = manuFacePlateRepairExJobDto.FacePlateId,
-                FacePlateButtonId = manuFacePlateRepairExJobDto.FacePlateButtonId,
-                Extra = JsonConvert.SerializeObject(new
-                {
-                    manuFacePlateRepairExJobDto.ProcedureId,
-                    manuFacePlateRepairExJobDto.ResourceId,
-                    manuFacePlateRepairExJobDto.SFC
-                })
+                FacePlateButtonId = manuFacePlateRepairExJobDto.FacePlateButtonId
             };
-            //调用作业
-            var resJob = await _manuFacePlateButtonService.ClickAsync(jobDto);
-            if (resJob == null || resJob.Count() <= 0)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES17320));
-            }
-            var dic = resJob.Where(it => it.Value <= 0);
-            if (dic.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES17319)).WithData("key", dic.FirstOrDefault().Key);
-            }
+
+            jobDto.Param?.Add("SFC", manuFacePlateRepairExJobDto.SFC);
+            jobDto.Param?.Add("ProcedureId", $"{manuFacePlateRepairExJobDto.ProcedureId}");
+            jobDto.Param?.Add("ResourceId", $"{manuFacePlateRepairExJobDto.ResourceId}");
+
+            // 调用作业
+            var responseDto = await _manuFacePlateButtonService.ClickAsync(jobDto);
+            var resJob = responseDto.Data;
+            if (resJob == null || resJob.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES17320));
 
             var list = new List<ManuFacePlateRepairButJobReturnTypeEnum>();
             foreach (var item in resJob)

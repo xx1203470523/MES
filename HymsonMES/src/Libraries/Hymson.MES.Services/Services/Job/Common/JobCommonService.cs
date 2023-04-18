@@ -1,5 +1,7 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Job.Manufacture;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -47,12 +49,12 @@ namespace Hymson.MES.Services.Services.Job.Common
         /// <summary>
         /// 读取挂载的作业并执行
         /// </summary>
-        /// <param name="classNames"></param>
-        /// <param name="extra"></param>
+        /// <param name="jobs"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<Dictionary<string, int>> ExecuteJobAsync(IEnumerable<string> classNames, string? extra)
+        public async Task<Dictionary<string, JobResponseDto>> ExecuteJobAsync(IEnumerable<InteJobEntity> jobs, Dictionary<string, string>? param)
         {
-            var result = new Dictionary<string, int>(); // 返回结果
+            var result = new Dictionary<string, JobResponseDto>(); // 返回结果
 
             // 获取实现了 IManufactureJobService 接口的所有类的 Type 对象
             Type[] types = Assembly.GetExecutingAssembly().GetTypes()
@@ -60,13 +62,19 @@ namespace Hymson.MES.Services.Services.Job.Common
 
             // 遍历实现类，执行有绑定在当前按钮下面的job
             var serviceScope = _serviceProvider.CreateAsyncScope();
-            foreach (Type type in types)
+            if (serviceScope.ServiceProvider == null) return result;
+
+            foreach (var job in jobs)
             {
-                if (classNames.Any(a => a == type.Name) == false) continue;
+                var type = types.FirstOrDefault(a => a.Name == job.ClassProgram);
+                if (type == null) continue;
 
                 // 通过依赖注入的方式创建该类的实例，并调用 执行 方法
-                var obj = (IManufactureJobService)serviceScope.ServiceProvider.GetService(type);
+                var obj = serviceScope.ServiceProvider.GetService(type);
                 if (obj == null) continue;
+
+                var service = (IManufactureJobService)obj;
+                if (service == null) continue;
 
                 /*
                 // 创建该类的实例，并调用 执行 方法
@@ -74,7 +82,10 @@ namespace Hymson.MES.Services.Services.Job.Common
                 if (obj == null) continue;
                 */
 
-                result.Add(type.Name, await obj.ExecuteAsync(extra));
+                // TODO 如果job有额外参数，可以在这里进行拼装
+                //extra.Add();
+
+                result.Add(type.Name, await service.ExecuteAsync(param));
             }
 
             return result;

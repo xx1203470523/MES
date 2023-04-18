@@ -3,9 +3,9 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Bos.Manufacture;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Utils;
-using Newtonsoft.Json;
 
 namespace Hymson.MES.Services.Services.Job.Manufacture
 {
@@ -55,23 +55,39 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <summary>
         /// 执行（中止）
         /// </summary>
-        /// <param name="extra"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> ExecuteAsync(string? extra)
+        public async Task<JobResponseDto> ExecuteAsync(Dictionary<string, string>? param)
         {
-            if (string.IsNullOrEmpty(extra) == true) return 0;
+            var defaultDto = new JobResponseDto { };
+            if (param == null) return defaultDto;
 
-            var dto = JsonConvert.DeserializeObject<ManufactureBo>(extra);
-            if (dto == null) return 0;
+            var rows = 0;
+            if (param.ContainsKey("SFC") == false || param.ContainsKey("ProcedureId") == false || param.ContainsKey("ResourceId") == false)
+            {
+                defaultDto.Message = "失败";
+            }
+            else
+            {
+                // 获取生产条码信息（附带条码合法性校验 + 工序活动状态校验）
+                var sfcProduceEntity = await _manuCommonService.GetProduceSFCWithCheckAsync(param["SFC"], param["ProcedureId"].ParseToLong());
 
-            // 获取生产条码信息（附带条码合法性校验 + 工序活动状态校验）
-            var sfcProduceEntity = await _manuCommonService.GetProduceSFCWithCheckAsync(dto.SFC, dto.ProcedureId);
+                // 更改状态，将条码由"活动"改为"排队"
+                sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
+                sfcProduceEntity.UpdatedBy = _currentUser.UserName;
+                sfcProduceEntity.UpdatedOn = defaultDto.Time;
 
-            // 更改状态，将条码由"活动"改为"排队"
-            sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
-            sfcProduceEntity.UpdatedBy = _currentUser.UserName;
-            sfcProduceEntity.UpdatedOn = HymsonClock.Now();
-            return await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
+                rows = await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
+
+                defaultDto.Message = "成功";
+            }
+
+            var result = (rows > 0).ToString();
+            defaultDto.Content?.Add("PackageCom", result);
+            defaultDto.Content?.Add("BadEntryCom", result);
+            defaultDto.Content?.Add("Result", result);
+
+            return defaultDto;
         }
     }
 }

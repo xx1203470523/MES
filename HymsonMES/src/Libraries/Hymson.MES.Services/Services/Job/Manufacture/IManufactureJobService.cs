@@ -1,4 +1,6 @@
-﻿namespace Hymson.MES.Services.Services.Job.Manufacture
+﻿using Hymson.MES.Services.Dtos.Common;
+
+namespace Hymson.MES.Services.Services.Job.Manufacture
 {
     /// <summary>
     /// 
@@ -8,8 +10,8 @@
         /// <summary>
         /// 执行
         /// </summary>
-        /// <param name="extra"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> ExecuteAsync(string? extra);
+        Task<JobResponseDto> ExecuteAsync(Dictionary<string, string>? param);
     }
 }

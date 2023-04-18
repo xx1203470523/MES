@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Services.Bos.Manufacture;
+using Hymson.MES.Services.Dtos.Common;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInStation
 {
