@@ -320,6 +320,9 @@
         public const string MES15307 = "扫描的条码状态都必须是“锁定”或者有未关闭的将来锁定指令存在";
         //public const string MES15308= " 当前条码状态为{operationType}，与选择的操作类型不匹配";
         public const string MES15308 = "将来锁定操作必须是同一工单下的条码！";
+        public const string MES15309 = "条码全部不是在制品！";
+        public const string MES15310 = "将来锁工序{lockproduction}不在条码所用工艺路线中！";
+        public const string MES15311 = "将来锁锁定工序不存在！"; 
         #endregion
 
         #region 质量录入 15400
@@ -497,6 +500,7 @@
         public const string MES16609 = "找不到条码{barCode}对应物料的数据数据收集方式!";
         public const string MES16610 = "组件条码{barCode}对应的批次大小未维护!";
         public const string MES16611 = "组件条码{barCode}的批次大小超出可装载数量!";
+        public const string MES16612 = "当前工序与条码生产信息中的不一致！";
         #endregion
 
         #region 容器包装 MES 16700

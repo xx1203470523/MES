@@ -337,24 +337,20 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             var processRouteDetailNodeListTask = _procProcessRouteDetailNodeRepository.GetProcProcessRouteDetailNodesByProcessRouteId(processRouteId);
             var processRouteDetailLinkList = await processRouteDetailLinkListTask;
             var processRouteDetailNodeList = await processRouteDetailNodeListTask;
-            ;
 
-            var list = new List<ProcessRouteDetailDto>();
+            IList<ProcessRouteDetailDto> list = new List<ProcessRouteDetailDto>();
             if (processRouteDetailLinkList != null && processRouteDetailLinkList.Any()
                 && processRouteDetailNodeList != null && processRouteDetailNodeList.Any())
             {
                 var firstProcedure = processRouteDetailNodeList.FirstOrDefault(x => x.IsFirstProcess == 1);
-                if (firstProcedure == null)
+                if (firstProcedure != null)
                 {
-                    //报错
-                }
-                else
-                {
-                    CombinationProcessRoute(list, firstProcedure.ProcedureId, processRouteDetailLinkList);
+                    CombinationProcessRoute(ref list, firstProcedure.ProcedureId, processRouteDetailLinkList);
                 }
             }
             return list;
         }
+
         /// <summary>
         /// 组装工艺路线
         /// </summary>
@@ -362,14 +358,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="key"></param>
         /// <param name="procedureId"></param>
         /// <param name="procProcessRouteDetailLinkEntities"></param>
-        private void CombinationProcessRoute(IList<ProcessRouteDetailDto> list, long procedureId, IEnumerable<ProcProcessRouteDetailLinkEntity> procProcessRouteDetailLinkEntities, long key = 0)
+        private void CombinationProcessRoute(ref IList<ProcessRouteDetailDto> list, long procedureId, IEnumerable<ProcProcessRouteDetailLinkEntity> procProcessRouteDetailLinkEntities, long key = 0)
         {
             if (list == null || !list.Any())
             {
+                list=new List<ProcessRouteDetailDto>();
                 key = IdGenProvider.Instance.CreateId();
-                list = new List<ProcessRouteDetailDto>();
                 var processRouteDetail = new ProcessRouteDetailDto();
-                processRouteDetail.key = key;   
+                processRouteDetail.key = key;
                 processRouteDetail.ProcedureIds = new List<long>();
                 processRouteDetail.ProcedureIds.Add(procedureId);
                 list.Add(processRouteDetail);
@@ -389,7 +385,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                             if (index == 1)
                             {
                                 processRouteDetail.ProcedureIds.Add(item.ProcessRouteDetailId);
-                                CombinationProcessRoute(list, item.ProcessRouteDetailId, procProcessRouteDetailLinkEntities, key);
+                                CombinationProcessRoute(ref list, item.ProcessRouteDetailId, procProcessRouteDetailLinkEntities, key);
                             }
                             else
                             {
@@ -398,9 +394,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                                     key = IdGenProvider.Instance.CreateId(),
                                     ProcedureIds = procedureIds,
                                 };
-                                processRouteDetailDto.ProcedureIds = processRouteDetailDto.ProcedureIds.Append(item.ProcessRouteDetailId).ToList();
+                                processRouteDetailDto.ProcedureIds.Add(item.ProcessRouteDetailId);
                                 list.Add(processRouteDetailDto);
-                                CombinationProcessRoute(list, item.ProcessRouteDetailId, procProcessRouteDetailLinkEntities, processRouteDetailDto.key);
+                                CombinationProcessRoute(ref list, item.ProcessRouteDetailId, procProcessRouteDetailLinkEntities, processRouteDetailDto.key);
                             }
                         }
                         index++;

@@ -39,21 +39,21 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="param"></param>
         /// <returns></returns>
         [HttpGet("getPlateProductionPackageInfo")]
-        public async Task<ManuFacePlateProductionPackageDto> GetsManuFacePlateProductionPackageInfo([FromQuery] ManuFacePlateProductionPackageQueryDto param) 
+        public async Task<ManuFacePlateProductionPackageDto> GetsManuFacePlateProductionPackageInfo([FromQuery] ManuFacePlateProductionPackageQueryDto param)
         {
             return await _manuFacePlateProductionService.GetManuFacePlateProductionPackageInfo(param);
         }
 
-        /// <summary>
-        /// 组装
-        /// </summary>
-        /// <param name="addDto"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("addPackageCom")]
-        public async Task<string> AddPackageCom(ManuFacePlateProductionPackageAddDto addDto) 
-        {
-            return await _manuFacePlateProductionService.AddPackageCom(addDto);
-        }
+        ///// <summary>
+        ///// 组装
+        ///// </summary>
+        ///// <param name="addDto"></param>
+        ///// <returns></returns>
+        //[HttpPost]
+        //[Route("addPackageCom")]
+        //public async Task<string> AddPackageCom(ManuFacePlateProductionPackageAddDto addDto) 
+        //{
+        //    return await _manuFacePlateProductionService.AddPackageCom(addDto);
+        //}
     }
 }
