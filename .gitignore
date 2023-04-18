@@ -405,3 +405,4 @@ dist-ssr
 /dist*
 *-lock.*
 pnpm-debug
+/HymsonMES/src/Presentation/Hymson.MES.Api/Filter
