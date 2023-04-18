@@ -322,6 +322,7 @@
         public const string MES15308 = "将来锁定操作必须是同一工单下的条码！";
         public const string MES15309 = "条码全部不是在制品！";
         public const string MES15310 = "将来锁工序{lockproduction}不在条码所用工艺路线中！";
+        public const string MES15311 = "将来锁锁定工序不存在！"; 
         #endregion
 
         #region 质量录入 15400

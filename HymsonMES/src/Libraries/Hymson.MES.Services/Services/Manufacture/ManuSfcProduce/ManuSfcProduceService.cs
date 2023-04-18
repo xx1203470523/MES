@@ -205,12 +205,14 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                 if (procProcessRouteDetailNodeEntity == null)
                 {
-                var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(parm.LockProductionId ?? 0);
+                    var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(parm.LockProductionId ?? 0);
                     if (procProcedureEntity == null)
                     {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES15308)).WithData("lockproduction", );
-                    } else
-                    { 
+                        throw new CustomerValidationException(nameof(ErrorCode.MES15311));
+                    }
+                    else
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES15308)).WithData("lockproduction", procProcedureEntity.Name);
                     }
                 }
             }
