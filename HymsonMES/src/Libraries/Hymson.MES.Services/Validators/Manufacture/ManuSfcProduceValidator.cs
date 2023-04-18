@@ -1,17 +1,7 @@
-/*
- *creator: Karl
- *
- *describe: 条码生产信息验证规则  
- *builder:  zhaoqing
- *build datetime: 2023-03-18 05:37:27
- */
 using FluentValidation;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
-using Hymson.MES.Services.Dtos.Manufacture.ManuValidatorDto;
 
 namespace Hymson.MES.Services.Validators.Manufacture
 {
