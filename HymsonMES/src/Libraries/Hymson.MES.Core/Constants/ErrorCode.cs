@@ -320,6 +320,8 @@
         public const string MES15307 = "扫描的条码状态都必须是“锁定”或者有未关闭的将来锁定指令存在";
         //public const string MES15308= " 当前条码状态为{operationType}，与选择的操作类型不匹配";
         public const string MES15308 = "将来锁定操作必须是同一工单下的条码！";
+        public const string MES15309 = "条码全部不是在制品！";
+        public const string MES15310 = "将来锁工序{lockproduction}不在条码所用工艺路线中！";
         #endregion
 
         #region 质量录入 15400
