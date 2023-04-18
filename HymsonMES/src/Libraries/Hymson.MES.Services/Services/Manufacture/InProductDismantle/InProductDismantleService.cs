@@ -465,7 +465,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES16608)).WithData("barCode", addDto.CirculationBarCode);
                     }
-                   //  var message = _localizationService.GetResource(nameof(ErrorCode.MES16608));
+                    //  var message = _localizationService.GetResource(nameof(ErrorCode.MES16608));
 
                     if (serialNumber == MaterialSerialNumberEnum.Inside)
                     {
@@ -796,7 +796,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var replaceMaterials = await _replaceMaterialRepository.GetByBomDetailIdAsync(bomDetailId);
             if (replaceMaterials.Any())
             {
-                var replaceMaterialEntity = replaceMaterials.FirstOrDefault(x => x.ReplaceMaterialId == bomDetailId);
+                var replaceMaterialEntity = replaceMaterials.FirstOrDefault(x => x.ReplaceMaterialId == productId);
                 if (replaceMaterialEntity == null)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16608)).WithData("barCode", circulationBarCode);
@@ -869,8 +869,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                 bomDetailEntity.MaterialId
             };
 
+            var procReplaces = new List<ProcReplaceMaterialEntity>();
             //读取替代物料
-            var replaceMaterials = await _replaceMaterialRepository.GetByBomDetailIdAsync(bomDetailId);
+            var replaceMaterials = (await _replaceMaterialRepository.GetByBomDetailIdAsync(bomDetailId)).ToList();
             if (replaceMaterials.Any())
             {
                 var replaceMaterialIds = replaceMaterials.Select(item => item.ReplaceMaterialId).ToList();
@@ -881,7 +882,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 bool isEnableReplace = bomDetailEntity?.IsEnableReplace ?? false;
                 if (isEnableReplace)
                 {
-                    var procReplaces = await _procReplaceMaterialRepository.GetByMaterialIdAsync(mainProductId);
+                    procReplaces = (await _procReplaceMaterialRepository.GetByMaterialIdAsync(mainProductId)).ToList();
                     if (procReplaces.Any())
                     {
                         var replaceMaterialIds = procReplaces.Select(item => item.ReplaceMaterialId).ToList();
@@ -898,14 +899,52 @@ namespace Hymson.MES.Services.Services.Manufacture
                 return procMaterials;
             }
 
-            procMaterialList.ForEach(item =>
+            //添加主物料
+            var mainItem = procMaterialList.FirstOrDefault(x => x.Id == bomDetailEntity?.MaterialId);
+            if (mainItem != null)
             {
                 procMaterials.Add(new InProductDismantleDto
                 {
-                    MaterialId = item.Id,
-                    MaterialCode = item.MaterialCode,
-                    MaterialName = item.MaterialName
+                    MaterialId = mainItem.Id,
+                    MaterialCode = mainItem.MaterialCode,
+                    MaterialName = mainItem.MaterialName,
+                    SerialNumber = bomDetailEntity?.DataCollectionWay.HasValue == true ? bomDetailEntity.DataCollectionWay.Value : mainItem?.SerialNumber,
+                    Version = mainItem?.Version ?? ""
                 });
+            }
+
+            //添加bom替代料
+            replaceMaterials.ForEach(item =>
+            {
+                var material = procMaterialList.FirstOrDefault(x => x.Id == item.ReplaceMaterialId);
+                if (material != null)
+                {
+                    procMaterials.Add(new InProductDismantleDto
+                    {
+                        MaterialId = item.Id,
+                        MaterialCode = material.MaterialCode,
+                        MaterialName = material.MaterialName,
+                        SerialNumber = item?.DataCollectionWay.HasValue == true ? item.DataCollectionWay.Value : mainItem?.SerialNumber,
+                        Version = material.Version ?? ""
+                    });
+                }
+            });
+
+            //物料维护中的替代料
+            procReplaces.ForEach(item =>
+            {
+                var material = procMaterialList.FirstOrDefault(x => x.Id == item.ReplaceMaterialId);
+                if (material != null)
+                {
+                    procMaterials.Add(new InProductDismantleDto
+                    {
+                        MaterialId = item.Id,
+                        MaterialCode = material.MaterialCode,
+                        MaterialName = material.MaterialName,
+                        SerialNumber = material.SerialNumber,
+                        Version = material.Version ?? ""
+                    });
+                }
             });
             return procMaterials;
         }
