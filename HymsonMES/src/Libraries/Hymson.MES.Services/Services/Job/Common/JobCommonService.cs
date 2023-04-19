@@ -54,31 +54,12 @@ namespace Hymson.MES.Services.Services.Job.Common
         {
             var result = new Dictionary<string, JobResponseDto>(); // 返回结果
 
-            // 获取实现了 IManufactureJobService 接口的所有类的 Type 对象
-            var types = Assembly.GetExecutingAssembly().GetTypes()
-                .Where(t => t.GetInterfaces().Contains(typeof(IJobManufactureService)));
-
-            // 遍历实现类，执行有绑定在当前按钮下面的job
-            var serviceScope = _serviceProvider.CreateAsyncScope();
-            if (serviceScope.ServiceProvider == null) return result;
-
+            // 获取所有实现类
+            var services = _serviceProvider.GetServices<IJobManufactureService>();
             foreach (var job in jobs)
             {
-                var type = types.FirstOrDefault(a => a.Name == job.ClassProgram);
-                if (type == null) continue;
-
-                // 通过依赖注入的方式创建该类的实例，并调用 执行 方法
-                var obj = serviceScope.ServiceProvider.GetService(type);
-                if (obj == null) continue;
-
-                var service = (IJobManufactureService)obj;
+                var service = services.FirstOrDefault(f => f.GetType().Name == job.ClassProgram);
                 if (service == null) continue;
-
-                /*
-                // 创建该类的实例，并调用 执行 方法
-                var obj = (IManufactureJobService)Activator.CreateInstance(type);
-                if (obj == null) continue;
-                */
 
                 // TODO 如果job有额外参数，可以在这里进行拼装
                 //param.Add(extra);
@@ -87,7 +68,7 @@ namespace Hymson.MES.Services.Services.Job.Common
                 await service.VerifyParamAsync(param);
 
                 // 执行job
-                result.Add(type.Name, await service.ExecuteAsync(param));
+                result.Add(job.ClassProgram, await service.ExecuteAsync(param));
             }
 
             return result;
