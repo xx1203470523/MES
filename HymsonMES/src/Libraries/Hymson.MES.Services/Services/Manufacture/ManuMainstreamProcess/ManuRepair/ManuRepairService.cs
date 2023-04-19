@@ -6,16 +6,15 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Bos.Manufacture;
-using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Utils;
 
-namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInStation
+namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPackage
 {
     /// <summary>
-    /// 进站
+    /// 维修
     /// </summary>
-    public class ManuInStationService : IManuInStationService
+    public class ManuRepairService : IManuRepairService
     {
         /// <summary>
         /// 当前对象（登录用户）
@@ -50,7 +49,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
         /// <param name="manuCommonService"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="procProcedureRepository"></param>
-        public ManuInStationService(ICurrentUser currentUser, ICurrentSite currentSite,
+        public ManuRepairService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonService manuCommonService,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IProcProcedureRepository procProcedureRepository)
@@ -64,19 +63,23 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
 
 
         /// <summary>
-        /// 执行（进站）
+        /// 开始
         /// </summary>
         /// <param name="bo"></param>
         /// <returns></returns>
-        public async Task<int> InStationAsync(ManufactureBo bo)
+        public async Task<int> StartAsync(ManufactureBo bo)
         {
             var rows = 0;
 
-            // 获取生产条码信息（附带条码合法性校验）
+            // 获取生产条码信息
             var sfcProduceEntity = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
 
-            // 合法性校验
-            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.lineUp).VerifyProcedure(bo.ProcedureId);
+            // 当前工序是否是排队状态
+            if (sfcProduceEntity.Status == SfcProduceStatusEnum.Activity)
+            {
+                // 如果状态已经为活动中，就直接返回成功
+                return 1;
+            }
 
             // 如果工序对应不上
             if (sfcProduceEntity.ProcedureId != bo.ProcedureId)

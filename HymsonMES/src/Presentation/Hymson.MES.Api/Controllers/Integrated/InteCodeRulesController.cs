@@ -19,7 +19,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
     /// @author Karl
     /// @date 2023-03-17 05:02:26
     /// </summary>
-    [Authorize]
+    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class InteCodeRulesController : ControllerBase

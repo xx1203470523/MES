@@ -15,6 +15,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Warehouse;
+using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -211,7 +212,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <returns></returns>
         public async Task<int> DeletesWhMaterialInventoryAsync(string ids)
         {
-            var idsArr = StringExtension.SpitLongArrary(ids);
+            var idsArr = ids.ToSpitLongArray();
             return await _whMaterialInventoryRepository.DeletesAsync(idsArr);
         }
 

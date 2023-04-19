@@ -36,11 +36,15 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 容器规格id
         /// </summary>
         public long ContainerId { get; set; }
+        /// <summary>
+        /// 生产工单Id
+        /// </summary>
+        public long WorkOrderId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态;1：打开 2：关闭
         /// </summary>
-        public int Status { get; set; }
+        public int Status { get; set; } = 1;
 
        
     }

@@ -133,7 +133,7 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
             //await _validationRules.ValidateAndThrowAsync(dto);
             if (param == null)
             {
-                throw new CustomerDataException(nameof(ErrorCode.MES10100));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
 
             var userName = _currentUser.UserName;
@@ -157,7 +157,7 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
             var resourceType = await _resourceTypeRepository.GetByCodeAsync(resEntity);
             if (resourceType != null)
             {
-                throw new CustomerDataException(nameof(ErrorCode.MES10311)).WithData("ResType", param.ResType);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10311)).WithData("ResType", param.ResType);
             }
 
             var resourceIds = param.ResourceIds;
@@ -193,12 +193,12 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
             //await _validationRules.ValidateAndThrowAsync(dto);
             if (param == null)
             {
-                throw new CustomerDataException(nameof(ErrorCode.MES10100));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
             var entity = await _resourceTypeRepository.GetByIdAsync(param?.Id ?? 0);
             if (entity == null)
             {
-                throw new NotFoundException(nameof(ErrorCode.MES10309));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10309));
             }
 
             var userName = _currentUser.UserName;
@@ -253,7 +253,10 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
         /// <returns></returns>
         public async Task<int> DeleteProcResourceTypeAsync(long[] idsArr)
         {
-            if (idsArr.Length < 1) throw new CustomerValidationException(nameof(ErrorCode.MES10102));
+            if (idsArr.Length < 1)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10102));
+            }
 
             /*
              * 测试于帅动要求可以删除

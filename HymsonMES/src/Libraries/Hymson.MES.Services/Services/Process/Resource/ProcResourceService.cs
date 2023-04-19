@@ -372,7 +372,7 @@ namespace Hymson.MES.Services.Services.Process
                 //判断打印机是否重复配置  数据库中 已经存储的情况
                 if (parm.PrintList.GroupBy(x => x.PrintId).Where(g => g.Count() >= 2).Count() >= 1)
                 {
-                    throw new ValidationException(nameof(ErrorCode.MES10313));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10313));
                 }
             }
 
@@ -543,7 +543,7 @@ namespace Hymson.MES.Services.Services.Process
             #region 验证
             if (param == null)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10100));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
 
             //验证DTO
@@ -555,7 +555,7 @@ namespace Hymson.MES.Services.Services.Process
                 var resourceType = await _resourceTypeRepository.GetByIdAsync(param.ResTypeId);
                 if (resourceType == null)
                 {
-                    throw new ValidationException(nameof(ErrorCode.MES10310));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10310));
                 }
             }
 
@@ -571,7 +571,7 @@ namespace Hymson.MES.Services.Services.Process
                 //判断打印机是否重复配置  数据库中 已经存储的情况
                 if (param.PrintList.GroupBy(x => x.PrintId).Where(g => g.Count() >= 2).Count() >= 1)
                 {
-                    throw new ValidationException(nameof(ErrorCode.MES10313));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10313));
                 }
             }
 
@@ -602,7 +602,7 @@ namespace Hymson.MES.Services.Services.Process
                 var ismianList = param.EquList.Where(a => a.IsMain == true).ToList();
                 if (ismianList.Count > 1)
                 {
-                    throw new ValidationException(nameof(ErrorCode.MES10307));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10307));
                 }
             }
             #endregion

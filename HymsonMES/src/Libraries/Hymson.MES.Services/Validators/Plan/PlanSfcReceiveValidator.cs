@@ -7,6 +7,8 @@
  */
 using FluentValidation;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Services.Dtos.Plan;
 using System;
 using System.Collections.Generic;
@@ -26,7 +28,7 @@ namespace Hymson.MES.Services.Validators.Plan
             RuleFor(x => x.ReceiveType).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16101));
             RuleFor(x => x.WorkOrderId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16102));
             //RuleFor(x => x.relevanceWorkOrderId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16103));
-            RuleFor(x => x.SFC).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16104));
+            RuleFor(x => x.SFCs).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16104));
         }
     }
 

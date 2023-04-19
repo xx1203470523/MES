@@ -13,7 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.Data.Repositories.Warehouse
+namespace Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query
 {
     /// <summary>
     /// 物料库存 分页参数

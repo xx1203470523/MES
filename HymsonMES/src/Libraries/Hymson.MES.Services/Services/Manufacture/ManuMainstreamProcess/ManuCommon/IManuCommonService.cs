@@ -11,19 +11,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
     public interface IManuCommonService
     {
         /// <summary>
-        /// 获取生产条码信息（附带条码合法性校验 + 工序活动状态校验）
+        /// 获取生产条码信息
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        Task<ManuSfcProduceEntity> GetProduceSFCForStartAsync(string sfc);
-
-        /// <summary>
-        /// 获取生产条码信息（附带条码合法性校验 + 工序活动状态校验）
-        /// </summary>
-        /// <param name="sfc"></param>
-        /// <param name="procedureId"></param>
-        /// <returns></returns>
-        Task<ManuSfcProduceEntity> GetProduceSFCWithCheckAsync(string sfc, long procedureId);
+        Task<ManuSfcProduceEntity> GetProduceSFCAsync(string sfc);
 
         /// <summary>
         /// 获取生产工单

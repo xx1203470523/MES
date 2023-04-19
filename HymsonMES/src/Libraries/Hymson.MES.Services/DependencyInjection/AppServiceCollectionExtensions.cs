@@ -28,6 +28,7 @@ using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCreateBarcode;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInStation;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOutStation;
+using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPackage;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
 using Hymson.MES.Services.Services.Manufacture.ManuSfc;
 using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
@@ -167,7 +168,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuFacePlateService, ManuFacePlateService>();
             services.AddSingleton<IManuFacePlateButtonService, ManuFacePlateButtonService>();
 
-
+            services.AddSingleton<IManuRepairService, ManuRepairService>();
             services.AddSingleton<IManuInStationService, ManuInStationService>();
             services.AddSingleton<IManuOutStationService, ManuOutStationService>();
             services.AddSingleton<IInProductDismantleService, InProductDismantleService>();
@@ -212,11 +213,12 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region Job
             services.AddSingleton<IJobCommonService, JobCommonService>();
-            services.AddSingleton<ManuBadRecordService>();
-            services.AddSingleton<ManuPackageService>();
-            services.AddSingleton<ManuCompleteService>();
-            services.AddSingleton<ManuStartService>();
-            services.AddSingleton<ManuStopService>();
+            services.AddSingleton<JobBadRecordService>();
+            services.AddSingleton<JobManuCompleteService>();
+            services.AddSingleton<JobManuPackageService>();
+            services.AddSingleton<JobManuRepairStartService>();
+            services.AddSingleton<JobManuStartService>();
+            services.AddSingleton<JobManuStopService>();
             #endregion
 
             return services;

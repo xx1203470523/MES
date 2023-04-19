@@ -13,7 +13,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
     /// @author 陈志谱
     /// @date 2023-02-11 10:03:48
     /// </summary>
-    [Authorize]
+    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class InteCalendarController : ControllerBase

@@ -1,5 +1,7 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInStation;
@@ -10,7 +12,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
     /// <summary>
     /// 开始
     /// </summary>
-    public class ManuStartService : IManufactureJobService
+    public class JobManuStartService : IManufactureJobService
     {
         /// <summary>
         /// 当前对象（登录用户）
@@ -33,7 +35,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="manuInStationService"></param>
-        public ManuStartService(ICurrentUser currentUser, ICurrentSite currentSite,
+        public JobManuStartService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuInStationService manuInStationService)
         {
             _currentUser = currentUser;
@@ -43,6 +45,24 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
 
 
         /// <summary>
+        /// 验证参数
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task VerifyParamAsync(Dictionary<string, string>? param)
+        {
+            if (param == null ||
+                param.ContainsKey("SFC") == false
+                || param.ContainsKey("ProcedureId") == false
+                || param.ContainsKey("ResourceId") == false)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16312));
+            }
+
+            await Task.CompletedTask;
+        }
+
+        /// <summary>
         /// 执行（开始）
         /// </summary>
         /// <param name="param"></param>
@@ -50,30 +70,19 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         public async Task<JobResponseDto> ExecuteAsync(Dictionary<string, string>? param)
         {
             var defaultDto = new JobResponseDto { };
-            if (param == null) return defaultDto;
 
-            var rows = 0;
-            if (param.ContainsKey("SFC") == false || param.ContainsKey("ProcedureId") == false || param.ContainsKey("ResourceId") == false)
+            var rows = await _manuInStationService.InStationAsync(new ManufactureBo
             {
-                defaultDto.Message = "失败";
-            }
-            else
-            {
-                rows = await _manuInStationService.InStationAsync(new ManufactureBo
-                {
-                    SFC = param["SFC"],
-                    ProcedureId = param["ProcedureId"].ParseToLong(),
-                    ResourceId = param["ResourceId"].ParseToLong()
-                });
-
-                defaultDto.Message = "成功";
-            }
+                SFC = param["SFC"],
+                ProcedureId = param["ProcedureId"].ParseToLong(),
+                ResourceId = param["ResourceId"].ParseToLong()
+            });
 
             var result = (rows > 0).ToString();
             defaultDto.Content?.Add("PackageCom", result);
             defaultDto.Content?.Add("BadEntryCom", result);
-            defaultDto.Content?.Add("Result", result);
 
+            defaultDto.Message = $"条码{param["SFC"]}已于NF排队！";
             return defaultDto;
         }
 

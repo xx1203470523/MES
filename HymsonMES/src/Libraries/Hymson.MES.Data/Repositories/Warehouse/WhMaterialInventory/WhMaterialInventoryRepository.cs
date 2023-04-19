@@ -11,6 +11,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
+using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -78,10 +79,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="barCode"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<WhMaterialInventoryEntity>> GetByBarCodesAsync(string[] barCodes)
+        public async Task<IEnumerable<WhMaterialInventoryEntity>> GetByBarCodesAsync(WhMaterialInventoryBarcodeQuery param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<WhMaterialInventoryEntity>(GetByBarCodes, new { barCodes });
+            return await conn.QueryAsync<WhMaterialInventoryEntity>(GetByBarCodes, param);
         }
 
         /// <summary>
@@ -312,7 +313,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
                                `Id`, `SupplierId`, `MaterialId`, `MaterialBarCode`, `Batch`, `QuantityResidue`, `Status`, `DueDate`, `Source`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `wh_material_inventory`  WHERE Id = @Id ";
         const string GetByBarCode = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND MaterialBarCode = @barCode";
-        const string GetByBarCodes = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND MaterialBarCode in @barCodes";
+        const string GetByBarCodes = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND MaterialBarCode in @BarCodes AND SiteId=@SiteId";
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SupplierId`, `MaterialId`, `MaterialBarCode`, `Batch`, `QuantityResidue`, `Status`, `DueDate`, `Source`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `wh_material_inventory`  WHERE Id IN @ids ";

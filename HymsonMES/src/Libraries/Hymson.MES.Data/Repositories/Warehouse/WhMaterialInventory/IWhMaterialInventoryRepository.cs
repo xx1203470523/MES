@@ -10,6 +10,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
+using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
@@ -106,7 +107,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="barCode"></param>
         /// <returns></returns>
-        Task<IEnumerable<WhMaterialInventoryEntity>> GetByBarCodesAsync(string[] barCodes);
+        Task<IEnumerable<WhMaterialInventoryEntity>> GetByBarCodesAsync(WhMaterialInventoryBarcodeQuery param);
 
         /// <summary>
         /// 根据IDs批量获取数据

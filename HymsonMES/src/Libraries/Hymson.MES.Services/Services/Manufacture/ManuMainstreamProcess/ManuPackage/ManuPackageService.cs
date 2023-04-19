@@ -7,7 +7,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPac
     /// <summary>
     /// 组装
     /// </summary>
-    public class ManuPackageService
+    public class ManuPackageService: IManuPackageService
     {
         /// <summary>
         /// 当前对象（登录用户）

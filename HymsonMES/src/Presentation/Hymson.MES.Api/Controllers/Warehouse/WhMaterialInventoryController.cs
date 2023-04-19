@@ -20,7 +20,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
     /// @author pengxin
     /// @date 2023-03-06 03:27:59
     /// </summary>
-    [Authorize]
+    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class WhMaterialInventoryController : ControllerBase

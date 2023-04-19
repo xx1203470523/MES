@@ -224,6 +224,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ManuSfcEntity>(GetBySFCSql, new { SFC = sfc });
         }
+
+        /// <summary>
+        /// 更具sfc 获取条码信息
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcEntity>> GetBySFCsAsync(IEnumerable<string> sfcs)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuSfcEntity>(GetBySFCSql, new { SFC = sfcs });
+        }
         #endregion
     }
 
@@ -238,7 +249,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                             /**select**/
                                            FROM `manu_sfc` /**where**/  ";
         const string GetManuSfcInfoEntitiesSqlTemplate = @"SELECT 
-                                            sfc.Id ,sfc.SiteId ,sfc.SFC ,sfc.Qty ,sfc.Status ,info.WorkOrderId ,info.ProductId ,info.IsUsed  FROM manu_sfc sfc LEFT JOIN  manu_sfc_info1 info on sfc.Id =info.SfcId  and info.IsUsed =1
+                                            sfc.Id ,sfc.SiteId ,sfc.SFC ,sfc.Qty ,sfc.Status ,info.WorkOrderId ,info.ProductId ,info.IsUsed  FROM manu_sfc sfc LEFT JOIN  manu_sfc_info info on sfc.Id =info.SfcId  and info.IsUsed =1
                                             /**where**/  ";
 
         const string InsertSql = "INSERT INTO `manu_sfc`(  `Id`, `SiteId`, `SFC`, `Qty`, `Status`, IsUsed, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SFC, @Qty, @Status, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
@@ -255,5 +266,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdsSql = @"SELECT * FROM `manu_sfc`  WHERE Id IN @Ids ";
 
         const string GetBySFCSql = @"SELECT * FROM `manu_sfc`  WHERE SFC = @SFC ";
+        const string GetBySFCsSql = @"SELECT * FROM `manu_sfc`  WHERE SFC IN @SFCs AND IsDeleted=0 ";
     }
 }

@@ -9,7 +9,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
     /// <summary>
     /// ¿ØÖÆÆ÷£¨ÈÝÆ÷Î¬»¤£©
     /// </summary>
-    [Authorize]
+    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class InteContainerController : ControllerBase

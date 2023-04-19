@@ -29,7 +29,7 @@ namespace Hymson.MES.Services.Validators.Manufacture
             RuleFor(x => x.Status).NotEmpty().WithErrorCode(nameof(ErrorCode.MES17204));
             RuleFor(x => x).MustAsync(async (manuFacePlate, cancellation) =>
             {
-                var isExists = await _manuFacePlateRepository.IsExists(manuFacePlate.Code, manuFacePlate.Id);
+                var isExists = await _manuFacePlateRepository.IsExists(manuFacePlate.Code.Trim(), manuFacePlate.Id);
                 return !isExists;
             }).WithErrorCode(nameof(ErrorCode.MES17205));
         }
@@ -52,7 +52,7 @@ namespace Hymson.MES.Services.Validators.Manufacture
             RuleFor(x => x.Status).NotEmpty().WithErrorCode(nameof(ErrorCode.MES17204));
             RuleFor(x => x).MustAsync(async (manuFacePlate, cancellation) =>
             {
-                var isExists = await _manuFacePlateRepository.IsExists(manuFacePlate.Code, manuFacePlate.Id);
+                var isExists = await _manuFacePlateRepository.IsExists(manuFacePlate.Code.Trim(), manuFacePlate.Id);
                 return !isExists;
             }).WithErrorCode(nameof(ErrorCode.MES17205));
         }

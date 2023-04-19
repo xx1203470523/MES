@@ -10,7 +10,7 @@ namespace Hymson.MES.Api.Controllers.Process
     /// <summary>
     /// ¿ØÖÆÆ÷£¨ÑÚÂëÎ¬»¤£©
     /// </summary>
-    [Authorize]
+    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcMaskCodeController : ControllerBase
