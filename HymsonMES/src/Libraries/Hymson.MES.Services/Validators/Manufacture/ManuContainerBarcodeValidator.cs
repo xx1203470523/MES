@@ -41,7 +41,7 @@ namespace Hymson.MES.Services.Validators.Manufacture
     {
         public CreateManuContainerBarcodeValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11");
+            RuleFor(x => x.FacePlateCode).NotEmpty().WithErrorCode("MES16704");
             //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111");
         }
     }
