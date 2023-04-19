@@ -77,6 +77,17 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
 
         /// <summary>
+        /// 根据ID获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<PlanWorkOrderActivationEntity> GetByWorkOrderIdAsync(long workOrderId)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderActivationEntity>(GetByworkOrderIdSql, new { workOrderId = workOrderId });
+        }
+
+        /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
         /// <param name="ids"></param>
@@ -281,6 +292,9 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string GetByIdSql = @"SELECT
       `Id`, `SiteId`, `WorkOrderId`, `LineId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
     FROM `plan_work_order_activation`  WHERE Id = @Id ";
+        const string GetByworkOrderIdSql = @"SELECT
+      `Id`, `SiteId`, `WorkOrderId`, `LineId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+    FROM `plan_work_order_activation`  WHERE WorkOrderId = @WorkOrderId AND  IsDeleted=0";
         const string GetByIdsSql = @"SELECT
       `Id`, `SiteId`, `WorkOrderId`, `LineId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
     FROM `plan_work_order_activation`  WHERE Id IN @ids ";

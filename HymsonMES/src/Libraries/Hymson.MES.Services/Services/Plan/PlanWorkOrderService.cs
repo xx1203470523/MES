@@ -15,6 +15,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Plan
@@ -104,13 +105,27 @@ namespace Hymson.MES.Services.Services.Plan
             planWorkOrderEntity.UpdatedOn = HymsonClock.Now();
             planWorkOrderEntity.SiteId = _currentSite.SiteId ?? 0;
 
+            var planWorkOrderRecordEntity = new PlanWorkOrderRecordEntity() {
+                Id = IdGenProvider.Instance.CreateId(),
+                UpdatedBy = _currentUser.UserName,
+                CreatedBy = _currentUser.UserName,
+                SiteId = _currentSite.SiteId ?? 0,
+                WorkOrderId = planWorkOrderEntity.Id,
+                InputQty=0,
+                UnqualifiedQuantity=0,
+                FinishProductQuantity=0,
+                PassDownQuantity=0
+            };
             //入库
+            using var ts = TransactionHelper.GetTransactionScope();
             var response = await _planWorkOrderRepository.InsertAsync(planWorkOrderEntity);
 
             if (response == 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16002));
             }
+            await  _planWorkOrderRepository.InsertPlanWorkOrderRecordAsync(planWorkOrderRecordEntity);
+            ts.Complete();
         }
 
         /// <summary>

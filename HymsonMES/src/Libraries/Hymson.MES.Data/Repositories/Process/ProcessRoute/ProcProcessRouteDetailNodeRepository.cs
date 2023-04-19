@@ -91,12 +91,12 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<ProcProcessRouteDetailNodeEntity> GetFirstProcedureByProcessRouteIdAsync(long processRouteId)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcProcessRouteDetailNodeEntity>(GetFirstProcedureByProcessRouteIdSql, new { Id = processRouteId });
+            return await conn.QueryFirstOrDefaultAsync<ProcProcessRouteDetailNodeEntity>(GetFirstProcedureByProcessRouteIdSql, new { ProcessRouteId = processRouteId });
         }
 
         /// <summary>
         /// 根据IDs批量获取数据
-        /// </summary>
+        /// </summary>  
         /// <param name="ids"></param>
         /// <returns></returns>
         public async Task<IEnumerable<ProcProcessRouteDetailNodeEntity>> GetByIdsAsync(long[] ids)

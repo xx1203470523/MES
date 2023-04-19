@@ -145,5 +145,12 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="param"></param>
         /// <returns></returns>
         Task<int> UpdatePassDownQuantityByWorkOrderId(UpdatePassDownQuantityCommand param);
+
+        /// <summary>
+        /// 新增工单记录表
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<int> InsertPlanWorkOrderRecordAsync(PlanWorkOrderRecordEntity param);
     }
 }
