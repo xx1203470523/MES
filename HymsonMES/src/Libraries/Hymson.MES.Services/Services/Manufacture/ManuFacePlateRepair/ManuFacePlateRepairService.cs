@@ -159,8 +159,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             jobDto.Param?.Add("ResourceId", $"{manuFacePlateRepairExJobDto.ResourceId}");
 
             // 调用作业
-            var responseDto = await _manuFacePlateButtonService.ClickAsync(jobDto);
-            var resJob = responseDto.Data;
+            var resJob = await _manuFacePlateButtonService.ClickAsync(jobDto);
             if (resJob == null || resJob.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES17320));
 
             var list = new List<ManuFacePlateRepairButJobReturnTypeEnum>();

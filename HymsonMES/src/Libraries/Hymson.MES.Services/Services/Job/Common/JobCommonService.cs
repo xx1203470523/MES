@@ -83,7 +83,7 @@ namespace Hymson.MES.Services.Services.Job.Common
                 */
 
                 // TODO 如果job有额外参数，可以在这里进行拼装
-                //extra.Add();
+                //param.Add(extra);
 
                 result.Add(type.Name, await service.ExecuteAsync(param));
             }

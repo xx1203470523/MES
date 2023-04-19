@@ -301,9 +301,9 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task<ButtonResponseDto> ClickAsync(ButtonRequestDto dto)
+        public async Task<Dictionary<string, JobResponseDto>> ClickAsync(ButtonRequestDto dto)
         {
-            var result = new ButtonResponseDto { FacePlateButtonId = dto.FacePlateButtonId }; // 返回结果
+            var result = new Dictionary<string, JobResponseDto> { }; // 返回结果
 
             // 根据面板ID和按钮ID找出绑定的作业job
             var buttonJobs = await _manuFacePlateButtonJobRelationRepository.GetByFacePlateButtonIdAsync(dto.FacePlateButtonId);
@@ -322,7 +322,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             //    new InteJobEntity{ ClassProgram = "ManuStopService" },
             //}, dto.Param);
 
-            result.Data = await _jobCommonService.ExecuteJobAsync(jobs, dto.Param);
+            result = await _jobCommonService.ExecuteJobAsync(jobs, dto.Param);
 
             return result;
         }
