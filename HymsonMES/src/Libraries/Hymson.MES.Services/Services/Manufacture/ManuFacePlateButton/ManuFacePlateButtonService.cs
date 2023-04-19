@@ -313,17 +313,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var jobs = await _inteJobRepository.GetByIdsAsync(buttonJobs.Select(s => s.JobId).ToArray());
 
             // 执行Job
-            //result = await _jobCommonService.ExecuteJobAsync(new List<InteJobEntity>
-            //{
-            //    new InteJobEntity{ ClassProgram = "JobManuBadRecordService" },
-            //    new InteJobEntity{ ClassProgram = "JobManuCompleteService" },
-            //    new InteJobEntity{ ClassProgram = "JobManuPackageService" },
-            //    new InteJobEntity{ ClassProgram = "JobManuStartService" },
-            //    new InteJobEntity{ ClassProgram = "JobManuStopService" },
-            //}, dto.Param);
-
             result = await _jobCommonService.ExecuteJobAsync(jobs, dto.Param);
-
             return result;
         }
     }
