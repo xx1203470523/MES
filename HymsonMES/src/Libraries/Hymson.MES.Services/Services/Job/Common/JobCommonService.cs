@@ -56,7 +56,7 @@ namespace Hymson.MES.Services.Services.Job.Common
 
             // 获取实现了 IManufactureJobService 接口的所有类的 Type 对象
             var types = Assembly.GetExecutingAssembly().GetTypes()
-                .Where(t => t.GetInterfaces().Contains(typeof(IManufactureJobService)));
+                .Where(t => t.GetInterfaces().Contains(typeof(IJobManufactureService)));
 
             // 遍历实现类，执行有绑定在当前按钮下面的job
             var serviceScope = _serviceProvider.CreateAsyncScope();
@@ -71,7 +71,7 @@ namespace Hymson.MES.Services.Services.Job.Common
                 var obj = serviceScope.ServiceProvider.GetService(type);
                 if (obj == null) continue;
 
-                var service = (IManufactureJobService)obj;
+                var service = (IJobManufactureService)obj;
                 if (service == null) continue;
 
                 /*

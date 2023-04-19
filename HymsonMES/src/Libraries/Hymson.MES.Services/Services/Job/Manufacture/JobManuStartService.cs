@@ -12,7 +12,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
     /// <summary>
     /// 开始
     /// </summary>
-    public class JobManuStartService : IManufactureJobService
+    public class JobManuStartService : IJobManufactureService
     {
         /// <summary>
         /// 当前对象（登录用户）
