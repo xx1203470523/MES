@@ -18,7 +18,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
     /// @author wxk
     /// @date 2023-04-12 02:29:23
     /// </summary>
-    [Authorize]
+    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ManuContainerBarcodeController : ControllerBase
