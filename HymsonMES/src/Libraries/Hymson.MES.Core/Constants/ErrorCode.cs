@@ -62,6 +62,7 @@
         public const string MES10319 = $"不能删除启用状态的资源!";
         public const string MES10320 = "所属资源类型ID不能为空";
         public const string MES10321 = "工序名称超长";
+        public const string MES10322 = "资源名称最大长度为50!";
         #endregion
 
         #region 标签模板

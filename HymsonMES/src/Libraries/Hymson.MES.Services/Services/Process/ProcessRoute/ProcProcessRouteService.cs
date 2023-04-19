@@ -108,7 +108,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             var processRoute = await _procProcessRouteRepository.GetByIdAsync(id);
             if (processRoute == null)
             {
-                throw new Exception(nameof(ErrorCode.MES10439));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10439));
             }
             model.Info = processRoute.ToModel<ProcProcessRouteDto>();
 
@@ -176,7 +176,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
 
             if (parm == null)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10100));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
 
             //// 判断是否有获取到站点码
@@ -198,7 +198,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             };
             if (await _procProcessRouteRepository.IsExistsAsync(query))
             {
-                throw new BusinessException(nameof(ErrorCode.MES10437)).WithData("Code", parm.Code).WithData("Version", parm.Version);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10437)).WithData("Code", parm.Code).WithData("Version", parm.Version);
             }
 
             var siteId = _currentSite.SiteId ?? 0;
@@ -217,12 +217,12 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             var firstProcessCount = nodes.Where(w => w.IsFirstProcess == (int)YesOrNoEnum.Yes).Count();
             if (firstProcessCount == 0)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10435));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10435));
             }
 
             if (firstProcessCount > 1)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10436));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10436));
             }
             #endregion
 
@@ -255,7 +255,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
 
             if (parm == null)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10100));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
 
             //// 判断是否有获取到站点码
@@ -271,7 +271,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             var processRoute = await _procProcessRouteRepository.GetByIdAsync(parm.Id);
             if (processRoute == null)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10438));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10438));
             }
 
             //DTO转换实体
@@ -285,12 +285,12 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             var firstProcessCount = nodes.Where(w => w.IsFirstProcess == (int)YesOrNoEnum.Yes).Count();
             if (firstProcessCount == 0)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10435));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10435));
             }
 
             if (firstProcessCount > 1)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10436));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10436));
             }
 
             // 工艺路线编码和版本唯一
@@ -303,7 +303,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             };
             if (await _procProcessRouteRepository.IsExistsAsync(query))
             {
-                throw new BusinessException(nameof(ErrorCode.MES10437)).WithData("Code", processRoute.Code).WithData("Version", processRoute.Version);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10437)).WithData("Code", processRoute.Code).WithData("Version", processRoute.Version);
             }
             #endregion
 
@@ -338,7 +338,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
         {
             if (idsArr.Length < 1)
             {
-                throw new NotFoundException(nameof(ErrorCode.MES10102));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10102));
             }
 
             #region 参数校验
