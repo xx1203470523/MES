@@ -8,6 +8,13 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
     public interface IManufactureJobService
     {
         /// <summary>
+        /// 验证参数
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task VerifyParamAsync(Dictionary<string, string>? param);
+
+        /// <summary>
         /// 执行
         /// </summary>
         /// <param name="param"></param>

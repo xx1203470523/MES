@@ -179,6 +179,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, manuFacePlateContainerPackEntitys);
         }
+
+     
         #endregion
 
     }
@@ -209,6 +211,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                             FROM `manu_face_plate_container_pack`  WHERE Id IN @Ids ";
 
         const string GetByFacePlateIdSql = @"SELECT 
+                              `Id`, `SiteId`, `FacePlateId`, `ResourceId`, `IsResourceEdit`, `ProcedureId`, `IsProcedureEdit`, `ScanJobId`, `IsSuccessBeep`, `SuccessBeepUrl`, `SuccessBeepTime`, `IsErrorBeep`, `ErrorBeepUrl`, `ErrorBeepTime`, `IsAllowDifferentMaterial`, `IsMixedWorkOrder`, `IsAllowQueueProduct`, `IsAllowCompleteProduct`, `IsAllowActiveProduct`, `IsShowMinQty`, `IsShowMaxQty`, `IsShowCurrentQty`, `QualifiedColour`, `ErrorsColour`, `IsShowLog`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `manu_face_plate_container_pack`  WHERE FacePlateId = @FacePlateId ";
+        const string GetByCodeSql = @"SELECT 
                               `Id`, `SiteId`, `FacePlateId`, `ResourceId`, `IsResourceEdit`, `ProcedureId`, `IsProcedureEdit`, `ScanJobId`, `IsSuccessBeep`, `SuccessBeepUrl`, `SuccessBeepTime`, `IsErrorBeep`, `ErrorBeepUrl`, `ErrorBeepTime`, `IsAllowDifferentMaterial`, `IsMixedWorkOrder`, `IsAllowQueueProduct`, `IsAllowCompleteProduct`, `IsAllowActiveProduct`, `IsShowMinQty`, `IsShowMaxQty`, `IsShowCurrentQty`, `QualifiedColour`, `ErrorsColour`, `IsShowLog`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_face_plate_container_pack`  WHERE FacePlateId = @FacePlateId ";
 
