@@ -67,6 +67,9 @@
         #region 标签模板
         public const string MES10340 = "模板名称已经存在!";
         public const string MES10341 = "打印机名称重复!";
+        public const string MES10342 = "模板名称最大长度为50!";
+        public const string MES10343 = "模板名称不能为空!";
+        public const string MES10344 = "存储路径不能为空!";
         #endregion
 
         #region 工序 10400
@@ -492,7 +495,7 @@
         public const string MES16600 = "条码不存在或不是在制品!";
         public const string MES16601 = "组件{CirculationBarCode}同SFC{SFC}已绑定,请检查!";
         public const string MES16602 = "数据不存在!";
-        public const string MES16603 = "组件条码{barCode}库存不存在!";
+        public const string MES16603 = "组件条码{barCode}不存在!";
         public const string MES16604 = "组件条码{barCode}库存不足,请检查!";
         public const string MES16605 = "物料掩码规则不存在!";
         public const string MES16606 = "组件条码{barCode}同掩码规则不符,请检查!";
