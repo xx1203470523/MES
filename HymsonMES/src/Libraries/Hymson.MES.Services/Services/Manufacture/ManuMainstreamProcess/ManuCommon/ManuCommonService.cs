@@ -11,6 +11,7 @@ using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
 using Hymson.Sequences;
 using Hymson.Snowflake;
@@ -74,6 +75,16 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// </summary>
         private readonly IProcProcedureRepository _procProcedureRepository;
 
+        /// <summary>
+        /// 仓储接口（物料维护）
+        /// </summary>
+        private readonly IProcMaterialRepository _procMaterialRepository;
+
+        /// <summary>
+        /// 仓储接口（掩码维护）
+        /// </summary>
+        private readonly IProcMaskCodeRepository _procMaskCodeRepository;
+
 
         /// <summary>
         /// 构造函数
@@ -88,6 +99,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="procProcessRouteDetailNodeRepository"></param>
         /// <param name="procProcessRouteDetailLinkRepository"></param>
         /// <param name="procProcedureRepository"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="procMaskCodeRepository"></param>
         public ManuCommonService(ICurrentUser currentUser, ICurrentSite currentSite,
             IMemoryCache memoryCache, ISequenceService sequenceService,
             IManuSfcProduceRepository manuSfcProduceRepository,
@@ -95,7 +108,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
             IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
-            IProcProcedureRepository procProcedureRepository)
+            IProcProcedureRepository procProcedureRepository,
+            IProcMaterialRepository procMaterialRepository,
+            IProcMaskCodeRepository procMaskCodeRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -107,8 +122,30 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
             _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
             _procProcedureRepository = procProcedureRepository;
+            _procMaterialRepository = procMaterialRepository;
+            _procMaskCodeRepository = procMaskCodeRepository;
         }
 
+
+        /// <summary>
+        /// 验证条码掩码规则
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <param name="materialId"></param>
+        /// <returns></returns>
+        public async Task<bool> CheckBarCodeByMaskCodeRule(string barCode, long materialId)
+        {
+            var material = await _procMaterialRepository.GetByIdAsync(materialId);
+            if (material == null) throw new CustomerValidationException(nameof(ErrorCode.MES10204));
+
+            if (material.MaskCodeId.HasValue == false) return true;
+            var maskCode = await _procMaskCodeRepository.GetByIdAsync(material.MaskCodeId.Value);
+
+
+            // TODO 对掩码规则进行校验
+
+            return await Task.FromResult(true);
+        }
 
         /// <summary>
         /// 获取生产条码信息
@@ -381,6 +418,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             }
         }
     }
+
 
     /// <summary>
     /// 扩展方法
