@@ -70,7 +70,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             defaultDto.Content?.Add("PackageCom", result);
             defaultDto.Content?.Add("BadEntryCom", result);
 
-            defaultDto.Message = "成功";
+            defaultDto.Message = $"条码{param["SFC"]}已于NF排队！";
             return defaultDto;
         }
 
