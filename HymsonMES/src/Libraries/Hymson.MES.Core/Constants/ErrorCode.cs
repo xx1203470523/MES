@@ -507,6 +507,9 @@
         public const string MES16501 = "产品{product}未维护编码规则,无法下达条码。";
         public const string MES16502 = "产品{product}批次大写为0,无法下达条码。";
         public const string MES16503 = "工单{workorder}超过计划数量,下达条码失败。";
+        public const string MES16504 = "条码已经存在。";
+        public const string MES16505 = "条码不存在，无法复用。";
+        public const string MES16506 = "条码部位完成和在库状态，无法复用。";
         #endregion
 
 

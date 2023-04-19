@@ -14,6 +14,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
@@ -23,8 +24,12 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
+using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
+using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCreateBarcodeDto;
 using Hymson.MES.Services.Dtos.Plan;
+using Hymson.Utils.Tools;
 using System.Security.Policy;
+using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Plan
 {
@@ -95,17 +100,20 @@ namespace Hymson.MES.Services.Services.Plan
                 throw new CustomerValidationException(nameof(ErrorCode.MES16119)).WithData("OrderCode", workOrdeEntity.OrderCode);
             }
             var validationFailures = new List<ValidationFailure>();
-            if (param.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)
-            {
-                var whMaterialInventoryList = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarcodeQuery
-                {
-                    BarCodes = param.SFCs,
-                    SiteId = _currentSite.SiteId ?? 0
-                });
+            var barcodeList = new List<BarcodeDto>();
 
-                foreach (var sfc in param.SFCs)
+            var whMaterialInventoryList = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarcodeQuery
+            {
+                BarCodes = param.SFCs,
+                SiteId = _currentSite.SiteId ?? 0
+            });
+
+            foreach (var sfc in param.SFCs)
+            {
+                var validationFailure = new ValidationFailure();
+                decimal qty = 0;
+                if (param.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)
                 {
-                    var validationFailure = new ValidationFailure();
                     if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
                     {
                         validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
@@ -116,25 +124,36 @@ namespace Hymson.MES.Services.Services.Plan
                     {
                         validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
                     }
-                    if (!whMaterialInventoryList.Any(x => x.MaterialBarCode == sfc))
+                    var whMaterialInventoryEntity = whMaterialInventoryList.FirstOrDefault(x => x.MaterialBarCode == sfc);
+                    if (whMaterialInventoryEntity == null || whMaterialInventoryEntity.QuantityResidue == 0)
                     {
                         validationFailure.ErrorCode = nameof(ErrorCode.MES16120);
                         validationFailures.Add(validationFailure);
                     }
+                    else
+                    {
+                        qty = whMaterialInventoryEntity.QuantityResidue;
+                    }
                 }
-            }
-            else
-            {
-                foreach (var sfc in param.SFCs)
+                else
                 {
 
                 }
+                barcodeList.Add(new BarcodeDto
+                {
+                    SFC = sfc,
+                    Qty = qty
+                });
             }
 
             if (validationFailures.Any())
             {
                 throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
             }
+
+            using var ts = TransactionHelper.GetTransactionScope(TransactionScopeOption.Suppress);
+
+            ts.Complete();
         }
 
         /// <summary>

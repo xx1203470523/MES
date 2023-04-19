@@ -42,7 +42,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCrea
     /// <summary>
     /// 根据老条码生成新条码
     /// </summary>
-    public class CreateBarcodeByOldSFCDto
+    public class CreateBarcodeByOldMesSFCDto
     {
         /// <summary>
         /// 设备Id
@@ -62,6 +62,32 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCrea
         /// <summary>
         /// 就条码
         /// </summary>
-        public IEnumerable<BarcodeDto> OldSFC { set; get; }
+        public IEnumerable<BarcodeDto> OldSFCs { set; get; }
+    }
+
+    /// <summary>
+    /// 更具
+    /// </summary>
+    public class CreateBarcodeByExternalSFCDto
+    {
+        /// <summary>
+        /// 设备Id
+        /// </summary>
+        public long? EquipmentId { set; get; }
+
+        /// <summary>
+        /// 资源Id
+        /// </summary>
+        public long? ResourceId { set; get; }
+
+        /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long WorkOrderId { set; get; }
+
+        /// <summary>
+        /// 就条码
+        /// </summary>
+        public IEnumerable<BarcodeDto> ExternalSFCs { set; get; }
     }
 }
