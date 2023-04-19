@@ -109,6 +109,7 @@
         public const string MES10508 = "参数单位不能为空";
         public const string MES10509 = "参数编码不能为空";
         public const string MES10510 = "参数名称不能为空";
+        public const string MES10511 = "标准参数代码最大长度为50!";
 
         #endregion
 

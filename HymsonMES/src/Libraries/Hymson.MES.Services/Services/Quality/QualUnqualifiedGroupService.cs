@@ -102,6 +102,8 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 throw new ValidationException(nameof(ErrorCode.MES10100));
             }
+            param.UnqualifiedGroup = param.UnqualifiedGroup.ToUpperInvariant();
+
             await _validationCreateRules.ValidateAndThrowAsync(param);
 
             var qualUnqualifiedGroupEntity = await _qualUnqualifiedGroupRepository.GetByCodeAsync(new QualUnqualifiedGroupByCodeQuery { Code = param.UnqualifiedGroup, Site = _currentSite.SiteId ?? 0 });
