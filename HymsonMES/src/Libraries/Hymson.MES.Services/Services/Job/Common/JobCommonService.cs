@@ -35,8 +35,6 @@ namespace Hymson.MES.Services.Services.Job.Common
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="serviceProvider"></param>
-        /// <param name="manuFacePlateButtonJobRelationRepository"></param>
-        /// <param name="inteJobRepository"></param>
         public JobCommonService(ICurrentUser currentUser, ICurrentSite currentSite,
             IServiceProvider serviceProvider)
         {

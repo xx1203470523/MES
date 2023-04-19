@@ -11,7 +11,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
     /// <summary>
     /// 组装
     /// </summary>
-    public class ManuPackageService : IManufactureJobService
+    public class ManuPackageJobService : IManufactureJobService
     {
         /// <summary>
         /// 当前对象（登录用户）
@@ -30,7 +30,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <param name="currentSite"></param>
         /// <param name="manuCommonService"></param>
         /// <param name="manuSfcProduceRepository"></param>
-        public ManuPackageService(ICurrentUser currentUser, ICurrentSite currentSite,
+        public ManuPackageJobService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonService manuCommonService,
             IManuSfcProduceRepository manuSfcProduceRepository)
         {
