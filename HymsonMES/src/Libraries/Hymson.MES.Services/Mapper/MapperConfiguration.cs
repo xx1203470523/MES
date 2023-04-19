@@ -32,6 +32,7 @@ using Hymson.MES.Data.Repositories.Process.ResourceType.View;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
+using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;

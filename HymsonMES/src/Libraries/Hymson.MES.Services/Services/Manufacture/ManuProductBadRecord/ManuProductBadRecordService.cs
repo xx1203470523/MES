@@ -300,7 +300,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             #endregion
 
-            //入库
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {

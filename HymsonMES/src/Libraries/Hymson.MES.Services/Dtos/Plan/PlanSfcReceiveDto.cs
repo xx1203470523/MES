@@ -100,11 +100,10 @@ namespace Hymson.MES.Services.Dtos.Plan
     /// </summary>
     public record PlanSfcReceiveCreateDto : BaseEntityDto
     {
-
         /// <summary>
         /// 条码
         /// </summary>
-        public string? SFC { get; set; }
+        public string[] SFCs { get; set; }
 
         /// <summary>
         /// 工单id
@@ -112,16 +111,14 @@ namespace Hymson.MES.Services.Dtos.Plan
         public long WorkOrderId { get; set; }
 
         /// <summary>
-        /// 关联工单
+        /// 关联工单id
         /// </summary>
         public long RelevanceWorkOrderId { get; set; }
 
         /// <summary>
-        /// 工单类型
+        /// 条码接收类型
         /// </summary>
         public PlanSFCReceiveTypeEnum ReceiveType { get; set; }
-
-
     }
 
     /// <summary>

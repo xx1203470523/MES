@@ -391,6 +391,12 @@
         public const string MES16114 = "扫描SN与工单产品编码规则不符！基数为:{Base}位";
         public const string MES16115 = "扫描SN与工单产品编码规则不符！需包含{ValuesType}值:{SegmentedValue}";
         public const string MES16116 = "已使用的条码，不允许删除";
+
+        public const string MES16117 = "工单{OrderCode}已经被锁定，无法继续生产";
+        public const string MES16118 = "工单{OrderCode}状态为未开始，无法继续生产";
+        public const string MES16119 = "工单{OrderCode}已经关闭，无法继续生产";
+        public const string MES16120= "库存不存在";
+        public const string MES16121 = "不满足产品{}的掩码规则";
         #endregion
 
         #region 条码生成 MES16200
