@@ -119,18 +119,22 @@ namespace Hymson.MES.Data.Repositories.Warehouse
 
             if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.Batch))
             {
-                sqlBuilder.Where(" wmi.Batch=@Batch");
+                whMaterialInventoryPagedQuery.Batch = $"%{whMaterialInventoryPagedQuery.Batch}%";
+                sqlBuilder.Where(" wmi.Batch like @Batch");
             }
             if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.MaterialBarCode))
             {
-                sqlBuilder.Where(" wmi.MaterialBarCode=@MaterialBarCode");
+                whMaterialInventoryPagedQuery.MaterialBarCode = $"%{whMaterialInventoryPagedQuery.MaterialBarCode}%";
+                sqlBuilder.Where(" wmi.MaterialBarCode like @MaterialBarCode");
             }
             if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.MaterialCode))
             {
-                sqlBuilder.Where(" pm.MaterialCode=@MaterialCode");
+                whMaterialInventoryPagedQuery.MaterialCode = $"%{whMaterialInventoryPagedQuery.MaterialCode}%";
+                sqlBuilder.Where(" pm.MaterialCode like @MaterialCode");
             }
             if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.Version))
             {
+                whMaterialInventoryPagedQuery.Version = $"%{whMaterialInventoryPagedQuery.Version}%";
                 sqlBuilder.Where(" pm.Version=@Version");
             }
             if (whMaterialInventoryPagedQuery.Status > 0)
