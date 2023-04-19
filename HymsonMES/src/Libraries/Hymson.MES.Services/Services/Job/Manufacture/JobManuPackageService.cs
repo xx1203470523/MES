@@ -9,9 +9,9 @@ using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 namespace Hymson.MES.Services.Services.Job.Manufacture
 {
     /// <summary>
-    /// 不良录入
+    /// 组装
     /// </summary>
-    public class ManuBadRecordService : IManufactureJobService
+    public class JobManuPackageService : IManufactureJobService
     {
         /// <summary>
         /// 当前对象（登录用户）
@@ -30,7 +30,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <param name="currentSite"></param>
         /// <param name="manuCommonService"></param>
         /// <param name="manuSfcProduceRepository"></param>
-        public ManuBadRecordService(ICurrentUser currentUser, ICurrentSite currentSite,
+        public JobManuPackageService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonService manuCommonService,
             IManuSfcProduceRepository manuSfcProduceRepository)
         {
@@ -40,23 +40,35 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
 
 
         /// <summary>
-        /// 执行（不良录入）
+        /// 验证参数
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task VerifyParamAsync(Dictionary<string, string>? param)
+        {
+            if (param == null ||
+                param.ContainsKey("SFC") == false
+                || param.ContainsKey("ProcedureId") == false
+                || param.ContainsKey("ResourceId") == false)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16312));
+            }
+
+            await Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// 执行（组装）
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
         public async Task<JobResponseDto> ExecuteAsync(Dictionary<string, string>? param)
         {
             var defaultDto = new JobResponseDto { };
-            if (param == null) return defaultDto;
-
-            if (param.ContainsKey("SFC") == false || param.ContainsKey("ProcedureId") == false || param.ContainsKey("ResourceId") == false)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16312));
-            }
 
             defaultDto.Content?.Add("PackageCom", "True");
             defaultDto.Content?.Add("BadEntryCom", "True");
-            defaultDto.Message = $"条码{param["SFC"]}已于NF排队！";
+            defaultDto.Message = $"条码{param?["SFC"]}已于NF排队！";
 
             // TODO
             return await Task.FromResult(defaultDto);

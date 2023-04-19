@@ -16,6 +16,7 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
+using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Sequences;
@@ -382,7 +383,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             var feeds = await _manuFeedingRepository.GetByIdsAsync(idsArr);
 
             // 查询条码
-            var inventorys = await _whMaterialInventoryRepository.GetByBarCodesAsync(feeds.Select(s => s.BarCode).ToArray());
+            var inventorys = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarcodeQuery { BarCodes = feeds.Select(s => s.BarCode),SiteId=_currentSite.SiteId??0 }
+               );
 
             // 查询物料
             var materials = await _procMaterialRepository.GetByIdsAsync(feeds.Select(s => s.ProductId).ToArray());

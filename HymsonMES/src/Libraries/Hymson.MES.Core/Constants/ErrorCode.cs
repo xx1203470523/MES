@@ -147,7 +147,7 @@
         public const string MES10802 = "此编码【{Code}】在系统中已经存在!";
         public const string MES10803 = "掩码规则不能为空!";
         public const string MES10804 = "匹配方式不能为空!";
-        public const string MES10805= "匹配方式为全码时掩码规则长度为10!";
+        public const string MES10805 = "匹配方式为全码时掩码规则长度为10!";
         public const string MES10806 = "起始方式掩码末尾不能为特殊字符\"?\"";
         public const string MES10807 = "中间方式掩码首位和末尾不能为特殊字符\"?\"";
         public const string MES10808 = "结束方式掩码首位不能为特殊字符\"?\"";
@@ -322,17 +322,22 @@
         #region 质量锁定 15300
         public const string MES15300 = "将来锁定工序必填";
         public const string MES15301 = "产品条码不能为空";
-        public const string MES15302 = "条码已报废/删除，不可再操作锁定/取消锁定！";
-        public const string MES15303 = "将来锁定操作必须是同一工单下的条码！";
-        public const string MES15304 = "条码{sfcs}不是在制品!";
+        public const string MES15302 = "条码已报废/删除，不可再操作锁定/取消锁定";
+        public const string MES15303 = "将来锁定操作必须是同一工单下的条码";
+        public const string MES15304 = "条码{sfcs}不是在制品";
         public const string MES15305 = "条码数量上限为100行";
         public const string MES15306 = "选中的条码状态与选择的操作类型不匹配！";
         public const string MES15307 = "扫描的条码状态都必须是“锁定”或者有未关闭的将来锁定指令存在";
         //public const string MES15308= " 当前条码状态为{operationType}，与选择的操作类型不匹配";
-        public const string MES15308 = "将来锁定操作必须是同一工单下的条码！";
-        public const string MES15309 = "条码全部不是在制品！";
-        public const string MES15310 = "将来锁工序{lockproduction}不在条码所用工艺路线中！";
-        public const string MES15311 = "将来锁锁定工序不存在！";
+        public const string MES15308 = "将来锁定操作必须是同一工单下的条码";
+        public const string MES15309 = "条码全部不是在制品";
+        public const string MES15310 = "将来锁工序{lockproduction}不在条码所用工艺路线中";
+        public const string MES15311 = "将来锁锁定工序不存在";
+        public const string MES15312 = "条码不是在制品！";
+        public const string MES15313 = "条码已经锁定，无法添加将来锁";
+        public const string MES15314 = "锁定工序{sfcproduction}不在条码所在工序{lockproductionname}之后";
+        public const string MES15315 = "条码存在及时锁定，无法添加及时锁";
+        public const string MES15316 = "条码未被锁定，无法执行解锁操作";
         #endregion
 
         #region 质量录入 15400
@@ -402,6 +407,12 @@
         public const string MES16114 = "扫描SN与工单产品编码规则不符！基数为:{Base}位";
         public const string MES16115 = "扫描SN与工单产品编码规则不符！需包含{ValuesType}值:{SegmentedValue}";
         public const string MES16116 = "已使用的条码，不允许删除";
+
+        public const string MES16117 = "工单{OrderCode}已经被锁定，无法继续生产";
+        public const string MES16118 = "工单{OrderCode}状态为未开始，无法继续生产";
+        public const string MES16119 = "工单{OrderCode}已经关闭，无法继续生产";
+        public const string MES16120= "库存不存在";
+        public const string MES16121 = "不满足产品{}的掩码规则";
         #endregion
 
         #region 条码生成 MES16200
@@ -428,6 +439,7 @@
         public const string MES16310 = "SFC状态为完成，不允许操作。";
         public const string MES16311 = "SFC在库存中状态为：{Status}，但不存在在制信息。";
         public const string MES16312 = "请求参数不合法，不允许操作。";
+        public const string MES16313 = "SFC状态不是{Status}状态，不允许操作。";
         #endregion
 
         #region 生产
@@ -521,6 +533,9 @@
         public const string MES16701 = "容器包装，条码信息未找到";
         public const string MES16702 = "容器包装，包装码不存在";
         public const string MES16703 = "容器包装，条码的包装维护记录未找到";
+        public const string MES16704 = "容器包装，配置面板编号为空";
+        public const string MES16705 = "容器包装，配置面板不存在";
+        public const string MES16706 = "容器包装，配置面板不允许混工单,当前容器工单{first},当前条码工单{second}";
         #endregion
 
         #region 绑定工单激活  MES16800

@@ -13,7 +13,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
     /// <summary>
     /// 中止
     /// </summary>
-    public class ManuStopService : IManufactureJobService
+    public class JobManuStopService : IManufactureJobService
     {
         /// <summary>
         /// 当前对象（登录用户）
@@ -42,7 +42,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <param name="currentSite"></param>
         /// <param name="manuCommonService"></param>
         /// <param name="manuSfcProduceRepository"></param>
-        public ManuStopService(ICurrentUser currentUser, ICurrentSite currentSite,
+        public JobManuStopService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonService manuCommonService,
             IManuSfcProduceRepository manuSfcProduceRepository)
         {
@@ -54,6 +54,24 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
 
 
         /// <summary>
+        /// 验证参数
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task VerifyParamAsync(Dictionary<string, string>? param)
+        {
+            if (param == null ||
+                param.ContainsKey("SFC") == false
+                || param.ContainsKey("ProcedureId") == false
+                || param.ContainsKey("ResourceId") == false)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16312));
+            }
+
+            await Task.CompletedTask;
+        }
+
+        /// <summary>
         /// 执行（中止）
         /// </summary>
         /// <param name="param"></param>
@@ -61,12 +79,6 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         public async Task<JobResponseDto> ExecuteAsync(Dictionary<string, string>? param)
         {
             var defaultDto = new JobResponseDto { };
-            if (param == null) return defaultDto;
-
-            if (param.ContainsKey("SFC") == false || param.ContainsKey("ProcedureId") == false || param.ContainsKey("ResourceId") == false)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16312));
-            }
 
             // 获取生产条码信息（附带条码合法性校验 + 工序活动状态校验）
             var sfcProduceEntity = await _manuCommonService.GetProduceSFCWithCheckAsync(param["SFC"], param["ProcedureId"].ParseToLong());

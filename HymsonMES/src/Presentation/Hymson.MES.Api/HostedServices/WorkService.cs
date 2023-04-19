@@ -1,6 +1,7 @@
 ﻿using Hymson.ClearCache;
 using Hymson.Infrastructure.Enums;
 using Hymson.Localization.Services;
+using Hymson.MES.Core.Constants;
 
 namespace Hymson.MES.Api
 {
@@ -25,8 +26,8 @@ namespace Hymson.MES.Api
                  ServiceTypeEnum.User,
                   ServiceTypeEnum.MES
                 },stoppingToken);
-                //await _resourceService.InitEnumAsync();
-                //await _resourceService.InitErrorCodeAsync(typeof(ErrorCode));
+                await _resourceService.InitEnumAsync();
+                await _resourceService.InitErrorCodeAsync(typeof(ErrorCode));
 
             }
             catch (Exception e)

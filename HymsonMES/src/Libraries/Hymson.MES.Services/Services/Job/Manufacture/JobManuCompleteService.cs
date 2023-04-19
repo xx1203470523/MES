@@ -12,7 +12,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
     /// <summary>
     /// 完成
     /// </summary>
-    public class ManuCompleteService : IManufactureJobService
+    public class JobManuCompleteService : IManufactureJobService
     {
         /// <summary>
         /// 当前对象（登录用户）
@@ -36,7 +36,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="manuOutStationService"></param>
-        public ManuCompleteService(ICurrentUser currentUser, ICurrentSite currentSite,
+        public JobManuCompleteService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuOutStationService manuOutStationService)
         {
             _currentUser = currentUser;
@@ -46,6 +46,24 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
 
 
         /// <summary>
+        /// 验证参数
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task VerifyParamAsync(Dictionary<string, string>? param)
+        {
+            if (param == null ||
+                param.ContainsKey("SFC") == false
+                || param.ContainsKey("ProcedureId") == false
+                || param.ContainsKey("ResourceId") == false)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16312));
+            }
+
+            await Task.CompletedTask;
+        }
+
+        /// <summary>
         /// 执行（完成）
         /// </summary>
         /// <param name="param"></param>
@@ -53,12 +71,6 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         public async Task<JobResponseDto> ExecuteAsync(Dictionary<string, string>? param)
         {
             var defaultDto = new JobResponseDto { };
-            if (param == null) return defaultDto;
-
-            if (param.ContainsKey("SFC") == false || param.ContainsKey("ProcedureId") == false || param.ContainsKey("ResourceId") == false)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16312));
-            }
 
             var rows = await _manuOutStationService.OutStationAsync(new ManufactureBo
             {
