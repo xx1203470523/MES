@@ -20,10 +20,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// <summary>
     /// 容器装载表（物理删除）仓储
     /// </summary>
-    public partial class ManuContainerPackRepository :BaseRepository, IManuContainerPackRepository
+    public partial class ManuContainerPackRepository : BaseRepository, IManuContainerPackRepository
     {
 
-        public ManuContainerPackRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        public ManuContainerPackRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
         }
 
@@ -44,10 +44,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
+        }
+
+        /// <summary>
+        /// 根据容器Id 删除所有容器装载记录（物理删除）
+        /// </summary>
+        /// <param name="containerBarCodeId"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteAllAsync(long containerBarCodeId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteAllSql, new { ContainerBarCodeId = containerBarCodeId });
         }
 
         /// <summary>
@@ -58,7 +69,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<ManuContainerPackEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ManuContainerPackEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ManuContainerPackEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -66,10 +77,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuContainerPackEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ManuContainerPackEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<ManuContainerPackEntity>(GetByIdsSql, new { Ids = ids});
+            return await conn.QueryAsync<ManuContainerPackEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -77,30 +88,34 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuContainerPackPagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ManuContainerPackEntity>> GetPagedInfoAsync(ManuContainerPackPagedQuery manuContainerPackPagedQuery)
+        public async Task<PagedInfo<ManuContainerPackView>> GetPagedInfoAsync(ManuContainerPackPagedQuery manuContainerPackPagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.Select("*");
+            sqlBuilder.Where("pack.IsDeleted=0");
+            sqlBuilder.Select("pack.Id,pack.SiteId,pack.ContainerBarCodeId,barcode.BarCode,barcode.ProductId,pack.LadeBarCode");
+            sqlBuilder.LeftJoin("manu_container_barcode barcode on barcode.Id =pack.ContainerBarCodeId and barcode.IsDeleted=0");
+            if (!string.IsNullOrWhiteSpace(manuContainerPackPagedQuery.BarCode))
+            {
+                sqlBuilder.Where("barcode.BarCode=@BarCode");
+            }
+            if (manuContainerPackPagedQuery.BarCodeId.HasValue)
+            {
+                sqlBuilder.Where("barcode.Id=@BarCodeId");
+            }
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-           
             var offSet = (manuContainerPackPagedQuery.PageIndex - 1) * manuContainerPackPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = manuContainerPackPagedQuery.PageSize });
             sqlBuilder.AddParameters(manuContainerPackPagedQuery);
 
             using var conn = GetMESDbConnection();
-            var manuContainerPackEntitiesTask = conn.QueryAsync<ManuContainerPackEntity>(templateData.RawSql, templateData.Parameters);
+            var manuContainerPackEntitiesTask = conn.QueryAsync<ManuContainerPackView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var manuContainerPackEntities = await manuContainerPackEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<ManuContainerPackEntity>(manuContainerPackEntities, manuContainerPackPagedQuery.PageIndex, manuContainerPackPagedQuery.PageSize, totalCount);
+            return new PagedInfo<ManuContainerPackView>(manuContainerPackEntities, manuContainerPackPagedQuery.PageIndex, manuContainerPackPagedQuery.PageSize, totalCount);
         }
 
         /// <summary>
@@ -179,8 +194,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     public partial class ManuContainerPackRepository
     {
         #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_container_pack` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `manu_container_pack` /**where**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_container_pack` pack /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `manu_container_pack` pack /**leftjoin**/  /**where**/ ";
         const string GetManuContainerPackEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `manu_container_pack` /**where**/  ";
@@ -193,6 +208,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string DeleteSql = "UPDATE `manu_container_pack` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `manu_container_pack` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
+        const string DeleteAllSql = "DELETE FROM `manu_container_pack`  WHERE ContainerBarCodeId = @ContainerBarCodeId ";
 
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteId`, `ContainerBarCodeId`, `LadeBarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`

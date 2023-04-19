@@ -51,6 +51,13 @@ namespace Hymson.MES.Services.Services.Manufacture
         Task<int> DeletesManuContainerPackAsync(long[] ids);
 
         /// <summary>
+        /// 根据容器Id 删除所有容器装载记录（物理删除）
+        /// </summary>
+        /// <param name="containerBarCodeId"></param>
+        /// <returns></returns>
+        Task DeleteAllByContainerBarCodeIdAsync(long containerBarCodeId);
+
+        /// <summary>
         /// 根据ID查询
         /// </summary>
         /// <param name="id"></param>

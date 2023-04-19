@@ -32,7 +32,31 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long ProductId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 产品编码
+        /// </summary>
+        public string ProductCode { get; set; }
+        /// <summary>
+        /// 产品名称
+        /// </summary>
+        public string ProductName { get; set; }
+
+        /// <summary>
+        /// 包装等级
+        /// </summary>
+        public int Level { get; set; }
+
+        /// <summary>
+        /// 最大包装数
+        /// </summary>
+        public decimal Maximum { get; set; }
+
+        /// <summary>
+        /// 最小包装数
+        /// </summary>
+        public decimal Minimum { get; set; }
+
+        /// <summary>
         /// 条码
         /// </summary>
         public string BarCode { get; set; }
@@ -45,7 +69,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
        /// <summary>
         /// 状态;1：打开 2：关闭
         /// </summary>
-        public bool Status { get; set; }
+        public int Status { get; set; }
 
        /// <summary>
         /// 创建人
@@ -217,9 +241,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 删除标识
         /// </summary>
         public long IsDeleted { get; set; }
-
-       
-
     }
 
     /// <summary>
@@ -248,5 +269,38 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     /// </summary>
     public class ManuContainerBarcodePagedQueryDto : PagerInfo
     {
+        /// <summary>
+        /// 容器条码
+        /// </summary>
+        public string? BarCode { get; set; }
+        /// <summary>
+        /// 包装等级
+        /// </summary>
+        public int? Level { get; set; }
+        /// <summary>
+        /// 产品编码 对应物料表编码
+        /// </summary>
+        public string? ProductCode { get; set; }
+        /// <summary>
+        /// 产品名称 对应物料表名称
+        /// </summary>
+        public string? ProductName { get; set; }
+    }
+
+
+    /// <summary>
+    /// 容器条码表更新Dto
+    /// </summary>
+    public record UpdateManuContainerBarcodeStatusDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 状态;1：打开 2：关闭
+        /// </summary>
+        public int Status { get; set; }
     }
 }

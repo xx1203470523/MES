@@ -30,7 +30,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long? ContainerBarCodeId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 容器条码
+        /// </summary>
+        public string BarCode { get; set; }
+        /// <summary>
         /// 装载条码
         /// </summary>
         public string LadeBarCode { get; set; }
@@ -188,5 +192,13 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     /// </summary>
     public class ManuContainerPackPagedQueryDto : PagerInfo
     {
+        /// <summary>
+        /// 容器Id
+        /// </summary>
+        public long? BarCodeId { get; set; }
+        /// <summary>
+        /// 容器条码
+        /// </summary>
+        public string? BarCode { get; set; }
     }
 }

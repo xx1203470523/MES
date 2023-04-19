@@ -14,6 +14,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public class ManuContainerBarcodePagedQuery : PagerInfo
     {
-
+        /// <summary>
+        /// 容器条码
+        /// </summary>
+        public string? BarCode { get; set; }
+        /// <summary>
+        /// 包装等级
+        /// </summary>
+        public int? Level { get; set; }
+        /// <summary>
+        /// 产品编码 对应物料表编码
+        /// </summary>
+        public string? ProductCode { get; set; }
+        /// <summary>
+        /// 产品名称 对应物料表名称
+        /// </summary>
+        public string? ProductName { get; set; }
     }
 }

@@ -100,6 +100,18 @@ namespace Hymson.MES.Api.Controllers.Manufacture
             await _manuContainerPackService.DeletesManuContainerPackAsync(ids);
         }
 
+        /// <summary>
+        /// 根据容器Id 删除所有容器装载记录（物理删除）
+        /// </summary>
+        /// <param name="containerBarCodeId"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("deleteAll")]
+        public async Task DeleteManuContainerPackAsync([FromBody] long containerBarCodeId)
+        {
+            await _manuContainerPackService.DeleteAllByContainerBarCodeIdAsync(containerBarCodeId);
+        }
+
         #endregion
     }
 }
