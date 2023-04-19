@@ -94,6 +94,7 @@
         public const string MES10440 = $"获取下一工序失败!";
         public const string MES10441 = $"不存在空值类型工序!";
         public const string MES10442 = $"获取上一工序失败!";
+        public const string MES10443 = $"启用状态或保留状态不可删除!";
         #endregion
 
         #region 参数 10500
