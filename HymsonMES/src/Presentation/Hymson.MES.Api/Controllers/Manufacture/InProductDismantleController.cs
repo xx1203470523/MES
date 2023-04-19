@@ -77,5 +77,17 @@ namespace Hymson.MES.Api.Controllers.Manufacture
             await _inProductDismantleService.ReplaceModuleAsync(replaceDto);
         }
 
+        /// <summary>
+        /// 获取主物料下的所有物料列表
+        /// </summary>
+        /// <param name="id">bom详情id</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("bomMaterials/{id}")]
+        public async Task<List<InProductDismantleDto>> GetBomMaterialsAsync(long id)
+        {
+            return await _inProductDismantleService.GetBomMaterialsAsync(id);
+        }
+
     }
 }

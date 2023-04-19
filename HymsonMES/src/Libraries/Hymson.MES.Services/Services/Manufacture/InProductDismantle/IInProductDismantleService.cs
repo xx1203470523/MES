@@ -36,5 +36,12 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="replaceDto"></param>
         /// <returns></returns>
         Task ReplaceModuleAsync(InProductDismantleReplaceDto replaceDto);
+
+        /// <summary>
+        /// 获取主物料下的所有物料列表
+        /// </summary>
+        /// <param name="bomDetailId"></param>
+        /// <returns></returns>
+        Task<List<InProductDismantleDto>> GetBomMaterialsAsync(long bomDetailId);
     }
 }

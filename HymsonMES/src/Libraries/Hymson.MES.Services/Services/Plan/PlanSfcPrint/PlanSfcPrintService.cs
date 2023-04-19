@@ -6,7 +6,6 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -140,7 +139,7 @@ namespace Hymson.MES.Services.Services.Plan
         public async Task<int> DeletesAsync(long[] idsArr)
         {
             var sfcEntities = await _manuSfcRepository.GetByIdsAsync(idsArr);
-            if (sfcEntities.Any(it => it.IsUsed > YesOrNoEnum.Yes) == true) throw new BusinessException(nameof(ErrorCode.MES16116));
+            if (sfcEntities.Any(it => it.IsUsed > YesOrNoEnum.Yes) == true) throw new CustomerValidationException(nameof(ErrorCode.MES16116));
 
             // 条码集合
             var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcEntities.Select(s => s.Id));

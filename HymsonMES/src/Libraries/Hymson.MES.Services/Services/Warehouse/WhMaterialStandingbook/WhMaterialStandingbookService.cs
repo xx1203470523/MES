@@ -82,7 +82,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <returns></returns>
         public async Task<int> DeletesWhMaterialStandingbookAsync(string ids)
         {
-            var idsArr = StringExtension.SpitLongArrary(ids);
+            var idsArr = ids.ToSpitLongArray();
             return await _whMaterialStandingbookRepository.DeletesAsync(idsArr);
         }
 

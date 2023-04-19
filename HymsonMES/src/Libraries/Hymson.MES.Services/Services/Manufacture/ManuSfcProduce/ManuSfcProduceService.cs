@@ -1,9 +1,11 @@
 using FluentValidation;
+using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
@@ -22,8 +24,7 @@ using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Newtonsoft.Json;
-using System.Xml.Linq;
+using System.Text.Json;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -78,6 +79,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IProcProcedureRepository _procProcedureRepository;
 
         /// <summary>
+        /// 
+        /// </summary>
+        private readonly ILocalizationService _localizationService;
+
+        /// <summary>
         ///工艺路线工序节点明细仓储
         /// </summary>
         private readonly IProcProcessRouteDetailNodeRepository _procProcessRouteDetailNodeRepository;
@@ -97,6 +103,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             IManuCommonService manuCommonService,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
             IProcProcedureRepository procProcedureRepository,
+            ILocalizationService localizationService,
             AbstractValidator<ManuSfcProduceLockDto> validationLockRules,
             AbstractValidator<ManuSfcProduceModifyDto> validationModifyRules)
         {
@@ -111,6 +118,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuCommonService = manuCommonService;
             _procProcedureRepository = procProcedureRepository;
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
+            _localizationService = localizationService;
             _validationLockRules = validationLockRules;
             _validationModifyRules = validationModifyRules;
         }
@@ -151,6 +159,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Lock = item.Lock,
                     LockProductionId = item.LockProductionId,
                     ProductBOMId = item.ProductBOMId,
+                    ProcedureId = item.ProcedureId,
                     Status = item.Status,
                     OrderCode = item.OrderCode,
                     Code = item.Code,
@@ -179,7 +188,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
 
             var sfcListTask = _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery { Sfcs = parm.Sfcs.Distinct().ToArray() });
-            var sfcProduceBusinesssListTask = _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcProduceBusinessQuery { Sfcs = parm.Sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
+            var sfcProduceBusinesssListTask = _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = parm.Sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
             var sfcList = await sfcListTask;
             var sfcProduceBusinesssList = await sfcProduceBusinesssListTask;
 
@@ -212,17 +221,31 @@ namespace Hymson.MES.Services.Services.Manufacture
                     }
                     else
                     {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES15308)).WithData("lockproduction", procProcedureEntity.Name);
+                        throw new CustomerValidationException(nameof(ErrorCode.MES15310)).WithData("lockproduction", procProcedureEntity.Name);
                     }
                 }
             }
             //TODO  验证未完成 wangkeming
+            var validationFailures = new List<ValidationFailure>();
             foreach (var sfc in parm.Sfcs)
             {
                 var sfcEntity = sfcList.FirstOrDefault(x => x.SFC == sfc);
                 if (sfcEntity == null)
                 {
-                    //不是在制在制
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", sfc}
+                        };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
+                    }
+
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15312);
+                    validationFailures.Add(validationFailure);
                     continue;
                 }
                 var sfcProduceBusinessEntity = sfcProduceBusinesssList.FirstOrDefault(x => x.SfcInfoId == sfcEntity.Id);
@@ -232,13 +255,36 @@ namespace Hymson.MES.Services.Services.Manufacture
                         QualityLockEnum.FutureLock:
                         if (sfcProduceBusinessEntity != null)
                         {
-                            //已经锁定
+                            var validationFailure = new ValidationFailure();
+                            if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {{ "CollectionIndex", sfc} };
+                            }
+                            else
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
+                            }
+
+                            validationFailure.ErrorCode = nameof(ErrorCode.MES15313);
+                            validationFailures.Add(validationFailure);
                         }
 
                         //验证工序
                         if (await _manuCommonService.IsProcessStartBeforeEnd(sfcEntity.ProcessRouteId, sfcEntity.ProcedureId, parm.LockProductionId ?? 0))
                         {
-
+                            var validationFailure = new ValidationFailure();
+                            if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", sfc } };
+                            }
+                            else
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
+                            }
+                            validationFailure.FormattedMessagePlaceholderValues.Add("sfcproduction", sfc);
+                            validationFailure.FormattedMessagePlaceholderValues.Add("lockproductionname", sfc);
+                            validationFailure.ErrorCode = nameof(ErrorCode.MES15313);
+                            validationFailures.Add(validationFailure);
                         }
 
                         break;
@@ -246,10 +292,21 @@ namespace Hymson.MES.Services.Services.Manufacture
                         QualityLockEnum.InstantLock:
                         if (sfcProduceBusinessEntity != null)
                         {
-                            var sfcProduceLockBo = JsonConvert.DeserializeObject<SfcProduceLockBo>(sfcProduceBusinessEntity.BusinessContent);
-                            if (sfcProduceLockBo.Lock == QualityLockEnum.InstantLock)
+                            var sfcProduceLockBo = JsonSerializer.Deserialize<SfcProduceLockBo>(sfcProduceBusinessEntity.BusinessContent);
+
+                            if (sfcProduceLockBo != null && sfcProduceLockBo.Lock == QualityLockEnum.InstantLock)
                             {
-                                //已经及时锁 报错
+                                var validationFailure = new ValidationFailure();
+                                if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                                {
+                                    validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", sfc } };
+                                }
+                                else
+                                {
+                                    validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
+                                }
+                                validationFailure.ErrorCode = nameof(ErrorCode.MES15315);
+                                validationFailures.Add(validationFailure);
                             }
                         }
                         break;
@@ -257,12 +314,27 @@ namespace Hymson.MES.Services.Services.Manufacture
                         QualityLockEnum.Unlock:
                         if (sfcProduceBusinessEntity == null)
                         {
-                            //未锁定
+                            var validationFailure = new ValidationFailure();
+                            if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", sfc } };
+                            }
+                            else
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
+                            }
+                            validationFailure.ErrorCode = nameof(ErrorCode.MES15316);
+                            validationFailures.Add(validationFailure);
                         }
                         break;
                     default:
                         break;
                 }
+            }
+
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
             }
             #endregion
 
@@ -315,7 +387,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         SiteId = _currentSite.SiteId ?? 0,
                         SfcInfoId = sfc.Id,
                         BusinessType = ManuSfcProduceBusinessType.Lock,
-                        BusinessContent = JsonConvert.SerializeObject(sfcProduceLockBo),
+                        BusinessContent = JsonSerializer.Serialize(sfcProduceLockBo),
                         CreatedBy = sfc.CreatedBy,
                         UpdatedBy = sfc.UpdatedBy
                     });
@@ -329,7 +401,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     SiteId = _currentSite.SiteId ?? 0,
                     SfcStepId = stepEntity.Id,
                     BusinessType = ManuSfcProduceBusinessType.Lock,
-                    BusinessContent = JsonConvert.SerializeObject(sfcProduceLockBo),
+                    BusinessContent = JsonSerializer.Serialize(sfcProduceLockBo),
                     CreatedBy = sfc.CreatedBy,
                     UpdatedBy = sfc.UpdatedBy
                 });
@@ -597,7 +669,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task<int> DeletesManuSfcProduceAsync(string ids)
         {
-            var idsArr = StringExtension.SpitLongArrary(ids);
+            var idsArr = ids.ToSpitLongArray();
             return await _manuSfcProduceRepository.DeleteRangeAsync(idsArr);
         }
 

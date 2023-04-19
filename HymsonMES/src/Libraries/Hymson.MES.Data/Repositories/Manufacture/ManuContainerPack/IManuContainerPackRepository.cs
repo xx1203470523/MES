@@ -61,6 +61,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> DeletesAsync(DeleteCommand param);
 
         /// <summary>
+        /// 根据容器Id 删除所有容器装载记录（物理删除）
+        /// </summary>
+        /// <param name="containerBarCodeId"></param>
+        /// <returns></returns>
+        Task<int> DeleteAllAsync(long containerBarCodeId);
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -98,7 +105,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuContainerPackPagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<ManuContainerPackEntity>> GetPagedInfoAsync(ManuContainerPackPagedQuery manuContainerPackPagedQuery);
+        Task<PagedInfo<ManuContainerPackView>> GetPagedInfoAsync(ManuContainerPackPagedQuery manuContainerPackPagedQuery);
         #endregion
     }
 }

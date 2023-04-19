@@ -86,7 +86,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task<int> DeletesInteCodeRulesMakeAsync(string ids)
         {
-            var idsArr = StringExtension.SpitLongArrary(ids);
+            var idsArr = ids.ToSpitLongArray();
             return await _inteCodeRulesMakeRepository.DeletesAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
         }
 

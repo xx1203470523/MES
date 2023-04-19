@@ -1,8 +1,11 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 
 namespace Hymson.MES.Services.Services.Job.Manufacture
 {
@@ -40,12 +43,20 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <summary>
         /// 执行（不良录入）
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> ExecuteAsync(JobDto dto)
+        public async Task<JobResponseDto> ExecuteAsync(Dictionary<string, string>? param)
         {
+            var defaultDto = new JobResponseDto { };
+            if (param == null) return defaultDto;
+
+            defaultDto.Content?.Add("PackageCom", "True");
+            defaultDto.Content?.Add("BadEntryCom", "True");
+            defaultDto.Content?.Add("Result", "True");
+            defaultDto.Message = "成功";
+
             // TODO
-            return await Task.FromResult(0);
+            return await Task.FromResult(defaultDto);
         }
 
 

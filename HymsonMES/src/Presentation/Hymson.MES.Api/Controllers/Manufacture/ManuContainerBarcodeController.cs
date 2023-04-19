@@ -88,6 +88,14 @@ namespace Hymson.MES.Api.Controllers.Manufacture
              await _manuContainerBarcodeService.ModifyManuContainerBarcodeAsync(parm);
         }
 
+
+        [HttpPost]
+        [Route("updateStatus")]
+        public async Task UpdateManuContainerBarcodeStatusAsync([FromBody] UpdateManuContainerBarcodeStatusDto parm)
+        {
+            await _manuContainerBarcodeService.ModifyManuContainerBarcodeStatusAsync(parm);
+        }
+
         /// <summary>
         /// 删除（容器条码表）
         /// </summary>

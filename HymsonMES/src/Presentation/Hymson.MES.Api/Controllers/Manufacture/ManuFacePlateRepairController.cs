@@ -81,9 +81,9 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("endRepair")]
-        public async Task EndManuFacePlateRepairAsync(ManuFacePlateRepairBeginRepairDto beginRepairDto)
+        public async Task<ManuFacePlateRepairOpenInfoDto> EndManuFacePlateRepairAsync(ManuFacePlateRepairBeginRepairDto beginRepairDto)
         {
-            await _manuFacePlateRepairService.EndManuFacePlateRepairAsync(beginRepairDto);
+            return await _manuFacePlateRepairService.EndManuFacePlateRepairAsync(beginRepairDto);
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("confirmSubmit")]
-        public async Task ConfirmSubmitManuFacePlateRepairAsync(ManuFacePlateRepairConfirmSubmitDto confirmSubmitDto)
+        public async Task ConfirmSubmitManuFacePlateRepairAsync([FromBody] ManuFacePlateRepairConfirmSubmitDto confirmSubmitDto)
         {
             await _manuFacePlateRepairService.ConfirmSubmitManuFacePlateRepairAsync(confirmSubmitDto);
         }

@@ -13,8 +13,10 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -34,16 +36,18 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// 容器装载表（物理删除） 仓储
         /// </summary>
         private readonly IManuContainerPackRepository _manuContainerPackRepository;
+        private readonly IProcMaterialRepository _procMaterialRepository;
         private readonly AbstractValidator<ManuContainerPackCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ManuContainerPackModifyDto> _validationModifyRules;
 
-        public ManuContainerPackService(ICurrentUser currentUser, ICurrentSite currentSite, IManuContainerPackRepository manuContainerPackRepository, AbstractValidator<ManuContainerPackCreateDto> validationCreateRules, AbstractValidator<ManuContainerPackModifyDto> validationModifyRules)
+        public ManuContainerPackService(ICurrentUser currentUser, ICurrentSite currentSite, IManuContainerPackRepository manuContainerPackRepository, AbstractValidator<ManuContainerPackCreateDto> validationCreateRules, AbstractValidator<ManuContainerPackModifyDto> validationModifyRules, IProcMaterialRepository procMaterialRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _manuContainerPackRepository = manuContainerPackRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
+            _procMaterialRepository = procMaterialRepository;
         }
 
         /// <summary>
@@ -64,7 +68,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             //DTO转换实体
             var manuContainerPackEntity = manuContainerPackCreateDto.ToEntity<ManuContainerPackEntity>();
-            manuContainerPackEntity.Id= IdGenProvider.Instance.CreateId();
+            manuContainerPackEntity.Id = IdGenProvider.Instance.CreateId();
             manuContainerPackEntity.CreatedBy = _currentUser.UserName;
             manuContainerPackEntity.UpdatedBy = _currentUser.UserName;
             manuContainerPackEntity.CreatedOn = HymsonClock.Now();
@@ -96,6 +100,16 @@ namespace Hymson.MES.Services.Services.Manufacture
         }
 
         /// <summary>
+        /// 根据容器Id 删除所有容器装载记录（物理删除）
+        /// </summary>
+        /// <param name="containerBarCodeId"></param>
+        /// <returns></returns>
+        public async Task DeleteAllByContainerBarCodeIdAsync(long containerBarCodeId)
+        {
+            await _manuContainerPackRepository.DeleteAllAsync(containerBarCodeId);
+        }
+
+        /// <summary>
         /// 根据查询条件获取分页数据
         /// </summary>
         /// <param name="manuContainerPackPagedQueryDto"></param>
@@ -105,8 +119,9 @@ namespace Hymson.MES.Services.Services.Manufacture
             var manuContainerPackPagedQuery = manuContainerPackPagedQueryDto.ToQuery<ManuContainerPackPagedQuery>();
             var pagedInfo = await _manuContainerPackRepository.GetPagedInfoAsync(manuContainerPackPagedQuery);
 
+
             //实体到DTO转换 装载数据
-            List<ManuContainerPackDto> manuContainerPackDtos = PrepareManuContainerPackDtos(pagedInfo);
+            List<ManuContainerPackDto> manuContainerPackDtos = await PrepareManuContainerPackDtos(pagedInfo);
             return new PagedInfo<ManuContainerPackDto>(manuContainerPackDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
@@ -115,12 +130,29 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="pagedInfo"></param>
         /// <returns></returns>
-        private static List<ManuContainerPackDto> PrepareManuContainerPackDtos(PagedInfo<ManuContainerPackEntity>   pagedInfo)
+        private async Task<List<ManuContainerPackDto>> PrepareManuContainerPackDtos(PagedInfo<ManuContainerPackView> pagedInfo)
         {
             var manuContainerPackDtos = new List<ManuContainerPackDto>();
-            foreach (var manuContainerPackEntity in pagedInfo.Data)
+            //批量查询物料信息
+            IEnumerable<ProcMaterialEntity> procMaterialList = new List<ProcMaterialEntity>();
+            if (pagedInfo.Data.Any())
             {
-                var manuContainerPackDto = manuContainerPackEntity.ToModel<ManuContainerPackDto>();
+                var productIds = pagedInfo.Data.Select(c => c.ProductId).ToArray();
+                if (productIds.Any())
+                {
+                    procMaterialList = await _procMaterialRepository.GetByIdsAsync(productIds);
+                }
+            }
+            //转换Dto
+            foreach (var manuContainerPackView in pagedInfo.Data)
+            {
+                var manuContainerPackDto = manuContainerPackView.ToModel<ManuContainerPackDto>();
+                //转换物料编码
+                var procMater = procMaterialList.Where(c => c.Id == manuContainerPackView.ProductId)?.FirstOrDefault();
+                if (procMater != null)
+                {
+                    manuContainerPackDto.MaterialCode = procMater.MaterialCode;
+                }
                 manuContainerPackDtos.Add(manuContainerPackDto);
             }
 
@@ -134,13 +166,13 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task ModifyManuContainerPackAsync(ManuContainerPackModifyDto manuContainerPackModifyDto)
         {
-             // 判断是否有获取到站点码 
+            // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0)
             {
                 throw new ValidationException(nameof(ErrorCode.MES10101));
             }
 
-             //验证DTO
+            //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(manuContainerPackModifyDto);
 
             //DTO转换实体
@@ -156,13 +188,13 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ManuContainerPackDto> QueryManuContainerPackByIdAsync(long id) 
+        public async Task<ManuContainerPackDto> QueryManuContainerPackByIdAsync(long id)
         {
-           var manuContainerPackEntity = await _manuContainerPackRepository.GetByIdAsync(id);
-           if (manuContainerPackEntity != null) 
-           {
-               return manuContainerPackEntity.ToModel<ManuContainerPackDto>();
-           }
+            var manuContainerPackEntity = await _manuContainerPackRepository.GetByIdAsync(id);
+            if (manuContainerPackEntity != null)
+            {
+                return manuContainerPackEntity.ToModel<ManuContainerPackDto>();
+            }
             return null;
         }
     }

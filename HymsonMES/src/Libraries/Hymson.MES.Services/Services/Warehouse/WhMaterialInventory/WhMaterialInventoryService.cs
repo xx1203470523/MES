@@ -212,7 +212,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <returns></returns>
         public async Task<int> DeletesWhMaterialInventoryAsync(string ids)
         {
-            var idsArr = StringExtension.SpitLongArrary(ids);
+            var idsArr = ids.ToSpitLongArray();
             return await _whMaterialInventoryRepository.DeletesAsync(idsArr);
         }
 

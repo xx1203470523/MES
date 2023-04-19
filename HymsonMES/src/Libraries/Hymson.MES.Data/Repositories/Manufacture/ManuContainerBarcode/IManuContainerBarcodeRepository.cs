@@ -46,6 +46,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> UpdatesAsync(List<ManuContainerBarcodeEntity> manuContainerBarcodeEntitys);
 
         /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="manuContainerBarcodeEntity"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAsync(ManuContainerBarcodeEntity manuContainerBarcodeEntity);
+
+        /// <summary>
         /// 删除  
         /// 最好使用批量删除，可以设置更新人和更新时间
         /// </summary>
@@ -99,7 +106,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuContainerBarcodePagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<ManuContainerBarcodeEntity>> GetPagedInfoAsync(ManuContainerBarcodePagedQuery manuContainerBarcodePagedQuery);
+        Task<PagedInfo<ManuContainerBarcodeQueryView>> GetPagedInfoAsync(ManuContainerBarcodePagedQuery manuContainerBarcodePagedQuery);
         #endregion
     }
 }

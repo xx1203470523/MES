@@ -37,6 +37,13 @@ namespace Hymson.MES.Services.Services.Manufacture
         Task ModifyManuContainerBarcodeAsync(ManuContainerBarcodeModifyDto manuContainerBarcodeModifyDto);
 
         /// <summary>
+        /// 更新容器状态
+        /// </summary>
+        /// <param name="updateManuContainerBarcodeStatusDto"></param>
+        /// <returns></returns>
+        Task ModifyManuContainerBarcodeStatusAsync(UpdateManuContainerBarcodeStatusDto updateManuContainerBarcodeStatusDto);
+
+        /// <summary>
         /// 删除
         /// </summary>
         /// <param name="id"></param>

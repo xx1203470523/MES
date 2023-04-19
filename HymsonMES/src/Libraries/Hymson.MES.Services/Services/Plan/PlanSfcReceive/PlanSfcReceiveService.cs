@@ -133,7 +133,7 @@ namespace Hymson.MES.Services.Services.Plan
 
             if (validationFailures.Any())
             {
-                throw new ValidationException(_localizationService.GetResource("条码{0}:"), validationFailures);
+                throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
             }
         }
 

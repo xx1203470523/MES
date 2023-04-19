@@ -312,17 +312,22 @@
         #region 质量锁定 15300
         public const string MES15300 = "将来锁定工序必填";
         public const string MES15301 = "产品条码不能为空";
-        public const string MES15302 = "条码已报废/删除，不可再操作锁定/取消锁定！";
-        public const string MES15303 = "将来锁定操作必须是同一工单下的条码！";
-        public const string MES15304 = "条码{sfcs}不是在制品!";
+        public const string MES15302 = "条码已报废/删除，不可再操作锁定/取消锁定";
+        public const string MES15303 = "将来锁定操作必须是同一工单下的条码";
+        public const string MES15304 = "条码{sfcs}不是在制品";
         public const string MES15305 = "条码数量上限为100行";
         public const string MES15306 = "选中的条码状态与选择的操作类型不匹配！";
         public const string MES15307 = "扫描的条码状态都必须是“锁定”或者有未关闭的将来锁定指令存在";
         //public const string MES15308= " 当前条码状态为{operationType}，与选择的操作类型不匹配";
-        public const string MES15308 = "将来锁定操作必须是同一工单下的条码！";
-        public const string MES15309 = "条码全部不是在制品！";
-        public const string MES15310 = "将来锁工序{lockproduction}不在条码所用工艺路线中！";
-        public const string MES15311 = "将来锁锁定工序不存在！"; 
+        public const string MES15308 = "将来锁定操作必须是同一工单下的条码";
+        public const string MES15309 = "条码全部不是在制品";
+        public const string MES15310 = "将来锁工序{lockproduction}不在条码所用工艺路线中";
+        public const string MES15311 = "将来锁锁定工序不存在";
+        public const string MES15312 = "条码不是在制品！";
+        public const string MES15313 = "条码已经锁定，无法添加将来锁";
+        public const string MES15314 = "锁定工序{sfcproduction}不在条码所在工序{lockproductionname}之后";
+        public const string MES15315 = "条码存在及时锁定，无法添加及时锁";
+        public const string MES15316 = "条码未被锁定，无法执行解锁操作";
         #endregion
 
         #region 质量录入 15400
@@ -332,6 +337,7 @@
         public const string MES15403 = "条码{sfcs}状态不是报废,不可再执行当前操作!";
         public const string MES15404 = "工单{orders}不是激活状态,不可再执行当前操作!";
         public const string MES15405 = "不合格缺陷信息不能为空!";
+        public const string MES15406 = "已存在返修信息!";
         #endregion
 
         #region 工单  16000
@@ -507,6 +513,8 @@
         public const string MES16610 = "组件条码{barCode}对应的批次大小未维护!";
         public const string MES16611 = "组件条码{barCode}的批次大小超出可装载数量!";
         public const string MES16612 = "当前工序与条码生产信息中的不一致！";
+        public const string MES16613 = "请选择活动状态下的组件移除！";
+        public const string MES16614 = "请选择活动状态下的组件替换！";
         #endregion
 
         #region 容器包装 MES 16700
