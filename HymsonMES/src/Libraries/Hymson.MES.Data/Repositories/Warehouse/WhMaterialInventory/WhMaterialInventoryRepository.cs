@@ -132,7 +132,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             {
                 sqlBuilder.Where(" pm.Version=@Version");
             }
-            if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.Status.ToString()))
+            if (whMaterialInventoryPagedQuery.Status > 0)
             {
                 //Enum.GetValues(whMaterialInventoryPagedQuery.Status)
                 sqlBuilder.Where(" wmi.Status=@Status");
@@ -189,7 +189,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="whMaterialInventoryEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(List<WhMaterialInventoryEntity> whMaterialInventoryEntitys)
+        public async Task<int> InsertsAsync(IEnumerable<WhMaterialInventoryEntity> whMaterialInventoryEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertsSql, whMaterialInventoryEntitys);
@@ -211,7 +211,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="whMaterialInventoryEntitys"></param>
         /// <returns></returns>
-        public async Task<int> UpdatesAsync(List<WhMaterialInventoryEntity> whMaterialInventoryEntitys)
+        public async Task<int> UpdatesAsync(IEnumerable<WhMaterialInventoryEntity> whMaterialInventoryEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdatesSql, whMaterialInventoryEntitys);

@@ -6,6 +6,7 @@
  *build datetime: 2023-03-06 03:27:59
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,6 +39,6 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <summary>
         /// 状态
         /// </summary>
-        public int? Status { get; set; }
+        public WhMaterialInventoryStatusEnum? Status { get; set; }
     }
 }
