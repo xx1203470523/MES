@@ -1,14 +1,9 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
-using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
 using Hymson.Utils;
-using Newtonsoft.Json;
 
 namespace Hymson.MES.Services.Services.Job.Manufacture
 {
@@ -78,6 +73,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             var result = (rows > 0).ToString();
             defaultDto.Content?.Add("PackageCom", result);
             defaultDto.Content?.Add("BadEntryCom", result);
+            defaultDto.Content?.Add("Qty", "1");
             defaultDto.Content?.Add("Result", result);
 
             return defaultDto;
