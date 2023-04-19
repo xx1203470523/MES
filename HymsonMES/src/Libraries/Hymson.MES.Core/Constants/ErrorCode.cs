@@ -147,7 +147,7 @@
         public const string MES10802 = "此编码【{Code}】在系统中已经存在!";
         public const string MES10803 = "掩码规则不能为空!";
         public const string MES10804 = "匹配方式不能为空!";
-        public const string MES10805= "匹配方式为全码时掩码规则长度为10!";
+        public const string MES10805 = "匹配方式为全码时掩码规则长度为10!";
         public const string MES10806 = "起始方式掩码末尾不能为特殊字符\"?\"";
         public const string MES10807 = "中间方式掩码首位和末尾不能为特殊字符\"?\"";
         public const string MES10808 = "结束方式掩码首位不能为特殊字符\"?\"";
@@ -428,6 +428,7 @@
         public const string MES16310 = "SFC状态为完成，不允许操作。";
         public const string MES16311 = "SFC在库存中状态为：{Status}，但不存在在制信息。";
         public const string MES16312 = "请求参数不合法，不允许操作。";
+        public const string MES16313 = "SFC状态不是{Status}状态，不允许操作。";
         #endregion
 
         #region 生产
