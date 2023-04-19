@@ -4,8 +4,10 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
@@ -16,6 +18,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using System.Data;
+using System.Text;
 
 namespace Hymson.MES.Services.Services.Process.MaskCode
 {
@@ -38,6 +41,7 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
         /// 序列号生成服务
         /// </summary>
         private readonly ISequenceService _sequenceService;
+        private readonly ILocalizationService _localizationService;
 
         /// <summary>
         /// 验证器
@@ -50,17 +54,11 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
         private readonly IProcMaskCodeRepository _procMaskCodeRepository;
         private readonly IProcMaskCodeRuleRepository _procMaskCodeRuleRepository;
 
-
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="currentSite"></param>
-        /// <param name="currentUser"></param>
-        /// <param name="sequenceService"></param>
-        /// <param name="validationSaveRules"></param>
-        /// <param name="procMaskCodeRepository"></param>
-        /// <param name="procMaskCodeRuleRepository"></param>
         public ProcMaskCodeService(ICurrentUser currentUser, ICurrentSite currentSite, ISequenceService sequenceService,
+            ILocalizationService localizationService,
             AbstractValidator<ProcMaskCodeSaveDto> validationSaveRules,
             IProcMaskCodeRepository procMaskCodeRepository,
             IProcMaskCodeRuleRepository procMaskCodeRuleRepository)
@@ -68,6 +66,7 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
             _currentUser = currentUser;
             _currentSite = currentSite;
             _sequenceService = sequenceService;
+            _localizationService = localizationService;
             _validationSaveRules = validationSaveRules;
             _procMaskCodeRepository = procMaskCodeRepository;
             _procMaskCodeRuleRepository = procMaskCodeRuleRepository;
@@ -94,7 +93,13 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
 
             // 编码唯一性验证
             var checkEntity = await _procMaskCodeRepository.GetByCodeAsync(new EntityByCodeQuery { Site = entity.SiteId, Code = entity.Code });
-            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES10802)).WithData("Code", entity.Code);
+            if (checkEntity != null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10802)).WithData("Code", entity.Code);
+            }
+
+            //验证规则
+            Verification(createDto.RuleList.ToList()); 
 
             List<ProcMaskCodeRuleEntity> rules = new();
             for (int i = 0; i < createDto.RuleList.Count; i++)
@@ -132,6 +137,9 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
             // DTO转换实体
             var entity = modifyDto.ToEntity<ProcMaskCodeEntity>();
             entity.UpdatedBy = _currentUser.UserName;
+
+            //验证规则
+            Verification(modifyDto.RuleList.ToList());
 
             List<ProcMaskCodeRuleEntity> rules = new();
             for (int i = 0; i < modifyDto.RuleList.Count; i++)
@@ -201,6 +209,71 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
                 dto.RuleList = (await _procMaskCodeRuleRepository.GetByMaskCodeIdAsync(dto.Id)).Select(s => s.ToModel<ProcMaskCodeRuleDto>());
             }
             return dto;
+        }
+
+        /// <summary>
+        /// 新增、修改规则校验
+        /// </summary>
+        /// <param name="linkeRuleList"></param>
+        /// <returns></returns>
+        private void Verification(List<ProcMaskCodeRuleDto> linkeRuleList)
+        {
+            if (linkeRuleList.Any(a => string.IsNullOrWhiteSpace(a.Rule)))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10803));
+            }
+
+            if (linkeRuleList.Any(a => a.MatchWay<0))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10804));
+            }
+
+            //全码验证
+            if (linkeRuleList.Any(a => a.MatchWay == (int)MatchModeEnum .Whole&& a.Rule.Trim().Length != 10))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10805));
+            }
+
+            //全码:4,起始:1,结束:3,中间:2;根据匹配方式校验规则
+            //全码：系统会校验所有的字符及字符长度，允许“?”
+            //起始：系统只会校验掩码的起始字符，不校验长度，结束位不为‘?’；
+            //结束：系统只会校验掩码的结束字符，不校验长度，起始字符不为‘?’；
+            //中间：系统只会校验掩码的中间字符，不校验长度，结束和起始为不为‘?’；
+            var errorMessage = new StringBuilder();
+            foreach (var rule in linkeRuleList)
+            {
+                switch (rule.MatchWay)
+                {
+                    case (int)MatchModeEnum.Start:
+                        if (rule.Rule.EndsWith("?") || rule.Rule.EndsWith("？"))
+                        {
+                            //errorMessage.Append($"起始方式掩码末尾不能为特殊字符\"?\"");
+                            errorMessage.Append(_localizationService.GetResource(nameof(ErrorCode.MES10806)));
+                        }
+                        break;
+                    case (int)MatchModeEnum.Middle:
+                        if (rule.Rule.StartsWith("?") || rule.Rule.StartsWith("？") || rule.Rule.EndsWith("?") || rule.Rule.EndsWith("？"))
+                        {
+                            //errorMessage.Append($"中间方式掩码首位和末尾不能为特殊字符\"?\";");
+                            errorMessage.Append(_localizationService.GetResource(nameof(ErrorCode.MES10807)));
+                        }
+                        break;
+                    case (int)MatchModeEnum.End:
+                        if (rule.Rule.StartsWith("?") || rule.Rule.StartsWith("？"))
+                        {
+                            // errorMessage.Append($"结束方式掩码首位不能为特殊字符\"?\";");
+                            errorMessage.Append(_localizationService.GetResource(nameof(ErrorCode.MES10808)));
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(errorMessage.ToString()))
+            {
+                throw new CustomerValidationException(errorMessage.ToString());
+            }
         }
     }
 }

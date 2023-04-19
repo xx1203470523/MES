@@ -145,6 +145,13 @@
         public const string MES10800 = "掩码维护错误";
         public const string MES10801 = "掩码编码不能为空";
         public const string MES10802 = "此编码【{Code}】在系统中已经存在!";
+        public const string MES10803 = "掩码规则不能为空!";
+        public const string MES10804 = "匹配方式不能为空!";
+        public const string MES10805= "匹配方式为全码时掩码规则长度为10!";
+        public const string MES10806 = "起始方式掩码末尾不能为特殊字符\"?\"";
+        public const string MES10807 = "中间方式掩码首位和末尾不能为特殊字符\"?\"";
+        public const string MES10808 = "结束方式掩码首位不能为特殊字符\"?\"";
+
         #endregion
 
         #region 不合格代码 11100
