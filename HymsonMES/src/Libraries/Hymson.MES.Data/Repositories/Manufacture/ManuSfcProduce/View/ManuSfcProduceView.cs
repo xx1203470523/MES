@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hymson.MES.Core.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,7 +22,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 锁;1：未锁定；2：即时锁；3：将来锁；
         /// </summary>
-        public int? Lock { get; set; }
+        public QualityLockEnum? Lock { get; set; }
 
         /// <summary>
         /// 未来锁工序id
