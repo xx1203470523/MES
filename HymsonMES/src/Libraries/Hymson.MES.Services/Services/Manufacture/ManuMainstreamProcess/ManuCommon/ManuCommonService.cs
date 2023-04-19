@@ -259,7 +259,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 .Select(s => s.PreProcessRouteDetailId.Value).ToArray())
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10442));
 
-            // 有多工序分叉的情况
+            // 有多工序分叉的情况（取第一个当默认值）
             ProcProcessRouteDetailNodeEntity defaultPreProcedure = procedureNodes.FirstOrDefault();
             if (preProcessRouteDetailLinks.Count() > 1)
             {
@@ -335,14 +335,17 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         {
             if (list == null || !list.Any())
             {
-                list = new List<ProcessRouteDetailDto>();
                 key = IdGenProvider.Instance.CreateId();
-                var processRouteDetail = new ProcessRouteDetailDto();
-                processRouteDetail.key = key;
-                processRouteDetail.ProcedureIds = new List<long>();
-                processRouteDetail.ProcedureIds.Add(procedureId);
-                list.Add(processRouteDetail);
+                list = new List<ProcessRouteDetailDto>
+                {
+                    new ProcessRouteDetailDto
+                    {
+                        key = key,
+                        ProcedureIds = new List<long> { procedureId }
+                    }
+                };
             }
+
             var procProcessRouteDetailLinkByprocedureIdList = procProcessRouteDetailLinkEntities.Where(x => x.PreProcessRouteDetailId == procedureId);
             if (procProcessRouteDetailLinkByprocedureIdList != null && procProcessRouteDetailLinkByprocedureIdList.Any())
             {

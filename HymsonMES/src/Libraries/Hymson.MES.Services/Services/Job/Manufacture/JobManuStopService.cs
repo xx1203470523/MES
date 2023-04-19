@@ -80,7 +80,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         {
             var defaultDto = new JobResponseDto { };
 
-            // 获取生产条码信息（附带条码合法性校验 + 工序活动状态校验）
+            // 获取生产条码信息
             var sfcProduceEntity = await _manuCommonService.GetProduceSFCAsync(param["SFC"]);
 
             // 合法性校验
