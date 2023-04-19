@@ -37,7 +37,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="whMaterialInventoryEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertsAsync(List<WhMaterialInventoryEntity> whMaterialInventoryEntitys);
+        Task<int> InsertsAsync(IEnumerable<WhMaterialInventoryEntity> whMaterialInventoryEntitys);
 
         /// <summary>
         /// 更新
@@ -51,7 +51,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="whMaterialInventoryEntitys"></param>
         /// <returns></returns>
-        Task<int> UpdatesAsync(List<WhMaterialInventoryEntity> whMaterialInventoryEntitys);
+        Task<int> UpdatesAsync(IEnumerable<WhMaterialInventoryEntity> whMaterialInventoryEntitys);
 
         /// <summary>
         /// 更新状态

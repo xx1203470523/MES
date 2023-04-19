@@ -258,7 +258,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             #region 验证
             if (parm == null)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10100));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
 
             var siteId = _currentSite.SiteId ?? 0;
@@ -274,7 +274,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             };
             if (await _procProcedureRepository.IsExistsAsync(query))
             {
-                throw new BusinessException(nameof(ErrorCode.MES10405)).WithData("Code", parm.Procedure.Code);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10405)).WithData("Code", parm.Procedure.Code);
             }
             #endregion
 
@@ -359,7 +359,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             #region
             if (parm == null)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10100));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
             var siteId = _currentSite.SiteId ?? 0;
             var userName = _currentUser.UserName;
@@ -445,11 +445,17 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// <returns></returns>
         public async Task<int> DeleteProcProcedureAsync(long[] idsArr)
         {
-            if (idsArr.Length < 1) throw new NotFoundException(nameof(ErrorCode.MES10102));
+            if (idsArr.Length < 1)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10102));
+            }
 
             var entitys = await _procProcedureRepository.GetByIdsAsync(idsArr);
             if (entitys.Any(a => a.Status == SysDataStatusEnum.Enable
-            || a.Status == SysDataStatusEnum.Retain) == true) throw new BusinessException(nameof(ErrorCode.MES10105));
+            || a.Status == SysDataStatusEnum.Retain) == true)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10105));
+            }
 
             return await _procProcedureRepository.DeleteRangeAsync(new DeleteCommand
             {

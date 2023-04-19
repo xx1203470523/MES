@@ -1,18 +1,18 @@
 
 不良录入
-ManuBadRecordService
+JobManuBadRecordService
 
 完成
-ManuCompleteService
+JobManuCompleteService
 
 组装
-ManuPackageService
+JobManuPackageService
 
 开始（维修）
-ManuRepairStartService
+JobManuRepairStartService
 
 开始
-ManuStartService
+JobManuStartService
 
 中止
-ManuStopService
+JobManuStopService

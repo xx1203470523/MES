@@ -3,9 +3,9 @@
 namespace Hymson.MES.Services.Services.Job.Manufacture
 {
     /// <summary>
-    /// 
+    /// 生产作业接口
     /// </summary>
-    public interface IManufactureJobService
+    public interface IJobManufactureService
     {
         /// <summary>
         /// 验证参数

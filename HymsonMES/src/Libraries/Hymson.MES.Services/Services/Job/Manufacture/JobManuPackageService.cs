@@ -11,7 +11,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
     /// <summary>
     /// 组装
     /// </summary>
-    public class JobManuPackageService : IManufactureJobService
+    public class JobManuPackageService : IJobManufactureService
     {
         /// <summary>
         /// 当前对象（登录用户）

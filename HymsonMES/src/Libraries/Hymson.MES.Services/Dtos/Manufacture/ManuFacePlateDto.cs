@@ -108,9 +108,9 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public ManuFacePlateTypeEnum Type { get; set; }
 
        /// <summary>
-        /// 状态;1、新建、2、启用、3、保留、4、废除；
+        /// 状态;0、新建、1、启用、2、保留、3、废除；
         /// </summary>
-        public SysDataStatusEnum Status { get; set; }
+        public SysDataStatusEnum? Status { get; set; }
 
        /// <summary>
         /// 会话时间（分钟）

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 
 namespace Hymson.MES.Core.Enums
 {
@@ -21,7 +16,7 @@ namespace Hymson.MES.Core.Enums
         /// 即时锁
         /// </summary>
         [Description("即时锁")]
-        InstantLock =2,
+        InstantLock = 2,
         /// <summary>
         /// 将来锁
         /// </summary>

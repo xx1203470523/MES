@@ -228,11 +228,11 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
                 throw new CustomerValidationException(nameof(ErrorCode.MES10804));
             }
 
-            //全码验证
-            if (linkeRuleList.Any(a => a.MatchWay == (int)MatchModeEnum .Whole&& a.Rule.Trim().Length != 10))
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10805));
-            }
+            ////全码验证
+            //if (linkeRuleList.Any(a => a.MatchWay == (int)MatchModeEnum .Whole&& a.Rule.Trim().Length != 10))
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES10805));
+            //}
 
             //全码:4,起始:1,结束:3,中间:2;根据匹配方式校验规则
             //全码：系统会校验所有的字符及字符长度，允许“?”
@@ -245,21 +245,21 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
                 switch (rule.MatchWay)
                 {
                     case (int)MatchModeEnum.Start:
-                        if (rule.Rule.EndsWith("?") || rule.Rule.EndsWith("？"))
+                        if (rule.Rule.EndsWith("?"))
                         {
                             //errorMessage.Append($"起始方式掩码末尾不能为特殊字符\"?\"");
                             errorMessage.Append(_localizationService.GetResource(nameof(ErrorCode.MES10806)));
                         }
                         break;
                     case (int)MatchModeEnum.Middle:
-                        if (rule.Rule.StartsWith("?") || rule.Rule.StartsWith("？") || rule.Rule.EndsWith("?") || rule.Rule.EndsWith("？"))
+                        if (rule.Rule.StartsWith("?")|| rule.Rule.EndsWith("?"))
                         {
                             //errorMessage.Append($"中间方式掩码首位和末尾不能为特殊字符\"?\";");
                             errorMessage.Append(_localizationService.GetResource(nameof(ErrorCode.MES10807)));
                         }
                         break;
                     case (int)MatchModeEnum.End:
-                        if (rule.Rule.StartsWith("?") || rule.Rule.StartsWith("？"))
+                        if (rule.Rule.StartsWith("?") )
                         {
                             // errorMessage.Append($"结束方式掩码首位不能为特殊字符\"?\";");
                             errorMessage.Append(_localizationService.GetResource(nameof(ErrorCode.MES10808)));
