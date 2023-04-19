@@ -85,7 +85,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
        /// <summary>
         /// 未来锁工序id
         /// </summary>
-        public string LockProductionId { get; set; }
+        public long? LockProductionId { get; set; }
 
        /// <summary>
         /// 是否可疑
@@ -244,7 +244,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 未来锁工序id
         /// </summary>
-        public string LockProductionId { get; set; }
+        public long? LockProductionId { get; set; }
 
         /// <summary>
         /// 是否可疑
@@ -362,7 +362,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
        /// <summary>
         /// 未来锁工序id
         /// </summary>
-        public string LockProductionId { get; set; }
+        public long? LockProductionId { get; set; }
 
        /// <summary>
         /// 是否可疑
