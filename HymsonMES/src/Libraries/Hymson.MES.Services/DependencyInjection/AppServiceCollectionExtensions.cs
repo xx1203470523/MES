@@ -214,6 +214,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IJobCommonService, JobCommonService>();
             services.AddSingleton<ManuBadRecordService>();
             services.AddSingleton<ManuPackageService>();
+            services.AddSingleton<ManuRepairStartService>();
             services.AddSingleton<ManuCompleteService>();
             services.AddSingleton<ManuStartService>();
             services.AddSingleton<ManuStopService>();
