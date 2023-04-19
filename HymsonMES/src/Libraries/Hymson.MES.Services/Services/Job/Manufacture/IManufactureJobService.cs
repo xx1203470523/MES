@@ -10,8 +10,8 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <summary>
         /// 执行
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> ExecuteAsync(JobDto dto);
+        Task<JobResponseDto> ExecuteAsync(Dictionary<string, string>? param);
     }
 }

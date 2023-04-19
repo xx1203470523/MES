@@ -12,3 +12,4 @@ namespace Hymson.MES.Core.Constants.Process
         public const long LastProcedureId = 999999999;
 }
 }
+    

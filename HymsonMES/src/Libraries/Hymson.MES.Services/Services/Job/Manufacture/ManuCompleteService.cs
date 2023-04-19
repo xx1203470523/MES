@@ -4,9 +4,11 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
 using Hymson.Utils;
+using Newtonsoft.Json;
 
 namespace Hymson.MES.Services.Services.Job.Manufacture
 {
@@ -49,11 +51,36 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <summary>
         /// 执行（完成）
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> ExecuteAsync(JobDto dto)
+        public async Task<JobResponseDto> ExecuteAsync(Dictionary<string, string>? param)
         {
-            return await _manuOutStationService.OutStationAsync(dto);
+            var defaultDto = new JobResponseDto { };
+            if (param == null) return defaultDto;
+
+            var rows = 0;
+            if (param.ContainsKey("SFC") == false || param.ContainsKey("ProcedureId") == false || param.ContainsKey("ResourceId") == false)
+            {
+                defaultDto.Message = "失败";
+            }
+            else
+            {
+                rows = await _manuOutStationService.OutStationAsync(new ManufactureBo
+                {
+                    SFC = param["SFC"],
+                    ProcedureId = param["ProcedureId"].ParseToLong(),
+                    ResourceId = param["ResourceId"].ParseToLong()
+                });
+
+                defaultDto.Message = "成功";
+            }
+
+            var result = (rows > 0).ToString();
+            defaultDto.Content?.Add("PackageCom", result);
+            defaultDto.Content?.Add("BadEntryCom", result);
+            defaultDto.Content?.Add("Result", result);
+
+            return defaultDto;
         }
 
     }

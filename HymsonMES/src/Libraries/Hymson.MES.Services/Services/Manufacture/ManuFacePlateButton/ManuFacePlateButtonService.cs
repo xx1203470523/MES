@@ -21,7 +21,6 @@ using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Job.Common;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using IdGen;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -295,7 +294,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuFacePlateButtonDto = manuFacePlateButtonEntity.ToModel<ManuFacePlateButtonDto>();
             manuFacePlateButtonDto.ManuFacePlateButtonJobRelations = manuFacePlateButtonJobRelationDtos.ToArray();
             return manuFacePlateButtonDto;
-
         }
 
         /// <summary>
@@ -303,9 +301,9 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task<Dictionary<string, int>> ClickAsync(JobDto dto)
+        public async Task<ButtonResponseDto> ClickAsync(ButtonRequestDto dto)
         {
-            var result = new Dictionary<string, int>(); // 返回结果
+            var result = new ButtonResponseDto { FacePlateButtonId = dto.FacePlateButtonId }; // 返回结果
 
             // 根据面板ID和按钮ID找出绑定的作业job
             var buttonJobs = await _manuFacePlateButtonJobRelationRepository.GetByFacePlateButtonIdAsync(dto.FacePlateButtonId);
@@ -315,8 +313,17 @@ namespace Hymson.MES.Services.Services.Manufacture
             var jobs = await _inteJobRepository.GetByIdsAsync(buttonJobs.Select(s => s.JobId).ToArray());
 
             // 执行Job
-            //result = await _jobCommonService.ExecuteJobAsync(new List<InteJobEntity> { }.Select(s => s.Code), dto);
-            result = await _jobCommonService.ExecuteJobAsync(jobs.Select(s => s.ClassProgram), dto);
+            //result.Data = await _jobCommonService.ExecuteJobAsync(new List<InteJobEntity>
+            //{
+            //    new InteJobEntity{ ClassProgram = "ManuBadRecordService" },
+            //    new InteJobEntity{ ClassProgram = "ManuCompleteService" },
+            //    new InteJobEntity{ ClassProgram = "ManuPackageService" },
+            //    new InteJobEntity{ ClassProgram = "ManuStartService" },
+            //    new InteJobEntity{ ClassProgram = "ManuStopService" },
+            //}, dto.Param);
+
+            result.Data = await _jobCommonService.ExecuteJobAsync(jobs, dto.Param);
+
             return result;
         }
     }

@@ -119,13 +119,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         public async Task<ManuSfcProduceEntity> GetProduceSFCForStartAsync(string sfc)
         {
             if (string.IsNullOrWhiteSpace(sfc) == true
-                || sfc.Contains(' ') == true) throw new BusinessException(nameof(ErrorCode.MES16305));
+                || sfc.Contains(' ') == true) throw new CustomerValidationException(nameof(ErrorCode.MES16305));
 
             var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(sfc);
-            if (sfcProduceEntity == null) throw new BusinessException(nameof(ErrorCode.MES16306));
+            if (sfcProduceEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES16306));
 
             // 当前工序是否是排队状态
-            if (sfcProduceEntity.Status == SfcProduceStatusEnum.lineUp) throw new BusinessException(nameof(ErrorCode.MES16309));
+            if (sfcProduceEntity.Status == SfcProduceStatusEnum.lineUp) throw new CustomerValidationException(nameof(ErrorCode.MES16309));
 
             return sfcProduceEntity;
         }
@@ -139,16 +139,16 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         public async Task<ManuSfcProduceEntity> GetProduceSFCWithCheckAsync(string sfc, long procedureId)
         {
             if (string.IsNullOrWhiteSpace(sfc) == true
-                || sfc.Contains(' ') == true) throw new BusinessException(nameof(ErrorCode.MES16305));
+                || sfc.Contains(' ') == true) throw new CustomerValidationException(nameof(ErrorCode.MES16305));
 
             var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(sfc);
-            if (sfcProduceEntity == null) throw new BusinessException(nameof(ErrorCode.MES16306));
+            if (sfcProduceEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES16306));
 
             // 当前工序是否是活动状态
-            if (sfcProduceEntity.Status == SfcProduceStatusEnum.Activity) throw new BusinessException(nameof(ErrorCode.MES16309));
+            if (sfcProduceEntity.Status == SfcProduceStatusEnum.Activity) throw new CustomerValidationException(nameof(ErrorCode.MES16309));
 
             // 产品编码是否和工序对应
-            if (sfcProduceEntity.ProcedureId != procedureId) throw new BusinessException(nameof(ErrorCode.MES16308));
+            if (sfcProduceEntity.ProcedureId != procedureId) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
 
             return sfcProduceEntity;
         }
@@ -161,17 +161,17 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         public async Task<PlanWorkOrderEntity> GetProduceWorkOrderByIdAsync(long workOrderId)
         {
             var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(workOrderId);
-            if (planWorkOrderEntity == null) throw new BusinessException(nameof(ErrorCode.MES16301));
+            if (planWorkOrderEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES16301));
 
             // 判断是否被锁定
             if (planWorkOrderEntity.IsLocked == YesOrNoEnum.Yes)
             {
-                throw new BusinessException(nameof(ErrorCode.MES16302)).WithData("ordercode", planWorkOrderEntity.OrderCode);
+                throw new CustomerValidationException(nameof(ErrorCode.MES16302)).WithData("ordercode", planWorkOrderEntity.OrderCode);
             }
 
             // 判断是否是激活的工单
             var activatedWorkOrder = await _planWorkOrderActivationRepository.GetByIdAsync(planWorkOrderEntity.Id);
-            if (activatedWorkOrder == null) throw new BusinessException(nameof(ErrorCode.MES16410));
+            if (activatedWorkOrder == null) throw new CustomerValidationException(nameof(ErrorCode.MES16410));
 
             switch (planWorkOrderEntity.Status)
             {
@@ -182,7 +182,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 case PlanWorkOrderStatusEnum.NotStarted:
                 case PlanWorkOrderStatusEnum.Closed:
                 default:
-                    throw new BusinessException(nameof(ErrorCode.MES16303)).WithData("ordercode", planWorkOrderEntity.OrderCode);
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16303)).WithData("ordercode", planWorkOrderEntity.OrderCode);
             }
 
             return planWorkOrderEntity;
@@ -196,10 +196,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         public async Task<ProcessRouteProcedureDto> GetFirstProcedureAsync(long processRouteId)
         {
             var procProcessRouteDetailNodeEntity = await _procProcessRouteDetailNodeRepository.GetFirstProcedureByProcessRouteIdAsync(processRouteId);
-            if (procProcessRouteDetailNodeEntity == null) throw new BusinessException(nameof(ErrorCode.MES16304));
+            if (procProcessRouteDetailNodeEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES16304));
 
             var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(procProcessRouteDetailNodeEntity.ProcedureId);
-            if (procProcedureEntity == null) throw new BusinessException(nameof(ErrorCode.MES10406));
+            if (procProcedureEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES10406));
 
             return new ProcessRouteProcedureDto
             {
@@ -232,15 +232,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 ProcessRouteId = manuSfcProduce.ProcessRouteId,
                 ProcedureId = manuSfcProduce.ProcedureId
             });
-            if (netxtProcessRouteDetailLinks == null || netxtProcessRouteDetailLinks.Any() == false) throw new BusinessException(nameof(ErrorCode.MES10440));
+            if (netxtProcessRouteDetailLinks == null || netxtProcessRouteDetailLinks.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES10440));
 
             // 获取当前工序在工艺路线里面的扩展信息
             var procedureNodes = await _procProcessRouteDetailNodeRepository.GetByIdsAsync(netxtProcessRouteDetailLinks.Select(s => s.ProcessRouteDetailId).ToArray())
-                ?? throw new BusinessException(nameof(ErrorCode.MES10440));
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10440));
 
             // 检查是否有"空值"类型的工序
             var defaultNextProcedure = procedureNodes.FirstOrDefault(f => f.CheckType == ProcessRouteInspectTypeEnum.None)
-                ?? throw new BusinessException(nameof(ErrorCode.MES10441));
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10441));
 
             // 有多工序分叉的情况
             if (procedureNodes.Count() > 1)
@@ -260,7 +260,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             }
 
             // 获取下一工序
-            if (defaultNextProcedure == null) throw new BusinessException(nameof(ErrorCode.MES10440));
+            if (defaultNextProcedure == null) throw new CustomerValidationException(nameof(ErrorCode.MES10440));
             return await _procProcedureRepository.GetByIdAsync(defaultNextProcedure.ProcedureId);
         }
 
@@ -277,14 +277,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 ProcessRouteId = manuSfcProduce.ProcessRouteId,
                 ProcedureId = manuSfcProduce.ProcedureId
             });
-            if (preProcessRouteDetailLinks == null || preProcessRouteDetailLinks.Any() == false) throw new BusinessException(nameof(ErrorCode.MES10442));
+            if (preProcessRouteDetailLinks == null || preProcessRouteDetailLinks.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES10442));
 
             // 获取当前工序在工艺路线里面的扩展信息
             var procedureNodes = await _procProcessRouteDetailNodeRepository
                 .GetByIdsAsync(preProcessRouteDetailLinks
                 .Where(w => w.PreProcessRouteDetailId.HasValue)
                 .Select(s => s.PreProcessRouteDetailId.Value).ToArray())
-                ?? throw new BusinessException(nameof(ErrorCode.MES10442));
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10442));
 
             // 有多工序分叉的情况
             ProcProcessRouteDetailNodeEntity defaultPreProcedure = procedureNodes.FirstOrDefault();
@@ -292,11 +292,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             {
                 // 下工序找上工序，执照正常流程的工序
                 defaultPreProcedure = procedureNodes.FirstOrDefault(f => f.CheckType == ProcessRouteInspectTypeEnum.None)
-                   ?? throw new BusinessException(nameof(ErrorCode.MES10441));
+                   ?? throw new CustomerValidationException(nameof(ErrorCode.MES10441));
             }
 
             // 获取上一工序
-            if (defaultPreProcedure == null) throw new BusinessException(nameof(ErrorCode.MES10442));
+            if (defaultPreProcedure == null) throw new CustomerValidationException(nameof(ErrorCode.MES10442));
             return defaultPreProcedure.CheckType == ProcessRouteInspectTypeEnum.RandomInspection;
         }
 
@@ -337,24 +337,20 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             var processRouteDetailNodeListTask = _procProcessRouteDetailNodeRepository.GetProcProcessRouteDetailNodesByProcessRouteId(processRouteId);
             var processRouteDetailLinkList = await processRouteDetailLinkListTask;
             var processRouteDetailNodeList = await processRouteDetailNodeListTask;
-            ;
 
-            var list = new List<ProcessRouteDetailDto>();
+            IList<ProcessRouteDetailDto> list = new List<ProcessRouteDetailDto>();
             if (processRouteDetailLinkList != null && processRouteDetailLinkList.Any()
                 && processRouteDetailNodeList != null && processRouteDetailNodeList.Any())
             {
                 var firstProcedure = processRouteDetailNodeList.FirstOrDefault(x => x.IsFirstProcess == 1);
-                if (firstProcedure == null)
+                if (firstProcedure != null)
                 {
-                    //报错
-                }
-                else
-                {
-                    CombinationProcessRoute(list, firstProcedure.ProcedureId, processRouteDetailLinkList);
+                    CombinationProcessRoute(ref list, firstProcedure.ProcedureId, processRouteDetailLinkList);
                 }
             }
             return list;
         }
+
         /// <summary>
         /// 组装工艺路线
         /// </summary>
@@ -362,14 +358,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="key"></param>
         /// <param name="procedureId"></param>
         /// <param name="procProcessRouteDetailLinkEntities"></param>
-        private void CombinationProcessRoute(IList<ProcessRouteDetailDto> list, long procedureId, IEnumerable<ProcProcessRouteDetailLinkEntity> procProcessRouteDetailLinkEntities, long key = 0)
+        private void CombinationProcessRoute(ref IList<ProcessRouteDetailDto> list, long procedureId, IEnumerable<ProcProcessRouteDetailLinkEntity> procProcessRouteDetailLinkEntities, long key = 0)
         {
             if (list == null || !list.Any())
             {
+                list=new List<ProcessRouteDetailDto>();
                 key = IdGenProvider.Instance.CreateId();
-                list = new List<ProcessRouteDetailDto>();
                 var processRouteDetail = new ProcessRouteDetailDto();
-                processRouteDetail.key = key;   
+                processRouteDetail.key = key;
                 processRouteDetail.ProcedureIds = new List<long>();
                 processRouteDetail.ProcedureIds.Add(procedureId);
                 list.Add(processRouteDetail);
@@ -389,7 +385,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                             if (index == 1)
                             {
                                 processRouteDetail.ProcedureIds.Add(item.ProcessRouteDetailId);
-                                CombinationProcessRoute(list, item.ProcessRouteDetailId, procProcessRouteDetailLinkEntities, key);
+                                CombinationProcessRoute(ref list, item.ProcessRouteDetailId, procProcessRouteDetailLinkEntities, key);
                             }
                             else
                             {
@@ -398,9 +394,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                                     key = IdGenProvider.Instance.CreateId(),
                                     ProcedureIds = procedureIds,
                                 };
-                                processRouteDetailDto.ProcedureIds = processRouteDetailDto.ProcedureIds.Append(item.ProcessRouteDetailId).ToList();
+                                processRouteDetailDto.ProcedureIds.Add(item.ProcessRouteDetailId);
                                 list.Add(processRouteDetailDto);
-                                CombinationProcessRoute(list, item.ProcessRouteDetailId, procProcessRouteDetailLinkEntities, processRouteDetailDto.key);
+                                CombinationProcessRoute(ref list, item.ProcessRouteDetailId, procProcessRouteDetailLinkEntities, processRouteDetailDto.key);
                             }
                         }
                         index++;

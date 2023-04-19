@@ -31,9 +31,6 @@ using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBar
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Microsoft.AspNetCore.Mvc;
-using MySql.Data.MySqlClient;
-using System.Data.Common;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -278,7 +275,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var inteCodeRulesEntity = await _inteCodeRulesRepository.GetInteCodeRulesByProductIdAsync(sfcinfo.ProductId);
                 if (inteCodeRulesEntity == null)
                 {
-                    throw new BusinessException(nameof(ErrorCode.MES16501)).WithData("product", material.MaterialCode);
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16501)).WithData("product", material.MaterialCode);
                 }
                 var barcodeList = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new GenerateBarcodeDto
                 {

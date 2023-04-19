@@ -1,4 +1,5 @@
-﻿using Hymson.MES.Services.Dtos.Common;
+﻿using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Services.Dtos.Common;
 
 namespace Hymson.MES.Services.Services.Job.Common
 {
@@ -10,10 +11,10 @@ namespace Hymson.MES.Services.Services.Job.Common
         /// <summary>
         /// 读取挂载的作业并执行
         /// </summary>
-        /// <param name="classNames"></param>
-        /// <param name="dto"></param>
+        /// <param name="jobs"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task<Dictionary<string, int>> ExecuteJobAsync(IEnumerable<string> classNames, JobDto dto);
+        Task<Dictionary<string, JobResponseDto>> ExecuteJobAsync(IEnumerable<InteJobEntity> jobs, Dictionary<string, string>? param);
 
     }
 }
