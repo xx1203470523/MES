@@ -10,7 +10,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
     /// <summary>
     /// 控制器（单位维护）
     /// </summary>
-    [Authorize]
+    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class EquEquipmentUnitController : ControllerBase

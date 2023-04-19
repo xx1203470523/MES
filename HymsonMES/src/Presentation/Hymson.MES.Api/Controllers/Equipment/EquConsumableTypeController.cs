@@ -11,7 +11,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
     /// @author 陈志谱
     /// @date 2023-02-18
     /// </summary>
-    [Authorize]
+    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class EquConsumableTypeController : ControllerBase

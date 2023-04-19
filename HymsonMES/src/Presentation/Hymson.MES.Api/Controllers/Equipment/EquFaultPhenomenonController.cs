@@ -12,7 +12,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
     /// @author Czhipu
     /// @date 2023-02-15 08:56:34
     /// </summary>
-    [Authorize]
+    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class EquFaultPhenomenonController : ControllerBase

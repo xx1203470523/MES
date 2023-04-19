@@ -39,8 +39,4 @@
     <ProjectReference Include="..\Hymson.MES.Data\Hymson.MES.Data.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Services\Job\Manufacture\" />
-  </ItemGroup>
-
 </Project>

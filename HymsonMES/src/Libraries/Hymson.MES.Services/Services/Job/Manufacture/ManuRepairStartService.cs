@@ -2,16 +2,17 @@
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
-using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
+using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPackage;
+using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Job.Manufacture
 {
     /// <summary>
-    /// 组装
+    /// 开始（维修）
     /// </summary>
-    public class ManuPackageService : IManufactureJobService
+    public class ManuRepairStartService : IManufactureJobService
     {
         /// <summary>
         /// 当前对象（登录用户）
@@ -24,23 +25,27 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
+        /// 服务接口（维修）
+        /// </summary>
+        private readonly IManuRepairService _manuRepairService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="manuCommonService"></param>
-        /// <param name="manuSfcProduceRepository"></param>
-        public ManuPackageService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IManuCommonService manuCommonService,
-            IManuSfcProduceRepository manuSfcProduceRepository)
+        /// <param name="manuRepairService"></param>
+        public ManuRepairStartService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IManuRepairService manuRepairService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _manuRepairService = manuRepairService;
         }
 
 
         /// <summary>
-        /// 执行（组装）
+        /// 执行（开始）
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
@@ -54,15 +59,16 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES16312));
             }
 
-            defaultDto.Content?.Add("PackageCom", "True");
-            defaultDto.Content?.Add("BadEntryCom", "True");
-            defaultDto.Message = $"条码{param["SFC"]}已于NF排队！";
+            var rows = await _manuRepairService.StartAsync(new ManufactureBo
+            {
+                SFC = param["SFC"],
+                ProcedureId = param["ProcedureId"].ParseToLong(),
+                ResourceId = param["ResourceId"].ParseToLong()
+            });
 
-            // TODO
-            return await Task.FromResult(defaultDto);
+            defaultDto.Content?.Add("TableCom", (rows > 0).ToString());
+            return defaultDto;
         }
-
-
 
     }
 }

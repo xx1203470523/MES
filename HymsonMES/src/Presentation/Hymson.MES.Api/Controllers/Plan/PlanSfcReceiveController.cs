@@ -18,7 +18,7 @@ namespace Hymson.MES.Api.Controllers.Plan
     /// @author pengxin
     /// @date 2023-03-21 04:33:58
     /// </summary>
-    [Authorize]
+    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class PlanSfcReceiveController : ControllerBase

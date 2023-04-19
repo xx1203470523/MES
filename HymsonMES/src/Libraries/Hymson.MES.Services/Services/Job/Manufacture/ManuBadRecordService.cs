@@ -1,5 +1,7 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
@@ -47,10 +49,14 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             var defaultDto = new JobResponseDto { };
             if (param == null) return defaultDto;
 
+            if (param.ContainsKey("SFC") == false || param.ContainsKey("ProcedureId") == false || param.ContainsKey("ResourceId") == false)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16312));
+            }
+
             defaultDto.Content?.Add("PackageCom", "True");
             defaultDto.Content?.Add("BadEntryCom", "True");
-            defaultDto.Content?.Add("Result", "True");
-            defaultDto.Message = "成功";
+            defaultDto.Message = $"条码{param["SFC"]}已于NF排队！";
 
             // TODO
             return await Task.FromResult(defaultDto);
