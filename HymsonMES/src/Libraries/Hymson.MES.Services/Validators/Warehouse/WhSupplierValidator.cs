@@ -6,6 +6,7 @@
  *build datetime: 2023-03-03 01:51:43
  */
 using FluentValidation;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Services.Dtos.Warehouse;
 using System;
 using System.Collections.Generic;
@@ -18,12 +19,13 @@ namespace Hymson.MES.Services.Validators.Warehouse
     /// <summary>
     /// 供应商 更新 验证
     /// </summary>
-    internal class WhSupplierCreateValidator: AbstractValidator<WhSupplierCreateDto>
+    internal class WhSupplierCreateValidator : AbstractValidator<WhSupplierCreateDto>
     {
         public WhSupplierCreateValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
+            RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES15007));
+            RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES15006));
+
         }
     }
 
@@ -34,8 +36,8 @@ namespace Hymson.MES.Services.Validators.Warehouse
     {
         public WhSupplierModifyValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
+            RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES15007));
+            RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES15006));
         }
     }
 }

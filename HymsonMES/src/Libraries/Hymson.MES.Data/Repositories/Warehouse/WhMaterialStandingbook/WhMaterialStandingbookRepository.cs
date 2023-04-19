@@ -94,19 +94,23 @@ namespace Hymson.MES.Data.Repositories.Warehouse
 
             if (!string.IsNullOrWhiteSpace(whMaterialStandingbookPagedQuery.Batch))
             {
-                sqlBuilder.Where(" Batch=@Batch");
+                whMaterialStandingbookPagedQuery.Batch = $"%{whMaterialStandingbookPagedQuery.Batch}%";
+                sqlBuilder.Where("Batch like @Batch");
             }
             if (!string.IsNullOrWhiteSpace(whMaterialStandingbookPagedQuery.MaterialBarCode))
             {
-                sqlBuilder.Where(" MaterialBarCode=@MaterialBarCode");
+                whMaterialStandingbookPagedQuery.MaterialBarCode = $"%{whMaterialStandingbookPagedQuery.MaterialBarCode}%";
+                sqlBuilder.Where("MaterialBarCode like @MaterialBarCode");
             }
             if (!string.IsNullOrWhiteSpace(whMaterialStandingbookPagedQuery.MaterialCode))
             {
-                sqlBuilder.Where(" MaterialCode=@MaterialCode");
+                whMaterialStandingbookPagedQuery.MaterialCode = $"%{whMaterialStandingbookPagedQuery.MaterialCode}%";
+                sqlBuilder.Where("MaterialCode like @MaterialCode");
             }
             if (!string.IsNullOrWhiteSpace(whMaterialStandingbookPagedQuery.MaterialVersion))
             {
-                sqlBuilder.Where(" MaterialVersion=@MaterialVersion");
+                whMaterialStandingbookPagedQuery.MaterialVersion = $"%{whMaterialStandingbookPagedQuery.MaterialVersion}%";
+                sqlBuilder.Where("MaterialVersion like @MaterialVersion");
             }
 
             var offSet = (whMaterialStandingbookPagedQuery.PageIndex - 1) * whMaterialStandingbookPagedQuery.PageSize;

@@ -97,33 +97,44 @@ namespace Hymson.MES.Services.Services.Warehouse
         {
             var list = new List<WhMaterialInventoryEntity>();
             var listStandingbook = new List<WhMaterialStandingbookEntity>();
+
+            if (whMaterialInventoryLists == null || whMaterialInventoryLists.Count() <= 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15106));
+            }
             foreach (var item in whMaterialInventoryLists)
             {
+                item.MaterialBarCode = item.MaterialBarCode.Trim();
+                var isMaterialBarCodeList = whMaterialInventoryLists.Where(it => it.MaterialBarCode.Trim() == item.MaterialBarCode).Any();
+                if (isMaterialBarCodeList)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15104)).WithData("MaterialCode", item.MaterialBarCode);
+                }
                 #region 校验
                 //验证DTO
                 //await _validationCreateListRules.ValidateAndThrowAsync(item);
 
                 if (item.QuantityResidue <= 0)
                 {
-                    throw new BusinessException(nameof(ErrorCode.MES15103)).WithData("MaterialCode", item.MaterialCode); ;
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15103)).WithData("MaterialCode", item.MaterialBarCode);
                 }
                 //DTO转换实体 
                 //var whMaterialInventoryEntity = item.ToEntity<WhMaterialInventoryEntity>();
                 var materialInfo = await _whMaterialInventoryRepository.GetProcMaterialByMaterialCodeAsync(item.MaterialCode);
                 if (materialInfo == null)
                 {
-                    throw new BusinessException(nameof(ErrorCode.MES15101));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15101));
                 }
                 //var supplierInfo = await _whMaterialInventoryRepository.GetWhSupplierByMaterialIdAsync(materialInfo.Id, item.SupplierId);
                 //if (materialInfo == null || supplierInfo.Count() <= 0)
                 //{
-                //    throw new BusinessException(nameof(ErrorCode.MES15102)).WithData("MaterialCode", item.MaterialCode);
+                //    throw new CustomerValidationException(nameof(ErrorCode.MES15102)).WithData("MaterialCode", item.MaterialCode);
                 //}
 
                 var isMaterialBarCode = await GetMaterialBarCodeAnyAsync(item.MaterialBarCode);
                 if (isMaterialBarCode)
                 {
-                    throw new BusinessException(nameof(ErrorCode.MES15104)).WithData("MaterialCode", item.MaterialCode);
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15104)).WithData("MaterialCode", item.MaterialBarCode);
                 }
 
                 #endregion
@@ -190,7 +201,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             }
             if (rows == 0)
             {
-                throw new BusinessException(nameof(ErrorCode.MES15105));
+                throw new CustomerValidationException(nameof(ErrorCode.MES15105));
             }
             #endregion
         }
@@ -319,12 +330,12 @@ namespace Hymson.MES.Services.Services.Warehouse
             var materialInfo = await _whMaterialInventoryRepository.GetProcMaterialByMaterialCodeAsync(materialCode);
             if (materialInfo == null)
             {
-                throw new BusinessException(nameof(ErrorCode.MES15101));
+                throw new CustomerValidationException(nameof(ErrorCode.MES15101));
             }
             var supplierInfo = await _whMaterialInventoryRepository.GetWhSupplierByMaterialIdAsync(materialInfo.Id);
             if (!supplierInfo.Any())
             {
-                throw new BusinessException(nameof(ErrorCode.MES15102)).WithData("MaterialCode", materialCode);
+                throw new CustomerValidationException(nameof(ErrorCode.MES15102)).WithData("MaterialCode", materialCode);
             }
             ProcMaterialInfoViewDto dto = new ProcMaterialInfoViewDto();
             dto.MaterialInfo = materialInfo;

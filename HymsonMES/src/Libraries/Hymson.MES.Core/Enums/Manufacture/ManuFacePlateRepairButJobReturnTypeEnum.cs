@@ -16,11 +16,11 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 开始维修
         /// </summary>
         [Description("开始维修")]
-        ManuStartService = 1,
+        JobManuRepairStartService = 1,
         /// <summary>
         /// 结束维修
         /// </summary>
         [Description("结束维修")]
-        ManuStopService = 2,
+        JobManuCompleteService = 2,
     }
 }
