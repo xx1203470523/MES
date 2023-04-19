@@ -20,7 +20,7 @@ namespace Hymson.MES.Api.Controllers.Process
     /// @author Karl
     /// @date 2023-02-13 02:50:20
     /// </summary>
-    [Authorize]
+    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcParameterController : ControllerBase

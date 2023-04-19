@@ -11,7 +11,7 @@ namespace Hymson.MES.Api.Controllers.Plan
     /// @author Karl
     /// @date 2023-03-20 10:07:17
     /// </summary>
-    [Authorize]
+    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class PlanWorkOrderController : ControllerBase

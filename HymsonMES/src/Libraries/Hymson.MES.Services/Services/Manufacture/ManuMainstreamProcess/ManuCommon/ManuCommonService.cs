@@ -3,7 +3,6 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Process;
-using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
@@ -16,8 +15,6 @@ using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDt
 using Hymson.Sequences;
 using Hymson.Snowflake;
 using Microsoft.Extensions.Caching.Memory;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon
 {
@@ -112,11 +109,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         }
 
         /// <summary>
-        /// 获取生产条码信息（附带条码合法性校验 + 工序活动状态校验）
+        /// 获取生产条码信息
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        public async Task<ManuSfcProduceEntity> GetProduceSFCForStartAsync(string sfc)
+        public async Task<ManuSfcProduceEntity> GetProduceSFCAsync(string sfc)
         {
             if (string.IsNullOrWhiteSpace(sfc) == true
                 || sfc.Contains(' ') == true) throw new CustomerValidationException(nameof(ErrorCode.MES16305));
@@ -124,8 +121,21 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(sfc);
             if (sfcProduceEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES16306));
 
+            return sfcProduceEntity;
+        }
+
+        /// <summary>
+        /// 获取生产条码信息（附带条码合法性校验）
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <param name="produceStatus"></param>
+        /// <returns></returns>
+        public async Task<ManuSfcProduceEntity> GetProduceSFCForStartAsync(string sfc, SfcProduceStatusEnum produceStatus)
+        {
+            var sfcProduceEntity = await GetProduceSFCAsync(sfc);
+
             // 当前工序是否是排队状态
-            if (sfcProduceEntity.Status == SfcProduceStatusEnum.lineUp) throw new CustomerValidationException(nameof(ErrorCode.MES16309));
+            if (sfcProduceEntity.Status != produceStatus) throw new CustomerValidationException(nameof(ErrorCode.MES16307));
 
             return sfcProduceEntity;
         }
@@ -138,14 +148,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <returns></returns>
         public async Task<ManuSfcProduceEntity> GetProduceSFCWithCheckAsync(string sfc, long procedureId)
         {
-            if (string.IsNullOrWhiteSpace(sfc) == true
-                || sfc.Contains(' ') == true) throw new CustomerValidationException(nameof(ErrorCode.MES16305));
-
-            var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(sfc);
-            if (sfcProduceEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES16306));
-
-            // 当前工序是否是活动状态
-            if (sfcProduceEntity.Status == SfcProduceStatusEnum.Activity) throw new CustomerValidationException(nameof(ErrorCode.MES16309));
+            var sfcProduceEntity = await GetProduceSFCForStartAsync(sfc, SfcProduceStatusEnum.Activity);
 
             // 产品编码是否和工序对应
             if (sfcProduceEntity.ProcedureId != procedureId) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
@@ -362,7 +365,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         {
             if (list == null || !list.Any())
             {
-                list=new List<ProcessRouteDetailDto>();
+                list = new List<ProcessRouteDetailDto>();
                 key = IdGenProvider.Instance.CreateId();
                 var processRouteDetail = new ProcessRouteDetailDto();
                 processRouteDetail.key = key;

@@ -27,7 +27,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
     /// @author pengxin
     /// @date 2023-04-12 10:32:46
     /// </summary>
-    [Authorize]
+    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ManuFacePlateRepairController : ControllerBase

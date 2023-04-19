@@ -9,7 +9,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
     /// <summary>
     /// 控制器（物料加载）
     /// </summary>
-    [Authorize]
+    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ManuFeedingController : ControllerBase

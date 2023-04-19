@@ -332,7 +332,7 @@
         public const string MES15308 = "将来锁定操作必须是同一工单下的条码！";
         public const string MES15309 = "条码全部不是在制品！";
         public const string MES15310 = "将来锁工序{lockproduction}不在条码所用工艺路线中！";
-        public const string MES15311 = "将来锁锁定工序不存在！"; 
+        public const string MES15311 = "将来锁锁定工序不存在！";
         #endregion
 
         #region 质量录入 15400
@@ -427,6 +427,7 @@
         public const string MES16309 = "SFC状态非活动，请先置于活动。";
         public const string MES16310 = "SFC状态为完成，不允许操作。";
         public const string MES16311 = "SFC在库存中状态为：{Status}，但不存在在制信息。";
+        public const string MES16312 = "请求参数不合法，不允许操作。";
         #endregion
 
         #region 生产
