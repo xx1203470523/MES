@@ -94,6 +94,7 @@
         public const string MES10440 = $"获取下一工序失败!";
         public const string MES10441 = $"不存在空值类型工序!";
         public const string MES10442 = $"获取上一工序失败!";
+        public const string MES10443 = $"启用状态或保留状态不可删除!";
         #endregion
 
         #region 参数 10500
@@ -108,6 +109,7 @@
         public const string MES10508 = "参数单位不能为空";
         public const string MES10509 = "参数编码不能为空";
         public const string MES10510 = "参数名称不能为空";
+        public const string MES10511 = "标准参数代码最大长度为50!";
 
         #endregion
 
@@ -297,6 +299,7 @@
         public const string MES15103 = "物料条码：{MaterialCode}数量需大于0";
         public const string MES15104 = " 条码：{MaterialCode}在车间库存中已存在！";
         public const string MES15105 = " 增加库存失败";
+        public const string MES15106 = " 请扫描物料条码";
 
         #endregion
 

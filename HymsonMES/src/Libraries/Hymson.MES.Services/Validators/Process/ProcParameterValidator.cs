@@ -26,6 +26,7 @@ namespace Hymson.MES.Services.Validators.Process
             RuleFor(x => x.ParameterCode).NotEmpty().WithErrorCode(ErrorCode.MES10509);
             RuleFor(x => x.ParameterName).NotEmpty().WithErrorCode(ErrorCode.MES10510);
             RuleFor(x => x.ParameterUnit).NotEmpty().WithErrorCode(ErrorCode.MES10508);
+            RuleFor(x => x.ParameterUnit).NotEmpty().WithErrorCode(ErrorCode.MES10508);
             //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
         }
     }

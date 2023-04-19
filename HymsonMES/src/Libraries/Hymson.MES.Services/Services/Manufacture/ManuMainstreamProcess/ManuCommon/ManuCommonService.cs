@@ -1,6 +1,4 @@
-﻿using Hymson.Authentication;
-using Hymson.Authentication.JwtBearer.Security;
-using Hymson.Infrastructure.Exceptions;
+﻿using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
@@ -16,7 +14,6 @@ using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDt
 using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon
 {
@@ -25,21 +22,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
     /// </summary>
     public class ManuCommonService : IManuCommonService
     {
-        /// <summary>
-        /// 当前对象（登录用户）
-        /// </summary>
-        private readonly ICurrentUser _currentUser;
-
-        /// <summary>
-        /// 当前对象（站点）
-        /// </summary>
-        private readonly ICurrentSite _currentSite;
-
-        /// <summary>
-        /// 缓存
-        /// </summary>
-        private readonly IMemoryCache _memoryCache;
-
         /// <summary>
         /// 序列号服务
         /// </summary>
@@ -81,17 +63,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         private readonly IProcMaterialRepository _procMaterialRepository;
 
         /// <summary>
-        /// 仓储接口（掩码维护）
+        /// 仓储接口（掩码规则维护）
         /// </summary>
-        private readonly IProcMaskCodeRepository _procMaskCodeRepository;
+        private readonly IProcMaskCodeRuleRepository _procMaskCodeRuleRepository;
 
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="currentUser"></param>
-        /// <param name="currentSite"></param>
-        /// <param name="memoryCache"></param>
         /// <param name="sequenceService"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
@@ -100,9 +79,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="procProcessRouteDetailLinkRepository"></param>
         /// <param name="procProcedureRepository"></param>
         /// <param name="procMaterialRepository"></param>
-        /// <param name="procMaskCodeRepository"></param>
-        public ManuCommonService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IMemoryCache memoryCache, ISequenceService sequenceService,
+        /// <param name="procMaskCodeRuleRepository"></param>
+        public ManuCommonService(ISequenceService sequenceService,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
@@ -110,11 +88,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
             IProcProcedureRepository procProcedureRepository,
             IProcMaterialRepository procMaterialRepository,
-            IProcMaskCodeRepository procMaskCodeRepository)
+            IProcMaskCodeRuleRepository procMaskCodeRuleRepository)
         {
-            _currentUser = currentUser;
-            _currentSite = currentSite;
-            _memoryCache = memoryCache;
             _sequenceService = sequenceService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
@@ -123,7 +98,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
             _procProcedureRepository = procProcedureRepository;
             _procMaterialRepository = procMaterialRepository;
-            _procMaskCodeRepository = procMaskCodeRepository;
+            _procMaskCodeRuleRepository = procMaskCodeRuleRepository;
         }
 
 
@@ -138,11 +113,18 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             var material = await _procMaterialRepository.GetByIdAsync(materialId);
             if (material == null) throw new CustomerValidationException(nameof(ErrorCode.MES10204));
 
+            // 物料未设置掩码
             if (material.MaskCodeId.HasValue == false) return true;
-            var maskCode = await _procMaskCodeRepository.GetByIdAsync(material.MaskCodeId.Value);
 
+            // 未设置规则
+            var maskCodeRules = await _procMaskCodeRuleRepository.GetByMaskCodeIdAsync(material.MaskCodeId.Value);
+            if (maskCodeRules == null || maskCodeRules.Any() == false) return true;
 
             // TODO 对掩码规则进行校验
+            foreach (var item in maskCodeRules)
+            {
+
+            }
 
             return await Task.FromResult(true);
         }

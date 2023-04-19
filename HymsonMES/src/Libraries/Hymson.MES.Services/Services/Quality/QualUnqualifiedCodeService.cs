@@ -154,6 +154,9 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 throw new ValidationException(nameof(ErrorCode.MES10100));
             }
+
+            param.UnqualifiedCode = param.UnqualifiedCode.ToUpperInvariant();
+
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(param);
 

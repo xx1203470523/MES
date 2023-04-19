@@ -163,15 +163,15 @@ namespace Hymson.MES.Services.Services.Manufacture
             var list = new List<ManuFacePlateRepairButJobReturnTypeEnum>();
             foreach (var item in resJob)
             {
-                if (item.Key == ManuFacePlateRepairButJobReturnTypeEnum.ManuStartService.ToString())
+                if (item.Key == ManuFacePlateRepairButJobReturnTypeEnum.JobManuRepairStartService.ToString())
                 {
-                    if (!list.Contains(ManuFacePlateRepairButJobReturnTypeEnum.ManuStartService))
-                        list.Add(ManuFacePlateRepairButJobReturnTypeEnum.ManuStartService);
+                    if (!list.Contains(ManuFacePlateRepairButJobReturnTypeEnum.JobManuRepairStartService))
+                        list.Add(ManuFacePlateRepairButJobReturnTypeEnum.JobManuRepairStartService);
                 }
-                else if (item.Key == ManuFacePlateRepairButJobReturnTypeEnum.ManuStopService.ToString())
+                else if (item.Key == ManuFacePlateRepairButJobReturnTypeEnum.JobManuCompleteService.ToString())
                 {
-                    if (!list.Contains(ManuFacePlateRepairButJobReturnTypeEnum.ManuStopService))
-                        list.Add(ManuFacePlateRepairButJobReturnTypeEnum.ManuStopService);
+                    if (!list.Contains(ManuFacePlateRepairButJobReturnTypeEnum.JobManuCompleteService))
+                        list.Add(ManuFacePlateRepairButJobReturnTypeEnum.JobManuCompleteService);
                 }
                 else
                 {
