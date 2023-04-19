@@ -12,7 +12,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
     /// <summary>
     /// 开始（维修）
     /// </summary>
-    public class ManuRepairStartService : IManufactureJobService
+    public class JobManuRepairStartService : IManufactureJobService
     {
         /// <summary>
         /// 当前对象（登录用户）
@@ -35,7 +35,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="manuRepairService"></param>
-        public ManuRepairStartService(ICurrentUser currentUser, ICurrentSite currentSite,
+        public JobManuRepairStartService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuRepairService manuRepairService)
         {
             _currentUser = currentUser;
