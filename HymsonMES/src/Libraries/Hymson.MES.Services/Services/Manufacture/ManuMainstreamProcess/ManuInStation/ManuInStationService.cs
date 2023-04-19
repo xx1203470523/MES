@@ -72,7 +72,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
         {
             var rows = 0;
 
-            // 获取生产条码信息（附带条码合法性校验）
+            // 获取生产条码信息
             var sfcProduceEntity = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
 
             // 合法性校验

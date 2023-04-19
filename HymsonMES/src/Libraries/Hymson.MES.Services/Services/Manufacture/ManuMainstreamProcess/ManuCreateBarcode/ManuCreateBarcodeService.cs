@@ -1,6 +1,9 @@
-﻿using Hymson.Authentication;
+﻿using FluentValidation;
+using FluentValidation.Results;
+using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Process;
@@ -40,6 +43,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
+        private readonly ILocalizationService _localizationService;
 
         public ManuCreateBarcodeService(ICurrentUser currentUser,
              ICurrentSite currentSite,
@@ -51,7 +55,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
              IManuSfcInfoRepository manuSfcInfoRepository,
              IManuSfcProduceRepository manuSfcProduceRepository,
              IManuSfcStepRepository manuSfcStepRepository,
-             IPlanWorkOrderRepository planWorkOrderRepository)
+             IPlanWorkOrderRepository planWorkOrderRepository,
+                ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -64,6 +69,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
+            _localizationService = localizationService;
         }
 
         /// <summary>
@@ -195,31 +201,51 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         }
 
         /// <summary>
-        /// 条码复用
+        /// 根据外部条码下达条码
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task CreateBarcodeByOldSFC(CreateBarcodeByOldSFCDto param)
+        public async Task CreateBarcodeByExternalSFC(CreateBarcodeByExternalSFCDto param)
         {
             var planWorkOrderEntity = await _manuCommonService.GetProduceWorkOrderByIdAsync(param.WorkOrderId);
-            var sfclist = await _manuSfcRepository.GetBySFCsAsync(param.OldSFC.Select(x => x.SFC));
+            var sfclist = await _manuSfcRepository.GetBySFCsAsync(param.ExternalSFCs.Select(x => x.SFC));
             var processRouteFirstProcedure = await _manuCommonService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
-           
+
             List<ManuSfcEntity> manuSfcList = new List<ManuSfcEntity>();
             List<ManuSfcInfoEntity> manuSfcInfoList = new List<ManuSfcInfoEntity>();
             List<ManuSfcProduceEntity> manuSfcProduceList = new List<ManuSfcProduceEntity>();
             List<ManuSfcStepEntity> manuSfcStepList = new List<ManuSfcStepEntity>();
-            foreach (var item in param.OldSFC)
+            var validationFailures = new List<ValidationFailure>();
+            foreach (var item in param.ExternalSFCs)
             {
                 var sfcEntity = sfclist.FirstOrDefault(x => x.SFC == item.SFC);
-                if (sfcEntity == null)
+                if (sfcEntity != null)
                 {
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", item.SFC}
+                        };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.SFC);
+                    }
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES16504);
+                    validationFailures.Add(validationFailure);
                     continue;
                 }
-                sfcEntity.Qty= item.Qty;
-                sfcEntity.Status = SfcStatusEnum.InProcess;
-                sfcEntity.UpdatedBy = _currentUser.UserName;
-                sfcEntity.UpdatedOn= HymsonClock.Now();
+                var manuSfcEntity = new ManuSfcEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    SFC = item.SFC,
+                    Qty = item.Qty,
+                    Status = SfcStatusEnum.InProcess,
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName
+                };
                 manuSfcList.Add(sfcEntity);
 
                 manuSfcInfoList.Add(new ManuSfcInfoEntity
@@ -271,6 +297,162 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                     UpdatedBy = _currentUser.UserName
                 });
             }
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
+            }
+            using var ts = TransactionHelper.GetTransactionScope();
+            var row = await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderId(new UpdatePassDownQuantityCommand
+            {
+                WorkOrderId = planWorkOrderEntity.Id,
+                PlanQuantity = planWorkOrderEntity.Qty * (1 + planWorkOrderEntity.OverScale / 100),
+                PassDownQuantity = param.ExternalSFCs.Sum(x => x.Qty),
+                UserName = _currentUser.UserName,
+                UpdateDate = HymsonClock.Now()
+            });
+
+            if (row == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16503)).WithData("workorder", planWorkOrderEntity.OrderCode);
+            }
+            await _manuSfcRepository.InsertRangeAsync(manuSfcList);
+            await _manuSfcInfoRepository.InsertsAsync(manuSfcInfoList);
+            await _manuSfcProduceRepository.InsertRangeAsync(manuSfcProduceList);
+            await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
+            ts.Complete();
+        }
+
+        /// <summary>
+        /// 内部条码复用
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task CreateBarcodeByOldMESSFC(CreateBarcodeByOldMesSFCDto param)
+        {
+            var planWorkOrderEntity = await _manuCommonService.GetProduceWorkOrderByIdAsync(param.WorkOrderId);
+            var sfclist = await _manuSfcRepository.GetBySFCsAsync(param.OldSFCs.Select(x => x.SFC));
+            var processRouteFirstProcedure = await _manuCommonService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
+
+            List<ManuSfcEntity> manuSfcList = new List<ManuSfcEntity>();
+            List<ManuSfcInfoEntity> manuSfcInfoList = new List<ManuSfcInfoEntity>();
+            List<ManuSfcProduceEntity> manuSfcProduceList = new List<ManuSfcProduceEntity>();
+            List<ManuSfcStepEntity> manuSfcStepList = new List<ManuSfcStepEntity>();
+            var validationFailures = new List<ValidationFailure>();
+            foreach (var item in param.OldSFCs)
+            {
+                var sfcEntity = sfclist.FirstOrDefault(x => x.SFC == item.SFC);
+                if (sfcEntity == null)
+                {
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", item.SFC}
+                        };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.SFC);
+                    }
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES16505);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
+                if (sfcEntity.Status == SfcStatusEnum.Complete || sfcEntity.Status == SfcStatusEnum.Received)
+                {
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", item.SFC}
+                        };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.SFC);
+                    }
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES16506);
+                    validationFailures.Add(validationFailure);
+                }
+
+                sfcEntity.Qty = item.Qty;
+                sfcEntity.Status = SfcStatusEnum.InProcess;
+                sfcEntity.UpdatedBy = _currentUser.UserName;
+                sfcEntity.UpdatedOn = HymsonClock.Now();
+                manuSfcList.Add(sfcEntity);
+
+                manuSfcInfoList.Add(new ManuSfcInfoEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    SfcId = sfcEntity.Id,
+                    WorkOrderId = planWorkOrderEntity.Id,
+                    ProductId = planWorkOrderEntity.ProductId,
+                    IsUsed = true,
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName
+                });
+
+                manuSfcProduceList.Add(new ManuSfcProduceEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    SFC = item.SFC,
+                    ProductId = planWorkOrderEntity.ProductId,
+                    WorkOrderId = planWorkOrderEntity.Id,
+                    BarCodeInfoId = sfcEntity.Id,
+                    ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
+                    WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
+                    ProductBOMId = planWorkOrderEntity.ProductBOMId,
+                    Qty = item.Qty,
+                    ProcedureId = processRouteFirstProcedure.ProcedureId,
+                    Status = SfcProduceStatusEnum.lineUp,
+                    RepeatedCount = 0,
+                    IsScrap = TrueOrFalseEnum.No,
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName
+                });
+
+                manuSfcStepList.Add(new ManuSfcStepEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    SFC = item.SFC,
+                    ProductId = planWorkOrderEntity.ProductId,
+                    WorkOrderId = planWorkOrderEntity.Id,
+                    ProductBOMId = planWorkOrderEntity.ProductBOMId,
+                    WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
+                    Qty = item.Qty,
+                    ProcedureId = processRouteFirstProcedure.ProcedureId,
+                    Operatetype = ManuSfcStepTypeEnum.Create,
+                    CurrentStatus = SfcProduceStatusEnum.lineUp,
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName
+                });
+            }
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
+            }
+            using var ts = TransactionHelper.GetTransactionScope();
+            var row = await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderId(new UpdatePassDownQuantityCommand
+            {
+                WorkOrderId = planWorkOrderEntity.Id,
+                PlanQuantity = planWorkOrderEntity.Qty * (1 + planWorkOrderEntity.OverScale / 100),
+                PassDownQuantity = param.OldSFCs.Sum(x => x.Qty),
+                UserName = _currentUser.UserName,
+                UpdateDate = HymsonClock.Now()
+            });
+
+            if (row == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16503)).WithData("workorder", planWorkOrderEntity.OrderCode);
+            }
+            await _manuSfcRepository.UpdateRangeAsync(manuSfcList);
+            await _manuSfcInfoRepository.InsertsAsync(manuSfcInfoList);
+            await _manuSfcProduceRepository.InsertRangeAsync(manuSfcProduceList);
+            await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
+            ts.Complete();
         }
     }
 }

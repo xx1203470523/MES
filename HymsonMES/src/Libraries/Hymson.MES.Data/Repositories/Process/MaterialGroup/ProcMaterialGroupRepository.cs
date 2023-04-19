@@ -184,6 +184,7 @@ namespace Hymson.MES.Data.Repositories.Process
             var template = sqlBuilder.AddTemplate(GetProcMaterialGroupEntitiesSqlTemplate);
             //sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Where("IsDeleted =0");
             sqlBuilder.Select("*");
 
             if (!string.IsNullOrWhiteSpace(procMaterialGroupQuery.GroupCode))

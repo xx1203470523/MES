@@ -46,7 +46,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuSfcEntitys"></param>
         /// <returns></returns>
-        Task<int> UpdatesAsync(List<ManuSfcEntity> manuSfcEntitys);
+        Task<int> UpdateRangeAsync(List<ManuSfcEntity> manuSfcEntitys);
 
         /// <summary>
         /// 删除  

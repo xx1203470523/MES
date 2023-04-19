@@ -454,7 +454,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             if (entitys.Any(a => a.Status == SysDataStatusEnum.Enable
             || a.Status == SysDataStatusEnum.Retain) == true)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10105));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10443));
             }
 
             return await _procProcedureRepository.DeleteRangeAsync(new DeleteCommand
