@@ -82,6 +82,11 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public QualityLockEnum? Lock { get; set; }
 
         /// <summary>
+        /// 将来锁，锁定的工序id
+        /// </summary>
+        public long? LockProductionId { get; set; }
+
+        /// <summary>
         /// 是否可疑
         /// </summary>
         public bool? IsSuspicious { get; set; }
