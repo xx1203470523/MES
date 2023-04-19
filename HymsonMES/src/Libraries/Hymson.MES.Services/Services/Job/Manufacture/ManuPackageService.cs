@@ -49,7 +49,6 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
 
             defaultDto.Content?.Add("PackageCom", "True");
             defaultDto.Content?.Add("BadEntryCom", "True");
-            defaultDto.Content?.Add("Result", "True");
             defaultDto.Message = "成功";
 
             // TODO

@@ -1,5 +1,7 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
@@ -61,31 +63,26 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             var defaultDto = new JobResponseDto { };
             if (param == null) return defaultDto;
 
-            var rows = 0;
             if (param.ContainsKey("SFC") == false || param.ContainsKey("ProcedureId") == false || param.ContainsKey("ResourceId") == false)
             {
-                defaultDto.Message = "失败";
+                throw new CustomerValidationException(nameof(ErrorCode.MES16312));
             }
-            else
-            {
-                // 获取生产条码信息（附带条码合法性校验 + 工序活动状态校验）
-                var sfcProduceEntity = await _manuCommonService.GetProduceSFCWithCheckAsync(param["SFC"], param["ProcedureId"].ParseToLong());
 
-                // 更改状态，将条码由"活动"改为"排队"
-                sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
-                sfcProduceEntity.UpdatedBy = _currentUser.UserName;
-                sfcProduceEntity.UpdatedOn = defaultDto.Time;
+            // 获取生产条码信息（附带条码合法性校验 + 工序活动状态校验）
+            var sfcProduceEntity = await _manuCommonService.GetProduceSFCWithCheckAsync(param["SFC"], param["ProcedureId"].ParseToLong());
 
-                rows = await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
+            // 更改状态，将条码由"活动"改为"排队"
+            sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
+            sfcProduceEntity.UpdatedBy = _currentUser.UserName;
+            sfcProduceEntity.UpdatedOn = defaultDto.Time;
 
-                defaultDto.Message = "成功";
-            }
+            var rows = await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
 
             var result = (rows > 0).ToString();
             defaultDto.Content?.Add("PackageCom", result);
             defaultDto.Content?.Add("BadEntryCom", result);
-            defaultDto.Content?.Add("Result", result);
 
+            defaultDto.Message = "成功";
             return defaultDto;
         }
     }

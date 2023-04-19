@@ -1,5 +1,7 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInStation;
@@ -52,28 +54,23 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             var defaultDto = new JobResponseDto { };
             if (param == null) return defaultDto;
 
-            var rows = 0;
             if (param.ContainsKey("SFC") == false || param.ContainsKey("ProcedureId") == false || param.ContainsKey("ResourceId") == false)
             {
-                defaultDto.Message = "失败";
+                throw new CustomerValidationException(nameof(ErrorCode.MES16312));
             }
-            else
-            {
-                rows = await _manuInStationService.InStationAsync(new ManufactureBo
-                {
-                    SFC = param["SFC"],
-                    ProcedureId = param["ProcedureId"].ParseToLong(),
-                    ResourceId = param["ResourceId"].ParseToLong()
-                });
 
-                defaultDto.Message = "成功";
-            }
+            var rows = await _manuInStationService.InStationAsync(new ManufactureBo
+            {
+                SFC = param["SFC"],
+                ProcedureId = param["ProcedureId"].ParseToLong(),
+                ResourceId = param["ResourceId"].ParseToLong()
+            });
 
             var result = (rows > 0).ToString();
             defaultDto.Content?.Add("PackageCom", result);
             defaultDto.Content?.Add("BadEntryCom", result);
-            defaultDto.Content?.Add("Result", result);
 
+            defaultDto.Message = "成功";
             return defaultDto;
         }
 

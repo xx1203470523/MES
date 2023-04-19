@@ -4,15 +4,15 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
-using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
+using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPackage;
 using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Job.Manufacture
 {
     /// <summary>
-    /// 完成
+    /// 开始（维修）
     /// </summary>
-    public class ManuCompleteService : IManufactureJobService
+    public class ManuRepairStartService : IManufactureJobService
     {
         /// <summary>
         /// 当前对象（登录用户）
@@ -25,28 +25,27 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
-        /// 服务接口（出站）
+        /// 服务接口（维修）
         /// </summary>
-        private readonly IManuOutStationService _manuOutStationService;
-
+        private readonly IManuRepairService _manuRepairService;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="manuOutStationService"></param>
-        public ManuCompleteService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IManuOutStationService manuOutStationService)
+        /// <param name="manuRepairService"></param>
+        public ManuRepairStartService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IManuRepairService manuRepairService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _manuOutStationService = manuOutStationService;
+            _manuRepairService = manuRepairService;
         }
 
 
         /// <summary>
-        /// 执行（完成）
+        /// 执行（开始）
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
@@ -60,19 +59,14 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES16312));
             }
 
-            var rows = await _manuOutStationService.OutStationAsync(new ManufactureBo
+            var rows = await _manuRepairService.StartAsync(new ManufactureBo
             {
                 SFC = param["SFC"],
                 ProcedureId = param["ProcedureId"].ParseToLong(),
                 ResourceId = param["ResourceId"].ParseToLong()
             });
 
-            var result = (rows > 0).ToString();
-            defaultDto.Content?.Add("PackageCom", result);
-            defaultDto.Content?.Add("BadEntryCom", result);
-            defaultDto.Content?.Add("Qty", "1");
-
-            defaultDto.Message = "成功";
+            defaultDto.Content?.Add("TableCom", (rows > 0).ToString());
             return defaultDto;
         }
 
