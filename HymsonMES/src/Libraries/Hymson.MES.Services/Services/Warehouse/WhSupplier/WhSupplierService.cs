@@ -58,6 +58,8 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <returns></returns>
         public async Task CreateWhSupplierAsync(WhSupplierCreateDto whSupplierCreateDto)
         {
+            whSupplierCreateDto.Code = whSupplierCreateDto.Code.Replace(" ", "");
+            whSupplierCreateDto.Name = whSupplierCreateDto.Name.Replace(" ", "");
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(whSupplierCreateDto);
 
@@ -163,6 +165,8 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <returns></returns>
         public async Task ModifyWhSupplierAsync(WhSupplierModifyDto whSupplierModifyDto)
         {
+            whSupplierModifyDto.Code = whSupplierModifyDto.Code.Replace(" ", "");
+            whSupplierModifyDto.Name = whSupplierModifyDto.Name.Replace(" ", "");
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(whSupplierModifyDto);
 
