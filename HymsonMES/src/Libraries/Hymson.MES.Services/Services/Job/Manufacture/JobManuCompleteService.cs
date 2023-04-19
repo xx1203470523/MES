@@ -2,16 +2,17 @@
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
-using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
+using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
+using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Job.Manufacture
 {
     /// <summary>
-    /// 不良录入
+    /// 完成
     /// </summary>
-    public class ManuBadRecordService : IManufactureJobService
+    public class JobManuCompleteService : IManufactureJobService
     {
         /// <summary>
         /// 当前对象（登录用户）
@@ -24,18 +25,23 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
+        /// 服务接口（出站）
+        /// </summary>
+        private readonly IManuOutStationService _manuOutStationService;
+
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="manuCommonService"></param>
-        /// <param name="manuSfcProduceRepository"></param>
-        public ManuBadRecordService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IManuCommonService manuCommonService,
-            IManuSfcProduceRepository manuSfcProduceRepository)
+        /// <param name="manuOutStationService"></param>
+        public JobManuCompleteService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IManuOutStationService manuOutStationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _manuOutStationService = manuOutStationService;
         }
 
 
@@ -58,22 +64,29 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         }
 
         /// <summary>
-        /// 执行（不良录入）
+        /// 执行（完成）
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
         public async Task<JobResponseDto> ExecuteAsync(Dictionary<string, string>? param)
         {
             var defaultDto = new JobResponseDto { };
-            defaultDto.Content?.Add("PackageCom", "True");
-            defaultDto.Content?.Add("BadEntryCom", "True");
-            defaultDto.Message = $"条码{param?["SFC"]}已于NF排队！";
 
-            // TODO
-            return await Task.FromResult(defaultDto);
+            var rows = await _manuOutStationService.OutStationAsync(new ManufactureBo
+            {
+                SFC = param["SFC"],
+                ProcedureId = param["ProcedureId"].ParseToLong(),
+                ResourceId = param["ResourceId"].ParseToLong()
+            });
+
+            var result = (rows > 0).ToString();
+            defaultDto.Content?.Add("PackageCom", result);
+            defaultDto.Content?.Add("BadEntryCom", result);
+            defaultDto.Content?.Add("Qty", "1");
+
+            defaultDto.Message = $"条码{param["SFC"]}已于NF排队！";
+            return defaultDto;
         }
-
-
 
     }
 }

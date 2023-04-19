@@ -4,15 +4,15 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
-using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
+using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInStation;
 using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Job.Manufacture
 {
     /// <summary>
-    /// 完成
+    /// 开始
     /// </summary>
-    public class ManuCompleteService : IManufactureJobService
+    public class JobManuStartService : IManufactureJobService
     {
         /// <summary>
         /// 当前对象（登录用户）
@@ -25,23 +25,22 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
-        /// 服务接口（出站）
+        /// 服务接口（进站）
         /// </summary>
-        private readonly IManuOutStationService _manuOutStationService;
-
+        private readonly IManuInStationService _manuInStationService;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="manuOutStationService"></param>
-        public ManuCompleteService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IManuOutStationService manuOutStationService)
+        /// <param name="manuInStationService"></param>
+        public JobManuStartService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IManuInStationService manuInStationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _manuOutStationService = manuOutStationService;
+            _manuInStationService = manuInStationService;
         }
 
 
@@ -64,7 +63,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         }
 
         /// <summary>
-        /// 执行（完成）
+        /// 执行（开始）
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
@@ -72,7 +71,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         {
             var defaultDto = new JobResponseDto { };
 
-            var rows = await _manuOutStationService.OutStationAsync(new ManufactureBo
+            var rows = await _manuInStationService.InStationAsync(new ManufactureBo
             {
                 SFC = param["SFC"],
                 ProcedureId = param["ProcedureId"].ParseToLong(),
@@ -82,7 +81,6 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             var result = (rows > 0).ToString();
             defaultDto.Content?.Add("PackageCom", result);
             defaultDto.Content?.Add("BadEntryCom", result);
-            defaultDto.Content?.Add("Qty", "1");
 
             defaultDto.Message = $"条码{param["SFC"]}已于NF排队！";
             return defaultDto;
