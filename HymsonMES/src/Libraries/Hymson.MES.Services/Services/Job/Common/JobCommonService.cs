@@ -57,8 +57,8 @@ namespace Hymson.MES.Services.Services.Job.Common
             var result = new Dictionary<string, JobResponseDto>(); // 返回结果
 
             // 获取实现了 IManufactureJobService 接口的所有类的 Type 对象
-            Type[] types = Assembly.GetExecutingAssembly().GetTypes()
-                .Where(t => t.GetInterfaces().Contains(typeof(IManufactureJobService))).ToArray();
+            var types = Assembly.GetExecutingAssembly().GetTypes()
+                .Where(t => t.GetInterfaces().Contains(typeof(IManufactureJobService)));
 
             // 遍历实现类，执行有绑定在当前按钮下面的job
             var serviceScope = _serviceProvider.CreateAsyncScope();
@@ -85,6 +85,10 @@ namespace Hymson.MES.Services.Services.Job.Common
                 // TODO 如果job有额外参数，可以在这里进行拼装
                 //param.Add(extra);
 
+                // 验证参数
+                await service.VerifyParamAsync(param);
+
+                // 执行job
                 result.Add(type.Name, await service.ExecuteAsync(param));
             }
 
