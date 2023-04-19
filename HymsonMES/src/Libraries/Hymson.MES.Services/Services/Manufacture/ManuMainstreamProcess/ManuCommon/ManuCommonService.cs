@@ -109,6 +109,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             _procProcedureRepository = procProcedureRepository;
         }
 
+
         /// <summary>
         /// 获取生产条码信息
         /// </summary>
@@ -121,38 +122,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
 
             var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(sfc);
             if (sfcProduceEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES16306));
-
-            return sfcProduceEntity;
-        }
-
-        /// <summary>
-        /// 获取生产条码信息（附带条码合法性校验）
-        /// </summary>
-        /// <param name="sfc"></param>
-        /// <param name="produceStatus"></param>
-        /// <returns></returns>
-        public async Task<ManuSfcProduceEntity> GetProduceSFCForStartAsync(string sfc, SfcProduceStatusEnum produceStatus)
-        {
-            var sfcProduceEntity = await GetProduceSFCAsync(sfc);
-
-            // 当前工序是否是指定状态
-            if (sfcProduceEntity.Status != produceStatus) throw new CustomerValidationException(nameof(ErrorCode.MES16313)).WithData("Status", produceStatus.GetDescription());
-
-            return sfcProduceEntity;
-        }
-
-        /// <summary>
-        /// 获取生产条码信息（附带条码合法性校验 + 工序活动状态校验）
-        /// </summary>
-        /// <param name="sfc"></param>
-        /// <param name="procedureId"></param>
-        /// <returns></returns>
-        public async Task<ManuSfcProduceEntity> GetProduceSFCWithCheckAsync(string sfc, long procedureId)
-        {
-            var sfcProduceEntity = await GetProduceSFCForStartAsync(sfc, SfcProduceStatusEnum.Activity);
-
-            // 产品编码是否和工序对应
-            if (sfcProduceEntity.ProcedureId != procedureId) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
 
             return sfcProduceEntity;
         }
@@ -408,5 +377,53 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// 扩展方法
+    /// </summary>
+    public static class ManuSfcProduceExtensions
+    {
+        /// <summary>
+        /// 条码合法性校验
+        /// </summary>
+        /// <param name="sfcProduceEntity"></param>
+        /// <param name="produceStatus"></param>
+        public static ManuSfcProduceEntity VerifySFCStatus(this ManuSfcProduceEntity sfcProduceEntity, SfcProduceStatusEnum produceStatus)
+        {
+            // 当前工序是否是指定状态
+            if (sfcProduceEntity.Status != produceStatus) throw new CustomerValidationException(nameof(ErrorCode.MES16313)).WithData("Status", produceStatus.GetDescription());
+
+            return sfcProduceEntity;
+        }
+
+        /// <summary>
+        /// 工序活动状态校验
+        /// </summary>
+        /// <param name="sfcProduceEntity"></param>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        public static ManuSfcProduceEntity VerifyProcedure(this ManuSfcProduceEntity sfcProduceEntity, long procedureId)
+        {
+            // 产品编码是否和工序对应
+            if (sfcProduceEntity.ProcedureId != procedureId) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
+
+            // 是否被锁定
+            if (sfcProduceEntity.Lock.HasValue == true)
+            {
+                if (sfcProduceEntity.Lock == QualityLockEnum.InstantLock)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16314)).WithData("SFC", sfcProduceEntity.SFC);
+                }
+
+                if (sfcProduceEntity.Lock == QualityLockEnum.FutureLock && sfcProduceEntity.ProcedureId == procedureId)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16314)).WithData("SFC", sfcProduceEntity.SFC);
+                }
+            }
+
+            return sfcProduceEntity;
+        }
+
     }
 }

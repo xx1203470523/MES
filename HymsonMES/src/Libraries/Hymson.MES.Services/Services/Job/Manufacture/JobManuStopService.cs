@@ -81,7 +81,10 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             var defaultDto = new JobResponseDto { };
 
             // 获取生产条码信息（附带条码合法性校验 + 工序活动状态校验）
-            var sfcProduceEntity = await _manuCommonService.GetProduceSFCWithCheckAsync(param["SFC"], param["ProcedureId"].ParseToLong());
+            var sfcProduceEntity = await _manuCommonService.GetProduceSFCAsync(param["SFC"]);
+
+            // 合法性校验
+            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity).VerifyProcedure(param["ProcedureId"].ParseToLong());
 
             // 更改状态，将条码由"活动"改为"排队"
             sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;

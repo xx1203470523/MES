@@ -339,6 +339,7 @@
         public const string MES15314 = "锁定工序{sfcproduction}不在条码所在工序{lockproductionname}之后";
         public const string MES15315 = "条码存在及时锁定，无法添加及时锁";
         public const string MES15316 = "条码未被锁定，无法执行解锁操作";
+
         #endregion
 
         #region 质量录入 15400
@@ -412,7 +413,7 @@
         public const string MES16117 = "工单{OrderCode}已经被锁定，无法继续生产";
         public const string MES16118 = "工单{OrderCode}状态为未开始，无法继续生产";
         public const string MES16119 = "工单{OrderCode}已经关闭，无法继续生产";
-        public const string MES16120= "库存不存在";
+        public const string MES16120 = "库存不存在";
         public const string MES16121 = "不满足产品{}的掩码规则";
         #endregion
 
@@ -441,6 +442,7 @@
         public const string MES16311 = "SFC在库存中状态为：{Status}，但不存在在制信息。";
         public const string MES16312 = "请求参数不合法，不允许操作。";
         public const string MES16313 = "SFC状态不是{Status}状态，不允许操作。";
+        public const string MES16314 = "SFC条码{SFC}已锁定，不允许操作。";
         #endregion
 
         #region 生产
