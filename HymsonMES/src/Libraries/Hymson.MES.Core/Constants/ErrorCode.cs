@@ -67,6 +67,9 @@
         #region 标签模板
         public const string MES10340 = "模板名称已经存在!";
         public const string MES10341 = "打印机名称重复!";
+        public const string MES10342 = "模板名称最大长度为50!";
+        public const string MES10343 = "模板名称不能为空!";
+        public const string MES10344 = "存储路径不能为空!";
         #endregion
 
         #region 工序 10400
@@ -142,6 +145,13 @@
         public const string MES10800 = "掩码维护错误";
         public const string MES10801 = "掩码编码不能为空";
         public const string MES10802 = "此编码【{Code}】在系统中已经存在!";
+        public const string MES10803 = "掩码规则不能为空!";
+        public const string MES10804 = "匹配方式不能为空!";
+        public const string MES10805 = "匹配方式为全码时掩码规则长度为10!";
+        public const string MES10806 = "起始方式掩码末尾不能为特殊字符\"?\"";
+        public const string MES10807 = "中间方式掩码首位和末尾不能为特殊字符\"?\"";
+        public const string MES10808 = "结束方式掩码首位不能为特殊字符\"?\"";
+
         #endregion
 
         #region 不合格代码 11100
@@ -428,6 +438,8 @@
         public const string MES16309 = "SFC状态非活动，请先置于活动。";
         public const string MES16310 = "SFC状态为完成，不允许操作。";
         public const string MES16311 = "SFC在库存中状态为：{Status}，但不存在在制信息。";
+        public const string MES16312 = "请求参数不合法，不允许操作。";
+        public const string MES16313 = "SFC状态不是{Status}状态，不允许操作。";
         #endregion
 
         #region 生产
@@ -503,7 +515,7 @@
         public const string MES16600 = "条码不存在或不是在制品!";
         public const string MES16601 = "组件{CirculationBarCode}同SFC{SFC}已绑定,请检查!";
         public const string MES16602 = "数据不存在!";
-        public const string MES16603 = "组件条码{barCode}库存不存在!";
+        public const string MES16603 = "组件条码{barCode}不存在!";
         public const string MES16604 = "组件条码{barCode}库存不足,请检查!";
         public const string MES16605 = "物料掩码规则不存在!";
         public const string MES16606 = "组件条码{barCode}同掩码规则不符,请检查!";
@@ -521,6 +533,9 @@
         public const string MES16701 = "容器包装，条码信息未找到";
         public const string MES16702 = "容器包装，包装码不存在";
         public const string MES16703 = "容器包装，条码的包装维护记录未找到";
+        public const string MES16704 = "容器包装，配置面板编号为空";
+        public const string MES16705 = "容器包装，配置面板不存在";
+        public const string MES16706 = "容器包装，配置面板不允许混工单,当前容器工单{first},当前条码工单{second}";
         #endregion
 
         #region 绑定工单激活  MES16800

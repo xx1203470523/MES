@@ -4,15 +4,15 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
-using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInStation;
+using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPackage;
 using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Job.Manufacture
 {
     /// <summary>
-    /// 开始
+    /// 开始（维修）
     /// </summary>
-    public class ManuStartService : IManufactureJobService
+    public class ManuRepairStartService : IManufactureJobService
     {
         /// <summary>
         /// 当前对象（登录用户）
@@ -25,22 +25,22 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
-        /// 服务接口（进站）
+        /// 服务接口（维修）
         /// </summary>
-        private readonly IManuInStationService _manuInStationService;
+        private readonly IManuRepairService _manuRepairService;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="manuInStationService"></param>
-        public ManuStartService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IManuInStationService manuInStationService)
+        /// <param name="manuRepairService"></param>
+        public ManuRepairStartService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IManuRepairService manuRepairService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _manuInStationService = manuInStationService;
+            _manuRepairService = manuRepairService;
         }
 
 
@@ -71,18 +71,14 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         {
             var defaultDto = new JobResponseDto { };
 
-            var rows = await _manuInStationService.InStationAsync(new ManufactureBo
+            var rows = await _manuRepairService.StartAsync(new ManufactureBo
             {
                 SFC = param["SFC"],
                 ProcedureId = param["ProcedureId"].ParseToLong(),
                 ResourceId = param["ResourceId"].ParseToLong()
             });
 
-            var result = (rows > 0).ToString();
-            defaultDto.Content?.Add("PackageCom", result);
-            defaultDto.Content?.Add("BadEntryCom", result);
-
-            defaultDto.Message = $"条码{param["SFC"]}已于NF排队！";
+            defaultDto.Content?.Add("TableCom", (rows > 0).ToString());
             return defaultDto;
         }
 

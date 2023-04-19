@@ -12,7 +12,7 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
     /// @author Czhipu
     /// @date 2022-11-08
     /// </summary>
-    [Authorize]
+    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class EquEquipmentController : ControllerBase

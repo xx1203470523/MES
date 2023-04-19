@@ -224,7 +224,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
                                         m.MaterialCode, m.MaterialName,m.Version as MaterialVersion
                                     FROM `inte_code_rules` cr
                                     LEFT JOIN proc_material m on cr.ProductId=m.Id
-                                    /**where**/ LIMIT @Offset,@Rows ";
+                                    /**where**/ Order by cr.CreatedOn desc LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = @"SELECT COUNT(1) 
                                             FROM `inte_code_rules` cr
                                             LEFT JOIN proc_material m on cr.ProductId=m.Id  

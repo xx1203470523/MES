@@ -1,8 +1,9 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Utils;
@@ -53,6 +54,24 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
 
 
         /// <summary>
+        /// 验证参数
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task VerifyParamAsync(Dictionary<string, string>? param)
+        {
+            if (param == null ||
+                param.ContainsKey("SFC") == false
+                || param.ContainsKey("ProcedureId") == false
+                || param.ContainsKey("ResourceId") == false)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16312));
+            }
+
+            await Task.CompletedTask;
+        }
+
+        /// <summary>
         /// 执行（中止）
         /// </summary>
         /// <param name="param"></param>
@@ -60,33 +79,22 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         public async Task<JobResponseDto> ExecuteAsync(Dictionary<string, string>? param)
         {
             var defaultDto = new JobResponseDto { };
-            if (param == null) return defaultDto;
 
-            var rows = 0;
-            if (param.ContainsKey("SFC") == false || param.ContainsKey("ProcedureId") == false || param.ContainsKey("ResourceId") == false)
-            {
-                defaultDto.Message = "失败";
-            }
-            else
-            {
-                // 获取生产条码信息（附带条码合法性校验 + 工序活动状态校验）
-                var sfcProduceEntity = await _manuCommonService.GetProduceSFCWithCheckAsync(param["SFC"], param["ProcedureId"].ParseToLong());
+            // 获取生产条码信息（附带条码合法性校验 + 工序活动状态校验）
+            var sfcProduceEntity = await _manuCommonService.GetProduceSFCWithCheckAsync(param["SFC"], param["ProcedureId"].ParseToLong());
 
-                // 更改状态，将条码由"活动"改为"排队"
-                sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
-                sfcProduceEntity.UpdatedBy = _currentUser.UserName;
-                sfcProduceEntity.UpdatedOn = defaultDto.Time;
+            // 更改状态，将条码由"活动"改为"排队"
+            sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
+            sfcProduceEntity.UpdatedBy = _currentUser.UserName;
+            sfcProduceEntity.UpdatedOn = defaultDto.Time;
 
-                rows = await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
-
-                defaultDto.Message = "成功";
-            }
+            var rows = await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
 
             var result = (rows > 0).ToString();
             defaultDto.Content?.Add("PackageCom", result);
             defaultDto.Content?.Add("BadEntryCom", result);
-            defaultDto.Content?.Add("Result", result);
 
+            defaultDto.Message = $"条码{param["SFC"]}已于NF排队！";
             return defaultDto;
         }
     }

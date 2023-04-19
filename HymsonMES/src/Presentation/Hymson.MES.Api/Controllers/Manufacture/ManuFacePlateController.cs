@@ -19,7 +19,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
     /// @author Karl
     /// @date 2023-04-01 02:05:24
     /// </summary>
-    [Authorize]
+    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ManuFacePlateController : ControllerBase
