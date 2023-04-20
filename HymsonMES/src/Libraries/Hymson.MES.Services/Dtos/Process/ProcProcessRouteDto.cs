@@ -268,6 +268,11 @@ namespace Hymson.MES.Services.Dtos.Process
         public long Id { get; set; }
 
         /// <summary>
+        /// 工艺路线名称
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
         /// 备注
         /// </summary>
         public string Remark { get; set; }

@@ -83,8 +83,8 @@
 
         public const string MES10430 = $"不能删除启用和保留状态的工艺路线！";
         public const string MES10431 = $"此工艺路线在系统中已经存在!";
-        public const string MES10432 = $"编码不能为空!";
-        public const string MES10433 = $"名称不能为空!";
+        public const string MES10432 = $"工艺编码不能为空!";
+        public const string MES10433 = $"工艺名称不能为空!";
         public const string MES10434 = $"版本不能为空!";
         public const string MES10435 = $"未设置首工序！";
         public const string MES10436 = $"只允许设置一个首工序！";
@@ -95,6 +95,8 @@
         public const string MES10441 = $"不存在空值类型工序!";
         public const string MES10442 = $"获取上一工序失败!";
         public const string MES10443 = $"启用状态或保留状态不可删除!";
+        public const string MES10444 = $"工艺编码最大长度为60!";
+        public const string MES10445 = $"工艺名称最大长度为60!";
         #endregion
 
         #region 参数 10500

@@ -26,7 +26,8 @@ namespace Hymson.MES.Services.Validators.Process
             RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10432));
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10433));
             RuleFor(x => x.Version).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10434));
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
+            RuleFor(x => x.Code).MaximumLength(60).WithErrorCode(nameof(ErrorCode.MES10444));
+            RuleFor(x => x.Name).MaximumLength(60).WithErrorCode(nameof(ErrorCode.MES10445));
         }
     }
 
@@ -37,6 +38,8 @@ namespace Hymson.MES.Services.Validators.Process
     {
         public ProcProcessRouteModifyValidator()
         {
+            RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10433));
+            RuleFor(x => x.Name).MaximumLength(60).WithErrorCode(nameof(ErrorCode.MES10445));
             //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");
             //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
         }
