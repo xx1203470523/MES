@@ -61,7 +61,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <param name="workOrderCode"></param>
         /// <returns></returns>
         [HttpGet("residue/{workOrderCode}")]
-        public async Task<int> GetPlanWorkOrderByWorkOrderCodeAsync(string workOrderCode)
+        public async Task<decimal> GetPlanWorkOrderByWorkOrderCodeAsync(string workOrderCode)
         {
             return await _planWorkOrderService.GetPlanWorkOrderByWorkOrderCodeAsync(workOrderCode);
         }

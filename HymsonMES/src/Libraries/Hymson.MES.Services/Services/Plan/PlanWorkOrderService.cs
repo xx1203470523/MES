@@ -105,16 +105,17 @@ namespace Hymson.MES.Services.Services.Plan
             planWorkOrderEntity.UpdatedOn = HymsonClock.Now();
             planWorkOrderEntity.SiteId = _currentSite.SiteId ?? 0;
 
-            var planWorkOrderRecordEntity = new PlanWorkOrderRecordEntity() {
+            var planWorkOrderRecordEntity = new PlanWorkOrderRecordEntity()
+            {
                 Id = IdGenProvider.Instance.CreateId(),
                 UpdatedBy = _currentUser.UserName,
                 CreatedBy = _currentUser.UserName,
                 SiteId = _currentSite.SiteId ?? 0,
                 WorkOrderId = planWorkOrderEntity.Id,
-                InputQty=0,
-                UnqualifiedQuantity=0,
-                FinishProductQuantity=0,
-                PassDownQuantity=0
+                InputQty = 0,
+                UnqualifiedQuantity = 0,
+                FinishProductQuantity = 0,
+                PassDownQuantity = 0
             };
             //入库
             using var ts = TransactionHelper.GetTransactionScope();
@@ -124,7 +125,7 @@ namespace Hymson.MES.Services.Services.Plan
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16002));
             }
-            await  _planWorkOrderRepository.InsertPlanWorkOrderRecordAsync(planWorkOrderRecordEntity);
+            await _planWorkOrderRepository.InsertPlanWorkOrderRecordAsync(planWorkOrderRecordEntity);
             ts.Complete();
         }
 
@@ -179,15 +180,24 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="workOrderCode"></param>
         /// <returns></returns>
-        public async Task<int> GetPlanWorkOrderByWorkOrderCodeAsync(string workOrderCode)
+        public async Task<decimal> GetPlanWorkOrderByWorkOrderCodeAsync(string workOrderCode)
         {
-            var workOrderEntity = await _planWorkOrderRepository.GetByCodeAsync(workOrderCode);
-            if (workOrderEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES16003));
+            var workOrderEntity = await _planWorkOrderRepository.GetByCodeAsync(workOrderCode)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16003));
+
+            // 应下达数量
+            var residue = Math.Ceiling(workOrderEntity.Qty * (1 + workOrderEntity.OverScale / 100));
 
             // 查询已下发数量
-            //var asdasdasdasdasdasd
+            var workOrderRecordEntity = await _planWorkOrderRepository.GetByWorkOrderIdAsync(workOrderEntity.Id);
+            if (workOrderRecordEntity != null && workOrderRecordEntity.PassDownQuantity.HasValue == true)
+            {
+                // 减掉已下达数量
+                residue -= workOrderRecordEntity.PassDownQuantity.Value;
+            }
 
-            return 0;
+            if (residue < 0) residue = 0;
+            return residue;
         }
 
         /// <summary>

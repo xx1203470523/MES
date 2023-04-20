@@ -67,7 +67,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="workOrderCode"></param>
         /// <returns></returns>
-        Task<int> GetPlanWorkOrderByWorkOrderCodeAsync(string workOrderCode);
+        Task<decimal> GetPlanWorkOrderByWorkOrderCodeAsync(string workOrderCode);
 
         /// <summary>
         /// 修改工单状态

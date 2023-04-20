@@ -229,7 +229,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
 
             // 读取资源绑定的产线
             var workCenter = await _inteWorkCenterRepository.GetByResourceIdAsync(queryDto.ResourceId);
-            if (workCenter == null) return list;
 
             /*
             if (workCenter == null)
@@ -244,13 +243,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             // 不混线
             else if (workCenter.IsMixLine == false)
             {
-                materialIds = await GetMaterialIdsByWorkCenterIdAsync(workCenter.Id);
+                materialIds = await GetMaterialIdsByWorkCenterIdAsync(workCenter.Id, queryDto.WorkOrderId);
             }
             else
             {
                 return list;
             }
             */
+
+            if (workCenter == null) return list;
 
             // 通过产线->工单->BOM->查询物料
             materialIds = await GetMaterialIdsByWorkCenterIdAsync(workCenter.Id, queryDto.WorkOrderId);
@@ -383,7 +384,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             var feeds = await _manuFeedingRepository.GetByIdsAsync(idsArr);
 
             // 查询条码
-            var inventorys = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarcodeQuery { BarCodes = feeds.Select(s => s.BarCode),SiteId=_currentSite.SiteId??0 }
+            var inventorys = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarcodeQuery { BarCodes = feeds.Select(s => s.BarCode), SiteId = _currentSite.SiteId ?? 0 }
                );
 
             // 查询物料
