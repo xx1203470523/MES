@@ -7,6 +7,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
@@ -258,7 +259,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             var validationFailure = new ValidationFailure();
                             if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
                             {
-                                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {{ "CollectionIndex", sfc} };
+                                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", sfc } };
                             }
                             else
                             {
@@ -461,7 +462,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var scrapSfcs = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery
             {
                 Sfcs = parm.Sfcs,
-                Status = SfcStatusEnum.Scrapping
+                Statuss = new SfcStatusEnum?[1] { SfcStatusEnum.Scrapping }
             });
             //类型为报废时判断条码是否已经报废,若已经报废提示:存在已报废的条码，不可再次报废
             if (scrapSfcs.Any())
@@ -719,5 +720,100 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             return manuSfcProduceEntity.ToModel<ManuSfcProduceDto>();
         }
+
+
+        #region 在制品步骤控制
+        /// <summary>
+        /// 根据SFC查询在制品步骤列表
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        public async Task<List<ManuSfcProduceStepViewDto>> QueryManuSfcProduceStepBySFCsAsync(List<ManuSfcProduceStepSFCDto> sfcs)
+        {
+
+            #region 验证
+            if (sfcs == null || sfcs.Count() == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            }
+            #endregion
+
+            #region 获取已完成SFC
+
+            var manuSfcProduceStepList = new List<ManuSfcProduceStepViewDto>();
+            var errorMsg = "";
+
+            //获取条码
+            var manuSfcStatusQuery = new ManuSfcStatusQuery { Sfcs = sfcs.Select(it => it.Sfc).ToArray() };
+            var manuSfcInfos = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(manuSfcStatusQuery);
+            if (manuSfcInfos == null || manuSfcInfos.Count() == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18000));
+            }
+            foreach (var item in manuSfcInfos)
+            {
+                //报废不允许操作
+                if (item.Status == SfcStatusEnum.Scrapping)
+                {
+                    errorMsg += ErrorCode.MES18000 + "\r\t";
+                    continue;
+                }
+                //在制的
+                if (item.Status == SfcStatusEnum.InProcess)
+                {
+                    var manuSfcProduceEntit = _manuSfcProduceRepository.GetBySFCAsync(item.SFC); 
+                }
+                //完成的
+                else
+                {
+                    //获取工单
+                    var planWorkOrderEntit = await _planWorkOrderRepository.GetByIdAsync(item.WorkOrderId);
+                    if (planWorkOrderEntit == null)
+                    {
+                        errorMsg += ErrorCode.MES18001 + "\r\t";
+                        continue;
+                    }
+
+                    //生产中/已完工的工单
+                    if (planWorkOrderEntit.Status != PlanWorkOrderStatusEnum.InProduction && planWorkOrderEntit.Status != PlanWorkOrderStatusEnum.Finish)
+                    {
+                        errorMsg += ErrorCode.MES18002 + "\r\t";
+                        continue;
+                    }
+
+                    //获取工序路线（实际完成节点）
+                    var procProcessRouteDetailNodesParam = new ProcProcessRouteDetailNodeQuery { ProcessRouteId = planWorkOrderEntit.ProcessRouteId, ProcedureId = ProcessRoute.LastProcedureId };
+                    var procProcessRouteDetailNodes = await _procProcessRouteDetailNodeRepository.GetListAsync(procProcessRouteDetailNodesParam);
+                    if (procProcessRouteDetailNodes == null || !procProcessRouteDetailNodes.Any())
+                    {
+                        errorMsg += ErrorCode.MES18006 + "\r\t";
+                        continue;
+                    }
+                    //工序
+                    var procedureId = procProcessRouteDetailNodes.FirstOrDefault().ProcedureId;
+                    var procProcedureEntit = await _procProcedureRepository.GetByIdAsync(procedureId);
+                    var manuSfcProduceStep = manuSfcProduceStepList.Where(it => it.ProcedureId == procedureId).FirstOrDefault();
+                    if (manuSfcProduceStep == null)
+                    {
+                        manuSfcProduceStep = new ManuSfcProduceStepViewDto
+                        {
+                            ProcedureId = procedureId,
+                            ProcedureCode = procProcedureEntit.Code,
+                            ProcedureName = procProcedureEntit.Name,
+                            completeNumber = 1
+                        };
+                        manuSfcProduceStepList.Add(manuSfcProduceStep);
+                    }
+                    else
+                    {
+                        manuSfcProduceStep.completeNumber += 1;
+                    }
+                }
+            }
+            #endregion
+            return manuSfcProduceStepList;
+        }
+
+        #endregion
     }
 }

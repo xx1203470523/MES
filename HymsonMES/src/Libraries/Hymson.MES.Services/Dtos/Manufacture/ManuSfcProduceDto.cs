@@ -22,112 +22,112 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 条码
         /// </summary>
         public string Sfc { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 产品id
         /// </summary>
         public long ProductId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工单id
         /// </summary>
         public long WorkOrderId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 条码数据id
         /// </summary>
         public long BarCodeInfoId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工艺路线
         /// </summary>
         public long ProcessRouteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工作中心
         /// </summary>
         public long WorkCenterId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// BOMId
         /// </summary>
         public long ProductBOMId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 设备Id
         /// </summary>
         public long EquipmentId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 资源id
         /// </summary>
         public long ResourceId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工序id
         /// </summary>
         public long ProcedureId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态;1：排队；2：活动；
         /// </summary>
         public SfcProduceStatusEnum Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 锁;1：未锁定；2：即时锁；3：将来锁；
         /// </summary>
         public QualityLockEnum? Lock { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 未来锁工序id
         /// </summary>
         public long? LockProductionId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否可疑
         /// </summary>
         public bool? IsSuspicious { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 复投次数;复投次数
         /// </summary>
         public int RepeatedCount { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 删除标识
         /// </summary>
         public long IsDeleted { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
 
-       
+
     }
 
     /// <summary>
@@ -299,107 +299,107 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 条码
         /// </summary>
         public string Sfc { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 产品id
         /// </summary>
         public long ProductId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工单id
         /// </summary>
         public long WorkOrderId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 条码数据id
         /// </summary>
         public long BarCodeInfoId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工艺路线
         /// </summary>
         public long ProcessRouteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工作中心
         /// </summary>
         public long WorkCenterId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// BOMId
         /// </summary>
         public long ProductBOMId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 设备Id
         /// </summary>
         public long EquipmentId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 资源id
         /// </summary>
         public long ResourceId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工序id
         /// </summary>
         public long ProcedureId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态;1：排队；2：活动；
         /// </summary>
         public bool Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 锁;1：未锁定；2：即时锁；3：将来锁；
         /// </summary>
         public QualityLockEnum Lock { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 未来锁工序id
         /// </summary>
         public long? LockProductionId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否可疑
         /// </summary>
         public bool? IsSuspicious { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 复投次数;复投次数
         /// </summary>
         public int RepeatedCount { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 删除标识
         /// </summary>
         public long IsDeleted { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
@@ -449,7 +449,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     /// <summary>
     /// 分页查询返回实体
     /// </summary>
-   public class ManuSfcProduceViewDto
+    public class ManuSfcProduceViewDto
     {
         /// <summary>
         ///  唯一标识
@@ -515,5 +515,79 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 产品版本
         /// </summary>
         public string Version { get; set; }
+    }
+
+    /// <summary>
+    /// 在制品步骤控制操作实体（操作条码）
+    /// </summary>
+    public record ManuSfcProduceStepSFCDto
+    {
+        /// <summary>
+        /// 条码列表
+        /// </summary>
+        public string Sfc { get; set; }
+    }
+
+    /// <summary>
+    /// 在制品步骤控制操作实体（步骤列表）
+    /// </summary>
+    public record ManuSfcProduceStepViewDto
+    {
+        /// <summary>
+        /// SFC
+        /// </summary>
+        //public string Sfc { get; set; }
+        /// <summary>
+        /// 工序Id
+        /// </summary>
+        public long ProcedureId { get; set; }
+        /// <summary>
+        /// 工序Code
+        /// </summary>
+        public string ProcedureCode { get; set; }
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string ProcedureName { get; set; }
+
+
+        /// <summary>
+        /// 排队数量
+        /// </summary>
+        public int lineUpNumber { get; set; }
+        /// <summary>
+        /// 活动数量
+        /// </summary>
+        public int activityNumber { get; set; }
+        /// <summary>
+        /// 完工数量
+        /// </summary>
+        public int completeNumber { get; set; }
+    }
+
+    /// <summary>
+    /// 在制品步骤控制操作实体（保存）
+    /// </summary>
+    public record ManuSfcProduceStepSaveDto
+    {
+        /// <summary>
+        /// 操作类型
+        /// </summary>
+        public SfcProduceStatusEnum OperationType { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string Remark { get; set; }
+
+        /// <summary>
+        /// 操作工序
+        /// </summary>
+        public long? ProcedureId { get; set; }
+
+        /// <summary>
+        /// 条码列表
+        /// </summary>
+        public List<ManuSfcProduceStepSFCDto> Sfcs { get; set; }
     }
 }

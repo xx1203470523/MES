@@ -105,10 +105,10 @@ namespace Hymson.MES.Services.Services.Warehouse
             foreach (var item in whMaterialInventoryLists)
             {
                 item.MaterialBarCode = item.MaterialBarCode.Trim();
-                var isMaterialBarCodeList = whMaterialInventoryLists.Where(it => it.MaterialBarCode.Trim() == item.MaterialBarCode).Any();
-                if (isMaterialBarCodeList)
+                var isMaterialBarCodeList = whMaterialInventoryLists.Where(it => it.MaterialBarCode.Trim() == item.MaterialBarCode);
+                if (isMaterialBarCodeList.Count() > 1)
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15104)).WithData("MaterialCode", item.MaterialBarCode);
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15107)).WithData("MaterialCode", item.MaterialBarCode);
                 }
                 #region 校验
                 //验证DTO

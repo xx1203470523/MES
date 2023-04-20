@@ -23,6 +23,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query
         /// <summary>
         /// 条码状态
         /// </summary>
-        public SfcStatusEnum? Status { get; set; }
+        public SfcStatusEnum?[] Statuss { get; set; } 
     }
 }

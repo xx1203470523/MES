@@ -279,7 +279,7 @@
 
         #endregion
 
-        #region 供应商库存  15000
+        #region 供应商  15000
         public const string MES15000 = "库存供应商错误";
         public const string MES15001 = "站点码获取失败，请重新登录！";
         public const string MES15002 = "此供应商编码{Code}在系统已经存在！";
@@ -297,13 +297,14 @@
         public const string MES15101 = "物料不存在";
         public const string MES15102 = "物料条码：{MaterialCode}未关联到供应商";
         public const string MES15103 = "物料条码：{MaterialCode}数量需大于0";
-        public const string MES15104 = " 条码：{MaterialCode}在车间库存中已存在！";
+        public const string MES15104 = " 物料条码：{MaterialCode}在车间库存中已存在！";
         public const string MES15105 = " 增加库存失败";
         public const string MES15106 = " 请扫描物料条码";
+        public const string MES15107 = " 物料条码：{MaterialCode}重复扫描！";
 
         #endregion
 
-        #region 车间库存接收  15200
+        #region 物料台账  15200
         public const string MES15200 = "物料台账错误";
         public const string MES15201 = "物料编码不能为空";
         public const string MES15202 = "物料版本不能为空";
@@ -569,6 +570,19 @@
         public const string MES16910 = "实际使用的物料为空!";
         public const string MES16911 = "实际使用的物料与条码不合!";
         public const string MES16912 = "条码为空！";
+        #endregion
+
+
+        #region 在制品步骤控制
+        public const string MES18000 = "条码:{SFC}状态{Status}不允许操作";
+        public const string MES18001 = "条码:{SFC}工单信息不存在";
+        public const string MES18002 = "条码:{SFC}工单状态{Status}不允许操作";
+        public const string MES18003 = "在制信息不存在";
+        public const string MES18004 = "工艺路线信息不存在";
+        public const string MES18005 = "工艺路线节点信息不存在";
+        public const string MES18006 = "在库条码:{SFC}对于工单所在工艺路线不存在尾工序节点";
+
+
         #endregion
         #endregion
 

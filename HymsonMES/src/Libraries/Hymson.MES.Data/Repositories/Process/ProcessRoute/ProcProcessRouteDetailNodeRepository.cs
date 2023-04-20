@@ -43,6 +43,10 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 sqlBuilder.Where("ProcessRouteId=@ProcessRouteId");
             }
+            if (query.ProcedureId > 0)
+            {
+                sqlBuilder.Where("ProcedureId=@ProcedureId");
+            }
             sqlBuilder.AddParameters(query);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
