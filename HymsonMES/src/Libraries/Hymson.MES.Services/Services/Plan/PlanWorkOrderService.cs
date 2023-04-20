@@ -175,6 +175,22 @@ namespace Hymson.MES.Services.Services.Plan
         }
 
         /// <summary>
+        /// 查询剩余可下单条码数量
+        /// </summary>
+        /// <param name="workOrderCode"></param>
+        /// <returns></returns>
+        public async Task<int> GetPlanWorkOrderByWorkOrderCodeAsync(string workOrderCode)
+        {
+            var workOrderEntity = await _planWorkOrderRepository.GetByCodeAsync(workOrderCode);
+            if (workOrderEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES16003));
+
+            // 查询已下发数量
+            //var asdasdasdasdasdasd
+
+            return 0;
+        }
+
+        /// <summary>
         /// 修改
         /// </summary>
         /// <param name="planWorkOrderModifyDto"></param>
