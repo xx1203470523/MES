@@ -21,7 +21,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 产品条码
         /// </summary>
-        public string? MaterialCode { get; set; }
+        public string? SFC { get; set; }
 
         /// <summary>
         /// 是否使用

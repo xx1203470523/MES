@@ -104,10 +104,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 sqlBuilder.Where("PWO.OrderCode LIKE @WorkOrderCode");
             }
 
-            if (!string.IsNullOrWhiteSpace(pagedQuery.MaterialCode))
+            if (!string.IsNullOrWhiteSpace(pagedQuery.SFC))
             {
-                pagedQuery.MaterialCode = $"%{pagedQuery.MaterialCode}%";
-                sqlBuilder.Where("PM.MaterialCode LIKE @MaterialCode");
+                pagedQuery.SFC = $"%{pagedQuery.SFC}%";
+                sqlBuilder.Where("MS.SFC LIKE @SFC");
             }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
