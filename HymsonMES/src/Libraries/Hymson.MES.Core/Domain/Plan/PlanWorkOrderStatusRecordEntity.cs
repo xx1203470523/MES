@@ -29,66 +29,64 @@ namespace Hymson.MES.Core.Domain.Plan
         /// </summary>
         public string OrderCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 产品id
         /// </summary>
         public long? ProductId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工作中心
         /// </summary>
         public long? WorkCenterId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工艺路线
         /// </summary>
         public long? ProcessRouteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 产品bom
         /// </summary>
         public long? ProductBOMId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工单类型
         /// </summary>
         public PlanWorkOrderTypeEnum Type { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工单状态
         /// </summary>
         public PlanWorkOrderStatusEnum Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工单数量
         /// </summary>
         public decimal Qty { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 超产比例
         /// </summary>
         public decimal OverScale { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 开始时间
         /// </summary>
         public DateTime PlanStartTime { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 结束时间
         /// </summary>
         public DateTime PlanEndTime { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否锁定;1：是；2：否；
         /// </summary>
         public YesOrNoEnum? IsLocked { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
-
-       
     }
 }

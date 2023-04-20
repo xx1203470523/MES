@@ -162,7 +162,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             }
 
             // 判断是否是激活的工单
-            var activatedWorkOrder = await _planWorkOrderActivationRepository.GetByIdAsync(planWorkOrderEntity.Id);
+            var activatedWorkOrder = await _planWorkOrderActivationRepository.GetByWorkOrderIdAsync(planWorkOrderEntity.Id);
             if (activatedWorkOrder == null) throw new CustomerValidationException(nameof(ErrorCode.MES16410));
 
             switch (planWorkOrderEntity.Status)

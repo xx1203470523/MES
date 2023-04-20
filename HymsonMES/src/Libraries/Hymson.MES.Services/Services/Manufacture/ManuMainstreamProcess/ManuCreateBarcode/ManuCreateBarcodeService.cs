@@ -102,11 +102,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
             List<ManuSfcInfoEntity> manuSfcInfoList = new List<ManuSfcInfoEntity>();
             List<ManuSfcProduceEntity> manuSfcProduceList = new List<ManuSfcProduceEntity>();
             List<ManuSfcStepEntity> manuSfcStepList = new List<ManuSfcStepEntity>();
-
+            var issQty = param.Qty;
             foreach (var item in barcodeList)
             {
-                var qty = param.Qty > procMaterialEntity.Batch ? procMaterialEntity.Batch : param.Qty;
-                param.Qty -= procMaterialEntity.Batch;
+                var qty = issQty > procMaterialEntity.Batch ? procMaterialEntity.Batch : issQty;
+                issQty -= procMaterialEntity.Batch;
 
                 var manuSfcEntity = new ManuSfcEntity
                 {
@@ -246,7 +246,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                     CreatedBy = _currentUser.UserName,
                     UpdatedBy = _currentUser.UserName
                 };
-                manuSfcList.Add(sfcEntity);
+                manuSfcList.Add(manuSfcEntity);
 
                 manuSfcInfoList.Add(new ManuSfcInfoEntity
                 {
