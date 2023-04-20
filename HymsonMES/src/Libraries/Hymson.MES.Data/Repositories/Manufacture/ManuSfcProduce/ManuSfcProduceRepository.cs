@@ -60,7 +60,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             }
             if (query.NoLock.HasValue)
             {
-                sqlBuilder.Where("msp.Lock!=@NoLock");
+                if (query.NoLock != 1)
+                {
+                    sqlBuilder.Where("(msp.Lock!=@NoLock or `Lock`  is null)");
+                }        
             }
             if (!string.IsNullOrWhiteSpace(query.Sfc))
             {
