@@ -1,7 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Services.Plan;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Plan
@@ -11,7 +10,7 @@ namespace Hymson.MES.Api.Controllers.Plan
     /// @author Karl
     /// @date 2023-03-20 10:07:17
     /// </summary>
-    
+
     [ApiController]
     [Route("api/v1/[controller]")]
     public class PlanWorkOrderController : ControllerBase
@@ -31,7 +30,7 @@ namespace Hymson.MES.Api.Controllers.Plan
             _planWorkOrderService = planWorkOrderService;
             _logger = logger;
         }
-        
+
 
         /// <summary>
         /// 分页查询列表（工单信息表）
@@ -57,6 +56,17 @@ namespace Hymson.MES.Api.Controllers.Plan
         }
 
         /// <summary>
+        /// 查询剩余可下单条码数量
+        /// </summary>
+        /// <param name="workOrderCode"></param>
+        /// <returns></returns>
+        [HttpGet("residue/{workOrderCode}")]
+        public async Task<int> GetPlanWorkOrderByWorkOrderCodeAsync(string workOrderCode)
+        {
+            return await _planWorkOrderService.GetPlanWorkOrderByWorkOrderCodeAsync(workOrderCode);
+        }
+
+        /// <summary>
         /// 添加（工单信息表）
         /// </summary>
         /// <param name="parm"></param>
@@ -65,7 +75,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         [Route("create")]
         public async Task AddPlanWorkOrderAsync([FromBody] PlanWorkOrderCreateDto parm)
         {
-             await _planWorkOrderService.CreatePlanWorkOrderAsync(parm);
+            await _planWorkOrderService.CreatePlanWorkOrderAsync(parm);
         }
 
         /// <summary>
@@ -77,7 +87,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         [Route("update")]
         public async Task UpdatePlanWorkOrderAsync([FromBody] PlanWorkOrderModifyDto parm)
         {
-             await _planWorkOrderService.ModifyPlanWorkOrderAsync(parm);
+            await _planWorkOrderService.ModifyPlanWorkOrderAsync(parm);
         }
 
         /// <summary>
@@ -98,7 +108,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <returns></returns>
         [HttpPut]
         [Route("changWorkOrderStatus")]
-        public async Task ChangWorkOrderStatusAsync(List<PlanWorkOrderChangeStatusDto> parms) 
+        public async Task ChangWorkOrderStatusAsync(List<PlanWorkOrderChangeStatusDto> parms)
         {
             await _planWorkOrderService.ModifyWorkOrderStatusAsync(parms);
         }
@@ -110,7 +120,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <returns></returns>
         [HttpPut]
         [Route("changLocked")]
-        public async Task ChangLockedAsync(List<PlanWorkOrderLockedDto> parms) 
+        public async Task ChangLockedAsync(List<PlanWorkOrderLockedDto> parms)
         {
             await _planWorkOrderService.ModifyWorkOrderLockedAsync(parms);
         }

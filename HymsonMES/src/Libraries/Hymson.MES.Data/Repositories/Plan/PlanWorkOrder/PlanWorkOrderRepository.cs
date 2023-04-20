@@ -65,6 +65,17 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
 
         /// <summary>
+        /// 根据Code获取数据
+        /// </summary>
+        /// <param name="workOrderCode"></param>
+        /// <returns></returns>
+        public async Task<PlanWorkOrderEntity> GetByCodeAsync(string workOrderCode)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderEntity>(GetByCodeSql, new { Id = workOrderCode });
+        }
+
+        /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
         /// <param name="ids"></param>
@@ -332,6 +343,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string GetByIdsSql = @"SELECT
       `Id`, `OrderCode`, `ProductId`, `WorkCenterType`, `WorkCenterId`, `ProcessRouteId`, `ProductBOMId`, `Type`, `Qty`, `Status`, `OverScale`, `PlanStartTime`, `PlanEndTime`, `IsLocked`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
     FROM `plan_work_order`  WHERE Id IN @ids ";
+        const string GetByCodeSql = @"SELECT * FROM plan_work_order WHERE IsDeleted = 0 AND OrderCode = @workOrderCode ";
         const string GetByIdsAboutMaterialInfoSql = @"SELECT
       wo.`Id`, wo.`OrderCode`, wo.`ProductId`, wo.`WorkCenterType`, wo.`WorkCenterId`, wo.`ProcessRouteId`, wo.`ProductBOMId`, wo.`Type`, wo.`Qty`, wo.`Status`, wo.`OverScale`, wo.`PlanStartTime`, wo.`PlanEndTime`, wo.`IsLocked`, wo.`Remark`, wo.`CreatedBy`, wo.`CreatedOn`, wo.`UpdatedBy`, wo.`UpdatedOn`, wo.`IsDeleted`, wo.`SiteId`,
          m.MaterialCode, m.MaterialName,m.Version as MaterialVersion 
