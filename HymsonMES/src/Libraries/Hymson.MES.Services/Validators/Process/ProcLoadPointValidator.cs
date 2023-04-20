@@ -6,6 +6,7 @@
  *build datetime: 2023-02-17 08:57:53
  */
 using FluentValidation;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Services.Dtos.Process;
 using System;
 using System.Collections.Generic;
@@ -22,8 +23,10 @@ namespace Hymson.MES.Services.Validators.Process
     {
         public ProcLoadPointCreateValidator()
         {
-            //RuleFor(x => x.LinkMaterials.ToString()).NotEmpty().WithErrorCode("11").WithMessage("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
+            RuleFor(x => x.LoadPoint).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10712));
+            RuleFor(x => x.LoadPoint).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES10714));
+            RuleFor(x => x.LoadPointName).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10713));
+            RuleFor(x => x.LoadPointName).MaximumLength(60).WithErrorCode(nameof(ErrorCode.MES10715));
         }
     }
 
@@ -34,6 +37,8 @@ namespace Hymson.MES.Services.Validators.Process
     {
         public ProcLoadPointModifyValidator()
         {
+            RuleFor(x => x.LoadPointName).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10713));
+            RuleFor(x => x.LoadPointName).MaximumLength(60).WithErrorCode(nameof(ErrorCode.MES10715));
             //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");
             //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
         }

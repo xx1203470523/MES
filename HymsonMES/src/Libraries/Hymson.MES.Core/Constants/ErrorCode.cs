@@ -146,6 +146,10 @@
         public const string MES10709 = "删除数据失败!无法删除保留或者启用的数据！";
         public const string MES10710 = "关联物料页签物料不能重复!";
         public const string MES10711 = "关联资源页签资源不能重复!";
+        public const string MES10712 = "上料点不能为空";
+        public const string MES10713 = "上料点名称不能为空";
+        public const string MES10714= "上料点最大长度为50";
+        public const string MES10715 = "上料点名称最大长度为60";
         #endregion
 
         #region 掩码维护 10800
