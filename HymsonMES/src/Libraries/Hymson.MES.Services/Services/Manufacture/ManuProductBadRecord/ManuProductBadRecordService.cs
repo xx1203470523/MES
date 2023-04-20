@@ -109,9 +109,23 @@ namespace Hymson.MES.Services.Services.Manufacture
             // 验证DTO
             //await _validationCreateRules.ValidateAndThrowAsync(manuProductBadRecordCreateDto);
 
+            if (createDto.Sfcs == null || createDto.Sfcs.Length < 1)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15400));
+            }
+
             var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = createDto.Sfcs };
             // 获取条码列表
             var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
+
+            //即时锁不能操作
+            var instantLockSfcs=manuSfcs.Where(a => a.Lock == QualityLockEnum.InstantLock).Select(x => x.SFC).ToArray(); 
+            if (instantLockSfcs.Any())
+            {
+                var strs = string.Join("','", instantLockSfcs);
+                throw new CustomerValidationException(nameof(ErrorCode.MES15407)).WithData("sfcs", strs);
+            }
+            //将来锁定当前工序不能操作
 
             // 获取不合格代码列表
             var qualUnqualifiedCodes = await _qualUnqualifiedCodeRepository.GetByIdsAsync(createDto.UnqualifiedIds);

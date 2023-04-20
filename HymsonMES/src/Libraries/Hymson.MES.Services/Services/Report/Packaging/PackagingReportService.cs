@@ -17,18 +17,13 @@ namespace Hymson.MES.Services.Services.Report
             _manuContainerBarcodeRepository = manuContainerBarcodeRepository;
         }
 
-        /// <summary>
-        /// 根据ID查询
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<ManuContainerBarcodeDto> QueryManuContainerBarcodeByIdAsync(long id)
+        public async Task<ManuContainerBarcodeDto> QueryManuContainerByCodeAsync(string code)
         {
-            var manuContainerBarcodeEntity = await _manuContainerBarcodeRepository.GetByIdAsync(id);
-            if (manuContainerBarcodeEntity != null)
-            {
-                return manuContainerBarcodeEntity.ToModel<ManuContainerBarcodeDto>();
-            }
+            //var manuContainerBarcodeEntity = await _manuContainerBarcodeRepository.GetByIdAsync(id);
+            //if (manuContainerBarcodeEntity != null)
+            //{
+            //    return manuContainerBarcodeEntity.ToModel<ManuContainerBarcodeDto>();
+            //}
             return null;
         }
     }
