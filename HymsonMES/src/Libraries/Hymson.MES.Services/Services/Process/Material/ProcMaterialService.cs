@@ -304,13 +304,13 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             // 判断编号是否已存在
-            var existsList = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery()
+            var exists= await _procMaterialRepository.GetByCodeAsync(new ProcMaterialQuery()
             {
                 SiteId = _currentSite.SiteId,
                 MaterialCode = procMaterialEntity.MaterialCode,
                 Version = procMaterialEntity.Version
             });
-            if (existsList != null && existsList.Count() > 0 && existsList.Where(x => x.Id != procMaterialEntity.Id).Any())
+            if (exists != null && exists.Id != procMaterialEntity.Id)
             {
                 throw new BusinessException(nameof(ErrorCode.MES10201)).WithData("materialCode", procMaterialEntity.MaterialCode).WithData("version", procMaterialEntity.Version);
             }
