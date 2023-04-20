@@ -102,6 +102,13 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<IEnumerable<ProcMaterialEntity>> GetProcMaterialEntitiesAsync(ProcMaterialQuery procMaterialQuery);
 
         /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ProcMaterialEntity> GetByCodeAsync(ProcMaterialQuery query);
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="procMaterialPagedQuery"></param>

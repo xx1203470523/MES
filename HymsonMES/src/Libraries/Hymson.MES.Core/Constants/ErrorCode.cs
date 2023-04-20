@@ -37,6 +37,8 @@
         public const string MES10220 = "修改物料组失败！";
         public const string MES10221 = "已被分配物料，不允许删除！";
         public const string MES10222 = "插入物料供应商关联表失败！";
+        public const string MES10223 = "物料编码最大长度为50";
+        public const string MES10224= "物料名称最大长度为50";
 
         #endregion
 
@@ -62,13 +64,13 @@
         public const string MES10319 = $"不能删除启用状态的资源!";
         public const string MES10320 = "所属资源类型ID不能为空";
         public const string MES10321 = "工序名称超长";
-        public const string MES10322 = "资源名称最大长度为50!";
+        public const string MES10322 = "资源名称最大长度为50";
         #endregion
 
         #region 标签模板
         public const string MES10340 = "模板名称已经存在!";
         public const string MES10341 = "打印机名称重复!";
-        public const string MES10342 = "模板名称最大长度为50!";
+        public const string MES10342 = "模板名称最大长度为50";
         public const string MES10343 = "模板名称不能为空!";
         public const string MES10344 = "存储路径不能为空!";
         #endregion
@@ -95,8 +97,8 @@
         public const string MES10441 = $"不存在空值类型工序!";
         public const string MES10442 = $"获取上一工序失败!";
         public const string MES10443 = $"启用状态或保留状态不可删除!";
-        public const string MES10444 = $"工艺编码最大长度为60!";
-        public const string MES10445 = $"工艺名称最大长度为60!";
+        public const string MES10444 = $"工艺编码最大长度为60";
+        public const string MES10445 = $"工艺名称最大长度为60";
         #endregion
 
         #region 参数 10500
@@ -111,7 +113,7 @@
         public const string MES10508 = "参数单位不能为空";
         public const string MES10509 = "参数编码不能为空";
         public const string MES10510 = "参数名称不能为空";
-        public const string MES10511 = "标准参数代码最大长度为50!";
+        public const string MES10511 = "标准参数代码最大长度为50";
 
         #endregion
 
