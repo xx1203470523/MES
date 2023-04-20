@@ -196,7 +196,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             }
             if (param.Statuss != null && param.Statuss.Any())
             {
-                sqlBuilder.Where("sfc.Status in @Status");
+                sqlBuilder.Where("sfc.Status in @Statuss");
             }
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var list = await conn.QueryAsync<ManuSfcView>(template.RawSql, param);
