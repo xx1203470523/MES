@@ -13,6 +13,7 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using System.Security.Policy;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -186,10 +187,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.ExecuteAsync(UpdateStatusSql, manuContainerBarcodeEntity);
         }
 
-        public async Task<ManuContainerBarcodeEntity> GetByCodeAsync(string code)
+        public async Task<ManuContainerBarcodeEntity> GetByCodeAsync(ManuContainerBarcodeQuery query)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ManuContainerBarcodeEntity>(GetByCodeSql, new { BarCode = code });
+            return await conn.QueryFirstOrDefaultAsync<ManuContainerBarcodeEntity>(GetByCodeSql, new { BarCode = query.BarCode, SiteId= query.SiteId });
         }
 
         public async Task<ManuContainerBarcodeEntity> GetByProductIdAsync(long pid, int status)
@@ -226,7 +227,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                             FROM `manu_container_barcode`  WHERE Id = @Id ";
         const string GetByCodeSql = @"SELECT 
                                `Id`, `SiteId`, `ProductId`, `BarCode`,`WorkOrderId`, `ContainerId`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `manu_container_barcode`  WHERE BarCode = @BarCode ";
+                            FROM `manu_container_barcode`  WHERE BarCode = @BarCode and SiteId=@SiteId ";
         const string GetByProductIdSql = @"SELECT 
                                `Id`, `SiteId`, `ProductId`,`WorkOrderId`, `BarCode`, `ContainerId`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_container_barcode`  WHERE IsDeleted =0 and ProductId = @ProductId and Status=@Status ";

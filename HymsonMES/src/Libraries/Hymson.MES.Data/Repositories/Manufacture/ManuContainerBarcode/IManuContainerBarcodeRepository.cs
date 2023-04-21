@@ -78,7 +78,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<ManuContainerBarcodeEntity> GetByCodeAsync(string code);
+        Task<ManuContainerBarcodeEntity> GetByCodeAsync(ManuContainerBarcodeQuery query);
         /// <summary>
         /// 根据productId获取数据
         /// </summary>
