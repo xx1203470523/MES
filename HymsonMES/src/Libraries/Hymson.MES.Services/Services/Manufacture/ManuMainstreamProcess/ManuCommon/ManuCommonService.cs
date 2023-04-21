@@ -5,6 +5,7 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
@@ -14,6 +15,8 @@ using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDt
 using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using System.Data;
+using System.Text.RegularExpressions;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon
 {
@@ -120,13 +123,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             var maskCodeRules = await _procMaskCodeRuleRepository.GetByMaskCodeIdAsync(material.MaskCodeId.Value);
             if (maskCodeRules == null || maskCodeRules.Any() == false) return true;
 
-            // TODO 对掩码规则进行校验
-            foreach (var item in maskCodeRules)
-            {
-
-            }
-
-            return await Task.FromResult(true);
+            return barCode.VerifyBarCode(maskCodeRules);
         }
 
         /// <summary>
@@ -446,6 +443,38 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             }
 
             return sfcProduceEntity;
+        }
+
+        /// <summary>
+        /// 验证条码
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <param name="maskCodeRules"></param>
+        /// <returns></returns>
+        public static bool VerifyBarCode(this string barCode, IEnumerable<ProcMaskCodeRuleEntity> maskCodeRules)
+        {
+            // 对掩码规则进行校验
+            foreach (var ruleEntity in maskCodeRules)
+            {
+                var rule = Regex.Replace(ruleEntity.Rule, "[?？]", ".");
+                var pattern = $"^{rule}$";
+
+                switch (ruleEntity.MatchWay)
+                {
+                    case MatchModeEnum.Start:
+                    case MatchModeEnum.Middle:
+                    case MatchModeEnum.End:
+                        if (Regex.IsMatch(barCode, pattern) == false) return false;
+                        break;
+                    case MatchModeEnum.Whole:
+                        if (barCode.Length != 10) return false;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            return true;
         }
 
     }
