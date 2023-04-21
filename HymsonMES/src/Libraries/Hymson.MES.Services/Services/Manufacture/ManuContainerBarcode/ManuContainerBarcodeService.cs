@@ -226,7 +226,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                      * N 创建全新包装
                      */
 
-                    var barcodeobj = await _manuContainerBarcodeRepository.GetByCodeAsync(createManuContainerBarcodeDto.ContainerCode);
+                    var barcodeobj = await _manuContainerBarcodeRepository.GetByCodeAsync(new ManuContainerBarcodeQuery {BarCode= createManuContainerBarcodeDto.ContainerCode ,SiteId=_currentSite.SiteId??0});
 
                     if (barcodeobj.WorkOrderId != workorder.Id)
                     {

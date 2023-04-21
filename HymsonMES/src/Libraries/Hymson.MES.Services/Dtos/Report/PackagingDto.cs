@@ -1,5 +1,6 @@
 ﻿using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.Core.Enums.Report;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +9,17 @@ using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Dtos.Report
 {
-    public class PackagingDto
+    public class PackagingQueryDto
     {
+        /// <summary>
+        /// 条码列表
+        /// </summary>
+        public string BarCode { get; set; }
 
+        /// <summary>
+        /// 查询类型
+        /// </summary>
+        public PackagingTypeEnum? Type { get; set; }
     }
 
     /// <summary>
