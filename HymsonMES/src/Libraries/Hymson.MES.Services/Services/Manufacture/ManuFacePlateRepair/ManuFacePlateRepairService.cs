@@ -152,10 +152,13 @@ namespace Hymson.MES.Services.Services.Manufacture
                 FacePlateButtonId = manuFacePlateRepairExJobDto.FacePlateButtonId
             };
 
-            jobDto.Param?.Add("SFC", manuFacePlateRepairExJobDto.SFC);
-            jobDto.Param?.Add("ProcedureId", $"{manuFacePlateRepairExJobDto.ProcedureId}");
-            jobDto.Param?.Add("ResourceId", $"{manuFacePlateRepairExJobDto.ResourceId}");
-
+            Dictionary<string, string> dic = new Dictionary<string, string>
+            {
+                { "SFC", manuFacePlateRepairExJobDto.SFC },
+                { "ProcedureId", $"{manuFacePlateRepairExJobDto.ProcedureId}" },
+                { "ResourceId", $"{manuFacePlateRepairExJobDto.ResourceId}" }
+            };
+            jobDto.Param = dic;
             // 调用作业
             var resJob = await _manuFacePlateButtonService.ClickAsync(jobDto);
             if (resJob == null || resJob.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES17320));
@@ -168,10 +171,10 @@ namespace Hymson.MES.Services.Services.Manufacture
                     if (!list.Contains(ManuFacePlateRepairButJobReturnTypeEnum.JobManuRepairStartService))
                         list.Add(ManuFacePlateRepairButJobReturnTypeEnum.JobManuRepairStartService);
                 }
-                else if (item.Key == ManuFacePlateRepairButJobReturnTypeEnum.JobManuCompleteService.ToString())
+                else if (item.Key == ManuFacePlateRepairButJobReturnTypeEnum.JobManuRepairEndService.ToString())
                 {
-                    if (!list.Contains(ManuFacePlateRepairButJobReturnTypeEnum.JobManuCompleteService))
-                        list.Add(ManuFacePlateRepairButJobReturnTypeEnum.JobManuCompleteService);
+                    if (!list.Contains(ManuFacePlateRepairButJobReturnTypeEnum.JobManuRepairEndService))
+                        list.Add(ManuFacePlateRepairButJobReturnTypeEnum.JobManuRepairEndService);
                 }
                 else
                 {
@@ -216,11 +219,12 @@ namespace Hymson.MES.Services.Services.Manufacture
                     throw new CustomerValidationException(nameof(ErrorCode.MES16310));
                 }
             }
-            //验证在制信息
-            if (manuSfcProduceEntit.ProcedureId != beginRepairDto.ProcedureId || manuSfcProduceEntit.Status != SfcProduceStatusEnum.lineUp)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16308));
-            }
+
+            //验证在制信息(JOb已经把状态改了，所以这里不用验证了)
+            //if (manuSfcProduceEntit.ProcedureId != beginRepairDto.ProcedureId || manuSfcProduceEntit.Status != SfcProduceStatusEnum.lineUp)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES16308));
+            //}
             #endregion
 
             #region 获取展示信息 

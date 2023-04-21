@@ -539,9 +539,9 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     public record ManuSfcProduceStepViewDto
     {
         /// <summary>
-        /// SFC
+        /// 步骤
         /// </summary>
-        //public string Sfc { get; set; }
+        public int Step { get; set; }
         /// <summary>
         /// 工序Id
         /// </summary>
