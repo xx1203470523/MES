@@ -161,8 +161,15 @@ namespace Hymson.MES.Data.Repositories.Plan
 
             if (pageQuery.Status.HasValue) sqlBuilder.Where("wo.Status = @Status");
             if (pageQuery.IsLocked.HasValue) sqlBuilder.Where("wo.IsLocked = @IsLocked");
-            if (pageQuery.PlanStartTimeS.HasValue) sqlBuilder.Where("wo.PlanStartTime>= @PlanStartTimeS");
-            if (pageQuery.PlanStartTimeE.HasValue) sqlBuilder.Where("wo.PlanStartTime< @PlanStartTimeE");
+            if (pageQuery.PlanStartTimeS.HasValue || pageQuery.PlanStartTimeE.HasValue)
+            {
+                if (pageQuery.PlanStartTimeS.HasValue && pageQuery.PlanStartTimeE.HasValue) sqlBuilder.Where("wo.PlanStartTime BETWEEN @PlanStartTimeS AND @PlanStartTimeE");
+                else
+                {
+                    if (pageQuery.PlanStartTimeS.HasValue) sqlBuilder.Where("wo.PlanStartTime >= @PlanStartTimeS");
+                    if (pageQuery.PlanStartTimeE.HasValue) sqlBuilder.Where("wo.PlanStartTime < @PlanStartTimeE");
+                }
+            }
 
             var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });

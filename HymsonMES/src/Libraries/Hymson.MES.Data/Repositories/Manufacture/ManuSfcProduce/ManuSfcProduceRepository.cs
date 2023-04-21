@@ -58,6 +58,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("msp.Lock=@Lock");
             }
+            if (query.NoLock.HasValue)
+            {
+                if (query.NoLock != 1)
+                {
+                    sqlBuilder.Where("(msp.Lock!=@NoLock or `Lock`  is null)");
+                }        
+            }
             if (!string.IsNullOrWhiteSpace(query.Sfc))
             {
                 query.Sfc = $"%{query.Sfc}%";

@@ -98,16 +98,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 sqlBuilder.Where("MS.IsUsed = @IsUsed");
             }
 
-            if (!string.IsNullOrWhiteSpace(pagedQuery.WorkOrderCode))
+            if (!string.IsNullOrWhiteSpace(pagedQuery.OrderCode))
             {
-                pagedQuery.WorkOrderCode = $"%{pagedQuery.WorkOrderCode}%";
-                sqlBuilder.Where("PWO.OrderCode LIKE @WorkOrderCode");
+                pagedQuery.OrderCode = $"%{pagedQuery.OrderCode}%";
+                sqlBuilder.Where("PWO.OrderCode LIKE @OrderCode");
             }
 
-            if (!string.IsNullOrWhiteSpace(pagedQuery.MaterialCode))
+            if (!string.IsNullOrWhiteSpace(pagedQuery.SFC))
             {
-                pagedQuery.MaterialCode = $"%{pagedQuery.MaterialCode}%";
-                sqlBuilder.Where("PM.MaterialCode LIKE @MaterialCode");
+                pagedQuery.SFC = $"%{pagedQuery.SFC}%";
+                sqlBuilder.Where("MS.SFC LIKE @SFC");
             }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
@@ -196,7 +196,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             }
             if (param.Statuss != null && param.Statuss.Any())
             {
-                sqlBuilder.Where("sfc.Status in @Status");
+                sqlBuilder.Where("sfc.Status in @Statuss");
             }
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var list = await conn.QueryAsync<ManuSfcView>(template.RawSql, param);
