@@ -9,9 +9,9 @@ using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 namespace Hymson.MES.Services.Services.Job.Manufacture
 {
     /// <summary>
-    /// 组装
+    /// 结束（维修）
     /// </summary>
-    public class JobManuPackageService : IJobManufactureService
+    public class JobManuRepairEndService : IJobManufactureService
     {
         /// <summary>
         /// 当前对象（登录用户）
@@ -30,7 +30,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <param name="currentSite"></param>
         /// <param name="manuCommonService"></param>
         /// <param name="manuSfcProduceRepository"></param>
-        public JobManuPackageService(ICurrentUser currentUser, ICurrentSite currentSite,
+        public JobManuRepairEndService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonService manuCommonService,
             IManuSfcProduceRepository manuSfcProduceRepository)
         {
@@ -58,7 +58,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         }
 
         /// <summary>
-        /// 执行（组装）
+        /// 执行（维修）
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
