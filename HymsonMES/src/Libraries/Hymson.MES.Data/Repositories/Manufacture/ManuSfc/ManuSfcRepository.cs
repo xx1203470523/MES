@@ -98,10 +98,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 sqlBuilder.Where("MS.IsUsed = @IsUsed");
             }
 
-            if (!string.IsNullOrWhiteSpace(pagedQuery.WorkOrderCode))
+            if (!string.IsNullOrWhiteSpace(pagedQuery.OrderCode))
             {
-                pagedQuery.WorkOrderCode = $"%{pagedQuery.WorkOrderCode}%";
-                sqlBuilder.Where("PWO.OrderCode LIKE @WorkOrderCode");
+                pagedQuery.OrderCode = $"%{pagedQuery.OrderCode}%";
+                sqlBuilder.Where("PWO.OrderCode LIKE @OrderCode");
             }
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.SFC))

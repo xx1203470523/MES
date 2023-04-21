@@ -16,7 +16,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 工单号
         /// </summary>
-        public string? WorkOrderCode { get; set; }
+        public string? OrderCode { get; set; }
 
         /// <summary>
         /// 产品条码
