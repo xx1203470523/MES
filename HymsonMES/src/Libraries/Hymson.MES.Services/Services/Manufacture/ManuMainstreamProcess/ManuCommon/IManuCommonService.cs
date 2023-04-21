@@ -15,7 +15,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        Task<ManuSfcProduceEntity> GetProduceSFCAsync(string sfc);
+      Task<(ManuSfcProduceEntity, ManuSfcProduceBusinessEntity)> GetProduceSFCAsync(string sfc);
 
         /// <summary>
         /// 获取生产工单
