@@ -6,7 +6,6 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Bos.Manufacture;
-using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Utils;
 
@@ -73,10 +72,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
             var rows = 0;
 
             // 获取生产条码信息
-            var sfcProduceEntity = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
+            var (sfcProduceEntity, sfcProduceBusinessEntity) = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
 
             // 合法性校验
             sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.lineUp).VerifyProcedure(bo.ProcedureId);
+            sfcProduceBusinessEntity.VerifyProcedureLock(bo.SFC, bo.ProcedureId);
 
             // 如果工序对应不上
             if (sfcProduceEntity.ProcedureId != bo.ProcedureId)

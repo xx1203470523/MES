@@ -21,6 +21,6 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 结束维修
         /// </summary>
         [Description("结束维修")]
-        JobManuCompleteService = 2,
+        JobManuRepairEndService = 2,
     }
 }

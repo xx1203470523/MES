@@ -52,12 +52,13 @@ namespace Hymson.MES.Services.Services.Report
         /// <summary>
         /// 根据容器编码查询容器当前信息
         /// </summary>
-        /// <param name="code"></param>
+        /// <param name="barCode"></param>
         /// <returns></returns>
-        public async Task<ManuContainerBarcodeViewDto> QueryManuContainerByCodeAsync(string code)
+        public async Task<ManuContainerBarcodeViewDto> QueryManuContainerByCodeAsync(string barCode)
         {
             var barcodeViewDto = new ManuContainerBarcodeViewDto();
-            var barcodeEntity = await _manuContainerBarcodeRepository.GetByCodeAsync(code);
+            var query = new ManuContainerBarcodeQuery { BarCode = barCode, SiteId = _currentSite.SiteId ?? 0 };
+            var barcodeEntity = await _manuContainerBarcodeRepository.GetByCodeAsync(query);
             if (barcodeEntity == null)
             {
                 return barcodeViewDto;
@@ -65,7 +66,7 @@ namespace Hymson.MES.Services.Services.Report
 
             //获取产品信息
             var materials = await _procMaterialRepository.GetByIdAsync(barcodeEntity.ProductId);
-            barcodeViewDto.Id= barcodeEntity.Id;
+            barcodeViewDto.Id = barcodeEntity.Id;
             barcodeViewDto.ProductCode = materials?.MaterialCode ?? "";
             barcodeViewDto.ProductName = materials?.MaterialName ?? "";
             barcodeViewDto.Status = barcodeEntity.Status;
@@ -73,12 +74,21 @@ namespace Hymson.MES.Services.Services.Report
             var inteContainer = await _inteContainerRepository.GetByIdAsync(barcodeEntity.ContainerId);
             barcodeViewDto.Level = inteContainer?.Level;
 
-           var lists= await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(barcodeEntity.Id);
+            var lists = await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(barcodeEntity.Id);
             barcodeViewDto.CurrentQuantity = lists.ToList().Count;
 
             return barcodeViewDto;
         }
 
-
+        /// <summary>
+        /// 根据容器编码查询容器当前信息
+        /// </summary>
+        /// <param name="containerBarCodeId"></param>
+        /// <returns></returns>
+        public async Task<List<ManuContainerPackDto>> QueryManuContainerPackByBarCodeId(long containerBarCodeId)
+        {
+            var lists = await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(containerBarCodeId);
+            return new List<ManuContainerPackDto>();
+        }
     }
 }

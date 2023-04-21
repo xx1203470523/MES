@@ -38,7 +38,7 @@
         public const string MES10221 = "已被分配物料，不允许删除！";
         public const string MES10222 = "插入物料供应商关联表失败！";
         public const string MES10223 = "物料编码最大长度为50";
-        public const string MES10224= "物料名称最大长度为50";
+        public const string MES10224 = "物料名称最大长度为50";
 
         #endregion
 
@@ -148,7 +148,7 @@
         public const string MES10711 = "关联资源页签资源不能重复!";
         public const string MES10712 = "上料点不能为空";
         public const string MES10713 = "上料点名称不能为空";
-        public const string MES10714= "上料点最大长度为50";
+        public const string MES10714 = "上料点最大长度为50";
         public const string MES10715 = "上料点名称最大长度为60";
         #endregion
 
@@ -303,7 +303,7 @@
         #region 车间库存接收  15100
         public const string MES15100 = "物料库存错误";
         public const string MES15101 = "物料不存在";
-        public const string MES15102 = "物料条码：{MaterialCode}未关联到供应商";
+        public const string MES15102 = "物料条码未关联到供应商";
         public const string MES15103 = "物料条码：{MaterialCode}数量需大于0";
         public const string MES15104 = " 物料条码：{MaterialCode}在车间库存中已存在！";
         public const string MES15105 = " 增加库存失败";
@@ -583,13 +583,18 @@
 
 
         #region 在制品步骤控制
-        public const string MES18000 = "条码:{SFC}状态{Status}不允许操作";
-        public const string MES18001 = "条码:{SFC}工单信息不存在";
-        public const string MES18002 = "条码:{SFC}工单状态{Status}不允许操作";
-        public const string MES18003 = "在制信息不存在";
-        public const string MES18004 = "工艺路线信息不存在";
-        public const string MES18005 = "工艺路线节点信息不存在";
-        public const string MES18006 = "在库条码:{SFC}对于工单所在工艺路线不存在尾工序节点";
+        public const string MES18000 = "在制品步骤控制错误";
+        public const string MES18001 = "条码信息不存在";
+        public const string MES18002 = "请扫描相同工单的条码";
+        public const string MES18003 = "工单信息不存在";
+        public const string MES18004 = "需扫描相同工艺路线条码";
+        public const string MES18005 = "工艺路线不存在节点";
+        public const string MES18006 = "条码:{SFC}已报废,不允许操作";
+        public const string MES18007 = "条码没有对应的生产工序";
+        public const string MES18008 = "条码生产状态异常:{Status}";
+        public const string MES18009 = "工单状态不允许";
+        public const string MES180010 = "条码已锁定不允许操作";
+
 
 
         #endregion
