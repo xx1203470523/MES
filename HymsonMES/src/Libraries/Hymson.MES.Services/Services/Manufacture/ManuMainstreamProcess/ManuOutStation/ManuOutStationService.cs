@@ -246,7 +246,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             var rows = 0;
 
             // 获取生产条码信息
-            var sfcProduceEntity = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
+            var (sfcProduceEntity, _) = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
 
             // 合法性校验
             sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity).VerifyProcedure(bo.ProcedureId);
