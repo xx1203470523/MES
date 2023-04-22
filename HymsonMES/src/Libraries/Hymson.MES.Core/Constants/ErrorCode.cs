@@ -494,6 +494,7 @@
         public const string MES17319 = "作业:{key}执行失败";
         public const string MES17320 = "作业返回空，请检查作业是否正确配置";
         public const string MES17321 = "不识别的类型：{key}";
+        public const string MES17322 = "请先开始维修";
 
 
         #endregion

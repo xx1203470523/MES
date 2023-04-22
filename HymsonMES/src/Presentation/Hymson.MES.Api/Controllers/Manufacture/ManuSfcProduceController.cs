@@ -4,6 +4,11 @@
  *build datetime: 2023-03-18 05:37:27
  */
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Core.Constants.Process;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
+using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Microsoft.AspNetCore.Mvc;
@@ -138,5 +143,18 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         {
             await _manuSfcProduceService.DeletesManuSfcProduceAsync(ids);
         }
+
+        #region 在制品步骤控制
+        /// <summary>
+        /// 根据SFC查询在制品步骤列表
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        [HttpPost("getManuSfcProduceStep")]
+        public async Task<List<ManuSfcProduceStepViewDto>> QueryManuSfcProduceStepBySFCsAsync(List<ManuSfcProduceStepSFCDto> sfcs)
+        {
+            return await _manuSfcProduceService.QueryManuSfcProduceStepBySFCsAsync(sfcs);
+        }
+        #endregion
     }
 }

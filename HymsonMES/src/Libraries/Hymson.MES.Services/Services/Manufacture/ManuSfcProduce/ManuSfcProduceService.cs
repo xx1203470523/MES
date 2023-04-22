@@ -808,6 +808,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             foreach (var item in manuSfcProduceEntit)
             {
 
+                //为错误信息添加SFC头
                 var validationFailure = new ValidationFailure();
                 if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
                 {
@@ -820,6 +821,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.SFC);
                 }
 
+                //锁定不允许操作
                 if (item.Lock != QualityLockEnum.Unlock)
                 {
                     validationFailure.ErrorCode = nameof(ErrorCode.MES180010);
