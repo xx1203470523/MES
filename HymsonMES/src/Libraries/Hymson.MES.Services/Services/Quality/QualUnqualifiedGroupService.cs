@@ -102,7 +102,7 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 throw new ValidationException(nameof(ErrorCode.MES10100));
             }
-            param.UnqualifiedGroup = param.UnqualifiedGroup.ToUpperInvariant();
+            param.UnqualifiedGroup = param.UnqualifiedGroup.Trim().ToUpperInvariant();
 
             await _validationCreateRules.ValidateAndThrowAsync(param);
 

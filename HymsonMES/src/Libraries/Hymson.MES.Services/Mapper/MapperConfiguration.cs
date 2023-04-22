@@ -488,11 +488,12 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<CreateManuContainerBarcodeDto, ManuContainerBarcodeEntity>();
 
             CreateMap<ManuContainerPackRecordCreateDto, ManuContainerPackRecordEntity>();
-
-
-
             #endregion
 
+            #region ContainerPackRecord
+            CreateMap<ManuContainerPackRecordPagedQueryDto, ManuContainerPackRecordPagedQuery>();
+            CreateMap<ManuContainerPackRecordEntity, ManuContainerPackRecordDto>();
+            #endregion
         }
 
         /// <summary>

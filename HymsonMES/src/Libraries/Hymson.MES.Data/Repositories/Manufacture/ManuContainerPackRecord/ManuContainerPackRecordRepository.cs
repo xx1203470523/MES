@@ -83,6 +83,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
+            sqlBuilder.Where("SiteId=@SiteId");
 
             if (manuContainerPackRecordPagedQuery.ContainerBarCodeId.HasValue)
             {

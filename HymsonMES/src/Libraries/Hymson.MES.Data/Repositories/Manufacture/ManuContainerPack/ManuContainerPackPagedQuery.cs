@@ -15,6 +15,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     public class ManuContainerPackPagedQuery : PagerInfo
     {
         /// <summary>
+        /// 变电id
+        /// </summary>
+        public long SiteId { get; set; }
+        /// <summary>
         /// 容器Id
         /// </summary>
         public long? BarCodeId { get; set; }

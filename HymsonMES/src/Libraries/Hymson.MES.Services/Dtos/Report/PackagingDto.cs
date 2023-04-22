@@ -75,12 +75,12 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 物料编码
         /// </summary>
-        public string MaterialCode { get; set; }
+        public string ProductCode { get; set; }
 
         /// <summary>
         /// 物料名称
         /// </summary>
-        public string MaterialName { get; set; }
+        public string ProductName { get; set; }
 
         /// <summary>
         /// 物料版本

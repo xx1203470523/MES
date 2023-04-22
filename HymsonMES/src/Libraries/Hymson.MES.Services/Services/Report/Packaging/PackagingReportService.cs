@@ -131,8 +131,8 @@ namespace Hymson.MES.Services.Services.Report
             {
                 WorkOrderId = planWorkOrder.Id,
                 OrderCode = planWorkOrder.OrderCode,
-                MaterialCode = procMaterial.MaterialCode,
-                MaterialName = procMaterial.MaterialName,
+                ProductCode = procMaterial.MaterialCode,
+                ProductName = procMaterial.MaterialName,
                 MaterialVersion = procMaterial.Version ?? "",
                 Level = LevelEnum.One
             };

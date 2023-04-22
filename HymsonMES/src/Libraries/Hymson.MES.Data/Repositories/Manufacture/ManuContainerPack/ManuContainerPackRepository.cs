@@ -96,6 +96,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("pack.IsDeleted=0");
+            sqlBuilder.Where("pack.SiteId=@SiteId");
             sqlBuilder.Select("pack.Id,pack.SiteId,pack.ContainerBarCodeId,pack.CreatedBy,pack.CreatedOn,barcode.BarCode,barcode.ProductId,pack.LadeBarCode");
             sqlBuilder.LeftJoin("manu_container_barcode barcode on barcode.Id =pack.ContainerBarCodeId and barcode.IsDeleted=0");
             if (!string.IsNullOrWhiteSpace(manuContainerPackPagedQuery.BarCode))

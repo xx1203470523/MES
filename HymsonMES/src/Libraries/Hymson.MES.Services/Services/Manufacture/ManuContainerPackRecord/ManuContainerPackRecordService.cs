@@ -103,6 +103,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task<PagedInfo<ManuContainerPackRecordDto>> GetPagedListAsync(ManuContainerPackRecordPagedQueryDto manuContainerPackRecordPagedQueryDto)
         {
             var manuContainerPackRecordPagedQuery = manuContainerPackRecordPagedQueryDto.ToQuery<ManuContainerPackRecordPagedQuery>();
+            manuContainerPackRecordPagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _manuContainerPackRecordRepository.GetPagedInfoAsync(manuContainerPackRecordPagedQuery);
 
             //实体到DTO转换 装载数据
