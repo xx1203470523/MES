@@ -14,6 +14,8 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 using Org.BouncyCastle.Crypto;
+using System.Security.Cryptography;
+using System.Security.Policy;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -180,16 +182,33 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.ExecuteAsync(UpdatesSql, manuContainerPackEntitys);
         }
 
-        public async Task<ManuContainerPackEntity> GetByLadeBarCodeAsync(string sfc)
+        public async Task<ManuContainerPackEntity> GetByLadeBarCodeAsync(ManuContainerPackQuery query)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ManuContainerPackEntity>(GetBysfcSql, new { SFC = sfc });
+            return await conn.QueryFirstOrDefaultAsync<ManuContainerPackEntity>(GetBysfcSql, new { LadeBarCode = query.LadeBarCode, SiteId=query.SiteId });
         }
 
         public async Task<IEnumerable<ManuContainerPackEntity>> GetByContainerBarCodeIdAsync(long cid)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuContainerPackEntity>(GetByPackcodeSql, new { ContainerBarCodeId = cid });
+        }
+
+        public async Task<IEnumerable<ManuContainerPackEntity>> GetByContainerBarCodeIdsAsync(long [] ids)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuContainerPackEntity>(GetByContainerBarCodeIdsSql, new { Ids = ids });
+        }
+
+        /// <summary>
+        /// 获取容器的包装数量
+        /// </summary>
+        /// <param name="containerBarCodeId"></param>
+        /// <returns></returns>
+        public async Task<int> GetCountByrBarCodeIdAsync(long containerBarCodeId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteScalarAsync<int>(GetCountByrBarCodeIdSql,new { ContainerBarCodeId = containerBarCodeId });
         }
         #endregion
 
@@ -219,13 +238,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                             FROM `manu_container_pack`  WHERE Id = @Id ";
         const string GetBysfcSql = @"SELECT 
                                `Id`, `SiteId`, `ContainerBarCodeId`, `LadeBarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `manu_container_pack`  WHERE LadeBarCode = @SFC ";
+                            FROM `manu_container_pack`  WHERE LadeBarCode = @LadeBarCode  and SiteId=@SiteId ";
         const string GetByPackcodeSql = @"SELECT 
                                `Id`, `SiteId`, `ContainerBarCodeId`, `LadeBarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_container_pack`  WHERE ContainerBarCodeId = @ContainerBarCodeId ";
+
+        const string GetByContainerBarCodeIdsSql = @"SELECT 
+                               `Id`, `SiteId`, `ContainerBarCodeId`, `LadeBarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `manu_container_pack`  WHERE ContainerBarCodeId in @Ids ";
+
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `ContainerBarCodeId`, `LadeBarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_container_pack`  WHERE Id IN @Ids ";
+
+        const string GetCountByrBarCodeIdSql = "SELECT COUNT(*) FROM manu_container_pack where ContainerBarCodeId=@ContainerBarCodeId";
         #endregion
     }
 }

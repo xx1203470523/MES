@@ -18,13 +18,13 @@ namespace Hymson.MES.Api.Controllers.Report
     public class BadRecordReportController : ControllerBase
     {
         /// <summary>
-        /// 接口（工单信息表）
+        /// 接口（不良报告）
         /// </summary>
         private readonly IBadRecordReportService _badRecordReportService;
         private readonly ILogger<BadRecordReportController> _logger;
 
         /// <summary>
-        /// 构造函数（工单信息表）
+        /// 构造函数（不良报告）
         /// </summary>
         /// <param name="badRecordReportService"></param>
         public BadRecordReportController(IBadRecordReportService badRecordReportService, ILogger<BadRecordReportController> logger)
@@ -35,7 +35,7 @@ namespace Hymson.MES.Api.Controllers.Report
 
 
         /// <summary>
-        /// 分页查询列表（工单信息表）
+        /// 分页查询列表（不良报告）
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
