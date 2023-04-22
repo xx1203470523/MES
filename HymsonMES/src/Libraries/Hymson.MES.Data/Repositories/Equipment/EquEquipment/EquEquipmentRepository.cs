@@ -127,14 +127,14 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         }
 
         /// <summary>
-        /// 
+        /// 根据设备编码查询实体
         /// </summary>
-        /// <param name="equipmentCode"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<EquEquipmentEntity> GetByEquipmentCodeAsync(string equipmentCode)
+        public async Task<EquEquipmentEntity> GetByEquipmentCodeAsync(EntityByCodeQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<EquEquipmentEntity>(GetByEquipmentCodeSql, new { equipmentCode });
+            return await conn.QueryFirstOrDefaultAsync<EquEquipmentEntity>(GetByEquipmentCodeSql, query);
         }
 
         /// <summary>
@@ -245,7 +245,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         const string GetByIdSql = "SELECT * FROM `equ_equipment` WHERE `Id` = @Id;";
         const string GetByGroupIdSql = "SELECT * FROM `equ_equipment` WHERE `IsDeleted` = 0 AND EquipmentGroupId = @EquipmentGroupId;";
         const string GetBaseListSql = "SELECT * FROM `equ_equipment` WHERE `IsDeleted` = 0;";
-        const string GetByEquipmentCodeSql = "SELECT * FROM `equ_equipment` WHERE `IsDeleted` = 0 AND EquipmentCode = @EquipmentCode;";
+        const string GetByEquipmentCodeSql = "SELECT * FROM `equ_equipment` WHERE IsDeleted = 0 AND SiteId = @Site AND EquipmentCode = @Code;";
         const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM equ_equipment EE /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM equ_equipment EE /**innerjoin**/ /**leftjoin**/ /**where**/";
         const string GetEntitiesSqlTemplate = "";

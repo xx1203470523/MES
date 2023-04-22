@@ -71,11 +71,11 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         Task<IEnumerable<EquEquipmentEntity>> GetByGroupIdAsync(long equipmentGroupId);
 
         /// <summary>
-        /// 
+        /// 根据设备编码查询实体
         /// </summary>
-        /// <param name="equipmentCode"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        Task<EquEquipmentEntity> GetByEquipmentCodeAsync(string equipmentCode);
+        Task<EquEquipmentEntity> GetByEquipmentCodeAsync(EntityByCodeQuery query);
 
         /// <summary>
         /// 
