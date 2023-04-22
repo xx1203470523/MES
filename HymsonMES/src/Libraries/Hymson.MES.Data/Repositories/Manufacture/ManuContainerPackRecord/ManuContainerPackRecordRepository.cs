@@ -84,11 +84,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-           
+            if (manuContainerPackRecordPagedQuery.ContainerBarCodeId.HasValue)
+            {
+                sqlBuilder.Where("ContainerBarCodeId=@ContainerBarCodeId");
+            }
+            if (string.IsNullOrWhiteSpace(manuContainerPackRecordPagedQuery.LadeBarCode))
+            {
+                sqlBuilder.Where("LadeBarCode=@LadeBarCode");
+            }
+
             var offSet = (manuContainerPackRecordPagedQuery.PageIndex - 1) * manuContainerPackRecordPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = manuContainerPackRecordPagedQuery.PageSize });

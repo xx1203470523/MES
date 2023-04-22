@@ -200,5 +200,10 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 容器条码
         /// </summary>
         public string? BarCode { get; set; }
+
+        /// <summary>
+        /// 装载条码
+        /// </summary>
+        public string? LadeBarCode { get; set; }
     }
 }

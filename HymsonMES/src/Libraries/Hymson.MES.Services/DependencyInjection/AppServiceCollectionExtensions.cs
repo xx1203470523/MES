@@ -43,6 +43,7 @@ using Hymson.MES.Services.Services.Process.Resource;
 using Hymson.MES.Services.Services.Process.ResourceType;
 using Hymson.MES.Services.Services.Quality;
 using Hymson.MES.Services.Services.Quality.IQualityService;
+using Hymson.MES.Services.Services.Report;
 using Hymson.MES.Services.Services.Warehouse;
 using Hymson.MES.Services.Validators.Equipment;
 using Hymson.MES.Services.Validators.Integrated;
@@ -222,6 +223,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IJobManufactureService, JobManuStopService>();
             #endregion
 
+            #region report
+            services.AddSingleton<IPackagingReportService, PackagingReportService>();
+            #endregion
             return services;
         }
 

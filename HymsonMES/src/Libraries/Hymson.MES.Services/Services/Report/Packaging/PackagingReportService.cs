@@ -1,10 +1,15 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Manufacture;
+using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Report;
 
 namespace Hymson.MES.Services.Services.Report
@@ -36,17 +41,24 @@ namespace Hymson.MES.Services.Services.Report
         /// </summary>
         private readonly IManuContainerPackRepository _manuContainerPackRepository;
 
+        /// <summary>
+        /// 工单信息表 仓储
+        /// </summary>
+        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
+
         public PackagingReportService(ICurrentSite currentSite,
          IInteContainerRepository inteContainerRepository,
          IManuContainerBarcodeRepository manuContainerBarcodeRepository,
          IProcMaterialRepository procMaterialRepository,
-        IManuContainerPackRepository manuContainerPackRepository)
+         IManuContainerPackRepository manuContainerPackRepository,
+         IPlanWorkOrderRepository planWorkOrderRepository)
         {
             _currentSite = currentSite;
             _inteContainerRepository = inteContainerRepository;
             _manuContainerBarcodeRepository = manuContainerBarcodeRepository;
             _procMaterialRepository = procMaterialRepository;
             _manuContainerPackRepository = manuContainerPackRepository;
+            _planWorkOrderRepository=planWorkOrderRepository;
         }
 
         /// <summary>
@@ -64,6 +76,54 @@ namespace Hymson.MES.Services.Services.Report
                 return barcodeViewDto;
             }
 
+            return await GetBarCodeViewAsync(barcodeEntity);
+        }
+
+        /// <summary>
+        /// 查询装载条码的包装信息
+        /// </summary>
+        /// <param name="ladeBarCode"></param>
+        /// <returns></returns>
+        public async Task<ManuContainerBarcodeViewDto> QueryContainerByLadeBarCodeeAsync(string ladeBarCode)
+        {
+            var barcodeViewDto = new ManuContainerBarcodeViewDto();
+
+            //根据装载的条码获取到容器的id
+            var containerPackEntity = await _manuContainerPackRepository.GetByLadeBarCodeAsync(ladeBarCode);
+            if (containerPackEntity == null)
+            {
+                return barcodeViewDto;
+            }
+
+            var barcodeEntity = await _manuContainerBarcodeRepository.GetByIdAsync(containerPackEntity.Id);
+            if (barcodeEntity == null)
+            {
+                return barcodeViewDto;
+            }
+
+            return await GetBarCodeViewAsync(barcodeEntity);
+        }
+
+        /// <summary>
+        /// 查询工单信息
+        /// </summary>
+        /// <param name="workOrderCode"></param>
+        /// <returns></returns>
+        public async Task<PlanWorkOrderListDetailViewDto> GetByWorkOrderCodeAsync(string workOrderCode)
+        {
+            var query = new PlanWorkOrderQuery
+            {
+                OrderCode = workOrderCode,
+                SiteId = _currentSite.SiteId ?? 0
+            };
+            await _planWorkOrderRepository.GetByCodeAsync(query);
+            return new PlanWorkOrderListDetailViewDto();
+        }
+
+        private async Task<ManuContainerBarcodeViewDto> GetBarCodeViewAsync(ManuContainerBarcodeEntity barcodeEntity)
+        {
+            var barcodeViewDto = new ManuContainerBarcodeViewDto();
+
             //获取产品信息
             var materials = await _procMaterialRepository.GetByIdAsync(barcodeEntity.ProductId);
             barcodeViewDto.Id = barcodeEntity.Id;
@@ -78,17 +138,6 @@ namespace Hymson.MES.Services.Services.Report
             barcodeViewDto.CurrentQuantity = lists.ToList().Count;
 
             return barcodeViewDto;
-        }
-
-        /// <summary>
-        /// 根据容器编码查询容器当前信息
-        /// </summary>
-        /// <param name="containerBarCodeId"></param>
-        /// <returns></returns>
-        public async Task<List<ManuContainerPackDto>> QueryManuContainerPackByBarCodeId(long containerBarCodeId)
-        {
-            var lists = await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(containerBarCodeId);
-            return new List<ManuContainerPackDto>();
         }
     }
 }
