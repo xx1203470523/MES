@@ -350,7 +350,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         private async Task<ManuFacePlateRepairOpenInfoDto> GetManuFacePlateRepairOpenInfoDto(ManuSfcProduceEntity manuSfcProduceEntit)
         {
             //获取产品信息
-            var manuSfcProduce = await _manuSfcProduceRepository.GetPagedInfoAsync(new ManuSfcProducePagedQuery { PageSize = 1, PageIndex = 1, SiteId = _currentSite.SiteId, Sfc = sfc });
+            var manuSfcProduce = await _manuSfcProduceRepository.GetPagedInfoAsync(new ManuSfcProducePagedQuery { PageSize = 1, PageIndex = 1, SiteId = _currentSite.SiteId, Sfc = manuSfcProduceEntit.SFC });
             var manuSfcProduceInfo = manuSfcProduce.Data.FirstOrDefault();
             if (manuSfcProduceInfo == null)
             {
