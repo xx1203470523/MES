@@ -13,5 +13,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public class ManuContainerPackQuery
     {
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string? LadeBarCode { get; set; }
+
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long SiteId { get; set; }
     }
 }

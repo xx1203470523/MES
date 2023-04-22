@@ -546,6 +546,7 @@
         public const string MES16612 = "当前工序与条码生产信息中的不一致！";
         public const string MES16613 = "请选择活动状态下的组件移除！";
         public const string MES16614 = "请选择活动状态下的组件替换！";
+        public const string MES16615= "组件条码已装配所有组件,无需添加!";
         #endregion
 
         #region 容器包装 MES 16700
