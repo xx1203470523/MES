@@ -734,7 +734,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task<List<ManuSfcProduceStepViewDto>> QueryManuSfcProduceStepBySFCsAsync(List<ManuSfcProduceStepSFCDto> sfcs)
         {
 
-            #region 验证
+            #region 参数验证
             if (sfcs == null || sfcs.Count() == 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
@@ -744,23 +744,22 @@ namespace Hymson.MES.Services.Services.Manufacture
             #region 组装
 
             #region 主数据
-            //获取工艺路线
-            var manuSfcProduceStepList = new List<ManuSfcProduceStepViewDto>();
-            var errorMsg = "";
-
             //获取条码
             var manuSfcs = sfcs.Select(it => it.Sfc).ToArray();
             var manuSfcInfoEntitiesParam = new ManuSfcStatusQuery { Sfcs = manuSfcs, Statuss = new SfcStatusEnum?[3] { SfcStatusEnum.InProcess, SfcStatusEnum.Complete, SfcStatusEnum.Received } };
             var manuSfcInfos = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(manuSfcInfoEntitiesParam);
-            if (manuSfcs.Count() != manuSfcInfos.Count())
-            {
-                var differentSfcs = sfcs.Where(it => !manuSfcInfos.Where(info => info.SFC.Contains(it.Sfc)).Any()).ToList();
-                throw new CustomerValidationException(nameof(ErrorCode.MES18006)).WithData("SFC", string.Join(",", differentSfcs));
-            }
+
             if (manuSfcInfos == null || manuSfcInfos.Count() == 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18001));
             }
+
+            if (manuSfcs.Count() != manuSfcInfos.Count())
+            {
+                var differentSfcs = sfcs.Where(it => !manuSfcInfos.Where(info => info.SFC.Contains(it.Sfc)).Any()).Select(it => it.Sfc).ToList();
+                throw new CustomerValidationException(nameof(ErrorCode.MES18006)).WithData("SFC", string.Join(",", differentSfcs));
+            }
+
             //获取工单
             var workOrderArr = manuSfcInfos.Select(it => it.WorkOrderId).Distinct().ToArray();
             if (workOrderArr.Count() > 1)
@@ -795,8 +794,37 @@ namespace Hymson.MES.Services.Services.Manufacture
             #endregion
 
             #region 组装节点
-            //罐装节点
+            //组装节点
+            var nodeList = new List<long>();
+            foreach (var item in processRouteNodes)
+            {
+                foreach (var node in item.ProcedureIds)
+                {
+                    nodeList.Add(node);
+                }
+            }
+            //获取工序
+            var procProcedures = await _procProcedureRepository.GetByIdsAsync(nodeList.ToArray());
+            if (!procProcedures.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES180011));
+            }
 
+            //组装工序
+            var manuSfcProduceStepList = new List<ManuSfcProduceStepViewDto>();
+            int i = 0;
+            foreach (var item in procProcedures)
+            {
+                i++;
+                var manuSfcProduceStep = new ManuSfcProduceStepViewDto()
+                {
+                    ProcedureId = item.Id,
+                    ProcedureCode = item.Code,
+                    ProcedureName = item.Name,
+                    Step = i
+                };
+                manuSfcProduceStepList.Add(manuSfcProduceStep);
+            }
             #endregion
 
             #region 组装步骤数据
@@ -822,7 +850,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 }
 
                 //锁定不允许操作
-                if (item.Lock != QualityLockEnum.Unlock)
+                if (item.Lock == QualityLockEnum.FutureLock || item.Lock == QualityLockEnum.InstantLock)
                 {
                     validationFailure.ErrorCode = nameof(ErrorCode.MES180010);
                     validationFailures.Add(validationFailure);
@@ -855,7 +883,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             //已完成入库数据
-            foreach (var item in manuSfcInfos)
+            var manuSfcInfoList = manuSfcInfos.Where(it => it.Status == SfcStatusEnum.Complete || it.Status == SfcStatusEnum.Received).ToList();
+            foreach (var item in manuSfcInfoList)
             {
                 var validationFailure = new ValidationFailure();
                 if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())

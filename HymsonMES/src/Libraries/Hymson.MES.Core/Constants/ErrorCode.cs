@@ -595,6 +595,7 @@
         public const string MES18008 = "条码生产状态异常:{Status}";
         public const string MES18009 = "工单状态不允许";
         public const string MES180010 = "条码已锁定不允许操作";
+        public const string MES180011 = "获取工序信息失败";
 
 
 
