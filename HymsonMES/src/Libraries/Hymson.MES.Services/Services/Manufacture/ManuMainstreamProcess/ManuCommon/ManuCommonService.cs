@@ -6,16 +6,21 @@ using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
+using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
 using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using System.Data;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon
@@ -131,7 +136,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        public async Task<ManuSfcProduceEntity> GetProduceSFCAsync(string sfc)
+        public async Task<(ManuSfcProduceEntity, ManuSfcProduceBusinessEntity)> GetProduceSFCAsync(string sfc)
         {
             if (string.IsNullOrWhiteSpace(sfc) == true
                 || sfc.Contains(' ') == true) throw new CustomerValidationException(nameof(ErrorCode.MES16305));
@@ -139,7 +144,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(sfc);
             if (sfcProduceEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES16306));
 
-            return sfcProduceEntity;
+            // 获取锁状态
+            var sfcProduceBusinessEntity = await _manuSfcProduceRepository.GetSfcProduceBusinessBySFCAsync(new SfcProduceBusinessQuery
+            {
+                Sfc = sfcProduceEntity.SFC,
+                BusinessType = ManuSfcProduceBusinessType.Lock
+            });
+
+            return (sfcProduceEntity, sfcProduceBusinessEntity);
         }
 
         /// <summary>
@@ -428,21 +440,36 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             // 产品编码是否和工序对应
             if (sfcProduceEntity.ProcedureId != procedureId) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
 
-            // 是否被锁定
-            if (sfcProduceEntity.Lock.HasValue == true)
-            {
-                if (sfcProduceEntity.Lock == QualityLockEnum.InstantLock)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16314)).WithData("SFC", sfcProduceEntity.SFC);
-                }
+            return sfcProduceEntity;
+        }
 
-                if (sfcProduceEntity.Lock == QualityLockEnum.FutureLock && sfcProduceEntity.ProcedureId == procedureId)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16314)).WithData("SFC", sfcProduceEntity.SFC);
-                }
+        /// <summary>
+        /// 工序锁校验
+        /// </summary>
+        /// <param name="sfcProduceBusinessEntity"></param>
+        /// <param name="sfc"></param>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        public static ManuSfcProduceBusinessEntity? VerifyProcedureLock(this ManuSfcProduceBusinessEntity sfcProduceBusinessEntity, string sfc, long procedureId)
+        {
+            // 是否被锁定
+            if (sfcProduceBusinessEntity == null) return sfcProduceBusinessEntity;
+            if (sfcProduceBusinessEntity.BusinessType != ManuSfcProduceBusinessType.Lock) return sfcProduceBusinessEntity;
+
+            var sfcProduceLockBo = JsonSerializer.Deserialize<SfcProduceLockBo>(sfcProduceBusinessEntity.BusinessContent);//sfcProduceBusinessEntity.BusinessContent
+            if (sfcProduceLockBo == null) return sfcProduceBusinessEntity;
+
+            if (sfcProduceLockBo.Lock == QualityLockEnum.InstantLock)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16314)).WithData("SFC", sfc);
             }
 
-            return sfcProduceEntity;
+            if (sfcProduceLockBo.Lock == QualityLockEnum.FutureLock && sfcProduceLockBo.LockProductionId == procedureId)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16314)).WithData("SFC", sfc);
+            }
+
+            return sfcProduceBusinessEntity;
         }
 
         /// <summary>

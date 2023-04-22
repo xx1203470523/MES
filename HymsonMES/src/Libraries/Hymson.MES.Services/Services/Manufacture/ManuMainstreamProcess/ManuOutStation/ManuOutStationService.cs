@@ -2,6 +2,7 @@
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
@@ -137,7 +138,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             var rows = 0;
 
             // 获取生产条码信息
-            var sfcProduceEntity = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
+            var (sfcProduceEntity, _) = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
 
             // 合法性校验
             sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity).VerifyProcedure(bo.ProcedureId);
@@ -225,6 +226,111 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 // 修改 manu_sfc_produce 为排队, 工序修改为下一工序的id
                 sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
                 sfcProduceEntity.ProcedureId = nextProcedure.Id;
+                rows += await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
+
+                // 插入 manu_sfc_step 状态为 进站
+                sfcStep.Operatetype = ManuSfcStepTypeEnum.OutStock;
+                rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
+            }
+
+            return rows;
+        }
+
+        /// <summary>
+        /// 出站(在制维修)
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        public async Task<int> OutStationRepiarAsync(ManufactureRepairBo bo)
+        {
+            var rows = 0;
+
+            // 获取生产条码信息
+            var (sfcProduceEntity, _) = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
+
+            // 合法性校验
+            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity).VerifyProcedure(bo.ProcedureId);
+
+            // 获取生产工单
+            _ = await _manuCommonService.GetProduceWorkOrderByIdAsync(sfcProduceEntity.WorkOrderId);
+
+            // 更新时间
+            sfcProduceEntity.UpdatedBy = _currentUser.UserName;
+            sfcProduceEntity.UpdatedOn = HymsonClock.Now();
+
+            // 初始化步骤
+            var sfcStep = new ManuSfcStepEntity
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                SFC = sfcProduceEntity.SFC,
+                ProductId = sfcProduceEntity.ProductId,
+                WorkOrderId = sfcProduceEntity.WorkOrderId,
+                WorkCenterId = sfcProduceEntity.WorkCenterId,
+                ProductBOMId = sfcProduceEntity.ProductBOMId,
+                Qty = sfcProduceEntity.Qty,
+                EquipmentId = sfcProduceEntity.EquipmentId,
+                ResourceId = sfcProduceEntity.ResourceId,
+                CreatedBy = sfcProduceEntity.UpdatedBy,
+                CreatedOn = sfcProduceEntity.UpdatedOn.Value,
+                UpdatedBy = sfcProduceEntity.UpdatedBy,
+                UpdatedOn = sfcProduceEntity.UpdatedOn.Value,
+            };
+
+
+            // 扣料
+            //await func(sfcProduceEntity.ProductBOMId, sfcProduceEntity.ProcedureId);
+            var initialMaterials = await GetInitialMaterialsAsync(sfcProduceEntity);
+
+            // 过滤扣料集合
+            foreach (var material in initialMaterials)
+            {
+                var materialEntity = await _procMaterialRepository.GetByIdAsync(material.MaterialId);
+                if (materialEntity == null) continue;
+
+                // 如有设置消耗系数
+                if (materialEntity.ConsumeRatio.HasValue == true) material.ConsumeRatio = materialEntity.ConsumeRatio.Value;
+
+                // 收集方式是批次
+                if (material.DataCollectionWay == MaterialSerialNumberEnum.Batch)
+                {
+                    // 进行扣料
+                    await UpdateDeductQty(sfcProduceEntity, material);
+                    continue;
+                }
+
+                // 2.确认主物料的收集方式，不是"批次"就结束（不对该物料进行扣料）
+                if (materialEntity.SerialNumber != MaterialSerialNumberEnum.Batch) continue;
+
+                // 进行扣料
+                await UpdateDeductQty(sfcProduceEntity, material);
+            }
+
+            // 完工(返回结束工序)
+            if (bo.ReturnProcedureId == ProcessRoute.LastProcedureId)
+            {
+                // 删除 manu_sfc_produce
+                rows += await _manuSfcProduceRepository.DeletePhysicalAsync(sfcProduceEntity.SFC);
+
+                // TODO 删除 manu_sfc_produce_business
+
+                // 插入 manu_sfc_step 状态为 完成
+                sfcStep.Operatetype = ManuSfcStepTypeEnum.OutStock;    // TODO 这里的状态？？
+                sfcStep.CurrentStatus = SfcProduceStatusEnum.Complete;  // TODO 这里的状态？？
+                rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
+
+                // TODO manu_sfc_info 修改为 完成或者入库
+                // 条码信息
+                var sfcInfo = await _manuSfcRepository.GetBySFCAsync(sfcProduceEntity.SFC);
+
+                sfcInfo.Status = SfcStatusEnum.Complete;
+                rows += await _manuSfcRepository.UpdateAsync(sfcInfo);
+            }
+            // 未完工
+            else
+            {
+                // 修改 manu_sfc_produce 为排队, 工序修改为指定工序ID
+                sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
+                sfcProduceEntity.ProcedureId = bo.ReturnProcedureId;
                 rows += await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
 
                 // 插入 manu_sfc_step 状态为 进站

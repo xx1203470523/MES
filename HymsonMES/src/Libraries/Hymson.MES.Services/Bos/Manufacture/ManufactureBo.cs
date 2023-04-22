@@ -29,6 +29,31 @@ namespace Hymson.MES.Services.Bos.Manufacture
     }
 
     /// <summary>
+    /// 在制维修出站
+    /// </summary>
+    public class ManufactureRepairBo
+    {
+        /// <summary>
+        /// 当前工序ID
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 返回工序ID
+        /// </summary>
+        public long ReturnProcedureId { get; set; }
+
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
+        /// <summary>
+        /// 产品条码
+        /// </summary>
+        public string SFC { get; set; }
+    }
+
+    /// <summary>
     /// 扣料
     /// </summary>
     public class MaterialDeductBo : MaterialDeductItemBo
