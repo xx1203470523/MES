@@ -635,7 +635,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             };
             var circulationEntities = await GetBarCodesAsync(queryDto);
             //查询bom明细
-            var bomDetailEntity = await _procBomDetailRepository.GetByIdAsync(addDto.BomDetailId);
+            var bomDetailEntity = await _procBomDetailRepository.GetByIdAsync(replaceDto.BomDetailId);
             var remainQty = bomDetailEntity?.Usages - circulationEntities.Sum(item => item.CirculationQty) ?? 0;
             if (remainQty <= 0)
             {
