@@ -218,29 +218,34 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where(" rbr.IsDeleted = 0 ");
             sqlBuilder.Where(" rbr.SiteId=@SiteId ");
 
-            if (!string.IsNullOrEmpty(pageQuery.MaterialCode)) 
+            if (!string.IsNullOrEmpty(pageQuery.MaterialCode))
             {
-                sqlBuilder.Where(" m.MaterialCode=@MaterialCode ");
+                pageQuery.MaterialCode = $"%{pageQuery.MaterialCode}%";
+                sqlBuilder.Where(" m.MaterialCode like @MaterialCode ");
             }
-            if (!string.IsNullOrEmpty(pageQuery.MaterialVersion)) 
+            if (!string.IsNullOrEmpty(pageQuery.MaterialVersion))
             {
-                sqlBuilder.Where(" m.Version=@MaterialVersion ");
+                pageQuery.MaterialVersion = $"%{pageQuery.MaterialVersion}%";
+                sqlBuilder.Where(" m.Version like @MaterialVersion ");
             }
-            if (!string.IsNullOrEmpty(pageQuery.OrderCode)) 
+            if (!string.IsNullOrEmpty(pageQuery.OrderCode))
             {
-                sqlBuilder.Where(" o.OrderCode=@OrderCode ");
+                pageQuery.OrderCode = $"%{pageQuery.OrderCode}%";
+                sqlBuilder.Where(" o.OrderCode like @OrderCode ");
             }
             if (!string.IsNullOrEmpty(pageQuery.SFC))
             {
-                sqlBuilder.Where(" rbr.SFC=@SFC ");
+                pageQuery.SFC = $"%{pageQuery.SFC}%";
+                sqlBuilder.Where(" rbr.SFC like @SFC ");
             }
             if (!string.IsNullOrEmpty(pageQuery.ProcedureCode))
             {
-                sqlBuilder.Where(" p.`Code` =@ProcedureCode ");
+                pageQuery.ProcedureCode = $"%{pageQuery.ProcedureCode}%";
+                sqlBuilder.Where(" p.`Code` like  @ProcedureCode ");
             }
             if (pageQuery.CreatedOnS.HasValue || pageQuery.CreatedOnE.HasValue)
             {
-                if (pageQuery.CreatedOnS.HasValue && pageQuery.CreatedOnE.HasValue) 
+                if (pageQuery.CreatedOnS.HasValue && pageQuery.CreatedOnE.HasValue)
                     sqlBuilder.Where(" rbr.CreatedOn BETWEEN @CreatedOnS AND @CreatedOnE ");
                 else
                 {
@@ -279,23 +284,28 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
             if (!string.IsNullOrEmpty(pageQuery.MaterialCode))
             {
-                sqlBuilder.Where(" m.MaterialCode=@MaterialCode ");
+                pageQuery.MaterialCode = $"%{pageQuery.MaterialCode}%";
+                sqlBuilder.Where(" m.MaterialCode like @MaterialCode ");
             }
             if (!string.IsNullOrEmpty(pageQuery.MaterialVersion))
             {
-                sqlBuilder.Where(" m.Version=@MaterialVersion ");
+                pageQuery.MaterialVersion = $"%{pageQuery.MaterialVersion}%";
+                sqlBuilder.Where(" m.Version like @MaterialVersion ");
             }
             if (!string.IsNullOrEmpty(pageQuery.OrderCode))
             {
-                sqlBuilder.Where(" o.OrderCode=@OrderCode ");
+                pageQuery.OrderCode = $"%{pageQuery.OrderCode}%";
+                sqlBuilder.Where(" o.OrderCode like @OrderCode ");
             }
             if (!string.IsNullOrEmpty(pageQuery.SFC))
             {
-                sqlBuilder.Where(" rbr.SFC=@SFC ");
+                pageQuery.SFC = $"%{pageQuery.SFC}%";
+                sqlBuilder.Where(" rbr.SFC like @SFC ");
             }
             if (!string.IsNullOrEmpty(pageQuery.ProcedureCode))
             {
-                sqlBuilder.Where(" p.`Code` =@ProcedureCode ");
+                pageQuery.ProcedureCode = $"%{pageQuery.ProcedureCode}%";
+                sqlBuilder.Where(" p.`Code` like  @ProcedureCode ");
             }
             if (pageQuery.CreatedOnS.HasValue || pageQuery.CreatedOnE.HasValue)
             {
