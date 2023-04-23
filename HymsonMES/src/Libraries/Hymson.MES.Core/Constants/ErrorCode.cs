@@ -473,6 +473,7 @@
         public const string MES17205 = "面板编码已经存在";
         public const string MES17206 = "面板编码最大长度为255";
         public const string MES17207 = "面板名称最大长度为255";
+        public const string MES17208 = "面板有更新，请刷新页面！";
         #endregion
 
 
