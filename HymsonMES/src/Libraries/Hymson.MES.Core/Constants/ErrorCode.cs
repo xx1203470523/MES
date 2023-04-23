@@ -44,9 +44,9 @@
 
         #region 资源 10300
         public const string MES10301 = "资源编码不能为空";
-        public const string MES10302 = "资源编码超长";
+        public const string MES10302 = "资源编码最大长度不超过50";
         public const string MES10303 = "资源名称不能为空";
-        public const string MES10304 = "资源名称超长";
+        public const string MES10304 = "资源名称最大长度不超过50";
         public const string MES10305 = "资源状态不能为空";
         public const string MES10306 = "资源配置打印机中，重复配置设备!";
         public const string MES10307 = "一个资源只能对用对应一个主设备";
@@ -64,7 +64,10 @@
         public const string MES10319 = $"不能删除启用状态的资源!";
         public const string MES10320 = "所属资源类型ID不能为空";
         public const string MES10321 = "工序名称超长";
-        public const string MES10322 = "资源名称最大长度为50";
+        public const string MES10351 = "资源类型编码不能为空";
+        public const string MES10352 = "资源类型编码最大长度不超过50";
+        public const string MES10353= "资源类型名称不能为空";
+        public const string MES10354 = "资源类型名称最大长度不超过50";
         #endregion
 
         #region 标签模板
@@ -77,9 +80,9 @@
 
         #region 工序 10400
         public const string MES10401 = "工序编码不能为空";
-        public const string MES10402 = "工序编码超长";
+        public const string MES10402 = "工序编码最大长度不超过50";
         public const string MES10403 = "工序名称不能为空";
-        public const string MES10404 = "工序名称超长";
+        public const string MES10404 = "工序名称最大长度不超过50";
         public const string MES10405 = "编码:{Code}已存在！";
         public const string MES10406 = "工序不存在！";
 
