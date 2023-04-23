@@ -72,7 +72,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPac
             var rows = 0;
 
             // 获取生产条码信息
-            var sfcProduceEntity = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
+            var (sfcProduceEntity, _) = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
 
             // 当前工序是否是排队状态
             if (sfcProduceEntity.Status == SfcProduceStatusEnum.Activity)

@@ -98,8 +98,8 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
                 throw new CustomerValidationException(nameof(ErrorCode.MES10802)).WithData("Code", entity.Code);
             }
 
-            //验证规则
-            Verification(createDto.RuleList.ToList()); 
+            // 验证规则
+            Verification(createDto.RuleList.ToList());
 
             List<ProcMaskCodeRuleEntity> rules = new();
             for (int i = 0; i < createDto.RuleList.Count; i++)
@@ -218,15 +218,8 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
         /// <returns></returns>
         private void Verification(List<ProcMaskCodeRuleDto> linkeRuleList)
         {
-            if (linkeRuleList.Any(a => string.IsNullOrWhiteSpace(a.Rule)))
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10803));
-            }
-
-            if (linkeRuleList.Any(a => a.MatchWay<0))
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10804));
-            }
+            if (linkeRuleList.Any(a => string.IsNullOrWhiteSpace(a.Rule))) throw new CustomerValidationException(nameof(ErrorCode.MES10803));
+            if (linkeRuleList.Any(a => a.MatchWay < 0)) throw new CustomerValidationException(nameof(ErrorCode.MES10804));
 
             ////全码验证
             //if (linkeRuleList.Any(a => a.MatchWay == (int)MatchModeEnum .Whole&& a.Rule.Trim().Length != 10))
@@ -244,22 +237,22 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
             {
                 switch (rule.MatchWay)
                 {
-                    case (int)MatchModeEnum.Start:
+                    case MatchModeEnum.Start:
                         if (rule.Rule.EndsWith("?"))
                         {
                             //errorMessage.Append($"起始方式掩码末尾不能为特殊字符\"?\"");
                             errorMessage.Append(_localizationService.GetResource(nameof(ErrorCode.MES10806)));
                         }
                         break;
-                    case (int)MatchModeEnum.Middle:
-                        if (rule.Rule.StartsWith("?")|| rule.Rule.EndsWith("?"))
+                    case MatchModeEnum.Middle:
+                        if (rule.Rule.StartsWith("?") || rule.Rule.EndsWith("?"))
                         {
                             //errorMessage.Append($"中间方式掩码首位和末尾不能为特殊字符\"?\";");
                             errorMessage.Append(_localizationService.GetResource(nameof(ErrorCode.MES10807)));
                         }
                         break;
-                    case (int)MatchModeEnum.End:
-                        if (rule.Rule.StartsWith("?") )
+                    case MatchModeEnum.End:
+                        if (rule.Rule.StartsWith("?"))
                         {
                             // errorMessage.Append($"结束方式掩码首位不能为特殊字符\"?\";");
                             errorMessage.Append(_localizationService.GetResource(nameof(ErrorCode.MES10808)));

@@ -182,7 +182,12 @@ namespace Hymson.MES.Services.Services.Plan
         /// <returns></returns>
         public async Task<decimal> GetPlanWorkOrderByWorkOrderCodeAsync(string workOrderCode)
         {
-            var workOrderEntity = await _planWorkOrderRepository.GetByCodeAsync(workOrderCode)
+            var query = new PlanWorkOrderQuery
+            {
+                OrderCode= workOrderCode,
+                SiteId=_currentSite.SiteId??0
+            };
+            var workOrderEntity = await _planWorkOrderRepository.GetByCodeAsync(query)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES16003));
 
             // 应下达数量

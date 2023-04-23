@@ -38,7 +38,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
        /// <summary>
         /// 操作类型;1、装载2、移除
         /// </summary>
-        public bool? OperateType { get; set; }
+        public int? OperateType { get; set; }
 
        /// <summary>
         /// 创建人
@@ -58,14 +58,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
        /// <summary>
         /// 更新时间
         /// </summary>
-        public DateTime UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 删除标识
-        /// </summary>
-        public long IsDeleted { get; set; }
-
-       
+        public DateTime UpdatedOn { get; set; }    
     }
 
 
@@ -119,7 +112,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
        /// <summary>
         /// 操作类型;1、装载2、移除
         /// </summary>
-        public bool? OperateType { get; set; }
+        public int? OperateType { get; set; }
 
        /// <summary>
         /// 创建人
@@ -155,5 +148,9 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     /// </summary>
     public class ManuContainerPackRecordPagedQueryDto : PagerInfo
     {
+        /// <summary>
+        /// 容器条码id
+        /// </summary>
+        public long? ContainerBarCodeId { get; set; }
     }
 }

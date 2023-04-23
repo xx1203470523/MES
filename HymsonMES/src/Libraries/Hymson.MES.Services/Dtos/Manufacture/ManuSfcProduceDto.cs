@@ -444,6 +444,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 锁定状态
         /// </summary>
         public int? Lock { get; set; }
+
+        /// <summary>
+        /// 查询锁定状态不为某个状态的sfc信息，即时锁定的不能操作不查
+        /// </summary>
+        public int? NoLock { get; set; }
     }
 
     /// <summary>
@@ -534,9 +539,9 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     public record ManuSfcProduceStepViewDto
     {
         /// <summary>
-        /// SFC
+        /// 步骤
         /// </summary>
-        //public string Sfc { get; set; }
+        public int Step { get; set; }
         /// <summary>
         /// 工序Id
         /// </summary>

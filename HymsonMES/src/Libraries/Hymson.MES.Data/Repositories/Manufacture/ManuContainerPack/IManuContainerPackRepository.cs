@@ -23,7 +23,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuContainerPackEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ManuContainerPackEntity manuContainerPackEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -37,7 +37,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuContainerPackEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ManuContainerPackEntity manuContainerPackEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -52,7 +52,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -76,15 +76,22 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 根据条码编码获取数据
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        Task<ManuContainerPackEntity> GetByLadeBarCodeAsync(string sfc);
+        Task<ManuContainerPackEntity> GetByLadeBarCodeAsync(ManuContainerPackQuery query);
         /// <summary>
         /// 根据容器ID获取数据
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuContainerPackEntity>> GetByContainerBarCodeIdAsync(long cid);
+
+        /// <summary>
+        /// 根据容器ID获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuContainerPackEntity>> GetByContainerBarCodeIdsAsync(long[] ids);
 
         /// <summary>
         /// 根据IDs批量获取数据
@@ -99,13 +106,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuContainerPackQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuContainerPackEntity>> GetManuContainerPackEntitiesAsync(ManuContainerPackQuery manuContainerPackQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="manuContainerPackPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuContainerPackView>> GetPagedInfoAsync(ManuContainerPackPagedQuery manuContainerPackPagedQuery);
+
+        /// <summary>
+        /// 获取容器的包装数量
+        /// </summary>
+        /// <param name="containerBarCodeId"></param>
+        /// <returns></returns>
+        Task<int> GetCountByrBarCodeIdAsync(long containerBarCodeId);
         #endregion
     }
 }

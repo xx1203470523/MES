@@ -15,6 +15,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     public class ManuContainerBarcodePagedQuery : PagerInfo
     {
         /// <summary>
+        /// 站点id
+        /// </summary>
+        public long? SiteId { get; set; }
+
+        /// <summary>
         /// 容器条码
         /// </summary>
         public string? BarCode { get; set; }
@@ -30,5 +35,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 产品名称 对应物料表名称
         /// </summary>
         public string? ProductName { get; set; }
+
+        /// <summary>
+        /// 工单ID
+        /// </summary>
+        public long? WorkOrderId { get; set; }
     }
 }
