@@ -74,7 +74,5 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             return await Task.FromResult(defaultDto);
         }
 
-
-
     }
 }

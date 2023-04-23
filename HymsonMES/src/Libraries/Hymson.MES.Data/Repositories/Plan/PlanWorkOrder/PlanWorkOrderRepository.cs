@@ -8,6 +8,7 @@ using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using System.Security.Policy;
 
 namespace Hymson.MES.Data.Repositories.Plan
 {
@@ -65,6 +66,17 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
 
         /// <summary>
+        /// 根据Code获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<PlanWorkOrderEntity> GetByCodeAsync(PlanWorkOrderQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderEntity>(GetByCodeSql, new { OrderCode=query.OrderCode, SiteId =query.SiteId});
+        }
+
+        /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
         /// <param name="ids"></param>
@@ -73,6 +85,17 @@ namespace Hymson.MES.Data.Repositories.Plan
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<PlanWorkOrderEntity>(GetByIdsSql, new { ids = ids });
+        }
+
+        /// <summary>
+        /// 根据 workOrderId 获取数据
+        /// </summary>
+        /// <param name="workOrderId"></param>
+        /// <returns></returns>
+        public async Task<PlanWorkOrderRecordEntity> GetByWorkOrderIdAsync(long workOrderId)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderRecordEntity>(GetByWorkOrderIdSql, new { workOrderId });
         }
 
         /// <summary>
@@ -139,8 +162,15 @@ namespace Hymson.MES.Data.Repositories.Plan
 
             if (pageQuery.Status.HasValue) sqlBuilder.Where("wo.Status = @Status");
             if (pageQuery.IsLocked.HasValue) sqlBuilder.Where("wo.IsLocked = @IsLocked");
-            if (pageQuery.PlanStartTimeS.HasValue) sqlBuilder.Where("wo.PlanStartTime>= @PlanStartTimeS");
-            if (pageQuery.PlanStartTimeE.HasValue) sqlBuilder.Where("wo.PlanStartTime< @PlanStartTimeE");
+            if (pageQuery.PlanStartTimeS.HasValue || pageQuery.PlanStartTimeE.HasValue)
+            {
+                if (pageQuery.PlanStartTimeS.HasValue && pageQuery.PlanStartTimeE.HasValue) sqlBuilder.Where("wo.PlanStartTime BETWEEN @PlanStartTimeS AND @PlanStartTimeE");
+                else
+                {
+                    if (pageQuery.PlanStartTimeS.HasValue) sqlBuilder.Where("wo.PlanStartTime >= @PlanStartTimeS");
+                    if (pageQuery.PlanStartTimeE.HasValue) sqlBuilder.Where("wo.PlanStartTime < @PlanStartTimeE");
+                }
+            }
 
             var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -269,6 +299,19 @@ namespace Hymson.MES.Data.Repositories.Plan
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdatePassDownQuantitySql, param);
         }
+
+        #region 工单记录表
+        /// <summary>
+        /// 新增工单记录表
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<int> InsertPlanWorkOrderRecordAsync(PlanWorkOrderRecordEntity param)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(InsertPlanWorkOrderRecordSql, param);
+        }
+        #endregion
     }
 
 
@@ -307,9 +350,10 @@ namespace Hymson.MES.Data.Repositories.Plan
 
         const string InsertSql = "INSERT INTO `plan_work_order`(  `Id`, `OrderCode`, `ProductId`, `WorkCenterType`, `WorkCenterId`, `ProcessRouteId`, `ProductBOMId`, `Type`, `Qty`, `Status`, `OverScale`, `PlanStartTime`, `PlanEndTime`, `IsLocked`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @OrderCode, @ProductId, @WorkCenterType, @WorkCenterId, @ProcessRouteId, @ProductBOMId, @Type, @Qty, @Status, @OverScale, @PlanStartTime, @PlanEndTime, @IsLocked, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string InsertsSql = "INSERT INTO `plan_work_order`(  `Id`, `OrderCode`, `ProductId`, `WorkCenterType`, `WorkCenterId`, `ProcessRouteId`, `ProductBOMId`, `Type`, `Qty`, `Status`, `OverScale`, `PlanStartTime`, `PlanEndTime`, `IsLocked`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @OrderCode, @ProductId, @WorkCenterType, @WorkCenterId, @ProcessRouteId, @ProductBOMId, @Type, @Qty, @Status, @OverScale, @PlanStartTime, @PlanEndTime, @IsLocked, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
+        const string InsertPlanWorkOrderRecordSql = "INSERT INTO `plan_work_order_record`(  `Id`, `RealStart`, `RealEnd`, `InputQty`, `UnqualifiedQuantity`, `FinishProductQuantity`, `PassDownQuantity`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `WorkOrderId`) VALUES (   @Id, @RealStart, @RealEnd, @InputQty, @UnqualifiedQuantity, @FinishProductQuantity, @PassDownQuantity, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @WorkOrderId )";
         const string UpdateSql = "UPDATE `plan_work_order` SET  ProductId = @ProductId, WorkCenterType = @WorkCenterType, WorkCenterId = @WorkCenterId, ProcessRouteId = @ProcessRouteId, ProductBOMId = @ProductBOMId, Type = @Type, Qty = @Qty, OverScale = @OverScale, PlanStartTime = @PlanStartTime, PlanEndTime = @PlanEndTime, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `plan_work_order` SET   OrderCode = @OrderCode, ProductId = @ProductId, WorkCenterType = @WorkCenterType, WorkCenterId = @WorkCenterId, ProcessRouteId = @ProcessRouteId, ProductBOMId = @ProductBOMId, Type = @Type, Qty = @Qty, Status = @Status, OverScale = @OverScale, PlanStartTime = @PlanStartTime, PlanEndTime = @PlanEndTime, IsLocked = @IsLocked, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
-        const string UpdatePassDownQuantitySql = "UPDATE plan_work_order_record SET PassDownQuantity=PassDownQuantity-@PassDownQuantity,UpdatedBy=@UserName,UpdatedOn=@UpdateDate WHERE WorkOrderId=@WorkOrderId AND PassDownQuantity<=@PlanQuantity-@PassDownQuantity AND IsDeleted=0";
+        const string UpdatePassDownQuantitySql = "UPDATE plan_work_order_record SET PassDownQuantity= ifnull(PassDownQuantity,0)+@PassDownQuantity,UpdatedBy=@UserName,UpdatedOn=@UpdateDate WHERE WorkOrderId=@WorkOrderId AND  ifnull(PassDownQuantity,0)<=@PlanQuantity-@PassDownQuantity AND IsDeleted=0";
         const string DeleteSql = "UPDATE `plan_work_order` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `plan_work_order`  SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids ";
         const string GetByIdSql = @"SELECT
@@ -318,6 +362,8 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string GetByIdsSql = @"SELECT
       `Id`, `OrderCode`, `ProductId`, `WorkCenterType`, `WorkCenterId`, `ProcessRouteId`, `ProductBOMId`, `Type`, `Qty`, `Status`, `OverScale`, `PlanStartTime`, `PlanEndTime`, `IsLocked`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
     FROM `plan_work_order`  WHERE Id IN @ids ";
+        const string GetByWorkOrderIdSql = "SELECT * FROM plan_work_order_record WHERE IsDeleted = 0 AND WorkOrderId = @workOrderId ";
+        const string GetByCodeSql = @"SELECT * FROM plan_work_order WHERE IsDeleted = 0 AND OrderCode = @OrderCode and SiteId=@SiteId ";
         const string GetByIdsAboutMaterialInfoSql = @"SELECT
       wo.`Id`, wo.`OrderCode`, wo.`ProductId`, wo.`WorkCenterType`, wo.`WorkCenterId`, wo.`ProcessRouteId`, wo.`ProductBOMId`, wo.`Type`, wo.`Qty`, wo.`Status`, wo.`OverScale`, wo.`PlanStartTime`, wo.`PlanEndTime`, wo.`IsLocked`, wo.`Remark`, wo.`CreatedBy`, wo.`CreatedOn`, wo.`UpdatedBy`, wo.`UpdatedOn`, wo.`IsDeleted`, wo.`SiteId`,
          m.MaterialCode, m.MaterialName,m.Version as MaterialVersion 

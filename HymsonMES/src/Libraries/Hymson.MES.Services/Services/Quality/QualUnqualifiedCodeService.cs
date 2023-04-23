@@ -154,6 +154,10 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 throw new ValidationException(nameof(ErrorCode.MES10100));
             }
+
+            param.UnqualifiedCode = param.UnqualifiedCode.ToTrimSpace().ToUpperInvariant();
+            param.UnqualifiedCodeName = param.UnqualifiedCodeName.ToTrimSpace();
+
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(param);
 
@@ -219,6 +223,7 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 throw new ValidationException(nameof(ErrorCode.MES10100));
             }
+            param.UnqualifiedCodeName = param.UnqualifiedCodeName.ToTrimSpace();
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(param);
             var userId = _currentUser.UserName;

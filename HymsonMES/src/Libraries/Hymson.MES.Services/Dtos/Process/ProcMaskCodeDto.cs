@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Integrated;
 
 namespace Hymson.MES.Services.Dtos.Process
 {
@@ -92,7 +93,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 描述 :匹配方式 
         /// </summary>
-        public int MatchWay { get; set; }
+        public MatchModeEnum MatchWay { get; set; }
     }
 
     /// <summary>

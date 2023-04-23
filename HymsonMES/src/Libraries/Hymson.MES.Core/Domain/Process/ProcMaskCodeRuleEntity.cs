@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Integrated;
 
 namespace Hymson.MES.Core.Domain.Process
 {
@@ -37,6 +38,6 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :匹配方式 
         /// 空值 : true  
         /// </summary>
-        public string MatchWay { get; set; }
+        public MatchModeEnum MatchWay { get; set; }
     }
 }

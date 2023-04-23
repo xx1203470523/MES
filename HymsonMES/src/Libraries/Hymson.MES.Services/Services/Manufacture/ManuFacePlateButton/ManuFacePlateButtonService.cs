@@ -9,6 +9,7 @@ using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
@@ -304,6 +305,10 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task<Dictionary<string, JobResponseDto>> ClickAsync(ButtonRequestDto dto)
         {
             var result = new Dictionary<string, JobResponseDto> { }; // 返回结果
+
+            // 先检查按钮是否存在
+            var button = await _manuFacePlateButtonRepository.GetByIdAsync(dto.FacePlateButtonId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES17208));
 
             // 根据面板ID和按钮ID找出绑定的作业job
             var buttonJobs = await _manuFacePlateButtonJobRelationRepository.GetByFacePlateButtonIdAsync(dto.FacePlateButtonId);

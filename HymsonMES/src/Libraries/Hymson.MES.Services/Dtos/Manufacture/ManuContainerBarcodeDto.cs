@@ -215,7 +215,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
        /// <summary>
         /// 状态;1：打开 2：关闭
         /// </summary>
-        public bool Status { get; set; }
+        public int Status { get; set; }
 
        /// <summary>
         /// 创建人

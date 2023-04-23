@@ -43,6 +43,7 @@ using Hymson.MES.Services.Services.Process.Resource;
 using Hymson.MES.Services.Services.Process.ResourceType;
 using Hymson.MES.Services.Services.Quality;
 using Hymson.MES.Services.Services.Quality.IQualityService;
+using Hymson.MES.Services.Services.Report;
 using Hymson.MES.Services.Services.Warehouse;
 using Hymson.MES.Services.Validators.Equipment;
 using Hymson.MES.Services.Validators.Integrated;
@@ -52,6 +53,7 @@ using Hymson.MES.Services.Validators.Process;
 using Hymson.MES.Services.Validators.Quality;
 using Hymson.MES.Services.Validators.Warehouse;
 using Microsoft.Extensions.Configuration;
+using System.ComponentModel;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -60,6 +62,7 @@ namespace Microsoft.Extensions.DependencyInjection
     /// </summary>
     public static class AppServiceCollectionExtensions
     {
+        
         /// <summary>
         /// 业务逻辑层依赖服务添加
         /// </summary>
@@ -216,9 +219,20 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IJobManufactureService, JobBadRecordService>();
             services.AddSingleton<IJobManufactureService, JobManuCompleteService>();
             services.AddSingleton<IJobManufactureService, JobManuPackageService>();
+            services.AddSingleton<IJobManufactureService, JobManuRepairEndService>();
             services.AddSingleton<IJobManufactureService, JobManuRepairStartService>();
             services.AddSingleton<IJobManufactureService, JobManuStartService>();
             services.AddSingleton<IJobManufactureService, JobManuStopService>();
+            #endregion
+
+            #region Report
+            #region BadRecordReport
+            services.AddSingleton<IBadRecordReportService, BadRecordReportService>();
+            #endregion
+
+            #region Packaging
+            services.AddSingleton<IPackagingReportService, PackagingReportService>();
+            #endregion
             #endregion
 
             return services;
@@ -291,6 +305,11 @@ namespace Microsoft.Extensions.DependencyInjection
             #region Resource
             services.AddSingleton<AbstractValidator<ProcResourceCreateDto>, ProcResourceCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcResourceModifyDto>, ProcResourcelModifyValidator>();
+            #endregion
+
+            #region ResourceType
+            services.AddSingleton<AbstractValidator<ProcResourceTypeAddDto>, ProcResourceTypeCreateValidator>();
+            services.AddSingleton<AbstractValidator<ProcResourceTypeUpdateDto>, ProcResourceTypeModifyValidator>();
             #endregion
 
             #region Procedure
@@ -423,5 +442,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return services;
         }
+       
     }
 }

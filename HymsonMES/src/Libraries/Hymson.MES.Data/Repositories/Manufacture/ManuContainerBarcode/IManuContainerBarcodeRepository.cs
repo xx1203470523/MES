@@ -23,7 +23,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuContainerBarcodeEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ManuContainerBarcodeEntity manuContainerBarcodeEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -37,7 +37,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuContainerBarcodeEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ManuContainerBarcodeEntity manuContainerBarcodeEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -59,7 +59,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -78,14 +78,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<ManuContainerBarcodeEntity> GetByCodeAsync(string code);
+        Task<ManuContainerBarcodeEntity> GetByCodeAsync(ManuContainerBarcodeQuery query);
         /// <summary>
         /// 根据productId获取数据
         /// </summary>
         /// <param name="pid"></param>
         /// <param name="status">容器状态 1 打开 ，2关闭</param>
         /// <returns></returns>
-        Task<ManuContainerBarcodeEntity> GetByProductIdAsync(long pid,int status);
+        Task<ManuContainerBarcodeEntity> GetByProductIdAsync(long pid, int status);
 
         /// <summary>
         /// 根据IDs批量获取数据
@@ -100,13 +100,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuContainerBarcodeQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuContainerBarcodeEntity>> GetManuContainerBarcodeEntitiesAsync(ManuContainerBarcodeQuery manuContainerBarcodeQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="manuContainerBarcodePagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuContainerBarcodeQueryView>> GetPagedInfoAsync(ManuContainerBarcodePagedQuery manuContainerBarcodePagedQuery);
+
+        Task<PagedInfo<ManuContainerBarcodeEntity>> GetPagedListAsync(ManuContainerBarcodePagedQuery manuContainerBarcodePagedQuery);
         #endregion
     }
 }

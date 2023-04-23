@@ -39,6 +39,7 @@ using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Dtos.Quality;
+using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Dtos.Warehouse;
 
 namespace Hymson.MES.Services.Mapper
@@ -60,6 +61,7 @@ namespace Hymson.MES.Services.Mapper
             CreateWarehouseMaps();
             CreatePlanMaps();
             CreateManufactureMaps();
+            CreateReportMaps();
         }
 
         /// <summary>
@@ -486,11 +488,12 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<CreateManuContainerBarcodeDto, ManuContainerBarcodeEntity>();
 
             CreateMap<ManuContainerPackRecordCreateDto, ManuContainerPackRecordEntity>();
-
-
-
             #endregion
 
+            #region ContainerPackRecord
+            CreateMap<ManuContainerPackRecordPagedQueryDto, ManuContainerPackRecordPagedQuery>();
+            CreateMap<ManuContainerPackRecordEntity, ManuContainerPackRecordDto>();
+            #endregion
         }
 
         /// <summary>
@@ -529,6 +532,17 @@ namespace Hymson.MES.Services.Mapper
             #region PlanSfcPrint
             CreateMap<PlanSfcPrintPagedQueryDto, ManuSfcPassDownPagedQuery>();
             CreateMap<ManuSfcPassDownView, PlanSfcPrintDto>();
+            #endregion
+
+        }
+
+        protected virtual void CreateReportMaps() 
+        {
+            #region BadRecordReport
+            CreateMap<BadRecordReportDto, ManuProductBadRecordReportPagedQuery>();
+
+            CreateMap<ManuProductBadRecordLogReportPagedQueryDto, ManuProductBadRecordLogReportPagedQuery>();
+            CreateMap<ManuProductBadRecordLogReportView, ManuProductBadRecordLogReportViewDto>();
             #endregion
 
         }

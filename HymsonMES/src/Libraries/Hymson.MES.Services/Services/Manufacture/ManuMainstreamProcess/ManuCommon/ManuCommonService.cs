@@ -5,15 +5,23 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
+using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
 using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using System.Data;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon
 {
@@ -120,13 +128,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             var maskCodeRules = await _procMaskCodeRuleRepository.GetByMaskCodeIdAsync(material.MaskCodeId.Value);
             if (maskCodeRules == null || maskCodeRules.Any() == false) return true;
 
-            // TODO 对掩码规则进行校验
-            foreach (var item in maskCodeRules)
-            {
-
-            }
-
-            return await Task.FromResult(true);
+            return barCode.VerifyBarCode(maskCodeRules);
         }
 
         /// <summary>
@@ -134,7 +136,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        public async Task<ManuSfcProduceEntity> GetProduceSFCAsync(string sfc)
+        public async Task<(ManuSfcProduceEntity, ManuSfcProduceBusinessEntity)> GetProduceSFCAsync(string sfc)
         {
             if (string.IsNullOrWhiteSpace(sfc) == true
                 || sfc.Contains(' ') == true) throw new CustomerValidationException(nameof(ErrorCode.MES16305));
@@ -142,7 +144,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(sfc);
             if (sfcProduceEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES16306));
 
-            return sfcProduceEntity;
+            // 获取锁状态
+            var sfcProduceBusinessEntity = await _manuSfcProduceRepository.GetSfcProduceBusinessBySFCAsync(new SfcProduceBusinessQuery
+            {
+                Sfc = sfcProduceEntity.SFC,
+                BusinessType = ManuSfcProduceBusinessType.Lock
+            });
+
+            return (sfcProduceEntity, sfcProduceBusinessEntity);
         }
 
         /// <summary>
@@ -162,7 +171,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             }
 
             // 判断是否是激活的工单
-            var activatedWorkOrder = await _planWorkOrderActivationRepository.GetByIdAsync(planWorkOrderEntity.Id);
+            var activatedWorkOrder = await _planWorkOrderActivationRepository.GetByWorkOrderIdAsync(planWorkOrderEntity.Id);
             if (activatedWorkOrder == null) throw new CustomerValidationException(nameof(ErrorCode.MES16410));
 
             switch (planWorkOrderEntity.Status)
@@ -226,9 +235,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             });
             if (netxtProcessRouteDetailLinks == null || netxtProcessRouteDetailLinks.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES10440));
 
-            // 获取当前工序在工艺路线里面的扩展信息
-            var procedureNodes = await _procProcessRouteDetailNodeRepository.GetByIdsAsync(netxtProcessRouteDetailLinks.Select(s => s.ProcessRouteDetailId).ToArray())
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10440));
+            // 获取当前工序在工艺路线里面的扩展信息（这里存放是Node表的工序ID，而不是主键ID，后期建议改为主键ID）
+            var procedureNodes = await _procProcessRouteDetailNodeRepository.GetByProcedureIdsAsync(new ProcProcessRouteDetailNodesQuery
+            {
+                ProcessRouteId = manuSfcProduce.ProcessRouteId,
+                ProcedureIds = netxtProcessRouteDetailLinks.Select(s => s.ProcessRouteDetailId)
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10440));
 
             // 检查是否有"空值"类型的工序
             var defaultNextProcedure = procedureNodes.FirstOrDefault(f => f.CheckType == ProcessRouteInspectTypeEnum.None)
@@ -431,21 +443,68 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             // 产品编码是否和工序对应
             if (sfcProduceEntity.ProcedureId != procedureId) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
 
-            // 是否被锁定
-            if (sfcProduceEntity.Lock.HasValue == true)
-            {
-                if (sfcProduceEntity.Lock == QualityLockEnum.InstantLock)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16314)).WithData("SFC", sfcProduceEntity.SFC);
-                }
+            return sfcProduceEntity;
+        }
 
-                if (sfcProduceEntity.Lock == QualityLockEnum.FutureLock && sfcProduceEntity.ProcedureId == procedureId)
+        /// <summary>
+        /// 工序锁校验
+        /// </summary>
+        /// <param name="sfcProduceBusinessEntity"></param>
+        /// <param name="sfc"></param>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        public static ManuSfcProduceBusinessEntity? VerifyProcedureLock(this ManuSfcProduceBusinessEntity sfcProduceBusinessEntity, string sfc, long procedureId)
+        {
+            // 是否被锁定
+            if (sfcProduceBusinessEntity == null) return sfcProduceBusinessEntity;
+            if (sfcProduceBusinessEntity.BusinessType != ManuSfcProduceBusinessType.Lock) return sfcProduceBusinessEntity;
+
+            var sfcProduceLockBo = JsonSerializer.Deserialize<SfcProduceLockBo>(sfcProduceBusinessEntity.BusinessContent);//sfcProduceBusinessEntity.BusinessContent
+            if (sfcProduceLockBo == null) return sfcProduceBusinessEntity;
+
+            if (sfcProduceLockBo.Lock == QualityLockEnum.InstantLock)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16314)).WithData("SFC", sfc);
+            }
+
+            if (sfcProduceLockBo.Lock == QualityLockEnum.FutureLock && sfcProduceLockBo.LockProductionId == procedureId)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16314)).WithData("SFC", sfc);
+            }
+
+            return sfcProduceBusinessEntity;
+        }
+
+        /// <summary>
+        /// 验证条码
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <param name="maskCodeRules"></param>
+        /// <returns></returns>
+        public static bool VerifyBarCode(this string barCode, IEnumerable<ProcMaskCodeRuleEntity> maskCodeRules)
+        {
+            // 对掩码规则进行校验
+            foreach (var ruleEntity in maskCodeRules)
+            {
+                var rule = Regex.Replace(ruleEntity.Rule, "[?？]", ".");
+                var pattern = $"^{rule}$";
+
+                switch (ruleEntity.MatchWay)
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16314)).WithData("SFC", sfcProduceEntity.SFC);
+                    case MatchModeEnum.Start:
+                    case MatchModeEnum.Middle:
+                    case MatchModeEnum.End:
+                        if (Regex.IsMatch(barCode, pattern) == false) return false;
+                        break;
+                    case MatchModeEnum.Whole:
+                        if (barCode.Length != 10) return false;
+                        break;
+                    default:
+                        break;
                 }
             }
 
-            return sfcProduceEntity;
+            return true;
         }
 
     }

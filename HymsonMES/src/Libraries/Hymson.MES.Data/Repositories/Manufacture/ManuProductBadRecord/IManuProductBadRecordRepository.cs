@@ -93,5 +93,27 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuSfcInfoEntity"></param>
         /// <returns></returns>
         Task<int> UpdateStatusRangeAsync(List<ManuProductBadRecordCommand> commands);
+
+
+        /// <summary>
+        /// 报表分页查询
+        /// </summary>
+        /// <param name="pageQuery"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ManuProductBadRecordReportView>> GetPagedInfoReportAsync(ManuProductBadRecordReportPagedQuery pageQuery);
+
+        /// <summary>
+        /// 获取 前多少的不良记录
+        /// </summary>
+        /// <param name="pageQuery"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuProductBadRecordReportView>> GetTopNumReportAsync(ManuProductBadRecordReportPagedQuery pageQuery);
+
+        /// <summary>
+        /// 不合格日志报表分页查询
+        /// </summary>
+        /// <param name="pageQuery"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ManuProductBadRecordLogReportView>> GetPagedInfoLogReportAsync(ManuProductBadRecordLogReportPagedQuery pageQuery);
     }
 }

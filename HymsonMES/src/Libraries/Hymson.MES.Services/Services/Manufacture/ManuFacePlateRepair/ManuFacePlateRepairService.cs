@@ -12,6 +12,7 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
@@ -152,10 +153,13 @@ namespace Hymson.MES.Services.Services.Manufacture
                 FacePlateButtonId = manuFacePlateRepairExJobDto.FacePlateButtonId
             };
 
-            jobDto.Param?.Add("SFC", manuFacePlateRepairExJobDto.SFC);
-            jobDto.Param?.Add("ProcedureId", $"{manuFacePlateRepairExJobDto.ProcedureId}");
-            jobDto.Param?.Add("ResourceId", $"{manuFacePlateRepairExJobDto.ResourceId}");
-
+            Dictionary<string, string> dic = new Dictionary<string, string>
+            {
+                { "SFC", manuFacePlateRepairExJobDto.SFC },
+                { "ProcedureId", $"{manuFacePlateRepairExJobDto.ProcedureId}" },
+                { "ResourceId", $"{manuFacePlateRepairExJobDto.ResourceId}" }
+            };
+            jobDto.Param = dic;
             // 调用作业
             var resJob = await _manuFacePlateButtonService.ClickAsync(jobDto);
             if (resJob == null || resJob.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES17320));
@@ -168,10 +172,10 @@ namespace Hymson.MES.Services.Services.Manufacture
                     if (!list.Contains(ManuFacePlateRepairButJobReturnTypeEnum.JobManuRepairStartService))
                         list.Add(ManuFacePlateRepairButJobReturnTypeEnum.JobManuRepairStartService);
                 }
-                else if (item.Key == ManuFacePlateRepairButJobReturnTypeEnum.JobManuCompleteService.ToString())
+                else if (item.Key == ManuFacePlateRepairButJobReturnTypeEnum.JobManuRepairEndService.ToString())
                 {
-                    if (!list.Contains(ManuFacePlateRepairButJobReturnTypeEnum.JobManuCompleteService))
-                        list.Add(ManuFacePlateRepairButJobReturnTypeEnum.JobManuCompleteService);
+                    if (!list.Contains(ManuFacePlateRepairButJobReturnTypeEnum.JobManuRepairEndService))
+                        list.Add(ManuFacePlateRepairButJobReturnTypeEnum.JobManuRepairEndService);
                 }
                 else
                 {
@@ -216,11 +220,12 @@ namespace Hymson.MES.Services.Services.Manufacture
                     throw new CustomerValidationException(nameof(ErrorCode.MES16310));
                 }
             }
-            //验证在制信息
-            if (manuSfcProduceEntit.ProcedureId != beginRepairDto.ProcedureId || manuSfcProduceEntit.Status != SfcProduceStatusEnum.lineUp)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16308));
-            }
+
+            //验证在制信息(JOb已经把状态改了，所以这里不用验证了)
+            //if (manuSfcProduceEntit.ProcedureId != beginRepairDto.ProcedureId || manuSfcProduceEntit.Status != SfcProduceStatusEnum.lineUp)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES16308));
+            //}
             #endregion
 
             #region 获取展示信息 
@@ -312,7 +317,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             //manuFacePlateRepairOpenInfoDto.returnProcedureInfo = manuFacePlateRepairReturnProcedureList;
 
             #endregion
-            var manuFacePlateRepairOpenInfoDto = await GetManuFacePlateRepairOpenInfoDto(beginRepairDto.SFC);
+            var manuFacePlateRepairOpenInfoDto = await GetManuFacePlateRepairOpenInfoDto(manuSfcProduceEntit);
 
             #region 启动维修 更新状态
 
@@ -339,18 +344,13 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <summary>
         /// 获取展示信息 
         /// </summary>
-        /// <param name="sfc"></param>
+        /// <param name="manuSfcProduceEntit"></param>
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
-        private async Task<ManuFacePlateRepairOpenInfoDto> GetManuFacePlateRepairOpenInfoDto(string sfc)
+        private async Task<ManuFacePlateRepairOpenInfoDto> GetManuFacePlateRepairOpenInfoDto(ManuSfcProduceEntity manuSfcProduceEntit)
         {
-            var manuSfcProduceEntit = await _manuSfcProduceRepository.GetBySFCAsync(sfc);
-            if (manuSfcProduceEntit == null)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16310));
-            }
             //获取产品信息
-            var manuSfcProduce = await _manuSfcProduceRepository.GetPagedInfoAsync(new ManuSfcProducePagedQuery { PageSize = 1, PageIndex = 1, SiteId = _currentSite.SiteId, Sfc = sfc });
+            var manuSfcProduce = await _manuSfcProduceRepository.GetPagedInfoAsync(new ManuSfcProducePagedQuery { PageSize = 1, PageIndex = 1, SiteId = _currentSite.SiteId, Sfc = manuSfcProduceEntit.SFC });
             var manuSfcProduceInfo = manuSfcProduce.Data.FirstOrDefault();
             if (manuSfcProduceInfo == null)
             {
@@ -441,6 +441,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                         manuFacePlateRepairReturnProcedureList.Add(manuFacePlateRepairReturnProcedureDto);
                     }
             }
+            manuFacePlateRepairReturnProcedureList.Add(new ManuFacePlateRepairReturnProcedureDto
+            {
+                ProcedureId = ProcessRoute.LastProcedureId,
+                ProcedureCode = "END"
+            });
             manuFacePlateRepairOpenInfoDto.returnProcedureInfo = manuFacePlateRepairReturnProcedureList;
 
             return manuFacePlateRepairOpenInfoDto;
@@ -458,8 +463,17 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17303));
             }
+            var manuSfcProduceEntit = await _manuSfcProduceRepository.GetBySFCAsync(beginRepairDto.SFC);
+            if (manuSfcProduceEntit == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16306));
+            }
+            if (manuSfcProduceEntit.Status != SfcProduceStatusEnum.Activity)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17322));
+            }
             beginRepairDto.SFC = beginRepairDto.SFC.Trim();
-            var manuFacePlateRepairOpenInfoDto = await GetManuFacePlateRepairOpenInfoDto(beginRepairDto.SFC);
+            var manuFacePlateRepairOpenInfoDto = await GetManuFacePlateRepairOpenInfoDto(manuSfcProduceEntit);
             return manuFacePlateRepairOpenInfoDto;
         }
 
@@ -550,14 +564,14 @@ namespace Hymson.MES.Services.Services.Manufacture
                 manuSfcRepairDetailList.Add(manuSfcRepairDetailEntity);
             }
 
-            //  返回工序
-            var updateProcedureCommand = new UpdateProcedureCommand
-            {
-                Id = manuSfcProduceEntit.Id,
-                ProcedureId = confirmSubmitDto.ReturnProcedureId,
-                UserId = _currentUser.UserName,
-                UpdatedOn = HymsonClock.Now()
-            };
+            //  返回工序(出站更改)
+            //var updateProcedureCommand = new UpdateProcedureCommand
+            //{
+            //    Id = manuSfcProduceEntit.Id,
+            //    ProcedureId = confirmSubmitDto.ReturnProcedureId,
+            //    UserId = _currentUser.UserName,
+            //    UpdatedOn = HymsonClock.Now()
+            //};
             #endregion
 
             #region 事务入库
@@ -570,11 +584,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                 rows += await _manuFacePlateRepairRepository.InsertsDetailAsync(manuSfcRepairDetailList);
                 //不良录入
                 rows += await _manuProductBadRecordRepository.UpdateRangeAsync(badRecordsList);
-                //返回工序
-                rows += await _manuSfcProduceRepository.UpdateUpdateProcedureIdSqlAsync(updateProcedureCommand);
+                //返回工序(出站更改)
+                //rows += await _manuSfcProduceRepository.UpdateUpdateProcedureIdSqlAsync(updateProcedureCommand);
 
-                //出站
-                rows += await _manuOutStationService.OutStationAsync(new ManufactureBo { SFC = confirmSubmitDto.SFC, ProcedureId = confirmSubmitDto.ProcedureId, ResourceId = confirmSubmitDto.ResourceId });
+                //出站 
+                rows += await _manuOutStationService.OutStationRepiarAsync(new ManufactureRepairBo { SFC = confirmSubmitDto.SFC, ProcedureId = confirmSubmitDto.ProcedureId, ReturnProcedureId = confirmSubmitDto.ReturnProcedureId, ResourceId = confirmSubmitDto.ResourceId });
                 trans.Complete();
             }
             if (rows == 0)
@@ -583,6 +597,10 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             #endregion
         }
+
+
+
+
 
 
         /// <summary>

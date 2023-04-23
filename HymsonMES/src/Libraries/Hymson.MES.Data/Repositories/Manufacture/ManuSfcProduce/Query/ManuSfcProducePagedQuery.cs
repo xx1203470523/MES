@@ -59,5 +59,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 锁定状态
         /// </summary>
         public int? Lock { get; set; }
+
+        /// <summary>
+        /// 查询锁定状态不为某个状态的sfc信息，即时锁定的不能操作不查
+        /// </summary>
+        public int? NoLock { get; set; }
     }
 }

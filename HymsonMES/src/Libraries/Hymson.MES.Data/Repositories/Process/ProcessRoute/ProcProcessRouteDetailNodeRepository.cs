@@ -7,13 +7,10 @@
  */
 
 using Dapper;
-using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
-using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using static Dapper.SqlBuilder;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -42,6 +39,10 @@ namespace Hymson.MES.Data.Repositories.Process
             if (query.ProcessRouteId > 0)
             {
                 sqlBuilder.Where("ProcessRouteId=@ProcessRouteId");
+            }
+            if (query.ProcedureId > 0)
+            {
+                sqlBuilder.Where("ProcedureId=@ProcedureId");
             }
             sqlBuilder.AddParameters(query);
 
@@ -84,6 +85,17 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 查询节点明细
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcProcessRouteDetailNodeEntity>> GetByProcedureIdsAsync(ProcProcessRouteDetailNodesQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcProcessRouteDetailNodeEntity>(GetByProcedureIdsSql, query);
+        }
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -91,12 +103,12 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<ProcProcessRouteDetailNodeEntity> GetFirstProcedureByProcessRouteIdAsync(long processRouteId)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcProcessRouteDetailNodeEntity>(GetFirstProcedureByProcessRouteIdSql, new { Id = processRouteId });
+            return await conn.QueryFirstOrDefaultAsync<ProcProcessRouteDetailNodeEntity>(GetFirstProcedureByProcessRouteIdSql, new { ProcessRouteId = processRouteId });
         }
 
         /// <summary>
         /// 根据IDs批量获取数据
-        /// </summary>
+        /// </summary>  
         /// <param name="ids"></param>
         /// <returns></returns>
         public async Task<IEnumerable<ProcProcessRouteDetailNodeEntity>> GetByIdsAsync(long[] ids)
@@ -162,6 +174,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string DeletesSql = "UPDATE `proc_process_route_detail_node` SET IsDeleted = '1' WHERE Id in @ids";
         const string GetByIdSql = @"SELECT * FROM `proc_process_route_detail_node`  WHERE Id = @Id ";
         const string GetByProcessRouteIdSql = "SELECT * FROM proc_process_route_detail_node WHERE ProcessRouteId = @ProcessRouteId AND ProcedureId = @ProcedureId";
+        const string GetByProcedureIdsSql = "SELECT * FROM proc_process_route_detail_node WHERE ProcessRouteId = @ProcessRouteId AND ProcedureId IN @ProcedureIds";
         const string GetFirstProcedureByProcessRouteIdSql = @"SELECT * FROM `proc_process_route_detail_node`  WHERE ProcessRouteId = @ProcessRouteId and  IsFirstProcess=1";
         const string GetProcedureByProcessRouteIdSql = @"SELECT * FROM `proc_process_route_detail_node`  WHERE ProcessRouteId = @ProcessRouteId";
         const string GetByIdsSql = @"SELECT * FROM `proc_process_route_detail_node`  WHERE Id IN @ids ";

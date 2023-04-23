@@ -6,6 +6,7 @@
  *build datetime: 2023-04-12 02:32:21
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -28,6 +29,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="manuContainerPackRecordCreateDto"></param>
         /// <returns></returns>
         Task CreateManuContainerPackRecordAsync(ManuContainerPackRecordCreateDto manuContainerPackRecordCreateDto);
+        Task CreateManuContainerPackRecordsAsync(List<ManuContainerPackRecordCreateDto> manuContainerPackRecordCreateDtos);
 
         /// <summary>
         /// 修改

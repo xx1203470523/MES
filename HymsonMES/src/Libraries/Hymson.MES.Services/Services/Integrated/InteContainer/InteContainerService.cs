@@ -6,9 +6,11 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer.Query;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Sequences;
 using Hymson.Snowflake;
@@ -37,26 +39,42 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
         private readonly AbstractValidator<InteContainerSaveDto> _validationSaveRules;
 
         /// <summary>
-        /// 容器维护 仓储
+        /// 仓储（容器维护）
         /// </summary>
         private readonly IInteContainerRepository _inteContainerRepository;
 
         /// <summary>
-        /// 
+        ///  仓储（物料）
+        /// </summary>
+        private readonly IProcMaterialRepository _procMaterialRepository;
+
+        /// <summary>
+        ///  仓储（物料组）
+        /// </summary>
+        private readonly IProcMaterialGroupRepository _procMaterialGroupRepository;
+
+        /// <summary>
+        /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="sequenceService"></param>
         /// <param name="validationSaveRules"></param>
         /// <param name="inteContainerRepository"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="procMaterialGroupRepository"></param>
         public InteContainerService(ICurrentUser currentUser, ICurrentSite currentSite, ISequenceService sequenceService,
             AbstractValidator<InteContainerSaveDto> validationSaveRules,
-            IInteContainerRepository inteContainerRepository)
+            IInteContainerRepository inteContainerRepository,
+            IProcMaterialRepository procMaterialRepository,
+            IProcMaterialGroupRepository procMaterialGroupRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _inteContainerRepository = inteContainerRepository;
+            _procMaterialRepository = procMaterialRepository;
+            _procMaterialGroupRepository = procMaterialGroupRepository;
         }
 
 
@@ -69,6 +87,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
         {
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(createDto);
+            await ValidationSaveDto(createDto);
 
             // DTO转换实体
             var entity = createDto.ToEntity<InteContainerEntity>();
@@ -76,7 +95,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
             entity.SiteId = _currentSite.SiteId ?? 0;
-     
+
             // 验证是否相同物料或者物料组已经设置过
             var entityByRelation = await _inteContainerRepository.GetByRelationIdAsync(new InteContainerQuery
             {
@@ -85,10 +104,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
                 MaterialGroupId = entity.MaterialGroupId
             });
 
-            if (entityByRelation != null)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES12503));
-            }
+            if (entityByRelation != null) throw new CustomerValidationException(nameof(ErrorCode.MES12503));
 
             // 保存实体
             return await _inteContainerRepository.InsertAsync(entity);
@@ -103,6 +119,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
         {
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(modifyDto);
+            await ValidationSaveDto(modifyDto);
 
             // DTO转换实体
             var entity = modifyDto.ToEntity<InteContainerEntity>();
@@ -116,10 +133,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
                 MaterialGroupId = entity.MaterialGroupId
             });
 
-            if (entityByRelation != null && entityByRelation.Id != entity.Id)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES12503));
-            }
+            if (entityByRelation != null && entityByRelation.Id != entity.Id) throw new CustomerValidationException(nameof(ErrorCode.MES12503));
 
             // 更新实体
             return await _inteContainerRepository.UpdateAsync(entity);
@@ -175,11 +189,21 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
         /// 验证对象
         /// </summary>
         /// <param name="dto"></param>
-        private static void ValidationSaveDto(InteContainerSaveDto dto)
+        private async Task ValidationSaveDto(InteContainerSaveDto dto)
         {
-            if (dto == null)
-            {
+            if (dto == null) throw new CustomerValidationException(nameof(ErrorCode.MES12503));
 
+            // 判断物料/物料组是否存在
+            switch (dto.DefinitionMethod)
+            {
+                case DefinitionMethodEnum.Material:
+                    _ = await _procMaterialRepository.GetByIdAsync(dto.MaterialId) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10204));
+                    break;
+                case DefinitionMethodEnum.MaterialGroup:
+                    _ = await _procMaterialGroupRepository.GetByIdAsync(dto.MaterialGroupId) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10219));
+                    break;
+                default:
+                    break;
             }
         }
 

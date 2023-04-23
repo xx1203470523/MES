@@ -162,7 +162,12 @@ namespace Hymson.MES.Services.Services.Manufacture
              *        Y  根据条码查找打开着的包装码 返回view
              *        N  返回这个包装码的view
              */
-            var foo = await _manuContainerPackRepository.GetByLadeBarCodeAsync(createManuContainerBarcodeDto.BarCode);
+            var packQuery = new ManuContainerPackQuery
+            {
+                LadeBarCode = createManuContainerBarcodeDto.BarCode,
+                SiteId = _currentSite.SiteId ?? 0,
+            };
+            var foo = await _manuContainerPackRepository.GetByLadeBarCodeAsync(packQuery);
             if (foo != null)
             {
                 var barcodeobj = await _manuContainerBarcodeRepository.GetByIdAsync(foo.ContainerBarCodeId);
@@ -226,7 +231,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                      * N 创建全新包装
                      */
 
-                    var barcodeobj = await _manuContainerBarcodeRepository.GetByCodeAsync(createManuContainerBarcodeDto.ContainerCode);
+                    var barcodeobj = await _manuContainerBarcodeRepository.GetByCodeAsync(new ManuContainerBarcodeQuery {BarCode= createManuContainerBarcodeDto.ContainerCode ,SiteId=_currentSite.SiteId??0});
 
                     if (barcodeobj.WorkOrderId != workorder.Id)
                     {

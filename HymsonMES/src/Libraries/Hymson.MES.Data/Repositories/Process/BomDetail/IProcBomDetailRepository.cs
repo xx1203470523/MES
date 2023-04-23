@@ -110,9 +110,9 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 获取List
         /// </summary>
-        /// <param name="procBomDetailQuery"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcBomDetailEntity>> GetProcBomDetailEntitiesAsync(ProcBomDetailQuery procBomDetailQuery);
+        Task<IEnumerable<ProcBomDetailEntity>> GetProcBomDetailEntitiesAsync(ProcBomDetailQuery query);
 
         /// <summary>
         /// 分页查询

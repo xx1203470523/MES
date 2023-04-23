@@ -85,7 +85,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.LeftJoin("manu_sfc_info MSI ON MSI.SFC = MS.SFC");
+            sqlBuilder.LeftJoin("manu_sfc_info MSI ON MSI.SfcId = MS.Id");
             sqlBuilder.LeftJoin("plan_work_order PWO ON PWO.Id = MSI.WorkOrderId");
             sqlBuilder.LeftJoin("proc_material PM ON PM.Id = MSI.ProductId");
             sqlBuilder.Where("MS.IsDeleted = 0");
@@ -98,16 +98,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 sqlBuilder.Where("MS.IsUsed = @IsUsed");
             }
 
-            if (!string.IsNullOrWhiteSpace(pagedQuery.WorkOrderCode))
+            if (!string.IsNullOrWhiteSpace(pagedQuery.OrderCode))
             {
-                pagedQuery.WorkOrderCode = $"%{pagedQuery.WorkOrderCode}%";
-                sqlBuilder.Where("PWO.OrderCode LIKE @WorkOrderCode");
+                pagedQuery.OrderCode = $"%{pagedQuery.OrderCode}%";
+                sqlBuilder.Where("PWO.OrderCode LIKE @OrderCode");
             }
 
-            if (!string.IsNullOrWhiteSpace(pagedQuery.MaterialCode))
+            if (!string.IsNullOrWhiteSpace(pagedQuery.SFC))
             {
-                pagedQuery.MaterialCode = $"%{pagedQuery.MaterialCode}%";
-                sqlBuilder.Where("PM.MaterialCode LIKE @MaterialCode");
+                pagedQuery.SFC = $"%{pagedQuery.SFC}%";
+                sqlBuilder.Where("MS.SFC LIKE @SFC");
             }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
@@ -194,9 +194,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("sfc.SFC in @Sfcs");
             }
-            if (param.Status.HasValue)
+            if (param.Statuss != null && param.Statuss.Any())
             {
-                sqlBuilder.Where("sfc.Status =@Status");
+                sqlBuilder.Where("sfc.Status in @Statuss");
             }
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var list = await conn.QueryAsync<ManuSfcView>(template.RawSql, param);

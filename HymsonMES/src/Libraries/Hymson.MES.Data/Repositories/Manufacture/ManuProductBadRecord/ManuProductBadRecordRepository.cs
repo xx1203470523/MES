@@ -162,8 +162,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSql, manuProductBadRecordEntity);
         }
-		
-		/// <summary>
+        
+        /// <summary>
         /// 批量更新
         /// </summary>
         /// <param name="manuProductBadRecordEntitys"></param>
@@ -195,6 +195,232 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateStatusSql, commands);
         }
+
+        /// <summary>
+        /// 报表分页查询
+        /// </summary>
+        /// <param name="pageQuery"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ManuProductBadRecordReportView>> GetPagedInfoReportAsync(ManuProductBadRecordReportPagedQuery pageQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoReportDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoReportCountSqlTemplate);
+
+            //where rbr.IsDeleted = 0
+            //        AND m.MaterialCode = ''
+            //        AND m.Version = ''
+            //        AND o.OrderCode = ''
+            //        AND rbr.SFC = ''
+            //        AND p.`Code`= ''
+            //        AND rbr.CreatedOn BETWEEN '' and ''
+
+            sqlBuilder.Where(" rbr.IsDeleted = 0 ");
+            sqlBuilder.Where(" rbr.SiteId=@SiteId ");
+
+            if (!string.IsNullOrEmpty(pageQuery.MaterialCode))
+            {
+                pageQuery.MaterialCode = $"%{pageQuery.MaterialCode}%";
+                sqlBuilder.Where(" m.MaterialCode like @MaterialCode ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.MaterialVersion))
+            {
+                pageQuery.MaterialVersion = $"%{pageQuery.MaterialVersion}%";
+                sqlBuilder.Where(" m.Version like @MaterialVersion ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.OrderCode))
+            {
+                pageQuery.OrderCode = $"%{pageQuery.OrderCode}%";
+                sqlBuilder.Where(" o.OrderCode like @OrderCode ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.SFC))
+            {
+                pageQuery.SFC = $"%{pageQuery.SFC}%";
+                sqlBuilder.Where(" rbr.SFC like @SFC ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.ProcedureCode))
+            {
+                pageQuery.ProcedureCode = $"%{pageQuery.ProcedureCode}%";
+                sqlBuilder.Where(" p.`Code` like  @ProcedureCode ");
+            }
+            if (pageQuery.CreatedOnS.HasValue || pageQuery.CreatedOnE.HasValue)
+            {
+                if (pageQuery.CreatedOnS.HasValue && pageQuery.CreatedOnE.HasValue)
+                    sqlBuilder.Where(" rbr.CreatedOn BETWEEN @CreatedOnS AND @CreatedOnE ");
+                else
+                {
+                    if (pageQuery.CreatedOnS.HasValue) sqlBuilder.Where("rbr.CreatedOn >= @CreatedOnS");
+                    if (pageQuery.CreatedOnE.HasValue) sqlBuilder.Where("rbr.CreatedOn < @CreatedOnE");
+                }
+            }
+
+
+            var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = pageQuery.PageSize });
+            sqlBuilder.AddParameters(pageQuery);
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var manuProductBadRecordEntitiesTask = conn.QueryAsync<ManuProductBadRecordReportView>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var manuProductBadRecordEntities = await manuProductBadRecordEntitiesTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<ManuProductBadRecordReportView>(manuProductBadRecordEntities, pageQuery.PageIndex, pageQuery.PageSize, totalCount);
+        }
+
+
+        /// <summary>
+        /// 获取 前多少的不良记录
+        /// </summary>
+        /// <param name="pageQuery"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuProductBadRecordReportView>> GetTopNumReportAsync(ManuProductBadRecordReportPagedQuery pageQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoReportDataSqlTemplate);
+
+            sqlBuilder.Where(" rbr.IsDeleted = 0 ");
+            sqlBuilder.Where(" rbr.SiteId=@SiteId ");
+
+            if (!string.IsNullOrEmpty(pageQuery.MaterialCode))
+            {
+                pageQuery.MaterialCode = $"%{pageQuery.MaterialCode}%";
+                sqlBuilder.Where(" m.MaterialCode like @MaterialCode ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.MaterialVersion))
+            {
+                pageQuery.MaterialVersion = $"%{pageQuery.MaterialVersion}%";
+                sqlBuilder.Where(" m.Version like @MaterialVersion ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.OrderCode))
+            {
+                pageQuery.OrderCode = $"%{pageQuery.OrderCode}%";
+                sqlBuilder.Where(" o.OrderCode like @OrderCode ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.SFC))
+            {
+                pageQuery.SFC = $"%{pageQuery.SFC}%";
+                sqlBuilder.Where(" rbr.SFC like @SFC ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.ProcedureCode))
+            {
+                pageQuery.ProcedureCode = $"%{pageQuery.ProcedureCode}%";
+                sqlBuilder.Where(" p.`Code` like  @ProcedureCode ");
+            }
+            if (pageQuery.CreatedOnS.HasValue || pageQuery.CreatedOnE.HasValue)
+            {
+                if (pageQuery.CreatedOnS.HasValue && pageQuery.CreatedOnE.HasValue)
+                    sqlBuilder.Where(" rbr.CreatedOn BETWEEN @CreatedOnS AND @CreatedOnE ");
+                else
+                {
+                    if (pageQuery.CreatedOnS.HasValue) sqlBuilder.Where("rbr.CreatedOn >= @CreatedOnS");
+                    if (pageQuery.CreatedOnE.HasValue) sqlBuilder.Where("rbr.CreatedOn < @CreatedOnE");
+                }
+            }
+
+
+            var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = pageQuery.PageSize });
+            sqlBuilder.AddParameters(pageQuery);
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var manuProductBadRecordEntitiesTask = conn.QueryAsync<ManuProductBadRecordReportView>(templateData.RawSql, templateData.Parameters);
+            return await manuProductBadRecordEntitiesTask;
+        }
+
+        /// <summary>
+        /// 不合格日志报表分页查询
+        /// </summary>
+        /// <param name="pageQuery"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ManuProductBadRecordLogReportView>> GetPagedInfoLogReportAsync(ManuProductBadRecordLogReportPagedQuery pageQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoLogReportDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoLogReportCountSqlTemplate);
+
+            //where rbr.IsDeleted=0
+            //    AND m.MaterialCode like '%%'
+            //    AND m.Version like '%%'
+            //    AND o.OrderCode like '%%'
+            //    AND p.`Code` like '%%'
+            //    AND r.ResCode like '%%'
+            //    AND uc.UnqualifiedCode like '%%'
+            //    AND uc.Type =''
+            //    AND rbr.`Status` =''
+            //    AND rbr.SFC like '%%'
+            //    AND CreatedBy BETWEEN '' and ''
+
+            sqlBuilder.Where(" rbr.IsDeleted = 0 ");
+            sqlBuilder.Where(" rbr.SiteId=@SiteId ");
+
+            if (!string.IsNullOrEmpty(pageQuery.MaterialCode))
+            {
+                pageQuery.MaterialCode = $"%{pageQuery.MaterialCode}%";
+                sqlBuilder.Where(" m.MaterialCode like @MaterialCode ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.MaterialVersion))
+            {
+                pageQuery.MaterialVersion = $"%{pageQuery.MaterialVersion}%";
+                sqlBuilder.Where(" m.Version like @MaterialVersion ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.OrderCode))
+            {
+                pageQuery.OrderCode = $"%{pageQuery.OrderCode}%";
+                sqlBuilder.Where(" o.OrderCode like @OrderCode ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.ProcedureCode))
+            {
+                pageQuery.ProcedureCode = $"%{pageQuery.ProcedureCode}%";
+                sqlBuilder.Where(" p.`Code` like  @ProcedureCode ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.ResourceCode))
+            {
+                pageQuery.ResourceCode = $"%{pageQuery.ResourceCode}%";
+                sqlBuilder.Where(" r.ResCode like  @ResourceCode ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.UnqualifiedCode))
+            {
+                pageQuery.UnqualifiedCode = $"%{pageQuery.UnqualifiedCode}%";
+                sqlBuilder.Where(" uc.UnqualifiedCode like  @UnqualifiedCode ");
+            }
+            if (pageQuery.UnqualifiedType.HasValue)
+            {
+                sqlBuilder.Where(" uc.Type =  @UnqualifiedType ");
+            }
+            if (pageQuery.BadRecordStatus.HasValue)
+            {
+                sqlBuilder.Where(" rbr.`Status` =  @BadRecordStatus ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.SFC))
+            {
+                pageQuery.SFC = $"%{pageQuery.SFC}%";
+                sqlBuilder.Where(" rbr.SFC like @SFC ");
+            }
+            if (pageQuery.CreatedOnS.HasValue || pageQuery.CreatedOnE.HasValue)
+            {
+                if (pageQuery.CreatedOnS.HasValue && pageQuery.CreatedOnE.HasValue)
+                    sqlBuilder.Where(" rbr.CreatedOn BETWEEN @CreatedOnS AND @CreatedOnE ");
+                else
+                {
+                    if (pageQuery.CreatedOnS.HasValue) sqlBuilder.Where("rbr.CreatedOn >= @CreatedOnS");
+                    if (pageQuery.CreatedOnE.HasValue) sqlBuilder.Where("rbr.CreatedOn < @CreatedOnE");
+                }
+            }
+
+            var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = pageQuery.PageSize });
+            sqlBuilder.AddParameters(pageQuery);
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var manuProductBadRecordEntitiesTask = conn.QueryAsync<ManuProductBadRecordLogReportView>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var manuProductBadRecordEntities = await manuProductBadRecordEntitiesTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<ManuProductBadRecordLogReportView>(manuProductBadRecordEntities, pageQuery.PageIndex, pageQuery.PageSize, totalCount);
+        }
     }
 
     public partial class ManuProductBadRecordRepository
@@ -218,5 +444,77 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                             FROM `manu_product_bad_record`  WHERE Id IN @ids ";
 
         const string UpdateStatusSql = "UPDATE `manu_product_bad_record` SET Remark = @Remark,Status=@Status,UpdatedBy=@UserId,UpdatedOn=@UpdatedOn WHERE SFC=@Sfc  AND UnqualifiedId=@UnqualifiedId  and  Status!=@Status ";
+
+        const string GetPagedInfoReportDataSqlTemplate = @"
+                    select 
+                        rbr.UnqualifiedId, Sum(rbr.Qty)  as num
+                    from manu_product_bad_record rbr
+                    LEFT JOIN proc_procedure p on p.Id=rbr.OutflowOperationId -- 为了查询工序编码
+
+                    LEFT join manu_sfc s on s.SFC=rbr.SFC
+                    left join manu_sfc_info si on si.SfcId= s.Id -- 为了获取关联信息
+
+                    LEFT JOIN proc_material m on m.Id=si.ProductId  -- 为了查询物料编码
+                    LEFT join plan_work_order o on o.Id=si.WorkOrderId -- 为了查询工单编码
+
+                    /**where**/
+                    GROUP BY rbr.UnqualifiedId 
+                    ORDER BY num desc
+
+                    LIMIT @Offset,@Rows 
+                     ";
+        const string GetPagedInfoReportCountSqlTemplate = @" 
+                    select 
+                        COUNT(DISTINCT rbr.UnqualifiedId )
+                    from manu_product_bad_record rbr
+                    LEFT JOIN proc_procedure p on p.Id=rbr.OutflowOperationId -- 为了查询工序编码
+
+                    LEFT join manu_sfc s on s.SFC=rbr.SFC
+                    left join manu_sfc_info si on si.SfcId= s.Id -- 为了获取关联信息
+
+                    LEFT JOIN proc_material m on m.Id=si.ProductId  -- 为了查询物料编码
+                    LEFT join plan_work_order o on o.Id=si.WorkOrderId -- 为了查询工单编码
+                    /**where**/   ";
+
+        const string GetPagedInfoLogReportDataSqlTemplate = @"
+                select  rbr.SFC,  
+                        m.MaterialCode,m.MaterialName,
+                        o.OrderCode,
+                        p.`Code` as ProcedureCode,
+                        r.ResCode,
+                        uc.UnqualifiedCode,
+                        uc.Type as UnqualifiedType,
+                        rbr.`Status` as BadRecordStatus,
+                        rbr.CreatedBy,
+                        rbr.CreatedOn
+                
+                from manu_product_bad_record rbr
+                LEFT JOIN proc_procedure p on p.Id=rbr.OutflowOperationId -- 为了查询工序编码
+                LEFT join proc_resource r on r.id=rbr.FoundBadResourceId  -- 为了查询资源
+                LEFT join qual_unqualified_code uc on uc.id=rbr.UnqualifiedId -- 为了查询不合格代码
+
+                LEFT join manu_sfc s on s.SFC=rbr.SFC
+                left join manu_sfc_info si on si.SfcId= s.Id -- 为了获取关联信息
+
+                LEFT JOIN proc_material m on m.Id=si.ProductId  -- 为了查询物料编码
+                LEFT join plan_work_order o on o.Id=si.WorkOrderId -- 为了查询工单编码
+                /**where**/
+                ORDER BY rbr.CreatedOn desc
+
+                LIMIT @Offset,@Rows 
+        ";
+        const string GetPagedInfoLogReportCountSqlTemplate = @" 
+                select  COUNT(1) 
+                from manu_product_bad_record rbr
+                LEFT JOIN proc_procedure p on p.Id=rbr.OutflowOperationId -- 为了查询工序编码
+                LEFT join proc_resource r on r.id=rbr.FoundBadResourceId  -- 为了查询资源
+                LEFT join qual_unqualified_code uc on uc.id=rbr.UnqualifiedId -- 为了查询不合格代码
+
+                LEFT join manu_sfc s on s.SFC=rbr.SFC
+                left join manu_sfc_info si on si.SfcId= s.Id -- 为了获取关联信息
+
+                LEFT JOIN proc_material m on m.Id=si.ProductId  -- 为了查询物料编码
+                LEFT join plan_work_order o on o.Id=si.WorkOrderId -- 为了查询工单编码
+                /**where**/  ";
     }
 }

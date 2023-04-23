@@ -22,6 +22,9 @@ using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
+using MySql.Data.MySqlClient;
+using System.Reflection.Emit;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -41,13 +44,16 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IProcMaterialRepository _procMaterialRepository;
         private readonly AbstractValidator<ManuContainerPackCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ManuContainerPackModifyDto> _validationModifyRules;
-
+        private readonly IManuContainerPackRecordService _manuContainerPackRecordService;
         /// <summary>
         /// 接口（操作面板按钮）
         /// </summary>
         private readonly IManuFacePlateButtonService _manuFacePlateButtonService;
 
-        public ManuContainerPackService(ICurrentUser currentUser, ICurrentSite currentSite, IManuContainerPackRepository manuContainerPackRepository, AbstractValidator<ManuContainerPackCreateDto> validationCreateRules, AbstractValidator<ManuContainerPackModifyDto> validationModifyRules, IProcMaterialRepository procMaterialRepository, IManuFacePlateButtonService manuFacePlateButtonService)
+        public ManuContainerPackService(ICurrentUser currentUser, ICurrentSite currentSite
+            , IManuContainerPackRepository manuContainerPackRepository
+            , IManuContainerPackRecordService manuContainerPackRecordService
+            , AbstractValidator<ManuContainerPackCreateDto> validationCreateRules, AbstractValidator<ManuContainerPackModifyDto> validationModifyRules, IProcMaterialRepository procMaterialRepository,IManuContainerPackRecordService manuContainerPackRecordService, IManuFacePlateButtonService manuFacePlateButtonService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -56,6 +62,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _validationModifyRules = validationModifyRules;
             _procMaterialRepository = procMaterialRepository;
             _manuFacePlateButtonService = manuFacePlateButtonService;
+            _manuContainerPackRecordService = manuContainerPackRecordService;
         }
 
         /// <summary>
@@ -114,7 +121,44 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task DeleteAllByContainerBarCodeIdAsync(long containerBarCodeId)
         {
-            await _manuContainerPackRepository.DeleteAllAsync(containerBarCodeId);
+            MySqlCommand cmd = new MySqlCommand();
+           
+            //生成删除记录
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            {
+                await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(containerBarCodeId).ContinueWith(async t =>
+                {
+                    var packs = t.Result.Select(m =>
+                    {
+                        return new ManuContainerPackRecordCreateDto()
+                        {
+                            ContainerBarCodeId = m.ContainerBarCodeId,
+                            LadeBarCode = m.LadeBarCode,
+                            OperateType = (int)Core.Enums.Manufacture.ManuContainerBarcodeOperateTypeEnum.Unload
+                        };
+                    });
+                    await _manuContainerPackRecordService.CreateManuContainerPackRecordsAsync(packs.ToList());
+
+                });
+                //var records = new List<ManuContainerPackRecordCreateDto>();
+                //foreach (var item in packs)
+                //{
+                //    var r = new ManuContainerPackRecordCreateDto()
+                //    {
+                //        ContainerBarCodeId = containerBarCodeId,
+                //        LadeBarCode  =item.LadeBarCode,
+                //        OperateType = (int)Core.Enums.Manufacture.ManuContainerBarcodeOperateTypeEnum.Unload
+                //    };
+                //    records.Add(r); 
+                //}
+
+                // await _manuContainerPackRecordService.CreateManuContainerPackRecordsAsync(records);
+                await _manuContainerPackRepository.DeleteAllAsync(containerBarCodeId);
+                ts.Complete();
+            }
+            //物理删除
+          
+           
         }
 
         /// <summary>
@@ -125,6 +169,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task<PagedInfo<ManuContainerPackDto>> GetPagedListAsync(ManuContainerPackPagedQueryDto manuContainerPackPagedQueryDto)
         {
             var manuContainerPackPagedQuery = manuContainerPackPagedQueryDto.ToQuery<ManuContainerPackPagedQuery>();
+            manuContainerPackPagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _manuContainerPackRepository.GetPagedInfoAsync(manuContainerPackPagedQuery);
 
 
@@ -253,7 +298,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 }
                 else
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16707)).WithData("key", item.Key);
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16710)).WithData("key", item.Key);
                 }
             }
 

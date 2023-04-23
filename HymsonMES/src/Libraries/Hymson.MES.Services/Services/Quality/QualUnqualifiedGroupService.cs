@@ -102,6 +102,9 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 throw new ValidationException(nameof(ErrorCode.MES10100));
             }
+            param.UnqualifiedGroup = param.UnqualifiedGroup.ToTrimSpace().ToUpperInvariant();
+            param.UnqualifiedGroupName = param.UnqualifiedGroupName.ToTrimSpace();
+
             await _validationCreateRules.ValidateAndThrowAsync(param);
 
             var qualUnqualifiedGroupEntity = await _qualUnqualifiedGroupRepository.GetByCodeAsync(new QualUnqualifiedGroupByCodeQuery { Code = param.UnqualifiedGroup, Site = _currentSite.SiteId ?? 0 });
@@ -205,6 +208,7 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 throw new ValidationException(nameof(ErrorCode.MES10100));
             }
+            param.UnqualifiedGroupName = param.UnqualifiedGroupName.ToTrimSpace();
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(param);
             var userId = _currentUser.UserName;

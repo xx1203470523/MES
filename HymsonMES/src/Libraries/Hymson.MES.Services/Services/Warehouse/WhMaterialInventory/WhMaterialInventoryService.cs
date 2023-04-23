@@ -14,6 +14,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Services.Dtos.Warehouse;
@@ -36,6 +37,9 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// </summary>
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
         private readonly IWhMaterialStandingbookRepository _whMaterialStandingbookRepository;
+
+        //物料仓储
+        private readonly IProcReplaceMaterialRepository _procReplaceMaterialRepository;
         private readonly AbstractValidator<WhMaterialInventoryCreateDto> _validationCreateRules;
         private readonly AbstractValidator<WhMaterialInventoryModifyDto> _validationModifyRules;
         private readonly ICurrentSite _currentSite;
@@ -52,13 +56,15 @@ namespace Hymson.MES.Services.Services.Warehouse
         public WhMaterialInventoryService(ICurrentUser currentUser,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
-            AbstractValidator<WhMaterialInventoryCreateDto> validationCreateRules,
+            IProcReplaceMaterialRepository procReplaceMaterialRepository,
+        AbstractValidator<WhMaterialInventoryCreateDto> validationCreateRules,
             AbstractValidator<WhMaterialInventoryModifyDto> validationModifyRules,
             ICurrentSite currentSite)
         {
             _currentUser = currentUser;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
+            _procReplaceMaterialRepository = procReplaceMaterialRepository;
 
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
@@ -105,10 +111,10 @@ namespace Hymson.MES.Services.Services.Warehouse
             foreach (var item in whMaterialInventoryLists)
             {
                 item.MaterialBarCode = item.MaterialBarCode.Trim();
-                var isMaterialBarCodeList = whMaterialInventoryLists.Where(it => it.MaterialBarCode.Trim() == item.MaterialBarCode).Any();
-                if (isMaterialBarCodeList)
+                var isMaterialBarCodeList = whMaterialInventoryLists.Where(it => it.MaterialBarCode.Trim() == item.MaterialBarCode);
+                if (isMaterialBarCodeList.Count() > 1)
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15104)).WithData("MaterialCode", item.MaterialBarCode);
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15107)).WithData("MaterialCode", item.MaterialBarCode);
                 }
                 #region 校验
                 //验证DTO

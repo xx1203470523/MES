@@ -27,6 +27,7 @@ using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCreateBarcodeDto;
 using Hymson.MES.Services.Dtos.Plan;
+using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCreateBarcode;
 using Hymson.Utils.Tools;
 using System.Security.Policy;
 using System.Transactions;
@@ -50,6 +51,7 @@ namespace Hymson.MES.Services.Services.Plan
         private readonly IInteCodeRulesMakeRepository _inteCodeRulesMakeRepository;
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
         private readonly ILocalizationService _localizationService;
+        private readonly IManuCreateBarcodeService _manuCreateBarcodeService;
         private readonly AbstractValidator<PlanSfcReceiveCreateDto> _validationCreateRules;
         private readonly AbstractValidator<PlanSfcReceiveModifyDto> _validationModifyRules;
 
@@ -61,6 +63,7 @@ namespace Hymson.MES.Services.Services.Plan
             IInteCodeRulesMakeRepository inteCodeRulesMakeRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             ILocalizationService localizationService,
+            IManuCreateBarcodeService manuCreateBarcodeService,
         AbstractValidator<PlanSfcReceiveCreateDto> validationCreateRules, AbstractValidator<PlanSfcReceiveModifyDto> validationModifyRules)
         {
             _currentUser = currentUser;
@@ -72,6 +75,7 @@ namespace Hymson.MES.Services.Services.Plan
             _inteCodeRulesMakeRepository = inteCodeRulesMakeRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _localizationService = localizationService;
+            _manuCreateBarcodeService = manuCreateBarcodeService;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
         }
