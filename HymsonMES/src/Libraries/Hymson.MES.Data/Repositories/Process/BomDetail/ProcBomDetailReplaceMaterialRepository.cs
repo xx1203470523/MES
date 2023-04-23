@@ -93,6 +93,17 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 根据BomID查询替代物料
+        /// </summary>
+        /// <param name="bomIds"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcBomDetailReplaceMaterialEntity>> GetByBomIdsAsync(IEnumerable<long> bomIds)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcBomDetailReplaceMaterialEntity>(GetByBomIdsSql, new { bomIds });
+        }
+
+        /// <summary>
         /// 根据BomDetailId查询替代物料
         /// </summary>
         /// <param name="bomDetailId"></param>
@@ -100,7 +111,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<IEnumerable<ProcBomDetailReplaceMaterialEntity>> GetByBomDetailIdAsync(long bomDetailId)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcBomDetailReplaceMaterialEntity>(GetByBomDetailIdSql, new { BomDetailId= bomDetailId });
+            return await conn.QueryAsync<ProcBomDetailReplaceMaterialEntity>(GetByBomDetailIdSql, new { BomDetailId = bomDetailId });
         }
 
         /// <summary>
@@ -213,6 +224,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdSql = @"SELECT * FROM `proc_bom_detail_replace_material`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `proc_bom_detail_replace_material`  WHERE Id IN @ids ";
         const string GetByBomIdSql = "SELECT * FROM proc_bom_detail_replace_material WHERE IsDeleted = 0 AND BomId = @bomId ";
+        const string GetByBomIdsSql = "SELECT * FROM proc_bom_detail_replace_material WHERE IsDeleted = 0 AND BomId IN @bomIds ";
         const string GetByBomDetailIdSql = "SELECT * FROM proc_bom_detail_replace_material WHERE IsDeleted = 0 AND BomDetailId = @BomDetailId ";
     }
 }
