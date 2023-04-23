@@ -13,6 +13,10 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using Org.BouncyCastle.Tsp;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Common;
+using System.Reflection;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {

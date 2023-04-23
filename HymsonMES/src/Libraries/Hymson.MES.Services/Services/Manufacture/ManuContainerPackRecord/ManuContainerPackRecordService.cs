@@ -165,5 +165,36 @@ namespace Hymson.MES.Services.Services.Manufacture
            }
             return null;
         }
+
+        public async Task CreateManuContainerPackRecordsAsync(List<ManuContainerPackRecordCreateDto> manuContainerPackRecordCreateDtos)
+        {
+            if(manuContainerPackRecordCreateDtos!=null&& manuContainerPackRecordCreateDtos.Any())
+            {
+                // 判断是否有获取到站点码 
+                if (_currentSite.SiteId == 0)
+                {
+                    throw new ValidationException(nameof(ErrorCode.MES10101));
+                }
+                var lst = new List<ManuContainerPackRecordEntity>();
+                foreach (var manuContainerPackRecordCreateDto in manuContainerPackRecordCreateDtos)
+                {
+
+                    //验证DTO
+                    await _validationCreateRules.ValidateAndThrowAsync(manuContainerPackRecordCreateDto);
+
+                    //DTO转换实体
+                    var manuContainerPackRecordEntity = manuContainerPackRecordCreateDto.ToEntity<ManuContainerPackRecordEntity>();
+                    manuContainerPackRecordEntity.Id = IdGenProvider.Instance.CreateId();
+                    manuContainerPackRecordEntity.CreatedBy = _currentUser.UserName;
+                    manuContainerPackRecordEntity.UpdatedBy = _currentUser.UserName;
+                    manuContainerPackRecordEntity.CreatedOn = HymsonClock.Now();
+                    manuContainerPackRecordEntity.UpdatedOn = HymsonClock.Now();
+                    manuContainerPackRecordEntity.SiteId = _currentSite.SiteId ?? 0;
+                   
+                    lst.Add(manuContainerPackRecordEntity);
+                }
+                await _manuContainerPackRecordRepository.InsertsAsync(lst); 
+            }
+        }
     }
 }
