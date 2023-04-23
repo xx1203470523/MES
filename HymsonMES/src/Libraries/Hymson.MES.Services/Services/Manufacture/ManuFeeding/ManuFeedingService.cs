@@ -82,11 +82,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         private readonly IProcMaterialRepository _procMaterialRepository;
 
         /// <summary>
-        ///  仓储（物料替代料）
-        /// </summary>
-        private readonly IProcReplaceMaterialRepository _procReplaceMaterialRepository;
-
-        /// <summary>
         ///  仓储（物料库存）
         /// </summary>
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
