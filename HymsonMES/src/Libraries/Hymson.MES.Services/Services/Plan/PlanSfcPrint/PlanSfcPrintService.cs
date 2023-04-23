@@ -170,12 +170,17 @@ namespace Hymson.MES.Services.Services.Plan
                     CreatedBy = _currentUser.UserName,
                     UpdatedBy = _currentUser.UserName
                 }));
+
+                /*
+                 * 禅道 1159 反映不能删除
                 rows += await _planWorkOrderRepository.DeletesAsync(new DeleteCommand
                 {
                     Ids = sfcInfoEntities.Select(s => s.WorkOrderId).ToArray(),
                     UserId = _currentUser.UserName,
                     DeleteOn = HymsonClock.Now()
                 });
+                */
+
                 trans.Complete();
             }
             return rows;
