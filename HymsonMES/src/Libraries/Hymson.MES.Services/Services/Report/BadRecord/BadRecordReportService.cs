@@ -118,5 +118,24 @@ namespace Hymson.MES.Services.Services.Report
             return listDto;
         }
 
+        /// <summary>
+        /// 根据查询条件获取不良日志报表分页数据
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ManuProductBadRecordLogReportViewDto>> GetLogPageListAsync(ManuProductBadRecordLogReportPagedQueryDto param)
+        {
+            var pagedQuery = param.ToQuery<ManuProductBadRecordLogReportPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId;
+            var pagedInfo = await _manuProductBadRecordRepository.GetPagedInfoLogReportAsync(pagedQuery);
+
+            List<ManuProductBadRecordLogReportViewDto> listDto = new List<ManuProductBadRecordLogReportViewDto>();
+            foreach (var item in pagedInfo.Data)
+            {
+                listDto.Add( item.ToModel<ManuProductBadRecordLogReportViewDto>());
+            }
+
+            return new PagedInfo<ManuProductBadRecordLogReportViewDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
     }
 }

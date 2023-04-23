@@ -47,7 +47,7 @@ namespace Hymson.MES.Api.Controllers.Report
         }
 
         /// <summary>
-        /// 分页查询列表（不良报告）
+        /// 查询前十列表（不良报告）
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
@@ -58,5 +58,16 @@ namespace Hymson.MES.Api.Controllers.Report
             return await _badRecordReportService.GetTopTenBadRecordAsync(parm);
         }
 
+        /// <summary>
+        /// 分页查询列表（不良报告日志）
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("logPageList")]
+        public async Task<PagedInfo<ManuProductBadRecordLogReportViewDto>> GetLogPageListAsync([FromQuery] ManuProductBadRecordLogReportPagedQueryDto parm)
+        {
+            return await _badRecordReportService.GetLogPageListAsync(parm);
+        }
     }
 }

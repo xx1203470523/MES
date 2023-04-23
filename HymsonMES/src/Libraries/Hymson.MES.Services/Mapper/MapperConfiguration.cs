@@ -540,6 +540,9 @@ namespace Hymson.MES.Services.Mapper
         {
             #region BadRecordReport
             CreateMap<BadRecordReportDto, ManuProductBadRecordReportPagedQuery>();
+
+            CreateMap<ManuProductBadRecordLogReportPagedQueryDto, ManuProductBadRecordLogReportPagedQuery>();
+            CreateMap<ManuProductBadRecordLogReportView, ManuProductBadRecordLogReportViewDto>();
             #endregion
 
         }
