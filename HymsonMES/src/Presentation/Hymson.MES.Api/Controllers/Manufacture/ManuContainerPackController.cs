@@ -6,6 +6,7 @@
  *build datetime: 2023-04-12 02:33:13
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
 using Microsoft.AspNetCore.Authorization;
@@ -113,5 +114,18 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         #endregion
+
+
+        /// <summary>
+        /// 执行作业
+        /// </summary>
+        /// <param name="manuFacePlateContainerPackExJobDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("exJob")]
+        public async Task<List<ManuContainerPackagJobReturnTypeEnum>> ExecuteexecuteJobAsync(ManuFacePlateContainerPackExJobDto manuFacePlateContainerPackExJobDto)
+        {
+            return await _manuContainerPackService.ExecuteexecuteJobAsync(manuFacePlateContainerPackExJobDto);
+        }
     }
 }

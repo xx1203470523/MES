@@ -544,6 +544,9 @@
         public const string MES16704 = "容器包装，配置面板编号为空";
         public const string MES16705 = "容器包装，配置面板不存在";
         public const string MES16706 = "容器包装，配置面板不允许混工单,当前容器工单{first},当前条码工单{second}";
+        public const string MES16707 = "不识别的类型：{key}";
+        public const string MES16708 = "产品条码不能为空";
+        public const string MES16709 = "作业返回空，请检查作业是否正确配置";
         #endregion
 
         #region 绑定工单激活  MES16800

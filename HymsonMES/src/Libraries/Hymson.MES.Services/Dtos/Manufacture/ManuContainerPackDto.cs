@@ -201,4 +201,37 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public string? BarCode { get; set; }
     }
+
+
+    /// <summary>
+    /// 容器包装 执行作业
+    /// </summary>
+    public record ManuFacePlateContainerPackExJobDto
+    {
+        /// <summary>
+        /// 面板ID
+        /// </summary>
+        public long FacePlateId { get; set; }
+
+        /// <summary>
+        /// 按钮ID
+        /// </summary>
+        public long FacePlateButtonId { get; set; }
+
+        /// <summary>
+        /// 工序id
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 产品条码
+        /// </summary>
+        public string SFC { get; set; }
+
+    }
 }
