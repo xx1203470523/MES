@@ -226,15 +226,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where(" m.Version=@MaterialVersion ");
             }
-            if (string.IsNullOrEmpty(pageQuery.OrderCode)) 
+            if (!string.IsNullOrEmpty(pageQuery.OrderCode)) 
             {
                 sqlBuilder.Where(" o.OrderCode=@OrderCode ");
             }
-            if (string.IsNullOrEmpty(pageQuery.SFC))
+            if (!string.IsNullOrEmpty(pageQuery.SFC))
             {
                 sqlBuilder.Where(" rbr.SFC=@SFC ");
             }
-            if (string.IsNullOrEmpty(pageQuery.ProcedureCode))
+            if (!string.IsNullOrEmpty(pageQuery.ProcedureCode))
             {
                 sqlBuilder.Where(" p.`Code` =@ProcedureCode ");
             }
@@ -261,6 +261,62 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var manuProductBadRecordEntities = await manuProductBadRecordEntitiesTask;
             var totalCount = await totalCountTask;
             return new PagedInfo<ManuProductBadRecordReportView>(manuProductBadRecordEntities, pageQuery.PageIndex, pageQuery.PageSize, totalCount);
+        }
+
+
+        /// <summary>
+        /// 获取 前多少的不良记录
+        /// </summary>
+        /// <param name="pageQuery"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuProductBadRecordReportView>> GetTopNumReportAsync(ManuProductBadRecordReportPagedQuery pageQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoReportDataSqlTemplate);
+
+            sqlBuilder.Where(" rbr.IsDeleted = 0 ");
+            sqlBuilder.Where(" rbr.SiteId=@SiteId ");
+
+            if (!string.IsNullOrEmpty(pageQuery.MaterialCode))
+            {
+                sqlBuilder.Where(" m.MaterialCode=@MaterialCode ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.MaterialVersion))
+            {
+                sqlBuilder.Where(" m.Version=@MaterialVersion ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.OrderCode))
+            {
+                sqlBuilder.Where(" o.OrderCode=@OrderCode ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.SFC))
+            {
+                sqlBuilder.Where(" rbr.SFC=@SFC ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.ProcedureCode))
+            {
+                sqlBuilder.Where(" p.`Code` =@ProcedureCode ");
+            }
+            if (pageQuery.CreatedOnS.HasValue || pageQuery.CreatedOnE.HasValue)
+            {
+                if (pageQuery.CreatedOnS.HasValue && pageQuery.CreatedOnE.HasValue)
+                    sqlBuilder.Where(" rbr.CreatedOn BETWEEN @CreatedOnS AND @CreatedOnE ");
+                else
+                {
+                    if (pageQuery.CreatedOnS.HasValue) sqlBuilder.Where("rbr.CreatedOn >= @CreatedOnS");
+                    if (pageQuery.CreatedOnE.HasValue) sqlBuilder.Where("rbr.CreatedOn < @CreatedOnE");
+                }
+            }
+
+
+            var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = pageQuery.PageSize });
+            sqlBuilder.AddParameters(pageQuery);
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var manuProductBadRecordEntitiesTask = conn.QueryAsync<ManuProductBadRecordReportView>(templateData.RawSql, templateData.Parameters);
+            return await manuProductBadRecordEntitiesTask;
         }
 
     }
