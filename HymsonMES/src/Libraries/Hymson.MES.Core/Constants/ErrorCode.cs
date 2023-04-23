@@ -459,6 +459,7 @@
         public const string MES16312 = "请求参数不合法，不允许操作。";
         public const string MES16313 = "SFC状态不是{Status}状态，不允许操作。";
         public const string MES16314 = "SFC条码{SFC}已锁定，不允许操作。";
+        public const string MES16315 = "库存{barCode}和待加载物料编码/版本不符！";
         #endregion
 
         #region 生产
