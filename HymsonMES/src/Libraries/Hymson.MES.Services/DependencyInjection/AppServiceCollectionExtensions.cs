@@ -442,13 +442,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return services;
         }
-        public static void Setup()
-        {
-            var services = new ServiceCollection();
-        }
-        public static T Get<T>()
-        {
-            return _container.Resolve<T>();
-        }
+       
     }
 }
