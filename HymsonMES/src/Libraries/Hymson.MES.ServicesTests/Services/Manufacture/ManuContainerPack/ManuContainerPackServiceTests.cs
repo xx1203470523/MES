@@ -16,7 +16,7 @@ namespace Hymson.MES.Services.Services.Manufacture.Tests
     [TestClass()]
     public class ManuContainerPackServiceTests
     {
-        ManuContainerPackService? manuContainerPackService;
+        IManuContainerPackService? manuContainerPackService;
         
         public ManuContainerPackServiceTests()
         {
@@ -25,7 +25,7 @@ namespace Hymson.MES.Services.Services.Manufacture.Tests
             services.AddAppService(configurationManager);
           
             var provider = services.BuildServiceProvider();
-            manuContainerPackService = provider.GetService<ManuContainerPackService>();
+            manuContainerPackService = provider.GetService<IManuContainerPackService>();
             
         }
         [TestMethod()]
