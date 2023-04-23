@@ -179,12 +179,12 @@
 
         #region 不合格组 11200
         public const string MES11200 = "不合格代码组错误";
-        public const string MES11201 = "不合格代码组编码不能为空";
-        public const string MES11202 = "不合格代码组编码超过最大长度，不合格代码编码最大长度为50";
-        public const string MES11203 = "不合格代码组名称不能为空";
-        public const string MES11204 = "不合格代码组名称超过最大长度，不合格代码名称最大长度为60";
-        public const string MES11205 = "不合格代码备注超过最大长度，不合格代码备注最大长度为255";
-        public const string MES11206 = "不合格代码{code}已经存在";
+        public const string MES11201 = "不合格组编码不能为空";
+        public const string MES11202 = "不合格组编码超过最大长度，不合格代码编码最大长度为50";
+        public const string MES11203 = "不合格组名称不能为空";
+        public const string MES11204 = "不合格组名称超过最大长度，不合格代码名称最大长度为60";
+        public const string MES11205 = "说明超过最大长度，不合格代码备注最大长度为255";
+        public const string MES11206 = "不合格组编码{code}已经存在";
         #endregion
 
         #region 作业12000
