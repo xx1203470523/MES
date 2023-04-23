@@ -44,9 +44,9 @@
 
         #region 资源 10300
         public const string MES10301 = "资源编码不能为空";
-        public const string MES10302 = "资源编码超长";
+        public const string MES10302 = "资源编码最大长度不超过50";
         public const string MES10303 = "资源名称不能为空";
-        public const string MES10304 = "资源名称超长";
+        public const string MES10304 = "资源名称最大长度不超过50";
         public const string MES10305 = "资源状态不能为空";
         public const string MES10306 = "资源配置打印机中，重复配置设备!";
         public const string MES10307 = "一个资源只能对用对应一个主设备";
@@ -64,7 +64,10 @@
         public const string MES10319 = $"不能删除启用状态的资源!";
         public const string MES10320 = "所属资源类型ID不能为空";
         public const string MES10321 = "工序名称超长";
-        public const string MES10322 = "资源名称最大长度为50";
+        public const string MES10351 = "资源类型编码不能为空";
+        public const string MES10352 = "资源类型编码最大长度不超过50";
+        public const string MES10353= "资源类型名称不能为空";
+        public const string MES10354 = "资源类型名称最大长度不超过50";
         #endregion
 
         #region 标签模板
@@ -77,9 +80,9 @@
 
         #region 工序 10400
         public const string MES10401 = "工序编码不能为空";
-        public const string MES10402 = "工序编码超长";
+        public const string MES10402 = "工序编码最大长度不超过50";
         public const string MES10403 = "工序名称不能为空";
-        public const string MES10404 = "工序名称超长";
+        public const string MES10404 = "工序名称最大长度不超过50";
         public const string MES10405 = "编码:{Code}已存在！";
         public const string MES10406 = "工序不存在！";
 
@@ -179,12 +182,12 @@
 
         #region 不合格组 11200
         public const string MES11200 = "不合格代码组错误";
-        public const string MES11201 = "不合格代码组编码不能为空";
-        public const string MES11202 = "不合格代码组编码超过最大长度，不合格代码编码最大长度为50";
-        public const string MES11203 = "不合格代码组名称不能为空";
-        public const string MES11204 = "不合格代码组名称超过最大长度，不合格代码名称最大长度为60";
-        public const string MES11205 = "不合格代码备注超过最大长度，不合格代码备注最大长度为255";
-        public const string MES11206 = "不合格代码{code}已经存在";
+        public const string MES11201 = "不合格组编码不能为空";
+        public const string MES11202 = "不合格组编码超过最大长度，不合格代码编码最大长度为50";
+        public const string MES11203 = "不合格组名称不能为空";
+        public const string MES11204 = "不合格组名称超过最大长度，不合格代码名称最大长度为60";
+        public const string MES11205 = "说明超过最大长度，不合格代码备注最大长度为255";
+        public const string MES11206 = "不合格组编码{code}已经存在";
         #endregion
 
         #region 作业12000
@@ -456,6 +459,7 @@
         public const string MES16312 = "请求参数不合法，不允许操作。";
         public const string MES16313 = "SFC状态不是{Status}状态，不允许操作。";
         public const string MES16314 = "SFC条码{SFC}已锁定，不允许操作。";
+        public const string MES16315 = "库存{barCode}和待加载物料编码/版本不符！";
         #endregion
 
         #region 生产

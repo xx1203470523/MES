@@ -84,5 +84,39 @@ namespace Hymson.MES.Services.Services.Report
             return new PagedInfo<ManuProductBadRecordReportViewDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
+        /// <summary>
+        /// 根据查询条件获取不良报表分页数据
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<List<ManuProductBadRecordReportViewDto>> GetTopTenBadRecordAsync(BadRecordReportDto param)
+        {
+            var pagedQuery = param.ToQuery<ManuProductBadRecordReportPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId;
+            pagedQuery.PageIndex = 1;
+            pagedQuery.PageSize = 10;
+
+            var badRecordslist = await _manuProductBadRecordRepository.GetTopNumReportAsync(pagedQuery);
+
+            var unqualifiedIds = badRecordslist.Select(x => x.UnqualifiedId).ToArray();
+            var unqualifiedCodeEntities = await _qualUnqualifiedCodeRepository.GetByIdsAsync(unqualifiedIds);
+
+            List<ManuProductBadRecordReportViewDto> listDto = new List<ManuProductBadRecordReportViewDto>();
+            foreach (var item in badRecordslist)
+            {
+                var unqualifiedCodeEntitie = unqualifiedCodeEntities.Where(y => y.Id == item.UnqualifiedId).FirstOrDefault();
+
+                listDto.Add(new ManuProductBadRecordReportViewDto
+                {
+                    UnqualifiedId = item.UnqualifiedId,
+                    Num = item.Num,
+                    UnqualifiedCode = unqualifiedCodeEntitie?.UnqualifiedCode ?? "",
+                    UnqualifiedCodeName = unqualifiedCodeEntitie?.UnqualifiedCodeName ?? ""
+                });
+            }
+
+            return listDto;
+        }
+
     }
 }
