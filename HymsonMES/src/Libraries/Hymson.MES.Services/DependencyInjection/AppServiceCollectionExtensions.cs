@@ -53,6 +53,7 @@ using Hymson.MES.Services.Validators.Process;
 using Hymson.MES.Services.Validators.Quality;
 using Hymson.MES.Services.Validators.Warehouse;
 using Microsoft.Extensions.Configuration;
+using System.ComponentModel;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -61,6 +62,7 @@ namespace Microsoft.Extensions.DependencyInjection
     /// </summary>
     public static class AppServiceCollectionExtensions
     {
+        
         /// <summary>
         /// 业务逻辑层依赖服务添加
         /// </summary>
@@ -434,6 +436,14 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             return services;
+        }
+        public static void Setup()
+        {
+            var services = new ServiceCollection();
+        }
+        public static T Get<T>()
+        {
+            return _container.Resolve<T>();
         }
     }
 }

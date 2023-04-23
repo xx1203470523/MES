@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting.Server;
 using FluentValidation;
+using Microsoft.Extensions.Configuration;
 
 namespace Hymson.MES.Services.Services.Manufacture.Tests
 {
@@ -20,8 +21,9 @@ namespace Hymson.MES.Services.Services.Manufacture.Tests
         public ManuContainerPackServiceTests()
         {
             var services = new ServiceCollection();
-           // services.AddAppService();
-            
+            ConfigurationManager configurationManager = new ConfigurationManager();
+            services.AddAppService(configurationManager);
+          
             var provider = services.BuildServiceProvider();
             manuContainerPackService = provider.GetService<ManuContainerPackService>();
             
