@@ -50,10 +50,13 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         private readonly IManuFacePlateButtonService _manuFacePlateButtonService;
 
-        public ManuContainerPackService(ICurrentUser currentUser, ICurrentSite currentSite
-            , IManuContainerPackRepository manuContainerPackRepository
-            , IManuContainerPackRecordService manuContainerPackRecordService
-            , AbstractValidator<ManuContainerPackCreateDto> validationCreateRules, AbstractValidator<ManuContainerPackModifyDto> validationModifyRules, IProcMaterialRepository procMaterialRepository,IManuContainerPackRecordService manuContainerPackRecordService, IManuFacePlateButtonService manuFacePlateButtonService)
+        public ManuContainerPackService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IManuContainerPackRepository manuContainerPackRepository,
+            IManuContainerPackRecordService manuContainerPackRecordService,
+            AbstractValidator<ManuContainerPackCreateDto> validationCreateRules,
+            AbstractValidator<ManuContainerPackModifyDto> validationModifyRules,
+            IProcMaterialRepository procMaterialRepository,
+            IManuFacePlateButtonService manuFacePlateButtonService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -122,7 +125,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task DeleteAllByContainerBarCodeIdAsync(long containerBarCodeId)
         {
             MySqlCommand cmd = new MySqlCommand();
-           
+
             //生成删除记录
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
@@ -157,8 +160,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ts.Complete();
             }
             //物理删除
-          
-           
+
+
         }
 
         /// <summary>
