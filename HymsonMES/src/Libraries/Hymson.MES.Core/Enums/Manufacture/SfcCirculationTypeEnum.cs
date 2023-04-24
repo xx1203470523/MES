@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 
 namespace Hymson.MES.Core.Enums.Manufacture
 {
@@ -42,7 +37,7 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 组件添加
         /// </summary>
         [Description("组件添加")]
-        ModuleAdd= 6,
+        ModuleAdd = 6,
         /// <summary>
         /// 换件
         /// </summary>

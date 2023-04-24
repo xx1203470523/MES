@@ -27,5 +27,19 @@ namespace Hymson.MES.Services.Services.Report
         /// <param name="param"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuProductBadRecordReportViewDto>> GetPageListAsync(BadRecordReportDto param);
+
+        /// <summary>
+        /// 查询前十的不良记录
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<List<ManuProductBadRecordReportViewDto>> GetTopTenBadRecordAsync(BadRecordReportDto param);
+
+        /// <summary>
+        /// 根据查询条件获取不良日志报表分页数据
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ManuProductBadRecordLogReportViewDto>> GetLogPageListAsync(ManuProductBadRecordLogReportPagedQueryDto param);
     }
 }

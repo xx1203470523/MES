@@ -1,11 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 条码流转表 仓储类 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-03-27 03:50:00
- */
-
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
@@ -25,6 +17,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     {
         private readonly ConnectionOptions _connectionOptions;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
         public ManuSfcCirculationRepository(IOptions<ConnectionOptions> connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;

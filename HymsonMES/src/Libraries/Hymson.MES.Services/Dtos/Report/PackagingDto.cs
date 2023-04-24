@@ -1,13 +1,5 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Integrated;
-using Hymson.MES.Core.Enums.Report;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
 
 namespace Hymson.MES.Services.Dtos.Report
 {
@@ -103,7 +95,7 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 容器id
         /// </summary>
-        public long ContainerId { get; set; }
+        public long ContainerBarCodeId { get; set; }
 
         /// <summary>
         /// 当前装载数量

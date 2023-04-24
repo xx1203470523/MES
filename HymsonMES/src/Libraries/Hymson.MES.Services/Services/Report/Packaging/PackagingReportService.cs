@@ -4,7 +4,6 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Report;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
@@ -80,7 +79,7 @@ namespace Hymson.MES.Services.Services.Report
                 barcodeEntity = await _manuContainerBarcodeRepository.GetByCodeAsync(query);
                 if (barcodeEntity == null)
                 {
-                    return barcodeViewDto;
+                    return null;
                 }
             }
             else
@@ -94,13 +93,13 @@ namespace Hymson.MES.Services.Services.Report
                 var containerPackEntity = await _manuContainerPackRepository.GetByLadeBarCodeAsync(query);
                 if (containerPackEntity == null)
                 {
-                    return barcodeViewDto;
+                    return null;
                 }
 
-                barcodeEntity = await _manuContainerBarcodeRepository.GetByIdAsync(containerPackEntity.Id);
+                barcodeEntity = await _manuContainerBarcodeRepository.GetByIdAsync(containerPackEntity.ContainerBarCodeId);
                 if (barcodeEntity == null)
                 {
-                    return barcodeViewDto;
+                    return null;
                 }
             }
 
@@ -150,7 +149,7 @@ namespace Hymson.MES.Services.Services.Report
             var pagedInfo = await _manuContainerBarcodeRepository.GetPagedListAsync(manuContainerBarcodePagedQuery);
 
             var list = pagedInfo.Data;
-            var containerIds = list.Select(x => x.ContainerId).ToArray();
+            var containerIds = list.Select(x => x.Id).ToArray();
             var containerPackEntities = await _manuContainerPackRepository.GetByContainerBarCodeIdsAsync(containerIds);
 
             var workPackingDtos = new List<PlanWorkPackingDto>();
@@ -159,7 +158,7 @@ namespace Hymson.MES.Services.Services.Report
                 workPackingDtos.Add(new PlanWorkPackingDto
                 {
                     BarCode = item.BarCode,
-                    ContainerId = item.ContainerId,
+                    ContainerBarCodeId = item.ContainerId,
                     Status = item.Status,
                     CreatedBy = item.CreatedBy,
                     CreatedOn = item.CreatedOn,
@@ -177,6 +176,7 @@ namespace Hymson.MES.Services.Services.Report
         public async Task<PagedInfo<PlanWorkPackingDto>> GetPagedRecordListAsync(ManuContainerBarcodePagedQueryDto queryDto)
         {
             var manuContainerBarcodePagedQuery = queryDto.ToQuery<ManuContainerBarcodePagedQuery>();
+            manuContainerBarcodePagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _manuContainerBarcodeRepository.GetPagedListAsync(manuContainerBarcodePagedQuery);
 
             //实体到DTO转换 装载数据
@@ -186,7 +186,7 @@ namespace Hymson.MES.Services.Services.Report
                 workPackingDtos.Add(new PlanWorkPackingDto
                 {
                     BarCode = item.BarCode,
-                    ContainerId = item.ContainerId,
+                    ContainerBarCodeId = item.Id,
                     Status = item.Status,
                     CreatedBy = item.CreatedBy,
                     CreatedOn = item.CreatedOn

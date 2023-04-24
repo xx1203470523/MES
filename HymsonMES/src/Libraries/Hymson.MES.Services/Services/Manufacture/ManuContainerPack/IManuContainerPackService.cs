@@ -6,6 +6,7 @@
  *build datetime: 2023-04-12 02:33:13
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -63,5 +64,12 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ManuContainerPackDto> QueryManuContainerPackByIdAsync(long id);
+
+        /// <summary>
+        /// 执行作业
+        /// </summary>
+        /// <param name="manuFacePlateContainerPackExJobDto"></param>
+        /// <returns></returns>
+        Task<List<ManuContainerPackagJobReturnTypeEnum>> ExecuteexecuteJobAsync(ManuFacePlateContainerPackExJobDto manuFacePlateContainerPackExJobDto);
     }
 }

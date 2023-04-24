@@ -71,18 +71,17 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         {
             var defaultDto = new JobResponseDto { };
 
-            var rows = await _manuInStationService.InStationAsync(new ManufactureBo
+            _ = await _manuInStationService.InStationAsync(new ManufactureBo
             {
                 SFC = param["SFC"],
                 ProcedureId = param["ProcedureId"].ParseToLong(),
                 ResourceId = param["ResourceId"].ParseToLong()
             });
 
-            var result = (rows > 0).ToString();
-            defaultDto.Content?.Add("PackageCom", result);
-            defaultDto.Content?.Add("BadEntryCom", result);
+            defaultDto.Content?.Add("PackageCom", "False");
+            defaultDto.Content?.Add("BadEntryCom", "False");
 
-            defaultDto.Message = $"条码{param["SFC"]}已于NF排队！";
+            defaultDto.Message = $"条码{param["SFC"]}设置为活动状态成功！";
             return defaultDto;
         }
 

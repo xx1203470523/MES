@@ -3,9 +3,8 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
+using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Utils;
@@ -13,9 +12,9 @@ using Hymson.Utils;
 namespace Hymson.MES.Services.Services.Job.Manufacture
 {
     /// <summary>
-    /// 中止
+    /// 不良录入
     /// </summary>
-    public class JobManuStopService : IJobManufactureService
+    public class JobManuBadRecordService : IJobManufactureService
     {
         /// <summary>
         /// 当前对象（登录用户）
@@ -33,9 +32,9 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         private readonly IManuCommonService _manuCommonService;
 
         /// <summary>
-        /// 仓储接口（条码生产信息）
+        /// 服务接口（不良录入）
         /// </summary>
-        private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
+        private readonly IManuProductBadRecordRepository _manuProductBadRecordRepository;
 
         /// <summary>
         /// 构造函数
@@ -43,15 +42,15 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="manuCommonService"></param>
-        /// <param name="manuSfcProduceRepository"></param>
-        public JobManuStopService(ICurrentUser currentUser, ICurrentSite currentSite,
+        /// <param name="manuProductBadRecordRepository"></param>
+        public JobManuBadRecordService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonService manuCommonService,
-            IManuSfcProduceRepository manuSfcProduceRepository)
+            IManuProductBadRecordRepository manuProductBadRecordRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _manuCommonService = manuCommonService;
-            _manuSfcProduceRepository = manuSfcProduceRepository;
+            _manuProductBadRecordRepository = manuProductBadRecordRepository;
         }
 
 
@@ -74,32 +73,44 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         }
 
         /// <summary>
-        /// 执行（中止）
+        /// 执行（不良录入）
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
         public async Task<JobResponseDto> ExecuteAsync(Dictionary<string, string>? param)
         {
             var defaultDto = new JobResponseDto { };
+            defaultDto.Content?.Add("PackageCom", "False");
+
+            var bo = new ManufactureBo
+            {
+                SFC = param["SFC"],
+                ProcedureId = param["ProcedureId"].ParseToLong(),
+                ResourceId = param["ResourceId"].ParseToLong()
+            };
 
             // 获取生产条码信息
-            var (sfcProduceEntity, _) = await _manuCommonService.GetProduceSFCAsync(param["SFC"]);
+            var (sfcProduceEntity, _) = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
 
             // 合法性校验
-            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity).VerifyProcedure(param["ProcedureId"].ParseToLong());
+            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity).VerifyProcedure(bo.ProcedureId);
 
-            // 更改状态，将条码由"活动"改为"排队"
-            sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
-            sfcProduceEntity.UpdatedBy = _currentUser.UserName;
-            sfcProduceEntity.UpdatedOn = defaultDto.Time;
+            // 读取之前的录入记录
+            var manuProductBadRecordViews = await _manuProductBadRecordRepository.GetBadRecordsBySfcAsync(new ManuProductBadRecordQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                SFC = bo.SFC,
+            });
 
-            _ = await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
+            // 判断面板是否显示
+            var isShow = manuProductBadRecordViews == null || manuProductBadRecordViews.Any() == false;
 
-            defaultDto.Content?.Add("PackageCom", "False");
-            defaultDto.Content?.Add("BadEntryCom", "False");
+            defaultDto.Content?.Add("BadEntryCom", $"{isShow}".ToString());
+            defaultDto.Message = $"条码{bo.SFC}" + (isShow ? "开始录入" : "已经完成录入，无需重复录入！");
 
-            defaultDto.Message = $"条码{param["SFC"]}已中止！";
             return defaultDto;
         }
+
+
     }
 }

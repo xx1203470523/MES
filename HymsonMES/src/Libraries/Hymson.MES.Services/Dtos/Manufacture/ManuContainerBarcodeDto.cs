@@ -270,6 +270,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     public class ManuContainerBarcodePagedQueryDto : PagerInfo
     {
         /// <summary>
+        /// 工单ID
+        /// </summary>
+        public long? WorkOrderId { get; set; }
+
+        /// <summary>
         /// 容器条码
         /// </summary>
         public string? BarCode { get; set; }
