@@ -84,7 +84,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             defaultDto.Content?.Add("PackageCom", "True");
             defaultDto.Content?.Add("BadEntryCom", "False");
 
-            defaultDto.Message = $"条码{param?["SFC"]}已于NF排队！";
+            defaultDto.Message = $"条码{param?["SFC"]}开始组装！";
             return defaultDto;
         }
 
