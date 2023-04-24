@@ -79,6 +79,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="query"></param>
         /// <returns></returns>
         Task<ManuContainerPackEntity> GetByLadeBarCodeAsync(ManuContainerPackQuery query);
+
+        /// <summary>
+        /// 根据SFC批量获取装箱数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuContainerPackEntity>> GetByLadeBarCodesAsync(ManuContainerPackQuery query);
+
         /// <summary>
         /// 根据容器ID获取数据
         /// </summary>

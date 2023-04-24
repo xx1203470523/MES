@@ -103,6 +103,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
         /// <param name="sfc"></param>
         /// <returns></returns>
         Task<List<ManuSfcProduceStepViewDto>> QueryManuSfcProduceStepBySFCsAsync(List<ManuSfcProduceStepSFCDto> sfcs);
+
+        /// <summary>
+        /// 保存在制品步骤
+        /// </summary>
+        /// <param name="sfcProduceStepDto"></param>
+        /// <returns></returns>
+        Task SaveManuSfcProduceStepAsync(SaveManuSfcProduceStepDto sfcProduceStepDto);
         #endregion
     }
 }

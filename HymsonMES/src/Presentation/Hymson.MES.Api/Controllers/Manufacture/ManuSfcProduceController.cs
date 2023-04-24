@@ -155,6 +155,17 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         {
             return await _manuSfcProduceService.QueryManuSfcProduceStepBySFCsAsync(sfcs);
         }
+
+        /// <summary>
+        /// 保存在制品步骤
+        /// </summary>
+        /// <param name="sfcProduceStepDto"></param>
+        /// <returns></returns>
+        [HttpPost("saveManuSfcProduceStep")]
+        public async Task SaveManuSfcProduceStepAsync(SaveManuSfcProduceStepDto sfcProduceStepDto)
+        {
+            await _manuSfcProduceService.SaveManuSfcProduceStepAsync(sfcProduceStepDto);
+        }
         #endregion
     }
 }

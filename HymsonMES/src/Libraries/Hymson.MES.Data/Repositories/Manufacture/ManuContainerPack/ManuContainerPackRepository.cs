@@ -186,7 +186,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<ManuContainerPackEntity> GetByLadeBarCodeAsync(ManuContainerPackQuery query)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ManuContainerPackEntity>(GetBysfcSql, new { LadeBarCode = query.LadeBarCode, SiteId=query.SiteId });
+            return await conn.QueryFirstOrDefaultAsync<ManuContainerPackEntity>(GetBysfcSql, new { LadeBarCode = query.LadeBarCode, SiteId = query.SiteId });
+        }
+        /// <summary>
+        /// 根据SFC批量获取装箱数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuContainerPackEntity>> GetByLadeBarCodesAsync(ManuContainerPackQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuContainerPackEntity>(GetBysfcsSql, new { LadeBarCodes = query.LadeBarCodes, SiteId = query.SiteId });
         }
 
         public async Task<IEnumerable<ManuContainerPackEntity>> GetByContainerBarCodeIdAsync(long cid)
@@ -195,7 +205,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.QueryAsync<ManuContainerPackEntity>(GetByPackcodeSql, new { ContainerBarCodeId = cid });
         }
 
-        public async Task<IEnumerable<ManuContainerPackEntity>> GetByContainerBarCodeIdsAsync(long [] ids)
+        public async Task<IEnumerable<ManuContainerPackEntity>> GetByContainerBarCodeIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuContainerPackEntity>(GetByContainerBarCodeIdsSql, new { Ids = ids });
@@ -209,7 +219,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> GetCountByrBarCodeIdAsync(long containerBarCodeId)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteScalarAsync<int>(GetCountByrBarCodeIdSql,new { ContainerBarCodeId = containerBarCodeId });
+            return await conn.ExecuteScalarAsync<int>(GetCountByrBarCodeIdSql, new { ContainerBarCodeId = containerBarCodeId });
         }
         #endregion
 
@@ -251,6 +261,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `ContainerBarCodeId`, `LadeBarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_container_pack`  WHERE Id IN @Ids ";
+
+        const string GetBysfcsSql = @"SELECT 
+                               `Id`, `SiteId`, `ContainerBarCodeId`, `LadeBarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `manu_container_pack`  WHERE LadeBarCode IN @LadeBarCodes  and SiteId=@SiteId ";
 
         const string GetCountByrBarCodeIdSql = "SELECT COUNT(*) FROM manu_container_pack where ContainerBarCodeId=@ContainerBarCodeId";
         #endregion

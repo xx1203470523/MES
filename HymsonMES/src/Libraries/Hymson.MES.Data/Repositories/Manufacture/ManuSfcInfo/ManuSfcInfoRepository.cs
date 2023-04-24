@@ -177,6 +177,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, ManuSfcInfoEntitys);
         }
+
+        /// <summary>
+        /// 批量更新 是否在用
+        /// </summary>
+        /// <param name="sfcIds"></param>
+        /// <returns></returns>
+        public async Task<int> UpdatesIsUsedAsync(ManuSfcInfoUpdateCommand manuSfcInfoUpdate)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdatesIsUsedSql, manuSfcInfoUpdate);
+        }
         #endregion
     }
 
@@ -205,6 +216,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdsSql = @"SELECT * FROM manu_sfc_info WHERE IsDeleted = 0 AND Id IN @ids ";
         const string GetBySFCSql = @"SELECT * FROM manu_sfc_info WHERE IsDeleted = 0 AND SFC = @sfc ";
         const string GetBySFCIdsSql = @"SELECT * FROM manu_sfc_info WHERE IsDeleted = 0 AND SfcId IN @sfcIds ";
+
+        const string UpdatesIsUsedSql = "UPDATE `manu_sfc_info` SET  IsUsed = @IsUsed, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE SfcId IN @SfcIds";
+
         #endregion
     }
 }
