@@ -45,15 +45,5 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 操作类型;1、装载2、移除
         /// </summary>
         public int OperateType { get; set; } = 1;
-
-        /// <summary>
-        /// 资源id
-        /// </summary>
-        public long ResourceId { get; set; }
-
-        /// <summary>
-        /// 工序id
-        /// </summary>
-       public long ProcedureId { get; set; }
     }
 }
