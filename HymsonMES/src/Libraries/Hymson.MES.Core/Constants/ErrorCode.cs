@@ -66,7 +66,7 @@
         public const string MES10321 = "工序名称超长";
         public const string MES10351 = "资源类型编码不能为空";
         public const string MES10352 = "资源类型编码最大长度不超过50";
-        public const string MES10353= "资源类型名称不能为空";
+        public const string MES10353 = "资源类型名称不能为空";
         public const string MES10354 = "资源类型名称最大长度不超过50";
         #endregion
 
@@ -97,11 +97,13 @@
         public const string MES10438 = "此工艺路线不存在！";
         public const string MES10439 = $"此工艺路线在系统中不存在!";
         public const string MES10440 = $"获取下一工序失败!";
-        public const string MES10441 = $"不存在空值类型工序!";
+        public const string MES10441 = $"下一工序不存在空值类型工序!";
         public const string MES10442 = $"获取上一工序失败!";
         public const string MES10443 = $"启用状态或保留状态不可删除!";
         public const string MES10444 = $"工艺编码最大长度为60";
         public const string MES10445 = $"工艺名称最大长度为60";
+        public const string MES10446 = $"抽检比例设置错误";
+        public const string MES10447 = $"下一工序不存在非空值类型工序";
         #endregion
 
         #region 参数 10500
@@ -552,7 +554,7 @@
         public const string MES16612 = "当前工序与条码生产信息中的不一致！";
         public const string MES16613 = "请选择活动状态下的组件移除！";
         public const string MES16614 = "请选择活动状态下的组件替换！";
-        public const string MES16615= "组件条码已装配所有组件,无需添加!";
+        public const string MES16615 = "组件条码已装配所有组件,无需添加!";
         public const string MES16616 = "组件条码{barCode}未设置掩码规则!";
         #endregion
 

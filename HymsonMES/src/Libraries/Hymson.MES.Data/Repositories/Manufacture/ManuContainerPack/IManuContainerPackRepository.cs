@@ -61,6 +61,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> DeletesAsync(DeleteCommand param);
 
         /// <summary>
+        /// 批量硬删除
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+
+        Task<int> DeleteTrueAsync(DeleteCommand param);
+
+        /// <summary>
         /// 根据容器Id 删除所有容器装载记录（物理删除）
         /// </summary>
         /// <param name="containerBarCodeId"></param>

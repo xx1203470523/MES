@@ -1,11 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 产品不良录入 仓储类 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-03-27 03:49:17
- */
-
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
@@ -14,7 +6,6 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Command;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using System.Collections;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -25,6 +16,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     {
         private readonly ConnectionOptions _connectionOptions;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
         public ManuProductBadRecordRepository(IOptions<ConnectionOptions> connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
@@ -38,7 +33,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<ManuProductBadRecordEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ManuProductBadRecordEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ManuProductBadRecordEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -50,7 +45,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
-             sqlBuilder.Where("br.SiteId = @SiteId");
+            sqlBuilder.Where("br.SiteId = @SiteId");
             sqlBuilder.Where("br.IsDeleted =0");
 
             sqlBuilder.Select("br.Id,br.Status,uc.UnqualifiedCode,uc.UnqualifiedCodeName,br.UnqualifiedId,pr.ResCode,pr.ResName,uc.ProcessRouteId");
@@ -79,10 +74,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuProductBadRecordEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ManuProductBadRecordEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ManuProductBadRecordEntity>(GetByIdsSql, new { ids = ids});
+            return await conn.QueryAsync<ManuProductBadRecordEntity>(GetByIdsSql, new { ids = ids });
         }
 
         /// <summary>
@@ -102,7 +97,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
-           
+
             var offSet = (manuProductBadRecordPagedQuery.PageIndex - 1) * manuProductBadRecordPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = manuProductBadRecordPagedQuery.PageSize });
@@ -162,7 +157,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSql, manuProductBadRecordEntity);
         }
-        
+
         /// <summary>
         /// 批量更新
         /// </summary>
@@ -179,10 +174,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeleteRangeAsync(DeleteCommand command) 
+        public async Task<int> DeleteRangeAsync(DeleteCommand command)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql,command);
+            return await conn.ExecuteAsync(DeleteSql, command);
         }
 
         /// <summary>
@@ -423,6 +418,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class ManuProductBadRecordRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_product_bad_record` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";

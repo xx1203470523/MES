@@ -7,7 +7,6 @@
  */
 
 using Hymson.Infrastructure;
-using System.Text;
 
 namespace Hymson.MES.Services.Dtos.Manufacture
 {
@@ -26,15 +25,29 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
         /// 容器条码id
         /// </summary>
         public long? ContainerBarCodeId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 装载条码
         /// </summary>
         public string LadeBarCode { get; set; }
+
+        /// <summary>
+        /// 资源编码
+        /// </summary>
+        public string ResCode { get; set; }
 
         /// <summary>
         /// 条码
@@ -73,7 +86,17 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     /// </summary>
     public record ManuContainerPackRecordCreateDto : BaseEntityDto
     {
-       /// <summary>
+
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
         /// 容器条码id
         /// </summary>
         public long? ContainerBarCodeId { get; set; }
@@ -105,7 +128,17 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
         /// 容器条码id
         /// </summary>
         public long? ContainerBarCodeId { get; set; }
