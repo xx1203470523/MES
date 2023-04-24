@@ -136,26 +136,26 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             var facePlateEntity = await _manuFacePlateRepository.GetByCodeAsync(createManuContainerBarcodeDto.FacePlateCode);
             if(facePlateEntity==null)
-                throw new ValidationException(nameof(ErrorCode.MES16705));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16705));
             var facePlateContainerPackEntity = await _manuFacePlateContainerPackRepository.GetByFacePlateIdAsync(facePlateEntity.Id);
 
             //获取工单信息
             var sfcEntity = await _manuSfcRepository.GetBySFCAsync(createManuContainerBarcodeDto.BarCode);
             if (sfcEntity == null)
             {
-                throw new ValidationException(nameof(ErrorCode.MES16701));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16701));
             }
             var sfcinfos = await _manuSfcInfoRepository.GetBySFCIdsAsync(new long[] { sfcEntity.Id });
             if (sfcinfos == null||!sfcinfos.Any())
             {
-                throw new ValidationException(nameof(ErrorCode.MES16701));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16701));
             }
             var sfcinfo = sfcinfos.First();
             var workorder = await _planWorkOrderRepository.GetByIdAsync(sfcinfo.WorkOrderId);
             //获取物料信息
             var material = await _procMaterialRepository.GetByIdAsync(sfcinfo.ProductId);
             if (material == null)
-                throw new ValidationException(nameof(ErrorCode.MES10204));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10204));
             /*根据条码判定是否有包装记录
              * Y 返回 view 
              * N ，判定包装码是否为空，
@@ -185,7 +185,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         if(barcodeobj.WorkOrderId!=workorder.Id)
                         {
                             if(!facePlateContainerPackEntity.IsMixedWorkOrder)
-                                throw new ValidationException(nameof(ErrorCode.MES16706));
+                                throw new CustomerValidationException(nameof(ErrorCode.MES16706));
                         }
                         var inte = await _inteContainerRepository.GetByIdAsync(barcodeobj.ContainerId);
                         var packs = await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(barcodeobj.Id);
@@ -240,7 +240,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     if (barcodeobj.WorkOrderId != workorder.Id)
                     {
                         if (!facePlateContainerPackEntity.IsMixedWorkOrder)
-                            throw new ValidationException(nameof(ErrorCode.MES16706));
+                            throw new CustomerValidationException(nameof(ErrorCode.MES16706));
                     }
                     if (barcodeobj?.ProductId == sfcinfo.ProductId)//相同包装
                     {
@@ -401,12 +401,12 @@ namespace Hymson.MES.Services.Services.Manufacture
                     }
                     else
                     {
-                        throw new ValidationException(nameof(ErrorCode.MES16703));
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16703));
                     }
                 }
                 else
                 {
-                    throw new ValidationException(nameof(ErrorCode.MES10219));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10219));
                 }
             }
         }
