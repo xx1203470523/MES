@@ -11,6 +11,7 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
@@ -84,7 +85,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// </summary>
         private readonly IProcReplaceMaterialRepository _procReplaceMaterialRepository;
 
+        /// <summary>
+        /// 仓储接口（物料库存）
+        /// </summary>
+        private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
 
+        /// <summary>
+        /// 仓储接口（物料台账）
+        /// </summary>
+        private readonly IWhMaterialStandingbookRepository _whMaterialStandingbookRepository;
 
 
         /// <summary>
@@ -102,6 +111,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// <param name="procBomDetailReplaceMaterialRepository"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="procReplaceMaterialRepository"></param>
+        /// <param name="whMaterialInventoryRepository"></param>
+        /// <param name="whMaterialStandingbookRepository"></param>
         public ManuOutStationService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonService manuCommonService,
             IManuSfcStepRepository manuSfcStepRepository,
@@ -112,7 +123,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             IProcBomDetailRepository procBomDetailRepository,
             IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository,
             IProcMaterialRepository procMaterialRepository,
-            IProcReplaceMaterialRepository procReplaceMaterialRepository)
+            IProcReplaceMaterialRepository procReplaceMaterialRepository,
+            IWhMaterialInventoryRepository whMaterialInventoryRepository,
+            IWhMaterialStandingbookRepository whMaterialStandingbookRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -126,6 +139,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             _procBomDetailReplaceMaterialRepository = procBomDetailReplaceMaterialRepository;
             _procMaterialRepository = procMaterialRepository;
             _procReplaceMaterialRepository = procReplaceMaterialRepository;
+            _whMaterialInventoryRepository = whMaterialInventoryRepository;
+            _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
         }
 
 
@@ -235,6 +250,20 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
             }
 
+            return rows;
+        }
+
+        /// <summary>
+        /// 出站（批量）
+        /// </summary>
+        /// <param name="bos"></param>
+        /// <returns></returns>
+        public async Task<int> OutStationAsync(IEnumerable<ManufactureBo> bos)
+        {
+            var rows = 0;
+
+            // TODO
+            await Task.CompletedTask;
             return rows;
         }
 
@@ -477,9 +506,17 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// <returns></returns>
         private async Task<int> InWarehouse()
         {
-            // wh_material_inventory
+            // TODO 新增 wh_material_inventory
+            _ = await _whMaterialInventoryRepository.InsertAsync(new Core.Domain.Warehouse.WhMaterialInventoryEntity
+            {
 
-            // wh_material_standingbook
+            });
+
+            // TODO 新增 wh_material_standingbook
+            _ = await _whMaterialStandingbookRepository.InsertAsync(new Core.Domain.Warehouse.WhMaterialStandingbookEntity
+            {
+
+            });
 
             return await Task.FromResult(0);
         }

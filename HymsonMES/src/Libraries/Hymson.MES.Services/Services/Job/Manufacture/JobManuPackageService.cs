@@ -28,6 +28,11 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
+        /// 服务接口（生产通用）
+        /// </summary>
+        private readonly IManuCommonService _manuCommonService;
+
+        /// <summary>
         /// 服务接口（组装）
         /// </summary>
         private readonly IManuPackageService _manuPackageService;
@@ -37,12 +42,15 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
+        /// <param name="manuCommonService"></param>
         /// <param name="manuPackageService"></param>
         public JobManuPackageService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IManuCommonService manuCommonService,
             IManuPackageService manuPackageService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _manuCommonService = manuCommonService;
             _manuPackageService = manuPackageService;
         }
 
@@ -74,17 +82,20 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         {
             var defaultDto = new JobResponseDto { };
 
-            _ = await _manuPackageService.PackageAsync(new ManufactureBo
+            var bo = new ManufactureBo
             {
                 SFC = param["SFC"],
                 ProcedureId = param["ProcedureId"].ParseToLong(),
                 ResourceId = param["ResourceId"].ParseToLong()
-            });
+            };
 
-            defaultDto.Content?.Add("PackageCom", "True");
+            _ = await _manuPackageService.PackageAsync(bo);
+            var isShow = await _manuCommonService.CheckSFCIsCanDoneStep(bo, Core.Enums.Manufacture.SfcCirculationTypeEnum.ModuleAdd);
+
+            defaultDto.Content?.Add("PackageCom", $"{isShow}".ToString());
             defaultDto.Content?.Add("BadEntryCom", "False");
+            defaultDto.Message = $"条码{bo.SFC}" + (isShow ? "开始组装！" : "已经完成组装，无需重复组装！");
 
-            defaultDto.Message = $"条码{param?["SFC"]}开始组装！";
             return defaultDto;
         }
 

@@ -3,8 +3,9 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
-using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
+using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Job.Manufacture
 {
@@ -24,18 +25,22 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
+        /// 服务接口（不良录入）
+        /// </summary>
+        private readonly IManuProductBadRecordRepository _manuProductBadRecordRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="manuCommonService"></param>
-        /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="manuProductBadRecordRepository"></param>
         public JobManuBadRecordService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IManuCommonService manuCommonService,
-            IManuSfcProduceRepository manuSfcProduceRepository)
+            IManuProductBadRecordRepository manuProductBadRecordRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _manuProductBadRecordRepository = manuProductBadRecordRepository;
         }
 
 
@@ -66,13 +71,26 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         {
             var defaultDto = new JobResponseDto { };
             defaultDto.Content?.Add("PackageCom", "False");
-            defaultDto.Content?.Add("BadEntryCom", "True");
-            defaultDto.Message = "";
 
-            // TODO
-            return await Task.FromResult(defaultDto);
+            var bo = new ManufactureBo
+            {
+                SFC = param["SFC"],
+                ProcedureId = param["ProcedureId"].ParseToLong(),
+                ResourceId = param["ResourceId"].ParseToLong()
+            };
+
+            var manuProductBadRecordViews = await _manuProductBadRecordRepository.GetBadRecordsBySfcAsync(new ManuProductBadRecordQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                SFC = bo.SFC,
+            });
+            var isShow = manuProductBadRecordViews != null && manuProductBadRecordViews.Any() == true;
+
+            defaultDto.Content?.Add("BadEntryCom", $"{isShow}".ToString());
+            defaultDto.Message = $"条码{bo.SFC}" + (isShow ? "开始录入" : "已经完成录入，无需重复录入！");
+
+            return defaultDto;
         }
-
 
 
     }

@@ -1,6 +1,8 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon
@@ -11,11 +13,27 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
     public interface IManuCommonService
     {
         /// <summary>
+        /// 验证条码掩码规则
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <param name="materialId"></param>
+        /// <returns></returns>
+        Task<bool> CheckBarCodeByMaskCodeRule(string barCode, long materialId);
+
+        /// <summary>
+        /// 检查条码是否可以执行某流程
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <param name="sfcCirculationType"></param>
+        /// <returns></returns>
+        Task<bool> CheckSFCIsCanDoneStep(ManufactureBo bo, SfcCirculationTypeEnum sfcCirculationType);
+
+        /// <summary>
         /// 获取生产条码信息
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-      Task<(ManuSfcProduceEntity, ManuSfcProduceBusinessEntity)> GetProduceSFCAsync(string sfc);
+        Task<(ManuSfcProduceEntity, ManuSfcProduceBusinessEntity)> GetProduceSFCAsync(string sfc);
 
         /// <summary>
         /// 获取生产工单

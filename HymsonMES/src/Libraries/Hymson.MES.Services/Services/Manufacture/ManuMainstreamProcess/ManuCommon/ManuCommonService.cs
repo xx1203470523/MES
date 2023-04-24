@@ -1,4 +1,5 @@
-﻿using Hymson.Infrastructure.Exceptions;
+﻿using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
@@ -29,6 +30,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
     public class ManuCommonService : IManuCommonService
     {
         /// <summary>
+        /// 当前对象（站点）
+        /// </summary>
+        private readonly ICurrentSite _currentSite;
+
+        /// <summary>
         /// 序列号服务
         /// </summary>
         private readonly ISequenceService _sequenceService;
@@ -37,6 +43,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// 仓储接口（条码生产信息）
         /// </summary>
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
+
+        /// <summary>
+        /// 仓储接口（条码流转信息）
+        /// </summary>
+        private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
 
         /// <summary>
         /// 仓储接口（工单信息）
@@ -77,8 +88,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <summary>
         /// 构造函数
         /// </summary>
+        /// <param name="currentSite"></param>
         /// <param name="sequenceService"></param>
         /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="manuSfcCirculationRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="planWorkOrderActivationRepository"></param>
         /// <param name="procProcessRouteDetailNodeRepository"></param>
@@ -86,8 +99,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="procProcedureRepository"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="procMaskCodeRuleRepository"></param>
-        public ManuCommonService(ISequenceService sequenceService,
+        public ManuCommonService(ICurrentSite currentSite, ISequenceService sequenceService,
             IManuSfcProduceRepository manuSfcProduceRepository,
+            IManuSfcCirculationRepository manuSfcCirculationRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
@@ -96,8 +110,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             IProcMaterialRepository procMaterialRepository,
             IProcMaskCodeRuleRepository procMaskCodeRuleRepository)
         {
+            _currentSite = currentSite;
             _sequenceService = sequenceService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
+            _manuSfcCirculationRepository = manuSfcCirculationRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
@@ -127,6 +143,28 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             if (maskCodeRules == null || maskCodeRules.Any() == false) return true;
 
             return barCode.VerifyBarCode(maskCodeRules);
+        }
+
+        /// <summary>
+        /// 检查条码是否可以执行某流程
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <param name="sfcCirculationType"></param>
+        /// <returns></returns>
+        public async Task<bool> CheckSFCIsCanDoneStep(ManufactureBo bo, SfcCirculationTypeEnum sfcCirculationType)
+        {
+            if (bo == null) return false;
+
+            // 读取指定类型的流转信息
+            var manuSfcCirculationEntities = await _manuSfcCirculationRepository.GetSfcMoudulesAsync(new Data.Repositories.Manufacture.ManuSfcCirculation.Query.ManuSfcCirculationQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                Sfc = bo.SFC,
+                CirculationTypes = new SfcCirculationTypeEnum[] { sfcCirculationType }
+            });
+
+            if (manuSfcCirculationEntities == null || manuSfcCirculationEntities.Any() == false) return true;
+            return false;
         }
 
         /// <summary>
