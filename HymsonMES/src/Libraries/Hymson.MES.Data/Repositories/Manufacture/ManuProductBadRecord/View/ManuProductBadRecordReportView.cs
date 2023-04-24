@@ -70,6 +70,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public ProductBadRecordStatusEnum BadRecordStatus { get; set; }
         
         /// <summary>
+        /// 数量
+        /// </summary>
+        public decimal Qty { get;set; }
+
+        /// <summary>
         /// 录入人
         /// </summary>
         public string CreatedBy { get; set; }

@@ -1,4 +1,6 @@
-﻿namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPackage
+﻿using Hymson.MES.Services.Bos.Manufacture;
+
+namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPackage
 {
     /// <summary>
     /// 组装
@@ -8,6 +10,9 @@
         /// <summary>
         /// 执行（组装）
         /// </summary>
-        Task ExecuteAsync();
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        Task<int> PackageAsync(ManufactureBo bo);
+
     }
 }

@@ -260,6 +260,11 @@ namespace Hymson.MES.Services.Dtos.Report
         public ProductBadRecordStatusEnum BadRecordStatus { get; set; }
 
         /// <summary>
+        /// 数量
+        /// </summary>
+        public decimal Qty { get; set; }
+
+        /// <summary>
         /// 录入人
         /// </summary>
         public string CreatedBy { get; set; }

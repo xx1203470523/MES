@@ -11,7 +11,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
     /// <summary>
     /// 不良录入
     /// </summary>
-    public class JobBadRecordService : IJobManufactureService
+    public class JobManuBadRecordService : IJobManufactureService
     {
         /// <summary>
         /// 当前对象（登录用户）
@@ -30,7 +30,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <param name="currentSite"></param>
         /// <param name="manuCommonService"></param>
         /// <param name="manuSfcProduceRepository"></param>
-        public JobBadRecordService(ICurrentUser currentUser, ICurrentSite currentSite,
+        public JobManuBadRecordService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonService manuCommonService,
             IManuSfcProduceRepository manuSfcProduceRepository)
         {
@@ -65,9 +65,9 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         public async Task<JobResponseDto> ExecuteAsync(Dictionary<string, string>? param)
         {
             var defaultDto = new JobResponseDto { };
-            defaultDto.Content?.Add("PackageCom", "True");
+            defaultDto.Content?.Add("PackageCom", "False");
             defaultDto.Content?.Add("BadEntryCom", "True");
-            defaultDto.Message = $"条码{param?["SFC"]}已于NF排队！";
+            defaultDto.Message = "";
 
             // TODO
             return await Task.FromResult(defaultDto);

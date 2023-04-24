@@ -471,5 +471,18 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             return 0;
         }
 
+        /// <summary>
+        /// 入库
+        /// </summary>
+        /// <returns></returns>
+        private async Task<int> InWarehouse()
+        {
+            // wh_material_inventory
+
+            // wh_material_standingbook
+
+            return await Task.FromResult(0);
+        }
+
     }
 }

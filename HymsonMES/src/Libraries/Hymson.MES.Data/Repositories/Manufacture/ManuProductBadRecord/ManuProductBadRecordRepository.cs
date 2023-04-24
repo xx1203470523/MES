@@ -485,6 +485,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                         uc.UnqualifiedCode,
                         uc.Type as UnqualifiedType,
                         rbr.`Status` as BadRecordStatus,
+                        rbr.Qty,
                         rbr.CreatedBy,
                         rbr.CreatedOn
                 

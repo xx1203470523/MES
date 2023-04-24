@@ -3,8 +3,12 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
+using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInStation;
+using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPackage;
+using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Job.Manufacture
 {
@@ -24,18 +28,22 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
+        /// 服务接口（组装）
+        /// </summary>
+        private readonly IManuPackageService _manuPackageService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="manuCommonService"></param>
-        /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="manuPackageService"></param>
         public JobManuPackageService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IManuCommonService manuCommonService,
-            IManuSfcProduceRepository manuSfcProduceRepository)
+            IManuPackageService manuPackageService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _manuPackageService = manuPackageService;
         }
 
 
@@ -66,12 +74,18 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         {
             var defaultDto = new JobResponseDto { };
 
-            defaultDto.Content?.Add("PackageCom", "True");
-            defaultDto.Content?.Add("BadEntryCom", "True");
-            defaultDto.Message = $"条码{param?["SFC"]}已于NF排队！";
+            _ = await _manuPackageService.PackageAsync(new ManufactureBo
+            {
+                SFC = param["SFC"],
+                ProcedureId = param["ProcedureId"].ParseToLong(),
+                ResourceId = param["ResourceId"].ParseToLong()
+            });
 
-            // TODO
-            return await Task.FromResult(defaultDto);
+            defaultDto.Content?.Add("PackageCom", "True");
+            defaultDto.Content?.Add("BadEntryCom", "False");
+
+            defaultDto.Message = $"条码{param?["SFC"]}开始组装！";
+            return defaultDto;
         }
 
     }

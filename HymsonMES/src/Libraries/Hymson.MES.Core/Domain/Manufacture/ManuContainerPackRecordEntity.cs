@@ -46,6 +46,14 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public int OperateType { get; set; } = 1;
 
-       
+        /// <summary>
+        /// 资源id
+        /// </summary>
+        public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 工序id
+        /// </summary>
+       public long ProcedureId { get; set; }
     }
 }

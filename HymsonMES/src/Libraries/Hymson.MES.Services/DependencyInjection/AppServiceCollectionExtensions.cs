@@ -174,6 +174,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuRepairService, ManuRepairService>();
             services.AddSingleton<IManuInStationService, ManuInStationService>();
             services.AddSingleton<IManuOutStationService, ManuOutStationService>();
+            services.AddSingleton<IManuPackageService, ManuPackageService>();
             services.AddSingleton<IInProductDismantleService, InProductDismantleService>();
             services.AddSingleton<IManuFacePlateRepairService, ManuFacePlateRepairService>();
 
@@ -216,7 +217,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region Job
             services.AddSingleton<IJobCommonService, JobCommonService>();
-            services.AddSingleton<IJobManufactureService, JobBadRecordService>();
+            services.AddSingleton<IJobManufactureService, JobManuBadRecordService>();
             services.AddSingleton<IJobManufactureService, JobManuCompleteService>();
             services.AddSingleton<IJobManufactureService, JobManuPackageService>();
             services.AddSingleton<IJobManufactureService, JobManuRepairEndService>();

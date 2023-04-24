@@ -13,8 +13,10 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -39,12 +41,17 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// 容器条码表仓储接口
         /// </summary>
         private readonly IManuContainerBarcodeRepository _manuContainerBarcodeRepository;
+        /// <summary>
+        /// 资源仓储
+        /// </summary>
+        private readonly IProcResourceRepository _resourceRepository;
         private readonly AbstractValidator<ManuContainerPackRecordCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ManuContainerPackRecordModifyDto> _validationModifyRules;
 
         public ManuContainerPackRecordService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuContainerPackRecordRepository manuContainerPackRecordRepository,
             IManuContainerBarcodeRepository manuContainerBarcodeRepository,
+            IProcResourceRepository resourceRepository,
             AbstractValidator<ManuContainerPackRecordCreateDto> validationCreateRules,
             AbstractValidator<ManuContainerPackRecordModifyDto> validationModifyRules)
         {
@@ -52,6 +59,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _currentSite = currentSite;
             _manuContainerPackRecordRepository = manuContainerPackRecordRepository;
             _manuContainerBarcodeRepository = manuContainerBarcodeRepository;
+            _resourceRepository = resourceRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
         }
@@ -116,16 +124,33 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuContainerPackRecordPagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _manuContainerPackRecordRepository.GetPagedInfoAsync(manuContainerPackRecordPagedQuery);
 
-            var containerIds = pagedInfo.Data.Select(x => x.ContainerBarCodeId.GetValueOrDefault()).ToArray();
+            //实体到DTO转换 装载数据
+            List<ManuContainerPackRecordDto> manuContainerPackRecordDtos = PrepareManuContainerPackRecordDtos(pagedInfo);
+            //查询容器条码信息
+            var containerIds = pagedInfo.Data.Select(x => x.ContainerBarCodeId.GetValueOrDefault()).Distinct().ToArray();
             var containerBarcodeEntities = new List<ManuContainerBarcodeEntity>();
             if (containerIds.Any())
             {
                 containerBarcodeEntities = (await _manuContainerBarcodeRepository.GetByIdsAsync(containerIds)).ToList();
             }
 
-            //实体到DTO转换 装载数据
-            List<ManuContainerPackRecordDto> manuContainerPackRecordDtos = PrepareManuContainerPackRecordDtos(pagedInfo, containerBarcodeEntities);
-   
+            //查询资源信息
+            var resourceIds = pagedInfo.Data.Select(x => x.ResourceId).Distinct().ToArray();
+            var procResourceEntities = new List<ProcResourceEntity>();
+            if (resourceIds.Any())
+            {
+                procResourceEntities = (await _resourceRepository.GetListByIdsAsync(resourceIds)).ToList();
+            }
+
+            foreach (var packRecordDto in manuContainerPackRecordDtos)
+            {
+                var containerBarcodeEntity = containerBarcodeEntities.FirstOrDefault(x => x.Id == packRecordDto.ContainerBarCodeId);
+                packRecordDto.BarCode = containerBarcodeEntity?.BarCode ?? "";
+
+                var resourceEntity = procResourceEntities.FirstOrDefault(x => x.Id == packRecordDto.ResourceId);
+                packRecordDto.ResCode = resourceEntity?.ResCode ?? "";
+            }
+
             return new PagedInfo<ManuContainerPackRecordDto>(manuContainerPackRecordDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
@@ -134,16 +159,12 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="pagedInfo"></param>
         /// <returns></returns>
-        private static List<ManuContainerPackRecordDto> PrepareManuContainerPackRecordDtos(PagedInfo<ManuContainerPackRecordEntity> pagedInfo, List<ManuContainerBarcodeEntity> containerBarcodeEntities)
+        private static List<ManuContainerPackRecordDto> PrepareManuContainerPackRecordDtos(PagedInfo<ManuContainerPackRecordEntity> pagedInfo)
         {
             var manuContainerPackRecordDtos = new List<ManuContainerPackRecordDto>();
             foreach (var manuContainerPackRecordEntity in pagedInfo.Data)
             {
                 var manuContainerPackRecordDto = manuContainerPackRecordEntity.ToModel<ManuContainerPackRecordDto>();
-
-                var containerBarcodeEntity=containerBarcodeEntities.FirstOrDefault(x => x.Id == manuContainerPackRecordEntity.ContainerBarCodeId);
-                manuContainerPackRecordDto.BarCode = containerBarcodeEntity?.BarCode ?? "";
-
                 manuContainerPackRecordDtos.Add(manuContainerPackRecordDto);
             }
 
