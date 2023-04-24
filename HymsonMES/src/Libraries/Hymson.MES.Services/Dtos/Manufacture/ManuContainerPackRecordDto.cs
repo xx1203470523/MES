@@ -7,7 +7,6 @@
  */
 
 using Hymson.Infrastructure;
-using System.Text;
 
 namespace Hymson.MES.Services.Dtos.Manufacture
 {
@@ -39,16 +38,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 容器条码id
         /// </summary>
         public long? ContainerBarCodeId { get; set; }
-
-        /// <summary>
-        /// 工序id
-        /// </summary>
-        public long ProcedureId { get; set; }
-
-        /// <summary>
-        /// 资源id
-        /// </summary>
-        public long ResourceId { get; set; }
 
         /// <summary>
         /// 装载条码
