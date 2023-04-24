@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using System.Text;
 
 namespace Hymson.MES.Services.Dtos.Manufacture
 {
@@ -35,9 +36,14 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public string LadeBarCode { get; set; }
 
-       /// <summary>
-        /// 操作类型;1、装载2、移除
+        /// <summary>
+        /// 条码
         /// </summary>
+        public string BarCode { get; set; }
+
+       /// <summary>
+       /// 操作类型;1、装载2、移除
+       /// </summary>
         public int? OperateType { get; set; }
 
        /// <summary>
@@ -152,5 +158,10 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 容器条码id
         /// </summary>
         public long? ContainerBarCodeId { get; set; }
+
+        /// <summary>
+        /// 装载条码
+        /// </summary>
+        public string? LadeBarCode { get; set; }
     }
 }

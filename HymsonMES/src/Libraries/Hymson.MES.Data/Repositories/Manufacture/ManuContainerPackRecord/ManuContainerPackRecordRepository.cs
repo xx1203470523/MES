@@ -93,7 +93,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("ContainerBarCodeId=@ContainerBarCodeId");
             }
-            if (string.IsNullOrWhiteSpace(manuContainerPackRecordPagedQuery.LadeBarCode))
+            if (!string.IsNullOrWhiteSpace(manuContainerPackRecordPagedQuery.LadeBarCode))
             {
                 sqlBuilder.Where("LadeBarCode=@LadeBarCode");
             }

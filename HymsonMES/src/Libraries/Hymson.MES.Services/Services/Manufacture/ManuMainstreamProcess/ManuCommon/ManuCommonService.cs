@@ -5,7 +5,6 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -20,7 +19,6 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using System.Data;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon
@@ -118,8 +116,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <returns></returns>
         public async Task<bool> CheckBarCodeByMaskCodeRule(string barCode, long materialId)
         {
-            var material = await _procMaterialRepository.GetByIdAsync(materialId);
-            if (material == null) throw new CustomerValidationException(nameof(ErrorCode.MES10204));
+            var material = await _procMaterialRepository.GetByIdAsync(materialId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10204));
 
             // 物料未设置掩码
             if (material.MaskCodeId.HasValue == false) return true;
@@ -489,6 +487,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 var rule = Regex.Replace(ruleEntity.Rule, "[?？]", ".");
                 var pattern = $"^{rule}$";
 
+                if (Regex.IsMatch(barCode, pattern) == false) return false;
+
+                /*
                 switch (ruleEntity.MatchWay)
                 {
                     case MatchModeEnum.Start:
@@ -502,6 +503,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                     default:
                         break;
                 }
+                */
             }
 
             return true;

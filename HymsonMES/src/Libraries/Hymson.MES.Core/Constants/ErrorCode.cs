@@ -542,7 +542,7 @@
         public const string MES16602 = "数据不存在!";
         public const string MES16603 = "组件条码{barCode}不存在!";
         public const string MES16604 = "组件条码{barCode}库存不足,请检查!";
-        public const string MES16605 = "物料掩码规则不存在!";
+        public const string MES16605 = "组件条码{barCode}不符合掩码规则!";
         public const string MES16606 = "组件条码{barCode}同掩码规则不符,请检查!";
         public const string MES16607 = "选择的替换组件不存在!";
         public const string MES16608 = "组件条码{barCode}与选择的产品不一致!";
@@ -553,6 +553,7 @@
         public const string MES16613 = "请选择活动状态下的组件移除！";
         public const string MES16614 = "请选择活动状态下的组件替换！";
         public const string MES16615= "组件条码已装配所有组件,无需添加!";
+        public const string MES16616 = "组件条码{barCode}未设置掩码规则!";
         #endregion
 
         #region 容器包装 MES 16700
@@ -563,6 +564,9 @@
         public const string MES16705 = "容器包装，配置面板不存在";
         public const string MES16706 = "容器包装，配置面板不允许混工单,当前容器工单{first},当前条码工单{second}";
         public const string MES16707 = "容器包装，包装码不能为空";
+        public const string MES16710 = "不识别的类型：{key}";
+        public const string MES16708 = "产品条码不能为空";
+        public const string MES16709 = "作业返回空，请检查作业是否正确配置";
         #endregion
 
         #region 绑定工单激活  MES16800
