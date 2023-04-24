@@ -45,7 +45,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -60,7 +60,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<ProcMaterialSupplierRelationEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcMaterialSupplierRelationEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ProcMaterialSupplierRelationEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -68,10 +68,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcMaterialSupplierRelationEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ProcMaterialSupplierRelationEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcMaterialSupplierRelationEntity>(GetByIdsSql, new { ids = ids});
+            return await conn.QueryAsync<ProcMaterialSupplierRelationEntity>(GetByIdsSql, new { ids = ids });
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace Hymson.MES.Data.Repositories.Process
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
-           
+
             var offSet = (procMaterialSupplierRelationPagedQuery.PageIndex - 1) * procMaterialSupplierRelationPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = procMaterialSupplierRelationPagedQuery.PageSize });
@@ -184,6 +184,17 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ProcMaterialSupplierView>(GetByMaterialIdSql, new { materialId = materialId });
         }
+
+        /// <summary>
+        /// 通过物料Id查询
+        /// </summary>
+        /// <param name="materialId"></param>
+        /// <returns></returns> 
+        public async Task<IEnumerable<ProcMaterialSupplierView>> GetByMaterialIdsAsync(long[] materialIds)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcMaterialSupplierView>(GetByMaterialIdSql, new { materialId = materialIds });
+        }
     }
 
     public partial class ProcMaterialSupplierRelationRepository
@@ -214,6 +225,14 @@ namespace Hymson.MES.Data.Repositories.Process
                                 from proc_material_supplier_relation msr
                                 LEFT join wh_supplier s on msr.SupplierId=s.Id
                                 where msr.MaterialId=@materialId
+            ";
+
+        const string GetByMaterialIdsSql = @"Select 
+                                    msr.`Id`, msr.`MaterialId`, msr.`SupplierId`, msr.`CreatedBy`, msr.`CreatedOn`,
+                                    s.code, s.name
+                                from proc_material_supplier_relation msr
+                                LEFT join wh_supplier s on msr.SupplierId=s.Id
+                                where msr.MaterialId in @materialIds
             ";
     }
 }

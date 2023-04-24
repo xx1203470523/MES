@@ -607,9 +607,17 @@
         public const string MES18007 = "条码没有对应的生产工序";
         public const string MES18008 = "条码生产状态异常:{Status}";
         public const string MES18009 = "工单状态不允许";
-        public const string MES180010 = "条码已锁定不允许操作";
-        public const string MES180011 = "获取工序信息失败";
+        public const string MES18010 = "条码已锁定不允许操作";
+        public const string MES18011 = "获取工序信息失败";
 
+
+        public const string MES18012 = "工序不能为空";
+        public const string MES18013 = "类型不能为空";
+        public const string MES18014 = "条码不能为空";
+        public const string MES18015 = "条码:{SFC}已装箱，请先解包";
+        public const string MES18016 = "在制品步骤控制入库失败";
+        public const string MES18017 = "工艺路线不存在尾工序";
+        public const string MES18018 = "工艺路线存在多个尾工序";
 
 
         #endregion

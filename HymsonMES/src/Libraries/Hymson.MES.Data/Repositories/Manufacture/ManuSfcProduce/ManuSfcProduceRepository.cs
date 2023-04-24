@@ -63,7 +63,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 if (query.NoLock != 1)
                 {
                     sqlBuilder.Where("(msp.Lock!=@NoLock or `Lock`  is null)");
-                }        
+                }
             }
             if (!string.IsNullOrWhiteSpace(query.Sfc))
             {
@@ -283,10 +283,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuSfcInfoEntity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateUpdateProcedureIdSqlAsync(UpdateProcedureCommand command)
+        public async Task<int> UpdateProcedureIdAsync(UpdateProcedureCommand command)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateProcedureIdSql, command);
+        }
+
+        /// <summary>
+        /// 根据SFC批量更新工序与状态
+        /// </summary>
+        /// <param name="manuSfcInfoEntity"></param 
+        /// <returns></returns>
+        public async Task<int> UpdateProcedureAndStatusRangeAsync(UpdateProcedureAndStatusCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateProcedureAndStatusSql, command);
         }
 
 
@@ -439,5 +450,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         //在制维修 
         const string UpdateStatusSql = "UPDATE `manu_sfc_produce` SET Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string UpdateProcedureIdSql = "UPDATE `manu_sfc_produce` SET ProcedureId = @ProcedureId, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
+
+        //在制品步骤控制 
+        const string UpdateProcedureAndStatusSql = "UPDATE `manu_sfc_produce` SET ProcedureId = @ProcedureId,Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE SFC in @Sfcs ";
+
     }
 }

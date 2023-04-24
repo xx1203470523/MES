@@ -21,6 +21,12 @@ namespace Hymson.MES.Core.Enums
         /// 物料加载
         /// </summary>
         [Description("物料加载")]
-        MaterialLoading = 3
+        MaterialLoading = 3,
+
+        /// <summary>
+        /// 生产完成
+        /// </summary>
+        [Description("生产完成")]
+        manuComplete = 4
     }
 }

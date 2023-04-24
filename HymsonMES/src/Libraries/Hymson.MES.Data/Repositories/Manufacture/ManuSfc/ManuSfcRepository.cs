@@ -214,6 +214,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.ExecuteAsync(UpdateStatusSql, command);
         }
 
+        ///// <summary>
+        ///// 批量更新条码状态
+        ///// </summary>
+        ///// <param name="manuSfcInfoEntity"></param>
+        ///// <returns></returns>
+        //public async Task<int> UpdateStatusAsync(ManuSfcUpdateCommand command)
+        //{
+        //    using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        //    return await conn.ExecuteAsync(UpdateStatusSql, command);
+        //}
+
         /// <summary>
         /// 获取SFC
         /// </summary>
