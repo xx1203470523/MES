@@ -31,10 +31,25 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long? ContainerBarCodeId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 工序id
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 资源id
+        /// </summary>
+        public long ResourceId { get; set; }
+
+        /// <summary>
         /// 装载条码
         /// </summary>
         public string LadeBarCode { get; set; }
+
+        /// <summary>
+        /// 资源编码
+        /// </summary>
+        public string ResCode { get; set; }
 
         /// <summary>
         /// 条码
