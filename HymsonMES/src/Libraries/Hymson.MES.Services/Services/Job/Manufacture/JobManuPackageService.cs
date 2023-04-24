@@ -2,6 +2,7 @@
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
@@ -32,10 +33,6 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         private readonly IManuCommonService _manuCommonService;
 
-        /// <summary>
-        /// 服务接口（组装）
-        /// </summary>
-        private readonly IManuPackageService _manuPackageService;
 
         /// <summary>
         /// 构造函数
@@ -43,15 +40,12 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="manuCommonService"></param>
-        /// <param name="manuPackageService"></param>
         public JobManuPackageService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IManuCommonService manuCommonService,
-            IManuPackageService manuPackageService)
+            IManuCommonService manuCommonService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _manuCommonService = manuCommonService;
-            _manuPackageService = manuPackageService;
         }
 
 
@@ -89,7 +83,13 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
                 ResourceId = param["ResourceId"].ParseToLong()
             };
 
-            _ = await _manuPackageService.PackageAsync(bo);
+            // 获取生产条码信息
+            var (sfcProduceEntity, _) = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
+
+            // 合法性校验
+            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity).VerifyProcedure(bo.ProcedureId);
+
+            // 判断面板是否显示
             var isShow = await _manuCommonService.CheckSFCIsCanDoneStep(bo, Core.Enums.Manufacture.SfcCirculationTypeEnum.ModuleAdd);
 
             defaultDto.Content?.Add("PackageCom", $"{isShow}".ToString());

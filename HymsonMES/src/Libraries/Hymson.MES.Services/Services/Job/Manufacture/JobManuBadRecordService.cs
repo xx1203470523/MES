@@ -2,9 +2,11 @@
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
+using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Job.Manufacture
@@ -25,6 +27,11 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
+        /// 服务接口（生产通用）
+        /// </summary>
+        private readonly IManuCommonService _manuCommonService;
+
+        /// <summary>
         /// 服务接口（不良录入）
         /// </summary>
         private readonly IManuProductBadRecordRepository _manuProductBadRecordRepository;
@@ -34,12 +41,15 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
+        /// <param name="manuCommonService"></param>
         /// <param name="manuProductBadRecordRepository"></param>
         public JobManuBadRecordService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IManuCommonService manuCommonService,
             IManuProductBadRecordRepository manuProductBadRecordRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _manuCommonService = manuCommonService;
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
         }
 
@@ -79,11 +89,20 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
                 ResourceId = param["ResourceId"].ParseToLong()
             };
 
+            // 获取生产条码信息
+            var (sfcProduceEntity, _) = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
+
+            // 合法性校验
+            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity).VerifyProcedure(bo.ProcedureId);
+
+            // 读取之前的录入记录
             var manuProductBadRecordViews = await _manuProductBadRecordRepository.GetBadRecordsBySfcAsync(new ManuProductBadRecordQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 SFC = bo.SFC,
             });
+
+            // 判断面板是否显示
             var isShow = manuProductBadRecordViews != null && manuProductBadRecordViews.Any() == true;
 
             defaultDto.Content?.Add("BadEntryCom", $"{isShow}".ToString());

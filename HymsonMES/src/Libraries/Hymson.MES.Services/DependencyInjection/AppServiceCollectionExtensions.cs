@@ -53,7 +53,6 @@ using Hymson.MES.Services.Validators.Process;
 using Hymson.MES.Services.Validators.Quality;
 using Hymson.MES.Services.Validators.Warehouse;
 using Microsoft.Extensions.Configuration;
-using System.ComponentModel;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -174,7 +173,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuRepairService, ManuRepairService>();
             services.AddSingleton<IManuInStationService, ManuInStationService>();
             services.AddSingleton<IManuOutStationService, ManuOutStationService>();
-            services.AddSingleton<IManuPackageService, ManuPackageService>();
             services.AddSingleton<IInProductDismantleService, InProductDismantleService>();
             services.AddSingleton<IManuFacePlateRepairService, ManuFacePlateRepairService>();
 
