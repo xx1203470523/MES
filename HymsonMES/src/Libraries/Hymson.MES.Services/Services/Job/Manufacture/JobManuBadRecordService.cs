@@ -11,7 +11,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
     /// <summary>
     /// 不良录入
     /// </summary>
-    public class JobBadRecordService : IJobManufactureService
+    public class JobManuBadRecordService : IJobManufactureService
     {
         /// <summary>
         /// 当前对象（登录用户）
@@ -30,7 +30,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <param name="currentSite"></param>
         /// <param name="manuCommonService"></param>
         /// <param name="manuSfcProduceRepository"></param>
-        public JobBadRecordService(ICurrentUser currentUser, ICurrentSite currentSite,
+        public JobManuBadRecordService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonService manuCommonService,
             IManuSfcProduceRepository manuSfcProduceRepository)
         {
