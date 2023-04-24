@@ -103,7 +103,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             });
 
             // 判断面板是否显示
-            var isShow = manuProductBadRecordViews != null && manuProductBadRecordViews.Any() == true;
+            var isShow = manuProductBadRecordViews == null || manuProductBadRecordViews.Any() == false;
 
             defaultDto.Content?.Add("BadEntryCom", $"{isShow}".ToString());
             defaultDto.Message = $"条码{bo.SFC}" + (isShow ? "开始录入" : "已经完成录入，无需重复录入！");
