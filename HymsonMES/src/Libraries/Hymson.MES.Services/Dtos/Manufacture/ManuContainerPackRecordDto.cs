@@ -7,7 +7,6 @@
  */
 
 using Hymson.Infrastructure;
-using System.Text;
 
 namespace Hymson.MES.Services.Dtos.Manufacture
 {
