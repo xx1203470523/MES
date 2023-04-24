@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -178,6 +179,82 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.ExecuteAsync(UpdatesSql, ManuSfcInfoEntitys);
         }
         #endregion
+
+        /// <summary>
+        /// 车间作业控制 报表分页查询
+        /// </summary>
+        /// <param name="pageQuery"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<WorkshopJobControlReportView>> GetPagedInfoWorkshopJobControlReportAsync(WorkshopJobControlReportPagedQuery pageQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoWorkshopJobControlReportDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoWorkshopJobControlReportCountSqlTemplate);
+
+            //where si.IsDeleted = 0
+            //AND si.IsUsed = 1
+
+            //AND m.MaterialCode like '%%'
+            //AND m.Version like '%%'
+            //AND o.OrderCode like '%%'
+            //AND s.SFC like '%%'
+            //AND s.`Status` = ''
+
+            //AND p.`Code` like '%%'
+            //AND r.ResCode like '%%'
+
+            sqlBuilder.Where(" si.SiteId = @SiteId ");
+            sqlBuilder.Where(" si.IsDeleted = 0 ");
+            sqlBuilder.Where(" si.IsUsed = 1 ");
+
+            if (!string.IsNullOrEmpty(pageQuery.MaterialCode))
+            {
+                pageQuery.MaterialCode = $"%{pageQuery.MaterialCode}%";
+                sqlBuilder.Where(" m.MaterialCode like @MaterialCode ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.MaterialVersion))
+            {
+                pageQuery.MaterialVersion = $"%{pageQuery.MaterialVersion}%";
+                sqlBuilder.Where(" m.Version like @MaterialVersion ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.OrderCode))
+            {
+                pageQuery.OrderCode = $"%{pageQuery.OrderCode}%";
+                sqlBuilder.Where(" o.OrderCode like @OrderCode ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.SFC))
+            {
+                pageQuery.SFC = $"%{pageQuery.SFC}%";
+                sqlBuilder.Where(" s.SFC like @SFC ");
+            }
+            if (pageQuery.SFCStatus.HasValue) 
+            {
+                sqlBuilder.Where(" s.`Status` =  @SFCStatus ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.ProcedureCode))
+            {
+                pageQuery.ProcedureCode = $"%{pageQuery.ProcedureCode}%";
+                sqlBuilder.Where(" p.`Code` like  @ProcedureCode ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.ResourceCode))
+            {
+                pageQuery.ResourceCode = $"%{pageQuery.ResourceCode}%";
+                sqlBuilder.Where(" r.ResCode like  @ResourceCode ");
+            }
+
+            var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = pageQuery.PageSize });
+            sqlBuilder.AddParameters(pageQuery);
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var reportDataTask = conn.QueryAsync<WorkshopJobControlReportView>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var reportData = await reportDataTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<WorkshopJobControlReportView>(reportData, pageQuery.PageIndex, pageQuery.PageSize, totalCount);
+        }
+
     }
 
     /// <summary>
@@ -206,5 +283,46 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetBySFCSql = @"SELECT * FROM manu_sfc_info WHERE IsDeleted = 0 AND SFC = @sfc ";
         const string GetBySFCIdsSql = @"SELECT * FROM manu_sfc_info WHERE IsDeleted = 0 AND SfcId IN @sfcIds ";
         #endregion
+
+        const string GetPagedInfoWorkshopJobControlReportDataSqlTemplate = @"
+                        select 
+                            s.SFC,
+                            s.`Status` as SFCStatus,
+                            CONCAT_WS('/',m.MaterialCode,m.Version) as MaterialCodeVersion,
+                            m.MaterialName,
+                            o.OrderCode,
+                            o.Type as OrderType,
+
+                            p.`Code` as ProcedureCode,
+                            p.`Name` as ProcedureName,
+                            CONCAT_WS('/',b.BomCode,b.Version) as BomCodeVersion,
+                            b.BomName,
+
+                            s.Qty 
+                        from manu_sfc_info si
+                        LEFT JOIN Manu_sfc s on s.id=si.SfcId -- 为了查询状态
+                        LEFT JOIN proc_material m on m.Id=si.ProductId  -- 为了查询物料编码
+                        LEFT join plan_work_order o on o.Id=si.WorkOrderId -- 为了查询工单编码
+                        LEft join proc_bom b on b.id=o.ProductBOMId -- 为了查询bom
+
+                        LEFT join manu_sfc_produce sp on sp.SFC=s.SFC and s.Status=1 -- 为了查询工序
+                        LEFT JOIN proc_procedure p on p.Id=sp.ProcedureId -- 为了查询工序编码
+                        LEFT join proc_resource r on r.id=sp.ResourceId  -- 为了查询资源
+                        /**where**/ 
+                        LIMIT @Offset,@Rows 
+        ";
+        const string GetPagedInfoWorkshopJobControlReportCountSqlTemplate = @"
+                        select count(1)
+                        from manu_sfc_info si
+                        LEFT JOIN Manu_sfc s on s.id=si.SfcId -- 为了查询状态
+                        LEFT JOIN proc_material m on m.Id=si.ProductId  -- 为了查询物料编码
+                        LEFT join plan_work_order o on o.Id=si.WorkOrderId -- 为了查询工单编码
+                        LEft join proc_bom b on b.id=o.ProductBOMId -- 为了查询bom
+
+                        LEFT join manu_sfc_produce sp on sp.SFC=s.SFC and s.Status=1 -- 为了查询工序
+                        LEFT JOIN proc_procedure p on p.Id=sp.ProcedureId -- 为了查询工序编码
+                        LEFT join proc_resource r on r.id=sp.ResourceId  -- 为了查询资源
+                        /**where**/ 
+        ";
     }
 }

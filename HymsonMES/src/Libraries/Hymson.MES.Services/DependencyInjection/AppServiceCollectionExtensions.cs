@@ -230,6 +230,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IBadRecordReportService, BadRecordReportService>();
             #endregion
 
+            #region BadRecordReport
+            services.AddSingleton<IWorkshopJobControlReportService, WorkshopJobControlReportService>();
+            #endregion
+
             #region Packaging
             services.AddSingleton<IPackagingReportService, PackagingReportService>();
             #endregion

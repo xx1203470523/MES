@@ -22,6 +22,7 @@ using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.View;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
@@ -543,6 +544,11 @@ namespace Hymson.MES.Services.Mapper
 
             CreateMap<ManuProductBadRecordLogReportPagedQueryDto, ManuProductBadRecordLogReportPagedQuery>();
             CreateMap<ManuProductBadRecordLogReportView, ManuProductBadRecordLogReportViewDto>();
+            #endregion
+
+            #region WorkshopJobControl
+            CreateMap<WorkshopJobControlReportPagedQueryDto, WorkshopJobControlReportPagedQuery>();
+            CreateMap<WorkshopJobControlReportView, WorkshopJobControlReportViewDto>();
             #endregion
 
         }
