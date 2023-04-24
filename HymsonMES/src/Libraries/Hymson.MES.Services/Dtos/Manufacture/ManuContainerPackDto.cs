@@ -25,7 +25,16 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
         /// 容器条码id
         /// </summary>
         public long? ContainerBarCodeId { get; set; }
@@ -95,7 +104,17 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
         /// 容器条码id
         /// </summary>
         public long? ContainerBarCodeId { get; set; }
@@ -148,7 +167,16 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
         /// 容器条码id
         /// </summary>
         public long? ContainerBarCodeId { get; set; }

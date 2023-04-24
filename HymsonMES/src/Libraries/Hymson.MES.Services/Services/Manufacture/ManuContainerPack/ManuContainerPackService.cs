@@ -135,6 +135,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         return new ManuContainerPackRecordCreateDto()
                         {
+                            ResourceId = m.ResourceId,
+                            ProcedureId = m.ProcedureId,
                             ContainerBarCodeId = m.ContainerBarCodeId,
                             LadeBarCode = m.LadeBarCode,
                             OperateType = (int)Core.Enums.Manufacture.ManuContainerBarcodeOperateTypeEnum.Unload
