@@ -97,13 +97,13 @@
         public const string MES10438 = "此工艺路线不存在！";
         public const string MES10439 = $"此工艺路线在系统中不存在!";
         public const string MES10440 = $"获取下一工序失败!";
-        public const string MES10441 = $"不存在空值类型工序!";
+        public const string MES10441 = $"下一工序不存在空值类型工序!";
         public const string MES10442 = $"获取上一工序失败!";
         public const string MES10443 = $"启用状态或保留状态不可删除!";
         public const string MES10444 = $"工艺编码最大长度为60";
         public const string MES10445 = $"工艺名称最大长度为60";
         public const string MES10446 = $"抽检比例设置错误";
-
+        public const string MES10447 = $"下一工序不存在非空值类型工序";
         #endregion
 
         #region 参数 10500

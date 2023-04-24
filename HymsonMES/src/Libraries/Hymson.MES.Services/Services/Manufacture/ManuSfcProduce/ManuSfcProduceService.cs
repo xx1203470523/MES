@@ -462,14 +462,16 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES15402));
             }
 
-            var scrapSfcs = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery
-            {
-                Sfcs = parm.Sfcs,
-                Statuss = new SfcStatusEnum?[1] { SfcStatusEnum.Scrapping }
-            });
+            //var scrapSfcs = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery
+            //{
+            //    Sfcs = parm.Sfcs,
+            //    Statuss = new SfcStatusEnum?[1] { SfcStatusEnum.Scrapping }
+            //});
+            var scrapSfcs = manuSfcs.Where(x => x.IsScrap == TrueOrFalseEnum.Yes).Select(x => x.SFC).ToArray();
             //类型为报废时判断条码是否已经报废,若已经报废提示:存在已报废的条码，不可再次报废
             if (scrapSfcs.Any())
             {
+                var strs = string.Join("','", scrapSfcs);
                 throw new CustomerValidationException(nameof(ErrorCode.MES15401));
             }
             #endregion
@@ -545,8 +547,8 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             //取消报废， 验证工单是否已经激活，若已经取消激活，不能取消报废条码
             var orderIds = manuSfcs.Select(x => x.WorkOrderId).Distinct().ToArray();
-            var activeOrders = await _planWorkOrderActivationRepository.GetByIdsAsync(orderIds);
-            if (activeOrders == null)
+            var activeOrders = await _planWorkOrderActivationRepository.GetByWorkOrderIdsAsync(orderIds);
+            if (!activeOrders.Any())
             {
                 var orders = await _planWorkOrderRepository.GetByIdsAsync(orderIds);
                 var orderCodes = orders.Select(x => x.OrderCode).ToArray();

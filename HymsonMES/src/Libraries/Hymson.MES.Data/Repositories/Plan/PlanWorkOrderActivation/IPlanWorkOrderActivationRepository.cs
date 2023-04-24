@@ -27,7 +27,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="planWorkOrderActivationEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(PlanWorkOrderActivationEntity planWorkOrderActivationEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -41,7 +41,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="planWorkOrderActivationEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(PlanWorkOrderActivationEntity planWorkOrderActivationEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -55,7 +55,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -85,6 +85,13 @@ namespace Hymson.MES.Data.Repositories.Plan
         Task<PlanWorkOrderActivationEntity> GetByWorkOrderIdAsync(long workOrderId);
 
         /// <summary>
+        /// 根据工单id获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<PlanWorkOrderActivationEntity>> GetByWorkOrderIdsAsync(long[] orderIds);
+
+        /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
         /// <param name="ids"></param>
@@ -97,7 +104,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="planWorkOrderActivationQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<PlanWorkOrderActivationEntity>> GetPlanWorkOrderActivationEntitiesAsync(PlanWorkOrderActivationQuery planWorkOrderActivationQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>
