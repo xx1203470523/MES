@@ -105,6 +105,16 @@ namespace Hymson.MES.Services.Dtos.Report
         public SfcStatusEnum? SFCStatus { get; set; }
 
         /// <summary>
+        /// 条码在制状态
+        /// </summary>
+        public SfcProduceStatusEnum? SFCProduceStatus { get; set; }
+
+        /// <summary>
+        /// 是否锁
+        /// </summary>
+        public TrueOrFalseEnum? SFCIsLock { get; set; }
+
+        /// <summary>
         /// 工序编码
         /// </summary>
         public string? ProcedureCode { get; set; }

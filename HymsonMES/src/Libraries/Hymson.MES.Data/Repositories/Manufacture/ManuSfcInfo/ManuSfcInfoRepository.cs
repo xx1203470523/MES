@@ -242,6 +242,24 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 sqlBuilder.Where(" r.ResCode like  @ResourceCode ");
             }
 
+            if (pageQuery.SFCProduceStatus.HasValue) 
+            {
+                sqlBuilder.Where(" sp.`Status` =  @SFCProduceStatus ");
+            }
+
+            if (pageQuery.SFCIsLock.HasValue) 
+            {
+                sqlBuilder.LeftJoin(" manu_sfc_produce_business spb on spb.SfcInfoId=si.Id ");
+                if (pageQuery.SFCIsLock == Core.Enums.TrueOrFalseEnum.Yes)
+                {
+                    sqlBuilder.Where(" spb.BusinessType=2 ");
+                }
+                else 
+                {
+                    sqlBuilder.Where(" spb.BusinessType!=2 ");
+                }
+            }
+
             var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pageQuery.PageSize });
@@ -308,6 +326,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                         LEFT join manu_sfc_produce sp on sp.SFC=s.SFC and s.Status=1 -- 为了查询工序
                         LEFT JOIN proc_procedure p on p.Id=sp.ProcedureId -- 为了查询工序编码
                         LEFT join proc_resource r on r.id=sp.ResourceId  -- 为了查询资源
+                        
+                        /**leftjoin**/
+
                         /**where**/ 
                         LIMIT @Offset,@Rows 
         ";
@@ -322,6 +343,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                         LEFT join manu_sfc_produce sp on sp.SFC=s.SFC and s.Status=1 -- 为了查询工序
                         LEFT JOIN proc_procedure p on p.Id=sp.ProcedureId -- 为了查询工序编码
                         LEFT join proc_resource r on r.id=sp.ResourceId  -- 为了查询资源
+
+                        /**leftjoin**/
                         /**where**/ 
         ";
     }
