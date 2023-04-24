@@ -480,6 +480,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             // wh_material_inventory
 
             // wh_material_standingbook
+
+            return await Task.FromResult(0);
         }
 
     }
