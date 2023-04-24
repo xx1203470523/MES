@@ -254,6 +254,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 var count = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.None, cacheKey);
 
                 // 读取工序抽检次数
+                if (defaultNextProcedure.CheckRate == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10446));
+
                 if (count > 0 && count % defaultNextProcedure.CheckRate == 0)
                 {
                     // 如果满足抽检次数，就取出一个非"空值"的随机工序作为下一工序
