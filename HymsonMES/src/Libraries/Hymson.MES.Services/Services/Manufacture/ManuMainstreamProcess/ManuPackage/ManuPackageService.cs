@@ -1,5 +1,7 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPackage
@@ -7,7 +9,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPac
     /// <summary>
     /// 组装
     /// </summary>
-    public class ManuPackageService: IManuPackageService
+    public class ManuPackageService : IManuPackageService
     {
         /// <summary>
         /// 当前对象（登录用户）
@@ -42,11 +44,19 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPac
         /// <summary>
         /// 执行（组装）
         /// </summary>
+        /// <param name="bo"></param>
         /// <returns></returns>
-        public async Task ExecuteAsync()
+        public async Task<int> PackageAsync(ManufactureBo bo)
         {
-            // TODO 组装
-            await Task.CompletedTask;
+            var rows = 0;
+
+            // 获取生产条码信息
+            var (sfcProduceEntity, _) = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
+
+            // 合法性校验
+            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity).VerifyProcedure(bo.ProcedureId);
+
+            return rows;
         }
 
     }

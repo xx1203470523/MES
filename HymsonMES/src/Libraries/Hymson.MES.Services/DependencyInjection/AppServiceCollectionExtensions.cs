@@ -174,6 +174,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuRepairService, ManuRepairService>();
             services.AddSingleton<IManuInStationService, ManuInStationService>();
             services.AddSingleton<IManuOutStationService, ManuOutStationService>();
+            services.AddSingleton<IManuPackageService, ManuPackageService>();
             services.AddSingleton<IInProductDismantleService, InProductDismantleService>();
             services.AddSingleton<IManuFacePlateRepairService, ManuFacePlateRepairService>();
 
