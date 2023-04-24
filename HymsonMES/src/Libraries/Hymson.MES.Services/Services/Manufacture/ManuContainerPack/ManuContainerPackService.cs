@@ -114,7 +114,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task<int> DeletesManuContainerPackAsync(long[] ids)
         {
-            return await _manuContainerPackRepository.DeletesAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
+            return await _manuContainerPackRepository.DeleteTrueAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
         }
 
         /// <summary>
@@ -124,8 +124,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task DeleteAllByContainerBarCodeIdAsync(long containerBarCodeId)
         {
-            MySqlCommand cmd = new MySqlCommand();
-
             //生成删除记录
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
@@ -139,25 +137,12 @@ namespace Hymson.MES.Services.Services.Manufacture
                             ProcedureId = m.ProcedureId,
                             ContainerBarCodeId = m.ContainerBarCodeId,
                             LadeBarCode = m.LadeBarCode,
-                            OperateType = (int)Core.Enums.Manufacture.ManuContainerBarcodeOperateTypeEnum.Unload
+                            OperateType = (int)ManuContainerBarcodeOperateTypeEnum.Unload
                         };
                     });
                     await _manuContainerPackRecordService.CreateManuContainerPackRecordsAsync(packs.ToList());
 
                 });
-                //var records = new List<ManuContainerPackRecordCreateDto>();
-                //foreach (var item in packs)
-                //{
-                //    var r = new ManuContainerPackRecordCreateDto()
-                //    {
-                //        ContainerBarCodeId = containerBarCodeId,
-                //        LadeBarCode  =item.LadeBarCode,
-                //        OperateType = (int)Core.Enums.Manufacture.ManuContainerBarcodeOperateTypeEnum.Unload
-                //    };
-                //    records.Add(r); 
-                //}
-
-                // await _manuContainerPackRecordService.CreateManuContainerPackRecordsAsync(records);
                 await _manuContainerPackRepository.DeleteAllAsync(containerBarCodeId);
                 ts.Complete();
             }
