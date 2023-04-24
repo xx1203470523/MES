@@ -3,12 +3,9 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
-using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInStation;
-using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPackage;
 using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Job.Manufacture
@@ -90,7 +87,8 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity).VerifyProcedure(bo.ProcedureId);
 
             // 判断面板是否显示
-            var isShow = await _manuCommonService.CheckSFCIsCanDoneStep(bo, Core.Enums.Manufacture.SfcCirculationTypeEnum.ModuleAdd);
+            //var isShow = await _manuCommonService.CheckSFCIsCanDoneStep(bo, Core.Enums.Manufacture.SfcCirculationTypeEnum.ModuleAdd);
+            var isShow = true;
 
             defaultDto.Content?.Add("PackageCom", $"{isShow}".ToString());
             defaultDto.Content?.Add("BadEntryCom", "False");

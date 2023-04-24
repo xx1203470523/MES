@@ -296,7 +296,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 var nextProcedureOfNone = procedureNodes.FirstOrDefault(f => f.CheckType != ProcessRouteInspectTypeEnum.None)
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES10447));
 
-                // 读取工序抽检次数
+                // 判断工序抽检比例
                 if (nextProcedureOfNone.CheckRate == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10446));
 
                 // 如果满足抽检次数，就取出一个非"空值"的随机工序作为下一工序
