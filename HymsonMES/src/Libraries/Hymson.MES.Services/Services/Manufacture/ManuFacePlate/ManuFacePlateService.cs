@@ -63,9 +63,9 @@ namespace Hymson.MES.Services.Services.Manufacture
             AbstractValidator<ManuFacePlateCreateDto> validationCreateRules, AbstractValidator<ManuFacePlateModifyDto> validationModifyRules,
             AbstractValidator<ManuFacePlateProductionCreateDto> validationProductionCreateRules, AbstractValidator<ManuFacePlateProductionModifyDto> validationProductionModifyRules,
             AbstractValidator<ManuFacePlateRepairCreateDto> validationRepairCreateRules, AbstractValidator<ManuFacePlateRepairModifyDto> validationRepairModifyRules,
-            AbstractValidator<ManuFacePlateContainerPackCreateDto> validationContainerPackCreateRules, AbstractValidator<ManuFacePlateContainerPackModifyDto> validationContainerPackModifyRules, 
+            AbstractValidator<ManuFacePlateContainerPackCreateDto> validationContainerPackCreateRules, AbstractValidator<ManuFacePlateContainerPackModifyDto> validationContainerPackModifyRules,
             IInteJobRepository inteJobRepository, AbstractValidator<ManuFacePlateButtonModifyDto> validationButtonModifyRules,
-            AbstractValidator<ManuFacePlateButtonCreateDto> validationButtonCreateRules, IManuFacePlateButtonRepository manuFacePlateButtonRepository, 
+            AbstractValidator<ManuFacePlateButtonCreateDto> validationButtonCreateRules, IManuFacePlateButtonRepository manuFacePlateButtonRepository,
             IManuFacePlateButtonJobRelationRepository manuFacePlateButtonJobRelationRepository)
         {
             _currentUser = currentUser;
@@ -452,12 +452,14 @@ namespace Hymson.MES.Services.Services.Manufacture
                         resourceId = manuFacePlateRepairEntity.ResourceId;
                         procedureId = manuFacePlateRepairEntity.ProcedureId;
                         facePlateQueryDto.FacePlateContainerPack = manuFacePlateRepairEntity.ToModel<ManuFacePlateContainerPackDto>();
+                        facePlateQueryDto.FacePlateContainerPack.IsShowErrorsColour = !string.IsNullOrEmpty(manuFacePlateRepairEntity.ErrorsColour);
+                        facePlateQueryDto.FacePlateContainerPack.IsShowQualifiedColour = !string.IsNullOrEmpty(manuFacePlateRepairEntity.QualifiedColour);
                     }
                 }
                 #endregion
 
                 #region 按钮信息
-                var manuFacePlateButtonEntityList = (await _manuFacePlateButtonRepository.GetByFacePlateIdAsync(manuFacePlateEntity.Id)).OrderBy(x=>x.Seq).ToList();
+                var manuFacePlateButtonEntityList = (await _manuFacePlateButtonRepository.GetByFacePlateIdAsync(manuFacePlateEntity.Id)).OrderBy(x => x.Seq).ToList();
                 //按钮信息
                 List<ManuFacePlateButtonDto> manuFacePlateButtons = new();
                 foreach (var manuFacePlateButtonEntity in manuFacePlateButtonEntityList)

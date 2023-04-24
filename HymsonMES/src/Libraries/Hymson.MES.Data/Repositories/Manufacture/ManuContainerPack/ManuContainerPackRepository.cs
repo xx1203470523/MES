@@ -53,6 +53,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 批量删除（硬删除）
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteTrueAsync(DeleteCommand param)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteTrueSql, param);
+        }
+
+        /// <summary>
         /// 根据容器Id 删除所有容器装载记录（物理删除）
         /// </summary>
         /// <param name="containerBarCodeId"></param>
@@ -232,6 +243,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string DeleteSql = "UPDATE `manu_container_pack` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `manu_container_pack` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
+        const string DeleteTrueSql = "DELETE FROM  `manu_container_pack` WHERE Id IN @Ids";
         const string DeleteAllSql = "DELETE FROM `manu_container_pack`  WHERE ContainerBarCodeId = @ContainerBarCodeId ";
 
         const string GetByIdSql = @"SELECT 
