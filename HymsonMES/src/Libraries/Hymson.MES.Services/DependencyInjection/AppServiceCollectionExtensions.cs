@@ -236,6 +236,10 @@ namespace Microsoft.Extensions.DependencyInjection
             #region Packaging
             services.AddSingleton<IPackagingReportService, PackagingReportService>();
             #endregion
+
+            #region OriginalSummary
+            services.AddSingleton<IOriginalSummaryReportService, OriginalSummaryReportService>();
+            #endregion
             #endregion
 
             return services;

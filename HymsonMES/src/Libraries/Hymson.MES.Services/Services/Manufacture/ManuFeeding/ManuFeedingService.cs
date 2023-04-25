@@ -235,7 +235,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             // 读取资源绑定的产线
             var workCenter = await _inteWorkCenterRepository.GetByResourceIdAsync(queryDto.ResourceId);
 
-            /*
             if (workCenter == null)
             {
                 materialIds = await GetMaterialIdsByResourceIdAsync(queryDto.ResourceId);
@@ -254,12 +253,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             {
                 return list;
             }
-            */
 
+            /*
             if (workCenter == null) return list;
 
             // 通过产线->工单->BOM->查询物料
             materialIds = await GetMaterialIdsByWorkCenterIdAsync(workCenter.Id, queryDto.WorkOrderId);
+            */
 
             // 查询不到物料
             if (materialIds == null || materialIds.Any() == false) return list;

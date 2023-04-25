@@ -138,7 +138,7 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
             param.ResType = param.ResType.ToTrimSpace().ToUpperInvariant();
-            param.ResTypeName = param.ResTypeName.ToTrimSpace();
+            param.ResTypeName = param.ResTypeName.Trim();
             param.Remark = param.Remark??"".Trim();
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(param);
@@ -199,7 +199,7 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
-            param.ResTypeName = param.ResTypeName.ToTrimSpace();
+            param.ResTypeName = param.ResTypeName.Trim();
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(param);
 
