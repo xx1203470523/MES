@@ -258,5 +258,4 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long CirculationMainProductId { get; set; }
         public string CirculationBarCode { get; set; }
     }
-
 }

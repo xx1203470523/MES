@@ -278,10 +278,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 ProcedureIds = netxtProcessRouteDetailLinks.Select(s => s.ProcessRouteDetailId)
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10440));
 
-            // 检查是否有"空值"类型的工序
-            var defaultNextProcedure = procedureNodes.FirstOrDefault(f => f.CheckType == ProcessRouteInspectTypeEnum.None)
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10441));
-
             // 随机工序Key
             var cacheKey = $"{manuSfcProduce.ProcedureId}-{manuSfcProduce.WorkOrderId}";
             var count = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.None, cacheKey);
@@ -289,9 +285,16 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             // 这个Key太长了
             //var cacheKey = $"{manuSfcProduce.ProcessRouteId}-{manuSfcProduce.ProcedureId}-{manuSfcProduce.ResourceId}-{manuSfcProduce.WorkOrderId}";
 
+            // 默认下一工序
+            ProcProcessRouteDetailNodeEntity? defaultNextProcedure = null;
+
             // 有多工序分叉的情况
             if (procedureNodes.Count() > 1)
             {
+                // 检查是否有"空值"类型的工序
+                defaultNextProcedure = procedureNodes.FirstOrDefault(f => f.CheckType == ProcessRouteInspectTypeEnum.None)
+                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES10441));
+
                 // 抽检类型不为空值的下一工序
                 var nextProcedureOfNone = procedureNodes.FirstOrDefault(f => f.CheckType != ProcessRouteInspectTypeEnum.None)
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES10447));
@@ -303,10 +306,18 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 if (count > 0 && count % defaultNextProcedure.CheckRate == 0) defaultNextProcedure = nextProcedureOfNone;
             }
             // 没有分叉的情况
-            //else
-            //{
+            else
+            {
+                // 抽检类型不为空值的下一工序
+                var nextProcedureOfNone = procedureNodes.FirstOrDefault()
+                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES10440));
 
-            //}
+                // 判断工序抽检比例
+                if (nextProcedureOfNone.CheckRate == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10446));
+
+                // 如果满足抽检次数，就取出一个非"空值"的随机工序作为下一工序
+                if (count > 0 && count % nextProcedureOfNone.CheckRate == 0) defaultNextProcedure = nextProcedureOfNone;
+            }
 
             // 获取下一工序
             if (defaultNextProcedure == null) throw new CustomerValidationException(nameof(ErrorCode.MES10440));

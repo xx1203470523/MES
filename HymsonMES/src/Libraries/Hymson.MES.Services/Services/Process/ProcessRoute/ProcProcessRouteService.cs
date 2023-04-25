@@ -185,7 +185,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             //    throw new ValidationException(ErrorCode.MES10101);
             //}
             parm.Code = parm.Code.ToTrimSpace().ToUpperInvariant();
-            parm.Name = parm.Name.ToTrimSpace();
+            parm.Name = parm.Name.Trim();
             parm.Remark = parm.Remark.Trim();
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(parm);
@@ -266,7 +266,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             //    throw new ValidationException(ErrorCode.MES10101);
             //}
 
-            parm.Name = parm.Name.ToTrimSpace();
+            parm.Name = parm.Name.Trim();
             parm.Remark = parm.Remark.Trim();
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(parm);

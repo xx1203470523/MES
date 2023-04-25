@@ -10,6 +10,7 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Microsoft.Extensions.Options;
@@ -178,6 +179,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             return whMaterialInventoryEntities;
         }
 
+
         /// <summary>
         /// 新增
         /// </summary>
@@ -243,6 +245,18 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateIncreaseQuantityResidueSql, updateQuantityCommand);
         }
+
+        /// <summary>
+        /// 批量更新库存数量(增加库存)
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateIncreaseQuantityResidueRangeAsync(IEnumerable<UpdateQuantityCommand> updateQuantityCommand)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateIncreaseQuantityResidueSql, updateQuantityCommand);
+        }
+
 
         /// <summary>
         /// 更新库存数量(减少库存)

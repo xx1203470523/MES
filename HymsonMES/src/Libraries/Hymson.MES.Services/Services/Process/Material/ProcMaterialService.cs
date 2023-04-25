@@ -78,6 +78,11 @@ namespace Hymson.MES.Services.Services.Process
                 throw new ValidationException(nameof(ErrorCode.MES10101));
             }
 
+            procMaterialCreateDto.MaterialCode = procMaterialCreateDto.MaterialCode.ToTrimSpace().ToUpperInvariant();
+            procMaterialCreateDto.MaterialName = procMaterialCreateDto.MaterialName.Trim();
+            procMaterialCreateDto.Version = procMaterialCreateDto.Version.Trim();
+            procMaterialCreateDto.Remark = procMaterialCreateDto?.Remark??"".Trim();
+            procMaterialCreateDto.Unit = procMaterialCreateDto?.Unit??"".Trim();
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procMaterialCreateDto);
 
@@ -276,6 +281,11 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task ModifyProcMaterialAsync(ProcMaterialModifyDto procMaterialModifyDto)
         {
+            procMaterialModifyDto.MaterialName = procMaterialModifyDto.MaterialName.Trim();
+            procMaterialModifyDto.Version = procMaterialModifyDto.Version.Trim();
+            procMaterialModifyDto.Remark = procMaterialModifyDto?.Remark ?? "".Trim();
+            procMaterialModifyDto.Unit = procMaterialModifyDto?.Unit ??"".Trim();
+
             //DTO转换实体
             var procMaterialEntity = procMaterialModifyDto.ToEntity<ProcMaterialEntity>();
             procMaterialEntity.UpdatedBy = _currentUser.UserName;
