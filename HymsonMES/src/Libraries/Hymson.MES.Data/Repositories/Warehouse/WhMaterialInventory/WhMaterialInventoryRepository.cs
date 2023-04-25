@@ -272,17 +272,17 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <summary>
         /// 根据物料编码获取物料数据
         /// </summary>
-        /// <param name="materialCode"></param>
+        /// <param name="materialId"></param>
         /// <returns></returns>
-        public async Task<ProcMaterialInfoView> GetProcMaterialByMaterialCodeAsync(string materialCode)
+        public async Task<ProcMaterialInfoView> GetProcMaterialByMaterialCodeAsync(long materialId)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetMaterialByMaterialCodeSql);
             sqlBuilder.Select("*");
-            sqlBuilder.Where("MaterialCode=@materialCode");
+            sqlBuilder.Where("Id=@materialId");
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var pmInfo = await conn.QueryFirstOrDefaultAsync<ProcMaterialInfoView>(template.RawSql, new { materialCode });
+            var pmInfo = await conn.QueryFirstOrDefaultAsync<ProcMaterialInfoView>(template.RawSql, new { materialId });
             return pmInfo;
         }
 

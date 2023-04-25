@@ -144,7 +144,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="materialCode"></param>
         /// <returns></returns>
-        Task<ProcMaterialInfoView> GetProcMaterialByMaterialCodeAsync(string materialCode);
+        Task<ProcMaterialInfoView> GetProcMaterialByMaterialCodeAsync(long materialId);
 
 
         /// <summary>
