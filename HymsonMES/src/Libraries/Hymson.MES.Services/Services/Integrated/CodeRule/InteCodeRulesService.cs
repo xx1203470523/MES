@@ -13,6 +13,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Plan;
@@ -97,7 +98,24 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
             var hasCodeRulesEntities = await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery { ProductId = inteCodeRulesCreateDto.ProductId });
             if (hasCodeRulesEntities != null && hasCodeRulesEntities.Any())
             {
-                throw new BusinessException(nameof(ErrorCode.MES12401)).WithData("productId", inteCodeRulesCreateDto.ProductId);
+                IEnumerable<InteCodeRulesEntity> repeats = new List<InteCodeRulesEntity>();
+                //判断 编码类型和包装类型是否重复，重复则报错   2023/04/25 加的需求
+                if (inteCodeRulesCreateDto.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode)
+                {
+                    repeats = hasCodeRulesEntities.Where(x => x.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode).ToList();
+                }
+                else 
+                {
+                    repeats = hasCodeRulesEntities.Where(x => x.CodeType == CodeRuleCodeTypeEnum.PackagingSeqCode && x.PackType== inteCodeRulesCreateDto.PackType).ToList();
+                }
+
+                if (repeats != null && repeats.Any()) 
+                {
+                    if (inteCodeRulesCreateDto.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode)
+                        throw new BusinessException(nameof(ErrorCode.MES12401)).WithData("productId", inteCodeRulesCreateDto.ProductId);
+                    else
+                        throw new BusinessException(nameof(ErrorCode.MES12403)).WithData("productId", inteCodeRulesCreateDto.ProductId);
+                }
             }
 
             List<InteCodeRulesMakeEntity> inteCodeRulesMakeEntitys = new List<InteCodeRulesMakeEntity>();
@@ -211,6 +229,34 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
             var inteCodeRulesEntity = inteCodeRulesModifyDto.ToEntity<InteCodeRulesEntity>();
             inteCodeRulesEntity.UpdatedBy = _currentUser.UserName;
             inteCodeRulesEntity.UpdatedOn = HymsonClock.Now();
+
+
+            //判断是否已经存在该物料数据
+            var hasCodeRulesEntities = await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery { ProductId = inteCodeRulesModifyDto.ProductId });
+            if (hasCodeRulesEntities != null && hasCodeRulesEntities.Any())
+            {
+                IEnumerable<InteCodeRulesEntity> repeats = new List<InteCodeRulesEntity>();
+                //判断 编码类型和包装类型是否重复，重复则报错   2023/04/25 加的需求
+                if (inteCodeRulesModifyDto.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode)
+                {
+                    repeats = hasCodeRulesEntities.Where(x => x.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode).ToList();
+                }
+                else
+                {
+                    repeats = hasCodeRulesEntities.Where(x => x.CodeType == CodeRuleCodeTypeEnum.PackagingSeqCode && x.PackType == inteCodeRulesModifyDto.PackType).ToList();
+                }
+
+                if (repeats != null && repeats.Any())
+                {
+                    if (!(repeats.Count() == 1 && repeats.First().Id == inteCodeRulesModifyDto.Id)) //去掉当前修改的数据的
+                    {
+                        if (inteCodeRulesModifyDto.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode)
+                            throw new BusinessException(nameof(ErrorCode.MES12401)).WithData("productId", inteCodeRulesModifyDto.ProductId);
+                        else
+                            throw new BusinessException(nameof(ErrorCode.MES12403)).WithData("productId", inteCodeRulesModifyDto.ProductId);
+                    }
+                }
+            }
 
             List<InteCodeRulesMakeEntity> inteCodeRulesMakeEntitys = new List<InteCodeRulesMakeEntity>();
             if (inteCodeRulesModifyDto.CodeRulesMakes != null)

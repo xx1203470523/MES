@@ -27,5 +27,12 @@ namespace Hymson.MES.Services.Services.Report
         /// <param name="param"></param>
         /// <returns></returns>
         Task<PagedInfo<WorkshopJobControlReportViewDto>> GetWorkshopJobControlPageListAsync(WorkshopJobControlReportPagedQueryDto param);
+
+        /// <summary>
+        /// 获取SFC的车间作业控制步骤
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        Task<WorkshopJobControlStepReportDto> GetSfcInOutInfo(string sfc);
     }
 }
