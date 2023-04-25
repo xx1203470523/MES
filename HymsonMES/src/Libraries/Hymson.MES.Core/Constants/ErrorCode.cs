@@ -223,9 +223,10 @@
 
         #region 编码规则 12400
         public const string MES12400 = "代码规则维护错误";
-        public const string MES12401 = "代码规则中物料Id[{productId}]已经存在";
+        public const string MES12401 = "代码规则中同样物料Id[{productId}],编码类型已经存在";
 
         public const string MES12402 = "代码规则新增失败";
+        public const string MES12403 = "代码规则中同样物料Id[{productId}],编码类型,包装类型已经存在";
 
         public const string MES12410 = "物料 不能为空！";
         public const string MES12411 = "编码类型 不能为空！";
