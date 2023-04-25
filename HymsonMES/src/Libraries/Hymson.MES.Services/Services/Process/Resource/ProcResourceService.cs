@@ -343,7 +343,7 @@ namespace Hymson.MES.Services.Services.Process
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
             parm.ResCode = parm.ResCode.ToTrimSpace().ToUpperInvariant();
-            parm.ResName = parm.ResName.ToTrimSpace();
+            parm.ResName = parm.ResName.Trim();
             parm.Remark= parm.Remark.Trim();
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(parm);
@@ -547,7 +547,7 @@ namespace Hymson.MES.Services.Services.Process
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
-            param.ResName = param.ResName.ToTrimSpace();
+            param.ResName = param.ResName.Trim();
             param.Remark = param.Remark.Trim();
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(param);

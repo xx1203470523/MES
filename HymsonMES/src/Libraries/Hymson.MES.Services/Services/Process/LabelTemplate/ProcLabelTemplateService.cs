@@ -46,10 +46,11 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
         /// <summary>
         /// 创建
         /// </summary>
-        /// <param name="procLabelTemplateDto"></param>
+        /// <param name="procLabelTemplateCreateDto"></param>
         /// <returns></returns>
         public async Task CreateProcLabelTemplateAsync(ProcLabelTemplateCreateDto procLabelTemplateCreateDto)
         {
+            procLabelTemplateCreateDto.Name = procLabelTemplateCreateDto.Name.Trim();
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procLabelTemplateCreateDto);
 
@@ -128,10 +129,11 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="procLabelTemplateDto"></param>
+        /// <param name="procLabelTemplateModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyProcLabelTemplateAsync(ProcLabelTemplateModifyDto procLabelTemplateModifyDto)
         {
+            procLabelTemplateModifyDto.Name = procLabelTemplateModifyDto.Name.Trim();
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(procLabelTemplateModifyDto);
 

@@ -20,6 +20,7 @@ using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -58,6 +59,13 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<int> CreateProcParameterAsync(ProcParameterCreateDto procParameterCreateDto)
         {
+            if (procParameterCreateDto == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            }
+            procParameterCreateDto.ParameterCode = procParameterCreateDto.ParameterCode.ToTrimSpace().ToUpperInvariant();
+            procParameterCreateDto.ParameterName = procParameterCreateDto.ParameterName.Trim();
+            procParameterCreateDto.Remark = procParameterCreateDto.Remark??"".Trim();
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procParameterCreateDto);
 
@@ -68,7 +76,7 @@ namespace Hymson.MES.Services.Services.Process
             procParameterEntity.UpdatedBy = _currentUser.UserName;
             procParameterEntity.CreatedOn = HymsonClock.Now();
             procParameterEntity.UpdatedOn = HymsonClock.Now();
-            procParameterEntity.ParameterCode = procParameterEntity.ParameterCode.ToUpper();
+            procParameterEntity.ParameterCode = procParameterEntity.ParameterCode;
             procParameterEntity.SiteId = _currentSite.SiteId;
 
             //判断编号是否已经存在
@@ -163,6 +171,8 @@ namespace Hymson.MES.Services.Services.Process
             {
                 throw new ValidationException(nameof(ErrorCode.MES10503));
             }
+            procParameterModifyDto.ParameterName = procParameterModifyDto.ParameterName.Trim();
+            procParameterModifyDto.Remark = procParameterModifyDto.Remark ?? "".Trim();
 
             //DTO转换实体
             var procParameterEntity = procParameterModifyDto.ToEntity<ProcParameterEntity>();

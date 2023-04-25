@@ -196,8 +196,8 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
             {
                 Id = param.Id,
                 Remark = param.Remark ?? "",
-                PrintName = param.PrintName ?? "",
-                PrintIp = param.PrintIp ?? "",
+                PrintName = param.PrintName ?? "".Trim(),
+                PrintIp = param.PrintIp ?? "".Trim(),
                 UpdatedBy = userName
             };
 
