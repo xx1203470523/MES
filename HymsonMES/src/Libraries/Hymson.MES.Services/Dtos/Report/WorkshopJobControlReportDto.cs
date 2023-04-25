@@ -125,4 +125,41 @@ namespace Hymson.MES.Services.Dtos.Report
         public string? ResourceCode { get; set; }
     }
 
+    public class WorkshopJobControlStepReportDto 
+    {
+        public string SFC { get; set; }
+
+        public string OrderCode { get; set; }
+
+        public string MaterialCodrNameVersion { get; set; }
+
+        public string ProcessRouteCodeNameVersion { get; set; }
+
+        public string ProcBomCodeNameVersion { get; set; }
+
+        public List<WorkshopJobControlInOutSteptDto> WorkshopJobControlInOutSteptDtos { get; set; }=new List<WorkshopJobControlInOutSteptDto>();
+    }
+
+    public class WorkshopJobControlInOutSteptDto 
+    {
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string ProcedureCode { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public string Status { get; set; }
+
+        /// <summary>
+        /// 进站时间
+        /// </summary>
+        public DateTime InDateTime { get; set; }
+
+        /// <summary>
+        /// 出站时间
+        /// </summary>
+        public DateTime? OutDatetTime { get; set; }
+    }
 }

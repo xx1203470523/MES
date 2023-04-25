@@ -596,7 +596,7 @@
         #endregion
 
 
-        #region 在制品步骤控制
+        #region 在制品步骤控制 MES18000
         public const string MES18000 = "在制品步骤控制错误";
         public const string MES18001 = "条码信息不存在";
         public const string MES18002 = "请扫描相同工单的条码";
@@ -621,6 +621,16 @@
 
 
         #endregion
+
+        #region 车间作业控制 报告 MES18100
+        public const string MES18100 = "车间作业控制报告错误";
+        public const string MES18101 = "没有获取到{sfc}对应步骤的信息";
+        public const string MES18102 = "没有获取到{sfc}对应步骤中的工单信息";
+        public const string MES18103 = "没有获取到{sfc}对应步骤中的产品信息";
+        public const string MES18104 = "没有获取到{sfc}对应步骤中的工艺路线信息";
+        public const string MES18105 = "没有获取到{sfc}对应步骤中的BOM信息";
+        #endregion
+
         #endregion
 
         #region 系统执行出错 业务逻辑出错
