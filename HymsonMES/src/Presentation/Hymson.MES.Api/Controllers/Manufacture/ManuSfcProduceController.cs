@@ -145,6 +145,19 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         #region 在制品步骤控制
+
+
+
+        /// <summary>
+        /// 分页查询列表（条码生产信息（物理删除））
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpGet("getManuSfcPageList")]
+        public async Task<PagedInfo<ManuSfcProduceViewDto>> GetManuSfcPagedInfoAsync([FromQuery] ManuSfcProducePagedQueryDto parm)
+        {
+            return await _manuSfcProduceService.GetManuSfcPagedInfoAsync(parm);
+        }
         /// <summary>
         /// 根据SFC查询在制品步骤列表
         /// </summary>

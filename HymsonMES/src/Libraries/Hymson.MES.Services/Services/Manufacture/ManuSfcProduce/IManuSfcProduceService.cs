@@ -98,6 +98,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
         #region 在制品步骤控制
 
         /// <summary>
+        /// 分页查询（查询所有条码信息）
+        /// </summary>
+        /// <param name="manuSfcProducePagedQueryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ManuSfcProduceViewDto>> GetManuSfcPagedInfoAsync(ManuSfcProducePagedQueryDto manuSfcProducePagedQueryDto);
+
+        /// <summary>
         /// 根据SFC查询在制品步骤列表
         /// </summary>
         /// <param name="sfc"></param>
