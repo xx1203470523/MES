@@ -16,6 +16,7 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -31,6 +32,7 @@ using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBar
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.Diagnostics;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -66,6 +68,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly AbstractValidator<CreateManuContainerBarcodeDto> _validationCreateManuContainerBarcodeRules;
         private readonly AbstractValidator<UpdateManuContainerBarcodeStatusDto> _validationUpdateStatusRules;
 
+        /// <summary>
+        /// 仓储接口（条码生产信息）
+        /// </summary>
+        private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
+
         public ManuContainerBarcodeService(ICurrentUser currentUser, ICurrentSite currentSite, IManuContainerBarcodeRepository manuContainerBarcodeRepository, AbstractValidator<ManuContainerBarcodeCreateDto> validationCreateRules
             , AbstractValidator<ManuContainerBarcodeModifyDto> validationModifyRules
             , IManuContainerPackRepository manuContainerPackRepository
@@ -79,15 +86,15 @@ namespace Hymson.MES.Services.Services.Manufacture
             , IPlanWorkOrderRepository planWorkOrderRepository
             , IManuContainerPackService manuContainerPack
             , IManuFacePlateRepository manuFacePlateRepository
-            ,IManuFacePlateContainerPackRepository manuFacePlateContainerPackRepository
+            , IManuFacePlateContainerPackRepository manuFacePlateContainerPackRepository
             , IManuContainerPackRecordService manuContainerPackRecordService
             , AbstractValidator<CreateManuContainerBarcodeDto> validationCreateManuContainerBarcodeRules,
-            AbstractValidator<UpdateManuContainerBarcodeStatusDto> validationUpdateStatusRules)
+            AbstractValidator<UpdateManuContainerBarcodeStatusDto> validationUpdateStatusRules, IManuSfcProduceRepository manuSfcProduceRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _manuContainerBarcodeRepository = manuContainerBarcodeRepository;
-           // _validationCreateRules = validationCreateRules;
+            // _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _manuContainerPackRepository = manuContainerPackRepository;
             _inteContainerRepository = ingiContainerRepository;
@@ -104,6 +111,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _validationUpdateStatusRules = validationUpdateStatusRules;
             _manuFacePlateRepository = manuFacePlateRepository;
             _manuFacePlateContainerPackRepository = manuFacePlateContainerPackRepository;
+            _manuSfcProduceRepository = manuSfcProduceRepository;
         }
 
         /// <summary>
@@ -132,8 +140,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuContainerBarcodeEntity.SiteId = _currentSite.SiteId ?? 0;
 
             //获取面板信息
-           
-
             var facePlateEntity = await _manuFacePlateRepository.GetByCodeAsync(createManuContainerBarcodeDto.FacePlateCode);
             if(facePlateEntity==null)
                 throw new CustomerValidationException(nameof(ErrorCode.MES16705));
@@ -145,6 +151,27 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16701));
             }
+            //获取条码生产信息
+            var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(createManuContainerBarcodeDto.BarCode);
+            if (sfcProduceEntity != null)
+            {
+                //是否允许活动产品
+                if (sfcProduceEntity.Status == SfcProduceStatusEnum.Activity && !facePlateContainerPackEntity.IsAllowActiveProduct)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16711));
+                }
+                //是否允许完成产品
+                if (sfcProduceEntity.Status == SfcProduceStatusEnum.Complete && !facePlateContainerPackEntity.IsAllowCompleteProduct)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16712));
+                }
+                //是否允许排队产品
+                if (sfcProduceEntity.Status == SfcProduceStatusEnum.lineUp && !facePlateContainerPackEntity.IsAllowQueueProduct)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16713));
+                }
+            }
+
             var sfcinfos = await _manuSfcInfoRepository.GetBySFCIdsAsync(new long[] { sfcEntity.Id });
             if (sfcinfos == null||!sfcinfos.Any())
             {

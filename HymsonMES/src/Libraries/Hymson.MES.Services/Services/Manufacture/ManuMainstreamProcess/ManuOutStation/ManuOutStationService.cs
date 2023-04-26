@@ -4,6 +4,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -230,12 +231,18 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 sfcStep.CurrentStatus = SfcProduceStatusEnum.Complete;  // TODO 这里的状态？？
                 rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
 
-                // TODO manu_sfc_info 修改为 完成或者入库
+                // manu_sfc_info 修改为完成 且入库
                 // 条码信息
                 var sfcInfo = await _manuSfcRepository.GetBySFCAsync(sfcProduceEntity.SFC);
 
+                // 更新状态
                 sfcInfo.Status = SfcStatusEnum.Complete;
+                sfcInfo.UpdatedBy = sfcProduceEntity.UpdatedBy;
+                sfcInfo.UpdatedOn = sfcProduceEntity.UpdatedOn;
                 rows += await _manuSfcRepository.UpdateAsync(sfcInfo);
+
+                // 入库
+                rows += await SaveToWarehouse(sfcInfo);
             }
             // 未完工
             else
@@ -503,22 +510,53 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// <summary>
         /// 入库
         /// </summary>
+        /// <param name="manuSfcEntity"></param>
         /// <returns></returns>
-        private async Task<int> InWarehouse()
+        private async Task<int> SaveToWarehouse(ManuSfcEntity manuSfcEntity)
         {
-            // TODO 新增 wh_material_inventory
-            _ = await _whMaterialInventoryRepository.InsertAsync(new Core.Domain.Warehouse.WhMaterialInventoryEntity
-            {
+            var rows = 0;
 
+            /*
+            // TODO 新增 wh_material_inventory
+            rows += await _whMaterialInventoryRepository.InsertAsync(new WhMaterialInventoryEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SupplierId = 0,//自制品 没有
+                MaterialId = procMaterial.Id,
+                MaterialBarCode = manuSfcEntity.SFC,
+                Batch = "",//自制品 没有
+                QuantityResidue = procMaterial.Batch,
+                Status = WhMaterialInventoryStatusEnum.ToBeUsed,
+                Source = WhMaterialInventorySourceEnum.ManuComplete,
+                SiteId = _currentSite.SiteId ?? 0,
+                CreatedBy = _currentUser.UserName,
+                CreatedOn = HymsonClock.Now(),
+                UpdatedBy = manuSfcEntity.UpdatedBy,
+                UpdatedOn = manuSfcEntity.UpdatedOn
             });
 
             // TODO 新增 wh_material_standingbook
-            _ = await _whMaterialStandingbookRepository.InsertAsync(new Core.Domain.Warehouse.WhMaterialStandingbookEntity
+            rows += await _whMaterialStandingbookRepository.InsertAsync(new WhMaterialStandingbookEntity
             {
-
+                Id = IdGenProvider.Instance.CreateId(),
+                MaterialCode = procMaterial.MaterialCode,
+                MaterialName = procMaterial.MaterialName,
+                MaterialVersion = procMaterial.Version,
+                MaterialBarCode = manuSfcEntity.SFC,
+                Batch = "",//自制品 没有
+                Quantity = procMaterial.Batch,
+                Unit = procMaterial.Unit ?? "",
+                Type = WhMaterialInventoryTypeEnum.ManuComplete, //(int)WhMaterialInventorySourceEnum.MaterialReceiving;
+                Source = WhMaterialInventorySourceEnum.ManuComplete,
+                SiteId = _currentSite.SiteId ?? 0,
+                CreatedBy = _currentUser.UserName,
+                CreatedOn = HymsonClock.Now(),
+                UpdatedBy = manuSfcEntity.UpdatedBy,
+                UpdatedOn = manuSfcEntity.UpdatedOn
             });
+            */
 
-            return await Task.FromResult(0);
+            return rows;
         }
 
     }

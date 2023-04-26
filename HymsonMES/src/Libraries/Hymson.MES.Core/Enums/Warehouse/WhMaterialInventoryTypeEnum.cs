@@ -27,6 +27,6 @@ namespace Hymson.MES.Core.Enums
         /// 生产完成
         /// </summary>
         [Description("生产完成")]
-        manuComplete = 4
+        ManuComplete = 4
     }
 }

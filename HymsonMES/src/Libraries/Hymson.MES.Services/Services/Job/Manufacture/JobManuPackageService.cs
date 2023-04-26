@@ -84,7 +84,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             var (sfcProduceEntity, _) = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
 
             // 合法性校验
-            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity).VerifyProcedure(bo.ProcedureId);
+            //sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity).VerifyProcedure(bo.ProcedureId);
 
             // 判断面板是否显示
             //var isShow = await _manuCommonService.CheckSFCIsCanDoneStep(bo, Core.Enums.Manufacture.SfcCirculationTypeEnum.ModuleAdd);
