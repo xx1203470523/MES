@@ -248,7 +248,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="manuFacePlateContainerPackExJobDto"></param>
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
-        public async Task<List<ManuContainerPackagJobReturnTypeEnum>> ExecuteexecuteJobAsync(ManuFacePlateContainerPackExJobDto manuFacePlateContainerPackExJobDto)
+        public async Task<Dictionary<string, JobResponseDto>> ExecuteexecuteJobAsync(ManuFacePlateContainerPackExJobDto manuFacePlateContainerPackExJobDto)
         {
             #region  验证数据
             if (string.IsNullOrWhiteSpace(manuFacePlateContainerPackExJobDto.SFC))
@@ -268,31 +268,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             jobDto.Param?.Add("SFC", manuFacePlateContainerPackExJobDto.SFC);
             jobDto.Param?.Add("ProcedureId", $"{manuFacePlateContainerPackExJobDto.ProcedureId}");
             jobDto.Param?.Add("ResourceId", $"{manuFacePlateContainerPackExJobDto.ResourceId}");
+            jobDto.Param?.Add("ContainerId", $"{manuFacePlateContainerPackExJobDto.ContainerId}");
 
             // 调用作业
             var resJob = await _manuFacePlateButtonService.ClickAsync(jobDto);
             if (resJob == null || resJob.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES16709));
-
-            var list = new List<ManuContainerPackagJobReturnTypeEnum>();
-            foreach (var item in resJob)
-            {
-                if (item.Key == ManuContainerPackagJobReturnTypeEnum.JobManuPackageService.ToString())
-                {
-                    if (!list.Contains(ManuContainerPackagJobReturnTypeEnum.JobManuPackageService))
-                        list.Add(ManuContainerPackagJobReturnTypeEnum.JobManuPackageService);
-                }
-                else if (item.Key == ManuContainerPackagJobReturnTypeEnum.JobManuCloseService.ToString())
-                {
-                    if (!list.Contains(ManuContainerPackagJobReturnTypeEnum.JobManuCloseService))
-                        list.Add(ManuContainerPackagJobReturnTypeEnum.JobManuCloseService);
-                }
-                else
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16710)).WithData("key", item.Key);
-                }
-            }
-
-            return list;
+            return resJob;
             #endregion
         }
     }
