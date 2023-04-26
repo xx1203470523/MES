@@ -59,4 +59,7 @@
 		<PackageReference Include="Quartz.Extensions.Hosting" Version="3.4.0" />
 		<PackageReference Include="Quartz.Serialization.Json" Version="3.4.0" />
 	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Libraries\Hymson.MES.BackgroundServices\Hymson.MES.BackgroundServices.csproj" />
+	</ItemGroup>
 </Project>
