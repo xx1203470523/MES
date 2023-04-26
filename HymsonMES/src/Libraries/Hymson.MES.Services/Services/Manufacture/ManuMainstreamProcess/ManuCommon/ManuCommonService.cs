@@ -483,6 +483,19 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
     public static class ManuSfcProduceExtensions
     {
         /// <summary>
+        /// 条码资源关联校验
+        /// </summary>
+        /// <param name="sfcProduceEntity"></param>
+        /// <param name="resourceId"></param>
+        public static ManuSfcProduceEntity VerifyResource(this ManuSfcProduceEntity sfcProduceEntity, long resourceId)
+        {
+            // 当前资源是否对于的上
+            if (sfcProduceEntity.ResourceId != resourceId) throw new CustomerValidationException(nameof(ErrorCode.MES16316)).WithData("SFC", sfcProduceEntity.SFC);
+
+            return sfcProduceEntity;
+        }
+
+        /// <summary>
         /// 条码合法性校验
         /// </summary>
         /// <param name="sfcProduceEntity"></param>
