@@ -8,6 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -101,6 +102,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuSfcInfo1PagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuSfcInfoEntity>> GetPagedInfoAsync(ManuSfcInfo1PagedQuery manuSfcInfo1PagedQuery);
+
+        /// <summary>
+        /// 批量更新 是否在用
+        /// </summary>
+        /// <param name="sfcIds"></param>
+        /// <returns></returns>
+        Task<int> UpdatesIsUsedAsync(ManuSfcInfoUpdateCommand manuSfcInfoUpdate);
         #endregion
+
+
+        /// <summary>
+        /// 车间作业控制 报表分页查询
+        /// </summary>
+        /// <param name="pageQuery"></param>
+        /// <returns></returns>
+        Task<PagedInfo<WorkshopJobControlReportView>> GetPagedInfoWorkshopJobControlReportAsync(WorkshopJobControlReportPagedQuery pageQuery);
     }
 }

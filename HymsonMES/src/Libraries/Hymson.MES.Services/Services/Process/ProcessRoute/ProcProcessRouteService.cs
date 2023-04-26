@@ -184,12 +184,14 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             //{
             //    throw new ValidationException(ErrorCode.MES10101);
             //}
-
+            parm.Code = parm.Code.ToTrimSpace().ToUpperInvariant();
+            parm.Name = parm.Name.Trim();
+            parm.Remark = parm.Remark.Trim();
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(parm);
 
             //工艺路线编码和版本唯一
-            var code = parm.Code.ToUpperInvariant();
+            var code = parm.Code;
             var query = new ProcProcessRouteQuery
             {
                 Code = code,
@@ -264,6 +266,8 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             //    throw new ValidationException(ErrorCode.MES10101);
             //}
 
+            parm.Name = parm.Name.Trim();
+            parm.Remark = parm.Remark.Trim();
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(parm);
 

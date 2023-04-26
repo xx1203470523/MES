@@ -26,7 +26,7 @@ namespace Hymson.MES.Api
                  ServiceTypeEnum.User,
                   ServiceTypeEnum.MES
                 },stoppingToken);
-                //await _resourceService.InitEnumAsync();
+                await _resourceService.InitEnumAsync();
                 //await _resourceService.InitErrorCodeAsync(typeof(ErrorCode));
 
             }

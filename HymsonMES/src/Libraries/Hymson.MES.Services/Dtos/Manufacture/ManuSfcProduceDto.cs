@@ -534,6 +534,35 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     }
 
     /// <summary>
+    /// 在制品步骤控制操作实体（操作条码）
+    /// </summary>
+    public record SaveManuSfcProduceStepDto
+    {
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 操作类型
+        /// </summary>
+        public SfcProduceStatusEnum Type { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+
+        /// <summary>
+        /// 条码列表
+        /// </summary>
+        public List<ManuSfcProduceStepSFCDto> Sfcs { get; set; }
+
+
+    }
+
+
+    /// <summary>
     /// 在制品步骤控制操作实体（步骤列表）
     /// </summary>
     public record ManuSfcProduceStepViewDto

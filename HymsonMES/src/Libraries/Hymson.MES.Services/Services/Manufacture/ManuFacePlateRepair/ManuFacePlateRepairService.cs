@@ -317,7 +317,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             //manuFacePlateRepairOpenInfoDto.returnProcedureInfo = manuFacePlateRepairReturnProcedureList;
 
             #endregion
-            var manuFacePlateRepairOpenInfoDto = await GetManuFacePlateRepairOpenInfoDto(beginRepairDto.SFC);
+            var manuFacePlateRepairOpenInfoDto = await GetManuFacePlateRepairOpenInfoDto(manuSfcProduceEntit);
 
             #region 启动维修 更新状态
 
@@ -344,18 +344,13 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <summary>
         /// 获取展示信息 
         /// </summary>
-        /// <param name="sfc"></param>
+        /// <param name="manuSfcProduceEntit"></param>
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
-        private async Task<ManuFacePlateRepairOpenInfoDto> GetManuFacePlateRepairOpenInfoDto(string sfc)
+        private async Task<ManuFacePlateRepairOpenInfoDto> GetManuFacePlateRepairOpenInfoDto(ManuSfcProduceEntity manuSfcProduceEntit)
         {
-            var manuSfcProduceEntit = await _manuSfcProduceRepository.GetBySFCAsync(sfc);
-            if (manuSfcProduceEntit == null)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16310));
-            }
             //获取产品信息
-            var manuSfcProduce = await _manuSfcProduceRepository.GetPagedInfoAsync(new ManuSfcProducePagedQuery { PageSize = 1, PageIndex = 1, SiteId = _currentSite.SiteId, Sfc = sfc });
+            var manuSfcProduce = await _manuSfcProduceRepository.GetPagedInfoAsync(new ManuSfcProducePagedQuery { PageSize = 1, PageIndex = 1, SiteId = _currentSite.SiteId, Sfc = manuSfcProduceEntit.SFC });
             var manuSfcProduceInfo = manuSfcProduce.Data.FirstOrDefault();
             if (manuSfcProduceInfo == null)
             {
@@ -468,8 +463,17 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17303));
             }
+            var manuSfcProduceEntit = await _manuSfcProduceRepository.GetBySFCAsync(beginRepairDto.SFC);
+            if (manuSfcProduceEntit == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16306));
+            }
+            if (manuSfcProduceEntit.Status != SfcProduceStatusEnum.Activity)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17322));
+            }
             beginRepairDto.SFC = beginRepairDto.SFC.Trim();
-            var manuFacePlateRepairOpenInfoDto = await GetManuFacePlateRepairOpenInfoDto(beginRepairDto.SFC);
+            var manuFacePlateRepairOpenInfoDto = await GetManuFacePlateRepairOpenInfoDto(manuSfcProduceEntit);
             return manuFacePlateRepairOpenInfoDto;
         }
 

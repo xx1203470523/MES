@@ -1,4 +1,5 @@
-﻿using Hymson.Authentication;
+﻿using FluentValidation;
+using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
@@ -10,6 +11,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -41,21 +43,24 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
         /// 资源仓储对象
         /// </summary>
         private readonly IProcResourceRepository _resourceRepository;
-        //private readonly AbstractValidator<ProcResourceTypeDto> _validationRules;
+        private readonly AbstractValidator<ProcResourceTypeAddDto> _validationCreateRules;
+        private readonly AbstractValidator<ProcResourceTypeUpdateDto> _validationModifyRules;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         public ProcResourceTypeService(ICurrentUser currentUser, ICurrentSite currentSite,
             IProcResourceTypeRepository resourceTypeRepository,
-            IProcResourceRepository resourceRepository)
-        //AbstractValidator<ProcResourceTypeDto> validationRules)
+            IProcResourceRepository resourceRepository,
+            AbstractValidator<ProcResourceTypeAddDto> validationCreateRules,
+            AbstractValidator<ProcResourceTypeUpdateDto> validationModifyRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _resourceTypeRepository = resourceTypeRepository;
             _resourceRepository = resourceRepository;
-            // _validationRules = validationRules;
+            _validationCreateRules = validationCreateRules;
+            _validationModifyRules = validationModifyRules;
         }
 
         /// <summary>
@@ -128,19 +133,21 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
         /// <returns></returns>
         public async Task AddProcResourceTypeAsync(ProcResourceTypeAddDto param)
         {
-            //验证DTO
-            //var dto = new ProcResourceTypeDto();
-            //await _validationRules.ValidateAndThrowAsync(dto);
             if (param == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
+            param.ResType = param.ResType.ToTrimSpace().ToUpperInvariant();
+            param.ResTypeName = param.ResTypeName.Trim();
+            param.Remark = param.Remark??"".Trim();
+            //验证DTO
+            await _validationCreateRules.ValidateAndThrowAsync(param);
 
             var userName = _currentUser.UserName;
             var siteId = _currentSite.SiteId ?? 0;
             //DTO转换实体
             var id = IdGenProvider.Instance.CreateId();
-            var resType = param.ResType.ToUpperInvariant();
+            var resType = param.ResType;
             var entity = new ProcResourceTypeAddCommand
             {
                 Id = id,
@@ -188,13 +195,14 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
         /// <returns></returns>
         public async Task UpdateProcResrouceTypeAsync(ProcResourceTypeUpdateDto param)
         {
-            //验证DTO
-            //var dto = new ProcResourceTypeDto();
-            //await _validationRules.ValidateAndThrowAsync(dto);
             if (param == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
+            param.ResTypeName = param.ResTypeName.Trim();
+            //验证DTO
+            await _validationModifyRules.ValidateAndThrowAsync(param);
+
             var entity = await _resourceTypeRepository.GetByIdAsync(param?.Id ?? 0);
             if (entity == null)
             {

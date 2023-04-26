@@ -4,6 +4,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -11,9 +12,11 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
+using Hymson.Snowflake;
 using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOutStation
@@ -83,7 +86,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// </summary>
         private readonly IProcReplaceMaterialRepository _procReplaceMaterialRepository;
 
+        /// <summary>
+        /// 仓储接口（物料库存）
+        /// </summary>
+        private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
 
+        /// <summary>
+        /// 仓储接口（物料台账）
+        /// </summary>
+        private readonly IWhMaterialStandingbookRepository _whMaterialStandingbookRepository;
 
 
         /// <summary>
@@ -101,6 +112,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// <param name="procBomDetailReplaceMaterialRepository"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="procReplaceMaterialRepository"></param>
+        /// <param name="whMaterialInventoryRepository"></param>
+        /// <param name="whMaterialStandingbookRepository"></param>
         public ManuOutStationService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonService manuCommonService,
             IManuSfcStepRepository manuSfcStepRepository,
@@ -111,7 +124,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             IProcBomDetailRepository procBomDetailRepository,
             IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository,
             IProcMaterialRepository procMaterialRepository,
-            IProcReplaceMaterialRepository procReplaceMaterialRepository)
+            IProcReplaceMaterialRepository procReplaceMaterialRepository,
+            IWhMaterialInventoryRepository whMaterialInventoryRepository,
+            IWhMaterialStandingbookRepository whMaterialStandingbookRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -125,6 +140,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             _procBomDetailReplaceMaterialRepository = procBomDetailReplaceMaterialRepository;
             _procMaterialRepository = procMaterialRepository;
             _procReplaceMaterialRepository = procReplaceMaterialRepository;
+            _whMaterialInventoryRepository = whMaterialInventoryRepository;
+            _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
         }
 
 
@@ -153,6 +170,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             // 初始化步骤
             var sfcStep = new ManuSfcStepEntity
             {
+                Id = IdGenProvider.Instance.CreateId(),
                 SiteId = _currentSite.SiteId ?? 0,
                 SFC = sfcProduceEntity.SFC,
                 ProductId = sfcProduceEntity.ProductId,
@@ -213,12 +231,18 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 sfcStep.CurrentStatus = SfcProduceStatusEnum.Complete;  // TODO 这里的状态？？
                 rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
 
-                // TODO manu_sfc_info 修改为 完成或者入库
+                // manu_sfc_info 修改为完成 且入库
                 // 条码信息
                 var sfcInfo = await _manuSfcRepository.GetBySFCAsync(sfcProduceEntity.SFC);
 
+                // 更新状态
                 sfcInfo.Status = SfcStatusEnum.Complete;
+                sfcInfo.UpdatedBy = sfcProduceEntity.UpdatedBy;
+                sfcInfo.UpdatedOn = sfcProduceEntity.UpdatedOn;
                 rows += await _manuSfcRepository.UpdateAsync(sfcInfo);
+
+                // 入库
+                rows += await SaveToWarehouse(sfcInfo);
             }
             // 未完工
             else
@@ -233,6 +257,20 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
             }
 
+            return rows;
+        }
+
+        /// <summary>
+        /// 出站（批量）
+        /// </summary>
+        /// <param name="bos"></param>
+        /// <returns></returns>
+        public async Task<int> OutStationAsync(IEnumerable<ManufactureBo> bos)
+        {
+            var rows = 0;
+
+            // TODO
+            await Task.CompletedTask;
             return rows;
         }
 
@@ -261,6 +299,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             // 初始化步骤
             var sfcStep = new ManuSfcStepEntity
             {
+                Id = IdGenProvider.Instance.CreateId(),
                 SiteId = _currentSite.SiteId ?? 0,
                 SFC = sfcProduceEntity.SFC,
                 ProductId = sfcProduceEntity.ProductId,
@@ -316,6 +355,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 // 插入 manu_sfc_step 状态为 完成
                 sfcStep.Operatetype = ManuSfcStepTypeEnum.OutStock;    // TODO 这里的状态？？
                 sfcStep.CurrentStatus = SfcProduceStatusEnum.Complete;  // TODO 这里的状态？？
+
                 rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
 
                 // TODO manu_sfc_info 修改为 完成或者入库
@@ -465,6 +505,58 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
 
 
             return 0;
+        }
+
+        /// <summary>
+        /// 入库
+        /// </summary>
+        /// <param name="manuSfcEntity"></param>
+        /// <returns></returns>
+        private async Task<int> SaveToWarehouse(ManuSfcEntity manuSfcEntity)
+        {
+            var rows = 0;
+
+            /*
+            // TODO 新增 wh_material_inventory
+            rows += await _whMaterialInventoryRepository.InsertAsync(new WhMaterialInventoryEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SupplierId = 0,//自制品 没有
+                MaterialId = procMaterial.Id,
+                MaterialBarCode = manuSfcEntity.SFC,
+                Batch = "",//自制品 没有
+                QuantityResidue = procMaterial.Batch,
+                Status = WhMaterialInventoryStatusEnum.ToBeUsed,
+                Source = WhMaterialInventorySourceEnum.ManuComplete,
+                SiteId = _currentSite.SiteId ?? 0,
+                CreatedBy = _currentUser.UserName,
+                CreatedOn = HymsonClock.Now(),
+                UpdatedBy = manuSfcEntity.UpdatedBy,
+                UpdatedOn = manuSfcEntity.UpdatedOn
+            });
+
+            // TODO 新增 wh_material_standingbook
+            rows += await _whMaterialStandingbookRepository.InsertAsync(new WhMaterialStandingbookEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                MaterialCode = procMaterial.MaterialCode,
+                MaterialName = procMaterial.MaterialName,
+                MaterialVersion = procMaterial.Version,
+                MaterialBarCode = manuSfcEntity.SFC,
+                Batch = "",//自制品 没有
+                Quantity = procMaterial.Batch,
+                Unit = procMaterial.Unit ?? "",
+                Type = WhMaterialInventoryTypeEnum.ManuComplete, //(int)WhMaterialInventorySourceEnum.MaterialReceiving;
+                Source = WhMaterialInventorySourceEnum.ManuComplete,
+                SiteId = _currentSite.SiteId ?? 0,
+                CreatedBy = _currentUser.UserName,
+                CreatedOn = HymsonClock.Now(),
+                UpdatedBy = manuSfcEntity.UpdatedBy,
+                UpdatedOn = manuSfcEntity.UpdatedOn
+            });
+            */
+
+            return rows;
         }
 
     }

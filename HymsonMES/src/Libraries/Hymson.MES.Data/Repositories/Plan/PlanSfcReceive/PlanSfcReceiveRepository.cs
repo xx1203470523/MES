@@ -38,10 +38,10 @@ namespace Hymson.MES.Data.Repositories.Plan
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Select(" msi.Id,pwo.OrderCode,pwo.Type,pm.MaterialCode,pm.MaterialName,pwo.Qty,pwoR.OrderCode AS relevanceOrderCode,msi.IsUsed,msi.CreatedBy,msi.CreatedOn");
+            sqlBuilder.Select(" ms.Id,ms.SFC,pwo.OrderCode,pwo.Type,pm.MaterialCode,pm.MaterialName,pwo.Qty,'' AS relevanceOrderCode,msi.IsUsed,ms.CreatedBy,ms.CreatedOn");
+            sqlBuilder.InnerJoin(" manu_sfc_info msi ON ms.Id=msi.SfcId");
             sqlBuilder.InnerJoin(" plan_work_order pwo ON pwo.Id=msi.WorkOrderId");
             sqlBuilder.InnerJoin(" proc_material pm ON pm.Id=msi.ProductId");
-            sqlBuilder.LeftJoin(" plan_work_order pwoR ON pwoR.Id=msi.RelevanceWorkOrderId");
 
             sqlBuilder.Where(" msi.IsDeleted=0");
 
@@ -100,8 +100,8 @@ namespace Hymson.MES.Data.Repositories.Plan
 
     public partial class PlanSfcReceiveRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_info` msi /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_sfc_info` msi /**innerjoin**/ /**leftjoin**/ /**where**/";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc` ms /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_sfc` ms /**innerjoin**/ /**leftjoin**/ /**where**/";
         const string GetPlanSfcInfoEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `manu_sfc_info` /**where**/  ";

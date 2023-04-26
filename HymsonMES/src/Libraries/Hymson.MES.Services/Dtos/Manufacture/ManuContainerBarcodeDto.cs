@@ -215,7 +215,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
        /// <summary>
         /// 状态;1：打开 2：关闭
         /// </summary>
-        public bool Status { get; set; }
+        public int Status { get; set; }
 
        /// <summary>
         /// 创建人
@@ -269,6 +269,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     /// </summary>
     public class ManuContainerBarcodePagedQueryDto : PagerInfo
     {
+        /// <summary>
+        /// 工单ID
+        /// </summary>
+        public long? WorkOrderId { get; set; }
+
         /// <summary>
         /// 容器条码
         /// </summary>

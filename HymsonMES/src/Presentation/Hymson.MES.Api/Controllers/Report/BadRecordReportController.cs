@@ -18,13 +18,13 @@ namespace Hymson.MES.Api.Controllers.Report
     public class BadRecordReportController : ControllerBase
     {
         /// <summary>
-        /// 接口（工单信息表）
+        /// 接口（不良报告）
         /// </summary>
         private readonly IBadRecordReportService _badRecordReportService;
         private readonly ILogger<BadRecordReportController> _logger;
 
         /// <summary>
-        /// 构造函数（工单信息表）
+        /// 构造函数（不良报告）
         /// </summary>
         /// <param name="badRecordReportService"></param>
         public BadRecordReportController(IBadRecordReportService badRecordReportService, ILogger<BadRecordReportController> logger)
@@ -35,7 +35,7 @@ namespace Hymson.MES.Api.Controllers.Report
 
 
         /// <summary>
-        /// 分页查询列表（工单信息表）
+        /// 分页查询列表（不良报告）
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
@@ -46,5 +46,28 @@ namespace Hymson.MES.Api.Controllers.Report
             return await _badRecordReportService.GetPageListAsync(parm);
         }
 
+        /// <summary>
+        /// 查询前十列表（不良报告）
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("topTenList")]
+        public async Task<List<ManuProductBadRecordReportViewDto>> QueryTopTenBadRecordAsync([FromQuery] BadRecordReportDto parm)
+        {
+            return await _badRecordReportService.GetTopTenBadRecordAsync(parm);
+        }
+
+        /// <summary>
+        /// 分页查询列表（不良报告日志）
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("logPageList")]
+        public async Task<PagedInfo<ManuProductBadRecordLogReportViewDto>> GetLogPageListAsync([FromQuery] ManuProductBadRecordLogReportPagedQueryDto parm)
+        {
+            return await _badRecordReportService.GetLogPageListAsync(parm);
+        }
     }
 }

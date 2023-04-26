@@ -61,6 +61,7 @@ namespace Microsoft.Extensions.DependencyInjection
     /// </summary>
     public static class AppServiceCollectionExtensions
     {
+        
         /// <summary>
         /// 业务逻辑层依赖服务添加
         /// </summary>
@@ -214,7 +215,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region Job
             services.AddSingleton<IJobCommonService, JobCommonService>();
-            services.AddSingleton<IJobManufactureService, JobBadRecordService>();
+            services.AddSingleton<IJobManufactureService, JobManuBadRecordService>();
             services.AddSingleton<IJobManufactureService, JobManuCompleteService>();
             services.AddSingleton<IJobManufactureService, JobManuPackageService>();
             services.AddSingleton<IJobManufactureService, JobManuRepairEndService>();
@@ -228,8 +229,16 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IBadRecordReportService, BadRecordReportService>();
             #endregion
 
+            #region BadRecordReport
+            services.AddSingleton<IWorkshopJobControlReportService, WorkshopJobControlReportService>();
+            #endregion
+
             #region Packaging
             services.AddSingleton<IPackagingReportService, PackagingReportService>();
+            #endregion
+
+            #region OriginalSummary
+            services.AddSingleton<IOriginalSummaryReportService, OriginalSummaryReportService>();
             #endregion
             #endregion
 
@@ -303,6 +312,11 @@ namespace Microsoft.Extensions.DependencyInjection
             #region Resource
             services.AddSingleton<AbstractValidator<ProcResourceCreateDto>, ProcResourceCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcResourceModifyDto>, ProcResourcelModifyValidator>();
+            #endregion
+
+            #region ResourceType
+            services.AddSingleton<AbstractValidator<ProcResourceTypeAddDto>, ProcResourceTypeCreateValidator>();
+            services.AddSingleton<AbstractValidator<ProcResourceTypeUpdateDto>, ProcResourceTypeModifyValidator>();
             #endregion
 
             #region Procedure
@@ -435,5 +449,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return services;
         }
+       
     }
 }

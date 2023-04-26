@@ -315,7 +315,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 物料编码
         /// </summary>
-        public string MaterialCode { get; set; }
+        public long MaterialId { get; set; }
         /// <summary>
         /// 批次
         /// </summary>

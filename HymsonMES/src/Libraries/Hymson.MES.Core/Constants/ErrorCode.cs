@@ -44,9 +44,9 @@
 
         #region 资源 10300
         public const string MES10301 = "资源编码不能为空";
-        public const string MES10302 = "资源编码超长";
+        public const string MES10302 = "资源编码最大长度不超过50";
         public const string MES10303 = "资源名称不能为空";
-        public const string MES10304 = "资源名称超长";
+        public const string MES10304 = "资源名称最大长度不超过50";
         public const string MES10305 = "资源状态不能为空";
         public const string MES10306 = "资源配置打印机中，重复配置设备!";
         public const string MES10307 = "一个资源只能对用对应一个主设备";
@@ -64,7 +64,10 @@
         public const string MES10319 = $"不能删除启用状态的资源!";
         public const string MES10320 = "所属资源类型ID不能为空";
         public const string MES10321 = "工序名称超长";
-        public const string MES10322 = "资源名称最大长度为50";
+        public const string MES10351 = "资源类型编码不能为空";
+        public const string MES10352 = "资源类型编码最大长度不超过50";
+        public const string MES10353 = "资源类型名称不能为空";
+        public const string MES10354 = "资源类型名称最大长度不超过50";
         #endregion
 
         #region 标签模板
@@ -77,9 +80,9 @@
 
         #region 工序 10400
         public const string MES10401 = "工序编码不能为空";
-        public const string MES10402 = "工序编码超长";
+        public const string MES10402 = "工序编码最大长度不超过50";
         public const string MES10403 = "工序名称不能为空";
-        public const string MES10404 = "工序名称超长";
+        public const string MES10404 = "工序名称最大长度不超过50";
         public const string MES10405 = "编码:{Code}已存在！";
         public const string MES10406 = "工序不存在！";
 
@@ -94,11 +97,13 @@
         public const string MES10438 = "此工艺路线不存在！";
         public const string MES10439 = $"此工艺路线在系统中不存在!";
         public const string MES10440 = $"获取下一工序失败!";
-        public const string MES10441 = $"不存在空值类型工序!";
+        public const string MES10441 = $"下一工序不存在空值类型工序!";
         public const string MES10442 = $"获取上一工序失败!";
         public const string MES10443 = $"启用状态或保留状态不可删除!";
         public const string MES10444 = $"工艺编码最大长度为60";
         public const string MES10445 = $"工艺名称最大长度为60";
+        public const string MES10446 = $"抽检比例设置错误";
+        public const string MES10447 = $"下一工序不存在非空值类型工序";
         #endregion
 
         #region 参数 10500
@@ -179,12 +184,12 @@
 
         #region 不合格组 11200
         public const string MES11200 = "不合格代码组错误";
-        public const string MES11201 = "不合格代码组编码不能为空";
-        public const string MES11202 = "不合格代码组编码超过最大长度，不合格代码编码最大长度为50";
-        public const string MES11203 = "不合格代码组名称不能为空";
-        public const string MES11204 = "不合格代码组名称超过最大长度，不合格代码名称最大长度为60";
-        public const string MES11205 = "不合格代码备注超过最大长度，不合格代码备注最大长度为255";
-        public const string MES11206 = "不合格代码{code}已经存在";
+        public const string MES11201 = "不合格组编码不能为空";
+        public const string MES11202 = "不合格组编码超过最大长度，不合格代码编码最大长度为50";
+        public const string MES11203 = "不合格组名称不能为空";
+        public const string MES11204 = "不合格组名称超过最大长度，不合格代码名称最大长度为60";
+        public const string MES11205 = "说明超过最大长度，不合格代码备注最大长度为255";
+        public const string MES11206 = "不合格组编码{code}已经存在";
         #endregion
 
         #region 作业12000
@@ -218,9 +223,10 @@
 
         #region 编码规则 12400
         public const string MES12400 = "代码规则维护错误";
-        public const string MES12401 = "代码规则中物料Id[{productId}]已经存在";
+        public const string MES12401 = "代码规则中同样物料Id[{productId}],编码类型已经存在";
 
         public const string MES12402 = "代码规则新增失败";
+        public const string MES12403 = "代码规则中同样物料Id[{productId}],编码类型,包装类型已经存在";
 
         public const string MES12410 = "物料 不能为空！";
         public const string MES12411 = "编码类型 不能为空！";
@@ -456,6 +462,7 @@
         public const string MES16312 = "请求参数不合法，不允许操作。";
         public const string MES16313 = "SFC状态不是{Status}状态，不允许操作。";
         public const string MES16314 = "SFC条码{SFC}已锁定，不允许操作。";
+        public const string MES16315 = "库存{barCode}和待加载物料编码/版本不符！";
         #endregion
 
         #region 生产
@@ -469,6 +476,7 @@
         public const string MES17205 = "面板编码已经存在";
         public const string MES17206 = "面板编码最大长度为255";
         public const string MES17207 = "面板名称最大长度为255";
+        public const string MES17208 = "面板有更新，请刷新页面！";
         #endregion
 
 
@@ -494,6 +502,7 @@
         public const string MES17319 = "作业:{key}执行失败";
         public const string MES17320 = "作业返回空，请检查作业是否正确配置";
         public const string MES17321 = "不识别的类型：{key}";
+        public const string MES17322 = "请先开始维修";
 
 
         #endregion
@@ -535,7 +544,7 @@
         public const string MES16602 = "数据不存在!";
         public const string MES16603 = "组件条码{barCode}不存在!";
         public const string MES16604 = "组件条码{barCode}库存不足,请检查!";
-        public const string MES16605 = "物料掩码规则不存在!";
+        public const string MES16605 = "组件条码{barCode}不符合掩码规则!";
         public const string MES16606 = "组件条码{barCode}同掩码规则不符,请检查!";
         public const string MES16607 = "选择的替换组件不存在!";
         public const string MES16608 = "组件条码{barCode}与选择的产品不一致!";
@@ -545,6 +554,8 @@
         public const string MES16612 = "当前工序与条码生产信息中的不一致！";
         public const string MES16613 = "请选择活动状态下的组件移除！";
         public const string MES16614 = "请选择活动状态下的组件替换！";
+        public const string MES16615 = "组件条码已装配所有组件,无需添加!";
+        public const string MES16616 = "组件条码{barCode}未设置掩码规则!";
         #endregion
 
         #region 容器包装 MES 16700
@@ -554,6 +565,13 @@
         public const string MES16704 = "容器包装，配置面板编号为空";
         public const string MES16705 = "容器包装，配置面板不存在";
         public const string MES16706 = "容器包装，配置面板不允许混工单,当前容器工单{first},当前条码工单{second}";
+        public const string MES16707 = "容器包装，包装码不能为空";
+        public const string MES16710 = "不识别的类型：{key}";
+        public const string MES16708 = "产品条码不能为空";
+        public const string MES16709 = "作业返回空，请检查作业是否正确配置";
+        public const string MES16711 = "容器包装，配置面板不允许排队产品";
+        public const string MES16712 = "容器包装，配置面板不允许完成产品";
+        public const string MES16713 = "容器包装，配置面板不允许排队产品";
         #endregion
 
         #region 绑定工单激活  MES16800
@@ -580,22 +598,41 @@
         public const string MES16912 = "条码为空！";
         #endregion
 
-        #region 在制品步骤控制
+        #region 在制品步骤控制 MES18000
         public const string MES18000 = "在制品步骤控制错误";
         public const string MES18001 = "条码信息不存在";
         public const string MES18002 = "请扫描相同工单的条码";
         public const string MES18003 = "工单信息不存在";
         public const string MES18004 = "需扫描相同工艺路线条码";
         public const string MES18005 = "工艺路线不存在节点";
-        public const string MES18006 = "条码:{SFC}已报废,不允许操作";
+        public const string MES18006 = "条码:{SFC}不允许操作";
         public const string MES18007 = "条码没有对应的生产工序";
         public const string MES18008 = "条码生产状态异常:{Status}";
         public const string MES18009 = "工单状态不允许";
-        public const string MES180010 = "条码已锁定不允许操作";
+        public const string MES18010 = "条码已锁定不允许操作";
+        public const string MES18011 = "获取工序信息失败";
 
+
+        public const string MES18012 = "工序不能为空";
+        public const string MES18013 = "类型不能为空";
+        public const string MES18014 = "条码不能为空";
+        public const string MES18015 = "条码:{SFC}已装箱，请先解包";
+        public const string MES18016 = "在制品步骤控制入库失败";
+        public const string MES18017 = "工艺路线不存在尾工序";
+        public const string MES18018 = "工艺路线存在多个尾工序";
 
 
         #endregion
+
+        #region 车间作业控制 报告 MES18100
+        public const string MES18100 = "车间作业控制报告错误";
+        public const string MES18101 = "没有获取到{sfc}对应步骤的信息";
+        public const string MES18102 = "没有获取到{sfc}对应步骤中的工单信息";
+        public const string MES18103 = "没有获取到{sfc}对应步骤中的产品信息";
+        public const string MES18104 = "没有获取到{sfc}对应步骤中的工艺路线信息";
+        public const string MES18105 = "没有获取到{sfc}对应步骤中的BOM信息";
+        #endregion
+
         #endregion
 
         #region 系统执行出错 业务逻辑出错

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.Core.Enums.Report
+namespace Hymson.MES.Core.Enums
 {
     /// <summary>
     /// 包装报告查询类型

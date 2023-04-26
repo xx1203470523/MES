@@ -3,6 +3,7 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
@@ -11,6 +12,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Report;
+using System.ComponentModel;
 
 namespace Hymson.MES.Services.Services.Report
 {
@@ -58,66 +60,139 @@ namespace Hymson.MES.Services.Services.Report
             _manuContainerBarcodeRepository = manuContainerBarcodeRepository;
             _procMaterialRepository = procMaterialRepository;
             _manuContainerPackRepository = manuContainerPackRepository;
-            _planWorkOrderRepository=planWorkOrderRepository;
+            _planWorkOrderRepository = planWorkOrderRepository;
         }
 
         /// <summary>
-        /// 根据容器编码查询容器当前信息
+        /// 根据容器编码或者装载条码查询容器当前信息
         /// </summary>
-        /// <param name="barCode"></param>
+        /// <param name="queryDto"></param>
         /// <returns></returns>
-        public async Task<ManuContainerBarcodeViewDto> QueryManuContainerByCodeAsync(string barCode)
+        public async Task<ManuContainerBarcodeViewDto> QueryManuContainerByCodeAsync(PackagingQueryDto queryDto)
         {
             var barcodeViewDto = new ManuContainerBarcodeViewDto();
-            var query = new ManuContainerBarcodeQuery { BarCode = barCode, SiteId = _currentSite.SiteId ?? 0 };
-            var barcodeEntity = await _manuContainerBarcodeRepository.GetByCodeAsync(query);
-            if (barcodeEntity == null)
+
+            var barcodeEntity = new ManuContainerBarcodeEntity();
+            if (queryDto.Type == PackagingTypeEnum.Container)
             {
-                return barcodeViewDto;
+                var query = new ManuContainerBarcodeQuery { BarCode = queryDto.Code, SiteId = _currentSite.SiteId ?? 0 };
+                barcodeEntity = await _manuContainerBarcodeRepository.GetByCodeAsync(query);
+                if (barcodeEntity == null)
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                //根据装载的条码获取到容器的id
+                var query = new ManuContainerPackQuery
+                {
+                    LadeBarCode= queryDto.Code,
+                    SiteId=_currentSite.SiteId ?? 0,
+                };
+                var containerPackEntity = await _manuContainerPackRepository.GetByLadeBarCodeAsync(query);
+                if (containerPackEntity == null)
+                {
+                    return null;
+                }
+
+                barcodeEntity = await _manuContainerBarcodeRepository.GetByIdAsync(containerPackEntity.ContainerBarCodeId);
+                if (barcodeEntity == null)
+                {
+                    return null;
+                }
             }
 
             return await GetBarCodeViewAsync(barcodeEntity);
         }
 
         /// <summary>
-        /// 查询装载条码的包装信息
+        /// 查询工单包装信息
         /// </summary>
-        /// <param name="ladeBarCode"></param>
+        /// <param name="queryDto"></param>
         /// <returns></returns>
-        public async Task<ManuContainerBarcodeViewDto> QueryContainerByLadeBarCodeeAsync(string ladeBarCode)
-        {
-            var barcodeViewDto = new ManuContainerBarcodeViewDto();
-
-            //根据装载的条码获取到容器的id
-            var containerPackEntity = await _manuContainerPackRepository.GetByLadeBarCodeAsync(ladeBarCode);
-            if (containerPackEntity == null)
-            {
-                return barcodeViewDto;
-            }
-
-            var barcodeEntity = await _manuContainerBarcodeRepository.GetByIdAsync(containerPackEntity.Id);
-            if (barcodeEntity == null)
-            {
-                return barcodeViewDto;
-            }
-
-            return await GetBarCodeViewAsync(barcodeEntity);
-        }
-
-        /// <summary>
-        /// 查询工单信息
-        /// </summary>
-        /// <param name="workOrderCode"></param>
-        /// <returns></returns>
-        public async Task<PlanWorkOrderListDetailViewDto> GetByWorkOrderCodeAsync(string workOrderCode)
+        public async Task<PlanWorkPackDto> GetByWorkOrderCodeAsync(PackagingQueryDto queryDto)
         {
             var query = new PlanWorkOrderQuery
             {
-                OrderCode = workOrderCode,
+                OrderCode = queryDto.Code,
                 SiteId = _currentSite.SiteId ?? 0
             };
-            await _planWorkOrderRepository.GetByCodeAsync(query);
-            return new PlanWorkOrderListDetailViewDto();
+
+            var planWorkOrder = await _planWorkOrderRepository.GetByCodeAsync(query);
+            if (planWorkOrder == null)
+            {
+                return new PlanWorkPackDto();
+            }
+
+            var procMaterial = await _procMaterialRepository.GetByIdAsync(planWorkOrder.ProductId);
+            return new PlanWorkPackDto
+            {
+                WorkOrderId = planWorkOrder.Id,
+                OrderCode = planWorkOrder.OrderCode,
+                ProductCode = procMaterial.MaterialCode,
+                ProductName = procMaterial.MaterialName,
+                MaterialVersion = procMaterial.Version ?? "",
+                Level = LevelEnum.One
+            };
+        }
+
+        /// <summary>
+        /// 根据查询条件获取分页数据
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<PlanWorkPackingDto>> GetPagedListAsync(ManuContainerBarcodePagedQueryDto queryDto)
+        {
+            var manuContainerBarcodePagedQuery = queryDto.ToQuery<ManuContainerBarcodePagedQuery>();
+            manuContainerBarcodePagedQuery.SiteId = _currentSite.SiteId;
+            var pagedInfo = await _manuContainerBarcodeRepository.GetPagedListAsync(manuContainerBarcodePagedQuery);
+
+            var list = pagedInfo.Data;
+            var containerIds = list.Select(x => x.Id).ToArray();
+            var containerPackEntities = await _manuContainerPackRepository.GetByContainerBarCodeIdsAsync(containerIds);
+
+            var workPackingDtos = new List<PlanWorkPackingDto>();
+            foreach (var item in pagedInfo.Data)
+            {
+                workPackingDtos.Add(new PlanWorkPackingDto
+                {
+                    BarCode = item.BarCode,
+                    ContainerBarCodeId = item.ContainerId,
+                    Status = item.Status,
+                    CreatedBy = item.CreatedBy,
+                    CreatedOn = item.CreatedOn,
+                    PackQuantity = containerPackEntities.Where(x => x.ContainerBarCodeId == item.Id).Count()
+                });
+            }
+            return new PagedInfo<PlanWorkPackingDto>(workPackingDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 根据查询条件获取分页数据
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<PlanWorkPackingDto>> GetPagedRecordListAsync(ManuContainerBarcodePagedQueryDto queryDto)
+        {
+            var manuContainerBarcodePagedQuery = queryDto.ToQuery<ManuContainerBarcodePagedQuery>();
+            manuContainerBarcodePagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            var pagedInfo = await _manuContainerBarcodeRepository.GetPagedListAsync(manuContainerBarcodePagedQuery);
+
+            //实体到DTO转换 装载数据
+            List<PlanWorkPackingDto> workPackingDtos = new List<PlanWorkPackingDto>();
+            foreach (var item in pagedInfo.Data)
+            {
+                workPackingDtos.Add(new PlanWorkPackingDto
+                {
+                    BarCode = item.BarCode,
+                    ContainerBarCodeId = item.Id,
+                    Status = item.Status,
+                    CreatedBy = item.CreatedBy,
+                    CreatedOn = item.CreatedOn
+                });
+            }
+            return new PagedInfo<PlanWorkPackingDto>(workPackingDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
         private async Task<ManuContainerBarcodeViewDto> GetBarCodeViewAsync(ManuContainerBarcodeEntity barcodeEntity)
@@ -133,9 +208,7 @@ namespace Hymson.MES.Services.Services.Report
 
             var inteContainer = await _inteContainerRepository.GetByIdAsync(barcodeEntity.ContainerId);
             barcodeViewDto.Level = inteContainer?.Level;
-
-            var lists = await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(barcodeEntity.Id);
-            barcodeViewDto.CurrentQuantity = lists.ToList().Count;
+            barcodeViewDto.PackQuantity = await _manuContainerPackRepository.GetCountByrBarCodeIdAsync(barcodeEntity.Id);
 
             return barcodeViewDto;
         }

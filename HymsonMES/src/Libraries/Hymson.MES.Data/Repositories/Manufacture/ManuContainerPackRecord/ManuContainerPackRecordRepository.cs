@@ -13,6 +13,10 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using Org.BouncyCastle.Tsp;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Common;
+using System.Reflection;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -83,12 +87,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
+            sqlBuilder.Where("SiteId=@SiteId");
 
             if (manuContainerPackRecordPagedQuery.ContainerBarCodeId.HasValue)
             {
                 sqlBuilder.Where("ContainerBarCodeId=@ContainerBarCodeId");
             }
-            if (string.IsNullOrWhiteSpace(manuContainerPackRecordPagedQuery.LadeBarCode))
+            if (!string.IsNullOrWhiteSpace(manuContainerPackRecordPagedQuery.LadeBarCode))
             {
                 sqlBuilder.Where("LadeBarCode=@LadeBarCode");
             }
@@ -176,20 +181,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                             /**select**/
                                            FROM `manu_container_pack_record` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `manu_container_pack_record`(  `Id`, `SiteId`, `ContainerBarCodeId`, `LadeBarCode`, `OperateType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ContainerBarCodeId, @LadeBarCode, @OperateType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `manu_container_pack_record`(  `Id`, `SiteId`, `ContainerBarCodeId`, `LadeBarCode`, `OperateType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ContainerBarCodeId, @LadeBarCode, @OperateType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `manu_container_pack_record`(  `Id`, `SiteId`,`ResourceId`,`ProcedureId`, `ContainerBarCodeId`, `LadeBarCode`, `OperateType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId,@ResourceId,@ProcedureId, @ContainerBarCodeId, @LadeBarCode, @OperateType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsSql = "INSERT INTO `manu_container_pack_record`(  `Id`, `SiteId`,`ResourceId`,`ProcedureId`, `ContainerBarCodeId`, `LadeBarCode`, `OperateType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId,@ResourceId,@ProcedureId, @ContainerBarCodeId, @LadeBarCode, @OperateType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
-        const string UpdateSql = "UPDATE `manu_container_pack_record` SET   SiteId = @SiteId, ContainerBarCodeId = @ContainerBarCodeId, LadeBarCode = @LadeBarCode, OperateType = @OperateType, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `manu_container_pack_record` SET   SiteId = @SiteId, ContainerBarCodeId = @ContainerBarCodeId, LadeBarCode = @LadeBarCode, OperateType = @OperateType, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `manu_container_pack_record` SET   SiteId = @SiteId,ResourceId=@ResourceId,ProcedureId=@ProcedureId, ContainerBarCodeId = @ContainerBarCodeId, LadeBarCode = @LadeBarCode, OperateType = @OperateType, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `manu_container_pack_record` SET   SiteId = @SiteId,ResourceId=@ResourceId,ProcedureId=@ProcedureId, ContainerBarCodeId = @ContainerBarCodeId, LadeBarCode = @LadeBarCode, OperateType = @OperateType, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `manu_container_pack_record` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `manu_container_pack_record` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteId`, `ContainerBarCodeId`, `LadeBarCode`, `OperateType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                               `Id`, `SiteId`,`ResourceId`,`ProcedureId`, `ContainerBarCodeId`, `LadeBarCode`, `OperateType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_container_pack_record`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteId`, `ContainerBarCodeId`, `LadeBarCode`, `OperateType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                                          `Id`, `SiteId`,`ResourceId`,`ProcedureId`, `ContainerBarCodeId`, `LadeBarCode`, `OperateType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_container_pack_record`  WHERE Id IN @Ids ";
         #endregion
     }

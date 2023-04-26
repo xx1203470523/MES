@@ -54,10 +54,18 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 创建
         /// </summary>
-        /// <param name="procMaterialGroupDto"></param>
+        /// <param name="procMaterialGroupCreateDto"></param>
         /// <returns></returns>
         public async Task CreateProcMaterialGroupAsync(ProcMaterialGroupCreateDto procMaterialGroupCreateDto)
         {
+            if (procMaterialGroupCreateDto == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            }
+            procMaterialGroupCreateDto.GroupCode = procMaterialGroupCreateDto.GroupCode.ToTrimSpace().ToUpperInvariant();
+            procMaterialGroupCreateDto.GroupName = procMaterialGroupCreateDto.GroupName.ToTrimSpace();
+            procMaterialGroupCreateDto.Remark = procMaterialGroupCreateDto?.Remark ?? "".Trim();
+
             //DTO转换实体
             var procMaterialGroupEntity = procMaterialGroupCreateDto.ToEntity<ProcMaterialGroupEntity>();
             procMaterialGroupEntity.Id = IdGenProvider.Instance.CreateId();
@@ -225,7 +233,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="procMaterialGroupDto"></param>
+        /// <param name="procMaterialGroupModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyProcMaterialGroupAsync(ProcMaterialGroupModifyDto procMaterialGroupModifyDto)
         {
@@ -233,6 +241,8 @@ namespace Hymson.MES.Services.Services.Process
             {
                 throw new ValidationException(nameof(ErrorCode.MES10213));
             }
+            procMaterialGroupModifyDto.GroupName = procMaterialGroupModifyDto.GroupName.ToTrimSpace();
+            procMaterialGroupModifyDto.Remark = procMaterialGroupModifyDto?.Remark ?? "".Trim();
 
             //DTO转换实体
             var procMaterialGroupEntity = procMaterialGroupModifyDto.ToEntity<ProcMaterialGroupEntity>();

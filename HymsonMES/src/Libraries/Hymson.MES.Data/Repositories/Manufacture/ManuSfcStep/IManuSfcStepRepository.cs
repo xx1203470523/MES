@@ -97,5 +97,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="maunSfcStepBusinessEntities"></param>
         /// <returns></returns>
         Task<int> InsertSfcStepBusinessRangeAsync(IEnumerable<MaunSfcStepBusinessEntity> maunSfcStepBusinessEntities);
+
+        /// <summary>
+        /// 获取SFC的进出站步骤
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcStepEntity>> GetSFCInOutStepAsync(string sfc);
     }
 }

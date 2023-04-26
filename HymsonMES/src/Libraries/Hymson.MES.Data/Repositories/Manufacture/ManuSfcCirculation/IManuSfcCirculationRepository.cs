@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 条码流转表仓储类 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-03-27 03:50:00
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;

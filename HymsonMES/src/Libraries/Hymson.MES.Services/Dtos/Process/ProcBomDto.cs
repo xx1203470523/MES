@@ -146,6 +146,8 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public SysDataStatusEnum Status { get; set; }
 
+        public string Version { get; set; }
+
        /// <summary>
         /// 是否当前版本
         /// </summary>

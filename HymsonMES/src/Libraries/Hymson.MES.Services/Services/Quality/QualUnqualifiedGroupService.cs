@@ -102,7 +102,8 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 throw new ValidationException(nameof(ErrorCode.MES10100));
             }
-            param.UnqualifiedGroup = param.UnqualifiedGroup.ToUpperInvariant();
+            param.UnqualifiedGroup = param.UnqualifiedGroup.ToTrimSpace().ToUpperInvariant();
+            param.UnqualifiedGroupName = param.UnqualifiedGroupName.Trim();
 
             await _validationCreateRules.ValidateAndThrowAsync(param);
 
@@ -207,6 +208,7 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 throw new ValidationException(nameof(ErrorCode.MES10100));
             }
+            param.UnqualifiedGroupName = param.UnqualifiedGroupName.Trim();
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(param);
             var userId = _currentUser.UserName;

@@ -168,14 +168,14 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 查询List
         /// </summary>
-        /// <param name="procBomDetailQuery"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcBomDetailEntity>> GetProcBomDetailEntitiesAsync(ProcBomDetailQuery procBomDetailQuery)
+        public async Task<IEnumerable<ProcBomDetailEntity>> GetProcBomDetailEntitiesAsync(ProcBomDetailQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcBomDetailEntitiesSqlTemplate);
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var procBomDetailEntities = await conn.QueryAsync<ProcBomDetailEntity>(template.RawSql, procBomDetailQuery);
+            var procBomDetailEntities = await conn.QueryAsync<ProcBomDetailEntity>(template.RawSql, query);
             return procBomDetailEntities;
         }
 

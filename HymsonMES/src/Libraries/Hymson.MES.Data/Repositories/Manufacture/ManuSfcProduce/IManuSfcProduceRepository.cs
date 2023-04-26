@@ -128,7 +128,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuSfcInfoEntity"></param>
         /// <returns></returns>
-        Task<int> UpdateUpdateProcedureIdSqlAsync(UpdateProcedureCommand command);
+        Task<int> UpdateProcedureIdAsync(UpdateProcedureCommand command);
+
+        /// <summary>
+        /// 根据SFC批量更新工序与状态
+        /// </summary>
+        /// <param name="manuSfcInfoEntity"></param>
+        /// <returns></returns>
+        Task<int> UpdateProcedureAndStatusRangeAsync(UpdateProcedureAndStatusCommand command);
 
 
         /// <summary>

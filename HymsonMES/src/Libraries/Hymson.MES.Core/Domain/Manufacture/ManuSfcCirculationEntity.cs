@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 条码流转表    实体类 | 代码由框架生成  如果数据库字段发生变化,则手动调整
- *builder:  zhaoqing
- *build datetime: 2023-03-27 03:50:00
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;

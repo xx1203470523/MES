@@ -20,7 +20,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
     /// @author pengxin
     /// @date 2023-03-06 03:27:59
     /// </summary>
-    
+
     [ApiController]
     [Route("api/v1/[controller]")]
     public class WhMaterialInventoryController : ControllerBase
@@ -128,12 +128,12 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <summary>
         /// 查询物料与供应商
         /// </summary>
-        /// <param name="materialCode"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("{materialCode}")]
-        public async Task<ProcMaterialInfoViewDto> GetMaterialAndSupplierByMateialCodeIdAsync(string materialCode)
+        [HttpGet("materialAndSupplier/{id}")]
+        public async Task<ProcMaterialInfoViewDto> GetMaterialAndSupplierByMateialCodeIdAsync(long id)
         {
-            return await _whMaterialInventoryService.GetMaterialAndSupplierByMateialCodeIdAsync(materialCode);
+            return await _whMaterialInventoryService.GetMaterialAndSupplierByMateialCodeIdAsync(id);
         }
     }
 }

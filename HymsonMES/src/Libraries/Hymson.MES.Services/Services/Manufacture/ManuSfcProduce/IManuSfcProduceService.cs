@@ -6,6 +6,11 @@
  *build datetime: 2023-03-18 05:37:27
  */
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Core.Constants.Process;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
+using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
 using System;
 using System.Collections.Generic;
@@ -89,5 +94,29 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
         /// <param name="sfc"></param>
         /// <returns></returns>
         Task<ManuSfcProduceDto> QueryManuSfcProduceBySFCAsync(string sfc);
+
+        #region 在制品步骤控制
+
+        /// <summary>
+        /// 分页查询（查询所有条码信息）
+        /// </summary>
+        /// <param name="manuSfcProducePagedQueryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ManuSfcProduceViewDto>> GetManuSfcPagedInfoAsync(ManuSfcProducePagedQueryDto manuSfcProducePagedQueryDto);
+
+        /// <summary>
+        /// 根据SFC查询在制品步骤列表
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        Task<List<ManuSfcProduceStepViewDto>> QueryManuSfcProduceStepBySFCsAsync(List<ManuSfcProduceStepSFCDto> sfcs);
+
+        /// <summary>
+        /// 保存在制品步骤
+        /// </summary>
+        /// <param name="sfcProduceStepDto"></param>
+        /// <returns></returns>
+        Task SaveManuSfcProduceStepAsync(SaveManuSfcProduceStepDto sfcProduceStepDto);
+        #endregion
     }
 }

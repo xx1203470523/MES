@@ -24,9 +24,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         public DateTime UpdatedOn { get; set; }
 
+
         /// <summary>
-        /// 条码状态
+        /// 产品条码ID列表 
         /// </summary>
-        public SfcStatusEnum? Status { get; set; }
+        public long[] SfcIds { get; set; }
+        /// <summary>
+        /// 产品条码列表
+        /// </summary>
+        public YesOrNoEnum IsUsed { get; set; }
     }
 }
