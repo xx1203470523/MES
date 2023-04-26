@@ -80,6 +80,10 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             };
             string success = "true";
             var manuContainerBarcodeEntity = await _manuContainerBarcodeRepository.GetByIdAsync(bo.ContainerId);
+            if (manuContainerBarcodeEntity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16702));
+            }
             int status = 1;//1打开，2关闭
             //当前状态不等于修改状态
             if (manuContainerBarcodeEntity.Status != status)
