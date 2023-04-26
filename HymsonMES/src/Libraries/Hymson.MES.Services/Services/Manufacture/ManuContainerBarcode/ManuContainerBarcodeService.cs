@@ -140,8 +140,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuContainerBarcodeEntity.SiteId = _currentSite.SiteId ?? 0;
 
             //获取面板信息
-           
-
             var facePlateEntity = await _manuFacePlateRepository.GetByCodeAsync(createManuContainerBarcodeDto.FacePlateCode);
             if(facePlateEntity==null)
                 throw new CustomerValidationException(nameof(ErrorCode.MES16705));
