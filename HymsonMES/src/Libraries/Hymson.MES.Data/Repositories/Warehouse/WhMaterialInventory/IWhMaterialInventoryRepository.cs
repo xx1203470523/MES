@@ -68,6 +68,13 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         Task<int> UpdateIncreaseQuantityResidueAsync(UpdateQuantityCommand updateQuantityCommand);
 
         /// <summary>
+        /// 清空库存
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> UpdateWhMaterialInventoryEmptyByBarCodeAync(UpdateWhMaterialInventoryEmptyCommand command);
+       
+        /// <summary>
         /// 更新库存数量(减少库存)
         /// </summary>
         /// <param name="updateQuantityCommand"></param>

@@ -10,6 +10,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
     /// </summary>
     public interface IManuCommonService
     {
+
+        /// <summary>
+        /// 验证条码掩码规则
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <param name="materialId"></param>
+        /// <returns></returns>
+        Task<bool> CheckBarCodeByMaskCodeRule(string barCode, long materialId);
+
         /// <summary>
         /// 获取生产条码信息
         /// </summary>

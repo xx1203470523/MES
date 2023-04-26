@@ -109,7 +109,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             _procMaskCodeRuleRepository = procMaskCodeRuleRepository;
         }
 
-
         /// <summary>
         /// 验证条码掩码规则
         /// </summary>
@@ -176,7 +175,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
 
             switch (planWorkOrderEntity.Status)
             {
-                case PlanWorkOrderStatusEnum.SendDown:
+                case PlanWorkOrderStatusEnum.SendDown:  
                 case PlanWorkOrderStatusEnum.InProduction:
                 case PlanWorkOrderStatusEnum.Finish:
                     break;
