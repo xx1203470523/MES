@@ -344,6 +344,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                         /**leftjoin**/
 
                         /**where**/ 
+                        Order by si.CreatedOn desc
                         LIMIT @Offset,@Rows 
         ";
         const string GetPagedInfoWorkshopJobControlReportCountSqlTemplate = @"

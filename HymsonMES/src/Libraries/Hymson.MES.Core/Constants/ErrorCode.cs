@@ -223,9 +223,10 @@
 
         #region 编码规则 12400
         public const string MES12400 = "代码规则维护错误";
-        public const string MES12401 = "代码规则中物料Id[{productId}]已经存在";
+        public const string MES12401 = "代码规则中同样物料Id[{productId}],编码类型已经存在";
 
         public const string MES12402 = "代码规则新增失败";
+        public const string MES12403 = "代码规则中同样物料Id[{productId}],编码类型,包装类型已经存在";
 
         public const string MES12410 = "物料 不能为空！";
         public const string MES12411 = "编码类型 不能为空！";
@@ -596,14 +597,14 @@
         #endregion
 
 
-        #region 在制品步骤控制
+        #region 在制品步骤控制 MES18000
         public const string MES18000 = "在制品步骤控制错误";
         public const string MES18001 = "条码信息不存在";
         public const string MES18002 = "请扫描相同工单的条码";
         public const string MES18003 = "工单信息不存在";
         public const string MES18004 = "需扫描相同工艺路线条码";
         public const string MES18005 = "工艺路线不存在节点";
-        public const string MES18006 = "条码:{SFC}已报废,不允许操作";
+        public const string MES18006 = "条码:{SFC}不允许操作";
         public const string MES18007 = "条码没有对应的生产工序";
         public const string MES18008 = "条码生产状态异常:{Status}";
         public const string MES18009 = "工单状态不允许";
@@ -621,6 +622,16 @@
 
 
         #endregion
+
+        #region 车间作业控制 报告 MES18100
+        public const string MES18100 = "车间作业控制报告错误";
+        public const string MES18101 = "没有获取到{sfc}对应步骤的信息";
+        public const string MES18102 = "没有获取到{sfc}对应步骤中的工单信息";
+        public const string MES18103 = "没有获取到{sfc}对应步骤中的产品信息";
+        public const string MES18104 = "没有获取到{sfc}对应步骤中的工艺路线信息";
+        public const string MES18105 = "没有获取到{sfc}对应步骤中的BOM信息";
+        #endregion
+
         #endregion
 
         #region 系统执行出错 业务逻辑出错

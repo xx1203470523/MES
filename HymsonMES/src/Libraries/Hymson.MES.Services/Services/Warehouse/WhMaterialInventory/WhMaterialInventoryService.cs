@@ -38,25 +38,19 @@ namespace Hymson.MES.Services.Services.Warehouse
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
         private readonly IWhMaterialStandingbookRepository _whMaterialStandingbookRepository;
 
-        //物料仓储
-        private readonly IProcReplaceMaterialRepository _procReplaceMaterialRepository;
+        /// <summary>
+        /// 物料维护 仓储
+        /// </summary>
+        private readonly IProcMaterialRepository _procMaterialRepository;
         private readonly AbstractValidator<WhMaterialInventoryCreateDto> _validationCreateRules;
         private readonly AbstractValidator<WhMaterialInventoryModifyDto> _validationModifyRules;
         private readonly ICurrentSite _currentSite;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="currentUser"></param>
-        /// <param name="whMaterialInventoryRepository"></param>
-        /// <param name="whMaterialStandingbookRepository"></param>
-        /// <param name="validationCreateRules"></param>
-        /// <param name="validationModifyRules"></param>
-        /// <param name="currentSite"></param>
+
         public WhMaterialInventoryService(ICurrentUser currentUser,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
-            IProcReplaceMaterialRepository procReplaceMaterialRepository,
+             IProcMaterialRepository procMaterialRepository,
         AbstractValidator<WhMaterialInventoryCreateDto> validationCreateRules,
             AbstractValidator<WhMaterialInventoryModifyDto> validationModifyRules,
             ICurrentSite currentSite)
@@ -64,7 +58,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             _currentUser = currentUser;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
-            _procReplaceMaterialRepository = procReplaceMaterialRepository;
+            _procMaterialRepository = procMaterialRepository;
 
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
@@ -126,7 +120,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 }
                 //DTO转换实体 
                 //var whMaterialInventoryEntity = item.ToEntity<WhMaterialInventoryEntity>();
-                var materialInfo = await _whMaterialInventoryRepository.GetProcMaterialByMaterialCodeAsync(item.MaterialCode);
+                var materialInfo = await _whMaterialInventoryRepository.GetProcMaterialByMaterialCodeAsync(item.MaterialId);
                 if (materialInfo == null)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES15101));
@@ -329,11 +323,11 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <summary>
         /// 根据物料编码查询物料与供应商信息
         /// </summary>
-        /// <param name="materialCode"></param>
+        /// <param name="materialId"></param>
         /// <returns></returns>
-        public async Task<ProcMaterialInfoViewDto> GetMaterialAndSupplierByMateialCodeIdAsync(string materialCode)
+        public async Task<ProcMaterialInfoViewDto> GetMaterialAndSupplierByMateialCodeIdAsync(long materialId)
         {
-            var materialInfo = await _whMaterialInventoryRepository.GetProcMaterialByMaterialCodeAsync(materialCode);
+            var materialInfo = await _whMaterialInventoryRepository.GetProcMaterialByMaterialCodeAsync(materialId);
             if (materialInfo == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15101));
@@ -341,7 +335,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             var supplierInfo = await _whMaterialInventoryRepository.GetWhSupplierByMaterialIdAsync(materialInfo.Id);
             if (!supplierInfo.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES15102)).WithData("MaterialCode", materialCode);
+                throw new CustomerValidationException(nameof(ErrorCode.MES15102));
             }
             ProcMaterialInfoViewDto dto = new ProcMaterialInfoViewDto();
             dto.MaterialInfo = materialInfo;

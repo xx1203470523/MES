@@ -28,4 +28,18 @@ namespace Hymson.MES.Core.Enums.Manufacture
         [Description("全部")]
         Whole = 3
     }
+
+    public enum OriginalSummaryReportTypeEnum : sbyte
+    {
+        /// <summary>
+        /// 活动
+        /// </summary>
+        [Description("活动")]
+        Activity = 1,
+        /// <summary>
+        /// 移除
+        /// </summary>
+        [Description("移除")]
+        Remove = 2
+    }
 }

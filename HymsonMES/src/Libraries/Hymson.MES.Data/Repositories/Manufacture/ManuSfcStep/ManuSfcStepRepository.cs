@@ -5,6 +5,7 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using static Dapper.SqlBuilder;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -169,6 +170,19 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.ExecuteAsync(InsertSfcStepBusinessSql, maunSfcStepBusinessEntities);
         }
         #endregion
+
+        /// <summary>
+        /// 获取SFC的进出站步骤
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcStepEntity>> GetSFCInOutStepAsync(string sfc) 
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var manuSfcStepEntities = await conn.QueryAsync<ManuSfcStepEntity>(GetSFCInOutStepSql, new { SFC=sfc});
+            return manuSfcStepEntities;
+
+        }
     }
 
     /// <summary>
@@ -191,5 +205,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SFC`, `ProductId`, `WorkOrderId`, `WorkCenterId`, `ProductBOMId`, `Qty`, `EquipmentId`, `ResourceId`, `ProcedureId`, `Type`, `Status`, `Lock`, `IsMultiplex`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `manu_sfc_step`  WHERE Id IN @ids ";
+
+        const string GetSFCInOutStepSql = @" 
+                        SELECT 
+                           `Id`, `SFC`, `ProductId`, `WorkOrderId`, `WorkCenterId`, `ProductBOMId`, `Qty`, `EquipmentId`, `ResourceId`, `ProcedureId`, `CurrentStatus`, `Operatetype`, `IsRepair`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
+                        FROM `manu_sfc_step` 
+                        WHERE IsDeleted=0
+                        AND Operatetype in (3,4)
+                        and SFC=@SFC
+                        ORDER BY CreatedOn asc
+                        ";
     }
 }

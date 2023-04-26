@@ -1,10 +1,7 @@
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
-using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
-using Hymson.Infrastructure.Mapper;
-using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Manufacture;
@@ -12,28 +9,18 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.Core.Enums.QualUnqualifiedCode;
-using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
-using Hymson.MES.Data.Repositories.Process.Resource;
-using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Services.Dtos.Manufacture;
-using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Org.BouncyCastle.Crypto;
-using System.Collections;
-using System.Security.Policy;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -1106,130 +1093,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                 }
             });
             return procMaterials;
-        }
-
-
-        /// <summary>
-        /// 根据ID查询Bom 主物料以及组件信息详情
-        /// </summary>
-        /// <param name="queryDto"></param>
-        /// <returns></returns>
-        public async Task<List<InProductDismantleDto>> GetOriginalSummaryAsync(InProductDismantleQueryDto queryDto)
-        {
-            var bomDetailViews = new List<InProductDismantleDto>();
-
-            if (queryDto == null)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
-            }
-
-            //查询bom
-            var bom = await _procBomRepository.GetByIdAsync(queryDto.BomId);
-            if (bom == null)
-            {
-                return bomDetailViews;
-            }
-
-            //查询bom明细
-            var bomDetails = await _procBomDetailRepository.GetByBomIdAsync(queryDto.BomId);
-            if (!bomDetails.Any())
-            {
-                return bomDetailViews;
-            }
-
-            //查询组件信息
-            var manuSfcCirculations = await GetCirculationsBySfcAsync(queryDto);
-
-            //组件物料
-            var barCodeMaterialIds = manuSfcCirculations.Select(x => x.CirculationProductId).ToArray().Distinct();
-
-            //bom物料
-            var bomMaterialIds = bomDetails.Select(item => item.MaterialId).ToArray().Distinct();
-
-            var materialIds = new List<long>();
-            if (barCodeMaterialIds.Any())
-            {
-                materialIds.AddRange(barCodeMaterialIds);
-            }
-            if (bomMaterialIds.Any())
-            {
-                materialIds.AddRange(bomMaterialIds);
-            }
-
-            var procMaterials = new List<ProcMaterialEntity>();
-            var materials = materialIds.Distinct();
-            if (materials.Any())
-            {
-                procMaterials = (await _procMaterialRepository.GetByIdsAsync(materials.ToArray())).ToList();
-            }
-
-            //查询工序信息
-            var procedureIds = bomDetails.Select(item => item.ProcedureId).ToArray();
-            var procProcedures = new List<ProcProcedureEntity>();
-            if (procedureIds.Any())
-            {
-                procProcedures = (await _procProcedureRepository.GetByIdsAsync(procedureIds)).ToList();
-            }
-
-            //查询资源信息
-            var procResources = await GetResourcesAsync(manuSfcCirculations);
-
-            foreach (var detailEntity in bomDetails)
-            {
-                var material = procMaterials.FirstOrDefault(item => item.Id == detailEntity.MaterialId);
-                var procedures = procProcedures.FirstOrDefault(item => item.Id == detailEntity.ProcedureId);
-
-                var bomDetail = new InProductDismantleDto
-                {
-                    BomDetailId = detailEntity.Id,
-                    Usages = detailEntity.Usages,
-                    MaterialId = detailEntity.MaterialId,
-                    ProcedureId = detailEntity.ProcedureId,
-                    MaterialCode = material?.MaterialCode ?? "",
-                    MaterialName = material?.MaterialName ?? "",
-                    Version = material?.Version ?? "",
-                    SerialNumber = detailEntity.DataCollectionWay.HasValue == true ? detailEntity.DataCollectionWay.Value : material?.SerialNumber,
-                    Code = procedures?.Code ?? "",
-                    Name = procedures?.Name ?? "",
-                    BomRemark = bom.BomCode + "/" + bom.Version,
-                    AssembleCount = 0,
-                    Children = new List<ManuSfcChildCirculationDto>()
-                };
-                bomDetailViews.Add(bomDetail);
-
-                if (!manuSfcCirculations.Any())
-                {
-                    continue;
-                }
-
-                var assembleCount = 0M;
-                var listCirculations = manuSfcCirculations.Where(a => a.ProcedureId == bomDetail.ProcedureId && a.CirculationMainProductId == bomDetail.MaterialId).ToList();
-                foreach (var circulation in listCirculations)
-                {
-                    var barcodeMaterial = procMaterials.FirstOrDefault(item => item.Id == circulation.CirculationProductId);
-
-                    var manuSfcChild = new ManuSfcChildCirculationDto
-                    {
-                        Id = circulation.Id,
-                        BomDetailId = detailEntity.Id,
-                        ProcedureId = bomDetail.ProcedureId,
-                        ProductId = bomDetail.MaterialId,
-                        CirculationBarCode = circulation.CirculationBarCode,
-                        CirculationQty = circulation.CirculationQty ?? 0,
-                        MaterialRemark = barcodeMaterial?.MaterialName ?? "" + "/" + barcodeMaterial?.Version ?? "",
-                        ResCode = circulation.ResourceId.HasValue == true ? procResources.FirstOrDefault(x => x.Id == circulation.ResourceId.Value)?.ResCode ?? "" : "",
-                        Status = circulation.IsDisassemble == TrueOrFalseEnum.Yes ? InProductDismantleTypeEnum.Remove : InProductDismantleTypeEnum.Activity,
-                        UpdatedBy = circulation.UpdatedBy ?? "",
-                        UpdatedOn = circulation.UpdatedOn
-                    };
-                    bomDetail.Children.Add(manuSfcChild);
-                    assembleCount += manuSfcChild.Status == InProductDismantleTypeEnum.Activity ? circulation.CirculationQty ?? 0 : 0;
-                }
-                bomDetail.AssembleCount = assembleCount;
-            }
-
-            //查询子组件
-            return bomDetailViews;
         }
     }
 }
