@@ -571,6 +571,7 @@
         public const string MES16708 = "产品条码不能为空";
         public const string MES16709 = "作业返回空，请检查作业是否正确配置";
         public const string MES16711 = "容器包装，配置面板不允许排队产品";
+        public const string MES16712 = "容器包装，配置面板不允许完成产品";
         #endregion
 
         #region 绑定工单激活  MES16800

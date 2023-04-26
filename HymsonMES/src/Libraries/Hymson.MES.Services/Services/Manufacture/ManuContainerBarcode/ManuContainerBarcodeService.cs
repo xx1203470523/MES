@@ -151,6 +151,11 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (sfcEntity.Status == SfcStatusEnum.InProcess && !facePlateContainerPackEntity.IsAllowActiveProduct) {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16711));
             }
+            //是否允许完成产品
+            if (sfcEntity.Status == SfcStatusEnum.Complete && !facePlateContainerPackEntity.IsAllowCompleteProduct)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16712));
+            }
 
             var sfcinfos = await _manuSfcInfoRepository.GetBySFCIdsAsync(new long[] { sfcEntity.Id });
             if (sfcinfos == null||!sfcinfos.Any())
