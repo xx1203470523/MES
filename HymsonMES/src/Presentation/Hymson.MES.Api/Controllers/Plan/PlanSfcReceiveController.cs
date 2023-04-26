@@ -18,7 +18,7 @@ namespace Hymson.MES.Api.Controllers.Plan
     /// @author pengxin
     /// @date 2023-03-21 04:33:58
     /// </summary>
-    
+
     [ApiController]
     [Route("api/v1/[controller]")]
     public class PlanSfcReceiveController : ControllerBase
@@ -40,27 +40,27 @@ namespace Hymson.MES.Api.Controllers.Plan
         }
 
         /// <summary>
-        /// 分页查询列表（条码接收）
-        /// </summary>
-        /// <param name="parm"></param>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("pagelist")]
-        public async Task<PagedInfo<PlanSfcReceiveDto>> QueryPagedPlanSfcInfoAsync([FromQuery] PlanSfcReceivePagedQueryDto parm)
-        {
-            return await _planSfcInfoService.GetPageListAsync(parm);
-        }
-
-        /// <summary>
         /// 添加（条码接收）
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("create")]
+        [Route("receive")]
         public async Task AddPlanSfcInfoAsync([FromBody] PlanSfcReceiveCreateDto parm)
         {
             await _planSfcInfoService.CreatePlanSfcInfoAsync(parm);
+        }
+
+        /// <summary>
+        /// 分页查询列表（条码接收）
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("scanCode")]
+        public async Task<PlanSfcReceiveSFCDto> ScanCodeInfoAsync([FromQuery] PlanSfcReceiveScanCodeDto parm)
+        {
+            return await _planSfcInfoService.PlanSfcReceiveScanCodeAsync(parm);
         }
     }
 }

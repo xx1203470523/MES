@@ -11,6 +11,7 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services.Bos.Manufacture;
@@ -224,8 +225,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 // 删除 manu_sfc_produce
                 rows += await _manuSfcProduceRepository.DeletePhysicalAsync(sfcProduceEntity.SFC);
 
-                // TODO 删除 manu_sfc_produce_business
-
                 // 插入 manu_sfc_step 状态为 完成
                 sfcStep.Operatetype = ManuSfcStepTypeEnum.OutStock;    // TODO 这里的状态？？
                 sfcStep.CurrentStatus = SfcProduceStatusEnum.Complete;  // TODO 这里的状态？？
@@ -235,6 +234,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 // 条码信息
                 var sfcInfo = await _manuSfcRepository.GetBySFCAsync(sfcProduceEntity.SFC);
 
+                // 删除 manu_sfc_produce_business
+                await _manuSfcProduceRepository.DeleteSfcProduceBusinessBySfcInfoIdAsync(new DeleteSfcProduceBusinesssBySfcInfoIdCommand
+                {
+                    SiteId = sfcProduceEntity.SiteId,
+                    SfcInfoId = sfcInfo.Id
+                });
+
                 // 更新状态
                 sfcInfo.Status = SfcStatusEnum.Complete;
                 sfcInfo.UpdatedBy = sfcProduceEntity.UpdatedBy;
@@ -242,7 +248,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 rows += await _manuSfcRepository.UpdateAsync(sfcInfo);
 
                 // 入库
-                rows += await SaveToWarehouse(sfcInfo);
+                rows += await SaveToWarehouse(sfcProduceEntity);
             }
             // 未完工
             else
@@ -510,51 +516,52 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// <summary>
         /// 入库
         /// </summary>
-        /// <param name="manuSfcEntity"></param>
+        /// <param name="manuSfcProduceEntity"></param>
         /// <returns></returns>
-        private async Task<int> SaveToWarehouse(ManuSfcEntity manuSfcEntity)
+        private async Task<int> SaveToWarehouse(ManuSfcProduceEntity manuSfcProduceEntity)
         {
             var rows = 0;
 
-            /*
-            // TODO 新增 wh_material_inventory
+            var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(manuSfcProduceEntity.ProductId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES15101));
+
+            // 新增 wh_material_inventory
             rows += await _whMaterialInventoryRepository.InsertAsync(new WhMaterialInventoryEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SupplierId = 0,//自制品 没有
-                MaterialId = procMaterial.Id,
-                MaterialBarCode = manuSfcEntity.SFC,
+                MaterialId = manuSfcProduceEntity.ProductId,
+                MaterialBarCode = manuSfcProduceEntity.SFC,
                 Batch = "",//自制品 没有
-                QuantityResidue = procMaterial.Batch,
+                QuantityResidue = procMaterialEntity.Batch,
                 Status = WhMaterialInventoryStatusEnum.ToBeUsed,
                 Source = WhMaterialInventorySourceEnum.ManuComplete,
                 SiteId = _currentSite.SiteId ?? 0,
                 CreatedBy = _currentUser.UserName,
                 CreatedOn = HymsonClock.Now(),
-                UpdatedBy = manuSfcEntity.UpdatedBy,
-                UpdatedOn = manuSfcEntity.UpdatedOn
+                UpdatedBy = manuSfcProduceEntity.UpdatedBy,
+                UpdatedOn = manuSfcProduceEntity.UpdatedOn
             });
 
-            // TODO 新增 wh_material_standingbook
+            // 新增 wh_material_standingbook
             rows += await _whMaterialStandingbookRepository.InsertAsync(new WhMaterialStandingbookEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
-                MaterialCode = procMaterial.MaterialCode,
-                MaterialName = procMaterial.MaterialName,
-                MaterialVersion = procMaterial.Version,
-                MaterialBarCode = manuSfcEntity.SFC,
+                MaterialCode = procMaterialEntity.MaterialCode,
+                MaterialName = procMaterialEntity.MaterialName,
+                MaterialVersion = procMaterialEntity.Version ?? "",
+                MaterialBarCode = manuSfcProduceEntity.SFC,
                 Batch = "",//自制品 没有
-                Quantity = procMaterial.Batch,
-                Unit = procMaterial.Unit ?? "",
-                Type = WhMaterialInventoryTypeEnum.ManuComplete, //(int)WhMaterialInventorySourceEnum.MaterialReceiving;
+                Quantity = procMaterialEntity.Batch,
+                Unit = procMaterialEntity.Unit ?? "",
+                Type = WhMaterialInventoryTypeEnum.ManuComplete,
                 Source = WhMaterialInventorySourceEnum.ManuComplete,
                 SiteId = _currentSite.SiteId ?? 0,
                 CreatedBy = _currentUser.UserName,
                 CreatedOn = HymsonClock.Now(),
-                UpdatedBy = manuSfcEntity.UpdatedBy,
-                UpdatedOn = manuSfcEntity.UpdatedOn
+                UpdatedBy = manuSfcProduceEntity.UpdatedBy,
+                UpdatedOn = manuSfcProduceEntity.UpdatedOn
             });
-            */
 
             return rows;
         }

@@ -16,17 +16,17 @@ namespace Hymson.MES.Services.Services.Plan
     public interface IPlanSfcReceiveService
     {
         /// <summary>
-        /// 获取分页List
-        /// </summary>
-        /// <param name="planSfcInfoPagedQueryDto"></param>
-        /// <returns></returns>
-        Task<PagedInfo<PlanSfcReceiveDto>> GetPageListAsync(PlanSfcReceivePagedQueryDto planSfcInfoPagedQueryDto);
-
-        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="planSfcInfoCreateDto"></param>
         /// <returns></returns>
         Task CreatePlanSfcInfoAsync(PlanSfcReceiveCreateDto planSfcInfoCreateDto);
+
+        /// <summary>
+        /// 条码接收扫码
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<PlanSfcReceiveSFCDto> PlanSfcReceiveScanCodeAsync(PlanSfcReceiveScanCodeDto param);
     }
 }
