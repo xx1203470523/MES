@@ -6,6 +6,7 @@
  *build datetime: 2023-04-12 02:29:23
  */
 using Hymson.Infrastructure;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Hymson.MES.Core.Domain.Manufacture
 {
@@ -36,6 +37,14 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 容器规格id
         /// </summary>
         public long ContainerId { get; set; }
+        /// <summary>
+        /// 包装等级
+        /// </summary>
+        public int PackLevel { get; set; }
+        /// <summary>
+        /// 物料版本
+        /// </summary>
+        public string MaterialVersion { get; set; }
         /// <summary>
         /// 生产工单Id
         /// </summary>

@@ -123,7 +123,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             _procMaskCodeRuleRepository = procMaskCodeRuleRepository;
         }
 
-
         /// <summary>
         /// 验证条码掩码规则
         /// </summary>
@@ -300,7 +299,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES10447));
 
                 // 判断工序抽检比例
-                if (nextProcedureOfNone.CheckRate == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10446));
+                if (nextProcedureOfNone.CheckType == ProcessRouteInspectTypeEnum.FixedScale
+                    && nextProcedureOfNone.CheckRate == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10446));
 
                 // 如果满足抽检次数，就取出一个非"空值"的随机工序作为下一工序
                 if (count > 0 && count % defaultNextProcedure.CheckRate == 0) defaultNextProcedure = nextProcedureOfNone;
@@ -309,14 +309,21 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             else
             {
                 // 抽检类型不为空值的下一工序
-                var nextProcedureOfNone = procedureNodes.FirstOrDefault()
+                defaultNextProcedure = procedureNodes.FirstOrDefault()
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES10440));
 
-                // 判断工序抽检比例
-                if (nextProcedureOfNone.CheckRate == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10446));
-
-                // 如果满足抽检次数，就取出一个非"空值"的随机工序作为下一工序
-                if (count > 0 && count % nextProcedureOfNone.CheckRate == 0) defaultNextProcedure = nextProcedureOfNone;
+                switch (defaultNextProcedure.CheckType)
+                {
+                    case ProcessRouteInspectTypeEnum.FixedScale:
+                        // 判断工序抽检比例
+                        if (defaultNextProcedure.CheckRate == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10446));
+                        break;
+                    case ProcessRouteInspectTypeEnum.None:
+                    case ProcessRouteInspectTypeEnum.RandomInspection:
+                    case ProcessRouteInspectTypeEnum.SpecialSamplingInspection:
+                    default:
+                        break;
+                }
             }
 
             // 获取下一工序
@@ -475,6 +482,19 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
     /// </summary>
     public static class ManuSfcProduceExtensions
     {
+        /// <summary>
+        /// 条码资源关联校验
+        /// </summary>
+        /// <param name="sfcProduceEntity"></param>
+        /// <param name="resourceId"></param>
+        public static ManuSfcProduceEntity VerifyResource(this ManuSfcProduceEntity sfcProduceEntity, long resourceId)
+        {
+            // 当前资源是否对于的上
+            if (sfcProduceEntity.ResourceId != resourceId) throw new CustomerValidationException(nameof(ErrorCode.MES16316)).WithData("SFC", sfcProduceEntity.SFC);
+
+            return sfcProduceEntity;
+        }
+
         /// <summary>
         /// 条码合法性校验
         /// </summary>

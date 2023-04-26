@@ -3,7 +3,6 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
@@ -12,9 +11,9 @@ using Hymson.Utils;
 namespace Hymson.MES.Services.Services.Job.Manufacture
 {
     /// <summary>
-    /// 不良录入
+    /// 包装
     /// </summary>
-    public class JobManuBadRecordService : IJobManufactureService
+    public class JobManuPackageIngService : IJobManufactureService
     {
         /// <summary>
         /// 当前对象（登录用户）
@@ -31,10 +30,6 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         private readonly IManuCommonService _manuCommonService;
 
-        /// <summary>
-        /// 服务接口（不良录入）
-        /// </summary>
-        private readonly IManuProductBadRecordRepository _manuProductBadRecordRepository;
 
         /// <summary>
         /// 构造函数
@@ -42,15 +37,12 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="manuCommonService"></param>
-        /// <param name="manuProductBadRecordRepository"></param>
-        public JobManuBadRecordService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IManuCommonService manuCommonService,
-            IManuProductBadRecordRepository manuProductBadRecordRepository)
+        public JobManuPackageIngService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IManuCommonService manuCommonService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _manuCommonService = manuCommonService;
-            _manuProductBadRecordRepository = manuProductBadRecordRepository;
         }
 
 
@@ -73,14 +65,13 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         }
 
         /// <summary>
-        /// 执行（不良录入）
+        /// 执行（组装）
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
         public async Task<JobResponseDto> ExecuteAsync(Dictionary<string, string>? param)
         {
             var defaultDto = new JobResponseDto { };
-            defaultDto.Content?.Add("PackageCom", "False");
 
             var bo = new ManufactureBo
             {
@@ -91,26 +82,11 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
 
             // 获取生产条码信息
             var (sfcProduceEntity, _) = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
-
             // 合法性校验
-            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity).VerifyProcedure(bo.ProcedureId).VerifyResource(bo.ResourceId);
-
-            // 读取之前的录入记录
-            var manuProductBadRecordViews = await _manuProductBadRecordRepository.GetBadRecordsBySfcAsync(new ManuProductBadRecordQuery
-            {
-                SiteId = _currentSite.SiteId ?? 0,
-                SFC = bo.SFC,
-            });
-
-            // 判断面板是否显示
-            var isShow = manuProductBadRecordViews == null || manuProductBadRecordViews.Any() == false;
-
-            defaultDto.Content?.Add("BadEntryCom", $"{isShow}".ToString());
-            defaultDto.Message = $"条码{bo.SFC}" + (isShow ? "开始录入" : "已经完成录入，无需重复录入！");
+            //sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity).VerifyProcedure(bo.ProcedureId);
 
             return defaultDto;
         }
-
 
     }
 }

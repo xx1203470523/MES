@@ -1,5 +1,5 @@
-﻿using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Manufacture;
+﻿using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Core.Enums.Report;
 
 namespace Hymson.MES.Services.Dtos.Report
 {

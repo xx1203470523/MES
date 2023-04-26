@@ -96,7 +96,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         /// <summary>
-        /// 条码报废
+        /// 取消标识
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>

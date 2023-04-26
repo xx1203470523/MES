@@ -12,6 +12,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
     /// </summary>
     public interface IManuCommonService
     {
+
         /// <summary>
         /// 验证条码掩码规则
         /// </summary>
