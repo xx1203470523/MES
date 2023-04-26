@@ -22,11 +22,10 @@ namespace Hymson.MES.Core.Enums
         /// </summary>
         [Description("上料点")]
         LoadingPoint = 3,
-
         /// <summary>
         /// 生产完成
         /// </summary>
         [Description("生产完成")]
-        manuComplete = 4
+        ManuComplete = 4
     }
 }
