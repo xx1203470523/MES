@@ -296,16 +296,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.ExecuteAsync(UpdateStatusSql, command);
         }
 
-        ///// <summary>
-        ///// 批量更新条码状态
-        ///// </summary>
-        ///// <param name="manuSfcInfoEntity"></param>
-        ///// <returns></returns>
-        //public async Task<int> UpdateStatusAsync(ManuSfcUpdateCommand command)
-        //{
-        //    using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-        //    return await conn.ExecuteAsync(UpdateStatusSql, command);
-        //}
+        /// <summary>
+        /// 批量更新条码（使用状态）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateSfcIsUsedAsync(ManuSfcUpdateIsUsedCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateSfcIsUsedSql, command);
+        }
 
         /// <summary>
         /// 获取SFC
@@ -351,7 +351,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string UpdateSql = "UPDATE `manu_sfc` SET IsUsed = @IsUsed, SFC = @SFC, Qty = @Qty, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `manu_sfc` SET IsUsed = @IsUsed, SFC = @SFC, Qty = @Qty, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdateStatusSql = "UPDATE `manu_sfc` SET Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE SFC in @Sfcs ";
-
+        const string UpdateSfcIsUsedSql = "UPDATE manu_sfc SET IsUsed = @IsUsed, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn WHERE SFC IN @Sfcs ";
         const string DeleteSql = "UPDATE `manu_sfc` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `manu_sfc` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
