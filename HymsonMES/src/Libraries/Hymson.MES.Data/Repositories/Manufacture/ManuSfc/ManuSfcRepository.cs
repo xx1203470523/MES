@@ -319,7 +319,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
-        /// 更具sfc 获取条码信息
+        /// 根据sfc 获取条码信息
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
