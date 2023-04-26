@@ -222,6 +222,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IJobManufactureService, JobManuRepairStartService>();
             services.AddSingleton<IJobManufactureService, JobManuStartService>();
             services.AddSingleton<IJobManufactureService, JobManuStopService>();
+            services.AddSingleton<IJobManufactureService, JobManuPackageCloseService>();
+            services.AddSingleton<IJobManufactureService, JobManuPackageOpenService>();
+            services.AddSingleton<IJobManufactureService, JobManuPackageIngService>();
             #endregion
 
             #region Report
@@ -235,6 +238,10 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region Packaging
             services.AddSingleton<IPackagingReportService, PackagingReportService>();
+            #endregion
+
+            #region OriginalSummary
+            services.AddSingleton<IOriginalSummaryReportService, OriginalSummaryReportService>();
             #endregion
             #endregion
 

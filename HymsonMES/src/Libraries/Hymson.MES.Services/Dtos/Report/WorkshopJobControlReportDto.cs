@@ -125,4 +125,100 @@ namespace Hymson.MES.Services.Dtos.Report
         public string? ResourceCode { get; set; }
     }
 
+    public class WorkshopJobControlStepReportDto 
+    {
+        public string SFC { get; set; }
+
+        public string OrderCode { get; set; }
+
+        public string MaterialCodrNameVersion { get; set; }
+
+        public string ProcessRouteCodeNameVersion { get; set; }
+
+        public string ProcBomCodeNameVersion { get; set; }
+
+        public List<WorkshopJobControlInOutSteptDto> WorkshopJobControlInOutSteptDtos { get; set; }=new List<WorkshopJobControlInOutSteptDto>();
+    }
+
+    public class WorkshopJobControlInOutSteptDto 
+    {
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string ProcedureCode { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public string Status { get; set; }
+
+        /// <summary>
+        /// 进站时间
+        /// </summary>
+        public DateTime InDateTime { get; set; }
+
+        /// <summary>
+        /// 出站时间
+        /// </summary>
+        public DateTime? OutDatetTime { get; set; }
+    }
+
+    /// <summary>
+    /// 条码步骤表 分页参数
+    /// </summary>
+    public class ManuSfcStepBySFCPagedQueryDto : PagerInfo
+    {
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string? SFC { get; set; }
+    }
+
+    public class ManuSfcStepBySFCViewDto 
+    {
+        /// <summary>
+        /// sfc_step Id
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string SFC { get; set; }
+
+        /// <summary>
+        /// 作业名称  步骤类型
+        /// </summary>
+        public ManuSfcStepTypeEnum Operatetype { get; set; }
+
+        /// <summary>
+        /// 作业时间  创建时间
+        /// </summary>
+        public DateTime CreatedOn { get; set; }
+
+        /// <summary>
+        /// 物料编码/版本
+        /// </summary>
+        public string MaterialCodeVersion { get; set; }
+
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string MaterialName { get; set; }
+
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string ProcedureCode { get; set;}
+
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string ProcedureName { get; set; }
+
+        /// <summary>
+        /// 工单
+        /// </summary>
+        public string OrderCode { get; set;}
+    }
 }

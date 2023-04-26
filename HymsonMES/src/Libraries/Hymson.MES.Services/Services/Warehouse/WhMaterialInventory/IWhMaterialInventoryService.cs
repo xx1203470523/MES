@@ -76,9 +76,9 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <summary>
         /// 根据物料编码获取物料与供应商数据
         /// </summary>
-        /// <param name="materialCode"></param>
+        /// <param name="materialId"></param>
         /// <returns></returns>
-        Task<ProcMaterialInfoViewDto> GetMaterialAndSupplierByMateialCodeIdAsync(string materialCode);
+        Task<ProcMaterialInfoViewDto> GetMaterialAndSupplierByMateialCodeIdAsync(long materialId);
 
     }
 }

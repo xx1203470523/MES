@@ -66,7 +66,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public string BomRemark { get; set; }
 
         /// <summary>
-        /// 物料消耗信息
+        /// 组件信息
         /// </summary>
         public List<ManuSfcChildCirculationDto> Children { get; set; }
     }
@@ -258,5 +258,4 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long CirculationMainProductId { get; set; }
         public string CirculationBarCode { get; set; }
     }
-
 }

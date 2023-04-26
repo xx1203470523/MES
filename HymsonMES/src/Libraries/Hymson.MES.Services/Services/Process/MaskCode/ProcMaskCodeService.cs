@@ -79,9 +79,10 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
         /// <returns></returns>
         public async Task<int> CreateAsync(ProcMaskCodeSaveDto createDto)
         {
+            createDto.Code = createDto.Code.ToTrimSpace().ToUpperInvariant();
+            createDto.Name = createDto.Name.Trim();
+            createDto.Remark = createDto.Remark.Trim();
             // 验证DTO
-            createDto.Code = createDto.Code.Trim().Replace(" ", string.Empty);
-            createDto.Code = createDto.Code.ToUpperInvariant();
             await _validationSaveRules.ValidateAndThrowAsync(createDto);
 
             // DTO转换实体
@@ -131,6 +132,8 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
         /// <returns></returns>
         public async Task<int> ModifyAsync(ProcMaskCodeSaveDto modifyDto)
         {
+            modifyDto.Name = modifyDto.Name.Trim();
+            modifyDto.Remark = modifyDto.Remark.Trim();
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(modifyDto);
 

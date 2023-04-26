@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Hosting;
+using System.Reflection;
+
 namespace Hymson.MES.Services.UnitTests
 {
     public class Tests

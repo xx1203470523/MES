@@ -14,20 +14,21 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Plan;
-using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
+using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCreateBarcodeDto;
 using Hymson.MES.Services.Dtos.Plan;
+using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCreateBarcode;
+using Hymson.Utils;
 using Hymson.Utils.Tools;
 using System.Security.Policy;
 using System.Transactions;
@@ -52,6 +53,8 @@ namespace Hymson.MES.Services.Services.Plan
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
         private readonly ILocalizationService _localizationService;
         private readonly IManuCreateBarcodeService _manuCreateBarcodeService;
+        private readonly IProcMaterialRepository _procMaterialRepository;
+        private readonly IManuCommonService _manuCommonService;
         private readonly AbstractValidator<PlanSfcReceiveCreateDto> _validationCreateRules;
         private readonly AbstractValidator<PlanSfcReceiveModifyDto> _validationModifyRules;
 
@@ -64,6 +67,8 @@ namespace Hymson.MES.Services.Services.Plan
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             ILocalizationService localizationService,
             IManuCreateBarcodeService manuCreateBarcodeService,
+            IProcMaterialRepository procMaterialRepository,
+            IManuCommonService manuCommonService,
         AbstractValidator<PlanSfcReceiveCreateDto> validationCreateRules, AbstractValidator<PlanSfcReceiveModifyDto> validationModifyRules)
         {
             _currentUser = currentUser;
@@ -76,6 +81,9 @@ namespace Hymson.MES.Services.Services.Plan
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _localizationService = localizationService;
             _manuCreateBarcodeService = manuCreateBarcodeService;
+            _manuCreateBarcodeService = manuCreateBarcodeService;
+            _procMaterialRepository = procMaterialRepository;
+            _manuCommonService = manuCommonService;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
         }
@@ -88,21 +96,14 @@ namespace Hymson.MES.Services.Services.Plan
         public async Task CreatePlanSfcInfoAsync(PlanSfcReceiveCreateDto param)
         {
             //#region 验证与数据组装
-            //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(param);
-            var workOrdeEntity = await _planWorkOrderRepository.GetByIdAsync(param.WorkOrderId);
-            if (workOrdeEntity.IsLocked == YesOrNoEnum.Yes)
+            var planWorkOrderEntity = await _manuCommonService.GetProduceWorkOrderByIdAsync(param.WorkOrderId);
+            var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(planWorkOrderEntity.ProductId);
+            if (param.ReceiveType == PlanSFCReceiveTypeEnum.SupplierSfc && procMaterialEntity.Batch == 0)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16106)).WithData("OrderCode", workOrdeEntity.OrderCode);
+                throw new CustomerValidationException(nameof(ErrorCode.MES16502)).WithData("product", procMaterialEntity.MaterialCode);
             }
-            if (workOrdeEntity.Status == PlanWorkOrderStatusEnum.NotStarted)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16118)).WithData("OrderCode", workOrdeEntity.OrderCode);
-            }
-            if (workOrdeEntity.Status == PlanWorkOrderStatusEnum.Closed)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16119)).WithData("OrderCode", workOrdeEntity.OrderCode);
-            }
+
             var validationFailures = new List<ValidationFailure>();
             var barcodeList = new List<BarcodeDto>();
 
@@ -142,6 +143,22 @@ namespace Hymson.MES.Services.Services.Plan
                 else
                 {
 
+                    if (!await _manuCommonService.CheckBarCodeByMaskCodeRule(sfc, procMaterialEntity.Id))
+                    {
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", sfc}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
+                        }
+                        validationFailure.FormattedMessagePlaceholderValues.Add("Product", procMaterialEntity.MaterialCode);
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES16121);
+                        validationFailures.Add(validationFailure);
+                    }
                 }
                 barcodeList.Add(new BarcodeDto
                 {
@@ -156,77 +173,85 @@ namespace Hymson.MES.Services.Services.Plan
             }
 
             using var ts = TransactionHelper.GetTransactionScope(TransactionScopeOption.Suppress);
-
+            if (param.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)
+            {
+                await _manuCreateBarcodeService.CreateBarcodeByOldMESSFC(new CreateBarcodeByOldMesSFCDto
+                {
+                    WorkOrderId = param.WorkOrderId,
+                    OldSFCs = barcodeList
+                });
+                await _whMaterialInventoryRepository.UpdateWhMaterialInventoryEmptyByBarCodeAync(new UpdateWhMaterialInventoryEmptyCommand
+                {
+                    BarCodeList = whMaterialInventoryList.Select(x => x.MaterialBarCode).ToList(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    UserName = _currentUser.UserName,
+                    UpdateTime = HymsonClock.Now()
+                });
+            }
+            else
+            {
+                await _manuCreateBarcodeService.CreateBarcodeByExternalSFC(new CreateBarcodeByExternalSFCDto
+                {
+                    WorkOrderId = param.WorkOrderId,
+                    ExternalSFCs = barcodeList
+                });
+            }
             ts.Complete();
         }
 
         /// <summary>
-        /// 验证条码规则
+        /// 条码接收扫码
         /// </summary>
-        /// <param name="productId"></param>
-        /// <param name="sfc"></param>
-        /// <exception cref="BusinessException"></exception>
-        private async Task<bool> VerifyCodeRule(long productId, string sfc)
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<PlanSfcReceiveSFCDto> PlanSfcReceiveScanCodeAsync(PlanSfcReceiveScanCodeDto param)
         {
-
-            var getCodeRulesTask = await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery { ProductId = productId });
-            if (getCodeRulesTask.Count() == 0)
+            var planWorkOrderEntity = await _manuCommonService.GetProduceWorkOrderByIdAsync(param.WorkOrderId);
+            var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(planWorkOrderEntity.ProductId);
+            if (param.ReceiveType == PlanSFCReceiveTypeEnum.SupplierSfc && procMaterialEntity.Batch == 0)
             {
-                throw new BusinessException(nameof(ErrorCode.MES16113));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16502)).WithData("product", procMaterialEntity.MaterialCode);
             }
-            var getCodeRules = getCodeRulesTask.FirstOrDefault();
-
-            if (sfc.Length != getCodeRules.Base)
+            decimal qty = 0;
+            if (param.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)
             {
-                throw new BusinessException(nameof(ErrorCode.MES16114)).WithData("Base", getCodeRules.Base);
-            }
-
-            var getCodeRulesMakeListTask = _inteCodeRulesMakeRepository.GetInteCodeRulesMakeEntitiesAsync(new InteCodeRulesMakeQuery { CodeRulesId = getCodeRules.Id });
-            var codeRulesMakeList = await getCodeRulesMakeListTask;
-            foreach (var rule in codeRulesMakeList.OrderBy(x => x.Seq))
-            {
-                if (rule.ValueTakingType == CodeValueTakingTypeEnum.FixedValue)
+                var whMaterialInventoryEntity = await _whMaterialInventoryRepository.GetByBarCodeAsync(param.SFC);
+                if (whMaterialInventoryEntity == null)
                 {
-                    if (!sfc.Contains(rule.SegmentedValue))
-                    {
-                        throw new BusinessException(nameof(ErrorCode.MES16115)).WithData("ValuesType", CodeValueTakingTypeEnum.FixedValue.ToString()).WithData("SegmentedValue", rule.SegmentedValue);
-                    };
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16120));
+                }
+                qty = whMaterialInventoryEntity.QuantityResidue;
+                procMaterialEntity = await _procMaterialRepository.GetByIdAsync(whMaterialInventoryEntity.MaterialId);
+            }
+            else
+            {
+                if (!await _manuCommonService.CheckBarCodeByMaskCodeRule(param.SFC, procMaterialEntity.Id))
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16121)).WithData("Product", procMaterialEntity.MaterialCode); ;
+                }
+                qty = procMaterialEntity.Batch;
+            }
+            var relevanceOrderCode = string.Empty;
+            if (param.RelevanceWorkOrderId.HasValue)
+            {
+                var relevancePlanWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(param.RelevanceWorkOrderId ?? 0);
+                if (relevancePlanWorkOrderEntity != null)
+                {
+                    relevanceOrderCode = relevancePlanWorkOrderEntity.OrderCode;
                 }
             }
-            return true;
-        }
-
-
-        /// <summary>
-        /// 根据查询条件获取分页数据
-        /// </summary>
-        /// <param name="planSfcInfoPagedQueryDto"></param>
-        /// <returns></returns>
-        public async Task<PagedInfo<PlanSfcReceiveDto>> GetPageListAsync(PlanSfcReceivePagedQueryDto planSfcInfoPagedQueryDto)
-        {
-            var planSfcInfoPagedQuery = planSfcInfoPagedQueryDto.ToQuery<PlanSfcReceivePagedQuery>();
-            var pagedInfo = await _planSfcInfoRepository.GetPagedInfoAsync(planSfcInfoPagedQuery);
-
-            //实体到DTO转换 装载数据
-            List<PlanSfcReceiveDto> planSfcInfoDtos = PreparePlanSfcInfoDtos(pagedInfo);
-            return new PagedInfo<PlanSfcReceiveDto>(planSfcInfoDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="pagedInfo"></param>
-        /// <returns></returns>
-        private static List<PlanSfcReceiveDto> PreparePlanSfcInfoDtos(PagedInfo<PlanSfcReceiveView> pagedInfo)
-        {
-            var planSfcInfoDtos = new List<PlanSfcReceiveDto>();
-            foreach (var planSfcInfoEntity in pagedInfo.Data)
+            return new PlanSfcReceiveSFCDto()
             {
-                var planSfcInfoDto = planSfcInfoEntity.ToModel<PlanSfcReceiveDto>();
-                planSfcInfoDtos.Add(planSfcInfoDto);
-            }
-
-            return planSfcInfoDtos;
+                OrderCode = planWorkOrderEntity.OrderCode,
+                Type = planWorkOrderEntity.Type,
+                OrderCodeQty = planWorkOrderEntity.Qty,
+                BarCode = param.SFC,
+                MaterialCode = procMaterialEntity.MaterialCode,
+                MaterialName = procMaterialEntity.MaterialName,
+                MaterialVersion = procMaterialEntity.Version ?? "",
+                Qty = qty,
+                RelevanceOrderCode = relevanceOrderCode
+            };
         }
     }
 }

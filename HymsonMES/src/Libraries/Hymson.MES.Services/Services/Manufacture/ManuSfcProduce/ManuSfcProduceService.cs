@@ -10,6 +10,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -21,6 +22,7 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
+using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -33,9 +35,11 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.Extensions.Logging;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Policy;
 using System.Text.Json;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -130,6 +134,10 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         private readonly IProcProcessRouteDetailLinkRepository _procProcessRouteDetailLinkRepository;
 
+        /// <summary>
+        /// 物料台账 仓储
+        /// </summary>
+        private readonly IWhMaterialStandingbookRepository _whMaterialStandingbookRepository;
 
         private readonly AbstractValidator<ManuSfcProduceLockDto> _validationLockRules;
         private readonly AbstractValidator<ManuSfcProduceModifyDto> _validationModifyRules;
@@ -150,9 +158,11 @@ namespace Hymson.MES.Services.Services.Manufacture
             IProcProcedureRepository procProcedureRepository,
             ILocalizationService localizationService,
              IManuContainerPackRepository manuContainerPackRepository,
-              IWhMaterialInventoryService whMaterialInventoryService,
+              IWhMaterialInventoryRepository whMaterialInventoryRepository,
+        IWhMaterialInventoryService whMaterialInventoryService,
               IProcMaterialRepository procMaterialRepository,
                IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
+               IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
         AbstractValidator<ManuSfcProduceLockDto> validationLockRules,
             AbstractValidator<ManuSfcProduceModifyDto> validationModifyRules,
             ILogger<ManuSfcProduceService> logger)
@@ -170,9 +180,11 @@ namespace Hymson.MES.Services.Services.Manufacture
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
             _localizationService = localizationService;
             _manuContainerPackRepository = manuContainerPackRepository;
+            _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _whMaterialInventoryService = whMaterialInventoryService;
             _procMaterialRepository = procMaterialRepository;
             _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
+            _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
             _validationLockRules = validationLockRules;
             _validationModifyRules = validationModifyRules;
             this._logger = logger;
@@ -780,6 +792,56 @@ namespace Hymson.MES.Services.Services.Manufacture
 
         #region 在制品步骤控制
         /// <summary>
+        /// 分页查询（查询所有条码信息）
+        /// </summary>
+        /// <param name="manuSfcProducePagedQueryDto"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ManuSfcProduceViewDto>> GetManuSfcPagedInfoAsync(ManuSfcProducePagedQueryDto manuSfcProducePagedQueryDto)
+        {
+            var manuSfcProducePagedQuery = manuSfcProducePagedQueryDto.ToQuery<ManuSfcProducePagedQuery>();
+            manuSfcProducePagedQuery.SiteId = _currentSite.SiteId;
+
+            //查询多个条码
+            if (!string.IsNullOrWhiteSpace(manuSfcProducePagedQueryDto.Sfcs))
+            {
+                manuSfcProducePagedQuery.SfcArray = manuSfcProducePagedQueryDto.Sfcs.Split(',');
+            }
+
+            //根据资源查询
+            if (manuSfcProducePagedQueryDto.ResourceId.HasValue)
+            {
+                var resource = await _resourceRepository.GetByIdAsync(manuSfcProducePagedQueryDto.ResourceId.Value);
+                manuSfcProducePagedQuery.ResourceTypeId = resource.ResTypeId;
+            }
+
+            var pagedInfo = await _manuSfcRepository.GetManuSfcPagedInfoAsync(manuSfcProducePagedQuery);
+
+            //实体到DTO转换 装载数据
+            List<ManuSfcProduceViewDto> manuSfcProduceDtos = new List<ManuSfcProduceViewDto>();
+            foreach (var item in pagedInfo.Data)
+            {
+                manuSfcProduceDtos.Add(new ManuSfcProduceViewDto
+                {
+                    Id = item.Id,
+                    Sfc = item.Sfc,
+                    Lock = item.Lock,
+                    LockProductionId = item.LockProductionId,
+                    ProductBOMId = item.ProductBOMId,
+                    ProcedureId = item.ProcedureId,
+                    Status = item.Status,
+                    OrderCode = item.OrderCode,
+                    Code = item.Code,
+                    Name = item.Name,
+                    MaterialCode = item.MaterialCode,
+                    MaterialName = item.MaterialName,
+                    Version = item.Version
+                });
+            }
+            return new PagedInfo<ManuSfcProduceViewDto>(manuSfcProduceDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+
+        /// <summary>
         /// 根据SFC查询在制品步骤列表
         /// </summary>
         /// <param name="sfcs"></param>
@@ -1134,71 +1196,105 @@ namespace Hymson.MES.Services.Services.Manufacture
                 };
                 sfcStepList.Add(sfcStep);
             }
+            var updateInventoryQuantityList = new List<UpdateQuantityCommand>();
+            var whMaterialInventoryList = new List<WhMaterialInventoryEntity>();
+            var whMaterialStandingbookList = new List<WhMaterialStandingbookEntity>();
+            if (sfcProduceStepDto.Type == SfcProduceStatusEnum.Complete && sfcProduceStepDto.ProcedureId == endProcessRouteDetailId)
+            {
+                //入库
+                var whMaterialInventorys = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarcodeQuery { BarCodes = sfcsArr, SiteId = _currentSite.SiteId ?? 0 });
+                bool isWhMaterialInventorys = whMaterialInventorys != null && whMaterialInventorys.Any() ? true : false;
+
+                var notwhMaterialInventorySfcs = manuSfcInfos.Where(it => !whMaterialInventorys.Where(wmi => wmi.MaterialBarCode == it.SFC).Any()).ToList();
+                var productIds = notwhMaterialInventorySfcs.Select(it => it.ProductId).ToArray();
+                var procMaterials = await _procMaterialRepository.GetByIdsAsync(productIds);
+                foreach (var item in manuSfcInfos)
+                {
+                    var procMaterial = procMaterials.Where(it => it.Id == item.ProductId).First();
+                    if (isWhMaterialInventorys && whMaterialInventorys.Any(it => it.MaterialBarCode == item.SFC))
+                    {
+                        var updateInventoryQuantity = new UpdateQuantityCommand
+                        {
+                            BarCode = item.SFC,
+                            QuantityResidue = procMaterial.Batch,
+                            UpdatedBy = _currentUser.UserName,
+                            UpdatedOn = HymsonClock.Now()
+                        };
+                        updateInventoryQuantityList.Add(updateInventoryQuantity);
+                    }
+                    else
+                    {
+                        #region 数据组装
+                        //物料库存
+                        var whMaterialInventoryEntity = new WhMaterialInventoryEntity();
+                        whMaterialInventoryEntity.SupplierId = 0;//自制品 没有
+                        whMaterialInventoryEntity.MaterialId = procMaterial.Id;
+                        whMaterialInventoryEntity.MaterialBarCode = item.SFC;
+                        whMaterialInventoryEntity.Batch = "";//自制品 没有
+                        whMaterialInventoryEntity.QuantityResidue = procMaterial.Batch;
+                        whMaterialInventoryEntity.Status = WhMaterialInventoryStatusEnum.ToBeUsed;
+                        whMaterialInventoryEntity.Source = WhMaterialInventorySourceEnum.ManuComplete;
+                        whMaterialInventoryEntity.SiteId = _currentSite.SiteId ?? 0;
+                        whMaterialInventoryEntity.Id = IdGenProvider.Instance.CreateId();
+                        whMaterialInventoryEntity.CreatedBy = _currentUser.UserName;
+                        whMaterialInventoryEntity.UpdatedBy = _currentUser.UserName;
+                        whMaterialInventoryEntity.CreatedOn = HymsonClock.Now();
+                        whMaterialInventoryEntity.UpdatedOn = HymsonClock.Now();
+                        whMaterialInventoryList.Add(whMaterialInventoryEntity);
+
+                        //台账数据
+                        var whMaterialStandingbookEntity = new WhMaterialStandingbookEntity();
+                        whMaterialStandingbookEntity.MaterialCode = procMaterial.MaterialCode;
+                        whMaterialStandingbookEntity.MaterialName = procMaterial.MaterialName;
+                        whMaterialStandingbookEntity.MaterialVersion = procMaterial.Version;
+                        whMaterialStandingbookEntity.MaterialBarCode = item.SFC;
+                        whMaterialStandingbookEntity.Batch = "";//自制品 没有
+                        whMaterialStandingbookEntity.Quantity = procMaterial.Batch;
+                        whMaterialStandingbookEntity.Unit = procMaterial.Unit ?? "";
+                        whMaterialStandingbookEntity.Type = WhMaterialInventoryTypeEnum.ManuComplete; //(int)WhMaterialInventorySourceEnum.MaterialReceiving;
+                        whMaterialStandingbookEntity.Source = WhMaterialInventorySourceEnum.ManuComplete;
+                        whMaterialStandingbookEntity.SiteId = _currentSite.SiteId ?? 0;
+                        whMaterialStandingbookEntity.Id = IdGenProvider.Instance.CreateId();
+                        whMaterialStandingbookEntity.CreatedBy = _currentUser.UserName;
+                        whMaterialStandingbookEntity.UpdatedBy = _currentUser.UserName;
+                        whMaterialStandingbookEntity.CreatedOn = HymsonClock.Now();
+                        whMaterialStandingbookEntity.UpdatedOn = HymsonClock.Now();
+
+                        whMaterialStandingbookList.Add(whMaterialStandingbookEntity);
+                        #endregion
+                    }
+                }
+
+            }
 
             try
             {
                 using (var trans = TransactionHelper.GetTransactionScope())
                 {
-                    if (sfcProduceStepDto.Type == SfcProduceStatusEnum.Complete)
+                    if (sfcProduceStepDto.Type == SfcProduceStatusEnum.Complete && sfcProduceStepDto.ProcedureId == endProcessRouteDetailId)
                     {
+
                         //写步骤
                         await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
+                        //删除条码记录
+                        await _manuSfcProduceRepository.DeletePhysicalRangeAsync(sfcsArr.ToList());
 
-                        //如果尾工序
-                        if (sfcProduceStepDto.ProcedureId == endProcessRouteDetailId)
-                        {
-                            //删除条码记录
-                            await _manuSfcProduceRepository.DeletePhysicalRangeAsync(sfcsArr.ToList());
+                        // 更新条码信息
+                        var sfcInfo = await _manuSfcRepository.GetBySFCsAsync(sfcsArr);
+                        await _manuSfcRepository.UpdateStatusAsync(new ManuSfcUpdateCommand { Sfcs = sfcsArr, Status = SfcStatusEnum.Complete, UserId = _currentUser.UserName, UpdatedOn = HymsonClock.Now() });
+                        //不用更新这个  因为是唯一的生产肯定使用了  
+                        //await _manuSfcInfoRepository.UpdatesIsUsedAsync(new ManuSfcInfoUpdateCommand { Sfcs = sfcsArr, IsUsed = YesOrNoEnum.No, UserId = _currentUser.UserName, UpdatedOn = HymsonClock.Now() });
 
-                            // 更新条码信息
-                            var sfcInfo = await _manuSfcRepository.GetBySFCsAsync(sfcsArr);
-                            await _manuSfcRepository.UpdateStatusAsync(new ManuSfcUpdateCommand { Sfcs = sfcsArr, Status = SfcStatusEnum.Complete, UserId = _currentUser.UserName, UpdatedOn = HymsonClock.Now() });
-                            //不用更新这个  因为是唯一的生产肯定使用了  
-                            //await _manuSfcInfoRepository.UpdatesIsUsedAsync(new ManuSfcInfoUpdateCommand { Sfcs = sfcsArr, IsUsed = YesOrNoEnum.No, UserId = _currentUser.UserName, UpdatedOn = HymsonClock.Now() });
-
-                            //入库
-                            var whMaterialInventorys = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarcodeQuery { BarCodes = sfcsArr, SiteId = _currentSite.SiteId ?? 0 });
-                            var notwhMaterialInventorySfcs = manuSfcInfos.Where(it => !whMaterialInventorys.Where(wmi => wmi.MaterialBarCode == it.SFC).Any()).ToList();
-                            var productIds = notwhMaterialInventorySfcs.Select(it => it.ProductId).ToArray();
-                            var procMaterials = await _procMaterialRepository.GetByIdsAsync(productIds);
-
-                            var whMaterialInventoryListCreateDtoList = new List<WhMaterialInventoryListCreateDto>();
-                            foreach (var item in manuSfcInfos)
-                            {
-                                var procMaterial = procMaterials.Where(it => it.Id == item.ProductId).First();
-                                var whMaterialInventoryListCreateDto = new WhMaterialInventoryListCreateDto()
-                                {
-                                    Batch = HymsonClock.Now().ToShortDateString(),
-                                    MaterialBarCode = item.SFC,
-                                    MaterialCode = procMaterial.MaterialCode,
-                                    QuantityResidue = procMaterial.Batch,
-                                    Source = WhMaterialInventorySourceEnum.manuComplete,
-                                    SupplierId = 0,
-                                    Type = WhMaterialInventoryTypeEnum.manuComplete,
-                                    Version = procMaterial.Version
-                                };
-                                whMaterialInventoryListCreateDtoList.Add(whMaterialInventoryListCreateDto);
-
-                            }
-                            await _whMaterialInventoryService.CreateWhMaterialInventoryListAsync(whMaterialInventoryListCreateDtoList);
-                        }
-                        else
-                        {
-                            //不是尾工序 直接更改状态
-                            var updateProcedureAndStatusCommand = new UpdateProcedureAndStatusCommand
-                            {
-                                Sfcs = sfcsArr,
-                                ProcedureId = sfcProduceStepDto.ProcedureId,
-                                Status = sfcProduceStepDto.Type,
-                                UpdatedOn = HymsonClock.Now(),
-                                UserId = _currentUser.UserName
-                            };
-                            await _manuSfcProduceRepository.UpdateProcedureAndStatusRangeAsync(updateProcedureAndStatusCommand);
-                        }
+                        //更新库存
+                        if (updateInventoryQuantityList.Any())
+                            await _whMaterialInventoryRepository.UpdateIncreaseQuantityResidueRangeAsync(updateInventoryQuantityList);
+                        if (whMaterialInventoryList.Any())
+                            await _whMaterialInventoryRepository.InsertsAsync(whMaterialInventoryList);
+                        if (whMaterialStandingbookList.Any())
+                            await _whMaterialStandingbookRepository.InsertsAsync(whMaterialStandingbookList);
                     }
                     else
                     {
-                        //指定活动或排队的
                         //写步骤
                         await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
                         //指定工序
@@ -1212,6 +1308,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         };
                         await _manuSfcProduceRepository.UpdateProcedureAndStatusRangeAsync(updateProcedureAndStatusCommand);
                     }
+                    trans.Complete();
                 }
             }
             catch (Exception ex)

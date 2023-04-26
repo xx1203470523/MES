@@ -74,6 +74,10 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task CreateProcBomAsync(ProcBomCreateDto procBomCreateDto)
         {
+            procBomCreateDto.BomCode = procBomCreateDto.BomCode.ToTrimSpace().ToUpperInvariant();
+            procBomCreateDto.BomName = procBomCreateDto.BomName.Trim();
+            procBomCreateDto.Version = procBomCreateDto.Version.Trim();
+            procBomCreateDto.Remark = procBomCreateDto.Remark??"".Trim();
             if (procBomCreateDto == null)
             {
                 throw new ValidationException(nameof(ErrorCode.MES10503));
@@ -334,6 +338,8 @@ namespace Hymson.MES.Services.Services.Process
             {
                 throw new ValidationException(nameof(ErrorCode.MES10100));
             }
+            procBomModifyDto.BomName = procBomModifyDto.BomName.Trim();
+            procBomModifyDto.Remark = procBomModifyDto.Remark ?? "".Trim();
 
             var list = procBomModifyDto.MaterialList.ToList();
             list.ForEach(a =>

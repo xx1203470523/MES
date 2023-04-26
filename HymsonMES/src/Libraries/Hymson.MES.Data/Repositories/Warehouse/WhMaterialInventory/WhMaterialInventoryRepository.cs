@@ -10,6 +10,7 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Microsoft.Extensions.Options;
@@ -178,6 +179,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             return whMaterialInventoryEntities;
         }
 
+
         /// <summary>
         /// 新增
         /// </summary>
@@ -234,6 +236,17 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         }
 
         /// <summary>
+        /// 清空库存
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateWhMaterialInventoryEmptyByBarCodeAync(UpdateWhMaterialInventoryEmptyCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateWhMaterialInventoryEmptySql, command);
+        }
+
+        /// <summary>
         /// 更新库存数量(增加库存)
         /// </summary>
         /// <param name="barCode"></param>
@@ -243,6 +256,18 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateIncreaseQuantityResidueSql, updateQuantityCommand);
         }
+
+        /// <summary>
+        /// 批量更新库存数量(增加库存)
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateIncreaseQuantityResidueRangeAsync(IEnumerable<UpdateQuantityCommand> updateQuantityCommand)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateIncreaseQuantityResidueSql, updateQuantityCommand);
+        }
+
 
         /// <summary>
         /// 更新库存数量(减少库存)
@@ -258,17 +283,17 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <summary>
         /// 根据物料编码获取物料数据
         /// </summary>
-        /// <param name="materialCode"></param>
+        /// <param name="materialId"></param>
         /// <returns></returns>
-        public async Task<ProcMaterialInfoView> GetProcMaterialByMaterialCodeAsync(string materialCode)
+        public async Task<ProcMaterialInfoView> GetProcMaterialByMaterialCodeAsync(long materialId)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetMaterialByMaterialCodeSql);
             sqlBuilder.Select("*");
-            sqlBuilder.Where("MaterialCode=@materialCode");
+            sqlBuilder.Where("Id=@materialId");
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var pmInfo = await conn.QueryFirstOrDefaultAsync<ProcMaterialInfoView>(template.RawSql, new { materialCode });
+            var pmInfo = await conn.QueryFirstOrDefaultAsync<ProcMaterialInfoView>(template.RawSql, new { materialId });
             return pmInfo;
         }
 
@@ -311,6 +336,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         const string UpdateSql = "UPDATE `wh_material_inventory` SET   SupplierId = @SupplierId, MaterialId = @MaterialId, MaterialBarCode = @MaterialBarCode, Batch = @Batch, QuantityResidue = @QuantityResidue, Status = @Status, DueDate = @DueDate, Source = @Source, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `wh_material_inventory` SET   SupplierId = @SupplierId, MaterialId = @MaterialId, MaterialBarCode = @MaterialBarCode, Batch = @Batch, QuantityResidue = @QuantityResidue, Status = @Status, DueDate = @DueDate, Source = @Source, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
         const string UpPointByBarCode = "UPDATE wh_material_inventory SET Status = @Status, QuantityResidue = @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
+        const string UpdateWhMaterialInventoryEmptySql = "UPDATE wh_material_inventory SET  QuantityResidue =0, UpdatedBy = @UserName, UpdatedOn = @UpdateTime WHERE MaterialBarCode IN @BarCodeList AND SiteId=@SiteId";
         const string DeleteSql = "UPDATE `wh_material_inventory` SET IsDeleted = '1' WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `wh_material_inventory` SET IsDeleted = '1' WHERE Id in @ids";
         const string GetByIdSql = @"SELECT 

@@ -268,7 +268,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             var siteId = _currentSite.SiteId ?? 0;
             var userName = _currentUser.UserName;
             parm.Procedure.Code= parm.Procedure.Code.ToTrimSpace().ToUpperInvariant();
-            parm.Procedure.Name = parm.Procedure.Name.ToTrimSpace();
+            parm.Procedure.Name = parm.Procedure.Name.Trim();
             parm.Procedure.Remark = parm.Procedure.Remark.Trim();
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(parm.Procedure);
@@ -371,7 +371,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             var siteId = _currentSite.SiteId ?? 0;
             var userName = _currentUser.UserName;
 
-            parm.Procedure.Name = parm.Procedure.Name.ToTrimSpace();
+            parm.Procedure.Name = parm.Procedure.Name.Trim();
             parm.Procedure.Remark = parm.Procedure.Remark.Trim();
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(parm.Procedure);

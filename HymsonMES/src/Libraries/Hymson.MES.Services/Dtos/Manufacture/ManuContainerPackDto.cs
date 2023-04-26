@@ -266,5 +266,10 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public string SFC { get; set; }
 
+        /// <summary>
+        /// 容器id
+        /// </summary>
+        public long ContainerId { get; set; }
+
     }
 }

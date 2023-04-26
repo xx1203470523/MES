@@ -55,6 +55,11 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public string SFC { get; set; }
 
         /// <summary>
+        /// 条码id
+        /// </summary>
+        public long? SfcInfoId { get; set; }
+
+        /// <summary>
         /// 数量
         /// </summary>
         public decimal? Qty { get; set; }

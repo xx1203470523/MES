@@ -45,9 +45,13 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
         /// <summary>
-        /// 条码信息表 仓储
+        /// 条码表 仓储
         /// </summary>
         private readonly IManuSfcRepository _manuSfcRepository;
+        /// <summary>
+        /// 条码信息表 仓储
+        /// </summary>
+        private readonly IManuSfcInfoRepository _sfcInfoRepository;
 
         /// <summary>
         /// 条码步骤表仓储 仓储
@@ -76,6 +80,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         public ManuProductBadRecordService(ICurrentUser currentUser, ICurrentSite currentSite,
         IManuSfcProduceRepository manuSfcProduceRepository,
         IManuSfcRepository manuSfcRepository,
+         IManuSfcInfoRepository sfcInfoRepository,
         IManuSfcStepRepository manuSfcStepRepository,
         IManuProductBadRecordRepository manuProductBadRecordRepository,
         IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
@@ -86,6 +91,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _currentSite = currentSite;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcRepository = manuSfcRepository;
+            _sfcInfoRepository= sfcInfoRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
             _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
@@ -129,6 +135,11 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             // 获取不合格代码列表
             var qualUnqualifiedCodes = await _qualUnqualifiedCodeRepository.GetByIdsAsync(createDto.UnqualifiedIds);
+            //读取条码信息
+            var sfcEntities = await _manuSfcRepository.GetBySFCsAsync(createDto.Sfcs);
+            var sfcIds = sfcEntities.Select(x => x.Id).ToList();
+            //读取条码info信息
+            var sfcInfos =await _sfcInfoRepository.GetBySFCIdsAsync(sfcIds);
 
             var manuProductBadRecords = new List<ManuProductBadRecordEntity>();
             long badResourceId = 0;
@@ -138,6 +149,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             foreach (var item in manuSfcs)
             {
+                var sfcEntity= sfcEntities.FirstOrDefault(x=>x.SFC==item.SFC);
                 foreach (var unqualified in qualUnqualifiedCodes)
                 {
                     manuProductBadRecords.Add(new ManuProductBadRecordEntity
@@ -149,6 +161,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         OutflowOperationId = createDto.OutflowOperationId,
                         UnqualifiedId = unqualified.Id,
                         SFC = item.SFC,
+                        SfcInfoId = sfcInfos.FirstOrDefault(x => x.SfcId == sfcEntity?.Id)?.Id,
                         Qty = item.Qty,
                         Status = ProductBadRecordStatusEnum.Open,
                         Source = ProductBadRecordSourceEnum.BadManualEntry,

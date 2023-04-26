@@ -48,5 +48,28 @@ namespace Hymson.MES.Api.Controllers.Report
             return await _workshopJobControlReportService.GetWorkshopJobControlPageListAsync(param);
         }
 
+        /// <summary>
+        /// 获取SFC的车间作业控制步骤
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getSfcInOut/{sfc}")]
+        public async Task<WorkshopJobControlStepReportDto> QuerySfcInOutRecordAsync(string sfc)
+        {
+            return await _workshopJobControlReportService.GetSfcInOutInfo(sfc);
+        }
+
+        /// <summary>
+        /// 根据SFC分页获取条码步骤信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getSfcStepBySFCPageList")]
+        public async Task<PagedInfo<ManuSfcStepBySFCViewDto>> QueryPagedSFCStepBySFCAsync([FromQuery] ManuSfcStepBySFCPagedQueryDto param)
+        {
+            return await _workshopJobControlReportService.GetSFCStepsBySFCPageList(param);
+        }
     }
 }

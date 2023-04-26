@@ -5,6 +5,7 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using static Dapper.SqlBuilder;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -169,6 +170,51 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.ExecuteAsync(InsertSfcStepBusinessSql, maunSfcStepBusinessEntities);
         }
         #endregion
+
+        /// <summary>
+        /// 获取SFC的进出站步骤
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcStepEntity>> GetSFCInOutStepAsync(string sfc) 
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var manuSfcStepEntities = await conn.QueryAsync<ManuSfcStepEntity>(GetSFCInOutStepSql, new { SFC=sfc});
+            return manuSfcStepEntities;
+
+        }
+
+        /// <summary>
+        /// 分页查询 根据SFC
+        /// </summary>
+        /// <param name="queryParam"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ManuSfcStepEntity>> GetPagedInfoBySFCAsync(ManuSfcStepBySFCPagedQuery queryParam)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetBySFCPagedInfoDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetBySFCPagedInfoCountSqlTemplate);
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId=@SiteId");
+            sqlBuilder.Select("*");
+
+            if (!string.IsNullOrWhiteSpace(queryParam.SFC))
+            {
+                sqlBuilder.Where("SFC=@SFC");
+            }
+
+            var offSet = (queryParam.PageIndex - 1) * queryParam.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = queryParam.PageSize });
+            sqlBuilder.AddParameters(queryParam);
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var manuSfcStepEntitiesTask = conn.QueryAsync<ManuSfcStepEntity>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var manuSfcStepEntities = await manuSfcStepEntitiesTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<ManuSfcStepEntity>(manuSfcStepEntities, queryParam.PageIndex, queryParam.PageSize, totalCount);
+        }
     }
 
     /// <summary>
@@ -191,5 +237,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SFC`, `ProductId`, `WorkOrderId`, `WorkCenterId`, `ProductBOMId`, `Qty`, `EquipmentId`, `ResourceId`, `ProcedureId`, `Type`, `Status`, `Lock`, `IsMultiplex`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `manu_sfc_step`  WHERE Id IN @ids ";
+
+        const string GetSFCInOutStepSql = @" 
+                        SELECT 
+                           `Id`, `SFC`, `ProductId`, `WorkOrderId`, `WorkCenterId`, `ProductBOMId`, `Qty`, `EquipmentId`, `ResourceId`, `ProcedureId`, `CurrentStatus`, `Operatetype`, `IsRepair`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
+                        FROM `manu_sfc_step` 
+                        WHERE IsDeleted=0
+                        AND Operatetype in (3,4)
+                        and SFC=@SFC
+                        ORDER BY CreatedOn asc
+                        ";
+        const string GetBySFCPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_step` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY CreatedOn desc LIMIT @Offset,@Rows ";
+        const string GetBySFCPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_sfc_step` /**where**/ ";
     }
 }
