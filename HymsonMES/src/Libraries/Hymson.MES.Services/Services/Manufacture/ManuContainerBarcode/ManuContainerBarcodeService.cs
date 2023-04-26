@@ -153,19 +153,23 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             //获取条码生产信息
             var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(createManuContainerBarcodeDto.BarCode);
-            //是否允许活动产品
-            if (sfcProduceEntity.Status == SfcProduceStatusEnum.Activity && !facePlateContainerPackEntity.IsAllowActiveProduct) {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16711));
-            }
-            //是否允许完成产品
-            if (sfcProduceEntity.Status == SfcProduceStatusEnum.Complete && !facePlateContainerPackEntity.IsAllowCompleteProduct)
+            if (sfcProduceEntity != null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16712));
-            }
-            //是否允许排队产品
-            if (sfcProduceEntity.Status == SfcProduceStatusEnum.lineUp && !facePlateContainerPackEntity.IsAllowQueueProduct)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16713));
+                //是否允许活动产品
+                if (sfcProduceEntity.Status == SfcProduceStatusEnum.Activity && !facePlateContainerPackEntity.IsAllowActiveProduct)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16711));
+                }
+                //是否允许完成产品
+                if (sfcProduceEntity.Status == SfcProduceStatusEnum.Complete && !facePlateContainerPackEntity.IsAllowCompleteProduct)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16712));
+                }
+                //是否允许排队产品
+                if (sfcProduceEntity.Status == SfcProduceStatusEnum.lineUp && !facePlateContainerPackEntity.IsAllowQueueProduct)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16713));
+                }
             }
 
             var sfcinfos = await _manuSfcInfoRepository.GetBySFCIdsAsync(new long[] { sfcEntity.Id });
