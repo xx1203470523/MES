@@ -91,7 +91,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
             sfcProduceEntity.UpdatedOn = HymsonClock.Now();
 
             // 合法性校验
-            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.lineUp).VerifyProcedure(bo.ProcedureId);
+            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.lineUp).VerifyResource(bo.ResourceId);
             sfcProduceBusinessEntity.VerifyProcedureLock(bo.SFC, bo.ProcedureId);
 
             // 如果工序对应不上
