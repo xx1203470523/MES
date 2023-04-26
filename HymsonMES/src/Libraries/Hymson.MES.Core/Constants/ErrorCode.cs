@@ -433,7 +433,7 @@
         public const string MES16118 = "工单{OrderCode}状态为未开始，无法继续生产";
         public const string MES16119 = "工单{OrderCode}已经关闭，无法继续生产";
         public const string MES16120 = "库存不存在";
-        public const string MES16121 = "不满足产品{}的掩码规则";
+        public const string MES16121 = "不满足产品{Product}的掩码规则";
         #endregion
 
         #region 条码生成 MES16200
@@ -537,7 +537,6 @@
         public const string MES16506 = "条码部位完成和在库状态，无法复用。";
         #endregion
 
-
         #region 在制品移除添加 16600
 
         public const string MES16600 = "条码不存在或不是在制品!";
@@ -604,7 +603,6 @@
         public const string MES16912 = "条码为空！";
         #endregion
 
-
         #region 在制品步骤控制 MES18000
         public const string MES18000 = "在制品步骤控制错误";
         public const string MES18001 = "条码信息不存在";
@@ -654,6 +652,5 @@
         //public const string MES30100 = "MES30100";
         //public const string MES30101 = "MES30101";
         #endregion
-
     }
 }

@@ -147,12 +147,12 @@ namespace Hymson.MES.Data.Repositories.Quality
                 sqlBuilder.Where("UnqualifiedCodeName like @UnqualifiedCodeName");
             }
 
-            if (param.Status != null)
+            if (param.Status.HasValue)
             {
                 sqlBuilder.Where("Status=@Status");
             }
 
-            if (param.Type != null)
+            if (param.Type.HasValue)
             {
                 sqlBuilder.Where("Type=@Type");
             }
