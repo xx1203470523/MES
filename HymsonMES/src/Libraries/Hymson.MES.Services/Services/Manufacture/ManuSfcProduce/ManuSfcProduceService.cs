@@ -201,9 +201,13 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuSfcProducePagedQuery.SiteId = _currentSite.SiteId;
 
             //查询多个条码
-            if (!string.IsNullOrWhiteSpace(manuSfcProducePagedQueryDto.Sfcs))
+            //if (!string.IsNullOrWhiteSpace(manuSfcProducePagedQueryDto.Sfcs))
+            //{
+            //    manuSfcProducePagedQuery.SfcArray = manuSfcProducePagedQueryDto.Sfcs.Split(',');
+            //}
+            if (manuSfcProducePagedQueryDto.Sfcs!=null&& manuSfcProducePagedQueryDto.Sfcs.Any())
             {
-                manuSfcProducePagedQuery.SfcArray = manuSfcProducePagedQueryDto.Sfcs.Split(',');
+                manuSfcProducePagedQuery.SfcArray = manuSfcProducePagedQueryDto.Sfcs;
             }
 
             //根据资源查询
@@ -525,11 +529,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES15402));
             }
 
-            //var scrapSfcs = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery
-            //{
-            //    Sfcs = parm.Sfcs,
-            //    Statuss = new SfcStatusEnum?[1] { SfcStatusEnum.Scrapping }
-            //});
             var scrapSfcs = manuSfcs.Where(x => x.IsScrap == TrueOrFalseEnum.Yes).Select(x => x.SFC).ToArray();
             //类型为报废时判断条码是否已经报废,若已经报废提示:存在已报废的条码，不可再次报废
             if (scrapSfcs.Any())
@@ -802,9 +801,9 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuSfcProducePagedQuery.SiteId = _currentSite.SiteId;
 
             //查询多个条码
-            if (!string.IsNullOrWhiteSpace(manuSfcProducePagedQueryDto.Sfcs))
+            if (manuSfcProducePagedQueryDto.Sfcs != null && manuSfcProducePagedQueryDto.Sfcs.Any())
             {
-                manuSfcProducePagedQuery.SfcArray = manuSfcProducePagedQueryDto.Sfcs.Split(',');
+                manuSfcProducePagedQuery.SfcArray = manuSfcProducePagedQueryDto.Sfcs;
             }
 
             //根据资源查询

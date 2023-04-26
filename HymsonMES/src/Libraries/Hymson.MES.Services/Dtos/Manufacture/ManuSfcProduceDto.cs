@@ -433,7 +433,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 条码列表
         /// </summary>
-        public string? Sfcs { get; set; }
+        public string[]? Sfcs { get; set; }
 
         /// <summary>
         /// 资源id
