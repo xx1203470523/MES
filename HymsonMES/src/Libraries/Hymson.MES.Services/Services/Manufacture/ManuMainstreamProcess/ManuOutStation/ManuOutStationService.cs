@@ -11,6 +11,7 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services.Bos.Manufacture;
@@ -224,8 +225,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 // 删除 manu_sfc_produce
                 rows += await _manuSfcProduceRepository.DeletePhysicalAsync(sfcProduceEntity.SFC);
 
-                // TODO 删除 manu_sfc_produce_business
-
                 // 插入 manu_sfc_step 状态为 完成
                 sfcStep.Operatetype = ManuSfcStepTypeEnum.OutStock;    // TODO 这里的状态？？
                 sfcStep.CurrentStatus = SfcProduceStatusEnum.Complete;  // TODO 这里的状态？？
@@ -234,6 +233,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 // manu_sfc_info 修改为完成 且入库
                 // 条码信息
                 var sfcInfo = await _manuSfcRepository.GetBySFCAsync(sfcProduceEntity.SFC);
+
+                // 删除 manu_sfc_produce_business
+                await _manuSfcProduceRepository.DeleteSfcProduceBusinessBySfcInfoIdAsync(new DeleteSfcProduceBusinesssBySfcInfoIdCommand
+                {
+                    SiteId = sfcProduceEntity.SiteId,
+                    SfcInfoId = sfcInfo.Id
+                });
 
                 // 更新状态
                 sfcInfo.Status = SfcStatusEnum.Complete;

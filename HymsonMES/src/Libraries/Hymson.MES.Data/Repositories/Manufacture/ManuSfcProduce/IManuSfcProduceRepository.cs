@@ -204,6 +204,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 批量删除（物理删除）
         /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> DeleteSfcProduceBusinessBySfcInfoIdAsync(DeleteSfcProduceBusinesssBySfcInfoIdCommand command);
+
+        /// <summary>
+        /// 批量删除（物理删除）
+        /// </summary>
         /// <param name="sfcInfoIds"></param>
         /// <returns></returns>
         Task<int> DeleteSfcProduceBusinesssAsync(DeleteSfcProduceBusinesssCommand command);
