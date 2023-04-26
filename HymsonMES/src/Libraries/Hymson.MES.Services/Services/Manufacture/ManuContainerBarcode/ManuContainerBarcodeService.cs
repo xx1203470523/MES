@@ -16,6 +16,7 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -31,6 +32,7 @@ using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBar
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.Diagnostics;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -145,6 +147,11 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16701));
             }
+            //是否允许活动产品
+            if (sfcEntity.Status == SfcStatusEnum.InProcess && !facePlateContainerPackEntity.IsAllowActiveProduct) {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16711));
+            }
+
             var sfcinfos = await _manuSfcInfoRepository.GetBySFCIdsAsync(new long[] { sfcEntity.Id });
             if (sfcinfos == null||!sfcinfos.Any())
             {
