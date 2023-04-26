@@ -34,5 +34,12 @@ namespace Hymson.MES.Services.Services.Report
         /// <param name="sfc"></param>
         /// <returns></returns>
         Task<WorkshopJobControlStepReportDto> GetSfcInOutInfo(string sfc);
+
+        /// <summary>
+        /// 根据SFC分页获取条码步骤信息
+        /// </summary>
+        /// <param name="queryParam"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ManuSfcStepBySFCViewDto>> GetSFCStepsBySFCPageList(ManuSfcStepBySFCPagedQueryDto queryParam);
     }
 }

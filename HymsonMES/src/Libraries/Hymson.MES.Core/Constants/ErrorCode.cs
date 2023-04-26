@@ -631,6 +631,8 @@
         public const string MES18103 = "没有获取到{sfc}对应步骤中的产品信息";
         public const string MES18104 = "没有获取到{sfc}对应步骤中的工艺路线信息";
         public const string MES18105 = "没有获取到{sfc}对应步骤中的BOM信息";
+
+        public const string MES18110 = "没有传入SFC条码信息";
         #endregion
 
         #endregion

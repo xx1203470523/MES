@@ -186,5 +186,62 @@ namespace Hymson.MES.Services.Services.Report
 
             return workshopJobControlStepReportDto;
         }
+
+        /// <summary>
+        /// 根据SFC分页获取条码步骤信息
+        /// </summary>
+        /// <param name="queryParam"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ManuSfcStepBySFCViewDto>> GetSFCStepsBySFCPageList(ManuSfcStepBySFCPagedQueryDto queryParam)
+        {
+            var pagedQuery = queryParam.ToQuery<ManuSfcStepBySFCPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId.Value;
+
+            if (string.IsNullOrEmpty(pagedQuery.SFC)) 
+            {
+                throw new BusinessException(nameof(ErrorCode.MES18110));
+            }
+
+            var pagedInfo = await _manuSfcStepRepository.GetPagedInfoBySFCAsync(pagedQuery);
+
+            List<ManuSfcStepBySFCViewDto> listDto = new List<ManuSfcStepBySFCViewDto>();
+
+            if (pagedInfo.Data == null || !pagedInfo.Data.Any()) 
+            {
+                return new PagedInfo<ManuSfcStepBySFCViewDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            }
+
+            var materialIds = pagedInfo.Data.Select(x => x.ProductId).Distinct().ToArray();
+            var materials = await _procMaterialRepository.GetByIdsAsync(materialIds);
+
+            var procedureIds= pagedInfo.Data.Select(x => x.ProcedureId.Value).Distinct().ToArray();
+            var procedures = procedureIds!=null&&procedureIds.Any()? await _procProcedureRepository.GetByIdsAsync(procedureIds):null;
+
+            var workOrderIds= pagedInfo.Data.Select(x => x.WorkOrderId).Distinct().ToArray();
+            var workOrders= await _planWorkOrderRepository.GetByIdsAsync(workOrderIds);
+
+            foreach (var item in pagedInfo.Data)
+            {
+                var material = materials != null && materials.Any() ? materials.Where(x => x.Id == item.ProductId).FirstOrDefault() : null;
+                var procedure = procedures != null && procedures.Any() ? procedures.Where(x => x.Id == item.ProcedureId).FirstOrDefault() : null;
+                var workOrder=workOrders!=null&&workOrders.Any() ? workOrders.Where(x => x.Id == item.WorkOrderId).FirstOrDefault() : null;
+
+
+                listDto.Add(new ManuSfcStepBySFCViewDto()
+                {
+                    Id = item.Id,
+                    SFC = item.SFC,
+                    Operatetype = item.Operatetype,
+                    CreatedOn = item.CreatedOn,
+                    MaterialCodeVersion = material != null ? material.MaterialCode + "/" + material.Version : "",
+                    MaterialName = material != null ? material.MaterialName : "",
+                    ProcedureCode = procedure != null ? procedure.Code : "",
+                    ProcedureName = procedure != null ? procedure.Name : "",
+                    OrderCode= workOrder != null ? workOrder.OrderCode : ""
+                });
+            }
+
+            return new PagedInfo<ManuSfcStepBySFCViewDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
     }
 }
