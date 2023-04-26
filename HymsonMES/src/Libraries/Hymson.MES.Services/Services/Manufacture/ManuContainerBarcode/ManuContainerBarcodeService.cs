@@ -155,11 +155,11 @@ namespace Hymson.MES.Services.Services.Manufacture
             var procobj = await _procProcedureRepository.GetByIdAsync(facePlateContainerPackEntity.ProcedureId);
             if(procobj == null)
                 throw new CustomerValidationException(nameof(ErrorCode.MES16714));
-            if(procobj.PackingLevel==1)
+            if(procobj.PackingLevel==(int)ManuContainerBarcodePackageLevelEnum.First)
             {
                 return await CreateFirstPackage(createManuContainerBarcodeDto, facePlateContainerPackEntity, manuContainerBarcodeEntity);
             }
-            else if(procobj.PackingLevel==2||procobj.PackingLevel==3)
+            else if(procobj.PackingLevel== (int)ManuContainerBarcodePackageLevelEnum.Second || procobj.PackingLevel== (int)ManuContainerBarcodePackageLevelEnum.Third)
             {
                 return await CreateSecondPackage(createManuContainerBarcodeDto, facePlateContainerPackEntity, manuContainerBarcodeEntity, procobj.PackingLevel.Value);
             }
