@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -275,6 +276,17 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 查询工序关联的资源列表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcResourceEntity>> GetProcResourceListByProcedureIdAsync(ProcResourceListByProcedureIdQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcResourceEntity>(GetProcResourceListByProcedureIdSql, query);
+        }
+
+        /// <summary>
         /// 添加资源数据
         /// </summary>
         /// <param name="entity"></param>
@@ -376,6 +388,8 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetPagedInfoJoinCountSqlTemplate = "SELECT COUNT(*) FROM proc_resource r /**innerjoin**/ /**leftjoin**/ /**where**/ ";
 
         const string GetListSqlTemplate = "SELECT /**select**/ FROM proc_resource  /**where**/  ";
+        const string GetProcResourceListByProcedureIdSql = "SELECT R.* FROM proc_resource R INNER JOIN proc_procedure P ON R.ResTypeId = P.ResourceTypeId " +
+            "WHERE R.IsDeleted = 0 AND P.IsDeleted = 0 AND R.SiteId = @SiteId AND P.SiteId = @SiteId AND P.Id = @ProcedureId ";
 
         const string InsertSql = "INSERT INTO `proc_resource`(`Id`, `SiteId`, `ResCode`, `ResName`,`Status`,`ResTypeId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @ResCode, @ResName,@Status,@ResTypeId,@Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted); ";
         const string UpdateSql = "UPDATE `proc_resource` SET ResName = @ResName,ResTypeId = @ResTypeId,Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id;";
