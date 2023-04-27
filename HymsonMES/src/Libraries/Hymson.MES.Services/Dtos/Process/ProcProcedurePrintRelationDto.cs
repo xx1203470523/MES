@@ -209,7 +209,8 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 打印模板名称
         /// </summary>
-        public string TemplateName { get; set; }
+        public string Name { get; set; }
+
         /// <summary>
         /// 份数
         /// </summary>

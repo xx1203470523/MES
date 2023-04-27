@@ -334,27 +334,29 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <summary>
         /// 判断上一工序是否随机工序
         /// </summary>
-        /// <param name="manuSfcProduce"></param>
+        /// <param name="processRouteId"></param>
+        /// <param name="procedureId"></param>
         /// <returns></returns>
-        public async Task<bool> IsRandomPreProcedure(ManuSfcProduceEntity manuSfcProduce)
+        public async Task<bool> IsRandomPreProcedure(long processRouteId, long procedureId)
         {
             // 因为可能有分叉，所以返回的上一步工序是集合
             var preProcessRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetPreProcessRouteDetailLinkAsync(new ProcProcessRouteDetailLinkQuery
             {
-                ProcessRouteId = manuSfcProduce.ProcessRouteId,
-                ProcedureId = manuSfcProduce.ProcedureId
+                ProcessRouteId = processRouteId,
+                ProcedureId = procedureId
             });
             if (preProcessRouteDetailLinks == null || preProcessRouteDetailLinks.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES10442));
 
             // 获取当前工序在工艺路线里面的扩展信息
             var procedureNodes = await _procProcessRouteDetailNodeRepository
-                .GetByIdsAsync(preProcessRouteDetailLinks
-                .Where(w => w.PreProcessRouteDetailId.HasValue)
-                .Select(s => s.PreProcessRouteDetailId.Value).ToArray())
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10442));
+                .GetByProcedureIdsAsync(new ProcProcessRouteDetailNodesQuery
+                {
+                    ProcessRouteId = processRouteId,
+                    ProcedureIds = preProcessRouteDetailLinks.Where(w => w.PreProcessRouteDetailId.HasValue).Select(s => s.PreProcessRouteDetailId.Value)
+                }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10442));
 
             // 有多工序分叉的情况（取第一个当默认值）
-            ProcProcessRouteDetailNodeEntity defaultPreProcedure = procedureNodes.FirstOrDefault();
+            ProcProcessRouteDetailNodeEntity? defaultPreProcedure = procedureNodes.FirstOrDefault();
             if (preProcessRouteDetailLinks.Count() > 1)
             {
                 // 下工序找上工序，执照正常流程的工序
@@ -364,7 +366,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
 
             // 获取上一工序
             if (defaultPreProcedure == null) throw new CustomerValidationException(nameof(ErrorCode.MES10442));
-            return defaultPreProcedure.CheckType == ProcessRouteInspectTypeEnum.RandomInspection;
+            if (defaultPreProcedure.CheckType == ProcessRouteInspectTypeEnum.RandomInspection) return true;
+
+            // 继续检查上一工序
+            return await IsRandomPreProcedure(processRouteId, defaultPreProcedure.Id);
         }
 
         /// <summary>
