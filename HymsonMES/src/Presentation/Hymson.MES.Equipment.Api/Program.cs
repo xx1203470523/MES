@@ -39,7 +39,7 @@ namespace Hymson.MES.Equipment.Api
             builder.Services.AddMemoryCache();
             builder.Services.AddClearCacheService(builder.Configuration);
 #if DEBUG
-            //builder.Services.AddHostedService<WorkService>();
+            builder.Services.AddHostedService<HostedService>();
 #endif
             AddSwaggerGen(builder.Services);
 
