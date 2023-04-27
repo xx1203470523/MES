@@ -109,8 +109,8 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Select(@" wmi.MaterialBarCode,wmi.Batch, wmi.QuantityResidue,wmi.DueDate,wmi.Source,wmi.CreatedOn,wmi.Status,
                                 pm.Unit, pm.MaterialCode, pm.MaterialName, pm.Version, ws.Code as SupplierCode, ws.Name as SupplierName");
-            sqlBuilder.InnerJoin(" wh_supplier ws ON  ws.Id= wmi.SupplierId");
-            sqlBuilder.InnerJoin(" proc_material pm ON  pm.Id= wmi.MaterialId");
+            sqlBuilder.LeftJoin(" wh_supplier ws ON  ws.Id= wmi.SupplierId");
+            sqlBuilder.LeftJoin(" proc_material pm ON  pm.Id= wmi.MaterialId");
             sqlBuilder.Where(" wmi.IsDeleted = 0");
             sqlBuilder.OrderBy(" wmi.UpdatedOn DESC");
             //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))

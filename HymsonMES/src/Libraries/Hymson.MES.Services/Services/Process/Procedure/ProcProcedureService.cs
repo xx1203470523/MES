@@ -195,7 +195,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                         Version = entity.Version,
                         MaterialCode = material?.MaterialCode ?? "",
                         MaterialName = material?.MaterialName ?? "",
-                        TemplateName = template?.Name ?? ""
+                        Name = template?.Name ?? ""
                     };
                     dtos.Add(queryEntity);
                 }
