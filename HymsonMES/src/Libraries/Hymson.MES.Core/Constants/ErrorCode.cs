@@ -464,6 +464,7 @@
         public const string MES16314 = "SFC条码{SFC}已锁定，不允许操作。";
         public const string MES16315 = "库存{barCode}和待加载物料编码/版本不符！";
         public const string MES16316 = "SFC条码{SFC}和资源不匹配！";
+        public const string MES16317 = "工序和资源不匹配！";
         #endregion
 
         #region 生产

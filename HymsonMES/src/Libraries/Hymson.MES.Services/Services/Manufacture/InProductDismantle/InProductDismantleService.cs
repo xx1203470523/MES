@@ -620,12 +620,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             };
             var circulationEntities = await GetBarCodesAsync(queryDto);
             //查询bom明细
-            var bomDetailEntity = await _procBomDetailRepository.GetByIdAsync(replaceDto.BomDetailId);
-            var remainQty = bomDetailEntity?.Usages - circulationEntities.Sum(item => item.CirculationQty) ?? 0;
-            if (remainQty <= 0)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16615));
-            }
+            //var bomDetailEntity = await _procBomDetailRepository.GetByIdAsync(replaceDto.BomDetailId);
+            //var remainQty = bomDetailEntity?.Usages - circulationEntities.Sum(item => item.CirculationQty) ?? 0;
+            //if (remainQty <= 0)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES16615));
+            //}
 
             var circulationQty = circulationEntity.CirculationQty ?? 0M; //0m;
             var whMaterialInventory = new WhMaterialInventoryEntity();
@@ -1084,7 +1084,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     procMaterials.Add(new InProductDismantleDto
                     {
-                        MaterialId = item.Id,
+                        MaterialId = item.ReplaceMaterialId,
                         MaterialCode = material.MaterialCode,
                         MaterialName = material.MaterialName,
                         SerialNumber = material.SerialNumber,

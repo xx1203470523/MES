@@ -2,9 +2,7 @@
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
-using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 
 namespace Hymson.MES.Services.Services.Job.Manufacture
 {
@@ -28,11 +26,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="manuCommonService"></param>
-        /// <param name="manuSfcProduceRepository"></param>
-        public JobManuRepairEndService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IManuCommonService manuCommonService,
-            IManuSfcProduceRepository manuSfcProduceRepository)
+        public JobManuRepairEndService(ICurrentUser currentUser, ICurrentSite currentSite)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;

@@ -26,6 +26,11 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public long ProductId { get; set; }
 
         /// <summary>
+        /// 供应商ID
+        /// </summary>
+        public long SupplierId { get; set; }
+
+        /// <summary>
         /// 上料条码
         /// </summary>
         public string BarCode { get; set; }

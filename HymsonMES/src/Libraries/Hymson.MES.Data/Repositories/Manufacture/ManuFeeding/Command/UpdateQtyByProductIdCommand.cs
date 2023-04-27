@@ -1,9 +1,11 @@
-﻿namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command
+﻿using Hymson.MES.Data.Repositories.Common.Command;
+
+namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command
 {
     /// <summary>
     /// 
     /// </summary>
-    public class UpdateQtyByProductIdCommand
+    public class UpdateQtyByProductIdCommand : UpdateCommand
     {
         /// <summary>
         /// ID（资源）
