@@ -71,6 +71,8 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddAppService(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddWebFrameworkService(configuration);
+            services.AddExcelService();
+            services.AddMinioService(configuration);
             services.AddData(configuration);
             AddConfig(services, configuration);
             AddServices(services);
@@ -243,6 +245,11 @@ namespace Microsoft.Extensions.DependencyInjection
             #region OriginalSummary
             services.AddSingleton<IOriginalSummaryReportService, OriginalSummaryReportService>();
             #endregion
+
+            #region ComUsage
+            services.AddSingleton<IComUsageReportService, ComUsageReportService>();
+            #endregion
+
             #endregion
 
             return services;
@@ -257,7 +264,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddConfig(IServiceCollection services, IConfiguration configuration)
         {
             //数据库连接
-            services.Configure<TestOptions>(configuration.GetSection(nameof(TestOptions)));
+            //services.Configure<TestOptions>(configuration.GetSection(nameof(TestOptions)));
             //services.Configure<ConnectionOptions>(configuration);
             return services;
         }

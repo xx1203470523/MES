@@ -465,6 +465,7 @@
         public const string MES16314 = "SFC条码{SFC}已锁定，不允许操作。";
         public const string MES16315 = "库存{barCode}和待加载物料编码/版本不符！";
         public const string MES16316 = "SFC条码{SFC}和资源不匹配！";
+        public const string MES16317 = "工序和资源不匹配！";
         #endregion
 
         #region 生产
@@ -558,6 +559,7 @@
         public const string MES16614 = "请选择活动状态下的组件替换！";
         public const string MES16615 = "组件条码已装配所有组件,无需添加!";
         public const string MES16616 = "组件条码{barCode}未设置掩码规则!";
+        public const string MES16617 = "条码已报废,不可再执行当前操作!";
         #endregion
 
         #region 容器包装 MES 16700
@@ -641,6 +643,24 @@
         public const string MES18105 = "没有获取到{sfc}对应步骤中的BOM信息";
 
         public const string MES18110 = "没有传入SFC条码信息";
+        #endregion
+
+
+        #region 生产更改 MES18200
+        public const string MES18200 = "最大扫描{number}个";
+        public const string MES18201 = "条码不能为空";
+        public const string MES18202 = "工单不能为空";
+        public const string MES18203 = "工序不能为空";
+
+        public const string MES18204 = "条码:{SFC}已锁定";
+        public const string MES18205 = "条码:{SFC}的工单已关闭或锁定不允许操作";
+        public const string MES18206 = "工单必须相同";
+        public const string MES18207 = "新工单可生产数量不足";
+        public const string MES18208 = "未获取到工艺路线节点信息";
+        public const string MES18209 = "生产更改错误";
+        public const string MES18210 = "生产更改错误";
+
+
         #endregion
 
         #endregion

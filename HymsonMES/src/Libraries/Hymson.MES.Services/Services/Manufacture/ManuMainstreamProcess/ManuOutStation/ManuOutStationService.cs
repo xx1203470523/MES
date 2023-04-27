@@ -392,6 +392,23 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 {
                     residue -= item.Qty;
                     item.Qty -= qty;
+
+                    // 添加到扣减物料库存
+                    updateQtyByProductIdCommands.Add(new UpdateQtyByProductIdCommand
+                    {
+                        UpdatedBy = sfcProduceEntity.UpdatedBy ?? _currentUser.UserName,
+                        UpdatedOn = sfcProduceEntity.UpdatedOn,
+                        ResourceId = sfcProduceEntity.ResourceId,
+                        ProductId = material.MaterialId,
+                        Qty = item.Qty
+                    });
+
+                    // 条码流转
+                    manuSfcCirculationEntities.Add(new ManuSfcCirculationEntity
+                    {
+
+                    });
+                    break;
                 }
                 // 数量不够
                 else
@@ -406,13 +423,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             // 物料库存不够，启用替代料
             if (residue > 0)
             {
-
+                // TODO
             }
 
             // 扣减物料库存
-            // TODO 
-
-
+            _ = await _manuFeedingRepository.UpdateQtyByProductIdAsync(updateQtyByProductIdCommands);
 
             return 0;
         }
