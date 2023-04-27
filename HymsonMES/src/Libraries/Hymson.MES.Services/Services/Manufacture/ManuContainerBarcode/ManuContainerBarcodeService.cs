@@ -190,7 +190,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             
             if (sfcProduceEntity != null)
             {
-                sfcProduceEntity.VerifyProcedure(facePlateContainerPackEntity.ProcedureId);
+                //sfcProduceEntity.VerifyProcedure(facePlateContainerPackEntity.ProcedureId);
                 
                 //是否允许活动产品
                 if (sfcProduceEntity.Status == SfcProduceStatusEnum.Activity && !facePlateContainerPackEntity.IsAllowActiveProduct)
