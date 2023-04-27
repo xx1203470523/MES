@@ -79,6 +79,10 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 sqlBuilder.Where("Status = @Status");
             }
+            if (query.Type.HasValue)
+            {
+                sqlBuilder.Where("Type = @Type");
+            }
 
             var offSet = (query.PageIndex - 1) * query.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
