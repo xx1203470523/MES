@@ -369,7 +369,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             if (defaultPreProcedure.CheckType == ProcessRouteInspectTypeEnum.RandomInspection) return true;
 
             // 继续检查上一工序
-            await IsRandomPreProcedure(processRouteId, defaultPreProcedure.Id);
+            return await IsRandomPreProcedure(processRouteId, defaultPreProcedure.Id);
         }
 
         /// <summary>
