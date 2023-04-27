@@ -183,6 +183,38 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return manuSfcStepEntities;
 
         }
+
+        /// <summary>
+        /// 分页查询 根据SFC
+        /// </summary>
+        /// <param name="queryParam"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ManuSfcStepEntity>> GetPagedInfoBySFCAsync(ManuSfcStepBySFCPagedQuery queryParam)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetBySFCPagedInfoDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetBySFCPagedInfoCountSqlTemplate);
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId=@SiteId");
+            sqlBuilder.Select("*");
+
+            if (!string.IsNullOrWhiteSpace(queryParam.SFC))
+            {
+                sqlBuilder.Where("SFC=@SFC");
+            }
+
+            var offSet = (queryParam.PageIndex - 1) * queryParam.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = queryParam.PageSize });
+            sqlBuilder.AddParameters(queryParam);
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var manuSfcStepEntitiesTask = conn.QueryAsync<ManuSfcStepEntity>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var manuSfcStepEntities = await manuSfcStepEntitiesTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<ManuSfcStepEntity>(manuSfcStepEntities, queryParam.PageIndex, queryParam.PageSize, totalCount);
+        }
     }
 
     /// <summary>
@@ -215,5 +247,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                         and SFC=@SFC
                         ORDER BY CreatedOn asc
                         ";
+        const string GetBySFCPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_step` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY CreatedOn desc LIMIT @Offset,@Rows ";
+        const string GetBySFCPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_sfc_step` /**where**/ ";
     }
 }

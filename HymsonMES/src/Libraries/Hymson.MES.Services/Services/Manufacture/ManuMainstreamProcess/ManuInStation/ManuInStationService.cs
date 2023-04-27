@@ -2,10 +2,11 @@
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Utils;
 
@@ -32,6 +33,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
         private readonly IManuCommonService _manuCommonService;
 
         /// <summary>
+        /// 仓储接口（条码信息）
+        /// </summary>
+        private readonly IManuSfcRepository _manuSfcRepository;
+
+        /// <summary>
         /// 仓储接口（条码生产信息）
         /// </summary>
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
@@ -47,16 +53,19 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="manuCommonService"></param>
+        /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="procProcedureRepository"></param>
         public ManuInStationService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonService manuCommonService,
+            IManuSfcRepository manuSfcRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IProcProcedureRepository procProcedureRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _manuCommonService = manuCommonService;
+            _manuSfcRepository = manuSfcRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _procProcedureRepository = procProcedureRepository;
         }
@@ -65,29 +74,16 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
         /// <summary>
         /// 执行（进站）
         /// </summary>
-        /// <param name="bo"></param>
+        /// <param name="sfcProduceEntity"></param>
         /// <returns></returns>
-        public async Task<int> InStationAsync(ManufactureBo bo)
+        public async Task<int> InStationAsync(ManuSfcProduceEntity sfcProduceEntity)
         {
             var rows = 0;
 
-            // 获取生产条码信息
-            var (sfcProduceEntity, sfcProduceBusinessEntity) = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
-
-            // 合法性校验
-            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.lineUp).VerifyProcedure(bo.ProcedureId);
-            sfcProduceBusinessEntity.VerifyProcedureLock(bo.SFC, bo.ProcedureId);
-
-            // 如果工序对应不上
-            if (sfcProduceEntity.ProcedureId != bo.ProcedureId)
-            {
-                // 判断上一个工序是否是随机工序
-                var IsRandomPreProcedure = await _manuCommonService.IsRandomPreProcedure(sfcProduceEntity);
-                if (IsRandomPreProcedure == false) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
-
-                // 将SFC对应的工序改为当前工序
-                sfcProduceEntity.ProcessRouteId = bo.ProcedureId;
-            }
+            // 更新状态，将条码由"排队"改为"活动"
+            sfcProduceEntity.Status = SfcProduceStatusEnum.Activity;
+            sfcProduceEntity.UpdatedBy = _currentUser.UserName;
+            sfcProduceEntity.UpdatedOn = HymsonClock.Now();
 
             // 获取生产工单（附带工单状态校验）
             _ = await _manuCommonService.GetProduceWorkOrderByIdAsync(sfcProduceEntity.WorkOrderId);
@@ -103,10 +99,16 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
                 sfcProduceEntity.RepeatedCount++;
             }
 
-            // 更改状态，将条码由"排队"改为"活动"
-            sfcProduceEntity.Status = SfcProduceStatusEnum.Activity;
-            sfcProduceEntity.UpdatedBy = _currentUser.UserName;
-            sfcProduceEntity.UpdatedOn = HymsonClock.Now();
+            // 修改条码使用状态为"已使用"
+            rows += await _manuSfcRepository.UpdateSfcIsUsedAsync(new ManuSfcUpdateIsUsedCommand
+            {
+                Sfcs = new string[] { sfcProduceEntity.SFC },
+                UserId = sfcProduceEntity.UpdatedBy,
+                UpdatedOn = sfcProduceEntity.UpdatedOn,
+                IsUsed = YesOrNoEnum.Yes
+            });
+
+            // 更改状态
             rows += await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
 
             return rows;

@@ -27,7 +27,8 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <summary>
         /// 构造函数（不良报告）
         /// </summary>
-        /// <param name="badRecordReportService"></param>
+        /// <param name="logger"></param>
+        /// <param name="workshopJobControlReportService"></param>
         public WorkshopJobControlReportController( ILogger<BadRecordReportController> logger, IWorkshopJobControlReportService workshopJobControlReportService)
         {
             _logger = logger;
@@ -57,6 +58,18 @@ namespace Hymson.MES.Api.Controllers.Report
         public async Task<WorkshopJobControlStepReportDto> QuerySfcInOutRecordAsync(string sfc)
         {
             return await _workshopJobControlReportService.GetSfcInOutInfo(sfc);
+        }
+
+        /// <summary>
+        /// 根据SFC分页获取条码步骤信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getSfcStepBySFCPageList")]
+        public async Task<PagedInfo<ManuSfcStepBySFCViewDto>> QueryPagedSFCStepBySFCAsync([FromQuery] ManuSfcStepBySFCPagedQueryDto param)
+        {
+            return await _workshopJobControlReportService.GetSFCStepsBySFCPageList(param);
         }
     }
 }

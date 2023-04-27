@@ -85,7 +85,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="pid"></param>
         /// <param name="status">容器状态 1 打开 ，2关闭</param>
         /// <returns></returns>
-        Task<ManuContainerBarcodeEntity> GetByProductIdAsync(long pid, int status);
+        Task<ManuContainerBarcodeEntity> GetByProductIdAsync(long pid, int status,int level);
 
         /// <summary>
         /// 根据IDs批量获取数据

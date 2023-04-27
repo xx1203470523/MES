@@ -109,8 +109,8 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Select(@" wmi.MaterialBarCode,wmi.Batch, wmi.QuantityResidue,wmi.DueDate,wmi.Source,wmi.CreatedOn,wmi.Status,
                                 pm.Unit, pm.MaterialCode, pm.MaterialName, pm.Version, ws.Code as SupplierCode, ws.Name as SupplierName");
-            sqlBuilder.InnerJoin(" wh_supplier ws ON  ws.Id= wmi.SupplierId");
-            sqlBuilder.InnerJoin(" proc_material pm ON  pm.Id= wmi.MaterialId");
+            sqlBuilder.LeftJoin(" wh_supplier ws ON  ws.Id= wmi.SupplierId");
+            sqlBuilder.LeftJoin(" proc_material pm ON  pm.Id= wmi.MaterialId");
             sqlBuilder.Where(" wmi.IsDeleted = 0");
             sqlBuilder.OrderBy(" wmi.UpdatedOn DESC");
             //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
@@ -236,6 +236,17 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         }
 
         /// <summary>
+        /// 清空库存
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateWhMaterialInventoryEmptyByBarCodeAync(UpdateWhMaterialInventoryEmptyCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateWhMaterialInventoryEmptySql, command);
+        }
+
+        /// <summary>
         /// 更新库存数量(增加库存)
         /// </summary>
         /// <param name="barCode"></param>
@@ -325,6 +336,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         const string UpdateSql = "UPDATE `wh_material_inventory` SET   SupplierId = @SupplierId, MaterialId = @MaterialId, MaterialBarCode = @MaterialBarCode, Batch = @Batch, QuantityResidue = @QuantityResidue, Status = @Status, DueDate = @DueDate, Source = @Source, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `wh_material_inventory` SET   SupplierId = @SupplierId, MaterialId = @MaterialId, MaterialBarCode = @MaterialBarCode, Batch = @Batch, QuantityResidue = @QuantityResidue, Status = @Status, DueDate = @DueDate, Source = @Source, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
         const string UpPointByBarCode = "UPDATE wh_material_inventory SET Status = @Status, QuantityResidue = @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
+        const string UpdateWhMaterialInventoryEmptySql = "UPDATE wh_material_inventory SET  QuantityResidue =0, UpdatedBy = @UserName, UpdatedOn = @UpdateTime WHERE MaterialBarCode IN @BarCodeList AND SiteId=@SiteId";
         const string DeleteSql = "UPDATE `wh_material_inventory` SET IsDeleted = '1' WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `wh_material_inventory` SET IsDeleted = '1' WHERE Id in @ids";
         const string GetByIdSql = @"SELECT 

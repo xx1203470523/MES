@@ -223,10 +223,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.QueryFirstOrDefaultAsync<ManuContainerBarcodeEntity>(GetByCodeSql, new { BarCode = query.BarCode, SiteId= query.SiteId });
         }
 
-        public async Task<ManuContainerBarcodeEntity> GetByProductIdAsync(long pid, int status)
+        public async Task<ManuContainerBarcodeEntity> GetByProductIdAsync(long pid, int status,int level)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ManuContainerBarcodeEntity>(GetByProductIdSql, new { ProductId = pid, Status =status });
+            return await conn.QueryFirstOrDefaultAsync<ManuContainerBarcodeEntity>(GetByProductIdSql, new { ProductId = pid, Status =status,PackLevel=level });
         }
         #endregion
 
@@ -241,8 +241,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                             /**select**/
                                            FROM `manu_container_barcode` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `manu_container_barcode`(  `Id`, `SiteId`, `ProductId`, `WorkOrderId`,`BarCode`, `ContainerId`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ProductId,@WorkOrderId, @BarCode, @ContainerId, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `manu_container_barcode`(  `Id`, `SiteId`, `ProductId`,`WorkOrderId`, `BarCode`, `ContainerId`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ProductId,@WorkOrderId, @BarCode, @ContainerId, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `manu_container_barcode`(  `Id`, `SiteId`, `ProductId`, `WorkOrderId`,`BarCode`, `ContainerId`,`PackLevel`,`MaterialVersion`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ProductId,@WorkOrderId, @BarCode, @ContainerId,@PackLevel,@MaterialVersion, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsSql = "INSERT INTO `manu_container_barcode`(  `Id`, `SiteId`, `ProductId`,`WorkOrderId`, `BarCode`, `ContainerId`,`PackLevel`,`MaterialVersion`,  `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ProductId,@WorkOrderId, @BarCode, @ContainerId,@PackLevel,@MaterialVersion, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
         const string UpdateSql = "UPDATE `manu_container_barcode` SET   SiteId = @SiteId, ProductId = @ProductId, BarCode = @BarCode, ContainerId = @ContainerId, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `manu_container_barcode` SET   SiteId = @SiteId, ProductId = @ProductId, BarCode = @BarCode, ContainerId = @ContainerId, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
@@ -253,16 +253,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string DeletesSql = "UPDATE `manu_container_barcode` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteId`, `ProductId`,`WorkOrderId`, `BarCode`, `ContainerId`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                               `Id`, `SiteId`, `ProductId`,`WorkOrderId`, `BarCode`, `ContainerId`,`PackLevel`,`MaterialVersion`,  `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_container_barcode`  WHERE Id = @Id ";
         const string GetByCodeSql = @"SELECT 
-                               `Id`, `SiteId`, `ProductId`, `BarCode`,`WorkOrderId`, `ContainerId`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                               `Id`, `SiteId`, `ProductId`, `BarCode`,`WorkOrderId`, `ContainerId`,`PackLevel`,`MaterialVersion`,  `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_container_barcode`  WHERE BarCode = @BarCode and SiteId=@SiteId ";
         const string GetByProductIdSql = @"SELECT 
-                               `Id`, `SiteId`, `ProductId`,`WorkOrderId`, `BarCode`, `ContainerId`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `manu_container_barcode`  WHERE IsDeleted =0 and ProductId = @ProductId and Status=@Status ";
+                               `Id`, `SiteId`, `ProductId`,`WorkOrderId`, `BarCode`, `ContainerId`,`PackLevel`,`MaterialVersion`,  `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `manu_container_barcode`  WHERE IsDeleted =0 and ProductId = @ProductId and Status=@Status and PackLevel=@PackLevel ";
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteId`, `ProductId`,`WorkOrderId`, `BarCode`, `ContainerId`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                                          `Id`, `SiteId`, `ProductId`,`WorkOrderId`, `BarCode`, `ContainerId`,`PackLevel`,`MaterialVersion`,  `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_container_barcode`  WHERE Id IN @Ids ";
         #endregion
     }

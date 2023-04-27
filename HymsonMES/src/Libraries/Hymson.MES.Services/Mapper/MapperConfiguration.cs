@@ -22,6 +22,7 @@ using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.View;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
@@ -549,6 +550,13 @@ namespace Hymson.MES.Services.Mapper
             #region WorkshopJobControl
             CreateMap<WorkshopJobControlReportPagedQueryDto, WorkshopJobControlReportPagedQuery>();
             CreateMap<WorkshopJobControlReportView, WorkshopJobControlReportViewDto>();
+            
+            CreateMap<ManuSfcStepBySFCPagedQueryDto, ManuSfcStepBySFCPagedQuery>();
+            #endregion
+
+            #region ComUsageReport
+            CreateMap<ComUsageReportPagedQueryDto, ComUsageReportPagedQuery>();
+            
             #endregion
 
         }

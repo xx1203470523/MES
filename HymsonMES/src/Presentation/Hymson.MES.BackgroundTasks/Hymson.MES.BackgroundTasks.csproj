@@ -48,9 +48,9 @@
   </ItemGroup>
 	<ItemGroup>
 		
-		<PackageReference Include="Hymson.Kafka.Debezium" Version="2.1.0" />
+		<PackageReference Include="Hymson.Kafka.Debezium" Version="2.1.8" />
 		
-		<PackageReference Include="Hymson.NLog.Console" Version="2.1.0" />
+		<PackageReference Include="Hymson.NLog.Console" Version="2.1.8" />
 		
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
@@ -58,5 +58,8 @@
 		<PackageReference Include="MySql.Data" Version="8.0.32" />
 		<PackageReference Include="Quartz.Extensions.Hosting" Version="3.4.0" />
 		<PackageReference Include="Quartz.Serialization.Json" Version="3.4.0" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Libraries\Hymson.MES.BackgroundServices\Hymson.MES.BackgroundServices.csproj" />
 	</ItemGroup>
 </Project>

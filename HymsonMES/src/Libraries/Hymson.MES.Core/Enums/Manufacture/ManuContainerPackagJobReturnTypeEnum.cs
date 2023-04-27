@@ -21,6 +21,12 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 关闭
         /// </summary>
         [Description("关闭")]
-        JobManuCloseService = 2,
+        JobManuPackageCloseService = 2,
+
+        /// <summary>
+        /// 打开
+        /// </summary>
+        [Description("打开")]
+        JobManuPackageOpenService = 3
     }
 }

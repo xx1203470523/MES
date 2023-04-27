@@ -95,4 +95,16 @@ namespace Hymson.MES.Services.Bos.Manufacture
         /// </summary>
         public decimal ConsumeRatio { get; set; } = 1;
     }
+
+
+    /// <summary>
+    /// 容器包装
+    /// </summary>
+    public class ManufactureContainerBo
+    {
+        /// <summary>
+        /// 容器ID
+        /// </summary>
+        public long ContainerId { get; set; }
+    }
 }
