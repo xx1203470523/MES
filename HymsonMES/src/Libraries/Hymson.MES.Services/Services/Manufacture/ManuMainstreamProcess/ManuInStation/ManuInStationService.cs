@@ -103,7 +103,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
                 if (IsRandomPreProcedure == false) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
 
                 // 将SFC对应的工序改为当前工序
-                sfcProduceEntity.ProcessRouteId = bo.ProcedureId;
+                sfcProduceEntity.ProcedureId = bo.ProcedureId;
             }
 
             // 获取生产工单（附带工单状态校验）
