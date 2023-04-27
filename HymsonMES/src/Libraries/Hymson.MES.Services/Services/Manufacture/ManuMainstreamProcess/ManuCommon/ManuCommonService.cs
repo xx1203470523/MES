@@ -348,10 +348,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
 
             // 获取当前工序在工艺路线里面的扩展信息
             var procedureNodes = await _procProcessRouteDetailNodeRepository
-                .GetByIdsAsync(preProcessRouteDetailLinks
-                .Where(w => w.PreProcessRouteDetailId.HasValue)
-                .Select(s => s.PreProcessRouteDetailId.Value).ToArray())
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10442));
+                .GetByProcedureIdsAsync(new ProcProcessRouteDetailNodesQuery
+                {
+                    ProcessRouteId = manuSfcProduce.ProcessRouteId,
+                    ProcedureIds = preProcessRouteDetailLinks.Where(w => w.PreProcessRouteDetailId.HasValue).Select(s => s.PreProcessRouteDetailId.Value)
+                }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10442));
 
             // 有多工序分叉的情况（取第一个当默认值）
             ProcProcessRouteDetailNodeEntity defaultPreProcedure = procedureNodes.FirstOrDefault();
