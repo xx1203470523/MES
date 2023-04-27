@@ -312,7 +312,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                     && nextProcedureOfNone.CheckRate == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10446));
 
                 // 如果满足抽检次数，就取出一个非"空值"的随机工序作为下一工序
-                if (count > 0 && count % defaultNextProcedure.CheckRate == 0) defaultNextProcedure = nextProcedureOfNone;
+                if (count > 0 && count % nextProcedureOfNone.CheckRate == 0) defaultNextProcedure = nextProcedureOfNone;
             }
             // 没有分叉的情况
             else
