@@ -1,4 +1,4 @@
-﻿using Hymson.MES.Services.Bos.Manufacture;
+﻿using Hymson.MES.Core.Domain.Manufacture;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPackage
 {
@@ -8,11 +8,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPac
     public interface IManuRepairService
     {
         /// <summary>
-        /// 开始
+        /// 维修
         /// </summary>
-        /// <param name="bo"></param>
+        /// <param name="sfcProduceEntity"></param>
         /// <returns></returns>
-        Task<int> StartAsync(ManufactureBo bo);
+        Task<int> StartAsync(ManuSfcProduceEntity sfcProduceEntity);
 
     }
 }
