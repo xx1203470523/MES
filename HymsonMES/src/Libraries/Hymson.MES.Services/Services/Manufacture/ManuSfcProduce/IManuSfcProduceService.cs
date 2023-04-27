@@ -95,8 +95,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
         /// <returns></returns>
         Task<ManuSfcProduceDto> QueryManuSfcProduceBySFCAsync(string sfc);
 
-        #region 在制品步骤控制
-
         /// <summary>
         /// 分页查询（查询所有条码信息）
         /// </summary>
@@ -117,6 +115,26 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
         /// <param name="sfcProduceStepDto"></param>
         /// <returns></returns>
         Task SaveManuSfcProduceStepAsync(SaveManuSfcProduceStepDto sfcProduceStepDto);
-        #endregion
+
+        /// <summary>
+        /// 获取更改生产列表数据
+        /// </summary>
+        /// <param name="sfcs"></param>
+        /// <returns></returns>
+        Task<List<ManuUpdateViewDto>> GetManuUpdateList(string[] sfcs);
+
+        /// <summary>
+        /// 获取更改生产列表数据
+        /// </summary>
+        /// <param name="workOrderId"></param>
+        /// <returns></returns>
+        Task<List<ManuUpdateProcedureViewDto>> GetProcedureByOrderIdList(long workOrderId);
+
+        /// <summary>
+        /// 保存生产更改
+        /// </summary>
+        /// <param name="manuUpdateSaveDto"></param>
+        /// <returns></returns>
+        Task SaveManuUpdateList(ManuUpdateSaveDto manuUpdateSaveDto);
     }
 }

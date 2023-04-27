@@ -632,6 +632,24 @@
         public const string MES18105 = "没有获取到{sfc}对应步骤中的BOM信息";
         #endregion
 
+
+        #region 生产更改 MES18200
+        public const string MES18200 = "最大扫描{number}个";
+        public const string MES18201 = "条码不能为空";
+        public const string MES18202 = "工单不能为空";
+        public const string MES18203 = "工序不能为空";
+
+        public const string MES18204 = "条码:{SFC}已锁定";
+        public const string MES18205 = "条码:{SFC}的工单已关闭或锁定不允许操作";
+        public const string MES18206 = "工单必须相同";
+        public const string MES18207 = "新工单可生产数量不足";
+        public const string MES18208 = "未获取到工艺路线节点信息";
+        public const string MES18209 = "生产更改错误";
+        public const string MES18210 = "生产更改错误";
+
+
+        #endregion
+
         #endregion
 
         #region 系统执行出错 业务逻辑出错

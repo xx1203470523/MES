@@ -98,6 +98,16 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 维修
         /// </summary>
         [Description("维修")]
-        Repair = 18
+        Repair = 18,
+        /// <summary>
+        /// 步骤控制
+        /// </summary>
+        [Description("步骤控制")]
+        StepControl = 19,
+        /// <summary>
+        /// 生产更改
+        /// </summary>
+        [Description("生产更改")]
+        ManuUpdate = 20
     }
 }
