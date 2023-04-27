@@ -39,7 +39,6 @@
         public const string MES10222 = "插入物料供应商关联表失败！";
         public const string MES10223 = "物料编码最大长度为50";
         public const string MES10224 = "物料名称最大长度为50";
-        public const string MES10224 = "物料编码xxx没有维护容器规格";
 
         #endregion
 
@@ -579,6 +578,7 @@
         public const string MES16716 = "容器包装，不允许混物料版本包装";
         public const string MES16717 = "容器包装，超过了最大包装数量，不允许包装";
         public const string MES16718 = "容器包装，未找到该条码的子级包装记录";
+        public const string MES16719 = "容器包装，物料编码没有维护容器规格";
         #endregion
 
         #region 绑定工单激活  MES16800
