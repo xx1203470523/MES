@@ -7,6 +7,7 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using System.Security.Policy;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -202,6 +203,74 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DisassemblyUpdateSql, command);
         }
+
+
+        /// <summary>
+        /// 组件使用报告 分页查询
+        /// </summary>
+        /// <param name="manuSfcCirculationPagedQuery"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ManuSfcCirculationEntity>> GetReportPagedInfoAsync(ComUsageReportPagedQuery queryParam)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetReportPagedInfoDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetReportPagedInfoCountSqlTemplate);
+            sqlBuilder.Where(" IsDeleted=0 ");
+            sqlBuilder.Select("*");
+
+            sqlBuilder.Where(" SiteId=@SiteId ");
+
+            //where sc.IsDeleted = 0
+            //    and sc.SiteId = ''
+            //    and sc.CirculationProductId = ''
+            //    and sc.CreatedOn BETWEEN '' and ''-- 查询 时间
+            //    and sc.CirculationBarCode like '%%'-- 查询组件车间作业 / 库存批次 
+            //    -- and-- 查询 供应商编码
+            //    and sc.ProcedureId = ''
+            //    and sc.ResourceId-- 查询资源
+
+            if (queryParam.CirculationProductId.HasValue) 
+            {
+                sqlBuilder.Where(" CirculationProductId=@CirculationProductId ");
+            }
+
+            if (queryParam.CreatedOnS.HasValue || queryParam.CreatedOnE.HasValue)
+            {
+                if (queryParam.CreatedOnS.HasValue && queryParam.CreatedOnE.HasValue) sqlBuilder.Where(" CreatedOn BETWEEN @CreatedOnS AND @CreatedOnE");
+                else
+                {
+                    if (queryParam.CreatedOnS.HasValue) sqlBuilder.Where("CreatedOn >= @CreatedOnS");
+                    if (queryParam.CreatedOnE.HasValue) sqlBuilder.Where("CreatedOn < @CreatedOnE");
+                }
+            }
+
+            if (!string.IsNullOrEmpty(queryParam.CirculationBarCode))
+            {
+                sqlBuilder.Where(" CirculationBarCode=@CirculationBarCode ");
+            }
+
+            if (queryParam.ProcedureId.HasValue)
+            {
+                sqlBuilder.Where(" ProcedureId=@ProcedureId ");
+            }
+
+            if (queryParam.ResourceId.HasValue)
+            {
+                sqlBuilder.Where(" ResourceId=@ResourceId ");
+            }
+
+            var offSet = (queryParam.PageIndex - 1) * queryParam.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = queryParam.PageSize });
+            sqlBuilder.AddParameters(queryParam);
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var manuSfcCirculationEntitiesTask = conn.QueryAsync<ManuSfcCirculationEntity>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var manuSfcCirculationEntities = await manuSfcCirculationEntitiesTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<ManuSfcCirculationEntity>(manuSfcCirculationEntities, queryParam.PageIndex, queryParam.PageSize, totalCount);
+        }
     }
 
     public partial class ManuSfcCirculationRepository
@@ -224,5 +293,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                             FROM `manu_sfc_circulation`  WHERE Id IN @ids ";
 
         const string DisassemblyUpdateSql = "UPDATE `manu_sfc_circulation` SET CirculationType=@CirculationType, IsDisassemble=@IsDisassemble,DisassembledBy=@UserId,DisassembledOn=@UpdatedOn,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn WHERE Id =@Id   ";
+
+        const string GetReportPagedInfoDataSqlTemplate = @"
+                SELECT 
+                    /**select**/ 
+                FROM `manu_sfc_circulation` 
+                /**innerjoin**/ 
+                /**leftjoin**/ 
+                /**where**/ 
+                LIMIT @Offset,@Rows 
+                ";
+        const string GetReportPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_sfc_circulation` /**where**/ ";
     }
 }

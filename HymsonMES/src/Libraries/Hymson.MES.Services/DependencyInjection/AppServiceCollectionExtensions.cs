@@ -71,6 +71,8 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddAppService(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddWebFrameworkService(configuration);
+            services.AddExcelService();
+            services.AddMinioService(configuration);
             services.AddData(configuration);
             AddConfig(services, configuration);
             AddServices(services);
@@ -243,6 +245,11 @@ namespace Microsoft.Extensions.DependencyInjection
             #region OriginalSummary
             services.AddSingleton<IOriginalSummaryReportService, OriginalSummaryReportService>();
             #endregion
+
+            #region ComUsage
+            services.AddSingleton<IComUsageReportService, ComUsageReportService>();
+            #endregion
+
             #endregion
 
             return services;
