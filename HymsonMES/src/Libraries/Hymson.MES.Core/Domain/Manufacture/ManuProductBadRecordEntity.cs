@@ -75,6 +75,11 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public ProductBadRecordSourceEnum? Source { get; set; }
 
         /// <summary>
+        /// 处置结果
+        /// </summary>
+        public ProductBadDisposalResultEnum? DisposalResult { get; set; }
+
+        /// <summary>
         /// 说明
         /// </summary>
         public string Remark { get; set; }

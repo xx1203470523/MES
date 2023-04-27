@@ -9,6 +9,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -43,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuProductBadRecordQuery"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuProductBadRecordEntity>> GetManuProductBadRecordEntitiesAsync(ManuProductBadRecordQuery manuProductBadRecordQuery);
+        Task<IEnumerable<ManuProductBadRecordEntity>> GetManuProductBadRecordEntitiesBySFCAsync(ManuProductBadRecordBySFCQuery manuProductBadRecordQuery);
 
         /// <summary>
         /// 分页查询

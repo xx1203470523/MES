@@ -369,6 +369,7 @@
         public const string MES15405 = "不合格缺陷信息不能为空!";
         public const string MES15406 = "已存在返修信息!";
         public const string MES15407 = "SFC{sfcs}已锁定，不可再执行当前操作!";
+        public const string MES15408 = "存在未关闭的不合格信息，工艺路线为必填!";
         #endregion
 
         #region 工单  16000
