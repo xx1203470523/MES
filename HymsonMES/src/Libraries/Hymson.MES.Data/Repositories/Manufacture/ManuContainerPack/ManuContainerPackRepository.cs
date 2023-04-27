@@ -82,7 +82,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<ManuContainerPackEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ManuContainerPackEntity>(GetByIdSql, new { Id = id });
+            return await conn.QueryFirstOrDefaultAsync<ManuContainerPackEntity>(GetByIdSql, new { Id = id});
         }
 
         /// <summary>
@@ -210,10 +210,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.QueryAsync<ManuContainerPackEntity>(GetBysfcsSql, new { LadeBarCodes = query.LadeBarCodes, SiteId = query.SiteId });
         }
 
-        public async Task<IEnumerable<ManuContainerPackEntity>> GetByContainerBarCodeIdAsync(long cid)
+        public async Task<IEnumerable<ManuContainerPackEntity>> GetByContainerBarCodeIdAsync(long cid,long siteId)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<ManuContainerPackEntity>(GetByPackcodeSql, new { ContainerBarCodeId = cid });
+            return await conn.QueryAsync<ManuContainerPackEntity>(GetByPackcodeSql, new { ContainerBarCodeId = cid, SiteId = siteId });
         }
 
         public async Task<IEnumerable<ManuContainerPackEntity>> GetByContainerBarCodeIdsAsync(long[] ids)
@@ -264,7 +264,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                             FROM `manu_container_pack`  WHERE LadeBarCode = @LadeBarCode  and SiteId=@SiteId ";
         const string GetByPackcodeSql = @"SELECT 
                                `Id`, `SiteId`,`ResourceId`,`ProcedureId`, `ContainerBarCodeId`, `LadeBarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `manu_container_pack`  WHERE ContainerBarCodeId = @ContainerBarCodeId ";
+                            FROM `manu_container_pack`  WHERE ContainerBarCodeId = @ContainerBarCodeId and SiteId=@SiteId ";
 
         const string GetByContainerBarCodeIdsSql = @"SELECT 
                                `Id`, `SiteId`,`ResourceId`,`ProcedureId`, `ContainerBarCodeId`, `LadeBarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`

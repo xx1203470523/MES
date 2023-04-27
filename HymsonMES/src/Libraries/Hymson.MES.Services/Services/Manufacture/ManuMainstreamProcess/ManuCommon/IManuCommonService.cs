@@ -80,5 +80,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="endProcedureId"></param>
         /// <returns></returns>
         Task<bool> IsProcessStartBeforeEnd(long processRouteId, long startProcedureId, long endProcedureId);
+
+        /// <summary>
+        /// 获取工序关联的资源
+        /// </summary>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<long>> GetProcResourceIdByProcedureId(long procedureId);
     }
 }

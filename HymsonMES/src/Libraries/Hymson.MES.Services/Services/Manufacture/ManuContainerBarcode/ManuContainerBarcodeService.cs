@@ -228,7 +228,7 @@ namespace Hymson.MES.Services.Services.Manufacture
              * Y 返回 view 
              * N ，判定包装码是否为空，
              *        Y  根据条码查找打开着的包装码 返回view
-             *        N  返回这个包装码的view
+             *        N  创建全新包装 返回这个包装码的view
              */
             var packQuery = new ManuContainerPackQuery
             {
@@ -259,7 +259,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         if (material.Version != barcodeobj.MaterialVersion && !facePlateContainerPackEntity.IsAllowDifferentMaterial)
                             throw new CustomerValidationException(nameof(ErrorCode.MES16716));
                         var inte = await _inteContainerRepository.GetByIdAsync(barcodeobj.ContainerId);
-                        var packs = await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(barcodeobj.Id);
+                        var packs = await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(barcodeobj.Id,barcodeobj.SiteId);
                         if (inte.Maximum > packs.Count())
                         {
                             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
@@ -319,7 +319,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     if (barcodeobj?.ProductId == sfcinfo.ProductId)//相同包装
                     {
                         var inte = await _inteContainerRepository.GetByIdAsync(barcodeobj.ContainerId);
-                        var packs = await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(barcodeobj.Id);
+                        var packs = await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(barcodeobj.Id, barcodeobj.SiteId);
                         if (inte.Maximum > packs.Count())
                         {
                             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
@@ -388,7 +388,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             else
             {
                 //子级包装对象
-                var prebarcodeobj = await _manuContainerBarcodeRepository.GetByCodeAsync(new ManuContainerBarcodeQuery() { BarCode = createManuContainerBarcodeDto.BarCode, SiteId = _currentSite.SiteId ?? 0 });
+                var prebarcodeobj = await _manuContainerBarcodeRepository.GetByCodeAsync(new ManuContainerBarcodeQuery() { BarCode = createManuContainerBarcodeDto.BarCode, SiteId = manuContainerBarcodeEntity.SiteId});
                 if(prebarcodeobj==null)
                     throw new CustomerValidationException(nameof(ErrorCode.MES16718));
                 //新条码&& 没有指定包装
@@ -408,7 +408,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         if (prebarcodeobj.MaterialVersion != barcodeobj.MaterialVersion && !facePlateContainerPackEntity.IsAllowDifferentMaterial)
                             throw new CustomerValidationException(nameof(ErrorCode.MES16716));
                         var inte = await _inteContainerRepository.GetByIdAsync(barcodeobj.ContainerId);
-                        var packs = await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(barcodeobj.Id);
+                        var packs = await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(barcodeobj.Id, barcodeobj.SiteId);
                         if (inte.Maximum > packs.Count())
                         {
                             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
@@ -474,7 +474,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     if (barcodeobj?.ProductId == prebarcodeobj.ProductId)//相同包装
                     {
                         var inte = await _inteContainerRepository.GetByIdAsync(barcodeobj.ContainerId);
-                        var packs = await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(barcodeobj.Id);
+                        var packs = await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(barcodeobj.Id, barcodeobj.SiteId);
                         if (inte.Maximum > packs.Count())
                         {
                             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
@@ -667,7 +667,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
             if (inte == null)
                 inte = await _inteContainerRepository.GetByIdAsync(barcodeobj.ContainerId);
-            var packs = await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(barcodeobj.Id);//实际绑定集合
+            var packs = await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(barcodeobj.Id,barcodeobj.SiteId);//实际绑定集合
             ManuContainerBarcodeView view = new ManuContainerBarcodeView()
             {
                 manuContainerBarcodeEntity = barcodeobj,

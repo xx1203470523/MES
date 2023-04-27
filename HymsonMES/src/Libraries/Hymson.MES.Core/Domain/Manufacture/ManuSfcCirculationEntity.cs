@@ -73,6 +73,11 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public long? CirculationMainProductId { get; set; }
 
         /// <summary>
+        /// 流转后主产品供应商id
+        /// </summary>
+        public long? CirculationMainSupplierId { get; set; }
+
+        /// <summary>
         /// 流转条码数量
         /// </summary>
         public decimal? CirculationQty { get; set; }

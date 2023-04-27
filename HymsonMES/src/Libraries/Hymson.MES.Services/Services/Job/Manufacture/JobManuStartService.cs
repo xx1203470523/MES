@@ -89,7 +89,8 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             };
 
             // 校验工序和资源是否对应
-
+            var resourceIds = await _manuCommonService.GetProcResourceIdByProcedureId(bo.ProcedureId);
+            if (resourceIds.Any(a => a == bo.ResourceId) == false) throw new CustomerValidationException(nameof(ErrorCode.MES16317));
 
             // 获取生产条码信息
             var (sfcProduceEntity, sfcProduceBusinessEntity) = await _manuCommonService.GetProduceSFCAsync(bo.SFC);

@@ -92,6 +92,13 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<IEnumerable<ProcResourceEntity>> GetListForGroupAsync(ProcResourcePagedQuery query);
 
         /// <summary>
+        /// 查询工序关联的资源列表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcResourceEntity>> GetProcResourceListByProcedureIdAsync(ProcResourceListByProcedureIdQuery query);
+
+        /// <summary>
         /// 添加资源类型数据
         /// </summary>
         /// <param name="entity"></param>
