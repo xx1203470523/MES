@@ -2,8 +2,10 @@
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
+using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInStation;
 using Hymson.Utils;
 
@@ -25,6 +27,11 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
+        /// 服务接口（生产通用）
+        /// </summary>
+        private readonly IManuCommonService _manuCommonService;
+
+        /// <summary>
         /// 服务接口（进站）
         /// </summary>
         private readonly IManuInStationService _manuInStationService;
@@ -34,12 +41,15 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
+        /// <param name="manuCommonService"></param>
         /// <param name="manuInStationService"></param>
         public JobManuStartService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IManuCommonService manuCommonService,
             IManuInStationService manuInStationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _manuCommonService = manuCommonService;
             _manuInStationService = manuInStationService;
         }
 
@@ -71,12 +81,38 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         {
             var defaultDto = new JobResponseDto { };
 
-            _ = await _manuInStationService.InStationAsync(new ManufactureBo
+            var bo = new ManufactureBo
             {
                 SFC = param["SFC"],
                 ProcedureId = param["ProcedureId"].ParseToLong(),
                 ResourceId = param["ResourceId"].ParseToLong()
-            });
+            };
+
+            // 校验资源和条码是否对应
+
+
+
+            // 获取生产条码信息
+            var (sfcProduceEntity, sfcProduceBusinessEntity) = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
+
+            // 合法性校验
+            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.lineUp);
+            sfcProduceBusinessEntity.VerifyProcedureLock(bo.SFC, bo.ProcedureId);
+
+            // 如果工序对应不上
+            if (sfcProduceEntity.ProcedureId != bo.ProcedureId)
+            {
+                // 判断上一个工序是否是随机工序
+                var IsRandomPreProcedure = await _manuCommonService.IsRandomPreProcedure(sfcProduceEntity);
+                if (IsRandomPreProcedure == false) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
+
+                // 将SFC对应的工序改为当前工序
+                sfcProduceEntity.ProcedureId = bo.ProcedureId;
+            }
+
+            // 进站
+            sfcProduceEntity.ResourceId = bo.ResourceId;
+            _ = await _manuInStationService.InStationAsync(sfcProduceEntity);
 
             defaultDto.Content?.Add("PackageCom", "False");
             defaultDto.Content?.Add("BadEntryCom", "False");
