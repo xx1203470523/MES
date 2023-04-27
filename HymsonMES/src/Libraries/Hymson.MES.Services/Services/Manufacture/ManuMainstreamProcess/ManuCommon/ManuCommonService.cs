@@ -303,16 +303,20 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 defaultNextProcedure = procedureNodes.FirstOrDefault(f => f.CheckType == ProcessRouteInspectTypeEnum.None)
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES10441));
 
-                // 抽检类型不为空值的下一工序
-                var nextProcedureOfNone = procedureNodes.FirstOrDefault(f => f.CheckType != ProcessRouteInspectTypeEnum.None)
-                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES10447));
+                // 如果不是第一次走该工序，count是从1开始，不包括0。
+                if (count > 1)
+                {
+                    // 抽检类型不为空值的下一工序
+                    var nextProcedureOfNone = procedureNodes.FirstOrDefault(f => f.CheckType != ProcessRouteInspectTypeEnum.None)
+                        ?? throw new CustomerValidationException(nameof(ErrorCode.MES10447));
 
-                // 判断工序抽检比例
-                if (nextProcedureOfNone.CheckType == ProcessRouteInspectTypeEnum.FixedScale
-                    && nextProcedureOfNone.CheckRate == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10446));
+                    // 判断工序抽检比例
+                    if (nextProcedureOfNone.CheckType == ProcessRouteInspectTypeEnum.FixedScale
+                        && nextProcedureOfNone.CheckRate == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10446));
 
-                // 如果满足抽检次数，就取出一个非"空值"的随机工序作为下一工序
-                if (count > 0 && count % nextProcedureOfNone.CheckRate == 0) defaultNextProcedure = nextProcedureOfNone;
+                    // 如果满足抽检次数，就取出一个非"空值"的随机工序作为下一工序
+                    if (count > 1 && count % nextProcedureOfNone.CheckRate == 0) defaultNextProcedure = nextProcedureOfNone;
+                }
             }
             // 没有分叉的情况
             else
