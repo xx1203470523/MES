@@ -1,4 +1,4 @@
-﻿using Hymson.MES.Services.Bos.Manufacture;
+﻿using Hymson.MES.Core.Domain.Manufacture;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInStation
 {
@@ -10,9 +10,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
         /// <summary>
         /// 执行（进站）
         /// </summary>
-        /// <param name="bo"></param>
+        /// <param name="sfcProduceEntity"></param>
         /// <returns></returns>
-        Task<int> InStationAsync(ManufactureBo bo);
+        Task<int> InStationAsync(ManuSfcProduceEntity sfcProduceEntity);
 
     }
 }

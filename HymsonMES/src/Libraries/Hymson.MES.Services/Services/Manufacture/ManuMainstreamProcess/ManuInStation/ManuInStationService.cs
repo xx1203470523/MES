@@ -2,13 +2,11 @@
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Utils;
 
@@ -76,34 +74,16 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
         /// <summary>
         /// 执行（进站）
         /// </summary>
-        /// <param name="bo"></param>
+        /// <param name="sfcProduceEntity"></param>
         /// <returns></returns>
-        public async Task<int> InStationAsync(ManufactureBo bo)
+        public async Task<int> InStationAsync(ManuSfcProduceEntity sfcProduceEntity)
         {
             var rows = 0;
-
-            // 获取生产条码信息
-            var (sfcProduceEntity, sfcProduceBusinessEntity) = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
 
             // 更新状态，将条码由"排队"改为"活动"
             sfcProduceEntity.Status = SfcProduceStatusEnum.Activity;
             sfcProduceEntity.UpdatedBy = _currentUser.UserName;
             sfcProduceEntity.UpdatedOn = HymsonClock.Now();
-
-            // 合法性校验
-            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.lineUp).VerifyResource(bo.ResourceId);
-            sfcProduceBusinessEntity.VerifyProcedureLock(bo.SFC, bo.ProcedureId);
-
-            // 如果工序对应不上
-            if (sfcProduceEntity.ProcedureId != bo.ProcedureId)
-            {
-                // 判断上一个工序是否是随机工序
-                var IsRandomPreProcedure = await _manuCommonService.IsRandomPreProcedure(sfcProduceEntity);
-                if (IsRandomPreProcedure == false) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
-
-                // 将SFC对应的工序改为当前工序
-                sfcProduceEntity.ProcessRouteId = bo.ProcedureId;
-            }
 
             // 获取生产工单（附带工单状态校验）
             _ = await _manuCommonService.GetProduceWorkOrderByIdAsync(sfcProduceEntity.WorkOrderId);
