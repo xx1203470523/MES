@@ -634,4 +634,88 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public List<ManuSfcProduceStepSFCDto> Sfcs { get; set; }
     }
+
+
+
+    /// <summary>
+    /// 更改生产（列表）
+    /// </summary>
+    public record ManuUpdateViewDto
+    {
+        /// <summary>
+        /// SFC
+        /// </summary>
+        public string SFC { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public SfcProduceStatusEnum Status { get; set; }
+
+        /// <summary>
+        /// 工序Code
+        /// </summary>
+        public string ProcedureCode { get; set; }
+
+        /// <summary>
+        /// 物料与版本
+        /// </summary>
+        public string MaterialAndVersion { get; set; }
+
+        /// <summary>
+        /// 工艺路线与版本
+        /// </summary>
+        public string ProcessRouteAndVersion { get; set; }
+
+        /// <summary>
+        /// Bom与版本
+        /// </summary>
+        public string BomAndVersion { get; set; }
+
+    }
+
+    /// <summary>
+    /// 更改生产（工序）
+    /// </summary>
+    public record ManuUpdateProcedureViewDto
+    {
+        /// <summary>
+        /// ID
+        /// </summary>
+        public long ProcedureId { get; set; }
+        /// <summary>
+        /// 编码
+        /// </summary>
+        public string ProcedureCode { get; set; }
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string ProcedureName { get; set; }
+
+    }
+    /// <summary>
+    /// 在制品步骤控制操作实体（保存）
+    /// </summary>
+    public record ManuUpdateSaveDto
+    {
+        /// <summary>
+        /// Sfcs
+        /// </summary>
+        public string[] Sfcs { get; set; }
+
+        /// <summary>
+        /// 工单ID
+        /// </summary>
+        public long WorkOrderId { get; set; }
+
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string Remark { get; set; }
+    }
 }
