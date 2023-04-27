@@ -39,6 +39,7 @@
         public const string MES10222 = "插入物料供应商关联表失败！";
         public const string MES10223 = "物料编码最大长度为50";
         public const string MES10224 = "物料名称最大长度为50";
+        public const string MES10224 = "物料编码xxx没有维护容器规格";
 
         #endregion
 

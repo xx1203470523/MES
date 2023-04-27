@@ -651,7 +651,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 }
                 else
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES10219));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16719));
                 }
             }
         }
