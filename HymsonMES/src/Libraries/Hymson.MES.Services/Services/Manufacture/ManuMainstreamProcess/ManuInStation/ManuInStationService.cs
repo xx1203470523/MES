@@ -85,12 +85,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
             // 获取生产条码信息
             var (sfcProduceEntity, sfcProduceBusinessEntity) = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
 
-            // 更新状态，将条码由"排队"改为"活动"
-            sfcProduceEntity.ResourceId = bo.ResourceId;
-            sfcProduceEntity.Status = SfcProduceStatusEnum.Activity;
-            sfcProduceEntity.UpdatedBy = _currentUser.UserName;
-            sfcProduceEntity.UpdatedOn = HymsonClock.Now();
-
             // 合法性校验
             sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.lineUp);
             sfcProduceBusinessEntity.VerifyProcedureLock(bo.SFC, bo.ProcedureId);
@@ -105,6 +99,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
                 // 将SFC对应的工序改为当前工序
                 sfcProduceEntity.ProcedureId = bo.ProcedureId;
             }
+
+            // 更新状态，将条码由"排队"改为"活动"
+            sfcProduceEntity.ResourceId = bo.ResourceId;
+            sfcProduceEntity.Status = SfcProduceStatusEnum.Activity;
+            sfcProduceEntity.UpdatedBy = _currentUser.UserName;
+            sfcProduceEntity.UpdatedOn = HymsonClock.Now();
 
             // 获取生产工单（附带工单状态校验）
             _ = await _manuCommonService.GetProduceWorkOrderByIdAsync(sfcProduceEntity.WorkOrderId);
