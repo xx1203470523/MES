@@ -449,6 +449,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 查询锁定状态不为某个状态的sfc信息，即时锁定的不能操作不查
         /// </summary>
         public int? NoLock { get; set; }
+
+        /// <summary>
+        /// 是否报废
+        /// </summary>
+        public TrueOrFalseEnum? IsScrap { get; set; }
     }
 
     /// <summary>
@@ -520,6 +525,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 产品版本
         /// </summary>
         public string Version { get; set; }
+
+        /// <summary>
+        /// 是否报废
+        /// </summary>
+        public TrueOrFalseEnum? IsScrap { get; set; }
     }
 
     /// <summary>
