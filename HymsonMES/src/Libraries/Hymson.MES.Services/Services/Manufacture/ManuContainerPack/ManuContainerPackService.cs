@@ -127,7 +127,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             //生成删除记录
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
-                await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(containerBarCodeId).ContinueWith(async t =>
+                await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(containerBarCodeId, _currentSite.SiteId??0).ContinueWith(async t =>
                 {
                     var packs = t.Result.Select(m =>
                     {
