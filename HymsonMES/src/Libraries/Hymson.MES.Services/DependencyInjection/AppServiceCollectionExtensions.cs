@@ -264,7 +264,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddConfig(IServiceCollection services, IConfiguration configuration)
         {
             //数据库连接
-            services.Configure<TestOptions>(configuration.GetSection(nameof(TestOptions)));
+            //services.Configure<TestOptions>(configuration.GetSection(nameof(TestOptions)));
             //services.Configure<ConnectionOptions>(configuration);
             return services;
         }

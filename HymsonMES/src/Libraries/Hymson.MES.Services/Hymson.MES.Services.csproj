@@ -25,20 +25,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EPPlus" Version="6.2.2" />
-    <PackageReference Include="FluentValidation" Version="11.5.1" />
-    <PackageReference Include="Hymson.Authentication.JwtBearer" Version="2.1.7" />
-    <PackageReference Include="Hymson.Excel" Version="2.1.7" />
-    <PackageReference Include="Hymson.Kafka.Debezium" Version="2.1.7" />
-    <PackageReference Include="Hymson.Minio" Version="2.1.7" />
-    <PackageReference Include="Hymson.Sequences" Version="2.1.7" />
-    <PackageReference Include="Hymson.Snowflake" Version="2.1.7" />
-    <PackageReference Include="Hymson.Web.Framework" Version="2.1.7" />
+    <PackageReference Include="Hymson.Authentication.JwtBearer" Version="2.1.8" />
+    <PackageReference Include="Hymson.Sequences" Version="2.1.8" />
+    <PackageReference Include="Hymson.Snowflake" Version="2.1.8" />
+    <PackageReference Include="Hymson.Web.Framework" Version="2.1.8" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Hymson.MES.CoreServices\Hymson.MES.CoreServices.csproj" />
     <ProjectReference Include="..\Hymson.MES.Data\Hymson.MES.Data.csproj" />
   </ItemGroup>
 

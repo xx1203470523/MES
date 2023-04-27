@@ -11,7 +11,7 @@ namespace Hymson.MES.Api
         private readonly ILogger<WorkService> _logger;
         private readonly IClearCacheService _clearCacheService;
 
-        public WorkService(IResourceService resourceService,ILogger<WorkService> logger,
+        public WorkService(IResourceService resourceService, ILogger<WorkService> logger,
             IClearCacheService clearCacheService)
         {
             _resourceService = resourceService;
@@ -22,20 +22,19 @@ namespace Hymson.MES.Api
         {
             try
             {
-                await _clearCacheService.ClearCacheAsync(new ServiceTypeEnum[] { 
+                await _clearCacheService.ClearCacheAsync(new ServiceTypeEnum[] {
                  ServiceTypeEnum.User,
                   ServiceTypeEnum.MES
-                },stoppingToken);
+                }, stoppingToken);
                 await _resourceService.InitEnumAsync();
-                //await _resourceService.InitErrorCodeAsync(typeof(ErrorCode));
-
+                await _resourceService.InitErrorCodeAsync(typeof(ErrorCode));
             }
             catch (Exception e)
             {
 
                 _logger.LogError(e, "初始化失败");
             }
-           
+
         }
     }
 }

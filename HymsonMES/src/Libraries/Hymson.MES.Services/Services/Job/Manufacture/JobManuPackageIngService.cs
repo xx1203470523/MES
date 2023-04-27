@@ -81,7 +81,9 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             };
 
             // 获取生产条码信息
-            var (sfcProduceEntity, _) = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
+            //二三级包装时候 条码就是包装码了，不需要校验条码
+            // var (sfcProduceEntity, _) = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
+
             // 合法性校验
             //sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity).VerifyProcedure(bo.ProcedureId);
 

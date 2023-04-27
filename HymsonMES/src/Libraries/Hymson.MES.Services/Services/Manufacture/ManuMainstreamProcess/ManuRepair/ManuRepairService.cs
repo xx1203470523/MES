@@ -2,10 +2,10 @@
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Utils;
 
@@ -63,34 +63,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPac
 
 
         /// <summary>
-        /// 开始
+        /// 维修
         /// </summary>
-        /// <param name="bo"></param>
+        /// <param name="sfcProduceEntity"></param>
         /// <returns></returns>
-        public async Task<int> StartAsync(ManufactureBo bo)
+        public async Task<int> StartAsync(ManuSfcProduceEntity sfcProduceEntity)
         {
             var rows = 0;
-
-            // 获取生产条码信息
-            var (sfcProduceEntity, _) = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
-
-            // 当前工序是否是排队状态
-            if (sfcProduceEntity.Status == SfcProduceStatusEnum.Activity)
-            {
-                // 如果状态已经为活动中，就直接返回成功
-                return 1;
-            }
-
-            // 如果工序对应不上
-            if (sfcProduceEntity.ProcedureId != bo.ProcedureId)
-            {
-                // 判断上一个工序是否是随机工序
-                var IsRandomPreProcedure = await _manuCommonService.IsRandomPreProcedure(sfcProduceEntity);
-                if (IsRandomPreProcedure == false) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
-
-                // 将SFC对应的工序改为当前工序
-                sfcProduceEntity.ProcessRouteId = bo.ProcedureId;
-            }
 
             // 获取生产工单（附带工单状态校验）
             _ = await _manuCommonService.GetProduceWorkOrderByIdAsync(sfcProduceEntity.WorkOrderId);

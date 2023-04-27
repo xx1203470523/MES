@@ -331,6 +331,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
             entity.SiteId = _currentSite.SiteId ?? 0;
+            entity.SupplierId = inventory.SupplierId;
 
             // 一次性上完料
             entity.InitQty = inventory.QuantityResidue;

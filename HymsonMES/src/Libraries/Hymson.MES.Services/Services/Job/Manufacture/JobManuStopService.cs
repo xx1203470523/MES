@@ -94,7 +94,9 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             var (sfcProduceEntity, _) = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
 
             // 合法性校验
-            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity).VerifyProcedure(bo.ProcedureId).VerifyResource(bo.ResourceId);
+            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity)
+                            .VerifyProcedure(bo.ProcedureId)
+                            .VerifyResource(bo.ResourceId);
 
             // 更改状态，将条码由"活动"改为"排队"
             sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;

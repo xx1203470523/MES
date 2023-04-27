@@ -463,7 +463,8 @@
         public const string MES16313 = "SFC状态不是{Status}状态，不允许操作。";
         public const string MES16314 = "SFC条码{SFC}已锁定，不允许操作。";
         public const string MES16315 = "库存{barCode}和待加载物料编码/版本不符！";
-        public const string MES16316 = "SFC条码{SFC}和资源不部匹配！";
+        public const string MES16316 = "SFC条码{SFC}和资源不匹配！";
+        public const string MES16317 = "工序和资源不匹配！";
         #endregion
 
         #region 生产
@@ -578,6 +579,7 @@
         public const string MES16716 = "容器包装，不允许混物料版本包装";
         public const string MES16717 = "容器包装，超过了最大包装数量，不允许包装";
         public const string MES16718 = "容器包装，未找到该条码的子级包装记录";
+        public const string MES16719 = "容器包装，物料编码没有维护容器规格";
         #endregion
 
         #region 绑定工单激活  MES16800

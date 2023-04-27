@@ -20,9 +20,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         /// <summary>
         /// 更新数量
         /// </summary>
-        /// <param name="command"></param>
+        /// <param name="commands"></param>
         /// <returns></returns>
-        Task<int> UpdateQtyByProductIdAsync(UpdateQtyByProductIdCommand command);
+        Task<int> UpdateQtyByProductIdAsync(IEnumerable<UpdateQtyByProductIdCommand> commands);
 
         /// <summary>
         /// 批量删除（软删除）
