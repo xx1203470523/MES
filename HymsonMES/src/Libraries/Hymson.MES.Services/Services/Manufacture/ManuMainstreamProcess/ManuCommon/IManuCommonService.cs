@@ -60,9 +60,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <summary>
         /// 判断上一工序是否随机工序
         /// </summary>
-        /// <param name="manuSfcProduce"></param>
+        /// <param name="processRouteId"></param>
+        /// <param name="procedureId"></param>
         /// <returns></returns>
-        Task<bool> IsRandomPreProcedure(ManuSfcProduceEntity manuSfcProduce);
+        Task<bool> IsRandomPreProcedure(long processRouteId, long procedureId);
 
         /// <summary>
         /// 获取工艺路线

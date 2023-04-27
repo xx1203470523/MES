@@ -1,4 +1,5 @@
-﻿using Hymson.MES.Services.Bos.Manufacture;
+﻿using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Services.Bos.Manufacture;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation
 {
@@ -10,9 +11,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStat
         /// <summary>
         /// 出站
         /// </summary>
-        /// <param name="bo"></param>
+        /// <param name="sfcProduceEntity"></param>
         /// <returns></returns>
-        Task<int> OutStationAsync(ManufactureBo bo);
+        Task<int> OutStationAsync(ManuSfcProduceEntity sfcProduceEntity);
 
         /// <summary>
         /// 出站(在制维修)
