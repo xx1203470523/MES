@@ -78,7 +78,7 @@
         public const string MES10344 = "存储路径不能为空!";
         public const string MES10345 = "模板文件不能为空!";
         public const string MES10346 = "打印机名称不能为空!";
-        public const string MES10347= "打印机IP不能为空!";
+        public const string MES10347 = "打印机IP不能为空!";
         #endregion
 
         #region 工序 10400
@@ -223,6 +223,7 @@
         public const string MES12112 = "工作中心已经关联数据,允许修改.";
         public const string MES12113 = "启用状态或保留状态不可删除.";
         public const string MES12114 = "产线已关联资源，不允许修改.";
+        public const string MES12115 = "存在已被关联的资源,不允许重复关联.";
         #endregion
 
         #region 编码规则 12400
