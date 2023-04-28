@@ -584,6 +584,7 @@
         public const string MES16717 = "容器包装，超过了最大包装数量，不允许包装";
         public const string MES16718 = "容器包装，未找到该条码的子级包装记录";
         public const string MES16719 = "容器包装，物料编码没有维护容器规格";
+        public const string MES16720 = "容器包装，条码已报废";
         #endregion
 
         #region 绑定工单激活  MES16800
