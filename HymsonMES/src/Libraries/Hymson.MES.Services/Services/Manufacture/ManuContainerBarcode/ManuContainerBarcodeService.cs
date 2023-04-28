@@ -144,7 +144,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuContainerBarcodeEntity.UpdatedBy = _currentUser.UserName;
             manuContainerBarcodeEntity.CreatedOn = HymsonClock.Now();
             manuContainerBarcodeEntity.UpdatedOn = HymsonClock.Now();
-            manuContainerBarcodeEntity.SiteId = _currentSite.SiteId ?? 0;
+            manuContainerBarcodeEntity.SiteId = _currentSite.SiteId ?? 123456;
 
             return await CreatePackage(createManuContainerBarcodeDto, manuContainerBarcodeEntity);
 
@@ -572,6 +572,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     CodeRuleId = inteCodeRulesEntity.Id,
                     Count = 1
                 });
+                string barcode = manuContainerBarcodeEntity.BarCode;
                 manuContainerBarcodeEntity.BarCode = barcodeList.First();
                 //创建包装
                 using (TransactionScope ts = TransactionHelper.GetTransactionScope())
@@ -582,7 +583,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         ResourceId = manuFacePlateContainerPackEntity.ResourceId,
                         ProcedureId = manuContainerBarcodeEntity.ProductId,
                         ContainerBarCodeId = manuContainerBarcodeEntity.Id,
-                        LadeBarCode = manuContainerBarcodeEntity.BarCode
+                        LadeBarCode = barcode
 
                     });
                     await _manuContainerPackRecordService.CreateManuContainerPackRecordAsync(new ManuContainerPackRecordCreateDto()
@@ -591,7 +592,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         ProcedureId = manuContainerBarcodeEntity.ProductId,
                         ContainerBarCodeId = manuContainerBarcodeEntity.Id,
                         OperateType = (int)ManuContainerBarcodeOperateTypeEnum.Load,
-                        LadeBarCode = manuContainerBarcodeEntity.BarCode
+                        LadeBarCode = barcode
 
                     });
                     ts.Complete();
