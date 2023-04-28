@@ -117,10 +117,27 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuProductBadRecordQuery"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuProductBadRecordEntity>> GetManuProductBadRecordEntitiesBySFCAsync(ManuProductBadRecordBySFCQuery manuProductBadRecordQuery)
+        public async Task<IEnumerable<ManuProductBadRecordEntity>> GetManuProductBadRecordEntitiesBySFCAsync(ManuProductBadRecordBySFCQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var manuProductBadRecordEntities = await conn.QueryAsync<ManuProductBadRecordEntity>(GetManuProductBadRecordEntitiesSqlTemplate, manuProductBadRecordQuery);
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("br.*");
+            sqlBuilder.Where("br.SiteId = @SiteId");
+            sqlBuilder.Where("br.IsDeleted =0");
+            if (!string.IsNullOrWhiteSpace(query.SFC))
+            {
+                sqlBuilder.Where("SFC=@SFC");
+            }
+            if (query.Status.HasValue)
+            {
+                sqlBuilder.Where("Status=@Status");
+            }
+            if (query.Sfcs != null && query.Sfcs.Any())
+            {
+                sqlBuilder.Where("SFC in @Sfcs");
+            }
+            var manuProductBadRecordEntities = await conn.QueryAsync<ManuProductBadRecordEntity>(template.RawSql, query);
             return manuProductBadRecordEntities;
         }
 

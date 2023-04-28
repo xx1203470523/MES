@@ -13,7 +13,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query
         /// <summary>
         /// 不合格记录开关;1、开启  2、关闭
         /// </summary>
-        public ProductBadRecordStatusEnum Status { get; set; }
+        public ProductBadRecordStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 产品条码
@@ -24,5 +24,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query
         /// 站点id
         /// </summary>
         public long SiteId { get; set; }
+
+        /// <summary>
+        /// 条码列表
+        /// </summary>
+        public string[] Sfcs { get; set; }
     }
 }

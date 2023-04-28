@@ -126,8 +126,8 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
             {
                 throw new ValidationException(nameof(ErrorCode.MES10100));
             }
-            param.PrintName = param.PrintName.Trim();
-            param.PrintIp = param.PrintIp.Trim();
+            param.PrintName = param.PrintName.ToTrimSpace();
+            param.PrintIp = param.PrintIp.ToTrimSpace();
             param.Remark = param.Remark.Trim();
             await _validationCreateRules.ValidateAndThrowAsync(param);
 
@@ -173,8 +173,8 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
             {
                 throw new ValidationException(nameof(ErrorCode.MES10100));
             }
-            param.PrintName = param.PrintName.Trim();
-            param.PrintIp = param.PrintIp.Trim();
+            param.PrintName = param.PrintName.ToTrimSpace();
+            param.PrintIp = param.PrintIp.ToTrimSpace();
             param.Remark = param.Remark.Trim();
             await _validationModifyRules.ValidateAndThrowAsync(param);
             var entity = await _printConfigRepository.GetByIdAsync(param?.Id ?? 0);

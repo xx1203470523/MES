@@ -50,8 +50,8 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
         /// <returns></returns>
         public async Task CreateProcLabelTemplateAsync(ProcLabelTemplateCreateDto procLabelTemplateCreateDto)
         {
-            procLabelTemplateCreateDto.Name = procLabelTemplateCreateDto.Name.Trim();
-            procLabelTemplateCreateDto.Path=procLabelTemplateCreateDto.Path.Trim();
+            procLabelTemplateCreateDto.Name = procLabelTemplateCreateDto.Name.ToTrimSpace();
+            procLabelTemplateCreateDto.Path=procLabelTemplateCreateDto.Path.ToTrimSpace();
             procLabelTemplateCreateDto.Remark = procLabelTemplateCreateDto.Remark??"".Trim();
             procLabelTemplateCreateDto.Content = procLabelTemplateCreateDto.Content .Trim();
             //验证DTO
@@ -136,8 +136,8 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
         /// <returns></returns>
         public async Task ModifyProcLabelTemplateAsync(ProcLabelTemplateModifyDto procLabelTemplateModifyDto)
         {
-            procLabelTemplateModifyDto.Name = procLabelTemplateModifyDto.Name.Trim();
-            procLabelTemplateModifyDto.Path = procLabelTemplateModifyDto.Path.Trim();
+            procLabelTemplateModifyDto.Name = procLabelTemplateModifyDto.Name.ToTrimSpace();
+            procLabelTemplateModifyDto.Path = procLabelTemplateModifyDto.Path.ToTrimSpace();
             procLabelTemplateModifyDto.Remark = procLabelTemplateModifyDto.Remark ?? "".Trim();
             procLabelTemplateModifyDto.Content = procLabelTemplateModifyDto.Content.Trim();
             //验证DTO
