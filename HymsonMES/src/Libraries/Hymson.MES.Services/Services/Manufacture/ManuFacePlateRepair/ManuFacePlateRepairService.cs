@@ -206,7 +206,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (manuSfcProduceEntit == null)
             {
                 //是否已入库完成 待使用算完成
-                var whMaterialInventoryEntit = await _whMaterialInventoryRepository.GetByBarCodeAsync(beginRepairDto.SFC);
+                var whMaterialInventoryEntit = await _whMaterialInventoryRepository.GetByBarCode1Async(beginRepairDto.SFC);
                 if (whMaterialInventoryEntit == null)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16306));
