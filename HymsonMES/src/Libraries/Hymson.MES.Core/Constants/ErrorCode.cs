@@ -222,6 +222,7 @@
         public const string MES12111 = "工作中心修改的数据不存在.";
         public const string MES12112 = "工作中心已经关联数据,允许修改.";
         public const string MES12113 = "启用状态或保留状态不可删除.";
+        public const string MES12114 = "产线已关联资源，不允许修改.";
         #endregion
 
         #region 编码规则 12400
