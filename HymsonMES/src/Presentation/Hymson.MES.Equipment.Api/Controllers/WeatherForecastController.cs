@@ -15,16 +15,21 @@ namespace Hymson.MES.Equipment.Api.Controllers
 
         private readonly ILogger<WeatherForecastController> _logger;
         private readonly ICurrentEquipment _currentEquipment;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger,ICurrentEquipment  currentEquipment)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger,
+            ICurrentEquipment  currentEquipment,
+             IHttpContextAccessor httpContextAccessor)
         {
             _logger = logger;
             _currentEquipment = currentEquipment;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
+           var claimsPrincipal= _httpContextAccessor?.HttpContext?.User;
             _logger.LogInformation($"{_currentEquipment.Name} {_currentEquipment.Id} {_currentEquipment.SiteId} {_currentEquipment.FactoryId}");
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {

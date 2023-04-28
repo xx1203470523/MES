@@ -173,7 +173,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ManuSfcInfoEntitys"></param>
         /// <returns></returns>
-        public async Task<int> UpdatesAsync(List<ManuSfcInfoEntity> ManuSfcInfoEntitys)
+        public async Task<int> UpdatesAsync(IEnumerable<ManuSfcInfoEntity> ManuSfcInfoEntitys)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, ManuSfcInfoEntitys);

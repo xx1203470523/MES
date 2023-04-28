@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Hymson.MES.CoreServices": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:50085;http://localhost:50086"
+    }
+  }
+}

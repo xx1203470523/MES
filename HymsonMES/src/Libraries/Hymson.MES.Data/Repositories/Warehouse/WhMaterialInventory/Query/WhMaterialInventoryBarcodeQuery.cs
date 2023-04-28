@@ -1,21 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query
+﻿namespace Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query
 {
-    public class WhMaterialInventoryBarcodeQuery
+    /// <summary>
+    /// 
+    /// </summary>
+    public class WhMaterialInventoryBarCodeQuery
     {
         /// <summary>
         /// 条码集合
         /// </summary>
-        public IEnumerable<string> BarCodes { get; set; }
+        public string BarCode { get; set; }
 
         /// <summary>
         /// 工厂
         /// </summary>
-        public long SiteId { get; set; }
+        public long? SiteId { get; set; }
     }
 }

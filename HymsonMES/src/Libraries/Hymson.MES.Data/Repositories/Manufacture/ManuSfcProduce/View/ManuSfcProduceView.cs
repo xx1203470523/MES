@@ -74,5 +74,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 产品版本
         /// </summary>
         public string Version { get; set; }
+
+        /// <summary>
+        /// 是否报废
+        /// </summary>
+        public TrueOrFalseEnum? IsScrap { get; set; }
     }
 }

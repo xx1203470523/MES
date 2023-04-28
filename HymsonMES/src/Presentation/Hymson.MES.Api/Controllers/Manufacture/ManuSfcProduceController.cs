@@ -180,5 +180,38 @@ namespace Hymson.MES.Api.Controllers.Manufacture
             await _manuSfcProduceService.SaveManuSfcProduceStepAsync(sfcProduceStepDto);
         }
         #endregion
+
+        /// <summary>
+        /// 获取更改生产列表数据
+        /// </summary>
+        /// <param name="sfcs"></param>
+        /// <returns></returns>
+        [HttpPost("getManuUpdateList")]
+        public async Task<List<ManuUpdateViewDto>> GetManuUpdateList(string[] sfcs)
+        {
+            return await _manuSfcProduceService.GetManuUpdateList(sfcs);
+        }
+
+        /// <summary>
+        /// 获取更改生产列表数据
+        /// </summary>
+        /// <param name="workOrderId"></param>
+        /// <returns></returns>
+        [HttpGet("getProcedureByOrderId/{workOrderId}")]
+        public async Task<List<ManuUpdateProcedureViewDto>> GetProcedureByOrderIdList(long workOrderId)
+        {
+            return await _manuSfcProduceService.GetProcedureByOrderIdList(workOrderId);
+        }
+
+        /// <summary>
+        /// 保存生产更改
+        /// </summary>
+        /// <param name="manuUpdateSaveDto"></param>
+        /// <returns></returns>
+        [HttpPost("saveManuUpdate")]
+        public async Task SaveManuUpdateList(ManuUpdateSaveDto manuUpdateSaveDto)
+        {
+            await _manuSfcProduceService.SaveManuUpdateList(manuUpdateSaveDto);
+        }
     }
 }

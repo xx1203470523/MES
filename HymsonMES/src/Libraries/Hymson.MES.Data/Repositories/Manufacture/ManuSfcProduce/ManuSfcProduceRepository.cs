@@ -9,6 +9,7 @@
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
@@ -43,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where("msp.SiteId = @SiteId");
             sqlBuilder.OrderBy("msp.UpdatedOn DESC");
 
-            sqlBuilder.Select("msp.ProductBOMId,msp.Id,msp.Lock,msp.ProcedureId,msp.Sfc,msp.LockProductionId,msp.Status,pwo.OrderCode,pp.Code,pp.Name,pm.MaterialCode,pm.MaterialName,pm.Version ");
+            sqlBuilder.Select("msp.IsScrap,msp.ProductBOMId,msp.Id,msp.ProcedureId,msp.Sfc,msp.Status,pwo.OrderCode,pp.Code,pp.Name,pm.MaterialCode,pm.MaterialName,pm.Version ");
 
             sqlBuilder.LeftJoin("proc_material pm  on msp.ProductId =pm.Id  and pm.IsDeleted=0");
             sqlBuilder.LeftJoin("plan_work_order pwo on msp.WorkOrderId =pwo.Id  and pwo.IsDeleted=0");
@@ -64,6 +65,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 {
                     sqlBuilder.Where("(msp.Lock!=@NoLock or `Lock`  is null)");
                 }
+            }
+            if (query.IsScrap.HasValue)
+            {
+                sqlBuilder.Where("msp.IsScrap=@IsScrap");
             }
             if (!string.IsNullOrWhiteSpace(query.Sfc))
             {
@@ -445,7 +450,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                             LEFT JOIN manu_sfc_produce SFC ON SPB.SfcInfoId = SFC.Id 
                             WHERE SPB.IsDeleted = 0 AND SPB.BusinessType = @BusinessType AND SFC.SFC = @Sfc ";
         const string GetSfcProduceBusinessBySFCsSql = @"SELECT SPB.* FROM manu_sfc_produce_business SPB  
-                            LEFT JOIN manu_sfc_produce SFC ON SPB.SfcInfoId = SFC.Id 
+                            LEFT JOIN manu_sfc_info info ON SPB.SfcInfoId = info.Id 
+							LEFT JOIN manu_sfc SFC ON info.SfcId = SFC.Id 
                             WHERE SPB.IsDeleted = 0 AND SPB.BusinessType = @BusinessType AND SFC.SFC IN @Sfcs ";
         const string GetSfcProduceBusinessBySFCIdsSql = "SELECT `Id`, `SiteId`, `SfcInfoId`, `BusinessType`, `BusinessContent`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted` FROM manu_sfc_produce_business WHERE SfcInfoId IN @SfcInfoIds  AND IsDeleted=0";
         const string GetBySFCSql = @"SELECT * FROM manu_sfc_produce WHERE SFC = @sfc ";

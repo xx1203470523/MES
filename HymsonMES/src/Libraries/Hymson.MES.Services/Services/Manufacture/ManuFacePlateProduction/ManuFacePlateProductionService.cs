@@ -286,7 +286,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {//批次的，则检查库存里是否有该条码，检查库存
 
                 //查找库存条码
-                var whMaterialInventory = await _whMaterialInventoryRepository.GetByBarCodeAsync(addDto.CirculationBarCode);
+                var whMaterialInventory = await _whMaterialInventoryRepository.GetByBarCode1Async(addDto.CirculationBarCode);
                 if (whMaterialInventory == null)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16908)).WithData("barCode", addDto.CirculationBarCode);

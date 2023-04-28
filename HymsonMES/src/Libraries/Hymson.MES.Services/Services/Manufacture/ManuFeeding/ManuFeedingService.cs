@@ -320,7 +320,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             //await _validationCreateRules.ValidateAndThrowAsync(saveDto);
 
             // 查询条码
-            var inventory = await _whMaterialInventoryRepository.GetByBarCodeAsync(saveDto.BarCode);
+            var inventory = await _whMaterialInventoryRepository.GetByBarCode1Async(saveDto.BarCode);
 
             // 查询物料
             var material = await _procMaterialRepository.GetByIdAsync(saveDto.ProductId) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10204));
@@ -411,7 +411,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             var feeds = await _manuFeedingRepository.GetByIdsAsync(idsArr);
 
             // 查询条码
-            var inventorys = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarcodeQuery
+            var inventorys = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
             {
                 BarCodes = feeds.Select(s => s.BarCode),
                 SiteId = _currentSite.SiteId ?? 0
