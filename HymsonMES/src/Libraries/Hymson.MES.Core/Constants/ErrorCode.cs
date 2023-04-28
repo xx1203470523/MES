@@ -666,7 +666,7 @@
         public const string MES18206 = "工单必须相同";
         public const string MES18207 = "新工单可生产数量不足";
         public const string MES18208 = "未获取到工艺路线节点信息";
-        public const string MES18209 = "生产更改错误";
+        public const string MES18209 = "工单:{Code}状态不允许操作！";
         public const string MES18210 = "生产更改错误";
 
 
