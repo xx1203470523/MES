@@ -26,7 +26,7 @@
         public const string MES10209 = "插入物料替代组件表失败！";
         public const string MES10210 = "修改物料替代组件表失败！";
         public const string MES10211 = "删除物料替代组件表失败！";
-        public const string MES10212 = "有生产中工单引用当前物料，不能删除！";
+        public const string MES10212 = "不能删除启用和保留状态的物料！";
         public const string MES10213 = "参数不能为空";
         public const string MES10214 = "物料编码不能为空";
         public const string MES10215 = "物料名称不能为空";
