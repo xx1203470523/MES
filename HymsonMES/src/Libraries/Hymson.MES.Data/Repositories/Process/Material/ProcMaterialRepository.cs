@@ -140,6 +140,10 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 sqlBuilder.Where(" Origin = @Origin ");
             }
+            if (procMaterialPagedQuery.BuyTypes != null&& procMaterialPagedQuery.BuyTypes.Length>0)
+            {
+                sqlBuilder.Where(" BuyType IN @BuyTypes ");
+            }
 
             var offSet = (procMaterialPagedQuery.PageIndex - 1) * procMaterialPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });

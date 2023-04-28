@@ -224,6 +224,17 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
 
         #region 关联资源
         /// <summary>
+        /// 根据资源ID获取数据
+        /// </summary>
+        /// <param name="resourceId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<long>> GetWorkCenterIdByResourceIdAsync(IEnumerable<long> resourceIds)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<long>(GetWorkCenterIdByResourceIdSql, new { resourceIds });
+        }
+
+        /// <summary>
         /// 查询产线下面的资源ID集合
         /// </summary>
         /// <param name="workCenterIds"></param>
@@ -302,6 +313,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
                                                 From  inte_work_center_relation  wcr 
                                                 left join inte_work_center wc on wc.Id=wcr.WorkCenterId
                                                 Where wcr.SubWorkCenterId = @Id ";
+        const string GetWorkCenterIdByResourceIdSql = "SELECT WorkCenterId FROM inte_work_center_resource_relation WHERE IsDeleted = 0 AND ResourceId IN @resourceIds";
         const string GetResourceIdsByWorkCenterIdSql = "SELECT ResourceId FROM inte_work_center_resource_relation WHERE IsDeleted = 0 AND WorkCenterId IN @workCenterIds ";
     }
 }

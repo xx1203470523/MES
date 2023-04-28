@@ -223,6 +223,7 @@
         public const string MES12112 = "工作中心已经关联数据,允许修改.";
         public const string MES12113 = "启用状态或保留状态不可删除.";
         public const string MES12114 = "产线已关联资源，不允许修改.";
+        public const string MES12115 = "存在已被关联的资源,不允许重复关联.";
         #endregion
 
         #region 编码规则 12400
@@ -588,6 +589,8 @@
         public const string MES16718 = "容器包装，未找到该条码的子级包装记录";
         public const string MES16719 = "容器包装，物料编码没有维护容器规格";
         public const string MES16720 = "容器包装，条码已报废";
+        public const string MES16721 = "容器包装，该条码{sfc}已装箱{packId}";
+        public const string MES16722 = "容器包装，该包装{packId}已关闭或删除";
         #endregion
 
         #region 绑定工单激活  MES16800

@@ -477,6 +477,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 来源
         /// </summary>
         public MaterialOriginEnum? Origin { get; set; }
+
+        /// <summary>
+        /// 采购类型 数组
+        /// </summary>
+        public MaterialBuyTypeEnum[]? BuyTypes { get; set; }
     }
 
     /// <summary>
