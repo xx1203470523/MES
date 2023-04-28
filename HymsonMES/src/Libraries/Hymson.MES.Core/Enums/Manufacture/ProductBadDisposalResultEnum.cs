@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 
 namespace Hymson.MES.Core.Enums.Manufacture
 {
@@ -40,7 +35,6 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 自动处理
         /// </summary>
         [Description("自动处理")]
-        AutoHandle = 4,
+        AutoHandle = 5
     }
 }
-    
