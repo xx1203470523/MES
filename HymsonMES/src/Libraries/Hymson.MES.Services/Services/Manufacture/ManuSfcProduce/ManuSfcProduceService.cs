@@ -278,7 +278,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             await _validationLockRules.ValidateAndThrowAsync(parm);
 
 
-            var sfcListTask = _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery { Sfcs = parm.Sfcs.Distinct().ToArray() });
+            var sfcListTask = _manuSfcProduceRepository.GetManuSfcProduceInfoEntitiesAsync(
+                new ManuSfcProduceQuery { 
+                    Sfcs = parm.Sfcs.Distinct().ToArray(),
+                    SiteId=_currentSite.SiteId??00
+                });
+
             var sfcProduceBusinesssListTask = _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = parm.Sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
             var sfcList = await sfcListTask;
             var sfcProduceBusinesssList = await sfcProduceBusinesssListTask;
@@ -339,7 +344,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     validationFailures.Add(validationFailure);
                     continue;
                 }
-                var sfcProduceBusinessEntity = sfcProduceBusinesssList.FirstOrDefault(x => x.SfcInfoId == sfcEntity.Id);
+                var sfcProduceBusinessEntity = sfcProduceBusinesssList.FirstOrDefault(x => x.SfcInfoId == sfcEntity.SfcInfoId);
                 switch (parm.OperationType)
                 {
                     case
@@ -467,7 +472,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 if (parm.OperationType == QualityLockEnum.Unlock)
                 {
                     stepEntity.Operatetype = ManuSfcStepTypeEnum.Unlock;
-                    unLockList.Add(sfc.Id);
+                    unLockList.Add(sfc.SfcInfoId);
                 }
                 else
                 {
@@ -476,7 +481,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = _currentSite.SiteId ?? 0,
-                        SfcInfoId = sfc.Id,
+                        SfcInfoId = sfc.SfcInfoId,
                         BusinessType = ManuSfcProduceBusinessType.Lock,
                         BusinessContent = JsonSerializer.Serialize(sfcProduceLockBo),
                         CreatedBy = sfc.CreatedBy,

@@ -129,6 +129,26 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return manuSfcProduceEntities;
         }
 
+        public async Task<IEnumerable<ManuSfcProduceInfoView>> GetManuSfcProduceInfoEntitiesAsync(ManuSfcProduceQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesInfoSqlTemplate);
+
+            sqlBuilder.Select("msp.*,msi.Id as SfcInfoId");
+            sqlBuilder.LeftJoin("manu_sfc mf  on mf.SFC =msp.sfc  and mf.IsDeleted=0");
+            sqlBuilder.LeftJoin("manu_sfc_info msi on msi.SfcId =mf.Id  and msi.IsDeleted=0");
+
+            sqlBuilder.Where("msp.SiteId = @SiteId");
+            if (query.Sfcs != null && query.Sfcs.Length > 0)
+            {
+                sqlBuilder.Where("msp.Sfc in @Sfcs");
+            }
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var manuSfcProduceEntities = await conn.QueryAsync<ManuSfcProduceInfoView>(template.RawSql, query);
+            return manuSfcProduceEntities;
+        }
+
         /// <summary>
         /// 根据ID获取数据
         /// </summary>
@@ -436,6 +456,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_produce`  msp /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_sfc_produce`  msp  /**innerjoin**/ /**leftjoin**/  /**where**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT * FROM `manu_sfc_produce` /**where**/  ";
+        const string GetEntitiesInfoSqlTemplate = @"SELECT  /**select**/ FROM `manu_sfc_produce` msp /**innerjoin**/ /**leftjoin**/  /**where**/   ";
 
         const string InsertSql = "INSERT INTO `manu_sfc_produce`(  `Id`, `SFC`, `ProductId`, `WorkOrderId`, `BarCodeInfoId`, `ProcessRouteId`, `WorkCenterId`, `ProductBOMId`, `Qty`, `EquipmentId`, `ResourceId`, `ProcedureId`, `Status`, `Lock`, `LockProductionId`, `IsSuspicious`, `RepeatedCount`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsScrap`) VALUES (   @Id, @SFC, @ProductId, @WorkOrderId, @BarCodeInfoId, @ProcessRouteId, @WorkCenterId, @ProductBOMId, @Qty, @EquipmentId, @ResourceId, @ProcedureId, @Status, @Lock, @LockProductionId, @IsSuspicious, @RepeatedCount, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @SiteId, @IsScrap )  ";
         const string InsertSfcProduceBusinessSql = "INSERT INTO `manu_sfc_produce_business`(  `Id`, `SiteId`, `SfcInfoId`, `BusinessType`, `BusinessContent`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcInfoId, @BusinessType, @BusinessContent, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";

@@ -1,4 +1,5 @@
-﻿using Hymson.MES.Core.Enums;
+﻿using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -79,5 +80,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 是否报废
         /// </summary>
         public TrueOrFalseEnum? IsScrap { get; set; }
+    }
+
+    public class ManuSfcProduceInfoView : ManuSfcProduceEntity
+    {
+        public long SfcInfoId { get; set; }
     }
 }

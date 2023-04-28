@@ -53,6 +53,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<IEnumerable<ManuSfcProduceEntity>> GetManuSfcProduceEntitiesAsync(ManuSfcProduceQuery manuSfcProduceQuery);
 
         /// <summary>
+        /// 获取带manu_sfc_info的list
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcProduceInfoView>> GetManuSfcProduceInfoEntitiesAsync(ManuSfcProduceQuery query);
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="manuSfcProduceEntity"></param>
