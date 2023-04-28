@@ -1,31 +1,16 @@
 ﻿using FluentValidation;
-using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Authentication;
+using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
-using Hymson.MES.Core.Enums.Integrated;
-using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
-using Hymson.MES.Data.Repositories.Integrated;
-using Hymson.MES.Data.Repositories.Process.Resource;
-using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
-using Hymson.Utils.Tools;
 using Hymson.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process.PrintConfig
 {
@@ -47,21 +32,23 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
         private readonly IProcPrintConfigRepository _printConfigRepository;
 
         private readonly AbstractValidator<ProcPrinterDto> _validationCreateRules;
-        //private readonly AbstractValidator<ProcResourceModifyDto> _validationModifyRules;
+        private readonly AbstractValidator<ProcPrinterUpdateDto> _validationModifyRules;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         public ProcPrintConfigService(ICurrentUser currentUser, ICurrentSite currentSite,
                   IProcPrintConfigRepository printConfigRepository,
-                  IProcResourceConfigPrintRepository resourceRepository, AbstractValidator<ProcPrinterDto> validationRules)
+                  IProcResourceConfigPrintRepository resourceRepository,
+                  AbstractValidator<ProcPrinterDto> validationCreateRules,
+                 AbstractValidator<ProcPrinterUpdateDto> validationModifyRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _resourceRepository = resourceRepository;
             _printConfigRepository = printConfigRepository;
-            _validationCreateRules = validationRules;
-            //_validationModifyRules = validationModifyRules;
+            _validationCreateRules = validationCreateRules;
+            _validationModifyRules = validationModifyRules;
         }
 
         /// <summary>
@@ -135,11 +122,14 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
         {
             //验证DTO
             //var dto = new ProcResourceTypeDto();
-            await _validationCreateRules.ValidateAndThrowAsync(param);
-            if (param == null || string.IsNullOrEmpty(param.PrintName))
+            if (param == null)
             {
                 throw new ValidationException(nameof(ErrorCode.MES10100));
             }
+            param.PrintName = param.PrintName.Trim();
+            param.PrintIp = param.PrintIp.Trim();
+            param.Remark = param.Remark.Trim();
+            await _validationCreateRules.ValidateAndThrowAsync(param);
 
             var userName = _currentUser.UserName;
             var siteId = _currentSite.SiteId ?? 0;
@@ -179,11 +169,14 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
         {
             //验证DTO
             //var dto = new ProcResourceTypeDto();
-            //await _validationRules.ValidateAndThrowAsync(dto);
             if (param == null)
             {
                 throw new ValidationException(nameof(ErrorCode.MES10100));
             }
+            param.PrintName = param.PrintName.Trim();
+            param.PrintIp = param.PrintIp.Trim();
+            param.Remark = param.Remark.Trim();
+            await _validationModifyRules.ValidateAndThrowAsync(param);
             var entity = await _printConfigRepository.GetByIdAsync(param?.Id ?? 0);
             if (entity == null)
             {

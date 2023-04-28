@@ -77,6 +77,8 @@
         public const string MES10343 = "模板名称不能为空!";
         public const string MES10344 = "存储路径不能为空!";
         public const string MES10345 = "模板文件不能为空!";
+        public const string MES10346 = "打印机名称不能为空!";
+        public const string MES10347= "打印机IP不能为空!";
         #endregion
 
         #region 工序 10400
