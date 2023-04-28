@@ -78,7 +78,7 @@
         public const string MES10344 = "存储路径不能为空!";
         public const string MES10345 = "模板文件不能为空!";
         public const string MES10346 = "打印机名称不能为空!";
-        public const string MES10347= "打印机IP不能为空!";
+        public const string MES10347 = "打印机IP不能为空!";
         #endregion
 
         #region 工序 10400
@@ -659,7 +659,7 @@
         public const string MES18203 = "工序不能为空";
 
         public const string MES18204 = "条码:{SFC}已锁定";
-        public const string MES18205 = "条码:{SFC}的工单已关闭或锁定不允许操作";
+        public const string MES18205 = "条码:{SFC}的工单状态不允许操作";
         public const string MES18206 = "工单必须相同";
         public const string MES18207 = "新工单可生产数量不足";
         public const string MES18208 = "未获取到工艺路线节点信息";

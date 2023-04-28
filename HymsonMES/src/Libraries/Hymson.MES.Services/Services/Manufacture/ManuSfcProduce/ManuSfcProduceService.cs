@@ -972,6 +972,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     manuSfcProduceStepList.Add(manuSfcProduceStep);
                 }
             }
+            manuSfcProduceStepEnd.Step = manuSfcProduceStepList.Count() + 1;
             manuSfcProduceStepList.Add(manuSfcProduceStepEnd);
             #endregion
 
@@ -1300,8 +1301,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                         // 更新条码信息
                         var sfcInfo = await _manuSfcRepository.GetBySFCsAsync(sfcsArr);
                         await _manuSfcRepository.UpdateStatusAsync(new ManuSfcUpdateCommand { Sfcs = sfcsArr, Status = SfcStatusEnum.Complete, UserId = _currentUser.UserName, UpdatedOn = HymsonClock.Now() });
-                        //不用更新这个  因为是唯一的生产肯定使用了  
-                        //await _manuSfcInfoRepository.UpdatesIsUsedAsync(new ManuSfcInfoUpdateCommand { Sfcs = sfcsArr, IsUsed = YesOrNoEnum.No, UserId = _currentUser.UserName, UpdatedOn = HymsonClock.Now() });
+                        //有从仓库直接拉出来的可能没使用 
+                        await _manuSfcInfoRepository.UpdatesIsUsedAsync(new ManuSfcInfoUpdateCommand { Sfcs = sfcsArr, IsUsed = true, UserId = _currentUser.UserName, UpdatedOn = HymsonClock.Now() });
 
                         //更新库存
                         if (updateInventoryQuantityList.Any())
@@ -1453,7 +1454,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             //工单
             var WorkOrderIds = manuSfcProduces.Select(it => it.WorkOrderId).ToArray();
             var workOrders = await _planWorkOrderRepository.GetByIdsAsync(WorkOrderIds);
-            var workOrdersOrLosck = workOrders.Where(it => it.Status == PlanWorkOrderStatusEnum.Closed || it.IsLocked == YesOrNoEnum.Yes);
+            PlanWorkOrderStatusEnum[] statusArr = { PlanWorkOrderStatusEnum.NotStarted, PlanWorkOrderStatusEnum.Finish, PlanWorkOrderStatusEnum.Closed };
+            var workOrdersOrLosck = workOrders.Where(it => statusArr.Contains(it.Status) || it.IsLocked == YesOrNoEnum.Yes);
             if (workOrdersOrLosck.Any())
             {
                 var sfcInfoIds = manuSfcProduces.Select(it => workOrdersOrLosck.Select(order => order.Id == it.WorkOrderId).Any()).ToArray();
