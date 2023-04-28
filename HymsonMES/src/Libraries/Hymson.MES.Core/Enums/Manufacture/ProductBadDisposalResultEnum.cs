@@ -40,7 +40,7 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 自动处理
         /// </summary>
         [Description("自动处理")]
-        AutoHandle = 4,
+        AutoHandle = 5
     }
 }
     
