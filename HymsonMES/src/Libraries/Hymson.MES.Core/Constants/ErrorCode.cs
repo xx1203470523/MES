@@ -76,6 +76,7 @@
         public const string MES10342 = "模板名称最大长度为50";
         public const string MES10343 = "模板名称不能为空!";
         public const string MES10344 = "存储路径不能为空!";
+        public const string MES10345 = "模板文件不能为空!";
         #endregion
 
         #region 工序 10400
