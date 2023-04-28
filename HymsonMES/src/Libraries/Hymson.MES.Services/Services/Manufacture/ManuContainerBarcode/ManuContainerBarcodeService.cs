@@ -144,7 +144,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuContainerBarcodeEntity.UpdatedBy = _currentUser.UserName;
             manuContainerBarcodeEntity.CreatedOn = HymsonClock.Now();
             manuContainerBarcodeEntity.UpdatedOn = HymsonClock.Now();
-            manuContainerBarcodeEntity.SiteId = _currentSite.SiteId ?? 123456;
+            manuContainerBarcodeEntity.SiteId = _currentSite.SiteId ?? 0;
 
             return await CreatePackage(createManuContainerBarcodeDto, manuContainerBarcodeEntity);
 
