@@ -262,7 +262,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 面板编码
         /// </summary>
         public string FacePlateCode { get; set; }
-       
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public long ProcedureId { get; set; }
+
     }
 
     /// <summary>
