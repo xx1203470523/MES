@@ -78,7 +78,7 @@
         public const string MES10344 = "存储路径不能为空!";
         public const string MES10345 = "模板文件不能为空!";
         public const string MES10346 = "打印机名称不能为空!";
-        public const string MES10347= "打印机IP不能为空!";
+        public const string MES10347 = "打印机IP不能为空!";
         #endregion
 
         #region 工序 10400
@@ -223,6 +223,7 @@
         public const string MES12112 = "工作中心已经关联数据,允许修改.";
         public const string MES12113 = "启用状态或保留状态不可删除.";
         public const string MES12114 = "产线已关联资源，不允许修改.";
+        public const string MES12115 = "存在已被关联的资源,不允许重复关联.";
         #endregion
 
         #region 编码规则 12400
@@ -589,6 +590,8 @@
         public const string MES16718 = "容器包装，未找到该条码的子级包装记录";
         public const string MES16719 = "容器包装，物料编码没有维护容器规格";
         public const string MES16720 = "容器包装，条码已报废";
+        public const string MES16721 = "容器包装，该条码{sfc}已装箱{packId}";
+        public const string MES16722 = "容器包装，该包装{packId}已关闭或删除";
         #endregion
 
         #region 绑定工单激活  MES16800
@@ -660,11 +663,11 @@
         public const string MES18203 = "工序不能为空";
 
         public const string MES18204 = "条码:{SFC}已锁定";
-        public const string MES18205 = "条码:{SFC}的工单已关闭或锁定不允许操作";
+        public const string MES18205 = "条码:{SFC}的工单状态不允许操作";
         public const string MES18206 = "工单必须相同";
         public const string MES18207 = "新工单可生产数量不足";
         public const string MES18208 = "未获取到工艺路线节点信息";
-        public const string MES18209 = "生产更改错误";
+        public const string MES18209 = "工单:{Code}状态不允许操作！";
         public const string MES18210 = "生产更改错误";
 
 

@@ -225,8 +225,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <returns></returns>
         public async Task<PlanWorkOrderEntity> GetProduceWorkOrderByIdAsync(long workOrderId)
         {
-            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(workOrderId);
-            if (planWorkOrderEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES16301));
+            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(workOrderId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16301));
 
             // 判断是否被锁定
             if (planWorkOrderEntity.IsLocked == YesOrNoEnum.Yes)
@@ -235,8 +235,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             }
 
             // 判断是否是激活的工单
-            var activatedWorkOrder = await _planWorkOrderActivationRepository.GetByWorkOrderIdAsync(planWorkOrderEntity.Id);
-            if (activatedWorkOrder == null) throw new CustomerValidationException(nameof(ErrorCode.MES16410));
+            _ = await _planWorkOrderActivationRepository.GetByWorkOrderIdAsync(planWorkOrderEntity.Id)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16410));
 
             switch (planWorkOrderEntity.Status)
             {
