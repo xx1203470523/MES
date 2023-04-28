@@ -23,6 +23,7 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
+using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -206,7 +207,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (manuSfcProduceEntit == null)
             {
                 //是否已入库完成 待使用算完成
-                var whMaterialInventoryEntit = await _whMaterialInventoryRepository.GetByBarCodeAsync(beginRepairDto.SFC);
+                var whMaterialInventoryEntit = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery { SiteId = _currentSite.SiteId, BarCode = beginRepairDto.SFC });
                 if (whMaterialInventoryEntit == null)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16306));

@@ -3,17 +3,16 @@
     /// <summary>
     /// 
     /// </summary>
-    public class WhMaterialInventoryBarCodeQuery
+    public class WhMaterialInventoryBarCodesQuery
     {
-        /// <summary>
-        /// 工厂
-        /// </summary>
-        public long? SiteId { get; set; }
-
         /// <summary>
         /// 条码集合
         /// </summary>
-        public string BarCode { get; set; }
+        public IEnumerable<string> BarCodes { get; set; }
 
+        /// <summary>
+        /// 工厂
+        /// </summary>
+        public long SiteId { get; set; }
     }
 }

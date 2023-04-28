@@ -144,7 +144,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuContainerBarcodeEntity.UpdatedBy = _currentUser.UserName;
             manuContainerBarcodeEntity.CreatedOn = HymsonClock.Now();
             manuContainerBarcodeEntity.UpdatedOn = HymsonClock.Now();
-            manuContainerBarcodeEntity.SiteId = _currentSite.SiteId ?? 0;
+            manuContainerBarcodeEntity.SiteId = _currentSite.SiteId ?? 123456;
 
             return await CreatePackage(createManuContainerBarcodeDto, manuContainerBarcodeEntity);
 
@@ -157,10 +157,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES16705));
             var facePlateContainerPackEntity = await _manuFacePlateContainerPackRepository.GetByFacePlateIdAsync(facePlateEntity.Id);
             //工序信息
-            var procobj = await _procProcedureRepository.GetByIdAsync(facePlateContainerPackEntity.ProcedureId);
+            var procobj = await _procProcedureRepository.GetByIdAsync(createManuContainerBarcodeDto.ProcedureId);
             if(procobj == null)
                 throw new CustomerValidationException(nameof(ErrorCode.MES16714));
-            if(procobj.PackingLevel==(int)ManuContainerBarcodePackageLevelEnum.First)
+            facePlateContainerPackEntity.ProcedureId = createManuContainerBarcodeDto.ProcedureId;
+            if (procobj.PackingLevel==(int)ManuContainerBarcodePackageLevelEnum.First)
             {
                 return await CreateFirstPackage(createManuContainerBarcodeDto, facePlateContainerPackEntity, manuContainerBarcodeEntity);
             }

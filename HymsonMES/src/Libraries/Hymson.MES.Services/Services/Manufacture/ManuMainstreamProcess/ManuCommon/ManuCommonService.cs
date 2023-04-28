@@ -14,6 +14,8 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Data.Repositories.Process.Resource;
+using Hymson.MES.Data.Repositories.Warehouse;
+using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
 using Hymson.Sequences;
@@ -90,6 +92,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// </summary>
         private readonly IProcMaskCodeRuleRepository _procMaskCodeRuleRepository;
 
+        /// <summary>
+        /// 仓储接口（物料库存）
+        /// </summary>
+        private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
+
 
         /// <summary>
         /// 构造函数
@@ -106,6 +113,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="procProcedureRepository"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="procMaskCodeRuleRepository"></param>
+        /// <param name="whMaterialInventoryRepository"></param>
         public ManuCommonService(ICurrentSite currentSite, ISequenceService sequenceService,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
@@ -116,7 +124,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             IProcResourceRepository procResourceRepository,
             IProcProcedureRepository procProcedureRepository,
             IProcMaterialRepository procMaterialRepository,
-            IProcMaskCodeRuleRepository procMaskCodeRuleRepository)
+            IProcMaskCodeRuleRepository procMaskCodeRuleRepository,
+            IWhMaterialInventoryRepository whMaterialInventoryRepository)
         {
             _currentSite = currentSite;
             _sequenceService = sequenceService;
@@ -130,6 +139,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             _procProcedureRepository = procProcedureRepository;
             _procMaterialRepository = procMaterialRepository;
             _procMaskCodeRuleRepository = procMaskCodeRuleRepository;
+            _whMaterialInventoryRepository = whMaterialInventoryRepository;
         }
 
         /// <summary>
@@ -186,7 +196,17 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 || sfc.Contains(' ') == true) throw new CustomerValidationException(nameof(ErrorCode.MES16305));
 
             var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(sfc);
-            if (sfcProduceEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES16306));
+            if (sfcProduceEntity == null)
+            {
+                var whMaterialInventoryEntity = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery
+                {
+                    SiteId = _currentSite.SiteId,
+                    BarCode = sfc
+                });
+                if (whMaterialInventoryEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES16318));
+
+                throw new CustomerValidationException(nameof(ErrorCode.MES16306));
+            }
 
             // 获取锁状态
             var sfcProduceBusinessEntity = await _manuSfcProduceRepository.GetSfcProduceBusinessBySFCAsync(new SfcProduceBusinessQuery
@@ -531,7 +551,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         }
 
         /// <summary>
-        /// 条码合法性校验
+        /// 检查条码状态是否合法
         /// </summary>
         /// <param name="sfcProduceEntity"></param>
         /// <param name="produceStatus"></param>

@@ -101,7 +101,7 @@
         public const string MES10439 = $"此工艺路线在系统中不存在!";
         public const string MES10440 = $"获取下一工序失败!";
         public const string MES10441 = $"下一工序不存在空值类型工序!";
-        public const string MES10442 = $"获取上一工序失败!";
+        public const string MES10442 = $"工序不匹配或前工序不是随机工序!";
         public const string MES10443 = $"启用状态或保留状态不可删除!";
         public const string MES10444 = $"工艺编码最大长度为60";
         public const string MES10445 = $"工艺名称最大长度为60";
@@ -469,6 +469,7 @@
         public const string MES16315 = "库存{barCode}和待加载物料编码/版本不符！";
         public const string MES16316 = "SFC条码{SFC}和资源不匹配！";
         public const string MES16317 = "工序和资源不匹配！";
+        public const string MES16318 = "SFC状态为已完成，不允许操作！";
         #endregion
 
         #region 生产
