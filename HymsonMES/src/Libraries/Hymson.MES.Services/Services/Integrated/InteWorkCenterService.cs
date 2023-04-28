@@ -230,6 +230,13 @@ namespace Hymson.MES.Services.Services.Integrated
                 throw new CustomerValidationException(nameof(ErrorCode.MES12113));
             }
 
+            // 检查产线是否有下级资源
+            var inteWorkCenterRelations = await _inteWorkCenterRepository.GetResourceIdsByWorkCenterIdAsync(ids);
+            if (inteWorkCenterRelations != null && inteWorkCenterRelations.Any() == true)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12114));
+            }
+
             return await _inteWorkCenterRepository.DeleteRangAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = userId });
         }
 
