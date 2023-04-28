@@ -105,6 +105,13 @@ namespace Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository
         Task<IEnumerable<InteWorkCenterRelationView>> GetInteWorkCenterRelationAsync(long id);
 
         /// <summary>
+        /// 根据资源ID获取数据
+        /// </summary>
+        /// <param name="resourceId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<long>> GetWorkCenterIdByResourceIdAsync(IEnumerable<long> resourceIds);
+
+        /// <summary>
         /// 查询产线下面的资源ID集合
         /// </summary>
         /// <param name="workCenterIds"></param>
