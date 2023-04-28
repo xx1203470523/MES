@@ -144,7 +144,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuContainerBarcodeEntity.UpdatedBy = _currentUser.UserName;
             manuContainerBarcodeEntity.CreatedOn = HymsonClock.Now();
             manuContainerBarcodeEntity.UpdatedOn = HymsonClock.Now();
-            manuContainerBarcodeEntity.SiteId = _currentSite.SiteId ?? 123456;
+            manuContainerBarcodeEntity.SiteId = _currentSite.SiteId ?? 0;
 
             return await CreatePackage(createManuContainerBarcodeDto, manuContainerBarcodeEntity);
 
@@ -191,8 +191,9 @@ namespace Hymson.MES.Services.Services.Manufacture
             
             if (sfcProduceEntity != null)
             {
-                //sfcProduceEntity.VerifyProcedure(facePlateContainerPackEntity.ProcedureId);
-                
+                //条码是否已报废
+                if(sfcProduceEntity.IsScrap== TrueOrFalseEnum.Yes)
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16720));
                 //是否允许活动产品
                 if (sfcProduceEntity.Status == SfcProduceStatusEnum.Activity && !facePlateContainerPackEntity.IsAllowActiveProduct)
                 {
