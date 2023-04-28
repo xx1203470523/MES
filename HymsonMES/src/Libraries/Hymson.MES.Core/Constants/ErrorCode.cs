@@ -26,7 +26,7 @@
         public const string MES10209 = "插入物料替代组件表失败！";
         public const string MES10210 = "修改物料替代组件表失败！";
         public const string MES10211 = "删除物料替代组件表失败！";
-        public const string MES10212 = "有生产中工单引用当前物料，不能删除！";
+        public const string MES10212 = "不能删除启用和保留状态的物料！";
         public const string MES10213 = "参数不能为空";
         public const string MES10214 = "物料编码不能为空";
         public const string MES10215 = "物料名称不能为空";
@@ -76,6 +76,9 @@
         public const string MES10342 = "模板名称最大长度为50";
         public const string MES10343 = "模板名称不能为空!";
         public const string MES10344 = "存储路径不能为空!";
+        public const string MES10345 = "模板文件不能为空!";
+        public const string MES10346 = "打印机名称不能为空!";
+        public const string MES10347= "打印机IP不能为空!";
         #endregion
 
         #region 工序 10400
@@ -98,7 +101,7 @@
         public const string MES10439 = $"此工艺路线在系统中不存在!";
         public const string MES10440 = $"获取下一工序失败!";
         public const string MES10441 = $"下一工序不存在空值类型工序!";
-        public const string MES10442 = $"获取上一工序失败!";
+        public const string MES10442 = $"工序不匹配或前工序不是随机工序!";
         public const string MES10443 = $"启用状态或保留状态不可删除!";
         public const string MES10444 = $"工艺编码最大长度为60";
         public const string MES10445 = $"工艺名称最大长度为60";
@@ -219,6 +222,7 @@
         public const string MES12111 = "工作中心修改的数据不存在.";
         public const string MES12112 = "工作中心已经关联数据,允许修改.";
         public const string MES12113 = "启用状态或保留状态不可删除.";
+        public const string MES12114 = "产线已关联资源，不允许修改.";
         #endregion
 
         #region 编码规则 12400
@@ -466,6 +470,7 @@
         public const string MES16315 = "库存{barCode}和待加载物料编码/版本不符！";
         public const string MES16316 = "SFC条码{SFC}和资源不匹配！";
         public const string MES16317 = "工序和资源不匹配！";
+        public const string MES16318 = "SFC状态为已完成，不允许操作！";
         #endregion
 
         #region 生产
@@ -582,6 +587,7 @@
         public const string MES16717 = "容器包装，超过了最大包装数量，不允许包装";
         public const string MES16718 = "容器包装，未找到该条码的子级包装记录";
         public const string MES16719 = "容器包装，物料编码没有维护容器规格";
+        public const string MES16720 = "容器包装，条码已报废";
         #endregion
 
         #region 绑定工单激活  MES16800

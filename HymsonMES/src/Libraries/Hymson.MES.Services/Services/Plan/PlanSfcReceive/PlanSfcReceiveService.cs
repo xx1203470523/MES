@@ -107,7 +107,7 @@ namespace Hymson.MES.Services.Services.Plan
             var validationFailures = new List<ValidationFailure>();
             var barcodeList = new List<BarcodeDto>();
 
-            var whMaterialInventoryList = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarcodeQuery
+            var whMaterialInventoryList = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
             {
                 BarCodes = param.SFCs,
                 SiteId = _currentSite.SiteId ?? 0
@@ -215,7 +215,7 @@ namespace Hymson.MES.Services.Services.Plan
             decimal qty = 0;
             if (param.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)
             {
-                var whMaterialInventoryEntity = await _whMaterialInventoryRepository.GetByBarCodeAsync(param.SFC);
+                var whMaterialInventoryEntity = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery { SiteId = _currentSite.SiteId, BarCode = param.SFC });
                 if (whMaterialInventoryEntity == null)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16120));

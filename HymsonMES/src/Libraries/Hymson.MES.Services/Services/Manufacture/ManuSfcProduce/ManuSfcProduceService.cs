@@ -224,7 +224,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             //{
             //    manuSfcProducePagedQuery.SfcArray = manuSfcProducePagedQueryDto.Sfcs.Split(',');
             //}
-            if (manuSfcProducePagedQueryDto.Sfcs!=null&& manuSfcProducePagedQueryDto.Sfcs.Any())
+            if (manuSfcProducePagedQueryDto.Sfcs != null && manuSfcProducePagedQueryDto.Sfcs.Any())
             {
                 manuSfcProducePagedQuery.SfcArray = manuSfcProducePagedQueryDto.Sfcs;
             }
@@ -257,7 +257,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     MaterialCode = item.MaterialCode,
                     MaterialName = item.MaterialName,
                     Version = item.Version,
-                    IsScrap=item.IsScrap
+                    IsScrap = item.IsScrap
                 });
             }
             return new PagedInfo<ManuSfcProduceViewDto>(manuSfcProduceDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
@@ -1220,7 +1220,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (sfcProduceStepDto.Type == SfcProduceStatusEnum.Complete && sfcProduceStepDto.ProcedureId == endProcessRouteDetailId)
             {
                 //入库
-                var whMaterialInventorys = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarcodeQuery { BarCodes = sfcsArr, SiteId = _currentSite.SiteId ?? 0 });
+                var whMaterialInventorys = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery { BarCodes = sfcsArr, SiteId = _currentSite.SiteId ?? 0 });
                 bool isWhMaterialInventorys = whMaterialInventorys != null && whMaterialInventorys.Any() ? true : false;
 
                 var notwhMaterialInventorySfcs = manuSfcInfos.Where(it => !whMaterialInventorys.Where(wmi => wmi.MaterialBarCode == it.SFC).Any()).ToList();
@@ -1508,6 +1508,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 item.ProductId = newPlanWorkOrderEntity.ProductId;
                 item.ProcessRouteId = newPlanWorkOrderEntity.ProcessRouteId;
                 item.ProductBOMId = newPlanWorkOrderEntity.ProductBOMId;
+                item.WorkOrderId = newPlanWorkOrderEntity.Id;
 
                 // 初始化步骤
                 var sfcStep = new ManuSfcStepEntity
@@ -1583,6 +1584,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                 //步骤
                 await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
+                trans.Complete();
             }
             #endregion
         }
