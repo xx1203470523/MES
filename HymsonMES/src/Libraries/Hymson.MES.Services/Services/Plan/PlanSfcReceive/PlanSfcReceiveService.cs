@@ -215,7 +215,7 @@ namespace Hymson.MES.Services.Services.Plan
             decimal qty = 0;
             if (param.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)
             {
-                var whMaterialInventoryEntity = await _whMaterialInventoryRepository.GetByBarCode1Async(param.SFC);
+                var whMaterialInventoryEntity = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery { SiteId = _currentSite.SiteId, BarCode = param.SFC });
                 if (whMaterialInventoryEntity == null)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16120));

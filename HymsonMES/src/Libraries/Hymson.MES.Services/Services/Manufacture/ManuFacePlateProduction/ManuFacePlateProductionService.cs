@@ -24,6 +24,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
+using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -286,7 +287,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {//批次的，则检查库存里是否有该条码，检查库存
 
                 //查找库存条码
-                var whMaterialInventory = await _whMaterialInventoryRepository.GetByBarCode1Async(addDto.CirculationBarCode);
+                var whMaterialInventory = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery { SiteId = _currentSite.SiteId, BarCode = addDto.CirculationBarCode });
                 if (whMaterialInventory == null)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16908)).WithData("barCode", addDto.CirculationBarCode);

@@ -5,18 +5,10 @@
  *builder:  pengxin
  *build datetime: 2023-03-06 03:27:59
  */
-using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Warehouse;
-using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
-using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Warehouse
 {
@@ -109,13 +101,6 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <param name="id"></param>
         /// <returns></returns>
         Task<WhMaterialInventoryEntity> GetByIdAsync(long id);
-
-        /// <summary>
-        /// 根据物料条码获取数据
-        /// </summary>
-        /// <param name="barCode"></param>
-        /// <returns></returns>
-        Task<WhMaterialInventoryEntity> GetByBarCode1Async(string barCode);
 
         /// <summary>
         /// 根据物料条码获取数据

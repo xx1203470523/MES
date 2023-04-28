@@ -64,17 +64,6 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         }
 
         /// <summary>
-        /// 根据物料条码获取数据（建议用下面这个）
-        /// </summary>
-        /// <param name="barCode"></param>
-        /// <returns></returns>
-        public async Task<WhMaterialInventoryEntity> GetByBarCode1Async(string barCode)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<WhMaterialInventoryEntity>(GetByBarCode, new { barCode });
-        }
-
-        /// <summary>
         /// 根据物料条码获取数据
         /// </summary>
         /// <param name="query"></param>
