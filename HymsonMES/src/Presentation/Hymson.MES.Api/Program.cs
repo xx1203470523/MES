@@ -42,7 +42,7 @@ namespace Hymson.MES.Api
             builder.Services.AddMemoryCache();
             builder.Services.AddClearCacheService(builder.Configuration);
 #if DEBUG
-            builder.Services.AddHostedService<WorkService>();
+            //builder.Services.AddHostedService<WorkService>();
 #endif
             AddSwaggerGen(builder.Services);
 

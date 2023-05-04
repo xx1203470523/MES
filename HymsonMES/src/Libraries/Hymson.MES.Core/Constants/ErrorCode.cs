@@ -107,6 +107,7 @@
         public const string MES10445 = $"工艺名称最大长度为60";
         public const string MES10446 = $"抽检比例设置错误";
         public const string MES10447 = $"下一工序不存在非空值类型工序";
+        public const string MES10448 = $"只允许选择启用和保留状态的工艺路线！";
         #endregion
 
         #region 参数 10500
