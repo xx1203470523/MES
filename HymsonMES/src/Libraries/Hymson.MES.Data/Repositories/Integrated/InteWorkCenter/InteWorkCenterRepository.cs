@@ -61,7 +61,11 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
                 param.Name = $"%{param.Name}%";
                 sqlBuilder.Where("Name like @Name");
             }
-
+            if (!string.IsNullOrWhiteSpace(param.Remark))
+            {
+                param.Remark = $"%{param.Remark}%";
+                sqlBuilder.Where("Remark like @Remark");
+            }
 
             var offSet = (param.PageIndex - 1) * param.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });

@@ -301,11 +301,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
     public class InteWorkCenterPagedQueryDto : PagerInfo
     {
         /// <summary>
-        /// 站点Id 
-        /// </summary>
-        public long? SiteId { get; set; }
-
-        /// <summary>
         /// 工作中心代码 
         /// </summary>
         public string? Code { get; set; }
@@ -329,5 +324,10 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 状态 
         /// </summary>
         public SysDataStatusEnum? Status { get; set; }
+
+        /// <summary>
+        /// 描述
+        /// </summary>
+        public string? Remark { get; set; }
     }
 }
