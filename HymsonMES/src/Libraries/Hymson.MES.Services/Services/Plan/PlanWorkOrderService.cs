@@ -129,7 +129,7 @@ namespace Hymson.MES.Services.Services.Plan
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10438));
 
             // 工艺路线状态校验
-            if (procProcessRouteEntity.Status != SysDataStatusEnum.Enable || procProcessRouteEntity.Status != SysDataStatusEnum.Retain)
+            if (procProcessRouteEntity.Status != SysDataStatusEnum.Enable && procProcessRouteEntity.Status != SysDataStatusEnum.Retain)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10448));
             }
