@@ -467,8 +467,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdSql = @"SELECT * FROM `manu_sfc_produce`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `manu_sfc_produce`  WHERE Id IN @ids ";
         const string GetSfcProduceBusinessBySFCIdSql = "SELECT * FROM manu_sfc_produce_business WHERE IsDeleted = 0 AND SfcInfoId = @SfcInfoId ";
-        const string GetSfcProduceBusinessBySFCSql = @"SELECT SPB.* FROM manu_sfc_produce_business SPB  
-                            LEFT JOIN manu_sfc_produce SFC ON SPB.SfcInfoId = SFC.Id 
+        const string GetSfcProduceBusinessBySFCSql = @" SELECT SPB.* FROM manu_sfc_produce_business SPB  
+ left join manu_sfc_info msi ON SPB.SfcInfoId = msi.Id 
+ left join manu_sfc mf on mf.Id =msi.SfcId 
+ left join manu_sfc_produce sfc on sfc.SFC =mf.SFC 
                             WHERE SPB.IsDeleted = 0 AND SPB.BusinessType = @BusinessType AND SFC.SFC = @Sfc ";
         const string GetSfcProduceBusinessBySFCsSql = @"SELECT SPB.* FROM manu_sfc_produce_business SPB  
                             LEFT JOIN manu_sfc_info info ON SPB.SfcInfoId = info.Id 
