@@ -6,6 +6,7 @@
  *build datetime: 2023-02-14 10:04:25
  */
 using FluentValidation;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Services.Dtos.Process;
 using System;
 using System.Collections.Generic;
@@ -22,8 +23,10 @@ namespace Hymson.MES.Services.Validators.Process
     {
         public ProcBomCreateValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
+            RuleFor(x => x.BomCode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10613));
+            RuleFor(x => x.BomCode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10614));
+            RuleFor(x => x.BomName).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10615));
+            RuleFor(x => x.BomName).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES10616));
         }
     }
 
@@ -34,8 +37,8 @@ namespace Hymson.MES.Services.Validators.Process
     {
         public ProcBomModifyValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
+            RuleFor(x => x.BomName).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10615));
+            RuleFor(x => x.BomName).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES10616));
         }
     }
 }

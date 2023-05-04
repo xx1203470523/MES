@@ -140,6 +140,10 @@
         public const string MES10610 = "删除失败 Id不能为空!";
         public const string MES10611 = "不能删除启用状态的Bom!";
         public const string MES10612 = "此Bom在系统中不存在!";
+        public const string MES10613 = "Bom编码不能为空";
+        public const string MES10614 = "Bom编码最大长度不超过50";
+        public const string MES10615 = "Bom名称不能为空";
+        public const string MES10616 = "Bom名称最大长度不超过50";
         #endregion
 
         #region 上料点 10700
