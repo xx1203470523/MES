@@ -38,5 +38,10 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query
         /// 状态 
         /// </summary>
         public SysDataStatusEnum? Status { get; set; }
+
+        /// <summary>
+        /// 描述
+        /// </summary>
+        public string? Remark { get; set; }
     }
 }

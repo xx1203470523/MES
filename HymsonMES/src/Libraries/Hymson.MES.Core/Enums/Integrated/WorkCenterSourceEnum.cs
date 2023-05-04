@@ -1,24 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 
 namespace Hymson.MES.Core.Enums.Integrated
 {
-    public enum WorkCenterSourceEnum:short
+    /// <summary>
+    /// 
+    /// </summary>
+    public enum WorkCenterSourceEnum : short
     {
         /// <summary>
-        /// 工厂
+        /// MES
         /// </summary>
-        [Description("工厂")]
-        ERP = 0,
+        [Description("MES")]
+        MES = 1,
 
         /// <summary>
-        /// 产线
+        /// ERP
         /// </summary>
-        [Description("产线")]
-        MES = 1,
+        [Description("ERP")]
+        ERP = 2
+
     }
 }
