@@ -190,6 +190,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             var sfcStepList = new List<ManuSfcStepEntity>();
             var manuSfcProduceList = new List<ManuSfcProduceBusinessEntity>();
+           //不合格代码中包含报废
+            var scrapCode = qualUnqualifiedCodes.FirstOrDefault(a => a.UnqualifiedCode == "SCRAP");
             foreach (var item in manuSfcs)
             {
                 foreach (var unqualified in qualUnqualifiedCodes)
@@ -239,7 +241,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             //报废不合格代码
-            var scrapCode = qualUnqualifiedCodes.FirstOrDefault(a => a.UnqualifiedCode == "SCRAP");
             if (scrapCode != null)
             {
                 var rows = 0;

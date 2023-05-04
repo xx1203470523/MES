@@ -358,7 +358,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                     validationFailures.Add(validationFailure);
                     continue;
                 }
-                if (sfcEntity.Status == SfcStatusEnum.Complete || sfcEntity.Status == SfcStatusEnum.Received)
+                if (!(sfcEntity.Status == SfcStatusEnum.Complete || sfcEntity.Status == SfcStatusEnum.Received))
                 {
                     var validationFailure = new ValidationFailure();
                     if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
