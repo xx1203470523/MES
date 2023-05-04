@@ -6,6 +6,7 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -618,25 +619,27 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             foreach (var ruleEntity in maskCodeRules)
             {
                 var rule = Regex.Replace(ruleEntity.Rule, "[?？]", ".");
-                var pattern = $"^{rule}$";
+                var pattern = $"{rule}";
 
-                if (Regex.IsMatch(barCode, pattern) == false) return false;
-
-                /*
                 switch (ruleEntity.MatchWay)
                 {
                     case MatchModeEnum.Start:
+                        pattern = $"{rule}.+";
+                        break;
                     case MatchModeEnum.Middle:
+                        pattern = $".+{rule}.+";
+                        break;
                     case MatchModeEnum.End:
-                        if (Regex.IsMatch(barCode, pattern) == false) return false;
+                        pattern = $".+{rule}";
                         break;
                     case MatchModeEnum.Whole:
-                        if (barCode.Length != 10) return false;
+                        pattern = $"^{pattern}$";
                         break;
                     default:
                         break;
                 }
-                */
+
+                if (Regex.IsMatch(barCode, pattern) == false) return false;
             }
 
             return true;
