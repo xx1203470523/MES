@@ -164,7 +164,7 @@ namespace Hymson.MES.Services.Services.Integrated
             entity.Id = IdGenProvider.Instance.CreateId();
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = entity.CreatedBy;
-            entity.Status = SysDataStatusEnum.Build;
+            //entity.Status = SysDataStatusEnum.Build;
             entity.SiteId = _currentSite.SiteId ?? 0;
 
             List<InteWorkCenterRelation> inteWorkCenterRelations = new();

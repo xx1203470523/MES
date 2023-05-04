@@ -215,6 +215,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public WorkCenterSourceEnum? Source { get; set; }
 
         /// <summary>
+        /// 状态 
+        /// </summary>
+        public SysDataStatusEnum? Status { get; set; }
+
+        /// <summary>
         /// 是否混线 
         /// </summary>
         public bool IsMixLine { get; set; }
