@@ -162,9 +162,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (sfcProduceBusinesss != null && sfcProduceBusinesss.Any())
             {
                 var sfcInfoIds = sfcProduceBusinesss.Select(it => it.SfcInfoId).ToArray();
-                var lockSfcs = manuSfcs.Where(x => sfcInfoIds.Contains(x.SfcInfoId));
                 var sfcProduceBusinesssList = sfcProduceBusinesss.ToList();
-                var  instantLockSfcs = new List<string>();
+                var instantLockSfcs = new List<string>();
                 foreach (var business in sfcProduceBusinesssList)
                 {
                     var manuSfc = manuSfcs.FirstOrDefault(x => x.SfcInfoId == business.SfcInfoId);
@@ -214,7 +213,19 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES15408));
                 }
+
                 //判断是否有未关闭的维修业务，有不允许添加
+                var sfcRepairs = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Repair });
+                if (sfcRepairs != null && sfcRepairs.Any())
+                {
+                    var sfcInfoIds = sfcRepairs.Select(it => it.SfcInfoId).ToArray();
+                    var repairSfcs = manuSfcs.Where(x => sfcInfoIds.Contains(x.SfcInfoId)).Select(x=>x.SFC).Distinct().ToArray();
+                    if (repairSfcs.Any())
+                    {
+                        var strs = string.Join(",", repairSfcs);
+                        throw new CustomerValidationException(nameof(ErrorCode.MES15410)).WithData("sfcs", strs);
+                    }
+                }
                 processRouteProcedure = await _manuCommonService.GetFirstProcedureAsync(createDto.BadProcessRouteId ?? 0);
             }
             var sfcStepList = new List<ManuSfcStepEntity>();
