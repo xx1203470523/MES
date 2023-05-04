@@ -42,6 +42,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Security.Policy;
 using System.Text.Json;
 
@@ -279,9 +280,10 @@ namespace Hymson.MES.Services.Services.Manufacture
 
 
             var sfcListTask = _manuSfcProduceRepository.GetManuSfcProduceInfoEntitiesAsync(
-                new ManuSfcProduceQuery { 
+                new ManuSfcProduceQuery
+                {
                     Sfcs = parm.Sfcs.Distinct().ToArray(),
-                    SiteId=_currentSite.SiteId??00
+                    SiteId = _currentSite.SiteId ?? 00
                 });
 
             var sfcProduceBusinesssListTask = _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = parm.Sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
@@ -1099,6 +1101,24 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES18006)).WithData("SFC", string.Join(",", differentSfcs));
             }
 
+            //这个是物料删除 所以查到就是有锁
+            var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = manuSfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
+            if (sfcProduceBusinesss != null && sfcProduceBusinesss.Any())
+            {
+                var sfcInfoIds = sfcProduceBusinesss.Select(it => it.SfcInfoId).ToArray();
+                var sfcInfos = await _manuSfcInfoRepository.GetByIdsAsync(sfcInfoIds);
+                var sfcids = sfcInfos.Select(it => it.SfcId).ToArray();
+                var manuSfcsEntit = await _manuSfcRepository.GetByIdsAsync(sfcids);
+                throw new CustomerValidationException(nameof(ErrorCode.MES18204)).WithData("SFC", string.Join(",", manuSfcsEntit.Select(it => it.SFC).ToArray()));
+            }
+
+            //包装
+            var conPackList = await _manuContainerPackRepository.GetByLadeBarCodesAsync(new ManuContainerPackQuery { LadeBarCodes = manuSfcs, SiteId = _currentSite.SiteId ?? 0 });
+            if (conPackList != null && conPackList.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18019)).WithData("SFCs", string.Join(",", conPackList.Select(it => it.LadeBarCode).ToArray()));
+            }
+
             //获取工单
             var workOrderArr = manuSfcInfos.Select(it => it.WorkOrderId).Distinct().ToArray();
             if (workOrderArr.Count() > 1)
@@ -1411,12 +1431,13 @@ namespace Hymson.MES.Services.Services.Manufacture
             var list = new List<ManuUpdateProcedureViewDto>();
             foreach (var item in processRouteDetailNode)
             {
-                list.Add(new ManuUpdateProcedureViewDto
-                {
-                    ProcedureId = item.ProcedureId,
-                    ProcedureCode = item.Code,
-                    ProcedureName = item.Name,
-                });
+                if (!string.IsNullOrWhiteSpace(item.Code))
+                    list.Add(new ManuUpdateProcedureViewDto
+                    {
+                        ProcedureId = item.ProcedureId,
+                        ProcedureCode = item.Code,
+                        ProcedureName = item.Name,
+                    });
             }
             return list;
         }
@@ -1443,6 +1464,14 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (workOrderIdDistinct.Count() > 1)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18206));
+            }
+
+            //验证条码状态
+            SfcStatusEnum?[] sfcStatusArr = { SfcStatusEnum.Complete, SfcStatusEnum.Received, SfcStatusEnum.Scrapping };
+            var sfcList = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery { Sfcs = sfcs, Statuss = sfcStatusArr });
+            if (sfcList != null && sfcList.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18211));
             }
 
             //这个是物料删除 所以查到就是有锁

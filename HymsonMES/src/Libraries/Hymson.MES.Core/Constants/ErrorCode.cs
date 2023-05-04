@@ -107,6 +107,7 @@
         public const string MES10445 = $"工艺名称最大长度为60";
         public const string MES10446 = $"抽检比例设置错误";
         public const string MES10447 = $"下一工序不存在非空值类型工序";
+        public const string MES10448 = $"只允许选择启用和保留状态的工艺路线！";
         #endregion
 
         #region 参数 10500
@@ -642,6 +643,7 @@
         public const string MES18016 = "在制品步骤控制入库失败";
         public const string MES18017 = "工艺路线不存在尾工序";
         public const string MES18018 = "工艺路线存在多个尾工序";
+        public const string MES18019 = "条码:{SFCs}已包装，不允许操作";
 
 
         #endregion
@@ -671,6 +673,7 @@
         public const string MES18208 = "未获取到工艺路线节点信息";
         public const string MES18209 = "工单:{Code}状态不允许操作！";
         public const string MES18210 = "生产更改错误";
+        public const string MES18211 = "条码非在制状态，不允许操作";
 
 
         #endregion

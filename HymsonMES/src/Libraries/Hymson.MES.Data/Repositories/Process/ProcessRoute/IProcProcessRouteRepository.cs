@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 工艺路线表仓储类 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-02-14 10:07:11
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;

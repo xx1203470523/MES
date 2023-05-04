@@ -41,9 +41,8 @@ namespace Hymson.MES.Api
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddMemoryCache();
             builder.Services.AddClearCacheService(builder.Configuration);
-#if DEBUG
             builder.Services.AddHostedService<WorkService>();
-#endif
+
             AddSwaggerGen(builder.Services);
 
             builder.Services.AddJwtBearerService(builder.Configuration);

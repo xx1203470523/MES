@@ -19,6 +19,14 @@ namespace Hymson.MES.Api
         private readonly IResourceRepository _resourceRepository;
         private readonly ILanguageRepository _languageRepository;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="resourceService"></param>
+        /// <param name="logger"></param>
+        /// <param name="clearCacheService"></param>
+        /// <param name="resourceRepository"></param>
+        /// <param name="languageRepository"></param>
         public WorkService(IResourceService resourceService, ILogger<WorkService> logger,
             IClearCacheService clearCacheService, IResourceRepository resourceRepository,
             ILanguageRepository languageRepository)
@@ -29,13 +37,19 @@ namespace Hymson.MES.Api
             _resourceRepository = resourceRepository;
             _languageRepository = languageRepository;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="stoppingToken"></param>
+        /// <returns></returns>
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             try
             {
                 await _clearCacheService.ClearCacheAsync(new ServiceTypeEnum[] {
                  ServiceTypeEnum.User,
-                  ServiceTypeEnum.MES
+                 ServiceTypeEnum.MES
                 }, stoppingToken);
                 await _resourceService.InitEnumAsync();
                 await _resourceService.InitErrorCodeAsync(typeof(ErrorCode));
@@ -48,6 +62,11 @@ namespace Hymson.MES.Api
             }
 
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public async Task InitExcelDtoAsync()
         {
             var types = GetExcelDtoTypes();
@@ -90,6 +109,10 @@ namespace Hymson.MES.Api
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         private IEnumerable<Type> GetExcelDtoTypes()
         {
             var typeFinder = Singleton<ITypeFinder>.Instance;
@@ -102,5 +125,6 @@ namespace Hymson.MES.Api
             }
             return allExcelDtoTypes;
         }
+
     }
 }
