@@ -640,6 +640,7 @@
         public const string MES18016 = "在制品步骤控制入库失败";
         public const string MES18017 = "工艺路线不存在尾工序";
         public const string MES18018 = "工艺路线存在多个尾工序";
+        public const string MES18019 = "条码:{SFCs}已包装，不允许操作";
 
 
         #endregion
@@ -669,6 +670,7 @@
         public const string MES18208 = "未获取到工艺路线节点信息";
         public const string MES18209 = "工单:{Code}状态不允许操作！";
         public const string MES18210 = "生产更改错误";
+        public const string MES18211 = "条码非在制状态，不允许操作";
 
 
         #endregion
