@@ -66,8 +66,8 @@ namespace Hymson.MES.Services.Services.Integrated
             var pagedInfo = await _inteWorkCenterRepository.GetPagedInfoAsync(inteWorkCenterPagedQuery);
 
             // 实体到DTO转换 装载数据
-            List<InteWorkCenterDto> inteWorkCenterDtos = PrepareInteWorkCenterDtos(pagedInfo);
-            return new PagedInfo<InteWorkCenterDto>(inteWorkCenterDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            var dtos = pagedInfo.Data.Select(s => s.ToModel<InteWorkCenterDto>());
+            return new PagedInfo<InteWorkCenterDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
         /// <summary>
@@ -164,7 +164,7 @@ namespace Hymson.MES.Services.Services.Integrated
             entity.Id = IdGenProvider.Instance.CreateId();
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = entity.CreatedBy;
-            entity.Status = SysDataStatusEnum.Build;
+            //entity.Status = SysDataStatusEnum.Build;
             entity.SiteId = _currentSite.SiteId ?? 0;
 
             List<InteWorkCenterRelation> inteWorkCenterRelations = new();
@@ -196,6 +196,10 @@ namespace Hymson.MES.Services.Services.Integrated
                         CreatedBy = _currentUser.UserName,
                         UpdatedBy = _currentUser.UserName
                     }));
+
+                    // 判断资源是否被重复绑定
+                    var workCenterIds = await _inteWorkCenterRepository.GetWorkCenterIdByResourceIdAsync(param.ResourceIds);
+                    if (workCenterIds != null && workCenterIds.Any() == true) throw new CustomerValidationException(nameof(ErrorCode.MES12117));
                     break;
                 default:
                     break;
@@ -259,6 +263,10 @@ namespace Hymson.MES.Services.Services.Integrated
                         CreatedBy = _currentUser.UserName,
                         UpdatedBy = _currentUser.UserName
                     }));
+
+                    // 判断资源是否被重复绑定
+                    var workCenterIds = await _inteWorkCenterRepository.GetWorkCenterIdByResourceIdAsync(param.ResourceIds);
+                    if (workCenterIds != null && workCenterIds.Any() == true && workCenterIds.Contains(entity.Id) == false) throw new CustomerValidationException(nameof(ErrorCode.MES12117));
                     break;
                 default:
                     break;
@@ -315,22 +323,6 @@ namespace Hymson.MES.Services.Services.Integrated
             }
 
             return await _inteWorkCenterRepository.DeleteRangAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = userId });
-        }
-
-        /// <summary>
-        /// 查询
-        /// </summary>
-        /// <param name="pagedInfo"></param>
-        /// <returns></returns>
-        private static List<InteWorkCenterDto> PrepareInteWorkCenterDtos(PagedInfo<InteWorkCenterEntity> pagedInfo)
-        {
-            var inteWorkCenterDtos = new List<InteWorkCenterDto>();
-            foreach (var inteWorkCenterEntity in pagedInfo.Data)
-            {
-                var inteWorkCenterDto = inteWorkCenterEntity.ToModel<InteWorkCenterDto>();
-                inteWorkCenterDtos.Add(inteWorkCenterDto);
-            }
-            return inteWorkCenterDtos;
         }
 
     }
