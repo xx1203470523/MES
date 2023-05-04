@@ -225,6 +225,7 @@
         public const string MES12114 = "产线已关联资源，不允许修改.";
         public const string MES12115 = "存在已被关联的资源,不允许重复关联.";
         public const string MES12116 = "未配置产线对应的资源！";
+        public const string MES12117 = "存在已被其他产线关联的资源！";
         #endregion
 
         #region 编码规则 12400
