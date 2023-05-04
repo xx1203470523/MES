@@ -220,10 +220,12 @@
         public const string MES12109 = "说明 超过最大长度，最大长度为255.";
         public const string MES12110 = "工作中心状态不能为空.";
         public const string MES12111 = "工作中心修改的数据不存在.";
-        public const string MES12112 = "工作中心已经关联数据,允许修改.";
+        public const string MES12112 = "工作中心已经关联数据,不允许修改.";
         public const string MES12113 = "启用状态或保留状态不可删除.";
         public const string MES12114 = "产线已关联资源，不允许修改.";
         public const string MES12115 = "存在已被关联的资源,不允许重复关联.";
+        public const string MES12116 = "未配置产线对应的资源！";
+        public const string MES12117 = "存在已被其他产线关联的资源！";
         #endregion
 
         #region 编码规则 12400
@@ -375,7 +377,7 @@
         public const string MES15406 = "已存在返修信息!";
         public const string MES15407 = "SFC{sfcs}已锁定，不可再执行当前操作!";
         public const string MES15408 = "存在未关闭的不合格信息，工艺路线为必填!";
-        public const string MES15409 = "请勿重复录入不合格代码!";
+        public const string MES15409 = "不合格代码{codes}已录入,请勿重复录入!";
         #endregion
 
         #region 工单  16000
@@ -544,7 +546,7 @@
         public const string MES16503 = "工单{workorder}超过计划数量,下达条码失败。";
         public const string MES16504 = "条码已经存在。";
         public const string MES16505 = "条码不存在，无法复用。";
-        public const string MES16506 = "条码部位完成和在库状态，无法复用。";
+        public const string MES16506 = "条码不为完成和在库状态，无法复用。";
         #endregion
 
         #region 在制品移除添加 16600

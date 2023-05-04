@@ -133,27 +133,10 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES15400));
             }
 
-            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = createDto.Sfcs,SiteId=_currentSite.SiteId??0 };
+            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = createDto.Sfcs, SiteId = _currentSite.SiteId ?? 0 };
             // 获取条码列表
             var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceInfoEntitiesAsync(manuSfcProducePagedQuery);
             var sfcs = manuSfcs.Select(x => x.SFC).ToArray();
-            //var productBadRecordList = await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new ManuProductBadRecordBySFCQuery
-            //{
-            //    Sfcs = sfcs,
-            //    Status= ProductBadRecordStatusEnum.Open,
-            //    SiteId = _currentSite.SiteId ?? 0
-            //});
-
-            //var existUnqualifiedIds = productBadRecordList.Select(x => x.UnqualifiedId).Distinct().ToList();
-
-            // 获取不合格代码列表
-            var qualUnqualifiedCodes = await _qualUnqualifiedCodeRepository.GetByIdsAsync(createDto.UnqualifiedIds);
-            //var sameUnqualifiedIds = existUnqualifiedIds.Intersect(createDto.UnqualifiedIds).ToList();
-            //if (sameUnqualifiedIds.Any())
-            //{
-            //    var unqualifiedIds = string.Join(',', sameUnqualifiedIds);
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES15409)));
-            //}
 
             //报废的不能操作
             //即时锁不能操作
@@ -165,12 +148,23 @@ namespace Hymson.MES.Services.Services.Manufacture
             //}
             //将来锁定当前工序不能操作
 
-
-            //读取条码信息
-            //var sfcEntities = await _manuSfcRepository.GetBySFCsAsync(createDto.Sfcs);
-            //var sfcIds = sfcEntities.Select(x => x.Id).ToList();
-            //读取条码info信息
-           //var sfcInfos = await _sfcInfoRepository.GetBySFCIdsAsync(sfcIds);
+            //已经存在的不合格信息不允许重复录入
+            var productBadRecordList = await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new ManuProductBadRecordBySFCQuery
+            {
+                Sfcs = sfcs,
+                Status = ProductBadRecordStatusEnum.Open,
+                SiteId = _currentSite.SiteId ?? 0
+            });
+            var existUnqualifiedIds = productBadRecordList.Select(x => x.UnqualifiedId).Distinct().ToList();
+            // 获取不合格代码列表
+            var qualUnqualifiedCodes = await _qualUnqualifiedCodeRepository.GetByIdsAsync(createDto.UnqualifiedIds);
+            var sameUnqualifiedIds = existUnqualifiedIds.Intersect(createDto.UnqualifiedIds).ToList();
+            if (sameUnqualifiedIds.Any())
+            {
+                var codes = qualUnqualifiedCodes.Where(x => sameUnqualifiedIds.Contains(x.Id)).Select(x=>x.UnqualifiedCode).ToArray();
+                var existsCodes = string.Join(',', codes);
+                throw new CustomerValidationException(nameof(ErrorCode.MES15409)).WithData("codes", existsCodes);
+            }
 
             var manuProductBadRecords = new List<ManuProductBadRecordEntity>();
             long badResourceId = 0;
@@ -178,18 +172,26 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 badResourceId = createDto.FoundBadResourceId.ParseToLong();
             }
+
+            //TODO
+            // 1）如添加不合格代码包含缺陷类型，则将条码置于不合格代码对应不合格工艺路线首工序排队，原工序的状态清除；同时如有多条不合格工艺路线需手动选择；
+            //2）如添加不合格代码均为标记类型，则不改变当前条码的状态；
+            //3）如添加不合格代码为“SCRAP”，需将条码状态更新为“报废
+
             var isDefect = qualUnqualifiedCodes.Any(x => x.Type == QualUnqualifiedCodeTypeEnum.Defect);
             var processRouteProcedure = new ProcessRouteProcedureDto();
             if (isDefect)
             {
-                if (!createDto.BadProcessRouteId.HasValue)
+                if (!createDto.BadProcessRouteId.HasValue|| createDto.BadProcessRouteId==0)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES15408));
                 }
-                 processRouteProcedure = await _manuCommonService.GetFirstProcedureAsync(createDto.BadProcessRouteId ?? 0);
+                processRouteProcedure = await _manuCommonService.GetFirstProcedureAsync(createDto.BadProcessRouteId ?? 0);
             }
-            var sfcStepList = new List<ManuSfcStepEntity> ();
+            var sfcStepList = new List<ManuSfcStepEntity>();
             var manuSfcProduceList = new List<ManuSfcProduceBusinessEntity>();
+           //不合格代码中包含报废
+            var scrapCode = qualUnqualifiedCodes.FirstOrDefault(a => a.UnqualifiedCode == "SCRAP");
             foreach (var item in manuSfcs)
             {
                 foreach (var unqualified in qualUnqualifiedCodes)
@@ -208,7 +210,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         Status = ProductBadRecordStatusEnum.Open,
                         Source = ProductBadRecordSourceEnum.BadManualEntry,
                         Remark = createDto.Remark ?? "",
-                        DisposalResult= isDefect? ProductBadDisposalResultEnum.AutoHandle:null,
+                        DisposalResult = isDefect ? ProductBadDisposalResultEnum.AutoHandle : null,
                         CreatedBy = _currentUser.UserName,
                         UpdatedBy = _currentUser.UserName
                     });
@@ -238,14 +240,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 }
             }
 
-            //TODO
-            // 1）如添加不合格代码包含缺陷类型，则将条码置于不合格代码对应不合格工艺路线首工序排队，原工序的状态清除；同时如有多条不合格工艺路线需手动选择；
-            //2）如添加不合格代码均为标记类型，则不改变当前条码的状态；
-            //3）如添加不合格代码为“SCRAP”，需将条码状态更新为“报废
-
-        
             //报废不合格代码
-            var scrapCode = qualUnqualifiedCodes.FirstOrDefault(a => a.UnqualifiedCode == "SCRAP");
             if (scrapCode != null)
             {
                 var rows = 0;
@@ -287,7 +282,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     if (manuProductBadRecords.Any())
                     {
                         //入库
-                        rows+=await _manuProductBadRecordRepository.InsertRangeAsync(manuProductBadRecords);
+                        rows += await _manuProductBadRecordRepository.InsertRangeAsync(manuProductBadRecords);
                     }
                     if (sfcStepList.Any())
                     {
@@ -394,7 +389,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var manuSfcProduceBusinessEntity = new ManuSfcProduceBusinessEntity();
             if (productBadRecordList.Any(x => x.DisposalResult == ProductBadDisposalResultEnum.ReJudgmentRepair))
             {
-                if (badReJudgmentDto.BadProcessRouteId.HasValue)
+                if (!badReJudgmentDto.BadProcessRouteId.HasValue|| badReJudgmentDto.BadProcessRouteId==0)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES15408));
                 }
