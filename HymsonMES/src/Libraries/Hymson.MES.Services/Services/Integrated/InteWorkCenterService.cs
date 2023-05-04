@@ -158,8 +158,8 @@ namespace Hymson.MES.Services.Services.Integrated
             // 验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(param);
 
-            var entity = await _inteWorkCenterRepository.GetByCodeAsync(new EntityByCodeQuery { Code = param.Code, Site = _currentSite.SiteId });
-            if (entity != null) throw new BusinessException(nameof(ErrorCode.MES12101)).WithData("code", param.Code);
+            var entity = await _inteWorkCenterRepository.GetByCodeAsync(new EntityByCodeQuery { Code = param.Code, Site = _currentSite.SiteId })
+                ?? throw new BusinessException(nameof(ErrorCode.MES12101)).WithData("code", param.Code);
 
             // DTO转换实体
             entity = param.ToEntity<InteWorkCenterEntity>();
@@ -222,31 +222,25 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <exception cref="ValidationException">参数为空</exception>
         public async Task ModifyInteWorkCenterAsync(InteWorkCenterModifyDto param)
         {
-            if (param == null)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10100));
-            }
-            //验证DTO
+            if (param == null) throw new ValidationException(nameof(ErrorCode.MES10100));
+
+            // 验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(param);
-            var entity = await _inteWorkCenterRepository.GetByIdAsync(param.Id);
-            if (entity == null)
-            {
-                throw new BusinessException(nameof(ErrorCode.MES12111));
 
-            }
-            else
+            var entity = await _inteWorkCenterRepository.GetByIdAsync(param.Id)
+                ?? throw new BusinessException(nameof(ErrorCode.MES12111));
+
+            if (entity.Type != param.Type)
             {
-                if (entity.Type != param.Type)
+                var getInteWorkCenterRelationTask = _inteWorkCenterRepository.GetInteWorkCenterRelationAsync(param.Id);
+                var getInteWorkCenterResourceRelationTask = _inteWorkCenterRepository.GetInteWorkCenterResourceRelatioAsync(param.Id);
+                var inteWorkCenterRelationList = await getInteWorkCenterRelationTask;
+                var inteWorkCenterResourceRelationList = await getInteWorkCenterResourceRelationTask;
+
+                if ((inteWorkCenterRelationList != null && inteWorkCenterRelationList.Any())
+                    || (inteWorkCenterResourceRelationList != null && inteWorkCenterResourceRelationList.Any()))
                 {
-                    var getInteWorkCenterRelationTask = _inteWorkCenterRepository.GetInteWorkCenterRelationAsync(param.Id);
-                    var getInteWorkCenterResourceRelationTask = _inteWorkCenterRepository.GetInteWorkCenterResourceRelatioAsync(param.Id);
-                    var inteWorkCenterRelationList = await getInteWorkCenterRelationTask;
-                    var inteWorkCenterResourceRelationList = await getInteWorkCenterResourceRelationTask;
-
-                    if (inteWorkCenterRelationList != null && inteWorkCenterRelationList.Any() || inteWorkCenterResourceRelationList != null && inteWorkCenterResourceRelationList.Any())
-                    {
-                        throw new BusinessException(nameof(ErrorCode.MES12111));
-                    }
+                    throw new BusinessException(nameof(ErrorCode.MES12111));
                 }
             }
 
@@ -256,8 +250,8 @@ namespace Hymson.MES.Services.Services.Integrated
             inteWorkCenterEntity.UpdatedBy = userId;
             inteWorkCenterEntity.UpdatedOn = HymsonClock.Now();
 
-            List<InteWorkCenterRelation> inteWorkCenterRelations = new List<InteWorkCenterRelation>();
-            List<InteWorkCenterResourceRelation> inteWorkCenterResourceRelations = new List<InteWorkCenterResourceRelation>();
+            List<InteWorkCenterRelation> inteWorkCenterRelations = new();
+            List<InteWorkCenterResourceRelation> inteWorkCenterResourceRelations = new();
             if (param.Type == WorkCenterTypeEnum.Factory || param.Type == WorkCenterTypeEnum.Farm)
             {
 
