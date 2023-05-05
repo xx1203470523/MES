@@ -342,7 +342,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             {
                 // 读取资源绑定的产线
                 var workCenter = await _inteWorkCenterRepository.GetByResourceIdAsync(entity.ResourceId)
-                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES16803));
+                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES16315)).WithData("barCode", inventory.MaterialBarCode);    // ErrorCode.MES16803
 
                 // 通过产线->工单->BOM
                 var bomIds = await GetBomIdsByWorkCenterIdAsync(workCenter.Id, null);

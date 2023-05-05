@@ -12,6 +12,7 @@ using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
+using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
@@ -77,6 +78,7 @@ namespace Hymson.MES.Services.Services.Process
         /// 作业表仓储
         /// </summary>
         private readonly IInteJobRepository _inteJobRepository;
+        private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
 
         private readonly AbstractValidator<ProcResourceCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcResourceModifyDto> _validationModifyRules;
@@ -92,6 +94,7 @@ namespace Hymson.MES.Services.Services.Process
                   IProcResourceEquipmentBindRepository resourceEquipmentBindRepository,
                   IInteJobBusinessRelationRepository jobBusinessRelationRepository,
                   IInteJobRepository inteJobRepository,
+                  IInteWorkCenterRepository inteWorkCenterRepository,
                   AbstractValidator<ProcResourceCreateDto> validationCreateRules,
                   AbstractValidator<ProcResourceModifyDto> validationModifyRules)
         {
@@ -104,6 +107,7 @@ namespace Hymson.MES.Services.Services.Process
             _resourceEquipmentBindRepository = resourceEquipmentBindRepository;
             _jobBusinessRelationRepository = jobBusinessRelationRepository;
             _inteJobRepository = inteJobRepository;
+            _inteWorkCenterRepository = inteWorkCenterRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
         }
@@ -778,6 +782,13 @@ namespace Hymson.MES.Services.Services.Process
             if (resourceList != null && resourceList.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10319));
+            }
+
+            //资源被工作中心引用不能删除
+            var workCenterIds = await _inteWorkCenterRepository.GetWorkCenterIdByResourceIdAsync(idsArr);
+            if (workCenterIds != null &&workCenterIds.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10355));
             }
 
             var command = new DeleteCommand

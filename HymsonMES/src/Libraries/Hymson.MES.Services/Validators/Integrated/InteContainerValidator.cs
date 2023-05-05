@@ -14,7 +14,9 @@ namespace Hymson.MES.Services.Validators.Integrated
         /// </summary>
         public InteContainerValidator()
         {
-            RuleFor(x => x.Maximum).GreaterThanOrEqualTo(x => x.Minimum).WithErrorCode(nameof(ErrorCode.MES12502));
+            RuleFor(x => x.Minimum).GreaterThan(0).WithErrorCode(nameof(ErrorCode.MES12506));
+            RuleFor(x => x.Maximum).GreaterThan(0).WithErrorCode(nameof(ErrorCode.MES12507));
+            RuleFor(x => x.Maximum).GreaterThan(x => x.Minimum).WithErrorCode(nameof(ErrorCode.MES12508));
             //RuleFor(x => x).Must(x => { return x.Minimum <= x.Maximum; }).WithErrorCode(nameof(ErrorCode.MES12502));
         }
     }

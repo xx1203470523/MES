@@ -178,6 +178,11 @@ namespace Hymson.MES.Services.Dtos.Process
         public SysDataStatusEnum? Status { get; set; }
 
         /// <summary>
+        /// 状态列表
+        /// </summary>
+        public SysDataStatusEnum[]? StatusArr { get; set; }
+
+        /// <summary>
         /// 类型
         /// </summary>
         public ProcedureTypeEnum? Type { get; set; }
