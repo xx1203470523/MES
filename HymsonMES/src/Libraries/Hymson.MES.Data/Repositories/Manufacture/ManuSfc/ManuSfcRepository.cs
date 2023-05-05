@@ -93,18 +93,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.OrderBy("MS.UpdatedOn DESC");
             sqlBuilder.Select("MS.Id, MS.SFC, MS.IsUsed, MS.UpdatedOn, PWO.OrderCode, PM.MaterialCode, PM.MaterialName");
 
-            if (pagedQuery.IsUsed.HasValue)
-            {
-                sqlBuilder.Where("MS.IsUsed = @IsUsed");
-            }
+            if (pagedQuery.IsUsed.HasValue) sqlBuilder.Where("MS.IsUsed = @IsUsed");
 
-            if (!string.IsNullOrWhiteSpace(pagedQuery.OrderCode))
+            if (string.IsNullOrWhiteSpace(pagedQuery.OrderCode) == false)
             {
                 pagedQuery.OrderCode = $"%{pagedQuery.OrderCode}%";
                 sqlBuilder.Where("PWO.OrderCode LIKE @OrderCode");
             }
 
-            if (!string.IsNullOrWhiteSpace(pagedQuery.SFC))
+            if (string.IsNullOrWhiteSpace(pagedQuery.SFC) == false)
             {
                 pagedQuery.SFC = $"%{pagedQuery.SFC}%";
                 sqlBuilder.Where("MS.SFC LIKE @SFC");
