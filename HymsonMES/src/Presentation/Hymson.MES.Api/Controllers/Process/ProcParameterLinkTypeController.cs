@@ -1,16 +1,7 @@
-/*
- *creator: Karl
- *
- *describe: 标准参数关联类型表    控制器 | 代码由框架生成  
- *builder:  Karl
- *build datetime: 2023-02-15 03:53:38
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Extensions;
 
 namespace Hymson.MES.Api.Controllers.Process
 {
@@ -19,7 +10,7 @@ namespace Hymson.MES.Api.Controllers.Process
     /// @author Karl
     /// @date 2023-02-15 03:53:38
     /// </summary>
-    
+
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcParameterLinkTypeController : ControllerBase
@@ -63,17 +54,6 @@ namespace Hymson.MES.Api.Controllers.Process
         {
             return await _procParameterLinkTypeService.QueryPagedProcParameterLinkTypeByTypeAsync(parm);
         }
-
-        ///// <summary>
-        ///// 查询详情（标准参数关联类型表）
-        ///// </summary>
-        ///// <param name="id"></param>
-        ///// <returns></returns>
-        //[HttpGet("{id}")]
-        //public async Task<ProcParameterLinkTypeDto> QueryProcParameterLinkTypeByIdAsync(long id)
-        //{
-        //    return await _procParameterLinkTypeService.QueryProcParameterLinkTypeByIdAsync(id);
-        //}
 
         /// <summary>
         /// 添加（标准参数关联类型表）
