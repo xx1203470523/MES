@@ -68,6 +68,7 @@
         public const string MES10352 = "资源类型编码最大长度不超过50";
         public const string MES10353 = "资源类型名称不能为空";
         public const string MES10354 = "资源类型名称最大长度不超过50";
+        public const string MES10355 = $"资源已被工作中心引用,不能删除!";
         #endregion
 
         #region 标签模板
