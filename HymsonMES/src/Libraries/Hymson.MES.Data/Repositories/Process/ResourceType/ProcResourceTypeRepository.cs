@@ -64,7 +64,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("a.IsDeleted=0");
             if (string.IsNullOrEmpty(query.Sorting))
             {
-                sqlBuilder.OrderBy("a.UpdatedOn DESC");
+                sqlBuilder.OrderBy("a.CreatedOn DESC");
             }
             else
             {
@@ -190,7 +190,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdSql = "select * from proc_resource_type where Id =@Id and IsDeleted =0 ";
         const string GetByCodeSql = "select * from proc_resource_type where SiteId =@SiteId and ResType =@ResType and IsDeleted =0 ";
 
-        const string GetPagedInfoDataSqlTemplate = "SELECT a.*,b.ResCode,b.ResName  FROM proc_resource_type a left join proc_resource b on a.Id =b.ResTypeId /**where**/ ORDER BY a.UpdatedOn DESC LIMIT @Offset,@Rows";
+        const string GetPagedInfoDataSqlTemplate = "SELECT a.*,b.ResCode,b.ResName  FROM proc_resource_type a left join proc_resource b on a.Id =b.ResTypeId /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
         const string GetPagedInfoCountSqlTemplate = "SELECT count(*) FROM proc_resource_type a left join proc_resource b on a.Id =b.ResTypeId  /**where**/ ";
 
         const string GetPagedListSqlTemplate = "SELECT /**select**/ FROM proc_resource_type /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
