@@ -15,6 +15,8 @@ using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using System.Data;
+using System.Text.RegularExpressions;
 
 namespace Hymson.MES.Services.Services.Integrated.InteContainer
 {
@@ -192,6 +194,10 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
         private async Task ValidationSaveDto(InteContainerSaveDto dto)
         {
             if (dto == null) throw new CustomerValidationException(nameof(ErrorCode.MES12503));
+
+            var pattern = @"^[1-9]\d*$";
+            if (Regex.IsMatch($"{dto.Minimum}", pattern) == false) throw new CustomerValidationException(nameof(ErrorCode.MES12504));
+            if (Regex.IsMatch($"{dto.Maximum}", pattern) == false) throw new CustomerValidationException(nameof(ErrorCode.MES12505));
 
             // 判断物料/物料组是否存在
             switch (dto.DefinitionMethod)

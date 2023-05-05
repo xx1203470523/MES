@@ -42,6 +42,15 @@ namespace Hymson.MES.Data.Repositories.Process
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("a.IsDeleted=0");
+            if (string.IsNullOrEmpty(query.Sorting))
+            {
+                sqlBuilder.OrderBy("a.CreatedOn DESC");
+            }
+            else
+            {
+                sqlBuilder.OrderBy(query.Sorting);
+            }
+
             if (query.SiteId > 0)
             {
                 sqlBuilder.Where("a.SiteId = @SiteId");
@@ -167,7 +176,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
     public partial class ProcProcedureRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"select a.*,b.ResType ,b.ResTypeName  from proc_procedure a left join proc_resource_type b on a.ResourceTypeId=b.Id and b.IsDeleted=0 /**where**/ ORDER BY a.UpdatedOn DESC LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"select a.*,b.ResType ,b.ResTypeName  from proc_procedure a left join proc_resource_type b on a.ResourceTypeId=b.Id and b.IsDeleted=0 /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "select COUNT(*) from proc_procedure a left join proc_resource_type b on a.ResourceTypeId=b.Id and b.IsDeleted=0 /**where**/ ";
         const string GetProcProcedureEntitiesSqlTemplate = @"SELECT 
                                             /**select**/

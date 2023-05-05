@@ -68,6 +68,7 @@
         public const string MES10352 = "资源类型编码最大长度不超过50";
         public const string MES10353 = "资源类型名称不能为空";
         public const string MES10354 = "资源类型名称最大长度不超过50";
+        public const string MES10355 = $"资源已被工作中心引用,不能删除!";
         #endregion
 
         #region 标签模板
@@ -79,6 +80,7 @@
         public const string MES10345 = "模板文件不能为空!";
         public const string MES10346 = "打印机名称不能为空!";
         public const string MES10347 = "打印机IP不能为空!";
+        public const string MES10348 = "打印机IP重复！";
         #endregion
 
         #region 工序 10400
@@ -266,6 +268,11 @@
         public const string MES12501 = "最大数量不能小于最小数量{Minimum}";
         public const string MES12502 = "最大数量不能小于最小数量";
         public const string MES12503 = "同一物料/物料组只允许设置一次";
+        public const string MES12504 = "最小数量须为正整数";
+        public const string MES12505 = "最大数量须为正整数";
+        public const string MES12506 = "最小数量须大于0";
+        public const string MES12507 = "最大数量须大于0";
+        public const string MES12508 = "最大数量须大于最小数量";
         #endregion
 
         #region 设备 12600

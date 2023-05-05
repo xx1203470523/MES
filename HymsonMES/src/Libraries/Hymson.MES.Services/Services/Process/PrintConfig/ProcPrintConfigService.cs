@@ -7,6 +7,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
@@ -14,7 +15,9 @@ using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Process.PrintConfig
 {
-
+    /// <summary>
+    /// 
+    /// </summary>
     public class ProcPrintConfigService : IProcPrintConfigService
     {
         /// <summary>
@@ -31,6 +34,9 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
         /// </summary>
         private readonly IProcPrintConfigRepository _printConfigRepository;
 
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly AbstractValidator<ProcPrinterDto> _validationCreateRules;
         private readonly AbstractValidator<ProcPrinterUpdateDto> _validationModifyRules;
 
@@ -61,6 +67,7 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
             var entity = await _printConfigRepository.GetByIdAsync(id);
             return entity?.ToModel<ProcPrinterDto>() ?? new ProcPrinterDto();
         }
+
         /// <summary>
         /// 通过打印机名称获取指定打印机
         /// </summary>
@@ -113,6 +120,7 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
             }
             return new PagedInfo<ProcPrinterDto>(procResourceDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
+
         /// <summary>
         /// 添加打印配置数据
         /// </summary>
@@ -120,44 +128,40 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
         /// <returns></returns>
         public async Task AddProcPrintConfigAsync(ProcPrinterDto param)
         {
-            //验证DTO
-            //var dto = new ProcResourceTypeDto();
-            if (param == null)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10100));
-            }
+            if (param == null) throw new ValidationException(nameof(ErrorCode.MES10100));
+
             param.PrintName = param.PrintName.ToTrimSpace();
             param.PrintIp = param.PrintIp.ToTrimSpace();
             param.Remark = param.Remark.Trim();
+
+            // 验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(param);
 
             var userName = _currentUser.UserName;
-            var siteId = _currentSite.SiteId ?? 0;
-            //DTO转换实体
-            var id = IdGenProvider.Instance.CreateId();
-
             var entity = new ProcPrinterEntity
             {
-                Id = id,
-                SiteId = siteId,
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = _currentSite.SiteId ?? 0,
                 CreatedBy = userName,
                 UpdatedBy = userName,
                 Remark = param.Remark ?? "",
-                PrintName = param.PrintName.Trim(),
-                PrintIp = param.PrintIp.Trim()
+                PrintName = param.PrintName,
+                PrintIp = param.PrintIp
             };
 
+            var nameEntity = await _printConfigRepository.GetByPrintNameAsync(entity.PrintName);
+            if (nameEntity != null) throw new BusinessException(nameof(ErrorCode.MES10341));
 
-            var foo = await _printConfigRepository.GetByPrintNameAsync(param.PrintName.Trim());
-            if (foo != null)
+            // 检查IP是否重复
+            var ipEntity = await _printConfigRepository.GetByPrintIpAsync(new EntityByCodeQuery
             {
-                throw new BusinessException(nameof(ErrorCode.MES10341)).WithData("PrintName", param.PrintName);
-            }
+                Site = entity.SiteId,
+                Code = entity.PrintIp
+            });
+            if (ipEntity != null) throw new BusinessException(nameof(ErrorCode.MES10348));
 
-
-            //入库
+            // 新增
             await _printConfigRepository.InsertAsync(entity);
-
         }
 
         /// <summary>
@@ -167,47 +171,26 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
         /// <returns></returns>
         public async Task UpdateProcPrintConfigAsync(ProcPrinterUpdateDto param)
         {
-            //验证DTO
-            //var dto = new ProcResourceTypeDto();
-            if (param == null)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10100));
-            }
+            if (param == null) throw new ValidationException(nameof(ErrorCode.MES10100));
+
             param.PrintName = param.PrintName.ToTrimSpace();
-            param.PrintIp = param.PrintIp.ToTrimSpace();
+            //param.PrintIp = param.PrintIp.ToTrimSpace();
             param.Remark = param.Remark.Trim();
+
+            // 验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(param);
-            var entity = await _printConfigRepository.GetByIdAsync(param?.Id ?? 0);
-            if (entity == null)
-            {
-                throw new NotFoundException(nameof(ErrorCode.MES10309));
-            }
 
-            var userName = _currentUser.UserName;
-            //DTO转换实体
-            var updateEntity = new ProcPrinterEntity
-            {
-                Id = param.Id,
-                Remark = param.Remark ?? "",
-                PrintName = param.PrintName ?? "".Trim(),
-                PrintIp = param.PrintIp ?? "".Trim(),
-                UpdatedBy = userName
-            };
+            // 读取实体
+            var entity = await _printConfigRepository.GetByIdAsync(param.Id)
+                ?? throw new NotFoundException(nameof(ErrorCode.MES10309));
 
-            //var resources = _procResourceRepository.GetProcResrouces(ids, parm.Id);
-            //if (resources.Count > 0)
-            //{
-            //    apiResult.Code = (int)ResultCode.PARAM_ERROR;
-            //    apiResult.Msg = "一个资源只能关联一个资源类型！";
-            //    return apiResult;
-            //}
+            entity.PrintName = param.PrintName;
+            entity.Remark = param.Remark;
+            entity.UpdatedBy = _currentUser.UserName;
+            entity.UpdatedOn = HymsonClock.Now();
 
-
-            //更新
-            await _printConfigRepository.UpdateAsync(updateEntity);
-
-
-
+            // 更新
+            await _printConfigRepository.UpdateAsync(entity);
         }
 
         /// <summary>
