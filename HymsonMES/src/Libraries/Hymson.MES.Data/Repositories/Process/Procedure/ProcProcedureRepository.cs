@@ -69,6 +69,10 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 sqlBuilder.Where("Status = @Status");
             }
+            if (query.StatusArr != null && query.StatusArr.Length > 0)
+            {
+                sqlBuilder.Where("Status in @StatusArr");
+            }
             if (query.Type.HasValue)
             {
                 sqlBuilder.Where("Type=@Type");
