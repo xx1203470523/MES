@@ -1,9 +1,4 @@
 ﻿using Hymson.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Dtos.Process
 {
@@ -69,11 +64,13 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string PrintName { get; set; }
 
+        /*
         /// <summary>
         /// 描述 :打印机IP 
         /// 空值 : false  
         /// </summary>
         public string PrintIp { get; set; }
+        */
 
         /// <summary>
         /// 描述 :备注 
@@ -81,6 +78,10 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string Remark { get; set; }
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public class ProcPrinterViewDto: PagerInfo
     {
         /// <summary>
