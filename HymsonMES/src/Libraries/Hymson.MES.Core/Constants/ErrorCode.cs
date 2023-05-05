@@ -79,6 +79,7 @@
         public const string MES10345 = "模板文件不能为空!";
         public const string MES10346 = "打印机名称不能为空!";
         public const string MES10347 = "打印机IP不能为空!";
+        public const string MES10348 = "打印机IP重复！";
         #endregion
 
         #region 工序 10400
@@ -107,6 +108,7 @@
         public const string MES10445 = $"工艺名称最大长度为60";
         public const string MES10446 = $"抽检比例设置错误";
         public const string MES10447 = $"下一工序不存在非空值类型工序";
+        public const string MES10448 = $"只允许选择启用和保留状态的工艺路线！";
         #endregion
 
         #region 参数 10500
@@ -139,6 +141,10 @@
         public const string MES10610 = "删除失败 Id不能为空!";
         public const string MES10611 = "不能删除启用状态的Bom!";
         public const string MES10612 = "此Bom在系统中不存在!";
+        public const string MES10613 = "Bom编码不能为空";
+        public const string MES10614 = "Bom编码最大长度不超过50";
+        public const string MES10615 = "Bom名称不能为空";
+        public const string MES10616 = "Bom名称最大长度不超过50";
         #endregion
 
         #region 上料点 10700
@@ -222,7 +228,7 @@
         public const string MES12111 = "工作中心修改的数据不存在.";
         public const string MES12112 = "工作中心已经关联数据,不允许修改.";
         public const string MES12113 = "启用状态或保留状态不可删除.";
-        public const string MES12114 = "产线已关联资源，不允许修改.";
+        public const string MES12114 = "产线已关联资源，不允许删除.";
         public const string MES12115 = "存在已被关联的资源,不允许重复关联.";
         public const string MES12116 = "未配置产线对应的资源！";
         public const string MES12117 = "存在已被其他产线关联的资源！";
@@ -375,9 +381,10 @@
         public const string MES15404 = "工单{orders}不是激活状态,不可再执行当前操作!";
         public const string MES15405 = "不合格缺陷信息不能为空!";
         public const string MES15406 = "已存在返修信息!";
-        public const string MES15407 = "SFC{sfcs}已锁定，不可再执行当前操作!";
+        public const string MES15407 = "SFC {sfcs}已锁定，不可再执行当前操作!";
         public const string MES15408 = "存在未关闭的不合格信息，工艺路线为必填!";
         public const string MES15409 = "不合格代码{codes}已录入,请勿重复录入!";
+        public const string MES15410 = "SFC {sfcs}已存在返修信息，不可再执行当前操作!";
         #endregion
 
         #region 工单  16000

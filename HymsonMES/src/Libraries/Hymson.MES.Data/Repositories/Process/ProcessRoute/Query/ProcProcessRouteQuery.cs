@@ -1,11 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 工艺路线表 查询类 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-02-14 10:07:11
- */
-
 namespace Hymson.MES.Data.Repositories.Process
 {
     /// <summary>

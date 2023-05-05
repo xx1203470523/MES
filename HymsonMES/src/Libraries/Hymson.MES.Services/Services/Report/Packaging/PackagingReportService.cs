@@ -25,11 +25,6 @@ namespace Hymson.MES.Services.Services.Report
         /// 当前对象（站点）
         /// </summary>
         private readonly ICurrentSite _currentSite;
-
-        /// <summary>
-        /// 容器维护 仓储
-        /// </summary>
-        private readonly IInteContainerRepository _inteContainerRepository;
         /// <summary>
         /// 容器条码表仓储接口
         /// </summary>
@@ -49,14 +44,12 @@ namespace Hymson.MES.Services.Services.Report
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
         public PackagingReportService(ICurrentSite currentSite,
-         IInteContainerRepository inteContainerRepository,
          IManuContainerBarcodeRepository manuContainerBarcodeRepository,
          IProcMaterialRepository procMaterialRepository,
          IManuContainerPackRepository manuContainerPackRepository,
          IPlanWorkOrderRepository planWorkOrderRepository)
         {
             _currentSite = currentSite;
-            _inteContainerRepository = inteContainerRepository;
             _manuContainerBarcodeRepository = manuContainerBarcodeRepository;
             _procMaterialRepository = procMaterialRepository;
             _manuContainerPackRepository = manuContainerPackRepository;
@@ -206,8 +199,7 @@ namespace Hymson.MES.Services.Services.Report
             barcodeViewDto.ProductName = materials?.MaterialName ?? "";
             barcodeViewDto.Status = barcodeEntity.Status;
 
-            var inteContainer = await _inteContainerRepository.GetByIdAsync(barcodeEntity.ContainerId);
-            barcodeViewDto.Level = inteContainer?.Level;
+            barcodeViewDto.Level = barcodeEntity.PackLevel;
             barcodeViewDto.PackQuantity = await _manuContainerPackRepository.GetCountByrBarCodeIdAsync(barcodeEntity.Id);
 
             return barcodeViewDto;

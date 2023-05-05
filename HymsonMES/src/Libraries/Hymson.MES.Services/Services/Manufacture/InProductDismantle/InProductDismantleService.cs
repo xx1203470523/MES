@@ -627,6 +627,11 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16612));
             }
+            //报废的
+            if (manuSfcProduce.IsScrap == TrueOrFalseEnum.Yes)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16617));
+            }
 
             var circulationEntity = await _circulationRepository.GetByIdAsync(replaceDto.Id);
             if (circulationEntity == null)

@@ -1,14 +1,7 @@
-/*
- *describe: 工艺路线表    控制器 | 代码由框架生成  
- *builder:  zhaoqing
- *build datetime: 2023-02-14 10:07:11
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
-using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Process.ProcessRoute;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Process
@@ -18,7 +11,7 @@ namespace Hymson.MES.Api.Controllers.Process
     /// @author zhaoqing
     /// @date 2023-02-14 10:07:11
     /// </summary>
-    
+
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcProcessRouteController : ControllerBase
@@ -38,6 +31,7 @@ namespace Hymson.MES.Api.Controllers.Process
             _procProcessRouteService = procProcessRouteService;
             _logger = logger;
         }
+
 
         /// <summary>
         /// 分页查询列表（工艺路线表）

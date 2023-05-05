@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 资源配置打印机表    验证规则 | 代码由框架生成  
- *builder:  wxk
- *build datetime: 2023-04-12 08:10:40
- */
 using FluentValidation;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Services.Dtos.Process;
@@ -33,7 +26,7 @@ namespace Hymson.MES.Services.Validators.Process
         public ProcPrinterModifyValidator()
         {
             RuleFor(x => x.PrintName).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10346));
-            RuleFor(x => x.PrintIp).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10347));
+            //RuleFor(x => x.PrintIp).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10347));
             //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11");
             //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111");
         }

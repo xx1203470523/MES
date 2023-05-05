@@ -150,6 +150,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     public class InProductDismantleRemoveDto
     {
         /// <summary>
+        /// 产品条码
+        /// </summary>
+        public string Sfc { get; set; }
+
+        /// <summary>
         /// 条码流转表主键id
         /// </summary>
         public long Id { get; set; }
