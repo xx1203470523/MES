@@ -16,6 +16,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
+using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Snowflake;
@@ -330,7 +331,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES16613));
             }
 
-            var inventoryEntity = await _whMaterialInventoryRepository.GetByBarCodeAsync(circulationEntity.CirculationBarCode);
+            var inventoryEntity = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery
+            {
+                SiteId = circulationEntity.SiteId,
+                BarCode = circulationEntity.CirculationBarCode
+            });
             var command = new DisassemblyCommand
             {
                 Id = removeDto.Id,
@@ -461,7 +466,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     //找库存表，同时判断库存表的产品id需要跟选择的产品id一致，不一致报错
                     //数量为批次大小
-                    whMaterialInventory = await _whMaterialInventoryRepository.GetByBarCodeAsync(addDto.CirculationBarCode);
+                    whMaterialInventory = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery
+                    {
+                        SiteId = _currentSite.SiteId,
+                        BarCode = addDto.CirculationBarCode
+                    });
                     if (whMaterialInventory == null)
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES16603)).WithData("barCode", addDto.CirculationBarCode);
@@ -492,8 +501,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             else
             {
-                //全是内部或者批次数据
-                whMaterialInventory = await _whMaterialInventoryRepository.GetByBarCodeAsync(addDto.CirculationBarCode);
+                // 全是内部或者批次数据
+                whMaterialInventory = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery
+                {
+                    SiteId = _currentSite.SiteId,
+                    BarCode = addDto.CirculationBarCode
+                });
                 if (whMaterialInventory == null)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16603)).WithData("barCode", addDto.CirculationBarCode);
@@ -614,6 +627,11 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16612));
             }
+            //报废的
+            if (manuSfcProduce.IsScrap == TrueOrFalseEnum.Yes)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16617));
+            }
 
             var circulationEntity = await _circulationRepository.GetByIdAsync(replaceDto.Id);
             if (circulationEntity == null)
@@ -626,7 +644,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES16614));
             }
 
-            var replaceOld = await _whMaterialInventoryRepository.GetByBarCodeAsync(replaceDto.OldCirculationBarCode);
+            var replaceOld = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery
+            {
+                SiteId = _currentSite.SiteId,
+                BarCode = replaceDto.OldCirculationBarCode
+            });
             //用量
             var queryDto = new BarCodeQueryDto
             {
@@ -637,8 +659,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 Type = InProductDismantleTypeEnum.Activity
             };
             var circulationEntities = (await GetBarCodesAsync(queryDto)).ToList();
-            var oldBarCode=circulationEntities.FirstOrDefault(x=>x.Id== replaceDto.Id);
-            if(oldBarCode != null)
+            var oldBarCode = circulationEntities.FirstOrDefault(x => x.Id == replaceDto.Id);
+            if (oldBarCode != null)
             {
                 circulationEntities.Remove(oldBarCode);
             }
@@ -700,7 +722,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     //找库存表，同时判断库存表的产品id需要跟选择的产品id一致，不一致报错
                     //数量为批次大小
-                    whMaterialInventory = await _whMaterialInventoryRepository.GetByBarCodeAsync(replaceDto.CirculationBarCode);
+                    whMaterialInventory = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery
+                    {
+                        SiteId = _currentSite.SiteId,
+                        BarCode = replaceDto.CirculationBarCode
+                    });
                     if (whMaterialInventory == null)
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES16603)).WithData("barCode", replaceDto.CirculationBarCode);
@@ -732,7 +758,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             else
             {
                 //全是内部或者批次数据
-                whMaterialInventory = await _whMaterialInventoryRepository.GetByBarCodeAsync(replaceDto.CirculationBarCode);
+                whMaterialInventory = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery { SiteId = _currentSite.SiteId, BarCode = replaceDto.CirculationBarCode });
                 if (whMaterialInventory == null)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16603)).WithData("barCode", replaceDto.CirculationBarCode);
@@ -796,7 +822,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var oldQuantityCommand = new UpdateQuantityCommand
             {
                 BarCode = circulationEntity.CirculationBarCode,
-                QuantityResidue = circulationEntity.CirculationQty??0,
+                QuantityResidue = circulationEntity.CirculationQty ?? 0,
                 UpdatedBy = _currentUser.UserName
             };
 

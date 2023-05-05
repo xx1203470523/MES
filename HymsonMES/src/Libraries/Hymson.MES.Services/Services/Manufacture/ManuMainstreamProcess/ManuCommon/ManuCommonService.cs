@@ -1,11 +1,15 @@
-﻿using Hymson.Authentication.JwtBearer.Security;
+﻿using FluentValidation;
+using FluentValidation.Results;
+using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -14,6 +18,8 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Data.Repositories.Process.Resource;
+using Hymson.MES.Data.Repositories.Warehouse;
+using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
 using Hymson.Sequences;
@@ -90,6 +96,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// </summary>
         private readonly IProcMaskCodeRuleRepository _procMaskCodeRuleRepository;
 
+        /// <summary>
+        /// 仓储接口（物料库存）
+        /// </summary>
+        private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly ILocalizationService _localizationService;
 
         /// <summary>
         /// 构造函数
@@ -106,6 +121,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="procProcedureRepository"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="procMaskCodeRuleRepository"></param>
+        /// <param name="whMaterialInventoryRepository"></param>
+        /// <param name="localizationService"></param>
         public ManuCommonService(ICurrentSite currentSite, ISequenceService sequenceService,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
@@ -116,7 +133,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             IProcResourceRepository procResourceRepository,
             IProcProcedureRepository procProcedureRepository,
             IProcMaterialRepository procMaterialRepository,
-            IProcMaskCodeRuleRepository procMaskCodeRuleRepository)
+            IProcMaskCodeRuleRepository procMaskCodeRuleRepository,
+            IWhMaterialInventoryRepository whMaterialInventoryRepository, 
+            ILocalizationService localizationService)
         {
             _currentSite = currentSite;
             _sequenceService = sequenceService;
@@ -130,7 +149,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             _procProcedureRepository = procProcedureRepository;
             _procMaterialRepository = procMaterialRepository;
             _procMaskCodeRuleRepository = procMaskCodeRuleRepository;
+            _whMaterialInventoryRepository = whMaterialInventoryRepository;
+            _localizationService = localizationService;
         }
+
 
         /// <summary>
         /// 验证条码掩码规则
@@ -186,7 +208,17 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 || sfc.Contains(' ') == true) throw new CustomerValidationException(nameof(ErrorCode.MES16305));
 
             var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(sfc);
-            if (sfcProduceEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES16306));
+            if (sfcProduceEntity == null)
+            {
+                var whMaterialInventoryEntity = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery
+                {
+                    SiteId = _currentSite.SiteId,
+                    BarCode = sfc
+                });
+                if (whMaterialInventoryEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES16318));
+
+                throw new CustomerValidationException(nameof(ErrorCode.MES16306));
+            }
 
             // 获取锁状态
             var sfcProduceBusinessEntity = await _manuSfcProduceRepository.GetSfcProduceBusinessBySFCAsync(new SfcProduceBusinessQuery
@@ -205,8 +237,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <returns></returns>
         public async Task<PlanWorkOrderEntity> GetProduceWorkOrderByIdAsync(long workOrderId)
         {
-            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(workOrderId);
-            if (planWorkOrderEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES16301));
+            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(workOrderId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16301));
 
             // 判断是否被锁定
             if (planWorkOrderEntity.IsLocked == YesOrNoEnum.Yes)
@@ -215,8 +247,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             }
 
             // 判断是否是激活的工单
-            var activatedWorkOrder = await _planWorkOrderActivationRepository.GetByWorkOrderIdAsync(planWorkOrderEntity.Id);
-            if (activatedWorkOrder == null) throw new CustomerValidationException(nameof(ErrorCode.MES16410));
+            _ = await _planWorkOrderActivationRepository.GetByWorkOrderIdAsync(planWorkOrderEntity.Id)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16410));
 
             switch (planWorkOrderEntity.Status)
             {
@@ -509,6 +541,58 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 }
             }
         }
+
+
+        /// <summary>
+        /// 批量验证条码是否锁定
+        /// </summary>
+        /// <param name="sfcs"></param>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        public async Task VerifySfcsLockAsync(string[] sfcs, long procedureId)
+        {
+            var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
+            if (sfcProduceBusinesss != null && sfcProduceBusinesss.Any())
+            {
+                var validationFailures = new List<ValidationFailure>();
+
+                foreach (var item in sfcProduceBusinesss)
+                {
+                    var sfcProduceLockBo = JsonSerializer.Deserialize<SfcProduceLockBo>(item.BusinessContent);
+                    if (sfcProduceLockBo == null) continue;
+
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", item.Sfc}
+                        };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.Sfc);
+                    }
+
+                    if (sfcProduceLockBo.Lock == QualityLockEnum.InstantLock)
+                    {
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES18010);
+                        validationFailures.Add(validationFailure);
+                    }
+
+                    if (sfcProduceLockBo.Lock == QualityLockEnum.FutureLock && sfcProduceLockBo.LockProductionId == procedureId)
+                    {
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES18010);
+                        validationFailures.Add(validationFailure);
+                    }
+                }
+
+                //是否存在错误
+                if (validationFailures.Any())
+                {
+                    throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
+                }
+            }
+        }
     }
 
 
@@ -531,7 +615,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         }
 
         /// <summary>
-        /// 条码合法性校验
+        /// 检查条码状态是否合法
         /// </summary>
         /// <param name="sfcProduceEntity"></param>
         /// <param name="produceStatus"></param>
@@ -598,25 +682,27 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             foreach (var ruleEntity in maskCodeRules)
             {
                 var rule = Regex.Replace(ruleEntity.Rule, "[?？]", ".");
-                var pattern = $"^{rule}$";
+                var pattern = $"{rule}";
 
-                if (Regex.IsMatch(barCode, pattern) == false) return false;
-
-                /*
                 switch (ruleEntity.MatchWay)
                 {
                     case MatchModeEnum.Start:
+                        pattern = $"{rule}.+";
+                        break;
                     case MatchModeEnum.Middle:
+                        pattern = $".+{rule}.+";
+                        break;
                     case MatchModeEnum.End:
-                        if (Regex.IsMatch(barCode, pattern) == false) return false;
+                        pattern = $".+{rule}";
                         break;
                     case MatchModeEnum.Whole:
-                        if (barCode.Length != 10) return false;
+                        pattern = $"^{pattern}$";
                         break;
                     default:
                         break;
                 }
-                */
+
+                if (Regex.IsMatch(barCode, pattern) == false) return false;
             }
 
             return true;

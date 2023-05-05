@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -27,6 +28,7 @@ namespace Hymson.MES.Data.Repositories.Process
             _connectionOptions = connectionOptions.Value;
         }
 
+
         /// <summary>
         /// 
         /// </summary>
@@ -50,28 +52,6 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
-        /// 批量修改设备的设备组
-        /// </summary>
-        /// <param name="command"></param>
-        /// <returns></returns>
-        //public async Task<int> UpdateEquipmentGroupIdAsync(UpdateEquipmentGroupIdCommand command)
-        //{
-        //    using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-        //    return await conn.ExecuteAsync(UpdateEquipmentGroupIdSql, command);
-        //}
-
-        /// <summary>
-        /// 清空设备的设备组
-        /// </summary>
-        /// <param name="equipmentGroupId"></param>
-        /// <returns></returns>
-        //public async Task<int> ClearEquipmentGroupIdAsync(long equipmentGroupId)
-        //{
-        //    using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-        //    return await conn.ExecuteAsync(ClearEquipmentGroupIdSql, new { equipmentGroupId });
-        //}
-
-        /// <summary>
         /// 
         /// </summary>
         /// <param name="command"></param>
@@ -81,7 +61,6 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeleteSql, command);
         }
-
 
         /// <summary>
         /// 判断是否存在（编码）
@@ -105,28 +84,6 @@ namespace Hymson.MES.Data.Repositories.Process
             return await conn.QueryFirstOrDefaultAsync<ProcPrinterEntity>(GetByIdSql, new { id });
         }
 
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <param name="equipmentGroupId"></param>
-        ///// <returns></returns>
-        //public async Task<IEnumerable<ProcPrinterEntity>> GetByGroupIdAsync(long equipmentGroupId)
-        //{
-        //    using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-        //    return await conn.QueryAsync<ProcPrinterEntity>(GetByGroupIdSql, new { equipmentGroupId });
-        //}
-
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <param name="id"></param>
-        ///// <returns></returns>
-        //public async Task<EquEquipmentView> GetViewByIdAsync(long id)
-        //{
-        //    using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-        //    return await conn.QueryFirstOrDefaultAsync<EquEquipmentView>(GetByIdSql, new { id });
-        //}
-
         /// <summary>
         /// 
         /// </summary>
@@ -139,6 +96,17 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 根据IP查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<ProcPrinterEntity> GetByPrintIpAsync(EntityByCodeQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<ProcPrinterEntity>(GetByPrintIpSql, query);
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="query"></param>
@@ -148,6 +116,7 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ProcPrinterEntity>(GetBaseListSql);
         }
+
         /// <summary>
         /// 获取资源分页列表
         /// </summary>
@@ -240,12 +209,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 
         /// </summary>
         const string InsertSql = "INSERT INTO `proc_printer`(  `Id`, `SiteId`, `PrintName`, `PrintIp`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @PrintName, @PrintIp, @Remark,  @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted)  ";
-        const string UpdateSql = "UPDATE `proc_printer` SET PrintName = @PrintName, PrintIp = @PrintIp, Remark = @Remark,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `proc_printer` SET PrintName = @PrintName, Remark = @Remark,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_printer` SET `IsDeleted` = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE `Id` in @Ids;";
         const string IsExistsSql = "SELECT Id FROM proc_printer WHERE `IsDeleted` = 0 AND PrintName = @PrintName LIMIT 1";
         const string GetByIdSql = "SELECT * FROM `proc_printer` WHERE `Id` = @Id;";
         //const string GetByGroupIdSql = "SELECT * FROM `proc_printer` WHERE `IsDeleted` = 0 AND EquipmentGroupId = @EquipmentGroupId;";
         const string GetBaseListSql = "SELECT * FROM `proc_printer` WHERE `IsDeleted` = 0;";
+        const string GetByPrintIpSql = "SELECT * FROM proc_printer WHERE SiteId = @Site AND IsDeleted = 0 AND PrintIp = @Code;";
         const string GetByPrintNameSql = "SELECT * FROM `proc_printer` WHERE `IsDeleted` = 0 AND PrintName = @PrintName;";
         const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `proc_printer` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_printer` /**where**/";
@@ -253,10 +223,5 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetPagedListSqlTemplate = "SELECT /**select**/ FROM proc_printer /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
         const string GetPagedListCountSqlTemplate = "SELECT COUNT(*) FROM proc_printer /**where**/";
 
-        /// <summary>
-        /// 
-        /// </summary>
-        //const string UpdateEquipmentGroupIdSql = "UPDATE `proc_printer` SET EquipmentGroupId = @EquipmentGroupId WHERE Id = @Id ";
-        // const string ClearEquipmentGroupIdSql = "UPDATE `proc_printer` SET EquipmentGroupId = 0 WHERE EquipmentGroupId = @equipmentGroupId ";
     }
 }

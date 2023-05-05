@@ -78,7 +78,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         public async Task<int> CreateAsync(EquEquipmentGroupSaveDto createDto)
         {
             // 验证DTO
-            createDto.EquipmentGroupCode = createDto.EquipmentGroupCode.Trim().Replace(" ", string.Empty);
+            createDto.EquipmentGroupCode = createDto.EquipmentGroupCode.ToTrimSpace();
             createDto.EquipmentGroupCode = createDto.EquipmentGroupCode.ToUpperInvariant();
             await _validationSaveRules.ValidateAndThrowAsync(createDto);
 

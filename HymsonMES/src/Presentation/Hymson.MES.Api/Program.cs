@@ -36,14 +36,13 @@ namespace Hymson.MES.Api
             }).AddJsonOptions((jsonOptions) =>
             {
                 jsonOptions.JsonSerializerOptions.Converters.Add(new CustomInt64Converter());
-            }); ;
+            });
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddMemoryCache();
             builder.Services.AddClearCacheService(builder.Configuration);
-#if DEBUG
-            //builder.Services.AddHostedService<WorkService>();
-#endif
+            builder.Services.AddHostedService<WorkService>();
+
             AddSwaggerGen(builder.Services);
 
             builder.Services.AddJwtBearerService(builder.Configuration);

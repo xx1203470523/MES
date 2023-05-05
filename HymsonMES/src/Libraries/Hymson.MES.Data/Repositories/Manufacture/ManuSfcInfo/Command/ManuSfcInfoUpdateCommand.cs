@@ -32,6 +32,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 产品条码列表
         /// </summary>
-        public YesOrNoEnum IsUsed { get; set; }
+        public bool IsUsed { get; set; }
     }
 }

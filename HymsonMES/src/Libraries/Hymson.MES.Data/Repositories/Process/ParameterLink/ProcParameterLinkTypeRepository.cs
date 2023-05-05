@@ -1,20 +1,10 @@
-/*
- *creator: Karl
- *
- *describe: 标准参数关联类型表 仓储类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-02-13 05:06:17
- */
-
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using System;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -25,6 +15,10 @@ namespace Hymson.MES.Data.Repositories.Process
     {
         private readonly ConnectionOptions _connectionOptions;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
         public ProcParameterLinkTypeRepository(IOptions<ConnectionOptions> connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
@@ -46,7 +40,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -71,7 +65,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<ProcParameterLinkTypeEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcParameterLinkTypeEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ProcParameterLinkTypeEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -79,10 +73,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcParameterLinkTypeEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ProcParameterLinkTypeEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcParameterLinkTypeEntity>(GetByIdsSql, new { ids = ids});
+            return await conn.QueryAsync<ProcParameterLinkTypeEntity>(GetByIdsSql, new { ids = ids });
         }
 
         /// <summary>
@@ -113,7 +107,7 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 sqlBuilder.Where(" g.SiteId=@SiteId ");
             }
-            if (procParameterLinkTypePagedQuery.ParameterType>0)
+            if (procParameterLinkTypePagedQuery.ParameterType > 0)
             {
                 sqlBuilder.Where(" g.ParameterType=@ParameterType ");
             }
@@ -196,21 +190,11 @@ namespace Hymson.MES.Data.Repositories.Process
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcParameterLinkTypeEntitiesSqlTemplate);
             sqlBuilder.Select("*");
-
             sqlBuilder.Where(" IsDeleted = 0 ");
 
-            if (procParameterLinkTypeQuery.SiteId!=0) 
-            {
-                sqlBuilder.Where(" SiteId = @SiteId ");
-            }
-            if (procParameterLinkTypeQuery.ParameterID!=0) 
-            {
-                sqlBuilder.Where(" ParameterID = @ParameterID ");
-            }
-            if (procParameterLinkTypeQuery.ParameterType > 0)
-            {
-                sqlBuilder.Where(" ParameterType = @ParameterType ");
-            }
+            if (procParameterLinkTypeQuery.SiteId != 0) sqlBuilder.Where(" SiteId = @SiteId ");
+            if (procParameterLinkTypeQuery.ParameterID != 0) sqlBuilder.Where(" ParameterID = @ParameterID ");
+            if (procParameterLinkTypeQuery.ParameterType > 0) sqlBuilder.Where(" ParameterType = @ParameterType ");
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var procParameterLinkTypeEntities = await conn.QueryAsync<ProcParameterLinkTypeEntity>(template.RawSql, procParameterLinkTypeQuery);
@@ -233,7 +217,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procParameterLinkTypeEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(List<ProcParameterLinkTypeEntity> procParameterLinkTypeEntitys)
+        public async Task<int> InsertsAsync(IEnumerable<ProcParameterLinkTypeEntity> procParameterLinkTypeEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertsSql, procParameterLinkTypeEntitys);

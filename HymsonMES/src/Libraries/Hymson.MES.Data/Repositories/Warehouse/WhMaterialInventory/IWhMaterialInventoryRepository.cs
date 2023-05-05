@@ -5,18 +5,10 @@
  *builder:  pengxin
  *build datetime: 2023-03-06 03:27:59
  */
-using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Warehouse;
-using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
-using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Warehouse
 {
@@ -67,7 +59,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         Task<int> UpdateIncreaseQuantityResidueAsync(UpdateQuantityCommand updateQuantityCommand);
 
-    /// <summary>
+        /// <summary>
 
         /// 清空库存
         /// </summary>
@@ -80,7 +72,14 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="barCode"></param>
         /// <returns></returns>
-        Task<int> UpdateIncreaseQuantityResidueRangeAsync(IEnumerable<UpdateQuantityCommand> updateQuantityCommand);
+        Task<int> UpdateIncreaseQuantityResidueRangeAsync(IEnumerable<UpdateQuantityRangeCommand> updateQuantityCommand);
+
+        /// <summary>
+        /// 批量更新库存数量(减少库存)
+        /// </summary>
+        /// <param name="updateQuantityCommand"></param>
+        /// <returns></returns>
+        Task<int> UpdateReduceQuantityResidueRangeAsync(IEnumerable<UpdateQuantityRangeCommand> updateQuantityCommand);
 
         /// <summary>
         /// 更新库存数量(减少库存)
@@ -113,16 +112,16 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <summary>
         /// 根据物料条码获取数据
         /// </summary>
-        /// <param name="barCode"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        Task<WhMaterialInventoryEntity> GetByBarCodeAsync(string barCode);
+        Task<WhMaterialInventoryEntity> GetByBarCodeAsync(WhMaterialInventoryBarCodeQuery query);
 
         /// <summary>
         /// 根据物料条码获取数据
         /// </summary>
         /// <param name="barCode"></param>
         /// <returns></returns>
-        Task<IEnumerable<WhMaterialInventoryEntity>> GetByBarCodesAsync(WhMaterialInventoryBarcodeQuery param);
+        Task<IEnumerable<WhMaterialInventoryEntity>> GetByBarCodesAsync(WhMaterialInventoryBarCodesQuery param);
 
         /// <summary>
         /// 根据IDs批量获取数据

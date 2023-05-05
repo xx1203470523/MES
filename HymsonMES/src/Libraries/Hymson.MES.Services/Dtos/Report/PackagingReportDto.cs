@@ -44,7 +44,7 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 包装等级;1：一级；2：二级；3：三级；
         /// </summary>
-        public LevelEnum? Level { get; set; }
+        public int? Level { get; set; }
 
         /// <summary>
         /// 当前装载数量

@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.View;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -51,6 +52,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuSfcProduceQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuSfcProduceEntity>> GetManuSfcProduceEntitiesAsync(ManuSfcProduceQuery manuSfcProduceQuery);
+
+        /// <summary>
+        /// 获取带manu_sfc_info的list
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcProduceInfoView>> GetManuSfcProduceInfoEntitiesAsync(ManuSfcProduceQuery query);
 
         /// <summary>
         /// 新增
@@ -192,7 +200,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuSfcProduceBusinessEntity>> GetSfcProduceBusinessListBySFCAsync(SfcListProduceBusinessQuery sfc);
+        Task<IEnumerable<ManuSfcProduceBusinessView>> GetSfcProduceBusinessListBySFCAsync(SfcListProduceBusinessQuery sfc);
 
         /// <summary>
         /// 根据IDs批量获取在制品业务

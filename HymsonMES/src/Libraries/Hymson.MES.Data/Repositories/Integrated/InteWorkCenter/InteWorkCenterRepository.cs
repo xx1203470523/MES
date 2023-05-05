@@ -61,7 +61,11 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
                 param.Name = $"%{param.Name}%";
                 sqlBuilder.Where("Name like @Name");
             }
-
+            if (!string.IsNullOrWhiteSpace(param.Remark))
+            {
+                param.Remark = $"%{param.Remark}%";
+                sqlBuilder.Where("Remark like @Remark");
+            }
 
             var offSet = (param.PageIndex - 1) * param.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -220,10 +224,31 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<InteWorkCenterEntity>(GetHigherInteWorkCenterSql, new { Id = id });
         }
-
         #endregion
 
         #region 关联资源
+        /// <summary>
+        /// 根据资源ID获取数据
+        /// </summary>
+        /// <param name="resourceId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<long>> GetWorkCenterIdByResourceIdAsync(IEnumerable<long> resourceIds)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<long>(GetWorkCenterIdByResourceIdSql, new { resourceIds });
+        }
+
+        /// <summary>
+        /// 查询产线下面的资源ID集合
+        /// </summary>
+        /// <param name="workCenterIds"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<long>> GetResourceIdsByWorkCenterIdAsync(long[] workCenterIds)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<long>(GetResourceIdsByWorkCenterIdSql, new { workCenterIds });
+        }
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -292,5 +317,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
                                                 From  inte_work_center_relation  wcr 
                                                 left join inte_work_center wc on wc.Id=wcr.WorkCenterId
                                                 Where wcr.SubWorkCenterId = @Id ";
+        const string GetWorkCenterIdByResourceIdSql = "SELECT WorkCenterId FROM inte_work_center_resource_relation WHERE IsDeleted = 0 AND ResourceId IN @resourceIds";
+        const string GetResourceIdsByWorkCenterIdSql = "SELECT ResourceId FROM inte_work_center_resource_relation WHERE IsDeleted = 0 AND WorkCenterId IN @workCenterIds ";
     }
 }

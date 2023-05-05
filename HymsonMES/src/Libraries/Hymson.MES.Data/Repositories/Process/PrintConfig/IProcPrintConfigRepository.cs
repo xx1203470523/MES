@@ -3,6 +3,7 @@ using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using MySql.Data.MySqlClient;
@@ -50,21 +51,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcPrinterEntity> GetByIdAsync(long id);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
         Task<PagedInfo<ProcPrinterEntity>> GetListAsync(ProcPrinterPagedQuery query);
-
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <param name="equipmentGroupId"></param>
-        ///// <returns></returns>
-        //Task<IEnumerable<ProcPrinterEntity>> GetByGroupIdAsync(long equipmentGroupId);
-
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <param name="id"></param>
-        ///// <returns></returns>
-        //Task<EquEquipmentView> GetViewByIdAsync(long id);
 
         /// <summary>
         /// 
@@ -72,6 +65,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="PrintName"></param>
         /// <returns></returns>
         Task<ProcPrinterEntity> GetByPrintNameAsync(string PrintName);
+
+        /// <summary>
+        /// 根据IP查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ProcPrinterEntity> GetByPrintIpAsync(EntityByCodeQuery query);
 
         /// <summary>
         /// 

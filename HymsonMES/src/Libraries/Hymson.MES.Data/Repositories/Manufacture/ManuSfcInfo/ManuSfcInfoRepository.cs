@@ -238,7 +238,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 pageQuery.SFC = $"%{pageQuery.SFC}%";
                 sqlBuilder.Where(" s.SFC like @SFC ");
             }
-            if (pageQuery.SFCStatus.HasValue) 
+            if (pageQuery.SFCStatus.HasValue)
             {
                 sqlBuilder.Where(" s.`Status` =  @SFCStatus ");
             }
@@ -253,19 +253,19 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 sqlBuilder.Where(" r.ResCode like  @ResourceCode ");
             }
 
-            if (pageQuery.SFCProduceStatus.HasValue) 
+            if (pageQuery.SFCProduceStatus.HasValue)
             {
                 sqlBuilder.Where(" sp.`Status` =  @SFCProduceStatus ");
             }
 
-            if (pageQuery.SFCIsLock.HasValue) 
+            if (pageQuery.SFCIsLock.HasValue)
             {
                 sqlBuilder.LeftJoin(" manu_sfc_produce_business spb on spb.SfcInfoId=si.Id ");
                 if (pageQuery.SFCIsLock == Core.Enums.TrueOrFalseEnum.Yes)
                 {
                     sqlBuilder.Where(" spb.BusinessType=2 ");
                 }
-                else 
+                else
                 {
                     sqlBuilder.Where(" spb.BusinessType!=2 ");
                 }
@@ -312,7 +312,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetBySFCSql = @"SELECT * FROM manu_sfc_info WHERE IsDeleted = 0 AND SFC = @sfc ";
         const string GetBySFCIdsSql = @"SELECT * FROM manu_sfc_info WHERE IsDeleted = 0 AND SfcId IN @sfcIds ";
 
-        const string UpdatesIsUsedSql = "UPDATE `manu_sfc_info` SET  IsUsed = @IsUsed, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE SfcId IN @SfcIds";
+        const string UpdatesIsUsedSql = "UPDATE `manu_sfc_info` SET  IsUsed = @IsUsed, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn WHERE SfcId IN @SfcIds";
 
         #endregion
 

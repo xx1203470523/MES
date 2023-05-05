@@ -9,5 +9,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 条码列表
         /// </summary>
         public string[] Sfcs { get; set; }
+
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long SiteId { get; set; }
     }
 }

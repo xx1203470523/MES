@@ -90,7 +90,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         {
             #region 参数处理
             // 验证DTO
-            createDto.EquipmentCode = createDto.EquipmentCode.Trim().Replace(" ", string.Empty);
+            createDto.EquipmentCode = createDto.EquipmentCode.ToTrimSpace();
             createDto.EquipmentCode = createDto.EquipmentCode.ToUpperInvariant();
             await _validationSaveRules.ValidateAndThrowAsync(createDto);
 

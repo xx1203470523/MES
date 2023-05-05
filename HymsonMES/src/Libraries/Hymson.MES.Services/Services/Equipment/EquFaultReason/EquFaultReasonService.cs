@@ -57,7 +57,7 @@ namespace Hymson.MES.Services.Services.Equipment
         public async Task<int> CreateEquFaultReasonAsync(EquFaultReasonSaveDto createDto)
         {
             // 验证DTO
-            createDto.FaultReasonCode = createDto.FaultReasonCode.Trim().Replace(" ", string.Empty);
+            createDto.FaultReasonCode = createDto.FaultReasonCode.ToTrimSpace();
             createDto.FaultReasonCode = createDto.FaultReasonCode.ToUpperInvariant();
             await _validationSaveRules.ValidateAndThrowAsync(createDto);
 

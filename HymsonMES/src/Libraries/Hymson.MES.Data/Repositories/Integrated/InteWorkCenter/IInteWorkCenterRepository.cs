@@ -1,11 +1,9 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
-using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.View;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository
 {
@@ -92,7 +90,6 @@ namespace Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository
         /// <returns></returns>
         Task<int> InsertInteWorkCenterRelationRangAsync(IEnumerable<InteWorkCenterRelation> param);
 
-
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -107,8 +104,26 @@ namespace Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository
         /// <returns></returns>
         Task<IEnumerable<InteWorkCenterRelationView>> GetInteWorkCenterRelationAsync(long id);
 
-        Task<int> InsertInteWorkCenterResourceRelationRangAsync(IEnumerable<InteWorkCenterResourceRelation> param);
+        /// <summary>
+        /// 根据资源ID获取数据
+        /// </summary>
+        /// <param name="resourceId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<long>> GetWorkCenterIdByResourceIdAsync(IEnumerable<long> resourceIds);
 
+        /// <summary>
+        /// 查询产线下面的资源ID集合
+        /// </summary>
+        /// <param name="workCenterIds"></param>
+        /// <returns></returns>
+        Task<IEnumerable<long>> GetResourceIdsByWorkCenterIdAsync(long[] workCenterIds);
+
+        /// <summary>
+        /// 批量新增
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<int> InsertInteWorkCenterResourceRelationRangAsync(IEnumerable<InteWorkCenterResourceRelation> param);
 
         /// <summary>
         /// 根据下级工作中心Id获取上级工作中心
@@ -124,7 +139,6 @@ namespace Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> RealDelteInteWorkCenterResourceRelationRangAsync(long id);
-
 
         /// <summary>
         /// 获取工作中心关联
