@@ -122,6 +122,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="procMaterialRepository"></param>
         /// <param name="procMaskCodeRuleRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
+        /// <param name="localizationService"></param>
         public ManuCommonService(ICurrentSite currentSite, ISequenceService sequenceService,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
@@ -133,8 +134,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             IProcProcedureRepository procProcedureRepository,
             IProcMaterialRepository procMaterialRepository,
             IProcMaskCodeRuleRepository procMaskCodeRuleRepository,
-            IWhMaterialInventoryRepository whMaterialInventoryRepository,
-             ILocalizationService localizationService)
+            IWhMaterialInventoryRepository whMaterialInventoryRepository, 
+            ILocalizationService localizationService)
         {
             _currentSite = currentSite;
             _sequenceService = sequenceService;
@@ -151,6 +152,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _localizationService = localizationService;
         }
+
 
         /// <summary>
         /// 验证条码掩码规则
