@@ -87,5 +87,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="procedureId"></param>
         /// <returns></returns>
         Task<IEnumerable<long>> GetProcResourceIdByProcedureId(long procedureId);
+
+
+        /// <summary>
+        /// 批量判断条码是否锁定
+        /// </summary>
+        /// <param name="sfcs"></param>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        Task VerifySfcsLockAsync(string[] sfcs, long procedureId);
     }
 }

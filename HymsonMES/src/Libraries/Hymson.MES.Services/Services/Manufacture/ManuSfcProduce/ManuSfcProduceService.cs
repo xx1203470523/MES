@@ -1007,12 +1007,12 @@ namespace Hymson.MES.Services.Services.Manufacture
                 }
 
                 //锁定不允许操作
-                if (item.Lock == QualityLockEnum.FutureLock || item.Lock == QualityLockEnum.InstantLock)
-                {
-                    validationFailure.ErrorCode = nameof(ErrorCode.MES18010);
-                    validationFailures.Add(validationFailure);
-                    continue;
-                }
+                //if (item.Lock == QualityLockEnum.FutureLock || item.Lock == QualityLockEnum.InstantLock)
+                //{
+                //    validationFailure.ErrorCode = nameof(ErrorCode.MES18010);
+                //    validationFailures.Add(validationFailure);
+                //    continue;
+                //}
 
                 var manuSfcProduceStep = manuSfcProduceStepList.Where(it => it.ProcedureId == item.ProcedureId).FirstOrDefault();
                 if (manuSfcProduceStep == null)
@@ -1080,9 +1080,10 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// 验证
         /// </summary>
         /// <param name="sfcs"></param>
+        /// <param name="procedureId"></param>
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
-        private async Task<(IEnumerable<ManuSfcView> manuSfcInfos, IEnumerable<ProcessRouteDetailDto> processRouteNodes, long endProcessRouteDetailId)> VerifySfcAsync(List<ManuSfcProduceStepSFCDto> sfcs)
+        private async Task<(IEnumerable<ManuSfcView> manuSfcInfos, IEnumerable<ProcessRouteDetailDto> processRouteNodes, long endProcessRouteDetailId)> VerifySfcAsync(List<ManuSfcProduceStepSFCDto> sfcs, long procedureId = 0)
         {
             #region 主数据
             //获取条码
@@ -1101,16 +1102,19 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES18006)).WithData("SFC", string.Join(",", differentSfcs));
             }
 
+            //验证条码锁定
+            await _manuCommonService.VerifySfcsLockAsync(manuSfcs, procedureId);
+
             //这个是物料删除 所以查到就是有锁
-            var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = manuSfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
-            if (sfcProduceBusinesss != null && sfcProduceBusinesss.Any())
-            {
-                var sfcInfoIds = sfcProduceBusinesss.Select(it => it.SfcInfoId).ToArray();
-                var sfcInfos = await _manuSfcInfoRepository.GetByIdsAsync(sfcInfoIds);
-                var sfcids = sfcInfos.Select(it => it.SfcId).ToArray();
-                var manuSfcsEntit = await _manuSfcRepository.GetByIdsAsync(sfcids);
-                throw new CustomerValidationException(nameof(ErrorCode.MES18204)).WithData("SFC", string.Join(",", manuSfcsEntit.Select(it => it.SFC).ToArray()));
-            }
+            //var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = manuSfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
+            //if (sfcProduceBusinesss != null && sfcProduceBusinesss.Any())
+            //{
+            //    var sfcInfoIds = sfcProduceBusinesss.Select(it => it.SfcInfoId).ToArray();
+            //    var sfcInfos = await _manuSfcInfoRepository.GetByIdsAsync(sfcInfoIds);
+            //    var sfcids = sfcInfos.Select(it => it.SfcId).ToArray();
+            //    var manuSfcsEntit = await _manuSfcRepository.GetByIdsAsync(sfcids);
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES18204)).WithData("SFC", string.Join(",", manuSfcsEntit.Select(it => it.SFC).ToArray()));
+            //}
 
             //包装
             var conPackList = await _manuContainerPackRepository.GetByLadeBarCodesAsync(new ManuContainerPackQuery { LadeBarCodes = manuSfcs, SiteId = _currentSite.SiteId ?? 0 });
@@ -1195,7 +1199,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18014));
             }
-            var (manuSfcInfos, processRouteNodes, endProcessRouteDetailId) = await VerifySfcAsync(sfcProduceStepDto.Sfcs);
+            var (manuSfcInfos, processRouteNodes, endProcessRouteDetailId) = await VerifySfcAsync(sfcProduceStepDto.Sfcs, sfcProduceStepDto.ProcedureId);
             #endregion
 
 
@@ -1446,9 +1450,10 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// 验证
         /// </summary>
         /// <param name="sfcs"></param>
+        /// <param name="procedureId"></param>
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
-        private async Task<IEnumerable<ManuSfcProduceEntity>> ManuUpdateVerifyAsync(string[] sfcs)
+        private async Task<IEnumerable<ManuSfcProduceEntity>> ManuUpdateVerifyAsync(string[] sfcs, long procedureId = 0)
         {
             if (sfcs == null || sfcs.Length <= 0)
             {
@@ -1474,16 +1479,19 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES18211));
             }
 
+            //验证条码锁定
+            await _manuCommonService.VerifySfcsLockAsync(sfcs, procedureId);
+
             //这个是物料删除 所以查到就是有锁
-            var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
-            if (sfcProduceBusinesss != null && sfcProduceBusinesss.Any())
-            {
-                var sfcInfoIds = sfcProduceBusinesss.Select(it => it.SfcInfoId).ToArray();
-                var sfcInfos = await _manuSfcInfoRepository.GetByIdsAsync(sfcInfoIds);
-                var sfcids = sfcInfos.Select(it => it.SfcId).ToArray();
-                var manuSfcs = await _manuSfcRepository.GetByIdsAsync(sfcids);
-                throw new CustomerValidationException(nameof(ErrorCode.MES18204)).WithData("SFC", string.Join(",", manuSfcs.Select(it => it.SFC).ToArray()));
-            }
+            //var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
+            //if (sfcProduceBusinesss != null && sfcProduceBusinesss.Any())
+            //{
+            //    var sfcInfoIds = sfcProduceBusinesss.Select(it => it.SfcInfoId).ToArray();
+            //    var sfcInfos = await _manuSfcInfoRepository.GetByIdsAsync(sfcInfoIds);
+            //    var sfcids = sfcInfos.Select(it => it.SfcId).ToArray();
+            //    var manuSfcs = await _manuSfcRepository.GetByIdsAsync(sfcids);
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES18204)).WithData("SFC", string.Join(",", manuSfcs.Select(it => it.SFC).ToArray()));
+            //}
 
             //工单
             var WorkOrderIds = manuSfcProduces.Select(it => it.WorkOrderId).ToArray();
@@ -1520,7 +1528,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             #region 逻辑
             //在制数据
-            var manuSfcProduces = await ManuUpdateVerifyAsync(manuUpdateSaveDto.Sfcs);
+            var manuSfcProduces = await ManuUpdateVerifyAsync(manuUpdateSaveDto.Sfcs, manuUpdateSaveDto.ProcedureId);
 
             //老工单
             var workOrderId = manuSfcProduces.First().WorkOrderId;
