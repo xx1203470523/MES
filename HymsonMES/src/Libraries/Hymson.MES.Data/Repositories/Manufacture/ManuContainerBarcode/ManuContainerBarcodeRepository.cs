@@ -93,7 +93,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             }
             if (manuContainerBarcodePagedQuery.Level.HasValue)
             {
-                sqlBuilder.Where("barcode.Level=@Level");
+                sqlBuilder.Where("barcode.PackLevel=@Level");
             }
             if (!string.IsNullOrWhiteSpace(manuContainerBarcodePagedQuery.ProductName))
             {
