@@ -84,7 +84,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("barcode.IsDeleted=0");
             sqlBuilder.Select("barcode.id,barcode.SiteId,barcode.ProductId,barcode.BarCode,barcode.ContainerId,barcode.Status,barcode.CreatedBy," +
-                "barcode.CreatedOn,material.MaterialCode as ProductCode,material.MaterialName as ProductName,container.`Level`,container.Maximum,container.Minimum");
+                "barcode.CreatedOn,material.MaterialCode as ProductCode,material.MaterialName as ProductName,barcode.PackLevel as`Level`,container.Maximum,container.Minimum");
             sqlBuilder.LeftJoin("proc_material material on material.Id=barcode.ProductId and material.IsDeleted=0");
             sqlBuilder.LeftJoin("inte_container container on container.Id=barcode.ContainerId and container.IsDeleted=0");
             if (!string.IsNullOrWhiteSpace(manuContainerBarcodePagedQuery.BarCode))
@@ -93,7 +93,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             }
             if (manuContainerBarcodePagedQuery.Level.HasValue)
             {
-                sqlBuilder.Where("container.Level=@Level");
+                sqlBuilder.Where("barcode.PackLevel=@Level");
             }
             if (!string.IsNullOrWhiteSpace(manuContainerBarcodePagedQuery.ProductName))
             {
