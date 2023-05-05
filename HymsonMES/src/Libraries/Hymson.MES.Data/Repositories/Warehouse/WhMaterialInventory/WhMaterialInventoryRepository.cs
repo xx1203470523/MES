@@ -261,10 +261,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="barCode"></param>
         /// <returns></returns>
-        public async Task<int> UpdateIncreaseQuantityResidueRangeAsync(IEnumerable<UpdateQuantityCommand> updateQuantityCommand)
+        public async Task<int> UpdateIncreaseQuantityResidueRangeAsync(IEnumerable<UpdateQuantityRangeCommand> updateQuantityCommand)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateIncreaseQuantityResidueSql, updateQuantityCommand);
+            return await conn.ExecuteAsync(UpdateIncreaseQuantityResidueRangeSql, updateQuantityCommand);
         }
 
 
@@ -277,6 +277,17 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateReduceQuantityResidueSql, updateQuantityCommand);
+        }
+
+        /// <summary>
+        /// 批量更新库存数量(减少库存)
+        /// </summary>
+        /// <param name="updateQuantityCommand"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateReduceQuantityResidueRangeAsync(IEnumerable<UpdateQuantityRangeCommand> updateQuantityCommand)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateReduceQuantityResidueRangeSql, updateQuantityCommand);
         }
 
         /// <summary>
@@ -358,5 +369,8 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         const string UpdateIncreaseQuantityResidueSql = "UPDATE wh_material_inventory SET QuantityResidue =QuantityResidue+ @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
 
         const string UpdateReduceQuantityResidueSql = "UPDATE wh_material_inventory SET QuantityResidue=QuantityResidue- @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
+
+        const string UpdateIncreaseQuantityResidueRangeSql = "UPDATE wh_material_inventory SET QuantityResidue =QuantityResidue+ @QuantityResidue, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
+        const string UpdateReduceQuantityResidueRangeSql = "UPDATE wh_material_inventory SET QuantityResidue=QuantityResidue- @QuantityResidue, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
     }
 }

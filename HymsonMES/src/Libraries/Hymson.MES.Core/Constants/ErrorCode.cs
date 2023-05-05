@@ -650,6 +650,8 @@
         public const string MES18017 = "工艺路线不存在尾工序";
         public const string MES18018 = "工艺路线存在多个尾工序";
         public const string MES18019 = "条码:{SFCs}已包装，不允许操作";
+        public const string MES18020 = "库存信息不存在";
+        public const string MES18021 = "物料库存不足"; 
 
 
         #endregion

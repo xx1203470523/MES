@@ -10,8 +10,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfc.View
     /// <summary>
     /// 条码信息
     /// </summary>
-    public  class ManuSfcView
+    public class ManuSfcView
     {
+        /// <summary>
+        /// Id
+        /// </summary>
+        public long Id { get; set; }
+
         /// <summary>
         /// 站点Id
         /// </summary>

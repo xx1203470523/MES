@@ -27,4 +27,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command
         /// </summary>
         public SfcStatusEnum? Status { get; set; }
     }
+
+    /// <summary>
+    /// 条码状态更新 
+    /// </summary>
+    public class ManuSfcUpdateStatusAndIsUsedCommand : ManuSfcUpdateCommand
+    {
+        /// <summary>
+        /// 是否使用
+        /// </summary>
+        public YesOrNoEnum IsUsed { get; set; }
+    }
 }
