@@ -7,11 +7,6 @@
  */
 
 using Hymson.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Dtos.Process
 {
@@ -119,16 +114,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 
         /// </summary>
         public long Id { get; set; }
-
-       /// <summary>
-        /// 物料组编号
-        /// </summary>
-        public string GroupCode { get; set; }
-
-       /// <summary>
-        /// 物料组名称
-        /// </summary>
-        public string GroupName { get; set; }
 
        /// <summary>
         /// 物料组版本

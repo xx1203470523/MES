@@ -1,12 +1,4 @@
-/*
- *creator: Karl
- *
- *describe: 物料组维护表    服务 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-02-10 03:54:07
- */
 using FluentValidation;
-using Google.Protobuf.WellKnownTypes;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
@@ -18,7 +10,6 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
-using Hymson.Utils;
 using Hymson.Utils;
 using System.Transactions;
 
@@ -32,24 +23,36 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 物料组维护表 仓储
         /// </summary>
-        private readonly IProcMaterialGroupRepository _procMaterialGroupRepository;
-        private readonly AbstractValidator<ProcMaterialGroupCreateDto> _validationCreateRules;
-        private readonly AbstractValidator<ProcMaterialGroupModifyDto> _validationModifyRules;
-
-        private readonly IProcMaterialRepository _procMaterialRepository;
-
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
 
-        public ProcMaterialGroupService(ICurrentUser currentUser, ICurrentSite currentSite , IProcMaterialGroupRepository procMaterialGroupRepository, AbstractValidator<ProcMaterialGroupCreateDto> validationCreateRules, AbstractValidator<ProcMaterialGroupModifyDto> validationModifyRules, IProcMaterialRepository procMaterialRepository)
+        /// <summary>
+        /// 仓储接口（物料维护）
+        /// </summary>
+        private readonly IProcMaterialRepository _procMaterialRepository;
+
+        /// <summary>
+        /// 仓储接口（物料组维护）
+        /// </summary>
+        private readonly IProcMaterialGroupRepository _procMaterialGroupRepository;
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="currentUser"></param>
+        /// <param name="currentSite"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="procMaterialGroupRepository"></param>
+        public ProcMaterialGroupService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IProcMaterialRepository procMaterialRepository,
+            IProcMaterialGroupRepository procMaterialGroupRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _procMaterialGroupRepository = procMaterialGroupRepository;
-            _validationCreateRules = validationCreateRules;
-            _validationModifyRules = validationModifyRules;
             _procMaterialRepository = procMaterialRepository;
         }
+
 
         /// <summary>
         /// 创建
@@ -73,25 +76,22 @@ namespace Hymson.MES.Services.Services.Process
             procMaterialGroupEntity.UpdatedBy = _currentUser.UserName;
             procMaterialGroupEntity.CreatedOn = HymsonClock.Now();
             procMaterialGroupEntity.UpdatedOn = HymsonClock.Now();
-            procMaterialGroupEntity.SiteId = _currentSite.SiteId??0;
+            procMaterialGroupEntity.SiteId = _currentSite.SiteId ?? 0;
 
             #region 参数校验
-            //验证DTO
-            await _validationCreateRules.ValidateAndThrowAsync(procMaterialGroupCreateDto);
-
             //判断编号是否已存在
-            var existGroupCodes = await _procMaterialGroupRepository.GetProcMaterialGroupEntitiesAsync(new ProcMaterialGroupQuery { SiteId = _currentSite.SiteId??0, GroupCode = procMaterialGroupCreateDto.GroupCode });
+            var existGroupCodes = await _procMaterialGroupRepository.GetProcMaterialGroupEntitiesAsync(new ProcMaterialGroupQuery { SiteId = _currentSite.SiteId ?? 0, GroupCode = procMaterialGroupCreateDto.GroupCode });
             if (existGroupCodes != null && existGroupCodes.Count() > 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10216)).WithData("groupCode", procMaterialGroupCreateDto.GroupCode);
             }
 
-            var procMaterialList = ConvertProcMaterialList(procMaterialGroupCreateDto.DynamicList, procMaterialGroupEntity.Id);
+            var procMaterialList = ConvertProcMaterialList(procMaterialGroupCreateDto.DynamicList, procMaterialGroupEntity);
             var procMaterialIds = procMaterialList.Select(x => x.Id).ToArray();
 
             // 判断物料是否已被使用
             var procMaterials = await _procMaterialRepository.GetByIdsAsync(procMaterialIds);
-            if (procMaterials.Count()>0 && procMaterials.Where(x => x.GroupId != 0).Count() > 0)
+            if (procMaterials.Count() > 0 && procMaterials.Where(x => x.GroupId != 0).Count() > 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10217));
             }
@@ -118,7 +118,7 @@ namespace Hymson.MES.Services.Services.Process
                 }
                 response = await _procMaterialRepository.UpdateProcMaterialGroupAsync(procMaterialList);
 
-                if (response < procMaterialList.Count)
+                if (response < procMaterialList.Count())
                 {
                     throw new BusinessException(nameof(ErrorCode.MES10218));
                 }
@@ -128,6 +128,54 @@ namespace Hymson.MES.Services.Services.Process
 
             #endregion
 
+        }
+
+        /// <summary>
+        /// 修改
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task ModifyProcMaterialGroupAsync(ProcMaterialGroupModifyDto dto)
+        {
+            if (dto == null) throw new ValidationException(nameof(ErrorCode.MES10213));
+
+            dto.Remark ??= "".Trim();
+
+            // 物料组是否存在
+            var entity = await _procMaterialGroupRepository.GetByIdAsync(dto.Id)
+                ?? throw new BusinessException(nameof(ErrorCode.MES10219));
+
+            entity.Remark = dto.Remark;
+            entity.UpdatedBy = _currentUser.UserName;
+            entity.UpdatedOn = HymsonClock.Now();
+
+            var procMaterialList = ConvertProcMaterialList(dto.DynamicList, entity);
+
+            // 判断物料是否已被使用
+            var procMaterials = await _procMaterialRepository.GetByIdsAsync(procMaterialList.Select(x => x.Id).ToArray());
+            if (procMaterials.Any() == true
+                && procMaterials.Any(x => x.GroupId != 0 && x.GroupId != entity.Id) == true)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10217));
+            }
+
+            #region 保存到数据库
+            using (var trans = new TransactionScope())
+            {
+                var rows = 0;
+                rows = await _procMaterialGroupRepository.UpdateAsync(entity);
+                if (rows == 0) throw new BusinessException(nameof(ErrorCode.MES10220));
+
+                // 将之前所有该物料组的物料改为未绑定 
+                await _procMaterialRepository.UpdateProcMaterialUnboundAsync(entity.Id);
+
+                rows = await _procMaterialRepository.UpdateProcMaterialGroupAsync(procMaterialList);
+                //if (rows < procMaterialList.Count()) throw new BusinessException(nameof(ErrorCode.MES10220));
+
+                trans.Complete();
+            }
+
+            #endregion
         }
 
         /// <summary>
@@ -147,7 +195,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<int> DeletesProcMaterialGroupAsync(long[] idsArr)
         {
-            if (idsArr.Length<1)
+            if (idsArr.Length < 1)
             {
                 throw new ValidationException(nameof(ErrorCode.MES10213));
             }
@@ -169,7 +217,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<PagedInfo<ProcMaterialGroupDto>> GetPageListAsync(ProcMaterialGroupPagedQueryDto procMaterialGroupPagedQueryDto)
         {
-            procMaterialGroupPagedQueryDto.SiteId = _currentSite.SiteId??0;
+            procMaterialGroupPagedQueryDto.SiteId = _currentSite.SiteId ?? 0;
 
             var procMaterialGroupPagedQuery = procMaterialGroupPagedQueryDto.ToQuery<ProcMaterialGroupPagedQuery>();
             var pagedInfo = await _procMaterialGroupRepository.GetPagedInfoAsync(procMaterialGroupPagedQuery);
@@ -203,7 +251,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<PagedInfo<CustomProcMaterialGroupViewDto>> GetPageCustomListAsync(CustomProcMaterialGroupPagedQueryDto customProcMaterialGroupPagedQueryDto)
         {
-            customProcMaterialGroupPagedQueryDto.SiteId = _currentSite.SiteId??0;
+            customProcMaterialGroupPagedQueryDto.SiteId = _currentSite.SiteId ?? 0;
 
             var procMaterialGroupCustomPagedQuery = customProcMaterialGroupPagedQueryDto.ToQuery<ProcMaterialGroupCustomPagedQuery>();
             var pagedInfo = await _procMaterialGroupRepository.GetPagedCustomInfoAsync(procMaterialGroupCustomPagedQuery);
@@ -231,96 +279,13 @@ namespace Hymson.MES.Services.Services.Process
         }
 
         /// <summary>
-        /// 修改
-        /// </summary>
-        /// <param name="procMaterialGroupModifyDto"></param>
-        /// <returns></returns>
-        public async Task ModifyProcMaterialGroupAsync(ProcMaterialGroupModifyDto procMaterialGroupModifyDto)
-        {
-            if (procMaterialGroupModifyDto == null)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10213));
-            }
-            procMaterialGroupModifyDto.GroupName = procMaterialGroupModifyDto.GroupName.ToTrimSpace();
-            procMaterialGroupModifyDto.Remark = procMaterialGroupModifyDto?.Remark ?? "".Trim();
-
-            //DTO转换实体
-            var procMaterialGroupEntity = procMaterialGroupModifyDto.ToEntity<ProcMaterialGroupEntity>();
-            procMaterialGroupEntity.UpdatedBy = _currentUser.UserName;
-            procMaterialGroupEntity.UpdatedOn = HymsonClock.Now();
-            procMaterialGroupEntity.GroupCode = procMaterialGroupEntity.GroupCode.ToUpper();
-
-            procMaterialGroupEntity.SiteId = _currentSite.SiteId ?? 0;
-
-            #region 检验
-            //验证DTO
-            await _validationModifyRules.ValidateAndThrowAsync(procMaterialGroupModifyDto);
-
-            //检验物料组是否存在
-            var procMaterialGroup = await _procMaterialGroupRepository.GetByIdAsync(procMaterialGroupEntity.Id);
-            if (procMaterialGroup == null)
-            {
-                throw new BusinessException(nameof(ErrorCode.MES10219));
-            }
-
-            //判断编号是否已存在
-            var existGroupCodes = await _procMaterialGroupRepository.GetProcMaterialGroupEntitiesAsync(new ProcMaterialGroupQuery { SiteId = 0, GroupCode = procMaterialGroupEntity.GroupCode });
-            if (existGroupCodes != null && existGroupCodes.Count() > 0)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10216)).WithData("GroupCode", procMaterialGroupEntity.GroupCode);
-            }
-
-            var procMaterialList = ConvertProcMaterialList(procMaterialGroupModifyDto.DynamicList, procMaterialGroupEntity.Id);
-            var procMaterialIds = procMaterialList.Select(x => x.Id).ToArray();
-
-            // 判断物料是否已被使用
-            var procMaterials = await _procMaterialRepository.GetByIdsAsync(procMaterialIds);
-            if (procMaterials.Count()>0 && procMaterials.Where(x => x.GroupId != 0 && x.GroupId != procMaterialGroupEntity.Id).Count() > 0)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10217));
-            }
-            #endregion
-
-            #region 保存到数据库
-            using (TransactionScope ts = new TransactionScope())
-            {
-                var response = 0;
-                response = await _procMaterialGroupRepository.UpdateAsync(procMaterialGroupEntity);
-
-                if (response == 0)
-                {
-                    throw new BusinessException(nameof(ErrorCode.MES10220));
-                }
-
-                //将之前所有该物料组的物料改为未绑定 
-                await _procMaterialRepository.UpdateProcMaterialUnboundAsync(procMaterialGroupEntity.Id);
-
-                //绑定本次的物料
-                foreach (var item in procMaterialList)
-                {
-                    item.UpdatedBy = procMaterialGroupEntity.UpdatedBy;
-                    item.UpdatedOn = procMaterialGroupEntity.UpdatedOn;
-                }
-                response = await _procMaterialRepository.UpdateProcMaterialGroupAsync(procMaterialList);
-                if (response < procMaterialList.Count)
-                {
-                    throw new BusinessException(nameof(ErrorCode.MES10220));
-                }
-            }
-
-            #endregion
-
-
-        }
-
-        /// <summary>
         /// 根据ID查询
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         public async Task<ProcMaterialGroupDto> QueryProcMaterialGroupByIdAsync(long id)
         {
-            var procMaterialGroupEntity = await _procMaterialGroupRepository.GetByIdAndSiteIdAsync(id, _currentSite.SiteId??0);
+            var procMaterialGroupEntity = await _procMaterialGroupRepository.GetByIdAndSiteIdAsync(id, _currentSite.SiteId ?? 0);
             if (procMaterialGroupEntity != null)
             {
                 return procMaterialGroupEntity.ToModel<ProcMaterialGroupDto>();
@@ -329,36 +294,25 @@ namespace Hymson.MES.Services.Services.Process
         }
 
 
-        #region 业务扩展方法
+
         /// <summary>
         /// 转换集合（物料组）
         /// </summary>
         /// <param name="dynamicList"></param>
-        /// <param name="id"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        public static List<ProcMaterialEntity> ConvertProcMaterialList(IEnumerable<string> dynamicList, long id)
+        public static IEnumerable<ProcMaterialEntity> ConvertProcMaterialList(IEnumerable<string>? dynamicList, ProcMaterialGroupEntity entity)
         {
             if (dynamicList == null || dynamicList.Any() == false) return new List<ProcMaterialEntity> { };
 
             return dynamicList.Select(s => new ProcMaterialEntity
             {
-                Id = ObjToLong(s),
-                GroupId = id
-            }).ToList();
+                Id = s.ParseToLong(),
+                GroupId = entity.Id,
+                UpdatedBy = entity.UpdatedBy,
+                UpdatedOn = entity.UpdatedOn
+            });
         }
 
-        public static long ObjToLong(object obj)
-        {
-            try
-            {
-                return long.Parse(obj.ToString());
-            }
-            catch
-            {
-                return 0L;
-            }
-        }
-
-        #endregion
     }
 }
