@@ -1,5 +1,8 @@
-﻿using Hymson.Authentication.JwtBearer.Security;
+﻿using FluentValidation;
+using FluentValidation.Results;
+using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
@@ -98,6 +101,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// </summary>
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly ILocalizationService _localizationService;
 
         /// <summary>
         /// 构造函数
@@ -126,7 +133,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             IProcProcedureRepository procProcedureRepository,
             IProcMaterialRepository procMaterialRepository,
             IProcMaskCodeRuleRepository procMaskCodeRuleRepository,
-            IWhMaterialInventoryRepository whMaterialInventoryRepository)
+            IWhMaterialInventoryRepository whMaterialInventoryRepository,
+             ILocalizationService localizationService)
         {
             _currentSite = currentSite;
             _sequenceService = sequenceService;
@@ -141,6 +149,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             _procMaterialRepository = procMaterialRepository;
             _procMaskCodeRuleRepository = procMaskCodeRuleRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
+            _localizationService = localizationService;
         }
 
         /// <summary>
@@ -527,6 +536,58 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                         }
                         index++;
                     }
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// 批量验证条码是否锁定
+        /// </summary>
+        /// <param name="sfcs"></param>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        public async Task VerifySfcsLockAsync(string[] sfcs, long procedureId)
+        {
+            var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
+            if (sfcProduceBusinesss != null && sfcProduceBusinesss.Any())
+            {
+                var validationFailures = new List<ValidationFailure>();
+
+                foreach (var item in sfcProduceBusinesss)
+                {
+                    var sfcProduceLockBo = JsonSerializer.Deserialize<SfcProduceLockBo>(item.BusinessContent);
+                    if (sfcProduceLockBo == null) continue;
+
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", item.Sfc}
+                        };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.Sfc);
+                    }
+
+                    if (sfcProduceLockBo.Lock == QualityLockEnum.InstantLock)
+                    {
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES18010);
+                        validationFailures.Add(validationFailure);
+                    }
+
+                    if (sfcProduceLockBo.Lock == QualityLockEnum.FutureLock && sfcProduceLockBo.LockProductionId == procedureId)
+                    {
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES18010);
+                        validationFailures.Add(validationFailure);
+                    }
+                }
+
+                //是否存在错误
+                if (validationFailures.Any())
+                {
+                    throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
                 }
             }
         }

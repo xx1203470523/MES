@@ -13,6 +13,7 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.View;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -410,10 +411,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcProduceBusinessEntity>> GetSfcProduceBusinessListBySFCAsync(SfcListProduceBusinessQuery query)
+        public async Task<IEnumerable<ManuSfcProduceBusinessView>> GetSfcProduceBusinessListBySFCAsync(SfcListProduceBusinessQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ManuSfcProduceBusinessEntity>(GetSfcProduceBusinessBySFCsSql, query);
+            return await conn.QueryAsync<ManuSfcProduceBusinessView>(GetSfcProduceBusinessBySFCsSql, query);
         }
 
         /// <summary>
@@ -472,7 +473,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
  left join manu_sfc mf on mf.Id =msi.SfcId 
  left join manu_sfc_produce sfc on sfc.SFC =mf.SFC 
                             WHERE SPB.IsDeleted = 0 AND SPB.BusinessType = @BusinessType AND SFC.SFC = @Sfc ";
-        const string GetSfcProduceBusinessBySFCsSql = @"SELECT SPB.* FROM manu_sfc_produce_business SPB  
+        const string GetSfcProduceBusinessBySFCsSql = @"SELECT SFC.Sfc,SPB.* FROM manu_sfc_produce_business SPB  
                             LEFT JOIN manu_sfc_info info ON SPB.SfcInfoId = info.Id 
 							LEFT JOIN manu_sfc SFC ON info.SfcId = SFC.Id 
                             WHERE SPB.IsDeleted = 0 AND SPB.BusinessType = @BusinessType AND SFC.SFC IN @Sfcs ";
