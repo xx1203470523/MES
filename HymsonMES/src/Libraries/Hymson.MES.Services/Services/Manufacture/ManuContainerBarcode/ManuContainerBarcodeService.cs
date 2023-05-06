@@ -231,9 +231,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             var foo = await _manuContainerPackRepository.GetByLadeBarCodeAsync(packQuery);
             if (foo != null)
             {
-                //var barcodeobj = await _manuContainerBarcodeRepository.GetByIdAsync(foo.ContainerBarCodeId);
-                //return await GetContainerPackView(sfcProduceEntity.WorkOrderId, material, barcodeobj);
-                throw new CustomerValidationException(nameof(ErrorCode.MES16721)).WithData("sfc", packQuery.LadeBarCode).WithData("packId", foo.ContainerBarCodeId);
+                var barcodeobj = await _manuContainerBarcodeRepository.GetByIdAsync(foo.ContainerBarCodeId);
+                throw new CustomerValidationException(nameof(ErrorCode.MES16721)).WithData("sfc", packQuery.LadeBarCode).WithData("barcode", barcodeobj?.BarCode ?? foo.ContainerBarCodeId.ToString());
             }
             else
             {
@@ -389,7 +388,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             var foo = await _manuContainerPackRepository.GetByLadeBarCodeAsync(packQuery);
             if (foo != null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16721)).WithData("sfc", packQuery.LadeBarCode).WithData("packId", foo.ContainerBarCodeId);
+                var barcodeobj = await _manuContainerBarcodeRepository.GetByIdAsync(foo.ContainerBarCodeId);
+                throw new CustomerValidationException(nameof(ErrorCode.MES16721)).WithData("sfc", packQuery.LadeBarCode).WithData("barcode", barcodeobj?.BarCode?? foo.ContainerBarCodeId.ToString());
             }
             else
             {
