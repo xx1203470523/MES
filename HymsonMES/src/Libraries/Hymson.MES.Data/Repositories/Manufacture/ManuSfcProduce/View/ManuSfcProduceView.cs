@@ -80,6 +80,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 是否报废
         /// </summary>
         public TrueOrFalseEnum? IsScrap { get; set; }
+
+        /// <summary>
+        /// 资源编码
+        /// </summary>
+        public string ResCode { get; set; }
     }
 
     public class ManuSfcProduceInfoView : ManuSfcProduceEntity

@@ -11,6 +11,7 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
@@ -102,6 +103,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         private readonly IManuOutStationService _manuOutStationService;
 
+        private readonly ILocalizationService _localizationService;
         private readonly AbstractValidator<ManuFacePlateRepairCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ManuFacePlateRepairModifyDto> _validationModifyRules;
 
@@ -111,7 +113,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             IProcProcedureRepository procProcedureRepository, IProcMaterialRepository procMaterialRepository,
             IManuProductBadRecordRepository manuProductBadRecordRepository, IProcResourceRepository procResourceRepository,
             IProcProcessRouteDetailNodeRepository procProcessRouteNodeRepository, IManuFacePlateButtonService manuFacePlateButtonService,
-            IManuOutStationService manuOutStationService,
+            IManuOutStationService manuOutStationService, ILocalizationService localizationService,
         AbstractValidator<ManuFacePlateRepairCreateDto> validationCreateRules, AbstractValidator<ManuFacePlateRepairModifyDto> validationModifyRules)
         {
             _currentUser = currentUser;
@@ -129,6 +131,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuOutStationService = manuOutStationService;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
+            _localizationService = localizationService;
         }
 
         /// <summary>
@@ -378,6 +381,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17314));
             }
+
+            var status = manuSfcProduceEntit.Status == SfcProduceStatusEnum.lineUp ? _localizationService.GetResource(nameof(ErrorCode.MES17323)) : _localizationService.GetResource(nameof(ErrorCode.MES17324));
             var model = new ManuFacePlateRepairProductInfoDto
             {
                 SFC = manuSfcProduceEntit.SFC,

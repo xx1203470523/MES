@@ -45,11 +45,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where("msp.SiteId = @SiteId");
             sqlBuilder.OrderBy("msp.UpdatedOn DESC");
 
-            sqlBuilder.Select("msp.IsScrap,msp.ProductBOMId,msp.Id,msp.ProcedureId,msp.Sfc,msp.Status,pwo.OrderCode,pp.Code,pp.Name,pm.MaterialCode,pm.MaterialName,pm.Version ");
+            sqlBuilder.Select("msp.IsScrap,msp.ProductBOMId,msp.Id,msp.ProcedureId,msp.Sfc,msp.Status,pwo.OrderCode,pp.Code,pp.Name,pm.MaterialCode,pm.MaterialName,pm.Version,pr.ResCode ");
 
             sqlBuilder.LeftJoin("proc_material pm  on msp.ProductId =pm.Id  and pm.IsDeleted=0");
             sqlBuilder.LeftJoin("plan_work_order pwo on msp.WorkOrderId =pwo.Id  and pwo.IsDeleted=0");
             sqlBuilder.LeftJoin("proc_procedure pp on msp.ProcedureId =pp.Id and pp.IsDeleted =0");
+            sqlBuilder.LeftJoin("proc_resource pr on msp.ResourceId =pr.Id and pr.IsDeleted =0");
 
             //状态
             if (query.Status.HasValue)
@@ -91,6 +92,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 query.Code = $"%{query.Code}%";
                 sqlBuilder.Where("pp.Code like @Code");
+            }
+            //资源
+            if (!string.IsNullOrWhiteSpace(query.ResCode))
+            {
+                query.Code = $"%{query.Code}%";
+                sqlBuilder.Where("pr.ResCode like @ResCode");
             }
             //资源-》资源类型
             if (query.ResourceTypeId.HasValue)
