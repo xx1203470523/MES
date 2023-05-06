@@ -166,5 +166,12 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="param"></param>
         /// <returns></returns>
         Task<int> InsertPlanWorkOrderRecordAsync(PlanWorkOrderRecordEntity param);
+
+        /// <summary>
+        /// 更新生产订单记录的实际结束时间
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> UpdatePlanWorkOrderRealEndByWorkOrderIdAsync(UpdateWorkOrderRealEndCommand command);
     }
 }

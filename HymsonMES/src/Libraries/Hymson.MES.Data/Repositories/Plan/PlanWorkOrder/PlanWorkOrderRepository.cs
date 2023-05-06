@@ -311,6 +311,17 @@ namespace Hymson.MES.Data.Repositories.Plan
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertPlanWorkOrderRecordSql, param);
         }
+
+        /// <summary>
+        /// 更新生产订单记录的实际结束时间
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> UpdatePlanWorkOrderRealEndByWorkOrderIdAsync(UpdateWorkOrderRealEndCommand command) 
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateRecordRealEndSql, command);
+        }
         #endregion
     }
 
@@ -381,5 +392,6 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string UpdateWorkOrderStatusSql = @"UPDATE `plan_work_order` SET Status = @Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string UpdateWorkOrderLockedSql = @"UPDATE `plan_work_order` SET IsLocked = @IsLocked, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
 
+        const string UpdateRecordRealEndSql = "UPDATE plan_work_order_record SET RealEnd=@UpdatedOn, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn WHERE WorkOrderId in @WorkOrderIds AND IsDeleted=0 ";
     }
 }
