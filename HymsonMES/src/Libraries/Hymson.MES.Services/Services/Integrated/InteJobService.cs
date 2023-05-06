@@ -49,7 +49,7 @@ namespace Hymson.MES.Services.Services.Integrated
             AbstractValidator<InteJobCreateDto> validationCreateRules, AbstractValidator<InteJobModifyDto> validationModifyRules, ICurrentUser currentUser, ICurrentSite currentSite)
         {
             _inteJobRepository = inteJobRepository;
-            _jobBusinessRelationRepository= jobBusinessRelationRepository;
+            _jobBusinessRelationRepository = jobBusinessRelationRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _currentUser = currentUser;
@@ -64,7 +64,7 @@ namespace Hymson.MES.Services.Services.Integrated
         public async Task<PagedInfo<InteJobDto>> GetPageListAsync(InteJobPagedQueryDto pram)
         {
             var inteJobPagedQuery = pram.ToQuery<InteJobPagedQuery>();
-            inteJobPagedQuery.SiteId = _currentSite.SiteId ;
+            inteJobPagedQuery.SiteId = _currentSite.SiteId;
             var pagedInfo = await _inteJobRepository.GetPagedInfoAsync(inteJobPagedQuery);
 
             //实体到DTO转换 装载数据
@@ -127,8 +127,8 @@ namespace Hymson.MES.Services.Services.Integrated
         public async Task<int> DeleteRangInteJobAsync(long[] ids)
         {
             var userId = _currentUser.UserName;
-           var list =await  _jobBusinessRelationRepository.GetByJobIdsAsync(ids);
-            if (list == null || !list.Any())
+            var list = await _jobBusinessRelationRepository.GetByJobIdsAsync(ids);
+            if (list != null && list.Any())
             {
                 throw new BusinessException(nameof(ErrorCode.MES12009));
             }
