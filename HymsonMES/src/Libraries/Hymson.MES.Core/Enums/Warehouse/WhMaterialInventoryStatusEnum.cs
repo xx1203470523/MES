@@ -3,14 +3,14 @@
 namespace Hymson.MES.Core.Enums
 {
     /// <summary>
-    /// 库存来源类型
+    /// 库存状态
     /// </summary>
-    public enum WhMaterialInventoryStatusEnum : sbyte 
+    public enum WhMaterialInventoryStatusEnum : sbyte
     {
         /// <summary>
         /// 待使用
         /// </summary>
-        [Description("待使用")] 
+        [Description("待使用")]
         ToBeUsed = 1,
         /// <summary>
         /// 使用中

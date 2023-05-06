@@ -139,7 +139,7 @@ namespace Hymson.MES.Services.Services.Plan
         public async Task<int> DeletesAsync(long[] idsArr)
         {
             var sfcEntities = await _manuSfcRepository.GetByIdsAsync(idsArr);
-            if (sfcEntities.Any(it => it.IsUsed > YesOrNoEnum.Yes) == true) throw new CustomerValidationException(nameof(ErrorCode.MES16116));
+            if (sfcEntities.Any(it => it.IsUsed == YesOrNoEnum.Yes) == true) throw new CustomerValidationException(nameof(ErrorCode.MES16116));
 
             // 条码集合
             var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcEntities.Select(s => s.Id));

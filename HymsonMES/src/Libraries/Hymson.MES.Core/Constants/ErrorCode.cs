@@ -212,6 +212,7 @@
         public const string MES12006 = "类程序 不能为空.";
         public const string MES12007 = "类程序 超过最大长度，最大长度为255.";
         public const string MES12008 = "备注 超过最大长度，最大长度为255.";
+        public const string MES12009 = "作业已经被使用无法删除";
         #endregion
 
         #region 工作中心 12100
@@ -656,6 +657,8 @@
         public const string MES18017 = "工艺路线不存在尾工序";
         public const string MES18018 = "工艺路线存在多个尾工序";
         public const string MES18019 = "条码:{SFCs}已包装，不允许操作";
+        public const string MES18020 = "库存信息不存在";
+        public const string MES18021 = "物料库存不足"; 
 
 
         #endregion

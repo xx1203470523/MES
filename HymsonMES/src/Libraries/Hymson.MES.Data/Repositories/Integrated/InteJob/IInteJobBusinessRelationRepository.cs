@@ -35,6 +35,12 @@ namespace Hymson.MES.Data.Repositories.Integrated
         Task<IEnumerable<InteJobBusinessRelationEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
+        /// 根据JobIds批量获取数据
+        /// </summary>
+        /// <param name="jobIds"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteJobBusinessRelationEntity>> GetByJobIdsAsync(IEnumerable<long> jobIds);
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="inteJobBusinessRelationQuery"></param>

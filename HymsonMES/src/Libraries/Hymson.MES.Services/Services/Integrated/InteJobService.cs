@@ -8,6 +8,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Hymson.MES.Services.Dtos.Integrated;
@@ -25,6 +26,11 @@ namespace Hymson.MES.Services.Services.Integrated
     public class InteJobService : IInteJobService
     {
         private readonly IInteJobRepository _inteJobRepository;
+
+        /// <summary>
+        /// 工序配置作业表仓储
+        /// </summary>
+        private readonly IInteJobBusinessRelationRepository _jobBusinessRelationRepository;
         private readonly AbstractValidator<InteJobCreateDto> _validationCreateRules;
         private readonly AbstractValidator<InteJobModifyDto> _validationModifyRules;
         private readonly ICurrentUser _currentUser;
@@ -38,9 +44,12 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="validationModifyRules"></param>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        public InteJobService(IInteJobRepository inteJobRepository, AbstractValidator<InteJobCreateDto> validationCreateRules, AbstractValidator<InteJobModifyDto> validationModifyRules, ICurrentUser currentUser, ICurrentSite currentSite)
+        public InteJobService(IInteJobRepository inteJobRepository,
+            IInteJobBusinessRelationRepository jobBusinessRelationRepository,
+            AbstractValidator<InteJobCreateDto> validationCreateRules, AbstractValidator<InteJobModifyDto> validationModifyRules, ICurrentUser currentUser, ICurrentSite currentSite)
         {
             _inteJobRepository = inteJobRepository;
+            _jobBusinessRelationRepository= jobBusinessRelationRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _currentUser = currentUser;
@@ -118,6 +127,11 @@ namespace Hymson.MES.Services.Services.Integrated
         public async Task<int> DeleteRangInteJobAsync(long[] ids)
         {
             var userId = _currentUser.UserName;
+           var list =await  _jobBusinessRelationRepository.GetByJobIdsAsync(ids);
+            if (list == null || !list.Any())
+            {
+                throw new BusinessException(nameof(ErrorCode.MES12009));
+            }
             return await _inteJobRepository.DeleteRangAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = userId });
         }
 

@@ -72,7 +72,14 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="barCode"></param>
         /// <returns></returns>
-        Task<int> UpdateIncreaseQuantityResidueRangeAsync(IEnumerable<UpdateQuantityCommand> updateQuantityCommand);
+        Task<int> UpdateIncreaseQuantityResidueRangeAsync(IEnumerable<UpdateQuantityRangeCommand> updateQuantityCommand);
+
+        /// <summary>
+        /// 批量更新库存数量(减少库存)
+        /// </summary>
+        /// <param name="updateQuantityCommand"></param>
+        /// <returns></returns>
+        Task<int> UpdateReduceQuantityResidueRangeAsync(IEnumerable<UpdateQuantityRangeCommand> updateQuantityCommand);
 
         /// <summary>
         /// 更新库存数量(减少库存)

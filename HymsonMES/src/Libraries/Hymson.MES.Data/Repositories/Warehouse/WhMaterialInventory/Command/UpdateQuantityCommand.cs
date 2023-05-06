@@ -1,4 +1,5 @@
-﻿using Hymson.MES.Data.Repositories.Common.Command;
+﻿using Hymson.MES.Core.Enums;
+using Hymson.MES.Data.Repositories.Common.Command;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,5 +19,14 @@ namespace Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command
         /// 数量
         /// </summary>
         public decimal QuantityResidue { get; set; }
+    }
+
+    public class UpdateQuantityRangeCommand : UpdateQuantityCommand
+    {
+        /// <summary>
+        /// 条码状态
+        /// </summary>
+        public WhMaterialInventoryStatusEnum Status { get; set; }
+
     }
 }
