@@ -83,6 +83,10 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
         {
             var sql = GetByMaterialIdSql;
             if (query.DefinitionMethod == DefinitionMethodEnum.MaterialGroup) sql = GetByMaterialGroupIdSql;
+            //是否转入状态条件
+            if (query.Status.HasValue) {
+                sql += " AND Status = @Status";
+            }
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<InteContainerEntity>(sql, query);

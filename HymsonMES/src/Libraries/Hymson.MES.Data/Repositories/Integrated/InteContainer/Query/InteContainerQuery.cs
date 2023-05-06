@@ -1,3 +1,4 @@
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 
 namespace Hymson.MES.Data.Repositories.Integrated.InteContainer.Query
@@ -21,5 +22,10 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer.Query
         /// 物料组Id
         /// </summary>
         public long MaterialGroupId { get; set; }
+
+        /// <summary>
+        /// 状态;0-新建 1-启用 2-保留3-废弃
+        /// </summary>
+        public SysDataStatusEnum? Status { get; set; }
     }
 }
