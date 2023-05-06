@@ -529,6 +529,8 @@
         public const string MES17320 = "作业返回空，请检查作业是否正确配置";
         public const string MES17321 = "不识别的类型：{key}";
         public const string MES17322 = "请先开始维修";
+        public const string MES17323 = "排队中";
+        public const string MES17324 = "活动中";
 
 
         #endregion
@@ -658,7 +660,7 @@
         public const string MES18018 = "工艺路线存在多个尾工序";
         public const string MES18019 = "条码:{SFCs}已包装，不允许操作";
         public const string MES18020 = "库存信息不存在";
-        public const string MES18021 = "物料库存不足"; 
+        public const string MES18021 = "物料库存不足";
 
 
         #endregion

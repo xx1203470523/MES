@@ -248,7 +248,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                     MaterialCode = item.MaterialCode,
                     MaterialName = item.MaterialName,
                     Version = item.Version,
-                    IsScrap = item.IsScrap
+                    IsScrap = item.IsScrap,
+                    ResCode = item.ResCode
                 });
             }
             return new PagedInfo<ManuSfcProduceViewDto>(manuSfcProduceDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);

@@ -124,6 +124,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
                 var sqlBuilder = new SqlBuilder();
                 var template = sqlBuilder.AddTemplate(GetWhSupplierEntitiesSqlTemplate);
                 sqlBuilder.Select("*");
+                sqlBuilder.Where("IsDeleted=0");
                 if (!string.IsNullOrWhiteSpace(whSupplierQuery.Code))
                 {
                     sqlBuilder.Where("Code=@Code");

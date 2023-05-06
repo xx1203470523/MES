@@ -153,6 +153,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                 Count = param.Count,
                 Base = codeRule.Base,
                 Increment = codeRule.Increment,
+                IgnoreChar= codeRule.IgnoreChar,
                 OrderLength = codeRule.OrderLength,
                 ResetType = codeRule.ResetType,
                 StartNumber = codeRule.StartNumber
@@ -208,6 +209,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                 CodeRuleKey = param.IsTest ? param.ProductId.ToString() + "Test" : param.ProductId.ToString(),
                 Count = param.Count,
                 Base = param.Base,
+                IgnoreChar= param.IgnoreChar??"",
                 Increment = param.Increment,
                 OrderLength = param.OrderLength,
                 ResetType = param.ResetType,

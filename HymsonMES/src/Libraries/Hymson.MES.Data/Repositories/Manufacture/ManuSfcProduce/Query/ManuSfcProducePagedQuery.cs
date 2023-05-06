@@ -51,6 +51,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public string[]? SfcArray { get; set; }
 
         /// <summary>
+        /// 资源编码
+        /// </summary>
+        public string? ResCode { get; set; }
+
+        /// <summary>
         /// 资源类型Id
         /// </summary>
         public long? ResourceTypeId { get; set; }
