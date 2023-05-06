@@ -1621,7 +1621,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             //工单
             var WorkOrderIds = manuSfcProduces.Select(it => it.WorkOrderId).ToArray();
             var workOrders = await _planWorkOrderRepository.GetByIdsAsync(WorkOrderIds);
-            PlanWorkOrderStatusEnum[] statusArr = { PlanWorkOrderStatusEnum.NotStarted, PlanWorkOrderStatusEnum.SendDown, PlanWorkOrderStatusEnum.Closed };
+            PlanWorkOrderStatusEnum[] statusArr = { PlanWorkOrderStatusEnum.NotStarted, PlanWorkOrderStatusEnum.Finish, PlanWorkOrderStatusEnum.Closed };
             var workOrdersOrLosck = workOrders.Where(it => statusArr.Contains(it.Status) || it.IsLocked == YesOrNoEnum.Yes);
             if (workOrdersOrLosck.Any())
             {
@@ -1661,7 +1661,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var workOrderQty = manuSfcProduces.Sum(it => it.Qty);
             //新工单
             var newPlanWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuUpdateSaveDto.WorkOrderId);
-            PlanWorkOrderStatusEnum[] statusArr = { PlanWorkOrderStatusEnum.NotStarted, PlanWorkOrderStatusEnum.SendDown, PlanWorkOrderStatusEnum.Closed };
+            PlanWorkOrderStatusEnum[] statusArr = { PlanWorkOrderStatusEnum.NotStarted, PlanWorkOrderStatusEnum.Finish, PlanWorkOrderStatusEnum.Closed };
             var workOrdersOrLosck = statusArr.Contains(newPlanWorkOrderEntity.Status) || newPlanWorkOrderEntity.IsLocked == YesOrNoEnum.Yes;
             if (workOrdersOrLosck)
             {
