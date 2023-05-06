@@ -214,9 +214,11 @@ namespace Hymson.MES.Services.Services.Plan
             var hasActivationWorkOrders= await _planWorkOrderActivationRepository.GetPlanWorkOrderActivationEntitiesAsync(new PlanWorkOrderActivationQuery() 
              {
                 SiteId=_currentSite.SiteId??0,
-                LineId= workCenterEntity.Id
-             });
-            if (hasActivationWorkOrders.Count() == bindActivationWorkOrder.WorkOrderIds.Count) 
+                LineId= workCenterEntity.Id,
+                WorkOrderIds= bindActivationWorkOrder.WorkOrderIds,
+            });
+
+            if (hasActivationWorkOrders.Count() != bindActivationWorkOrder.WorkOrderIds.Count) 
             {
                 throw new BusinessException(nameof(ErrorCode.MES16802));
             }

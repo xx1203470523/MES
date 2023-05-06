@@ -30,6 +30,11 @@ namespace Hymson.MES.Data.Repositories.Plan
         public long? WorkOrderId { get; set; }
 
         /// <summary>
+        /// 工单ids   兼容批量查询   上方 WorkOrderId 与 WorkOrderIds 只能保证一个有值
+        /// </summary>
+        public IEnumerable<long> WorkOrderIds { get; set; }
+
+        /// <summary>
         /// 线体id
         /// </summary>
         public long? LineId { get; set; }

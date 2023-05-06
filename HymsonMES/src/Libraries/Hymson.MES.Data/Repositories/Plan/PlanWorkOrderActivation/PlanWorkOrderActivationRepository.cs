@@ -205,6 +205,10 @@ namespace Hymson.MES.Data.Repositories.Plan
             {
                 sqlBuilder.Where(" WorkOrderId = @WorkOrderId ");
             }
+            if (planWorkOrderActivationQuery.WorkOrderIds!=null&& planWorkOrderActivationQuery.WorkOrderIds.Any())
+            {
+                sqlBuilder.Where(" WorkOrderId in @WorkOrderIds ");
+            }
             if (planWorkOrderActivationQuery.LineId.HasValue)
             {
                 sqlBuilder.Where(" LineId = @LineId ");
