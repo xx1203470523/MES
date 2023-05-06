@@ -212,6 +212,7 @@
         public const string MES12006 = "类程序 不能为空.";
         public const string MES12007 = "类程序 超过最大长度，最大长度为255.";
         public const string MES12008 = "备注 超过最大长度，最大长度为255.";
+        public const string MES12009 = "作业已经被使用无法删除";
         #endregion
 
         #region 工作中心 12100

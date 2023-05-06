@@ -50,6 +50,18 @@ namespace Hymson.MES.Data.Repositories.Integrated
             return await conn.QueryAsync<InteJobBusinessRelationEntity>(GetByIdsSql, new { ids = ids });
         }
 
+
+        /// <summary>
+        /// 根据JobIds批量获取数据
+        /// </summary>
+        /// <param name="jobIds"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteJobBusinessRelationEntity>> GetByJobIdsAsync(IEnumerable<long> jobIds)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<InteJobBusinessRelationEntity>(GetByJobIdsSql, new { jobIds = jobIds });
+        }
+
         /// <summary>
         /// 分页查询
         /// </summary>
@@ -189,5 +201,9 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `BusinessType`, `BusinessId`, `OrderNumber`, `JobId`, `IsUse`, `Parameter`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `inte_job_business_relation`  WHERE Id IN @ids ";
+        const string GetByJobIdsSql = @"SELECT 
+                                          `Id`, `SiteId`, `BusinessType`, `BusinessId`, `OrderNumber`, `JobId`, `IsUse`, `Parameter`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `inte_job_business_relation`  WHERE JobId IN @jobIds ";
     }
+
 }
