@@ -6,6 +6,7 @@
  *build datetime: 2023-03-17 05:02:26
  */
 
+using Hymson.MES.Core.Enums.Integrated;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,11 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// 产品id  物料
         /// </summary>
         public long ProductId { get; set; }
+
+        /// <summary>
+        /// 编码类型;1：过程控制序列码；2：包装序列码；
+        /// </summary>
+        public CodeRuleCodeTypeEnum? CodeType { get; set; }
 
     }
 }
