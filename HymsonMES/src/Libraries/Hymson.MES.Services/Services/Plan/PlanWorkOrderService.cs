@@ -280,7 +280,7 @@ namespace Hymson.MES.Services.Services.Plan
 
                 if (updateWorkOrderRealEndList.Any()) //对是需要修改为完工状态的做特殊处理： 给 工单记录表 更新 真实结束时间
                 {
-                    UpdateWorkOrderRealEndCommand command = new UpdateWorkOrderRealEndCommand()
+                    UpdateWorkOrderRealTimeCommand command = new UpdateWorkOrderRealTimeCommand()
                     {
                         UpdatedBy = _currentUser.UserName,
                         UpdatedOn = HymsonClock.Now(),

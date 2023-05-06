@@ -6,6 +6,8 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
+using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Utils;
@@ -43,9 +45,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
         /// <summary>
+        /// 仓储接口（工单信息）
+        /// </summary>
+        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
+
+        /// <summary>
         /// 仓储接口（工序维护）
         /// </summary>
         private readonly IProcProcedureRepository _procProcedureRepository;
+
 
         /// <summary>
         /// 构造函数
@@ -55,11 +63,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
         /// <param name="manuCommonService"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
         /// <param name="procProcedureRepository"></param>
         public ManuInStationService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonService manuCommonService,
             IManuSfcRepository manuSfcRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
+             IPlanWorkOrderRepository planWorkOrderRepository,
             IProcProcedureRepository procProcedureRepository)
         {
             _currentUser = currentUser;
@@ -67,6 +77,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
             _manuCommonService = manuCommonService;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
+            _planWorkOrderRepository = planWorkOrderRepository;
             _procProcedureRepository = procProcedureRepository;
         }
 
@@ -110,6 +121,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
 
             // 更改状态
             rows += await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
+
+            // 更新工单统计表的 RealStart
+            rows += await _planWorkOrderRepository.UpdatePlanWorkOrderRealStartByWorkOrderIdAsync(new UpdateWorkOrderRealTimeCommand
+            {
+                UpdatedOn = sfcProduceEntity.UpdatedOn,
+                UpdatedBy = sfcProduceEntity.UpdatedBy,
+                WorkOrderIds = new long[] { sfcProduceEntity.WorkOrderId }
+            });
 
             return rows;
         }

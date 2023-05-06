@@ -8,7 +8,6 @@ using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using System.Security.Policy;
 
 namespace Hymson.MES.Data.Repositories.Plan
 {
@@ -73,7 +72,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         public async Task<PlanWorkOrderEntity> GetByCodeAsync(PlanWorkOrderQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderEntity>(GetByCodeSql, new { OrderCode=query.OrderCode, SiteId =query.SiteId});
+            return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderEntity>(GetByCodeSql, new { OrderCode = query.OrderCode, SiteId = query.SiteId });
         }
 
         /// <summary>
@@ -313,11 +312,22 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
 
         /// <summary>
+        /// 更新生产订单记录的实际开始时间
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> UpdatePlanWorkOrderRealStartByWorkOrderIdAsync(UpdateWorkOrderRealTimeCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateRecordRealStartSql, command);
+        }
+
+        /// <summary>
         /// 更新生产订单记录的实际结束时间
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> UpdatePlanWorkOrderRealEndByWorkOrderIdAsync(UpdateWorkOrderRealEndCommand command) 
+        public async Task<int> UpdatePlanWorkOrderRealEndByWorkOrderIdAsync(UpdateWorkOrderRealTimeCommand command)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateRecordRealEndSql, command);
@@ -391,7 +401,7 @@ namespace Hymson.MES.Data.Repositories.Plan
             "WHERE PWO.IsDeleted = 0 AND PWO.WorkCenterType = @WorkCenterType AND PWOA.LineId = @workLineId ";
         const string UpdateWorkOrderStatusSql = @"UPDATE `plan_work_order` SET Status = @Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string UpdateWorkOrderLockedSql = @"UPDATE `plan_work_order` SET IsLocked = @IsLocked, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
-
-        const string UpdateRecordRealEndSql = "UPDATE plan_work_order_record SET RealEnd=@UpdatedOn, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn WHERE WorkOrderId in @WorkOrderIds AND IsDeleted=0 ";
+        const string UpdateRecordRealStartSql = "UPDATE plan_work_order_record SET RealStart = @UpdatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND RealStart IS NULL AND WorkOrderId IN @WorkOrderIds ";
+        const string UpdateRecordRealEndSql = "UPDATE plan_work_order_record SET RealEnd = @UpdatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE WorkOrderId IN @WorkOrderIds AND IsDeleted = 0 ";
     }
 }
