@@ -94,6 +94,8 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
 
             defaultDto.Content?.Add("PackageCom", $"{isShow}".ToString());
             defaultDto.Content?.Add("BadEntryCom", "False");
+            if (param.ContainsKey("IsClear")) defaultDto.Content?.Add("IsClear", param["IsClear"]);
+
             defaultDto.Message = ""; // $"条码{bo.SFC}" + (isShow ? "开始组装！" : "已经完成组装，无需重复组装！");
 
             return defaultDto;

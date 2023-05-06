@@ -134,7 +134,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             IProcProcedureRepository procProcedureRepository,
             IProcMaterialRepository procMaterialRepository,
             IProcMaskCodeRuleRepository procMaskCodeRuleRepository,
-            IWhMaterialInventoryRepository whMaterialInventoryRepository, 
+            IWhMaterialInventoryRepository whMaterialInventoryRepository,
             ILocalizationService localizationService)
         {
             _currentSite = currentSite;
@@ -541,7 +541,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 }
             }
         }
-
 
         /// <summary>
         /// 批量验证条码是否锁定

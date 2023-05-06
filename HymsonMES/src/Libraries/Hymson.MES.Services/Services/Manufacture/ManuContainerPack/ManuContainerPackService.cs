@@ -13,10 +13,12 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -24,6 +26,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using MySql.Data.MySqlClient;
+using System.Collections.Generic;
 using System.Reflection.Emit;
 using System.Transactions;
 
@@ -42,6 +45,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         private readonly IManuContainerPackRepository _manuContainerPackRepository;
         private readonly IProcMaterialRepository _procMaterialRepository;
+        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
         private readonly AbstractValidator<ManuContainerPackCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ManuContainerPackModifyDto> _validationModifyRules;
         private readonly IManuContainerPackRecordService _manuContainerPackRecordService;
@@ -52,6 +56,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
         public ManuContainerPackService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuContainerPackRepository manuContainerPackRepository,
+            IPlanWorkOrderRepository planWorkOrderRepository,
             IManuContainerPackRecordService manuContainerPackRecordService,
             AbstractValidator<ManuContainerPackCreateDto> validationCreateRules,
             AbstractValidator<ManuContainerPackModifyDto> validationModifyRules,
@@ -61,6 +66,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _currentUser = currentUser;
             _currentSite = currentSite;
             _manuContainerPackRepository = manuContainerPackRepository;
+            _planWorkOrderRepository = planWorkOrderRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _procMaterialRepository = procMaterialRepository;
@@ -127,7 +133,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             //生成删除记录
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
-                await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(containerBarCodeId, _currentSite.SiteId??0).ContinueWith(async t =>
+                await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(containerBarCodeId, _currentSite.SiteId ?? 0).ContinueWith(async t =>
                 {
                     var packs = t.Result.Select(m =>
                     {
@@ -176,6 +182,8 @@ namespace Hymson.MES.Services.Services.Manufacture
         private async Task<List<ManuContainerPackDto>> PrepareManuContainerPackDtos(PagedInfo<ManuContainerPackView> pagedInfo)
         {
             var manuContainerPackDtos = new List<ManuContainerPackDto>();
+            //工单信息
+            IEnumerable<PlanWorkOrderEntity> planWorkOrderList = new List<PlanWorkOrderEntity>();
             //批量查询物料信息
             IEnumerable<ProcMaterialEntity> procMaterialList = new List<ProcMaterialEntity>();
             if (pagedInfo.Data.Any())
@@ -185,7 +193,15 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     procMaterialList = await _procMaterialRepository.GetByIdsAsync(productIds);
                 }
+
+                //批量查询工单信息
+                var workOrderIds = pagedInfo.Data.Select(c => c.WorkOrderId).ToArray();
+                if (workOrderIds.Any())
+                {
+                    planWorkOrderList = await _planWorkOrderRepository.GetByIdsAsync(workOrderIds);
+                }
             }
+
             //转换Dto
             foreach (var manuContainerPackView in pagedInfo.Data)
             {
@@ -196,6 +212,13 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     manuContainerPackDto.MaterialCode = procMater.MaterialCode;
                 }
+                //转换工单编码
+                var planWorkOrder = planWorkOrderList.Where(c => c.Id == manuContainerPackView.WorkOrderId)?.FirstOrDefault();
+                if (planWorkOrder != null)
+                {
+                    manuContainerPackDto.WorkOrderCode = planWorkOrder.OrderCode;
+                }
+
                 manuContainerPackDtos.Add(manuContainerPackDto);
             }
 

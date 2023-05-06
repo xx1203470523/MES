@@ -10,6 +10,7 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Plan;
@@ -238,6 +239,7 @@ namespace Hymson.MES.Services.Services.Plan
             #endregion
 
             List<PlanWorkOrderEntity> planWorkOrderEntities = new List<PlanWorkOrderEntity>();
+            List<long> updateWorkOrderRealEndList = new List<long>();
             foreach (var item in parms)
             {
                 planWorkOrderEntities.Add(new PlanWorkOrderEntity()
@@ -248,6 +250,12 @@ namespace Hymson.MES.Services.Services.Plan
                     UpdatedBy = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now()
                 });
+
+                //对是需要修改为完工状态的做特殊处理： 给 工单记录表 更新 真实结束时间
+                if (item.Status == PlanWorkOrderStatusEnum.Finish) 
+                {
+                    updateWorkOrderRealEndList.Add(item.Id);
+                }
             }
 
             //组装工单状态变化记录
@@ -269,6 +277,17 @@ namespace Hymson.MES.Services.Services.Plan
             using (TransactionScope ts = new TransactionScope())
             {
                 var response = await _planWorkOrderRepository.ModifyWorkOrderStatusAsync(planWorkOrderEntities);
+
+                if (updateWorkOrderRealEndList.Any()) //对是需要修改为完工状态的做特殊处理： 给 工单记录表 更新 真实结束时间
+                {
+                    UpdateWorkOrderRealTimeCommand command = new UpdateWorkOrderRealTimeCommand()
+                    {
+                        UpdatedBy = _currentUser.UserName,
+                        UpdatedOn = HymsonClock.Now(),
+                        WorkOrderIds = updateWorkOrderRealEndList.ToArray()
+                    };
+                    await _planWorkOrderRepository.UpdatePlanWorkOrderRealEndByWorkOrderIdAsync(command);
+                }
 
                 await _planWorkOrderStatusRecordRepository.InsertsAsync(planWorkOrderStatusRecordEntities);
 

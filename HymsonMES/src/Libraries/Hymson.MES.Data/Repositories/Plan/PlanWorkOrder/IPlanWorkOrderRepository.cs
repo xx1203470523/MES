@@ -7,16 +7,9 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Plan;
-using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
-using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Plan
 {
@@ -166,5 +159,20 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="param"></param>
         /// <returns></returns>
         Task<int> InsertPlanWorkOrderRecordAsync(PlanWorkOrderRecordEntity param);
+
+        /// <summary>
+        /// 更新生产订单记录的实际开始时间
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> UpdatePlanWorkOrderRealStartByWorkOrderIdAsync(UpdateWorkOrderRealTimeCommand command);
+
+        /// <summary>
+        /// 更新生产订单记录的实际结束时间
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> UpdatePlanWorkOrderRealEndByWorkOrderIdAsync(UpdateWorkOrderRealTimeCommand command);
+
     }
 }
