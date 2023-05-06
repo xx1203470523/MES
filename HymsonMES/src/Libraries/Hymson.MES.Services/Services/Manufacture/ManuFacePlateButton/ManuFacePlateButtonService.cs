@@ -317,6 +317,9 @@ namespace Hymson.MES.Services.Services.Manufacture
             // 根据 buttonJobs 读取对应的job对象
             var jobs = await _inteJobRepository.GetByIdsAsync(buttonJobs.Select(s => s.JobId).ToArray());
 
+            // 是否清除条码
+            if (buttonJobs.Any(a => a.IsClear) == true) dto.Param?.Add("IsClear", "True");
+
             // 执行Job
             result = await _jobCommonService.ExecuteJobAsync(jobs, dto.Param);
             return result;

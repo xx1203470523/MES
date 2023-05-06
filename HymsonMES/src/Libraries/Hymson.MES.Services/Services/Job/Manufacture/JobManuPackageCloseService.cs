@@ -104,6 +104,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             defaultDto.Content?.Add("Operation", ManuContainerPackagJobReturnTypeEnum.JobManuPackageCloseService.ParseToInt().ToString());
             defaultDto.Content?.Add("Status", $"{status}".ToString());
             defaultDto.Content?.Add("Success", success);
+
             return defaultDto;
         }
 
