@@ -18,7 +18,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfc.View
         /// <summary>
         /// 使用状态
         /// </summary>
-        public PlanSFCUsedStatusEnum IsUsed { get; set; }
+        public YesOrNoEnum IsUsed { get; set; }
         /// <summary>
         /// 生成时间
         /// </summary>

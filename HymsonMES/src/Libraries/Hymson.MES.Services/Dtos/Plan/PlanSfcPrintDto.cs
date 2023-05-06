@@ -21,7 +21,7 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// <summary>
         /// 是否使用
         /// </summary>
-        public PlanSFCUsedStatusEnum? IsUsed { get; set; }
+        public YesOrNoEnum? IsUsed { get; set; }
     }
 
     /// <summary>
@@ -40,7 +40,7 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// <summary>
         /// 使用状态
         /// </summary>
-        public PlanSFCUsedStatusEnum IsUsed { get; set; }
+        public YesOrNoEnum IsUsed { get; set; }
         /// <summary>
         /// 生成时间
         /// </summary>
