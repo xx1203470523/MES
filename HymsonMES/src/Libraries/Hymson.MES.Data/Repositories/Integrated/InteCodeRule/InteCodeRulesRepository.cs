@@ -47,7 +47,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -61,7 +61,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         public async Task<InteCodeRulesEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<InteCodeRulesEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<InteCodeRulesEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -80,10 +80,10 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InteCodeRulesEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<InteCodeRulesEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<InteCodeRulesEntity>(GetByIdsSql, new { ids = ids});
+            return await conn.QueryAsync<InteCodeRulesEntity>(GetByIdsSql, new { ids = ids });
         }
 
         /// <summary>
@@ -161,9 +161,13 @@ namespace Hymson.MES.Data.Repositories.Integrated
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
 
-            if (inteCodeRulesQuery.ProductId>0) 
+            if (inteCodeRulesQuery.ProductId > 0)
             {
                 sqlBuilder.Where(" ProductId=@ProductId ");
+            }
+            if (inteCodeRulesQuery.CodeType.HasValue)
+            {
+                sqlBuilder.Where(" CodeType=@CodeType ");
             }
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);

@@ -561,8 +561,13 @@ namespace Hymson.MES.Services.Services.Manufacture
                 manuContainerBarcodeEntity.ContainerId = entityByRelation.Id;
                 manuContainerBarcodeEntity.ProductId = ProductId;
 
-                var inteCodeRulesEntity = await _inteCodeRulesRepository.GetInteCodeRulesByProductIdAsync(ProductId);
-                if (inteCodeRulesEntity == null)
+                var inteCodeRulesResult = await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery
+                {
+                    ProductId = ProductId,
+                    CodeType = CodeRuleCodeTypeEnum.PackagingSeqCode
+                });
+                var inteCodeRulesEntity = inteCodeRulesResult.FirstOrDefault();
+                if (inteCodeRulesEntity == null || inteCodeRulesEntity.ProductId != ProductId)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16501)).WithData("product", material.MaterialCode);
                 }
