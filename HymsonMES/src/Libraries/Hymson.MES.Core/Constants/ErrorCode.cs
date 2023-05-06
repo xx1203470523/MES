@@ -596,7 +596,7 @@
         public const string MES16710 = "不识别的类型：{key}";
         public const string MES16708 = "产品条码不能为空";
         public const string MES16709 = "作业返回空，请检查作业是否正确配置";
-        public const string MES16711 = "容器包装，配置面板不允许排队产品";
+        public const string MES16711 = "容器包装，配置面板不允许活动产品";
         public const string MES16712 = "容器包装，配置面板不允许完成产品";
         public const string MES16713 = "容器包装，配置面板不允许排队产品";
         public const string MES16714 = "容器包装，工序信息未找到";
@@ -606,7 +606,7 @@
         public const string MES16718 = "容器包装，未找到该条码的子级包装记录";
         public const string MES16719 = "容器包装，物料编码没有维护容器规格";
         public const string MES16720 = "容器包装，条码已报废";
-        public const string MES16721 = "容器包装，该条码{sfc}已装箱{packId}";
+        public const string MES16721 = "容器包装，该条码{sfc}已装箱{barcode}";
         public const string MES16722 = "容器包装，该包装{packId}已关闭或删除";
         #endregion
 

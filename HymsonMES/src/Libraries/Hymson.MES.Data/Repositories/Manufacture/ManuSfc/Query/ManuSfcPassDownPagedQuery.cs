@@ -26,6 +26,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 是否使用
         /// </summary>
-        public PlanSFCUsedStatusEnum? IsUsed { get; set; }
+        public YesOrNoEnum? IsUsed { get; set; }
     }
 }

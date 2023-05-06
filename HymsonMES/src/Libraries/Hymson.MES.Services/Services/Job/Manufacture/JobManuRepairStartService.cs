@@ -113,6 +113,8 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             var rows = await _manuRepairService.StartAsync(sfcProduceEntity);
 
             defaultDto.Content?.Add("TableCom", (rows > 0).ToString());
+            if (param.ContainsKey("IsClear")) defaultDto.Content?.Add("IsClear", param["IsClear"]);
+
             return defaultDto;
         }
 

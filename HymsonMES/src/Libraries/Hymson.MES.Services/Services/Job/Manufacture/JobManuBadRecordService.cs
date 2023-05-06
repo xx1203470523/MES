@@ -108,6 +108,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             var isShow = manuProductBadRecordViews == null || manuProductBadRecordViews.Any() == false;
 
             defaultDto.Content?.Add("BadEntryCom", $"{isShow}".ToString());
+            if (param.ContainsKey("IsClear")) defaultDto.Content?.Add("IsClear", param["IsClear"]);
             defaultDto.Message = $"条码{bo.SFC}" + (isShow ? "开始录入" : "已经完成录入，无需重复录入！");
 
             return defaultDto;

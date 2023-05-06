@@ -103,6 +103,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             defaultDto.Content?.Add("PackageCom", "False");
             defaultDto.Content?.Add("BadEntryCom", "False");
             defaultDto.Content?.Add("Qty", "1");
+            if (param.ContainsKey("IsClear")) defaultDto.Content?.Add("IsClear", param["IsClear"]);
 
             defaultDto.Message = $"条码{param["SFC"]}已于NF排队！";
             return defaultDto;

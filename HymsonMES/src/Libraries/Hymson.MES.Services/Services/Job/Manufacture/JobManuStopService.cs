@@ -107,6 +107,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
 
             defaultDto.Content?.Add("PackageCom", "False");
             defaultDto.Content?.Add("BadEntryCom", "False");
+            if (param.ContainsKey("IsClear")) defaultDto.Content?.Add("IsClear", param["IsClear"]);
 
             defaultDto.Message = $"条码{param["SFC"]}已中止！";
             return defaultDto;

@@ -83,6 +83,10 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
         {
             var sql = GetByMaterialIdSql;
             if (query.DefinitionMethod == DefinitionMethodEnum.MaterialGroup) sql = GetByMaterialGroupIdSql;
+            //是否转入状态条件
+            if (query.Status.HasValue) {
+                sql += " AND Status = @Status";
+            }
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<InteContainerEntity>(sql, query);
@@ -103,7 +107,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
             sqlBuilder.OrderBy("IC.UpdatedOn DESC");
 
             sqlBuilder.Select("IC.Id, IC.Remark, IC.Status, IC.DefinitionMethod, IC.Level, IC.Maximum, IC.Minimum, IC.UpdatedBy, IC.UpdatedOn");
-            sqlBuilder.Select("(CASE IC.DefinitionMethod WHEN 1 THEN M.MaterialName WHEN 2 THEN MG.GroupName ELSE '' END) AS Name, M.Version");
+            sqlBuilder.Select("(CASE IC.DefinitionMethod WHEN 1 THEN M.MaterialCode WHEN 2 THEN MG.GroupCode ELSE '' END) AS Name, M.Version");
             sqlBuilder.LeftJoin("proc_material M ON IC.MaterialId = M.Id");
             sqlBuilder.LeftJoin("proc_material_group MG ON IC.MaterialGroupId = MG.Id");
 
@@ -125,7 +129,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
             if (!string.IsNullOrWhiteSpace(pagedQuery.Name))
             {
                 pagedQuery.Name = $"%{pagedQuery.Name}%";
-                sqlBuilder.Where("(M.MaterialName LIKE @Name OR MG.GroupName LIKE @Name)");
+                sqlBuilder.Where("(M.MaterialCode LIKE @Name OR MG.GroupCode LIKE @Name)");
             }
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.Version))
