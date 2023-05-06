@@ -441,6 +441,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long? ResourceId { get; set; }
 
         /// <summary>
+        /// 资源编码
+        /// </summary>
+        public string? ResCode { get; set; }
+
+        /// <summary>
         /// 锁定状态
         /// </summary>
         public int? Lock { get; set; }
@@ -530,6 +535,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 是否报废
         /// </summary>
         public TrueOrFalseEnum? IsScrap { get; set; }
+
+        /// <summary>
+        /// 资源编码
+        /// </summary>
+        public string ResCode { get; set; }
     }
 
     /// <summary>

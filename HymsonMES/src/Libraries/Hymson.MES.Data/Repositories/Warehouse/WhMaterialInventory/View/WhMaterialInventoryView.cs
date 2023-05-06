@@ -106,6 +106,11 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// 物料批次大小
         /// </summary>
         public string Batch { get; set; }
+
+        /// <summary>
+        /// 标包
+        /// </summary>
+        public int PackageNum { get; set; }
         /// <summary>
         /// 物料版本
         /// </summary>
