@@ -20,16 +20,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         public string LadeBarCode { get; set; }
         public long ProductId { get; set; }
+        /// <summary>
+        /// 工单号
+        /// </summary>
+        public long WorkOrderId { get; set; }
 
         /// <summary>
-        /// 装载人
+        /// 容器包装数量
         /// </summary>
-        public string CreatedBy { get; set; }
+        public int Count { get; set; }
 
-        /// <summary>
-        /// 装载时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
 
     }
 }
