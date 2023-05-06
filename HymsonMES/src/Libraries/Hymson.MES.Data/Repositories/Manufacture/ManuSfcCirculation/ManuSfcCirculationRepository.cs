@@ -218,6 +218,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where(" IsDeleted=0 ");
             sqlBuilder.Select("*");
 
+            sqlBuilder.Where(" IsDisassemble=0 "); //筛选出未拆解的
+
             sqlBuilder.Where(" SiteId=@SiteId ");
 
             //where sc.IsDeleted = 0
