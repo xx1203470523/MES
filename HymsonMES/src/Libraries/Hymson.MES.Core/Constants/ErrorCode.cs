@@ -342,7 +342,7 @@
 
         #endregion
 
-        #region 物料台账  15200
+        #region 物料台账 15200
         public const string MES15200 = "物料台账错误";
         public const string MES15201 = "物料编码不能为空";
         public const string MES15202 = "物料版本不能为空";
@@ -398,7 +398,11 @@
         public const string MES15410 = "SFC {sfcs}已存在返修信息，不可再执行当前操作!";
         #endregion
 
-        #region 工单  16000
+        #region 物料加载 15500
+        public const string MES15501 = "当前线体无激活工单，请先激活工单！";
+        #endregion
+
+        #region 工单 16000
         public const string MES16000 = "工单错误";
         public const string MES16001 = "此工单编码{orderCode}在系统已经存在！";
         public const string MES16002 = "添加生产工单失败！";

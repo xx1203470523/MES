@@ -67,6 +67,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
         /// <summary>
+        ///  仓储（工单激活）
+        /// </summary>
+        private readonly IPlanWorkOrderActivationRepository _planWorkOrderActivationRepository;
+
+        /// <summary>
         ///  仓储（Bom明细）
         /// </summary>
         private readonly IProcBomDetailRepository _procBomDetailRepository;
@@ -114,6 +119,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// <param name="procLoadPointRepository"></param>
         /// <param name="procLoadPointLinkMaterialRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
+        /// <param name="planWorkOrderActivationRepository"></param>
         /// <param name="procBomDetailRepository"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
@@ -126,6 +132,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             IProcLoadPointRepository procLoadPointRepository,
             IProcLoadPointLinkMaterialRepository procLoadPointLinkMaterialRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
+            IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
             IProcBomDetailRepository procBomDetailRepository,
             IProcMaterialRepository procMaterialRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
@@ -140,6 +147,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             _procLoadPointRepository = procLoadPointRepository;
             _procLoadPointLinkMaterialRepository = procLoadPointLinkMaterialRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
+            _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
             _procBomDetailRepository = procBomDetailRepository;
             _procMaterialRepository = procMaterialRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
@@ -553,6 +561,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
 
             // 保留指定的工单
             if (workOrderId.HasValue == true) workOrders = workOrders.Where(w => w.Id == workOrderId.Value);
+
+            // 判断是否有激活中的工单
+            var planWorkOrderActivationEntities = await _planWorkOrderActivationRepository.GetByWorkOrderIdsAsync(workOrders.Select(s => s.Id).ToArray());
+            if (planWorkOrderActivationEntities == null || planWorkOrderActivationEntities.Any() == false)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15501));
+            }
 
             // 通过工单查询BOM
             return workOrders.Select(s => s.ProductBOMId);
