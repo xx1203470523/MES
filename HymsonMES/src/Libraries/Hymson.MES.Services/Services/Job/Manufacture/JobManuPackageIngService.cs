@@ -79,7 +79,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
                 ProcedureId = param["ProcedureId"].ParseToLong(),
                 ResourceId = param["ResourceId"].ParseToLong()
             };
-
+            if (param.ContainsKey("IsClear")) defaultDto.Content?.Add("IsClear", param["IsClear"]);
             // 获取生产条码信息
             //二三级包装时候 条码就是包装码了，不需要校验条码
             // var (sfcProduceEntity, _) = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
