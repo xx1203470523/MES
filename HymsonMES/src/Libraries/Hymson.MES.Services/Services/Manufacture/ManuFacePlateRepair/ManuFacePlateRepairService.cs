@@ -386,7 +386,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var model = new ManuFacePlateRepairProductInfoDto
             {
                 SFC = manuSfcProduceEntit.SFC,
-                Status = manuSfcProduceEntit.Status.ToString(),
+                Status = status,// manuSfcProduceEntit.Status.ToString(),
                 ProcedureCode = procProcedureEntit.Code,
                 OrderCode = planWorkOrderEntit.OrderCode,
                 MaterialCode = procMaterialEntit.MaterialCode,
