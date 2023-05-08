@@ -490,6 +490,7 @@
         public const string MES16316 = "SFC条码{SFC}和资源不匹配！";
         public const string MES16317 = "工序和资源不匹配！";
         public const string MES16318 = "SFC状态为已完成，不允许操作！";
+        public const string MES16319 = "SFC条码{SFC}已存在返修信息，不允许操作。";
         #endregion
 
         #region 生产

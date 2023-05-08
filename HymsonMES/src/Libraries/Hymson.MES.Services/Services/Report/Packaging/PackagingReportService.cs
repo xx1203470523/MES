@@ -139,6 +139,7 @@ namespace Hymson.MES.Services.Services.Report
         {
             var manuContainerBarcodePagedQuery = queryDto.ToQuery<ManuContainerBarcodePagedQuery>();
             manuContainerBarcodePagedQuery.SiteId = _currentSite.SiteId;
+            manuContainerBarcodePagedQuery.PackLevel=(int)LevelEnum.One;
             var pagedInfo = await _manuContainerBarcodeRepository.GetPagedListAsync(manuContainerBarcodePagedQuery);
 
             var list = pagedInfo.Data;
@@ -153,6 +154,7 @@ namespace Hymson.MES.Services.Services.Report
                     BarCode = item.BarCode,
                     ContainerBarCodeId = item.ContainerId,
                     Status = item.Status,
+                    PackLevel=item.PackLevel,
                     CreatedBy = item.CreatedBy,
                     CreatedOn = item.CreatedOn,
                     PackQuantity = containerPackEntities.Where(x => x.ContainerBarCodeId == item.Id).Count()
@@ -170,6 +172,7 @@ namespace Hymson.MES.Services.Services.Report
         {
             var manuContainerBarcodePagedQuery = queryDto.ToQuery<ManuContainerBarcodePagedQuery>();
             manuContainerBarcodePagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            manuContainerBarcodePagedQuery.PackLevel = (int)LevelEnum.One;
             var pagedInfo = await _manuContainerBarcodeRepository.GetPagedListAsync(manuContainerBarcodePagedQuery);
 
             //实体到DTO转换 装载数据

@@ -160,9 +160,9 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long Id { get; set; }
 
         /// <summary>
-        /// 主物料数据收集方式
+        /// 当前工序
         /// </summary>
-        public MaterialSerialNumberEnum? SerialNumber { get; set; }
+        public long ProcedureId { get; set; }
     }
 
     public class InProductDismantleAddDto
