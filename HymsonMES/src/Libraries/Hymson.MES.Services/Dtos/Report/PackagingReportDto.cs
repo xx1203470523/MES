@@ -108,6 +108,11 @@ namespace Hymson.MES.Services.Dtos.Report
         public int Status { get; set; } = 1;
 
         /// <summary>
+        /// 包装等级;1：一级；2：二级；3：三级；
+        /// </summary>
+        public int PackLevel { get; set; }
+
+        /// <summary>
         /// 包装人
         /// </summary>
         public string CreatedBy { get; set; }
