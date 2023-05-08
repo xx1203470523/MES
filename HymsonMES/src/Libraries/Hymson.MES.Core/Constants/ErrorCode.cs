@@ -235,6 +235,8 @@
         public const string MES12116 = "未配置产线对应的资源！";
         public const string MES12117 = "存在已被其他产线关联的资源！";
         public const string MES12118 = "当前线体已激活多个工单，需取消激活工单，剩余激活工单<={maxCount}时才能完成设置！";
+        public const string MES12119 = "不能配置重复的车间/产线";
+        public const string MES12120 = "不能配置重复的资源";
         #endregion
 
         #region 编码规则 12400

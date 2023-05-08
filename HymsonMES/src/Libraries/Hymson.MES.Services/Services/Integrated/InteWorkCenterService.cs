@@ -188,6 +188,13 @@ namespace Hymson.MES.Services.Services.Integrated
                         CreatedBy = _currentUser.UserName,
                         UpdatedBy = _currentUser.UserName
                     }));
+
+                    // 是否存在相同车间/产线
+                    if (inteWorkCenterRelations.GroupBy(g => g.SubWorkCenterId).Count()
+                        < inteWorkCenterRelations.Count)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES12119));
+                    }
                     break;
                 case WorkCenterTypeEnum.Line:
                     param.ResourceIds ??= new List<long>();
@@ -201,6 +208,13 @@ namespace Hymson.MES.Services.Services.Integrated
                         CreatedBy = _currentUser.UserName,
                         UpdatedBy = _currentUser.UserName
                     }));
+
+                    // 是否存在相同资源
+                    if (inteWorkCenterResourceRelations.GroupBy(g => g.ResourceId).Count()
+                        < inteWorkCenterResourceRelations.Count)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES12120));
+                    }
 
                     // 判断资源是否被重复绑定
                     var workCenterIds = await _inteWorkCenterRepository.GetWorkCenterIdByResourceIdAsync(param.ResourceIds);
@@ -267,10 +281,17 @@ namespace Hymson.MES.Services.Services.Integrated
                         CreatedBy = _currentUser.UserName,
                         UpdatedBy = _currentUser.UserName
                     }));
+
+                    // 是否存在相同车间/产线
+                    if (inteWorkCenterRelations.GroupBy(g => g.SubWorkCenterId).Count()
+                        < inteWorkCenterRelations.Count)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES12119));
+                    }
                     break;
                 case WorkCenterTypeEnum.Line:
                     param.ResourceIds ??= new List<long>();
-                    if (param.ResourceIds.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES12116));
+                    //if (param.ResourceIds.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES12116));
 
                     inteWorkCenterResourceRelations.AddRange(param.ResourceIds.Select(s => new InteWorkCenterResourceRelation
                     {
@@ -280,6 +301,13 @@ namespace Hymson.MES.Services.Services.Integrated
                         CreatedBy = _currentUser.UserName,
                         UpdatedBy = _currentUser.UserName
                     }));
+
+                    // 是否存在相同资源
+                    if (inteWorkCenterResourceRelations.GroupBy(g => g.ResourceId).Count()
+                        < inteWorkCenterResourceRelations.Count)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES12120));
+                    }
 
                     // 判断资源是否被重复绑定
                     var workCenterIds = await _inteWorkCenterRepository.GetWorkCenterIdByResourceIdAsync(param.ResourceIds);
