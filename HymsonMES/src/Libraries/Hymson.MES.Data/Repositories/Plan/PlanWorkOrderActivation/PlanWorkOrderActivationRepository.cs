@@ -1,19 +1,9 @@
-/*
- *creator: Karl
- *
- *describe: 工单激活 仓储类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-03-29 10:23:51
- */
-
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
-using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -26,10 +16,15 @@ namespace Hymson.MES.Data.Repositories.Plan
     {
         private readonly ConnectionOptions _connectionOptions;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
         public PlanWorkOrderActivationRepository(IOptions<ConnectionOptions> connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
         }
+
 
         /// <summary>
         /// 删除（软删除）
@@ -92,7 +87,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<PlanWorkOrderActivationEntity>> GetByWorkOrderIdsAsync(long []orderIds)
+        public async Task<IEnumerable<PlanWorkOrderActivationEntity>> GetByWorkOrderIdsAsync(long[] orderIds)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<PlanWorkOrderActivationEntity>(GetByworkOrderIdsSql, new { WorkOrderIds = orderIds });
@@ -107,6 +102,17 @@ namespace Hymson.MES.Data.Repositories.Plan
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<PlanWorkOrderActivationEntity>(GetByIdsSql, new { ids = ids });
+        }
+
+        /// <summary>
+        /// 根据产线ID批量获取数据
+        /// </summary>
+        /// <param name="workCenterId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<PlanWorkOrderActivationEntity>> GetByWorkCenterIdAsync(long workCenterId)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<PlanWorkOrderActivationEntity>(GetByWorkCenterIdSql, new { workCenterId });
         }
 
         /// <summary>
@@ -205,7 +211,7 @@ namespace Hymson.MES.Data.Repositories.Plan
             {
                 sqlBuilder.Where(" WorkOrderId = @WorkOrderId ");
             }
-            if (planWorkOrderActivationQuery.WorkOrderIds!=null&& planWorkOrderActivationQuery.WorkOrderIds.Any())
+            if (planWorkOrderActivationQuery.WorkOrderIds != null && planWorkOrderActivationQuery.WorkOrderIds.Any())
             {
                 sqlBuilder.Where(" WorkOrderId in @WorkOrderIds ");
             }
@@ -264,6 +270,9 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class PlanWorkOrderActivationRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT 
@@ -317,6 +326,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string GetByIdsSql = @"SELECT
       `Id`, `SiteId`, `WorkOrderId`, `LineId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
     FROM `plan_work_order_activation`  WHERE Id IN @ids ";
+        const string GetByWorkCenterIdSql = "SELECT * FROM plan_work_order_activation WHERE IsDeleted = 0 AND LineId = @workCenterId";
         const string DeleteTrueSql = @"DELETE FROM  plan_work_order_activation where Id=@Id ";
     }
 }
