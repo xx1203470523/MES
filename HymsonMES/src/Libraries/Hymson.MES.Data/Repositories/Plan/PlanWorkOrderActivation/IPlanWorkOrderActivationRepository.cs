@@ -1,18 +1,6 @@
-/*
- *creator: Karl
- *
- *describe: 工单激活仓储类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-03-29 10:23:51
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Data.Repositories.Common.Command;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Plan
 {
@@ -97,6 +85,13 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<IEnumerable<PlanWorkOrderActivationEntity>> GetByIdsAsync(long[] ids);
+
+        /// <summary>
+        /// 根据产线ID批量获取数据
+        /// </summary>
+        /// <param name="workCenterId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<PlanWorkOrderActivationEntity>> GetByWorkCenterIdAsync(long workCenterId);
 
         /// <summary>
         /// 获取List

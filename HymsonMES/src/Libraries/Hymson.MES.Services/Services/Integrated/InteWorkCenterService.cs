@@ -12,6 +12,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
+using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated.IIntegratedService;
 using Hymson.Snowflake;
@@ -32,25 +33,29 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly AbstractValidator<InteWorkCenterCreateDto> _validationCreateRules;
         private readonly AbstractValidator<InteWorkCenterModifyDto> _validationModifyRules;
         private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
+        private readonly IPlanWorkOrderActivationRepository _planWorkOrderActivationRepository;
 
         /// <summary>
-        /// 工作中心表服务
+        /// 构造函数
         /// </summary>
-        /// <param name="inteWorkCenterRepository"></param>
-        /// <param name="validationCreateRules"></param>
-        /// <param name="validationModifyRules"></param>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
+        /// <param name="validationCreateRules"></param>
+        /// <param name="validationModifyRules"></param>
+        /// <param name="inteWorkCenterRepository"></param>
+        /// <param name="planWorkOrderActivationRepository"></param>
         public InteWorkCenterService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<InteWorkCenterCreateDto> validationCreateRules,
             AbstractValidator<InteWorkCenterModifyDto> validationModifyRules,
-            IInteWorkCenterRepository inteWorkCenterRepository)
+            IInteWorkCenterRepository inteWorkCenterRepository,
+            IPlanWorkOrderActivationRepository planWorkOrderActivationRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _inteWorkCenterRepository = inteWorkCenterRepository;
+            _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
         }
 
 
@@ -228,6 +233,18 @@ namespace Hymson.MES.Services.Services.Integrated
 
             var entity = await _inteWorkCenterRepository.GetByIdAsync(param.Id)
                 ?? throw new BusinessException(nameof(ErrorCode.MES12111));
+
+            // 如果有修改混线类型（从允许混线修改为不允许混线）
+            if (entity.Type == WorkCenterTypeEnum.Line && entity.IsMixLine != param.IsMixLine && param.IsMixLine == false)
+            {
+                // 判断激活的工单数量
+                var maxCount = 1;
+                var planWorkOrderActivationEntities = await _planWorkOrderActivationRepository.GetByWorkCenterIdAsync(entity.Id);
+                if (planWorkOrderActivationEntities != null && planWorkOrderActivationEntities.Count() > maxCount)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES12118)).WithData("maxCount", maxCount);
+                }
+            }
 
             // DTO转换实体
             var inteWorkCenterEntity = param.ToEntity<InteWorkCenterEntity>();

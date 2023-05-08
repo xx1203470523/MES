@@ -222,6 +222,6 @@ namespace Hymson.MES.Data.Repositories.Plan
         #endregion
 
         const string DeletesTrueByResourceIdSql = "Delete from `plan_work_order_bind` WHERE ResourceId=@ResourceId "; 
-        const string DeletesTrueByResourceIdAndWorkOrderIdsSql = "Delete from `plan_work_order_bind` WHERE ResourceId=@ResourceId And WorkOrderId=@WorkOrderIds ";
+        const string DeletesTrueByResourceIdAndWorkOrderIdsSql = "Delete from `plan_work_order_bind` WHERE ResourceId=@ResourceId And WorkOrderId in @WorkOrderIds ";
     }
 }

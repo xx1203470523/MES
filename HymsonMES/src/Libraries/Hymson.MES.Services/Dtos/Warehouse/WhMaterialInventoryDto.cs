@@ -348,7 +348,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 有效期/到期日
         /// </summary>
-        public DateTime? DueDate { get; set; } = DateTime.Now.AddMonths(1);
+        public DateTime? DueDate { get; set; }
 
         /// <summary>
         /// 供应商编码
