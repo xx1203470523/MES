@@ -24,6 +24,11 @@ namespace Hymson.MES.Data.Repositories.Process
         public SysDataStatusEnum? Status { get; set; }
 
         /// <summary>
+        /// 状态列表
+        /// </summary>
+        public SysDataStatusEnum[]? StatusArr { get; set; }
+
+        /// <summary>
         /// 类型
         /// </summary>
         public int? Type { get; set; } 
