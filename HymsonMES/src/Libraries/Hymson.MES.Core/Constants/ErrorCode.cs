@@ -235,6 +235,9 @@
         public const string MES12116 = "未配置产线对应的资源！";
         public const string MES12117 = "存在已被其他产线关联的资源！";
         public const string MES12118 = "当前线体已激活多个工单，需取消激活工单，剩余激活工单<={maxCount}时才能完成设置！";
+        public const string MES12119 = "不能配置重复的车间/产线";
+        public const string MES12120 = "不能配置重复的资源";
+        public const string MES12121 = "新建或者废除状态的资源不能用于工作中心";
         #endregion
 
         #region 编码规则 12400
@@ -490,6 +493,7 @@
         public const string MES16316 = "SFC条码{SFC}和资源不匹配！";
         public const string MES16317 = "工序和资源不匹配！";
         public const string MES16318 = "SFC状态为已完成，不允许操作！";
+        public const string MES16319 = "SFC条码{SFC}已存在返修信息，不允许操作。";
         #endregion
 
         #region 生产
