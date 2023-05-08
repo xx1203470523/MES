@@ -13,6 +13,8 @@ using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated.IIntegratedService;
 using Hymson.Snowflake;
@@ -33,6 +35,7 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly AbstractValidator<InteWorkCenterCreateDto> _validationCreateRules;
         private readonly AbstractValidator<InteWorkCenterModifyDto> _validationModifyRules;
         private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
+        private readonly IProcResourceRepository _procResourceRepository;
         private readonly IPlanWorkOrderActivationRepository _planWorkOrderActivationRepository;
 
         /// <summary>
@@ -43,11 +46,13 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="validationCreateRules"></param>
         /// <param name="validationModifyRules"></param>
         /// <param name="inteWorkCenterRepository"></param>
+        /// <param name="procResourceRepository"></param>
         /// <param name="planWorkOrderActivationRepository"></param>
         public InteWorkCenterService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<InteWorkCenterCreateDto> validationCreateRules,
             AbstractValidator<InteWorkCenterModifyDto> validationModifyRules,
             IInteWorkCenterRepository inteWorkCenterRepository,
+            IProcResourceRepository procResourceRepository,
             IPlanWorkOrderActivationRepository planWorkOrderActivationRepository)
         {
             _currentUser = currentUser;
@@ -55,6 +60,7 @@ namespace Hymson.MES.Services.Services.Integrated
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _inteWorkCenterRepository = inteWorkCenterRepository;
+            _procResourceRepository = procResourceRepository;
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
         }
 
@@ -216,6 +222,14 @@ namespace Hymson.MES.Services.Services.Integrated
                         throw new CustomerValidationException(nameof(ErrorCode.MES12120));
                     }
 
+                    // 判断资源的状态是否存在新建和废除状态
+                    var resources = await _procResourceRepository.GetListByIdsAsync(param.ResourceIds.ToArray());
+                    if (resources != null && resources.Any(a => a.Status == (int)SysDataStatusEnum.Build || a.Status == (int)SysDataStatusEnum.Abolish) == true)
+                    {
+                        // TODO 上面的资源类型要改为枚举
+                        throw new CustomerValidationException(nameof(ErrorCode.MES12121));
+                    }
+
                     // 判断资源是否被重复绑定
                     var workCenterIds = await _inteWorkCenterRepository.GetWorkCenterIdByResourceIdAsync(param.ResourceIds);
                     if (workCenterIds != null && workCenterIds.Any() == true) throw new CustomerValidationException(nameof(ErrorCode.MES12117));
@@ -307,6 +321,14 @@ namespace Hymson.MES.Services.Services.Integrated
                         < inteWorkCenterResourceRelations.Count)
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES12120));
+                    }
+
+                    // 判断资源的状态是否存在新建和废除状态
+                    var resources = await _procResourceRepository.GetListByIdsAsync(param.ResourceIds.ToArray());
+                    if (resources != null && resources.Any(a => a.Status == (int)SysDataStatusEnum.Build || a.Status == (int)SysDataStatusEnum.Abolish) == true)
+                    {
+                        // TODO 上面的资源类型要改为枚举
+                        throw new CustomerValidationException(nameof(ErrorCode.MES12121));
                     }
 
                     // 判断资源是否被重复绑定
