@@ -204,21 +204,30 @@ namespace Hymson.MES.Services.Services.Plan
                 throw new BusinessException(nameof(ErrorCode.MES16801));
             }
 
-            //检查当前工单是否重复
-            if (bindActivationWorkOrder.WorkOrderIds.Distinct().Count() != bindActivationWorkOrder.WorkOrderIds.Count())
+            if (bindActivationWorkOrder.WorkOrderIds != null && bindActivationWorkOrder.WorkOrderIds.Any())
             {
-                throw new BusinessException(nameof(ErrorCode.MES16804));
-            }
+                //检查当前工单是否重复
+                if (bindActivationWorkOrder.WorkOrderIds.Distinct().Count() != bindActivationWorkOrder.WorkOrderIds.Count())
+                {
+                    throw new BusinessException(nameof(ErrorCode.MES16804));
+                }
 
-            //检查当前这些工单是否是激活
-            var hasActivationWorkOrders= await _planWorkOrderActivationRepository.GetPlanWorkOrderActivationEntitiesAsync(new PlanWorkOrderActivationQuery() 
-             {
-                SiteId=_currentSite.SiteId??0,
-                LineId= workCenterEntity.Id
-             });
-            if (hasActivationWorkOrders.Count() == bindActivationWorkOrder.WorkOrderIds.Count) 
+                //检查当前这些工单是否是激活
+                var hasActivationWorkOrders = await _planWorkOrderActivationRepository.GetPlanWorkOrderActivationEntitiesAsync(new PlanWorkOrderActivationQuery()
+                {
+                    SiteId = _currentSite.SiteId ?? 0,
+                    LineId = workCenterEntity.Id,
+                    WorkOrderIds = bindActivationWorkOrder.WorkOrderIds,
+                });
+
+                if (hasActivationWorkOrders.Count() != bindActivationWorkOrder.WorkOrderIds.Count)
+                {
+                    throw new BusinessException(nameof(ErrorCode.MES16802));
+                }
+            }
+            else 
             {
-                throw new BusinessException(nameof(ErrorCode.MES16802));
+                
             }
 
             //查询已经绑定在该资源上的工单
@@ -235,9 +244,9 @@ namespace Hymson.MES.Services.Services.Plan
             ////找到不需要操作的
             //hasBindWorkOrderIds.Intersect(bindActivationWorkOrder.WorkOrderIds);
             //找到需要删除的
-            var needDeletes= hasBindWorkOrderIds.Except(bindActivationWorkOrder.WorkOrderIds);
+            var needDeletes= bindActivationWorkOrder.WorkOrderIds!=null&& bindActivationWorkOrder.WorkOrderIds.Any()?  hasBindWorkOrderIds.Except(bindActivationWorkOrder.WorkOrderIds): hasBindWorkOrderIds;
             //找到需要新增的
-            var needAdds = bindActivationWorkOrder.WorkOrderIds.Except(hasBindWorkOrderIds);
+            var needAdds = bindActivationWorkOrder.WorkOrderIds != null && bindActivationWorkOrder.WorkOrderIds.Any() ? bindActivationWorkOrder.WorkOrderIds.Except(hasBindWorkOrderIds):new List<long>();
 
             foreach (var item in needAdds)
             {

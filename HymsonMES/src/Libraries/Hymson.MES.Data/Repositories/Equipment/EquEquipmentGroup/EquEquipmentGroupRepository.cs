@@ -84,12 +84,14 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
         /// <returns></returns>
         public async Task<EquEquipmentGroupEntity> GetByIdAsync(long id)
         {
-            var key = $"equ_equipment_group_{id}";
-            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
-            {
-                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-                return await conn.QueryFirstOrDefaultAsync<EquEquipmentGroupEntity>(GetByIdSql, new { IsDeleted = 0, Id = id });
-            });
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<EquEquipmentGroupEntity>(GetByIdSql, new { IsDeleted = 0, Id = id });
+
+            //var key = $"equ_equipment_group_{id}";
+            //return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            //{
+            //   // TODO
+            //});
         }
 
         /// <summary>
