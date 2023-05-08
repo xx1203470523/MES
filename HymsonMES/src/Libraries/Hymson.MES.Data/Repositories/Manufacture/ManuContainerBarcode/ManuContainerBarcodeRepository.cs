@@ -134,6 +134,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("barcode.WorkOrderId=@WorkOrderId");
             }
+            if (manuContainerBarcodePagedQuery.PackLevel.HasValue)
+            {
+                sqlBuilder.Where("barcode.PackLevel=@PackLevel");
+            }
 
             var offSet = (manuContainerBarcodePagedQuery.PageIndex - 1) * manuContainerBarcodePagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -235,7 +239,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     public partial class ManuContainerBarcodeRepository
     {
         #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_container_barcode` barcode /**innerjoin**/ /**leftjoin**/ /**where**/  ORDER BY barcode.UpdatedOn DESC LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_container_barcode` barcode /**innerjoin**/ /**leftjoin**/ /**where**/  ORDER BY barcode.CreatedOn DESC LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `manu_container_barcode` barcode /**leftjoin**/ /**where**/ ";
         const string GetManuContainerBarcodeEntitiesSqlTemplate = @"SELECT 
                                             /**select**/

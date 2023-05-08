@@ -40,5 +40,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 工单ID
         /// </summary>
         public long? WorkOrderId { get; set; }
+
+        /// <summary>
+        /// 包装等级
+        /// </summary>
+        public int? PackLevel { get; set; }
     }
 }

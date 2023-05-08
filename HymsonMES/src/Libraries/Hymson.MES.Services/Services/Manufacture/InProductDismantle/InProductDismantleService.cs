@@ -12,6 +12,7 @@ using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Data.Repositories.Warehouse;
@@ -331,6 +332,26 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES16613));
             }
 
+            //验证条码
+            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = new string[] { removeDto.Sfc }, SiteId = _currentSite.SiteId ?? 0 };
+            // 获取条码列表
+            var manuSfcProduces = await _manuSfcProduceRepository.GetManuSfcProduceInfoEntitiesAsync(manuSfcProducePagedQuery);
+            if (manuSfcProduces == null || !manuSfcProduces.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16600));
+            }
+            var manuSfcProduce = manuSfcProduces.ToList()[0];
+            if (manuSfcProduce.ProcedureId != removeDto.ProcedureId)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16612));
+            }
+            //报废的不能操作
+            if (manuSfcProduce.IsScrap == TrueOrFalseEnum.Yes)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16617));
+            }
+            await VerifyLockOrRepair(removeDto.Sfc, manuSfcProduce.ProcedureId, manuSfcProduce.SfcInfoId);
+
             var inventoryEntity = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery
             {
                 SiteId = circulationEntity.SiteId,
@@ -380,24 +401,25 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
 
-            var manuSfcProduce = await _manuSfcProduceRepository.GetBySFCAsync(addDto.Sfc);
-            if (manuSfcProduce == null)
+            //验证条码
+            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = new string[] { addDto.Sfc }, SiteId = _currentSite.SiteId ?? 0 };
+            // 获取条码列表
+            var manuSfcProduces = await _manuSfcProduceRepository.GetManuSfcProduceInfoEntitiesAsync(manuSfcProducePagedQuery);
+            if (manuSfcProduces == null || !manuSfcProduces.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16600));
             }
-
+            var manuSfcProduce = manuSfcProduces.ToList()[0];
             if (manuSfcProduce.ProcedureId != addDto.ProcedureId)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16612));
             }
-
-            //报废的
+           //报废的不能操作
             if (manuSfcProduce.IsScrap == TrueOrFalseEnum.Yes)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16617));
             }
-            //锁定的
-            //有缺陷的
+            await VerifyLockOrRepair(addDto.Sfc, manuSfcProduce.ProcedureId, manuSfcProduce.SfcInfoId);
 
             //用量
             var queryDto = new BarCodeQueryDto
@@ -612,26 +634,25 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
 
-            var manuSfcProduce = await _manuSfcProduceRepository.GetBySFCAsync(replaceDto.Sfc);
-            if (manuSfcProduce == null)
+            //验证条码
+            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = new string[] { replaceDto.Sfc }, SiteId = _currentSite.SiteId ?? 0 };
+            // 获取条码列表
+            var manuSfcProduces = await _manuSfcProduceRepository.GetManuSfcProduceInfoEntitiesAsync(manuSfcProducePagedQuery);
+            if (manuSfcProduces == null || !manuSfcProduces.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16600));
             }
-            //报废的
-            if (manuSfcProduce.IsScrap == TrueOrFalseEnum.Yes)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16617));
-            }
-
+            var manuSfcProduce = manuSfcProduces.ToList()[0];
             if (manuSfcProduce.ProcedureId != replaceDto.ProcedureId)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16612));
             }
-            //报废的
+            //报废的不能操作
             if (manuSfcProduce.IsScrap == TrueOrFalseEnum.Yes)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16617));
             }
+            await VerifyLockOrRepair(replaceDto.Sfc, manuSfcProduce.ProcedureId, manuSfcProduce.SfcInfoId);
 
             var circulationEntity = await _circulationRepository.GetByIdAsync(replaceDto.Id);
             if (circulationEntity == null)
@@ -1151,6 +1172,35 @@ namespace Hymson.MES.Services.Services.Manufacture
                 }
             });
             return procMaterials;
+        }
+
+        /// <summary>
+        /// 验证条码是否锁定和是否有返修任务
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <param name="procedureId"></param>
+        /// <param name="sfcInfoId"></param>
+        /// <returns></returns>
+        public async Task VerifyLockOrRepair(string sfc, long procedureId, long sfcInfoId)
+        {
+            IEnumerable<long> sfcInfoIds = new[] { sfcInfoId };
+            var sfcProduceBusinessEntities = await _manuSfcProduceRepository.GetSfcProduceBusinessBySFCIdsAsync(sfcInfoIds);
+            if (sfcProduceBusinessEntities != null && sfcProduceBusinessEntities.Any())
+            {
+                //锁定的
+                var lockEntity = sfcProduceBusinessEntities.FirstOrDefault(x => x.BusinessType == ManuSfcProduceBusinessType.Lock);
+                if (lockEntity != null)
+                {
+                    ManuSfcProduceExtensions.VerifyProcedureLock(lockEntity, sfc, procedureId);
+                }
+
+                //有缺陷的返修业务
+                var repairEntity = sfcProduceBusinessEntities.FirstOrDefault(x => x.BusinessType == ManuSfcProduceBusinessType.Repair);
+                if (repairEntity != null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16319)).WithData("SFC", sfc);
+                }
+            }
         }
     }
 }
