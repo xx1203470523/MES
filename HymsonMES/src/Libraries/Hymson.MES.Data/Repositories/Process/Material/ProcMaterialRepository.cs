@@ -384,7 +384,7 @@ namespace Hymson.MES.Data.Repositories.Process
                                         `Id`, `SiteId`,`MaskCodeId`,`GroupId`, `MaterialCode`,`MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `BomId`, `Batch`, PackageNum, `Unit`, `SerialNumber`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`,ConsumeRatio
                             FROM `proc_material`
                             WHERE IsDeleted = 0 and GroupId IN @groupIds ";
-        const string UpdateSameMaterialCodeToNoVersionSql = "UPDATE `proc_material` SET IsDefaultVersion= 0 WHERE MaterialCode= @MaterialCode ";
+        const string UpdateSameMaterialCodeToNoVersionSql = "UPDATE `proc_material` SET IsDefaultVersion= 0 WHERE MaterialCode= @MaterialCode and IsDeleted = 0 ";
 
         /// <summary>
         /// 更改物料的物料组
