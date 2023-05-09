@@ -39,7 +39,7 @@
         public const string MES10222 = "插入物料供应商关联表失败！";
         public const string MES10223 = "物料编码最大长度为50";
         public const string MES10224 = "物料名称最大长度为50";
-
+        public const string MES10225 = "有生产中的工单引用其中的物料，不允许删除！";
         #endregion
 
         #region 资源 10300
