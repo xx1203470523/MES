@@ -101,7 +101,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
                 defaultDto.Message = $"该容器已经打开！";
             }
 
-            defaultDto.Content?.Add("Operation", ManuContainerPackagJobReturnTypeEnum.JobManuPackageCloseService.ParseToInt().ToString());
+            defaultDto.Content?.Add("Operation", ManuContainerPackagJobReturnTypeEnum.JobManuPackageOpenService.ParseToInt().ToString());
             defaultDto.Content?.Add("Status", $"{status}".ToString());
             defaultDto.Content?.Add("Success", success);
             return defaultDto;
