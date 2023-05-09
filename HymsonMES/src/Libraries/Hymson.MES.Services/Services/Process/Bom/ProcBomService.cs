@@ -441,7 +441,7 @@ namespace Hymson.MES.Services.Services.Process
                             ProcedureId = item.ProcedureId.ParseToLong(),
                             ReferencePoint = item.ReferencePoint,
                             Usages = item.Usages,
-                            Loss = item.Loss ?? 0,
+                            Loss = item.Loss,
                             CreatedBy = user,
                             UpdatedBy = user,
 

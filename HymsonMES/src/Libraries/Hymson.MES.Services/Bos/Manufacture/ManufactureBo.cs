@@ -88,7 +88,7 @@ namespace Hymson.MES.Services.Bos.Manufacture
         /// <summary>
         /// 损耗
         /// </summary>
-        public decimal Loss { get; set; }
+        public decimal? Loss { get; set; }
 
         /// <summary>
         /// 消耗系数
