@@ -11,6 +11,8 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
+using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services.Bos.Manufacture;
@@ -67,6 +69,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
 
         /// <summary>
+        /// 仓储接口（生产工单）
+        /// </summary>
+        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
+
+        /// <summary>
         /// 仓储接口（BOM明细）
         /// </summary>
         private readonly IProcBomDetailRepository _procBomDetailRepository;
@@ -108,6 +115,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="manuFeedingRepository"></param>
         /// <param name="manuSfcCirculationRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
         /// <param name="procBomDetailRepository"></param>
         /// <param name="procBomDetailReplaceMaterialRepository"></param>
         /// <param name="procMaterialRepository"></param>
@@ -121,6 +129,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuFeedingRepository manuFeedingRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
+            IPlanWorkOrderRepository planWorkOrderRepository,
             IProcBomDetailRepository procBomDetailRepository,
             IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository,
             IProcMaterialRepository procMaterialRepository,
@@ -232,6 +241,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 {
                     SiteId = sfcProduceEntity.SiteId,
                     SfcInfoId = sfcInfo.Id
+                });
+
+                // 更新完工数量
+                await _planWorkOrderRepository.UpdateFinishProductQuantityByWorkOrderId(new UpdateQtyCommand
+                {
+                    UpdatedBy = sfcProduceEntity.UpdatedBy,
+                    UpdatedOn = sfcProduceEntity.UpdatedOn,
+                    WorkOrderId = sfcProduceEntity.WorkOrderId,
+                    Qty = 1,
                 });
 
                 // 更新状态

@@ -359,6 +359,8 @@
         public const string MES152013 = "物料条码：{MaterialCode}数量需大于0";
         public const string MES152014 = " 条码：{MaterialCode}在车间库存中已存在！";
         public const string MES152015 = " 供应商不能为空";
+        public const string MES152016 = " 条码：{MaterialCode}已存在！";
+
 
         #endregion
 

@@ -359,7 +359,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         }
 
                         //验证工序
-                        if (await _manuCommonService.IsProcessStartBeforeEnd(sfcEntity.ProcessRouteId, sfcEntity.ProcedureId, parm.LockProductionId ?? 0))
+                        if (await _manuCommonService.IsProcessStartBeforeEndAsync(sfcEntity.ProcessRouteId, sfcEntity.ProcedureId, parm.LockProductionId ?? 0))
                         {
                             var validationFailure = new ValidationFailure();
                             if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
@@ -851,8 +851,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Name = item.Name,
                     MaterialCode = item.MaterialCode,
                     MaterialName = item.MaterialName,
-                    Version = item.Version,
-                    ResCode = item.ResCode
+                    Version = item.Version
                 });
             }
             return new PagedInfo<ManuSfcProduceViewDto>(manuSfcProduceDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
@@ -1140,7 +1139,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             var processRouteId = processRouteIds.FirstOrDefault();
             //获取工艺路线节点
-            var processRouteNodes = await _manuCommonService.GetProcessRoute(processRouteId);
+            var processRouteNodes = await _manuCommonService.GetProcessRouteAsync(processRouteId);
             if (processRouteNodes == null || processRouteIds.Count() == 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18005));
@@ -1606,7 +1605,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES18211));
             }
 
-            //验证条码锁定
+            // 验证条码锁定
             await _manuCommonService.VerifySfcsLockAsync(sfcs, procedureId);
 
             //这个是物料删除 所以查到就是有锁

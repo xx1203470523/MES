@@ -216,11 +216,11 @@ namespace Hymson.MES.Data.Repositories.Plan
             {
                 sqlBuilder.Where(" OrderCode = @OrderCode ");
             }
-            if (planWorkOrderQuery.ProductIds!=null&& planWorkOrderQuery.ProductIds.Any()) 
+            if (planWorkOrderQuery.ProductIds != null && planWorkOrderQuery.ProductIds.Any())
             {
                 sqlBuilder.Where(" ProductId in @ProductIds ");
             }
-            if (planWorkOrderQuery.StatusList != null&& planWorkOrderQuery.StatusList.Any()) 
+            if (planWorkOrderQuery.StatusList != null && planWorkOrderQuery.StatusList.Any())
             {
                 sqlBuilder.Where(" Status in @StatusList ");
             }
@@ -307,6 +307,28 @@ namespace Hymson.MES.Data.Repositories.Plan
             return await conn.ExecuteAsync(UpdatePassDownQuantitySql, param);
         }
 
+        /// <summary>
+        /// 更新数量（投入数量）
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateInputQtyByWorkOrderId(UpdateQtyCommand param)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateInputQtySql, param);
+        }
+
+        /// <summary>
+        /// 更新数量（完工数量）
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateFinishProductQuantityByWorkOrderId(UpdateQtyCommand param)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateFinishProductQuantitySql, param);
+        }
+
         #region 工单记录表
         /// <summary>
         /// 新增工单记录表
@@ -382,7 +404,11 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string InsertPlanWorkOrderRecordSql = "INSERT INTO `plan_work_order_record`(  `Id`, `RealStart`, `RealEnd`, `InputQty`, `UnqualifiedQuantity`, `FinishProductQuantity`, `PassDownQuantity`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `WorkOrderId`) VALUES (   @Id, @RealStart, @RealEnd, @InputQty, @UnqualifiedQuantity, @FinishProductQuantity, @PassDownQuantity, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @WorkOrderId )";
         const string UpdateSql = "UPDATE `plan_work_order` SET  ProductId = @ProductId, WorkCenterType = @WorkCenterType, WorkCenterId = @WorkCenterId, ProcessRouteId = @ProcessRouteId, ProductBOMId = @ProductBOMId, Type = @Type, Qty = @Qty, OverScale = @OverScale, PlanStartTime = @PlanStartTime, PlanEndTime = @PlanEndTime, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `plan_work_order` SET   OrderCode = @OrderCode, ProductId = @ProductId, WorkCenterType = @WorkCenterType, WorkCenterId = @WorkCenterId, ProcessRouteId = @ProcessRouteId, ProductBOMId = @ProductBOMId, Type = @Type, Qty = @Qty, Status = @Status, OverScale = @OverScale, PlanStartTime = @PlanStartTime, PlanEndTime = @PlanEndTime, IsLocked = @IsLocked, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
+
         const string UpdatePassDownQuantitySql = "UPDATE plan_work_order_record SET PassDownQuantity= ifnull(PassDownQuantity,0)+@PassDownQuantity,UpdatedBy=@UserName,UpdatedOn=@UpdateDate WHERE WorkOrderId=@WorkOrderId AND  ifnull(PassDownQuantity,0)<=@PlanQuantity-@PassDownQuantity AND IsDeleted=0";
+        const string UpdateInputQtySql = "UPDATE plan_work_order_record SET InputQty = IFNULL(InputQty, 0) + @Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND WorkOrderId = @WorkOrderId";
+        const string UpdateFinishProductQuantitySql = "UPDATE plan_work_order_record SET FinishProductQuantity = IFNULL(FinishProductQuantity, 0) + @Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND WorkOrderId = @WorkOrderId";
+
         const string DeleteSql = "UPDATE `plan_work_order` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `plan_work_order`  SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids ";
         const string GetByIdSql = @"SELECT
