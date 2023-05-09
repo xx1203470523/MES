@@ -402,11 +402,13 @@ namespace Hymson.MES.Services.Services.Manufacture
                 Status = ProductBadRecordStatusEnum.Open,
                 SiteId = _currentSite.SiteId ?? 0
             };
+            //获取条码不合格信息
             var manuProductBads = await _manuProductBadRecordRepository.GetBadRecordsBySfcAsync(query);
-            if (manuProductBads == null)
+            if (manuProductBads == null || !manuProductBads.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17316));
             }
+            //组装不合格数据
             var manuFacePlateRepairProductBadInfoList = new List<ManuFacePlateRepairProductBadInfoDto>();
             foreach (var item in manuProductBads)
             {
