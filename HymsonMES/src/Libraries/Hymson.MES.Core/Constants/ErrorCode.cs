@@ -619,6 +619,7 @@
         public const string MES16720 = "容器包装，条码已报废";
         public const string MES16721 = "容器包装，该条码{sfc}已装箱{barcode}";
         public const string MES16722 = "容器包装，该包装{packId}已关闭或删除";
+        public const string MES16723 = "容器包装，包装数量未达到最小包装数，不允许关闭";
         #endregion
 
         #region 绑定工单激活  MES16800
