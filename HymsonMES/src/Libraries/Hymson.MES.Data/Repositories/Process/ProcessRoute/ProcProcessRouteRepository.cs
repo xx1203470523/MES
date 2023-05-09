@@ -8,14 +8,12 @@
 
 using Dapper;
 using Hymson.Infrastructure;
-using Hymson.Infrastructure.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Process.Resource;
+using Hymson.MES.Data.Repositories.Process.ProcessRoute.Command;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using Org.BouncyCastle.Crypto;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -171,6 +169,17 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 新增
         /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> ResetCurrentVersionAsync(ResetCurrentVersionCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(ResetCurrentVersionSql, command);
+        }
+
+        /// <summary>
+        /// 新增
+        /// </summary>
         /// <param name="procProcessRouteEntity"></param>
         /// <returns></returns>
         public async Task<int> InsertAsync(ProcProcessRouteEntity procProcessRouteEntity)
@@ -224,6 +233,9 @@ namespace Hymson.MES.Data.Repositories.Process
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class ProcProcessRouteRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_process_route` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
@@ -234,6 +246,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string ExistsSql = "SELECT Id FROM proc_process_route  /**where**/ LIMIT 1";
 
         const string InsertSql = "INSERT INTO `proc_process_route`(  `Id`, `SiteId`, `Code`, `Name`, `Status`, `Type`, `Version`, `IsCurrentVersion`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Status, @Type, @Version, @IsCurrentVersion, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string ResetCurrentVersionSql = "UPDATE proc_process_route SET IsCurrentVersion = 0, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND SiteId = @SiteId AND IsCurrentVersion = 1";
         const string UpdateSql = "UPDATE `proc_process_route` SET Name=@Name ,Status = @Status, Type = @Type, IsCurrentVersion = @IsCurrentVersion, Remark = @Remark,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_process_route` SET IsDeleted = Id,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id in @Ids";
         const string GetByIdSql = @"SELECT * FROM `proc_process_route`  WHERE Id = @Id ";
