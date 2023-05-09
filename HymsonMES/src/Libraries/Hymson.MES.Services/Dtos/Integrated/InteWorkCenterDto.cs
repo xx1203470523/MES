@@ -330,4 +330,20 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public string? Remark { get; set; }
     }
+
+    /// <summary>
+    /// 根据类型查询列表
+    /// </summary>
+    public class QueryInteWorkCenterByTypeAndParentIdDto
+    {
+        /// <summary>
+        /// 类型(工厂/车间/产线) 
+        /// </summary>
+        public WorkCenterTypeEnum? Type { get; set; }
+
+        /// <summary>
+        /// 父ID
+        /// </summary>
+        public long? ParentId { get; set; }
+    }
 }

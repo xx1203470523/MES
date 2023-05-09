@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated.IIntegratedService;
 using Microsoft.AspNetCore.Mvc;
@@ -27,6 +28,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
             _inteWorkCenterService = inteWorkCenterService;
             _logger = logger;
         }
+
 
         /// <summary>
         /// 分页查询列表
@@ -71,6 +73,17 @@ namespace Hymson.MES.Api.Controllers.Integrated
         public async Task<List<InteWorkCenterRelationDto>> QueryInteWorkCenterRelationByIdAsync(long id)
         {
             return await _inteWorkCenterService.GetInteWorkCenterRelationByIdAsync(id);
+        }
+
+        /// <summary>
+        /// 根据类型查询列表（工作中心）
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        [HttpGet("listByType")]
+        public async Task<IEnumerable<SelectOptionDto>> GetListByTypeAndIdAsync([FromQuery] QueryInteWorkCenterByTypeAndParentIdDto queryDto)
+        {
+            return await _inteWorkCenterService.QueryListByTypeAndParentIdAsync(queryDto);
         }
 
         /// <summary>

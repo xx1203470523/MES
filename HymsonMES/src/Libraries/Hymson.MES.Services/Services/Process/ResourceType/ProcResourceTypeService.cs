@@ -266,8 +266,8 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
                 throw new CustomerValidationException(nameof(ErrorCode.MES10102));
             }
 
-            /*
-             * 测试于帅动要求可以删除
+
+            //测试于帅动要求可以删除
             //查询资源类型是否关联资源
             var siteId = _currentSite.SiteId ?? 0;
             var query = new ProcResourceQuery
@@ -281,7 +281,6 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10312));
             }
-            */
 
             var rows = 0;
             var nowTime = HymsonClock.Now();

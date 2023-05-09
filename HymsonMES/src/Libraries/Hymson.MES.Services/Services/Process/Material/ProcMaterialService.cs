@@ -156,6 +156,15 @@ namespace Hymson.MES.Services.Services.Process
             {
                 var response = 0;
 
+                if (procMaterialEntity.IsDefaultVersion)
+                {
+                    // 先将同编码的其他物料设置为非当前版本
+                    await _procMaterialRepository.UpdateSameMaterialCodeToNoVersionAsync(new ProcMaterialEntity()
+                    {
+                        MaterialCode = procMaterialEntity.MaterialCode,
+                    });
+                }
+
                 //入库
                 response = await _procMaterialRepository.InsertAsync(procMaterialEntity);
 
@@ -368,7 +377,7 @@ namespace Hymson.MES.Services.Services.Process
             using (TransactionScope ts = new TransactionScope())
             {
                 int response = 0;
-                if (procMaterialEntity.IsDefaultVersion == true)
+                if (procMaterialEntity.IsDefaultVersion)
                 {
                     // 先将同编码的其他物料设置为非当前版本
                     await _procMaterialRepository.UpdateSameMaterialCodeToNoVersionAsync(new ProcMaterialEntity()

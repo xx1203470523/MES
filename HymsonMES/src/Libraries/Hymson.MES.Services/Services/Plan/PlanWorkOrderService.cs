@@ -40,6 +40,8 @@ namespace Hymson.MES.Services.Services.Plan
         private readonly IProcProcessRouteRepository _procProcessRouteRepository;
         private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
         private readonly IPlanWorkOrderStatusRecordRepository _planWorkOrderStatusRecordRepository;
+        private readonly IPlanWorkOrderActivationRepository _planWorkOrderActivationRepository;
+        private readonly IPlanWorkOrderActivationRecordRepository _planWorkOrderActivationRecordRepository;
 
         /// <summary>
         /// 
@@ -62,7 +64,8 @@ namespace Hymson.MES.Services.Services.Plan
             IProcBomRepository procBomRepository,
             IProcProcessRouteRepository procProcessRouteRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
-            IPlanWorkOrderStatusRecordRepository planWorkOrderStatusRecordRepository)
+            IPlanWorkOrderStatusRecordRepository planWorkOrderStatusRecordRepository, IPlanWorkOrderActivationRecordRepository planWorkOrderActivationRecordRepository,
+            IPlanWorkOrderActivationRepository planWorkOrderActivationRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -75,6 +78,8 @@ namespace Hymson.MES.Services.Services.Plan
             _procProcessRouteRepository = procProcessRouteRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
             _planWorkOrderStatusRecordRepository = planWorkOrderStatusRecordRepository;
+            _planWorkOrderActivationRecordRepository = planWorkOrderActivationRecordRepository;
+            _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
         }
 
 
@@ -240,6 +245,8 @@ namespace Hymson.MES.Services.Services.Plan
 
             List<PlanWorkOrderEntity> planWorkOrderEntities = new List<PlanWorkOrderEntity>();
             List<long> updateWorkOrderRealEndList = new List<long>();
+            List<long> deleteActivationWorkOrderIds = new List<long>();//需要取消激活工单
+           
             foreach (var item in parms)
             {
                 planWorkOrderEntities.Add(new PlanWorkOrderEntity()
@@ -256,7 +263,37 @@ namespace Hymson.MES.Services.Services.Plan
                 {
                     updateWorkOrderRealEndList.Add(item.Id);
                 }
+
+                //对是需要修改为关闭状态的做特殊处理： 取消掉 对应工单激活的信息
+                if (item.Status == PlanWorkOrderStatusEnum.Closed)
+                {
+                    deleteActivationWorkOrderIds.Add(item.Id);
+                }
             }
+
+            List<PlanWorkOrderActivationRecordEntity> planWorkOrderActivationRecordEntitys = new List<PlanWorkOrderActivationRecordEntity>();//对取消激活的做记录
+            if (deleteActivationWorkOrderIds.Any()) 
+            {
+                var deleteActivationWorkOrders = await _planWorkOrderActivationRepository.GetByWorkOrderIdsAsync(deleteActivationWorkOrderIds.ToArray());
+                foreach (var item in deleteActivationWorkOrders)
+                {
+                    planWorkOrderActivationRecordEntitys.Add(new PlanWorkOrderActivationRecordEntity()
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        CreatedBy = _currentUser.UserName,
+                        UpdatedBy = _currentUser.UserName,
+                        CreatedOn = HymsonClock.Now(),
+                        UpdatedOn = HymsonClock.Now(),
+                        SiteId = _currentSite.SiteId ?? 0,
+
+                        WorkOrderId = item.WorkOrderId,
+                        LineId = item.LineId,
+
+                        ActivateType = PlanWorkOrderActivateTypeEnum.CancelActivate
+                    });
+                }
+            }
+
 
             //组装工单状态变化记录
             List<PlanWorkOrderStatusRecordEntity> planWorkOrderStatusRecordEntities = new List<PlanWorkOrderStatusRecordEntity>();
@@ -287,6 +324,16 @@ namespace Hymson.MES.Services.Services.Plan
                         WorkOrderIds = updateWorkOrderRealEndList.ToArray()
                     };
                     await _planWorkOrderRepository.UpdatePlanWorkOrderRealEndByWorkOrderIdAsync(command);
+                }
+
+                //对是需要修改为关闭状态的做特殊处理： 取消掉 对应工单激活的信息
+                if (deleteActivationWorkOrderIds.Any()) 
+                {
+                    await _planWorkOrderActivationRepository.DeletesTrueAsync(deleteActivationWorkOrderIds.ToArray());
+                    if (planWorkOrderActivationRecordEntitys.Any()) 
+                    {
+                        await _planWorkOrderActivationRecordRepository.InsertsAsync(planWorkOrderActivationRecordEntitys);
+                    }
                 }
 
                 await _planWorkOrderStatusRecordRepository.InsertsAsync(planWorkOrderStatusRecordEntities);

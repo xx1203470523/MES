@@ -1626,7 +1626,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var workOrdersOrLosck = workOrders.Where(it => statusArr.Contains(it.Status) || it.IsLocked == YesOrNoEnum.Yes);
             if (workOrdersOrLosck.Any())
             {
-                var sfcInfoIds = manuSfcProduces.Select(it => workOrdersOrLosck.Select(order => order.Id == it.WorkOrderId).Any()).ToArray();
+                var sfcInfoIds = manuSfcProduces.Where(it => workOrdersOrLosck.Where(order => order.Id == it.WorkOrderId).Any()).Select(it => it.SFC).ToArray();
                 throw new CustomerValidationException(nameof(ErrorCode.MES18205)).WithData("SFC", string.Join(",", sfcInfoIds));
             }
 
@@ -1727,7 +1727,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     SfcId = item.SfcId,
                     WorkOrderId = manuUpdateSaveDto.WorkOrderId,
-                    ProductId = manuUpdateSaveDto.ProcedureId,
+                    ProductId = newPlanWorkOrderEntity.ProductId,
                     IsUsed = true,
 
                     SiteId = _currentSite.SiteId ?? 0,
@@ -1745,12 +1745,22 @@ namespace Hymson.MES.Services.Services.Manufacture
                 //在制
                 await _manuSfcProduceRepository.UpdateRangeAsync(manuSfcProduces);
 
-                //工单
-                var row = await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderId(new UpdatePassDownQuantityCommand
+                //新工单
+                await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderId(new UpdatePassDownQuantityCommand
                 {
                     WorkOrderId = newPlanWorkOrderEntity.Id,
                     PlanQuantity = newPlanWorkOrderEntity.Qty * (1 + newPlanWorkOrderEntity.OverScale / 100),
                     PassDownQuantity = workOrderQty,
+                    UserName = _currentUser.UserName,
+                    UpdateDate = HymsonClock.Now()
+                });
+
+                //老工单
+                await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderId(new UpdatePassDownQuantityCommand
+                {
+                    WorkOrderId = workOrderId,
+                    PlanQuantity = planWorkOrderEntity.Qty * (1 + planWorkOrderEntity.OverScale / 100),
+                    PassDownQuantity = -workOrderQty,
                     UserName = _currentUser.UserName,
                     UpdateDate = HymsonClock.Now()
                 });
