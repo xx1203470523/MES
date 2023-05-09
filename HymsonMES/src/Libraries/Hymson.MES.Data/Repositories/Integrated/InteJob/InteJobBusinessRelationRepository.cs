@@ -172,6 +172,17 @@ namespace Hymson.MES.Data.Repositories.Integrated
         }
 
         /// <summary>
+        /// 删除（软删除）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteByBusinessIdRangeAsync(IEnumerable<long> ids)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeleteByBusinessIdRangeSql, new { BusinessIds = ids });
+        }
+
+        /// <summary>
         /// 批量删除（软删除）
         /// </summary>
         /// <param name="ids"></param>
@@ -194,6 +205,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string InsertSql = "INSERT INTO `inte_job_business_relation`(  `Id`, `SiteId`, `BusinessType`, `BusinessId`, `LinkPoint`, `OrderNumber`, `JobId`, `IsUse`, `Parameter`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @BusinessType, @BusinessId, @LinkPoint, @OrderNumber, @JobId, @IsUse, @Parameter, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string UpdateSql = "UPDATE `inte_job_business_relation` SET   BusinessType = @BusinessType, BusinessId = @BusinessId, OrderNumber = @OrderNumber, JobId = @JobId, IsUse = @IsUse, Parameter = @Parameter, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteByBusinessIdSql = "delete from `inte_job_business_relation` WHERE BusinessId = @BusinessId ";
+        const string DeleteByBusinessIdRangeSql = "delete from `inte_job_business_relation` WHERE BusinessId IN @BusinessIds ";
         const string DeletesSql = "UPDATE `inte_job_business_relation` SET IsDeleted = Id WHERE Id in @ids";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteId`, `BusinessType`, `BusinessId`, `OrderNumber`, `JobId`, `IsUse`, `Parameter`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
