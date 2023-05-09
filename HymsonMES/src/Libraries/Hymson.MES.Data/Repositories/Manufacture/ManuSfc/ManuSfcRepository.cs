@@ -91,7 +91,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where("MS.IsDeleted = 0");
             sqlBuilder.Where("MS.SiteId = @SiteId");
             sqlBuilder.OrderBy("MS.UpdatedOn DESC");
-            sqlBuilder.Select("MS.Id, MS.SFC, MS.IsUsed, MS.UpdatedOn, PWO.OrderCode, PM.MaterialCode, PM.MaterialName");
+            sqlBuilder.Select("MS.Id, MS.SFC, MS.IsUsed, MS.UpdatedOn, PWO.OrderCode, PM.MaterialCode, PM.MaterialName, PM.BuyType");
 
             if (pagedQuery.IsUsed.HasValue) sqlBuilder.Where("MS.IsUsed = @IsUsed");
 
