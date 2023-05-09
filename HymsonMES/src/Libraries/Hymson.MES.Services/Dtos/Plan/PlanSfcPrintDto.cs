@@ -59,6 +59,10 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// </summary>
         public string MaterialName { get; set; }
 
+        /// <summary>
+        /// 采购类型 
+        /// </summary>
+        public MaterialBuyTypeEnum BuyType { get; set; }
     }
 
     /// <summary>
