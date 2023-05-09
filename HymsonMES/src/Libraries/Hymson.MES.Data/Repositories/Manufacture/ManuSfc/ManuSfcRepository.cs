@@ -91,7 +91,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where("MS.IsDeleted = 0");
             sqlBuilder.Where("MS.SiteId = @SiteId");
             sqlBuilder.OrderBy("MS.UpdatedOn DESC");
-            sqlBuilder.Select("MS.Id, MS.SFC, MS.IsUsed, MS.UpdatedOn, PWO.OrderCode, PM.MaterialCode, PM.MaterialName");
+            sqlBuilder.Select("MS.Id, MS.SFC, MS.IsUsed, MS.UpdatedOn, PWO.OrderCode, PM.MaterialCode, PM.MaterialName, PM.BuyType");
 
             if (pagedQuery.IsUsed.HasValue) sqlBuilder.Where("MS.IsUsed = @IsUsed");
 
@@ -136,13 +136,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where("ms.IsDeleted=0");
             sqlBuilder.OrderBy("msp.UpdatedOn DESC");
 
-            sqlBuilder.Select(@"msp.ProductBOMId,msp.Id,msp.Lock,msp.ProcedureId,ms.Sfc,msp.LockProductionId,CASE ms.Status WHEN  1 THEN msp.Status ELSE 3 END AS  Status,pwo.OrderCode,pp.Code,pp.Name,pm.MaterialCode,pm.MaterialName,pm.Version ");
+            sqlBuilder.Select(@"msp.ProductBOMId,msp.Id,msp.Lock,msp.ProcedureId,ms.Sfc,msp.LockProductionId,CASE ms.Status WHEN  1 THEN msp.Status ELSE 3 END AS  Status,pwo.OrderCode,pp.Code,pp.Name,pm.MaterialCode,pm.MaterialName,pm.Version,pr.ResCode ");
 
             sqlBuilder.InnerJoin("manu_sfc_info  msi on ms.Id=msi.SfcId and msi.IsDeleted=0");
             sqlBuilder.LeftJoin("manu_sfc_produce msp  on msp.SFC =ms.SFC");
             sqlBuilder.LeftJoin("proc_material pm  on msi.ProductId =pm.Id  and pm.IsDeleted=0");
             sqlBuilder.LeftJoin("plan_work_order pwo on msp.WorkOrderId =pwo.Id  and pwo.IsDeleted=0");
             sqlBuilder.LeftJoin("proc_procedure pp on msp.ProcedureId =pp.Id and pp.IsDeleted =0");
+            sqlBuilder.LeftJoin("proc_resource pr on msp.ResourceId =pr.Id and pr.IsDeleted =0");
 
             //状态
             if (query.Status.HasValue)
@@ -180,6 +181,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 query.Code = $"%{query.Code}%";
                 sqlBuilder.Where("pp.Code like @Code");
+            }
+            //资源
+            if (!string.IsNullOrWhiteSpace(query.ResCode))
+            {
+                query.ResCode = $"%{query.ResCode}%";
+                sqlBuilder.Where("pr.ResCode like @ResCode");
             }
             //资源-》资源类型
             if (query.ResourceTypeId.HasValue)

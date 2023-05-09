@@ -56,7 +56,7 @@ namespace Hymson.MES.Core.Domain.Warehouse
         /// <summary>
         /// 来源/目标;手动录入/WMS/上料点编号
         /// </summary>
-        public WhMaterialInventorySourceEnum Source { get; set; }
+        public MaterialInventorySourceEnum Source { get; set; }
 
         /// <summary>
         /// 站点Id

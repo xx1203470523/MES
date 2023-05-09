@@ -267,7 +267,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
 
             var siteId = _currentSite.SiteId ?? 0;
             var userName = _currentUser.UserName;
-            parm.Procedure.Code= parm.Procedure.Code.ToTrimSpace().ToUpperInvariant();
+            parm.Procedure.Code = parm.Procedure.Code.ToTrimSpace().ToUpperInvariant();
             parm.Procedure.Name = parm.Procedure.Name.Trim();
             parm.Procedure.Remark = parm.Procedure.Remark.Trim();
             //验证DTO
@@ -466,12 +466,19 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 throw new CustomerValidationException(nameof(ErrorCode.MES10443));
             }
 
-            return await _procProcedureRepository.DeleteRangeAsync(new DeleteCommand
+            int rows = 0;
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
-                Ids = idsArr,
-                DeleteOn = HymsonClock.Now(),
-                UserId = _currentUser.UserName
-            });
+                rows += await _procProcedureRepository.DeleteRangeAsync(new DeleteCommand
+                {
+                    Ids = idsArr,
+                    DeleteOn = HymsonClock.Now(),
+                    UserId = _currentUser.UserName
+                });
+                rows += await _jobBusinessRelationRepository.DeleteByBusinessIdRangeAsync(idsArr);
+                ts.Complete();
+            }
+            return rows;
         }
     }
 }

@@ -348,7 +348,7 @@ namespace Hymson.MES.Services.Services.Process
             }
             parm.ResCode = parm.ResCode.ToTrimSpace().ToUpperInvariant();
             parm.ResName = parm.ResName.Trim();
-            parm.Remark= parm.Remark.Trim();
+            parm.Remark = parm.Remark.Trim();
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(parm);
 
@@ -786,7 +786,7 @@ namespace Hymson.MES.Services.Services.Process
 
             //资源被工作中心引用不能删除
             var workCenterIds = await _inteWorkCenterRepository.GetWorkCenterIdByResourceIdAsync(idsArr);
-            if (workCenterIds != null &&workCenterIds.Any())
+            if (workCenterIds != null && workCenterIds.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10355));
             }
@@ -797,7 +797,14 @@ namespace Hymson.MES.Services.Services.Process
                 DeleteOn = HymsonClock.Now(),
                 Ids = idsArr
             };
-            return await _resourceRepository.DeleteRangeAsync(command);
+            int rows = 0;
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            {
+                rows += await _resourceRepository.DeleteRangeAsync(command);
+                rows += await _jobBusinessRelationRepository.DeleteByBusinessIdRangeAsync(idsArr);
+                ts.Complete();
+            }
+            return rows;
         }
 
         /// <summary>

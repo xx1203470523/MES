@@ -381,7 +381,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             List<ManuSfcCirculationEntity> manuSfcCirculationEntities = new();
 
             // 需扣减数量 = 用量 * 损耗 * 消耗系数
-            decimal qty = material.Usages * (material.Loss??0) * material.ConsumeRatio;
+            decimal qty = material.Usages * (material.Loss ?? 0) * material.ConsumeRatio;
 
             // 剩余需扣减的数量
             var residue = qty;
@@ -454,7 +454,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 Batch = "",//自制品 没有
                 QuantityResidue = procMaterialEntity.Batch,
                 Status = WhMaterialInventoryStatusEnum.ToBeUsed,
-                Source = WhMaterialInventorySourceEnum.ManuComplete,
+                Source = MaterialInventorySourceEnum.ManuComplete,
                 SiteId = _currentSite.SiteId ?? 0,
                 CreatedBy = _currentUser.UserName,
                 CreatedOn = HymsonClock.Now(),
@@ -474,7 +474,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 Quantity = procMaterialEntity.Batch,
                 Unit = procMaterialEntity.Unit ?? "",
                 Type = WhMaterialInventoryTypeEnum.ManuComplete,
-                Source = WhMaterialInventorySourceEnum.ManuComplete,
+                Source = MaterialInventorySourceEnum.ManuComplete,
                 SiteId = _currentSite.SiteId ?? 0,
                 CreatedBy = _currentUser.UserName,
                 CreatedOn = HymsonClock.Now(),

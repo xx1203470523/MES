@@ -851,7 +851,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Name = item.Name,
                     MaterialCode = item.MaterialCode,
                     MaterialName = item.MaterialName,
-                    Version = item.Version
+                    Version = item.Version,
+                    ResCode = item.ResCode
                 });
             }
             return new PagedInfo<ManuSfcProduceViewDto>(manuSfcProduceDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
@@ -1277,7 +1278,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         whMaterialInventoryEntity.Batch = "";//自制品 没有
                         whMaterialInventoryEntity.QuantityResidue = procMaterial.Batch;
                         whMaterialInventoryEntity.Status = WhMaterialInventoryStatusEnum.ToBeUsed;
-                        whMaterialInventoryEntity.Source = WhMaterialInventorySourceEnum.ManuComplete;
+                        whMaterialInventoryEntity.Source = MaterialInventorySourceEnum.ManuComplete;
                         whMaterialInventoryEntity.SiteId = _currentSite.SiteId ?? 0;
                         whMaterialInventoryEntity.Id = IdGenProvider.Instance.CreateId();
                         whMaterialInventoryEntity.CreatedBy = _currentUser.UserName;
@@ -1296,7 +1297,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         whMaterialStandingbookEntity.Quantity = procMaterial.Batch;
                         whMaterialStandingbookEntity.Unit = procMaterial.Unit ?? "";
                         whMaterialStandingbookEntity.Type = WhMaterialInventoryTypeEnum.StepControl;
-                        whMaterialStandingbookEntity.Source = WhMaterialInventorySourceEnum.ManuComplete;
+                        whMaterialStandingbookEntity.Source = MaterialInventorySourceEnum.ManuComplete;
                         whMaterialStandingbookEntity.SiteId = _currentSite.SiteId ?? 0;
                         whMaterialStandingbookEntity.Id = IdGenProvider.Instance.CreateId();
                         whMaterialStandingbookEntity.CreatedBy = _currentUser.UserName;
@@ -1403,7 +1404,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             whMaterialStandingbookEntity.Quantity = procMaterial.Batch;
                             whMaterialStandingbookEntity.Unit = procMaterial.Unit ?? "";
                             whMaterialStandingbookEntity.Type = WhMaterialInventoryTypeEnum.StepControl;
-                            whMaterialStandingbookEntity.Source = WhMaterialInventorySourceEnum.ManuComplete;
+                            whMaterialStandingbookEntity.Source = MaterialInventorySourceEnum.ManuComplete;
                             whMaterialStandingbookEntity.SiteId = _currentSite.SiteId ?? 0;
                             whMaterialStandingbookEntity.Id = IdGenProvider.Instance.CreateId();
                             whMaterialStandingbookEntity.CreatedBy = _currentUser.UserName;

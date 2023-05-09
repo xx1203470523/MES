@@ -37,5 +37,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfc.View
         /// </summary>
         public string MaterialName { get; set; }
 
+        /// <summary>
+        /// 采购类型 
+        /// </summary>
+        public MaterialBuyTypeEnum BuyType { get; set; }
+
     }
 }

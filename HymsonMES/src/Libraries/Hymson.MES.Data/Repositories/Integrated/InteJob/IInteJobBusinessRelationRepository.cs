@@ -20,13 +20,13 @@ namespace Hymson.MES.Data.Repositories.Integrated
     /// </summary>
     public interface IInteJobBusinessRelationRepository
     {
-	    /// <summary>
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<InteJobBusinessRelationEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -46,21 +46,21 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="inteJobBusinessRelationQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<InteJobBusinessRelationEntity>> GetInteJobBusinessRelationEntitiesAsync(InteJobBusinessRelationQuery inteJobBusinessRelationQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="inteJobBusinessRelationPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<InteJobBusinessRelationEntity>> GetPagedInfoAsync(InteJobBusinessRelationPagedQuery inteJobBusinessRelationPagedQuery);
-		
+
         /// <summary>
         /// 新增
         /// </summary>
         /// <param name="inteJobBusinessRelationEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(InteJobBusinessRelationEntity inteJobBusinessRelationEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -74,7 +74,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="inteJobBusinessRelationEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(InteJobBusinessRelationEntity inteJobBusinessRelationEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -88,7 +88,14 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteByBusinessIdAsync(long id);
-        
+
+        /// <summary>
+        /// 删除（软删除）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<int> DeleteByBusinessIdRangeAsync(IEnumerable<long> ids);
+
         /// <summary>
         /// 批量删除
         /// </summary>
