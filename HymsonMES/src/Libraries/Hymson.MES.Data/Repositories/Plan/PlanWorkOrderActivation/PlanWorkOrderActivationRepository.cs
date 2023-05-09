@@ -61,6 +61,17 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
 
         /// <summary>
+        /// 批量删除（硬删除）
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<int> DeletesTrueAsync(long[] ids)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeletesTrueSql, new { Ids = ids });
+        }
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -328,5 +339,6 @@ namespace Hymson.MES.Data.Repositories.Plan
     FROM `plan_work_order_activation`  WHERE Id IN @ids ";
         const string GetByWorkCenterIdSql = "SELECT * FROM plan_work_order_activation WHERE IsDeleted = 0 AND LineId = @workCenterId";
         const string DeleteTrueSql = @"DELETE FROM  plan_work_order_activation where Id=@Id ";
+        const string DeletesTrueSql = @"DELETE FROM  plan_work_order_activation where Id in @Ids ";
     }
 }

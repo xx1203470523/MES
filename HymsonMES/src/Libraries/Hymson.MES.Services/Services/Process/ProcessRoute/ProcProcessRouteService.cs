@@ -16,8 +16,8 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.ProcessRoute.Command;
 using Hymson.MES.Services.Dtos.Process;
-using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -173,11 +173,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
         public async Task AddProcProcessRouteAsync(ProcProcessRouteCreateDto parm)
         {
             #region 验证
-
-            if (parm == null)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
-            }
+            if (parm == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
 
             //// 判断是否有获取到站点码
             //if (string.IsNullOrWhiteSpace(parm.SiteCode))
@@ -230,7 +226,19 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
 
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
-                //入库
+                // 只允许保存一个当前版本
+                if (procProcessRouteEntity.IsCurrentVersion == 1)
+                {
+                    // 取消其他记录为"非当前版本"
+                    await _procProcessRouteRepository.ResetCurrentVersionAsync(new ResetCurrentVersionCommand
+                    {
+                        SiteId = procProcessRouteEntity.SiteId,
+                        UpdatedOn = procProcessRouteEntity.UpdatedOn,
+                        UpdatedBy = procProcessRouteEntity.UpdatedBy
+                    });
+                }
+
+                // 入库
                 await _procProcessRouteRepository.InsertAsync(procProcessRouteEntity);
 
                 if (nodes != null && nodes.Count > 0)
@@ -254,11 +262,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
         public async Task UpdateProcProcessRouteAsync(ProcProcessRouteModifyDto parm)
         {
             #region 验证
-
-            if (parm == null)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
-            }
+            if (parm == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
 
             //// 判断是否有获取到站点码
             //if (string.IsNullOrWhiteSpace(parm.SiteCode))
@@ -268,15 +272,12 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
 
             parm.Name = parm.Name.Trim();
             parm.Remark = parm.Remark.Trim();
-            //验证DTO
+            // 验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(parm);
 
             //判断是否存在
-            var processRoute = await _procProcessRouteRepository.GetByIdAsync(parm.Id);
-            if (processRoute == null)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10438));
-            }
+            var processRoute = await _procProcessRouteRepository.GetByIdAsync(parm.Id) 
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10438));
 
             //DTO转换实体
             var procProcessRouteEntity = parm.ToEntity<ProcProcessRouteEntity>();
@@ -314,7 +315,19 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             //TODO 现在关联表批量删除批量新增，后面再修改
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
-                //入库
+                // 只允许保存一个当前版本
+                if (procProcessRouteEntity.IsCurrentVersion == 1)
+                {
+                    // 取消其他记录为"非当前版本"
+                    await _procProcessRouteRepository.ResetCurrentVersionAsync(new ResetCurrentVersionCommand
+                    {
+                        SiteId = processRoute.SiteId,
+                        UpdatedOn = procProcessRouteEntity.UpdatedOn,
+                        UpdatedBy = procProcessRouteEntity.UpdatedBy
+                    });
+                }
+
+                // 入库
                 await _procProcessRouteRepository.UpdateAsync(procProcessRouteEntity);
 
                 await _procProcessRouteNodeRepository.DeleteByProcessRouteIdAsync(procProcessRouteEntity.Id);

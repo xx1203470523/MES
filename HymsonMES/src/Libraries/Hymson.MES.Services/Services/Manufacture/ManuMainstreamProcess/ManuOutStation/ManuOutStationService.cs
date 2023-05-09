@@ -381,7 +381,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             List<ManuSfcCirculationEntity> manuSfcCirculationEntities = new();
 
             // 需扣减数量 = 用量 * 损耗 * 消耗系数
-            decimal qty = material.Usages * material.Loss * material.ConsumeRatio;
+            decimal qty = material.Usages * (material.Loss??0) * material.ConsumeRatio;
 
             // 剩余需扣减的数量
             var residue = qty;
