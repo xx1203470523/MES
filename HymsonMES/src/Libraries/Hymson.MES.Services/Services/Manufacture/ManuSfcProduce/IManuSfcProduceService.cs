@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
 {
@@ -136,5 +137,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
         /// <param name="manuUpdateSaveDto"></param>
         /// <returns></returns>
         Task SaveManuUpdateList(ManuUpdateSaveDto manuUpdateSaveDto);
+
+        /// <summary>
+        /// 获取工艺路线末尾工序
+        /// </summary>
+        /// <param name="processRouteId"></param>
+        /// <returns></returns>
+        Task<long> GetLastProcedureAsync(long processRouteId);
     }
 }

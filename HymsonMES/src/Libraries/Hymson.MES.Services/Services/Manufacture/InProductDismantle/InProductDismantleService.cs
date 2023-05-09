@@ -1181,7 +1181,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="procedureId"></param>
         /// <param name="sfcInfoId"></param>
         /// <returns></returns>
-        public async Task VerifyLockOrRepair(string sfc, long procedureId, long sfcInfoId)
+        private async Task VerifyLockOrRepair(string sfc, long procedureId, long sfcInfoId)
         {
             IEnumerable<long> sfcInfoIds = new[] { sfcInfoId };
             var sfcProduceBusinessEntities = await _manuSfcProduceRepository.GetSfcProduceBusinessBySFCIdsAsync(sfcInfoIds);

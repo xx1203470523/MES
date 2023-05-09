@@ -396,6 +396,7 @@
         public const string MES15408 = "存在未关闭的不合格信息，工艺路线为必填!";
         public const string MES15409 = "不合格代码{codes}已录入,请勿重复录入!";
         public const string MES15410 = "SFC {sfcs}已存在返修信息，不可再执行当前操作!";
+        public const string MES15411= "条码{sfcs}已报废,不可再执行当前操作！";
         #endregion
 
         #region 物料加载 15500
