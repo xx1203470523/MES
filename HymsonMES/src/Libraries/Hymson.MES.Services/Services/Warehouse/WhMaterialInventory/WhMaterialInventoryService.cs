@@ -22,6 +22,7 @@ using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Minio.DataModel;
 //using Hymson.Utils.Extensions;
 
 namespace Hymson.MES.Services.Services.Warehouse
@@ -139,17 +140,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 //    throw new CustomerValidationException(nameof(ErrorCode.MES15102)).WithData("MaterialCode", item.MaterialCode);
                 //}
 
-                var isMaterialBarCode = await GetMaterialBarCodeAnyAsync(item.MaterialBarCode);
-                if (isMaterialBarCode)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15104)).WithData("MaterialCode", item.MaterialBarCode);
-                }
-
-                var sfcEntit = await _manuSfcRepository.GetBySFCAsync(item.MaterialBarCode);
-                if (sfcEntit != null)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES152016)).WithData("MaterialCode", item.MaterialBarCode);
-                }
+                await GetMaterialBarCodeAnyAsync(item.MaterialBarCode);
 
                 #endregion
 
@@ -285,7 +276,18 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
                 MaterialBarCode = materialBarCode
             });
-            return pagedInfo.Any();
+
+            if (pagedInfo != null && pagedInfo.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15104)).WithData("MaterialCode", materialBarCode);
+            }
+
+            var sfcEntit = await _manuSfcRepository.GetBySFCAsync(materialBarCode);
+            if (sfcEntit != null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES152016)).WithData("MaterialCode", materialBarCode);
+            }
+            return false;
         }
 
         /// <summary>
