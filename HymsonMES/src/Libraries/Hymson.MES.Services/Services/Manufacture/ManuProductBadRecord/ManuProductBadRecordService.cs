@@ -802,7 +802,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
         private async Task<bool> IsLastProcedureIdAsync(long processRouteId, long procedureId)
         {
-            var processRouteNodes = await _manuCommonService.GetProcessRoute(processRouteId);
+            var processRouteNodes = await _manuCommonService.GetProcessRouteAsync(processRouteId);
             var isLast = false;
             if (processRouteNodes.Any())
             {

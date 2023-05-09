@@ -1792,7 +1792,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
             long id = 0;
             //获取工艺路线节点
-            var processRouteNodes = await _manuCommonService.GetProcessRoute(processRouteId);
+            var processRouteNodes = await _manuCommonService.GetProcessRouteAsync(processRouteId);
             if (processRouteNodes.Any())
             {
                 id = processRouteNodes?.FirstOrDefault()?.ProcedureIds.Last()??0;
