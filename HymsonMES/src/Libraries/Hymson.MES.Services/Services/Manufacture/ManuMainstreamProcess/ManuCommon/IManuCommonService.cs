@@ -12,14 +12,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
     /// </summary>
     public interface IManuCommonService
     {
-
         /// <summary>
         /// 验证条码掩码规则
         /// </summary>
         /// <param name="barCode"></param>
         /// <param name="materialId"></param>
         /// <returns></returns>
-        Task<bool> CheckBarCodeByMaskCodeRule(string barCode, long materialId);
+        Task<bool> CheckBarCodeByMaskCodeRuleAsync(string barCode, long materialId);
 
         /// <summary>
         /// 检查条码是否可以执行某流程
@@ -27,7 +26,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="bo"></param>
         /// <param name="sfcCirculationType"></param>
         /// <returns></returns>
-        Task<bool> CheckSFCIsCanDoneStep(ManufactureBo bo, SfcCirculationTypeEnum sfcCirculationType);
+        Task<bool> CheckSFCIsCanDoneStepAsync(ManufactureBo bo, SfcCirculationTypeEnum sfcCirculationType);
 
         /// <summary>
         /// 获取生产条码信息
@@ -63,14 +62,22 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="processRouteId"></param>
         /// <param name="procedureId"></param>
         /// <returns></returns>
-        Task<bool> IsRandomPreProcedure(long processRouteId, long procedureId);
+        Task<bool> IsRandomPreProcedureAsync(long processRouteId, long procedureId);
+
+        /// <summary>
+        /// 判断是否首工序
+        /// </summary>
+        /// <param name="processRouteId"></param>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        Task<bool> IsFirstProcedureAsync(long processRouteId, long procedureId);
 
         /// <summary>
         /// 获取工艺路线
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcessRouteDetailDto>> GetProcessRoute(long id);
+        Task<IEnumerable<ProcessRouteDetailDto>> GetProcessRouteAsync(long id);
 
         /// <summary>
         /// 验证开始工序是否在结束工序之前
@@ -79,15 +86,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="startProcedureId"></param>
         /// <param name="endProcedureId"></param>
         /// <returns></returns>
-        Task<bool> IsProcessStartBeforeEnd(long processRouteId, long startProcedureId, long endProcedureId);
+        Task<bool> IsProcessStartBeforeEndAsync(long processRouteId, long startProcedureId, long endProcedureId);
 
         /// <summary>
         /// 获取工序关联的资源
         /// </summary>
         /// <param name="procedureId"></param>
         /// <returns></returns>
-        Task<IEnumerable<long>> GetProcResourceIdByProcedureId(long procedureId);
-
+        Task<IEnumerable<long>> GetProcResourceIdByProcedureIdAsync(long procedureId);
 
         /// <summary>
         /// 批量判断条码是否锁定

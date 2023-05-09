@@ -64,7 +64,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 来源/目标;手动录入/WMS/上料点编号
         /// </summary>
-        public WhMaterialInventorySourceEnum Source { get; set; }
+        public MaterialInventorySourceEnum Source { get; set; }
 
         /// <summary>
         /// 创建人
@@ -153,7 +153,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 来源/目标;手动录入/WMS/上料点编号
         /// </summary>
-        public WhMaterialInventorySourceEnum Source { get; set; }
+        public MaterialInventorySourceEnum Source { get; set; }
 
         /// <summary>
         /// 创建人
@@ -241,7 +241,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 来源/目标;手动录入/WMS/上料点编号
         /// </summary>
-        public WhMaterialInventorySourceEnum Source { get; set; }
+        public MaterialInventorySourceEnum Source { get; set; }
 
         /// <summary>
         /// 创建人

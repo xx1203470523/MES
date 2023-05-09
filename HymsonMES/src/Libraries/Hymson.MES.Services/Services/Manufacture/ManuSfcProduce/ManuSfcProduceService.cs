@@ -362,7 +362,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         }
 
                         //验证工序
-                        if (await _manuCommonService.IsProcessStartBeforeEnd(sfcEntity.ProcessRouteId, sfcEntity.ProcedureId, parm.LockProductionId ?? 0))
+                        if (await _manuCommonService.IsProcessStartBeforeEndAsync(sfcEntity.ProcessRouteId, sfcEntity.ProcedureId, parm.LockProductionId ?? 0))
                         {
                             var validationFailure = new ValidationFailure();
                             if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
@@ -1146,7 +1146,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             var processRouteId = processRouteIds.FirstOrDefault();
             //获取工艺路线节点
-            var processRouteNodes = await _manuCommonService.GetProcessRoute(processRouteId);
+            var processRouteNodes = await _manuCommonService.GetProcessRouteAsync(processRouteId);
             if (processRouteNodes == null || processRouteIds.Count() == 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18005));
@@ -1284,7 +1284,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         whMaterialInventoryEntity.Batch = "";//自制品 没有
                         whMaterialInventoryEntity.QuantityResidue = procMaterial.Batch;
                         whMaterialInventoryEntity.Status = WhMaterialInventoryStatusEnum.ToBeUsed;
-                        whMaterialInventoryEntity.Source = WhMaterialInventorySourceEnum.ManuComplete;
+                        whMaterialInventoryEntity.Source = MaterialInventorySourceEnum.ManuComplete;
                         whMaterialInventoryEntity.SiteId = _currentSite.SiteId ?? 0;
                         whMaterialInventoryEntity.Id = IdGenProvider.Instance.CreateId();
                         whMaterialInventoryEntity.CreatedBy = _currentUser.UserName;
@@ -1303,7 +1303,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         whMaterialStandingbookEntity.Quantity = procMaterial.Batch;
                         whMaterialStandingbookEntity.Unit = procMaterial.Unit ?? "";
                         whMaterialStandingbookEntity.Type = WhMaterialInventoryTypeEnum.StepControl;
-                        whMaterialStandingbookEntity.Source = WhMaterialInventorySourceEnum.ManuComplete;
+                        whMaterialStandingbookEntity.Source = MaterialInventorySourceEnum.ManuComplete;
                         whMaterialStandingbookEntity.SiteId = _currentSite.SiteId ?? 0;
                         whMaterialStandingbookEntity.Id = IdGenProvider.Instance.CreateId();
                         whMaterialStandingbookEntity.CreatedBy = _currentUser.UserName;
@@ -1410,7 +1410,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             whMaterialStandingbookEntity.Quantity = procMaterial.Batch;
                             whMaterialStandingbookEntity.Unit = procMaterial.Unit ?? "";
                             whMaterialStandingbookEntity.Type = WhMaterialInventoryTypeEnum.StepControl;
-                            whMaterialStandingbookEntity.Source = WhMaterialInventorySourceEnum.ManuComplete;
+                            whMaterialStandingbookEntity.Source = MaterialInventorySourceEnum.ManuComplete;
                             whMaterialStandingbookEntity.SiteId = _currentSite.SiteId ?? 0;
                             whMaterialStandingbookEntity.Id = IdGenProvider.Instance.CreateId();
                             whMaterialStandingbookEntity.CreatedBy = _currentUser.UserName;
@@ -1612,7 +1612,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES18211));
             }
 
-            //验证条码锁定
+            // 验证条码锁定
             await _manuCommonService.VerifySfcsLockAsync(sfcs, procedureId);
 
             //这个是物料删除 所以查到就是有锁

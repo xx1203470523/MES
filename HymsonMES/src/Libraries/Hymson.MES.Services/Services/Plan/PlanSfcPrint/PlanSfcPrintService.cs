@@ -206,7 +206,8 @@ namespace Hymson.MES.Services.Services.Plan
                 UpdatedOn = s.UpdatedOn,
                 OrderCode = s.OrderCode,
                 MaterialCode = s.MaterialCode,
-                MaterialName = s.MaterialName
+                MaterialName = s.MaterialName,
+                BuyType = s.BuyType
             });
             return new PagedInfo<PlanSfcPrintDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }

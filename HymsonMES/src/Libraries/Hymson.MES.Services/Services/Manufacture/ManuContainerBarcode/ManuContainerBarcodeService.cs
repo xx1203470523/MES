@@ -389,7 +389,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (foo != null)
             {
                 var barcodeobj = await _manuContainerBarcodeRepository.GetByIdAsync(foo.ContainerBarCodeId);
-                throw new CustomerValidationException(nameof(ErrorCode.MES16721)).WithData("sfc", packQuery.LadeBarCode).WithData("barcode", barcodeobj?.BarCode?? foo.ContainerBarCodeId.ToString());
+                throw new CustomerValidationException(nameof(ErrorCode.MES16721)).WithData("sfc", packQuery.LadeBarCode).WithData("barcode", barcodeobj?.BarCode ?? foo.ContainerBarCodeId.ToString());
             }
             else
             {
@@ -679,7 +679,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             //转换ID为编码
             var procMateria = await _procMaterialRepository.GetByIdAsync(materialId);
-            var planWorkOrder= await _planWorkOrderRepository.GetByIdAsync(workorderId);
+            var planWorkOrder = await _planWorkOrderRepository.GetByIdAsync(workorderId);
 
 
             ManuContainerBarcodeView view = new ManuContainerBarcodeView()
@@ -796,13 +796,25 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task ModifyManuContainerBarcodeStatusAsync(UpdateManuContainerBarcodeStatusDto updateManuContainerBarcodeStatusDto)
         {
             // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0)
+            if (!_currentSite.SiteId.HasValue || _currentSite.SiteId == 0)
             {
                 throw new ValidationException(nameof(ErrorCode.MES10101));
             }
 
             //验证DTO
             await _validationUpdateStatusRules.ValidateAndThrowAsync(updateManuContainerBarcodeStatusDto);
+            //关闭操作必须要装箱数量达到最小包装数
+            if (updateManuContainerBarcodeStatusDto.Status == 2)
+            {
+                var containerBarcode = await _manuContainerBarcodeRepository.GetByIdAsync(updateManuContainerBarcodeStatusDto.Id);
+                var container = await _inteContainerRepository.GetByIdAsync(containerBarcode.ContainerId);
+                //查询已包装数
+                var containerPacks = await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(containerBarcode.Id, _currentSite.SiteId.Value);
+                if (containerPacks.Count() < container.Minimum)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16723));
+                }
+            }
 
             //DTO转换实体
             var manuContainerBarcodeEntity = new ManuContainerBarcodeEntity();

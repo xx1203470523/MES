@@ -39,7 +39,7 @@
         public const string MES10222 = "插入物料供应商关联表失败！";
         public const string MES10223 = "物料编码最大长度为50";
         public const string MES10224 = "物料名称最大长度为50";
-
+        public const string MES10225 = "有生产中的工单引用其中的物料，不允许删除！";
         #endregion
 
         #region 资源 10300
@@ -359,6 +359,8 @@
         public const string MES152013 = "物料条码：{MaterialCode}数量需大于0";
         public const string MES152014 = " 条码：{MaterialCode}在车间库存中已存在！";
         public const string MES152015 = " 供应商不能为空";
+        public const string MES152016 = " 条码：{MaterialCode}已存在！";
+
 
         #endregion
 
@@ -620,6 +622,7 @@
         public const string MES16720 = "容器包装，条码已报废";
         public const string MES16721 = "容器包装，该条码{sfc}已装箱{barcode}";
         public const string MES16722 = "容器包装，该包装{packId}已关闭或删除";
+        public const string MES16723 = "容器包装，包装数量未达到最小包装数，不允许关闭";
         #endregion
 
         #region 绑定工单激活  MES16800

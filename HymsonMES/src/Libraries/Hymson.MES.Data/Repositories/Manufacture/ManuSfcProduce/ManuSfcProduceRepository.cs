@@ -96,7 +96,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             //资源
             if (!string.IsNullOrWhiteSpace(query.ResCode))
             {
-                query.Code = $"%{query.Code}%";
+                query.ResCode = $"%{query.ResCode}%";
                 sqlBuilder.Where("pr.ResCode like @ResCode");
             }
             //资源-》资源类型
