@@ -1,6 +1,7 @@
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
@@ -21,10 +22,15 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
     {
         private readonly ConnectionOptions _connectionOptions;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
         public InteWorkCenterRepository(IOptions<ConnectionOptions> connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
         }
+
 
         /// <summary>
         /// 分页查询
@@ -100,6 +106,38 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<InteWorkCenterEntity>(GetByIdsSql, new { ids });
+        }
+
+        /// <summary>
+        /// 根据类型获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteWorkCenterEntity>> GetByTypeAndParentIdAsync(InteWorkCenterByTypeQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetByTypeAndParentIdSql);
+            sqlBuilder.LeftJoin("inte_work_center_relation IWCR ON IWCR.SubWorkCenterId = IWC.Id");
+            sqlBuilder.Select("IWC.*");
+
+            sqlBuilder.Where("IWC.IsDeleted = 0");
+            sqlBuilder.Where("IWC.SiteId = @SiteId");
+            sqlBuilder.Where("IWC.Type = @Type");
+            sqlBuilder.AddParameters(query);
+
+            switch (query.Type)
+            {
+                case WorkCenterTypeEnum.Farm:
+                case WorkCenterTypeEnum.Line:
+                    sqlBuilder.Where("IWCR.WorkCenterId = @ParentId");
+                    break;
+                case WorkCenterTypeEnum.Factory:
+                default:
+                    break;
+            }
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<InteWorkCenterEntity>(templateData.RawSql, templateData.Parameters);
         }
 
         /// <summary>
@@ -298,6 +336,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         const string DeleteRangSql = "UPDATE `inte_work_center` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id in @ids AND IsDeleted=0";
         const string GetByIdSql = @"SELECT Id,SiteId,Code,Name,Type,Source,Status,IsMixLine,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted FROM `inte_work_center`  WHERE Id = @Id AND IsDeleted=0  ";
         const string GetByIdsSql = @"SELECT * FROM inte_work_center WHERE IsDeleted = 0 AND Id IN @ids ";
+        const string GetByTypeAndParentIdSql = "SELECT /**select**/ FROM inte_work_center IWC /**innerjoin**/ /**leftjoin**/ /**where**/";
         const string GetByCodeSql = @"SELECT Id,SiteId,Code,Name,Type,Source,Status,IsMixLine,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted FROM `inte_work_center`  WHERE Code = @Code  AND SiteId=@Site AND IsDeleted=0 ";
         const string GetByResourceId = "SELECT IWC.* FROM inte_work_center_resource_relation IWCRR LEFT JOIN inte_work_center IWC ON IWCRR.WorkCenterId = IWC.Id WHERE IWC.IsDeleted = 0 AND IWCRR.ResourceId = @resourceId";
 

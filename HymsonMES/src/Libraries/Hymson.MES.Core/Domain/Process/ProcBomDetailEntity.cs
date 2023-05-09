@@ -50,7 +50,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :损耗 
         /// 空值 : true  
         /// </summary>
-        public decimal Loss { get; set; }
+        public decimal? Loss { get; set; }
         
         /// <summary>
         /// 描述 :说明 

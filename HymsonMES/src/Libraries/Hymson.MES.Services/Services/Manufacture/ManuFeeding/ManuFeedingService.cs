@@ -574,7 +574,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         }
 
         /// <summary>
-        /// 通过工作中心ID获取物料ID集合
+        /// 通过工作中心ID获取物料ID集合（不混线）
         /// </summary>
         /// <param name="workCenterId"></param>
         /// <param name="workOrderId"></param>
