@@ -9,6 +9,7 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Utils;
 
@@ -108,6 +109,19 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
                 // 超过复投次数，标识为NG
                 if (sfcProduceEntity.RepeatedCount > procedureEntity.Cycle) throw new CustomerValidationException(nameof(ErrorCode.MES16036));
                 sfcProduceEntity.RepeatedCount++;
+            }
+
+            // 检查是否首工序
+            var isFirstProcedure = await _manuCommonService.IsFirstProcedureAsync(sfcProduceEntity.ProcessRouteId, sfcProduceEntity.ProcedureId);
+            if (isFirstProcedure == true)
+            {
+                await _planWorkOrderRepository.UpdateInputQtyByWorkOrderId(new UpdateQtyCommand
+                {
+                    UpdatedBy = sfcProduceEntity.UpdatedBy,
+                    UpdatedOn = sfcProduceEntity.UpdatedOn,
+                    WorkOrderId = sfcProduceEntity.WorkOrderId,
+                    Qty = 1,
+                });
             }
 
             // 修改条码使用状态为"已使用"

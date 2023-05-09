@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 工单信息表仓储类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-03-20 10:07:17
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -152,6 +145,20 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="param"></param>
         /// <returns></returns>
         Task<int> UpdatePassDownQuantityByWorkOrderId(UpdatePassDownQuantityCommand param);
+
+        /// <summary>
+        /// 更新数量（投入数量）
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<int> UpdateInputQtyByWorkOrderId(UpdateQtyCommand param);
+
+        /// <summary>
+        /// 更新数量（完工数量）
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<int> UpdateFinishProductQuantityByWorkOrderId(UpdateQtyCommand param);
 
         /// <summary>
         /// 新增工单记录表
