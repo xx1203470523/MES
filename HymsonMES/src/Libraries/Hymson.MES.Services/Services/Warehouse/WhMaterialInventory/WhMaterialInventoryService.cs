@@ -14,6 +14,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
@@ -42,6 +43,11 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// 物料维护 仓储
         /// </summary>
         private readonly IProcMaterialRepository _procMaterialRepository;
+        /// <summary>
+        /// 条码信息表 仓储
+        /// </summary>
+        private readonly IManuSfcRepository _manuSfcRepository;
+
         private readonly AbstractValidator<WhMaterialInventoryCreateDto> _validationCreateRules;
         private readonly AbstractValidator<WhMaterialInventoryModifyDto> _validationModifyRules;
         private readonly ICurrentSite _currentSite;
@@ -51,6 +57,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
              IProcMaterialRepository procMaterialRepository,
+              IManuSfcRepository manuSfcRepository,
         AbstractValidator<WhMaterialInventoryCreateDto> validationCreateRules,
             AbstractValidator<WhMaterialInventoryModifyDto> validationModifyRules,
             ICurrentSite currentSite)
@@ -59,6 +66,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
             _procMaterialRepository = procMaterialRepository;
+            _manuSfcRepository = manuSfcRepository;
 
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
@@ -135,6 +143,12 @@ namespace Hymson.MES.Services.Services.Warehouse
                 if (isMaterialBarCode)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES15104)).WithData("MaterialCode", item.MaterialBarCode);
+                }
+
+                var sfcEntit = await _manuSfcRepository.GetBySFCAsync(item.MaterialBarCode);
+                if (sfcEntit != null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES152016)).WithData("MaterialCode", item.MaterialBarCode);
                 }
 
                 #endregion
