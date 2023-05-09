@@ -15,11 +15,14 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using System.Security.Policy;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -43,13 +46,16 @@ namespace Hymson.MES.Services.Services.Process
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
 
+        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
+
         public ProcMaterialService(ICurrentUser currentUser, IProcMaterialRepository procMaterialRepository,
             AbstractValidator<ProcMaterialCreateDto> validationCreateRules,
             AbstractValidator<ProcMaterialModifyDto> validationModifyRules,
             IProcReplaceMaterialRepository procReplaceMaterialRepository,
             ICurrentSite currentSite,
             IProcMaterialSupplierRelationRepository procMaterialSupplierRelationRepository,
-            IProcMaskCodeRepository procMaskCodeRepository)
+            IProcMaskCodeRepository procMaskCodeRepository,
+            IPlanWorkOrderRepository planWorkOrderRepository)
         {
             _currentUser = currentUser;
             _procMaterialRepository = procMaterialRepository;
@@ -60,6 +66,7 @@ namespace Hymson.MES.Services.Services.Process
             _currentSite = currentSite;
             _procMaterialSupplierRelationRepository = procMaterialSupplierRelationRepository;
             _procMaskCodeRepository = procMaskCodeRepository;
+            _planWorkOrderRepository = planWorkOrderRepository;
         }
 
         /// <summary>
@@ -224,6 +231,21 @@ namespace Hymson.MES.Services.Services.Process
             var entitys = await _procMaterialRepository.GetByIdsAsync(idsArr);
             if (entitys.Any(a => a.Status == SysDataStatusEnum.Enable
             || a.Status == SysDataStatusEnum.Retain) == true) throw new BusinessException(nameof(ErrorCode.MES10212));
+
+            //判断这些物料在 生产工单（已下达、生产中）中是否被使用，被使用则无法删除
+            var statusList = new List<PlanWorkOrderStatusEnum>();
+            statusList.Add(PlanWorkOrderStatusEnum.SendDown);
+            statusList.Add(PlanWorkOrderStatusEnum.InProduction);
+            var useMaterilWorkOrders = await _planWorkOrderRepository.GetEqualPlanWorkOrderEntitiesAsync(new PlanWorkOrderQuery()
+            {
+                SiteId=_currentSite.SiteId??0,
+                ProductIds = idsArr.ToList(),
+                StatusList = statusList
+            });
+            if (useMaterilWorkOrders != null && useMaterilWorkOrders.Any()) 
+            {
+                throw new BusinessException(nameof(ErrorCode.MES10225));
+            }
 
             return await _procMaterialRepository.DeletesAsync(new DeleteCommand
             {

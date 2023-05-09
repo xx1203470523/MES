@@ -201,7 +201,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
 
         /// <summary>
-        /// 获取List   LIKE
+        /// 获取List   equal
         /// </summary>
         /// <param name="planWorkOrderQuery"></param>
         /// <returns></returns>
@@ -215,6 +215,14 @@ namespace Hymson.MES.Data.Repositories.Plan
             if (!string.IsNullOrWhiteSpace(planWorkOrderQuery.OrderCode))
             {
                 sqlBuilder.Where(" OrderCode = @OrderCode ");
+            }
+            if (planWorkOrderQuery.ProductIds!=null&& planWorkOrderQuery.ProductIds.Any()) 
+            {
+                sqlBuilder.Where(" ProductId in @ProductIds ");
+            }
+            if (planWorkOrderQuery.StatusList != null&& planWorkOrderQuery.StatusList.Any()) 
+            {
+                sqlBuilder.Where(" Status in @StatusList ");
             }
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
