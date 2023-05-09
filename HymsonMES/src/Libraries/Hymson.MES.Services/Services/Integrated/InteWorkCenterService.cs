@@ -14,7 +14,7 @@ using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Process.Resource;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated.IIntegratedService;
 using Hymson.Snowflake;
@@ -151,7 +151,29 @@ namespace Hymson.MES.Services.Services.Integrated
             return workCenterRelationList;
         }
 
+        /// <summary>
+        /// 根据类型查询列表（工作中心）
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<SelectOptionDto>> QueryListByTypeAndParentIdAsync(QueryInteWorkCenterByTypeAndParentIdDto queryDto)
+        {
+            if (queryDto == null) throw new ValidationException(nameof(ErrorCode.MES10100));
 
+            var workCenters = await _inteWorkCenterRepository.GetByTypeAndParentIdAsync(new InteWorkCenterByTypeQuery
+            {
+                SiteId = _currentSite.SiteId,
+                Type = queryDto.Type,
+                ParentId = queryDto.ParentId
+            });
+
+            return workCenters.Select(s => new SelectOptionDto
+            {
+                Key = $"{s.Id}",
+                Label = s.Code,
+                Value = $"{s.Id}"
+            });
+        }
 
         /// <summary>
         /// 新增
