@@ -89,7 +89,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             };
 
             // 校验工序和资源是否对应
-            var resourceIds = await _manuCommonService.GetProcResourceIdByProcedureId(bo.ProcedureId);
+            var resourceIds = await _manuCommonService.GetProcResourceIdByProcedureIdAsync(bo.ProcedureId);
             if (resourceIds.Any(a => a == bo.ResourceId) == false) throw new CustomerValidationException(nameof(ErrorCode.MES16317));
 
             // 获取生产条码信息
@@ -99,11 +99,12 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.lineUp);
             sfcProduceBusinessEntity.VerifyProcedureLock(bo.SFC, bo.ProcedureId);
 
+
             // 如果工序对应不上
             if (sfcProduceEntity.ProcedureId != bo.ProcedureId)
             {
                 // 判断上一个工序是否是随机工序
-                var IsRandomPreProcedure = await _manuCommonService.IsRandomPreProcedure(sfcProduceEntity.ProcessRouteId, bo.ProcedureId);
+                var IsRandomPreProcedure = await _manuCommonService.IsRandomPreProcedureAsync(sfcProduceEntity.ProcessRouteId, bo.ProcedureId);
                 if (IsRandomPreProcedure == false) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
 
                 // 将SFC对应的工序改为当前工序

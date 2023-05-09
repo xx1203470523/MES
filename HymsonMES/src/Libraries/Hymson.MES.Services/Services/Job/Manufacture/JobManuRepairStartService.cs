@@ -2,10 +2,7 @@
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
@@ -39,12 +36,6 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         private readonly IManuRepairService _manuRepairService;
 
-
-        /// <summary>
-        /// 产品不良录入 仓储
-        /// </summary>
-        private readonly IManuProductBadRecordRepository _manuProductBadRecordRepository;
-
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -54,13 +45,12 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <param name="manuRepairService"></param>
         public JobManuRepairStartService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonService manuCommonService,
-            IManuRepairService manuRepairService, IManuProductBadRecordRepository manuProductBadRecordRepository)
+            IManuRepairService manuRepairService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _manuCommonService = manuCommonService;
             _manuRepairService = manuRepairService;
-            _manuProductBadRecordRepository = manuProductBadRecordRepository;
         }
 
 
@@ -112,24 +102,11 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             if (sfcProduceEntity.ProcedureId != bo.ProcedureId)
             {
                 // 判断上一个工序是否是随机工序
-                var IsRandomPreProcedure = await _manuCommonService.IsRandomPreProcedure(sfcProduceEntity.ProcessRouteId, bo.ProcedureId);
+                var IsRandomPreProcedure = await _manuCommonService.IsRandomPreProcedureAsync(sfcProduceEntity.ProcessRouteId, bo.ProcedureId);
                 if (IsRandomPreProcedure == false) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
 
                 // 将SFC对应的工序改为当前工序
                 sfcProduceEntity.ProcessRouteId = bo.ProcedureId;
-            }
-
-            //获取不合格信息
-            var query = new ManuProductBadRecordQuery
-            {
-                SFC = sfcProduceEntity.SFC,
-                Status = ProductBadRecordStatusEnum.Open,
-                SiteId = _currentSite.SiteId ?? 0
-            };
-            var manuProductBads = await _manuProductBadRecordRepository.GetBadRecordsBySfcAsync(query);
-            if (manuProductBads == null || !manuProductBads.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES17316));
             }
 
             // 开始维修
