@@ -101,8 +101,6 @@ namespace Hymson.MES.Services.Services.Plan
         /// <returns></returns>
         public async Task CreateAsync(PlanSfcPrintCreateDto createDto)
         {
-            #region 验证与数据组装
-            //// 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0)
             {
                 throw new ValidationException(nameof(ErrorCode.MES10101));
@@ -110,25 +108,6 @@ namespace Hymson.MES.Services.Services.Plan
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(createDto);
 
-            //验证条码与工单
-
-
-
-
-            //生成条码
-
-
-
-
-            //条码打印
-
-
-
-
-            #endregion
-
-            #region 入库
-            #endregion
         }
 
         /// <summary>
