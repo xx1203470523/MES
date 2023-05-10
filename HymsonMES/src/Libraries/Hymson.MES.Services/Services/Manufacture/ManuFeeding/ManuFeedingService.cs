@@ -588,8 +588,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             var bomDetailEntities = await _procBomDetailRepository.GetByBomIdsAsync(bomIds);
             if (bomDetailEntities == null) return null;
 
-            var bomMaterialIds = bomDetailEntities.Select(s => s.MaterialId);
-
             // 数据收集方式为“批次”的物料
             var bomDetailEntitiesOfBatch = bomDetailEntities.Where(w => w.DataCollectionWay == MaterialSerialNumberEnum.Batch);
 
