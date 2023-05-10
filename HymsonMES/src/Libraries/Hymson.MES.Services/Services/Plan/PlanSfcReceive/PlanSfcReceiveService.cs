@@ -53,7 +53,7 @@ namespace Hymson.MES.Services.Services.Plan
         private readonly IProcMaterialRepository _procMaterialRepository;
         private readonly IManuCommonService _manuCommonService;
         private readonly AbstractValidator<PlanSfcReceiveCreateDto> _validationCreateRules;
-        private readonly AbstractValidator<PlanSfcReceiveModifyDto> _validationModifyRules;
+        private readonly AbstractValidator<PlanSfcReceiveScanCodeDto> _validationModifyRules;
 
         public PlanSfcReceiveService(ICurrentUser currentUser, ICurrentSite currentSite,
             IPlanSfcReceiveRepository planSfcInfoRepository,
@@ -66,7 +66,7 @@ namespace Hymson.MES.Services.Services.Plan
             IManuCreateBarcodeService manuCreateBarcodeService,
             IProcMaterialRepository procMaterialRepository,
             IManuCommonService manuCommonService,
-        AbstractValidator<PlanSfcReceiveCreateDto> validationCreateRules, AbstractValidator<PlanSfcReceiveModifyDto> validationModifyRules)
+        AbstractValidator<PlanSfcReceiveCreateDto> validationCreateRules, AbstractValidator<PlanSfcReceiveScanCodeDto> validationModifyRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -237,6 +237,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// <returns></returns>
         public async Task<PlanSfcReceiveSFCDto> PlanSfcReceiveScanCodeAsync(PlanSfcReceiveScanCodeDto param)
         {
+            await _validationModifyRules.ValidateAndThrowAsync(param);
             var planWorkOrderEntity = await _manuCommonService.GetWorkOrderByIdAsync(param.WorkOrderId);
             var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(planWorkOrderEntity.ProductId);
             if (param.ReceiveType == PlanSFCReceiveTypeEnum.SupplierSfc && procMaterialEntity.Batch == 0)

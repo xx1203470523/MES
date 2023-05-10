@@ -433,7 +433,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region PlanSfcReceive
             services.AddSingleton<AbstractValidator<PlanSfcReceiveCreateDto>, PlanSfcReceiveCreateValidator>();
-            services.AddSingleton<AbstractValidator<PlanSfcReceiveModifyDto>, PlanSfcReceiveModifyValidator>();
+            services.AddSingleton<AbstractValidator<PlanSfcReceiveScanCodeDto>, PlanSfcReceiveModifyValidator>();
             #endregion
 
             #region PlanWorkOrderActivation
