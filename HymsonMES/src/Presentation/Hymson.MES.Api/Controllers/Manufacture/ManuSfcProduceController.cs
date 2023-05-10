@@ -12,6 +12,7 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Microsoft.AspNetCore.Mvc;
+using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
 
 namespace Hymson.MES.Api.Controllers.Manufacture
 {
@@ -212,6 +213,17 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         public async Task SaveManuUpdateList(ManuUpdateSaveDto manuUpdateSaveDto)
         {
             await _manuSfcProduceService.SaveManuUpdateList(manuUpdateSaveDto);
+        }
+
+        /// <summary>
+        /// 获取工艺路线末尾工序
+        /// </summary>
+        /// <param name="processRouteId"></param>
+        /// <returns></returns>
+        [HttpGet("getLastProcedure/{processRouteId}")]
+        public async Task<long> GetLastProcedureAsync(long processRouteId)
+        {
+            return await _manuSfcProduceService.GetLastProcedureAsync(processRouteId);
         }
     }
 }
