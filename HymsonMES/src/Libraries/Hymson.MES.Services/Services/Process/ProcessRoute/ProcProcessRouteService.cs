@@ -21,6 +21,7 @@ using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.Collections.Generic;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process.ProcessRoute
@@ -114,6 +115,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
 
             var nodeQuery = new ProcProcessRouteDetailNodeQuery { ProcessRouteId = id };
             var nodes = await _procProcessRouteNodeRepository.GetListAsync(nodeQuery);
+            nodes = nodes.OrderBy(x => x.SerialNo.ParseToInt());
             var detailNodeViewDtos = new List<ProcProcessRouteDetailNodeViewDto>();
             foreach (var node in nodes)
             {
@@ -276,7 +278,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             await _validationModifyRules.ValidateAndThrowAsync(parm);
 
             //判断是否存在
-            var processRoute = await _procProcessRouteRepository.GetByIdAsync(parm.Id) 
+            var processRoute = await _procProcessRouteRepository.GetByIdAsync(parm.Id)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10438));
 
             //DTO转换实体
@@ -449,21 +451,32 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
                 return new List<ProcProcessRouteDetailNodeEntity> { };
             }
 
-            return nodeList.Select(s => new ProcProcessRouteDetailNodeEntity
+            var list = new List<ProcProcessRouteDetailNodeEntity>();
+
+            var serialNo = 1;
+            foreach (var s in nodeList)
             {
-                Id = IdGenProvider.Instance.CreateId(),
-                SiteId = model.SiteId,
-                ProcessRouteId = model.Id,
-                SerialNo = s.SerialNo,
-                ProcedureId = s.ProcedureId,
-                CheckType = s.CheckType,
-                CheckRate = s.CheckRate,
-                IsWorkReport = s.IsWorkReport,
-                IsFirstProcess = s.IsFirstProcess,
-                Extra1 = s.Extra1,
-                CreatedBy = model?.UpdatedBy ?? "",
-                UpdatedBy = model?.UpdatedBy ?? ""
-            }).ToList();
+                if (s.IsFirstProcess != 1)
+                {
+                    serialNo++;
+                }
+                list.Add(new ProcProcessRouteDetailNodeEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = model.SiteId,
+                    ProcessRouteId = model.Id,
+                    SerialNo = s.IsFirstProcess == 1 ? "1" : serialNo.ToString(),
+                    ProcedureId = s.ProcedureId,
+                    CheckType = s.CheckType,
+                    CheckRate = s.CheckRate,
+                    IsWorkReport = s.IsWorkReport,
+                    IsFirstProcess = s.IsFirstProcess,
+                    Extra1 = s.Extra1,
+                    CreatedBy = model?.UpdatedBy ?? "",
+                    UpdatedBy = model?.UpdatedBy ?? ""
+                });
+            }
+            return list;
         }
 
         /// <summary>
