@@ -208,7 +208,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             var sfcStepList = new List<ManuSfcStepEntity>();
             var manuSfcProduceList = new List<ManuSfcProduceBusinessEntity>();
-            //不合格代码中包含报废
             var scrapCode = qualUnqualifiedCodes.FirstOrDefault(a => a.UnqualifiedCode == "SCRAP");
             foreach (var item in manuSfcs)
             {
@@ -247,8 +246,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                         BusinessType = ManuSfcProduceBusinessType.Repair,
                         BusinessContent = JsonConvert.SerializeObject(new SfcProduceRepairBo
                         {
-                            ProcessRouteId = createDto.BadProcessRouteId ?? 0,
-                            ProcedureId = processRouteProcedure.ProcedureId
+                            ProcessRouteId = item.ProcessRouteId, //createDto.BadProcessRouteId ?? 0,
+                            ProcedureId = item.ProcedureId //processRouteProcedure.ProcedureId
                         }),
                         SiteId = sfcStepEntity.SiteId,
                         CreatedBy = sfcStepEntity.CreatedBy,
@@ -256,6 +255,18 @@ namespace Hymson.MES.Services.Services.Manufacture
                     };
                     manuSfcProduceList.Add(manuSfcProduceBusinessEntity);
                 }
+            }
+
+            var updateRouteCommand = new ManuSfcUpdateRouteCommand();
+            if (isDefect)
+            {
+                updateRouteCommand = new ManuSfcUpdateRouteCommand
+                {
+                    ProcessRouteId = createDto.BadProcessRouteId ?? 0,
+                    ProcedureId = processRouteProcedure.ProcedureId,
+                    UpdatedBy = _currentUser.UserName,
+                    Ids = manuSfcs.Select(x => x.Id).ToArray()
+                };
             }
 
             //报废不合格代码
@@ -308,7 +319,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                     }
                     if (manuSfcProduceList.Any())
                     {
+                        //添加维修业务
                         await _manuSfcProduceRepository.InsertSfcProduceBusinessRangeAsync(manuSfcProduceList);
+
+                        //修改在制品工艺路线和工序信息
+                        await _manuSfcProduceRepository.UpdateRouteAsync(updateRouteCommand);
                     }
                     trans.Complete();
                 }
@@ -512,14 +527,23 @@ namespace Hymson.MES.Services.Services.Manufacture
                     BusinessType = ManuSfcProduceBusinessType.Repair,
                     BusinessContent = JsonConvert.SerializeObject(new SfcProduceRepairBo
                     {
-                        ProcessRouteId = badReJudgmentDto.BadProcessRouteId ?? 0,
-                        ProcedureId = processRouteProcedure.ProcedureId
+                        ProcessRouteId = manuSfc.ProcessRouteId, //badReJudgmentDto.BadProcessRouteId ?? 0,
+                        ProcedureId = manuSfc.ProductId,//processRouteProcedure.ProcedureId
                     }),
                     SiteId = sfcStepEntity.SiteId,
                     CreatedBy = sfcStepEntity.CreatedBy,
                     UpdatedBy = sfcStepEntity.UpdatedBy
                 };
 
+                var updateRouteCommand = new ManuSfcUpdateRouteCommand();
+
+                updateRouteCommand = new ManuSfcUpdateRouteCommand
+                {
+                    ProcessRouteId = badReJudgmentDto.BadProcessRouteId ?? 0,
+                    ProcedureId = processRouteProcedure.ProcedureId,
+                    UpdatedBy = _currentUser.UserName,
+                    Ids =new long[] { manuSfc.Id }
+                };
                 #endregion
 
                 // 入库
@@ -530,10 +554,14 @@ namespace Hymson.MES.Services.Services.Manufacture
                     rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
 
                     // 2.插入 manu_sfc_produce_business
+                    //添加维修业务
                     rows += await _manuSfcProduceRepository.InsertSfcProduceBusinessAsync(manuSfcProduceBusinessEntity);
 
                     // 3.插入 manu_product_bad_record
                     rows += await _manuProductBadRecordRepository.UpdateStatusRangeAsync(updateCommandList);
+
+                    //4.修改在制品工艺路线和工序信息
+                    rows += await _manuSfcProduceRepository.UpdateRouteAsync(updateRouteCommand);
                     trans.Complete();
                 }
             }
