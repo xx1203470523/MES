@@ -28,5 +28,9 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long SiteId { get; set; }
     }
 }
