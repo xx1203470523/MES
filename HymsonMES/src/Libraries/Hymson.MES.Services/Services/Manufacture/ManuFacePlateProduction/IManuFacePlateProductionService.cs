@@ -1,7 +1,5 @@
-using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Services.Dtos.Manufacture;
-using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -18,6 +16,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <exception cref="BusinessException"></exception>
         Task<ManuFacePlateProductionPackageDto> GetManuFacePlateProductionPackageInfo(ManuFacePlateProductionPackageQueryDto param);
 
+        /*
         /// <summary>
         /// 组装
         /// </summary>
@@ -26,5 +25,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <exception cref="CustomerValidationException"></exception>
         /// <exception cref="BusinessException"></exception>
         Task<string> AddPackageCom(ManuFacePlateProductionPackageAddDto addDto);
+        */
+
     }
 }

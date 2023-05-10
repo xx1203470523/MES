@@ -383,6 +383,7 @@
         public const string MES15314 = "锁定工序{sfcproduction}不在条码所在工序{lockproductionname}之后";
         public const string MES15315 = "条码存在及时锁定，无法添加及时锁";
         public const string MES15316 = "条码未被锁定，无法执行解锁操作";
+        public const string MES15317= "将来锁工序{lockproduction}不在条码所在工序之后";
 
         #endregion
 
@@ -602,6 +603,7 @@
         public const string MES16615 = "组件条码已装配所有组件,无需添加!";
         public const string MES16616 = "组件条码{barCode}未设置掩码规则!";
         public const string MES16617 = "条码已报废,不可再执行当前操作!";
+        public const string MES16618 = "组件条码{barCode}的数据收集方式与主物料数据收集方式冲突!";
         #endregion
 
         #region 容器包装 MES 16700

@@ -414,7 +414,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16612));
             }
-           //报废的不能操作
+            //报废的不能操作
             if (manuSfcProduce.IsScrap == TrueOrFalseEnum.Yes)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16617));
@@ -568,7 +568,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             //内部的不允许重复绑定
-            if (serialNumber == MaterialSerialNumberEnum.Inside|| serialNumber == MaterialSerialNumberEnum.Outside)
+            if (serialNumber == MaterialSerialNumberEnum.Inside || serialNumber == MaterialSerialNumberEnum.Outside)
             {
                 var flag = IsBarCodeRepetAsync(addDto.CirculationBarCode, circulationEntities.ToList());
                 if (flag)
@@ -995,21 +995,24 @@ namespace Hymson.MES.Services.Services.Manufacture
             string circulationBarCode = wayQueryDto.CirculationBarCode;
 
             MaterialSerialNumberEnum? serialNumber = null;
+            MaterialSerialNumberEnum? mainserialNumber = null;
             var material = await _procMaterialRepository.GetByIdAsync(productId);
 
             var bomDetailEntity = await _procBomDetailRepository.GetByIdAsync(bomDetailId);
+            if (bomDetailEntity?.DataCollectionWay != null && bomDetailEntity.DataCollectionWay.HasValue)
+            {
+                mainserialNumber = bomDetailEntity?.DataCollectionWay.Value;
+            }
+
+            if (!mainserialNumber.HasValue)
+            {
+                //读取物料信息，取物料上的数据采集方式
+                mainserialNumber = material?.SerialNumber;
+            }
+
             if (circulationMainProductId == productId)
             {
-                if (bomDetailEntity?.DataCollectionWay != null && bomDetailEntity.DataCollectionWay.HasValue)
-                {
-                    serialNumber = bomDetailEntity?.DataCollectionWay.Value;
-                }
-
-                if (!serialNumber.HasValue)
-                {
-                    //读取物料信息，取物料上的数据采集方式
-                    serialNumber = material?.SerialNumber;
-                }
+                serialNumber = mainserialNumber;
                 if (!serialNumber.HasValue)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16609)).WithData("barCode", circulationBarCode);
@@ -1069,6 +1072,16 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16609)).WithData("barCode", circulationBarCode);
                 }
+            }
+
+            if(mainserialNumber== MaterialSerialNumberEnum.Batch&& serialNumber != MaterialSerialNumberEnum.Batch)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16618)).WithData("barCode", circulationBarCode);
+            }
+
+            if (mainserialNumber != MaterialSerialNumberEnum.Batch && serialNumber == MaterialSerialNumberEnum.Batch)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16618)).WithData("barCode", circulationBarCode);
             }
             return serialNumber;
         }

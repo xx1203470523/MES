@@ -8,19 +8,19 @@ namespace Hymson.MES.Core.Enums
     public enum SfcProduceStatusEnum : sbyte
     {
         /// <summary>
-        /// 排队
+        /// 排队中
         /// </summary>
-        [Description("排队")]
+        [Description("排队中")]
         lineUp = 1,
         /// <summary>
-        /// 活动
+        /// 活动中
         /// </summary>
-        [Description("活动")]
+        [Description("活动中")]
         Activity = 2,
         /// <summary>
-        /// 完工
+        /// 完成
         /// </summary>
-        [Description("完工")]
+        [Description("完成")]
         Complete = 3
     }
 }

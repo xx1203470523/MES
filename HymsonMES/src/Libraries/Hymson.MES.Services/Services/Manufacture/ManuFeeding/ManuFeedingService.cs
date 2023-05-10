@@ -241,21 +241,21 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             IEnumerable<long>? materialIds = null;
 
             // 读取资源绑定的产线
-            var workCenter = await _inteWorkCenterRepository.GetByResourceIdAsync(queryDto.ResourceId);
+            var workCenterLineEntity = await _inteWorkCenterRepository.GetByResourceIdAsync(queryDto.ResourceId);
 
-            if (workCenter == null)
+            if (workCenterLineEntity == null)
             {
                 materialIds = await GetMaterialIdsByResourceIdAsync(queryDto.ResourceId);
             }
             // 混线
-            else if (workCenter.IsMixLine == true)
+            else if (workCenterLineEntity.IsMixLine == true)
             {
                 materialIds = await GetMaterialIdsByResourceIdAsync(queryDto.ResourceId);
             }
             // 不混线
-            else if (workCenter.IsMixLine == false)
+            else if (workCenterLineEntity.IsMixLine == false)
             {
-                materialIds = await GetMaterialIdsByWorkCenterIdAsync(workCenter.Id, queryDto.WorkOrderId);
+                materialIds = await GetMaterialIdsByWorkCenterIdAsync(workCenterLineEntity.Id, queryDto.WorkOrderId);
             }
             else
             {
@@ -585,10 +585,17 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             var bomIds = await GetBomIdsByWorkCenterIdAsync(workCenterId, workOrderId);
             if (bomIds == null) return null;
 
-            var materials = await _procBomDetailRepository.GetByBomIdsAsync(bomIds);
-            if (materials == null) return null;
+            var bomDetailEntities = await _procBomDetailRepository.GetByBomIdsAsync(bomIds);
+            if (bomDetailEntities == null) return null;
 
-            return materials.Select(s => s.MaterialId);
+            // 数据收集方式为“批次”的物料
+            var bomDetailEntitiesOfBatch = bomDetailEntities.Where(w => w.DataCollectionWay == MaterialSerialNumberEnum.Batch);
+
+            // 当“数据收集方式”为空，则去检查物料维护中 物料的“数据收集方式”，为批次也可以加载进来
+            // 因为目前BOM里面的“数据收集方式”为必填项，因为无需理会
+            // UNDO
+
+            return bomDetailEntitiesOfBatch.Select(s => s.MaterialId);
         }
         #endregion
 

@@ -120,7 +120,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
             {
                 if (isFirstProcedure == true)
                 {
-                    await _planWorkOrderRepository.UpdateInputQtyByWorkOrderId(new UpdateQtyCommand
+                    rows += await _planWorkOrderRepository.UpdateInputQtyByWorkOrderId(new UpdateQtyCommand
                     {
                         UpdatedBy = sfcProduceEntity.UpdatedBy,
                         UpdatedOn = sfcProduceEntity.UpdatedOn,
