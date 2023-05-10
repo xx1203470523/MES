@@ -10,6 +10,7 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
@@ -80,7 +81,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<ManuFacePlateEntity> GetByCodeAsync(string code)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ManuFacePlateEntity>(GetByCodeSql, new { Code = code });
+            return await conn.QueryFirstOrDefaultAsync<ManuFacePlateEntity>(GetByCodeSql, new { Code = code, Status = SysDataStatusEnum.Enable });
         }
 
         /// <summary>
@@ -232,7 +233,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string GetByCodeSql = @"SELECT 
                                `Id`, `Code`, `Name`, `Type`, `Status`, `ConversationTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
-                            FROM `manu_face_plate`  WHERE Code = @Code  and IsDeleted=0 ";
+                            FROM `manu_face_plate`  WHERE Code = @Code  and Status=@Status    and IsDeleted=0 ";
 
         const string IsExistsSql = "SELECT Id FROM manu_face_plate WHERE `IsDeleted` = 0 AND Code = @Code AND Id != @id LIMIT 1";
         #endregion
