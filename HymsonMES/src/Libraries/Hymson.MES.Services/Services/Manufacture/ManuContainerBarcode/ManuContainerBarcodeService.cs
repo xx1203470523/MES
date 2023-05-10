@@ -827,13 +827,16 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new ValidationException(nameof(ErrorCode.MES10101));
             }
+            var containerBarcode = await _manuContainerBarcodeRepository.GetByIdAsync(updateManuContainerBarcodeStatusDto.Id);
+            if (containerBarcode == null) {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16726));
+            }
 
             //验证DTO
             await _validationUpdateStatusRules.ValidateAndThrowAsync(updateManuContainerBarcodeStatusDto);
             //关闭操作必须要装箱数量达到最小包装数
             if (updateManuContainerBarcodeStatusDto.Status == 2)
             {
-                var containerBarcode = await _manuContainerBarcodeRepository.GetByIdAsync(updateManuContainerBarcodeStatusDto.Id);
                 var container = await _inteContainerRepository.GetByIdAsync(containerBarcode.ContainerId);
                 //查询已包装数
                 var containerPacks = await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(containerBarcode.Id, _currentSite.SiteId.Value);

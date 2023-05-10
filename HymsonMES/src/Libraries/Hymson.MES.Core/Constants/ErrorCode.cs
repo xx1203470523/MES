@@ -630,6 +630,7 @@
         public const string MES16723 = "容器包装，包装数量未达到最小包装数，不允许关闭";
         public const string MES16724 = "容器包装，资源信息未找到";
         public const string MES16725 = "容器包装，资源对应资源类型和工序对应资源类型不一致";
+        public const string MES16726 = "容器编码不存在";
         #endregion
 
         #region 绑定工单激活  MES16800
