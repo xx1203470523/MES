@@ -603,6 +603,7 @@
         public const string MES16615 = "组件条码已装配所有组件,无需添加!";
         public const string MES16616 = "组件条码{barCode}未设置掩码规则!";
         public const string MES16617 = "条码已报废,不可再执行当前操作!";
+        public const string MES16618 = "组件条码{barCode}的数据收集方式与主物料数据收集方式冲突!";
         #endregion
 
         #region 容器包装 MES 16700
