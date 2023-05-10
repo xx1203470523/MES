@@ -578,14 +578,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 manuContainerBarcodeEntity.ContainerId = entityByRelation.Id;
                 manuContainerBarcodeEntity.ProductId = ProductId;
 
-                //包装等级转换
-                var packType = CodeRulePackTypeEnum.OneLevel;
-                var isDefined = Enum.IsDefined(typeof(CodeRulePackTypeEnum), level);
-                if (isDefined)
-                {
-                    CodeRulePackTypeEnum codeRulePackType = (CodeRulePackTypeEnum)Enum.ToObject(typeof(CodeRulePackTypeEnum), level);
-                    packType = codeRulePackType;
-                }
+                //包装等级转换 程序内控制传入
+                var packType = (CodeRulePackTypeEnum)level;
                 //根据编码类型，包装等级查询编码规则
                 var inteCodeRulesResult = await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery
                 {
