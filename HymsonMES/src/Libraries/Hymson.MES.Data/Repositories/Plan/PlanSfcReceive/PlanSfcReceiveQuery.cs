@@ -28,5 +28,10 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// SFC
         /// </summary>
         public string? SFC { get; set; }
+
+        /// <summary>
+        /// 工厂
+        /// </summary>
+        public long SiteId { get; set; }
     }
 }

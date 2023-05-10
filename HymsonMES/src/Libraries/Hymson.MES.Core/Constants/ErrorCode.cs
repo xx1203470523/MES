@@ -464,7 +464,11 @@
         public const string MES16118 = "工单{OrderCode}状态为未开始，无法继续生产";
         public const string MES16119 = "工单{OrderCode}已经关闭，无法继续生产";
         public const string MES16120 = "库存不存在";
-        public const string MES16121 = "不满足产品{Product}的掩码规则";
+        public const string MES16121 = "不满足产品{product}的掩码规则";
+        public const string MES16122 = "条码{sfc}已存在";
+        public const string MES16123 = "条码{sfc}已经是在制状态";
+        public const string MES16124 = "条码已存在";
+        public const string MES16125 = "条码已经是在制状态";
         #endregion
 
         #region 条码生成 MES16200
@@ -498,6 +502,7 @@
         public const string MES16317 = "工序和资源不匹配！";
         public const string MES16318 = "SFC状态为已完成，不允许操作！";
         public const string MES16319 = "SFC条码{SFC}已存在返修信息，不允许操作。";
+        public const string MES16320 = "工单{ordercode}状态不为已下达|生产中，无法继续操作。";
         #endregion
 
         #region 生产

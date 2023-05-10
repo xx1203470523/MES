@@ -47,5 +47,10 @@ namespace Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query
         /// 计划开始时间  结束
         /// </summary>
         public DateTime? PlanStartTimeE { get; set; }
+
+        /// <summary>
+        /// 查询状态集合
+        /// </summary>
+        public IEnumerable<PlanWorkOrderStatusEnum>? Statuss { get; set; }
     }
 }
