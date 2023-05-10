@@ -615,7 +615,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             var sfc = parm.Sfcs.Distinct();
-            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = parm.Sfcs,SiteId = _currentSite.SiteId ?? 00 };
+            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = parm.Sfcs, SiteId = _currentSite.SiteId ?? 00 };
             //获取条码列表
             var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceInfoEntitiesAsync(manuSfcProducePagedQuery);
             if (!manuSfcs.Any())
@@ -1277,39 +1277,43 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         #region 数据组装
                         //物料库存
-                        var whMaterialInventoryEntity = new WhMaterialInventoryEntity();
-                        whMaterialInventoryEntity.SupplierId = 0;//自制品 没有
-                        whMaterialInventoryEntity.MaterialId = procMaterial.Id;
-                        whMaterialInventoryEntity.MaterialBarCode = item.SFC;
-                        whMaterialInventoryEntity.Batch = "";//自制品 没有
-                        whMaterialInventoryEntity.QuantityResidue = procMaterial.Batch;
-                        whMaterialInventoryEntity.Status = WhMaterialInventoryStatusEnum.ToBeUsed;
-                        whMaterialInventoryEntity.Source = MaterialInventorySourceEnum.ManuComplete;
-                        whMaterialInventoryEntity.SiteId = _currentSite.SiteId ?? 0;
-                        whMaterialInventoryEntity.Id = IdGenProvider.Instance.CreateId();
-                        whMaterialInventoryEntity.CreatedBy = _currentUser.UserName;
-                        whMaterialInventoryEntity.UpdatedBy = _currentUser.UserName;
-                        whMaterialInventoryEntity.CreatedOn = HymsonClock.Now();
-                        whMaterialInventoryEntity.UpdatedOn = HymsonClock.Now();
+                        var whMaterialInventoryEntity = new WhMaterialInventoryEntity
+                        {
+                            SupplierId = 0,//自制品 没有
+                            MaterialId = procMaterial.Id,
+                            MaterialBarCode = item.SFC,
+                            Batch = "",//自制品 没有
+                            QuantityResidue = procMaterial.Batch,
+                            Status = WhMaterialInventoryStatusEnum.ToBeUsed,
+                            Source = MaterialInventorySourceEnum.ManuComplete,
+                            SiteId = _currentSite.SiteId ?? 0,
+                            Id = IdGenProvider.Instance.CreateId(),
+                            CreatedBy = _currentUser.UserName,
+                            UpdatedBy = _currentUser.UserName,
+                            CreatedOn = HymsonClock.Now(),
+                            UpdatedOn = HymsonClock.Now()
+                        };
                         whMaterialInventoryList.Add(whMaterialInventoryEntity);
 
                         //台账数据
-                        var whMaterialStandingbookEntity = new WhMaterialStandingbookEntity();
-                        whMaterialStandingbookEntity.MaterialCode = procMaterial.MaterialCode;
-                        whMaterialStandingbookEntity.MaterialName = procMaterial.MaterialName;
-                        whMaterialStandingbookEntity.MaterialVersion = procMaterial.Version;
-                        whMaterialStandingbookEntity.MaterialBarCode = item.SFC;
-                        whMaterialStandingbookEntity.Batch = "";//自制品 没有
-                        whMaterialStandingbookEntity.Quantity = procMaterial.Batch;
-                        whMaterialStandingbookEntity.Unit = procMaterial.Unit ?? "";
-                        whMaterialStandingbookEntity.Type = WhMaterialInventoryTypeEnum.StepControl;
-                        whMaterialStandingbookEntity.Source = MaterialInventorySourceEnum.ManuComplete;
-                        whMaterialStandingbookEntity.SiteId = _currentSite.SiteId ?? 0;
-                        whMaterialStandingbookEntity.Id = IdGenProvider.Instance.CreateId();
-                        whMaterialStandingbookEntity.CreatedBy = _currentUser.UserName;
-                        whMaterialStandingbookEntity.UpdatedBy = _currentUser.UserName;
-                        whMaterialStandingbookEntity.CreatedOn = HymsonClock.Now();
-                        whMaterialStandingbookEntity.UpdatedOn = HymsonClock.Now();
+                        var whMaterialStandingbookEntity = new WhMaterialStandingbookEntity
+                        {
+                            MaterialCode = procMaterial.MaterialCode,
+                            MaterialName = procMaterial.MaterialName,
+                            MaterialVersion = procMaterial.Version ?? "",
+                            MaterialBarCode = item.SFC,
+                            Batch = "",//自制品 没有
+                            Quantity = procMaterial.Batch,
+                            Unit = procMaterial.Unit ?? "",
+                            Type = WhMaterialInventoryTypeEnum.StepControl,
+                            Source = MaterialInventorySourceEnum.ManuComplete,
+                            SiteId = _currentSite.SiteId ?? 0,
+                            Id = IdGenProvider.Instance.CreateId(),
+                            CreatedBy = _currentUser.UserName,
+                            UpdatedBy = _currentUser.UserName,
+                            CreatedOn = HymsonClock.Now(),
+                            UpdatedOn = HymsonClock.Now()
+                        };
 
                         whMaterialStandingbookList.Add(whMaterialStandingbookEntity);
                         #endregion
@@ -1795,7 +1799,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var processRouteNodes = await _manuCommonService.GetProcessRouteAsync(processRouteId);
             if (processRouteNodes.Any())
             {
-                id = processRouteNodes?.FirstOrDefault()?.ProcedureIds.Last()??0;
+                id = processRouteNodes?.FirstOrDefault()?.ProcedureIds.Last() ?? 0;
             }
             return id;
         }
