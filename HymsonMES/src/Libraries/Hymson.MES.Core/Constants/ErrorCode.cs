@@ -604,7 +604,7 @@
         public const string MES16702 = "容器包装，包装码不存在";
         public const string MES16703 = "容器包装，条码的包装维护记录未找到";
         public const string MES16704 = "容器包装，配置面板编号为空";
-        public const string MES16705 = "容器包装，配置面板不存在或未激活";
+        public const string MES16705 = "容器包装，配置面板不存在或未启用";
         public const string MES16706 = "容器包装，配置面板不允许混工单,当前容器工单{first},当前条码工单{second}";
         public const string MES16707 = "容器包装，包装码不能为空";
         public const string MES16710 = "不识别的类型：{key}";
