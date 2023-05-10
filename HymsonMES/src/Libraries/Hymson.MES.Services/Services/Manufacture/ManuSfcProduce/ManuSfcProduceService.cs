@@ -9,6 +9,7 @@ using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
@@ -34,6 +35,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.Extensions.Logging;
+using Minio.DataModel;
 using System.Text.Json;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -161,16 +163,16 @@ namespace Hymson.MES.Services.Services.Manufacture
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
             IProcProcedureRepository procProcedureRepository,
             ILocalizationService localizationService,
-             IManuContainerPackRepository manuContainerPackRepository,
-             IManuSfcInfoRepository manuSfcInfoRepository,
-        IWhMaterialInventoryRepository whMaterialInventoryRepository,
-        IWhMaterialInventoryService whMaterialInventoryService,
-              IProcMaterialRepository procMaterialRepository,
-               IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
-               IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
-               IProcProcessRouteRepository procProcessRouteRepository,
-                IProcBomRepository procBomRepository,
-        AbstractValidator<ManuSfcProduceLockDto> validationLockRules,
+            IManuContainerPackRepository manuContainerPackRepository,
+            IManuSfcInfoRepository manuSfcInfoRepository,
+            IWhMaterialInventoryRepository whMaterialInventoryRepository,
+            IWhMaterialInventoryService whMaterialInventoryService,
+            IProcMaterialRepository procMaterialRepository,
+            IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
+            IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
+            IProcProcessRouteRepository procProcessRouteRepository,
+            IProcBomRepository procBomRepository,
+            AbstractValidator<ManuSfcProduceLockDto> validationLockRules,
             AbstractValidator<ManuSfcProduceModifyDto> validationModifyRules,
             ILogger<ManuSfcProduceService> logger)
         {
@@ -270,7 +272,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             await _validationLockRules.ValidateAndThrowAsync(parm);
 
-
             var sfcListTask = _manuSfcProduceRepository.GetManuSfcProduceInfoEntitiesAsync(
                 new ManuSfcProduceQuery
                 {
@@ -295,27 +296,27 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES15308));
                 }
+
                 //验证工艺路线
-                var procProcessRouteDetailNodeEntity = await _procProcessRouteDetailNodeRepository.GetByProcessRouteIdAsync(new ProcProcessRouteDetailNodeQuery
-                {
-                    ProcessRouteId = sfcList.FirstOrDefault()?.ProcessRouteId ?? 0,
-                    ProcedureId = parm.LockProductionId ?? 0
-                });
+                await VeifyQualityLockProductionAsync(sfcList.ToArray(), parm.LockProductionId ?? 0);
+                //var procProcessRouteDetailNodeEntity = await _procProcessRouteDetailNodeRepository.GetByProcessRouteIdAsync(new ProcProcessRouteDetailNodeQuery
+                //{
+                //    ProcessRouteId = sfcList.FirstOrDefault()?.ProcessRouteId ?? 0,
+                //    ProcedureId = parm.LockProductionId ?? 0
+                //});
 
-                if (procProcessRouteDetailNodeEntity == null)
-                {
-                    var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(parm.LockProductionId ?? 0);
-                    if (procProcedureEntity == null)
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES15311));
-                    }
-                    else
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES15310)).WithData("lockproduction", procProcedureEntity.Name);
-                    }
-                }
-
-                //判断将来工序是不是工艺路线上的工序，而且是选择的条码的接下来的工序
+                //if (procProcessRouteDetailNodeEntity == null)
+                //{
+                //    var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(parm.LockProductionId ?? 0);
+                //    if (procProcedureEntity == null)
+                //    {
+                //        throw new CustomerValidationException(nameof(ErrorCode.MES15311));
+                //    }
+                //    else
+                //    {
+                //        throw new CustomerValidationException(nameof(ErrorCode.MES15310)).WithData("lockproduction", procProcedureEntity.Name);
+                //    }
+                //}
             }
             //TODO  验证未完成 wangkeming
             var validationFailures = new List<ValidationFailure>();
@@ -615,7 +616,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             var sfc = parm.Sfcs.Distinct();
-            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = parm.Sfcs,SiteId = _currentSite.SiteId ?? 00 };
+            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = parm.Sfcs, SiteId = _currentSite.SiteId ?? 00 };
             //获取条码列表
             var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceInfoEntitiesAsync(manuSfcProducePagedQuery);
             if (!manuSfcs.Any())
@@ -1795,7 +1796,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var processRouteNodes = await _manuCommonService.GetProcessRouteAsync(processRouteId);
             if (processRouteNodes.Any())
             {
-                id = processRouteNodes?.FirstOrDefault()?.ProcedureIds.Last()??0;
+                id = processRouteNodes?.FirstOrDefault()?.ProcedureIds.Last() ?? 0;
             }
             return id;
         }
@@ -1841,6 +1842,53 @@ namespace Hymson.MES.Services.Services.Manufacture
                     var strs = string.Join(",", instantLockSfcs.Distinct().ToArray());
                     throw new CustomerValidationException(nameof(ErrorCode.MES15407)).WithData("sfcs", strs);
                 }
+            }
+        }
+
+        /// <summary>
+        /// 验证将来工序
+        /// </summary>
+        /// <param name="sfcList"></param>
+        /// <param name="lockProductionId"></param>
+        /// <returns></returns>
+        private async Task VeifyQualityLockProductionAsync(ManuSfcProduceInfoView[] sfcList, long lockProductionId)
+        {
+            var processRouteId = sfcList.FirstOrDefault()?.ProcessRouteId ?? 0;
+            var sfcProcedureIds = sfcList.Select(x => x.ProcedureId).Distinct().ToList();
+
+            //判断将来工序是不是工艺路线上的工序，而且是选择的条码的接下来的工序
+            var processRouteNodes = await _manuCommonService.GetProcessRouteAsync(processRouteId);
+            if (processRouteNodes == null || !processRouteNodes.Any())
+            {
+                var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(lockProductionId);
+                throw new CustomerValidationException(nameof(ErrorCode.MES15310)).WithData("lockproduction", procProcedureEntity.Code);
+            }
+
+            //条码工序
+            var procedureIds = processRouteNodes?.FirstOrDefault()?.ProcedureIds.ToList();
+            if (procedureIds == null || !procedureIds.Any())
+            {
+                var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(lockProductionId);
+                throw new CustomerValidationException(nameof(ErrorCode.MES15310)).WithData("lockproduction", procProcedureEntity.Code);
+            }
+
+            if (!procedureIds.Contains(lockProductionId))
+            {
+                var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(lockProductionId);
+                throw new CustomerValidationException(nameof(ErrorCode.MES15310)).WithData("lockproduction", procProcedureEntity.Code);
+            }
+
+            var index = 0;
+            sfcProcedureIds.ForEach(item =>
+            {
+                int sfcIndex = procedureIds.FindLastIndex(x => x.Equals(item));
+                index = sfcIndex > index ? sfcIndex : index;
+            });
+            int sfcIndex = procedureIds.FindLastIndex(x => x.Equals(lockProductionId));
+            if (sfcIndex <= index)
+            {
+                var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(lockProductionId);
+                throw new CustomerValidationException(nameof(ErrorCode.MES15317)).WithData("lockproduction", procProcedureEntity.Code);
             }
         }
     }

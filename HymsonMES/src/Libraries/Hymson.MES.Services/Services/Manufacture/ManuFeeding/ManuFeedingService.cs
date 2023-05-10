@@ -241,21 +241,21 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             IEnumerable<long>? materialIds = null;
 
             // 读取资源绑定的产线
-            var workCenter = await _inteWorkCenterRepository.GetByResourceIdAsync(queryDto.ResourceId);
+            var workCenterLineEntity = await _inteWorkCenterRepository.GetByResourceIdAsync(queryDto.ResourceId);
 
-            if (workCenter == null)
+            if (workCenterLineEntity == null)
             {
                 materialIds = await GetMaterialIdsByResourceIdAsync(queryDto.ResourceId);
             }
             // 混线
-            else if (workCenter.IsMixLine == true)
+            else if (workCenterLineEntity.IsMixLine == true)
             {
                 materialIds = await GetMaterialIdsByResourceIdAsync(queryDto.ResourceId);
             }
             // 不混线
-            else if (workCenter.IsMixLine == false)
+            else if (workCenterLineEntity.IsMixLine == false)
             {
-                materialIds = await GetMaterialIdsByWorkCenterIdAsync(workCenter.Id, queryDto.WorkOrderId);
+                materialIds = await GetMaterialIdsByWorkCenterIdAsync(workCenterLineEntity.Id, queryDto.WorkOrderId);
             }
             else
             {

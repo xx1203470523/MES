@@ -242,14 +242,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                     var sfcInfo = await _manuSfcRepository.GetBySFCAsync(sfcProduceEntity.SFC);
 
                     // 删除 manu_sfc_produce_business
-                    await _manuSfcProduceRepository.DeleteSfcProduceBusinessBySfcInfoIdAsync(new DeleteSfcProduceBusinesssBySfcInfoIdCommand
+                    rows += await _manuSfcProduceRepository.DeleteSfcProduceBusinessBySfcInfoIdAsync(new DeleteSfcProduceBusinesssBySfcInfoIdCommand
                     {
                         SiteId = sfcProduceEntity.SiteId,
                         SfcInfoId = sfcInfo.Id
                     });
 
                     // 更新完工数量
-                    await _planWorkOrderRepository.UpdateFinishProductQuantityByWorkOrderId(new UpdateQtyCommand
+                    rows += await _planWorkOrderRepository.UpdateFinishProductQuantityByWorkOrderId(new UpdateQtyCommand
                     {
                         UpdatedBy = sfcProduceEntity.UpdatedBy,
                         UpdatedOn = sfcProduceEntity.UpdatedOn,

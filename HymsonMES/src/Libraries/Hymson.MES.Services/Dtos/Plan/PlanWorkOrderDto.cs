@@ -357,6 +357,11 @@ namespace Hymson.MES.Services.Dtos.Plan
                 }
             }
         }
+
+        /// <summary>
+        /// 查询状态集合
+        /// </summary>
+        public IEnumerable<PlanWorkOrderStatusEnum>? Statuss { get; set; }
     }
 
     /// <summary>

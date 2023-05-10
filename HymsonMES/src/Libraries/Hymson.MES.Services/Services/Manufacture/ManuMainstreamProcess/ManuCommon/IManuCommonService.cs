@@ -43,6 +43,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         Task<PlanWorkOrderEntity> GetProduceWorkOrderByIdAsync(long workOrderId);
 
         /// <summary>
+        /// 获取生产工单
+        /// </summary>
+        /// <param name="workOrderId"></param>
+        /// <returns></returns>
+        Task<PlanWorkOrderEntity> GetWorkOrderByIdAsync(long workOrderId);
+
+        /// <summary>
         /// 获取首工序
         /// </summary>
         /// <param name="processRouteId"></param>

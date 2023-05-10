@@ -1,8 +1,5 @@
-using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Manufacture;
-using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto;
 using Hymson.MES.Services.Services.Manufacture;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Manufacture
@@ -12,7 +9,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
     /// @author Karl
     /// @date 2023-04-014 14:54:24
     /// </summary>
-    
+
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ManuFacePlateProductionController : ControllerBase
