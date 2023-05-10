@@ -12,6 +12,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInStation
 {
@@ -113,36 +114,43 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
 
             // 检查是否首工序
             var isFirstProcedure = await _manuCommonService.IsFirstProcedureAsync(sfcProduceEntity.ProcessRouteId, sfcProduceEntity.ProcedureId);
-            if (isFirstProcedure == true)
+
+            // 更新数据
+            using (var trans = TransactionHelper.GetTransactionScope())
             {
-                await _planWorkOrderRepository.UpdateInputQtyByWorkOrderId(new UpdateQtyCommand
+                if (isFirstProcedure == true)
                 {
-                    UpdatedBy = sfcProduceEntity.UpdatedBy,
+                    await _planWorkOrderRepository.UpdateInputQtyByWorkOrderId(new UpdateQtyCommand
+                    {
+                        UpdatedBy = sfcProduceEntity.UpdatedBy,
+                        UpdatedOn = sfcProduceEntity.UpdatedOn,
+                        WorkOrderId = sfcProduceEntity.WorkOrderId,
+                        Qty = 1,
+                    });
+                }
+
+                // 修改条码使用状态为"已使用"
+                rows += await _manuSfcRepository.UpdateSfcIsUsedAsync(new ManuSfcUpdateIsUsedCommand
+                {
+                    Sfcs = new string[] { sfcProduceEntity.SFC },
+                    UserId = sfcProduceEntity.UpdatedBy,
                     UpdatedOn = sfcProduceEntity.UpdatedOn,
-                    WorkOrderId = sfcProduceEntity.WorkOrderId,
-                    Qty = 1,
+                    IsUsed = YesOrNoEnum.Yes
                 });
+
+                // 更改状态
+                rows += await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
+
+                // 更新工单统计表的 RealStart
+                rows += await _planWorkOrderRepository.UpdatePlanWorkOrderRealStartByWorkOrderIdAsync(new UpdateWorkOrderRealTimeCommand
+                {
+                    UpdatedOn = sfcProduceEntity.UpdatedOn,
+                    UpdatedBy = sfcProduceEntity.UpdatedBy,
+                    WorkOrderIds = new long[] { sfcProduceEntity.WorkOrderId }
+                });
+
+                trans.Complete();
             }
-
-            // 修改条码使用状态为"已使用"
-            rows += await _manuSfcRepository.UpdateSfcIsUsedAsync(new ManuSfcUpdateIsUsedCommand
-            {
-                Sfcs = new string[] { sfcProduceEntity.SFC },
-                UserId = sfcProduceEntity.UpdatedBy,
-                UpdatedOn = sfcProduceEntity.UpdatedOn,
-                IsUsed = YesOrNoEnum.Yes
-            });
-
-            // 更改状态
-            rows += await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
-
-            // 更新工单统计表的 RealStart
-            rows += await _planWorkOrderRepository.UpdatePlanWorkOrderRealStartByWorkOrderIdAsync(new UpdateWorkOrderRealTimeCommand
-            {
-                UpdatedOn = sfcProduceEntity.UpdatedOn,
-                UpdatedBy = sfcProduceEntity.UpdatedBy,
-                WorkOrderIds = new long[] { sfcProduceEntity.WorkOrderId }
-            });
 
             return rows;
         }
