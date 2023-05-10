@@ -146,6 +146,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuFeedingRepository = manuFeedingRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
+            _planWorkOrderRepository = planWorkOrderRepository;
             _procBomDetailRepository = procBomDetailRepository;
             _procBomDetailReplaceMaterialRepository = procBomDetailReplaceMaterialRepository;
             _procMaterialRepository = procMaterialRepository;
