@@ -24,6 +24,10 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer.Query
         public long MaterialGroupId { get; set; }
 
         /// <summary>
+        /// 包装等级（分为一级/二级/三级）
+        /// </summary>
+        public LevelEnum Level { get; set; }
+        /// <summary>
         /// 状态;0-新建 1-启用 2-保留3-废弃
         /// </summary>
         public SysDataStatusEnum? Status { get; set; }
