@@ -29,6 +29,6 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<ManuSfcEntity> GetPlanSfcInfoAsync(PlanSfcReceiveQuery query);
+        Task<ManuSfcInfoEntity> GetPlanSfcInfoAsync(PlanSfcReceiveQuery query);
     }
 }

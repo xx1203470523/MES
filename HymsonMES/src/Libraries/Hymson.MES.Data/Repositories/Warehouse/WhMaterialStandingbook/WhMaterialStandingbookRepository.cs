@@ -86,6 +86,8 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
             sqlBuilder.OrderBy(" CreatedOn DESC");
+            sqlBuilder.Where("SiteId=@SiteId");
+
             //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");

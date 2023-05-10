@@ -171,6 +171,11 @@ namespace Hymson.MES.Data.Repositories.Plan
                 }
             }
 
+            if (pageQuery.Statuss != null&& pageQuery.Statuss.Any())
+            {
+                sqlBuilder.Where("wo.Status IN @Statuss");
+            }
+
             var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pageQuery.PageSize });

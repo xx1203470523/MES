@@ -111,6 +111,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             sqlBuilder.LeftJoin(" wh_supplier ws ON  ws.Id= wmi.SupplierId");
             sqlBuilder.LeftJoin(" proc_material pm ON  pm.Id= wmi.MaterialId");
             sqlBuilder.Where(" wmi.IsDeleted = 0");
+            sqlBuilder.Where(" wmi.SiteId=@SiteId");
             sqlBuilder.OrderBy(" wmi.UpdatedOn DESC");
             //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
             //{
@@ -166,7 +167,8 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetWhMaterialInventoryEntitiesSqlTemplate);
-            //sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId=@SiteId");
             sqlBuilder.Select("*");
             if (!string.IsNullOrWhiteSpace(whMaterialInventoryQuery.MaterialBarCode))
             {
@@ -311,9 +313,9 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <summary>
         /// 根据物料编码获取供应商信息
         /// </summary>
-        /// <param name="materialCode"></param>
+        /// <param name="WhSupplierByMaterialCommand"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<WhSupplierInfoView>> GetWhSupplierByMaterialIdAsync(long materialId, long supplierId = 0)
+        public async Task<IEnumerable<WhSupplierInfoView>> GetWhSupplierByMaterialIdAsync(WhSupplierByMaterialCommand command)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetSupplierlByMaterialCodeSql);
@@ -321,13 +323,15 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             sqlBuilder.Select("ws.Id,ws.Code,ws.Name");
             sqlBuilder.InnerJoin("proc_material_supplier_relation pmsr ON pmsr.SupplierId=ws.Id");
             sqlBuilder.Where("pmsr.MaterialId=@materialId");
-            if (supplierId > 0)
+            sqlBuilder.Where("ws.SiteId=@SiteId");
+
+            if (command.SupplierId > 0)
             {
                 sqlBuilder.Where("ws.Id=@supplierId");
             }
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var wsInfo = await conn.QueryAsync<WhSupplierInfoView>(template.RawSql, new { materialId, supplierId });
+            var wsInfo = await conn.QueryAsync<WhSupplierInfoView>(template.RawSql, command);
             return wsInfo;
         }
 

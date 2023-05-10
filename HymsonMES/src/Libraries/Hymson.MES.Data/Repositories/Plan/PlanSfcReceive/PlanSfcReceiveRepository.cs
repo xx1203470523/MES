@@ -69,19 +69,18 @@ namespace Hymson.MES.Data.Repositories.Plan
             return new PagedInfo<PlanSfcReceiveView>(planSfcInfoEntities, planSfcInfoPagedQuery.PageIndex, planSfcInfoPagedQuery.PageSize, totalCount);
         }
 
-
-
         /// <summary>
         /// 获取条码数据
         /// </summary>
         /// <param name="SFC"></param>
         /// <returns></returns>
-        public async Task<ManuSfcEntity> GetPlanSfcInfoAsync(PlanSfcReceiveQuery query)
+        public async Task<ManuSfcInfoEntity> GetPlanSfcInfoAsync(PlanSfcReceiveQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetPlanSfcInfoEntitiesSqlTemplate);
             sqlBuilder.Select("*");
             sqlBuilder.Where(" IsDeleted=0");
+            sqlBuilder.Where(" SiteId=@SiteId");
 
             if (!string.IsNullOrWhiteSpace(query.SFC))
             {
@@ -92,7 +91,7 @@ namespace Hymson.MES.Data.Repositories.Plan
                 sqlBuilder.Where(" WorkOrderId=@WorkOrderId");
             }
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var planSfcInfo = await conn.QueryFirstOrDefaultAsync<ManuSfcEntity>(template.RawSql, query);
+            var planSfcInfo = await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(template.RawSql, query);
             return planSfcInfo;
         }
 

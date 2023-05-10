@@ -30,5 +30,10 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         public CodeRuleCodeTypeEnum? CodeType { get; set; }
 
+        /// <summary>
+        /// 包装等级;1：一级；2：二级；3：三级；
+        /// </summary>
+        public CodeRulePackTypeEnum? PackType { get; set; }
+
     }
 }

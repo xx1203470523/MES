@@ -23,5 +23,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query
         /// 物料条码
         /// </summary>
         public string MaterialBarCode { get; set; }
+
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long SiteId { get; set; }
     }
 }

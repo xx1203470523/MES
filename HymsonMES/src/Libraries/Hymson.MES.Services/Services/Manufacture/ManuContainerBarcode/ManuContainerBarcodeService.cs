@@ -33,6 +33,7 @@ using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Microsoft.IdentityModel.Tokens;
 using System.Diagnostics;
 using System.Transactions;
 
@@ -577,10 +578,20 @@ namespace Hymson.MES.Services.Services.Manufacture
                 manuContainerBarcodeEntity.ContainerId = entityByRelation.Id;
                 manuContainerBarcodeEntity.ProductId = ProductId;
 
+                //包装等级转换
+                var packType = CodeRulePackTypeEnum.OneLevel;
+                var isDefined = Enum.IsDefined(typeof(CodeRulePackTypeEnum), level);
+                if (isDefined)
+                {
+                    CodeRulePackTypeEnum codeRulePackType = (CodeRulePackTypeEnum)Enum.ToObject(typeof(CodeRulePackTypeEnum), level);
+                    packType = codeRulePackType;
+                }
+                //根据编码类型，包装等级查询编码规则
                 var inteCodeRulesResult = await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery
                 {
                     ProductId = ProductId,
-                    CodeType = CodeRuleCodeTypeEnum.PackagingSeqCode
+                    CodeType = CodeRuleCodeTypeEnum.PackagingSeqCode,
+                    PackType = packType
                 });
                 var inteCodeRulesEntity = inteCodeRulesResult.FirstOrDefault();
                 if (inteCodeRulesEntity == null || inteCodeRulesEntity.ProductId != ProductId)
@@ -816,13 +827,16 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new ValidationException(nameof(ErrorCode.MES10101));
             }
+            var containerBarcode = await _manuContainerBarcodeRepository.GetByIdAsync(updateManuContainerBarcodeStatusDto.Id);
+            if (containerBarcode == null) {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16726));
+            }
 
             //验证DTO
             await _validationUpdateStatusRules.ValidateAndThrowAsync(updateManuContainerBarcodeStatusDto);
             //关闭操作必须要装箱数量达到最小包装数
             if (updateManuContainerBarcodeStatusDto.Status == 2)
             {
-                var containerBarcode = await _manuContainerBarcodeRepository.GetByIdAsync(updateManuContainerBarcodeStatusDto.Id);
                 var container = await _inteContainerRepository.GetByIdAsync(containerBarcode.ContainerId);
                 //查询已包装数
                 var containerPacks = await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(containerBarcode.Id, _currentSite.SiteId.Value);

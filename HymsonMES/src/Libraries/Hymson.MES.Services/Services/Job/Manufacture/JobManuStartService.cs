@@ -99,7 +99,6 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.lineUp);
             sfcProduceBusinessEntity.VerifyProcedureLock(bo.SFC, bo.ProcedureId);
 
-
             // 如果工序对应不上
             if (sfcProduceEntity.ProcedureId != bo.ProcedureId)
             {
