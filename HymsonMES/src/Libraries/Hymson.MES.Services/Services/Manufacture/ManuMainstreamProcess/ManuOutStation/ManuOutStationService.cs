@@ -263,6 +263,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                     sfcInfo.UpdatedOn = sfcProduceEntity.UpdatedOn;
                     rows += await _manuSfcRepository.UpdateAsync(sfcInfo);
 
+                    // 更新工单统计表的 RealEnd
+                    rows += await _planWorkOrderRepository.UpdatePlanWorkOrderRealEndByWorkOrderIdAsync(new UpdateWorkOrderRealTimeCommand
+                    {
+                        UpdatedOn = sfcProduceEntity.UpdatedOn,
+                        UpdatedBy = sfcProduceEntity.UpdatedBy,
+                        WorkOrderIds = new long[] { sfcProduceEntity.WorkOrderId }
+                    });
+
                     // 入库
                     rows += await SaveToWarehouse(sfcProduceEntity);
                 }
