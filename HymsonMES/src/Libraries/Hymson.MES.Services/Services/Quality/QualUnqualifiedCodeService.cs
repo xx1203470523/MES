@@ -173,7 +173,6 @@ namespace Hymson.MES.Services.Services.Quality
             qualUnqualifiedCodeEntity.CreatedBy = userId;
             qualUnqualifiedCodeEntity.UpdatedBy = userId;
             qualUnqualifiedCodeEntity.SiteId = _currentSite.SiteId ?? 0;
-            qualUnqualifiedCodeEntity.Status = SysDataStatusEnum.Build;
             List<QualUnqualifiedCodeGroupRelation> list = new List<QualUnqualifiedCodeGroupRelation>();
             if (param.UnqualifiedGroupIds != null && param.UnqualifiedGroupIds.Any())
             {

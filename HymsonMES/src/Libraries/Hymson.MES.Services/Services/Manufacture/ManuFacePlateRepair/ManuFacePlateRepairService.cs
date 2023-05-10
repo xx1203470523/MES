@@ -606,11 +606,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             #endregion
         }
 
-
-
-
-
-
         /// <summary>
         /// 获取初始信息
         /// </summary>

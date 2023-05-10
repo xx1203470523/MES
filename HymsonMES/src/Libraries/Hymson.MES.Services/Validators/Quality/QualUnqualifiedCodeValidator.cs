@@ -17,6 +17,7 @@ namespace Hymson.MES.Services.Validators.Quality
             RuleFor(x => x.UnqualifiedCode).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES11102));
             RuleFor(x => x.UnqualifiedCodeName).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11103));
             RuleFor(x => x.UnqualifiedCodeName).MaximumLength(60).WithErrorCode(nameof(ErrorCode.MES11104));
+            RuleFor(x => x.Status).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11109));
             RuleFor(x => x.Type).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11105));
             RuleFor(x => x.Degree).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11106));
             RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES11107));
@@ -35,6 +36,7 @@ namespace Hymson.MES.Services.Validators.Quality
             RuleFor(x => x.UnqualifiedCodeName).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11103));
             RuleFor(x => x.UnqualifiedCodeName).MaximumLength(60).WithErrorCode(nameof(ErrorCode.MES11104));
             RuleFor(x => x.Type).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11103));
+            RuleFor(x => x.Status).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11109));
             RuleFor(x => x.Degree).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11103));
             RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES11107));
         }
