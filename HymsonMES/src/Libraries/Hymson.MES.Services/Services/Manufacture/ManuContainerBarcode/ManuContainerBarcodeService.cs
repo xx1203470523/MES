@@ -33,6 +33,7 @@ using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Microsoft.IdentityModel.Tokens;
 using System.Diagnostics;
 using System.Transactions;
 
@@ -577,10 +578,20 @@ namespace Hymson.MES.Services.Services.Manufacture
                 manuContainerBarcodeEntity.ContainerId = entityByRelation.Id;
                 manuContainerBarcodeEntity.ProductId = ProductId;
 
+                //包装等级转换
+                var packType = CodeRulePackTypeEnum.OneLevel;
+                var isDefined = Enum.IsDefined(typeof(CodeRulePackTypeEnum), level);
+                if (isDefined)
+                {
+                    CodeRulePackTypeEnum codeRulePackType = (CodeRulePackTypeEnum)Enum.ToObject(typeof(CodeRulePackTypeEnum), level);
+                    packType = codeRulePackType;
+                }
+                //根据编码类型，包装等级查询编码规则
                 var inteCodeRulesResult = await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery
                 {
                     ProductId = ProductId,
-                    CodeType = CodeRuleCodeTypeEnum.PackagingSeqCode
+                    CodeType = CodeRuleCodeTypeEnum.PackagingSeqCode,
+                    PackType = packType
                 });
                 var inteCodeRulesEntity = inteCodeRulesResult.FirstOrDefault();
                 if (inteCodeRulesEntity == null || inteCodeRulesEntity.ProductId != ProductId)
