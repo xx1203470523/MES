@@ -17,6 +17,7 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
+using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.Snowflake;
@@ -92,6 +93,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             whMaterialInventoryEntity.UpdatedBy = _currentUser.UserName;
             whMaterialInventoryEntity.CreatedOn = HymsonClock.Now();
             whMaterialInventoryEntity.UpdatedOn = HymsonClock.Now();
+            whMaterialInventoryEntity.SiteId = _currentSite.SiteId ?? 0;
 
             //入库
             await _whMaterialInventoryRepository.InsertAsync(whMaterialInventoryEntity);
@@ -240,6 +242,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         public async Task<PagedInfo<WhMaterialInventoryPageListViewDto>> GetPageListAsync(WhMaterialInventoryPagedQueryDto whMaterialInventoryPagedQueryDto)
         {
             var whMaterialInventoryPagedQuery = whMaterialInventoryPagedQueryDto.ToQuery<WhMaterialInventoryPagedQuery>();
+            whMaterialInventoryPagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _whMaterialInventoryRepository.GetPagedInfoAsync(whMaterialInventoryPagedQuery);
 
             //实体到DTO转换 装载数据
@@ -274,7 +277,8 @@ namespace Hymson.MES.Services.Services.Warehouse
         {
             var pagedInfo = await _whMaterialInventoryRepository.GetWhMaterialInventoryEntitiesAsync(new WhMaterialInventoryQuery
             {
-                MaterialBarCode = materialBarCode
+                MaterialBarCode = materialBarCode,
+                SiteId = _currentSite.SiteId ?? 0
             });
 
             if (pagedInfo != null && pagedInfo.Any())
@@ -348,7 +352,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15101));
             }
-            var supplierInfo = await _whMaterialInventoryRepository.GetWhSupplierByMaterialIdAsync(materialInfo.Id);
+            var supplierInfo = await _whMaterialInventoryRepository.GetWhSupplierByMaterialIdAsync(new WhSupplierByMaterialCommand { MaterialId = materialInfo.Id, SiteId = _currentSite.SiteId ?? 0 });
             if (!supplierInfo.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15102));
