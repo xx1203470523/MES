@@ -64,6 +64,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IManuContainerPackRecordService _manuContainerPackRecordService;
         private readonly IManuFacePlateContainerPackRepository _manuFacePlateContainerPackRepository;
         private readonly IProcProcedureRepository _procProcedureRepository;
+        private readonly IProcResourceRepository _procResourceRepository;
         // private readonly AbstractValidator<ManuContainerBarcodeCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ManuContainerBarcodeModifyDto> _validationModifyRules;
         private readonly AbstractValidator<CreateManuContainerBarcodeDto> _validationCreateManuContainerBarcodeRules;
@@ -94,7 +95,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             , AbstractValidator<CreateManuContainerBarcodeDto> validationCreateManuContainerBarcodeRules,
                 AbstractValidator<UpdateManuContainerBarcodeStatusDto> validationUpdateStatusRules
             // , IManuSfcProduceRepository manuSfcProduceRepository
-            , IManuCommonService manuCommonService)
+            , IManuCommonService manuCommonService, IProcResourceRepository procResourceRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -119,6 +120,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             // _manuSfcProduceRepository = manuSfcProduceRepository;
             _procProcedureRepository = procProcedureRepository;
             _manuCommonService = manuCommonService;
+            _procResourceRepository = procResourceRepository;
         }
 
         /// <summary>
@@ -151,15 +153,29 @@ namespace Hymson.MES.Services.Services.Manufacture
         }
         private async Task<ManuContainerBarcodeView> CreatePackage(CreateManuContainerBarcodeDto createManuContainerBarcodeDto, ManuContainerBarcodeEntity manuContainerBarcodeEntity)
         {
+            //工序信息
+            var procobj = await _procProcedureRepository.GetByIdAsync(createManuContainerBarcodeDto.ProcedureId);
+            if (procobj == null)
+                throw new CustomerValidationException(nameof(ErrorCode.MES16714));
+            //测试提出资源对应类型和工序对应类型不一致验证
+            if (createManuContainerBarcodeDto.ResourceId.HasValue)
+            {
+                var resource = await _procResourceRepository.GetResByIdAsync(createManuContainerBarcodeDto.ResourceId.Value);
+                if (resource == null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16724));
+                }
+                if (procobj.ResourceTypeId != resource.ResTypeId)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16725));
+                }
+            }
+
             //获取面板信息
             var facePlateEntity = await _manuFacePlateRepository.GetByCodeAsync(createManuContainerBarcodeDto.FacePlateCode);
             if (facePlateEntity == null)
                 throw new CustomerValidationException(nameof(ErrorCode.MES16705));
             var facePlateContainerPackEntity = await _manuFacePlateContainerPackRepository.GetByFacePlateIdAsync(facePlateEntity.Id);
-            //工序信息
-            var procobj = await _procProcedureRepository.GetByIdAsync(createManuContainerBarcodeDto.ProcedureId);
-            if (procobj == null)
-                throw new CustomerValidationException(nameof(ErrorCode.MES16714));
             facePlateContainerPackEntity.ProcedureId = createManuContainerBarcodeDto.ProcedureId;
             if (procobj.PackingLevel == (int)ManuContainerBarcodePackageLevelEnum.First)
             {
