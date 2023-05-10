@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Process.ProcessRoute.Command;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -50,6 +51,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="query"></param>
         /// <returns></returns>
         Task<bool> IsExistsAsync(ProcProcessRouteQuery query);
+
+        /// <summary>
+        /// 新增
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> ResetCurrentVersionAsync(ResetCurrentVersionCommand command);
 
         /// <summary>
         /// 新增

@@ -568,7 +568,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             //内部的不允许重复绑定
-            if (serialNumber == MaterialSerialNumberEnum.Inside)
+            if (serialNumber == MaterialSerialNumberEnum.Inside|| serialNumber == MaterialSerialNumberEnum.Outside)
             {
                 var flag = IsBarCodeRepetAsync(addDto.CirculationBarCode, circulationEntities.ToList());
                 if (flag)
@@ -819,7 +819,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             //内部的不允许重复绑定
-            if (serialNumber == MaterialSerialNumberEnum.Inside)
+            if (serialNumber == MaterialSerialNumberEnum.Inside || serialNumber == MaterialSerialNumberEnum.Outside)
             {
                 var flag = IsBarCodeRepetAsync(replaceDto.CirculationBarCode, circulationEntities.ToList());
                 if (flag)
@@ -1181,7 +1181,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="procedureId"></param>
         /// <param name="sfcInfoId"></param>
         /// <returns></returns>
-        public async Task VerifyLockOrRepair(string sfc, long procedureId, long sfcInfoId)
+        private async Task VerifyLockOrRepair(string sfc, long procedureId, long sfcInfoId)
         {
             IEnumerable<long> sfcInfoIds = new[] { sfcInfoId };
             var sfcProduceBusinessEntities = await _manuSfcProduceRepository.GetSfcProduceBusinessBySFCIdsAsync(sfcInfoIds);

@@ -14,13 +14,16 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
+using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Minio.DataModel;
 //using Hymson.Utils.Extensions;
 
 namespace Hymson.MES.Services.Services.Warehouse
@@ -42,6 +45,11 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// 物料维护 仓储
         /// </summary>
         private readonly IProcMaterialRepository _procMaterialRepository;
+        /// <summary>
+        /// 条码信息表 仓储
+        /// </summary>
+        private readonly IManuSfcRepository _manuSfcRepository;
+
         private readonly AbstractValidator<WhMaterialInventoryCreateDto> _validationCreateRules;
         private readonly AbstractValidator<WhMaterialInventoryModifyDto> _validationModifyRules;
         private readonly ICurrentSite _currentSite;
@@ -51,6 +59,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
              IProcMaterialRepository procMaterialRepository,
+              IManuSfcRepository manuSfcRepository,
         AbstractValidator<WhMaterialInventoryCreateDto> validationCreateRules,
             AbstractValidator<WhMaterialInventoryModifyDto> validationModifyRules,
             ICurrentSite currentSite)
@@ -59,6 +68,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
             _procMaterialRepository = procMaterialRepository;
+            _manuSfcRepository = manuSfcRepository;
 
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
@@ -83,6 +93,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             whMaterialInventoryEntity.UpdatedBy = _currentUser.UserName;
             whMaterialInventoryEntity.CreatedOn = HymsonClock.Now();
             whMaterialInventoryEntity.UpdatedOn = HymsonClock.Now();
+            whMaterialInventoryEntity.SiteId = _currentSite.SiteId ?? 0;
 
             //入库
             await _whMaterialInventoryRepository.InsertAsync(whMaterialInventoryEntity);
@@ -131,11 +142,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 //    throw new CustomerValidationException(nameof(ErrorCode.MES15102)).WithData("MaterialCode", item.MaterialCode);
                 //}
 
-                var isMaterialBarCode = await GetMaterialBarCodeAnyAsync(item.MaterialBarCode);
-                if (isMaterialBarCode)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15104)).WithData("MaterialCode", item.MaterialBarCode);
-                }
+                await GetMaterialBarCodeAnyAsync(item.MaterialBarCode);
 
                 #endregion
 
@@ -235,6 +242,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         public async Task<PagedInfo<WhMaterialInventoryPageListViewDto>> GetPageListAsync(WhMaterialInventoryPagedQueryDto whMaterialInventoryPagedQueryDto)
         {
             var whMaterialInventoryPagedQuery = whMaterialInventoryPagedQueryDto.ToQuery<WhMaterialInventoryPagedQuery>();
+            whMaterialInventoryPagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _whMaterialInventoryRepository.GetPagedInfoAsync(whMaterialInventoryPagedQuery);
 
             //实体到DTO转换 装载数据
@@ -269,9 +277,21 @@ namespace Hymson.MES.Services.Services.Warehouse
         {
             var pagedInfo = await _whMaterialInventoryRepository.GetWhMaterialInventoryEntitiesAsync(new WhMaterialInventoryQuery
             {
-                MaterialBarCode = materialBarCode
+                MaterialBarCode = materialBarCode,
+                SiteId = _currentSite.SiteId ?? 0
             });
-            return pagedInfo.Any();
+
+            if (pagedInfo != null && pagedInfo.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15104)).WithData("MaterialCode", materialBarCode);
+            }
+
+            var sfcEntit = await _manuSfcRepository.GetBySFCAsync(materialBarCode);
+            if (sfcEntit != null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES152016)).WithData("MaterialCode", materialBarCode);
+            }
+            return false;
         }
 
         /// <summary>
@@ -332,7 +352,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15101));
             }
-            var supplierInfo = await _whMaterialInventoryRepository.GetWhSupplierByMaterialIdAsync(materialInfo.Id);
+            var supplierInfo = await _whMaterialInventoryRepository.GetWhSupplierByMaterialIdAsync(new WhSupplierByMaterialCommand { MaterialId = materialInfo.Id, SiteId = _currentSite.SiteId ?? 0 });
             if (!supplierInfo.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15102));

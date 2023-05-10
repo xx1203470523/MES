@@ -7,6 +7,7 @@
  */
 using FluentValidation;
 using Hymson.Authentication;
+using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -28,19 +29,23 @@ namespace Hymson.MES.Services.Services.Warehouse
     {
         private readonly ICurrentUser _currentUser;
 
+        private readonly ICurrentSite _currentSite;
+
         /// <summary>
         /// 物料台账 仓储
         /// </summary>
         private readonly IWhMaterialStandingbookRepository _whMaterialStandingbookRepository;
+
         private readonly AbstractValidator<WhMaterialStandingbookCreateDto> _validationCreateRules;
         private readonly AbstractValidator<WhMaterialStandingbookModifyDto> _validationModifyRules;
 
-        public WhMaterialStandingbookService(ICurrentUser currentUser, IWhMaterialStandingbookRepository whMaterialStandingbookRepository, AbstractValidator<WhMaterialStandingbookCreateDto> validationCreateRules, AbstractValidator<WhMaterialStandingbookModifyDto> validationModifyRules)
+        public WhMaterialStandingbookService(ICurrentUser currentUser, ICurrentSite currentSite, IWhMaterialStandingbookRepository whMaterialStandingbookRepository, AbstractValidator<WhMaterialStandingbookCreateDto> validationCreateRules, AbstractValidator<WhMaterialStandingbookModifyDto> validationModifyRules)
         {
             _currentUser = currentUser;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
+            _currentSite = currentSite;
         }
 
         /// <summary>
@@ -94,6 +99,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         public async Task<PagedInfo<WhMaterialStandingbookDto>> GetPageListAsync(WhMaterialStandingbookPagedQueryDto whMaterialStandingbookPagedQueryDto)
         {
             var whMaterialStandingbookPagedQuery = whMaterialStandingbookPagedQueryDto.ToQuery<WhMaterialStandingbookPagedQuery>();
+            whMaterialStandingbookPagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _whMaterialStandingbookRepository.GetPagedInfoAsync(whMaterialStandingbookPagedQuery);
 
             //实体到DTO转换 装载数据

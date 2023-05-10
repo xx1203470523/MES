@@ -104,7 +104,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// <summary>
         /// 标包数量
         /// </summary>
-        public int PackageNum { get; set; }
+        public int? PackageNum { get; set; }
 
         /// <summary>
         /// 描述 :计量单位(字典定义) 

@@ -160,7 +160,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="barCode"></param>
         /// <param name="materialId"></param>
         /// <returns></returns>
-        public async Task<bool> CheckBarCodeByMaskCodeRule(string barCode, long materialId)
+        public async Task<bool> CheckBarCodeByMaskCodeRuleAsync(string barCode, long materialId)
         {
             var material = await _procMaterialRepository.GetByIdAsync(materialId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10204));
@@ -181,7 +181,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="bo"></param>
         /// <param name="sfcCirculationType"></param>
         /// <returns></returns>
-        public async Task<bool> CheckSFCIsCanDoneStep(ManufactureBo bo, SfcCirculationTypeEnum sfcCirculationType)
+        public async Task<bool> CheckSFCIsCanDoneStepAsync(ManufactureBo bo, SfcCirculationTypeEnum sfcCirculationType)
         {
             if (bo == null) return false;
 
@@ -414,7 +414,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="processRouteId"></param>
         /// <param name="procedureId"></param>
         /// <returns></returns>
-        public async Task<bool> IsRandomPreProcedure(long processRouteId, long procedureId)
+        public async Task<bool> IsRandomPreProcedureAsync(long processRouteId, long procedureId)
         {
             // 因为可能有分叉，所以返回的上一步工序是集合
             var preProcessRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetPreProcessRouteDetailLinkAsync(new ProcProcessRouteDetailLinkQuery
@@ -446,7 +446,21 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             if (defaultPreProcedure.CheckType == ProcessRouteInspectTypeEnum.RandomInspection) return true;
 
             // 继续检查上一工序
-            return await IsRandomPreProcedure(processRouteId, defaultPreProcedure.Id);
+            return await IsRandomPreProcedureAsync(processRouteId, defaultPreProcedure.Id);
+        }
+
+        /// <summary>
+        /// 判断是否首工序
+        /// </summary>
+        /// <param name="processRouteId"></param>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        public async Task<bool> IsFirstProcedureAsync(long processRouteId, long procedureId)
+        {
+            var firstProcedureDetailNodeEntity = await _procProcessRouteDetailNodeRepository.GetFirstProcedureByProcessRouteIdAsync(processRouteId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10435));
+
+            return firstProcedureDetailNodeEntity.ProcedureId == procedureId;
         }
 
         /// <summary>
@@ -456,9 +470,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="startProcedureId"></param>
         /// <param name="endProcedureId"></param>
         /// <returns></returns>
-        public async Task<bool> IsProcessStartBeforeEnd(long processRouteId, long startProcedureId, long endProcedureId)
+        public async Task<bool> IsProcessStartBeforeEndAsync(long processRouteId, long startProcedureId, long endProcedureId)
         {
-            var processRouteDetailList = await GetProcessRoute(processRouteId);
+            var processRouteDetailList = await GetProcessRouteAsync(processRouteId);
             var processRouteDetails = processRouteDetailList.Where(x => x.ProcedureIds.Contains(startProcedureId) && x.ProcedureIds.Contains(endProcedureId));
             if (processRouteDetails != null && processRouteDetails.Any())
             {
@@ -480,7 +494,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// </summary>
         /// <param name="procedureId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<long>> GetProcResourceIdByProcedureId(long procedureId)
+        public async Task<IEnumerable<long>> GetProcResourceIdByProcedureIdAsync(long procedureId)
         {
             var resources = await _procResourceRepository.GetProcResourceListByProcedureIdAsync(new ProcResourceListByProcedureIdQuery
             {
@@ -497,7 +511,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// </summary>
         /// <param name="processRouteId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcessRouteDetailDto>> GetProcessRoute(long processRouteId)
+        public async Task<IEnumerable<ProcessRouteDetailDto>> GetProcessRouteAsync(long processRouteId)
         {
             var processRouteDetailLinkListTask = _procProcessRouteDetailLinkRepository.GetListAsync(new ProcProcessRouteDetailLinkQuery { ProcessRouteId = processRouteId });
             var processRouteDetailNodeListTask = _procProcessRouteDetailNodeRepository.GetProcProcessRouteDetailNodesByProcessRouteId(processRouteId);
@@ -515,6 +529,57 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 }
             }
             return list;
+        }
+
+        /// <summary>
+        /// 批量验证条码是否锁定
+        /// </summary>
+        /// <param name="sfcs"></param>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        public async Task VerifySfcsLockAsync(string[] sfcs, long procedureId)
+        {
+            var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
+            if (sfcProduceBusinesss != null && sfcProduceBusinesss.Any())
+            {
+                var validationFailures = new List<ValidationFailure>();
+
+                foreach (var item in sfcProduceBusinesss)
+                {
+                    var sfcProduceLockBo = JsonSerializer.Deserialize<SfcProduceLockBo>(item.BusinessContent);
+                    if (sfcProduceLockBo == null) continue;
+
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", item.Sfc}
+                        };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.Sfc);
+                    }
+
+                    if (sfcProduceLockBo.Lock == QualityLockEnum.InstantLock)
+                    {
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES18010);
+                        validationFailures.Add(validationFailure);
+                    }
+
+                    if (sfcProduceLockBo.Lock == QualityLockEnum.FutureLock && sfcProduceLockBo.LockProductionId == procedureId)
+                    {
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES18010);
+                        validationFailures.Add(validationFailure);
+                    }
+                }
+
+                //是否存在错误
+                if (validationFailures.Any())
+                {
+                    throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
+                }
+            }
         }
 
         /// <summary>
@@ -574,56 +639,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             }
         }
 
-        /// <summary>
-        /// 批量验证条码是否锁定
-        /// </summary>
-        /// <param name="sfcs"></param>
-        /// <param name="procedureId"></param>
-        /// <returns></returns>
-        public async Task VerifySfcsLockAsync(string[] sfcs, long procedureId)
-        {
-            var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
-            if (sfcProduceBusinesss != null && sfcProduceBusinesss.Any())
-            {
-                var validationFailures = new List<ValidationFailure>();
-
-                foreach (var item in sfcProduceBusinesss)
-                {
-                    var sfcProduceLockBo = JsonSerializer.Deserialize<SfcProduceLockBo>(item.BusinessContent);
-                    if (sfcProduceLockBo == null) continue;
-
-                    var validationFailure = new ValidationFailure();
-                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
-                    {
-                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
-                            { "CollectionIndex", item.Sfc}
-                        };
-                    }
-                    else
-                    {
-                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.Sfc);
-                    }
-
-                    if (sfcProduceLockBo.Lock == QualityLockEnum.InstantLock)
-                    {
-                        validationFailure.ErrorCode = nameof(ErrorCode.MES18010);
-                        validationFailures.Add(validationFailure);
-                    }
-
-                    if (sfcProduceLockBo.Lock == QualityLockEnum.FutureLock && sfcProduceLockBo.LockProductionId == procedureId)
-                    {
-                        validationFailure.ErrorCode = nameof(ErrorCode.MES18010);
-                        validationFailures.Add(validationFailure);
-                    }
-                }
-
-                //是否存在错误
-                if (validationFailures.Any())
-                {
-                    throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
-                }
-            }
-        }
     }
 
 

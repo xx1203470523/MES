@@ -92,7 +92,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 标包数量
         /// </summary>
-        public int PackageNum { get; set; }
+        public int? PackageNum { get; set; }
 
        /// <summary>
        /// 计量单位(字典定义)
@@ -221,7 +221,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 标包数量
         /// </summary>
-        public int PackageNum { get; set; }
+        public int? PackageNum { get; set; }
 
         /// <summary>
         /// 计量单位(字典定义)
@@ -390,7 +390,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 标包数量
         /// </summary>
-        public int PackageNum { get; set; }
+        public int? PackageNum { get; set; }
 
         /// <summary>
         /// 计量单位(字典定义)

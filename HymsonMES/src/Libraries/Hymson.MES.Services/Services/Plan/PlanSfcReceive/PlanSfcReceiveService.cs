@@ -156,7 +156,7 @@ namespace Hymson.MES.Services.Services.Plan
                 }
                 else
                 {
-                    if (!await _manuCommonService.CheckBarCodeByMaskCodeRule(sfc, procMaterialEntity.Id))
+                    if (!await _manuCommonService.CheckBarCodeByMaskCodeRuleAsync(sfc, procMaterialEntity.Id))
                     {
                         var validationFailure = new ValidationFailure();
                         if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
@@ -265,10 +265,6 @@ namespace Hymson.MES.Services.Services.Plan
                 if (manuSfcEntity != null)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16122)).WithData("sfc", param.SFC);
-                }
-                if (!await _manuCommonService.CheckBarCodeByMaskCodeRule(param.SFC, procMaterialEntity.Id))
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16121)).WithData("product", procMaterialEntity.MaterialCode);
                 }
                 qty = procMaterialEntity.Batch;
             }

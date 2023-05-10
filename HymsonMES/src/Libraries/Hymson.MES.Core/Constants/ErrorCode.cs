@@ -39,7 +39,7 @@
         public const string MES10222 = "插入物料供应商关联表失败！";
         public const string MES10223 = "物料编码最大长度为50";
         public const string MES10224 = "物料名称最大长度为50";
-
+        public const string MES10225 = "有生产中的工单引用其中的物料，不允许删除！";
         #endregion
 
         #region 资源 10300
@@ -359,6 +359,8 @@
         public const string MES152013 = "物料条码：{MaterialCode}数量需大于0";
         public const string MES152014 = " 条码：{MaterialCode}在车间库存中已存在！";
         public const string MES152015 = " 供应商不能为空";
+        public const string MES152016 = " 条码：{MaterialCode}已存在！";
+
 
         #endregion
 
@@ -396,6 +398,7 @@
         public const string MES15408 = "存在未关闭的不合格信息，工艺路线为必填!";
         public const string MES15409 = "不合格代码{codes}已录入,请勿重复录入!";
         public const string MES15410 = "SFC {sfcs}已存在返修信息，不可再执行当前操作!";
+        public const string MES15411= "条码{sfcs}已报废,不可再执行当前操作！";
         #endregion
 
         #region 物料加载 15500
@@ -606,7 +609,7 @@
         public const string MES16702 = "容器包装，包装码不存在";
         public const string MES16703 = "容器包装，条码的包装维护记录未找到";
         public const string MES16704 = "容器包装，配置面板编号为空";
-        public const string MES16705 = "容器包装，配置面板不存在";
+        public const string MES16705 = "容器包装，配置面板不存在或未启用";
         public const string MES16706 = "容器包装，配置面板不允许混工单,当前容器工单{first},当前条码工单{second}";
         public const string MES16707 = "容器包装，包装码不能为空";
         public const string MES16710 = "不识别的类型：{key}";
@@ -624,6 +627,9 @@
         public const string MES16720 = "容器包装，条码已报废";
         public const string MES16721 = "容器包装，该条码{sfc}已装箱{barcode}";
         public const string MES16722 = "容器包装，该包装{packId}已关闭或删除";
+        public const string MES16723 = "容器包装，包装数量未达到最小包装数，不允许关闭";
+        public const string MES16724 = "容器包装，资源信息未找到";
+        public const string MES16725 = "容器包装，资源对应资源类型和工序对应资源类型不一致";
         #endregion
 
         #region 绑定工单激活  MES16800

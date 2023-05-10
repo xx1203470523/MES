@@ -4,6 +4,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Data.Repositories.Integrated.InteContainer;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
@@ -33,7 +34,8 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         private readonly IManuCommonService _manuCommonService;
         private readonly IManuContainerBarcodeRepository _manuContainerBarcodeRepository;
-
+        private readonly IManuContainerPackRepository _manuContainerPackRepository;
+        private readonly IInteContainerRepository _inteContainerRepository;
 
         /// <summary>
         /// 构造函数
@@ -42,13 +44,17 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <param name="currentSite"></param>
         /// <param name="manuCommonService"></param>
         /// <param name="manuContainerBarcodeRepository"></param>
+        /// <param name="manuContainerPackRepository"></param>
+        /// <param name="inteContainerRepository"></param>
         public JobManuPackageCloseService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IManuCommonService manuCommonService, IManuContainerBarcodeRepository manuContainerBarcodeRepository)
+            IManuCommonService manuCommonService, IManuContainerBarcodeRepository manuContainerBarcodeRepository, IManuContainerPackRepository manuContainerPackRepository, IInteContainerRepository inteContainerRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _manuCommonService = manuCommonService;
             _manuContainerBarcodeRepository = manuContainerBarcodeRepository;
+            _manuContainerPackRepository = manuContainerPackRepository;
+            _inteContainerRepository = inteContainerRepository;
         }
 
 
@@ -81,13 +87,28 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             };
             string success = "true";
             var manuContainerBarcodeEntity = await _manuContainerBarcodeRepository.GetByIdAsync(bo.ContainerId);
-            if (manuContainerBarcodeEntity == null) {
+            if (manuContainerBarcodeEntity == null)
+            {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16702));
             }
             int status = 2;//1打开，2关闭
+            defaultDto.Content?.Add("Operation", ManuContainerPackagJobReturnTypeEnum.JobManuPackageCloseService.ParseToInt().ToString());
+            defaultDto.Content?.Add("Status", $"{status}".ToString());
             //当前状态不等于修改状态
             if (manuContainerBarcodeEntity.Status != status)
             {
+
+                //关闭操作必须要装箱数量达到最小包装数
+                var container = await _inteContainerRepository.GetByIdAsync(manuContainerBarcodeEntity.ContainerId);
+                //查询已包装数
+                var containerPacks = await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(manuContainerBarcodeEntity.Id, _currentSite.SiteId.Value);
+                if (containerPacks.Count() < container.Minimum)
+                {
+                    success = "false";
+                    defaultDto.Message = ErrorCode.MES16723;
+                    defaultDto.Content?.Add("Success", success);
+                    return defaultDto;
+                }
                 //修改容器状态
                 manuContainerBarcodeEntity.Status = status;
                 manuContainerBarcodeEntity.UpdatedBy = _currentUser.UserName;
@@ -100,9 +121,6 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
                 success = "false";
                 defaultDto.Message = $"该容器已经关闭！";
             }
-
-            defaultDto.Content?.Add("Operation", ManuContainerPackagJobReturnTypeEnum.JobManuPackageCloseService.ParseToInt().ToString());
-            defaultDto.Content?.Add("Status", $"{status}".ToString());
             defaultDto.Content?.Add("Success", success);
 
             return defaultDto;

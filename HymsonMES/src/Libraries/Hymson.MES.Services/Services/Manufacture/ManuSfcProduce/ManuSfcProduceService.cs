@@ -237,8 +237,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     Id = item.Id,
                     Sfc = item.Sfc,
-                    Lock = item.Lock,
-                    LockProductionId = item.LockProductionId,
+                    //Lock = item.Lock,
+                    //LockProductionId = item.LockProductionId,
+                    ProcessRouteId = item.ProcessRouteId,
                     ProductBOMId = item.ProductBOMId,
                     ProcedureId = item.ProcedureId,
                     Status = item.Status,
@@ -313,6 +314,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                         throw new CustomerValidationException(nameof(ErrorCode.MES15310)).WithData("lockproduction", procProcedureEntity.Name);
                     }
                 }
+
+                //判断将来工序是不是工艺路线上的工序，而且是选择的条码的接下来的工序
             }
             //TODO  验证未完成 wangkeming
             var validationFailures = new List<ValidationFailure>();
@@ -359,7 +362,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         }
 
                         //验证工序
-                        if (await _manuCommonService.IsProcessStartBeforeEnd(sfcEntity.ProcessRouteId, sfcEntity.ProcedureId, parm.LockProductionId ?? 0))
+                        if (await _manuCommonService.IsProcessStartBeforeEndAsync(sfcEntity.ProcessRouteId, sfcEntity.ProcedureId, parm.LockProductionId ?? 0))
                         {
                             var validationFailure = new ValidationFailure();
                             if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
@@ -539,9 +542,9 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             var sfc = parm.Sfcs.Distinct();
-            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = parm.Sfcs };
+            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = parm.Sfcs, SiteId = _currentSite.SiteId ?? 00 };
             //获取条码列表
-            var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
+            var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceInfoEntitiesAsync(manuSfcProducePagedQuery);
             if (!manuSfcs.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15402));
@@ -554,6 +557,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var strs = string.Join("','", scrapSfcs);
                 throw new CustomerValidationException(nameof(ErrorCode.MES15401));
             }
+
+            await VerifySfcsLockAsync(manuSfcs.ToArray());
             #endregion
 
             #region  组装数据
@@ -610,9 +615,9 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             var sfc = parm.Sfcs.Distinct();
-            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = parm.Sfcs };
+            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = parm.Sfcs,SiteId = _currentSite.SiteId ?? 00 };
             //获取条码列表
-            var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
+            var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceInfoEntitiesAsync(manuSfcProducePagedQuery);
             if (!manuSfcs.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15402));
@@ -624,6 +629,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var strs = string.Join("','", noScrapSfcs);
                 throw new CustomerValidationException(nameof(ErrorCode.MES15403)).WithData("sfcs", strs);
             }
+
+            //await VerifySfcsLockAsync(manuSfcs.ToArray());
 
             //取消报废， 验证工单是否已经激活，若已经取消激活，不能取消报废条码
             var orderIds = manuSfcs.Select(x => x.WorkOrderId).Distinct().ToArray();
@@ -1139,7 +1146,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             var processRouteId = processRouteIds.FirstOrDefault();
             //获取工艺路线节点
-            var processRouteNodes = await _manuCommonService.GetProcessRoute(processRouteId);
+            var processRouteNodes = await _manuCommonService.GetProcessRouteAsync(processRouteId);
             if (processRouteNodes == null || processRouteIds.Count() == 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18005));
@@ -1277,7 +1284,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         whMaterialInventoryEntity.Batch = "";//自制品 没有
                         whMaterialInventoryEntity.QuantityResidue = procMaterial.Batch;
                         whMaterialInventoryEntity.Status = WhMaterialInventoryStatusEnum.ToBeUsed;
-                        whMaterialInventoryEntity.Source = WhMaterialInventorySourceEnum.ManuComplete;
+                        whMaterialInventoryEntity.Source = MaterialInventorySourceEnum.ManuComplete;
                         whMaterialInventoryEntity.SiteId = _currentSite.SiteId ?? 0;
                         whMaterialInventoryEntity.Id = IdGenProvider.Instance.CreateId();
                         whMaterialInventoryEntity.CreatedBy = _currentUser.UserName;
@@ -1296,7 +1303,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         whMaterialStandingbookEntity.Quantity = procMaterial.Batch;
                         whMaterialStandingbookEntity.Unit = procMaterial.Unit ?? "";
                         whMaterialStandingbookEntity.Type = WhMaterialInventoryTypeEnum.StepControl;
-                        whMaterialStandingbookEntity.Source = WhMaterialInventorySourceEnum.ManuComplete;
+                        whMaterialStandingbookEntity.Source = MaterialInventorySourceEnum.ManuComplete;
                         whMaterialStandingbookEntity.SiteId = _currentSite.SiteId ?? 0;
                         whMaterialStandingbookEntity.Id = IdGenProvider.Instance.CreateId();
                         whMaterialStandingbookEntity.CreatedBy = _currentUser.UserName;
@@ -1403,7 +1410,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             whMaterialStandingbookEntity.Quantity = procMaterial.Batch;
                             whMaterialStandingbookEntity.Unit = procMaterial.Unit ?? "";
                             whMaterialStandingbookEntity.Type = WhMaterialInventoryTypeEnum.StepControl;
-                            whMaterialStandingbookEntity.Source = WhMaterialInventorySourceEnum.ManuComplete;
+                            whMaterialStandingbookEntity.Source = MaterialInventorySourceEnum.ManuComplete;
                             whMaterialStandingbookEntity.SiteId = _currentSite.SiteId ?? 0;
                             whMaterialStandingbookEntity.Id = IdGenProvider.Instance.CreateId();
                             whMaterialStandingbookEntity.CreatedBy = _currentUser.UserName;
@@ -1605,7 +1612,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES18211));
             }
 
-            //验证条码锁定
+            // 验证条码锁定
             await _manuCommonService.VerifySfcsLockAsync(sfcs, procedureId);
 
             //这个是物料删除 所以查到就是有锁
@@ -1774,6 +1781,67 @@ namespace Hymson.MES.Services.Services.Manufacture
                 trans.Complete();
             }
             #endregion
+        }
+
+        /// <summary>
+        /// 获取工艺路线末尾工序
+        /// </summary>
+        /// <param name="processRouteId"></param>
+        /// <returns></returns>
+        public async Task<long> GetLastProcedureAsync(long processRouteId)
+        {
+            long id = 0;
+            //获取工艺路线节点
+            var processRouteNodes = await _manuCommonService.GetProcessRouteAsync(processRouteId);
+            if (processRouteNodes.Any())
+            {
+                id = processRouteNodes?.FirstOrDefault()?.ProcedureIds.Last()??0;
+            }
+            return id;
+        }
+
+        /// <summary>
+        /// 验证sfc是否锁定
+        /// </summary>
+        /// <param name="manuSfcs"></param>
+        /// <returns></returns>
+        private async Task VerifySfcsLockAsync(ManuSfcProduceInfoView[] manuSfcs)
+        {
+            var sfcs = manuSfcs.Select(x => x.SFC).ToArray();
+            var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
+            if (sfcProduceBusinesss != null && sfcProduceBusinesss.Any())
+            {
+                var sfcInfoIds = sfcProduceBusinesss.Select(it => it.SfcInfoId).ToArray();
+                var sfcProduceBusinesssList = sfcProduceBusinesss.ToList();
+                var instantLockSfcs = new List<string>();
+                foreach (var business in sfcProduceBusinesssList)
+                {
+                    var manuSfc = manuSfcs.FirstOrDefault(x => x.SfcInfoId == business.SfcInfoId);
+                    if (manuSfc == null)
+                    {
+                        continue;
+                    }
+                    var sfcProduceLockBo = System.Text.Json.JsonSerializer.Deserialize<SfcProduceLockBo>(business.BusinessContent);
+                    if (sfcProduceLockBo == null)
+                    {
+                        continue;
+                    }
+                    if (sfcProduceLockBo.Lock == QualityLockEnum.InstantLock)
+                    {
+                        instantLockSfcs.Add(manuSfc.SFC);
+                    }
+                    if (sfcProduceLockBo.Lock == QualityLockEnum.FutureLock && sfcProduceLockBo.LockProductionId == manuSfc.ProcedureId)
+                    {
+                        instantLockSfcs.Add(manuSfc.SFC);
+                    }
+                }
+
+                if (instantLockSfcs.Any())
+                {
+                    var strs = string.Join(",", instantLockSfcs.Distinct().ToArray());
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15407)).WithData("sfcs", strs);
+                }
+            }
         }
     }
 }
