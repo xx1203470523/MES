@@ -436,23 +436,35 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <returns></returns>
         public async Task<ProcProcedureEntity?> GetNextProcedureAsync(ManuSfcProduceEntity manuSfcProduce)
         {
+            return await GetNextProcedureAsync(manuSfcProduce.WorkOrderId, manuSfcProduce.ProcessRouteId, manuSfcProduce.ProcedureId);
+        }
+
+        /// <summary>
+        /// 获当前工序对应的下一工序
+        /// </summary>
+        /// <param name="workOrderId"></param>
+        /// <param name="processRouteId"></param>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        public async Task<ProcProcedureEntity?> GetNextProcedureAsync(long workOrderId, long processRouteId, long procedureId)
+        {
             // 因为可能有分叉，所以返回的下一步工序是集合
             var netxtProcessRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetNextProcessRouteDetailLinkAsync(new ProcProcessRouteDetailLinkQuery
             {
-                ProcessRouteId = manuSfcProduce.ProcessRouteId,
-                ProcedureId = manuSfcProduce.ProcedureId
+                ProcessRouteId = processRouteId,
+                ProcedureId = procedureId
             });
             if (netxtProcessRouteDetailLinks == null || netxtProcessRouteDetailLinks.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES10440));
 
             // 获取当前工序在工艺路线里面的扩展信息（这里存放是Node表的工序ID，而不是主键ID，后期建议改为主键ID）
             var procedureNodes = await _procProcessRouteDetailNodeRepository.GetByProcedureIdsAsync(new ProcProcessRouteDetailNodesQuery
             {
-                ProcessRouteId = manuSfcProduce.ProcessRouteId,
+                ProcessRouteId = processRouteId,
                 ProcedureIds = netxtProcessRouteDetailLinks.Select(s => s.ProcessRouteDetailId)
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10440));
 
             // 随机工序Key
-            var cacheKey = $"{manuSfcProduce.ProcedureId}-{manuSfcProduce.WorkOrderId}";
+            var cacheKey = $"{procedureId}-{workOrderId}";
             var count = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.None, cacheKey);
 
             // 这个Key太长了
