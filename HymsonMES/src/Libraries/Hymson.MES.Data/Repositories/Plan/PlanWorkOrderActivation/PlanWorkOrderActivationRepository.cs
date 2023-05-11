@@ -171,17 +171,28 @@ namespace Hymson.MES.Data.Repositories.Plan
             }
             if (planWorkOrderActivationPagedQuery.Status.HasValue)
             {
-                sqlBuilder.Where(" wo.Status = @Status ");
+                if (planWorkOrderActivationPagedQuery.Status == Core.Enums.PlanWorkOrderStatusEnum.Pending)
+                {
+                    planWorkOrderActivationPagedQuery.IsLocked = Core.Enums.YesOrNoEnum.Yes;
+                    sqlBuilder.Where("wo.IsLocked = @IsLocked ");
+
+                    planWorkOrderActivationPagedQuery.Status = PlanWorkOrderStatusEnum.Closed;
+                    sqlBuilder.Where(" wo.Status != @Status ");//不要显示状态为已关闭的
+                }
+                else 
+                {
+                    sqlBuilder.Where(" wo.Status = @Status ");
+                }
             }
             else
             {
                 planWorkOrderActivationPagedQuery.Status = PlanWorkOrderStatusEnum.Closed;
                 sqlBuilder.Where(" wo.Status != @Status ");//不要显示状态为已关闭的
             }
-            if (planWorkOrderActivationPagedQuery.IsLocked.HasValue)
-            {
-                sqlBuilder.Where(" wo.IsLocked = @IsLocked ");
-            }
+            //if (planWorkOrderActivationPagedQuery.IsLocked.HasValue)
+            //{
+            //    sqlBuilder.Where(" wo.IsLocked = @IsLocked ");
+            //}
 
             if (planWorkOrderActivationPagedQuery.PlanStartTime != null && planWorkOrderActivationPagedQuery.PlanStartTime.Length > 0)
             {
