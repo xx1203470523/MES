@@ -8,17 +8,17 @@ namespace Hymson.MES.Core.Enums.Manufacture
     public enum ManuSfcStepTypeEnum : short
     {
         // ; 跟枚举的对应不上了，具体以枚举的为准
-        // 步骤类型;1：创建；2：复用；3：进站；4：出站；5：将来锁定；6：及时锁定；7：解锁；8：完成；9：报废；10：NG标识；11：删除；12：拆解；13：合并；14：转换；
+        // 步骤类型;1：创建；3：进站；4：出站；5：将来锁定；6：及时锁定；7：解锁；9：报废；14：转换；15;关闭标识;16:关闭缺陷;17:删除;18:维修;19:步骤控制;20:生产更改
         /// <summary>
         /// 创建
         /// </summary>
         [Description("创建")]
         Create = 1,
-        /// <summary>
-        /// 复用
-        /// </summary>
-        [Description("复用")]
-        Multiplex = 2,
+        ///// <summary>
+        ///// 复用
+        ///// </summary>
+        //[Description("复用")]
+        //Multiplex = 2,
         /// <summary>
         /// 进站
         /// </summary>
@@ -44,36 +44,36 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// </summary>
         [Description("解锁")]
         Unlock = 7,
-        /// <summary>
-        /// 完成
-        /// </summary>
-        [Description("完成")]
-        Complete = 8,
+        ///// <summary>
+        ///// 完成
+        ///// </summary>
+        //[Description("完成")]
+        //Complete = 8,
         /// <summary>
         /// 报废
         /// </summary>
         [Description("报废")]
         Discard = 9,
-        /// <summary>
-        /// NG标识
-        /// </summary>
-        [Description("NG标识")]
-        NGMark = 10,
-        /// <summary>
-        /// 拆解
-        /// </summary>
-        [Description("拆解")]
-        Split = 11,
-        /// <summary>
-        /// 合并
-        /// </summary>
-        [Description("合并")]
-        Merge = 12,
-        /// <summary>
-        /// 转换
-        /// </summary>
-        [Description("转换")]
-        Change = 13,
+        ///// <summary>
+        ///// NG标识
+        ///// </summary>
+        //[Description("NG标识")]
+        //NGMark = 10,
+        ///// <summary>
+        ///// 拆解
+        ///// </summary>
+        //[Description("拆解")]
+        //Split = 11,
+        ///// <summary>
+        ///// 合并
+        ///// </summary>
+        //[Description("合并")]
+        //Merge = 12,
+        ///// <summary>
+        ///// 转换
+        ///// </summary>
+        //[Description("转换")]
+        //Change = 13,
         /// <summary>
         /// 取消报废
         /// </summary>
