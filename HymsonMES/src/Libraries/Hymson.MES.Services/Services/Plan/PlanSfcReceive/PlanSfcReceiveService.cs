@@ -52,6 +52,7 @@ namespace Hymson.MES.Services.Services.Plan
         private readonly IManuCreateBarcodeService _manuCreateBarcodeService;
         private readonly IProcMaterialRepository _procMaterialRepository;
         private readonly IManuCommonService _manuCommonService;
+        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
         private readonly AbstractValidator<PlanSfcReceiveCreateDto> _validationCreateRules;
         private readonly AbstractValidator<PlanSfcReceiveScanCodeDto> _validationModifyRules;
 
@@ -66,6 +67,7 @@ namespace Hymson.MES.Services.Services.Plan
             IManuCreateBarcodeService manuCreateBarcodeService,
             IProcMaterialRepository procMaterialRepository,
             IManuCommonService manuCommonService,
+            IManuSfcInfoRepository manuSfcInfoRepository,
         AbstractValidator<PlanSfcReceiveCreateDto> validationCreateRules, AbstractValidator<PlanSfcReceiveScanCodeDto> validationModifyRules)
         {
             _currentUser = currentUser;
@@ -81,6 +83,7 @@ namespace Hymson.MES.Services.Services.Plan
             _manuCreateBarcodeService = manuCreateBarcodeService;
             _procMaterialRepository = procMaterialRepository;
             _manuCommonService = manuCommonService;
+            _manuSfcInfoRepository = manuSfcInfoRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
         }
@@ -110,12 +113,31 @@ namespace Hymson.MES.Services.Services.Plan
                 SiteId = _currentSite.SiteId ?? 0
             });
             var manuSfcList = await _manuSfcRepository.GetBySFCsAsync(param.SFCs);
+            //TODO  考虑库存中是否存放工单字段 王克明
+            var manuSfcInfoList = await _manuSfcInfoRepository.GetBySFCIdsAsync(manuSfcList.Select(x => x.Id).ToList());
+
             foreach (var sfc in param.SFCs)
             {
                 decimal qty = 0;
                 var manuSfcEntity = manuSfcList.FirstOrDefault(x => x.SFC == sfc);
                 if (param.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)
                 {
+                    if (!manuSfcInfoList.Any(x => x.SfcId == manuSfcEntity?.Id && x.WorkOrderId == param.WorkOrderId))
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", sfc}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES16127);
+                        validationFailures.Add(validationFailure);
+                    }
                     var whMaterialInventoryEntity = whMaterialInventoryList.FirstOrDefault(x => x.MaterialBarCode == sfc);
                     if (whMaterialInventoryEntity == null || whMaterialInventoryEntity.QuantityResidue == 0)
                     {
@@ -253,6 +275,12 @@ namespace Hymson.MES.Services.Services.Plan
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16123)).WithData("sfc", param.SFC);
                 }
+                var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCAsync(param.SFC);
+
+                if (manuSfcInfoEntity != null && manuSfcInfoEntity.WorkOrderId != param.WorkOrderId)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16127));
+                }
                 var whMaterialInventoryEntity = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery { SiteId = _currentSite.SiteId, BarCode = param.SFC });
                 if (whMaterialInventoryEntity == null)
                 {
@@ -263,6 +291,10 @@ namespace Hymson.MES.Services.Services.Plan
             }
             else
             {
+                if (!await _manuCommonService.CheckBarCodeByMaskCodeRuleAsync(param.SFC, procMaterialEntity.Id))
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16121)).WithData("product", procMaterialEntity.MaterialCode);
+                }
                 if (manuSfcEntity != null)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16122)).WithData("sfc", param.SFC);

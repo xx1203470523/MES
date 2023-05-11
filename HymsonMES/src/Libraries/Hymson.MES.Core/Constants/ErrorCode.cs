@@ -474,6 +474,8 @@
         public const string MES16123 = "条码{sfc}已经是在制状态";
         public const string MES16124 = "条码已存在";
         public const string MES16125 = "条码已经是在制状态";
+        public const string MES16126 = "工单和关联工单不能一致";
+        public const string MES16127 = "条码工单和关联工单不能一致";
         #endregion
 
         #region 条码生成 MES16200

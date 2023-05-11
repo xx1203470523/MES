@@ -312,6 +312,11 @@ namespace Hymson.MES.Services.Dtos.Plan
         public string? WorkCenterCode { get; set; }
 
         /// <summary>
+        /// 工单类型
+        /// </summary>
+        public PlanWorkOrderTypeEnum? Type { get; set; }
+
+        /// <summary>
         /// 工单状态;1：未开始；2：下达；3：生产中；4：完成；5：锁定；6：暂停中；
         /// </summary>
         public PlanWorkOrderStatusEnum? Status { get; set; }
