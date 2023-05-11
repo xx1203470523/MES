@@ -296,6 +296,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES15308));
                 }
+                //var processRouteIds = sfcList.Select(x => x.ProcessRouteId).Distinct().ToList();
+                //if(processRouteIds.Count > 1)
+                //{
+                //    throw new CustomerValidationException(nameof(ErrorCode.MES15308));
+                //}
 
                 //验证工艺路线
                 await VeifyQualityLockProductionAsync(sfcList.ToArray(), parm.LockProductionId ?? 0);
