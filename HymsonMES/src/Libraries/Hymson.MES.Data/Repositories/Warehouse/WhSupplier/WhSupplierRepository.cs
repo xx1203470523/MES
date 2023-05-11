@@ -84,6 +84,8 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId=@SiteId");
+
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
@@ -125,6 +127,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
                 var template = sqlBuilder.AddTemplate(GetWhSupplierEntitiesSqlTemplate);
                 sqlBuilder.Select("*");
                 sqlBuilder.Where("IsDeleted=0");
+                sqlBuilder.Where("SiteId=@SiteId");
                 if (!string.IsNullOrWhiteSpace(whSupplierQuery.Code))
                 {
                     sqlBuilder.Where("Code=@Code");

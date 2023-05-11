@@ -75,7 +75,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             //判断编号是否已经存在
             var exists = await _whSupplierRepository.GetWhSupplierEntitiesAsync(new WhSupplierQuery()
             {
-                SiteId = _currentSite.SiteId,
+                SiteId = _currentSite.SiteId ?? 0,
                 Code = whSupplierCreateDto.Code
             });
             if (exists != null && exists.Count() > 0)
@@ -134,6 +134,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         public async Task<PagedInfo<WhSupplierDto>> GetPageListAsync(WhSupplierPagedQueryDto whSupplierPagedQueryDto)
         {
             var whSupplierPagedQuery = whSupplierPagedQueryDto.ToQuery<WhSupplierPagedQuery>();
+            whSupplierPagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _whSupplierRepository.GetPagedInfoAsync(whSupplierPagedQuery);
 
             //实体到DTO转换 装载数据

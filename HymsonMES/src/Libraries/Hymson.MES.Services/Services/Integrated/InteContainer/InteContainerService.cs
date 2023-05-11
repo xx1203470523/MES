@@ -17,6 +17,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using System.Data;
 using System.Text.RegularExpressions;
+using static Mysqlx.Notice.Warning.Types;
 
 namespace Hymson.MES.Services.Services.Integrated.InteContainer
 {
@@ -103,7 +104,8 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
             {
                 DefinitionMethod = entity.DefinitionMethod,
                 MaterialId = entity.MaterialId,
-                MaterialGroupId = entity.MaterialGroupId
+                MaterialGroupId = entity.MaterialGroupId,
+                Level=entity.Level
             });
 
             if (entityByRelation != null) throw new CustomerValidationException(nameof(ErrorCode.MES12503));

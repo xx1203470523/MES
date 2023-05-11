@@ -169,6 +169,9 @@ namespace Hymson.MES.Data.Repositories.Integrated
             {
                 sqlBuilder.Where(" CodeType=@CodeType ");
             }
+            if (inteCodeRulesQuery.PackType.HasValue) {
+                sqlBuilder.Where(" PackType=@PackType ");
+            }
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var inteCodeRulesEntities = await conn.QueryAsync<InteCodeRulesEntity>(template.RawSql, inteCodeRulesQuery);

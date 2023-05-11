@@ -1,16 +1,7 @@
-/*
- *creator: Karl
- *
- *describe: 物料台账 仓储类 | 代码由框架生成
- *builder:  pengxin
- *build datetime: 2023-03-13 10:03:29
- */
-
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Options;
-using Hymson.MES.Data.Repositories.Warehouse;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -86,6 +77,8 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
             sqlBuilder.OrderBy(" CreatedOn DESC");
+            sqlBuilder.Where("SiteId=@SiteId");
+
             //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
@@ -156,7 +149,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="whMaterialStandingbookEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(List<WhMaterialStandingbookEntity> whMaterialStandingbookEntitys)
+        public async Task<int> InsertsAsync(IEnumerable<WhMaterialStandingbookEntity> whMaterialStandingbookEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertsSql, whMaterialStandingbookEntitys);

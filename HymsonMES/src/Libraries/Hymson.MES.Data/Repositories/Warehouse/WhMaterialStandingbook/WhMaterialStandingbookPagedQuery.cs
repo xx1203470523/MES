@@ -38,6 +38,11 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <summary>
         /// 物料版本
         /// </summary>
-        public string? MaterialVersion { get; set; } 
+        public string? MaterialVersion { get; set; }
+
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long SiteId { get; set; }
     }
 }

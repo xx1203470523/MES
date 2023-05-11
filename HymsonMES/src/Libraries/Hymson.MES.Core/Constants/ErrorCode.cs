@@ -190,6 +190,7 @@
         public const string MES11106 = "不合格代码等级不能为空";
         public const string MES11107 = "不合格代码备注超过最大长度，不合格代码备注最大长度为255";
         public const string MES11108 = "不合格代码{code}已经存在";
+        public const string MES11109 = "不合格代码状态不能为空";
         #endregion
 
         #region 不合格组 11200
@@ -383,6 +384,7 @@
         public const string MES15314 = "锁定工序{sfcproduction}不在条码所在工序{lockproductionname}之后";
         public const string MES15315 = "条码存在及时锁定，无法添加及时锁";
         public const string MES15316 = "条码未被锁定，无法执行解锁操作";
+        public const string MES15317= "将来锁工序{lockproduction}不在条码所在工序之后";
 
         #endregion
 
@@ -398,6 +400,7 @@
         public const string MES15408 = "存在未关闭的不合格信息，工艺路线为必填!";
         public const string MES15409 = "不合格代码{codes}已录入,请勿重复录入!";
         public const string MES15410 = "SFC {sfcs}已存在返修信息，不可再执行当前操作!";
+        public const string MES15411= "条码{sfcs}已报废,不可再执行当前操作！";
         #endregion
 
         #region 物料加载 15500
@@ -466,7 +469,11 @@
         public const string MES16118 = "工单{OrderCode}状态为未开始，无法继续生产";
         public const string MES16119 = "工单{OrderCode}已经关闭，无法继续生产";
         public const string MES16120 = "库存不存在";
-        public const string MES16121 = "不满足产品{Product}的掩码规则";
+        public const string MES16121 = "不满足产品{product}的掩码规则";
+        public const string MES16122 = "条码{sfc}已存在";
+        public const string MES16123 = "条码{sfc}已经是在制状态";
+        public const string MES16124 = "条码已存在";
+        public const string MES16125 = "条码已经是在制状态";
         #endregion
 
         #region 条码生成 MES16200
@@ -500,6 +507,7 @@
         public const string MES16317 = "工序和资源不匹配！";
         public const string MES16318 = "SFC状态为已完成，不允许操作！";
         public const string MES16319 = "SFC条码{SFC}已存在返修信息，不允许操作。";
+        public const string MES16320 = "工单{ordercode}状态不为已下达|生产中，无法继续操作。";
         #endregion
 
         #region 生产
@@ -596,6 +604,7 @@
         public const string MES16615 = "组件条码已装配所有组件,无需添加!";
         public const string MES16616 = "组件条码{barCode}未设置掩码规则!";
         public const string MES16617 = "条码已报废,不可再执行当前操作!";
+        public const string MES16618 = "组件条码{barCode}的数据收集方式与主物料数据收集方式冲突!";
         #endregion
 
         #region 容器包装 MES 16700
@@ -603,7 +612,7 @@
         public const string MES16702 = "容器包装，包装码不存在";
         public const string MES16703 = "容器包装，条码的包装维护记录未找到";
         public const string MES16704 = "容器包装，配置面板编号为空";
-        public const string MES16705 = "容器包装，配置面板不存在";
+        public const string MES16705 = "容器包装，配置面板不存在或未启用";
         public const string MES16706 = "容器包装，配置面板不允许混工单,当前容器工单{first},当前条码工单{second}";
         public const string MES16707 = "容器包装，包装码不能为空";
         public const string MES16710 = "不识别的类型：{key}";
@@ -621,6 +630,10 @@
         public const string MES16720 = "容器包装，条码已报废";
         public const string MES16721 = "容器包装，该条码{sfc}已装箱{barcode}";
         public const string MES16722 = "容器包装，该包装{packId}已关闭或删除";
+        public const string MES16723 = "容器包装，包装数量未达到最小包装数，不允许关闭";
+        public const string MES16724 = "容器包装，资源信息未找到";
+        public const string MES16725 = "容器包装，资源对应资源类型和工序对应资源类型不一致";
+        public const string MES16726 = "容器编码不存在";
         #endregion
 
         #region 绑定工单激活  MES16800

@@ -85,7 +85,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.LeftJoin("manu_sfc_info MSI ON MSI.SfcId = MS.Id");
+            sqlBuilder.LeftJoin("manu_sfc_info MSI ON MSI.SfcId = MS.Id AND MSI.IsUsed = 1");
             sqlBuilder.LeftJoin("plan_work_order PWO ON PWO.Id = MSI.WorkOrderId");
             sqlBuilder.LeftJoin("proc_material PM ON PM.Id = MSI.ProductId");
             sqlBuilder.Where("MS.IsDeleted = 0");

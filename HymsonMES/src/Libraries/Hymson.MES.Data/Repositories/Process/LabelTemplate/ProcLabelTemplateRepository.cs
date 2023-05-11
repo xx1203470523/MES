@@ -196,6 +196,6 @@ namespace Hymson.MES.Data.Repositories.Process
                             FROM `proc_label_template`  WHERE Id IN @ids ";
         const string GetBynameSql = @"SELECT 
                                `Id`, `Name`, `Path`, `Content`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
-                            FROM `proc_label_template`  WHERE Name = @Name ";
+                            FROM `proc_label_template`  WHERE Name = @Name and IsDeleted=0";
     }
 }

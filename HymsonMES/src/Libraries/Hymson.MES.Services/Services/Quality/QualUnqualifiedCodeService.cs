@@ -127,7 +127,8 @@ namespace Hymson.MES.Services.Services.Quality
             var query = new QualUnqualifiedCodeQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
-                UnqualifiedGroupId = groupId
+                UnqualifiedGroupId = groupId,
+                StatusArr = new SysDataStatusEnum[] { SysDataStatusEnum.Enable, SysDataStatusEnum.Retain }
             };
             var list = await _qualUnqualifiedCodeRepository.GetListByGroupIdAsync(query);
 
@@ -173,7 +174,6 @@ namespace Hymson.MES.Services.Services.Quality
             qualUnqualifiedCodeEntity.CreatedBy = userId;
             qualUnqualifiedCodeEntity.UpdatedBy = userId;
             qualUnqualifiedCodeEntity.SiteId = _currentSite.SiteId ?? 0;
-            qualUnqualifiedCodeEntity.Status = SysDataStatusEnum.Build;
             List<QualUnqualifiedCodeGroupRelation> list = new List<QualUnqualifiedCodeGroupRelation>();
             if (param.UnqualifiedGroupIds != null && param.UnqualifiedGroupIds.Any())
             {

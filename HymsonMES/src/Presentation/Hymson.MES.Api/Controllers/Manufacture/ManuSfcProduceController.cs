@@ -1,14 +1,4 @@
-/*
- *describe: 条码生产信息（物理删除）    控制器 | 代码由框架生成  
- *builder:  zhaoqing
- *build datetime: 2023-03-18 05:37:27
- */
 using Hymson.Infrastructure;
-using Hymson.Infrastructure.Exceptions;
-using Hymson.MES.Core.Constants.Process;
-using Hymson.MES.Core.Enums;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
-using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Microsoft.AspNetCore.Mvc;
@@ -212,6 +202,17 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         public async Task SaveManuUpdateList(ManuUpdateSaveDto manuUpdateSaveDto)
         {
             await _manuSfcProduceService.SaveManuUpdateList(manuUpdateSaveDto);
+        }
+
+        /// <summary>
+        /// 获取工艺路线末尾工序
+        /// </summary>
+        /// <param name="processRouteId"></param>
+        /// <returns></returns>
+        [HttpGet("getLastProcedure/{processRouteId}")]
+        public async Task<long> GetLastProcedureAsync(long processRouteId)
+        {
+            return await _manuSfcProduceService.GetLastProcedureAsync(processRouteId);
         }
     }
 }

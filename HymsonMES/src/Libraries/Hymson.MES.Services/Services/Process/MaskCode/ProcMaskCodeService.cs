@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
@@ -17,6 +18,8 @@ using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Microsoft.IdentityModel.Tokens;
+using Minio.DataModel;
 using System.Data;
 using System.Text;
 
@@ -229,6 +232,7 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
             //{
             //    throw new CustomerValidationException(nameof(ErrorCode.MES10805));
             //}
+            var validationFailures = new List<FluentValidation.Results.ValidationFailure>();
 
             //全码:4,起始:1,结束:3,中间:2;根据匹配方式校验规则
             //全码：系统会校验所有的字符及字符长度，允许“?”
@@ -243,22 +247,60 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
                     case MatchModeEnum.Start:
                         if (rule.Rule.EndsWith("?"))
                         {
-                            //errorMessage.Append($"起始方式掩码末尾不能为特殊字符\"?\"");
-                            errorMessage.Append(_localizationService.GetResource(nameof(ErrorCode.MES10806)));
+                            var validationFailure = new FluentValidation.Results.ValidationFailure();
+                            if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                               { "CollectionIndex", rule.SerialNo}
+                               };
+                            }
+                            else
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", rule.SerialNo);
+                            }
+                            validationFailure.ErrorCode = nameof(ErrorCode.MES10806);
+                            validationFailures.Add(validationFailure);
+                           // errorMessage.Append(_localizationService.GetResource(nameof(ErrorCode.MES10806)));
                         }
                         break;
                     case MatchModeEnum.Middle:
                         if (rule.Rule.StartsWith("?") || rule.Rule.EndsWith("?"))
                         {
+                            var validationFailure = new FluentValidation.Results.ValidationFailure();
+                            if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                               { "CollectionIndex", rule.SerialNo}
+                               };
+                            }
+                            else
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", rule.SerialNo);
+                            }
+                            validationFailure.ErrorCode = nameof(ErrorCode.MES10807);
+                            validationFailures.Add(validationFailure);
                             //errorMessage.Append($"中间方式掩码首位和末尾不能为特殊字符\"?\";");
-                            errorMessage.Append(_localizationService.GetResource(nameof(ErrorCode.MES10807)));
+                           // errorMessage.Append(_localizationService.GetResource(nameof(ErrorCode.MES10807)));
                         }
                         break;
                     case MatchModeEnum.End:
                         if (rule.Rule.StartsWith("?"))
                         {
+                            var validationFailure = new FluentValidation.Results.ValidationFailure();
+                            if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                               { "CollectionIndex", rule.SerialNo}
+                               };
+                            }
+                            else
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", rule.SerialNo);
+                            }
+                            validationFailure.ErrorCode = nameof(ErrorCode.MES10808);
+                            validationFailures.Add(validationFailure);
                             // errorMessage.Append($"结束方式掩码首位不能为特殊字符\"?\";");
-                            errorMessage.Append(_localizationService.GetResource(nameof(ErrorCode.MES10808)));
+                           // errorMessage.Append(_localizationService.GetResource(nameof(ErrorCode.MES10808)));
                         }
                         break;
                     default:
@@ -266,10 +308,15 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(errorMessage.ToString()))
+            if (validationFailures.Any())
             {
-                throw new CustomerValidationException(errorMessage.ToString());
+                throw new ValidationException(_localizationService.GetResource("MaskCodeError"), validationFailures);
             }
+
+            //if (!string.IsNullOrWhiteSpace(errorMessage.ToString()))
+            //{
+            //    throw new CustomerValidationException(errorMessage.ToString());
+            //}
         }
     }
 }

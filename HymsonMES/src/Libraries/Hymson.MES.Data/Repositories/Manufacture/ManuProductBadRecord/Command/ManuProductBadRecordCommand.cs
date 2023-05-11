@@ -35,6 +35,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Command
         public ProductBadRecordStatusEnum? Status { get; set; }
 
         /// <summary>
+        /// 处置结果
+        /// </summary>
+        public ProductBadDisposalResultEnum? DisposalResult { get; set; }
+
+        /// <summary>
         /// 操作人员
         /// </summary>
         public string UserId { get; set; }

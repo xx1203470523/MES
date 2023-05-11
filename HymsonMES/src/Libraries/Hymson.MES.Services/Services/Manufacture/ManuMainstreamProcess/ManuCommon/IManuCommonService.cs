@@ -43,6 +43,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         Task<PlanWorkOrderEntity> GetProduceWorkOrderByIdAsync(long workOrderId);
 
         /// <summary>
+        /// 获取生产工单
+        /// </summary>
+        /// <param name="workOrderId"></param>
+        /// <returns></returns>
+        Task<PlanWorkOrderEntity> GetWorkOrderByIdAsync(long workOrderId);
+
+        /// <summary>
         /// 获取首工序
         /// </summary>
         /// <param name="processRouteId"></param>
@@ -55,6 +62,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="manuSfcProduce"></param>
         /// <returns></returns>
         Task<ProcProcedureEntity?> GetNextProcedureAsync(ManuSfcProduceEntity manuSfcProduce);
+
+        /// <summary>
+        /// 获当前工序对应的下一工序
+        /// </summary>
+        /// <param name="workOrderId"></param>
+        /// <param name="processRouteId"></param>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        Task<ProcProcedureEntity?> GetNextProcedureAsync(long workOrderId, long processRouteId, long procedureId);
 
         /// <summary>
         /// 判断上一工序是否随机工序

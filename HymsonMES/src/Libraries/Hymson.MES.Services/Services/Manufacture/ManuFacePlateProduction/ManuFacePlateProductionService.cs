@@ -1,37 +1,18 @@
-/*
- *creator: Karl
- *
- *describe: 操作面板    服务 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-04-01 01:56:57
- */
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
-using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
-using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Data.Repositories.Warehouse;
-using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
-using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Services.Dtos.Manufacture;
-using Hymson.Snowflake;
 using Hymson.Utils;
-using Hymson.Utils.Tools;
-using IdGen;
-using System.Linq;
-using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -43,7 +24,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
 
-        #region Repository
         /// <summary>
         /// 条码生产信息（物理删除） 仓储
         /// </summary>
@@ -64,6 +44,19 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="currentUser"></param>
+        /// <param name="currentSite"></param>
+        /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="procBomDetailRepository"></param>
+        /// <param name="procBomDetailReplaceMaterialRepository"></param>
+        /// <param name="manuSfcCirculationRepository"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="whMaterialInventoryRepository"></param>
+        /// <param name="procMaskCodeRuleRepository"></param>
+        /// <param name="procReplaceMaterialRepository"></param>
         public ManuFacePlateProductionService(ICurrentUser currentUser, ICurrentSite currentSite, IManuSfcProduceRepository manuSfcProduceRepository, IProcBomDetailRepository procBomDetailRepository, IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository, IManuSfcCirculationRepository manuSfcCirculationRepository, IProcMaterialRepository procMaterialRepository, IWhMaterialInventoryRepository whMaterialInventoryRepository, IProcMaskCodeRuleRepository procMaskCodeRuleRepository, IProcReplaceMaterialRepository procReplaceMaterialRepository)
         {
             _currentUser = currentUser;
@@ -77,9 +70,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             _procBomDetailReplaceMaterialRepository = procBomDetailReplaceMaterialRepository;
             _procReplaceMaterialRepository = procReplaceMaterialRepository;
         }
-        #endregion
 
-        #region 组装
+
         /// <summary>
         /// 组装界面获取当前条码对应bom下 当前需要组装的物料信息（操作面板）
         /// </summary>
@@ -216,6 +208,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             return null;
         }
 
+        /*
         /// <summary>
         /// 组装  （废弃）
         /// </summary>
@@ -464,8 +457,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             return true;
         }
-
-        #endregion
+        */
 
     }
 }

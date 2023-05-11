@@ -137,6 +137,12 @@ namespace Hymson.MES.Services.Dtos.Quality
         public string UnqualifiedCodeName { get; set; }
 
         /// <summary>
+        /// 描述 :状态 
+        /// 空值 : true  
+        /// </summary>
+        public SysDataStatusEnum? Status { get; set; }
+
+        /// <summary>
         /// 类型
         /// </summary>
         public  QualUnqualifiedCodeTypeEnum ? Type { get; set; }
