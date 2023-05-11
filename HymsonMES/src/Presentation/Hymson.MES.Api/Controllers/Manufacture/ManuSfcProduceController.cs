@@ -1,18 +1,7 @@
-/*
- *describe: 条码生产信息（物理删除）    控制器 | 代码由框架生成  
- *builder:  zhaoqing
- *build datetime: 2023-03-18 05:37:27
- */
 using Hymson.Infrastructure;
-using Hymson.Infrastructure.Exceptions;
-using Hymson.MES.Core.Constants.Process;
-using Hymson.MES.Core.Enums;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
-using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Microsoft.AspNetCore.Mvc;
-using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
 
 namespace Hymson.MES.Api.Controllers.Manufacture
 {
