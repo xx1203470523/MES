@@ -110,6 +110,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             }
 
             // 开始维修
+            sfcProduceEntity.ResourceId = bo.ResourceId;
             var rows = await _manuRepairService.StartAsync(sfcProduceEntity);
 
             defaultDto.Content?.Add("TableCom", (rows > 0).ToString());
