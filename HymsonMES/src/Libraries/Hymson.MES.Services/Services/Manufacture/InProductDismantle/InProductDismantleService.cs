@@ -231,7 +231,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         ProductId = bomDetail.MaterialId,
                         CirculationBarCode = circulation.CirculationBarCode,
                         CirculationQty = circulation.CirculationQty ?? 0,
-                        MaterialRemark = barcodeMaterial?.MaterialName ?? "" + "/" + barcodeMaterial?.Version ?? "",
+                        MaterialRemark = barcodeMaterial?.MaterialCode + "/" + barcodeMaterial?.Version,
                         ResCode = circulation.ResourceId.HasValue == true ? procResources.FirstOrDefault(x => x.Id == circulation.ResourceId.Value)?.ResCode ?? "" : "",
                         Status = circulation.IsDisassemble == TrueOrFalseEnum.Yes ? InProductDismantleTypeEnum.Remove : InProductDismantleTypeEnum.Activity,
                         UpdatedBy = circulation.UpdatedBy ?? "",
