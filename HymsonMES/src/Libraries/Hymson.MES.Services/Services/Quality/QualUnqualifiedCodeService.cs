@@ -127,7 +127,8 @@ namespace Hymson.MES.Services.Services.Quality
             var query = new QualUnqualifiedCodeQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
-                UnqualifiedGroupId = groupId
+                UnqualifiedGroupId = groupId,
+                StatusArr = new SysDataStatusEnum[] { SysDataStatusEnum.Enable, SysDataStatusEnum.Retain }
             };
             var list = await _qualUnqualifiedCodeRepository.GetListByGroupIdAsync(query);
 
