@@ -92,6 +92,11 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             // 获取生产条码信息
             var (sfcProduceEntity, _) = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
 
+
+            // 验证BOM主物料数量
+            await _manuCommonService.VerifyBomQtyAsync(sfcProduceEntity.ProductBOMId, bo.ProcedureId, bo.SFC);
+
+
             // 合法性校验
             sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity)
                             .VerifyProcedure(bo.ProcedureId)
