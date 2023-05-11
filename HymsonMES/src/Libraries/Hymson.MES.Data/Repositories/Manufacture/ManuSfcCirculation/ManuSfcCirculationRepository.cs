@@ -7,7 +7,6 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using System.Security.Policy;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -50,30 +49,30 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Select("*");
 
             sqlBuilder.Where("SiteId = @SiteId");
-            sqlBuilder.Where("IsDeleted =0");
+            sqlBuilder.Where("IsDeleted = 0");
 
             if (!string.IsNullOrWhiteSpace(query.Sfc))
             {
-                sqlBuilder.Where("SFC=@Sfc");
+                sqlBuilder.Where("SFC = @Sfc");
             }
 
             if (query.CirculationTypes != null && query.CirculationTypes.Length > 0)
             {
-                sqlBuilder.Where("CirculationType in @CirculationTypes");
+                sqlBuilder.Where("CirculationType IN @CirculationTypes");
             }
 
             if (query.IsDisassemble.HasValue)
             {
-                sqlBuilder.Where("IsDisassemble=@IsDisassemble");
+                sqlBuilder.Where("IsDisassemble = @IsDisassemble");
             }
 
             if (query.ProcedureId.HasValue)
             {
-                sqlBuilder.Where("ProcedureId=@ProcedureId");
+                sqlBuilder.Where("ProcedureId = @ProcedureId");
             }
             if (query.CirculationMainProductId.HasValue)
             {
-                sqlBuilder.Where("CirculationMainProductId=@CirculationMainProductId");
+                sqlBuilder.Where("CirculationMainProductId = @CirculationMainProductId");
             }
 
             sqlBuilder.AddParameters(query);

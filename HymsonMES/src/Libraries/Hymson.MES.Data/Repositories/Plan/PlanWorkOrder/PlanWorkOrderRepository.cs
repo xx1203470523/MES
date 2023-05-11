@@ -159,14 +159,19 @@ namespace Hymson.MES.Data.Repositories.Plan
                 sqlBuilder.Where("wc.Code LIKE @WorkCenterCode");
             }
 
-            if (pageQuery.Status.HasValue) 
+            if (pageQuery.Type.HasValue)
+            {
+                sqlBuilder.Where("wo.Type = @Type ");
+            }
+
+            if (pageQuery.Status.HasValue)
             {
                 if (pageQuery.Status == Core.Enums.PlanWorkOrderStatusEnum.Pending)
                 {
                     pageQuery.IsLocked = Core.Enums.YesOrNoEnum.Yes;
                     sqlBuilder.Where("wo.IsLocked = @IsLocked ");
                 }
-                else 
+                else
                 {
                     pageQuery.IsLocked = Core.Enums.YesOrNoEnum.No;
                     sqlBuilder.Where("wo.Status = @Status");
@@ -193,7 +198,7 @@ namespace Hymson.MES.Data.Repositories.Plan
                 } 
             }
 
-            if (pageQuery.Statuss != null&& pageQuery.Statuss.Any())
+            if (pageQuery.Statuss != null && pageQuery.Statuss.Any())
             {
                 sqlBuilder.Where("wo.Status IN @Statuss");
             }

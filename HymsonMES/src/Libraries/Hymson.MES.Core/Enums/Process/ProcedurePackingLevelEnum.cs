@@ -3,7 +3,7 @@
 namespace Hymson.MES.Core.Enums
 {
     /// <summary>
-    /// 工序包装等级
+    /// 工序包装等级(同LevelEnum枚举)
     /// </summary>
     public enum ProcedurePackingLevelEnum : sbyte
     {
