@@ -183,16 +183,12 @@ namespace Hymson.MES.Data.Repositories.Plan
                 sqlBuilder.Where(" wo.IsLocked = @IsLocked ");
             }
 
-            if (planWorkOrderActivationPagedQuery.PlanStartTimeS.HasValue || planWorkOrderActivationPagedQuery.PlanStartTimeE.HasValue) 
+            if (planWorkOrderActivationPagedQuery.PlanStartTime != null && planWorkOrderActivationPagedQuery.PlanStartTime.Length > 0)
             {
-                if (planWorkOrderActivationPagedQuery.PlanStartTimeS.HasValue && planWorkOrderActivationPagedQuery.PlanStartTimeE.HasValue) 
+                if (planWorkOrderActivationPagedQuery.PlanStartTime.Length >= 2)
                 {
-                    sqlBuilder.Where("wo.PlanStartTime BETWEEN @PlanStartTimeS AND @PlanStartTimeE");
-                } 
-                else 
-                {
-                    if (planWorkOrderActivationPagedQuery.PlanStartTimeS.HasValue) sqlBuilder.Where("wo.PlanStartTime >= @PlanStartTimeS");
-                    if (planWorkOrderActivationPagedQuery.PlanStartTimeE.HasValue) sqlBuilder.Where("wo.PlanStartTime < @PlanStartTimeE");
+                    sqlBuilder.AddParameters(new { PlanStartTimeStart = planWorkOrderActivationPagedQuery.PlanStartTime[0], PlanStartTimeEnd = planWorkOrderActivationPagedQuery.PlanStartTime[1] });
+                    sqlBuilder.Where("wo.PlanStartTime BETWEEN @PlanStartTimeStart AND @PlanStartTimeEnd");
                 }
             }
 

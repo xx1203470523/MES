@@ -326,41 +326,6 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// </summary>
         public DateTime[]? PlanStartTime { get; set; }
 
-        public DateTime? PlanStartTimeS 
-        { 
-            get
-            {
-                return this.PlanStartTime != null && this.PlanStartTime.Length > 0 ? this.PlanStartTime[0] : null;
-
-                //if (!string.IsNullOrEmpty(this.PlanStartTime))
-                //{
-                //    var dateArr = this.PlanStartTime.Split(',');
-                //    return dateArr.Length > 0 ? Convert.ToDateTime(dateArr[0]) : null;
-                //}
-                //else 
-                //{
-                //    return null;
-                //}
-            } 
-        }
-
-        public DateTime? PlanStartTimeE 
-        { 
-            get
-            {
-                return this.PlanStartTime != null && this.PlanStartTime.Length > 1 ? this.PlanStartTime[1] : null;
-                //if (!string.IsNullOrEmpty(this.PlanStartTime))
-                //{
-                //    var dateArr = this.PlanStartTime.Split(',');
-                //    return dateArr.Length > 1 ? Convert.ToDateTime(dateArr[1]) : null;
-                //}
-                //else
-                //{
-                //    return null;
-                //}
-            }
-        }
-
         /// <summary>
         /// 查询状态集合
         /// </summary>

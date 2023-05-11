@@ -39,14 +39,19 @@ namespace Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query
         public YesOrNoEnum? IsLocked { get; set; }
 
         /// <summary>
-        /// 计划开始时间  开始
+        /// 计划开始时间  时间范围  数组
         /// </summary>
-        public DateTime? PlanStartTimeS { get; set; }
+        public DateTime[]? PlanStartTime { get; set; }
 
-        /// <summary>
-        /// 计划开始时间  结束
-        /// </summary>
-        public DateTime? PlanStartTimeE { get; set; }
+        ///// <summary>
+        ///// 计划开始时间  开始
+        ///// </summary>
+        //public DateTime? PlanStartTimeS { get; set; }
+
+        ///// <summary>
+        ///// 计划开始时间  结束
+        ///// </summary>
+        //public DateTime? PlanStartTimeE { get; set; }
 
         /// <summary>
         /// 查询状态集合
