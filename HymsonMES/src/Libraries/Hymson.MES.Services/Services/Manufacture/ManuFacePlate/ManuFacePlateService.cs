@@ -14,6 +14,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -139,6 +140,12 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task<int> DeletesManuFacePlateAsync(long[] ids)
         {
+            var manuFacePlates = await _manuFacePlateRepository.GetByIdsAsync(ids);
+            if (manuFacePlates != null && manuFacePlates.Any())
+            {
+                var isAnyEnableOrRetain = manuFacePlates.Select(c => c.Status == SysDataStatusEnum.Enable || c.Status == SysDataStatusEnum.Retain).Any();
+                throw new CustomerValidationException(nameof(ErrorCode.MES16913));
+            }
             return await _manuFacePlateRepository.DeletesAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
         }
 

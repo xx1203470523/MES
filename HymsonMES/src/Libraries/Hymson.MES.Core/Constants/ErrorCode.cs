@@ -660,6 +660,7 @@
         public const string MES16910 = "实际使用的物料为空!";
         public const string MES16911 = "实际使用的物料与条码不合!";
         public const string MES16912 = "条码为空！";
+        public const string MES16913 = "不能删除启用或保留的记录！";
         #endregion
 
         #region 在制品步骤控制 MES18000
