@@ -208,8 +208,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         /// <returns></returns>
         public async Task CreateBarcodeByExternalSFC(CreateBarcodeByExternalSFCDto param)
         {
-            var planWorkOrderEntity = await _manuCommonService.GetProduceWorkOrderByIdAsync(param.WorkOrderId);
+            var planWorkOrderEntity = await _manuCommonService.GetWorkOrderByIdAsync(param.WorkOrderId);
             var sfclist = await _manuSfcRepository.GetBySFCsAsync(param.ExternalSFCs.Select(x => x.SFC));
+
             var processRouteFirstProcedure = await _manuCommonService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
 
             List<ManuSfcEntity> manuSfcList = new List<ManuSfcEntity>();
@@ -237,6 +238,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                     validationFailures.Add(validationFailure);
                     continue;
                 }
+
                 var manuSfcEntity = new ManuSfcEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
@@ -330,12 +332,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         /// <returns></returns>
         public async Task CreateBarcodeByOldMESSFC(CreateBarcodeByOldMesSFCDto param)
         {
-            var planWorkOrderEntity = await _manuCommonService.GetProduceWorkOrderByIdAsync(param.WorkOrderId);
+            var planWorkOrderEntity = await _manuCommonService.GetWorkOrderByIdAsync(param.WorkOrderId);
             var sfclist = await _manuSfcRepository.GetBySFCsAsync(param.OldSFCs.Select(x => x.SFC));
+            var sfcInfoList = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfclist.Select(x => x.Id));
             var processRouteFirstProcedure = await _manuCommonService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
 
             List<ManuSfcEntity> manuSfcList = new List<ManuSfcEntity>();
             List<ManuSfcInfoEntity> manuSfcInfoList = new List<ManuSfcInfoEntity>();
+            List<ManuSfcInfoEntity> updateManuSfcInfoList = new List<ManuSfcInfoEntity>();
             List<ManuSfcProduceEntity> manuSfcProduceList = new List<ManuSfcProduceEntity>();
             List<ManuSfcStepEntity> manuSfcStepList = new List<ManuSfcStepEntity>();
             var validationFailures = new List<ValidationFailure>();
@@ -381,7 +385,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                 sfcEntity.UpdatedBy = _currentUser.UserName;
                 sfcEntity.UpdatedOn = HymsonClock.Now();
                 manuSfcList.Add(sfcEntity);
-
+                var sfcInfo = sfcInfoList.FirstOrDefault(x => x.SfcId == sfcEntity.Id);
+                if (sfcInfo != null)
+                {
+                    sfcInfo.IsUsed = false;
+                    sfcInfo.UpdatedBy = _currentUser.UserName;
+                    sfcInfo.UpdatedOn = HymsonClock.Now();
+                    updateManuSfcInfoList.Add(sfcInfo);
+                }
                 manuSfcInfoList.Add(new ManuSfcInfoEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
@@ -449,6 +460,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16503)).WithData("workorder", planWorkOrderEntity.OrderCode);
             }
+            await _manuSfcInfoRepository.UpdatesAsync(updateManuSfcInfoList);
             await _manuSfcRepository.UpdateRangeAsync(manuSfcList);
             await _manuSfcInfoRepository.InsertsAsync(manuSfcInfoList);
             await _manuSfcProduceRepository.InsertRangeAsync(manuSfcProduceList);
