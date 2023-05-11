@@ -134,8 +134,9 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
             {
                 DefinitionMethod = entity.DefinitionMethod,
                 MaterialId = entity.MaterialId,
-                MaterialGroupId = entity.MaterialGroupId
-            });
+                MaterialGroupId = entity.MaterialGroupId,
+                Level = entity.Level
+            }) ;
 
             if (entityByRelation != null && entityByRelation.Id != entity.Id) throw new CustomerValidationException(nameof(ErrorCode.MES12503));
 
