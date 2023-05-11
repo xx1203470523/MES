@@ -195,6 +195,10 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.Where($"uc.SiteId =@SiteId");
             sqlBuilder.LeftJoin("qual_unqualified_code_group_relation gr on uc.Id =gr.UnqualifiedCodeId and gr.IsDeleted =0  ");
             sqlBuilder.Where("gr.UnqualifiedGroupId=@UnqualifiedGroupId");
+            if (query.StatusArr != null && query.StatusArr.Length > 0)
+            {
+                sqlBuilder.Where("uc.Status in @StatusArr");
+            }
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var qualUnqualifiedCodes = await conn.QueryAsync<QualUnqualifiedCodeEntity>(template.RawSql, query);

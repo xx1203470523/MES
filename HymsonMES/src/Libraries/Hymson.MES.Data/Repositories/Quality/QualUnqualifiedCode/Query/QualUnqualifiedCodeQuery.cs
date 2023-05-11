@@ -1,3 +1,4 @@
+using Hymson.MES.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,5 +23,10 @@ namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query
         /// 不合格代码组id
         /// </summary>
         public long? UnqualifiedGroupId { get; set; }
+
+        /// <summary>
+        /// 状态列表
+        /// </summary>
+        public SysDataStatusEnum[]? StatusArr { get; set; }
     }
 }
