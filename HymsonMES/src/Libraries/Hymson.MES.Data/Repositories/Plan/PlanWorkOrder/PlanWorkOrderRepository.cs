@@ -159,8 +159,21 @@ namespace Hymson.MES.Data.Repositories.Plan
                 sqlBuilder.Where("wc.Code LIKE @WorkCenterCode");
             }
 
-            if (pageQuery.Status.HasValue) sqlBuilder.Where("wo.Status = @Status");
-            if (pageQuery.IsLocked.HasValue) sqlBuilder.Where("wo.IsLocked = @IsLocked");
+            if (pageQuery.Status.HasValue) 
+            {
+                if (pageQuery.Status == Core.Enums.PlanWorkOrderStatusEnum.Pending)
+                {
+                    pageQuery.IsLocked = Core.Enums.YesOrNoEnum.Yes;
+                    sqlBuilder.Where("wo.IsLocked = @IsLocked ");
+                }
+                else 
+                {
+                    pageQuery.IsLocked = Core.Enums.YesOrNoEnum.No;
+                    sqlBuilder.Where("wo.Status = @Status");
+                    sqlBuilder.Where("wo.IsLocked = @IsLocked ");
+                }
+            } 
+            //if (pageQuery.IsLocked.HasValue) sqlBuilder.Where("wo.IsLocked = @IsLocked");
             if (pageQuery.PlanStartTimeS.HasValue || pageQuery.PlanStartTimeE.HasValue)
             {
                 if (pageQuery.PlanStartTimeS.HasValue && pageQuery.PlanStartTimeE.HasValue) sqlBuilder.Where("wo.PlanStartTime BETWEEN @PlanStartTimeS AND @PlanStartTimeE");

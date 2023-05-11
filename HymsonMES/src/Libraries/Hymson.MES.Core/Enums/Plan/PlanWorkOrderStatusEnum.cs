@@ -32,10 +32,11 @@ namespace Hymson.MES.Core.Enums
         /// </summary>
         [Description("已关闭")]
         Closed = 5,
-        ///// <summary>
-        ///// 暂停中    //采用锁定字段，该选项去掉
-        ///// </summary>
-        //[Description("暂停中")]
-        //Pending = 6,
+        /// <summary>
+        /// 暂停中    //采用锁定字段，该选项去掉   
+        /// 20230511 : 克明不能打败大魔王，又启用该做选项， 只做选项查询，不保存到数据库中
+        /// </summary>
+        [Description("暂停中")]
+        Pending = 6,
     }
 }
