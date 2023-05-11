@@ -636,7 +636,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                         DefinitionMethod = DefinitionMethodEnum.MaterialGroup,
                         MaterialId = ProductId,
                         MaterialGroupId = material.GroupId,
-                        Status = SysDataStatusEnum.Enable
+                        Status = SysDataStatusEnum.Enable,
+                        Level = (LevelEnum)level
                     });
                     if (entityByRelation1 != null)
                     {
