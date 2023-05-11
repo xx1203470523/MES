@@ -220,23 +220,25 @@ namespace Hymson.MES.Services.Dtos.Plan
         public YesOrNoEnum? IsLocked { get; set; }
 
         /// <summary>
-        /// 计划开始时间  字符串 ：时间范围，逗号分割
+        /// 计划开始时间  时间范围  数组
         /// </summary>
-        public string? PlanStartTime { get; set; }
+        public DateTime[]? PlanStartTime { get; set; }
 
         public DateTime? PlanStartTimeS
         {
             get
             {
-                if (!string.IsNullOrEmpty(this.PlanStartTime))
-                {
-                    var dateArr = this.PlanStartTime.Split(',');
-                    return dateArr.Length > 0 ? Convert.ToDateTime(dateArr[0]) : null;
-                }
-                else
-                {
-                    return null;
-                }
+                return this.PlanStartTime != null && this.PlanStartTime.Length > 0 ? this.PlanStartTime[0] : null;
+
+                //if (!string.IsNullOrEmpty(this.PlanStartTime))
+                //{
+                //    var dateArr = this.PlanStartTime.Split(',');
+                //    return dateArr.Length > 0 ? Convert.ToDateTime(dateArr[0]) : null;
+                //}
+                //else 
+                //{
+                //    return null;
+                //}
             }
         }
 
@@ -244,15 +246,16 @@ namespace Hymson.MES.Services.Dtos.Plan
         {
             get
             {
-                if (!string.IsNullOrEmpty(this.PlanStartTime))
-                {
-                    var dateArr = this.PlanStartTime.Split(',');
-                    return dateArr.Length > 1 ? Convert.ToDateTime(dateArr[1]) : null;
-                }
-                else
-                {
-                    return null;
-                }
+                return this.PlanStartTime != null && this.PlanStartTime.Length > 1 ? this.PlanStartTime[1] : null;
+                //if (!string.IsNullOrEmpty(this.PlanStartTime))
+                //{
+                //    var dateArr = this.PlanStartTime.Split(',');
+                //    return dateArr.Length > 1 ? Convert.ToDateTime(dateArr[1]) : null;
+                //}
+                //else
+                //{
+                //    return null;
+                //}
             }
         }
     }
@@ -304,23 +307,25 @@ namespace Hymson.MES.Services.Dtos.Plan
         public YesOrNoEnum? IsLocked { get; set; }
 
         /// <summary>
-        /// 计划开始时间  字符串 ：时间范围，逗号分割
+        /// 计划开始时间  时间范围  数组
         /// </summary>
-        public string? PlanStartTime { get; set; }
+        public DateTime[]? PlanStartTime { get; set; }
 
         public DateTime? PlanStartTimeS
         {
             get
             {
-                if (!string.IsNullOrEmpty(this.PlanStartTime))
-                {
-                    var dateArr = this.PlanStartTime.Split(',');
-                    return dateArr.Length > 0 ? Convert.ToDateTime(dateArr[0]) : null;
-                }
-                else
-                {
-                    return null;
-                }
+                return this.PlanStartTime != null && this.PlanStartTime.Length > 0 ? this.PlanStartTime[0] : null;
+
+                //if (!string.IsNullOrEmpty(this.PlanStartTime))
+                //{
+                //    var dateArr = this.PlanStartTime.Split(',');
+                //    return dateArr.Length > 0 ? Convert.ToDateTime(dateArr[0]) : null;
+                //}
+                //else 
+                //{
+                //    return null;
+                //}
             }
         }
 
@@ -328,15 +333,16 @@ namespace Hymson.MES.Services.Dtos.Plan
         {
             get
             {
-                if (!string.IsNullOrEmpty(this.PlanStartTime))
-                {
-                    var dateArr = this.PlanStartTime.Split(',');
-                    return dateArr.Length > 1 ? Convert.ToDateTime(dateArr[1]) : null;
-                }
-                else
-                {
-                    return null;
-                }
+                return this.PlanStartTime != null && this.PlanStartTime.Length > 1 ? this.PlanStartTime[1] : null;
+                //if (!string.IsNullOrEmpty(this.PlanStartTime))
+                //{
+                //    var dateArr = this.PlanStartTime.Split(',');
+                //    return dateArr.Length > 1 ? Convert.ToDateTime(dateArr[1]) : null;
+                //}
+                //else
+                //{
+                //    return null;
+                //}
             }
         }
     }

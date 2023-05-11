@@ -225,71 +225,71 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             }
 
             // 更新数据
-            using (var trans = TransactionHelper.GetTransactionScope())
+            using var trans = TransactionHelper.GetTransactionScope();
+
+            // 完工
+            if (nextProcedure == null)
             {
-                // 完工
-                if (nextProcedure == null)
+                // 删除 manu_sfc_produce
+                rows += await _manuSfcProduceRepository.DeletePhysicalAsync(sfcProduceEntity.SFC);
+
+                // 插入 manu_sfc_step 状态为 完成
+                sfcStep.Operatetype = ManuSfcStepTypeEnum.OutStock;    // TODO 这里的状态？？
+                sfcStep.CurrentStatus = SfcProduceStatusEnum.Complete;  // TODO 这里的状态？？
+                rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
+
+                // manu_sfc_info 修改为完成 且入库
+                // 条码信息
+                var sfcInfo = await _manuSfcRepository.GetBySFCAsync(sfcProduceEntity.SFC);
+
+                // 删除 manu_sfc_produce_business
+                rows += await _manuSfcProduceRepository.DeleteSfcProduceBusinessBySfcInfoIdAsync(new DeleteSfcProduceBusinesssBySfcInfoIdCommand
                 {
-                    // 删除 manu_sfc_produce
-                    rows += await _manuSfcProduceRepository.DeletePhysicalAsync(sfcProduceEntity.SFC);
+                    SiteId = sfcProduceEntity.SiteId,
+                    SfcInfoId = sfcInfo.Id
+                });
 
-                    // 插入 manu_sfc_step 状态为 完成
-                    sfcStep.Operatetype = ManuSfcStepTypeEnum.OutStock;    // TODO 这里的状态？？
-                    sfcStep.CurrentStatus = SfcProduceStatusEnum.Complete;  // TODO 这里的状态？？
-                    rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
-
-                    // manu_sfc_info 修改为完成 且入库
-                    // 条码信息
-                    var sfcInfo = await _manuSfcRepository.GetBySFCAsync(sfcProduceEntity.SFC);
-
-                    // 删除 manu_sfc_produce_business
-                    rows += await _manuSfcProduceRepository.DeleteSfcProduceBusinessBySfcInfoIdAsync(new DeleteSfcProduceBusinesssBySfcInfoIdCommand
-                    {
-                        SiteId = sfcProduceEntity.SiteId,
-                        SfcInfoId = sfcInfo.Id
-                    });
-
-                    // 更新完工数量
-                    rows += await _planWorkOrderRepository.UpdateFinishProductQuantityByWorkOrderId(new UpdateQtyCommand
-                    {
-                        UpdatedBy = sfcProduceEntity.UpdatedBy,
-                        UpdatedOn = sfcProduceEntity.UpdatedOn,
-                        WorkOrderId = sfcProduceEntity.WorkOrderId,
-                        Qty = 1,
-                    });
-
-                    // 更新状态
-                    sfcInfo.Status = SfcStatusEnum.Complete;
-                    sfcInfo.UpdatedBy = sfcProduceEntity.UpdatedBy;
-                    sfcInfo.UpdatedOn = sfcProduceEntity.UpdatedOn;
-                    rows += await _manuSfcRepository.UpdateAsync(sfcInfo);
-
-                    // 更新工单统计表的 RealEnd
-                    rows += await _planWorkOrderRepository.UpdatePlanWorkOrderRealEndByWorkOrderIdAsync(new UpdateWorkOrderRealTimeCommand
-                    {
-                        UpdatedOn = sfcProduceEntity.UpdatedOn,
-                        UpdatedBy = sfcProduceEntity.UpdatedBy,
-                        WorkOrderIds = new long[] { sfcProduceEntity.WorkOrderId }
-                    });
-
-                    // 入库
-                    rows += await SaveToWarehouse(sfcProduceEntity);
-                }
-                // 未完工
-                else
+                // 更新完工数量
+                rows += await _planWorkOrderRepository.UpdateFinishProductQuantityByWorkOrderId(new UpdateQtyCommand
                 {
-                    // 修改 manu_sfc_produce 为排队, 工序修改为下一工序的id
-                    sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
-                    sfcProduceEntity.ProcedureId = nextProcedure.Id;
-                    rows += await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
+                    UpdatedBy = sfcProduceEntity.UpdatedBy,
+                    UpdatedOn = sfcProduceEntity.UpdatedOn,
+                    WorkOrderId = sfcProduceEntity.WorkOrderId,
+                    Qty = 1,
+                });
 
-                    // 插入 manu_sfc_step 状态为 进站
-                    sfcStep.Operatetype = ManuSfcStepTypeEnum.OutStock;
-                    rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
-                }
+                // 更新状态
+                sfcInfo.Status = SfcStatusEnum.Complete;
+                sfcInfo.UpdatedBy = sfcProduceEntity.UpdatedBy;
+                sfcInfo.UpdatedOn = sfcProduceEntity.UpdatedOn;
+                rows += await _manuSfcRepository.UpdateAsync(sfcInfo);
 
-                trans.Complete();
+                // 更新工单统计表的 RealEnd
+                rows += await _planWorkOrderRepository.UpdatePlanWorkOrderRealEndByWorkOrderIdAsync(new UpdateWorkOrderRealTimeCommand
+                {
+                    UpdatedOn = sfcProduceEntity.UpdatedOn,
+                    UpdatedBy = sfcProduceEntity.UpdatedBy,
+                    WorkOrderIds = new long[] { sfcProduceEntity.WorkOrderId }
+                });
+
+                // 入库
+                rows += await SaveToWarehouse(sfcProduceEntity);
             }
+            // 未完工
+            else
+            {
+                // 修改 manu_sfc_produce 为排队, 工序修改为下一工序的id
+                sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
+                sfcProduceEntity.ProcedureId = nextProcedure.Id;
+                rows += await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
+
+                // 插入 manu_sfc_step 状态为 进站
+                sfcStep.Operatetype = ManuSfcStepTypeEnum.OutStock;
+                rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
+            }
+
+            trans.Complete();
+
             return rows;
         }
 

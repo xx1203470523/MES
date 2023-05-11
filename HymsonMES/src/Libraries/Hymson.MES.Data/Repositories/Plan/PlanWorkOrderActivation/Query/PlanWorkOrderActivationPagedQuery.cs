@@ -56,41 +56,8 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         public YesOrNoEnum? IsLocked { get; set; }
 
-        /// <summary>
-        /// 计划开始时间  字符串 ：时间范围，逗号分割
-        /// </summary>
-        public string? PlanStartTime { get; set; }
-
-        public DateTime? PlanStartTimeS
-        {
-            get
-            {
-                if (!string.IsNullOrEmpty(this.PlanStartTime))
-                {
-                    var dateArr = this.PlanStartTime.Split(',');
-                    return dateArr.Length > 0 ? Convert.ToDateTime(dateArr[0]) : null;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
-
-        public DateTime? PlanStartTimeE
-        {
-            get
-            {
-                if (!string.IsNullOrEmpty(this.PlanStartTime))
-                {
-                    var dateArr = this.PlanStartTime.Split(',');
-                    return dateArr.Length > 1 ? Convert.ToDateTime(dateArr[1]) : null;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
+        public DateTime? PlanStartTimeS { get; set; }
+        public DateTime? PlanStartTimeE { get; set; }
+        
     }
 }
