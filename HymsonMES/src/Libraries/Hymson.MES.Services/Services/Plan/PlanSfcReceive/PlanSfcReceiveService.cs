@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 条码接收    服务 | 代码由框架生成
- *builder:  pengxin
- *build datetime: 2023-03-21 04:33:58
- */
 using FluentValidation;
 using FluentValidation.Results;
 using Hymson.Authentication;
@@ -12,7 +5,6 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -37,8 +29,12 @@ namespace Hymson.MES.Services.Services.Plan
     /// </summary>
     public class PlanSfcReceiveService : IPlanSfcReceiveService
     {
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
+
         /// <summary>
         /// 条码接收 仓储
         /// </summary>
@@ -56,6 +52,24 @@ namespace Hymson.MES.Services.Services.Plan
         private readonly AbstractValidator<PlanSfcReceiveCreateDto> _validationCreateRules;
         private readonly AbstractValidator<PlanSfcReceiveScanCodeDto> _validationModifyRules;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="currentUser"></param>
+        /// <param name="currentSite"></param>
+        /// <param name="planSfcInfoRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
+        /// <param name="manuSfcRepository"></param>
+        /// <param name="inteCodeRulesRepository"></param>
+        /// <param name="inteCodeRulesMakeRepository"></param>
+        /// <param name="whMaterialInventoryRepository"></param>
+        /// <param name="localizationService"></param>
+        /// <param name="manuCreateBarcodeService"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="manuCommonService"></param>
+        /// <param name="manuSfcInfoRepository"></param>
+        /// <param name="validationCreateRules"></param>
+        /// <param name="validationModifyRules"></param>
         public PlanSfcReceiveService(ICurrentUser currentUser, ICurrentSite currentSite,
             IPlanSfcReceiveRepository planSfcInfoRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
@@ -68,7 +82,8 @@ namespace Hymson.MES.Services.Services.Plan
             IProcMaterialRepository procMaterialRepository,
             IManuCommonService manuCommonService,
             IManuSfcInfoRepository manuSfcInfoRepository,
-        AbstractValidator<PlanSfcReceiveCreateDto> validationCreateRules, AbstractValidator<PlanSfcReceiveScanCodeDto> validationModifyRules)
+        AbstractValidator<PlanSfcReceiveCreateDto> validationCreateRules,
+        AbstractValidator<PlanSfcReceiveScanCodeDto> validationModifyRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -87,6 +102,7 @@ namespace Hymson.MES.Services.Services.Plan
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
         }
+
 
         /// <summary>
         /// 条码接收
