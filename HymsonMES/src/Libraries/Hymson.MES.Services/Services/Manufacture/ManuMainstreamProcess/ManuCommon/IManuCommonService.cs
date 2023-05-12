@@ -118,5 +118,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="procedureId"></param>
         /// <returns></returns>
         Task VerifySfcsLockAsync(string[] sfcs, long procedureId);
+
+        /// <summary>
+        /// 验证条码BOM清单用量
+        /// </summary>
+        /// <param name="bomId"></param>
+        /// <param name="procedureId"></param>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        Task VerifyBomQtyAsync(long bomId, long procedureId, string sfc);
+
     }
 }

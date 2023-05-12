@@ -168,25 +168,36 @@ namespace Hymson.MES.Data.Repositories.Plan
             {
                 if (pageQuery.Status == Core.Enums.PlanWorkOrderStatusEnum.Pending)
                 {
-                    pageQuery.IsLocked = Core.Enums.YesOrNoEnum.Yes;
+                    //pageQuery.IsLocked = Core.Enums.YesOrNoEnum.Yes;
+                    sqlBuilder.AddParameters(new { IsLocked = Core.Enums.YesOrNoEnum.Yes });
                     sqlBuilder.Where("wo.IsLocked = @IsLocked ");
                 }
                 else
                 {
-                    pageQuery.IsLocked = Core.Enums.YesOrNoEnum.No;
+                    //pageQuery.IsLocked = Core.Enums.YesOrNoEnum.No;
+                    sqlBuilder.AddParameters(new { IsLocked = Core.Enums.YesOrNoEnum.No });
                     sqlBuilder.Where("wo.Status = @Status");
                     sqlBuilder.Where("wo.IsLocked = @IsLocked ");
                 }
             }
             //if (pageQuery.IsLocked.HasValue) sqlBuilder.Where("wo.IsLocked = @IsLocked");
-            if (pageQuery.PlanStartTimeS.HasValue || pageQuery.PlanStartTimeE.HasValue)
+            //if (pageQuery.PlanStartTimeS.HasValue || pageQuery.PlanStartTimeE.HasValue)
+            //{
+            //    if (pageQuery.PlanStartTimeS.HasValue && pageQuery.PlanStartTimeE.HasValue) sqlBuilder.Where("wo.PlanStartTime BETWEEN @PlanStartTimeS AND @PlanStartTimeE");
+            //    else
+            //    {
+            //        if (pageQuery.PlanStartTimeS.HasValue) sqlBuilder.Where("wo.PlanStartTime >= @PlanStartTimeS");
+            //        if (pageQuery.PlanStartTimeE.HasValue) sqlBuilder.Where("wo.PlanStartTime < @PlanStartTimeE");
+            //    }
+            //}
+
+            if (pageQuery.PlanStartTime != null && pageQuery.PlanStartTime.Length > 0) 
             {
-                if (pageQuery.PlanStartTimeS.HasValue && pageQuery.PlanStartTimeE.HasValue) sqlBuilder.Where("wo.PlanStartTime BETWEEN @PlanStartTimeS AND @PlanStartTimeE");
-                else
+                if (pageQuery.PlanStartTime.Length >= 2) 
                 {
-                    if (pageQuery.PlanStartTimeS.HasValue) sqlBuilder.Where("wo.PlanStartTime >= @PlanStartTimeS");
-                    if (pageQuery.PlanStartTimeE.HasValue) sqlBuilder.Where("wo.PlanStartTime < @PlanStartTimeE");
-                }
+                    sqlBuilder.AddParameters(new { PlanStartTimeStart = pageQuery.PlanStartTime[0], PlanStartTimeEnd = pageQuery.PlanStartTime[1] });
+                    sqlBuilder.Where("wo.PlanStartTime BETWEEN @PlanStartTimeStart AND @PlanStartTimeEnd");
+                } 
             }
 
             if (pageQuery.Statuss != null && pageQuery.Statuss.Any())

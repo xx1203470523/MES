@@ -511,6 +511,7 @@
         public const string MES16318 = "SFC状态为已完成，不允许操作！";
         public const string MES16319 = "SFC条码{SFC}已存在返修信息，不允许操作。";
         public const string MES16320 = "工单{ordercode}状态不为已下达|生产中，无法继续操作。";
+        public const string MES16321 = "物料{Code}未添加组件，请检查";
         #endregion
 
         #region 生产
@@ -661,6 +662,7 @@
         public const string MES16910 = "实际使用的物料为空!";
         public const string MES16911 = "实际使用的物料与条码不合!";
         public const string MES16912 = "条码为空！";
+        public const string MES16913 = "不能删除启用或保留的记录！";
         #endregion
 
         #region 在制品步骤控制 MES18000

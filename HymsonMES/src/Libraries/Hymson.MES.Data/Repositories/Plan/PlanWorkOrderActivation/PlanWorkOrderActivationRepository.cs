@@ -171,28 +171,36 @@ namespace Hymson.MES.Data.Repositories.Plan
             }
             if (planWorkOrderActivationPagedQuery.Status.HasValue)
             {
-                sqlBuilder.Where(" wo.Status = @Status ");
+                if (planWorkOrderActivationPagedQuery.Status == Core.Enums.PlanWorkOrderStatusEnum.Pending)
+                {
+                    //planWorkOrderActivationPagedQuery.IsLocked = Core.Enums.YesOrNoEnum.Yes;
+                    sqlBuilder.AddParameters(new { IsLocked = Core.Enums.YesOrNoEnum.Yes });
+                    sqlBuilder.Where("wo.IsLocked = @IsLocked ");
+
+                    sqlBuilder.AddParameters(new { NotStatus = new PlanWorkOrderStatusEnum[] { PlanWorkOrderStatusEnum.Closed, PlanWorkOrderStatusEnum.NotStarted } });
+                    sqlBuilder.Where(" wo.Status not in  @NotStatus ");//不要显示状态为已关闭的 和未开始的
+                }
+                else 
+                {
+                    sqlBuilder.Where(" wo.Status = @Status ");
+                }
             }
             else
             {
-                planWorkOrderActivationPagedQuery.Status = PlanWorkOrderStatusEnum.Closed;
-                sqlBuilder.Where(" wo.Status != @Status ");//不要显示状态为已关闭的
+                sqlBuilder.AddParameters(new { NotStatus = new PlanWorkOrderStatusEnum[] { PlanWorkOrderStatusEnum.Closed,PlanWorkOrderStatusEnum.NotStarted } });
+                sqlBuilder.Where(" wo.Status not in  @NotStatus ");//不要显示状态为已关闭的 和未开始的
             }
-            if (planWorkOrderActivationPagedQuery.IsLocked.HasValue)
-            {
-                sqlBuilder.Where(" wo.IsLocked = @IsLocked ");
-            }
+            //if (planWorkOrderActivationPagedQuery.IsLocked.HasValue)
+            //{
+            //    sqlBuilder.Where(" wo.IsLocked = @IsLocked ");
+            //}
 
-            if (planWorkOrderActivationPagedQuery.PlanStartTimeS.HasValue || planWorkOrderActivationPagedQuery.PlanStartTimeE.HasValue) 
+            if (planWorkOrderActivationPagedQuery.PlanStartTime != null && planWorkOrderActivationPagedQuery.PlanStartTime.Length > 0)
             {
-                if (planWorkOrderActivationPagedQuery.PlanStartTimeS.HasValue && planWorkOrderActivationPagedQuery.PlanStartTimeE.HasValue) 
+                if (planWorkOrderActivationPagedQuery.PlanStartTime.Length >= 2)
                 {
-                    sqlBuilder.Where("wo.PlanStartTime BETWEEN @PlanStartTimeS AND @PlanStartTimeE");
-                } 
-                else 
-                {
-                    if (planWorkOrderActivationPagedQuery.PlanStartTimeS.HasValue) sqlBuilder.Where("wo.PlanStartTime >= @PlanStartTimeS");
-                    if (planWorkOrderActivationPagedQuery.PlanStartTimeE.HasValue) sqlBuilder.Where("wo.PlanStartTime < @PlanStartTimeE");
+                    sqlBuilder.AddParameters(new { PlanStartTimeStart = planWorkOrderActivationPagedQuery.PlanStartTime[0], PlanStartTimeEnd = planWorkOrderActivationPagedQuery.PlanStartTime[1] });
+                    sqlBuilder.Where("wo.PlanStartTime BETWEEN @PlanStartTimeStart AND @PlanStartTimeEnd");
                 }
             }
 

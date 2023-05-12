@@ -570,7 +570,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 DefinitionMethod = DefinitionMethodEnum.Material,
                 MaterialId = ProductId,
                 MaterialGroupId = 0,
-                Status = SysDataStatusEnum.Enable
+                Status = SysDataStatusEnum.Enable,
+                Level=(LevelEnum)level
             });
             //物料-包装规格
             if (entityByRelation != null)
@@ -635,7 +636,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                         DefinitionMethod = DefinitionMethodEnum.MaterialGroup,
                         MaterialId = ProductId,
                         MaterialGroupId = material.GroupId,
-                        Status = SysDataStatusEnum.Enable
+                        Status = SysDataStatusEnum.Enable,
+                        Level = (LevelEnum)level
                     });
                     if (entityByRelation1 != null)
                     {
