@@ -321,10 +321,10 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// </summary>
         public PlanWorkOrderStatusEnum? Status { get; set; }
 
-        ///// <summary>
-        ///// 是否锁定
-        ///// </summary>
-        //public YesOrNoEnum? IsLocked { get; set; }
+        /// <summary>
+        /// 是否锁定
+        /// </summary>
+        public YesOrNoEnum? IsLocked { get; set; }
 
         /// <summary>
         /// 计划开始时间  时间范围  数组
