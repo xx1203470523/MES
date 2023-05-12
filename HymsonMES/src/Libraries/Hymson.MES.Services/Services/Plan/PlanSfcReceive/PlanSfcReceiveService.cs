@@ -157,6 +157,22 @@ namespace Hymson.MES.Services.Services.Plan
                     }
                     else
                     {
+                        if (whMaterialInventoryEntity.MaterialId != procMaterialEntity.Id)
+                        {
+                            var validationFailure = new ValidationFailure();
+                            if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", sfc}
+                        };
+                            }
+                            else
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
+                            }
+                            validationFailure.ErrorCode = nameof(ErrorCode.MES16129);
+                            validationFailures.Add(validationFailure);
+                        }
                         qty = whMaterialInventoryEntity.QuantityResidue;
                     }
                     if (manuSfcEntity != null && manuSfcEntity.Status == SfcStatusEnum.InProcess)
@@ -291,6 +307,10 @@ namespace Hymson.MES.Services.Services.Plan
                 if (whMaterialInventoryEntity == null)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16120));
+                }
+                if (procMaterialEntity.Id != whMaterialInventoryEntity.MaterialId)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16129));
                 }
                 qty = whMaterialInventoryEntity.QuantityResidue;
                 procMaterialEntity = await _procMaterialRepository.GetByIdAsync(whMaterialInventoryEntity.MaterialId);
