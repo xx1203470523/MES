@@ -122,7 +122,7 @@ namespace Hymson.MES.Services.Services.Plan
                 var manuSfcEntity = manuSfcList.FirstOrDefault(x => x.SFC == sfc);
                 if (param.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)
                 {
-                    if (!manuSfcInfoList.Any(x => x.SfcId == manuSfcEntity?.Id && x.WorkOrderId == param.WorkOrderId))
+                    if (!manuSfcInfoList.Any(x => x.SfcId == manuSfcEntity?.Id && x.WorkOrderId == param.RelevanceWorkOrderId))
                     {
                         var validationFailure = new ValidationFailure();
                         if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
@@ -282,7 +282,7 @@ namespace Hymson.MES.Services.Services.Plan
                 }
                 var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCAsync(manuSfcEntity.Id);
 
-                if (manuSfcInfoEntity != null && manuSfcInfoEntity.WorkOrderId != param.WorkOrderId)
+                if (manuSfcInfoEntity != null && manuSfcInfoEntity.WorkOrderId != param.RelevanceWorkOrderId)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16127));
                 }
