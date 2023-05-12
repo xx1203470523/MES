@@ -191,6 +191,8 @@
         public const string MES11107 = "不合格代码备注超过最大长度，不合格代码备注最大长度为255";
         public const string MES11108 = "不合格代码{code}已经存在";
         public const string MES11109 = "不合格代码状态不能为空";
+        public const string MES11110 = "不合格代码状态不为新建无法被删除";
+        public const string MES11111 = "无法将不合格代码状态由其他状态修改为新建";
         #endregion
 
         #region 不合格组 11200

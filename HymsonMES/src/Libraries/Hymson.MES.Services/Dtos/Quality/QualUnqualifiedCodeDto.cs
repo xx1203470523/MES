@@ -190,7 +190,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 描述 :状态 
         /// 空值 : true  
         /// </summary>
-        public SysDataStatusEnum Status { get; set; }
+        public SysDataStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 类型

@@ -207,6 +207,11 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task<int> DeletesQualUnqualifiedCodeAsync(long[] ids)
         {
+         var   qualUnqualifiedList= await _qualUnqualifiedCodeRepository.GetByIdsAsync(ids);
+            if (qualUnqualifiedList != null&& qualUnqualifiedList.Any(x=>x.Status!= SysDataStatusEnum.Build))
+            {
+                throw new BusinessException(nameof(ErrorCode.MES11110));
+            }
             var userId = _currentUser.UserName;
             return await _qualUnqualifiedCodeRepository.DeletesAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = userId });
         }
@@ -226,6 +231,11 @@ namespace Hymson.MES.Services.Services.Quality
             param.UnqualifiedCodeName = param.UnqualifiedCodeName.Trim();
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(param);
+            var qualUnqualifiedEntity = await _qualUnqualifiedCodeRepository.GetByIdAsync(param.Id);
+            if (qualUnqualifiedEntity != null && qualUnqualifiedEntity.Status != SysDataStatusEnum.Build && param.Status == SysDataStatusEnum.Build)
+            {
+                throw new BusinessException(nameof(ErrorCode.MES11111));
+            }
             var userId = _currentUser.UserName;
             //DTO转换实体
             var qualUnqualifiedCodeEntity = param.ToEntity<QualUnqualifiedCodeEntity>();
