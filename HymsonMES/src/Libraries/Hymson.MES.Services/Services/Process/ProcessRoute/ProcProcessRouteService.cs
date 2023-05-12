@@ -1,4 +1,3 @@
-using Dapper;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -433,7 +432,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             var nodesWithEndNode = saveNodes.Where(w => w.ProcedureId != EndNodeId);
 
             // 开始排序
-            UpdateNodesSort(ref newNodes, nodesWithEndNode, links, Array.Empty<ProcProcessRouteDetailNodeEntity>());
+            SortNodes(ref newNodes, nodesWithEndNode, links, Array.Empty<ProcProcessRouteDetailNodeEntity>());
 
             // 重新排序
             newNodes.ForEach(f => f.SerialNo = $"{newNodes.IndexOf(f) + 1}");
@@ -452,17 +451,17 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
         /// <summary>
         /// 对节点进行排序
         /// </summary>
-        /// <param name="nodesOfSort"></param>
+        /// <param name="nodesOfSorted"></param>
         /// <param name="childNodes"></param>
         /// <param name="allNodes"></param>
         /// <param name="allLinks"></param>
-        public static void UpdateNodesSort(ref List<ProcProcessRouteDetailNodeEntity> nodesOfSort,
+        public static void SortNodes(ref List<ProcProcessRouteDetailNodeEntity> nodesOfSorted,
             IEnumerable<ProcProcessRouteDetailNodeEntity> allNodes,
             IEnumerable<ProcProcessRouteDetailLinkEntity> allLinks,
             IEnumerable<ProcProcessRouteDetailNodeEntity> childNodes)
         {
             var targetNodes = childNodes;
-            if (nodesOfSort.Any() == false)
+            if (nodesOfSorted.Any() == false)
             {
                 // 首工序
                 var firstNode = allNodes.FirstOrDefault(f => f.IsFirstProcess == 1);
@@ -471,20 +470,20 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
                 targetNodes = new List<ProcProcessRouteDetailNodeEntity> { firstNode };
             }
 
-            childNodes = UpdateNodesSortAndGetChildNodes(ref nodesOfSort, allNodes, allLinks, targetNodes);
+            childNodes = UpdateNodesSortAndGetChildNodes(ref nodesOfSorted, allNodes, allLinks, targetNodes);
             if (childNodes.Any() == false) return;
 
-            UpdateNodesSort(ref nodesOfSort, allNodes, allLinks, childNodes);
+            SortNodes(ref nodesOfSorted, allNodes, allLinks, childNodes);
         }
 
         /// <summary>
-        /// 对节点进行排序
+        /// 更新节点排序号并获取子节点
         /// </summary>
-        /// <param name="nodesOfSort"></param>
+        /// <param name="nodesOfSorted"></param>
         /// <param name="nodes"></param>
         /// <param name="allNodes"></param>
         /// <param name="allLinks"></param>
-        public static IEnumerable<ProcProcessRouteDetailNodeEntity> UpdateNodesSortAndGetChildNodes(ref List<ProcProcessRouteDetailNodeEntity> nodesOfSort,
+        public static IEnumerable<ProcProcessRouteDetailNodeEntity> UpdateNodesSortAndGetChildNodes(ref List<ProcProcessRouteDetailNodeEntity> nodesOfSorted,
             IEnumerable<ProcProcessRouteDetailNodeEntity> allNodes,
             IEnumerable<ProcProcessRouteDetailLinkEntity> allLinks,
             IEnumerable<ProcProcessRouteDetailNodeEntity> nodes)
@@ -492,10 +491,10 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             List<ProcProcessRouteDetailNodeEntity> childNodes = new();
             foreach (var node in nodes)
             {
-                node.SerialNo = $"{nodesOfSort.Count + 1}";
+                node.SerialNo = $"{nodesOfSorted.Count + 1}";
 
-                nodesOfSort.RemoveAll(f => f.ProcedureId == node.ProcedureId);
-                nodesOfSort.Add(node);
+                nodesOfSorted.RemoveAll(f => f.ProcedureId == node.ProcedureId);
+                nodesOfSorted.Add(node);
 
                 // 当前节点的所有下级节点
                 childNodes.AddRange(GetChildNodes(node, allNodes, allLinks));

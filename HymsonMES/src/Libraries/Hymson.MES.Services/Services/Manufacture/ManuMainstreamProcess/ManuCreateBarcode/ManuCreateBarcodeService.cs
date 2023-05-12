@@ -258,7 +258,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                     SiteId = _currentSite.SiteId ?? 0,
                     SFC = item.SFC,
                     Qty = item.Qty,
-                    IsUsed = YesOrNoEnum.No,
+                    IsUsed = YesOrNoEnum.Yes,
                     Status = SfcStatusEnum.InProcess,
                     CreatedBy = _currentUser.UserName,
                     UpdatedBy = _currentUser.UserName
