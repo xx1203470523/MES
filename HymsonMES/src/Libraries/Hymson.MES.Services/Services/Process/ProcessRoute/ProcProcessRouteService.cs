@@ -406,6 +406,10 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             if (entity == null) return list;
             if (nodeList == null || nodeList.Any() == false) return list;
 
+            // 判断是否有重复工序
+            var procedureIds = nodeList.Select(s => s.ProcedureId).Distinct();
+            if (procedureIds.Count() < nodeList.Count()) throw new CustomerValidationException(nameof(ErrorCode.MES10449));
+
             var saveNodes = nodeList.Select(s => new ProcProcessRouteDetailNodeEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
@@ -430,6 +434,9 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
 
             // 开始排序
             UpdateNodesSort(ref newNodes, nodesWithEndNode, links, Array.Empty<ProcProcessRouteDetailNodeEntity>());
+
+            // 重新排序
+            newNodes.ForEach(f => f.SerialNo = $"{newNodes.IndexOf(f) + 1}");
 
             // 补回尾工序
             var lastNode = saveNodes.FirstOrDefault(w => w.ProcedureId == EndNodeId);
@@ -486,6 +493,8 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             foreach (var node in nodes)
             {
                 node.SerialNo = $"{nodesOfSort.Count + 1}";
+
+                nodesOfSort.RemoveAll(f => f.ProcedureId == node.ProcedureId);
                 nodesOfSort.Add(node);
 
                 // 当前节点的所有下级节点

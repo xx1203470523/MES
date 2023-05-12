@@ -110,6 +110,7 @@
         public const string MES10446 = $"抽检比例设置错误";
         public const string MES10447 = $"下一工序不存在非空值类型工序";
         public const string MES10448 = $"只允许选择启用和保留状态的工艺路线！";
+        public const string MES10449 = $"当前工艺路线存在重复的工序！";
         #endregion
 
         #region 参数 10500
@@ -386,7 +387,7 @@
         public const string MES15314 = "锁定工序{sfcproduction}不在条码所在工序{lockproductionname}之后";
         public const string MES15315 = "条码存在及时锁定，无法添加及时锁";
         public const string MES15316 = "条码未被锁定，无法执行解锁操作";
-        public const string MES15317= "将来锁工序{lockproduction}不在条码所在工序之后";
+        public const string MES15317 = "将来锁工序{lockproduction}不在条码所在工序之后";
 
         #endregion
 
@@ -402,7 +403,7 @@
         public const string MES15408 = "存在未关闭的不合格信息，工艺路线为必填!";
         public const string MES15409 = "不合格代码{codes}已录入,请勿重复录入!";
         public const string MES15410 = "SFC {sfcs}已存在返修信息，不可再执行当前操作!";
-        public const string MES15411= "条码{sfcs}已报废,不可再执行当前操作！";
+        public const string MES15411 = "条码{sfcs}已报废,不可再执行当前操作！";
         #endregion
 
         #region 物料加载 15500
