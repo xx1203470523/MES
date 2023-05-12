@@ -164,23 +164,24 @@ namespace Hymson.MES.Data.Repositories.Plan
                 sqlBuilder.Where("wo.Type = @Type ");
             }
 
+            //觉得别扭的兄弟们 那就对了 TODO  这里需要 查询 锁定和状态  
             if (pageQuery.Status.HasValue)
             {
                 if (pageQuery.Status == Core.Enums.PlanWorkOrderStatusEnum.Pending)
                 {
                     //pageQuery.IsLocked = Core.Enums.YesOrNoEnum.Yes;
-                    sqlBuilder.AddParameters(new { IsLocked = Core.Enums.YesOrNoEnum.Yes });
-                    sqlBuilder.Where("wo.IsLocked = @IsLocked ");
+                    sqlBuilder.AddParameters(new { StatusIsLocked = Core.Enums.YesOrNoEnum.Yes });
+                    sqlBuilder.Where("wo.IsLocked = @StatusIsLocked ");
                 }
                 else
                 {
                     //pageQuery.IsLocked = Core.Enums.YesOrNoEnum.No;
-                    sqlBuilder.AddParameters(new { IsLocked = Core.Enums.YesOrNoEnum.No });
+                    sqlBuilder.AddParameters(new { StatusIsLocked = Core.Enums.YesOrNoEnum.No });
                     sqlBuilder.Where("wo.Status = @Status");
-                    sqlBuilder.Where("wo.IsLocked = @IsLocked ");
+                    sqlBuilder.Where("wo.IsLocked = @StatusIsLocked ");
                 }
             }
-            //if (pageQuery.IsLocked.HasValue) sqlBuilder.Where("wo.IsLocked = @IsLocked");
+            if (pageQuery.IsLocked.HasValue) sqlBuilder.Where("wo.IsLocked = @IsLocked");
             //if (pageQuery.PlanStartTimeS.HasValue || pageQuery.PlanStartTimeE.HasValue)
             //{
             //    if (pageQuery.PlanStartTimeS.HasValue && pageQuery.PlanStartTimeE.HasValue) sqlBuilder.Where("wo.PlanStartTime BETWEEN @PlanStartTimeS AND @PlanStartTimeE");
