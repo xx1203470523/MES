@@ -86,7 +86,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPac
             }
 
             // 更改状态，将条码由"排队"改为"活动"
-            sfcProduceEntity.Status = SfcProduceStatusEnum.Activity;
+            //sfcProduceEntity.Status = SfcProduceStatusEnum.Activity;
             sfcProduceEntity.UpdatedBy = _currentUser.UserName;
             sfcProduceEntity.UpdatedOn = HymsonClock.Now();
             rows += await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
