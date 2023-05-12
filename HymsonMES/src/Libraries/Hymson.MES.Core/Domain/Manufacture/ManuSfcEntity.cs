@@ -34,6 +34,6 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 是否使用
         /// </summary>
-        public YesOrNoEnum IsUsed { get; set; }
+        public YesOrNoEnum IsUsed { get; set; } = YesOrNoEnum.No;
     }
 }

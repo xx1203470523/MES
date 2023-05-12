@@ -1,3 +1,4 @@
+using Dapper;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -428,7 +429,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             var nodesWithEndNode = saveNodes.Where(w => w.ProcedureId != EndNodeId);
 
             // 开始排序
-            UpdateNodesSort(ref newNodes, nodesWithEndNode, links);
+            UpdateNodesSort(ref newNodes, nodesWithEndNode, links, Array.Empty<ProcProcessRouteDetailNodeEntity>());
 
             // 补回尾工序
             var lastNode = saveNodes.FirstOrDefault(w => w.ProcedureId == EndNodeId);
@@ -444,37 +445,53 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
         /// <summary>
         /// 对节点进行排序
         /// </summary>
-        /// <returns></returns>
-        public static void UpdateNodesSort(ref List<ProcProcessRouteDetailNodeEntity> newNodes,
-            IEnumerable<ProcProcessRouteDetailNodeEntity> nodes,
-            IEnumerable<ProcProcessRouteDetailLinkEntity> links)
+        /// <param name="nodesOfSort"></param>
+        /// <param name="childNodes"></param>
+        /// <param name="allNodes"></param>
+        /// <param name="allLinks"></param>
+        public static void UpdateNodesSort(ref List<ProcProcessRouteDetailNodeEntity> nodesOfSort,
+            IEnumerable<ProcProcessRouteDetailNodeEntity> allNodes,
+            IEnumerable<ProcProcessRouteDetailLinkEntity> allLinks,
+            IEnumerable<ProcProcessRouteDetailNodeEntity> childNodes)
         {
-            if (nodes.Any() == false) return;
-
-            var targetNodes = nodes;
-            if (newNodes.Any() == false)
+            var targetNodes = childNodes;
+            if (nodesOfSort.Any() == false)
             {
                 // 首工序
-                var firstNode = nodes.FirstOrDefault(f => f.IsFirstProcess == 1);
+                var firstNode = allNodes.FirstOrDefault(f => f.IsFirstProcess == 1);
                 if (firstNode == null) return;
 
-                firstNode.SerialNo = $"{newNodes.Count + 1}";
-                newNodes.Add(firstNode);
-
-                targetNodes = GetChildNodes(firstNode, nodes, links);
+                targetNodes = new List<ProcProcessRouteDetailNodeEntity> { firstNode };
             }
 
+            childNodes = UpdateNodesSortAndGetChildNodes(ref nodesOfSort, allNodes, allLinks, targetNodes);
+            if (childNodes.Any() == false) return;
+
+            UpdateNodesSort(ref nodesOfSort, allNodes, allLinks, childNodes);
+        }
+
+        /// <summary>
+        /// 对节点进行排序
+        /// </summary>
+        /// <param name="nodesOfSort"></param>
+        /// <param name="nodes"></param>
+        /// <param name="allNodes"></param>
+        /// <param name="allLinks"></param>
+        public static IEnumerable<ProcProcessRouteDetailNodeEntity> UpdateNodesSortAndGetChildNodes(ref List<ProcProcessRouteDetailNodeEntity> nodesOfSort,
+            IEnumerable<ProcProcessRouteDetailNodeEntity> allNodes,
+            IEnumerable<ProcProcessRouteDetailLinkEntity> allLinks,
+            IEnumerable<ProcProcessRouteDetailNodeEntity> nodes)
+        {
             List<ProcProcessRouteDetailNodeEntity> childNodes = new();
-            foreach (var node in targetNodes)
+            foreach (var node in nodes)
             {
-                node.SerialNo = $"{newNodes.Count + 1}";
-                newNodes.Add(node);
+                node.SerialNo = $"{nodesOfSort.Count + 1}";
+                nodesOfSort.Add(node);
 
                 // 当前节点的所有下级节点
-                childNodes.AddRange(GetChildNodes(node, nodes, links));
+                childNodes.AddRange(GetChildNodes(node, allNodes, allLinks));
             }
-
-            UpdateNodesSort(ref newNodes, childNodes, links);
+            return childNodes;
         }
 
         /// <summary>
