@@ -44,47 +44,9 @@ namespace Hymson.MES.Services.Dtos.Report
         public string? ProcedureCode { get; set; }
 
         /// <summary>
-        /// 计划开始时间  字符串 ：时间范围，逗号分割
+        /// 计划开始时间  数组 ：时间范围 
         /// </summary>
-        public string? CreatedOnSE { get; set; }
-
-        /// <summary>
-        /// 创建时间-开始
-        /// </summary>
-        public DateTime? CreatedOnS
-        {
-            get
-            {
-                if (!string.IsNullOrEmpty(this.CreatedOnSE))
-                {
-                    var dateArr = this.CreatedOnSE.Split(',');
-                    return dateArr.Length > 0 ? Convert.ToDateTime(dateArr[0]) : null;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
-
-        /// <summary>
-        /// 创建时间-结束
-        /// </summary>
-        public DateTime? CreatedOnE
-        {
-            get
-            {
-                if (!string.IsNullOrEmpty(this.CreatedOnSE))
-                {
-                    var dateArr = this.CreatedOnSE.Split(',');
-                    return dateArr.Length > 1 ? Convert.ToDateTime(dateArr[1]) : null;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
+        public DateTime[]? CreatedOn { get; set; }
     }
 
     public class ManuProductBadRecordReportViewDto
@@ -148,47 +110,47 @@ namespace Hymson.MES.Services.Dtos.Report
         public string? ProcedureCode { get; set; }
 
         /// <summary>
-        /// 计划开始时间  字符串 ：时间范围，逗号分割
+        /// 计划开始时间  数组 ：时间范围 
         /// </summary>
-        public string? CreatedOnSE { get; set; }
+        public DateTime[]? CreatedOn { get; set; }
 
-        /// <summary>
-        /// 创建时间-开始
-        /// </summary>
-        public DateTime? CreatedOnS
-        {
-            get
-            {
-                if (!string.IsNullOrEmpty(this.CreatedOnSE))
-                {
-                    var dateArr = this.CreatedOnSE.Split(',');
-                    return dateArr.Length > 0 ? Convert.ToDateTime(dateArr[0]) : null;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
+        ///// <summary>
+        ///// 创建时间-开始
+        ///// </summary>
+        //public DateTime? CreatedOnS
+        //{
+        //    get
+        //    {
+        //        if (!string.IsNullOrEmpty(this.CreatedOnSE))
+        //        {
+        //            var dateArr = this.CreatedOnSE.Split(',');
+        //            return dateArr.Length > 0 ? Convert.ToDateTime(dateArr[0]) : null;
+        //        }
+        //        else
+        //        {
+        //            return null;
+        //        }
+        //    }
+        //}
 
-        /// <summary>
-        /// 创建时间-结束
-        /// </summary>
-        public DateTime? CreatedOnE
-        {
-            get
-            {
-                if (!string.IsNullOrEmpty(this.CreatedOnSE))
-                {
-                    var dateArr = this.CreatedOnSE.Split(',');
-                    return dateArr.Length > 1 ? Convert.ToDateTime(dateArr[1]) : null;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
+        ///// <summary>
+        ///// 创建时间-结束
+        ///// </summary>
+        //public DateTime? CreatedOnE
+        //{
+        //    get
+        //    {
+        //        if (!string.IsNullOrEmpty(this.CreatedOnSE))
+        //        {
+        //            var dateArr = this.CreatedOnSE.Split(',');
+        //            return dateArr.Length > 1 ? Convert.ToDateTime(dateArr[1]) : null;
+        //        }
+        //        else
+        //        {
+        //            return null;
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// 资源编码

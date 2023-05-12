@@ -52,14 +52,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public string? ProcedureCode { get; set; }
 
         /// <summary>
-        /// 创建时间-开始
+        /// 计划开始时间  数组 ：时间范围 
         /// </summary>
-        public DateTime? CreatedOnS { get; set; }
-
-        /// <summary>
-        /// 创建时间-结束
-        /// </summary>
-        public DateTime? CreatedOnE { get; set; }
+        public DateTime[]? CreatedOn { get; set; }
     }
 
     /// <summary>
@@ -98,14 +93,19 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public string? ProcedureCode { get; set; }
 
         /// <summary>
-        /// 创建时间-开始
+        /// 计划开始时间  数组 ：时间范围 
         /// </summary>
-        public DateTime? CreatedOnS { get; set; }
+        public DateTime[]? CreatedOn { get; set; }
 
-        /// <summary>
-        /// 创建时间-结束
-        /// </summary>
-        public DateTime? CreatedOnE { get; set; }
+        ///// <summary>
+        ///// 创建时间-开始
+        ///// </summary>
+        //public DateTime? CreatedOnS { get; set; }
+
+        ///// <summary>
+        ///// 创建时间-结束
+        ///// </summary>
+        //public DateTime? CreatedOnE { get; set; }
 
         /// <summary>
         /// 资源编码
