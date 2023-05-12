@@ -168,12 +168,14 @@ namespace Hymson.MES.Data.Repositories.Plan
             {
                 if (pageQuery.Status == Core.Enums.PlanWorkOrderStatusEnum.Pending)
                 {
-                    pageQuery.IsLocked = Core.Enums.YesOrNoEnum.Yes;
+                    //pageQuery.IsLocked = Core.Enums.YesOrNoEnum.Yes;
+                    sqlBuilder.AddParameters(new { IsLocked = Core.Enums.YesOrNoEnum.Yes });
                     sqlBuilder.Where("wo.IsLocked = @IsLocked ");
                 }
                 else
                 {
-                    pageQuery.IsLocked = Core.Enums.YesOrNoEnum.No;
+                    //pageQuery.IsLocked = Core.Enums.YesOrNoEnum.No;
+                    sqlBuilder.AddParameters(new { IsLocked = Core.Enums.YesOrNoEnum.No });
                     sqlBuilder.Where("wo.Status = @Status");
                     sqlBuilder.Where("wo.IsLocked = @IsLocked ");
                 }
