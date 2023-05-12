@@ -14,7 +14,6 @@ using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using System.Linq;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process.ProcessRoute
@@ -111,39 +110,27 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
         /// <returns></returns>
         public async Task<CustomProcessRouteDto> GetCustomProcProcessRouteAsync(long id)
         {
-            CustomProcessRouteDto model = new CustomProcessRouteDto { };
-            var processRoute = await _procProcessRouteRepository.GetByIdAsync(id);
-            if (processRoute == null)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10439));
-            }
+            CustomProcessRouteDto model = new();
+            var processRoute = await _procProcessRouteRepository.GetByIdAsync(id)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10439));
+
             model.Info = processRoute.ToModel<ProcProcessRouteDto>();
 
-            var nodeQuery = new ProcProcessRouteDetailNodeQuery { ProcessRouteId = id };
-            var nodes = await _procProcessRouteNodeRepository.GetListAsync(nodeQuery);
+            var nodes = await _procProcessRouteNodeRepository.GetListAsync(new ProcProcessRouteDetailNodeQuery { ProcessRouteId = id });
             nodes = nodes.OrderBy(x => x.SerialNo.ParseToInt());
-            var detailNodeViewDtos = new List<ProcProcessRouteDetailNodeViewDto>();
-            foreach (var node in nodes)
+            model.Nodes = nodes.Select(s =>
             {
-                //实体转换
-                var nodeViewDto = node.ToModel<ProcProcessRouteDetailNodeViewDto>();
-                nodeViewDto.ProcessType = node.Type;
+                // 实体转换
+                var nodeViewDto = s.ToModel<ProcProcessRouteDetailNodeViewDto>();
+                nodeViewDto.ProcessType = s.Type;
                 nodeViewDto.Code = ConvertProcedureCode(nodeViewDto.ProcedureId, nodeViewDto.Code);
                 nodeViewDto.Name = ConvertProcedureName(nodeViewDto.ProcedureId, nodeViewDto.Name);
-                detailNodeViewDtos.Add(nodeViewDto);
-            }
-            model.Nodes = detailNodeViewDtos;
+                return nodeViewDto;
+            });
 
-            var linkQuery = new ProcProcessRouteDetailLinkQuery { ProcessRouteId = id };
-            var links = await _procProcessRouteLinkRepository.GetListAsync(linkQuery);
-            var linkDtos = new List<ProcProcessRouteDetailLinkDto>();
-            foreach (var link in links)
-            {
-                //实体转换
-                var linkDto = link.ToModel<ProcProcessRouteDetailLinkDto>(); ;
-                linkDtos.Add(linkDto);
-            }
-            model.Links = linkDtos;
+            var links = await _procProcessRouteLinkRepository.GetListAsync(new ProcProcessRouteDetailLinkQuery { ProcessRouteId = id });
+            model.Links = links.Select(s => s.ToModel<ProcProcessRouteDetailLinkDto>());
+
             return model;
         }
 
@@ -197,8 +184,8 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             procProcessRouteEntity.CreatedBy = _currentUser.UserName;
             procProcessRouteEntity.UpdatedBy = _currentUser.UserName;
 
-            var nodes = ConvertProcessRouteNodeList(parm.DynamicData.Nodes, parm.DynamicData.Links, procProcessRouteEntity);
             var links = ConvertProcessRouteLinkList(parm.DynamicData.Links, procProcessRouteEntity);
+            var nodes = ConvertProcessRouteNodeList(parm.DynamicData.Nodes, links, procProcessRouteEntity);
 
             // 判断是否存在多个首工序
             var firstProcessCount = nodes.Where(w => w.IsFirstProcess == (int)YesOrNoEnum.Yes).Count();
@@ -231,8 +218,8 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             // 入库
             await _procProcessRouteRepository.InsertAsync(procProcessRouteEntity);
 
-            if (nodes != null && nodes.Count > 0) await _procProcessRouteNodeRepository.InsertRangeAsync(nodes);
-            if (links != null && links.Count > 0) await _procProcessRouteLinkRepository.InsertRangeAsync(links);
+            if (nodes != null && nodes.Any() == true) await _procProcessRouteNodeRepository.InsertRangeAsync(nodes);
+            if (links != null && links.Any() == true) await _procProcessRouteLinkRepository.InsertRangeAsync(links);
 
             trans.Complete();
         }
@@ -261,8 +248,8 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             var procProcessRouteEntity = parm.ToEntity<ProcProcessRouteEntity>();
             procProcessRouteEntity.UpdatedBy = _currentUser.UserName;
 
-            var nodes = ConvertProcessRouteNodeList(parm.DynamicData.Nodes, parm.DynamicData.Links, procProcessRouteEntity);
             var links = ConvertProcessRouteLinkList(parm.DynamicData.Links, procProcessRouteEntity);
+            var nodes = ConvertProcessRouteNodeList(parm.DynamicData.Nodes, links, procProcessRouteEntity);
 
             // 判断是否存在多个首工序
             var firstProcessCount = nodes.Where(w => w.IsFirstProcess == (int)YesOrNoEnum.Yes).Count();
@@ -299,10 +286,10 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             await _procProcessRouteRepository.UpdateAsync(procProcessRouteEntity);
 
             await _procProcessRouteNodeRepository.DeleteByProcessRouteIdAsync(procProcessRouteEntity.Id);
-            if (nodes != null && nodes.Count > 0) await _procProcessRouteNodeRepository.InsertRangeAsync(nodes);
+            if (nodes != null && nodes.Any() == true) await _procProcessRouteNodeRepository.InsertRangeAsync(nodes);
 
             await _procProcessRouteLinkRepository.DeleteByProcessRouteIdAsync(procProcessRouteEntity.Id);
-            if (links != null && links.Count > 0) await _procProcessRouteLinkRepository.InsertRangeAsync(links);
+            if (links != null && links.Any() == true) await _procProcessRouteLinkRepository.InsertRangeAsync(links);
 
             trans.Complete();
         }
@@ -381,25 +368,44 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
         }
 
         /// <summary>
-        /// 转换集合（工艺路线-节点）
+        /// 转换集合（工艺路线-连线）
         /// </summary>
-        /// <param name="nodeList"></param>
         /// <param name="linkList"></param>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public static List<ProcProcessRouteDetailNodeEntity> ConvertProcessRouteNodeList(IEnumerable<FlowDynamicNodeDto> nodeList, IEnumerable<FlowDynamicLinkDto> linkList, ProcProcessRouteEntity entity)
+        public static IEnumerable<ProcProcessRouteDetailLinkEntity> ConvertProcessRouteLinkList(IEnumerable<FlowDynamicLinkDto> linkList, ProcProcessRouteEntity entity)
+        {
+            if (linkList == null || linkList.Any() == false) return new List<ProcProcessRouteDetailLinkEntity> { };
+
+            return linkList.Select(s => new ProcProcessRouteDetailLinkEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = entity.SiteId,
+                SerialNo = s.SerialNo,
+                ProcessRouteId = entity.Id,
+                PreProcessRouteDetailId = s.PreProcessRouteDetailId,
+                ProcessRouteDetailId = s.ProcessRouteDetailId,
+                Extra1 = s.Extra1,
+                CreatedBy = entity?.UpdatedBy ?? "",
+                UpdatedBy = entity?.UpdatedBy ?? ""
+            });
+        }
+
+        /// <summary>
+        /// 转换集合（工艺路线-节点）
+        /// </summary>
+        /// <param name="nodeList"></param>
+        /// <param name="links"></param>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public static IEnumerable<ProcProcessRouteDetailNodeEntity> ConvertProcessRouteNodeList(IEnumerable<FlowDynamicNodeDto> nodeList, IEnumerable<ProcProcessRouteDetailLinkEntity> links, ProcProcessRouteEntity entity)
         {
             List<ProcProcessRouteDetailNodeEntity> list = new();
 
             if (entity == null) return list;
             if (nodeList == null || nodeList.Any() == false) return list;
 
-            // 首工序
-            var firstNode = nodeList.FirstOrDefault(f => f.IsFirstProcess == 1)
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10435));
-
-
-            var testNodes = nodeList.Select(s => new ProcProcessRouteDetailNodeEntity
+            var saveNodes = nodeList.Select(s => new ProcProcessRouteDetailNodeEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = entity.SiteId,
@@ -415,56 +421,77 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
                 UpdatedBy = entity.UpdatedBy
             });
 
+            // 排序之后的节点集合
+            List<ProcProcessRouteDetailNodeEntity> newNodes = new();
 
-            var serialNo = 1;
-            foreach (var s in nodeList)
+            // 先移除尾工序的干扰
+            var nodesWithEndNode = saveNodes.Where(w => w.ProcedureId != EndNodeId);
+
+            // 开始排序
+            UpdateNodesSort(ref newNodes, nodesWithEndNode, links);
+
+            // 补回尾工序
+            var lastNode = saveNodes.FirstOrDefault(w => w.ProcedureId == EndNodeId);
+            if (lastNode != null)
             {
-                if (s.IsFirstProcess != 1) serialNo++;
-
-                list.Add(new ProcProcessRouteDetailNodeEntity
-                {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = entity.SiteId,
-                    ProcessRouteId = entity.Id,
-                    SerialNo = s.IsFirstProcess == 1 ? "1" : serialNo.ToString(),
-                    ProcedureId = s.ProcedureId,
-                    CheckType = s.CheckType,
-                    CheckRate = s.CheckRate,
-                    IsWorkReport = s.IsWorkReport,
-                    IsFirstProcess = s.IsFirstProcess,
-                    Extra1 = s.Extra1,
-                    CreatedBy = entity.UpdatedBy ?? "",
-                    UpdatedBy = entity.UpdatedBy
-                });
+                lastNode.SerialNo = $"{newNodes.Count + 1}";
+                newNodes.Add(lastNode);
             }
 
-            return list;
+            return newNodes;
         }
 
         /// <summary>
-        /// 转换集合（工艺路线-连线）
+        /// 对节点进行排序
         /// </summary>
-        /// <param name="linkList"></param>
-        /// <param name="entity"></param>
         /// <returns></returns>
-        public static List<ProcProcessRouteDetailLinkEntity> ConvertProcessRouteLinkList(IEnumerable<FlowDynamicLinkDto> linkList, ProcProcessRouteEntity entity)
+        public static void UpdateNodesSort(ref List<ProcProcessRouteDetailNodeEntity> newNodes,
+            IEnumerable<ProcProcessRouteDetailNodeEntity> nodes,
+            IEnumerable<ProcProcessRouteDetailLinkEntity> links)
         {
-            if (linkList == null || linkList.Any() == false) return new List<ProcProcessRouteDetailLinkEntity> { };
+            if (nodes.Any() == false) return;
 
-            return linkList.Select(s => new ProcProcessRouteDetailLinkEntity
+            var targetNodes = nodes;
+            if (newNodes.Any() == false)
             {
-                Id = IdGenProvider.Instance.CreateId(),
-                SiteId = entity.SiteId,
-                SerialNo = s.SerialNo,
-                ProcessRouteId = entity.Id,
-                PreProcessRouteDetailId = s.PreProcessRouteDetailId,
-                ProcessRouteDetailId = s.ProcessRouteDetailId,
-                Extra1 = s.Extra1,
-                CreatedBy = entity?.UpdatedBy ?? "",
-                UpdatedBy = entity?.UpdatedBy ?? ""
-            }).ToList();
+                // 首工序
+                var firstNode = nodes.FirstOrDefault(f => f.IsFirstProcess == 1);
+                if (firstNode == null) return;
+
+                firstNode.SerialNo = $"{newNodes.Count + 1}";
+                newNodes.Add(firstNode);
+
+                targetNodes = GetChildNodes(firstNode, nodes, links);
+            }
+
+            List<ProcProcessRouteDetailNodeEntity> childNodes = new();
+            foreach (var node in targetNodes)
+            {
+                node.SerialNo = $"{newNodes.Count + 1}";
+                newNodes.Add(node);
+
+                // 当前节点的所有下级节点
+                childNodes.AddRange(GetChildNodes(node, nodes, links));
+            }
+
+            UpdateNodesSort(ref newNodes, childNodes, links);
         }
 
+        /// <summary>
+        /// 获取某节点的子节点
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="nodes"></param>
+        /// <param name="links"></param>
+        /// <returns></returns>
+        public static IEnumerable<ProcProcessRouteDetailNodeEntity> GetChildNodes(ProcProcessRouteDetailNodeEntity node,
+            IEnumerable<ProcProcessRouteDetailNodeEntity> nodes,
+            IEnumerable<ProcProcessRouteDetailLinkEntity> links)
+        {
+            // 当前节点的直属下级连线
+            links = links.Where(w => w.PreProcessRouteDetailId == node.ProcedureId);
+            return nodes.Where(w => links.Select(s => s.ProcessRouteDetailId).Contains(w.ProcedureId));
+        }
         #endregion
 
     }
