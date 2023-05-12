@@ -271,16 +271,22 @@ namespace Hymson.MES.Services.Services.Plan
             decimal qty = 0;
             if (param.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)
             {
-                if (manuSfcEntity != null && manuSfcEntity.Status == SfcStatusEnum.InProcess)
+                if (manuSfcEntity == null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16128)).WithData("sfc", param.SFC);
+
+                }
+                if (manuSfcEntity.Status == SfcStatusEnum.InProcess)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16123)).WithData("sfc", param.SFC);
                 }
-                var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCAsync(param.SFC);
+                var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCAsync(manuSfcEntity.Id);
 
                 if (manuSfcInfoEntity != null && manuSfcInfoEntity.WorkOrderId != param.WorkOrderId)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16127));
                 }
+
                 var whMaterialInventoryEntity = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery { SiteId = _currentSite.SiteId, BarCode = param.SFC });
                 if (whMaterialInventoryEntity == null)
                 {
