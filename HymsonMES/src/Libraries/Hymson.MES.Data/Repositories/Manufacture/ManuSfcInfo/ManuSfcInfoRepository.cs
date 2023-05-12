@@ -68,10 +68,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        public async Task<ManuSfcInfoEntity> GetBySFCAsync(string sfc)
+        public async Task<ManuSfcInfoEntity> GetBySFCAsync(long sfcId)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(GetBySFCSql, new { sfc });
+            return await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(GetBySFCSql, new { SfcId= sfcId });
         }
 
         /// <summary>
@@ -309,7 +309,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string GetByIdSql = @"SELECT * FROM manu_sfc_info WHERE IsDeleted = 0 AND Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM manu_sfc_info WHERE IsDeleted = 0 AND Id IN @ids ";
-        const string GetBySFCSql = @"SELECT * FROM manu_sfc_info WHERE IsDeleted = 0 AND SFC = @sfc ";
+        const string GetBySFCSql = @"SELECT * FROM manu_sfc_info WHERE IsDeleted = 0 AND SfcId = @SfcId  AND  IsUsed=1 ";
         const string GetBySFCIdsSql = @"SELECT * FROM manu_sfc_info WHERE IsDeleted = 0 AND SfcId IN @sfcIds  AND  IsUsed=1";
 
         const string UpdatesIsUsedSql = "UPDATE `manu_sfc_info` SET  IsUsed = @IsUsed, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn WHERE SfcId IN @SfcIds";

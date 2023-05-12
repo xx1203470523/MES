@@ -71,9 +71,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 根据SFC获取数据
         /// </summary>
-        /// <param name="sfc"></param>
+        /// <param name="sfcId"></param>
         /// <returns></returns>
-        Task<ManuSfcInfoEntity> GetBySFCAsync(string sfc);
+        Task<ManuSfcInfoEntity> GetBySFCAsync(long sfcId);
 
         /// <summary>
         /// 根据SFC获取数据
