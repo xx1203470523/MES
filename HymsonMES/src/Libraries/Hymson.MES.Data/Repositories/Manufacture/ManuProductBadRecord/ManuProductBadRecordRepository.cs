@@ -254,17 +254,24 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 pageQuery.ProcedureCode = $"%{pageQuery.ProcedureCode}%";
                 sqlBuilder.Where(" p.`Code` like  @ProcedureCode ");
             }
-            if (pageQuery.CreatedOnS.HasValue || pageQuery.CreatedOnE.HasValue)
+            //if (pageQuery.CreatedOnS.HasValue || pageQuery.CreatedOnE.HasValue)
+            //{
+            //    if (pageQuery.CreatedOnS.HasValue && pageQuery.CreatedOnE.HasValue)
+            //        sqlBuilder.Where(" rbr.CreatedOn BETWEEN @CreatedOnS AND @CreatedOnE ");
+            //    else
+            //    {
+            //        if (pageQuery.CreatedOnS.HasValue) sqlBuilder.Where("rbr.CreatedOn >= @CreatedOnS");
+            //        if (pageQuery.CreatedOnE.HasValue) sqlBuilder.Where("rbr.CreatedOn < @CreatedOnE");
+            //    }
+            //}
+            if (pageQuery.CreatedOn != null && pageQuery.CreatedOn.Length > 0)
             {
-                if (pageQuery.CreatedOnS.HasValue && pageQuery.CreatedOnE.HasValue)
-                    sqlBuilder.Where(" rbr.CreatedOn BETWEEN @CreatedOnS AND @CreatedOnE ");
-                else
+                if (pageQuery.CreatedOn.Length >= 2)
                 {
-                    if (pageQuery.CreatedOnS.HasValue) sqlBuilder.Where("rbr.CreatedOn >= @CreatedOnS");
-                    if (pageQuery.CreatedOnE.HasValue) sqlBuilder.Where("rbr.CreatedOn < @CreatedOnE");
+                    sqlBuilder.AddParameters(new { CreatedOnStart = pageQuery.CreatedOn[0], CreatedOnEnd = pageQuery.CreatedOn[1] });
+                    sqlBuilder.Where(" rbr.CreatedOn BETWEEN @CreatedOnStart AND @CreatedOnEnd ");
                 }
             }
-
 
             var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -318,17 +325,24 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 pageQuery.ProcedureCode = $"%{pageQuery.ProcedureCode}%";
                 sqlBuilder.Where(" p.`Code` like  @ProcedureCode ");
             }
-            if (pageQuery.CreatedOnS.HasValue || pageQuery.CreatedOnE.HasValue)
+            //if (pageQuery.CreatedOnS.HasValue || pageQuery.CreatedOnE.HasValue)
+            //{
+            //    if (pageQuery.CreatedOnS.HasValue && pageQuery.CreatedOnE.HasValue)
+            //        sqlBuilder.Where(" rbr.CreatedOn BETWEEN @CreatedOnS AND @CreatedOnE ");
+            //    else
+            //    {
+            //        if (pageQuery.CreatedOnS.HasValue) sqlBuilder.Where("rbr.CreatedOn >= @CreatedOnS");
+            //        if (pageQuery.CreatedOnE.HasValue) sqlBuilder.Where("rbr.CreatedOn < @CreatedOnE");
+            //    }
+            //}
+            if (pageQuery.CreatedOn != null && pageQuery.CreatedOn.Length > 0)
             {
-                if (pageQuery.CreatedOnS.HasValue && pageQuery.CreatedOnE.HasValue)
-                    sqlBuilder.Where(" rbr.CreatedOn BETWEEN @CreatedOnS AND @CreatedOnE ");
-                else
+                if (pageQuery.CreatedOn.Length >= 2)
                 {
-                    if (pageQuery.CreatedOnS.HasValue) sqlBuilder.Where("rbr.CreatedOn >= @CreatedOnS");
-                    if (pageQuery.CreatedOnE.HasValue) sqlBuilder.Where("rbr.CreatedOn < @CreatedOnE");
+                    sqlBuilder.AddParameters(new { CreatedOnStart = pageQuery.CreatedOn[0], CreatedOnEnd = pageQuery.CreatedOn[1] });
+                    sqlBuilder.Where(" rbr.CreatedOn BETWEEN @CreatedOnStart AND @CreatedOnEnd ");
                 }
             }
-
 
             var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -409,14 +423,22 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 pageQuery.SFC = $"%{pageQuery.SFC}%";
                 sqlBuilder.Where(" rbr.SFC like @SFC ");
             }
-            if (pageQuery.CreatedOnS.HasValue || pageQuery.CreatedOnE.HasValue)
+            //if (pageQuery.CreatedOnS.HasValue || pageQuery.CreatedOnE.HasValue)
+            //{
+            //    if (pageQuery.CreatedOnS.HasValue && pageQuery.CreatedOnE.HasValue)
+            //        sqlBuilder.Where(" rbr.CreatedOn BETWEEN @CreatedOnS AND @CreatedOnE ");
+            //    else
+            //    {
+            //        if (pageQuery.CreatedOnS.HasValue) sqlBuilder.Where("rbr.CreatedOn >= @CreatedOnS");
+            //        if (pageQuery.CreatedOnE.HasValue) sqlBuilder.Where("rbr.CreatedOn < @CreatedOnE");
+            //    }
+            //}
+            if (pageQuery.CreatedOn != null && pageQuery.CreatedOn.Length > 0)
             {
-                if (pageQuery.CreatedOnS.HasValue && pageQuery.CreatedOnE.HasValue)
-                    sqlBuilder.Where(" rbr.CreatedOn BETWEEN @CreatedOnS AND @CreatedOnE ");
-                else
+                if (pageQuery.CreatedOn.Length >= 2)
                 {
-                    if (pageQuery.CreatedOnS.HasValue) sqlBuilder.Where("rbr.CreatedOn >= @CreatedOnS");
-                    if (pageQuery.CreatedOnE.HasValue) sqlBuilder.Where("rbr.CreatedOn < @CreatedOnE");
+                    sqlBuilder.AddParameters(new { CreatedOnStart = pageQuery.CreatedOn[0], CreatedOnEnd = pageQuery.CreatedOn[1] });
+                    sqlBuilder.Where(" rbr.CreatedOn BETWEEN @CreatedOnStart AND @CreatedOnEnd ");
                 }
             }
 

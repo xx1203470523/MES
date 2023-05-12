@@ -51,13 +51,17 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         public PlanWorkOrderStatusEnum? Status { get; set; }
 
-        /// <summary>
-        /// 是否锁定
-        /// </summary>
-        public YesOrNoEnum? IsLocked { get; set; }
+        ///// <summary>
+        ///// 是否锁定
+        ///// </summary>
+        //public YesOrNoEnum? IsLocked { get; set; }
 
-        public DateTime? PlanStartTimeS { get; set; }
-        public DateTime? PlanStartTimeE { get; set; }
-        
+        /// <summary>
+        /// 计划开始时间  时间范围  数组
+        /// </summary>
+        public DateTime[]? PlanStartTime { get; set; }
+        //public DateTime? PlanStartTimeS { get; set; }
+        //public DateTime? PlanStartTimeE { get; set; }
+
     }
 }
