@@ -63,5 +63,12 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ManuContainerBarcodeDto> QueryManuContainerBarcodeByIdAsync(long id);
+
+        /// <summary>
+        /// 根据编码查询
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <returns></returns>
+        Task<ManuContainerBarcodeDto> QueryManuContainerBarcodeByBarCodeAsync(string barCode);
     }
 }

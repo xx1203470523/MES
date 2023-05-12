@@ -44,7 +44,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 包装等级
         /// </summary>
-        public int Level { get; set; }
+        public int PackLevel { get; set; }
 
         /// <summary>
         /// 最大包装数
