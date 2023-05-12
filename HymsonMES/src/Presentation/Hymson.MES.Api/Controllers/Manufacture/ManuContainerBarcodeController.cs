@@ -8,6 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
+using IdGen;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,7 +19,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
     /// @author wxk
     /// @date 2023-04-12 02:29:23
     /// </summary>
-    
+
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ManuContainerBarcodeController : ControllerBase
@@ -65,6 +66,17 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         /// <summary>
+        /// 根据编码查询
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <returns></returns>
+        [HttpGet("byCode/{barCode}")]
+        public async Task<ManuContainerBarcodeDto> QueryManuContainerBarcodeByBarCodeAsync(string barCode)
+        {
+            return await _manuContainerBarcodeService.QueryManuContainerBarcodeByBarCodeAsync(barCode);
+        }
+
+        /// <summary>
         /// 添加（容器条码表）
         /// </summary>
         /// <param name="parm"></param>
@@ -85,7 +97,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [Route("update")]
         public async Task UpdateManuContainerBarcodeAsync([FromBody] ManuContainerBarcodeModifyDto parm)
         {
-             await _manuContainerBarcodeService.ModifyManuContainerBarcodeAsync(parm);
+            await _manuContainerBarcodeService.ModifyManuContainerBarcodeAsync(parm);
         }
 
 

@@ -55,6 +55,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public string ProcedureName { get; set; }
 
         /// <summary>
+        /// 包装等级
+        /// </summary>
+        public int? PackingLevel { get; set; }
+
+        /// <summary>
         /// 是否修改工序
         /// </summary>
         public bool IsProcedureEdit { get; set; }

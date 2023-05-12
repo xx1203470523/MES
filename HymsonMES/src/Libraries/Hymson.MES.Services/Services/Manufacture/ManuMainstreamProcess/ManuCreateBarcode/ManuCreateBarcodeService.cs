@@ -6,7 +6,6 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Integrated;
@@ -21,7 +20,6 @@ using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using System.Linq;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCreateBarcode
 {
@@ -45,6 +43,21 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
         private readonly ILocalizationService _localizationService;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="currentUser"></param>
+        /// <param name="currentSite"></param>
+        /// <param name="manuCommonService"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="inteCodeRulesRepository"></param>
+        /// <param name="manuGenerateBarcodeService"></param>
+        /// <param name="manuSfcRepository"></param>
+        /// <param name="manuSfcInfoRepository"></param>
+        /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="manuSfcStepRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
+        /// <param name="localizationService"></param>
         public ManuCreateBarcodeService(ICurrentUser currentUser,
              ICurrentSite currentSite,
              IManuCommonService manuCommonService,
@@ -56,7 +69,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
              IManuSfcProduceRepository manuSfcProduceRepository,
              IManuSfcStepRepository manuSfcStepRepository,
              IPlanWorkOrderRepository planWorkOrderRepository,
-                ILocalizationService localizationService)
+             ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -245,6 +258,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                     SiteId = _currentSite.SiteId ?? 0,
                     SFC = item.SFC,
                     Qty = item.Qty,
+                    IsUsed = YesOrNoEnum.No,
                     Status = SfcStatusEnum.InProcess,
                     CreatedBy = _currentUser.UserName,
                     UpdatedBy = _currentUser.UserName
@@ -381,6 +395,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                 }
 
                 sfcEntity.Qty = item.Qty;
+                sfcEntity.IsUsed = YesOrNoEnum.No;
                 sfcEntity.Status = SfcStatusEnum.InProcess;
                 sfcEntity.UpdatedBy = _currentUser.UserName;
                 sfcEntity.UpdatedOn = HymsonClock.Now();

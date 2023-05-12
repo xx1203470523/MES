@@ -526,6 +526,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         {
                             facePlateQueryDto.FacePlateContainerPack.ProcedureName = procProcedureEntity.Name;
                             facePlateQueryDto.FacePlateContainerPack.ProcedureCode = procProcedureEntity.Code;
+                            facePlateQueryDto.FacePlateContainerPack.PackingLevel = procProcedureEntity.PackingLevel;
                         }
                     }
                 }
