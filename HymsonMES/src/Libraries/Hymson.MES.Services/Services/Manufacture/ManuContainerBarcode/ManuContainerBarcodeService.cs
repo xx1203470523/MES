@@ -571,7 +571,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 MaterialId = ProductId,
                 MaterialGroupId = 0,
                 Status = SysDataStatusEnum.Enable,
-                Level=(LevelEnum)level
+                Level = (LevelEnum)level
             });
             //物料-包装规格
             if (entityByRelation != null)
@@ -824,7 +824,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new ValidationException(nameof(ErrorCode.MES10101));
             }
             var containerBarcode = await _manuContainerBarcodeRepository.GetByIdAsync(updateManuContainerBarcodeStatusDto.Id);
-            if (containerBarcode == null) {
+            if (containerBarcode == null)
+            {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16726));
             }
 
@@ -862,6 +863,30 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (manuContainerBarcodeEntity != null)
             {
                 return manuContainerBarcodeEntity.ToModel<ManuContainerBarcodeDto>();
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 根据编码查询
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <returns></returns>
+        public async Task<ManuContainerBarcodeDto> QueryManuContainerBarcodeByBarCodeAsync(string barCode)
+        {
+            var manuContainerBarcodeEntity = await _manuContainerBarcodeRepository.GetByCodeAsync(new ManuContainerBarcodeQuery
+            {
+                BarCode = barCode,
+                SiteId = _currentSite.SiteId ?? 0
+            });
+            if (manuContainerBarcodeEntity != null)
+            {
+                var containerEntity = await _inteContainerRepository.GetByIdAsync(manuContainerBarcodeEntity.ContainerId);
+
+                var  barcodeDto = manuContainerBarcodeEntity.ToModel<ManuContainerBarcodeDto>();
+                barcodeDto.Maximum = containerEntity?.Maximum??0;
+                barcodeDto.Minimum= containerEntity?.Minimum??0;
+                return barcodeDto;
             }
             return null;
         }
