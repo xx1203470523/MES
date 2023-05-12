@@ -192,12 +192,12 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 展示不合格信息
         /// </summary>
-        public List<ManuFacePlateRepairProductBadInfoDto> productBadInfo { get; set; }
+        public IEnumerable<ManuFacePlateRepairProductBadInfoDto> productBadInfo { get; set; }
 
         /// <summary>
         /// 返回工序
         /// </summary>
-        public List<ManuFacePlateRepairReturnProcedureDto> returnProcedureInfo { get; set; }
+        public IEnumerable<ManuFacePlateRepairReturnProcedureDto> returnProcedureInfo { get; set; }
 
     }
 
@@ -237,7 +237,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 展示不合格信息
         /// </summary>
-        public List<ManuFacePlateRepairProductBadInfoDto> badInfoDtos { get; set; }
+        public IEnumerable<ManuFacePlateRepairProductBadInfoDto> badInfoDtos { get; set; }
     }
     /// <summary>
     /// 展示不合格信息
