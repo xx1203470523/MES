@@ -177,8 +177,8 @@ namespace Hymson.MES.Data.Repositories.Plan
                     sqlBuilder.AddParameters(new { IsLocked = Core.Enums.YesOrNoEnum.Yes });
                     sqlBuilder.Where("wo.IsLocked = @IsLocked ");
 
-                    planWorkOrderActivationPagedQuery.Status = PlanWorkOrderStatusEnum.Closed;
-                    sqlBuilder.Where(" wo.Status != @Status ");//不要显示状态为已关闭的
+                    sqlBuilder.AddParameters(new { NotStatus = new PlanWorkOrderStatusEnum[] { PlanWorkOrderStatusEnum.Closed, PlanWorkOrderStatusEnum.NotStarted } });
+                    sqlBuilder.Where(" wo.Status not in  @NotStatus ");//不要显示状态为已关闭的 和未开始的
                 }
                 else 
                 {
@@ -187,8 +187,8 @@ namespace Hymson.MES.Data.Repositories.Plan
             }
             else
             {
-                planWorkOrderActivationPagedQuery.Status = PlanWorkOrderStatusEnum.Closed;
-                sqlBuilder.Where(" wo.Status != @Status ");//不要显示状态为已关闭的
+                sqlBuilder.AddParameters(new { NotStatus = new PlanWorkOrderStatusEnum[] { PlanWorkOrderStatusEnum.Closed,PlanWorkOrderStatusEnum.NotStarted } });
+                sqlBuilder.Where(" wo.Status not in  @NotStatus ");//不要显示状态为已关闭的 和未开始的
             }
             //if (planWorkOrderActivationPagedQuery.IsLocked.HasValue)
             //{
