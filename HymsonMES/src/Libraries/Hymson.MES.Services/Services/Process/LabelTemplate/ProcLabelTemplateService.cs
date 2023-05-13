@@ -53,7 +53,6 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
             procLabelTemplateCreateDto.Name = procLabelTemplateCreateDto.Name.ToTrimSpace();
             procLabelTemplateCreateDto.Path=procLabelTemplateCreateDto.Path.ToTrimSpace();
             procLabelTemplateCreateDto.Remark = procLabelTemplateCreateDto.Remark??"".Trim();
-            procLabelTemplateCreateDto.Content = procLabelTemplateCreateDto.Content .Trim();
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procLabelTemplateCreateDto);
 
@@ -139,7 +138,7 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
             procLabelTemplateModifyDto.Name = procLabelTemplateModifyDto.Name.ToTrimSpace();
             procLabelTemplateModifyDto.Path = procLabelTemplateModifyDto.Path.ToTrimSpace();
             procLabelTemplateModifyDto.Remark = procLabelTemplateModifyDto.Remark ?? "".Trim();
-            procLabelTemplateModifyDto.Content = procLabelTemplateModifyDto.Content.Trim();
+            //procLabelTemplateModifyDto.Content = procLabelTemplateModifyDto.Content.Trim();
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(procLabelTemplateModifyDto);
 
