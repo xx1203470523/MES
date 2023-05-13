@@ -299,7 +299,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                                 await _manuContainerBarcodeRepository.UpdateAsync(barcodeobj);
                             }
-                            return await GetContainerPackView(sfcProduceEntity.WorkOrderId, material.Id, barcodeobj);
+                            return await GetContainerPackView(sfcProduceEntity.WorkOrderId, material.Id, barcodeobj,true);
                         }
                         else
                         {
@@ -369,7 +369,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                                 await _manuContainerBarcodeRepository.UpdateAsync(barcodeobj);
                             }
-                            return await GetContainerPackView(sfcProduceEntity.WorkOrderId, material.Id, barcodeobj);
+                            return await GetContainerPackView(sfcProduceEntity.WorkOrderId, material.Id, barcodeobj,true);
                         }
                         else
                         {
@@ -564,6 +564,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuContainerBarcodeEntity.WorkOrderId = workorderId;
             manuContainerBarcodeEntity.MaterialVersion = material.Version ?? "9999—Unknow";
             manuContainerBarcodeEntity.PackLevel = level;
+            bool isFirstPackage = level == (int)LevelEnum.One ? true : false;
+
             //判定  是物料-包装规格   OR 物料组-包装规格
             var entityByRelation = await _inteContainerRepository.GetByRelationIdAsync(new InteContainerQuery
             {
@@ -624,7 +626,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ts.Complete();
                 }
 
-                return await GetContainerPackView(workorderId, material.Id, manuContainerBarcodeEntity, entityByRelation);
+                return await GetContainerPackView(workorderId, material.Id, manuContainerBarcodeEntity, isFirstPackage,entityByRelation);
 
             }
             else //物料组-包装规格
@@ -673,7 +675,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         }
 
 
-                        return await GetContainerPackView(workorderId, material.Id, manuContainerBarcodeEntity, entityByRelation1);
+                        return await GetContainerPackView(workorderId, material.Id, manuContainerBarcodeEntity, isFirstPackage,entityByRelation1);
                     }
                     else
                     {
@@ -686,15 +688,17 @@ namespace Hymson.MES.Services.Services.Manufacture
                 }
             }
         }
+
         /// <summary>
         /// 获取包装清单
         /// </summary>
-        /// <param name="workorder"></param>
-        /// <param name="material"></param>
+        /// <param name="workorderId"></param>
+        /// <param name="materialId"></param>
         /// <param name="barcodeobj"></param>
+        /// <param name="isFirstPackage"></param>
         /// <param name="inte"></param>
         /// <returns></returns>
-        private async Task<ManuContainerBarcodeView> GetContainerPackView(long workorderId, long materialId, ManuContainerBarcodeEntity barcodeobj, InteContainerEntity inte = null)
+        private async Task<ManuContainerBarcodeView> GetContainerPackView(long workorderId, long materialId, ManuContainerBarcodeEntity barcodeobj, bool isFirstPackage=false, InteContainerEntity inte = null)
         {
             if (inte == null)
                 inte = await _inteContainerRepository.GetByIdAsync(barcodeobj.ContainerId);
@@ -725,7 +729,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         MaterialCode = procMateria?.MaterialCode ?? string.Empty,//如果关联结果删除直接返回空
                         SiteId = m.SiteId,
                         WorkOrderCode = planWorkOrder?.OrderCode ?? string.Empty,
-                        Count = packs.Count()
+                        Count =isFirstPackage?1: packs.Count()
                     };
                 }).ToList()
             };
