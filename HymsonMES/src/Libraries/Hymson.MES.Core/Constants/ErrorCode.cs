@@ -481,6 +481,7 @@
         public const string MES16127 = "条码工单和关联工单必须一致";
         public const string MES16128 = "条码{sfc}不存在";
         public const string MES16129 = "条码物料和工单物料编码不一致";
+        public const string MES16130 = "已报废的条码，不允许删除";
         #endregion
 
         #region 条码生成 MES16200

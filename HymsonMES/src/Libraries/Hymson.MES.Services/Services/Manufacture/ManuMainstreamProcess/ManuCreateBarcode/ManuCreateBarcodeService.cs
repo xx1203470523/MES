@@ -395,7 +395,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                 }
 
                 sfcEntity.Qty = item.Qty;
-                sfcEntity.IsUsed = YesOrNoEnum.No;
+                sfcEntity.IsUsed = YesOrNoEnum.Yes;
                 sfcEntity.Status = SfcStatusEnum.InProcess;
                 sfcEntity.UpdatedBy = _currentUser.UserName;
                 sfcEntity.UpdatedOn = HymsonClock.Now();
