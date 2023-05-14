@@ -152,6 +152,19 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<int> UpdateProcedureAndStatusRangeAsync(UpdateProcedureAndStatusCommand command);
 
+        /// <summary>
+        /// 锁定
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> LockedSfcProcedureAsync(LockedProcedureCommand command);
+
+        /// <summary>
+        /// 解除锁定
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> UnLockedSfcProcedureAsync(UnLockedProcedureCommand command);
 
         /// <summary>
         /// 插入或者更新

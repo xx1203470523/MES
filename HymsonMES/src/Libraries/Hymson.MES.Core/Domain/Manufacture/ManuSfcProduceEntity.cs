@@ -100,5 +100,10 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 是否报废
         /// </summary>
         public TrueOrFalseEnum IsScrap { get; set; }
+
+        /// <summary>
+        /// 锁定前状态
+        /// </summary>
+        public TrueOrFalseEnum BeforeLockedStatus { get; set; }
     }
 }

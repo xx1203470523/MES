@@ -20,7 +20,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
        /// <summary>
         /// 条码
         /// </summary>
-        public long SfcInfoId { get; set; }
+        public long SfcProduceId { get; set; }
 
        /// <summary>
         /// 业务类型;1、返修业务  2、锁业务

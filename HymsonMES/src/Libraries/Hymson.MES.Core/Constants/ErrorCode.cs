@@ -388,7 +388,7 @@
         public const string MES15315 = "条码存在及时锁定，无法添加及时锁";
         public const string MES15316 = "条码未被锁定，无法执行解锁操作";
         public const string MES15317 = "将来锁工序{lockproduction}不在条码所在工序之后";
-
+        public const string MES15318 = "条码已经被锁定";
         #endregion
 
         #region 质量录入 15400

@@ -262,6 +262,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             return new PagedInfo<ManuSfcProduceViewDto>(manuSfcProduceDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
+        #region 质量锁定
         /// <summary>
         /// 质量锁定
         /// </summary>
@@ -269,19 +270,54 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task QualityLockAsync(ManuSfcProduceLockDto parm)
         {
-            #region 验证
             if (parm == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
             await _validationLockRules.ValidateAndThrowAsync(parm);
 
+            switch (parm.OperationType)
+            {
+                case
+                    QualityLockEnum.FutureLock:
+                    await FutureLockAsync(new FutureLockDto
+                    {
+                        Sfcs = parm.Sfcs,
+                        LockProductionId = parm.LockProductionId ?? 0
+                    });
+                    break;
+                case
+                    QualityLockEnum.InstantLock:
+                    await InstantLockAsync(new InstantLockDto
+                    {
+                        Sfcs = parm.Sfcs,
+                    });
+                    break;
+                case
+                    QualityLockEnum.Unlock:
+                    await UnLockAsync(new UnLockDto
+                    {
+                        Sfcs = parm.Sfcs,
+                    });
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// 将来锁
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        private async Task FutureLockAsync(FutureLockDto parm)
+        {
             var sfcListTask = _manuSfcProduceRepository.GetManuSfcProduceInfoEntitiesAsync(
-                new ManuSfcProduceQuery
-                {
-                    Sfcs = parm.Sfcs.Distinct().ToArray(),
-                    SiteId = _currentSite.SiteId ?? 00
-                });
+           new ManuSfcProduceQuery
+           {
+               Sfcs = parm.Sfcs.Distinct().ToArray(),
+               SiteId = _currentSite.SiteId ?? 0
+           });
 
             var sfcProduceBusinesssListTask = _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = parm.Sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
             var sfcList = await sfcListTask;
@@ -292,46 +328,20 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES15309));
             }
 
-            //未来锁只能使用一个工单
-            if (parm.OperationType == QualityLockEnum.FutureLock)
+            var workOrders = sfcList.Select(x => x.WorkOrderId).Distinct().ToList();
+            if (workOrders.Count > 1)
             {
-                var workOrders = sfcList.Select(x => x.WorkOrderId).Distinct().ToList();
-                if (workOrders.Count > 1)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15308));
-                }
-                //var processRouteIds = sfcList.Select(x => x.ProcessRouteId).Distinct().ToList();
-                //if(processRouteIds.Count > 1)
-                //{
-                //    throw new CustomerValidationException(nameof(ErrorCode.MES15308));
-                //}
-
-                //验证工艺路线
-                await VeifyQualityLockProductionAsync(sfcList.ToArray(), parm.LockProductionId ?? 0);
-                //var procProcessRouteDetailNodeEntity = await _procProcessRouteDetailNodeRepository.GetByProcessRouteIdAsync(new ProcProcessRouteDetailNodeQuery
-                //{
-                //    ProcessRouteId = sfcList.FirstOrDefault()?.ProcessRouteId ?? 0,
-                //    ProcedureId = parm.LockProductionId ?? 0
-                //});
-
-                //if (procProcessRouteDetailNodeEntity == null)
-                //{
-                //    var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(parm.LockProductionId ?? 0);
-                //    if (procProcedureEntity == null)
-                //    {
-                //        throw new CustomerValidationException(nameof(ErrorCode.MES15311));
-                //    }
-                //    else
-                //    {
-                //        throw new CustomerValidationException(nameof(ErrorCode.MES15310)).WithData("lockproduction", procProcedureEntity.Name);
-                //    }
-                //}
+                throw new CustomerValidationException(nameof(ErrorCode.MES15308));
             }
-            //TODO  验证未完成 wangkeming
+
+            //验证工艺路线
+            await VeifyQualityLockProductionAsync(sfcList.ToArray(), parm.LockProductionId);
+
             var validationFailures = new List<ValidationFailure>();
             foreach (var sfc in parm.Sfcs)
             {
                 var sfcEntity = sfcList.FirstOrDefault(x => x.SFC == sfc);
+                //是否是在制品
                 if (sfcEntity == null)
                 {
                     var validationFailure = new ValidationFailure();
@@ -345,92 +355,66 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
                     }
-
                     validationFailure.ErrorCode = nameof(ErrorCode.MES15312);
                     validationFailures.Add(validationFailure);
                     continue;
                 }
-                var sfcProduceBusinessEntity = sfcProduceBusinesssList.FirstOrDefault(x => x.SfcInfoId == sfcEntity.SfcInfoId);
-                switch (parm.OperationType)
+
+                var sfcProduceBusinessEntity = sfcProduceBusinesssList.FirstOrDefault(x => x.SfcProduceId == sfcEntity.Id);
+
+                //是否被锁定
+                if (sfcEntity.Status == SfcProduceStatusEnum.Locked)
                 {
-                    case
-                        QualityLockEnum.FutureLock:
-                        if (sfcProduceBusinessEntity != null)
-                        {
-                            var validationFailure = new ValidationFailure();
-                            if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
-                            {
-                                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", sfc } };
-                            }
-                            else
-                            {
-                                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
-                            }
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", sfc}
+                        };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
+                    }
 
-                            validationFailure.ErrorCode = nameof(ErrorCode.MES15313);
-                            validationFailures.Add(validationFailure);
-                        }
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15318);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
 
-                        //验证工序
-                        if (await _manuCommonService.IsProcessStartBeforeEndAsync(sfcEntity.ProcessRouteId, sfcEntity.ProcedureId, parm.LockProductionId ?? 0))
-                        {
-                            var validationFailure = new ValidationFailure();
-                            if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
-                            {
-                                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", sfc } };
-                            }
-                            else
-                            {
-                                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
-                            }
-                            validationFailure.FormattedMessagePlaceholderValues.Add("sfcproduction", sfc);
-                            validationFailure.FormattedMessagePlaceholderValues.Add("lockproductionname", sfc);
-                            validationFailure.ErrorCode = nameof(ErrorCode.MES15313);
-                            validationFailures.Add(validationFailure);
-                        }
+                //是否存在将来锁
+                if (sfcProduceBusinessEntity != null)
+                {
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", sfc } };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
+                    }
 
-                        break;
-                    case
-                        QualityLockEnum.InstantLock:
-                        if (sfcProduceBusinessEntity != null)
-                        {
-                            var sfcProduceLockBo = JsonSerializer.Deserialize<SfcProduceLockBo>(sfcProduceBusinessEntity.BusinessContent);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15313);
+                    validationFailures.Add(validationFailure);
+                }
 
-                            if (sfcProduceLockBo != null && sfcProduceLockBo.Lock == QualityLockEnum.InstantLock)
-                            {
-                                var validationFailure = new ValidationFailure();
-                                if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
-                                {
-                                    validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", sfc } };
-                                }
-                                else
-                                {
-                                    validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
-                                }
-                                validationFailure.ErrorCode = nameof(ErrorCode.MES15315);
-                                validationFailures.Add(validationFailure);
-                            }
-                        }
-                        break;
-                    case
-                        QualityLockEnum.Unlock:
-                        if (sfcProduceBusinessEntity == null)
-                        {
-                            var validationFailure = new ValidationFailure();
-                            if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
-                            {
-                                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", sfc } };
-                            }
-                            else
-                            {
-                                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
-                            }
-                            validationFailure.ErrorCode = nameof(ErrorCode.MES15316);
-                            validationFailures.Add(validationFailure);
-                        }
-                        break;
-                    default:
-                        break;
+                //验证将来锁工序是否在条码所在工序之后
+                if (await _manuCommonService.IsProcessStartBeforeEndAsync(sfcEntity.ProcessRouteId, sfcEntity.ProcedureId, parm.LockProductionId))
+                {
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", sfc } };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
+                    }
+                    validationFailure.FormattedMessagePlaceholderValues.Add("sfcproduction", sfc);
+                    validationFailure.FormattedMessagePlaceholderValues.Add("lockproductionname", sfc);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15313);
+                    validationFailures.Add(validationFailure);
                 }
             }
 
@@ -438,22 +422,16 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
             }
-            #endregion
 
-            /* 1.即时锁定：将条码更新为“锁定”状态；
-             2.将来锁定：保存列表中的条码信息，及指定锁定的工序，供条码过站校验时调用；
-             3.取消锁定：产品条码已经是锁定状态：将条码更新到锁定前状态
-            指定将来锁定工序，且条码还没流转到指定工序：关闭将来锁定的工序指定，即取消将来锁定*/
+            #region  组装数据
             var sfcStepList = new List<ManuSfcStepEntity>();
             var sfcProduceBusinessList = new List<ManuSfcProduceBusinessEntity>();
-            var unLockList = new List<long>();
             var sfcStepBusinessList = new List<MaunSfcStepBusinessEntity>();
-            #region  组装数据
             foreach (var sfc in sfcList)
             {
                 SfcProduceLockBo sfcProduceLockBo = new SfcProduceLockBo()
                 {
-                    Lock = parm.OperationType,
+                    Lock = QualityLockEnum.FutureLock,
                     LockProductionId = parm.LockProductionId
                 };
 
@@ -470,32 +448,23 @@ namespace Hymson.MES.Services.Services.Manufacture
                     EquipmentId = sfc.EquipmentId,
                     ResourceId = sfc.ResourceId,
                     ProcedureId = sfc.ProcedureId,
+                    Operatetype = ManuSfcStepTypeEnum.FutureLock,
                     CurrentStatus = sfc.Status,
                     CreatedBy = sfc.CreatedBy,
                     UpdatedBy = sfc.UpdatedBy
                 };
-
-                if (parm.OperationType == QualityLockEnum.Unlock)
-                {
-                    stepEntity.Operatetype = ManuSfcStepTypeEnum.Unlock;
-                    unLockList.Add(sfc.SfcInfoId);
-                }
-                else
-                {
-                    stepEntity.Operatetype = parm.OperationType == QualityLockEnum.InstantLock ? ManuSfcStepTypeEnum.InstantLock : ManuSfcStepTypeEnum.FutureLock;
-                    sfcProduceBusinessList.Add(new ManuSfcProduceBusinessEntity
-                    {
-                        Id = IdGenProvider.Instance.CreateId(),
-                        SiteId = _currentSite.SiteId ?? 0,
-                        SfcInfoId = sfc.SfcInfoId,
-                        BusinessType = ManuSfcProduceBusinessType.Lock,
-                        BusinessContent = JsonSerializer.Serialize(sfcProduceLockBo),
-                        CreatedBy = sfc.CreatedBy,
-                        UpdatedBy = sfc.UpdatedBy
-                    });
-                }
-
                 sfcStepList.Add(stepEntity);
+
+                sfcProduceBusinessList.Add(new ManuSfcProduceBusinessEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    SfcProduceId = sfc.Id,
+                    BusinessType = ManuSfcProduceBusinessType.Lock,
+                    BusinessContent = JsonSerializer.Serialize(sfcProduceLockBo),
+                    CreatedBy = sfc.CreatedBy,
+                    UpdatedBy = sfc.UpdatedBy
+                });
 
                 sfcStepBusinessList.Add(new MaunSfcStepBusinessEntity
                 {
@@ -518,11 +487,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                     await _manuSfcProduceRepository.InsertOrUpdateSfcProduceBusinessRangeAsync(sfcProduceBusinessList);
                 }
 
-                if (unLockList != null && unLockList.Any())
-                {
-                    await _manuSfcProduceRepository.DeleteSfcProduceBusinesssAsync(new DeleteSfcProduceBusinesssCommand { SfcInfoIds = unLockList, BusinessType = ManuSfcProduceBusinessType.Lock });
-                }
-
                 //插入操作数据
                 await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
 
@@ -532,6 +496,278 @@ namespace Hymson.MES.Services.Services.Manufacture
                 trans.Complete();
             }
         }
+
+        /// <summary>
+        /// 及时锁
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        private async Task InstantLockAsync(InstantLockDto parm)
+        {
+            var sfcListTask = _manuSfcProduceRepository.GetManuSfcProduceInfoEntitiesAsync(
+            new ManuSfcProduceQuery
+            {
+                Sfcs = parm.Sfcs.Distinct().ToArray(),
+                SiteId = _currentSite.SiteId ?? 00
+            });
+
+            var sfcProduceBusinesssListTask = _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = parm.Sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
+            var sfcList = await sfcListTask;
+            var sfcProduceBusinesssList = await sfcProduceBusinesssListTask;
+
+            if (sfcListTask == null || !sfcList.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15309));
+            }
+            var validationFailures = new List<ValidationFailure>();
+            foreach (var sfc in parm.Sfcs)
+            {
+                var sfcEntity = sfcList.FirstOrDefault(x => x.SFC == sfc);
+                //是否是在制品
+                if (sfcEntity == null)
+                {
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", sfc}
+                        };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
+                    }
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15312);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
+
+                //是否被锁定
+                if (sfcEntity.Status == SfcProduceStatusEnum.Locked)
+                {
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", sfc}
+                        };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
+                    }
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15318);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
+            }
+
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
+            }
+
+            #region  组装数据
+            var sfcStepList = new List<ManuSfcStepEntity>();
+            var sfcProduceBusinessList = new List<ManuSfcProduceBusinessEntity>();
+            var sfcStepBusinessList = new List<MaunSfcStepBusinessEntity>();
+            foreach (var sfc in sfcList)
+            {
+                SfcProduceLockBo sfcProduceLockBo = new SfcProduceLockBo()
+                {
+                    Lock = QualityLockEnum.InstantLock
+                };
+
+                var stepEntity = new ManuSfcStepEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    SFC = sfc.SFC,
+                    ProductId = sfc.ProductId,
+                    WorkOrderId = sfc.WorkOrderId,
+                    WorkCenterId = sfc.WorkCenterId,
+                    ProductBOMId = sfc.ProductBOMId,
+                    Qty = sfc.Qty,
+                    EquipmentId = sfc.EquipmentId,
+                    ResourceId = sfc.ResourceId,
+                    ProcedureId = sfc.ProcedureId,
+                    Operatetype = ManuSfcStepTypeEnum.InstantLock,
+                    CurrentStatus = sfc.Status,
+                    CreatedBy = sfc.CreatedBy,
+                    UpdatedBy = sfc.UpdatedBy
+                };
+                sfcStepList.Add(stepEntity);
+
+                sfcProduceBusinessList.Add(new ManuSfcProduceBusinessEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    SfcProduceId = sfc.Id,
+                    BusinessType = ManuSfcProduceBusinessType.Lock,
+                    BusinessContent = JsonSerializer.Serialize(sfcProduceLockBo),
+                    CreatedBy = sfc.CreatedBy,
+                    UpdatedBy = sfc.UpdatedBy
+                });
+
+                sfcStepBusinessList.Add(new MaunSfcStepBusinessEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    SfcStepId = stepEntity.Id,
+                    BusinessType = ManuSfcProduceBusinessType.Lock,
+                    BusinessContent = JsonSerializer.Serialize(sfcProduceLockBo),
+                    CreatedBy = sfc.CreatedBy,
+                    UpdatedBy = sfc.UpdatedBy
+                });
+            }
+            #endregion
+
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                if (sfcProduceBusinessList != null && sfcProduceBusinessList.Any())
+                {
+                    //插入业务表
+                    await _manuSfcProduceRepository.InsertOrUpdateSfcProduceBusinessRangeAsync(sfcProduceBusinessList);
+                }
+
+                //插入操作数据
+                await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
+
+                //插入步骤业务表
+                await _manuSfcStepRepository.InsertSfcStepBusinessRangeAsync(sfcStepBusinessList);
+
+                await _manuSfcProduceRepository.LockedSfcProcedureAsync(new LockedProcedureCommand
+                {
+                    Sfcs = parm.Sfcs,
+                    UserId = _currentUser.UserName,
+                    UpdatedOn = HymsonClock.Now(),
+                    Status = SfcProduceStatusEnum.Locked
+                });
+                trans.Complete();
+            }
+        }
+
+        /// <summary>
+        /// 解除锁
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        private async Task UnLockAsync(UnLockDto parm)
+        {
+            var sfcListTask = _manuSfcProduceRepository.GetManuSfcProduceInfoEntitiesAsync(
+         new ManuSfcProduceQuery
+         {
+             Sfcs = parm.Sfcs.Distinct().ToArray(),
+             SiteId = _currentSite.SiteId ?? 00
+         });
+
+            var sfcProduceBusinesssListTask = _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = parm.Sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
+            var sfcList = await sfcListTask;
+            var sfcProduceBusinesssList = await sfcProduceBusinesssListTask;
+
+            if (sfcListTask == null || !sfcList.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15309));
+            }
+            var validationFailures = new List<ValidationFailure>();
+            foreach (var sfc in parm.Sfcs)
+            {
+                var sfcEntity = sfcList.FirstOrDefault(x => x.SFC == sfc);
+                //是否是在制品
+                if (sfcEntity == null)
+                {
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", sfc}
+                        };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
+                    }
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15312);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
+                var sfcProduceBusinessEntity = sfcProduceBusinesssList.FirstOrDefault(x => x.SfcProduceId == sfcEntity.Id);
+                //是否被锁定或者存在将来锁
+                if (sfcProduceBusinessEntity == null && sfcEntity.Status != SfcProduceStatusEnum.Locked)
+                {
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", sfc } };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
+                    }
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15316);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
+            }
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
+            }
+
+            /* 1.即时锁定：将条码更新为“锁定”状态；
+            2.将来锁定：保存列表中的条码信息，及指定锁定的工序，供条码过站校验时调用；
+            3.取消锁定：产品条码已经是锁定状态：将条码更新到锁定前状态
+           指定将来锁定工序，且条码还没流转到指定工序：关闭将来锁定的工序指定，即取消将来锁定*/
+            var sfcStepList = new List<ManuSfcStepEntity>();
+            var sfcProduceBusinessList = new List<ManuSfcProduceBusinessEntity>();
+            var unLockList = new List<long>();
+            var sfcStepBusinessList = new List<MaunSfcStepBusinessEntity>();
+            #region  组装数据
+            foreach (var sfc in sfcList)
+            {
+                var stepEntity = new ManuSfcStepEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    SFC = sfc.SFC,
+                    ProductId = sfc.ProductId,
+                    WorkOrderId = sfc.WorkOrderId,
+                    WorkCenterId = sfc.WorkCenterId,
+                    ProductBOMId = sfc.ProductBOMId,
+                    Qty = sfc.Qty,
+                    EquipmentId = sfc.EquipmentId,
+                    ResourceId = sfc.ResourceId,
+                    ProcedureId = sfc.ProcedureId,
+                    Operatetype = ManuSfcStepTypeEnum.Unlock,
+                    CurrentStatus = sfc.Status,
+                    CreatedBy = sfc.CreatedBy,
+                    UpdatedBy = sfc.UpdatedBy
+                };
+                sfcStepList.Add(stepEntity);
+                unLockList.Add(sfc.Id);
+            }
+            #endregion
+
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                if (unLockList != null && unLockList.Any())
+                {
+                    await _manuSfcProduceRepository.DeleteSfcProduceBusinesssAsync(new DeleteSfcProduceBusinesssCommand { SfcInfoIds = unLockList, BusinessType = ManuSfcProduceBusinessType.Lock });
+                }
+
+                await _manuSfcProduceRepository.UnLockedSfcProcedureAsync(new UnLockedProcedureCommand
+                {
+                    Sfcs = parm.Sfcs,
+                    UserId = _currentUser.UserName,
+                    UpdatedOn = HymsonClock.Now()
+                });
+
+                //插入操作数据
+                await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
+                trans.Complete();
+            }
+        } 
+        #endregion
 
         /// <summary>
         /// 条码报废
@@ -1857,12 +2093,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
             if (sfcProduceBusinesss != null && sfcProduceBusinesss.Any())
             {
-                var sfcInfoIds = sfcProduceBusinesss.Select(it => it.SfcInfoId).ToArray();
+                var sfcInfoIds = sfcProduceBusinesss.Select(it => it.SfcProduceId).ToArray();
                 var sfcProduceBusinesssList = sfcProduceBusinesss.ToList();
                 var instantLockSfcs = new List<string>();
                 foreach (var business in sfcProduceBusinesssList)
                 {
-                    var manuSfc = manuSfcs.FirstOrDefault(x => x.SfcInfoId == business.SfcInfoId);
+                    var manuSfc = manuSfcs.FirstOrDefault(x => x.Id == business.SfcProduceId);
                     if (manuSfc == null)
                     {
                         continue;
