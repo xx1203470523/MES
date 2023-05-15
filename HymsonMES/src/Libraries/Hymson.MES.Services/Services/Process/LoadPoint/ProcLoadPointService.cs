@@ -221,6 +221,11 @@ namespace Hymson.MES.Services.Services.Process
             var modelOrigin = await _procLoadPointRepository.GetByIdAsync(procLoadPointModifyDto.Id) ?? throw new ValidationException(nameof(ErrorCode.MES10705));
             #endregion
 
+            if (modelOrigin.Status != SysDataStatusEnum.Build&& procLoadPointModifyDto.Status== SysDataStatusEnum.Build)
+            {
+                throw new ValidationException(nameof(ErrorCode.MES10716));
+            }
+
             #region 组装数据
             //上料点关联物料列表
             var linkMaterials = new List<ProcLoadPointLinkMaterialEntity>();

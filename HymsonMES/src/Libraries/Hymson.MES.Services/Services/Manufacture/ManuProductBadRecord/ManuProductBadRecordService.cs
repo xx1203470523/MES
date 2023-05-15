@@ -246,8 +246,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                         BusinessType = ManuSfcProduceBusinessType.Repair,
                         BusinessContent = JsonConvert.SerializeObject(new SfcProduceRepairBo
                         {
-                            ProcessRouteId = item.ProcessRouteId, //createDto.BadProcessRouteId ?? 0,
-                            ProcedureId = item.ProcedureId //processRouteProcedure.ProcedureId
+                            ProcessRouteId = manuSfc.ProcessRouteId, //createDto.BadProcessRouteId ?? 0,
+                            ProcedureId = manuSfc.ProcedureId //processRouteProcedure.ProcedureId
                         }),
                         SiteId = sfcStepEntity.SiteId,
                         CreatedBy = sfcStepEntity.CreatedBy,
