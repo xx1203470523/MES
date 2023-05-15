@@ -8,6 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Integrated.InteCodeRule.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using System;
 using System.Collections.Generic;
@@ -74,9 +75,9 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <summary>
         /// 根据ID获取数据
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task<InteCodeRulesEntity> GetInteCodeRulesByProductIdAsync(long productId);
+        Task<InteCodeRulesEntity> GetInteCodeRulesByProductIdAsync(InteCodeRulesByProductQuery param);
 
         /// <summary>
         /// 根据IDs批量获取数据
