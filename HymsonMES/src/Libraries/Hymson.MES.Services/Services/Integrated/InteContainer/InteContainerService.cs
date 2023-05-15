@@ -199,8 +199,6 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
             return inteContainerEntity.ToModel<InteContainerDto>();
         }
 
-
-
         /// <summary>
         /// 验证对象
         /// </summary>

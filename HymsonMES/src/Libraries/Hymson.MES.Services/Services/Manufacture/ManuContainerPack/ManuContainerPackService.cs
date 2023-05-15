@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 容器装载表（物理删除）    服务 | 代码由框架生成
- *builder:  wxk
- *build datetime: 2023-04-12 02:33:13
- */
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -25,9 +18,6 @@ using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using MySql.Data.MySqlClient;
-using System.Collections.Generic;
-using System.Reflection.Emit;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -228,7 +218,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="manuContainerPackDto"></param>
+        /// <param name="manuContainerPackModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyManuContainerPackAsync(ManuContainerPackModifyDto manuContainerPackModifyDto)
         {

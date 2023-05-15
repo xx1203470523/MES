@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 容器装载表（物理删除）    控制器 | 代码由框架生成  
- *builder:  wxk
- *build datetime: 2023-04-12 02:33:13
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -39,8 +32,8 @@ namespace Hymson.MES.Api.Controllers.Manufacture
             _logger = logger;
         }
 
-        #region 框架生成方法
 
+        #region 框架生成方法
         /// <summary>
         /// 分页查询列表（容器装载表（物理删除））
         /// </summary>
