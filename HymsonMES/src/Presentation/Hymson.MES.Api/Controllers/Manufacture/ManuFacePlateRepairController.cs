@@ -58,7 +58,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [Route("exJob")]
         public async Task<List<ManuFacePlateRepairButJobReturnTypeEnum>> ExecuteexecuteJobAsync(ManuFacePlateRepairExJobDto manuFacePlateRepairExJobDto)
         {
-            return await _manuFacePlateRepairService.ExecuteexecuteJobAsync(manuFacePlateRepairExJobDto);
+            return await _manuFacePlateRepairService.ExecuteJobAsync(manuFacePlateRepairExJobDto);
         }
 
         /// <summary>
