@@ -885,6 +885,10 @@ namespace Hymson.MES.Services.Services.Manufacture
             });
             if (manuContainerBarcodeEntity != null)
             {
+                if (manuContainerBarcodeEntity.Status == (int)ManuContainerBarcodeStatusEnum.Close)
+                {
+                    return null;
+                }
                 var containerEntity = await _inteContainerRepository.GetByIdAsync(manuContainerBarcodeEntity.ContainerId);
 
                 var  barcodeDto = manuContainerBarcodeEntity.ToModel<ManuContainerBarcodeDto>();

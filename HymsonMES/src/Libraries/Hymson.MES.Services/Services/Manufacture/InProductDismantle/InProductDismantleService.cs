@@ -12,7 +12,6 @@ using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Data.Repositories.Warehouse;
@@ -924,7 +923,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             //根据掩码规则去验证条码，验证不通过就报错,逐条验证
-            return ManuSfcProduceExtensions.VerifyBarCode(barcode, procMaskCodes);
+            return barcode.VerifyBarCode(procMaskCodes);
         }
 
         /// <summary>
@@ -1074,7 +1073,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 }
             }
 
-            if(mainserialNumber== MaterialSerialNumberEnum.Batch&& serialNumber != MaterialSerialNumberEnum.Batch)
+            if (mainserialNumber == MaterialSerialNumberEnum.Batch && serialNumber != MaterialSerialNumberEnum.Batch)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16618)).WithData("barCode", circulationBarCode);
             }

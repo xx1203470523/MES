@@ -71,6 +71,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="manuFacePlateContainerPackExJobDto"></param>
         /// <returns></returns>
-        Task<Dictionary<string, JobResponseDto>> ExecuteexecuteJobAsync(ManuFacePlateContainerPackExJobDto manuFacePlateContainerPackExJobDto);
+        Task<Dictionary<string, JobResponseDto>> ExecuteJobAsync(ManuFacePlateContainerPackExJobDto manuFacePlateContainerPackExJobDto);
     }
 }

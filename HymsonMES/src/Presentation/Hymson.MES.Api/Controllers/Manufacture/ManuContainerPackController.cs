@@ -124,9 +124,9 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("exJob")]
-        public async Task<Dictionary<string, JobResponseDto>> ExecuteexecuteJobAsync(ManuFacePlateContainerPackExJobDto manuFacePlateContainerPackExJobDto)
+        public async Task<Dictionary<string, JobResponseDto>> ExecuteJobAsync(ManuFacePlateContainerPackExJobDto manuFacePlateContainerPackExJobDto)
         {
-            return await _manuContainerPackService.ExecuteexecuteJobAsync(manuFacePlateContainerPackExJobDto);
+            return await _manuContainerPackService.ExecuteJobAsync(manuFacePlateContainerPackExJobDto);
         }
     }
 }
