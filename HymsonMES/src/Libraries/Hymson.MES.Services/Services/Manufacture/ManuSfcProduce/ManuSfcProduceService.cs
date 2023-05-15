@@ -748,6 +748,9 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             #endregion
 
+
+            var lockSfc = sfcList.Where(x => x.Status == SfcProduceStatusEnum.Locked).Select(x => x.SFC).ToArray();
+
             using (var trans = TransactionHelper.GetTransactionScope())
             {
                 if (unLockList != null && unLockList.Any())
@@ -757,7 +760,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                 await _manuSfcProduceRepository.UnLockedSfcProcedureAsync(new UnLockedProcedureCommand
                 {
-                    Sfcs = parm.Sfcs,
+                    Sfcs = lockSfc,
                     UserId = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now()
                 });
