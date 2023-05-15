@@ -192,11 +192,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10204));
 
             // 物料未设置掩码
-            if (material.MaskCodeId.HasValue == false) return true;
+            if (material.MaskCodeId.HasValue == false) return false;
 
             // 未设置规则
             var maskCodeRules = await _procMaskCodeRuleRepository.GetByMaskCodeIdAsync(material.MaskCodeId.Value);
-            if (maskCodeRules == null || maskCodeRules.Any() == false) return true;
+            if (maskCodeRules == null || maskCodeRules.Any() == false) return false;
 
             return barCode.VerifyBarCode(maskCodeRules);
         }
