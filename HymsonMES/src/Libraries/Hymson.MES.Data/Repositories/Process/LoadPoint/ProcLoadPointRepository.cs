@@ -1,6 +1,7 @@
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
@@ -81,7 +82,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<IEnumerable<ProcLoadPointEntity>> GetByResourceIdAsync(long resourceId)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcLoadPointEntity>(GetByResourceId, new { resourceId });
+            return await conn.QueryAsync<ProcLoadPointEntity>(GetByResourceId, new { resourceId, Status= SysDataStatusEnum.Enable });
         }
 
         /// <summary>
@@ -222,6 +223,6 @@ namespace Hymson.MES.Data.Repositories.Process
                             FROM `proc_load_point`  WHERE Id IN @ids ";
         const string GetByResourceId = @"SELECT PLP.* FROM proc_load_point PLP
                                 LEFT JOIN proc_load_point_link_resource PLPLR ON PLPLR.LoadPointId = PLP.Id
-                                WHERE PLPLR.ResourceId = @resourceId ";
+                                WHERE PLPLR.ResourceId = @resourceId AND PLP.Status=@Status AND   PLP.IsDeleted=0";
     }
 }
