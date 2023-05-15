@@ -216,10 +216,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.QueryAsync<ManuContainerPackEntity>(GetByPackcodeSql, new { ContainerBarCodeId = cid, SiteId = siteId });
         }
 
-        public async Task<IEnumerable<ManuContainerPackEntity>> GetByContainerBarCodeIdsAsync(long[] ids)
+        public async Task<IEnumerable<ManuContainerPackEntity>> GetByContainerBarCodeIdsAsync(long[] ids, long siteId)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<ManuContainerPackEntity>(GetByContainerBarCodeIdsSql, new { Ids = ids });
+            return await conn.QueryAsync<ManuContainerPackEntity>(GetByContainerBarCodeIdsSql, new { Ids = ids, SiteId = siteId });
         }
 
         /// <summary>
@@ -268,7 +268,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string GetByContainerBarCodeIdsSql = @"SELECT 
                                `Id`, `SiteId`,`ResourceId`,`ProcedureId`, `ContainerBarCodeId`, `LadeBarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `manu_container_pack`  WHERE ContainerBarCodeId in @Ids ";
+                            FROM `manu_container_pack`  WHERE ContainerBarCodeId in @Ids  and SiteId=@SiteId";
 
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`,`ResourceId`,`ProcedureId`, `ContainerBarCodeId`, `LadeBarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
