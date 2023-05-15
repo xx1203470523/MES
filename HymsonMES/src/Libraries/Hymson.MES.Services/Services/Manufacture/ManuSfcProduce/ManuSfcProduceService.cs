@@ -769,7 +769,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
                 trans.Complete();
             }
-        } 
+        }
         #endregion
 
         /// <summary>
@@ -1088,6 +1088,10 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             var pagedInfo = await _manuSfcRepository.GetManuSfcPagedInfoAsync(manuSfcProducePagedQuery);
+            if (pagedInfo == null || !pagedInfo.Data.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18022)).WithData("SFC", string.Join(",", manuSfcProducePagedQuery.SfcArray));
+            }
 
             //实体到DTO转换 装载数据
             List<ManuSfcProduceViewDto> manuSfcProduceDtos = new List<ManuSfcProduceViewDto>();
