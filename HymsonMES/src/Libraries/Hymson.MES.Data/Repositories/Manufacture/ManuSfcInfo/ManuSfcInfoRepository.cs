@@ -218,6 +218,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where(" si.IsDeleted = 0 ");
             sqlBuilder.Where(" si.IsUsed = 1 ");
 
+            sqlBuilder.Where(" s.IsDeleted = 0 ");
+
             if (!string.IsNullOrEmpty(pageQuery.MaterialCode))
             {
                 pageQuery.MaterialCode = $"%{pageQuery.MaterialCode}%";
