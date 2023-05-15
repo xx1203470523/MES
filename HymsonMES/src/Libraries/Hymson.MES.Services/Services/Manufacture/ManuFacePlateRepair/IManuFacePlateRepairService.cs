@@ -31,7 +31,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="manuFacePlateRepairExJobDto"></param>
         /// <returns></returns>
         /// <exception cref="BusinessException"></exception>
-        Task<List<ManuFacePlateRepairButJobReturnTypeEnum>> ExecuteexecuteJobAsync(ManuFacePlateRepairExJobDto manuFacePlateRepairExJobDto);
+        Task<List<ManuFacePlateRepairButJobReturnTypeEnum>> ExecuteJobAsync(ManuFacePlateRepairExJobDto manuFacePlateRepairExJobDto);
 
         /// <summary>
         /// 开始维修

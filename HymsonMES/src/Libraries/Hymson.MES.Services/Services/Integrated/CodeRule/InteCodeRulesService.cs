@@ -187,6 +187,7 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
         public async Task<PagedInfo<InteCodeRulesPageViewDto>> GetPageListAsync(InteCodeRulesPagedQueryDto inteCodeRulesPagedQueryDto)
         {
             var inteCodeRulesPagedQuery = inteCodeRulesPagedQueryDto.ToQuery<InteCodeRulesPagedQuery>();
+            inteCodeRulesPagedQuery.SiteId = _currentSite.SiteId??0;
             var pagedInfo = await _inteCodeRulesRepository.GetPagedInfoAsync(inteCodeRulesPagedQuery);
 
             //实体到DTO转换 装载数据

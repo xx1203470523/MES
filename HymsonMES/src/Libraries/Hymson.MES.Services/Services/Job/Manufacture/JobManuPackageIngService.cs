@@ -2,9 +2,7 @@
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Utils;
@@ -54,8 +52,8 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <returns></returns>
         public async Task VerifyParamAsync(Dictionary<string, string>? param)
         {
-            if (param == null ||
-                param.ContainsKey("SFC") == false
+            //     || param.ContainsKey("SFC") == false
+            if (param == null
                 || param.ContainsKey("ProcedureId") == false
                 || param.ContainsKey("ResourceId") == false)
             {
@@ -74,14 +72,18 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         {
             var defaultDto = new JobResponseDto { };
 
+            /*
             var bo = new ManufactureBo
             {
                 SFC = param["SFC"],
                 ProcedureId = param["ProcedureId"].ParseToLong(),
                 ResourceId = param["ResourceId"].ParseToLong()
             };
+            */
+
             if (param.ContainsKey("IsClear")) defaultDto.Content?.Add("IsClear", param["IsClear"]);
             defaultDto.Content?.Add("Operation", ManuContainerPackagJobReturnTypeEnum.JobManuPackageService.ParseToInt().ToString());
+
             // 获取生产条码信息
             //二三级包装时候 条码就是包装码了，不需要校验条码
             // var (sfcProduceEntity, _) = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
@@ -89,7 +91,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             // 合法性校验
             //sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity).VerifyProcedure(bo.ProcedureId);
 
-            return defaultDto;
+            return await Task.FromResult(defaultDto);
         }
 
     }

@@ -136,7 +136,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="manuFacePlateRepairExJobDto"></param>
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
-        public async Task<List<ManuFacePlateRepairButJobReturnTypeEnum>> ExecuteexecuteJobAsync(ManuFacePlateRepairExJobDto manuFacePlateRepairExJobDto)
+        public async Task<List<ManuFacePlateRepairButJobReturnTypeEnum>> ExecuteJobAsync(ManuFacePlateRepairExJobDto manuFacePlateRepairExJobDto)
         {
             #region  验证数据
             if (string.IsNullOrWhiteSpace(manuFacePlateRepairExJobDto.SFC))
