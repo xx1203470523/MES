@@ -166,6 +166,7 @@
         public const string MES10713 = "上料点名称不能为空";
         public const string MES10714 = "上料点最大长度为50";
         public const string MES10715 = "上料点名称最大长度为60";
+        public const string MES10716 = "无法将其他状态修改成新建状态!";
         #endregion
 
         #region 掩码维护 10800
@@ -282,6 +283,8 @@
         public const string MES12506 = "最小数量须大于0";
         public const string MES12507 = "最大数量须大于0";
         public const string MES12508 = "最大数量须大于最小数量";
+        public const string MES12509 = "只能删除新建状态的数据";
+        public const string MES12510 = "只能删除新建状态的数据";
         #endregion
 
         #region 设备 12600
@@ -559,6 +562,7 @@
         public const string MES17322 = "请先开始维修";
         public const string MES17323 = "排队中";
         public const string MES17324 = "活动中";
+        public const string MES17325 = "未获取到维修业务";
 
 
         #endregion
@@ -695,6 +699,7 @@
         public const string MES18019 = "条码:{SFCs}已包装，不允许操作";
         public const string MES18020 = "库存信息不存在";
         public const string MES18021 = "物料库存不足";
+        public const string MES18022 = "条码{SFC}不存在或已报废，不允许操作";
 
 
         #endregion

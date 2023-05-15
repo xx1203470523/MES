@@ -271,17 +271,17 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="manuFacePlateContainerPackExJobDto"></param>
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
-        public async Task<Dictionary<string, JobResponseDto>> ExecuteexecuteJobAsync(ManuFacePlateContainerPackExJobDto manuFacePlateContainerPackExJobDto)
+        public async Task<Dictionary<string, JobResponseDto>> ExecuteJobAsync(ManuFacePlateContainerPackExJobDto manuFacePlateContainerPackExJobDto)
         {
             #region  验证数据
-            if (string.IsNullOrWhiteSpace(manuFacePlateContainerPackExJobDto.SFC))
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16708));
-            }
+            //if (string.IsNullOrWhiteSpace(manuFacePlateContainerPackExJobDto.SFC))
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES16708));
+            //}
             #endregion
 
             #region 调用作业
-            manuFacePlateContainerPackExJobDto.SFC = manuFacePlateContainerPackExJobDto.SFC.Trim();
+            manuFacePlateContainerPackExJobDto.SFC = "";//manuFacePlateContainerPackExJobDto.SFC.Trim();
             var jobDto = new ButtonRequestDto
             {
                 FacePlateId = manuFacePlateContainerPackExJobDto.FacePlateId,

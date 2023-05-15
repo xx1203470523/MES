@@ -729,7 +729,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         MaterialCode = procMateria?.MaterialCode ?? string.Empty,//如果关联结果删除直接返回空
                         SiteId = m.SiteId,
                         WorkOrderCode = planWorkOrder?.OrderCode ?? string.Empty,
-                        Count =isFirstPackage?1: packs.Count()
+                        Count =isFirstPackage?1: packs.Count(x=>x.ContainerBarCodeId== m.ContainerBarCodeId)
                     };
                 }).ToList()
             };
@@ -885,6 +885,10 @@ namespace Hymson.MES.Services.Services.Manufacture
             });
             if (manuContainerBarcodeEntity != null)
             {
+                if (manuContainerBarcodeEntity.Status == (int)ManuContainerBarcodeStatusEnum.Close)
+                {
+                    return null;
+                }
                 var containerEntity = await _inteContainerRepository.GetByIdAsync(manuContainerBarcodeEntity.ContainerId);
 
                 var  barcodeDto = manuContainerBarcodeEntity.ToModel<ManuContainerBarcodeDto>();
