@@ -75,6 +75,17 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
         }
 
         /// <summary>
+        /// 根据ID获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteContainerEntity>> GetByIdsAsync(IEnumerable<long> ids)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<InteContainerEntity>(GetByIdsSql, new { Ids = ids });
+        }
+
+        /// <summary>
         /// 通过关联ID获取数据
         /// </summary>
         /// <param name="query"></param>
@@ -84,7 +95,8 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
             var sql = GetByMaterialIdSql;
             if (query.DefinitionMethod == DefinitionMethodEnum.MaterialGroup) sql = GetByMaterialGroupIdSql;
             //是否转入状态条件
-            if (query.Status.HasValue) {
+            if (query.Status.HasValue)
+            {
                 sql += " AND Status = @Status";
             }
 
@@ -164,6 +176,9 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
         const string GetByIdSql = @"SELECT 
                                `Id`, `DefinitionMethod`, `MaterialId`, `MaterialGroupId`, Level, `Status`, `Maximum`, `Minimum`, `Height`, `Length`, `Width`, `MaxFillWeight`, `Weight`, Remark, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `inte_container`  WHERE Id = @Id ";
+        const string GetByIdsSql = @"SELECT 
+                               `Id`, `DefinitionMethod`, `MaterialId`, `MaterialGroupId`, Level, `Status`, `Maximum`, `Minimum`, `Height`, `Length`, `Width`, `MaxFillWeight`, `Weight`, Remark, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `inte_container`  WHERE Id IN @Ids ";
         const string GetByMaterialIdSql = @"SELECT * FROM inte_container WHERE IsDeleted = 0 AND DefinitionMethod = @DefinitionMethod AND MaterialId = @MaterialId   AND Level = @Level ";
         const string GetByMaterialGroupIdSql = @"SELECT * FROM inte_container WHERE IsDeleted = 0 AND DefinitionMethod = @DefinitionMethod AND MaterialGroupId = @MaterialGroupId AND Level = @Level ";
     }

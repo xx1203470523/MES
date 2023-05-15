@@ -39,6 +39,13 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
         Task<InteContainerEntity> GetByIdAsync(long id);
 
         /// <summary>
+        /// 根据ID获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteContainerEntity>> GetByIdsAsync(IEnumerable<long> ids);
+
+        /// <summary>
         /// 通过关联ID获取数据
         /// </summary>
         /// <param name="query"></param>
