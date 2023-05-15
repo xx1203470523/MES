@@ -95,11 +95,6 @@ namespace Hymson.MES.Services.Dtos.Process
         public string Path { get; set; }
 
        /// <summary>
-        /// 模板内容
-        /// </summary>
-        public string Content { get; set; }
-
-       /// <summary>
         /// 备注
         /// </summary>
         public string? Remark { get; set; }
@@ -126,11 +121,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 标签物理路径
         /// </summary>
         public string Path { get; set; }
-
-       /// <summary>
-        /// 模板内容
-        /// </summary>
-        public string Content { get; set; }
 
        /// <summary>
         /// 备注

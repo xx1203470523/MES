@@ -196,13 +196,13 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var sfcRepairs = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Repair });
                 if (sfcRepairs != null && sfcRepairs.Any())
                 {
-                    var sfcInfoIds = sfcRepairs.Select(it => it.SfcInfoId).ToArray();
-                    var repairSfcs = manuSfcs.Where(x => sfcInfoIds.Contains(x.SfcInfoId)).Select(x => x.SFC).Distinct().ToArray();
-                    if (repairSfcs.Any())
-                    {
-                        var strs = string.Join(",", repairSfcs);
+                    //var sfcInfoIds = sfcRepairs.Select(it => it.SfcProduceId).ToArray();
+                    //var repairSfcs = manuSfcs.Where(x => sfcInfoIds.Contains(x.SfcInfoId)).Select(x => x.SFC).Distinct().ToArray();
+                    //if (repairSfcs.Any())
+                    //{
+                        var strs = string.Join(",", sfcRepairs.Select(x=>x.Sfc));
                         throw new CustomerValidationException(nameof(ErrorCode.MES15410)).WithData("sfcs", strs);
-                    }
+                    //}
                 }
                 processRouteProcedure = await _manuCommonService.GetFirstProcedureAsync(createDto.BadProcessRouteId ?? 0);
             }
@@ -242,7 +242,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     var manuSfcProduceBusinessEntity = new ManuSfcProduceBusinessEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
-                        SfcInfoId = manuSfc.SfcInfoId,
+                        SfcProduceId = manuSfc.Id,
                         BusinessType = ManuSfcProduceBusinessType.Repair,
                         BusinessContent = JsonConvert.SerializeObject(new SfcProduceRepairBo
                         {
@@ -523,7 +523,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 manuSfcProduceBusinessEntity = new ManuSfcProduceBusinessEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SfcInfoId = manuSfc.SfcInfoId,
+                    SfcProduceId = manuSfc.Id,
                     BusinessType = ManuSfcProduceBusinessType.Repair,
                     BusinessContent = JsonConvert.SerializeObject(new SfcProduceRepairBo
                     {
@@ -766,12 +766,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
             if (sfcProduceBusinesss != null && sfcProduceBusinesss.Any())
             {
-                var sfcInfoIds = sfcProduceBusinesss.Select(it => it.SfcInfoId).ToArray();
+                var sfcInfoIds = sfcProduceBusinesss.Select(it => it.SfcProduceId).ToArray();
                 var sfcProduceBusinesssList = sfcProduceBusinesss.ToList();
                 var instantLockSfcs = new List<string>();
                 foreach (var business in sfcProduceBusinesssList)
                 {
-                    var manuSfc = manuSfcs.FirstOrDefault(x => x.SfcInfoId == business.SfcInfoId);
+                    var manuSfc = manuSfcs.FirstOrDefault(x => x.Id == business.SfcProduceId);
                     if (manuSfc == null)
                     {
                         continue;

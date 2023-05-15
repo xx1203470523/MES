@@ -388,7 +388,7 @@
         public const string MES15315 = "条码存在及时锁定，无法添加及时锁";
         public const string MES15316 = "条码未被锁定，无法执行解锁操作";
         public const string MES15317 = "将来锁工序{lockproduction}不在条码所在工序之后";
-
+        public const string MES15318 = "条码已经被锁定";
         #endregion
 
         #region 质量录入 15400
@@ -481,6 +481,7 @@
         public const string MES16127 = "条码工单和关联工单必须一致";
         public const string MES16128 = "条码{sfc}不存在";
         public const string MES16129 = "条码物料和工单物料编码不一致";
+        public const string MES16130 = "已报废的条码，不允许删除";
         #endregion
 
         #region 条码生成 MES16200

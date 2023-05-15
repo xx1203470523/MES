@@ -258,7 +258,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                     SiteId = _currentSite.SiteId ?? 0,
                     SFC = item.SFC,
                     Qty = item.Qty,
-                    IsUsed = YesOrNoEnum.No,
+                    IsUsed = YesOrNoEnum.Yes,
                     Status = SfcStatusEnum.InProcess,
                     CreatedBy = _currentUser.UserName,
                     UpdatedBy = _currentUser.UserName
@@ -395,7 +395,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                 }
 
                 sfcEntity.Qty = item.Qty;
-                sfcEntity.IsUsed = YesOrNoEnum.No;
+                sfcEntity.IsUsed = YesOrNoEnum.Yes;
                 sfcEntity.Status = SfcStatusEnum.InProcess;
                 sfcEntity.UpdatedBy = _currentUser.UserName;
                 sfcEntity.UpdatedOn = HymsonClock.Now();

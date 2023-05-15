@@ -152,6 +152,44 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     }
 
     /// <summary>
+    /// 将来锁
+    /// </summary>
+    public record FutureLockDto
+    {
+        /// <summary>
+        /// 将来锁，锁定的工序id
+        /// </summary>
+        public long LockProductionId { get; set; }
+
+        /// <summary>
+        /// 条码列表
+        /// </summary>
+        public string[] Sfcs { get; set; }
+    }
+
+    /// <summary>
+    /// 及时锁
+    /// </summary>
+    public record InstantLockDto
+    {
+        /// <summary>
+        /// 条码列表
+        /// </summary>
+        public IEnumerable<string> Sfcs { get; set; }
+    }
+
+    /// <summary>
+    /// 解除锁
+    /// </summary>
+    public record UnLockDto
+    {
+        /// <summary>
+        /// 条码列表
+        /// </summary>
+        public IEnumerable<string> Sfcs { get; set; }
+    }
+
+    /// <summary>
     /// 报废/取消报废操作实体
     /// </summary>
     public record ManuSfScrapDto
