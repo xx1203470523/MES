@@ -166,6 +166,7 @@
         public const string MES10713 = "上料点名称不能为空";
         public const string MES10714 = "上料点最大长度为50";
         public const string MES10715 = "上料点名称最大长度为60";
+        public const string MES10716 = "无法将其他状态修改成新建状态!";
         #endregion
 
         #region 掩码维护 10800
