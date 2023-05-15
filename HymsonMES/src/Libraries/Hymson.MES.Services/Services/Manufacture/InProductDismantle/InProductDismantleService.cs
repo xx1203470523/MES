@@ -13,7 +13,6 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
@@ -95,11 +94,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
 
-        /// <summary>
-        /// 掩码维护仓储
-        /// </summary>
-        private readonly IProcMaskCodeRuleRepository _procMaskCodeRuleRepository;
-
 
         /// <summary>
         /// 构造函数
@@ -117,7 +111,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="circulationRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
-        /// <param name="procMaskCodeRuleRepository"></param>
         public InProductDismantleService(ICurrentUser currentUser, ICurrentSite currentSite,
          IProcBomRepository procBomRepository,
         IProcBomDetailRepository procBomDetailRepository,
@@ -129,8 +122,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         IManuCommonService manuCommonService,
         IManuSfcCirculationRepository circulationRepository,
         IManuSfcProduceRepository manuSfcProduceRepository,
-        IWhMaterialInventoryRepository whMaterialInventoryRepository,
-        IProcMaskCodeRuleRepository procMaskCodeRuleRepository)
+        IWhMaterialInventoryRepository whMaterialInventoryRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -146,7 +138,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             _resourceRepository = resourceRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
-            _procMaskCodeRuleRepository = procMaskCodeRuleRepository;
         }
 
         /// <summary>
@@ -487,17 +478,10 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                 if (serialNumber == MaterialSerialNumberEnum.Outside)
                 {
-                    //验证外部条码合法性
-                    var isCorrect = await GetOutsideBarCodeAsync(new CirculationQueryDto
-                    {
-                        CirculationBarCode = addDto.CirculationBarCode,
-                        ProductId = addDto.CirculationProductId ?? 0
-                    });
+                    // 验证外部条码合法性
+                    var isCorrect = await _manuCommonService.CheckBarCodeByMaskCodeRuleAsync(addDto.CirculationBarCode, addDto.CirculationProductId ?? 0);
+                    if (isCorrect == false) throw new CustomerValidationException(nameof(ErrorCode.MES16605)).WithData("barCode", addDto.CirculationBarCode);
 
-                    if (!isCorrect)
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES16605)).WithData("barCode", addDto.CirculationBarCode);
-                    }
                     circulationQty = await GetOutsideQtyAsync(addDto.CirculationProductId.Value);
                     if (circulationQty < 1)
                     {
@@ -742,17 +726,10 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                 if (serialNumber == MaterialSerialNumberEnum.Outside)
                 {
-                    //验证外部条码合法性
-                    var isCorrect = await GetOutsideBarCodeAsync(new CirculationQueryDto
-                    {
-                        CirculationBarCode = replaceDto.CirculationBarCode,
-                        ProductId = replaceDto.CirculationProductId ?? 0
-                    });
+                    // 验证外部条码合法性
+                    var isCorrect = await _manuCommonService.CheckBarCodeByMaskCodeRuleAsync(replaceDto.CirculationBarCode, replaceDto.CirculationProductId ?? 0);
+                    if (isCorrect == false) throw new CustomerValidationException(nameof(ErrorCode.MES16605)).WithData("barCode", replaceDto.CirculationBarCode);
 
-                    if (!isCorrect)
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES16605)).WithData("barCode", replaceDto.CirculationBarCode);
-                    }
                     circulationQty = await GetOutsideQtyAsync(replaceDto.CirculationProductId.Value);
                     if (circulationQty < 1)
                     {
@@ -923,37 +900,6 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                 trans.Complete();
             }
-        }
-
-        /// <summary>
-        /// 添加、替换时判断输入的组件条码是否存在
-        /// </summary>
-        /// <param name="circulationQuery"></param>
-        /// <returns></returns>
-        private async Task<bool> GetOutsideBarCodeAsync(CirculationQueryDto circulationQuery)
-        {
-            /*
-            var barcode = circulationQuery.CirculationBarCode;
-            //读取主物料信息
-            var material = await _procMaterialRepository.GetByIdAsync(circulationQuery.ProductId);
-            var maskCodeId = material?.MaskCodeId ?? 0;
-            if (maskCodeId < 1)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16616)).WithData("barCode", barcode);
-            }
-
-            //查询掩码规则校验
-            var procMaskCodes = await _procMaskCodeRuleRepository.GetByMaskCodeIdAsync(maskCodeId);
-            if (!procMaskCodes.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16616)).WithData("barCode", barcode);
-            }
-
-            //根据掩码规则去验证条码，验证不通过就报错,逐条验证
-            return barcode.VerifyBarCode(procMaskCodes);
-            */
-
-            return await _manuCommonService.CheckBarCodeByMaskCodeRuleAsync(circulationQuery.CirculationBarCode, circulationQuery.ProductId);
         }
 
         /// <summary>
