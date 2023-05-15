@@ -271,7 +271,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="manuFacePlateContainerPackExJobDto"></param>
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
-        public async Task<Dictionary<string, JobResponseDto>> ExecuteexecuteJobAsync(ManuFacePlateContainerPackExJobDto manuFacePlateContainerPackExJobDto)
+        public async Task<Dictionary<string, JobResponseDto>> ExecuteJobAsync(ManuFacePlateContainerPackExJobDto manuFacePlateContainerPackExJobDto)
         {
             #region  验证数据
             if (string.IsNullOrWhiteSpace(manuFacePlateContainerPackExJobDto.SFC))
