@@ -21,6 +21,11 @@ namespace Hymson.MES.Data.Repositories.Integrated
     public class InteCodeRulesPagedQuery : PagerInfo
     {
         /// <summary>
+        /// 站点
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
         /// 物料编码
         /// </summary>
         public string? MaterialCode { get; set; }

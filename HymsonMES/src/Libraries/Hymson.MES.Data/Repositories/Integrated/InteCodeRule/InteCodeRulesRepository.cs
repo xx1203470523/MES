@@ -97,6 +97,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("cr.IsDeleted=0");
+            sqlBuilder.Where("cr.SiteId=@SiteId");
 
             if (!string.IsNullOrWhiteSpace(inteCodeRulesPagedQuery.MaterialCode))
             {
