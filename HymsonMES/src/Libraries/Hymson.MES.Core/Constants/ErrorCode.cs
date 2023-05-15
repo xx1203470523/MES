@@ -559,6 +559,7 @@
         public const string MES17322 = "请先开始维修";
         public const string MES17323 = "排队中";
         public const string MES17324 = "活动中";
+        public const string MES17325 = "未获取到维修业务";
 
 
         #endregion
@@ -695,6 +696,7 @@
         public const string MES18019 = "条码:{SFCs}已包装，不允许操作";
         public const string MES18020 = "库存信息不存在";
         public const string MES18021 = "物料库存不足";
+        public const string MES18022 = "条码{SFC}不存在或已报废，不允许操作";
 
 
         #endregion
