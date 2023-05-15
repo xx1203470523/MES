@@ -366,7 +366,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16617));
             }
-            await VerifyLockOrRepair(removeDto.Sfc, manuSfcProduce.ProcedureId, manuSfcProduce.SfcInfoId);
+            await VerifyLockOrRepair(removeDto.Sfc, manuSfcProduce.ProcedureId, manuSfcProduce.Id);
 
             var inventoryEntity = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery
             {
@@ -435,7 +435,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16617));
             }
-            await VerifyLockOrRepair(addDto.Sfc, manuSfcProduce.ProcedureId, manuSfcProduce.SfcInfoId);
+            await VerifyLockOrRepair(addDto.Sfc, manuSfcProduce.ProcedureId, manuSfcProduce.Id);
 
             //用量
             var queryDto = new BarCodeQueryDto
@@ -661,7 +661,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16617));
             }
-            await VerifyLockOrRepair(replaceDto.Sfc, manuSfcProduce.ProcedureId, manuSfcProduce.SfcInfoId);
+            await VerifyLockOrRepair(replaceDto.Sfc, manuSfcProduce.ProcedureId, manuSfcProduce.Id);
 
             var circulationEntity = await _circulationRepository.GetByIdAsync(replaceDto.Id);
             if (circulationEntity == null)

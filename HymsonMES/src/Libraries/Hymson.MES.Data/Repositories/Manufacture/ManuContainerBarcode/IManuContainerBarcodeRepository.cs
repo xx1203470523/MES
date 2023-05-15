@@ -79,13 +79,30 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ManuContainerBarcodeEntity> GetByCodeAsync(ManuContainerBarcodeQuery query);
+
+        /// <summary>
+        /// 根据code批量获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuContainerBarcodeEntity>> GetByCodesAsync(ManuContainerBarcodeQuery query);
+
         /// <summary>
         /// 根据productId获取数据
         /// </summary>
         /// <param name="pid"></param>
         /// <param name="status">容器状态 1 打开 ，2关闭</param>
         /// <returns></returns>
-        Task<ManuContainerBarcodeEntity> GetByProductIdAsync(long pid, int status,int level);
+        Task<ManuContainerBarcodeEntity> GetByProductIdAsync(long pid, int status, int level);
+
+        /// <summary>
+        /// 根据物料编码获取数据
+        /// </summary>
+        /// <param name="materialCode">物料编码</param>
+        /// <param name="status">容器状态 1 打开 ，2关闭</param>
+        /// <param name="level">包装等级</param>
+        /// <returns></returns>
+        Task<ManuContainerBarcodeEntity> GetByMaterialCodeAsync(string materialCode, int status, int level);
 
         /// <summary>
         /// 根据IDs批量获取数据

@@ -19,6 +19,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public string? BarCode { get; set; }
 
         /// <summary>
+        /// 条码列表
+        /// </summary>
+        public string[]? BarCodes { get; set; }
+
+        /// <summary>
         /// 站点id
         /// </summary>
         public long SiteId { get; set; }

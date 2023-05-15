@@ -2100,7 +2100,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
             if (sfcProduceBusinesss != null && sfcProduceBusinesss.Any())
             {
-                var sfcInfoIds = sfcProduceBusinesss.Select(it => it.SfcProduceId).ToArray();
+              //  var sfcInfoIds = sfcProduceBusinesss.Select(it => it.SfcProduceId).ToArray();
                 var sfcProduceBusinesssList = sfcProduceBusinesss.ToList();
                 var instantLockSfcs = new List<string>();
                 foreach (var business in sfcProduceBusinesssList)

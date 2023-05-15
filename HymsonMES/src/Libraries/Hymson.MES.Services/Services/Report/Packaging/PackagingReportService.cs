@@ -144,7 +144,7 @@ namespace Hymson.MES.Services.Services.Report
 
             var list = pagedInfo.Data;
             var containerIds = list.Select(x => x.Id).ToArray();
-            var containerPackEntities = await _manuContainerPackRepository.GetByContainerBarCodeIdsAsync(containerIds);
+            var containerPackEntities = await _manuContainerPackRepository.GetByContainerBarCodeIdsAsync(containerIds,_currentSite.SiteId??0);
 
             var workPackingDtos = new List<PlanWorkPackingDto>();
             foreach (var item in pagedInfo.Data)
