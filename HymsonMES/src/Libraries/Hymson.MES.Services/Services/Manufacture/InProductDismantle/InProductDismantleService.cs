@@ -69,18 +69,27 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// 工序表 仓储
         /// </summary>
         private readonly IProcProcedureRepository _procProcedureRepository;
+
+        /// <summary>
+        /// 服务接口（生产通用）
+        /// </summary>
+        private readonly IManuCommonService _manuCommonService;
+
         /// <summary>
         /// 条码流转表仓储
         /// </summary>
         private readonly IManuSfcCirculationRepository _circulationRepository;
+
         /// <summary>
         /// 资源仓储
         /// </summary>
         private readonly IProcResourceRepository _resourceRepository;
+
         /// <summary>
         /// 条码生产信息（物理删除） 仓储
         /// </summary>
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
+
         /// <summary>
         ///  仓储（物料库存）
         /// </summary>
@@ -91,9 +100,24 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         private readonly IProcMaskCodeRuleRepository _procMaskCodeRuleRepository;
 
+
         /// <summary>
         /// 构造函数
         /// </summary>
+        /// <param name="currentUser"></param>
+        /// <param name="currentSite"></param>
+        /// <param name="procBomRepository"></param>
+        /// <param name="procBomDetailRepository"></param>
+        /// <param name="replaceMaterialRepository"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="procReplaceMaterialRepository"></param>
+        /// <param name="procProcedureRepository"></param>
+        /// <param name="resourceRepository"></param>
+        /// <param name="manuCommonService"></param>
+        /// <param name="circulationRepository"></param>
+        /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="whMaterialInventoryRepository"></param>
+        /// <param name="procMaskCodeRuleRepository"></param>
         public InProductDismantleService(ICurrentUser currentUser, ICurrentSite currentSite,
          IProcBomRepository procBomRepository,
         IProcBomDetailRepository procBomDetailRepository,
@@ -102,10 +126,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         IProcReplaceMaterialRepository procReplaceMaterialRepository,
         IProcProcedureRepository procProcedureRepository,
         IProcResourceRepository resourceRepository,
+        IManuCommonService manuCommonService,
         IManuSfcCirculationRepository circulationRepository,
         IManuSfcProduceRepository manuSfcProduceRepository,
-         IWhMaterialInventoryRepository whMaterialInventoryRepository,
-         IProcMaskCodeRuleRepository procMaskCodeRuleRepository)
+        IWhMaterialInventoryRepository whMaterialInventoryRepository,
+        IProcMaskCodeRuleRepository procMaskCodeRuleRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -116,6 +141,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _procMaterialRepository = procMaterialRepository;
             _procReplaceMaterialRepository = procReplaceMaterialRepository;
             _procProcedureRepository = procProcedureRepository;
+            _manuCommonService = manuCommonService;
             _circulationRepository = circulationRepository;
             _resourceRepository = resourceRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
@@ -906,6 +932,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         private async Task<bool> GetOutsideBarCodeAsync(CirculationQueryDto circulationQuery)
         {
+            /*
             var barcode = circulationQuery.CirculationBarCode;
             //读取主物料信息
             var material = await _procMaterialRepository.GetByIdAsync(circulationQuery.ProductId);
@@ -924,6 +951,9 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             //根据掩码规则去验证条码，验证不通过就报错,逐条验证
             return barcode.VerifyBarCode(procMaskCodes);
+            */
+
+            return await _manuCommonService.CheckBarCodeByMaskCodeRuleAsync(circulationQuery.CirculationBarCode, circulationQuery.ProductId);
         }
 
         /// <summary>
