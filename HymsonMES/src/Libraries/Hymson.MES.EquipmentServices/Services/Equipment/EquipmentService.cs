@@ -1,8 +1,10 @@
-﻿using Hymson.MES.Core.Domain.Equipment;
+﻿using Hymson.Authentication.JwtBearer;
+using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.EquipmentServices.Request.Equipment;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
 
 namespace Hymson.MES.EquipmentServices.Services.Equipment
@@ -57,7 +59,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = _currentEquipment.SiteId,
-                CreatedBy = userCode, //_currentEquipment.Code
+                CreatedBy = userCode,
                 CreatedOn = nowTime,
                 UpdatedBy = userCode,
                 UpdatedOn = nowTime,
@@ -66,6 +68,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
                 LastOnLineTime = request.LocalTime
             };
 
+            using var trans = TransactionHelper.GetTransactionScope();
             await _equipmentHeartbeatRepository.InsertAsync(entity);
             await _equipmentHeartbeatRepository.InsertRecordAsync(new EquipmentHeartbeatRecordEntity
             {
@@ -79,6 +82,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
                 Status = entity.Status,
                 LocalTime = request.LocalTime
             });
+            trans.Complete();
         }
 
         /// <summary>
@@ -98,7 +102,18 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// <returns></returns>
         public async Task EquipmentAlarmAsync(EquipmentAlarmRequest request)
         {
-            await Task.CompletedTask;
+            var userCode = request.EquipmentCode; //_currentEquipment.Code
+            var nowTime = HymsonClock.Now();
+
+            await _equipmentAlarmRepository.InsertAsync(new EquipmentAlarmEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = _currentEquipment.SiteId,
+                CreatedBy = userCode,
+                CreatedOn = nowTime,
+                UpdatedBy = userCode,
+                UpdatedOn = nowTime,
+            });
         }
 
         /// <summary>
