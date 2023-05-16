@@ -11,13 +11,13 @@ using Hymson.MES.EquipmentServices.Request.OutBound;
 using Hymson.MES.EquipmentServices.Request.OutPutQty;
 using Hymson.MES.EquipmentServices.Request.QueryContainerBindSfc;
 using Hymson.MES.EquipmentServices.Request.SingleBarCodeLoadingVerification;
-using Hymson.MES.EquipmentServices.Request.UnBindContainer;
+//using Hymson.MES.EquipmentServices.Request.UnBindContainer;
 using Hymson.MES.EquipmentServices.Services.BindContainer;
 using Hymson.MES.EquipmentServices.Services.BindSFC;
 using Hymson.MES.EquipmentServices.Services.CCDFileUploadComplete;
+using Hymson.MES.EquipmentServices.Services.Equipment;
 using Hymson.MES.EquipmentServices.Services.FeedingConsumption;
 using Hymson.MES.EquipmentServices.Services.GenerateModuleSFC;
-using Hymson.MES.EquipmentServices.Services.Equipment;
 using Hymson.MES.EquipmentServices.Services.InBound;
 using Hymson.MES.EquipmentServices.Services.InboundInContainer;
 using Hymson.MES.EquipmentServices.Services.InboundInSFCContainer;
@@ -25,7 +25,7 @@ using Hymson.MES.EquipmentServices.Services.OutBound;
 using Hymson.MES.EquipmentServices.Services.OutPutQty;
 using Hymson.MES.EquipmentServices.Services.QueryContainerBindSfc;
 using Hymson.MES.EquipmentServices.Services.SingleBarCodeLoadingVerification;
-using Hymson.MES.EquipmentServices.Services.UnBindContainer;
+//using Hymson.MES.EquipmentServices.Services.UnBindContainer;
 using Hymson.MES.EquipmentServices.Validators.BindContainer;
 using Hymson.MES.EquipmentServices.Validators.BindSFC;
 using Hymson.MES.EquipmentServices.Validators.CCDFileUploadComplete;
@@ -74,7 +74,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IBindContainerService, BindContainerService>();//容器解绑绑定
             services.AddSingleton<IInBoundService, InBoundService>();//进站
             services.AddSingleton<IOutBoundService, OutBoundService>();//出站
-            services.AddSingleton<IOutBoundMoreService, OutBoundMoreService>();//出站（多个）
+            //services.AddSingleton<IOutBoundMoreService, OutBoundMoreService>();//出站（多个）
 
 
             services.AddSingleton<IInboundInContainerService, InboundInContainerService>();// 进站-容器
