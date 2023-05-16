@@ -23,15 +23,23 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         private readonly IEquipmentHeartbeatRepository _equipmentHeartbeatRepository;
 
         /// <summary>
+        /// 仓储（设备报警）
+        /// </summary>
+        private readonly IEquipmentAlarmRepository _equipmentAlarmRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentEquipment"></param>
         /// <param name="equipmentHeartbeatRepository"></param>
+        /// <param name="equipmentAlarmRepository"></param>
         public EquipmentService(ICurrentEquipment currentEquipment,
-            IEquipmentHeartbeatRepository equipmentHeartbeatRepository)
+            IEquipmentHeartbeatRepository equipmentHeartbeatRepository,
+            IEquipmentAlarmRepository equipmentAlarmRepository)
         {
             _currentEquipment = currentEquipment;
             _equipmentHeartbeatRepository = equipmentHeartbeatRepository;
+            _equipmentAlarmRepository = equipmentAlarmRepository;
         }
 
 
