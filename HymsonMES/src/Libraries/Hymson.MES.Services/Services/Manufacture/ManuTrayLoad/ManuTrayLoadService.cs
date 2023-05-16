@@ -130,7 +130,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="manuTrayLoadDto"></param>
+        /// <param name="manuTrayLoadModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyManuTrayLoadAsync(ManuTrayLoadModifyDto manuTrayLoadModifyDto)
         {

@@ -19,6 +19,6 @@ namespace Hymson.MES.EquipmentServices.Request.BindContainer
         /// <summary>
         /// 绑定位置
         /// </summary>
-        public string Location { get; set; } = string.Empty;
+        public int Location { get; set; }
     }
 }

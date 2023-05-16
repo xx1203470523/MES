@@ -73,6 +73,17 @@ namespace Hymson.MES.Data.Repositories.Integrated
         }
 
         /// <summary>
+        /// 根据容器编码获取数据
+        /// </summary>
+        /// <param name="containerCode"></param>
+        /// <returns></returns>
+        public async Task<InteTrayEntity> GetByCodeAsync(string containerCode) {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<InteTrayEntity>(GetByCodeSql, new { Code = containerCode });
+        }
+
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="inteTrayPagedQuery"></param>
@@ -188,6 +199,10 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `Code`, `Name`, `MaxLoadQty`, `MaxSeq`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `inte_tray`  WHERE Id IN @Ids ";
+
+        const string GetByCodeSql = @"SELECT 
+                               `Id`, `SiteId`, `Code`, `Name`, `MaxLoadQty`, `MaxSeq`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `inte_tray`  WHERE Code = @Code ";
         #endregion
     }
 }

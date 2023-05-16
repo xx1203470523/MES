@@ -13,16 +13,17 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using Org.BouncyCastle.Crypto;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 托盘装载信息表仓储
     /// </summary>
-    public partial class ManuTrayLoadRepository :BaseRepository, IManuTrayLoadRepository
+    public partial class ManuTrayLoadRepository : BaseRepository, IManuTrayLoadRepository
     {
 
-        public ManuTrayLoadRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        public ManuTrayLoadRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
         }
 
@@ -43,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -57,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<ManuTrayLoadEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ManuTrayLoadEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ManuTrayLoadEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -65,10 +66,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuTrayLoadEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ManuTrayLoadEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<ManuTrayLoadEntity>(GetByIdsSql, new { Ids = ids});
+            return await conn.QueryAsync<ManuTrayLoadEntity>(GetByIdsSql, new { Ids = ids });
+        }
+
+        /// <summary>
+        /// 通过trayCode查询装载信息
+        /// </summary>
+        /// <param name="trayCode"></param>
+        /// <returns></returns>
+        public async Task<ManuTrayLoadEntity> GetByTrayCodeAsync(string trayCode)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ManuTrayLoadEntity>(GetByTrayCodeSql, new { TrayCode = trayCode });
         }
 
         /// <summary>
@@ -88,7 +100,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
-           
+
             var offSet = (manuTrayLoadPagedQuery.PageIndex - 1) * manuTrayLoadPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = manuTrayLoadPagedQuery.PageSize });
@@ -187,6 +199,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `TrayCode`, `TrayId`, `LoadQty`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_tray_load`  WHERE Id IN @Ids ";
+
+        const string GetByTrayCodeSql = @"SELECT 
+                               `Id`, `SiteId`, `TrayCode`, `TrayId`, `LoadQty`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `manu_tray_load`  WHERE TrayCode = @TrayCode ";
         #endregion
     }
 }

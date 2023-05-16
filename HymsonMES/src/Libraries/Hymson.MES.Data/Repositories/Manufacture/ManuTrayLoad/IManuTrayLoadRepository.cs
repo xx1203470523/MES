@@ -75,6 +75,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<IEnumerable<ManuTrayLoadEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
+        /// 根据trayCode获取数据
+        /// </summary>
+        /// <param name="trayCode"></param>
+        /// <returns></returns>
+        Task<ManuTrayLoadEntity> GetByTrayCodeAsync(string trayCode);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="manuTrayLoadQuery"></param>

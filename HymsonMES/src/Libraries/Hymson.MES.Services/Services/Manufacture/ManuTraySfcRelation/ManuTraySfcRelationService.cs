@@ -130,7 +130,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="manuTraySfcRelationDto"></param>
+        /// <param name="manuTraySfcRelationModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyManuTraySfcRelationAsync(ManuTraySfcRelationModifyDto manuTraySfcRelationModifyDto)
         {

@@ -6,6 +6,7 @@
  *build datetime: 2023-05-16 11:11:02
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Manufacture;
 
 namespace Hymson.MES.Core.Domain.Manufacture
 {
@@ -50,7 +51,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
        /// <summary>
         /// 状态;0-解绑 1-绑定
         /// </summary>
-        public bool OperationType { get; set; }
+        public ManuTraySfcRecordOperationTypeEnum OperationType { get; set; }
 
        
     }

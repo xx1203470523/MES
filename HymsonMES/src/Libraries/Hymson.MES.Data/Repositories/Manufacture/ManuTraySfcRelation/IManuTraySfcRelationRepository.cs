@@ -75,6 +75,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<IEnumerable<ManuTraySfcRelationEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
+        /// 根据TrayLoadIdD获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuTraySfcRelationEntity>> GetByTrayLoadIdAsync(long trayLoadId);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="manuTraySfcRelationQuery"></param>

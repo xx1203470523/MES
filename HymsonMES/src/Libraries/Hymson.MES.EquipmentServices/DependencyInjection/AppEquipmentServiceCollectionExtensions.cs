@@ -3,6 +3,7 @@ using Hymson.MES.EquipmentServices.Request.BindContainer;
 using Hymson.MES.EquipmentServices.Request.BindSFC;
 using Hymson.MES.EquipmentServices.Request.InBound;
 using Hymson.MES.EquipmentServices.Request.OutBound;
+using Hymson.MES.EquipmentServices.Services.BindContainer;
 using Hymson.MES.EquipmentServices.Services.BindSFC;
 using Hymson.MES.EquipmentServices.Services.Equipment;
 using Hymson.MES.EquipmentServices.Services.InBound;
@@ -43,6 +44,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private static void AddServices(this IServiceCollection services)
         {
             services.AddSingleton<IBindSFCService, BindSFCService>();//条码解绑绑定
+            services.AddSingleton<IBindContainerService, BindContainerService>();//容器解绑绑定
             services.AddSingleton<IInBoundService, InBoundService>();//进站
             services.AddSingleton<IOutBoundService, OutBoundService>();//出站
             services.AddSingleton<IEquipmentService, EquipmentService>();   // 设备

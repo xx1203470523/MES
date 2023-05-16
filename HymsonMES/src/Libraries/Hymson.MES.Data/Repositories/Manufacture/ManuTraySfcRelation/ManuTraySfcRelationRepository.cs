@@ -13,6 +13,7 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using Org.BouncyCastle.Crypto;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -69,6 +70,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuTraySfcRelationEntity>(GetByIdsSql, new { Ids = ids});
+        }
+
+        /// <summary>
+        /// 根据trayLoadId 获取转载记录
+        /// </summary>
+        /// <param name="trayLoadId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuTraySfcRelationEntity>> GetByTrayLoadIdAsync(long trayLoadId) {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuTraySfcRelationEntity>(GetByTrayLoadIdSql, new { TrayLoadId = trayLoadId });
         }
 
         /// <summary>
@@ -187,6 +198,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `TrayLoadId`, `Seq`, `SFC`, `LoadQty`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_tray_sfc_relation`  WHERE Id IN @Ids ";
+
+        const string GetByTrayLoadIdSql = @"SELECT 
+                               `Id`, `SiteId`, `TrayLoadId`, `Seq`, `SFC`, `LoadQty`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `manu_tray_sfc_relation`  WHERE TrayLoadId = @TrayLoadId ";
         #endregion
     }
 }

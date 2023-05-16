@@ -751,6 +751,8 @@
         public const string MES19101 = "绑定的电芯条码列表不能为空";
         public const string MES19102 = "容器编码不能为空";
         public const string MES19103 = "容器电芯条码列表不能为空";
+        public const string MES19104 = "托盘装载信息不存在";
+        public const string MES19105 = "此托盘未装载任何信息";
 
         #endregion
 
