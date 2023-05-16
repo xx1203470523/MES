@@ -1,7 +1,7 @@
 ﻿using Hymson.MES.EquipmentServices.Request.Equipment;
 using Hymson.MES.EquipmentServices.Request.Feeding;
-using Hymson.MES.EquipmentServices.Services.BindSFC;
 using Hymson.MES.EquipmentServices.Services.Equipment;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Equipment.Api.Controllers
@@ -11,6 +11,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
     /// </summary>
     [Route("api/v1/[controller]")]
     //[Route("api/v1/EquApi")]
+    [AllowAnonymous]
     [ApiController]
     public class EquipmentController : Controller
     {
@@ -42,8 +43,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("HY-MES-EQU-002")]
+        [HttpPost("HY-MES-EQU-002")]
         public async Task EquipmentHeartbeatAsync(EquipmentHeartbeatRequest request)
         {
             await _equipmentService.EquipmentHeartbeatAsync(request);
@@ -54,8 +54,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("HY-MES-EQU-003")]
+        [HttpPost("HY-MES-EQU-003")]
         public async Task EquipmentStateAsync(EquipmentStateRequest request)
         {
             await _equipmentService.EquipmentStateAsync(request);
@@ -66,8 +65,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("HY-MES-EQU-004")]
+        [HttpPost("HY-MES-EQU-004")]
         public async Task EquipmentAlarmAsync(EquipmentAlarmRequest request)
         {
             await _equipmentService.EquipmentAlarmAsync(request);
@@ -78,13 +76,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("HY-MES-EQU-005")]
+        [HttpPost("HY-MES-EQU-005")]
         public async Task EquipmentDownReasonAsync(EquipmentDownReasonRequest request)
         {
             await _equipmentService.EquipmentDownReasonAsync(request);
         }
-
 
 
         /// <summary>
@@ -92,8 +88,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("HY-MES-EQU-010")]
+        [HttpPost("HY-MES-EQU-010")]
         public async Task EquipmentProcessParamAsync(EquipmentProcessParamRequest request)
         {
             await Task.CompletedTask;
@@ -104,8 +99,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("HY-MES-EQU-011")]
+        [HttpPost("HY-MES-EQU-011")]
         public async Task EquipmentProductProcessParamInNotCanSFCAsync(EquipmentProductProcessParamInNotCanSFCRequest request)
         {
             await Task.CompletedTask;
@@ -116,8 +110,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("HY-MES-EQU-012")]
+        [HttpPost("HY-MES-EQU-012")]
         public async Task EquipmentProductProcessParamAsync(EquipmentProductProcessParamRequest request)
         {
             await Task.CompletedTask;
@@ -128,8 +121,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("HY-MES-EQU-013")]
+        [HttpPost("HY-MES-EQU-013")]
         public async Task FeedingLoadingAsync(FeedingLoadRequest request)
         {
             await Task.CompletedTask;
@@ -140,8 +132,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("HY-MES-EQU-014")]
+        [HttpPost("HY-MES-EQU-014")]
         public async Task FeedingUnloadingAsync(FeedingUnloadingRequest request)
         {
             await Task.CompletedTask;
