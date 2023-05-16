@@ -5,17 +5,18 @@ using System.Text.Json;
 
 namespace Hymson.MES.HttpClients
 {
-    public class FastReportPrintService : ILabelPrintService
+    /// <summary>
+    /// FastReport 打印请求
+    /// </summary>
+    public class FastReportPrintRequest : ILabelPrintRequest
     {
         private readonly HttpClient _httpClient;
-        public FastReportPrintService(HttpClient httpClient)
+        public FastReportPrintRequest(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
 
-       
-
-        async Task<(string base64Str, bool result)> ILabelPrintService.PreviewFromImageBase64Async(PrintRequest printRequest)
+        async Task<(string base64Str, bool result)> ILabelPrintRequest.PreviewFromImageBase64Async(PrintRequest printRequest)
         {
             string api = "api/LabelPrint/printview";
             var httpResponseMessage = await _httpClient.PostAsJsonAsync<PrintRequest>(api, printRequest);
@@ -31,7 +32,7 @@ namespace Hymson.MES.HttpClients
             return ("调用失败",false);
         }
 
-        async Task<(string msg, bool result)> ILabelPrintService.PrintAsync(PrintRequest printRequest, bool ShowDialog)
+        async Task<(string msg, bool result)> ILabelPrintRequest.PrintAsync(PrintRequest printRequest, bool ShowDialog)
         {
             string api = "api/LabelPrint/print";
             var httpResponseMessage = await _httpClient.PostAsJsonAsync<PrintRequest>(api, printRequest);

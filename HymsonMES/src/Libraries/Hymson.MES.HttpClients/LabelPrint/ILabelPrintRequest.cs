@@ -8,7 +8,10 @@ using System.Threading.Tasks;
 
 namespace Hymson.MES.HttpClients
 {
-    public interface ILabelPrintService
+    /// <summary>
+    /// 标签打印请求
+    /// </summary>
+    public interface ILabelPrintRequest
     {
         /// <summary>
         /// 打印预览图片
