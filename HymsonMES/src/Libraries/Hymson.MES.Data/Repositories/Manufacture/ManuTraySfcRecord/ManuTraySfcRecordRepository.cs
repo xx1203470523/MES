@@ -19,11 +19,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// <summary>
     /// 托盘条码记录表仓储
     /// </summary>
-    public partial class ManuTraySfcRecordRepository :BaseRepository, IManuTraySfcRecordRepository
+    public partial class ManuTraySfcRecordRepository :IManuTraySfcRecordRepository
     {
 
-        public ManuTraySfcRecordRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        private readonly ConnectionOptions _connectionOptions;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
+        public ManuTraySfcRecordRepository(IOptions<ConnectionOptions> connectionOptions)
         {
+            _connectionOptions = connectionOptions.Value;
         }
 
         #region 方法
@@ -34,7 +40,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> DeleteAsync(long id)
         {
-            using var conn = GetMESDbConnection();
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeleteSql, new { Id = id });
         }
 
@@ -43,9 +49,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
-            using var conn = GetMESDbConnection();
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeletesSql, param);
         }
 
@@ -56,7 +62,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<ManuTraySfcRecordEntity> GetByIdAsync(long id)
         {
-            using var conn = GetMESDbConnection();
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<ManuTraySfcRecordEntity>(GetByIdSql, new { Id=id});
         }
 
@@ -65,9 +71,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuTraySfcRecordEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ManuTraySfcRecordEntity>> GetByIdsAsync(long[] ids)
         {
-            using var conn = GetMESDbConnection();
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ManuTraySfcRecordEntity>(GetByIdsSql, new { Ids = ids});
         }
 
@@ -94,7 +100,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.AddParameters(new { Rows = manuTraySfcRecordPagedQuery.PageSize });
             sqlBuilder.AddParameters(manuTraySfcRecordPagedQuery);
 
-            using var conn = GetMESDbConnection();
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var manuTraySfcRecordEntitiesTask = conn.QueryAsync<ManuTraySfcRecordEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var manuTraySfcRecordEntities = await manuTraySfcRecordEntitiesTask;
@@ -111,7 +117,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetManuTraySfcRecordEntitiesSqlTemplate);
-            using var conn = GetMESDbConnection();
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var manuTraySfcRecordEntities = await conn.QueryAsync<ManuTraySfcRecordEntity>(template.RawSql, manuTraySfcRecordQuery);
             return manuTraySfcRecordEntities;
         }
@@ -123,7 +129,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> InsertAsync(ManuTraySfcRecordEntity manuTraySfcRecordEntity)
         {
-            using var conn = GetMESDbConnection();
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertSql, manuTraySfcRecordEntity);
         }
 
@@ -134,7 +140,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> InsertsAsync(List<ManuTraySfcRecordEntity> manuTraySfcRecordEntitys)
         {
-            using var conn = GetMESDbConnection();
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertsSql, manuTraySfcRecordEntitys);
         }
 
@@ -145,7 +151,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> UpdateAsync(ManuTraySfcRecordEntity manuTraySfcRecordEntity)
         {
-            using var conn = GetMESDbConnection();
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSql, manuTraySfcRecordEntity);
         }
 
@@ -156,7 +162,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> UpdatesAsync(List<ManuTraySfcRecordEntity> manuTraySfcRecordEntitys)
         {
-            using var conn = GetMESDbConnection();
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdatesSql, manuTraySfcRecordEntitys);
         }
         #endregion

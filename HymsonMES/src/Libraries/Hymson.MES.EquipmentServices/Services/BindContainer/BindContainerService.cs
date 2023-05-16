@@ -26,19 +26,17 @@ namespace Hymson.MES.EquipmentServices.Services.BindContainer
         private readonly AbstractValidator<BindContainerRequest> _validationBindContainerRules;
         private readonly AbstractValidator<UnBindContainerRequest> _validationUnBindContainerRules;
 
-        private readonly InteTrayRepository _inteTrayRepository;
-        private readonly ManuTrayLoadRepository _manuTrayLoadRepository;
-        private readonly ManuTraySfcRecordRepository _manuTraySfcRecordRepository;
-        private readonly ManuTraySfcRelationRepository _manuTraySfcRelationRepository;
+        private readonly IManuTrayLoadRepository _manuTrayLoadRepository;
+        private readonly IManuTraySfcRecordRepository _manuTraySfcRecordRepository;
+        private readonly IManuTraySfcRelationRepository _manuTraySfcRelationRepository;
 
 
         public BindContainerService(AbstractValidator<BindContainerRequest> validationBindContainerRules, ICurrentEquipment currentEquipment, AbstractValidator<UnBindContainerRequest> validationUnBindContainerRules,
-            InteTrayRepository inteTrayRepository, ManuTraySfcRecordRepository manuTraySfcRecordRepository, ManuTraySfcRelationRepository manuTraySfcRelationRepository, ManuTrayLoadRepository manuTrayLoadRepository)
+           IManuTraySfcRecordRepository manuTraySfcRecordRepository, IManuTraySfcRelationRepository manuTraySfcRelationRepository, IManuTrayLoadRepository manuTrayLoadRepository)
         {
             _validationBindContainerRules = validationBindContainerRules;
             _currentEquipment = currentEquipment;
             _validationUnBindContainerRules = validationUnBindContainerRules;
-            _inteTrayRepository = inteTrayRepository;
             _manuTraySfcRecordRepository = manuTraySfcRecordRepository;
             _manuTraySfcRelationRepository = manuTraySfcRelationRepository;
             _manuTrayLoadRepository = manuTrayLoadRepository;

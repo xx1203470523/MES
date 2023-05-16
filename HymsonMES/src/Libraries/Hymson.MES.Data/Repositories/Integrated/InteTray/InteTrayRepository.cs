@@ -20,11 +20,17 @@ namespace Hymson.MES.Data.Repositories.Integrated
     /// <summary>
     /// 托盘信息仓储
     /// </summary>
-    public partial class InteTrayRepository :BaseRepository, IInteTrayRepository
+    public partial class InteTrayRepository :IInteTrayRepository
     {
 
-        public InteTrayRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        private readonly ConnectionOptions _connectionOptions;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
+        public InteTrayRepository(IOptions<ConnectionOptions> connectionOptions)
         {
+            _connectionOptions = connectionOptions.Value;
         }
 
         #region 方法
@@ -35,7 +41,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<int> DeleteAsync(long id)
         {
-            using var conn = GetMESDbConnection();
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeleteSql, new { Id = id });
         }
 
@@ -44,9 +50,9 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
-            using var conn = GetMESDbConnection();
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeletesSql, param);
         }
 
@@ -57,7 +63,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<InteTrayEntity> GetByIdAsync(long id)
         {
-            using var conn = GetMESDbConnection();
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<InteTrayEntity>(GetByIdSql, new { Id=id});
         }
 
@@ -66,9 +72,9 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InteTrayEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<InteTrayEntity>> GetByIdsAsync(long[] ids)
         {
-            using var conn = GetMESDbConnection();
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<InteTrayEntity>(GetByIdsSql, new { Ids = ids});
         }
 
@@ -77,8 +83,9 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="containerCode"></param>
         /// <returns></returns>
-        public async Task<InteTrayEntity> GetByCodeAsync(string containerCode) {
-            using var conn = GetMESDbConnection();
+        public async Task<InteTrayEntity> GetByCodeAsync(string containerCode)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<InteTrayEntity>(GetByCodeSql, new { Code = containerCode });
         }
 
@@ -106,7 +113,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
             sqlBuilder.AddParameters(new { Rows = inteTrayPagedQuery.PageSize });
             sqlBuilder.AddParameters(inteTrayPagedQuery);
 
-            using var conn = GetMESDbConnection();
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var inteTrayEntitiesTask = conn.QueryAsync<InteTrayEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var inteTrayEntities = await inteTrayEntitiesTask;
@@ -123,7 +130,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetInteTrayEntitiesSqlTemplate);
-            using var conn = GetMESDbConnection();
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var inteTrayEntities = await conn.QueryAsync<InteTrayEntity>(template.RawSql, inteTrayQuery);
             return inteTrayEntities;
         }
@@ -135,7 +142,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<int> InsertAsync(InteTrayEntity inteTrayEntity)
         {
-            using var conn = GetMESDbConnection();
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertSql, inteTrayEntity);
         }
 
@@ -146,7 +153,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<int> InsertsAsync(List<InteTrayEntity> inteTrayEntitys)
         {
-            using var conn = GetMESDbConnection();
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertsSql, inteTrayEntitys);
         }
 
@@ -157,7 +164,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<int> UpdateAsync(InteTrayEntity inteTrayEntity)
         {
-            using var conn = GetMESDbConnection();
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSql, inteTrayEntity);
         }
 
@@ -168,7 +175,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<int> UpdatesAsync(List<InteTrayEntity> inteTrayEntitys)
         {
-            using var conn = GetMESDbConnection();
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdatesSql, inteTrayEntitys);
         }
         #endregion
