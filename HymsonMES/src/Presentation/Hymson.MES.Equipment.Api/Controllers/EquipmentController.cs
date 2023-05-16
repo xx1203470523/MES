@@ -1,5 +1,9 @@
-﻿using Hymson.MES.EquipmentServices.Request.Equipment;
+﻿using Hymson.MES.EquipmentServices.Request.BindContainer;
+using Hymson.MES.EquipmentServices.Request.BindSFC;
+using Hymson.MES.EquipmentServices.Request.Equipment;
 using Hymson.MES.EquipmentServices.Request.Feeding;
+using Hymson.MES.EquipmentServices.Services.BindContainer;
+using Hymson.MES.EquipmentServices.Services.BindSFC;
 using Hymson.MES.EquipmentServices.Services.Equipment;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,17 +27,25 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// 业务接口（设备）
         /// </summary>
         private readonly IEquipmentService _equipmentService;
+        private readonly IBindSFCService _bindSFCService;
+        private readonly IBindContainerService _bindContainerService;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="equipmentService"></param>
+        /// <param name="bindSFCService"></param>
+        /// <param name="bindContainerService"></param>
         public EquipmentController(ILogger<EquipmentController> logger,
-            IEquipmentService equipmentService)
+            IEquipmentService equipmentService,
+            IBindSFCService bindSFCService,
+            IBindContainerService bindContainerService)
         {
             _logger = logger;
             _equipmentService = equipmentService;
+            _bindSFCService = bindSFCService;
+            _bindContainerService = bindContainerService;
         }
 
 
@@ -136,6 +148,58 @@ namespace Hymson.MES.Equipment.Api.Controllers
         public async Task FeedingUnloadingAsync(FeedingUnloadingRequest request)
         {
             await Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// 条码绑定
+        /// HY-MES-EQU-019
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("BindContainer")]
+        public async Task BindContainerAsync(BindContainerRequest request)
+        {
+            await _bindContainerService.BindContainerAsync(request);
+        }
+
+        /// <summary>
+        /// 条码绑定
+        /// HY-MES-EQU-020
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("BindSFCAsync")]
+        public async Task BindSFCAsync(BindSFCRequest request)
+        {
+            await _bindSFCService.BindSFCAsync(request);
+        }
+
+        /// <summary>
+        /// 条码解绑
+        /// HY-MES-EQU-020
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("UnBindSFCAsync")]
+        public async Task UnBindSFCAsync(UnBindSFCRequest request)
+        {
+            await _bindSFCService.UnBindSFCAsync(request);
+        }
+
+        /// <summary>
+        /// 容器解绑
+        /// HY-MES-EQU-022
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("UnBindContainer")]
+        public async Task UnBindContainerAsync(UnBindContainerRequest request)
+        {
+            await _bindContainerService.UnBindContainerAsync(request);
         }
 
     }
