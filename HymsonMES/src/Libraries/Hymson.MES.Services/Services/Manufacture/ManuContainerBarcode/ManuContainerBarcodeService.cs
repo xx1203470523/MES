@@ -299,70 +299,71 @@ namespace Hymson.MES.Services.Services.Manufacture
                 if (string.IsNullOrEmpty(createManuContainerBarcodeDto.ContainerCode))
                 {
                     //查找相同产品ID及打开着的包装
-                    var barcodeobj = await _manuContainerBarcodeRepository.GetByMaterialCodeAsync(material.MaterialCode, (int)ManuContainerBarcodeStatusEnum.Open, 1);
-                    if (barcodeobj != null)
-                    {
-                        if (barcodeobj.WorkOrderId != sfcProduceEntity.WorkOrderId)
-                        {
-                            if (!facePlateContainerPackEntity.IsMixedWorkOrder)
-                            {
-                                var planWorkOrder = await _planWorkOrderRepository.GetByIdsAsync(new[] { barcodeobj.WorkOrderId, sfcProduceEntity.WorkOrderId });
-                                var barOrderCode = planWorkOrder.FirstOrDefault(x => x.Id == barcodeobj.WorkOrderId)?.OrderCode ?? "";
-                                var sfcOrderCode = planWorkOrder.FirstOrDefault(x => x.Id == sfcProduceEntity.WorkOrderId)?.OrderCode ?? "";
-                                throw new CustomerValidationException(nameof(ErrorCode.MES16706)).WithData("first", barOrderCode).WithData("second", sfcOrderCode);
-                            }
-                        }
-                        //比较物料版本
-                        if (material.Version != barcodeobj.MaterialVersion && !facePlateContainerPackEntity.IsAllowDifferentMaterial)
-                            throw new CustomerValidationException(nameof(ErrorCode.MES16716));
+                    //var barcodeobj = await _manuContainerBarcodeRepository.GetByMaterialCodeAsync(material.MaterialCode, (int)ManuContainerBarcodeStatusEnum.Open, 1);
+                    //if (barcodeobj != null)
+                    //{
+                    //    if (barcodeobj.WorkOrderId != sfcProduceEntity.WorkOrderId)
+                    //    {
+                    //        if (!facePlateContainerPackEntity.IsMixedWorkOrder)
+                    //        {
+                    //            var planWorkOrder = await _planWorkOrderRepository.GetByIdsAsync(new[] { barcodeobj.WorkOrderId, sfcProduceEntity.WorkOrderId });
+                    //            var barOrderCode = planWorkOrder.FirstOrDefault(x => x.Id == barcodeobj.WorkOrderId)?.OrderCode ?? "";
+                    //            var sfcOrderCode = planWorkOrder.FirstOrDefault(x => x.Id == sfcProduceEntity.WorkOrderId)?.OrderCode ?? "";
+                    //            throw new CustomerValidationException(nameof(ErrorCode.MES16706)).WithData("first", barOrderCode).WithData("second", sfcOrderCode);
+                    //        }
+                    //    }
+                    //    //比较物料版本
+                    //    if (material.Version != barcodeobj.MaterialVersion && !facePlateContainerPackEntity.IsAllowDifferentMaterial)
+                    //        throw new CustomerValidationException(nameof(ErrorCode.MES16716));
 
-                        var inte = await _inteContainerRepository.GetByIdAsync(barcodeobj.ContainerId);
-                        var packs = await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(barcodeobj.Id, barcodeobj.SiteId);
-                        if (inte.Maximum > packs.Count())
-                        {
-                            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
-                            {
-                                await _manuContainerPack.CreateManuContainerPackAsync(new ManuContainerPackCreateDto()
-                                {
-                                    ResourceId = facePlateContainerPackEntity.ResourceId,
-                                    ProcedureId = barcodeobj.ProductId,
-                                    ContainerBarCodeId = barcodeobj.Id,
-                                    LadeBarCode = createManuContainerBarcodeDto.BarCode
+                    //    var inte = await _inteContainerRepository.GetByIdAsync(barcodeobj.ContainerId);
+                    //    var packs = await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(barcodeobj.Id, barcodeobj.SiteId);
+                    //    if (inte.Maximum > packs.Count())
+                    //    {
+                    //        using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+                    //        {
+                    //            await _manuContainerPack.CreateManuContainerPackAsync(new ManuContainerPackCreateDto()
+                    //            {
+                    //                ResourceId = facePlateContainerPackEntity.ResourceId,
+                    //                ProcedureId = barcodeobj.ProductId,
+                    //                ContainerBarCodeId = barcodeobj.Id,
+                    //                LadeBarCode = createManuContainerBarcodeDto.BarCode
 
-                                });
-                                await _manuContainerPackRecordService.CreateManuContainerPackRecordAsync(new ManuContainerPackRecordCreateDto()
-                                {
-                                    ResourceId = facePlateContainerPackEntity.ResourceId,
-                                    ProcedureId = barcodeobj.ProductId,
-                                    ContainerBarCodeId = barcodeobj.Id,
-                                    OperateType = (int)ManuContainerBarcodeOperateTypeEnum.Load,
-                                    LadeBarCode = createManuContainerBarcodeDto.BarCode
+                    //            });
+                    //            await _manuContainerPackRecordService.CreateManuContainerPackRecordAsync(new ManuContainerPackRecordCreateDto()
+                    //            {
+                    //                ResourceId = facePlateContainerPackEntity.ResourceId,
+                    //                ProcedureId = barcodeobj.ProductId,
+                    //                ContainerBarCodeId = barcodeobj.Id,
+                    //                OperateType = (int)ManuContainerBarcodeOperateTypeEnum.Load,
+                    //                LadeBarCode = createManuContainerBarcodeDto.BarCode
 
-                                });
-                                ts.Complete();
-                            }
-                            if (inte.Maximum == (packs.Count() + 1))
-                            {
-                                barcodeobj.Status = (int)ManuContainerBarcodeStatusEnum.Close;
+                    //            });
+                    //            ts.Complete();
+                    //        }
+                    //        if (inte.Maximum == (packs.Count() + 1))
+                    //        {
+                    //            barcodeobj.Status = (int)ManuContainerBarcodeStatusEnum.Close;
 
-                                await _manuContainerBarcodeRepository.UpdateAsync(barcodeobj);
-                            }
-                            return await GetContainerPackView(sfcProduceEntity.WorkOrderId, material.Id, barcodeobj, true);
-                        }
-                        else
-                        {
-                            barcodeobj.Status = (int)ManuContainerBarcodeStatusEnum.Close;
+                    //            await _manuContainerBarcodeRepository.UpdateAsync(barcodeobj);
+                    //        }
+                    //        return await GetContainerPackView(sfcProduceEntity.WorkOrderId, material.Id, barcodeobj, true);
+                    //    }
+                    //    else
+                    //    {
+                    //        barcodeobj.Status = (int)ManuContainerBarcodeStatusEnum.Close;
 
-                            await _manuContainerBarcodeRepository.UpdateAsync(barcodeobj);
-                            throw new CustomerValidationException(nameof(ErrorCode.MES16717));
-                            // return await CreateNewBarcode(manuContainerBarcodeEntity, sfcinfo, workorder, material, facePlateContainerPackEntity);
-                        }
+                    //        await _manuContainerBarcodeRepository.UpdateAsync(barcodeobj);
+                    //        throw new CustomerValidationException(nameof(ErrorCode.MES16717));
+                    //        // return await CreateNewBarcode(manuContainerBarcodeEntity, sfcinfo, workorder, material, facePlateContainerPackEntity);
+                    //    }
 
-                    }
-                    else //全新包装
-                    {
-                        return await CreateNewBarcode(manuContainerBarcodeEntity, sfcProduceEntity.ProductId, sfcProduceEntity.WorkOrderId, material, facePlateContainerPackEntity);
-                    }
+                    //}
+                    //else 
+                    //{
+                    //全新包装
+                    return await CreateNewBarcode(manuContainerBarcodeEntity, sfcProduceEntity.ProductId, sfcProduceEntity.WorkOrderId, material, facePlateContainerPackEntity);
+                    //}
                 }
                 else //新条码&& 指定包装
                 {
@@ -376,6 +377,13 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES16722)).WithData("packId", barcodeobj.Id);
                     }
+
+                    //物料不一样报错
+                    if (material.MaterialCode != barcodeobj.MaterialCode)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16730));
+                    }
+
                     if (barcodeobj.WorkOrderId != sfcProduceEntity.WorkOrderId)
                     {
                         if (!facePlateContainerPackEntity.IsMixedWorkOrder)
@@ -438,8 +446,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                             // return await CreateNewBarcode(manuContainerBarcodeEntity, sfcinfo, workorder, material, facePlateContainerPackEntity);
                         }
                     }
-                    else //不是相同包装，创建全新包装
+                    else
                     {
+                        //不是相同包装，创建全新包装
                         return await CreateNewBarcode(manuContainerBarcodeEntity, sfcProduceEntity.ProductId, sfcProduceEntity.WorkOrderId, material, facePlateContainerPackEntity);
                     }
                 }
@@ -492,74 +501,74 @@ namespace Hymson.MES.Services.Services.Manufacture
                 if (string.IsNullOrEmpty(createManuContainerBarcodeDto.ContainerCode))
                 {
                     //查找相同产品ID及打开着的包装
-                    var barcodeobj = await _manuContainerBarcodeRepository.GetByMaterialCodeAsync(prebarcodeobj.MaterialCode, (int)ManuContainerBarcodeStatusEnum.Open, level);
-                    if (barcodeobj != null)
-                    {
-                        if (barcodeobj.WorkOrderId != prebarcodeobj.WorkOrderId)
-                        {
-                            if (!facePlateContainerPackEntity.IsMixedWorkOrder)
-                            {
-                                var planWorkOrder = await _planWorkOrderRepository.GetByIdsAsync(new[] { barcodeobj.WorkOrderId, prebarcodeobj.WorkOrderId });
-                                var barOrderCode = planWorkOrder.FirstOrDefault(x => x.Id == barcodeobj.WorkOrderId)?.OrderCode ?? "";
-                                var sfcOrderCode = planWorkOrder.FirstOrDefault(x => x.Id == prebarcodeobj.WorkOrderId)?.OrderCode ?? "";
-                                throw new CustomerValidationException(nameof(ErrorCode.MES16706)).WithData("first", barOrderCode).WithData("second", sfcOrderCode);
-                            }
-                        }
-                        //比较物料版本
-                        if (prebarcodeobj.MaterialVersion != barcodeobj.MaterialVersion && !facePlateContainerPackEntity.IsAllowDifferentMaterial)
-                            throw new CustomerValidationException(nameof(ErrorCode.MES16716));
+                    //var barcodeobj = await _manuContainerBarcodeRepository.GetByMaterialCodeAsync(prebarcodeobj.MaterialCode, (int)ManuContainerBarcodeStatusEnum.Open, level);
+                    //if (barcodeobj != null)
+                    //{
+                    //    if (barcodeobj.WorkOrderId != prebarcodeobj.WorkOrderId)
+                    //    {
+                    //        if (!facePlateContainerPackEntity.IsMixedWorkOrder)
+                    //        {
+                    //            var planWorkOrder = await _planWorkOrderRepository.GetByIdsAsync(new[] { barcodeobj.WorkOrderId, prebarcodeobj.WorkOrderId });
+                    //            var barOrderCode = planWorkOrder.FirstOrDefault(x => x.Id == barcodeobj.WorkOrderId)?.OrderCode ?? "";
+                    //            var sfcOrderCode = planWorkOrder.FirstOrDefault(x => x.Id == prebarcodeobj.WorkOrderId)?.OrderCode ?? "";
+                    //            throw new CustomerValidationException(nameof(ErrorCode.MES16706)).WithData("first", barOrderCode).WithData("second", sfcOrderCode);
+                    //        }
+                    //    }
+                    //    //比较物料版本
+                    //    if (prebarcodeobj.MaterialVersion != barcodeobj.MaterialVersion && !facePlateContainerPackEntity.IsAllowDifferentMaterial)
+                    //        throw new CustomerValidationException(nameof(ErrorCode.MES16716));
 
-                        var inte = await _inteContainerRepository.GetByIdAsync(barcodeobj.ContainerId);
-                        var packs = await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(barcodeobj.Id, barcodeobj.SiteId);
-                        if (inte.Maximum > packs.Count())
-                        {
-                            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
-                            {
-                                await _manuContainerPack.CreateManuContainerPackAsync(new ManuContainerPackCreateDto()
-                                {
-                                    ResourceId = facePlateContainerPackEntity.ResourceId,
-                                    ProcedureId = barcodeobj.ProductId,
-                                    ContainerBarCodeId = barcodeobj.Id,
-                                    LadeBarCode = createManuContainerBarcodeDto.BarCode
+                    //    var inte = await _inteContainerRepository.GetByIdAsync(barcodeobj.ContainerId);
+                    //    var packs = await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(barcodeobj.Id, barcodeobj.SiteId);
+                    //    if (inte.Maximum > packs.Count())
+                    //    {
+                    //        using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+                    //        {
+                    //            await _manuContainerPack.CreateManuContainerPackAsync(new ManuContainerPackCreateDto()
+                    //            {
+                    //                ResourceId = facePlateContainerPackEntity.ResourceId,
+                    //                ProcedureId = barcodeobj.ProductId,
+                    //                ContainerBarCodeId = barcodeobj.Id,
+                    //                LadeBarCode = createManuContainerBarcodeDto.BarCode
 
-                                });
-                                await _manuContainerPackRecordService.CreateManuContainerPackRecordAsync(new ManuContainerPackRecordCreateDto()
-                                {
-                                    ResourceId = facePlateContainerPackEntity.ResourceId,
-                                    ProcedureId = barcodeobj.ProductId,
-                                    ContainerBarCodeId = barcodeobj.Id,
-                                    OperateType = (int)ManuContainerBarcodeOperateTypeEnum.Load,
-                                    LadeBarCode = createManuContainerBarcodeDto.BarCode
+                    //            });
+                    //            await _manuContainerPackRecordService.CreateManuContainerPackRecordAsync(new ManuContainerPackRecordCreateDto()
+                    //            {
+                    //                ResourceId = facePlateContainerPackEntity.ResourceId,
+                    //                ProcedureId = barcodeobj.ProductId,
+                    //                ContainerBarCodeId = barcodeobj.Id,
+                    //                OperateType = (int)ManuContainerBarcodeOperateTypeEnum.Load,
+                    //                LadeBarCode = createManuContainerBarcodeDto.BarCode
 
-                                });
-                                ts.Complete();
-                            }
-                            if (inte.Maximum == (packs.Count() + 1))
-                            {
-                                barcodeobj.Status = (int)ManuContainerBarcodeStatusEnum.Close;
+                    //            });
+                    //            ts.Complete();
+                    //        }
+                    //        if (inte.Maximum == (packs.Count() + 1))
+                    //        {
+                    //            barcodeobj.Status = (int)ManuContainerBarcodeStatusEnum.Close;
 
-                                await _manuContainerBarcodeRepository.UpdateAsync(barcodeobj);
-                            }
-                            return await GetContainerPackView(barcodeobj.WorkOrderId, barcodeobj.ProductId, barcodeobj);
+                    //            await _manuContainerBarcodeRepository.UpdateAsync(barcodeobj);
+                    //        }
+                    //        return await GetContainerPackView(barcodeobj.WorkOrderId, barcodeobj.ProductId, barcodeobj);
 
-                        }
-                        else
-                        {
-                            barcodeobj.Status = (int)ManuContainerBarcodeStatusEnum.Close;
+                    //    }
+                    //    else
+                    //    {
+                    //        barcodeobj.Status = (int)ManuContainerBarcodeStatusEnum.Close;
 
-                            await _manuContainerBarcodeRepository.UpdateAsync(barcodeobj);
-                            throw new CustomerValidationException(nameof(ErrorCode.MES16717));
-                            //return await CreateNewBarcode(manuContainerBarcodeEntity, sfcinfo, workorder, material, facePlateContainerPackEntity);
-                        }
+                    //        await _manuContainerBarcodeRepository.UpdateAsync(barcodeobj);
+                    //        throw new CustomerValidationException(nameof(ErrorCode.MES16717));
+                    //        //return await CreateNewBarcode(manuContainerBarcodeEntity, sfcinfo, workorder, material, facePlateContainerPackEntity);
+                    //    }
 
-                    }
-                    else //全新包装
-                    {
-
+                    //}
+                    //else
+                    //{
+                        //全新包装
                         //获取物料信息
                         var material = await _procMaterialRepository.GetByIdAsync(prebarcodeobj.ProductId);
                         return await CreateNewBarcode(manuContainerBarcodeEntity, prebarcodeobj.ProductId, prebarcodeobj.WorkOrderId, material, facePlateContainerPackEntity, level);
-                    }
+                    //}
                 }
                 else //新条码&& 指定包装
                 {
@@ -572,6 +581,12 @@ namespace Hymson.MES.Services.Services.Manufacture
                     //比较物料版本
                     if (prebarcodeobj.MaterialVersion != barcodeobj.MaterialVersion && !facePlateContainerPackEntity.IsAllowDifferentMaterial)
                         throw new CustomerValidationException(nameof(ErrorCode.MES16716));
+
+                    //物料不一样报错
+                    if (barcodeobj.MaterialCode != prebarcodeobj.MaterialCode)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16730));
+                    }
 
                     if (barcodeobj.WorkOrderId != prebarcodeobj.WorkOrderId)
                     {
@@ -631,8 +646,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                             // return await CreateNewBarcode(manuContainerBarcodeEntity, sfcinfo, workorder, material, facePlateContainerPackEntity);
                         }
                     }
-                    else //不是相同包装，创建全新包装
+                    else
                     {
+                        //不是相同包装，创建全新包装
                         // var workorder = await _planWorkOrderRepository.GetByIdAsync(prebarcodeobj.WorkOrderId);
                         //获取物料信息
                         var material = await _procMaterialRepository.GetByIdAsync(prebarcodeobj.ProductId);

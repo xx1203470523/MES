@@ -637,7 +637,7 @@
         public const string MES16713 = "容器包装，配置面板不允许排队产品";
         public const string MES16714 = "容器包装，工序信息未找到";
         public const string MES16715 = "容器包装，工序中未指定包装等级";
-        public const string MES16716 = "容器包装，不允许混物料版本包装";
+        public const string MES16716 = "容器包装，不允许混物料版本包装 ";
         public const string MES16717 = "容器包装，超过了最大包装数量，不允许包装";
         public const string MES16718 = "容器包装，未找到该条码的子级包装记录";
         public const string MES16719 = "容器包装，物料编码没有维护容器规格";
@@ -651,6 +651,7 @@
         public const string MES16727= "容器包装，二级包装只能装一级容器!";
         public const string MES16728 = "容器包装，三级包装只能装二级容器!";
         public const string MES16729 = "容器包装，容器{barcode}未关闭!";
+        public const string MES16730= "同一个容器不允许不同物料进行包装!";
         #endregion
 
         #region 绑定工单激活  MES16800
