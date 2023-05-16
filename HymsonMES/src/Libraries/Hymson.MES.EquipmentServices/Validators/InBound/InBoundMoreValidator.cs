@@ -9,12 +9,13 @@ using System.Threading.Tasks;
 namespace Hymson.MES.EquipmentServices.Validators.InBound
 {
     /// <summary>
-    /// 进站验证
+    /// 进站验证(多个)
     /// </summary>
-    internal class InBoundValidator : AbstractValidator<InBoundRequest>
+    internal class InBoundMoreValidator : AbstractValidator<InBoundMoreRequest>
     {
-        public InBoundValidator() { 
-        
+        public InBoundMoreValidator()
+        {
+
         }
     }
 }
