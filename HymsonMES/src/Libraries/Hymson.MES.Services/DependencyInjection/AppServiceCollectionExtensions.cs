@@ -108,6 +108,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteJobService, InteJobService>();
             services.AddSingleton<IInteContainerService, InteContainerService>();
             services.AddSingleton<IInteWorkCenterService, InteWorkCenterService>();
+            services.AddSingleton<IInteTrayService, InteTrayService>();
 
             #region CodeRule
             services.AddSingleton<IInteCodeRulesService, InteCodeRulesService>();
@@ -182,6 +183,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuContainerPackRecordService, ManuContainerPackRecordService>();
 
             services.AddSingleton<IManuFacePlateProductionService, ManuFacePlateProductionService>();
+            services.AddSingleton<IManuTrayLoadService, ManuTrayLoadService>();
+            services.AddSingleton<IManuTraySfcRecordService, ManuTraySfcRecordService>();
+            services.AddSingleton<IManuTraySfcRelationService, ManuTraySfcRelationService>();
 
             #endregion
 
@@ -356,6 +360,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<InteJobModifyDto>, InteJobModifyValidator>();
             services.AddSingleton<AbstractValidator<InteWorkCenterCreateDto>, InteWorkCenterCreateValidator>();
             services.AddSingleton<AbstractValidator<InteWorkCenterModifyDto>, InteWorkCenterModifyValidator>();
+            services.AddSingleton<AbstractValidator<InteTrayCreateDto>, InteTrayCreateValidator>();
+            services.AddSingleton<AbstractValidator<InteTrayModifyDto>, InteTrayModifyValidator>();
 
             #region CodeRule
             services.AddSingleton<AbstractValidator<InteCodeRulesCreateDto>, InteCodeRulesCreateValidator>();
@@ -408,6 +414,13 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<ManuContainerPackRecordModifyDto>, ManuContainerPackRecordModifyValidator>();
             services.AddSingleton<AbstractValidator<ManuContainerPackCreateDto>, ManuContainerPackCreateValidator>();
             services.AddSingleton<AbstractValidator<ManuContainerPackModifyDto>, ManuContainerPackModifyValidator>();
+
+            services.AddSingleton<AbstractValidator<ManuTrayLoadCreateDto>, ManuTrayLoadCreateValidator>();
+            services.AddSingleton<AbstractValidator<ManuTrayLoadModifyDto>, ManuTrayLoadModifyValidator>();
+            services.AddSingleton<AbstractValidator<ManuTraySfcRecordCreateDto>, ManuTraySfcRecordCreateValidator>();
+            services.AddSingleton<AbstractValidator<ManuTraySfcRecordModifyDto>, ManuTraySfcRecordModifyValidator>();
+            services.AddSingleton<AbstractValidator<ManuTraySfcRelationCreateDto>, ManuTraySfcRelationCreateValidator>();
+            services.AddSingleton<AbstractValidator<ManuTraySfcRelationModifyDto>, ManuTraySfcRelationModifyValidator>();
             #endregion
 
             #region Warehouse 

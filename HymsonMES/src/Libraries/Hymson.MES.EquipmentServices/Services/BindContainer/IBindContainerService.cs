@@ -18,5 +18,13 @@ namespace Hymson.MES.EquipmentServices.Services.BindContainer
         /// <param name="bindContainerRequest"></param>
         /// <returns></returns>
         Task BindContainerAsync(BindContainerRequest bindContainerRequest);
+
+
+        /// <summary>
+        /// 解绑
+        /// </summary>
+        /// <param name="unBindContainerRequest"></param>
+        /// <returns></returns>
+        Task UnBindContainerAsync(UnBindContainerRequest unBindContainerRequest);
     }
 }

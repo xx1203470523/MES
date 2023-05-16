@@ -17,6 +17,7 @@ using Hymson.MES.EquipmentServices.Services.BindSFC;
 using Hymson.MES.EquipmentServices.Services.CCDFileUploadComplete;
 using Hymson.MES.EquipmentServices.Services.FeedingConsumption;
 using Hymson.MES.EquipmentServices.Services.GenerateModuleSFC;
+using Hymson.MES.EquipmentServices.Services.Equipment;
 using Hymson.MES.EquipmentServices.Services.InBound;
 using Hymson.MES.EquipmentServices.Services.InboundInContainer;
 using Hymson.MES.EquipmentServices.Services.InboundInSFCContainer;
@@ -69,11 +70,9 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         private static void AddServices(this IServiceCollection services)
         {
-            services.AddSingleton<IBindSFCService, BindSFCService>();//条码绑定
-            services.AddSingleton<IBindContainerService, BindContainerService>();//容器绑定
-            services.AddSingleton<IUnBindContainerService, UnBindContainerService>();//容器解绑
+            services.AddSingleton<IBindSFCService, BindSFCService>();//条码解绑绑定
+            services.AddSingleton<IBindContainerService, BindContainerService>();//容器解绑绑定
             services.AddSingleton<IInBoundService, InBoundService>();//进站
-            services.AddSingleton<IInBoundMoreService, InBoundMoreService>();//进站（多个）
             services.AddSingleton<IOutBoundService, OutBoundService>();//出站
             services.AddSingleton<IOutBoundMoreService, OutBoundMoreService>();//出站（多个）
 
@@ -88,6 +87,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IQueryContainerBindSfcService, QueryContainerBindSfcService>();//容器绑定条码查询
 
 
+            services.AddSingleton<IEquipmentService, EquipmentService>();   // 设备
         }
 
         /// <summary>
@@ -110,6 +110,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private static void AddValidators(IServiceCollection services)
         {
             services.AddSingleton<AbstractValidator<BindSFCRequest>, BindSFCValidator>();//条码绑定
+            services.AddSingleton<AbstractValidator<UnBindSFCRequest>, UnBindSFCValidator>();//条码解绑
             services.AddSingleton<AbstractValidator<BindContainerRequest>, BindContainerValidator>();//容器绑定
             services.AddSingleton<AbstractValidator<UnBindContainerRequest>, UnBindContainerValidator>();//容器解绑
             services.AddSingleton<AbstractValidator<InBoundRequest>, InBoundValidator>();//进站

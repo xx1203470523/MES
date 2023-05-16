@@ -64,7 +64,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquFaultPhenomenonRepository, EquFaultPhenomenonRepository>();
             services.AddSingleton<IEquSparePartRepository, EquSparePartRepository>();
             services.AddSingleton<IEquSparePartTypeRepository, EquSparePartTypeRepository>();
-
+            services.AddSingleton<IEquipmentHeartbeatRepository, EquipmentHeartbeatRepository>();
 
             #region FaultReason
             services.AddSingleton<IEquFaultReasonRepository, EquFaultReasonRepository>();
@@ -84,6 +84,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteJobBusinessRelationRepository, InteJobBusinessRelationRepository>();
             services.AddSingleton<IInteJobRepository, InteJobRepository>();
             services.AddSingleton<IInteWorkCenterRepository, InteWorkCenterRepository>();
+            services.AddSingleton<IInteTrayRepository, InteTrayRepository>();
 
             #region CodeRule
             services.AddSingleton<IInteCodeRulesRepository, InteCodeRulesRepository>();
@@ -183,6 +184,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuContainerPackRecordRepository, ManuContainerPackRecordRepository>();
             services.AddSingleton<IManuContainerPackRepository, ManuContainerPackRepository>();
             services.AddSingleton<IManuContainerBarcodeRepository, ManuContainerBarcodeRepository>();
+
+            services.AddSingleton<IManuTrayLoadRepository, ManuTrayLoadRepository>();
+            services.AddSingleton<IManuTraySfcRecordRepository, ManuTraySfcRecordRepository>();
+            services.AddSingleton<IManuTraySfcRelationRepository, ManuTraySfcRelationRepository>();
             #endregion
 
             #region Warehouse 
@@ -227,7 +232,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddConfig(IServiceCollection services, IConfiguration configuration)
         {
-            //数据库连接
+            // 数据库连接
             services.Configure<ConnectionOptions>(configuration.GetSection(nameof(ConnectionOptions)));
             //services.Configure<ConnectionOptions>(configuration);
             return services;

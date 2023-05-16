@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Hymson.MES.EquipmentServices.Request.InBound;
-using Hymson.MES.EquipmentServices.Request.UnBindContainer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
