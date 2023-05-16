@@ -17,7 +17,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         public static IServiceCollection AddHttpClientService(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddHttpClient<ILabelPrintService, FastReportPrintService>().ConfigureHttpClient(httpClient =>
+            services.AddHttpClient<ILabelPrintRequest, FastReportPrintRequest>().ConfigureHttpClient(httpClient =>
             {
                 httpClient.BaseAddress = new Uri("http://localhost:50892/Help/");
 
