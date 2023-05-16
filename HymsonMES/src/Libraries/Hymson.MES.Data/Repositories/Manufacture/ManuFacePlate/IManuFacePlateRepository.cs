@@ -8,6 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -77,9 +78,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 根据code获取数据
         /// </summary>
-        /// <param name="code"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task<ManuFacePlateEntity> GetByCodeAsync(string code);
+        Task<ManuFacePlateEntity> GetByCodeAsync(EntityByCodeQuery param);
 
         /// <summary>
         /// 判断code是否存在且未删除

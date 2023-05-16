@@ -185,7 +185,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             //获取面板信息
-            var facePlateEntity = await _manuFacePlateRepository.GetByCodeAsync(createManuContainerBarcodeDto.FacePlateCode);
+            var facePlateEntity = await _manuFacePlateRepository.GetByCodeAsync(new Data.Repositories.Common.Query.EntityByCodeQuery {Code= createManuContainerBarcodeDto.FacePlateCode,Site=_currentSite.SiteId } );
             if (facePlateEntity == null)
                 throw new CustomerValidationException(nameof(ErrorCode.MES16705));
             var facePlateContainerPackEntity = await _manuFacePlateContainerPackRepository.GetByFacePlateIdAsync(facePlateEntity.Id);
