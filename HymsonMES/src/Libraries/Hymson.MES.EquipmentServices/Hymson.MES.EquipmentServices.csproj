@@ -8,6 +8,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Services\UnBindSFC\**" />
+    <Compile Remove="Validators\UnBindSFC\**" />
+    <EmbeddedResource Remove="Services\UnBindSFC\**" />
+    <EmbeddedResource Remove="Validators\UnBindSFC\**" />
+    <None Remove="Services\UnBindSFC\**" />
+    <None Remove="Validators\UnBindSFC\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Hymson.MES.CoreServices\Hymson.MES.CoreServices.csproj" />
   </ItemGroup>
 	<ItemGroup>

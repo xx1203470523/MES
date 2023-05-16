@@ -18,5 +18,12 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
         /// <param name="inBoundRequest"></param>
         /// <returns></returns>
         Task InBound(InBoundRequest inBoundRequest);
+
+        /// <summary>
+        /// 进站（多个）
+        /// </summary>
+        /// <param name="inBoundMoreRequest"></param>
+        /// <returns></returns>
+        Task InBoundMore(InBoundMoreRequest inBoundMoreRequest);
     }
 }

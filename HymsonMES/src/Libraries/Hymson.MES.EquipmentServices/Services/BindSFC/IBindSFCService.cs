@@ -13,5 +13,12 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
         /// <param name="bindSFCRequest"></param>
         /// <returns></returns>
         Task BindSFCAsync(BindSFCRequest bindSFCRequest);
+
+        /// <summary>
+        /// 解绑
+        /// </summary>
+        /// <param name="unBindSFCRequest"></param>
+        /// <returns></returns>
+        Task UnBindSFCAsync(UnBindSFCRequest unBindSFCRequest);
     }
 }

@@ -19,5 +19,12 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
         /// <param name="outBoundRequest"></param>
         /// <returns></returns>
         Task OutBound(OutBoundRequest outBoundRequest);
+
+        /// <summary>
+        /// 进站（多个）
+        /// </summary>
+        /// <param name="outBoundMoreRequest"></param>
+        /// <returns></returns>
+        Task OutBoundMore(OutBoundMoreRequest outBoundMoreRequest);
     }
 }

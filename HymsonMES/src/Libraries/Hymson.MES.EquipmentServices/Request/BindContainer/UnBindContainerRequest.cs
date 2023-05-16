@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.EquipmentServices.Request.UnBindContainer
+namespace Hymson.MES.EquipmentServices.Request.BindContainer
 {
     /// <summary>
     /// 容器解绑

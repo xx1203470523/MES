@@ -17,16 +17,19 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
     {
         private readonly ICurrentEquipment _currentEquipment;
         private readonly AbstractValidator<OutBoundRequest> _validationOutBoundRequestRules;
+        private readonly AbstractValidator<OutBoundMoreRequest> _validationOutBoundMoreRequestRules;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="validationOutBoundRequestRules"></param>
         /// <param name="currentEquipment"></param>
-        public OutBoundService(AbstractValidator<OutBoundRequest> validationOutBoundRequestRules, ICurrentEquipment currentEquipment)
+        /// <param name="validationOutBoundMoreRequestRules"></param>
+        public OutBoundService(AbstractValidator<OutBoundRequest> validationOutBoundRequestRules, ICurrentEquipment currentEquipment, AbstractValidator<OutBoundMoreRequest> validationOutBoundMoreRequestRules)
         {
             _validationOutBoundRequestRules = validationOutBoundRequestRules;
             _currentEquipment = currentEquipment;
+            _validationOutBoundMoreRequestRules = validationOutBoundMoreRequestRules;
         }
 
         /// <summary>
@@ -38,6 +41,19 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
         public async Task OutBound(OutBoundRequest outBoundRequest)
         {
             await _validationOutBoundRequestRules.ValidateAndThrowAsync(outBoundRequest);
+            throw new NotImplementedException();
+        }
+
+
+        /// <summary>
+        /// 出站（多个）
+        /// </summary>
+        /// <param name="outBoundMoreRequest"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task OutBoundMore(OutBoundMoreRequest outBoundMoreRequest)
+        {
+            await _validationOutBoundMoreRequestRules.ValidateAndThrowAsync(outBoundMoreRequest);
             throw new NotImplementedException();
         }
     }

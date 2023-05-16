@@ -17,4 +17,15 @@ namespace Hymson.MES.EquipmentServices.Validators.InBound
         
         }
     }
+
+    /// <summary>
+    /// 进站验证(多个)
+    /// </summary>
+    internal class InBoundMoreValidator : AbstractValidator<InBoundMoreRequest>
+    {
+        public InBoundMoreValidator()
+        {
+
+        }
+    }
 }

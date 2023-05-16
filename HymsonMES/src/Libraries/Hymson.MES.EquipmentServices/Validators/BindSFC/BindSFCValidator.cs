@@ -21,4 +21,13 @@ namespace Hymson.MES.EquipmentServices.Validators.BindSFC
             RuleFor(x => x.BindSFCs).NotEmpty().Must(list => list.Length <= 0).WithErrorCode(ErrorCode.MES19101);
         }
     }
+    internal class UnBindSFCValidator : AbstractValidator<UnBindSFCRequest>
+    {
+        /// <summary>
+        /// 条码解绑验证
+        /// </summary>
+        public UnBindSFCValidator()
+        {
+        }
+    }
 }

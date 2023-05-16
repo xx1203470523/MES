@@ -1,4 +1,4 @@
-﻿namespace Hymson.MES.EquipmentServices.Request.UnBindSFC
+﻿namespace Hymson.MES.EquipmentServices.Request.BindSFC
 {
     /// <summary>
     /// 条码解绑请求
