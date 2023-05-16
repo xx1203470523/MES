@@ -64,7 +64,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquFaultPhenomenonRepository, EquFaultPhenomenonRepository>();
             services.AddSingleton<IEquSparePartRepository, EquSparePartRepository>();
             services.AddSingleton<IEquSparePartTypeRepository, EquSparePartTypeRepository>();
-
+            services.AddSingleton<IEquipmentHeartbeatRepository, EquipmentHeartbeatRepository>();
 
             #region FaultReason
             services.AddSingleton<IEquFaultReasonRepository, EquFaultReasonRepository>();
@@ -232,7 +232,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddConfig(IServiceCollection services, IConfiguration configuration)
         {
-            //数据库连接
+            // 数据库连接
             services.Configure<ConnectionOptions>(configuration.GetSection(nameof(ConnectionOptions)));
             //services.Configure<ConnectionOptions>(configuration);
             return services;

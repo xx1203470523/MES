@@ -11,7 +11,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
     /// </summary>
     [Route("api/v1/[controller]")]
     //[Route("api/v1/EquApi")]
-    [AllowAnonymous]
     [ApiController]
     public class EquipmentController : Controller
     {
@@ -43,6 +42,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpPost("HY-MES-EQU-002")]
         public async Task EquipmentHeartbeatAsync(EquipmentHeartbeatRequest request)
         {
