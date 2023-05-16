@@ -7,6 +7,7 @@ using Hymson.MES.EquipmentServices.Request.UnBindContainer;
 using Hymson.MES.EquipmentServices.Request.UnBindSFC;
 using Hymson.MES.EquipmentServices.Services.BindContainer;
 using Hymson.MES.EquipmentServices.Services.BindSFC;
+using Hymson.MES.EquipmentServices.Services.Equipment;
 using Hymson.MES.EquipmentServices.Services.InBound;
 using Hymson.MES.EquipmentServices.Services.OutBound;
 using Hymson.MES.EquipmentServices.Services.UnBindContainer;
@@ -24,7 +25,6 @@ namespace Microsoft.Extensions.DependencyInjection
     /// </summary>
     public static class AppEquipmentServiceCollectionExtensions
     {
-        
         /// <summary>
         /// 业务逻辑层依赖服务添加
         /// </summary>
@@ -55,7 +55,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInBoundMoreService, InBoundMoreService>();//进站（多个）
             services.AddSingleton<IOutBoundService, OutBoundService>();//出站
             services.AddSingleton<IOutBoundMoreService, OutBoundMoreService>();//出站（多个）
-
+            services.AddSingleton<IEquipmentService, EquipmentService>();   // 设备
         }
 
         /// <summary>
@@ -86,6 +86,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<OutBoundRequest>, OutBoundValidator>();//出站
             services.AddSingleton<AbstractValidator<OutBoundMoreRequest>, OutBoundMoreValidator>();//出站（多个）
         }
-       
+
     }
 }

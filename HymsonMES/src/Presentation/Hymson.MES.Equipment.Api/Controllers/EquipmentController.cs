@@ -1,5 +1,7 @@
 ﻿using Hymson.MES.EquipmentServices.Request.Equipment;
 using Hymson.MES.EquipmentServices.Request.Feeding;
+using Hymson.MES.EquipmentServices.Services.BindSFC;
+using Hymson.MES.EquipmentServices.Services.Equipment;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Equipment.Api.Controllers
@@ -12,15 +14,26 @@ namespace Hymson.MES.Equipment.Api.Controllers
     [ApiController]
     public class EquipmentController : Controller
     {
+        /// <summary>
+        /// 日志
+        /// </summary>
         private readonly ILogger<EquipmentController> _logger;
+
+        /// <summary>
+        /// 业务接口（设备）
+        /// </summary>
+        private readonly IEquipmentService _equipmentService;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="logger"></param>
-        public EquipmentController(ILogger<EquipmentController> logger)
+        /// <param name="equipmentService"></param>
+        public EquipmentController(ILogger<EquipmentController> logger,
+            IEquipmentService equipmentService)
         {
             _logger = logger;
+            _equipmentService = equipmentService;
         }
 
 
@@ -31,9 +44,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("HY-MES-EQU-002")]
-        public async Task HeartbeatAsync(EquipmentHeartbeatRequest request)
+        public async Task EquipmentHeartbeatAsync(EquipmentHeartbeatRequest request)
         {
-            await Task.CompletedTask;
+            await _equipmentService.EquipmentHeartbeatAsync(request);
         }
 
         /// <summary>
@@ -43,9 +56,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("HY-MES-EQU-003")]
-        public async Task StateAsync(EquipmentStateRequest request)
+        public async Task EquipmentStateAsync(EquipmentStateRequest request)
         {
-            await Task.CompletedTask;
+            await _equipmentService.EquipmentStateAsync(request);
         }
 
         /// <summary>
@@ -55,9 +68,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("HY-MES-EQU-004")]
-        public async Task AlarmAsync(EquipmentAlarmRequest request)
+        public async Task EquipmentAlarmAsync(EquipmentAlarmRequest request)
         {
-            await Task.CompletedTask;
+            await _equipmentService.EquipmentAlarmAsync(request);
         }
 
         /// <summary>
@@ -67,9 +80,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("HY-MES-EQU-005")]
-        public async Task DownReasonAsync(EquipmentDownReasonRequest request)
+        public async Task EquipmentDownReasonAsync(EquipmentDownReasonRequest request)
         {
-            await Task.CompletedTask;
+            await _equipmentService.EquipmentDownReasonAsync(request);
         }
 
 
@@ -123,7 +136,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         }
 
         /// <summary>
-        /// 卸料（//EquApi/Unloading）
+        /// 卸料（/EquApi/Unloading）
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
