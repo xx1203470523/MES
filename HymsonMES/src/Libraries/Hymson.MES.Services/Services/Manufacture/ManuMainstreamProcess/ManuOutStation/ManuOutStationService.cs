@@ -10,6 +10,7 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
@@ -240,7 +241,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
 
                 // manu_sfc_info 修改为完成 且入库
                 // 条码信息
-                var sfcInfo = await _manuSfcRepository.GetBySFCAsync(sfcProduceEntity.SFC);
+                var sfcInfo = await _manuSfcRepository.GetBySFCAsync(new GetBySFCQuery { SFC = sfcProduceEntity.SFC, SiteId = _currentSite.SiteId });
 
                 // 删除 manu_sfc_produce_business
                 rows += await _manuSfcProduceRepository.DeleteSfcProduceBusinessBySfcInfoIdAsync(new DeleteSfcProduceBusinesssBySfcInfoIdCommand

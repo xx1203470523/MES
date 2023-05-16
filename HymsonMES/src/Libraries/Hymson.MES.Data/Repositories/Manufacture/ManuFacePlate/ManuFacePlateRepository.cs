@@ -13,8 +13,10 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using System.Security.Policy;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -76,12 +78,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 根据code获取数据
         /// </summary>
-        /// <param name="code"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<ManuFacePlateEntity> GetByCodeAsync(string code)
+        public async Task<ManuFacePlateEntity> GetByCodeAsync(EntityByCodeQuery param)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ManuFacePlateEntity>(GetByCodeSql, new { Code = code, Status = SysDataStatusEnum.Enable });
+            return await conn.QueryFirstOrDefaultAsync<ManuFacePlateEntity>(GetByCodeSql, new { Code = param.Code, SiteId = param.Site, Status = SysDataStatusEnum.Enable });
         }
 
         /// <summary>
@@ -107,6 +109,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId=@SiteId");
             sqlBuilder.OrderBy("CreatedOn DESC");
             sqlBuilder.Select("Id,Code, Name, Type, Status, ConversationTime, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn");
 
@@ -233,7 +236,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string GetByCodeSql = @"SELECT 
                                `Id`, `Code`, `Name`, `Type`, `Status`, `ConversationTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
-                            FROM `manu_face_plate`  WHERE Code = @Code  and Status=@Status    and IsDeleted=0 ";
+                            FROM `manu_face_plate`  WHERE Code = @Code  and Status=@Status    and IsDeleted=0 AND SiteId=@SiteId ";
 
         const string IsExistsSql = "SELECT Id FROM manu_face_plate WHERE `IsDeleted` = 0 AND Code = @Code AND Id != @id LIMIT 1";
         #endregion
