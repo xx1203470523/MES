@@ -1,4 +1,4 @@
-﻿using Hymson.MES.EquipmentServices.Request.BindSFC;
+﻿using Hymson.MES.EquipmentServices.Request.UnBindSFC;
 
 namespace Hymson.MES.EquipmentServices.Services.BindSFC
 {

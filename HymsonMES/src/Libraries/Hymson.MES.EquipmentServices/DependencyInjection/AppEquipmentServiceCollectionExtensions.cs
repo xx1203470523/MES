@@ -4,6 +4,7 @@ using Hymson.MES.EquipmentServices.Request.BindSFC;
 using Hymson.MES.EquipmentServices.Request.InBound;
 using Hymson.MES.EquipmentServices.Request.OutBound;
 using Hymson.MES.EquipmentServices.Request.UnBindContainer;
+using Hymson.MES.EquipmentServices.Request.UnBindSFC;
 using Hymson.MES.EquipmentServices.Services.BindContainer;
 using Hymson.MES.EquipmentServices.Services.BindSFC;
 using Hymson.MES.EquipmentServices.Services.InBound;
@@ -13,6 +14,7 @@ using Hymson.MES.EquipmentServices.Validators.BindContainer;
 using Hymson.MES.EquipmentServices.Validators.BindSFC;
 using Hymson.MES.EquipmentServices.Validators.InBound;
 using Hymson.MES.EquipmentServices.Validators.OutBound;
+using Hymson.MES.EquipmentServices.Validators.UnBindSFC;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -46,6 +48,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private static void AddServices(this IServiceCollection services)
         {
             services.AddSingleton<IBindSFCService, BindSFCService>();//条码绑定
+            services.AddSingleton<IUnBindSFCService, UnBindSFCService>();//条码解绑
             services.AddSingleton<IBindContainerService, BindContainerService>();//容器绑定
             services.AddSingleton<IUnBindContainerService, UnBindContainerService>();//容器解绑
             services.AddSingleton<IInBoundService, InBoundService>();//进站
@@ -75,6 +78,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private static void AddValidators(IServiceCollection services)
         {
             services.AddSingleton<AbstractValidator<BindSFCRequest>, BindSFCValidator>();//条码绑定
+            services.AddSingleton<AbstractValidator<UnBindSFCRequest>, UnBindSFCValidator>();//条码解绑
             services.AddSingleton<AbstractValidator<BindContainerRequest>, BindContainerValidator>();//容器绑定
             services.AddSingleton<AbstractValidator<UnBindContainerRequest>, UnBindContainerValidator>();//容器解绑
             services.AddSingleton<AbstractValidator<InBoundRequest>, InBoundValidator>();//进站
