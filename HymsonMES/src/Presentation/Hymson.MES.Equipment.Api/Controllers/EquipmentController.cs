@@ -1,10 +1,26 @@
 ﻿using Hymson.MES.EquipmentServices.Request.BindContainer;
 using Hymson.MES.EquipmentServices.Request.BindSFC;
+using Hymson.MES.EquipmentServices.Request.CCDFileUploadComplete;
 using Hymson.MES.EquipmentServices.Request.Equipment;
 using Hymson.MES.EquipmentServices.Request.Feeding;
+using Hymson.MES.EquipmentServices.Request.FeedingConsumption;
+using Hymson.MES.EquipmentServices.Request.GenerateModuleSFC;
+using Hymson.MES.EquipmentServices.Request.InboundInContainer;
+using Hymson.MES.EquipmentServices.Request.InboundInSFCContainer;
+using Hymson.MES.EquipmentServices.Request.OutPutQty;
+using Hymson.MES.EquipmentServices.Request.QueryContainerBindSfc;
+using Hymson.MES.EquipmentServices.Request.SingleBarCodeLoadingVerification;
 using Hymson.MES.EquipmentServices.Services.BindContainer;
 using Hymson.MES.EquipmentServices.Services.BindSFC;
+using Hymson.MES.EquipmentServices.Services.CCDFileUploadComplete;
 using Hymson.MES.EquipmentServices.Services.Equipment;
+using Hymson.MES.EquipmentServices.Services.FeedingConsumption;
+using Hymson.MES.EquipmentServices.Services.GenerateModuleSFC;
+using Hymson.MES.EquipmentServices.Services.InboundInContainer;
+using Hymson.MES.EquipmentServices.Services.InboundInSFCContainer;
+using Hymson.MES.EquipmentServices.Services.OutPutQty;
+using Hymson.MES.EquipmentServices.Services.QueryContainerBindSfc;
+using Hymson.MES.EquipmentServices.Services.SingleBarCodeLoadingVerification;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,6 +44,16 @@ namespace Hymson.MES.Equipment.Api.Controllers
         private readonly IEquipmentService _equipmentService;
         private readonly IBindSFCService _bindSFCService;
         private readonly IBindContainerService _bindContainerService;
+        private readonly ICCDFileUploadCompleteService _cCDFileUploadCompleteService;
+        private readonly IFeedingConsumptionService _feedingConsumptionService;
+        private readonly IGenerateModuleSFCService _generateModuleSFCService;
+        private readonly IInboundInContainerService _inboundInContainerService;
+        private readonly IInboundInSFCContainerService _inboundInSFCContainerService;
+        private readonly IOutPutQtyService _outPutQtyService;
+        private readonly IQueryContainerBindSfcService _queryContainerBindSfcService;
+        private readonly ISingleBarCodeLoadingVerificationService _singleBarCodeLoadingVerificationService;
+
+
 
         /// <summary>
         /// 构造函数
@@ -36,15 +62,39 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="equipmentService"></param>
         /// <param name="bindSFCService"></param>
         /// <param name="bindContainerService"></param>
+        /// <param name="cCDFileUploadCompleteService"></param>
+        /// <param name="feedingConsumptionService"></param>
+        /// <param name="generateModuleSFCService"></param>
+        /// <param name="inboundInContainerService"></param>
+        /// <param name="inboundInSFCContainerService"></param>
+        /// <param name="outPutQtyService"></param>
+        /// <param name="queryContainerBindSfcService"></param>
+        /// <param name="singleBarCodeLoadingVerificationService"></param>
         public EquipmentController(ILogger<EquipmentController> logger,
             IEquipmentService equipmentService,
             IBindSFCService bindSFCService,
-            IBindContainerService bindContainerService)
+            IBindContainerService bindContainerService,
+            ICCDFileUploadCompleteService cCDFileUploadCompleteService,
+            IFeedingConsumptionService feedingConsumptionService,
+            IGenerateModuleSFCService generateModuleSFCService,
+            IInboundInContainerService inboundInContainerService,
+            IInboundInSFCContainerService inboundInSFCContainerService,
+            IOutPutQtyService outPutQtyService,
+            IQueryContainerBindSfcService queryContainerBindSfcService,
+            ISingleBarCodeLoadingVerificationService singleBarCodeLoadingVerificationService)
         {
             _logger = logger;
             _equipmentService = equipmentService;
             _bindSFCService = bindSFCService;
             _bindContainerService = bindContainerService;
+            _cCDFileUploadCompleteService = cCDFileUploadCompleteService;
+            _feedingConsumptionService = feedingConsumptionService;
+            _generateModuleSFCService = generateModuleSFCService;
+            _inboundInContainerService = inboundInContainerService;
+            _inboundInSFCContainerService = inboundInSFCContainerService;
+            _outPutQtyService = outPutQtyService;
+            _queryContainerBindSfcService = queryContainerBindSfcService;
+            _singleBarCodeLoadingVerificationService = singleBarCodeLoadingVerificationService;
         }
 
 
@@ -199,6 +249,115 @@ namespace Hymson.MES.Equipment.Api.Controllers
         public async Task UnBindContainerAsync(UnBindContainerRequest request)
         {
             await _bindContainerService.UnBindContainerAsync(request);
+        }
+
+
+        /// <summary>
+        /// 进站-容器
+        /// HY-MES-EQU-023 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("InboundInContainer")]
+        public async Task InboundInContainerAsync(InboundInContainerRequest request)
+        {
+            await _inboundInContainerService.InboundInContainerAsync(request);
+        }
+
+        /// <summary>
+        /// 请求生成模组码-电芯堆叠
+        ///HY-MES-EQU-024 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("GenerateModuleSFC")]
+        public async Task GenerateModuleSFCAsync(GenerateModuleSFCRequest request)
+        {
+            await _generateModuleSFCService.GenerateModuleSFCAsync(request);
+        }
+
+        /// <summary>
+        ///进站-电芯和托盘-装盘2
+        /// HY-MES-EQU-025 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("InboundInSFCContainer")]
+        public async Task InboundInSFCContainerAsync(InboundInSFCContainerRequest request)
+        {
+            await _inboundInSFCContainerService.InboundInSFCContainerAsync(request);
+        }
+
+
+        /// <summary>
+        /// CCD文件上传完成
+        /// HY-MES-EQU-026  
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("CCDFileUploadComplete")]
+        public async Task CCDFileUploadCompleteAsync(CCDFileUploadCompleteRequest request)
+        {
+            await _cCDFileUploadCompleteService.CCDFileUploadCompleteAsync(request);
+        }
+
+        /// <summary>
+        /// 上报物料消耗
+        ///HY-MES-EQU-027
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("FeedingConsumption")]
+        public async Task FeedingConsumptionAsync(FeedingConsumptionRequest request)
+        {
+            await _feedingConsumptionService.FeedingConsumptionAsync(request);
+        }
+
+
+        /// <summary>
+        /// 单体条码上料校验
+        /// HY-MES-EQU-028
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("SingleBarCodeLoadingVerification")]
+        public async Task SingleBarCodeLoadingVerificationAsync(SingleBarCodeLoadingVerificationRequest request)
+        {
+            await _singleBarCodeLoadingVerificationService.SingleBarCodeLoadingVerificationAsync(request);
+        }
+
+
+        /// <summary>
+        ///产出上报数量
+        ///HY-MES-EQU-029   
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("OutPutQty")]
+        public async Task OutPutQtyAsync(OutPutQtyRequest request)
+        {
+            await _outPutQtyService.OutPutQtyAsync(request);
+        }
+
+
+        /// <summary>
+        ///容器内条码查询
+        ///HY-MES-EQU-035  
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("QueryContainerBindSfc")]
+        public async Task QueryContainerBindSfcAsync(QueryContainerBindSfcRequest request)
+        {
+            await _queryContainerBindSfcService.QueryContainerBindSfcAsync(request);
         }
 
     }
