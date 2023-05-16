@@ -729,6 +729,22 @@
 
         #endregion
 
+
+        #region 设备对接错误
+
+        #region 设备对接公用
+        public const string MES19001 = "设备编码不能为空";
+        public const string MES19002 = "资源编码不能为空";
+        public const string MES19003 = "SFC条码不能为空";
+        public const string MES19004 = "调用本地时间不能为空";
+        #endregion
+
+        public const string MES19101 = "绑定的电芯条码列表不能为空";
+        public const string MES19102 = "容器编码不能为空";
+        public const string MES19103 = "容器电芯条码列表不能为空";
+
+        #endregion
+
         #endregion
 
         #region 系统执行出错 业务逻辑出错
@@ -743,5 +759,6 @@
         //public const string MES30100 = "MES30100";
         //public const string MES30101 = "MES30101";
         #endregion
+
     }
 }
