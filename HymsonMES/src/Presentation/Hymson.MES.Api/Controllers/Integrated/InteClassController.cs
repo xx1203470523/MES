@@ -38,6 +38,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <summary>
         /// 添加（班制维护）
         /// </summary>
+        /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
         public async Task CreateAsync(InteClassSaveDto createDto)
@@ -48,6 +49,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <summary>
         /// 更新（班制维护）
         /// </summary>
+        /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
         public async Task ModifyAsync(InteClassSaveDto modifyDto)
