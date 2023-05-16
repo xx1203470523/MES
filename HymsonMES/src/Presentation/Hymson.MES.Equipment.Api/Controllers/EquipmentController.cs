@@ -15,12 +15,12 @@ namespace Hymson.MES.Equipment.Api.Controllers
     /// </summary>
     [Route("api/v1/EquApi")]
     [ApiController]
-    public class HymsonController : Controller
+    public class EquipmentController : Controller
     {
         /// <summary>
         /// 日志
         /// </summary>
-        private readonly ILogger<HymsonController> _logger;
+        private readonly ILogger<EquipmentController> _logger;
 
         /// <summary>
         /// 业务接口（设备）
