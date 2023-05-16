@@ -84,6 +84,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteJobBusinessRelationRepository, InteJobBusinessRelationRepository>();
             services.AddSingleton<IInteJobRepository, InteJobRepository>();
             services.AddSingleton<IInteWorkCenterRepository, InteWorkCenterRepository>();
+            services.AddSingleton<IInteTrayRepository, InteTrayRepository>();
 
             #region CodeRule
             services.AddSingleton<IInteCodeRulesRepository, InteCodeRulesRepository>();
@@ -183,6 +184,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuContainerPackRecordRepository, ManuContainerPackRecordRepository>();
             services.AddSingleton<IManuContainerPackRepository, ManuContainerPackRepository>();
             services.AddSingleton<IManuContainerBarcodeRepository, ManuContainerBarcodeRepository>();
+
+            services.AddSingleton<IManuTrayLoadRepository, ManuTrayLoadRepository>();
+            services.AddSingleton<IManuTraySfcRecordRepository, ManuTraySfcRecordRepository>();
+            services.AddSingleton<IManuTraySfcRelationRepository, ManuTraySfcRelationRepository>();
             #endregion
 
             #region Warehouse 

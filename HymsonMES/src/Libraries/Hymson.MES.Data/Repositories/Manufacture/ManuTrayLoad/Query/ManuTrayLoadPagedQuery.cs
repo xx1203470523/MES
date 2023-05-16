@@ -1,0 +1,19 @@
+/*
+ *creator: Karl
+ *
+ *describe: 托盘装载信息表 分页查询类 | 代码由框架生成
+ *builder:  chenjianxiong
+ *build datetime: 2023-05-16 11:10:43
+ */
+using Hymson.Infrastructure;
+
+namespace Hymson.MES.Data.Repositories.Manufacture
+{
+    /// <summary>
+    /// 托盘装载信息表 分页参数
+    /// </summary>
+    public class ManuTrayLoadPagedQuery : PagerInfo
+    {
+
+    }
+}
