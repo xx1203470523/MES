@@ -11,16 +11,16 @@ using Microsoft.AspNetCore.Mvc;
 namespace Hymson.MES.Equipment.Api.Controllers
 {
     /// <summary>
-    /// 设备
+    /// 设备接口（海目星设备）
     /// </summary>
     [Route("api/v1/EquApi")]
     [ApiController]
-    public class EquipmentController : Controller
+    public class HymsonController : Controller
     {
         /// <summary>
         /// 日志
         /// </summary>
-        private readonly ILogger<EquipmentController> _logger;
+        private readonly ILogger<HymsonController> _logger;
 
         /// <summary>
         /// 业务接口（设备）
