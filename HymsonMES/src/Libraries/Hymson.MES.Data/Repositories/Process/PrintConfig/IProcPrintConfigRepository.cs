@@ -62,9 +62,9 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="PrintName"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task<ProcPrinterEntity> GetByPrintNameAsync(string PrintName);
+        Task<ProcPrinterEntity> GetByPrintNameAsync(EntityByCodeQuery param);
 
         /// <summary>
         /// 根据IP查询对象

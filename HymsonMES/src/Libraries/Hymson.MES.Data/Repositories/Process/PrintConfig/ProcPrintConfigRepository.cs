@@ -89,10 +89,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="PrintName"></param>
         /// <returns></returns>
-        public async Task<ProcPrinterEntity> GetByPrintNameAsync(string PrintName)
+        public async Task<ProcPrinterEntity> GetByPrintNameAsync(EntityByCodeQuery param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcPrinterEntity>(GetByPrintNameSql, new { PrintName });
+            return await conn.QueryFirstOrDefaultAsync<ProcPrinterEntity>(GetByPrintNameSql, param);
         }
 
         /// <summary>
@@ -215,7 +215,7 @@ namespace Hymson.MES.Data.Repositories.Process
         //const string GetByGroupIdSql = "SELECT * FROM `proc_printer` WHERE `IsDeleted` = 0 AND EquipmentGroupId = @EquipmentGroupId;";
         const string GetBaseListSql = "SELECT * FROM `proc_printer` WHERE `IsDeleted` = 0;";
         const string GetByPrintIpSql = "SELECT * FROM proc_printer WHERE SiteId = @Site AND IsDeleted = 0 AND PrintIp = @Code;";
-        const string GetByPrintNameSql = "SELECT * FROM `proc_printer` WHERE `IsDeleted` = 0 AND PrintName = @PrintName;";
+        const string GetByPrintNameSql = "SELECT * FROM `proc_printer` WHERE `IsDeleted` = 0 AND PrintName = @Code AND SiteId = @Site;";
         const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `proc_printer` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_printer` /**where**/";
         const string GetEntitiesSqlTemplate = "";
