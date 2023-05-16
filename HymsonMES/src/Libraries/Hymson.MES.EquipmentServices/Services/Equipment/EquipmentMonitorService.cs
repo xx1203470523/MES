@@ -1,5 +1,4 @@
-﻿using Hymson.Authentication.JwtBearer;
-using Hymson.MES.Core.Domain.Equipment;
+﻿using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.EquipmentServices.Request.Equipment;
 using Hymson.Snowflake;
@@ -12,7 +11,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
     /// <summary>
     /// 设备服务
     /// </summary>
-    public class EquipmentService : IEquipmentService
+    public class EquipmentMonitorService : IEquipmentMonitorService
     {
         /// <summary>
         /// 
@@ -35,7 +34,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// <param name="currentEquipment"></param>
         /// <param name="equipmentHeartbeatRepository"></param>
         /// <param name="equipmentAlarmRepository"></param>
-        public EquipmentService(ICurrentEquipment currentEquipment,
+        public EquipmentMonitorService(ICurrentEquipment currentEquipment,
             IEquipmentHeartbeatRepository equipmentHeartbeatRepository,
             IEquipmentAlarmRepository equipmentAlarmRepository)
         {
@@ -52,6 +51,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// <returns></returns>
         public async Task EquipmentHeartbeatAsync(EquipmentHeartbeatRequest request)
         {
+            // TODO
             var userCode = request.EquipmentCode; //_currentEquipment.Code
             var nowTime = HymsonClock.Now();
 
@@ -79,8 +79,8 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
                 UpdatedBy = entity.UpdatedBy,
                 UpdatedOn = entity.UpdatedOn,
                 EquipmentId = entity.EquipmentId,
-                Status = entity.Status,
-                LocalTime = request.LocalTime
+                LocalTime = request.LocalTime,
+                Status = entity.Status
             });
             trans.Complete();
         }
@@ -102,6 +102,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// <returns></returns>
         public async Task EquipmentAlarmAsync(EquipmentAlarmRequest request)
         {
+            // TODO
             var userCode = request.EquipmentCode; //_currentEquipment.Code
             var nowTime = HymsonClock.Now();
 
@@ -113,6 +114,11 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
                 CreatedOn = nowTime,
                 UpdatedBy = userCode,
                 UpdatedOn = nowTime,
+                EquipmentId = _currentEquipment.Id ?? 0,
+                LocalTime = request.LocalTime,
+                FaultCode = request.AlarmCode,
+                AlarmMsg = request.AlarmMsg ?? "",
+                Status = request.Status
             });
         }
 

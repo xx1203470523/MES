@@ -39,9 +39,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         private readonly ILogger<EquipmentController> _logger;
 
         /// <summary>
-        /// 业务接口（设备）
+        /// 业务接口（设备监控服务）
         /// </summary>
-        private readonly IEquipmentService _equipmentService;
+        private readonly IEquipmentMonitorService _equipmentService;
         private readonly IBindSFCService _bindSFCService;
         private readonly IBindContainerService _bindContainerService;
         private readonly ICCDFileUploadCompleteService _cCDFileUploadCompleteService;
@@ -71,7 +71,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="queryContainerBindSfcService"></param>
         /// <param name="singleBarCodeLoadingVerificationService"></param>
         public EquipmentController(ILogger<EquipmentController> logger,
-            IEquipmentService equipmentService,
+            IEquipmentMonitorService equipmentService,
             IBindSFCService bindSFCService,
             IBindContainerService bindContainerService,
             ICCDFileUploadCompleteService cCDFileUploadCompleteService,

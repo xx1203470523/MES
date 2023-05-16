@@ -5,7 +5,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
     /// <summary>
     /// 设备接口
     /// </summary>
-    public interface IEquipmentService
+    public interface IEquipmentMonitorService
     {
         /// <summary>
         /// 设备心跳

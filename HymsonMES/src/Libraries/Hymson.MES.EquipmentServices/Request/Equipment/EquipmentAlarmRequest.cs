@@ -20,6 +20,6 @@ namespace Hymson.MES.EquipmentServices.Request.Equipment
         /// <summary>
         ///  故障详细信息
         /// </summary>
-        public int? AlarmMsg { get; set; }
+        public string? AlarmMsg { get; set; }
     }
 }

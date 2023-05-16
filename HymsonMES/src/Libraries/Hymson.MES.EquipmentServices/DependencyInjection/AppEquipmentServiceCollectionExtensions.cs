@@ -87,7 +87,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IQueryContainerBindSfcService, QueryContainerBindSfcService>();//容器绑定条码查询
 
 
-            services.AddSingleton<IEquipmentService, EquipmentService>();   // 设备
+            services.AddSingleton<IEquipmentMonitorService, EquipmentMonitorService>();   // 设备
         }
 
         /// <summary>

@@ -8,14 +8,14 @@ namespace Hymson.MES.Core.Enums
     public enum EquipmentAlarmStatusEnum : sbyte
     {
         /// <summary>
-        /// 自动恢复运行
-        /// </summary>
-        [Description("恢复")]
-        Recover = 0,
-        /// <summary>
         /// 触发
         /// </summary>
         [Description("触发")]
-        Trigger = 1
+        Trigger = 1,
+        /// <summary>
+        /// 自动恢复运行
+        /// </summary>
+        [Description("恢复")]
+        Recover = 2
     }
 }
