@@ -1,5 +1,4 @@
-﻿using Hymson.Authentication.JwtBearer;
-using Hymson.MES.Core.Domain.Equipment;
+﻿using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.EquipmentServices.Request.Equipment;
 using Hymson.Snowflake;
@@ -12,7 +11,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
     /// <summary>
     /// 设备服务
     /// </summary>
-    public class EquipmentService : IEquipmentService
+    public class EquipmentMonitorService : IEquipmentMonitorService
     {
         /// <summary>
         /// 
@@ -35,7 +34,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// <param name="currentEquipment"></param>
         /// <param name="equipmentHeartbeatRepository"></param>
         /// <param name="equipmentAlarmRepository"></param>
-        public EquipmentService(ICurrentEquipment currentEquipment,
+        public EquipmentMonitorService(ICurrentEquipment currentEquipment,
             IEquipmentHeartbeatRepository equipmentHeartbeatRepository,
             IEquipmentAlarmRepository equipmentAlarmRepository)
         {
