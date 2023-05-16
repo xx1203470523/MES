@@ -13,16 +13,16 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="inteClassEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(InteClassEntity inteClassEntity);
+        Task<int> InsertAsync(InteClassEntity entity);
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="inteClassEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(InteClassEntity inteClassEntity);
+        Task<int> UpdateAsync(InteClassEntity entity);
 
         /// <summary>
         /// 批量删除
@@ -48,8 +48,8 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="inteClassPagedQuery"></param>
+        /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<InteClassEntity>> GetPagedListAsync(InteClassPagedQuery inteClassPagedQuery);
+        Task<PagedInfo<InteClassEntity>> GetPagedListAsync(InteClassPagedQuery pagedQuery);
     }
 }
