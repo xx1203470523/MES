@@ -16,12 +16,12 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="validationInBoundMoreRequestRules"></param>
         /// <param name="currentEquipment"></param>
         public EquipmentService(ICurrentEquipment currentEquipment)
         {
             _currentEquipment = currentEquipment;
         }
+
 
         /// <summary>
         /// 设备心跳
@@ -30,6 +30,9 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// <returns></returns>
         public async Task EquipmentHeartbeatAsync(EquipmentHeartbeatRequest request)
         {
+            var id = _currentEquipment.Id;
+            // TODO 
+
             await Task.CompletedTask;
         }
 
