@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Equipment
 {
@@ -33,7 +34,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 状态;1、开启 2、恢复
         /// </summary>
-        public bool? Status { get; set; }
+        public EquipmentAlarmStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 传输时间

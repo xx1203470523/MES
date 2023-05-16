@@ -51,6 +51,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// <returns></returns>
         public async Task EquipmentHeartbeatAsync(EquipmentHeartbeatRequest request)
         {
+            // TODO
             var userCode = request.EquipmentCode; //_currentEquipment.Code
             var nowTime = HymsonClock.Now();
 
@@ -78,8 +79,8 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
                 UpdatedBy = entity.UpdatedBy,
                 UpdatedOn = entity.UpdatedOn,
                 EquipmentId = entity.EquipmentId,
-                Status = entity.Status,
-                LocalTime = request.LocalTime
+                LocalTime = request.LocalTime,
+                Status = entity.Status
             });
             trans.Complete();
         }
@@ -101,6 +102,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// <returns></returns>
         public async Task EquipmentAlarmAsync(EquipmentAlarmRequest request)
         {
+            // TODO
             var userCode = request.EquipmentCode; //_currentEquipment.Code
             var nowTime = HymsonClock.Now();
 
@@ -112,6 +114,11 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
                 CreatedOn = nowTime,
                 UpdatedBy = userCode,
                 UpdatedOn = nowTime,
+                EquipmentId = _currentEquipment.Id ?? 0,
+                LocalTime = request.LocalTime,
+                FaultCode = request.AlarmCode,
+                AlarmMsg = request.AlarmMsg ?? "",
+                Status = request.Status
             });
         }
 
