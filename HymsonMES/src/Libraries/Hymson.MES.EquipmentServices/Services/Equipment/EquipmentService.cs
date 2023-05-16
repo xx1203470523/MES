@@ -1,4 +1,5 @@
-﻿using Hymson.MES.EquipmentServices.Request.Equipment;
+﻿using Hymson.MES.Data.Repositories.Equipment;
+using Hymson.MES.EquipmentServices.Request.Equipment;
 using Hymson.Web.Framework.WorkContext;
 
 namespace Hymson.MES.EquipmentServices.Services.Equipment
@@ -14,12 +15,20 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         private readonly ICurrentEquipment _currentEquipment;
 
         /// <summary>
-        /// 
+        /// 仓储（设备心跳）
+        /// </summary>
+        private readonly IEquipmentHeartbeatRepository _equipmentHeartbeatRepository;
+
+        /// <summary>
+        /// 构造函数
         /// </summary>
         /// <param name="currentEquipment"></param>
-        public EquipmentService(ICurrentEquipment currentEquipment)
+        /// <param name="equipmentHeartbeatRepository"></param>
+        public EquipmentService(ICurrentEquipment currentEquipment,
+            IEquipmentHeartbeatRepository equipmentHeartbeatRepository)
         {
             _currentEquipment = currentEquipment;
+            _equipmentHeartbeatRepository = equipmentHeartbeatRepository;
         }
 
 
