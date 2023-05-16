@@ -107,7 +107,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuContainerPackEntity>> GetByContainerBarCodeIdsAsync(long[] ids);
+        Task<IEnumerable<ManuContainerPackEntity>> GetByContainerBarCodeIdsAsync(long[] ids,long siteId);
 
         /// <summary>
         /// 根据IDs批量获取数据

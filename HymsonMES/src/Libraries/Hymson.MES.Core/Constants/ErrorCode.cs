@@ -520,6 +520,7 @@
         public const string MES16319 = "SFC条码{SFC}已存在返修信息，不允许操作。";
         public const string MES16320 = "工单{ordercode}状态不为已下达|生产中，无法继续操作。";
         public const string MES16321 = "物料{Code}未添加组件，请检查";
+        public const string MES16322 = "SFC条码{SFC}已报废，不允许操作。";
         #endregion
 
         #region 生产
@@ -636,7 +637,7 @@
         public const string MES16713 = "容器包装，配置面板不允许排队产品";
         public const string MES16714 = "容器包装，工序信息未找到";
         public const string MES16715 = "容器包装，工序中未指定包装等级";
-        public const string MES16716 = "容器包装，不允许混物料版本包装";
+        public const string MES16716 = "容器包装，不允许混物料版本包装 ";
         public const string MES16717 = "容器包装，超过了最大包装数量，不允许包装";
         public const string MES16718 = "容器包装，未找到该条码的子级包装记录";
         public const string MES16719 = "容器包装，物料编码没有维护容器规格";
@@ -647,6 +648,10 @@
         public const string MES16724 = "容器包装，资源信息未找到";
         public const string MES16725 = "容器包装，资源对应资源类型和工序对应资源类型不一致";
         public const string MES16726 = "容器编码不存在";
+        public const string MES16727= "容器包装，二级包装只能装一级容器!";
+        public const string MES16728 = "容器包装，三级包装只能装二级容器!";
+        public const string MES16729 = "容器包装，容器{barcode}未关闭!";
+        public const string MES16730= "同一个容器不允许不同物料进行包装!";
         #endregion
 
         #region 绑定工单激活  MES16800
