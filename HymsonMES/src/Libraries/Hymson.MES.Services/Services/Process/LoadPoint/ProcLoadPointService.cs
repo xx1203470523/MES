@@ -424,7 +424,6 @@ namespace Hymson.MES.Services.Services.Process
                 loadPointDto.LinkResources = PrepareEntityToDto<ProcLoadPointLinkResourceView, ProcLoadPointLinkResourceViewDto>(loadPointLinkResources);
             }
 
-
             return loadPointDto;
         }
 

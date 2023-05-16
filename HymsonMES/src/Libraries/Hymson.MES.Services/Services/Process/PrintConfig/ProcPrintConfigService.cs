@@ -75,7 +75,7 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
         /// <returns></returns>
         public async Task<ProcPrinterDto> GetByPrintNameAsync(string printName)
         {
-            var entity = await _printConfigRepository.GetByPrintNameAsync(printName);
+            var entity = await _printConfigRepository.GetByPrintNameAsync(new EntityByCodeQuery { Code= printName,Site=_currentSite.SiteId??0});
             return entity?.ToModel<ProcPrinterDto>() ?? new ProcPrinterDto();
         }
 
@@ -149,7 +149,7 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
                 PrintIp = param.PrintIp
             };
 
-            var nameEntity = await _printConfigRepository.GetByPrintNameAsync(entity.PrintName);
+            var nameEntity = await _printConfigRepository.GetByPrintNameAsync(new EntityByCodeQuery { Site=_currentSite.SiteId??0,Code= param.PrintName });
             if (nameEntity != null) throw new BusinessException(nameof(ErrorCode.MES10341));
 
             // 检查IP是否重复
