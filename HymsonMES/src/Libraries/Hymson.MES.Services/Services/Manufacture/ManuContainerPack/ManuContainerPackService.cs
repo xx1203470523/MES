@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 容器装载表（物理删除）    服务 | 代码由框架生成
- *builder:  wxk
- *build datetime: 2023-04-12 02:33:13
- */
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -15,6 +8,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -25,9 +19,6 @@ using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using MySql.Data.MySqlClient;
-using System.Collections.Generic;
-using System.Reflection.Emit;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -40,6 +31,10 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
 
+        /// <summary>
+        /// 容器条码表 仓储
+        /// </summary>
+        private readonly IManuContainerBarcodeRepository _manuContainerBarcodeRepository;
         /// <summary>
         /// 容器装载表（物理删除） 仓储
         /// </summary>
@@ -55,6 +50,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IManuFacePlateButtonService _manuFacePlateButtonService;
 
         public ManuContainerPackService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IManuContainerBarcodeRepository manuContainerBarcodeRepository,
             IManuContainerPackRepository manuContainerPackRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IManuContainerPackRecordService manuContainerPackRecordService,
@@ -65,6 +61,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _manuContainerBarcodeRepository = manuContainerBarcodeRepository;
             _manuContainerPackRepository = manuContainerPackRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _validationCreateRules = validationCreateRules;
@@ -171,6 +168,27 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             //实体到DTO转换 装载数据
             List<ManuContainerPackDto> manuContainerPackDtos = await PrepareManuContainerPackDtos(pagedInfo);
+
+            var containerPackEntities = new List<ManuContainerPackEntity>();
+            var barCodes = manuContainerPackDtos.Select(x => x.LadeBarCode).ToArray();
+            var packBarCodesEntities = await _manuContainerBarcodeRepository.GetByCodesAsync(new ManuContainerBarcodeQuery
+            {
+                BarCodes = barCodes,
+                SiteId = _currentSite.SiteId ?? 0
+            });
+
+            if (packBarCodesEntities.Any())
+            {
+                var packBarCodeIds = packBarCodesEntities.Select(x => x.Id).ToArray();
+                containerPackEntities = (await _manuContainerPackRepository.GetByContainerBarCodeIdsAsync(packBarCodeIds, _currentSite.SiteId ?? 0)).ToList();
+            }
+
+            foreach (var item in manuContainerPackDtos)
+            {
+                var barCode = packBarCodesEntities.FirstOrDefault(x => x.BarCode == item.LadeBarCode);
+                var count = barCode==null?1:  containerPackEntities.Count(x => x.ContainerBarCodeId == barCode?.Id);
+                item.Count = count;
+            }
             return new PagedInfo<ManuContainerPackDto>(manuContainerPackDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
@@ -228,7 +246,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="manuContainerPackDto"></param>
+        /// <param name="manuContainerPackModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyManuContainerPackAsync(ManuContainerPackModifyDto manuContainerPackModifyDto)
         {
@@ -271,17 +289,17 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="manuFacePlateContainerPackExJobDto"></param>
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
-        public async Task<Dictionary<string, JobResponseDto>> ExecuteexecuteJobAsync(ManuFacePlateContainerPackExJobDto manuFacePlateContainerPackExJobDto)
+        public async Task<Dictionary<string, JobResponseDto>> ExecuteJobAsync(ManuFacePlateContainerPackExJobDto manuFacePlateContainerPackExJobDto)
         {
             #region  验证数据
-            if (string.IsNullOrWhiteSpace(manuFacePlateContainerPackExJobDto.SFC))
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16708));
-            }
+            //if (string.IsNullOrWhiteSpace(manuFacePlateContainerPackExJobDto.SFC))
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES16708));
+            //}
             #endregion
 
             #region 调用作业
-            manuFacePlateContainerPackExJobDto.SFC = manuFacePlateContainerPackExJobDto.SFC.Trim();
+            manuFacePlateContainerPackExJobDto.SFC = "";//manuFacePlateContainerPackExJobDto.SFC.Trim();
             var jobDto = new ButtonRequestDto
             {
                 FacePlateId = manuFacePlateContainerPackExJobDto.FacePlateId,

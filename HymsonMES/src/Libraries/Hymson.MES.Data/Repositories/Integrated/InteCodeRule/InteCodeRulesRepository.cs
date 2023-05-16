@@ -12,6 +12,7 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Integrated.InteCodeRule.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Microsoft.Extensions.Options;
@@ -69,10 +70,10 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<InteCodeRulesEntity> GetInteCodeRulesByProductIdAsync(long productId)
+        public async Task<InteCodeRulesEntity> GetInteCodeRulesByProductIdAsync(InteCodeRulesByProductQuery pram)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<InteCodeRulesEntity>(GetInteCodeRulesByProductIdSql, new { ProductId = productId });
+            return await conn.QueryFirstOrDefaultAsync<InteCodeRulesEntity>(GetInteCodeRulesByProductIdSql, pram);
         }
 
         /// <summary>
@@ -97,6 +98,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("cr.IsDeleted=0");
+            sqlBuilder.Where("cr.SiteId=@SiteId");
 
             if (!string.IsNullOrWhiteSpace(inteCodeRulesPagedQuery.MaterialCode))
             {
@@ -251,7 +253,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
                             FROM `inte_code_rules`  WHERE Id = @Id ";
         const string GetInteCodeRulesByProductIdSql = @"SELECT 
                                `Id`, `ProductId`, `CodeType`, `PackType`, `Base`, `IgnoreChar`, `Increment`, `OrderLength`, `ResetType`, StartNumber, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`
-                            FROM `inte_code_rules`  WHERE ProductId = @ProductId ";
+                            FROM `inte_code_rules`  WHERE ProductId = @ProductId AND CodeType=@CodeType AND IsDeleted=0 ";
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `ProductId`, `CodeType`, `PackType`, `Base`, `IgnoreChar`, `Increment`, `OrderLength`, `ResetType`, StartNumber, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`
                             FROM `inte_code_rules`  WHERE Id IN @ids ";

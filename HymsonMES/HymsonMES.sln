@@ -25,19 +25,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hymson.MES.Services", "src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hymson.MES.HttpClients", "src\Libraries\Hymson.MES.HttpClients\Hymson.MES.HttpClients.csproj", "{ECEC1615-92D0-4AA7-8F96-8AA0FC6C2169}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hymson.MES.ServicesTests", "src\Libraries\Hymson.MES.ServicesTests\Hymson.MES.ServicesTests.csproj", "{6708AD61-8790-42D4-AD30-BCF30448083E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hymson.MES.CoreServices", "src\Libraries\Hymson.MES.CoreServices\Hymson.MES.CoreServices.csproj", "{452BAACE-538A-435D-A206-77339B60CE6C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hymson.MES.CoreServices", "src\Libraries\Hymson.MES.CoreServices\Hymson.MES.CoreServices.csproj", "{452BAACE-538A-435D-A206-77339B60CE6C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hymson.MES.BackgroundServices", "src\Libraries\Hymson.MES.BackgroundServices\Hymson.MES.BackgroundServices.csproj", "{CE3AFDAB-35F1-4566-8915-FBBA5545D37A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hymson.MES.BackgroundServices", "src\Libraries\Hymson.MES.BackgroundServices\Hymson.MES.BackgroundServices.csproj", "{CE3AFDAB-35F1-4566-8915-FBBA5545D37A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hymson.MES.EquipmentServices", "src\Libraries\Hymson.MES.EquipmentServices\Hymson.MES.EquipmentServices.csproj", "{76BC653D-A9A5-4CE6-A69A-23B07CE1C4A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hymson.MES.EquipmentServices", "src\Libraries\Hymson.MES.EquipmentServices\Hymson.MES.EquipmentServices.csproj", "{76BC653D-A9A5-4CE6-A69A-23B07CE1C4A6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hymson.MES.SystemServices", "src\Libraries\Hymson.MES.SystemServices\Hymson.MES.SystemServices.csproj", "{7E82834B-195D-415B-8932-7AA78E2BFFD8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hymson.MES.SystemServices", "src\Libraries\Hymson.MES.SystemServices\Hymson.MES.SystemServices.csproj", "{7E82834B-195D-415B-8932-7AA78E2BFFD8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hymson.MES.Equipment.Api", "src\Presentation\Hymson.MES.Equipment.Api\Hymson.MES.Equipment.Api.csproj", "{1059FE28-8A7C-4E9A-BA74-410137A0871E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hymson.MES.Equipment.Api", "src\Presentation\Hymson.MES.Equipment.Api\Hymson.MES.Equipment.Api.csproj", "{1059FE28-8A7C-4E9A-BA74-410137A0871E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hymson.MES.System.Api", "src\Presentation\Hymson.MES.System.Api\Hymson.MES.System.Api.csproj", "{99086A57-0DE4-4BF6-9B20-DC33046BA5E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hymson.MES.System.Api", "src\Presentation\Hymson.MES.System.Api\Hymson.MES.System.Api.csproj", "{99086A57-0DE4-4BF6-9B20-DC33046BA5E0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -73,10 +71,6 @@ Global
 		{ECEC1615-92D0-4AA7-8F96-8AA0FC6C2169}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ECEC1615-92D0-4AA7-8F96-8AA0FC6C2169}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ECEC1615-92D0-4AA7-8F96-8AA0FC6C2169}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6708AD61-8790-42D4-AD30-BCF30448083E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6708AD61-8790-42D4-AD30-BCF30448083E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6708AD61-8790-42D4-AD30-BCF30448083E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6708AD61-8790-42D4-AD30-BCF30448083E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{452BAACE-538A-435D-A206-77339B60CE6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{452BAACE-538A-435D-A206-77339B60CE6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{452BAACE-538A-435D-A206-77339B60CE6C}.Release|Any CPU.ActiveCfg = Release|Any CPU

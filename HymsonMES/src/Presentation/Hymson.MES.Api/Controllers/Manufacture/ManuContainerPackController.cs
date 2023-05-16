@@ -1,16 +1,7 @@
-/*
- *creator: Karl
- *
- *describe: 容器装载表（物理删除）    控制器 | 代码由框架生成  
- *builder:  wxk
- *build datetime: 2023-04-12 02:33:13
- */
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Manufacture
@@ -20,7 +11,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
     /// @author wxk
     /// @date 2023-04-12 02:33:13
     /// </summary>
-    
+
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ManuContainerPackController : ControllerBase
@@ -41,8 +32,8 @@ namespace Hymson.MES.Api.Controllers.Manufacture
             _logger = logger;
         }
 
-        #region 框架生成方法
 
+        #region 框架生成方法
         /// <summary>
         /// 分页查询列表（容器装载表（物理删除））
         /// </summary>
@@ -124,9 +115,9 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("exJob")]
-        public async Task<Dictionary<string, JobResponseDto>> ExecuteexecuteJobAsync(ManuFacePlateContainerPackExJobDto manuFacePlateContainerPackExJobDto)
+        public async Task<Dictionary<string, JobResponseDto>> ExecuteJobAsync(ManuFacePlateContainerPackExJobDto manuFacePlateContainerPackExJobDto)
         {
-            return await _manuContainerPackService.ExecuteexecuteJobAsync(manuFacePlateContainerPackExJobDto);
+            return await _manuContainerPackService.ExecuteJobAsync(manuFacePlateContainerPackExJobDto);
         }
     }
 }

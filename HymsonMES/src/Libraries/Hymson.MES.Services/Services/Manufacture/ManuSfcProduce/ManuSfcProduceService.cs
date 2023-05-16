@@ -748,6 +748,9 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             #endregion
 
+
+            var lockSfc = sfcList.Where(x => x.Status == SfcProduceStatusEnum.Locked).Select(x => x.SFC).ToArray();
+
             using (var trans = TransactionHelper.GetTransactionScope())
             {
                 if (unLockList != null && unLockList.Any())
@@ -757,7 +760,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                 await _manuSfcProduceRepository.UnLockedSfcProcedureAsync(new UnLockedProcedureCommand
                 {
-                    Sfcs = parm.Sfcs,
+                    Sfcs = lockSfc,
                     UserId = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now()
                 });
@@ -766,7 +769,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
                 trans.Complete();
             }
-        } 
+        }
         #endregion
 
         /// <summary>
@@ -1085,6 +1088,10 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             var pagedInfo = await _manuSfcRepository.GetManuSfcPagedInfoAsync(manuSfcProducePagedQuery);
+            if (pagedInfo == null || !pagedInfo.Data.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18022)).WithData("SFC", string.Join(",", manuSfcProducePagedQuery.SfcArray));
+            }
 
             //实体到DTO转换 装载数据
             List<ManuSfcProduceViewDto> manuSfcProduceDtos = new List<ManuSfcProduceViewDto>();
@@ -2093,7 +2100,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
             if (sfcProduceBusinesss != null && sfcProduceBusinesss.Any())
             {
-                var sfcInfoIds = sfcProduceBusinesss.Select(it => it.SfcProduceId).ToArray();
+              //  var sfcInfoIds = sfcProduceBusinesss.Select(it => it.SfcProduceId).ToArray();
                 var sfcProduceBusinesssList = sfcProduceBusinesss.ToList();
                 var instantLockSfcs = new List<string>();
                 foreach (var business in sfcProduceBusinesssList)

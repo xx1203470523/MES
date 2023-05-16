@@ -438,10 +438,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                     });
 
                     // 条码流转
+                    /*
                     manuSfcCirculationEntities.Add(new ManuSfcCirculationEntity
                     {
 
                     });
+                    */
                     break;
                 }
                 // 数量不够

@@ -196,13 +196,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var sfcRepairs = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Repair });
                 if (sfcRepairs != null && sfcRepairs.Any())
                 {
-                    //var sfcInfoIds = sfcRepairs.Select(it => it.SfcProduceId).ToArray();
-                    //var repairSfcs = manuSfcs.Where(x => sfcInfoIds.Contains(x.SfcInfoId)).Select(x => x.SFC).Distinct().ToArray();
-                    //if (repairSfcs.Any())
-                    //{
-                        var strs = string.Join(",", sfcRepairs.Select(x=>x.Sfc));
-                        throw new CustomerValidationException(nameof(ErrorCode.MES15410)).WithData("sfcs", strs);
-                    //}
+                    var strs = string.Join(",", sfcRepairs.Select(x => x.Sfc));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15410)).WithData("sfcs", strs);
                 }
                 processRouteProcedure = await _manuCommonService.GetFirstProcedureAsync(createDto.BadProcessRouteId ?? 0);
             }
@@ -246,8 +241,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                         BusinessType = ManuSfcProduceBusinessType.Repair,
                         BusinessContent = JsonConvert.SerializeObject(new SfcProduceRepairBo
                         {
-                            ProcessRouteId = item.ProcessRouteId, //createDto.BadProcessRouteId ?? 0,
-                            ProcedureId = item.ProcedureId //processRouteProcedure.ProcedureId
+                            ProcessRouteId = manuSfc.ProcessRouteId, //createDto.BadProcessRouteId ?? 0,
+                            ProcedureId = manuSfc.ProcedureId //processRouteProcedure.ProcedureId
                         }),
                         SiteId = sfcStepEntity.SiteId,
                         CreatedBy = sfcStepEntity.CreatedBy,
@@ -404,7 +399,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES15402));
             }
             var manuSfc = manuSfcs.ToList()[0];
-            var sfcInfoId = manuSfc.SfcInfoId;
+            //var sfcInfoId = manuSfc.SfcInfoId;
 
             //验证是否报废
             if (manuSfc.IsScrap == TrueOrFalseEnum.Yes)
@@ -412,10 +407,10 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES15411)).WithData("sfcs", sfc);
             }
 
-            IEnumerable<long> sfcInfoIds = new[] { sfcInfoId };
+            // IEnumerable<long> sfcInfoIds = new[] { manuSfc.Id };
             // 判断是否已存在返修信息,是否锁定
-            var sfcProduceBusinessEntities = await _manuSfcProduceRepository.GetSfcProduceBusinessBySFCIdsAsync(sfcInfoIds);
-            await VerifyLockOrRepair(sfc, manuSfc.ProcedureId, sfcInfoId);
+            //  var sfcProduceBusinessEntities = await _manuSfcProduceRepository.GetSfcProduceBusinessBySFCIdsAsync(sfcInfoIds);
+            await VerifyLockOrRepair(sfc, manuSfc.ProcedureId, manuSfc.Id);
 
             //判断是否关闭所有不合格信息
             var allunqualifiedIds = badRecordList.Select(x => x.UnqualifiedId.ParseToLong()).Distinct().ToArray();
@@ -542,7 +537,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ProcessRouteId = badReJudgmentDto.BadProcessRouteId ?? 0,
                     ProcedureId = processRouteProcedure.ProcedureId,
                     UpdatedBy = _currentUser.UserName,
-                    Ids =new long[] { manuSfc.Id }
+                    Ids = new long[] { manuSfc.Id }
                 };
                 #endregion
 
@@ -766,7 +761,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
             if (sfcProduceBusinesss != null && sfcProduceBusinesss.Any())
             {
-                var sfcInfoIds = sfcProduceBusinesss.Select(it => it.SfcProduceId).ToArray();
+                //var sfcInfoIds = sfcProduceBusinesss.Select(it => it.SfcProduceId).ToArray();
                 var sfcProduceBusinesssList = sfcProduceBusinesss.ToList();
                 var instantLockSfcs = new List<string>();
                 foreach (var business in sfcProduceBusinesssList)

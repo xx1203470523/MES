@@ -6,6 +6,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer;
@@ -105,7 +106,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
                 DefinitionMethod = entity.DefinitionMethod,
                 MaterialId = entity.MaterialId,
                 MaterialGroupId = entity.MaterialGroupId,
-                Level=entity.Level
+                Level = entity.Level
             });
 
             if (entityByRelation != null) throw new CustomerValidationException(nameof(ErrorCode.MES12503));
@@ -124,6 +125,11 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(modifyDto);
             await ValidationSaveDto(modifyDto);
+            var inteContainerEntity = await  _inteContainerRepository.GetByIdAsync(modifyDto.Id ?? 0);
+            if (inteContainerEntity.Status != SysDataStatusEnum.Build && modifyDto.Status == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12510));
+            }
 
             // DTO转换实体
             var entity = modifyDto.ToEntity<InteContainerEntity>();
@@ -136,7 +142,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
                 MaterialId = entity.MaterialId,
                 MaterialGroupId = entity.MaterialGroupId,
                 Level = entity.Level
-            }) ;
+            });
 
             if (entityByRelation != null && entityByRelation.Id != entity.Id) throw new CustomerValidationException(nameof(ErrorCode.MES12503));
 
@@ -151,6 +157,11 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] idsArr)
         {
+            var list = await _inteContainerRepository.GetByIdsAsync(idsArr);
+            if (list != null && list.Any(x => x.Status != SysDataStatusEnum.Build))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12509));
+            }
             return await _inteContainerRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = idsArr,
@@ -187,8 +198,6 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
 
             return inteContainerEntity.ToModel<InteContainerDto>();
         }
-
-
 
         /// <summary>
         /// 验证对象
