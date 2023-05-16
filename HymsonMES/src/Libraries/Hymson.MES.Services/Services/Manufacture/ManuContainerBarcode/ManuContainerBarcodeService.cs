@@ -178,11 +178,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES16705));
             var facePlateContainerPackEntity = await _manuFacePlateContainerPackRepository.GetByFacePlateIdAsync(facePlateEntity.Id);
             facePlateContainerPackEntity.ProcedureId = createManuContainerBarcodeDto.ProcedureId;
-            if (procobj.PackingLevel == (int)ManuContainerBarcodePackageLevelEnum.First)
+            if (procobj.PackingLevel == (int)LevelEnum.One)
             {
                 return await CreateFirstPackage(createManuContainerBarcodeDto, facePlateContainerPackEntity, manuContainerBarcodeEntity);
             }
-            else if (procobj.PackingLevel == (int)ManuContainerBarcodePackageLevelEnum.Second || procobj.PackingLevel == (int)ManuContainerBarcodePackageLevelEnum.Third)
+            else if (procobj.PackingLevel == (int)LevelEnum.Two || procobj.PackingLevel == (int)LevelEnum.Three)
             {
                 return await CreateSecondPackage(createManuContainerBarcodeDto, facePlateContainerPackEntity, manuContainerBarcodeEntity, procobj.PackingLevel.Value);
             }
@@ -404,8 +404,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                     }
                 }
             }
-
         }
+
         private async Task<ManuContainerBarcodeView> CreateSecondPackage(CreateManuContainerBarcodeDto createManuContainerBarcodeDto
             , ManuFacePlateContainerPackEntity facePlateContainerPackEntity, ManuContainerBarcodeEntity manuContainerBarcodeEntity, int level)
         {
@@ -432,6 +432,22 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var prebarcodeobj = await _manuContainerBarcodeRepository.GetByCodeAsync(new ManuContainerBarcodeQuery() { BarCode = createManuContainerBarcodeDto.BarCode, SiteId = manuContainerBarcodeEntity.SiteId });
                 if (prebarcodeobj == null)
                     throw new CustomerValidationException(nameof(ErrorCode.MES16718));
+
+                //判断容器是否已关闭，只有关闭的才能装箱
+                if (prebarcodeobj.Status != (int)ManuContainerBarcodeStatusEnum.Close)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16729)).WithData("barcode", prebarcodeobj.BarCode);
+                }
+
+                if (prebarcodeobj.PackLevel==level&& level==(int)LevelEnum.Two)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16727));
+                }
+                if (prebarcodeobj.PackLevel == level && level == (int)LevelEnum.Three)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16728));
+                }
+
                 //新条码&& 没有指定包装
                 if (string.IsNullOrEmpty(createManuContainerBarcodeDto.ContainerCode))
                 {
@@ -587,8 +603,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                 }
             }
         }
-
-
 
         private async Task<ManuContainerBarcodeView> CreateNewBarcode(ManuContainerBarcodeEntity manuContainerBarcodeEntity,
            long ProductId, long workorderId,
