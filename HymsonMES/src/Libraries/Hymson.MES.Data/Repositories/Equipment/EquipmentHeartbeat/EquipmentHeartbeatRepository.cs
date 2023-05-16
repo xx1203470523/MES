@@ -2,6 +2,7 @@ using Dapper;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Options;
+using System.Text;
 
 namespace Hymson.MES.Data.Repositories.Equipment
 {
@@ -24,8 +25,25 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <returns></returns>
         public async Task<int> InsertAsync(EquipmentHeartbeatEntity entity)
         {
+            var stringBuilder = new StringBuilder();
+            stringBuilder.Append(InsertSql);
+            stringBuilder.Append(" ON DUPLICATE KEY ");
+            stringBuilder.Append(" UPDATE ");
+
+            if (entity.Status == true) stringBuilder.Append(" LastOnLineTime = @LastOnLineTime, ");
+
+            stringBuilder.Append(" Status = @Status, ");
+            stringBuilder.Append(" UpdatedBy = @UpdatedBy, ");
+            stringBuilder.Append(" UpdatedOn = @UpdatedOn ");
+
+            /*
+            var sqlBuilder = new SqlBuilder();
+            var sqlTemplate = sqlBuilder.AddTemplate(stringBuilder.ToString());
+            return await conn.ExecuteAsync(sqlTemplate.RawSql, entity);
+            */
+
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertSql, entity);
+            return await conn.ExecuteAsync(stringBuilder.ToString(), entity);
         }
 
         /// <summary>

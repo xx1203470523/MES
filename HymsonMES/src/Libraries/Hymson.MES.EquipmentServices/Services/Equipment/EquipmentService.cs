@@ -42,13 +42,10 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// <returns></returns>
         public async Task EquipmentHeartbeatAsync(EquipmentHeartbeatRequest request)
         {
-            var id = _currentEquipment.Id;
-            // TODO 
-
-            /*
             var userCode = request.EquipmentCode; //_currentEquipment.Code
             var nowTime = HymsonClock.Now();
-            await _equipmentHeartbeatRepository.InsertAsync(new EquipmentHeartbeatEntity
+
+            var entity = new EquipmentHeartbeatEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = _currentEquipment.SiteId,
@@ -57,13 +54,23 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
                 UpdatedBy = userCode,
                 UpdatedOn = nowTime,
                 EquipmentId = _currentEquipment.Id ?? 0,
-                LastOnLineTime = request.LocalTime,
-                Status = request.IsOnline
-            });
-            await _equipmentHeartbeatRepository.InsertRecordAsync(new EquipmentHeartbeatRecordEntity { });
-            */
+                Status = request.IsOnline,
+                LastOnLineTime = request.LocalTime
+            };
 
-            await Task.CompletedTask;
+            await _equipmentHeartbeatRepository.InsertAsync(entity);
+            await _equipmentHeartbeatRepository.InsertRecordAsync(new EquipmentHeartbeatRecordEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = entity.SiteId,
+                CreatedBy = entity.CreatedBy,
+                CreatedOn = entity.CreatedOn,
+                UpdatedBy = entity.UpdatedBy,
+                UpdatedOn = entity.UpdatedOn,
+                EquipmentId = entity.EquipmentId,
+                Status = entity.Status,
+                LocalTime = request.LocalTime
+            });
         }
 
         /// <summary>
