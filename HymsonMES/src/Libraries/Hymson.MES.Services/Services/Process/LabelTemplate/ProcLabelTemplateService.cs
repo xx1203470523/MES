@@ -7,6 +7,7 @@
  */
 using FluentValidation;
 using Hymson.Authentication;
+using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -16,7 +17,6 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
-
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process.LabelTemplate
@@ -27,7 +27,7 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
     public class ProcLabelTemplateService : IProcLabelTemplateService
     {
         private readonly ICurrentUser _currentUser;
-
+        private readonly ICurrentSite _currentSite;
         /// <summary>
         /// 仓库标签模板 仓储
         /// </summary>
@@ -35,9 +35,10 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
         private readonly AbstractValidator<ProcLabelTemplateCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcLabelTemplateModifyDto> _validationModifyRules;
 
-        public ProcLabelTemplateService(ICurrentUser currentUser, IProcLabelTemplateRepository procLabelTemplateRepository, AbstractValidator<ProcLabelTemplateCreateDto> validationCreateRules, AbstractValidator<ProcLabelTemplateModifyDto> validationModifyRules)
+        public ProcLabelTemplateService(ICurrentUser currentUser, ICurrentSite currentSite, IProcLabelTemplateRepository procLabelTemplateRepository, AbstractValidator<ProcLabelTemplateCreateDto> validationCreateRules, AbstractValidator<ProcLabelTemplateModifyDto> validationModifyRules)
         {
             _currentUser = currentUser;
+            _currentSite = currentSite;
             _procLabelTemplateRepository = procLabelTemplateRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
@@ -70,7 +71,7 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
             procLabelTemplateEntity.UpdatedBy = _currentUser.UserName;
             procLabelTemplateEntity.CreatedOn = HymsonClock.Now();
             procLabelTemplateEntity.UpdatedOn = HymsonClock.Now();
-
+            procLabelTemplateEntity.SiteId = _currentSite.SiteId ?? 0;
             //入库
             await _procLabelTemplateRepository.InsertAsync(procLabelTemplateEntity);
         }
@@ -104,6 +105,7 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
         public async Task<PagedInfo<ProcLabelTemplateDto>> GetPageListAsync(ProcLabelTemplatePagedQueryDto procLabelTemplatePagedQueryDto)
         {
             var procLabelTemplatePagedQuery = procLabelTemplatePagedQueryDto.ToQuery<ProcLabelTemplatePagedQuery>();
+            procLabelTemplatePagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _procLabelTemplateRepository.GetPagedInfoAsync(procLabelTemplatePagedQuery);
 
             //实体到DTO转换 装载数据
