@@ -51,6 +51,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 批量删除（硬删除）
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteTruesAsync(DeleteCommand param)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteTruesSql, param);
+        }
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -202,6 +213,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByTrayLoadIdSql = @"SELECT 
                                `Id`, `SiteId`, `TrayLoadId`, `Seq`, `SFC`, `LoadQty`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_tray_sfc_relation`  WHERE TrayLoadId = @TrayLoadId ";
+
+        const string DeleteTruesSql = @"Delete FROM `manu_tray_sfc_relation`  WHERE Id IN @Ids ";
         #endregion
     }
 }

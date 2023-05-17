@@ -157,7 +157,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindContainer
             };
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
-                await _manuTraySfcRelationRepository.DeletesAsync(command);
+                await _manuTraySfcRelationRepository.DeleteTruesAsync(command);
                 await _manuTraySfcRecordRepository.InsertsAsync(traySfcRecord);
                 //提交
                 ts.Complete();
