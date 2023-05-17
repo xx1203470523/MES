@@ -162,7 +162,7 @@ namespace Hymson.MES.Services.Services.Plan
             {
                 MaterialId = material.Id,
                 ProcedureId = createDto.ProcedureId,
-                Version = material.Version
+                Version = material?.Version??""
             });
             var pprp = ppr.FirstOrDefault();
             if(pprp!= null)

@@ -7,6 +7,9 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass.Query
     /// </summary>
     public class InteClassDetailPagedQuery : PagerInfo
     {
-
+        /// <summary>
+        /// 站点Id 
+        /// </summary>
+        public long? SiteId { get; set; }
     }
 }

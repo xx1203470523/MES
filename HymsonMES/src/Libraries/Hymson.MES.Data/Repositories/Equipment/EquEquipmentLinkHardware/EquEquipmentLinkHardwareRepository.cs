@@ -168,10 +168,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.SiteCode) == false)
-            {
-                sqlBuilder.Where("SiteCode = @SiteCode");
-            }
+            sqlBuilder.Where("SiteId = @SiteId");
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });

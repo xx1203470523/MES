@@ -443,7 +443,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             var sfcProduceRepairBo = JsonSerializer.Deserialize<SfcProduceRepairBo>(sfcProduceBusinessEntity.BusinessContent);
 
-            var nodeQuery = new ProcProcessRouteDetailNodeQuery { ProcessRouteId = sfcProduceRepairBo.ProcessRouteId };
+            var nodeQuery = new ProcProcessRouteDetailNodeQuery { ProcessRouteId = sfcProduceRepairBo?.ProcessRouteId??0 };
             var procProcessRouteNodeList = await _procProcessRouteNodeRepository.GetListAsync(nodeQuery);
             // var procProcessRouteNodeList = await _procProcessRouteNodeRepository.GetListAsync(new ProcProcessRouteDetailNodeQuery { ProcessRouteId = manuSfcProduceEntit.ProcessRouteId });
             var manuFacePlateRepairReturnProcedureList = new List<ManuFacePlateRepairReturnProcedureDto>();
