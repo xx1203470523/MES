@@ -1,4 +1,5 @@
-﻿using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCreateBarcodeDto;
+﻿using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCreateBarcodeDto;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCreateBarcode
 {
@@ -12,7 +13,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task CreateBarcodeByWorkOrderId(CreateBarcodeByWorkOrderDto param);
+        Task<List<ManuSfcEntity>> CreateBarcodeByWorkOrderId(CreateBarcodeByWorkOrderDto param);
+        /// <summary>
+        /// 工单下达条码
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task CreateBarcodeByWorkOrderIdAndPrint(CreateBarcodeByWorkOrderAndPrintDto param);
 
         /// <summary>
         /// 根据外部条码下达条码

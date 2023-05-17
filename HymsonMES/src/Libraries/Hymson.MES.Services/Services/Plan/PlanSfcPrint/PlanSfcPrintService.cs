@@ -183,8 +183,10 @@ namespace Hymson.MES.Services.Services.Plan
                             }
                         }
                     };
-                    await _labelPrintRequest.PrintAsync(printEntity);
-
+                    var result = await _labelPrintRequest.PrintAsync(printEntity);
+                    if(!result.result)
+                        throw new CustomerValidationException(nameof(ErrorCode.MES17003)).WithData("msg", result.msg);
+                    
                 }
                 else
                     throw new CustomerValidationException(nameof(ErrorCode.MES17001));
