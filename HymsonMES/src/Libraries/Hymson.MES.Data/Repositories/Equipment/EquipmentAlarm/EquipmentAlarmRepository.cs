@@ -20,23 +20,23 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="equipmentAlarmEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(EquipmentAlarmEntity equipmentAlarmEntity)
+        public async Task<int> InsertAsync(EquipmentAlarmEntity entity)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertSql, equipmentAlarmEntity);
+            return await conn.ExecuteAsync(InsertSql, entity);
         }
 
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="equipmentAlarmEntitys"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(List<EquipmentAlarmEntity> equipmentAlarmEntitys)
+        public async Task<int> InsertsAsync(IEnumerable<EquipmentAlarmEntity> entities)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertsSql, equipmentAlarmEntitys);
+            return await conn.ExecuteAsync(InsertsSql, entities);
         }
 
     }

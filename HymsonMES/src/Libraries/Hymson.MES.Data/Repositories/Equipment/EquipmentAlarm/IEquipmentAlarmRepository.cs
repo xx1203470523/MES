@@ -10,16 +10,16 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="equipmentAlarmEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(EquipmentAlarmEntity equipmentAlarmEntity);
+        Task<int> InsertAsync(EquipmentAlarmEntity entity);
         
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="equipmentAlarmEntitys"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        Task<int> InsertsAsync(List<EquipmentAlarmEntity> equipmentAlarmEntitys);
+        Task<int> InsertsAsync(IEnumerable<EquipmentAlarmEntity> entities);
 
     }
 }
