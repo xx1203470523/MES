@@ -189,6 +189,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuTrayLoadRepository, ManuTrayLoadRepository>();
             services.AddSingleton<IManuTraySfcRecordRepository, ManuTraySfcRecordRepository>();
             services.AddSingleton<IManuTraySfcRelationRepository, ManuTraySfcRelationRepository>();
+            services.AddSingleton<IManuSfcBindRecordRepository, ManuSfcBindRecordRepository>();
+            services.AddSingleton<IManuSfcBindRepository, ManuSfcBindRepository>();
             #endregion
 
             #region Warehouse 
