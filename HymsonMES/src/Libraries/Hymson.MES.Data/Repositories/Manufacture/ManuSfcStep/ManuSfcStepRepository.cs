@@ -176,10 +176,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcStepEntity>> GetSFCInOutStepAsync(string sfc) 
+        public async Task<IEnumerable<ManuSfcStepEntity>> GetSFCInOutStepAsync(SFCInOutStepQuery sfcQuery) 
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var manuSfcStepEntities = await conn.QueryAsync<ManuSfcStepEntity>(GetSFCInOutStepSql, new { SFC=sfc});
+            var manuSfcStepEntities = await conn.QueryAsync<ManuSfcStepEntity>(GetSFCInOutStepSql, sfcQuery);
             return manuSfcStepEntities;
 
         }
@@ -244,7 +244,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                         FROM `manu_sfc_step` 
                         WHERE IsDeleted=0
                         AND Operatetype in (3,4)
-                        and SFC=@SFC
+                        and SFC=@Sfc
+                        AND SiteId=@SiteId 
                         ORDER BY CreatedOn asc
                         ";
         const string GetBySFCPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_step` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY CreatedOn desc LIMIT @Offset,@Rows ";

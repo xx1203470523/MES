@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
+using Hymson.MES.EquipmentServices.Dtos.QueryContainerBindSfc;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.EquipmentServices.Request.QueryContainerBindSfc;
 using Hymson.Web.Framework.WorkContext;
 using System;
 using System.Collections.Generic;
@@ -17,32 +17,32 @@ namespace Hymson.MES.EquipmentServices.Services.QueryContainerBindSfc
     {
         private readonly ICurrentEquipment _currentEquipment;
         private readonly IManuTraySfcRelationRepository _manuTraySfcRelationRepository;
-        private readonly AbstractValidator<QueryContainerBindSfcRequest> _validationQueryContainerBindSfcRequestRules;
+
+        private readonly AbstractValidator<QueryContainerBindSfcDto> _validationQueryContainerBindSfcDtoRules;
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="validationQueryContainerBindSfcRequestRules"></param>
+        /// <param name="validationQueryContainerBindSfcDtoRules"></param>
         /// <param name="currentEquipment"></param>
-        /// <param name="manuTraySfcRelationRepository"></param>
-        public QueryContainerBindSfcService(
-            IManuTraySfcRelationRepository manuTraySfcRelationRepository,
-        AbstractValidator<QueryContainerBindSfcRequest> validationQueryContainerBindSfcRequestRules, ICurrentEquipment currentEquipment)
+        public QueryContainerBindSfcService(IManuTraySfcRelationRepository manuTraySfcRelationRepository, AbstractValidator<QueryContainerBindSfcRequest> validationQueryContainerBindSfcRequestRules, ICurrentEquipment currentEquipment)
         {
-            _manuTraySfcRelationRepository = manuTraySfcRelationRepository;
-            _validationQueryContainerBindSfcRequestRules = validationQueryContainerBindSfcRequestRules;
+
+            _manuTraySfcRelationRepository = manuTraySfcRelationRepository; 
+
+            _validationQueryContainerBindSfcDtoRules = validationQueryContainerBindSfcDtoRules;
             _currentEquipment = currentEquipment;
         }
 
         /// <summary>
         /// 容器绑定条码查询
         /// </summary>
-        /// <param name="queryContainerBindSfcRequest"></param>
+        /// <param name="queryContainerBindSfcDto"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<IEnumerable<QueryContainerBindSfcReaponse>> QueryContainerBindSfcAsync(QueryContainerBindSfcRequest queryContainerBindSfcRequest)
+        public async Task<IEnumerable<QueryContainerBindSfcReaponse>> QueryContainerBindSfcAsync(QueryContainerBindSfcDto queryContainerBindSfcDto)
         {
-            await _validationQueryContainerBindSfcRequestRules.ValidateAndThrowAsync(queryContainerBindSfcRequest);
+            await _validationQueryContainerBindSfcDtoRules.ValidateAndThrowAsync(queryContainerBindSfcDto);
             var manuTraySfcRelationEntits = await _manuTraySfcRelationRepository.GetManuTraySfcRelationByTrayCodeAsync(new ManuTraySfcRelationByTrayCodeQuery { TrayCode = queryContainerBindSfcRequest.ContaineCode, SiteId = _currentEquipment.SiteId });
             List<QueryContainerBindSfcReaponse> list = new List<QueryContainerBindSfcReaponse>();
             foreach (var item in manuTraySfcRelationEntits)

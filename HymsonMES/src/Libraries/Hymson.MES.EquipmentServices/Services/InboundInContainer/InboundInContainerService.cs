@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.EquipmentServices.Request.InboundInContainer;
-using Hymson.MES.EquipmentServices.Request.QueryContainerBindSfc;
+using Hymson.MES.EquipmentServices.Dtos.InboundInContainer;
 using Hymson.Web.Framework.WorkContext;
 using System;
 using System.Collections.Generic;
@@ -18,12 +17,13 @@ namespace Hymson.MES.EquipmentServices.Services.InboundInContainer
     {
         private readonly ICurrentEquipment _currentEquipment;
         private readonly IManuTraySfcRelationRepository _manuTraySfcRelationRepository;
-        private readonly AbstractValidator<InboundInContainerRequest> _validationInboundInContainerRequestRules;
+
+        private readonly AbstractValidator<InboundInContainerDto> _validationInboundInContainerDtoRules;
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="validationInboundInContainerRequestRules"></param>
+        /// <param name="validationInboundInContainerDtoRules"></param>
         /// <param name="currentEquipment"></param>
         public InboundInContainerService(IManuTraySfcRelationRepository manuTraySfcRelationRepository, AbstractValidator<InboundInContainerRequest> validationInboundInContainerRequestRules, ICurrentEquipment currentEquipment)
         {
@@ -35,12 +35,12 @@ namespace Hymson.MES.EquipmentServices.Services.InboundInContainer
         /// <summary>
         /// 进站-容器
         /// </summary>
-        /// <param name="InboundInContainerRequest"></param>
+        /// <param name="InboundInContainerDto"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task InboundInContainerAsync(InboundInContainerRequest InboundInContainerRequest)
+        public async Task InboundInContainerAsync(InboundInContainerDto InboundInContainerDto)
         {
-            await _validationInboundInContainerRequestRules.ValidateAndThrowAsync(InboundInContainerRequest);
+            await _validationInboundInContainerDtoRules.ValidateAndThrowAsync(InboundInContainerDto);
             var manuTraySfcRelationEntits = await _manuTraySfcRelationRepository.GetManuTraySfcRelationByTrayCodeAsync(new ManuTraySfcRelationByTrayCodeQuery { TrayCode = InboundInContainerRequest.ContainerCode, SiteId = _currentEquipment.SiteId });
             List<string> list = new List<string>();
             foreach (var item in manuTraySfcRelationEntits)

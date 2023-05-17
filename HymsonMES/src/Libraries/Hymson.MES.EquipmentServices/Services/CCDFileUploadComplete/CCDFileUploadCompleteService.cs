@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
+using Hymson.MES.EquipmentServices.Dtos.CCDFileUploadComplete;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.EquipmentServices.Request.CCDFileUploadComplete;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Web.Framework.WorkContext;
@@ -21,30 +21,31 @@ namespace Hymson.MES.EquipmentServices.Services.CCDFileUploadComplete
     {
         private readonly ICurrentEquipment _currentEquipment;
         private readonly IManuCcdFileRepository _manuCcdFileRepository;
-        private readonly AbstractValidator<CCDFileUploadCompleteRequest> _validationCCDFileUploadCompleteRequestRules;
+
+        private readonly AbstractValidator<CCDFileUploadCompleteDto> _validationCCDFileUploadCompleteDtoRules;
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="manuCcdFileRepository"></param>
-        /// <param name="validationCCDFileUploadCompleteRequestRules"></param>
-        /// <param name="currentEquipment"></param> 
-        public CCDFileUploadCompleteService(IManuCcdFileRepository manuCcdFileRepository, AbstractValidator<CCDFileUploadCompleteRequest> validationCCDFileUploadCompleteRequestRules, ICurrentEquipment currentEquipment)
+        /// <param name="validationCCDFileUploadCompleteDtoRules"></param>
+        /// <param name="currentEquipment"></param>
+        public CCDFileUploadCompleteService(IManuCcdFileRepository manuCcdFileRepository, AbstractValidator<CCDFileUploadCompleteDto> validationCCDFileUploadCompleteDtoRules, ICurrentEquipment currentEquipment)
         {
             _manuCcdFileRepository = manuCcdFileRepository;
-            _validationCCDFileUploadCompleteRequestRules = validationCCDFileUploadCompleteRequestRules;
+
+            _validationCCDFileUploadCompleteDtoRules = validationCCDFileUploadCompleteDtoRules;
             _currentEquipment = currentEquipment;
         }
 
         /// <summary>
         /// CCD文件上传完成
         /// </summary>
-        /// <param name="cCDFileUploadCompleteRequest"></param>
+        /// <param name="cCDFileUploadCompleteDto"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task CCDFileUploadCompleteAsync(CCDFileUploadCompleteRequest cCDFileUploadCompleteRequest)
+        public async Task CCDFileUploadCompleteAsync(CCDFileUploadCompleteDto cCDFileUploadCompleteDto)
         {
-            await _validationCCDFileUploadCompleteRequestRules.ValidateAndThrowAsync(cCDFileUploadCompleteRequest);
+            await _validationCCDFileUploadCompleteDtoRules.ValidateAndThrowAsync(cCDFileUploadCompleteDto);
             List<ManuCcdFileEntity> list = new List<ManuCcdFileEntity>();
             foreach (var item in cCDFileUploadCompleteRequest.SFCs)
             {

@@ -235,15 +235,24 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 sqlBuilder.Where(" CirculationProductId=@CirculationProductId ");
             }
 
-            if (queryParam.CreatedOnS.HasValue || queryParam.CreatedOnE.HasValue)
+            if (queryParam.CreatedOn != null && queryParam.CreatedOn.Length > 0)
             {
-                if (queryParam.CreatedOnS.HasValue && queryParam.CreatedOnE.HasValue) sqlBuilder.Where(" CreatedOn BETWEEN @CreatedOnS AND @CreatedOnE");
-                else
+                if (queryParam.CreatedOn.Length >= 2)
                 {
-                    if (queryParam.CreatedOnS.HasValue) sqlBuilder.Where("CreatedOn >= @CreatedOnS");
-                    if (queryParam.CreatedOnE.HasValue) sqlBuilder.Where("CreatedOn < @CreatedOnE");
+                    sqlBuilder.AddParameters(new { CreatedOnStart = queryParam.CreatedOn[0], CreatedOnEnd = queryParam.CreatedOn[1] });
+                    sqlBuilder.Where(" CreatedOn BETWEEN @CreatedOnStart AND @CreatedOnEnd ");
                 }
             }
+
+            //if (queryParam.CreatedOnS.HasValue || queryParam.CreatedOnE.HasValue)
+            //{
+            //    if (queryParam.CreatedOnS.HasValue && queryParam.CreatedOnE.HasValue) sqlBuilder.Where(" CreatedOn BETWEEN @CreatedOnS AND @CreatedOnE");
+            //    else
+            //    {
+            //        if (queryParam.CreatedOnS.HasValue) sqlBuilder.Where("CreatedOn >= @CreatedOnS");
+            //        if (queryParam.CreatedOnE.HasValue) sqlBuilder.Where("CreatedOn < @CreatedOnE");
+            //    }
+            //}
 
             if (!string.IsNullOrEmpty(queryParam.CirculationBarCode))
             {
@@ -258,6 +267,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             if (queryParam.ResourceId.HasValue)
             {
                 sqlBuilder.Where(" ResourceId=@ResourceId ");
+            }
+
+            if (queryParam.CirculationMainSupplierId.HasValue) 
+            {
+                sqlBuilder.Where(" CirculationMainSupplierId=@CirculationMainSupplierId ");
             }
 
             var offSet = (queryParam.PageIndex - 1) * queryParam.PageSize;

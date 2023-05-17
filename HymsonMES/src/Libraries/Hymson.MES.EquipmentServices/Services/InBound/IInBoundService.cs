@@ -1,4 +1,4 @@
-﻿using Hymson.MES.EquipmentServices.Request.InBound;
+﻿using Hymson.MES.EquipmentServices.Dtos.InBound;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,15 +15,15 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
         /// <summary>
         /// 进站
         /// </summary>
-        /// <param name="inBoundRequest"></param>
+        /// <param name="inBoundDto"></param>
         /// <returns></returns>
-        Task InBound(InBoundRequest inBoundRequest);
+        Task InBound(InBoundDto inBoundDto);
 
         /// <summary>
         /// 进站（多个）
         /// </summary>
-        /// <param name="inBoundMoreRequest"></param>
+        /// <param name="inBoundMoreDto"></param>
         /// <returns></returns>
-        Task InBoundMore(InBoundMoreRequest inBoundMoreRequest);
+        Task InBoundMore(InBoundMoreDto inBoundMoreDto);
     }
 }

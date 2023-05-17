@@ -1,5 +1,6 @@
 using FluentValidation;
 using Hymson.Authentication;
+using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Process;
@@ -23,6 +24,7 @@ namespace Hymson.MES.Services.Services.Process
         private readonly AbstractValidator<ProcBomDetailCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcBomDetailModifyDto> _validationModifyRules;
         private readonly ICurrentUser _currentUser;
+        private readonly ICurrentSite _currentSite;
 
         /// <summary>
         /// 
@@ -31,9 +33,10 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="procBomDetailRepository"></param>
         /// <param name="validationCreateRules"></param>
         /// <param name="validationModifyRules"></param>
-        public ProcBomDetailService(ICurrentUser currentUser, IProcBomDetailRepository procBomDetailRepository, AbstractValidator<ProcBomDetailCreateDto> validationCreateRules, AbstractValidator<ProcBomDetailModifyDto> validationModifyRules)
+        public ProcBomDetailService(ICurrentUser currentUser, IProcBomDetailRepository procBomDetailRepository, AbstractValidator<ProcBomDetailCreateDto> validationCreateRules, AbstractValidator<ProcBomDetailModifyDto> validationModifyRules, ICurrentSite currentSite)
         {
             _currentUser = currentUser;
+            _currentSite= currentSite;
             _procBomDetailRepository = procBomDetailRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
@@ -90,6 +93,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcBomDetailDto>> GetPageListAsync(ProcBomDetailPagedQueryDto procBomDetailPagedQueryDto)
         {
             var procBomDetailPagedQuery = procBomDetailPagedQueryDto.ToQuery<ProcBomDetailPagedQuery>();
+            procBomDetailPagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _procBomDetailRepository.GetPagedInfoAsync(procBomDetailPagedQuery);
 
             //实体到DTO转换 装载数据

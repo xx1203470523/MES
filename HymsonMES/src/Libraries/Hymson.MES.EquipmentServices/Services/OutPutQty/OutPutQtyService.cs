@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Hymson.MES.EquipmentServices.Request.OutPutQty;
+using Hymson.MES.EquipmentServices.Dtos.OutPutQty;
 using Hymson.Web.Framework.WorkContext;
 using System;
 using System.Collections.Generic;
@@ -15,28 +15,28 @@ namespace Hymson.MES.EquipmentServices.Services.OutPutQty
     public class OutPutQtyService : IOutPutQtyService
     {
         private readonly ICurrentEquipment _currentEquipment;
-        private readonly AbstractValidator<OutPutQtyRequest> _validationOutPutQtyRequestRules;
+        private readonly AbstractValidator<OutPutQtyDto> _validationOutPutQtyDtoRules;
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="validationOutPutQtyRequestRules"></param>
+        /// <param name="validationOutPutQtyDtoRules"></param>
         /// <param name="currentEquipment"></param>
-        public OutPutQtyService(AbstractValidator<OutPutQtyRequest> validationOutPutQtyRequestRules, ICurrentEquipment currentEquipment)
+        public OutPutQtyService(AbstractValidator<OutPutQtyDto> validationOutPutQtyDtoRules, ICurrentEquipment currentEquipment)
         {
-            _validationOutPutQtyRequestRules = validationOutPutQtyRequestRules;
+            _validationOutPutQtyDtoRules = validationOutPutQtyDtoRules;
             _currentEquipment = currentEquipment;
         }
 
         /// <summary>
         /// 产出上报数量
         /// </summary>
-        /// <param name="outPutQtyRequest"></param>
+        /// <param name="outPutQtyDto"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task OutPutQtyAsync(OutPutQtyRequest outPutQtyRequest)
+        public async Task OutPutQtyAsync(OutPutQtyDto outPutQtyDto)
         {
-            await _validationOutPutQtyRequestRules.ValidateAndThrowAsync(outPutQtyRequest);
+            await _validationOutPutQtyDtoRules.ValidateAndThrowAsync(outPutQtyDto);
             throw new NotImplementedException();
         }
     }

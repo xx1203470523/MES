@@ -1,4 +1,4 @@
-﻿using Hymson.MES.EquipmentServices.Request.FeedingConsumption;
+﻿using Hymson.MES.EquipmentServices.Dtos.FeedingConsumption;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,8 +15,8 @@ namespace Hymson.MES.EquipmentServices.Services.FeedingConsumption
         /// <summary>
         /// 上报物料消耗
         /// </summary>
-        /// <param name="feedingConsumptionRequest"></param>
+        /// <param name="feedingConsumptionDto"></param>
         /// <returns></returns> 
-        Task FeedingConsumptionAsync(FeedingConsumptionRequest feedingConsumptionRequest); 
+        Task FeedingConsumptionAsync(FeedingConsumptionDto feedingConsumptionDto); 
     }
 }

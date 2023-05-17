@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Hymson.MES.EquipmentServices.Request.SingleBarCodeLoadingVerification;
+using Hymson.MES.EquipmentServices.Dtos.SingleBarCodeLoadingVerification;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,7 @@ namespace Hymson.MES.EquipmentServices.Validators.SingleBarCodeLoadingVerificati
     /// <summary>
     ///单体条码上料校验
     /// </summary>
-    internal class SingleBarCodeLoadingVerificationValidator : AbstractValidator<SingleBarCodeLoadingVerificationRequest>
+    internal class SingleBarCodeLoadingVerificationValidator : AbstractValidator<SingleBarCodeLoadingVerificationDto>
     {
         public SingleBarCodeLoadingVerificationValidator()
         {

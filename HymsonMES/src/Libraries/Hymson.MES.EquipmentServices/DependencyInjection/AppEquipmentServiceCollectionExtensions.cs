@@ -1,17 +1,16 @@
 ﻿using FluentValidation;
-using Hymson.MES.EquipmentServices.Request.BindContainer;
-using Hymson.MES.EquipmentServices.Request.BindSFC;
-using Hymson.MES.EquipmentServices.Request.CCDFileUploadComplete;
-using Hymson.MES.EquipmentServices.Request.FeedingConsumption;
-using Hymson.MES.EquipmentServices.Request.GenerateModuleSFC;
-using Hymson.MES.EquipmentServices.Request.InBound;
-using Hymson.MES.EquipmentServices.Request.InboundInContainer;
-using Hymson.MES.EquipmentServices.Request.InboundInSFCContainer;
-using Hymson.MES.EquipmentServices.Request.OutBound;
-using Hymson.MES.EquipmentServices.Request.OutPutQty;
-using Hymson.MES.EquipmentServices.Request.QueryContainerBindSfc;
-using Hymson.MES.EquipmentServices.Request.SingleBarCodeLoadingVerification;
-//using Hymson.MES.EquipmentServices.Request.UnBindContainer;
+using Hymson.MES.EquipmentServices.Dtos.BindContainer;
+using Hymson.MES.EquipmentServices.Dtos.BindSFC;
+using Hymson.MES.EquipmentServices.Dtos.CCDFileUploadComplete;
+using Hymson.MES.EquipmentServices.Dtos.FeedingConsumption;
+using Hymson.MES.EquipmentServices.Dtos.GenerateModuleSFC;
+using Hymson.MES.EquipmentServices.Dtos.InBound;
+using Hymson.MES.EquipmentServices.Dtos.InboundInContainer;
+using Hymson.MES.EquipmentServices.Dtos.InboundInSFCContainer;
+using Hymson.MES.EquipmentServices.Dtos.OutBound;
+using Hymson.MES.EquipmentServices.Dtos.OutPutQty;
+using Hymson.MES.EquipmentServices.Dtos.QueryContainerBindSfc;
+using Hymson.MES.EquipmentServices.Dtos.SingleBarCodeLoadingVerification;
 using Hymson.MES.EquipmentServices.Services.BindContainer;
 using Hymson.MES.EquipmentServices.Services.BindSFC;
 using Hymson.MES.EquipmentServices.Services.CCDFileUploadComplete;
@@ -25,7 +24,6 @@ using Hymson.MES.EquipmentServices.Services.OutBound;
 using Hymson.MES.EquipmentServices.Services.OutPutQty;
 using Hymson.MES.EquipmentServices.Services.QueryContainerBindSfc;
 using Hymson.MES.EquipmentServices.Services.SingleBarCodeLoadingVerification;
-//using Hymson.MES.EquipmentServices.Services.UnBindContainer;
 using Hymson.MES.EquipmentServices.Validators.BindContainer;
 using Hymson.MES.EquipmentServices.Validators.BindSFC;
 using Hymson.MES.EquipmentServices.Validators.CCDFileUploadComplete;
@@ -74,7 +72,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IBindContainerService, BindContainerService>();//容器解绑绑定
             services.AddSingleton<IInBoundService, InBoundService>();//进站
             services.AddSingleton<IOutBoundService, OutBoundService>();//出站
-            //services.AddSingleton<IOutBoundMoreService, OutBoundMoreService>();//出站（多个）
 
 
             services.AddSingleton<IInboundInContainerService, InboundInContainerService>();// 进站-容器
@@ -109,25 +106,25 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         private static void AddValidators(IServiceCollection services)
         {
-            services.AddSingleton<AbstractValidator<BindSFCRequest>, BindSFCValidator>();//条码绑定
-            services.AddSingleton<AbstractValidator<UnBindSFCRequest>, UnBindSFCValidator>();//条码解绑
-            services.AddSingleton<AbstractValidator<BindContainerRequest>, BindContainerValidator>();//容器绑定
-            services.AddSingleton<AbstractValidator<UnBindContainerRequest>, UnBindContainerValidator>();//容器解绑
-            services.AddSingleton<AbstractValidator<InBoundRequest>, InBoundValidator>();//进站
-            services.AddSingleton<AbstractValidator<InBoundMoreRequest>, InBoundMoreValidator>();//进站（多个）
-            services.AddSingleton<AbstractValidator<OutBoundRequest>, OutBoundValidator>();//出站
-            services.AddSingleton<AbstractValidator<OutBoundMoreRequest>, OutBoundMoreValidator>();//出站（多个）
+            services.AddSingleton<AbstractValidator<BindSFCDto>, BindSFCValidator>();//条码绑定
+            services.AddSingleton<AbstractValidator<UnBindSFCDto>, UnBindSFCValidator>();//条码解绑
+            services.AddSingleton<AbstractValidator<BindContainerDto>, BindContainerValidator>();//容器绑定
+            services.AddSingleton<AbstractValidator<UnBindContainerDto>, UnBindContainerValidator>();//容器解绑
+            services.AddSingleton<AbstractValidator<InBoundDto>, InBoundValidator>();//进站
+            services.AddSingleton<AbstractValidator<InBoundMoreDto>, InBoundMoreValidator>();//进站（多个）
+            services.AddSingleton<AbstractValidator<OutBoundDto>, OutBoundValidator>();//出站
+            services.AddSingleton<AbstractValidator<OutBoundMoreDto>, OutBoundMoreValidator>();//出站（多个）
 
 
 
-            services.AddSingleton<AbstractValidator<InboundInContainerRequest>, InboundInContainerValidator>();// 进站-容器
-            services.AddSingleton<AbstractValidator<GenerateModuleSFCRequest>, GenerateModuleSFCValidator>();//请求生成模组码-电芯堆叠
-            services.AddSingleton<AbstractValidator<InboundInSFCContainerRequest>, InboundInSFCContainerValidator>();//进站-电芯和托盘-装盘2
-            services.AddSingleton<AbstractValidator<CCDFileUploadCompleteRequest>, CCDFileUploadCompleteValidator>();//CCD文件上传完成
-            services.AddSingleton<AbstractValidator<FeedingConsumptionRequest>, FeedingConsumptionValidator>();//上报物料消耗
-            services.AddSingleton<AbstractValidator<SingleBarCodeLoadingVerificationRequest>, SingleBarCodeLoadingVerificationValidator>();//单体条码上料校验
-            services.AddSingleton<AbstractValidator<OutPutQtyRequest>, OutPutQtyValidator>();//产出上报数量
-            services.AddSingleton<AbstractValidator<QueryContainerBindSfcRequest>, QueryContainerBindSfcValidator>();//容器绑定条码查询
+            services.AddSingleton<AbstractValidator<InboundInContainerDto>, InboundInContainerValidator>();// 进站-容器
+            services.AddSingleton<AbstractValidator<GenerateModuleSFCDto>, GenerateModuleSFCValidator>();//请求生成模组码-电芯堆叠
+            services.AddSingleton<AbstractValidator<InboundInSFCContainerDto>, InboundInSFCContainerValidator>();//进站-电芯和托盘-装盘2
+            services.AddSingleton<AbstractValidator<CCDFileUploadCompleteDto>, CCDFileUploadCompleteValidator>();//CCD文件上传完成
+            services.AddSingleton<AbstractValidator<FeedingConsumptionDto>, FeedingConsumptionValidator>();//上报物料消耗
+            services.AddSingleton<AbstractValidator<SingleBarCodeLoadingVerificationDto>, SingleBarCodeLoadingVerificationValidator>();//单体条码上料校验
+            services.AddSingleton<AbstractValidator<OutPutQtyDto>, OutPutQtyValidator>();//产出上报数量
+            services.AddSingleton<AbstractValidator<QueryContainerBindSfcDto>, QueryContainerBindSfcValidator>();//容器绑定条码查询
         }
 
     }

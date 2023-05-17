@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Hymson.MES.EquipmentServices.Request.InBound;
+using Hymson.MES.EquipmentServices.Dtos.InBound;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,7 @@ namespace Hymson.MES.EquipmentServices.Validators.InBound
     /// <summary>
     /// 进站验证
     /// </summary>
-    internal class InBoundValidator : AbstractValidator<InBoundRequest>
+    internal class InBoundValidator : AbstractValidator<InBoundDto>
     {
         public InBoundValidator() { 
         

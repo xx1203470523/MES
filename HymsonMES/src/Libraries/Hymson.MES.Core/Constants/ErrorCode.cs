@@ -637,7 +637,7 @@
         public const string MES16713 = "容器包装，配置面板不允许排队产品";
         public const string MES16714 = "容器包装，工序信息未找到";
         public const string MES16715 = "容器包装，工序中未指定包装等级";
-        public const string MES16716 = "容器包装，不允许混物料版本包装";
+        public const string MES16716 = "容器包装，不允许混物料版本包装 ";
         public const string MES16717 = "容器包装，超过了最大包装数量，不允许包装";
         public const string MES16718 = "容器包装，未找到该条码的子级包装记录";
         public const string MES16719 = "容器包装，物料编码没有维护容器规格";
@@ -651,6 +651,8 @@
         public const string MES16727 = "容器包装，二级包装只能装一级容器!";
         public const string MES16728 = "容器包装，三级包装只能装二级容器!";
         public const string MES16729 = "容器包装，容器{barcode}未关闭!";
+        public const string MES16730 = "同一个容器不允许不同物料进行包装!";
+        public const string MES16731 = "容器包装，容器包装等级跟工序包装等级不匹配!";
         #endregion
 
         #region 绑定工单激活  MES16800
@@ -676,6 +678,12 @@
         public const string MES16911 = "实际使用的物料与条码不合!";
         public const string MES16912 = "条码为空！";
         public const string MES16913 = "不能删除启用或保留的记录！";
+        #endregion
+
+        #region 条码打印 MES17000
+        public const string MES17001 = "条码打印，打印模板文件未找到";
+        public const string MES17002 = "条码打印，打印机信息未找到";
+        public const string MES17003 = "条码打印，条码的包装维护记录未找到";
         #endregion
 
         #region 在制品步骤控制 MES18000
@@ -719,7 +727,6 @@
         public const string MES18110 = "没有传入SFC条码信息";
         #endregion
 
-
         #region 生产更改 MES18200
         public const string MES18200 = "最大扫描{number}个";
         public const string MES18201 = "条码不能为空";
@@ -738,7 +745,6 @@
 
         #endregion
 
-
         #region 设备对接错误
 
         #region 设备对接公用
@@ -748,13 +754,18 @@
         public const string MES19004 = "调用本地时间不能为空";
         #endregion
 
-        public const string MES19101 = "绑定的电芯条码列表不能为空";
+        public const string MES19101 = "条码列表不能为空";
         public const string MES19102 = "容器编码不能为空";
-        public const string MES19103 = "容器电芯条码列表不能为空";
+        public const string MES19103 = "容器条码列表不能为空";
         public const string MES19104 = "托盘装载信息不存在";
         public const string MES19105 = "此托盘未装载任何信息";
-        public const string MES19106 = "托盘条码不能为空";
-        public const string MES19107 = "上传SFC信息不能为空";
+        public const string MES19106 = "不存在任何绑定关系不需要解绑";
+        public const string MES19107 = "参数列表不能为空";
+        public const string MES19108 = "参数编码{Code}不存在";
+        public const string MES19109 = "资源编码{Code}不存在";
+        public const string MES19110 = "产品条码参数列表不能为空";
+        public const string MES19111 = "托盘条码不能为空";
+        public const string MES19112 = "上传SFC信息不能为空";
 
         #endregion
 

@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Hymson.MES.EquipmentServices.Request.SingleBarCodeLoadingVerification;
+using Hymson.MES.EquipmentServices.Dtos.SingleBarCodeLoadingVerification;
 using Hymson.Web.Framework.WorkContext;
 using System;
 using System.Collections.Generic;
@@ -15,28 +15,28 @@ namespace Hymson.MES.EquipmentServices.Services.SingleBarCodeLoadingVerification
     public class SingleBarCodeLoadingVerificationService : ISingleBarCodeLoadingVerificationService
     {
         private readonly ICurrentEquipment _currentEquipment;
-        private readonly AbstractValidator<SingleBarCodeLoadingVerificationRequest> _validationSingleBarCodeLoadingVerificationRequestRules;
+        private readonly AbstractValidator<SingleBarCodeLoadingVerificationDto> _validationSingleBarCodeLoadingVerificationDtoRules;
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="validationSingleBarCodeLoadingVerificationRequestRules"></param>
+        /// <param name="validationSingleBarCodeLoadingVerificationDtoRules"></param>
         /// <param name="currentEquipment"></param>
-        public SingleBarCodeLoadingVerificationService(AbstractValidator<SingleBarCodeLoadingVerificationRequest> validationSingleBarCodeLoadingVerificationRequestRules, ICurrentEquipment currentEquipment)
+        public SingleBarCodeLoadingVerificationService(AbstractValidator<SingleBarCodeLoadingVerificationDto> validationSingleBarCodeLoadingVerificationDtoRules, ICurrentEquipment currentEquipment)
         {
-            _validationSingleBarCodeLoadingVerificationRequestRules = validationSingleBarCodeLoadingVerificationRequestRules;
+            _validationSingleBarCodeLoadingVerificationDtoRules = validationSingleBarCodeLoadingVerificationDtoRules;
             _currentEquipment = currentEquipment;
         }
 
         /// <summary>
         /// 单体条码上料校验
         /// </summary>
-        /// <param name="singleBarCodeLoadingVerificationRequest"></param>
+        /// <param name="singleBarCodeLoadingVerificationDto"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task SingleBarCodeLoadingVerificationAsync(SingleBarCodeLoadingVerificationRequest singleBarCodeLoadingVerificationRequest)
+        public async Task SingleBarCodeLoadingVerificationAsync(SingleBarCodeLoadingVerificationDto singleBarCodeLoadingVerificationDto)
         {
-            await _validationSingleBarCodeLoadingVerificationRequestRules.ValidateAndThrowAsync(singleBarCodeLoadingVerificationRequest);
+            await _validationSingleBarCodeLoadingVerificationDtoRules.ValidateAndThrowAsync(singleBarCodeLoadingVerificationDto);
             throw new NotImplementedException();
         }
     }

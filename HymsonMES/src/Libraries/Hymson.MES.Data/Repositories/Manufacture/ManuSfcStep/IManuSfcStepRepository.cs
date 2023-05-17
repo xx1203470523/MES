@@ -103,7 +103,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuSfcStepEntity>> GetSFCInOutStepAsync(string sfc);
+        Task<IEnumerable<ManuSfcStepEntity>> GetSFCInOutStepAsync(SFCInOutStepQuery sfcQuery);
 
         /// <summary>
         /// 分页查询 根据SFC

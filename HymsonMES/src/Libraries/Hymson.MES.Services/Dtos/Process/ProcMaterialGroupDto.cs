@@ -138,11 +138,6 @@ namespace Hymson.MES.Services.Dtos.Process
     public class ProcMaterialGroupPagedQueryDto : PagerInfo
     {
         /// <summary>
-        /// 所属站点代码
-        /// </summary>
-        public long SiteId { get; set; }
-
-        /// <summary>
         /// 物料组编码
         /// </summary>
         public string? GroupCode { get; set; }
@@ -168,11 +163,6 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public class CustomProcMaterialGroupPagedQueryDto : PagerInfo
     {
-        /// <summary>
-        /// 所属站点代码
-        /// </summary>
-        public long SiteId { get; set; }
-
         /// <summary>
         /// 物料组编码
         /// </summary>

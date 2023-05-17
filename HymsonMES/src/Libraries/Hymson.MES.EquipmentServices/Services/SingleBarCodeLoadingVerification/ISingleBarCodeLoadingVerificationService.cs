@@ -1,4 +1,4 @@
-﻿using Hymson.MES.EquipmentServices.Request.SingleBarCodeLoadingVerification;
+﻿using Hymson.MES.EquipmentServices.Dtos.SingleBarCodeLoadingVerification;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,8 +15,8 @@ namespace Hymson.MES.EquipmentServices.Services.SingleBarCodeLoadingVerification
         /// <summary>
         /// 单体条码上料校验
         /// </summary>
-        /// <param name="singleBarCodeLoadingVerificationRequest"></param>
+        /// <param name="singleBarCodeLoadingVerificationDto"></param>
         /// <returns></returns> 
-        Task SingleBarCodeLoadingVerificationAsync(SingleBarCodeLoadingVerificationRequest singleBarCodeLoadingVerificationRequest);
+        Task SingleBarCodeLoadingVerificationAsync(SingleBarCodeLoadingVerificationDto singleBarCodeLoadingVerificationDto);
     }
 }

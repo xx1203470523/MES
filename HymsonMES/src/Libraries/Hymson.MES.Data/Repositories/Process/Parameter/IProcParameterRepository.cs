@@ -8,6 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +28,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procParameterEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ProcParameterEntity procParameterEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -41,7 +42,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procParameterEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ProcParameterEntity procParameterEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -69,7 +70,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcParameterEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -78,12 +79,19 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<IEnumerable<ProcParameterEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcParameterEntity>> GetByCodesAsync(EntityByCodesQuery query);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="procParameterQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcParameterEntity>> GetProcParameterEntitiesAsync(ProcParameterQuery procParameterQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>

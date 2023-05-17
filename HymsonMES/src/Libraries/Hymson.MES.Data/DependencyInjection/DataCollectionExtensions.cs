@@ -64,13 +64,12 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquFaultPhenomenonRepository, EquFaultPhenomenonRepository>();
             services.AddSingleton<IEquSparePartRepository, EquSparePartRepository>();
             services.AddSingleton<IEquSparePartTypeRepository, EquSparePartTypeRepository>();
-            services.AddSingleton<IEquipmentHeartbeatRepository, EquipmentHeartbeatRepository>();
-            services.AddSingleton<IEquipmentAlarmRepository, EquipmentAlarmRepository>();
+            services.AddSingleton<IEquHeartbeatRepository, EquHeartbeatRepository>();
+            services.AddSingleton<IEquAlarmRepository, EquAlarmRepository>();
+            services.AddSingleton<IEquStatusRepository, EquStatusRepository>();
+            services.AddSingleton<IEquProductParameterRepository, EquProductParameterRepository>();
 
-            #region FaultReason
             services.AddSingleton<IEquFaultReasonRepository, EquFaultReasonRepository>();
-
-            #endregion
             #endregion
 
             #region Integrated
@@ -189,6 +188,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuTrayLoadRepository, ManuTrayLoadRepository>();
             services.AddSingleton<IManuTraySfcRecordRepository, ManuTraySfcRecordRepository>();
             services.AddSingleton<IManuTraySfcRelationRepository, ManuTraySfcRelationRepository>();
+            services.AddSingleton<IManuSfcBindRecordRepository, ManuSfcBindRecordRepository>();
+            services.AddSingleton<IManuSfcBindRepository, ManuSfcBindRepository>();
+            services.AddSingleton<IManuProductParameterRepository, ManuProductParameterRepository>();
             services.AddSingleton<IManuCcdFileRepository, ManuCcdFileRepository>();
             #endregion
 

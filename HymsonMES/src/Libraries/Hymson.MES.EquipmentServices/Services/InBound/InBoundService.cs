@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Hymson.MES.EquipmentServices.Request.InBound;
+using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.Web.Framework.WorkContext;
 using System;
 using System.Collections.Generic;
@@ -15,43 +15,43 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
     public class InBoundService : IInBoundService
     {
         private readonly ICurrentEquipment _currentEquipment;
-        private readonly AbstractValidator<InBoundRequest> _validationInBoundRequestRules;
-        private readonly AbstractValidator<InBoundMoreRequest> _validationInBoundMoreRequestRules;
+        private readonly AbstractValidator<InBoundDto> _validationInBoundDtoRules;
+        private readonly AbstractValidator<InBoundMoreDto> _validationInBoundMoreDtoRules;
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="validationInBoundRequestRules"></param>
+        /// <param name="validationInBoundDtoRules"></param>
         /// <param name="currentEquipment"></param>
-        /// <param name="validationInBoundMoreRequestRules"></param>
-        public InBoundService(AbstractValidator<InBoundRequest> validationInBoundRequestRules, ICurrentEquipment currentEquipment, AbstractValidator<InBoundMoreRequest> validationInBoundMoreRequestRules)
+        /// <param name="validationInBoundMoreDtoRules"></param>
+        public InBoundService(AbstractValidator<InBoundDto> validationInBoundDtoRules, ICurrentEquipment currentEquipment, AbstractValidator<InBoundMoreDto> validationInBoundMoreDtoRules)
         {
-            _validationInBoundRequestRules = validationInBoundRequestRules;
+            _validationInBoundDtoRules = validationInBoundDtoRules;
             _currentEquipment = currentEquipment;
-            _validationInBoundMoreRequestRules = validationInBoundMoreRequestRules;
+            _validationInBoundMoreDtoRules = validationInBoundMoreDtoRules;
         }
 
         /// <summary>
         /// 进站
         /// </summary>
-        /// <param name="inBoundRequest"></param>
+        /// <param name="inBoundDto"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task InBound(InBoundRequest inBoundRequest)
+        public async Task InBound(InBoundDto inBoundDto)
         {
-            await _validationInBoundRequestRules.ValidateAndThrowAsync(inBoundRequest);
+            await _validationInBoundDtoRules.ValidateAndThrowAsync(inBoundDto);
             throw new NotImplementedException();
         }
 
         /// <summary>
         /// 进站（多个）
         /// </summary>
-        /// <param name="inBoundMoreRequest"></param>
+        /// <param name="inBoundMoreDto"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task InBoundMore(InBoundMoreRequest inBoundMoreRequest)
+        public async Task InBoundMore(InBoundMoreDto inBoundMoreDto)
         {
-            await _validationInBoundMoreRequestRules.ValidateAndThrowAsync(inBoundMoreRequest);
+            await _validationInBoundMoreDtoRules.ValidateAndThrowAsync(inBoundMoreDto);
             throw new NotImplementedException();
         }
     }

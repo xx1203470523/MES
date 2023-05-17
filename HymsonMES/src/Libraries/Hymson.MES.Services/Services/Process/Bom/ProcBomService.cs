@@ -487,7 +487,7 @@ namespace Hymson.MES.Services.Services.Process
                     var procBoms = await _procBomRepository.GetProcBomEntitiesAsync(new ProcBomQuery()
                     {
                         SiteId = siteId,
-                        BomCode = bomCode,
+                        BomCode = bomCode
                     });
 
                     var currentVersionProcBoms = procBoms!=null&&procBoms.Any()? procBoms.Where(x => x.IsCurrentVersion = true).ToList():null;

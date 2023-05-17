@@ -37,6 +37,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
     /// </summary>
     public class UpdateProcedureAndStatusCommand
     {
+        public long SiteId { get; set; }
+
         /// <summary>
         ///Id
         /// </summary>

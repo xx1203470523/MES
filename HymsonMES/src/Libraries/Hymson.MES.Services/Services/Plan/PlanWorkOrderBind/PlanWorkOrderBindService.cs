@@ -232,6 +232,7 @@ namespace Hymson.MES.Services.Services.Plan
 
             //查询已经绑定在该资源上的工单
             var hasBindWorkOrders= await _planWorkOrderBindRepository.GetPlanWorkOrderBindEntitiesAsync(new PlanWorkOrderBindQuery() {
+                SiteId = _currentSite.SiteId ?? 0,
                 ResourceId= bindActivationWorkOrder.ResourceId
             });
             var hasBindWorkOrderIds = hasBindWorkOrders.Select(x => x.WorkOrderId).ToList();
@@ -339,6 +340,7 @@ namespace Hymson.MES.Services.Services.Plan
             //查询已经绑定在该资源上的工单
             var hasBindWorkOrders = await _planWorkOrderBindRepository.GetPlanWorkOrderBindEntitiesAsync(new PlanWorkOrderBindQuery()
             {
+                SiteId = _currentSite.SiteId??0,
                 ResourceId = resourceId
             });
             var hasBindWorkOrderIds = hasBindWorkOrders.Select(x => x.WorkOrderId).ToList();

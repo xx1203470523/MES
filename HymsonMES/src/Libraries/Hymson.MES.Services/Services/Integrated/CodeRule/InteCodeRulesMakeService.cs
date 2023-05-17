@@ -98,6 +98,7 @@ namespace Hymson.MES.Services.Services.Integrated
         public async Task<PagedInfo<InteCodeRulesMakeDto>> GetPageListAsync(InteCodeRulesMakePagedQueryDto inteCodeRulesMakePagedQueryDto)
         {
             var inteCodeRulesMakePagedQuery = inteCodeRulesMakePagedQueryDto.ToQuery<InteCodeRulesMakePagedQuery>();
+            inteCodeRulesMakePagedQuery.SiteId = _currentSite.SiteId.Value;
             var pagedInfo = await _inteCodeRulesMakeRepository.GetPagedInfoAsync(inteCodeRulesMakePagedQuery);
 
             //实体到DTO转换 装载数据

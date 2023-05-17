@@ -1,4 +1,4 @@
-﻿using Hymson.MES.EquipmentServices.Request.OutPutQty;
+﻿using Hymson.MES.EquipmentServices.Dtos.OutPutQty;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,8 +15,8 @@ namespace Hymson.MES.EquipmentServices.Services.OutPutQty
         /// <summary>
         /// 产出上报数量
         /// </summary>
-        /// <param name="outPutQtyRequest"></param> 
+        /// <param name="outPutQtyDto"></param> 
         /// <returns></returns> 
-        Task OutPutQtyAsync(OutPutQtyRequest outPutQtyRequest);
+        Task OutPutQtyAsync(OutPutQtyDto outPutQtyDto);
     }
 }

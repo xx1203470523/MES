@@ -1,4 +1,6 @@
-﻿using Hymson.Infrastructure.Exceptions;
+﻿using Hymson.Authentication;
+using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Repositories.Integrated;
@@ -18,6 +20,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         private readonly ISequenceService _sequenceService;
         private readonly IInteCodeRulesRepository _inteCodeRulesRepository;
         private readonly IInteCodeRulesMakeRepository _inteCodeRulesMakeRepository;
+        private readonly ICurrentSite _currentSite;
 
         /// <summary>
         /// 条码生成
@@ -25,11 +28,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         /// <param name="sequenceService"></param>
         /// <param name="inteCodeRulesMakeRepository"></param>
         /// <param name="inteCodeRulesRepository"></param>
-        public ManuGenerateBarcodeService(ISequenceService sequenceService, IInteCodeRulesMakeRepository inteCodeRulesMakeRepository, IInteCodeRulesRepository inteCodeRulesRepository)
+        public ManuGenerateBarcodeService(ISequenceService sequenceService, IInteCodeRulesMakeRepository inteCodeRulesMakeRepository, IInteCodeRulesRepository inteCodeRulesRepository, ICurrentSite currentSite)
         {
             _sequenceService = sequenceService;
             _inteCodeRulesMakeRepository = inteCodeRulesMakeRepository;
             _inteCodeRulesRepository = inteCodeRulesRepository;
+            _currentSite = currentSite;
         }
 
         /// <summary>
@@ -144,7 +148,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         public async Task<IEnumerable<string>> GenerateBarcodeListByIdAsync(GenerateBarcodeDto param)
         {
             var getCodeRulesTask = _inteCodeRulesRepository.GetByIdAsync(param.CodeRuleId);
-            var getCodeRulesMakeListTask = _inteCodeRulesMakeRepository.GetInteCodeRulesMakeEntitiesAsync(new InteCodeRulesMakeQuery { CodeRulesId = param.CodeRuleId });
+            var getCodeRulesMakeListTask = _inteCodeRulesMakeRepository.GetInteCodeRulesMakeEntitiesAsync(new InteCodeRulesMakeQuery { SiteId = _currentSite.SiteId ?? 0, CodeRulesId = param.CodeRuleId });
             var codeRulesMakeList = await getCodeRulesMakeListTask;
             var codeRule = await getCodeRulesTask;
             var barcodeSerialNumberList = await GenerateBarcodeSerialNumberAsync(new BarcodeSerialNumberDto

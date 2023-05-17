@@ -1,10 +1,10 @@
 ﻿using FluentValidation;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.EquipmentServices.Request.BindContainer;
+using Hymson.MES.EquipmentServices.Dtos.BindContainer;
 
 namespace Hymson.MES.EquipmentServices.Validators.BindContainer
 {
-    internal class BindContainerValidator : AbstractValidator<BindContainerRequest>
+    internal class BindContainerValidator : AbstractValidator<BindContainerDto>
     {
         /// <summary>
         /// 容器绑定验证
