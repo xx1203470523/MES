@@ -211,7 +211,11 @@ namespace Hymson.MES.Services.Services.Manufacture
             //获取条码生产信息
             //var produceSFCobj = await _manuCommonService.GetProduceSFCAsync(createManuContainerBarcodeDto.BarCode);
             //var sfcProduceEntity = produceSFCobj.Item1;
-            var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(createManuContainerBarcodeDto.BarCode);
+            var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery() 
+            {
+                SiteId=_currentSite.SiteId??0,
+                Sfc= createManuContainerBarcodeDto.BarCode
+            });
             if (sfcProduceEntity != null)
             {
                 //条码是否已报废
@@ -263,9 +267,10 @@ namespace Hymson.MES.Services.Services.Manufacture
             // 获取锁状态
             var sfcProduceBusinessEntity = await _manuSfcProduceRepository.GetSfcProduceBusinessBySFCAsync(new SfcProduceBusinessQuery
             {
+                SiteId = _currentSite.SiteId ?? 0,
                 Sfc = sfcProduceEntity.SFC,
                 BusinessType = ManuSfcProduceBusinessType.Lock
-            });
+            }) ;
             if (sfcProduceBusinessEntity != null)
             {
                 sfcProduceBusinessEntity.VerifyProcedureLock(createManuContainerBarcodeDto.BarCode, facePlateContainerPackEntity.ProcedureId);
@@ -700,6 +705,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 //根据编码类型，包装等级查询编码规则
                 var inteCodeRulesResult = await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery
                 {
+                    SiteId = _currentSite.SiteId ?? 0,
                     ProductId = ProductId,
                     CodeType = CodeRuleCodeTypeEnum.PackagingSeqCode,
                     PackType = packType
@@ -841,7 +847,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             else
             {
-                var query = new ManuSfcProduceQuery  { Sfcs = packs.Select(x => x.LadeBarCode).ToArray()};
+                var query = new ManuSfcProduceQuery { SiteId = _currentSite.SiteId ?? 0, Sfcs = packs.Select(x => x.LadeBarCode).ToArray()};
                 var sfcProduceEntities = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(query);
                 sfcDatas = sfcProduceEntities.ToList();
                 var orderIds = sfcDatas.Select(x => x.WorkOrderId).ToArray();

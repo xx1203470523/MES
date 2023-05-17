@@ -444,11 +444,6 @@ namespace Hymson.MES.Services.Dtos.Process
     public class ProcMaterialPagedQueryDto : PagerInfo
     {
         /// <summary>
-        /// 所属站点代码
-        /// </summary>
-        public long SiteId { get; set; }
-
-        /// <summary>
         /// 物料组ID
         /// </summary>
         public long? GroupId { get; set; }

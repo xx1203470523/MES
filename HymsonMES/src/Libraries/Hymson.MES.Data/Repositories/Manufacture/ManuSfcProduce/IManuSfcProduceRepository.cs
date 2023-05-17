@@ -43,9 +43,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 根据SFC获取数据
         /// </summary>
-        /// <param name="sfc"></param>
+        /// <param name="sfcQuery"></param>
         /// <returns></returns>
-        Task<ManuSfcProduceEntity> GetBySFCAsync(string sfc);
+        Task<ManuSfcProduceEntity> GetBySFCAsync(ManuSfcProduceBySfcQuery sfcQuery);
 
         /// <summary>
         /// 获取List
@@ -108,14 +108,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        Task<int> DeletePhysicalAsync(string sfc);
+        Task<int> DeletePhysicalAsync(DeletePhysicalBySfcCommand sfcCommand);
 
         /// <summary>
         /// 批量删除（物理删除）条码信息
         /// </summary>
         /// <param name="sfcs"></param>
         /// <returns></returns>
-        Task<int> DeletePhysicalRangeAsync(IEnumerable<string> sfcs);
+        Task<int> DeletePhysicalRangeAsync(DeletePhysicalBySfcsCommand sfcsCommand);
 
         /// <summary>
         /// 批量更新条码IsScrap

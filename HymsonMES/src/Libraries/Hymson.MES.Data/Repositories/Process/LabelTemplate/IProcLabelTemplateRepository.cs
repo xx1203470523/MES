@@ -68,7 +68,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcLabelTemplateEntity> GetByIdAsync(long id);
-        Task<ProcLabelTemplateEntity> GetByNameAsync(string name);
+        Task<ProcLabelTemplateEntity> GetByNameAsync(ProcLabelTemplateByNameQuery query);
 
         /// <summary>
         /// 根据IDs批量获取数据

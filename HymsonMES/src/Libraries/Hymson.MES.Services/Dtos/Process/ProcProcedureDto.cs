@@ -188,6 +188,11 @@ namespace Hymson.MES.Services.Dtos.Process
         public ProcedureTypeEnum? Type { get; set; }
 
         /// <summary>
+        /// 类型列表
+        /// </summary>
+        public ProcedureTypeEnum[]? TypeArr { get; set; }
+
+        /// <summary>
         /// 描述 :资源类型名称 
         /// </summary>
         public string? ResTypeName { get; set; }

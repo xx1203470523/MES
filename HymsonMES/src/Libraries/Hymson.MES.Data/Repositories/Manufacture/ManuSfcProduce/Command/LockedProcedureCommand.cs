@@ -12,6 +12,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
     /// </summary>
     public  class LockedProcedureCommand
     {
+        public long SiteId { get; set; }
+
         /// <summary>
         /// 条码列表
         /// </summary>

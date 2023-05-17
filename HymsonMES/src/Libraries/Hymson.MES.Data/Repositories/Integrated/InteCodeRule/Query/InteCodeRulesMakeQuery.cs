@@ -19,6 +19,8 @@ namespace Hymson.MES.Data.Repositories.Integrated
     /// </summary>
     public class InteCodeRulesMakeQuery
     {
+        public long SiteId { get; set; }
+
         /// <summary>
         /// 编码规则Id
         /// </summary>

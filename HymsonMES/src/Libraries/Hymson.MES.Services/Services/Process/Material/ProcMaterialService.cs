@@ -262,9 +262,8 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<PagedInfo<ProcMaterialDto>> GetPageListAsync(ProcMaterialPagedQueryDto procMaterialPagedQueryDto)
         {
-            procMaterialPagedQueryDto.SiteId = _currentSite.SiteId ?? 0;
-
             var procMaterialPagedQuery = procMaterialPagedQueryDto.ToQuery<ProcMaterialPagedQuery>();
+            procMaterialPagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _procMaterialRepository.GetPagedInfoAsync(procMaterialPagedQuery);
 
             //实体到DTO转换 装载数据
@@ -296,8 +295,8 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<PagedInfo<ProcMaterialDto>> GetPageListForGroupAsync(ProcMaterialPagedQueryDto procMaterialPagedQueryDto)
         {
-            procMaterialPagedQueryDto.SiteId = _currentSite.SiteId ?? 0;
             var procMaterialPagedQuery = procMaterialPagedQueryDto.ToQuery<ProcMaterialPagedQuery>();
+            procMaterialPagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _procMaterialRepository.GetPagedInfoForGroupAsync(procMaterialPagedQuery);
 
             //实体到DTO转换 装载数据

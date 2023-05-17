@@ -96,7 +96,7 @@ namespace Hymson.MES.Services.Services.Report
         {
             var workshopJobControlStepReportDto = new WorkshopJobControlStepReportDto() { SFC=sfc};
 
-            var sfcSteps= await _manuSfcStepRepository.GetSFCInOutStepAsync(sfc);
+            var sfcSteps= await _manuSfcStepRepository.GetSFCInOutStepAsync(new SFCInOutStepQuery() { SiteId=_currentSite.SiteId??0,Sfc=sfc});
 
             if (sfcSteps==null|| !sfcSteps.Any()) 
             {

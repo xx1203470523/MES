@@ -85,10 +85,8 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
-            if (query.SiteId > 0)
-            {
-                sqlBuilder.Where("SiteId = @SiteId");
-            }
+             sqlBuilder.Where("SiteId = @SiteId");
+
             var offSet = (query.PageIndex - 1) * query.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = query.PageSize });

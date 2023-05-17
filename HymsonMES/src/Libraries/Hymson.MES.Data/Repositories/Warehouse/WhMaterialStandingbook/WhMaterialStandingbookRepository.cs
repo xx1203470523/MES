@@ -127,6 +127,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         public async Task<IEnumerable<WhMaterialStandingbookEntity>> GetWhMaterialStandingbookEntitiesAsync(WhMaterialStandingbookQuery whMaterialStandingbookQuery)
         {
             var sqlBuilder = new SqlBuilder();
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Select("*");
+            sqlBuilder.OrderBy(" CreatedOn DESC");
+            sqlBuilder.Where("SiteId=@SiteId");
             var template = sqlBuilder.AddTemplate(GetWhMaterialStandingbookEntitiesSqlTemplate);
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var whMaterialStandingbookEntities = await conn.QueryAsync<WhMaterialStandingbookEntity>(template.RawSql, whMaterialStandingbookQuery);

@@ -19,6 +19,6 @@ namespace Hymson.MES.Data.Repositories.Integrated
     /// </summary>
     public class InteCodeRulesMakePagedQuery : PagerInfo
     {
-
+        public long SiteId { get; set; }
     }
 }

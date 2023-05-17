@@ -217,8 +217,17 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         /// <returns></returns>
         public async Task CreateBarcodeByWorkOrderIdAndPrint(CreateBarcodeByWorkOrderAndPrintDto param)
         {
-            var lst = await CreateBarcodeByWorkOrderId(new CreateBarcodeByWorkOrderDto() { Qty = param.Qty, WorkOrderId = param.WorkOrderId }); 
-            
+            var lst = await CreateBarcodeByWorkOrderId(new CreateBarcodeByWorkOrderDto() { Qty = param.Qty, WorkOrderId = param.WorkOrderId });
+            foreach (var item in lst)
+            {
+                await _planSfcPrintService.CreatePrintAsync(new Dtos.Plan.PlanSfcPrintCreatePrintDto()
+                {
+                    PrintId = param.PrintId,
+                    ProcedureId = param.ProcedureId,
+                    SFC = item.SFC,
+                    WorkOrderId = param.WorkOrderId
+                });
+            }
         }
 
 

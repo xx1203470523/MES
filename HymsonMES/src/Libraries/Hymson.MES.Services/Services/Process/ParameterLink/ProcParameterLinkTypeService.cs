@@ -120,6 +120,7 @@ namespace Hymson.MES.Services.Services.Process
 
             var current = await _procParameterLinkTypeRepository.GetProcParameterLinkTypeEntitiesAsync(new ProcParameterLinkTypeQuery
             {
+                SiteId= _currentSite.SiteId,
                 ParameterType = procParameterLinkTypeModifyDto.ParameterType
             });
 
