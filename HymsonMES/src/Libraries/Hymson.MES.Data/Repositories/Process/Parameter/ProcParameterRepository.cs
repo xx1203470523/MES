@@ -11,7 +11,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -72,6 +72,17 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ProcParameterEntity>(GetByIdsSql, new { ids = ids });
+        }
+
+        /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcParameterEntity>> GetByCodesAsync(EntityByCodesQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcParameterEntity>(GetByCodesSql, query);
         }
 
         /// <summary>
@@ -195,6 +206,9 @@ namespace Hymson.MES.Data.Repositories.Process
 
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class ProcParameterRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_parameter` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
@@ -202,6 +216,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetProcParameterEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `proc_parameter` /**where**/  ";
+        const string GetByCodesSql = "SELECT * FROM proc_parameter WHERE `IsDeleted` = 0 AND SiteId = @Site AND ParameterCode IN @Codes";
 
         const string InsertSql = "INSERT INTO `proc_parameter`(  `Id`, `SiteId`, `ParameterCode`, `ParameterName`, `ParameterUnit`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ParameterCode, @ParameterName, @ParameterUnit, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `proc_parameter`(  `Id`, `SiteId`, `ParameterCode`, `ParameterName`, `ParameterUnit`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ParameterCode, @ParameterName, @ParameterUnit, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";

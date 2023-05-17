@@ -7,6 +7,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query
     /// </summary>
     public class SfcListProduceBusinessQuery
     {
+        public long SiteId { get; set; }
+
         /// <summary>
         /// 集合（条码）
         /// </summary>
@@ -23,6 +25,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query
     /// </summary>
     public class SfcProduceBusinessQuery
     {
+        public long SiteId { get; set; }
+
         /// <summary>
         /// 条码
         /// </summary>

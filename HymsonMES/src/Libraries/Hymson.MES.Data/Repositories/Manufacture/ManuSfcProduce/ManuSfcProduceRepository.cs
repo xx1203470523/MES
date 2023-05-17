@@ -129,6 +129,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
 
+            sqlBuilder.Where("SiteId = @SiteId");
+
             if (query.Sfcs != null && query.Sfcs.Length > 0)
             {
                 sqlBuilder.Where("Sfc in @Sfcs");
@@ -185,10 +187,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        public async Task<ManuSfcProduceEntity> GetBySFCAsync(string sfc)
+        public async Task<ManuSfcProduceEntity> GetBySFCAsync(ManuSfcProduceBySfcQuery sfcQuery)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ManuSfcProduceEntity>(GetBySFCSql, new { sfc });
+            return await conn.QueryFirstOrDefaultAsync<ManuSfcProduceEntity>(GetBySFCSql, sfcQuery);
         }
 
         /// <summary>
@@ -273,10 +275,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        public async Task<int> DeletePhysicalAsync(string sfc)
+        public async Task<int> DeletePhysicalAsync(DeletePhysicalBySfcCommand sfcCommand)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeletePhysicalSql, new { sfc });
+            return await conn.ExecuteAsync(DeletePhysicalSql, sfcCommand );
         }
 
         /// <summary>
@@ -284,10 +286,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfcs"></param>
         /// <returns></returns>
-        public async Task<int> DeletePhysicalRangeAsync(IEnumerable<string> sfcs)
+        public async Task<int> DeletePhysicalRangeAsync(DeletePhysicalBySfcsCommand sfcsCommand)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeletePhysicalRangeSql, new { Sfcs = sfcs });
+            return await conn.ExecuteAsync(DeletePhysicalRangeSql, sfcsCommand);
         }
 
         /// <summary>
@@ -512,31 +514,31 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetSfcProduceBusinessBySFCIdSql = "SELECT * FROM manu_sfc_produce_business WHERE IsDeleted = 0 AND SfcProduceId = @SfcInfoId ";
         const string GetSfcProduceBusinessBySFCSql = @" SELECT SPB.* FROM manu_sfc_produce_business SPB  
                                           LEFT JOIN manu_sfc_produce sfc on sfc.Id =SPB.SfcProduceId 
-                            WHERE SPB.IsDeleted = 0 AND SPB.BusinessType = @BusinessType AND SFC.SFC = @Sfc ";
+                            WHERE SPB.IsDeleted = 0 AND SPB.BusinessType = @BusinessType AND SPB.SiteId=@SiteId AND SFC.SFC = @Sfc ";
         const string GetSfcProduceBusinessBySFCsSql = @"SELECT SFC.Sfc,SPB.* FROM manu_sfc_produce_business SPB  
                                         LEFT JOIN manu_sfc_produce SFC on sfc.Id =SPB.SfcProduceId 
-                            WHERE SPB.IsDeleted = 0 AND SPB.BusinessType = @BusinessType AND SFC.SFC IN @Sfcs ";
+                            WHERE SPB.IsDeleted = 0 AND SPB.BusinessType = @BusinessType AND SPB.SiteId=@SiteId AND SFC.SFC IN @Sfcs ";
         const string GetSfcProduceBusinessBySFCIdsSql = "SELECT * FROM manu_sfc_produce_business WHERE SfcProduceId IN @SfcInfoIds  AND IsDeleted=0";
-        const string GetBySFCSql = @"SELECT * FROM manu_sfc_produce WHERE SFC = @sfc ";
-        const string DeletePhysicalSql = "DELETE FROM manu_sfc_produce WHERE SFC = @sfc";
-        const string DeletePhysicalRangeSql = "DELETE FROM manu_sfc_produce WHERE SFC in @Sfcs";
+        const string GetBySFCSql = @"SELECT * FROM manu_sfc_produce WHERE SFC = @Sfc and SiteId=@SiteId ";
+        const string DeletePhysicalSql = "DELETE FROM manu_sfc_produce WHERE SFC = @Sfc and SiteId=@SiteId ";
+        const string DeletePhysicalRangeSql = "DELETE FROM manu_sfc_produce WHERE SFC in @Sfcs and SiteId=@SiteId ";
         const string DeleteSfcProduceBusinessBySfcInfoIdSql = "DELETE FROM manu_sfc_produce_business WHERE SiteId = @SiteId AND SfcProduceId = @SfcInfoId";
         const string RealDeletesSfcProduceBusinessSql = "DELETE FROM manu_sfc_produce_business WHERE SfcProduceId IN @SfcInfoIds AND BusinessType=@BusinessType";
         const string InsertOrUpdateSfcProduceBusinessSql = @"INSERT INTO `manu_sfc_produce_business`(  `Id`, `SiteId`, `SfcProduceId`, `BusinessType`, `BusinessContent`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcProduceId, @BusinessType, @BusinessContent, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted ) ON DUPLICATE KEY UPDATE
                                                              BusinessContent = @BusinessContent,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  ";
         //质量锁定sql
-        const string UpdateQualityLockSql = "update  manu_sfc_produce set `Lock`=@Lock,LockProductionId=@LockProductionId,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn where SFC in  @Sfcs";
-        const string UpdateIsScrapSql = "UPDATE `manu_sfc_produce` SET IsScrap = @IsScrap, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE SFC in @Sfcs ";
+        const string UpdateQualityLockSql = "update  manu_sfc_produce set `Lock`=@Lock,LockProductionId=@LockProductionId,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn where SFC in  @Sfcs  and SiteId=@SiteId ";
+        const string UpdateIsScrapSql = "UPDATE `manu_sfc_produce` SET IsScrap = @IsScrap, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE SFC in @Sfcs and SiteId=SiteId ";
 
         //在制维修 
         const string UpdateStatusSql = "UPDATE `manu_sfc_produce` SET Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string UpdateProcedureIdSql = "UPDATE `manu_sfc_produce` SET ProcedureId = @ProcedureId, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
 
         //在制品步骤控制 
-        const string UpdateProcedureAndStatusSql = "UPDATE `manu_sfc_produce` SET ProcedureId = @ProcedureId,Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE SFC in @Sfcs ";
+        const string UpdateProcedureAndStatusSql = "UPDATE `manu_sfc_produce` SET ProcedureId = @ProcedureId,Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE SFC in @Sfcs and SiteId=@SiteId ";
         //不良录入修改工艺路线和工序信息
         const string UpdateRouteSql = "UPDATE `manu_sfc_produce` SET ProcessRouteId = @ProcessRouteId, ProcedureId=@ProcedureId,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id in @Ids ";
-        const string LockSfcProcedureSql = "UPDATE `manu_sfc_produce`  SET  BeforeLockedStatus=Status,Status = @Status,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE  SFC in  @Sfcs";
-        const string UnLockSfcProcedureSql = "UPDATE `manu_sfc_produce`  SET Status = BeforeLockedStatus, BeforeLockedStatus=null,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE  SFC in  @Sfcs";
+        const string LockSfcProcedureSql = "UPDATE `manu_sfc_produce`  SET  BeforeLockedStatus=Status,Status = @Status,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE  SFC in  @Sfcs and SiteId=@SiteId ";
+        const string UnLockSfcProcedureSql = "UPDATE `manu_sfc_produce`  SET Status = BeforeLockedStatus, BeforeLockedStatus=null,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE  SFC in  @Sfcs and SiteId=@SiteId ";
     }
 }

@@ -325,7 +325,7 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
                 }
 
                 //查询关联的编码规则组成
-                var inteCodeRulesMakeEntitys = await _inteCodeRulesMakeRepository.GetInteCodeRulesMakeEntitiesAsync(new InteCodeRulesMakeQuery { CodeRulesId = inteCodeRulesEntity.Id });
+                var inteCodeRulesMakeEntitys = await _inteCodeRulesMakeRepository.GetInteCodeRulesMakeEntitiesAsync(new InteCodeRulesMakeQuery { SiteId=_currentSite.SiteId ?? 0, CodeRulesId = inteCodeRulesEntity.Id });
 
                 List<InteCodeRulesMakeDto> inteCodeRulesDtos = new List<InteCodeRulesMakeDto>();
                 if (inteCodeRulesMakeEntitys != null && inteCodeRulesMakeEntitys.Count() > 0)

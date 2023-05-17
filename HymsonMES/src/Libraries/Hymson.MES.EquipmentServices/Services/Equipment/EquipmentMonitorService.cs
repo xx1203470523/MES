@@ -1,6 +1,11 @@
-﻿using Hymson.MES.Core.Domain.Equipment;
+﻿using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.EquipmentServices.Request.Equipment;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -35,8 +40,20 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         private readonly IEquStatusRepository _equipmentStatusRepository;
 
         /// <summary>
-        /// 仓储（设备状态）
+        /// 仓储（设备生产参数）
         /// </summary>
+        private readonly IEquProductParameterRepository _equProductParameterRepository;
+
+        /// <summary>
+        /// 仓储（资源维护）
+        /// </summary>
+        private readonly IProcResourceRepository _procResourceRepository;
+
+        /// <summary>
+        /// 仓储（标准参数）
+        /// </summary>
+        private readonly IProcParameterRepository _procParameterRepository;
+
 
         /// <summary>
         /// 构造函数
@@ -45,15 +62,24 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// <param name="equipmentHeartbeatRepository"></param>
         /// <param name="equipmentAlarmRepository"></param>
         /// <param name="equipmentStatusRepository"></param>
+        /// <param name="equProductParameterRepository"></param>
+        /// <param name="procResourceRepository"></param>
+        /// <param name="procParameterRepository"></param>
         public EquipmentMonitorService(ICurrentEquipment currentEquipment,
             IEquHeartbeatRepository equipmentHeartbeatRepository,
             IEquAlarmRepository equipmentAlarmRepository,
-            IEquStatusRepository equipmentStatusRepository)
+            IEquStatusRepository equipmentStatusRepository,
+            IEquProductParameterRepository equProductParameterRepository,
+            IProcResourceRepository procResourceRepository,
+            IProcParameterRepository procParameterRepository)
         {
             _currentEquipment = currentEquipment;
             _equipmentHeartbeatRepository = equipmentHeartbeatRepository;
             _equipmentAlarmRepository = equipmentAlarmRepository;
             _equipmentStatusRepository = equipmentStatusRepository;
+            _equProductParameterRepository = equProductParameterRepository;
+            _procResourceRepository = procResourceRepository;
+            _procParameterRepository = procParameterRepository;
         }
 
 
@@ -180,7 +206,91 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
 
 
 
+        /// <summary>
+        /// 设备过程参数采集(无在制品条码)
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task EquipmentProcessParamAsync(EquipmentProcessParamRequest request)
+        {
+            // TODO
+            var userCode = request.EquipmentCode; //_currentEquipment.Code
+            var nowTime = HymsonClock.Now();
+            var siteId = _currentEquipment.SiteId;
 
+            if (request.ParamList == null || request.ParamList.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES19107));
+
+            // 查询设备参数
+            var paramCodes = request.ParamList.Select(s => s.ParamCode);
+            var parameterEntities = await _procParameterRepository.GetByCodesAsync(new EntityByCodesQuery
+            {
+                Site = siteId,
+                Codes = paramCodes,
+            });
+
+            // 找出不在数据库里面的Code
+            var noIncluedeCodes = paramCodes.Where(w => parameterEntities.Select(s => s.ParameterCode).Contains(w) == false);
+            if (noIncluedeCodes.Any() == true) throw new CustomerValidationException(nameof(ErrorCode.MES19108)).WithData("Code", string.Join(',', noIncluedeCodes));
+
+            // 查询资源
+            var resourceEntity = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery
+            {
+                Site = siteId,
+                Code = request.ResourceCode,
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19109)).WithData("Code", request.ResourceCode);
+
+            var entitis = request.ParamList.Select(s => new EquProductParameterEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = siteId,
+                CreatedBy = userCode,
+                CreatedOn = nowTime,
+                UpdatedBy = userCode,
+                UpdatedOn = nowTime,
+                EquipmentId = _currentEquipment.Id ?? 0,
+                LocalTime = request.LocalTime,
+
+                //ProcedureId = 0,
+                ResourceId = resourceEntity.Id,
+                ParameterId = GetParameterIdByParameterCode(s.ParamCode, parameterEntities),
+                ParamValue = s.ParamValue
+            });
+
+            await _equProductParameterRepository.InsertsAsync(entitis);
+        }
+
+        /// <summary>
+        /// 设备产品过程参数采集(无在制品条码)
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task EquipmentProductProcessParamInNotCanSFCAsync(EquipmentProductProcessParamInNotCanSFCRequest request)
+        {
+            // TODO
+            await Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// 设备产品过程参数采集
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task EquipmentProductProcessParamAsync(EquipmentProductProcessParamRequest request)
+        {
+            // TODO
+            var userCode = request.EquipmentCode; //_currentEquipment.Code
+            var nowTime = HymsonClock.Now();
+            var siteId = _currentEquipment.SiteId;
+
+            if (request.SFCParams == null || request.SFCParams.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES19110));
+
+            // TODO
+            await Task.CompletedTask;
+        }
+
+
+
+        #region 内部方法
         /// <summary>
         /// 更新设备状态
         /// </summary>
@@ -218,6 +328,22 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
 
             trans.Complete();
         }
+
+        /// <summary>
+        /// 根据参数编码获取参数Id
+        /// </summary>
+        /// <param name="parameterCode"></param>
+        /// <param name="parameterEntities"></param>
+        /// <returns></returns>
+        private static long GetParameterIdByParameterCode(string parameterCode, IEnumerable<ProcParameterEntity> parameterEntities)
+        {
+            var entity = parameterEntities.FirstOrDefault(f => f.ParameterCode == parameterCode);
+            if (entity == null) return 0;
+
+            return entity.Id;
+        }
+        #endregion
+
 
     }
 }

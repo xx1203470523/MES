@@ -1,9 +1,9 @@
 ﻿namespace Hymson.MES.Data.Repositories.Common.Query
 {
     /// <summary>
-    /// code查询实体集合
+    /// code查询实体
     /// </summary>
-    public class EntityByCodesQuery
+    public  class EntityByCodeQuery
     {
         /// <summary>
         /// 工厂
@@ -13,6 +13,6 @@
         /// <summary>
         /// 编码
         /// </summary>
-        public IEnumerable<string> Codes { get; set; }
+        public string Code { get; set; }
     }
 }

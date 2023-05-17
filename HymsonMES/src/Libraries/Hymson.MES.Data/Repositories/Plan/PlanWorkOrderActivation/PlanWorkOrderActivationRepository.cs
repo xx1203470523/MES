@@ -137,6 +137,7 @@ namespace Hymson.MES.Data.Repositories.Plan
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("wo.IsDeleted=0");
+            sqlBuilder.Where("wo.SiteId=@SiteId");
 
             if (planWorkOrderActivationPagedQuery.WorkCenterIds != null && planWorkOrderActivationPagedQuery.WorkCenterIds.Count > 0)
             {

@@ -1,6 +1,7 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
 
 namespace Hymson.MES.Data.Repositories.Process
@@ -20,6 +21,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcResourceEntity> GetResByIdAsync(long id);
+
+        /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ProcResourceEntity> GetByCodeAsync(EntityByCodeQuery query);
 
         /// <summary>
         /// 查询某些资源类型下关联的资源列表

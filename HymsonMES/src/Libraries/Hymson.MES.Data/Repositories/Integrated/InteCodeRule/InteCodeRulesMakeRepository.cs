@@ -96,12 +96,13 @@ namespace Hymson.MES.Data.Repositories.Integrated
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
+            sqlBuilder.Where("SiteId=@SiteId");
 
             //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
-           
+
             var offSet = (inteCodeRulesMakePagedQuery.PageIndex - 1) * inteCodeRulesMakePagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = inteCodeRulesMakePagedQuery.PageSize });
@@ -125,6 +126,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetInteCodeRulesMakeEntitiesSqlTemplate);
             sqlBuilder.Select("*");
+            sqlBuilder.Where(" SiteId=@SiteId ");
 
             if (inteCodeRulesMakeQuery.CodeRulesId>0)
             {

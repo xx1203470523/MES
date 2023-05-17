@@ -175,7 +175,7 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
         }
         private async Task<ProcLabelTemplateEntity> QueryProcLabelTemplateByNameAsync(string name)
         {
-            return await _procLabelTemplateRepository.GetByNameAsync(name);
+            return await _procLabelTemplateRepository.GetByNameAsync(new ProcLabelTemplateByNameQuery() {SiteId=_currentSite.SiteId??0,Name=name });
 
         }
     }

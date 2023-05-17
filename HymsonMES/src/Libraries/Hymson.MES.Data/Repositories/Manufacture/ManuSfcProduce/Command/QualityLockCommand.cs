@@ -12,6 +12,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public class QualityLockCommand
     {
+        public long SiteId { get; set; }
+
         /// <summary>
         /// 操作类型
         /// </summary>

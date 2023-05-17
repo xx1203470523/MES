@@ -232,7 +232,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             if (nextProcedure == null)
             {
                 // 删除 manu_sfc_produce
-                rows += await _manuSfcProduceRepository.DeletePhysicalAsync(sfcProduceEntity.SFC);
+                rows += await _manuSfcProduceRepository.DeletePhysicalAsync( new DeletePhysicalBySfcCommand() 
+                {
+                    SiteId=_currentSite.SiteId??0,
+                    Sfc= sfcProduceEntity.SFC
+                } );
 
                 // 插入 manu_sfc_step 状态为 完成
                 sfcStep.Operatetype = ManuSfcStepTypeEnum.OutStock;    // TODO 这里的状态？？

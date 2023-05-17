@@ -115,6 +115,7 @@ namespace Hymson.MES.Data.Repositories.Plan
 
             sqlBuilder.Select("*");
             sqlBuilder.Where(" IsDeleted = 0 ");
+            sqlBuilder.Where(" SiteId = @SiteId ");
 
             if (planWorkOrderBindQuery.ResourceId.HasValue)
             {

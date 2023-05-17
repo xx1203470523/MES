@@ -218,7 +218,11 @@ namespace Hymson.MES.Services.Services.Plan
                     UserId = _currentUser.UserName,
                     DeleteOn = HymsonClock.Now()
                 });
-                rows += await _manuSfcProduceRepository.DeletePhysicalRangeAsync(sfcEntities.Select(s => s.SFC).ToArray());
+                rows += await _manuSfcProduceRepository.DeletePhysicalRangeAsync(new Data.Repositories.Manufacture.ManuSfcProduce.Command.DeletePhysicalBySfcsCommand() 
+                {
+                    SiteId=_currentSite.SiteId??0,
+                    Sfcs= sfcEntities.Select(s => s.SFC).ToArray()
+                });
                 rows += await _manuSfcStepRepository.InsertRangeAsync(sfcEntities.Select(s => new ManuSfcStepEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),

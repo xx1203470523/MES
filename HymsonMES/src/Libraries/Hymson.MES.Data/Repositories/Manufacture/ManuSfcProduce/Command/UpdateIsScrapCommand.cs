@@ -9,6 +9,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
 {
     public class UpdateIsScrapCommand
     {
+        public long SiteId { get; set; }
+
         /// <summary>
         /// 产品条码列表
         /// </summary>
