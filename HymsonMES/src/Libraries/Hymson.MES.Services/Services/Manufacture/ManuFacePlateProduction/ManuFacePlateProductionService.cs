@@ -80,7 +80,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <exception cref="BusinessException"></exception>
         public async Task<ManuFacePlateProductionPackageDto> GetManuFacePlateProductionPackageInfo(ManuFacePlateProductionPackageQueryDto param)
         {
-            var manuSfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(param.SFC);
+            var manuSfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                Sfc = param.SFC
+            });
             //判断工序是否一致
             if (manuSfcProduceEntity == null)
             {
