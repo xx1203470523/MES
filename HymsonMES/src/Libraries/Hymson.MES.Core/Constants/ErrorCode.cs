@@ -766,6 +766,7 @@
         public const string MES19110 = "产品条码参数列表不能为空";
         public const string MES19111 = "托盘条码不能为空";
         public const string MES19112 = "上传SFC信息不能为空";
+        public const string MES19113 = "该设备已经设置临时SFC";
 
         #endregion
 

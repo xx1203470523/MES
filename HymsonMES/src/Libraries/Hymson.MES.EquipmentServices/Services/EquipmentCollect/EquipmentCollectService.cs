@@ -7,6 +7,7 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuProductParameter.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.EquipmentServices.Bos;
 using Hymson.MES.EquipmentServices.Dtos.EquipmentCollect;
@@ -229,9 +230,9 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
 
             // 查询设备参数
             var paramCodes = request.ParamList.Select(s => s.ParamCode);
-            var (parameterEntities, resourceEntity) = await GetEntitiesWithCheck(paramCodes, request.ResourceCode);
+            var (parameterEntities, resourceEntity) = await GetEntitiesWithCheckAsync(paramCodes, request.ResourceCode);
 
-            var entitis = request.ParamList.Select(s => new EquProductParameterEntity
+            var entities = request.ParamList.Select(s => new EquProductParameterEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = _currentEquipment.SiteId,
@@ -249,7 +250,7 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
                 Timestamp = s.Timestamp
             });
 
-            await _equProductParameterRepository.InsertsAsync(entitis);
+            await _equProductParameterRepository.InsertsAsync(entities);
         }
 
         /// <summary>
@@ -263,14 +264,21 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
 
             if (request.ParamList == null || request.ParamList.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES19107));
 
-            // 校验数据库是否存在该设备的值
-            // TODO 
-
             // 查询设备参数
             var paramCodes = request.ParamList.Select(s => s.ParamCode);
-            var (parameterEntities, resourceEntity) = await GetEntitiesWithCheck(paramCodes, request.ResourceCode);
+            var (parameterEntities, resourceEntity) = await GetEntitiesWithCheckAsync(paramCodes, request.ResourceCode);
 
-            var entitis = request.ParamList.Select(s => new ManuProductParameterEntity
+            // 校验数据库是否存在该设备的值
+            var isExists = await _manuProductParameterRepository.IsExistsAsync(new EquipmentIdQuery
+            {
+                SiteId = resourceEntity.SiteId,
+                EquipmentId = _currentEquipment.Id ?? 0,
+                ResourceId = resourceEntity.Id,
+                SFC = DefaultSFC
+            });
+            if (isExists == true) throw new CustomerValidationException(nameof(ErrorCode.MES19113));
+
+            var entities = request.ParamList.Select(s => new ManuProductParameterEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = _currentEquipment.SiteId,
@@ -289,7 +297,7 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
                 Timestamp = s.Timestamp
             });
 
-            await _manuProductParameterRepository.InsertsAsync(entitis);
+            await _manuProductParameterRepository.InsertsAsync(entities);
 
             return DefaultSFC;
         }
@@ -322,9 +330,9 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
             }
 
             var paramCodes = paramList.Select(s => s.ParamCode);
-            var (parameterEntities, resourceEntity) = await GetEntitiesWithCheck(paramCodes, request.ResourceCode);
+            var (parameterEntities, resourceEntity) = await GetEntitiesWithCheckAsync(paramCodes, request.ResourceCode);
 
-            var entitis = paramList.Select(s => new ManuProductParameterEntity
+            var entities = paramList.Select(s => new ManuProductParameterEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = _currentEquipment.SiteId,
@@ -343,7 +351,7 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
                 Timestamp = s.Timestamp
             });
 
-            await _manuProductParameterRepository.InsertsAsync(entitis);
+            await _manuProductParameterRepository.InsertsAsync(entities);
         }
 
 
@@ -393,7 +401,7 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
         /// <param name="paramCodes"></param>
         /// <param name="resourceCode"></param>
         /// <returns></returns>
-        private async Task<(IEnumerable<ProcParameterEntity>, ProcResourceEntity)> GetEntitiesWithCheck(IEnumerable<string> paramCodes, string resourceCode)
+        private async Task<(IEnumerable<ProcParameterEntity>, ProcResourceEntity)> GetEntitiesWithCheckAsync(IEnumerable<string> paramCodes, string resourceCode)
         {
             var parameterEntities = await _procParameterRepository.GetByCodesAsync(new EntityByCodesQuery
             {
