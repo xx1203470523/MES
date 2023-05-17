@@ -92,8 +92,15 @@ namespace Hymson.MES.EquipmentServices.Services.BindContainer
                 };
                 traySfcRecord.Add(sfcRecord);
             }
+            //更新托盘信息
+            inteTrayLoad.UpdatedBy = _currentEquipment.Name;
+            inteTrayLoad.UpdatedOn = HymsonClock.Now();
+            //计算绑定数量
+            inteTrayLoad.LoadQty = traySfcRelations.Count;
+
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
+                await _manuTrayLoadRepository.UpdateAsync(inteTrayLoad);
                 await _manuTraySfcRelationRepository.InsertsAsync(traySfcRelations);
                 await _manuTraySfcRecordRepository.InsertsAsync(traySfcRecord);
                 //提交
@@ -148,6 +155,12 @@ namespace Hymson.MES.EquipmentServices.Services.BindContainer
                 traySfcRecord.Add(sfcRecord);
                 idsList.Add(item.Id);
             }
+            //更新托盘信息
+            inteTrayLoad.UpdatedBy = _currentEquipment.Name;
+            inteTrayLoad.UpdatedOn = HymsonClock.Now();
+            //计算绑定数量
+            inteTrayLoad.LoadQty = trayLoads.Count() - unBindSFCs.Count();
+
             //删除
             var command = new DeleteCommand
             {
@@ -157,6 +170,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindContainer
             };
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
+                await _manuTrayLoadRepository.UpdateAsync(inteTrayLoad);
                 await _manuTraySfcRelationRepository.DeleteTruesAsync(command);
                 await _manuTraySfcRecordRepository.InsertsAsync(traySfcRecord);
                 //提交
