@@ -152,7 +152,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [HttpPost("EquipmentProcessParam")]
         public async Task EquipmentProcessParamAsync(EquipmentProcessParamRequest request)
         {
-            await Task.CompletedTask;
+            await _equipmentService.EquipmentProcessParamAsync(request);
         }
 
         /// <summary>
@@ -163,7 +163,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [HttpPost("EquipmentProductProcessParamInNotCanSFC")]
         public async Task EquipmentProductProcessParamInNotCanSFCAsync(EquipmentProductProcessParamInNotCanSFCRequest request)
         {
-            await Task.CompletedTask;
+            await _equipmentService.EquipmentProductProcessParamInNotCanSFCAsync(request);
         }
 
         /// <summary>
@@ -174,7 +174,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [HttpPost("EquipmentProductProcessParam")]
         public async Task EquipmentProductProcessParamAsync(EquipmentProductProcessParamRequest request)
         {
-            await Task.CompletedTask;
+            await _equipmentService.EquipmentProductProcessParamAsync(request);
         }
 
 

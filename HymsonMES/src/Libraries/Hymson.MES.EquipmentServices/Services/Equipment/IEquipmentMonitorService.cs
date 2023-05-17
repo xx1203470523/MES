@@ -56,7 +56,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task EquipmentProductProcessParamAsync(EquipmentProductProcessParamInNotCanSFCRequest request);
+        Task EquipmentProductProcessParamAsync(EquipmentProductProcessParamRequest request);
 
 
 

@@ -1,6 +1,7 @@
 ﻿using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment;
@@ -251,7 +252,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
 
                 //ProcedureId = 0,
                 ResourceId = resourceEntity.Id,
-                //parameterId = parameterEntities.FirstOrDefault(f => f.ParameterCode == s.ParamCode)?.Id,
+                ParameterId = GetParameterIdByParameterCode(s.ParamCode, parameterEntities),
                 ParamValue = s.ParamValue
             });
 
@@ -274,8 +275,16 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task EquipmentProductProcessParamAsync(EquipmentProductProcessParamInNotCanSFCRequest request)
+        public async Task EquipmentProductProcessParamAsync(EquipmentProductProcessParamRequest request)
         {
+            // TODO
+            var userCode = request.EquipmentCode; //_currentEquipment.Code
+            var nowTime = HymsonClock.Now();
+            var siteId = _currentEquipment.SiteId;
+
+            if (request.SFCParams == null || request.SFCParams.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES19110));
+
+            // TODO
             await Task.CompletedTask;
         }
 
@@ -318,6 +327,20 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
             }
 
             trans.Complete();
+        }
+
+        /// <summary>
+        /// 根据参数编码获取参数Id
+        /// </summary>
+        /// <param name="parameterCode"></param>
+        /// <param name="parameterEntities"></param>
+        /// <returns></returns>
+        private static long GetParameterIdByParameterCode(string parameterCode, IEnumerable<ProcParameterEntity> parameterEntities)
+        {
+            var entity = parameterEntities.FirstOrDefault(f => f.ParameterCode == parameterCode);
+            if (entity == null) return 0;
+
+            return entity.Id;
         }
         #endregion
 

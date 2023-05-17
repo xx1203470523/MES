@@ -763,7 +763,8 @@
         public const string MES19107 = "参数列表不能为空";
         public const string MES19108 = "参数编码{Code}不存在";
         public const string MES19109 = "资源编码{Code}不存在";
-     
+        public const string MES19110 = "产品条码参数列表不能为空";
+
         #endregion
 
         #endregion
