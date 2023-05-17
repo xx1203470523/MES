@@ -186,6 +186,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuTrayLoadService, ManuTrayLoadService>();
             services.AddSingleton<IManuTraySfcRecordService, ManuTraySfcRecordService>();
             services.AddSingleton<IManuTraySfcRelationService, ManuTraySfcRelationService>();
+            services.AddSingleton<IManuSfcBindService, ManuSfcBindService>();
+            services.AddSingleton<IManuSfcBindRecordService, ManuSfcBindRecordService>();
 
             #endregion
 
@@ -421,6 +423,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<ManuTraySfcRecordModifyDto>, ManuTraySfcRecordModifyValidator>();
             services.AddSingleton<AbstractValidator<ManuTraySfcRelationCreateDto>, ManuTraySfcRelationCreateValidator>();
             services.AddSingleton<AbstractValidator<ManuTraySfcRelationModifyDto>, ManuTraySfcRelationModifyValidator>();
+
+            services.AddSingleton<AbstractValidator<ManuSfcBindCreateDto>, ManuSfcBindCreateValidator>();
+            services.AddSingleton<AbstractValidator<ManuSfcBindModifyDto>, ManuSfcBindModifyValidator>();
+            services.AddSingleton<AbstractValidator<ManuSfcBindRecordCreateDto>, ManuSfcBindRecordCreateValidator>();
+            services.AddSingleton<AbstractValidator<ManuSfcBindRecordModifyDto>, ManuSfcBindRecordModifyValidator>();
             #endregion
 
             #region Warehouse 

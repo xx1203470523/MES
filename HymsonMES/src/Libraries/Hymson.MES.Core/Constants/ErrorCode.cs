@@ -748,11 +748,12 @@
         public const string MES19004 = "调用本地时间不能为空";
         #endregion
 
-        public const string MES19101 = "绑定的电芯条码列表不能为空";
+        public const string MES19101 = "条码列表不能为空";
         public const string MES19102 = "容器编码不能为空";
-        public const string MES19103 = "容器电芯条码列表不能为空";
+        public const string MES19103 = "容器条码列表不能为空";
         public const string MES19104 = "托盘装载信息不存在";
         public const string MES19105 = "此托盘未装载任何信息";
+        public const string MES19106 = "不存在任何绑定关系不需要解绑";
 
         #endregion
 

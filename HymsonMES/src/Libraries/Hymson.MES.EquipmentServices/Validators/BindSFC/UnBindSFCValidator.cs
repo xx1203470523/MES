@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.EquipmentServices.Request.BindSFC;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,9 @@ namespace Hymson.MES.EquipmentServices.Validators.BindSFC
         /// </summary>
         public UnBindSFCValidator()
         {
+            RuleFor(x => x.ResourceCode).NotEmpty().WithErrorCode(ErrorCode.MES19002);
+            RuleFor(x => x.SFC).NotEmpty().WithErrorCode(ErrorCode.MES19003);
+            RuleFor(x => x.BindSFCs).NotEmpty().Must(list => list.Length <= 0).WithErrorCode(ErrorCode.MES19101);
         }
     }
 }

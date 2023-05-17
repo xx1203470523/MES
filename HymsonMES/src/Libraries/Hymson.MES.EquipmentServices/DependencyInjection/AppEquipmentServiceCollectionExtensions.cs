@@ -74,7 +74,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IBindContainerService, BindContainerService>();//容器解绑绑定
             services.AddSingleton<IInBoundService, InBoundService>();//进站
             services.AddSingleton<IOutBoundService, OutBoundService>();//出站
-            //services.AddSingleton<IOutBoundMoreService, OutBoundMoreService>();//出站（多个）
 
 
             services.AddSingleton<IInboundInContainerService, InboundInContainerService>();// 进站-容器
