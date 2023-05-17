@@ -31,6 +31,7 @@ namespace Hymson.MES.Equipment.Api
                 Id = 1,
                 Name = "设备1",
                 SiteId = 123456,
+                Code = "Test"
             };
             var token = JwtHelper.GenerateJwtToken(equipmentModel, _jwtOptions);
             Console.WriteLine(token);

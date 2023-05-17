@@ -27,13 +27,14 @@ namespace Hymson.MES.Equipment.Api
             // Add services to the container.
             builder.Services.AddControllers(options =>
             {
-                options.Filters.Add(typeof(HttpGlobalExceptionFilter));
-                options.Filters.Add(typeof(HttpGlobalActionFilter));
+                options.Filters.Add(typeof(EquipmentExceptionFilter));
+                options.Filters.Add(typeof(EquipmentActionFilter));
+                options.Filters.Add(typeof(EquipmentAsyncResultFilter));
                 options.Filters.Add(new AuthorizeFilter());
             }).AddJsonOptions((jsonOptions) =>
             {
                 jsonOptions.JsonSerializerOptions.Converters.Add(new CustomInt64Converter());
-            }); ;
+            });
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddMemoryCache();
