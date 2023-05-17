@@ -101,8 +101,7 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
         /// <returns></returns>
         public async Task EquipmentHeartbeatAsync(EquipmentHeartbeatDto request)
         {
-            // TODO
-            var userCode = request.EquipmentCode; //_currentEquipment.Code
+            var userCode = _currentEquipment.Code;
             var nowTime = HymsonClock.Now();
 
             var entity = new EquHeartbeatEntity
@@ -142,8 +141,7 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
         /// <returns></returns>
         public async Task EquipmentStateAsync(EquipmentStateDto request)
         {
-            // TODO
-            var userCode = request.EquipmentCode; //_currentEquipment.Code
+            var userCode = _currentEquipment.Code;
             var nowTime = HymsonClock.Now();
 
             await UpdateEquipmentStatusAsync(new EquStatusEntity
@@ -167,8 +165,7 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
         /// <returns></returns>
         public async Task EquipmentAlarmAsync(EquipmentAlarmDto request)
         {
-            // TODO
-            var userCode = request.EquipmentCode; //_currentEquipment.Code
+            var userCode = _currentEquipment.Code;
             var nowTime = HymsonClock.Now();
 
             await _equipmentAlarmRepository.InsertAsync(new EquAlarmEntity
@@ -194,8 +191,7 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
         /// <returns></returns>
         public async Task EquipmentDownReasonAsync(EquipmentDownReasonDto request)
         {
-            // TODO
-            var userCode = request.EquipmentCode; //_currentEquipment.Code
+            var userCode = _currentEquipment.Code;
             var nowTime = HymsonClock.Now();
 
             await UpdateEquipmentStatusAsync(new EquStatusEntity
@@ -224,8 +220,7 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
         /// <returns></returns>
         public async Task EquipmentProcessParamAsync(EquipmentProcessParamDto request)
         {
-            // TODO
-            var userCode = request.EquipmentCode; //_currentEquipment.Code
+            var userCode = _currentEquipment.Code;
             var nowTime = HymsonClock.Now();
             var siteId = _currentEquipment.SiteId;
 
@@ -289,8 +284,7 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
         /// <returns></returns>
         public async Task EquipmentProductProcessParamAsync(EquipmentProductProcessParamDto request)
         {
-            // TODO
-            var userCode = request.EquipmentCode; //_currentEquipment.Code
+            var userCode = _currentEquipment.Code;
             var nowTime = HymsonClock.Now();
             var siteId = _currentEquipment.SiteId;
 
