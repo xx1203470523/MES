@@ -177,8 +177,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 根据托盘条码查询装载信息
         /// </summary>
         /// <param name="manuTraySfcRelationQuery"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<ManuTraySfcRelationEntity>> GetManuTraySfcRelationByContaineCodeAsync(ManuTraySfcRelationByTrayCodeQuery manuTraySfcRelationByTrayCode)
+        /// <returns></returns> 
+        public async Task<IEnumerable<ManuTraySfcRelationEntity>> GetManuTraySfcRelationByTrayCodeAsync(ManuTraySfcRelationByTrayCodeQuery manuTraySfcRelationByTrayCode)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
