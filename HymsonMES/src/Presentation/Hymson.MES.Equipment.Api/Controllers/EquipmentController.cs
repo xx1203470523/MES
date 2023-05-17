@@ -159,9 +159,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("EquipmentProductProcessParamInNotCanSFC")]
-        public async Task EquipmentProductProcessParamInNotCanSFCAsync(EquipmentProductProcessParamInNotCanSFCDto request)
+        public async Task<string> EquipmentProductProcessParamInNotCanSFCAsync(EquipmentProductProcessParamInNotCanSFCDto request)
         {
-            await _equipmentService.EquipmentProductProcessParamInNotCanSFCAsync(request);
+            return await _equipmentService.EquipmentProductProcessParamInNotCanSFCAsync(request);
         }
 
         /// <summary>

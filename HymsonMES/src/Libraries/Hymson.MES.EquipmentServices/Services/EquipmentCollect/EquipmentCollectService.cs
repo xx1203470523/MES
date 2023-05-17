@@ -18,10 +18,17 @@ using Hymson.Web.Framework.WorkContext;
 namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
 {
     /// <summary>
-    /// 设备服务
+    /// 设备信息收集服务
+    /// @author Czhipu
+    /// @date 2023-05-16 04:51:15
     /// </summary>
     public class EquipmentCollectService : IEquipmentCollectService
     {
+        /// <summary>
+        /// 默认条码（应该统一出处存放常量）
+        /// </summary>
+        private const string DefaultSFC = "HYM123456789";
+
         /// <summary>
         /// 
         /// </summary>
@@ -101,16 +108,15 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
         /// <returns></returns>
         public async Task EquipmentHeartbeatAsync(EquipmentHeartbeatDto request)
         {
-            var userCode = _currentEquipment.Code;
             var nowTime = HymsonClock.Now();
 
             var entity = new EquHeartbeatEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = _currentEquipment.SiteId,
-                CreatedBy = userCode,
+                CreatedBy = _currentEquipment.Code,
+                UpdatedBy = _currentEquipment.Code,
                 CreatedOn = nowTime,
-                UpdatedBy = userCode,
                 UpdatedOn = nowTime,
                 EquipmentId = _currentEquipment.Id ?? 0,
                 Status = request.IsOnline,
@@ -141,16 +147,15 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
         /// <returns></returns>
         public async Task EquipmentStateAsync(EquipmentStateDto request)
         {
-            var userCode = _currentEquipment.Code;
             var nowTime = HymsonClock.Now();
 
             await UpdateEquipmentStatusAsync(new EquStatusEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = _currentEquipment.SiteId,
-                CreatedBy = userCode,
+                CreatedBy = _currentEquipment.Code,
+                UpdatedBy = _currentEquipment.Code,
                 CreatedOn = nowTime,
-                UpdatedBy = userCode,
                 UpdatedOn = nowTime,
                 EquipmentId = _currentEquipment.Id ?? 0,
                 LocalTime = request.LocalTime,
@@ -165,16 +170,15 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
         /// <returns></returns>
         public async Task EquipmentAlarmAsync(EquipmentAlarmDto request)
         {
-            var userCode = _currentEquipment.Code;
             var nowTime = HymsonClock.Now();
 
             await _equipmentAlarmRepository.InsertAsync(new EquAlarmEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = _currentEquipment.SiteId,
-                CreatedBy = userCode,
+                CreatedBy = _currentEquipment.Code,
+                UpdatedBy = _currentEquipment.Code,
                 CreatedOn = nowTime,
-                UpdatedBy = userCode,
                 UpdatedOn = nowTime,
                 EquipmentId = _currentEquipment.Id ?? 0,
                 LocalTime = request.LocalTime,
@@ -191,16 +195,15 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
         /// <returns></returns>
         public async Task EquipmentDownReasonAsync(EquipmentDownReasonDto request)
         {
-            var userCode = _currentEquipment.Code;
             var nowTime = HymsonClock.Now();
 
             await UpdateEquipmentStatusAsync(new EquStatusEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = _currentEquipment.SiteId,
-                CreatedBy = userCode,
+                CreatedBy = _currentEquipment.Code,
+                UpdatedBy = _currentEquipment.Code,
                 CreatedOn = nowTime,
-                UpdatedBy = userCode,
                 UpdatedOn = nowTime,
                 EquipmentId = _currentEquipment.Id ?? 0,
                 LocalTime = request.LocalTime,
@@ -220,38 +223,21 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
         /// <returns></returns>
         public async Task EquipmentProcessParamAsync(EquipmentProcessParamDto request)
         {
-            var userCode = _currentEquipment.Code;
             var nowTime = HymsonClock.Now();
-            var siteId = _currentEquipment.SiteId;
 
             if (request.ParamList == null || request.ParamList.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES19107));
 
             // 查询设备参数
             var paramCodes = request.ParamList.Select(s => s.ParamCode);
-            var parameterEntities = await _procParameterRepository.GetByCodesAsync(new EntityByCodesQuery
-            {
-                Site = siteId,
-                Codes = paramCodes,
-            });
-
-            // 找出不在数据库里面的Code
-            var noIncludeCodes = paramCodes.Where(w => parameterEntities.Select(s => s.ParameterCode).Contains(w) == false);
-            if (noIncludeCodes.Any() == true) throw new CustomerValidationException(nameof(ErrorCode.MES19108)).WithData("Code", string.Join(',', noIncludeCodes));
-
-            // 查询资源
-            var resourceEntity = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery
-            {
-                Site = siteId,
-                Code = request.ResourceCode,
-            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19109)).WithData("Code", request.ResourceCode);
+            var (parameterEntities, resourceEntity) = await GetEntitiesWithCheck(paramCodes, request.ResourceCode);
 
             var entitis = request.ParamList.Select(s => new EquProductParameterEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
-                SiteId = siteId,
-                CreatedBy = userCode,
+                SiteId = _currentEquipment.SiteId,
+                CreatedBy = _currentEquipment.Code,
+                UpdatedBy = _currentEquipment.Code,
                 CreatedOn = nowTime,
-                UpdatedBy = userCode,
                 UpdatedOn = nowTime,
                 EquipmentId = _currentEquipment.Id ?? 0,
                 LocalTime = request.LocalTime,
@@ -271,10 +257,41 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task EquipmentProductProcessParamInNotCanSFCAsync(EquipmentProductProcessParamInNotCanSFCDto request)
+        public async Task<string> EquipmentProductProcessParamInNotCanSFCAsync(EquipmentProductProcessParamInNotCanSFCDto request)
         {
-            // TODO
-            await Task.CompletedTask;
+            var nowTime = HymsonClock.Now();
+
+            if (request.ParamList == null || request.ParamList.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES19107));
+
+            // 校验数据库是否存在该设备的值
+            // TODO 
+
+            // 查询设备参数
+            var paramCodes = request.ParamList.Select(s => s.ParamCode);
+            var (parameterEntities, resourceEntity) = await GetEntitiesWithCheck(paramCodes, request.ResourceCode);
+
+            var entitis = request.ParamList.Select(s => new ManuProductParameterEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = _currentEquipment.SiteId,
+                CreatedBy = _currentEquipment.Code,
+                UpdatedBy = _currentEquipment.Code,
+                CreatedOn = nowTime,
+                UpdatedOn = nowTime,
+                EquipmentId = _currentEquipment.Id ?? 0,
+                LocalTime = request.LocalTime,
+
+                //ProcedureId = 0,
+                SFC = DefaultSFC,
+                ResourceId = resourceEntity.Id,
+                ParameterId = GetParameterIdByParameterCode(s.ParamCode, parameterEntities),
+                ParamValue = s.ParamValue,
+                Timestamp = s.Timestamp
+            });
+
+            await _manuProductParameterRepository.InsertsAsync(entitis);
+
+            return DefaultSFC;
         }
 
         /// <summary>
@@ -284,12 +301,12 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
         /// <returns></returns>
         public async Task EquipmentProductProcessParamAsync(EquipmentProductProcessParamDto request)
         {
-            var userCode = _currentEquipment.Code;
             var nowTime = HymsonClock.Now();
-            var siteId = _currentEquipment.SiteId;
 
             if (request.SFCParams == null || request.SFCParams.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES19110));
-            if (request.SFCParams.Any(a => a.ParamList == null || a.ParamList.Any() == false)) throw new CustomerValidationException(nameof(ErrorCode.MES19107));
+            if (request.SFCParams.Any(a => a.ParamList == null
+            || a.SFC.IsEmpty() == true
+            || a.ParamList.Any() == false)) throw new CustomerValidationException(nameof(ErrorCode.MES19107));
 
             // 查询设备参数
             List<EquipmentProductParamBo> paramList = new();
@@ -305,30 +322,15 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
             }
 
             var paramCodes = paramList.Select(s => s.ParamCode);
-            var parameterEntities = await _procParameterRepository.GetByCodesAsync(new EntityByCodesQuery
-            {
-                Site = siteId,
-                Codes = paramCodes,
-            });
-
-            // 找出不在数据库里面的Code
-            var noIncludeCodes = paramCodes.Where(w => parameterEntities.Select(s => s.ParameterCode).Contains(w) == false);
-            if (noIncludeCodes.Any() == true) throw new CustomerValidationException(nameof(ErrorCode.MES19108)).WithData("Code", string.Join(',', noIncludeCodes));
-
-            // 查询资源
-            var resourceEntity = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery
-            {
-                Site = siteId,
-                Code = request.ResourceCode,
-            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19109)).WithData("Code", request.ResourceCode);
+            var (parameterEntities, resourceEntity) = await GetEntitiesWithCheck(paramCodes, request.ResourceCode);
 
             var entitis = paramList.Select(s => new ManuProductParameterEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
-                SiteId = siteId,
-                CreatedBy = userCode,
+                SiteId = _currentEquipment.SiteId,
+                CreatedBy = _currentEquipment.Code,
+                UpdatedBy = _currentEquipment.Code,
                 CreatedOn = nowTime,
-                UpdatedBy = userCode,
                 UpdatedOn = nowTime,
                 EquipmentId = _currentEquipment.Id ?? 0,
                 LocalTime = request.LocalTime,
@@ -383,6 +385,34 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
             }
 
             trans.Complete();
+        }
+
+        /// <summary>
+        /// 获取相关实体（附带校验）
+        /// </summary>
+        /// <param name="paramCodes"></param>
+        /// <param name="resourceCode"></param>
+        /// <returns></returns>
+        private async Task<(IEnumerable<ProcParameterEntity>, ProcResourceEntity)> GetEntitiesWithCheck(IEnumerable<string> paramCodes, string resourceCode)
+        {
+            var parameterEntities = await _procParameterRepository.GetByCodesAsync(new EntityByCodesQuery
+            {
+                Site = _currentEquipment.SiteId,
+                Codes = paramCodes,
+            });
+
+            // 找出不在数据库里面的Code
+            var noIncludeCodes = paramCodes.Where(w => parameterEntities.Select(s => s.ParameterCode).Contains(w) == false);
+            if (noIncludeCodes.Any() == true) throw new CustomerValidationException(nameof(ErrorCode.MES19108)).WithData("Code", string.Join(',', noIncludeCodes));
+
+            // 查询资源
+            var resourceEntity = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery
+            {
+                Site = _currentEquipment.SiteId,
+                Code = resourceCode,
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19109)).WithData("Code", resourceCode);
+
+            return (parameterEntities, resourceEntity);
         }
 
         /// <summary>
