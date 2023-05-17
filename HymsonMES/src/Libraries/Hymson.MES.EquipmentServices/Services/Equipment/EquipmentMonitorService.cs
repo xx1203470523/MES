@@ -22,17 +22,17 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// <summary>
         /// 仓储（设备心跳）
         /// </summary>
-        private readonly IEquipmentHeartbeatRepository _equipmentHeartbeatRepository;
+        private readonly IEquHeartbeatRepository _equipmentHeartbeatRepository;
 
         /// <summary>
         /// 仓储（设备报警）
         /// </summary>
-        private readonly IEquipmentAlarmRepository _equipmentAlarmRepository;
+        private readonly IEquAlarmRepository _equipmentAlarmRepository;
 
         /// <summary>
         /// 仓储（设备状态）
         /// </summary>
-        private readonly IEquipmentStatusRepository _equipmentStatusRepository;
+        private readonly IEquStatusRepository _equipmentStatusRepository;
 
         /// <summary>
         /// 仓储（设备状态）
@@ -46,9 +46,9 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// <param name="equipmentAlarmRepository"></param>
         /// <param name="equipmentStatusRepository"></param>
         public EquipmentMonitorService(ICurrentEquipment currentEquipment,
-            IEquipmentHeartbeatRepository equipmentHeartbeatRepository,
-            IEquipmentAlarmRepository equipmentAlarmRepository,
-            IEquipmentStatusRepository equipmentStatusRepository)
+            IEquHeartbeatRepository equipmentHeartbeatRepository,
+            IEquAlarmRepository equipmentAlarmRepository,
+            IEquStatusRepository equipmentStatusRepository)
         {
             _currentEquipment = currentEquipment;
             _equipmentHeartbeatRepository = equipmentHeartbeatRepository;
@@ -68,7 +68,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
             var userCode = request.EquipmentCode; //_currentEquipment.Code
             var nowTime = HymsonClock.Now();
 
-            var entity = new EquipmentHeartbeatEntity
+            var entity = new EquHeartbeatEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = _currentEquipment.SiteId,
@@ -83,7 +83,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
 
             using var trans = TransactionHelper.GetTransactionScope();
             await _equipmentHeartbeatRepository.InsertAsync(entity);
-            await _equipmentHeartbeatRepository.InsertRecordAsync(new EquipmentHeartbeatRecordEntity
+            await _equipmentHeartbeatRepository.InsertRecordAsync(new EquHeartbeatRecordEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = entity.SiteId,
@@ -109,7 +109,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
             var userCode = request.EquipmentCode; //_currentEquipment.Code
             var nowTime = HymsonClock.Now();
 
-            await UpdateEquipmentStatusAsync(new EquipmentStatusEntity
+            await UpdateEquipmentStatusAsync(new EquStatusEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = _currentEquipment.SiteId,
@@ -134,7 +134,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
             var userCode = request.EquipmentCode; //_currentEquipment.Code
             var nowTime = HymsonClock.Now();
 
-            await _equipmentAlarmRepository.InsertAsync(new EquipmentAlarmEntity
+            await _equipmentAlarmRepository.InsertAsync(new EquAlarmEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = _currentEquipment.SiteId,
@@ -161,7 +161,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
             var userCode = request.EquipmentCode; //_currentEquipment.Code
             var nowTime = HymsonClock.Now();
 
-            await UpdateEquipmentStatusAsync(new EquipmentStatusEntity
+            await UpdateEquipmentStatusAsync(new EquStatusEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = _currentEquipment.SiteId,
@@ -186,7 +186,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// </summary>
         /// <param name="currentStatusEntity"></param>
         /// <returns></returns>
-        private async Task UpdateEquipmentStatusAsync(EquipmentStatusEntity currentStatusEntity)
+        private async Task UpdateEquipmentStatusAsync(EquStatusEntity currentStatusEntity)
         {
             // 最近的状态记录
             var lastStatusEntity = await _equipmentStatusRepository.GetLastEntityByEquipmentIdAsync(currentStatusEntity.EquipmentId);
@@ -200,7 +200,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
             // 更新统计表
             if (lastStatusEntity != null && lastStatusEntity.EquipmentStatus != lastStatusEntity.EquipmentStatus)
             {
-                await _equipmentStatusRepository.InsertStatisticsAsync(new EquipmentStatusStatisticsEntity
+                await _equipmentStatusRepository.InsertStatisticsAsync(new EquStatusStatisticsEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = currentStatusEntity.SiteId,

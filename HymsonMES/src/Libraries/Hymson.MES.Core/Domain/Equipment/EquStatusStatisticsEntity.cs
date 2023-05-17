@@ -9,7 +9,7 @@ namespace Hymson.MES.Core.Domain.Equipment
     /// @author Czhipu
     /// @date 2023-05-16 04:51:59
     /// </summary>
-    public class EquipmentStatusStatisticsEntity : BaseEntity
+    public class EquStatusStatisticsEntity : BaseEntity
     {
         /// <summary>
         /// 站点Id

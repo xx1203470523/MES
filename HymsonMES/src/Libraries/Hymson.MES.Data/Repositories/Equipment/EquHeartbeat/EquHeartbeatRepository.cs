@@ -9,13 +9,13 @@ namespace Hymson.MES.Data.Repositories.Equipment
     /// <summary>
     /// 设备心跳仓储
     /// </summary>
-    public partial class EquipmentHeartbeatRepository : BaseRepository, IEquipmentHeartbeatRepository
+    public partial class EquHeartbeatRepository : BaseRepository, IEquHeartbeatRepository
     {
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public EquipmentHeartbeatRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
+        public EquHeartbeatRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
 
 
         /// <summary>
@@ -23,7 +23,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(EquipmentHeartbeatEntity entity)
+        public async Task<int> InsertAsync(EquHeartbeatEntity entity)
         {
             var stringBuilder = new StringBuilder();
             stringBuilder.Append(InsertSql);
@@ -51,7 +51,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(IEnumerable<EquipmentHeartbeatEntity> entities)
+        public async Task<int> InsertsAsync(IEnumerable<EquHeartbeatEntity> entities)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, entities);
@@ -63,7 +63,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> InsertRecordAsync(EquipmentHeartbeatRecordEntity entity)
+        public async Task<int> InsertRecordAsync(EquHeartbeatRecordEntity entity)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertRecordSql, entity);
@@ -74,7 +74,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> InsertRecordsAsync(IEnumerable<EquipmentHeartbeatRecordEntity> entities)
+        public async Task<int> InsertRecordsAsync(IEnumerable<EquHeartbeatRecordEntity> entities)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertRecordsSql, entities);
@@ -85,7 +85,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
     /// <summary>
     /// 
     /// </summary>
-    public partial class EquipmentHeartbeatRepository
+    public partial class EquHeartbeatRepository
     {
         const string InsertSql = "INSERT INTO `equ_heartbeat`(  `Id`, `SiteId`, `EquipmentId`, `LastOnLineTime`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @EquipmentId, @LastOnLineTime, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `equ_heartbeat`(  `Id`, `SiteId`, `EquipmentId`, `LastOnLineTime`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @EquipmentId, @LastOnLineTime, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";

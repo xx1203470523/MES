@@ -8,13 +8,13 @@ namespace Hymson.MES.Data.Repositories.Equipment
     /// <summary>
     /// 设备状态仓储
     /// </summary>
-    public partial class EquipmentStatusRepository : BaseRepository, IEquipmentStatusRepository
+    public partial class EquStatusRepository : BaseRepository, IEquStatusRepository
     {
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public EquipmentStatusRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
+        public EquStatusRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
 
 
         /// <summary>
@@ -22,7 +22,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(EquipmentStatusEntity entity)
+        public async Task<int> InsertAsync(EquStatusEntity entity)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, entity);
@@ -33,7 +33,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(IEnumerable<EquipmentStatusEntity> entities)
+        public async Task<int> InsertsAsync(IEnumerable<EquStatusEntity> entities)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, entities);
@@ -44,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> InsertStatisticsAsync(EquipmentStatusStatisticsEntity entity)
+        public async Task<int> InsertStatisticsAsync(EquStatusStatisticsEntity entity)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertStatisticsSql, entity);
@@ -55,7 +55,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(EquipmentStatusEntity entity)
+        public async Task<int> UpdateAsync(EquStatusEntity entity)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, entity);
@@ -66,7 +66,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> UpdatesAsync(IEnumerable<EquipmentStatusEntity> entities)
+        public async Task<int> UpdatesAsync(IEnumerable<EquStatusEntity> entities)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, entities);
@@ -77,10 +77,10 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="equipmentId"></param>
         /// <returns></returns>
-        public async Task<EquipmentStatusEntity> GetLastEntityByEquipmentIdAsync(long equipmentId)
+        public async Task<EquStatusEntity> GetLastEntityByEquipmentIdAsync(long equipmentId)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<EquipmentStatusEntity>(GetLastEntityByEquipmentIdSql, new { equipmentId });
+            return await conn.QueryFirstOrDefaultAsync<EquStatusEntity>(GetLastEntityByEquipmentIdSql, new { equipmentId });
         }
 
     }
@@ -88,7 +88,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
     /// <summary>
     /// 
     /// </summary>
-    public partial class EquipmentStatusRepository
+    public partial class EquStatusRepository
     {
         const string InsertSql = "REPLACE INTO `equ_status`(  `Id`, `SiteId`, `EquipmentId`, `EquipmentStatus`, `LossRemark`, `BeginTime`, `EndTime`, `LocalTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @EquipmentId, @EquipmentStatus, @LossRemark, @BeginTime, @EndTime, @LocalTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `equ_status`(  `Id`, `SiteId`, `EquipmentId`, `EquipmentStatus`, `LossRemark`, `BeginTime`, `EndTime`, `LocalTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @EquipmentId, @EquipmentStatus, @LossRemark, @BeginTime, @EndTime, @LocalTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";

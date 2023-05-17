@@ -8,13 +8,13 @@ namespace Hymson.MES.Data.Repositories.Equipment
     /// <summary>
     /// 设备报警信息仓储
     /// </summary>
-    public partial class EquipmentAlarmRepository : BaseRepository, IEquipmentAlarmRepository
+    public partial class EquAlarmRepository : BaseRepository, IEquAlarmRepository
     {
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public EquipmentAlarmRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
+        public EquAlarmRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
 
 
         /// <summary>
@@ -22,7 +22,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(EquipmentAlarmEntity entity)
+        public async Task<int> InsertAsync(EquAlarmEntity entity)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, entity);
@@ -33,7 +33,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(IEnumerable<EquipmentAlarmEntity> entities)
+        public async Task<int> InsertsAsync(IEnumerable<EquAlarmEntity> entities)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, entities);
@@ -44,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
     /// <summary>
     /// 
     /// </summary>
-    public partial class EquipmentAlarmRepository
+    public partial class EquAlarmRepository
     {
         const string InsertSql = "INSERT INTO `equ_alarm`(  `Id`, `SiteId`, `EquipmentId`, `FaultCode`, `AlarmMsg`, `Status`, `LocalTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @EquipmentId, @FaultCode, @AlarmMsg, @Status, @LocalTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `equ_alarm`(  `Id`, `SiteId`, `EquipmentId`, `FaultCode`, `AlarmMsg`, `Status`, `LocalTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @EquipmentId, @FaultCode, @AlarmMsg, @Status, @LocalTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";

@@ -1,14 +1,15 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Equipment
 {
     /// <summary>
-    /// 设备状态记录表，数据实体对象   
-    /// equ_status_record
+    /// 设备报警信息，数据实体对象   
+    /// equ_alarm
     /// @author Czhipu
-    /// @date 2023-05-16 04:51:46
+    /// @date 2023-05-16 04:51:15
     /// </summary>
-    public class EquipmentStatusRecordEntity : BaseEntity
+    public class EquAlarmEntity : BaseEntity
     {
         /// <summary>
         /// 站点Id
@@ -21,24 +22,19 @@ namespace Hymson.MES.Core.Domain.Equipment
         public long EquipmentId { get; set; }
 
         /// <summary>
-        /// 状态;0.自动运行、1.手动运行、2.停机、3.故障、4.离线
+        /// 故障代码
         /// </summary>
-        public bool EquipmentStatus { get; set; }
+        public string FaultCode { get; set; }
 
         /// <summary>
-        /// 停机原因
+        /// 故障信息
         /// </summary>
-        public string LossRemark { get; set; }
+        public string AlarmMsg { get; set; }
 
         /// <summary>
-        /// 设备停机开始时间
+        /// 状态;1、开启 2、恢复
         /// </summary>
-        public DateTime? HaltBeginTime { get; set; }
-
-        /// <summary>
-        /// 设备停机开始时间
-        /// </summary>
-        public DateTime? HaltEndTime { get; set; }
+        public EquipmentAlarmStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 传输时间
