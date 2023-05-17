@@ -73,9 +73,30 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 sqlBuilder.Where("Status in @StatusArr");
             }
-            if (query.Type.HasValue)
+            if (query.TypeArr != null && query.TypeArr.Length > 0)
             {
-                sqlBuilder.Where("Type=@Type");
+                if (query.Type.HasValue)
+                {
+                    if (query.TypeArr.Contains(query.Type.Value))
+                    {
+                        sqlBuilder.Where("Type=@Type");
+                    }
+                    else
+                    {
+                        sqlBuilder.Where("Type=-1");
+                    }
+                }
+                else
+                {
+                    sqlBuilder.Where("Type in @TypeArr");
+                }
+            }
+            else
+            {
+                if (query.Type.HasValue)
+                {
+                    sqlBuilder.Where("Type=@Type");
+                }
             }
             if (!string.IsNullOrWhiteSpace(query.ResTypeName))
             {
@@ -104,7 +125,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<ProcProcedureEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcProcedureEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ProcProcedureEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -115,8 +136,8 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<bool> IsExistsAsync(ProcProcedureQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var entity= await conn.QueryAsync<ProcProcedureEntity>(ExistsSql, new { Code = query.Code, SiteId = query.SiteId });
-            return entity != null&&entity.Any();
+            var entity = await conn.QueryAsync<ProcProcedureEntity>(ExistsSql, new { Code = query.Code, SiteId = query.SiteId });
+            return entity != null && entity.Any();
         }
 
         /// <summary>
@@ -124,10 +145,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcProcedureEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ProcProcedureEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcProcedureEntity>(GetByIdsSql, new { ids = ids});
+            return await conn.QueryAsync<ProcProcedureEntity>(GetByIdsSql, new { ids = ids });
         }
 
         /// <summary>
@@ -174,7 +195,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<int> DeleteRangeAsync(DeleteCommand command)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeletesSql, new { UpdatedBy = command.UserId, UpdatedOn =command.DeleteOn, Ids = command.Ids});
+            return await conn.ExecuteAsync(DeletesSql, new { UpdatedBy = command.UserId, UpdatedOn = command.DeleteOn, Ids = command.Ids });
         }
     }
 

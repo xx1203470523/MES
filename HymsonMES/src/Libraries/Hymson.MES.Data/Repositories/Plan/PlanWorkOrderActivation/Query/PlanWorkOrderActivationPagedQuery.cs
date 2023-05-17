@@ -20,6 +20,8 @@ namespace Hymson.MES.Data.Repositories.Plan
     /// </summary>
     public class PlanWorkOrderActivationPagedQuery : PagerInfo
     {
+        public long SiteId { get; set; }
+
         /// <summary>
         /// 工作中心Id (包含线体的和车间)
         /// </summary>

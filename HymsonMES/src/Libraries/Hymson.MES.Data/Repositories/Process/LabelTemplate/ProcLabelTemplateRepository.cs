@@ -74,10 +74,10 @@ namespace Hymson.MES.Data.Repositories.Process
             return await conn.QueryAsync<ProcLabelTemplateEntity>(GetByIdsSql, new { ids = ids });
         }
 
-        public async Task<ProcLabelTemplateEntity> GetByNameAsync(string name)
+        public async Task<ProcLabelTemplateEntity> GetByNameAsync(ProcLabelTemplateByNameQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcLabelTemplateEntity>(GetBynameSql, new { Name = name });
+            return await conn.QueryFirstOrDefaultAsync<ProcLabelTemplateEntity>(GetBynameSql, query);
         }
 
         /// <summary>
@@ -197,6 +197,6 @@ namespace Hymson.MES.Data.Repositories.Process
                             FROM `proc_label_template`  WHERE Id IN @ids ";
         const string GetBynameSql = @"SELECT 
                                `Id`, `Name`, `Path`, `Content`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
-                            FROM `proc_label_template`  WHERE Name = @Name and IsDeleted=0";
+                            FROM `proc_label_template`  WHERE Name = @Name and IsDeleted=0 and SiteId=@SiteId";
     }
 }

@@ -13,6 +13,8 @@ namespace Hymson.MES.Data.Repositories.Plan
     /// </summary>
     public class PlanWorkOrderBindQuery
     {
+        public long SiteId { get; set; }
+
         /// <summary>
         /// 资源ID
         /// </summary>

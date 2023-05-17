@@ -193,7 +193,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 }
 
                 //判断是否有未关闭的维修业务，有不允许添加
-                var sfcRepairs = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Repair });
+                var sfcRepairs = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { SiteId = _currentSite.SiteId ?? 0, Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Repair });
                 if (sfcRepairs != null && sfcRepairs.Any())
                 {
                     var strs = string.Join(",", sfcRepairs.Select(x => x.Sfc));
@@ -277,6 +277,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 };
                 var isScrapCommand = new UpdateIsScrapCommand
                 {
+                    SiteId=_currentSite.SiteId??0,
                     Sfcs = sfcs,
                     UserId = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now(),
@@ -758,7 +759,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         private async Task VerifySfcsLockAsync(ManuSfcProduceInfoView[] manuSfcs)
         {
             var sfcs = manuSfcs.Select(x => x.SFC).ToArray();
-            var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
+            var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery {SiteId = _currentSite.SiteId ?? 0, Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
             if (sfcProduceBusinesss != null && sfcProduceBusinesss.Any())
             {
                 //var sfcInfoIds = sfcProduceBusinesss.Select(it => it.SfcProduceId).ToArray();
