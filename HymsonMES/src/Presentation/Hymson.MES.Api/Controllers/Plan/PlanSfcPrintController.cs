@@ -51,6 +51,12 @@ namespace Hymson.MES.Api.Controllers.Plan
         {
             await _planSfcPrintService.CreateAsync(createDto);
         }
+        [HttpPost]
+        [Route("print")]
+        public async Task PrintAsync([FromBody] PlanSfcPrintCreatePrintDto createDto)
+        {
+            await _planSfcPrintService.CreatePrintAsync(createDto);
+        }
 
         /// <summary>
         /// 删除（条码打印）

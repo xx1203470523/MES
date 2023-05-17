@@ -113,17 +113,12 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="equipmentGroupId"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<EquEquipmentEntity>> GetByGroupIdAsync(long equipmentGroupId)
+        public async Task<IEnumerable<EquEquipmentEntity>> GetByGroupIdAsync(EquEquipmentGroupIdQuery param)
         {
-            //var key = $"equ_equipment_{equipmentGroupId}";
-            //return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
-            //{
-            //  // TODO
-            //});
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<EquEquipmentEntity>(GetByGroupIdSql, new { equipmentGroupId });
+            return await conn.QueryAsync<EquEquipmentEntity>(GetByGroupIdSql, param);
         }
 
         /// <summary>
@@ -243,7 +238,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         const string DeleteSql = "UPDATE `equ_equipment` SET `IsDeleted` = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids;";
         const string GetByCodeSql = "SELECT * FROM equ_equipment WHERE `IsDeleted` = 0 AND SiteId = @Site AND EquipmentCode = @Code LIMIT 1";
         const string GetByIdSql = "SELECT * FROM `equ_equipment` WHERE `Id` = @Id;";
-        const string GetByGroupIdSql = "SELECT * FROM `equ_equipment` WHERE `IsDeleted` = 0 AND (EquipmentGroupId = 0 OR EquipmentGroupId = @EquipmentGroupId);";
+        const string GetByGroupIdSql = "SELECT * FROM `equ_equipment` WHERE `IsDeleted` = 0 AND (EquipmentGroupId = 0 AND  SiteId=@SiteId OR EquipmentGroupId = @EquipmentGroupId);";
         const string GetBaseListSql = "SELECT * FROM `equ_equipment` WHERE `IsDeleted` = 0;";
         const string GetByEquipmentCodeSql = "SELECT * FROM `equ_equipment` WHERE IsDeleted = 0 AND SiteId = @Site AND EquipmentCode = @Code;";
         const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM equ_equipment EE /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows";

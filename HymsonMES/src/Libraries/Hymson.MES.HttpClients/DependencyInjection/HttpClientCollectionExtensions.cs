@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Hymson.MES.HttpClients;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -16,7 +17,12 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         public static IServiceCollection AddHttpClientService(this IServiceCollection services, IConfiguration configuration)
         {
-           
+            services.AddHttpClient<ILabelPrintRequest, FastReportPrintRequest>().ConfigureHttpClient(httpClient =>
+            {
+                httpClient.BaseAddress = new Uri("http://localhost:51973/");
+
+            });
+
             return services;
         }
 

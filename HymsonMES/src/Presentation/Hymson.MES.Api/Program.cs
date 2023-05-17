@@ -26,7 +26,7 @@ namespace Hymson.MES.Api
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+            
             // Add services to the container.
             builder.Services.AddControllers(options =>
             {
@@ -42,13 +42,14 @@ namespace Hymson.MES.Api
             builder.Services.AddMemoryCache();
             builder.Services.AddClearCacheService(builder.Configuration);
             builder.Services.AddHostedService<WorkService>();
-
+         
             AddSwaggerGen(builder.Services);
 
             builder.Services.AddJwtBearerService(builder.Configuration);
             builder.Services.AddAppService(builder.Configuration);
             builder.Services.AddSqlLocalization(builder.Configuration);
             builder.Services.AddSequenceService(builder.Configuration);
+            builder.Services.AddHttpClientService(builder.Configuration);
             builder.Services.AddLocalization();
 
             // 注入nlog日志服务

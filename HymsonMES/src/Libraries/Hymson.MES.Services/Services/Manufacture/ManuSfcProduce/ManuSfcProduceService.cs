@@ -1549,21 +1549,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                             }
                         }
                     }
-                    // 其他
-                    else
-                    {
-                        // 获取下一工序
-                        var nextProcedure = await _manuCommonService.GetNextProcedureAsync(firstSFC.WorkOrderId, firstSFC.ProcessRouteId, sfcProduceStepDto.ProcedureId);
-                        if (nextProcedure == null) return;
-
-                        // 将下工序置为"排队中"
-                        foreach (var sfcProduceEntity in sfcProduceEntities)
-                        {
-                            sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
-                            sfcProduceEntity.ProcedureId = nextProcedure.Id;
-                            manuSfcProduceList.Add(sfcProduceEntity);
-                        }
-                    }
                     break;
                 case SfcProduceStatusEnum.lineUp:
                 case SfcProduceStatusEnum.Activity:
@@ -1742,8 +1727,15 @@ namespace Hymson.MES.Services.Services.Manufacture
                         // 其他
                         else
                         {
-                            // 批量更新条码的下工序状态
-                            await _manuSfcProduceRepository.UpdateRangeAsync(manuSfcProduceList);
+                            // 指定工序
+                            await _manuSfcProduceRepository.UpdateProcedureAndStatusRangeAsync(new UpdateProcedureAndStatusCommand
+                            {
+                                Sfcs = sfcsArray,
+                                ProcedureId = sfcProduceStepDto.ProcedureId,
+                                Status = sfcProduceStepDto.Type,
+                                UpdatedOn = HymsonClock.Now(),
+                                UserId = _currentUser.UserName
+                            });
                         }
                         break;
                     case SfcProduceStatusEnum.lineUp:
@@ -2100,7 +2092,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
             if (sfcProduceBusinesss != null && sfcProduceBusinesss.Any())
             {
-                var sfcInfoIds = sfcProduceBusinesss.Select(it => it.SfcProduceId).ToArray();
+              //  var sfcInfoIds = sfcProduceBusinesss.Select(it => it.SfcProduceId).ToArray();
                 var sfcProduceBusinesssList = sfcProduceBusinesss.ToList();
                 var instantLockSfcs = new List<string>();
                 foreach (var business in sfcProduceBusinesssList)

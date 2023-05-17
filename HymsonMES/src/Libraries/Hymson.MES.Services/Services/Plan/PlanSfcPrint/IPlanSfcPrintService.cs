@@ -14,6 +14,12 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="createDto"></param>
         /// <returns></returns>
         Task CreateAsync(PlanSfcPrintCreateDto createDto);
+        /// <summary>
+        /// 打印
+        /// </summary>
+        /// <param name="createDto"></param>
+        /// <returns></returns>
+        Task CreatePrintAsync(PlanSfcPrintCreatePrintDto createDto);
 
         /// <summary>
         /// 批量删除

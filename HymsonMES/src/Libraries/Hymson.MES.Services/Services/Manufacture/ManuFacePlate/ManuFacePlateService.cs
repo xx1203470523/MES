@@ -16,6 +16,7 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
@@ -157,6 +158,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task<PagedInfo<ManuFacePlateDto>> GetPagedListAsync(ManuFacePlatePagedQueryDto manuFacePlatePagedQueryDto)
         {
             var manuFacePlatePagedQuery = manuFacePlatePagedQueryDto.ToQuery<ManuFacePlatePagedQuery>();
+            manuFacePlatePagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _manuFacePlateRepository.GetPagedInfoAsync(manuFacePlatePagedQuery);
 
             //实体到DTO转换 装载数据
@@ -410,7 +412,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task<ManuFacePlateQueryDto> QueryManuFacePlateByCodeAsync(string code)
         {
             ManuFacePlateQueryDto facePlateQueryDto = new ManuFacePlateQueryDto();
-            var manuFacePlateEntity = await _manuFacePlateRepository.GetByCodeAsync(code);
+            var manuFacePlateEntity = await _manuFacePlateRepository.GetByCodeAsync(new EntityByCodeQuery 
+            { 
+                Code = code,
+                Site=_currentSite.SiteId
+            });
             if (manuFacePlateEntity != null)
             {
                 long resourceId = 0;
