@@ -14,7 +14,7 @@ using Hymson.MES.EquipmentServices.Dtos.SingleBarCodeLoadingVerification;
 using Hymson.MES.EquipmentServices.Services.BindContainer;
 using Hymson.MES.EquipmentServices.Services.BindSFC;
 using Hymson.MES.EquipmentServices.Services.CCDFileUploadComplete;
-using Hymson.MES.EquipmentServices.Services.Equipment;
+using Hymson.MES.EquipmentServices.Services.EquipmentCollect;
 using Hymson.MES.EquipmentServices.Services.FeedingConsumption;
 using Hymson.MES.EquipmentServices.Services.GenerateModuleSFC;
 using Hymson.MES.EquipmentServices.Services.InBound;
@@ -84,7 +84,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IQueryContainerBindSfcService, QueryContainerBindSfcService>();//容器绑定条码查询
 
 
-            services.AddSingleton<IEquipmentMonitorService, EquipmentMonitorService>();   // 设备
+            services.AddSingleton<IEquipmentCollectService, EquipmentCollectService>();   // 设备信息采集
         }
 
         /// <summary>
