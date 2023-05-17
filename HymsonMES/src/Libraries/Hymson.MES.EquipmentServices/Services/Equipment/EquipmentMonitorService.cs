@@ -229,8 +229,8 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
             });
 
             // 找出不在数据库里面的Code
-            var noIncluedeCodes = paramCodes.Where(w => parameterEntities.Select(s => s.ParameterCode).Contains(w) == false);
-            if (noIncluedeCodes.Any() == true) throw new CustomerValidationException(nameof(ErrorCode.MES19108)).WithData("Code", string.Join(',', noIncluedeCodes));
+            var noIncludeCodes = paramCodes.Where(w => parameterEntities.Select(s => s.ParameterCode).Contains(w) == false);
+            if (noIncludeCodes.Any() == true) throw new CustomerValidationException(nameof(ErrorCode.MES19108)).WithData("Code", string.Join(',', noIncludeCodes));
 
             // 查询资源
             var resourceEntity = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery
@@ -253,7 +253,8 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
                 //ProcedureId = 0,
                 ResourceId = resourceEntity.Id,
                 ParameterId = GetParameterIdByParameterCode(s.ParamCode, parameterEntities),
-                ParamValue = s.ParamValue
+                ParamValue = s.ParamValue,
+                Timestamp = s.Timestamp
             });
 
             await _equProductParameterRepository.InsertsAsync(entitis);
@@ -283,6 +284,9 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
             var siteId = _currentEquipment.SiteId;
 
             if (request.SFCParams == null || request.SFCParams.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES19110));
+            if (request.SFCParams.Any(a => a.ParamList == null || a.ParamList.Any() == false)) throw new CustomerValidationException(nameof(ErrorCode.MES19107));
+
+
 
             // TODO
             await Task.CompletedTask;

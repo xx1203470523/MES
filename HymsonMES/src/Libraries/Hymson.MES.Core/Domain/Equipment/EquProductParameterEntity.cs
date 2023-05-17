@@ -45,6 +45,10 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// </summary>
         public DateTime LocalTime { get; set; }
 
-       
+        /// <summary>
+        /// 参数采集到的时间
+        /// </summary>
+        public DateTime Timestamp { get; set; }
+        
     }
 }
