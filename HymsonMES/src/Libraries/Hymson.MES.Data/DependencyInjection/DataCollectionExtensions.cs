@@ -67,6 +67,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquHeartbeatRepository, EquHeartbeatRepository>();
             services.AddSingleton<IEquAlarmRepository, EquAlarmRepository>();
             services.AddSingleton<IEquStatusRepository, EquStatusRepository>();
+            services.AddSingleton<IEquProductParameterRepository, EquProductParameterRepository>();
 
             services.AddSingleton<IEquFaultReasonRepository, EquFaultReasonRepository>();
             #endregion
@@ -189,6 +190,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuTraySfcRelationRepository, ManuTraySfcRelationRepository>();
             services.AddSingleton<IManuSfcBindRecordRepository, ManuSfcBindRecordRepository>();
             services.AddSingleton<IManuSfcBindRepository, ManuSfcBindRepository>();
+            services.AddSingleton<IManuProductParameterRepository, ManuProductParameterRepository>();
             #endregion
 
             #region Warehouse 

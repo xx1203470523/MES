@@ -48,7 +48,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
        /// <summary>
         /// 标准参数Id
         /// </summary>
-        public long parameterId { get; set; }
+        public long ParameterId { get; set; }
 
        /// <summary>
         /// 参数值
