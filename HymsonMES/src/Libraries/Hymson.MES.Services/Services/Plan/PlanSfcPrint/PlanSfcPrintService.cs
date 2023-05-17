@@ -6,11 +6,15 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.HttpClients;
+using Hymson.MES.HttpClients.Requests.Print;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -37,6 +41,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// 验证器
         /// </summary>
         private readonly AbstractValidator<PlanSfcPrintCreateDto> _validationCreateRules;
+        private readonly AbstractValidator<PlanSfcPrintCreatePrintDto> _validationCreatePrintRules;
 
         /// <summary>
         /// 仓储（条码）
@@ -62,6 +67,18 @@ namespace Hymson.MES.Services.Services.Plan
         /// 仓储（工单）
         /// </summary>
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
+        /// <summary>
+        /// 打印机配置
+        /// </summary>
+        private readonly IProcPrintConfigRepository _procPrintConfigRepository;
+        private readonly IProcMaterialRepository _procMaterialRepository;
+        private readonly IProcLabelTemplateRepository _procLabelTemplateRepository;
+        private readonly ILabelPrintRequest _labelPrintRequest;
+        /// <summary>
+        /// 工序-物料-打印模板
+        /// </summary>
+
+        private readonly IProcProcedurePrintRelationRepository _procProcedurePrintRelationRepository;
 
 
         /// <summary>
@@ -77,7 +94,13 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="planWorkOrderRepository"></param>
         public PlanSfcPrintService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<PlanSfcPrintCreateDto> validationCreateRules,
+             AbstractValidator<PlanSfcPrintCreatePrintDto> validationCreatePrintRules,
             IManuSfcRepository manuSfcRepository,
+            IProcPrintConfigRepository procPrintConfigRepository,
+            IProcProcedurePrintRelationRepository procProcedurePrintRelationRepository,
+            IProcMaterialRepository procMaterialRepository,
+            IProcLabelTemplateRepository procLabelTemplateRepository,
+            ILabelPrintRequest labelPrintRequest,
             IManuSfcInfoRepository manuSfcInfoRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcStepRepository manuSfcStepRepository,
@@ -86,11 +109,17 @@ namespace Hymson.MES.Services.Services.Plan
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationCreateRules = validationCreateRules;
+            _validationCreatePrintRules = validationCreatePrintRules;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
+            _procPrintConfigRepository = procPrintConfigRepository;
+            _procProcedurePrintRelationRepository = procProcedurePrintRelationRepository;
+            _procMaterialRepository = procMaterialRepository;
+            _procLabelTemplateRepository = procLabelTemplateRepository;
+            _labelPrintRequest = labelPrintRequest;
         }
 
 
@@ -109,6 +138,62 @@ namespace Hymson.MES.Services.Services.Plan
             await _validationCreateRules.ValidateAndThrowAsync(createDto);
 
 
+        }
+        /// <summary>
+        /// 创建
+        /// </summary>
+        /// <param name="createDto"></param>
+        /// <returns></returns>
+        public async Task CreatePrintAsync(PlanSfcPrintCreatePrintDto createDto)
+        {
+            if (_currentSite.SiteId == 0)
+            {
+                throw new ValidationException(nameof(ErrorCode.MES10101));
+            }
+            //验证DTO
+            await _validationCreatePrintRules.ValidateAndThrowAsync(createDto);
+
+            var print = await _procPrintConfigRepository.GetByIdAsync(createDto.PrintId);
+            if(print==null)
+                throw new CustomerValidationException(nameof(ErrorCode.MES17002));
+            var work = await _planWorkOrderRepository.GetByIdAsync(createDto.WorkOrderId);
+            var material = await _procMaterialRepository.GetByIdAsync(work.ProductId);
+            var ppr = await _procProcedurePrintRelationRepository.GetProcProcedurePrintReleationEntitiesAsync(new ProcProcedurePrintReleationQuery()
+            {
+                MaterialId = material.Id,
+                ProcedureId = createDto.ProcedureId,
+                Version = material.Version
+            });
+            var pprp = ppr.FirstOrDefault();
+            if(pprp!= null)
+            {
+                var tl = await _procLabelTemplateRepository.GetByIdAsync(pprp.TemplateId);
+                if (tl != null)
+                {
+                    PrintRequest printEntity = new PrintRequest()
+                    {
+                        TemplateName = tl.Name,
+                        PrinterName = print.PrintName,
+                        Params = new List<PrintRequest.ParamEntity>()
+                        {
+                            new PrintRequest.ParamEntity()
+                            {
+                                ParamName = "SFC",
+                                ParamValue = createDto.SFC
+                            }
+                        }
+                    };
+                    await _labelPrintRequest.PrintAsync(printEntity);
+
+                }
+                else
+                    throw new CustomerValidationException(nameof(ErrorCode.MES17001));
+            }
+            else
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17001));
+            }
+            
         }
 
         /// <summary>

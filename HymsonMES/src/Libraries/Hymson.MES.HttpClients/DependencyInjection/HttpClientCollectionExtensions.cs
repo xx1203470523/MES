@@ -19,7 +19,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddHttpClient<ILabelPrintRequest, FastReportPrintRequest>().ConfigureHttpClient(httpClient =>
             {
-                httpClient.BaseAddress = new Uri("http://localhost:50892/Help/");
+                httpClient.BaseAddress = new Uri("http://localhost:51973/");
 
             });
 

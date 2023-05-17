@@ -327,10 +327,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        public async Task<ManuSfcEntity> GetBySFCAsync(string sfc)
+        public async Task<ManuSfcEntity> GetBySFCAsync(GetBySFCQuery command)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ManuSfcEntity>(GetBySFCSql, new { SFC = sfc });
+            return await conn.QueryFirstOrDefaultAsync<ManuSfcEntity>(GetBySFCSql, command);
         }
 
         /// <summary>
@@ -376,7 +376,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdSql = @"SELECT * FROM `manu_sfc`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `manu_sfc`  WHERE Id IN @Ids ";
 
-        const string GetBySFCSql = @"SELECT * FROM `manu_sfc`  WHERE SFC = @SFC ";
+        const string GetBySFCSql = @"SELECT * FROM `manu_sfc`  WHERE SFC = @SFC AND SiteId=@SiteId";
         const string GetBySFCsSql = @"SELECT * FROM `manu_sfc`  WHERE SFC IN @SFCs AND IsDeleted=0 ";
     }
 }

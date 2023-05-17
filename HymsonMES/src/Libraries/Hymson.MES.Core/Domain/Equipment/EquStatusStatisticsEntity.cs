@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Equipment
 {
@@ -8,7 +9,7 @@ namespace Hymson.MES.Core.Domain.Equipment
     /// @author Czhipu
     /// @date 2023-05-16 04:51:59
     /// </summary>
-    public class EquipmentStatusStatisticsEntity : BaseEntity
+    public class EquStatusStatisticsEntity : BaseEntity
     {
         /// <summary>
         /// 站点Id
@@ -23,12 +24,12 @@ namespace Hymson.MES.Core.Domain.Equipment
        /// <summary>
         /// 状态;0.自动运行、1.手动运行、2.停机、3.故障、4.离线
         /// </summary>
-        public bool EquipmentStatus { get; set; }
+        public EquipmentStateEnum EquipmentStatus { get; set; }
 
        /// <summary>
         /// 转换状态
         /// </summary>
-        public bool? SwitchEquipmentStatus { get; set; }
+        public EquipmentStateEnum? SwitchEquipmentStatus { get; set; }
 
        /// <summary>
         /// 开始时间

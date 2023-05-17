@@ -64,13 +64,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquFaultPhenomenonRepository, EquFaultPhenomenonRepository>();
             services.AddSingleton<IEquSparePartRepository, EquSparePartRepository>();
             services.AddSingleton<IEquSparePartTypeRepository, EquSparePartTypeRepository>();
-            services.AddSingleton<IEquipmentHeartbeatRepository, EquipmentHeartbeatRepository>();
-            services.AddSingleton<IEquipmentAlarmRepository, EquipmentAlarmRepository>();
+            services.AddSingleton<IEquHeartbeatRepository, EquHeartbeatRepository>();
+            services.AddSingleton<IEquAlarmRepository, EquAlarmRepository>();
+            services.AddSingleton<IEquStatusRepository, EquStatusRepository>();
 
-            #region FaultReason
             services.AddSingleton<IEquFaultReasonRepository, EquFaultReasonRepository>();
-
-            #endregion
             #endregion
 
             #region Integrated

@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.EquipmentServices.Request.Equipment;
 using Hymson.Snowflake;
@@ -21,12 +22,21 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// <summary>
         /// 仓储（设备心跳）
         /// </summary>
-        private readonly IEquipmentHeartbeatRepository _equipmentHeartbeatRepository;
+        private readonly IEquHeartbeatRepository _equipmentHeartbeatRepository;
 
         /// <summary>
         /// 仓储（设备报警）
         /// </summary>
-        private readonly IEquipmentAlarmRepository _equipmentAlarmRepository;
+        private readonly IEquAlarmRepository _equipmentAlarmRepository;
+
+        /// <summary>
+        /// 仓储（设备状态）
+        /// </summary>
+        private readonly IEquStatusRepository _equipmentStatusRepository;
+
+        /// <summary>
+        /// 仓储（设备状态）
+        /// </summary>
 
         /// <summary>
         /// 构造函数
@@ -34,13 +44,16 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// <param name="currentEquipment"></param>
         /// <param name="equipmentHeartbeatRepository"></param>
         /// <param name="equipmentAlarmRepository"></param>
+        /// <param name="equipmentStatusRepository"></param>
         public EquipmentMonitorService(ICurrentEquipment currentEquipment,
-            IEquipmentHeartbeatRepository equipmentHeartbeatRepository,
-            IEquipmentAlarmRepository equipmentAlarmRepository)
+            IEquHeartbeatRepository equipmentHeartbeatRepository,
+            IEquAlarmRepository equipmentAlarmRepository,
+            IEquStatusRepository equipmentStatusRepository)
         {
             _currentEquipment = currentEquipment;
             _equipmentHeartbeatRepository = equipmentHeartbeatRepository;
             _equipmentAlarmRepository = equipmentAlarmRepository;
+            _equipmentStatusRepository = equipmentStatusRepository;
         }
 
 
@@ -51,10 +64,11 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// <returns></returns>
         public async Task EquipmentHeartbeatAsync(EquipmentHeartbeatRequest request)
         {
+            // TODO
             var userCode = request.EquipmentCode; //_currentEquipment.Code
             var nowTime = HymsonClock.Now();
 
-            var entity = new EquipmentHeartbeatEntity
+            var entity = new EquHeartbeatEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = _currentEquipment.SiteId,
@@ -69,7 +83,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
 
             using var trans = TransactionHelper.GetTransactionScope();
             await _equipmentHeartbeatRepository.InsertAsync(entity);
-            await _equipmentHeartbeatRepository.InsertRecordAsync(new EquipmentHeartbeatRecordEntity
+            await _equipmentHeartbeatRepository.InsertRecordAsync(new EquHeartbeatRecordEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = entity.SiteId,
@@ -78,8 +92,8 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
                 UpdatedBy = entity.UpdatedBy,
                 UpdatedOn = entity.UpdatedOn,
                 EquipmentId = entity.EquipmentId,
-                Status = entity.Status,
-                LocalTime = request.LocalTime
+                LocalTime = request.LocalTime,
+                Status = entity.Status
             });
             trans.Complete();
         }
@@ -91,7 +105,22 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// <returns></returns>
         public async Task EquipmentStateAsync(EquipmentStateRequest request)
         {
-            await Task.CompletedTask;
+            // TODO
+            var userCode = request.EquipmentCode; //_currentEquipment.Code
+            var nowTime = HymsonClock.Now();
+
+            await UpdateEquipmentStatusAsync(new EquStatusEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = _currentEquipment.SiteId,
+                CreatedBy = userCode,
+                CreatedOn = nowTime,
+                UpdatedBy = userCode,
+                UpdatedOn = nowTime,
+                EquipmentId = _currentEquipment.Id ?? 0,
+                LocalTime = request.LocalTime,
+                EquipmentStatus = request.StateCode
+            });
         }
 
         /// <summary>
@@ -101,10 +130,11 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// <returns></returns>
         public async Task EquipmentAlarmAsync(EquipmentAlarmRequest request)
         {
+            // TODO
             var userCode = request.EquipmentCode; //_currentEquipment.Code
             var nowTime = HymsonClock.Now();
 
-            await _equipmentAlarmRepository.InsertAsync(new EquipmentAlarmEntity
+            await _equipmentAlarmRepository.InsertAsync(new EquAlarmEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = _currentEquipment.SiteId,
@@ -112,6 +142,11 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
                 CreatedOn = nowTime,
                 UpdatedBy = userCode,
                 UpdatedOn = nowTime,
+                EquipmentId = _currentEquipment.Id ?? 0,
+                LocalTime = request.LocalTime,
+                FaultCode = request.AlarmCode,
+                AlarmMsg = request.AlarmMsg ?? "",
+                Status = request.Status
             });
         }
 
@@ -122,7 +157,66 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// <returns></returns>
         public async Task EquipmentDownReasonAsync(EquipmentDownReasonRequest request)
         {
-            await Task.CompletedTask;
+            // TODO
+            var userCode = request.EquipmentCode; //_currentEquipment.Code
+            var nowTime = HymsonClock.Now();
+
+            await UpdateEquipmentStatusAsync(new EquStatusEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = _currentEquipment.SiteId,
+                CreatedBy = userCode,
+                CreatedOn = nowTime,
+                UpdatedBy = userCode,
+                UpdatedOn = nowTime,
+                EquipmentId = _currentEquipment.Id ?? 0,
+                LocalTime = request.LocalTime,
+                EquipmentStatus = EquipmentStateEnum.DownNormal, // 暂定为正常停机
+                LossRemark = request.DownReasonCode.GetDescription(),
+                BeginTime = request.BeginTime,
+                EndTime = request.EndTime
+            });
+        }
+
+
+
+
+        /// <summary>
+        /// 更新设备状态
+        /// </summary>
+        /// <param name="currentStatusEntity"></param>
+        /// <returns></returns>
+        private async Task UpdateEquipmentStatusAsync(EquStatusEntity currentStatusEntity)
+        {
+            // 最近的状态记录
+            var lastStatusEntity = await _equipmentStatusRepository.GetLastEntityByEquipmentIdAsync(currentStatusEntity.EquipmentId);
+
+            // 开启事务
+            using var trans = TransactionHelper.GetTransactionScope();
+
+            // 更新设备当前状态
+            await _equipmentStatusRepository.InsertAsync(currentStatusEntity);
+
+            // 更新统计表
+            if (lastStatusEntity != null && lastStatusEntity.EquipmentStatus != lastStatusEntity.EquipmentStatus)
+            {
+                await _equipmentStatusRepository.InsertStatisticsAsync(new EquStatusStatisticsEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = currentStatusEntity.SiteId,
+                    CreatedBy = currentStatusEntity.CreatedBy,
+                    CreatedOn = currentStatusEntity.CreatedOn,
+                    UpdatedBy = currentStatusEntity.UpdatedBy,
+                    UpdatedOn = currentStatusEntity.UpdatedOn,
+                    EquipmentId = currentStatusEntity.EquipmentId,
+                    EquipmentStatus = lastStatusEntity.EquipmentStatus,
+                    SwitchEquipmentStatus = currentStatusEntity.EquipmentStatus,
+                    BeginTime = lastStatusEntity.LocalTime,
+                    EndTime = currentStatusEntity.LocalTime
+                });
+            }
+
+            trans.Complete();
         }
 
     }
