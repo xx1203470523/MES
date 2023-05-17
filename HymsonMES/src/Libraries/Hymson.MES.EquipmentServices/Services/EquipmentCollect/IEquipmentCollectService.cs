@@ -1,11 +1,11 @@
-﻿using Hymson.MES.EquipmentServices.Dtos.Equipment;
+﻿using Hymson.MES.EquipmentServices.Dtos.EquipmentCollect;
 
-namespace Hymson.MES.EquipmentServices.Services.Equipment
+namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
 {
     /// <summary>
     /// 设备接口
     /// </summary>
-    public interface IEquipmentMonitorService
+    public interface IEquipmentCollectService
     {
         /// <summary>
         /// 设备心跳

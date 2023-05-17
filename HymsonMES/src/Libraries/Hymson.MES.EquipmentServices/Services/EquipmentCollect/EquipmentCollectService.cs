@@ -9,18 +9,18 @@ using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.EquipmentServices.Bos;
-using Hymson.MES.EquipmentServices.Dtos.Equipment;
+using Hymson.MES.EquipmentServices.Dtos.EquipmentCollect;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
 
-namespace Hymson.MES.EquipmentServices.Services.Equipment
+namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
 {
     /// <summary>
     /// 设备服务
     /// </summary>
-    public class EquipmentMonitorService : IEquipmentMonitorService
+    public class EquipmentCollectService : IEquipmentCollectService
     {
         /// <summary>
         /// 
@@ -74,7 +74,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// <param name="procResourceRepository"></param>
         /// <param name="procParameterRepository"></param>
         /// <param name="manuProductParameterRepository"></param>
-        public EquipmentMonitorService(ICurrentEquipment currentEquipment,
+        public EquipmentCollectService(ICurrentEquipment currentEquipment,
             IEquHeartbeatRepository equipmentHeartbeatRepository,
             IEquAlarmRepository equipmentAlarmRepository,
             IEquStatusRepository equipmentStatusRepository,

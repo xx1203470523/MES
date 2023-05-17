@@ -1,7 +1,7 @@
 ﻿using Hymson.MES.EquipmentServices.Dtos.BindContainer;
 using Hymson.MES.EquipmentServices.Dtos.BindSFC;
 using Hymson.MES.EquipmentServices.Dtos.CCDFileUploadComplete;
-using Hymson.MES.EquipmentServices.Dtos.Equipment;
+using Hymson.MES.EquipmentServices.Dtos.EquipmentCollect;
 using Hymson.MES.EquipmentServices.Dtos.Feeding;
 using Hymson.MES.EquipmentServices.Dtos.FeedingConsumption;
 using Hymson.MES.EquipmentServices.Dtos.GenerateModuleSFC;
@@ -13,7 +13,7 @@ using Hymson.MES.EquipmentServices.Dtos.SingleBarCodeLoadingVerification;
 using Hymson.MES.EquipmentServices.Services.BindContainer;
 using Hymson.MES.EquipmentServices.Services.BindSFC;
 using Hymson.MES.EquipmentServices.Services.CCDFileUploadComplete;
-using Hymson.MES.EquipmentServices.Services.Equipment;
+using Hymson.MES.EquipmentServices.Services.EquipmentCollect;
 using Hymson.MES.EquipmentServices.Services.FeedingConsumption;
 using Hymson.MES.EquipmentServices.Services.GenerateModuleSFC;
 using Hymson.MES.EquipmentServices.Services.InboundInContainer;
@@ -40,7 +40,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <summary>
         /// 业务接口（设备监控服务）
         /// </summary>
-        private readonly IEquipmentMonitorService _equipmentService;
+        private readonly IEquipmentCollectService _equipmentService;
         private readonly IBindSFCService _bindSFCService;
         private readonly IBindContainerService _bindContainerService;
         private readonly ICCDFileUploadCompleteService _cCDFileUploadCompleteService;
@@ -70,7 +70,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="queryContainerBindSfcService"></param>
         /// <param name="singleBarCodeLoadingVerificationService"></param>
         public EquipmentController(ILogger<EquipmentController> logger,
-            IEquipmentMonitorService equipmentService,
+            IEquipmentCollectService equipmentService,
             IBindSFCService bindSFCService,
             IBindContainerService bindContainerService,
             ICCDFileUploadCompleteService cCDFileUploadCompleteService,
