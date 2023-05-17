@@ -21,7 +21,7 @@ namespace Hymson.MES.EquipmentServices.Dtos.CCDFileUploadComplete
     /// <summary>
     /// CCD文件上传完成明细
     /// </summary>
-    public class CCDFileUploadCompleteDetail : BaseRequest
+    public class CCDFileUploadCompleteDetail
     {
         /// <summary>
         /// 条码

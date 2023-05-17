@@ -47,7 +47,7 @@ namespace Hymson.MES.EquipmentServices.Services.CCDFileUploadComplete
         {
             await _validationCCDFileUploadCompleteDtoRules.ValidateAndThrowAsync(cCDFileUploadCompleteDto);
             List<ManuCcdFileEntity> list = new List<ManuCcdFileEntity>();
-            foreach (var item in cCDFileUploadCompleteRequest.SFCs)
+            foreach (var item in cCDFileUploadCompleteDto.SFCs)
             {
                 list.Add(new ManuCcdFileEntity
                 {

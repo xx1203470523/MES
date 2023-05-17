@@ -25,23 +25,23 @@ namespace Hymson.MES.EquipmentServices.Services.InboundInContainer
         /// </summary>
         /// <param name="validationInboundInContainerDtoRules"></param>
         /// <param name="currentEquipment"></param>
-        public InboundInContainerService(IManuTraySfcRelationRepository manuTraySfcRelationRepository, AbstractValidator<InboundInContainerRequest> validationInboundInContainerRequestRules, ICurrentEquipment currentEquipment)
+        public InboundInContainerService(IManuTraySfcRelationRepository manuTraySfcRelationRepository, AbstractValidator<InboundInContainerDto> validationInboundInContainerDtoRules, ICurrentEquipment currentEquipment)
         {
             _manuTraySfcRelationRepository = manuTraySfcRelationRepository;
-            _validationInboundInContainerRequestRules = validationInboundInContainerRequestRules;
+            _validationInboundInContainerDtoRules = validationInboundInContainerDtoRules;
             _currentEquipment = currentEquipment;
         }
 
         /// <summary>
         /// 进站-容器
         /// </summary>
-        /// <param name="InboundInContainerDto"></param>
+        /// <param name="inboundInContainerDto"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task InboundInContainerAsync(InboundInContainerDto InboundInContainerDto)
+        public async Task InboundInContainerAsync(InboundInContainerDto inboundInContainerDto)
         {
-            await _validationInboundInContainerDtoRules.ValidateAndThrowAsync(InboundInContainerDto);
-            var manuTraySfcRelationEntits = await _manuTraySfcRelationRepository.GetManuTraySfcRelationByTrayCodeAsync(new ManuTraySfcRelationByTrayCodeQuery { TrayCode = InboundInContainerRequest.ContainerCode, SiteId = _currentEquipment.SiteId });
+            await _validationInboundInContainerDtoRules.ValidateAndThrowAsync(inboundInContainerDto);
+            var manuTraySfcRelationEntits = await _manuTraySfcRelationRepository.GetManuTraySfcRelationByTrayCodeAsync(new ManuTraySfcRelationByTrayCodeQuery { TrayCode = inboundInContainerDto.ContainerCode, SiteId = _currentEquipment.SiteId });
             List<string> list = new List<string>();
             foreach (var item in manuTraySfcRelationEntits)
             {

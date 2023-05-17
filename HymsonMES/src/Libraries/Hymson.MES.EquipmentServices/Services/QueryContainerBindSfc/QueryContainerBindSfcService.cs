@@ -25,11 +25,11 @@ namespace Hymson.MES.EquipmentServices.Services.QueryContainerBindSfc
         /// </summary>
         /// <param name="validationQueryContainerBindSfcDtoRules"></param>
         /// <param name="currentEquipment"></param>
-        public QueryContainerBindSfcService(IManuTraySfcRelationRepository manuTraySfcRelationRepository, AbstractValidator<QueryContainerBindSfcRequest> validationQueryContainerBindSfcRequestRules, ICurrentEquipment currentEquipment)
+        public QueryContainerBindSfcService(IManuTraySfcRelationRepository manuTraySfcRelationRepository, AbstractValidator<QueryContainerBindSfcDto> validationQueryContainerBindSfcDtoRules, ICurrentEquipment currentEquipment)
         {
 
             _manuTraySfcRelationRepository = manuTraySfcRelationRepository; 
-
+             
             _validationQueryContainerBindSfcDtoRules = validationQueryContainerBindSfcDtoRules;
             _currentEquipment = currentEquipment;
         }
@@ -43,7 +43,7 @@ namespace Hymson.MES.EquipmentServices.Services.QueryContainerBindSfc
         public async Task<IEnumerable<QueryContainerBindSfcReaponse>> QueryContainerBindSfcAsync(QueryContainerBindSfcDto queryContainerBindSfcDto)
         {
             await _validationQueryContainerBindSfcDtoRules.ValidateAndThrowAsync(queryContainerBindSfcDto);
-            var manuTraySfcRelationEntits = await _manuTraySfcRelationRepository.GetManuTraySfcRelationByTrayCodeAsync(new ManuTraySfcRelationByTrayCodeQuery { TrayCode = queryContainerBindSfcRequest.ContaineCode, SiteId = _currentEquipment.SiteId });
+            var manuTraySfcRelationEntits = await _manuTraySfcRelationRepository.GetManuTraySfcRelationByTrayCodeAsync(new ManuTraySfcRelationByTrayCodeQuery { TrayCode = queryContainerBindSfcDto.ContaineCode, SiteId = _currentEquipment.SiteId });
             List<QueryContainerBindSfcReaponse> list = new List<QueryContainerBindSfcReaponse>();
             foreach (var item in manuTraySfcRelationEntits)
             {
