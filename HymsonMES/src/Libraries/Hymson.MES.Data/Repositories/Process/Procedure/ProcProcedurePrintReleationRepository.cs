@@ -130,7 +130,7 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 sqlBuilder.Where("MaterialId=@MaterialId");
             }
-            if (string.IsNullOrWhiteSpace(query.Version))
+            if (!string.IsNullOrWhiteSpace(query.Version))
             {
                 sqlBuilder.Where("Version=@Version");
             }
