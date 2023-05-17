@@ -14,4 +14,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query
     public class ManuSfcQuery
     {
     }
+
+
+    /// <summary>
+    /// 根据SFC查询条码
+    /// </summary>
+    public class GetBySFCQuery
+    {
+        /// <summary>
+        /// 站点编码 
+        /// </summary>
+        public long? SiteId { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string? SFC { get; set; }
+    }
 }
