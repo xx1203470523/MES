@@ -47,7 +47,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
             }
             else
             {
-                serialList =( await _sequenceService.GetSerialNumbersAsync(param.ResetType, param.CodeRuleKey, param.Count, param.StartNumber, param.Increment, 9)).ToList();
+                serialList = (await _sequenceService.GetSerialNumbersAsync(param.ResetType, param.CodeRuleKey, param.Count, param.StartNumber, param.Increment, 9)).ToList();
             }
 
             List<string> list = new List<string>();
@@ -67,7 +67,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                     default:
                         throw new CustomerValidationException(nameof(ErrorCode.MES16202));
                 }
-                if (param.OrderLength>0&& str.Length > param.OrderLength)
+                if (param.OrderLength > 0 && str.Length > param.OrderLength)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16201));
                 }
@@ -153,7 +153,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                 Count = param.Count,
                 Base = codeRule.Base,
                 Increment = codeRule.Increment,
-                IgnoreChar= codeRule.IgnoreChar,
+                IgnoreChar = codeRule.IgnoreChar,
                 OrderLength = codeRule.OrderLength,
                 ResetType = codeRule.ResetType,
                 StartNumber = codeRule.StartNumber
@@ -184,6 +184,18 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                         {
                             stringBuilder.Append(HymsonClock.Now().ToString("yyMMdd"));
                         }
+                        else if (rule.SegmentedValue == "%YY%")
+                        {
+                            stringBuilder.Append(GetYY(HymsonClock.Now().Year));
+                        }
+                        else if (rule.SegmentedValue == "%MM%")
+                        {
+                            stringBuilder.Append(GetMonth(HymsonClock.Now().Month));
+                        }
+                        else if (rule.SegmentedValue == "%DD%")
+                        {
+                            stringBuilder.Append(GetDay(HymsonClock.Now().Day));
+                        }
                         else
                         {
                             throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", rule.SegmentedValue);
@@ -209,7 +221,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                 CodeRuleKey = param.IsTest ? param.ProductId.ToString() + "Test" : param.ProductId.ToString(),
                 Count = param.Count,
                 Base = param.Base,
-                IgnoreChar= param.IgnoreChar??"",
+                IgnoreChar = param.IgnoreChar ?? "",
                 Increment = param.Increment,
                 OrderLength = param.OrderLength,
                 ResetType = param.ResetType,
@@ -241,6 +253,18 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                         {
                             stringBuilder.Append(HymsonClock.Now().ToString("yyMMdd"));
                         }
+                        else if (rule.SegmentedValue == "%YY%")
+                        {
+                            stringBuilder.Append(GetYY(HymsonClock.Now().Year));
+                        }
+                        else if (rule.SegmentedValue == "%MM%")
+                        {
+                            stringBuilder.Append(GetMonth(HymsonClock.Now().Month));
+                        }
+                        else if (rule.SegmentedValue == "%DD%")
+                        {
+                            stringBuilder.Append(GetDay(HymsonClock.Now().Day));
+                        }
                         else
                         {
                             throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", rule.SegmentedValue);
@@ -250,6 +274,87 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                 list.Add(stringBuilder.ToString());
             }
             return list;
+        }
+
+        /// <summary>
+        /// 获取转换年
+        /// </summary>
+        /// <param name="year"></param>
+        /// <returns></returns>
+        private string GetYY(int year)
+        {
+            var dic = new Dictionary<string, int>
+            {
+                { "A", 2021 },
+                { "B", 2022 },
+                { "C", 2023 },
+                { "D", 2024 },
+                { "E", 2025 },
+                { "F", 2026 },
+                { "G", 2027 },
+                { "H", 2028 },
+                { "I", 2029 }
+            };
+            return dic.Where(it => it.Value == year).FirstOrDefault().Key;
+        }
+        /// <summary>
+        /// 获取转换月
+        /// </summary>
+        /// <param name="month"></param>
+        /// <returns></returns>
+        private string GetMonth(int month)
+        {
+            if (month < 10)
+            {
+                return month.ToString();
+            }
+            var dic = new Dictionary<string, int>
+            {
+                { "A", 10 },
+                { "B", 11 },
+                { "C", 12 },
+            };
+            return dic.Where(it => it.Value == month).FirstOrDefault().Key;
+
+        }
+
+        /// <summary>
+        /// 获取转换日
+        /// </summary>
+        /// <param name="day"></param>
+        /// <returns></returns>
+        private string GetDay(int day)
+        {
+            if (day < 10)
+            {
+                return day.ToString();
+            }
+            var dic = new Dictionary<string, int>
+            {
+                { "A", 10 },
+                { "B", 11 },
+                { "C", 12 },
+                { "D", 13 },
+                { "E", 14 },
+                { "F", 15 },
+                { "G", 16 },
+                { "H", 17 },
+                { "J", 18 },
+                { "K", 19 },
+                { "L", 20 },
+                { "M", 21 },
+                { "N", 22 },
+                { "O", 23 },
+                { "P", 24 },
+                { "Q", 25 },
+                { "R", 26 },
+                { "S", 27 },
+                { "T", 28 },
+                { "U", 29 },
+                { "V", 30 },
+                { "W", 31 },
+            };
+            return dic.Where(it => it.Value == day).FirstOrDefault().Key;
         }
     }
 }

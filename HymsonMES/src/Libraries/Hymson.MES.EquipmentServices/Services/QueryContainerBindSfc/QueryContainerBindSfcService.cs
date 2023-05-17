@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.EquipmentServices.Request.QueryContainerBindSfc;
 using Hymson.Web.Framework.WorkContext;
 using System;
@@ -15,6 +16,7 @@ namespace Hymson.MES.EquipmentServices.Services.QueryContainerBindSfc
     public class QueryContainerBindSfcService : IQueryContainerBindSfcService
     {
         private readonly ICurrentEquipment _currentEquipment;
+        private readonly IManuTraySfcRelationRepository _manuTraySfcRelationRepository;
         private readonly AbstractValidator<QueryContainerBindSfcRequest> _validationQueryContainerBindSfcRequestRules;
 
         /// <summary>
@@ -22,8 +24,12 @@ namespace Hymson.MES.EquipmentServices.Services.QueryContainerBindSfc
         /// </summary>
         /// <param name="validationQueryContainerBindSfcRequestRules"></param>
         /// <param name="currentEquipment"></param>
-        public QueryContainerBindSfcService(AbstractValidator<QueryContainerBindSfcRequest> validationQueryContainerBindSfcRequestRules, ICurrentEquipment currentEquipment)
+        /// <param name="manuTraySfcRelationRepository"></param>
+        public QueryContainerBindSfcService(
+            IManuTraySfcRelationRepository manuTraySfcRelationRepository,
+        AbstractValidator<QueryContainerBindSfcRequest> validationQueryContainerBindSfcRequestRules, ICurrentEquipment currentEquipment)
         {
+            _manuTraySfcRelationRepository = manuTraySfcRelationRepository;
             _validationQueryContainerBindSfcRequestRules = validationQueryContainerBindSfcRequestRules;
             _currentEquipment = currentEquipment;
         }
@@ -37,7 +43,17 @@ namespace Hymson.MES.EquipmentServices.Services.QueryContainerBindSfc
         public async Task<IEnumerable<QueryContainerBindSfcReaponse>> QueryContainerBindSfcAsync(QueryContainerBindSfcRequest queryContainerBindSfcRequest)
         {
             await _validationQueryContainerBindSfcRequestRules.ValidateAndThrowAsync(queryContainerBindSfcRequest);
-            throw new NotImplementedException();
+            var manuTraySfcRelationEntits = await _manuTraySfcRelationRepository.GetManuTraySfcRelationByTrayCodeAsync(new ManuTraySfcRelationByTrayCodeQuery { TrayCode = queryContainerBindSfcRequest.ContaineCode, SiteId = _currentEquipment.SiteId });
+            List<QueryContainerBindSfcReaponse> list = new List<QueryContainerBindSfcReaponse>();
+            foreach (var item in manuTraySfcRelationEntits)
+            {
+                list.Add(new QueryContainerBindSfcReaponse
+                {
+                    SFC = item.SFC,
+                    Location = (item.Seq ?? 0).ToString(),
+                });
+            }
+            return list;
         }
     }
 }

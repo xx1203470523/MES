@@ -23,7 +23,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuTraySfcRelationEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ManuTraySfcRelationEntity manuTraySfcRelationEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -37,7 +37,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuTraySfcRelationEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ManuTraySfcRelationEntity manuTraySfcRelationEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -52,7 +52,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -66,7 +66,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ManuTraySfcRelationEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -87,13 +87,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuTraySfcRelationQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuTraySfcRelationEntity>> GetManuTraySfcRelationEntitiesAsync(ManuTraySfcRelationQuery manuTraySfcRelationQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="manuTraySfcRelationPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuTraySfcRelationEntity>> GetPagedInfoAsync(ManuTraySfcRelationPagedQuery manuTraySfcRelationPagedQuery);
+
+        /// <summary>
+        /// 根据托盘条码查询装载信息
+        /// </summary>
+        /// <param name="manuTraySfcRelationQuery"></param>
+        /// <returns></returns> 
+        Task<IEnumerable<ManuTraySfcRelationEntity>> GetManuTraySfcRelationByTrayCodeAsync(ManuTraySfcRelationByTrayCodeQuery manuTraySfcRelationByTrayCode);
         #endregion
     }
 }

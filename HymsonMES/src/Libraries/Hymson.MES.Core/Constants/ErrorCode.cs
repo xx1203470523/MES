@@ -648,7 +648,7 @@
         public const string MES16724 = "容器包装，资源信息未找到";
         public const string MES16725 = "容器包装，资源对应资源类型和工序对应资源类型不一致";
         public const string MES16726 = "容器编码不存在";
-        public const string MES16727= "容器包装，二级包装只能装一级容器!";
+        public const string MES16727 = "容器包装，二级包装只能装一级容器!";
         public const string MES16728 = "容器包装，三级包装只能装二级容器!";
         public const string MES16729 = "容器包装，容器{barcode}未关闭!";
         #endregion
@@ -753,6 +753,8 @@
         public const string MES19103 = "容器电芯条码列表不能为空";
         public const string MES19104 = "托盘装载信息不存在";
         public const string MES19105 = "此托盘未装载任何信息";
+        public const string MES19106 = "托盘条码不能为空";
+        public const string MES19107 = "上传SFC信息不能为空";
 
         #endregion
 
