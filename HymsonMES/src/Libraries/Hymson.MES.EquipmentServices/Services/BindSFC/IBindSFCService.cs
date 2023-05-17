@@ -1,4 +1,4 @@
-﻿using Hymson.MES.EquipmentServices.Request.BindSFC;
+﻿using Hymson.MES.EquipmentServices.Dtos.BindSFC;
 
 namespace Hymson.MES.EquipmentServices.Services.BindSFC
 {
@@ -10,15 +10,15 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
         /// <summary>
         /// 绑定
         /// </summary>
-        /// <param name="bindSFCRequest"></param>
+        /// <param name="bindSFCDto"></param>
         /// <returns></returns>
-        Task BindSFCAsync(BindSFCRequest bindSFCRequest);
+        Task BindSFCAsync(BindSFCDto bindSFCDto);
 
         /// <summary>
         /// 解绑
         /// </summary>
-        /// <param name="unBindSFCRequest"></param>
+        /// <param name="unBindSFCDto"></param>
         /// <returns></returns>
-        Task UnBindSFCAsync(UnBindSFCRequest unBindSFCRequest);
+        Task UnBindSFCAsync(UnBindSFCDto unBindSFCDto);
     }
 }

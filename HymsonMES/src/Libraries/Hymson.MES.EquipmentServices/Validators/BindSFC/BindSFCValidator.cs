@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.EquipmentServices.Request.BindSFC;
+using Hymson.MES.EquipmentServices.Dtos.BindSFC;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Hymson.MES.EquipmentServices.Validators.BindSFC
 {
-    internal class BindSFCValidator : AbstractValidator<BindSFCRequest>
+    internal class BindSFCValidator : AbstractValidator<BindSFCDto>
     {
         /// <summary>
         /// 条码绑定验证

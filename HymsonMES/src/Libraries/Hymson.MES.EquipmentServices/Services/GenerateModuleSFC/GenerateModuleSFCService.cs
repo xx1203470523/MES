@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Hymson.MES.EquipmentServices.Request.GenerateModuleSFC;
+using Hymson.MES.EquipmentServices.Dtos.GenerateModuleSFC;
 using Hymson.Web.Framework.WorkContext;
 using System;
 using System.Collections.Generic;
@@ -15,28 +15,28 @@ namespace Hymson.MES.EquipmentServices.Services.GenerateModuleSFC
     public class GenerateModuleSFCService : IGenerateModuleSFCService
     {
         private readonly ICurrentEquipment _currentEquipment;
-        private readonly AbstractValidator<GenerateModuleSFCRequest> _validationGenerateModuleSFCRequestRules;
+        private readonly AbstractValidator<GenerateModuleSFCDto> _validationGenerateModuleSFCDtoRules;
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="validationGenerateModuleSFCRequestRules"></param>
+        /// <param name="validationGenerateModuleSFCDtoRules"></param>
         /// <param name="currentEquipment"></param>
-        public GenerateModuleSFCService(AbstractValidator<GenerateModuleSFCRequest> validationGenerateModuleSFCRequestRules, ICurrentEquipment currentEquipment)
+        public GenerateModuleSFCService(AbstractValidator<GenerateModuleSFCDto> validationGenerateModuleSFCDtoRules, ICurrentEquipment currentEquipment)
         {
-            _validationGenerateModuleSFCRequestRules = validationGenerateModuleSFCRequestRules;
+            _validationGenerateModuleSFCDtoRules = validationGenerateModuleSFCDtoRules;
             _currentEquipment = currentEquipment;
         }
 
         /// <summary>
         /// 请求生成模组码-电芯堆叠
         /// </summary>
-        /// <param name="generateModuleSFCRequest"></param>
+        /// <param name="generateModuleSFCDto"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task GenerateModuleSFCAsync(GenerateModuleSFCRequest generateModuleSFCRequest)
+        public async Task GenerateModuleSFCAsync(GenerateModuleSFCDto generateModuleSFCDto)
         {
-            await _validationGenerateModuleSFCRequestRules.ValidateAndThrowAsync(generateModuleSFCRequest);
+            await _validationGenerateModuleSFCDtoRules.ValidateAndThrowAsync(generateModuleSFCDto);
             throw new NotImplementedException();
         }
     }

@@ -1,4 +1,4 @@
-﻿using Hymson.MES.EquipmentServices.Request.CCDFileUploadComplete;
+﻿using Hymson.MES.EquipmentServices.Dtos.CCDFileUploadComplete;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,8 +15,8 @@ namespace Hymson.MES.EquipmentServices.Services.CCDFileUploadComplete
         /// <summary>
         /// CCD文件上传完成
         /// </summary>
-        /// <param name="cCDFileUploadCompleteRequest"></param>
+        /// <param name="cCDFileUploadCompleteDto"></param>
         /// <returns></returns> 
-        Task CCDFileUploadCompleteAsync(CCDFileUploadCompleteRequest cCDFileUploadCompleteRequest);
+        Task CCDFileUploadCompleteAsync(CCDFileUploadCompleteDto cCDFileUploadCompleteDto);
     }
 }

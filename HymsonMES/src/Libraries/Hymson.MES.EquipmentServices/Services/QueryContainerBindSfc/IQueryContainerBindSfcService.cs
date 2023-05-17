@@ -1,4 +1,4 @@
-﻿using Hymson.MES.EquipmentServices.Request.QueryContainerBindSfc;
+﻿using Hymson.MES.EquipmentServices.Dtos.QueryContainerBindSfc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,8 +15,8 @@ namespace Hymson.MES.EquipmentServices.Services.QueryContainerBindSfc
         /// <summary>
         /// 容器绑定条码查询
         /// </summary>
-        /// <param name="queryContainerBindSfcRequest"></param> 
+        /// <param name="queryContainerBindSfcDto"></param> 
         /// <returns></returns> 
-        Task<IEnumerable<QueryContainerBindSfcReaponse>> QueryContainerBindSfcAsync(QueryContainerBindSfcRequest queryContainerBindSfcRequest);
+        Task<IEnumerable<QueryContainerBindSfcReaponse>> QueryContainerBindSfcAsync(QueryContainerBindSfcDto queryContainerBindSfcDto);
     }
 }

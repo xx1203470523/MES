@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
-using Hymson.MES.EquipmentServices.Request.InBound;
-using Hymson.MES.EquipmentServices.Request.OutBound;
+using Hymson.MES.EquipmentServices.Dtos.InBound;
+using Hymson.MES.EquipmentServices.Dtos.OutBound;
 using Hymson.Web.Framework.WorkContext;
 using System;
 using System.Collections.Generic;
@@ -16,31 +16,31 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
     public class OutBoundService : IOutBoundService
     {
         private readonly ICurrentEquipment _currentEquipment;
-        private readonly AbstractValidator<OutBoundRequest> _validationOutBoundRequestRules;
-        private readonly AbstractValidator<OutBoundMoreRequest> _validationOutBoundMoreRequestRules;
+        private readonly AbstractValidator<OutBoundDto> _validationOutBoundDtoRules;
+        private readonly AbstractValidator<OutBoundMoreDto> _validationOutBoundMoreDtoRules;
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="validationOutBoundRequestRules"></param>
+        /// <param name="validationOutBoundDtoRules"></param>
         /// <param name="currentEquipment"></param>
-        /// <param name="validationOutBoundMoreRequestRules"></param>
-        public OutBoundService(AbstractValidator<OutBoundRequest> validationOutBoundRequestRules, ICurrentEquipment currentEquipment, AbstractValidator<OutBoundMoreRequest> validationOutBoundMoreRequestRules)
+        /// <param name="validationOutBoundMoreDtoRules"></param>
+        public OutBoundService(AbstractValidator<OutBoundDto> validationOutBoundDtoRules, ICurrentEquipment currentEquipment, AbstractValidator<OutBoundMoreDto> validationOutBoundMoreDtoRules)
         {
-            _validationOutBoundRequestRules = validationOutBoundRequestRules;
+            _validationOutBoundDtoRules = validationOutBoundDtoRules;
             _currentEquipment = currentEquipment;
-            _validationOutBoundMoreRequestRules = validationOutBoundMoreRequestRules;
+            _validationOutBoundMoreDtoRules = validationOutBoundMoreDtoRules;
         }
 
         /// <summary>
         /// 出站
         /// </summary>
-        /// <param name="outBoundRequest"></param>
+        /// <param name="outBoundDto"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task OutBound(OutBoundRequest outBoundRequest)
+        public async Task OutBound(OutBoundDto outBoundDto)
         {
-            await _validationOutBoundRequestRules.ValidateAndThrowAsync(outBoundRequest);
+            await _validationOutBoundDtoRules.ValidateAndThrowAsync(outBoundDto);
             throw new NotImplementedException();
         }
 
@@ -48,12 +48,12 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
         /// <summary>
         /// 出站（多个）
         /// </summary>
-        /// <param name="outBoundMoreRequest"></param>
+        /// <param name="outBoundMoreDto"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task OutBoundMore(OutBoundMoreRequest outBoundMoreRequest)
+        public async Task OutBoundMore(OutBoundMoreDto outBoundMoreDto)
         {
-            await _validationOutBoundMoreRequestRules.ValidateAndThrowAsync(outBoundMoreRequest);
+            await _validationOutBoundMoreDtoRules.ValidateAndThrowAsync(outBoundMoreDto);
             throw new NotImplementedException();
         }
     }

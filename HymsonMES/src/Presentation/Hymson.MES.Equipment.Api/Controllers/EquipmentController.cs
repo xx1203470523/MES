@@ -1,15 +1,15 @@
-﻿using Hymson.MES.EquipmentServices.Request.BindContainer;
-using Hymson.MES.EquipmentServices.Request.BindSFC;
-using Hymson.MES.EquipmentServices.Request.CCDFileUploadComplete;
-using Hymson.MES.EquipmentServices.Request.Equipment;
-using Hymson.MES.EquipmentServices.Request.Feeding;
-using Hymson.MES.EquipmentServices.Request.FeedingConsumption;
-using Hymson.MES.EquipmentServices.Request.GenerateModuleSFC;
-using Hymson.MES.EquipmentServices.Request.InboundInContainer;
-using Hymson.MES.EquipmentServices.Request.InboundInSFCContainer;
-using Hymson.MES.EquipmentServices.Request.OutPutQty;
-using Hymson.MES.EquipmentServices.Request.QueryContainerBindSfc;
-using Hymson.MES.EquipmentServices.Request.SingleBarCodeLoadingVerification;
+﻿using Hymson.MES.EquipmentServices.Dtos.BindContainer;
+using Hymson.MES.EquipmentServices.Dtos.BindSFC;
+using Hymson.MES.EquipmentServices.Dtos.CCDFileUploadComplete;
+using Hymson.MES.EquipmentServices.Dtos.Equipment;
+using Hymson.MES.EquipmentServices.Dtos.Feeding;
+using Hymson.MES.EquipmentServices.Dtos.FeedingConsumption;
+using Hymson.MES.EquipmentServices.Dtos.GenerateModuleSFC;
+using Hymson.MES.EquipmentServices.Dtos.InboundInContainer;
+using Hymson.MES.EquipmentServices.Dtos.InboundInSFCContainer;
+using Hymson.MES.EquipmentServices.Dtos.OutPutQty;
+using Hymson.MES.EquipmentServices.Dtos.QueryContainerBindSfc;
+using Hymson.MES.EquipmentServices.Dtos.SingleBarCodeLoadingVerification;
 using Hymson.MES.EquipmentServices.Services.BindContainer;
 using Hymson.MES.EquipmentServices.Services.BindSFC;
 using Hymson.MES.EquipmentServices.Services.CCDFileUploadComplete;
@@ -103,7 +103,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("Heartbeat")]
-        public async Task EquipmentHeartbeatAsync(EquipmentHeartbeatRequest request)
+        public async Task EquipmentHeartbeatAsync(EquipmentHeartbeatDto request)
         {
             await _equipmentService.EquipmentHeartbeatAsync(request);
         }
@@ -114,7 +114,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("State")]
-        public async Task EquipmentStateAsync(EquipmentStateRequest request)
+        public async Task EquipmentStateAsync(EquipmentStateDto request)
         {
             await _equipmentService.EquipmentStateAsync(request);
         }
@@ -125,7 +125,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("Alarm")]
-        public async Task EquipmentAlarmAsync(EquipmentAlarmRequest request)
+        public async Task EquipmentAlarmAsync(EquipmentAlarmDto request)
         {
             await _equipmentService.EquipmentAlarmAsync(request);
         }
@@ -136,7 +136,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("DownReason")]
-        public async Task EquipmentDownReasonAsync(EquipmentDownReasonRequest request)
+        public async Task EquipmentDownReasonAsync(EquipmentDownReasonDto request)
         {
             await _equipmentService.EquipmentDownReasonAsync(request);
         }
@@ -148,7 +148,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("EquipmentProcessParam")]
-        public async Task EquipmentProcessParamAsync(EquipmentProcessParamRequest request)
+        public async Task EquipmentProcessParamAsync(EquipmentProcessParamDto request)
         {
             await _equipmentService.EquipmentProcessParamAsync(request);
         }
@@ -159,7 +159,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("EquipmentProductProcessParamInNotCanSFC")]
-        public async Task EquipmentProductProcessParamInNotCanSFCAsync(EquipmentProductProcessParamInNotCanSFCRequest request)
+        public async Task EquipmentProductProcessParamInNotCanSFCAsync(EquipmentProductProcessParamInNotCanSFCDto request)
         {
             await _equipmentService.EquipmentProductProcessParamInNotCanSFCAsync(request);
         }
@@ -170,7 +170,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("EquipmentProductProcessParam")]
-        public async Task EquipmentProductProcessParamAsync(EquipmentProductProcessParamRequest request)
+        public async Task EquipmentProductProcessParamAsync(EquipmentProductProcessParamDto request)
         {
             await _equipmentService.EquipmentProductProcessParamAsync(request);
         }
@@ -182,7 +182,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("Feeding")]
-        public async Task FeedingLoadingAsync(FeedingLoadRequest request)
+        public async Task FeedingLoadingAsync(FeedingLoadDto request)
         {
             await Task.CompletedTask;
         }
@@ -193,7 +193,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("Unloading")]
-        public async Task FeedingUnloadingAsync(FeedingUnloadingRequest request)
+        public async Task FeedingUnloadingAsync(FeedingUnloadingDto request)
         {
             await Task.CompletedTask;
         }
@@ -207,7 +207,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("BindContainer")]
-        public async Task BindContainerAsync(BindContainerRequest request)
+        public async Task BindContainerAsync(BindContainerDto request)
         {
             await _bindContainerService.BindContainerAsync(request);
         }
@@ -220,7 +220,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("BindSFCAsync")]
-        public async Task BindSFCAsync(BindSFCRequest request)
+        public async Task BindSFCAsync(BindSFCDto request)
         {
             await _bindSFCService.BindSFCAsync(request);
         }
@@ -233,7 +233,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("UnBindSFCAsync")]
-        public async Task UnBindSFCAsync(UnBindSFCRequest request)
+        public async Task UnBindSFCAsync(UnBindSFCDto request)
         {
             await _bindSFCService.UnBindSFCAsync(request);
         }
@@ -246,7 +246,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("UnBindContainer")]
-        public async Task UnBindContainerAsync(UnBindContainerRequest request)
+        public async Task UnBindContainerAsync(UnBindContainerDto request)
         {
             await _bindContainerService.UnBindContainerAsync(request);
         }
@@ -260,7 +260,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("InboundInContainer")]
-        public async Task InboundInContainerAsync(InboundInContainerRequest request)
+        public async Task InboundInContainerAsync(InboundInContainerDto request)
         {
             await _inboundInContainerService.InboundInContainerAsync(request);
         }
@@ -273,7 +273,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("GenerateModuleSFC")]
-        public async Task GenerateModuleSFCAsync(GenerateModuleSFCRequest request)
+        public async Task GenerateModuleSFCAsync(GenerateModuleSFCDto request)
         {
             await _generateModuleSFCService.GenerateModuleSFCAsync(request);
         }
@@ -286,7 +286,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("InboundInSFCContainer")]
-        public async Task InboundInSFCContainerAsync(InboundInSFCContainerRequest request)
+        public async Task InboundInSFCContainerAsync(InboundInSFCContainerDto request)
         {
             await _inboundInSFCContainerService.InboundInSFCContainerAsync(request);
         }
@@ -300,7 +300,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("CCDFileUploadComplete")]
-        public async Task CCDFileUploadCompleteAsync(CCDFileUploadCompleteRequest request)
+        public async Task CCDFileUploadCompleteAsync(CCDFileUploadCompleteDto request)
         {
             await _cCDFileUploadCompleteService.CCDFileUploadCompleteAsync(request);
         }
@@ -313,7 +313,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("FeedingConsumption")]
-        public async Task FeedingConsumptionAsync(FeedingConsumptionRequest request)
+        public async Task FeedingConsumptionAsync(FeedingConsumptionDto request)
         {
             await _feedingConsumptionService.FeedingConsumptionAsync(request);
         }
@@ -327,7 +327,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("SingleBarCodeLoadingVerification")]
-        public async Task SingleBarCodeLoadingVerificationAsync(SingleBarCodeLoadingVerificationRequest request)
+        public async Task SingleBarCodeLoadingVerificationAsync(SingleBarCodeLoadingVerificationDto request)
         {
             await _singleBarCodeLoadingVerificationService.SingleBarCodeLoadingVerificationAsync(request);
         }
@@ -341,7 +341,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("OutPutQty")]
-        public async Task OutPutQtyAsync(OutPutQtyRequest request)
+        public async Task OutPutQtyAsync(OutPutQtyDto request)
         {
             await _outPutQtyService.OutPutQtyAsync(request);
         }
@@ -355,7 +355,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("QueryContainerBindSfc")]
-        public async Task QueryContainerBindSfcAsync(QueryContainerBindSfcRequest request)
+        public async Task QueryContainerBindSfcAsync(QueryContainerBindSfcDto request)
         {
             await _queryContainerBindSfcService.QueryContainerBindSfcAsync(request);
         }

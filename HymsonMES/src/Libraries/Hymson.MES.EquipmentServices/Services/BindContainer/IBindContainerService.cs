@@ -1,4 +1,4 @@
-﻿using Hymson.MES.EquipmentServices.Request.BindContainer;
+﻿using Hymson.MES.EquipmentServices.Dtos.BindContainer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,16 +15,16 @@ namespace Hymson.MES.EquipmentServices.Services.BindContainer
         /// <summary>
         /// 绑定
         /// </summary>
-        /// <param name="bindContainerRequest"></param>
+        /// <param name="bindContainerDto"></param>
         /// <returns></returns>
-        Task BindContainerAsync(BindContainerRequest bindContainerRequest);
+        Task BindContainerAsync(BindContainerDto bindContainerDto);
 
 
         /// <summary>
         /// 解绑
         /// </summary>
-        /// <param name="unBindContainerRequest"></param>
+        /// <param name="unBindContainerDto"></param>
         /// <returns></returns>
-        Task UnBindContainerAsync(UnBindContainerRequest unBindContainerRequest);
+        Task UnBindContainerAsync(UnBindContainerDto unBindContainerDto);
     }
 }

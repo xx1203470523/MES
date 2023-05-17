@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Hymson.MES.EquipmentServices.Request.CCDFileUploadComplete;
+using Hymson.MES.EquipmentServices.Dtos.CCDFileUploadComplete;
 using Hymson.Web.Framework.WorkContext;
 using System;
 using System.Collections.Generic;
@@ -15,28 +15,28 @@ namespace Hymson.MES.EquipmentServices.Services.CCDFileUploadComplete
     public class CCDFileUploadCompleteService : ICCDFileUploadCompleteService
     {
         private readonly ICurrentEquipment _currentEquipment;
-        private readonly AbstractValidator<CCDFileUploadCompleteRequest> _validationCCDFileUploadCompleteRequestRules;
+        private readonly AbstractValidator<CCDFileUploadCompleteDto> _validationCCDFileUploadCompleteDtoRules;
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="validationCCDFileUploadCompleteRequestRules"></param>
+        /// <param name="validationCCDFileUploadCompleteDtoRules"></param>
         /// <param name="currentEquipment"></param>
-        public CCDFileUploadCompleteService(AbstractValidator<CCDFileUploadCompleteRequest> validationCCDFileUploadCompleteRequestRules, ICurrentEquipment currentEquipment)
+        public CCDFileUploadCompleteService(AbstractValidator<CCDFileUploadCompleteDto> validationCCDFileUploadCompleteDtoRules, ICurrentEquipment currentEquipment)
         {
-            _validationCCDFileUploadCompleteRequestRules = validationCCDFileUploadCompleteRequestRules;
+            _validationCCDFileUploadCompleteDtoRules = validationCCDFileUploadCompleteDtoRules;
             _currentEquipment = currentEquipment;
         }
 
         /// <summary>
         /// CCD文件上传完成
         /// </summary>
-        /// <param name="cCDFileUploadCompleteRequest"></param>
+        /// <param name="cCDFileUploadCompleteDto"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task CCDFileUploadCompleteAsync(CCDFileUploadCompleteRequest cCDFileUploadCompleteRequest)
+        public async Task CCDFileUploadCompleteAsync(CCDFileUploadCompleteDto cCDFileUploadCompleteDto)
         {
-            await _validationCCDFileUploadCompleteRequestRules.ValidateAndThrowAsync(cCDFileUploadCompleteRequest);
+            await _validationCCDFileUploadCompleteDtoRules.ValidateAndThrowAsync(cCDFileUploadCompleteDto);
             throw new NotImplementedException();
         }
     }

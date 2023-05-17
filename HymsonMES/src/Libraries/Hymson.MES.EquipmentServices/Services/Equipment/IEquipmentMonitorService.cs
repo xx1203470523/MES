@@ -1,4 +1,4 @@
-﻿using Hymson.MES.EquipmentServices.Request.Equipment;
+﻿using Hymson.MES.EquipmentServices.Dtos.Equipment;
 
 namespace Hymson.MES.EquipmentServices.Services.Equipment
 {
@@ -12,28 +12,28 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task EquipmentHeartbeatAsync(EquipmentHeartbeatRequest request);
+        Task EquipmentHeartbeatAsync(EquipmentHeartbeatDto request);
 
         /// <summary>
         /// 设备状态监控
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task EquipmentStateAsync(EquipmentStateRequest request);
+        Task EquipmentStateAsync(EquipmentStateDto request);
 
         /// <summary>
         /// 设备报警
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task EquipmentAlarmAsync(EquipmentAlarmRequest request);
+        Task EquipmentAlarmAsync(EquipmentAlarmDto request);
 
         /// <summary>
         /// 设备停机原因
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task EquipmentDownReasonAsync(EquipmentDownReasonRequest request);
+        Task EquipmentDownReasonAsync(EquipmentDownReasonDto request);
 
 
 
@@ -42,21 +42,21 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task EquipmentProcessParamAsync(EquipmentProcessParamRequest request);
+        Task EquipmentProcessParamAsync(EquipmentProcessParamDto request);
 
         /// <summary>
         /// 设备产品过程参数采集(无在制品条码)
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task EquipmentProductProcessParamInNotCanSFCAsync(EquipmentProductProcessParamInNotCanSFCRequest request);
+        Task EquipmentProductProcessParamInNotCanSFCAsync(EquipmentProductProcessParamInNotCanSFCDto request);
 
         /// <summary>
         /// 设备产品过程参数采集
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task EquipmentProductProcessParamAsync(EquipmentProductProcessParamRequest request);
+        Task EquipmentProductProcessParamAsync(EquipmentProductProcessParamDto request);
 
 
 

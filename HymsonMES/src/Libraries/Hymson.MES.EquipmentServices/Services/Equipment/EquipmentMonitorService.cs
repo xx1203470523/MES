@@ -9,7 +9,7 @@ using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.EquipmentServices.Bos;
-using Hymson.MES.EquipmentServices.Request.Equipment;
+using Hymson.MES.EquipmentServices.Dtos.Equipment;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -99,7 +99,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task EquipmentHeartbeatAsync(EquipmentHeartbeatRequest request)
+        public async Task EquipmentHeartbeatAsync(EquipmentHeartbeatDto request)
         {
             // TODO
             var userCode = request.EquipmentCode; //_currentEquipment.Code
@@ -140,7 +140,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task EquipmentStateAsync(EquipmentStateRequest request)
+        public async Task EquipmentStateAsync(EquipmentStateDto request)
         {
             // TODO
             var userCode = request.EquipmentCode; //_currentEquipment.Code
@@ -165,7 +165,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task EquipmentAlarmAsync(EquipmentAlarmRequest request)
+        public async Task EquipmentAlarmAsync(EquipmentAlarmDto request)
         {
             // TODO
             var userCode = request.EquipmentCode; //_currentEquipment.Code
@@ -192,7 +192,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task EquipmentDownReasonAsync(EquipmentDownReasonRequest request)
+        public async Task EquipmentDownReasonAsync(EquipmentDownReasonDto request)
         {
             // TODO
             var userCode = request.EquipmentCode; //_currentEquipment.Code
@@ -222,7 +222,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task EquipmentProcessParamAsync(EquipmentProcessParamRequest request)
+        public async Task EquipmentProcessParamAsync(EquipmentProcessParamDto request)
         {
             // TODO
             var userCode = request.EquipmentCode; //_currentEquipment.Code
@@ -276,7 +276,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task EquipmentProductProcessParamInNotCanSFCAsync(EquipmentProductProcessParamInNotCanSFCRequest request)
+        public async Task EquipmentProductProcessParamInNotCanSFCAsync(EquipmentProductProcessParamInNotCanSFCDto request)
         {
             // TODO
             await Task.CompletedTask;
@@ -287,7 +287,7 @@ namespace Hymson.MES.EquipmentServices.Services.Equipment
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task EquipmentProductProcessParamAsync(EquipmentProductProcessParamRequest request)
+        public async Task EquipmentProductProcessParamAsync(EquipmentProductProcessParamDto request)
         {
             // TODO
             var userCode = request.EquipmentCode; //_currentEquipment.Code

@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Hymson.MES.EquipmentServices.Request.OutBound;
+using Hymson.MES.EquipmentServices.Dtos.OutBound;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,7 @@ namespace Hymson.MES.EquipmentServices.Validators.OutBound
     /// <summary>
     /// 出站验证(多个)
     /// </summary>
-    internal class OutBoundMoreValidator : AbstractValidator<OutBoundMoreRequest>
+    internal class OutBoundMoreValidator : AbstractValidator<OutBoundMoreDto>
     {
         public OutBoundMoreValidator()
         {

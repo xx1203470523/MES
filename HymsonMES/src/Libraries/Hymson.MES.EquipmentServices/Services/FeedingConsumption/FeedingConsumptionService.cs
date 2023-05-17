@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Hymson.MES.EquipmentServices.Request.FeedingConsumption;
+using Hymson.MES.EquipmentServices.Dtos.FeedingConsumption;
 using Hymson.Web.Framework.WorkContext;
 using System;
 using System.Collections.Generic;
@@ -15,28 +15,28 @@ namespace Hymson.MES.EquipmentServices.Services.FeedingConsumption
     public class FeedingConsumptionService : IFeedingConsumptionService
     {
         private readonly ICurrentEquipment _currentEquipment;
-        private readonly AbstractValidator<FeedingConsumptionRequest> _validationFeedingConsumptionRequestRules;
+        private readonly AbstractValidator<FeedingConsumptionDto> _validationFeedingConsumptionDtoRules;
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="validationFeedingConsumptionRequestRules"></param>
+        /// <param name="validationFeedingConsumptionDtoRules"></param>
         /// <param name="currentEquipment"></param>
-        public FeedingConsumptionService(AbstractValidator<FeedingConsumptionRequest> validationFeedingConsumptionRequestRules, ICurrentEquipment currentEquipment)
+        public FeedingConsumptionService(AbstractValidator<FeedingConsumptionDto> validationFeedingConsumptionDtoRules, ICurrentEquipment currentEquipment)
         {
-            _validationFeedingConsumptionRequestRules = validationFeedingConsumptionRequestRules;
+            _validationFeedingConsumptionDtoRules = validationFeedingConsumptionDtoRules;
             _currentEquipment = currentEquipment;
         }
 
         /// <summary>
         /// 上报物料消耗
         /// </summary>
-        /// <param name="feedingConsumptionRequest"></param>
+        /// <param name="feedingConsumptionDto"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task FeedingConsumptionAsync(FeedingConsumptionRequest feedingConsumptionRequest)
+        public async Task FeedingConsumptionAsync(FeedingConsumptionDto feedingConsumptionDto)
         {
-            await _validationFeedingConsumptionRequestRules.ValidateAndThrowAsync(feedingConsumptionRequest);
+            await _validationFeedingConsumptionDtoRules.ValidateAndThrowAsync(feedingConsumptionDto);
             throw new NotImplementedException();
         }
     }

@@ -1,4 +1,4 @@
-﻿using Hymson.MES.EquipmentServices.Request.InboundInSFCContainer;
+﻿using Hymson.MES.EquipmentServices.Dtos.InboundInSFCContainer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,8 +15,8 @@ namespace Hymson.MES.EquipmentServices.Services.InboundInSFCContainer
         /// <summary>
         /// 进站-电芯和托盘-装盘2
         /// </summary>
-        /// <param name="inboundInSFCContainerRequest"></param>
+        /// <param name="inboundInSFCContainerDto"></param>
         /// <returns></returns>
-        Task InboundInSFCContainerAsync(InboundInSFCContainerRequest inboundInSFCContainerRequest);
+        Task InboundInSFCContainerAsync(InboundInSFCContainerDto inboundInSFCContainerDto);
     }
 }

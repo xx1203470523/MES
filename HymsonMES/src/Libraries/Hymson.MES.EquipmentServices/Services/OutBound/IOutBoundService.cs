@@ -1,10 +1,4 @@
-﻿using Hymson.MES.EquipmentServices.Request.InBound;
-using Hymson.MES.EquipmentServices.Request.OutBound;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Hymson.MES.EquipmentServices.Dtos.OutBound;
 
 namespace Hymson.MES.EquipmentServices.Services.OutBound
 {
@@ -16,15 +10,15 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
         /// <summary>
         /// 出站
         /// </summary>
-        /// <param name="outBoundRequest"></param>
+        /// <param name="outBoundDto"></param>
         /// <returns></returns>
-        Task OutBound(OutBoundRequest outBoundRequest);
+        Task OutBound(OutBoundDto outBoundDto);
 
         /// <summary>
         /// 进站（多个）
         /// </summary>
-        /// <param name="outBoundMoreRequest"></param>
+        /// <param name="outBoundMoreDto"></param>
         /// <returns></returns>
-        Task OutBoundMore(OutBoundMoreRequest outBoundMoreRequest);
+        Task OutBoundMore(OutBoundMoreDto outBoundMoreDto);
     }
 }

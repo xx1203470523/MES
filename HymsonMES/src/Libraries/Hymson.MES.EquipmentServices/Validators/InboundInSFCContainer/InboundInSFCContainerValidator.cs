@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Hymson.MES.EquipmentServices.Request.InboundInSFCContainer;
+using Hymson.MES.EquipmentServices.Dtos.InboundInSFCContainer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,7 @@ namespace Hymson.MES.EquipmentServices.Validators.InboundInSFCContainer
     /// <summary>
     /// 进站-电芯和托盘-装盘2验证
     /// </summary>
-    internal class InboundInSFCContainerValidator : AbstractValidator<InboundInSFCContainerRequest>
+    internal class InboundInSFCContainerValidator : AbstractValidator<InboundInSFCContainerDto>
     {
         public InboundInSFCContainerValidator()
         {

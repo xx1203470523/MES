@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Hymson.MES.EquipmentServices.Request.QueryContainerBindSfc;
+using Hymson.MES.EquipmentServices.Dtos.QueryContainerBindSfc;
 using Hymson.Web.Framework.WorkContext;
 using System;
 using System.Collections.Generic;
@@ -15,28 +15,28 @@ namespace Hymson.MES.EquipmentServices.Services.QueryContainerBindSfc
     public class QueryContainerBindSfcService : IQueryContainerBindSfcService
     {
         private readonly ICurrentEquipment _currentEquipment;
-        private readonly AbstractValidator<QueryContainerBindSfcRequest> _validationQueryContainerBindSfcRequestRules;
+        private readonly AbstractValidator<QueryContainerBindSfcDto> _validationQueryContainerBindSfcDtoRules;
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="validationQueryContainerBindSfcRequestRules"></param>
+        /// <param name="validationQueryContainerBindSfcDtoRules"></param>
         /// <param name="currentEquipment"></param>
-        public QueryContainerBindSfcService(AbstractValidator<QueryContainerBindSfcRequest> validationQueryContainerBindSfcRequestRules, ICurrentEquipment currentEquipment)
+        public QueryContainerBindSfcService(AbstractValidator<QueryContainerBindSfcDto> validationQueryContainerBindSfcDtoRules, ICurrentEquipment currentEquipment)
         {
-            _validationQueryContainerBindSfcRequestRules = validationQueryContainerBindSfcRequestRules;
+            _validationQueryContainerBindSfcDtoRules = validationQueryContainerBindSfcDtoRules;
             _currentEquipment = currentEquipment;
         }
 
         /// <summary>
         /// 容器绑定条码查询
         /// </summary>
-        /// <param name="queryContainerBindSfcRequest"></param>
+        /// <param name="queryContainerBindSfcDto"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<IEnumerable<QueryContainerBindSfcReaponse>> QueryContainerBindSfcAsync(QueryContainerBindSfcRequest queryContainerBindSfcRequest)
+        public async Task<IEnumerable<QueryContainerBindSfcReaponse>> QueryContainerBindSfcAsync(QueryContainerBindSfcDto queryContainerBindSfcDto)
         {
-            await _validationQueryContainerBindSfcRequestRules.ValidateAndThrowAsync(queryContainerBindSfcRequest);
+            await _validationQueryContainerBindSfcDtoRules.ValidateAndThrowAsync(queryContainerBindSfcDto);
             throw new NotImplementedException();
         }
     }

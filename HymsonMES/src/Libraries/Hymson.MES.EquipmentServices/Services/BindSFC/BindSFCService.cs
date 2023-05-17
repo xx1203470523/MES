@@ -4,8 +4,8 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.EquipmentServices.Request.BindContainer;
-using Hymson.MES.EquipmentServices.Request.BindSFC;
+using Hymson.MES.EquipmentServices.Dtos.BindContainer;
+using Hymson.MES.EquipmentServices.Dtos.BindSFC;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -20,16 +20,16 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
     public class BindSFCService : IBindSFCService
     {
         private readonly ICurrentEquipment _currentEquipment;
-        private readonly AbstractValidator<BindSFCRequest> _validationBindRequestRules;
-        private readonly AbstractValidator<UnBindSFCRequest> _validationUnBindRequestRules;
+        private readonly AbstractValidator<BindSFCDto> _validationBindDtoRules;
+        private readonly AbstractValidator<UnBindSFCDto> _validationUnBindDtoRules;
         private readonly IManuSfcBindRecordRepository _manuSfcBindRecordRepository;
         private readonly IManuSfcBindRepository _manuSfcBindRepository;
 
-        public BindSFCService(AbstractValidator<BindSFCRequest> validationBindRequestRules, ICurrentEquipment currentEquipment, AbstractValidator<UnBindSFCRequest> validationUnBindRequestRules, IManuSfcBindRecordRepository manuSfcBindRecordRepository, IManuSfcBindRepository manuSfcBindRepository)
+        public BindSFCService(AbstractValidator<BindSFCDto> validationBindDtoRules, ICurrentEquipment currentEquipment, AbstractValidator<UnBindSFCDto> validationUnBindDtoRules, IManuSfcBindRecordRepository manuSfcBindRecordRepository, IManuSfcBindRepository manuSfcBindRepository)
         {
-            _validationBindRequestRules = validationBindRequestRules;
+            _validationBindDtoRules = validationBindDtoRules;
             _currentEquipment = currentEquipment;
-            _validationUnBindRequestRules = validationUnBindRequestRules;
+            _validationUnBindDtoRules = validationUnBindDtoRules;
             _manuSfcBindRecordRepository = manuSfcBindRecordRepository;
             _manuSfcBindRepository = manuSfcBindRepository;
         }
@@ -37,21 +37,21 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
         /// <summary>
         /// 绑定
         /// </summary>
-        /// <param name="bindSFCRequest"></param>
+        /// <param name="bindSFCDto"></param>
         /// <returns></returns>
-        public async Task BindSFCAsync(BindSFCRequest bindSFCRequest)
+        public async Task BindSFCAsync(BindSFCDto bindSFCDto)
         {
             //验证参数
-            await _validationBindRequestRules.ValidateAndThrowAsync(bindSFCRequest);
+            await _validationBindDtoRules.ValidateAndThrowAsync(bindSFCDto);
             List<ManuSfcBindEntity> sfcBindList = new();
             List<ManuSfcBindRecordEntity> sfcBindRecordList = new();
-            foreach (var item in bindSFCRequest.BindSFCs)
+            foreach (var item in bindSFCDto.BindSFCs)
             {
                 sfcBindList.Add(new ManuSfcBindEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = _currentEquipment.SiteId,
-                    SFC = bindSFCRequest.SFC,
+                    SFC = bindSFCDto.SFC,
                     BindSFC = item,
                     Type = 0,//预留字段
                     Location = 0,//预留
@@ -66,7 +66,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
                 {
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = _currentEquipment.SiteId,
-                    SFC = bindSFCRequest.SFC,
+                    SFC = bindSFCDto.SFC,
                     BindSFC = item,
                     Type = 0,//预留字段
                     Location = 0,//预留
@@ -90,13 +90,13 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
         /// <summary>
         /// 解绑
         /// </summary>
-        /// <param name="unBindSFCRequest"></param>
+        /// <param name="unBindSFCDto"></param>
         /// <returns></returns>
-        public async Task UnBindSFCAsync(UnBindSFCRequest unBindSFCRequest)
+        public async Task UnBindSFCAsync(UnBindSFCDto unBindSFCDto)
         {
             //验证参数
-            await _validationUnBindRequestRules.ValidateAndThrowAsync(unBindSFCRequest);
-            var bindSfcs = await _manuSfcBindRepository.GetBySFCAsync(unBindSFCRequest.SFC);
+            await _validationUnBindDtoRules.ValidateAndThrowAsync(unBindSFCDto);
+            var bindSfcs = await _manuSfcBindRepository.GetBySFCAsync(unBindSFCDto.SFC);
             if (!bindSfcs.Any())
             {
                 //不需要解绑
@@ -104,7 +104,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
             }
 
             //需要解绑的SFC
-            var unBindSFCs = bindSfcs.Where(c => unBindSFCRequest.BindSFCs.Contains(c.BindSFC));
+            var unBindSFCs = bindSfcs.Where(c => unBindSFCDto.BindSFCs.Contains(c.BindSFC));
             List<long> idsList = new List<long>();
             List<ManuSfcBindRecordEntity> sfcBindRecordList = new();
             foreach (var item in unBindSFCs)
@@ -120,7 +120,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
                 {
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = _currentEquipment.SiteId,
-                    SFC = unBindSFCRequest.SFC,
+                    SFC = unBindSFCDto.SFC,
                     BindSFC = item.BindSFC,
                     Type = 0,//预留字段
                     Location = 0,//预留

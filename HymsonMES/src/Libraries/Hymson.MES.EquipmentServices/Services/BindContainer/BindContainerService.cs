@@ -6,7 +6,7 @@ using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.EquipmentServices.Request.BindContainer;
+using Hymson.MES.EquipmentServices.Dtos.BindContainer;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -23,15 +23,15 @@ namespace Hymson.MES.EquipmentServices.Services.BindContainer
     public class BindContainerService : IBindContainerService
     {
         private readonly ICurrentEquipment _currentEquipment;
-        private readonly AbstractValidator<BindContainerRequest> _validationBindContainerRules;
-        private readonly AbstractValidator<UnBindContainerRequest> _validationUnBindContainerRules;
+        private readonly AbstractValidator<BindContainerDto> _validationBindContainerRules;
+        private readonly AbstractValidator<UnBindContainerDto> _validationUnBindContainerRules;
 
         private readonly IManuTrayLoadRepository _manuTrayLoadRepository;
         private readonly IManuTraySfcRecordRepository _manuTraySfcRecordRepository;
         private readonly IManuTraySfcRelationRepository _manuTraySfcRelationRepository;
 
 
-        public BindContainerService(AbstractValidator<BindContainerRequest> validationBindContainerRules, ICurrentEquipment currentEquipment, AbstractValidator<UnBindContainerRequest> validationUnBindContainerRules,
+        public BindContainerService(AbstractValidator<BindContainerDto> validationBindContainerRules, ICurrentEquipment currentEquipment, AbstractValidator<UnBindContainerDto> validationUnBindContainerRules,
            IManuTraySfcRecordRepository manuTraySfcRecordRepository, IManuTraySfcRelationRepository manuTraySfcRelationRepository, IManuTrayLoadRepository manuTrayLoadRepository)
         {
             _validationBindContainerRules = validationBindContainerRules;
@@ -44,14 +44,14 @@ namespace Hymson.MES.EquipmentServices.Services.BindContainer
         /// <summary>
         /// 绑定
         /// </summary>
-        /// <param name="bindContainerRequest"></param>
+        /// <param name="bindContainerDto"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task BindContainerAsync(BindContainerRequest bindContainerRequest)
+        public async Task BindContainerAsync(BindContainerDto bindContainerDto)
         {
-            await _validationBindContainerRules.ValidateAndThrowAsync(bindContainerRequest);
+            await _validationBindContainerRules.ValidateAndThrowAsync(bindContainerDto);
             //查找绑定容器
-            var inteTrayLoad = await _manuTrayLoadRepository.GetByTrayCodeAsync(bindContainerRequest.ContainerCode);
+            var inteTrayLoad = await _manuTrayLoadRepository.GetByTrayCodeAsync(bindContainerDto.ContainerCode);
             //容器不存在
             if (inteTrayLoad == null)
             {
@@ -59,7 +59,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindContainer
             }
             List<ManuTraySfcRelationEntity> traySfcRelations = new List<ManuTraySfcRelationEntity>();
             List<ManuTraySfcRecordEntity> traySfcRecord = new List<ManuTraySfcRecordEntity>();
-            foreach (var item in bindContainerRequest.ContainerSFCs)
+            foreach (var item in bindContainerDto.ContainerSFCs)
             {
                 //容器绑定关系
                 ManuTraySfcRelationEntity sfc = new()
@@ -111,14 +111,14 @@ namespace Hymson.MES.EquipmentServices.Services.BindContainer
         /// <summary>
         /// 解绑
         /// </summary>
-        /// <param name="unBindContainerRequest"></param>
+        /// <param name="unBindContainerDto"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task UnBindContainerAsync(UnBindContainerRequest unBindContainerRequest)
+        public async Task UnBindContainerAsync(UnBindContainerDto unBindContainerDto)
         {
-            await _validationUnBindContainerRules.ValidateAndThrowAsync(unBindContainerRequest);
+            await _validationUnBindContainerRules.ValidateAndThrowAsync(unBindContainerDto);
             //查找绑定容器
-            var inteTrayLoad = await _manuTrayLoadRepository.GetByTrayCodeAsync(unBindContainerRequest.ContainerCode);
+            var inteTrayLoad = await _manuTrayLoadRepository.GetByTrayCodeAsync(unBindContainerDto.ContainerCode);
             //容器不存在
             if (inteTrayLoad == null)
             {
@@ -132,7 +132,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindContainer
             }
 
             //需要解绑的SFC
-            var unBindSFCs = trayLoads.Where(c => unBindContainerRequest.ContainerSFCs.Contains(c.SFC));
+            var unBindSFCs = trayLoads.Where(c => unBindContainerDto.ContainerSFCs.Contains(c.SFC));
             List<long> idsList = new List<long>();
             List<ManuTraySfcRecordEntity> traySfcRecord = new List<ManuTraySfcRecordEntity>();
             foreach (var item in unBindSFCs)

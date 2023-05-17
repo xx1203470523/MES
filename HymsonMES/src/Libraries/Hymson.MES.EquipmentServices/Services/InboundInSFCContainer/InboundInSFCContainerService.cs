@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Hymson.MES.EquipmentServices.Request.InboundInSFCContainer;
+using Hymson.MES.EquipmentServices.Dtos.InboundInSFCContainer;
 using Hymson.Web.Framework.WorkContext;
 using System;
 using System.Collections.Generic;
@@ -15,28 +15,28 @@ namespace Hymson.MES.EquipmentServices.Services.InboundInSFCContainer
     public class InboundInSFCContainerService : IInboundInSFCContainerService
     {
         private readonly ICurrentEquipment _currentEquipment;
-        private readonly AbstractValidator<InboundInSFCContainerRequest> _validationInboundInSFCContainerRequestRules;
+        private readonly AbstractValidator<InboundInSFCContainerDto> _validationInboundInSFCContainerDtoRules;
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="validationInboundInSFCContainerRequestRules"></param>
+        /// <param name="validationInboundInSFCContainerDtoRules"></param>
         /// <param name="currentEquipment"></param>
-        public InboundInSFCContainerService(AbstractValidator<InboundInSFCContainerRequest> validationInboundInSFCContainerRequestRules, ICurrentEquipment currentEquipment)
+        public InboundInSFCContainerService(AbstractValidator<InboundInSFCContainerDto> validationInboundInSFCContainerDtoRules, ICurrentEquipment currentEquipment)
         {
-            _validationInboundInSFCContainerRequestRules = validationInboundInSFCContainerRequestRules;
+            _validationInboundInSFCContainerDtoRules = validationInboundInSFCContainerDtoRules;
             _currentEquipment = currentEquipment;
         }
 
         /// <summary>
         /// 进站-电芯和托盘-装盘2
         /// </summary>
-        /// <param name="inboundInSFCContainerRequest"></param>
+        /// <param name="inboundInSFCContainerDto"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task InboundInSFCContainerAsync(InboundInSFCContainerRequest inboundInSFCContainerRequest)
+        public async Task InboundInSFCContainerAsync(InboundInSFCContainerDto inboundInSFCContainerDto)
         {
-            await _validationInboundInSFCContainerRequestRules.ValidateAndThrowAsync(inboundInSFCContainerRequest);
+            await _validationInboundInSFCContainerDtoRules.ValidateAndThrowAsync(inboundInSFCContainerDto);
             throw new NotImplementedException();
         }
     }
