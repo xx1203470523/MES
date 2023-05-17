@@ -11,6 +11,7 @@ using FluentValidation.Validators;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.View;
 using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -118,9 +119,23 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcProcedurePrintReleationEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            if (procProcedurePrintReleationQuery.ProcedureId != 0)
+            {
+                sqlBuilder.Where("ProcedureId = @ProcedureId");
+            }
+            if (string.IsNullOrEmpty(procProcedurePrintReleationQuery.Version) != true)
+            {
+                sqlBuilder.Where("Version = @Version");
+            }
+            if (procProcedurePrintReleationQuery.MaterialId != 0)
+            {
+                sqlBuilder.Where("MaterialId = @MaterialId");
+            }
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var procProcedurePrintReleationEntities = await conn.QueryAsync<ProcProcedurePrintRelationEntity>(template.RawSql, procProcedurePrintReleationQuery);
             return procProcedurePrintReleationEntities;
+            
         }
 
         /// <summary>
