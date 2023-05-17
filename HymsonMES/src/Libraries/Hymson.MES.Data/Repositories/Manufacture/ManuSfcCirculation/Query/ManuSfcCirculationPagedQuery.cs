@@ -38,14 +38,19 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query
         public long? CirculationProductId { get; set; }
 
         /// <summary>
-        /// 开始时间 
+        /// 开始时间
         /// </summary>
-        public DateTime? CreatedOnS { get; set; }
+        public DateTime[]? CreatedOn { get; set; }
 
-        /// <summary>
-        /// 结束时间
-        /// </summary>
-        public DateTime? CreatedOnE { get; set; }
+        ///// <summary>
+        ///// 开始时间 
+        ///// </summary>
+        //public DateTime? CreatedOnS { get; set; }
+
+        ///// <summary>
+        ///// 结束时间
+        ///// </summary>
+        //public DateTime? CreatedOnE { get; set; }
 
         /// <summary>
         /// 批次条码
@@ -61,5 +66,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query
         /// 资源ID
         /// </summary>
         public long? ResourceId { get; set; }
+
+        /// <summary>
+        /// 供应商ID
+        /// </summary>
+        public long? CirculationMainSupplierId { get; set; }
     }
 }
