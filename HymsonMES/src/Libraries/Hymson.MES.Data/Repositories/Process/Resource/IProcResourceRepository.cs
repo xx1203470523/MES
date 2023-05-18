@@ -72,6 +72,13 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<bool> IsExistsAsync(ProcResourceQuery query);
 
         /// <summary>
+        /// 判断激活的资源是否存在
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<bool> IsExistsActiveAsync(ProcResourceQuery query);
+
+        /// <summary>
         ///  查询资源维护表列表(关联资源类型，展示资源类型名称)
         /// </summary>
         /// <param name="query"></param>

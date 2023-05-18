@@ -752,6 +752,9 @@
         public const string MES19002 = "资源编码不能为空";
         public const string MES19003 = "SFC条码不能为空";
         public const string MES19004 = "调用本地时间不能为空";
+        public const string MES19005 = "设备编码不存在";
+        public const string MES19006 = "资源编码不存在";
+        public const string MES19007 = "SFC条码不允许重复";
         #endregion
 
         public const string MES19101 = "条码列表不能为空";
@@ -767,6 +770,7 @@
         public const string MES19111 = "托盘条码不能为空";
         public const string MES19112 = "上传SFC信息不能为空";
         public const string MES19113 = "该设备已经设置临时SFC";
+        public const string MES19114 = "NG编码{Code}不存在";
 
         #endregion
 

@@ -20,7 +20,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 步骤表id
         /// </summary>
-        public string BarCodeStepId { get; set; }
+        public long BarCodeStepId { get; set; }
 
        /// <summary>
         /// 不合格代码

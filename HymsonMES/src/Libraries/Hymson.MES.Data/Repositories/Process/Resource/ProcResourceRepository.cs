@@ -134,6 +134,18 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 判断激活的资源是否存在
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<bool> IsExistsActiveAsync(ProcResourceQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var procResource = await conn.QueryAsync<ProcResourceEntity>(ExistsActiveSql, new { query.ResCode, query.SiteId });
+            return procResource != null && procResource.Any();
+        }
+
+        /// <summary>
         /// 获取资源分页列表(关联资源类型)
         /// </summary>
         /// <param name="query"></param>
@@ -398,6 +410,8 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetResByIdsSql = "select * from proc_resource where  Id  =@Id";
 
         const string ExistsSql = "SELECT Id FROM proc_resource WHERE `IsDeleted`= 0 AND ResCode=@ResCode and SiteId=@SiteId LIMIT 1";
+
+        const string ExistsActiveSql = "SELECT Id FROM proc_resource WHERE `IsDeleted`= 0 AND ResCode=@ResCode and SiteId=@SiteId and Status=1 LIMIT 1";
 
         const string GetPagedInfoDataSqlTemplate = "SELECT a.*,b.ResType,b.ResTypeName  FROM proc_resource a left join proc_resource_type b on a.ResTypeId =b.Id and b.IsDeleted =0 /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
         const string GetPagedInfoCountSqlTemplate = "SELECT count(*) FROM proc_resource a left join proc_resource_type b on a.ResTypeId =b.Id  /**where**/ ";
