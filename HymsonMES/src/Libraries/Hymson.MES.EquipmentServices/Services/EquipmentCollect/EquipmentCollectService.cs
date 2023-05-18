@@ -364,6 +364,8 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
         /// <returns></returns>
         private async Task UpdateEquipmentStatusAsync(EquStatusEntity currentStatusEntity)
         {
+            if (currentStatusEntity == null) return;
+
             // 最近的状态记录
             var lastStatusEntity = await _equipmentStatusRepository.GetLastEntityByEquipmentIdAsync(currentStatusEntity.EquipmentId);
 
@@ -374,7 +376,7 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
             await _equipmentStatusRepository.InsertAsync(currentStatusEntity);
 
             // 更新统计表
-            if (lastStatusEntity != null && lastStatusEntity.EquipmentStatus != lastStatusEntity.EquipmentStatus)
+            if (lastStatusEntity != null && currentStatusEntity.EquipmentStatus != lastStatusEntity.EquipmentStatus)
             {
                 await _equipmentStatusRepository.InsertStatisticsAsync(new EquStatusStatisticsEntity
                 {
