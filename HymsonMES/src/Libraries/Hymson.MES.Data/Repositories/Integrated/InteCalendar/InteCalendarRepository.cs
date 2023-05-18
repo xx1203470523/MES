@@ -115,6 +115,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IC.IsDeleted = 0");
+            sqlBuilder.Where("IC.SiteId = @SiteId");
             sqlBuilder.OrderBy("IC.UpdatedOn DESC");
             sqlBuilder.Select("IC.Id, IC.CalendarName, IC.CalendarType, IC.Remark, IC.UseStatus, IC.CreatedBy, IC.CreatedOn, IC.UpdatedBy, IC.UpdatedOn");
             sqlBuilder.Select("IWC.`Code`, IWC.`Name`, EE.EquipmentCode, EE.EquipmentName");

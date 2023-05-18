@@ -120,6 +120,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
         {
             var pagedQuery = equSparePartPagedQueryDto.ToQuery<EquSparePartPagedQuery>();
             pagedQuery.Type = EquipmentPartTypeEnum.Consumable; // 工装
+            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _equConsumableRepository.GetPagedInfoAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据

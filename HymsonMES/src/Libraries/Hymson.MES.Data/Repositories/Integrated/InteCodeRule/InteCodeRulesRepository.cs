@@ -161,6 +161,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
             var template = sqlBuilder.AddTemplate(GetInteCodeRulesEntitiesSqlTemplate);
 
             sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId=@SiteId");
             sqlBuilder.Select("*");
 
             if (inteCodeRulesQuery.ProductId > 0)

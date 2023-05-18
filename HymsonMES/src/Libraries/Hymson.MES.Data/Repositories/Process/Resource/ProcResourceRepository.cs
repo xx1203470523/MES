@@ -1,6 +1,5 @@
 ﻿using Dapper;
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -104,10 +103,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="resourceCode"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcResourceEntity>> GetByResourceCodeAsync(string resourceCode)
+        public async Task<IEnumerable<ProcResourceEntity>> GetByResourceCodeAsync(ProcResourceQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcResourceEntity>(GetByResourceCode, new { resourceCode });
+            return await conn.QueryAsync<ProcResourceEntity>(GetByResourceCode, new { ResCode = query.ResCode, SiteId = query .SiteId});
         }
 
         /// <summary>
@@ -115,10 +114,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="equipmentCode"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcResourceEntity>> GetByEquipmentCodeAsync(string equipmentCode)
+        public async Task<IEnumerable<ProcResourceEntity>> GetByEquipmentCodeAsync(ProcResourceQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcResourceEntity>(GetByEquipmentCode, new { equipmentCode });
+            return await conn.QueryAsync<ProcResourceEntity>(GetByEquipmentCode, new { EquipmentCode=query.EquipmentCode, SiteId=query.SiteId });
         }
 
         /// <summary>
@@ -402,11 +401,11 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdsAndStatusSql = "select * from proc_resource where  Id  in @Ids and Status=@Status";
         const string GetByIdsSql = "select * from proc_resource  WHERE Id IN @ids and IsDeleted=0";
         const string GetByCodeSql = "SELECT * FROM proc_resource WHERE `IsDeleted` = 0 AND SiteId = @Site AND ResCode = @Code LIMIT 1";
-        const string GetByResourceCode = "SELECT Id, ResCode FROM proc_resource WHERE IsDeleted = 0 AND ResCode = @resourceCode";
-        const string GetByEquipmentCode = "SELECT R.Id, R.ResCode FROM proc_resource_equipment_bind REB " +
-            "LEFT JOIN equ_equipment E ON REB.EquipmentId = E.Id " +
-            "LEFT JOIN proc_resource R ON REB.ResourceId = R.Id " +
-            "WHERE E.IsDeleted = 0 AND R.IsDeleted = 0 AND E.EquipmentCode = @equipmentCode";
+        const string GetByResourceCode = "SELECT Id, ResCode FROM proc_resource WHERE IsDeleted = 0 AND ResCode = @ResCode and SiteId =@SiteId ";
+        const string GetByEquipmentCode = @"SELECT R.Id, R.ResCode FROM proc_resource_equipment_bind REB 
+            LEFT JOIN equ_equipment E ON REB.EquipmentId = E.Id
+            LEFT JOIN proc_resource R ON REB.ResourceId = R.Id
+            WHERE E.IsDeleted = 0 AND R.IsDeleted = 0 AND E.EquipmentCode = @EquipmentCode AND E.SiteId =@SiteId";
         const string GetResByIdsSql = "select * from proc_resource where  Id  =@Id";
 
         const string ExistsSql = "SELECT Id FROM proc_resource WHERE `IsDeleted`= 0 AND ResCode=@ResCode and SiteId=@SiteId LIMIT 1";

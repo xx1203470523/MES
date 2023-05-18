@@ -74,5 +74,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 是否报废
         /// </summary>
         public TrueOrFalseEnum? IsScrap { get; set; }
+
+        /// <summary>
+        /// 产品编码
+        /// </summary>
+        public string? MaterialCode { get; set; }
+
+        /// <summary>
+        /// 物料版本
+        /// </summary>
+        public string? Version { get; set; }
     }
 }

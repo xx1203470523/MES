@@ -167,7 +167,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
 
             //实体到DTO转换 装载数据
-            List<ManuContainerPackDto> manuContainerPackDtos = await PrepareManuContainerPackDtos(pagedInfo);
+            List<ManuContainerPackDto> manuContainerPackDtos = await PrepareManuContainerPackDtosAsync(pagedInfo);
 
             var containerPackEntities = new List<ManuContainerPackEntity>();
             var barCodes = manuContainerPackDtos.Select(x => x.LadeBarCode).ToArray();
@@ -197,7 +197,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="pagedInfo"></param>
         /// <returns></returns>
-        private async Task<List<ManuContainerPackDto>> PrepareManuContainerPackDtos(PagedInfo<ManuContainerPackView> pagedInfo)
+        private async Task<List<ManuContainerPackDto>> PrepareManuContainerPackDtosAsync(PagedInfo<ManuContainerPackView> pagedInfo)
         {
             var manuContainerPackDtos = new List<ManuContainerPackDto>();
             //工单信息

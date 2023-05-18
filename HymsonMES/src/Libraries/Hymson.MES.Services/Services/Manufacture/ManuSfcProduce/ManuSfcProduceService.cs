@@ -1804,7 +1804,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="sfcs"></param>
         /// <returns></returns>
-        public async Task<List<ManuUpdateViewDto>> GetManuUpdateList(string[] sfcs)
+        public async Task<List<ManuUpdateViewDto>> GetManuUpdateListAsync(string[] sfcs)
         {
             var manuUpdateViewDtoList = new List<ManuUpdateViewDto>();
             //在制数据
@@ -1847,7 +1847,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="workOrderId"></param>
         /// <returns></returns>
-        public async Task<List<ManuUpdateProcedureViewDto>> GetProcedureByOrderIdList(long workOrderId)
+        public async Task<List<ManuUpdateProcedureViewDto>> GetProcedureByOrderIdListAsync(long workOrderId)
         {
             if (workOrderId <= 0)
             {
@@ -1880,7 +1880,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="sfcs"></param>
         /// <param name="procedureId"></param>
         /// <returns></returns>
-        /// <exception cref="CustomerValidationException"></exception>
         private async Task<IEnumerable<ManuSfcProduceEntity>> ManuUpdateVerifyAsync(string[] sfcs, long procedureId = 0)
         {
             if (sfcs == null || sfcs.Length <= 0)
@@ -1940,7 +1939,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="manuUpdateSaveDto"></param>
         /// <returns></returns>
-        public async Task SaveManuUpdateList(ManuUpdateSaveDto manuUpdateSaveDto)
+        public async Task SaveManuUpdateListAsync(ManuUpdateSaveDto manuUpdateSaveDto)
         {
             #region 验证
             if (manuUpdateSaveDto.WorkOrderId <= 0)

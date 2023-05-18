@@ -139,7 +139,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<List<ProcProcessRouteDetailNodeViewDto>> GetNodesByRouteId(long id)
+        public async Task<List<ProcProcessRouteDetailNodeViewDto>> GetNodesByRouteIdAsync(long id)
         {
             var nodeQuery = new ProcProcessRouteDetailNodeQuery { ProcessRouteId = id };
             var nodes = await _procProcessRouteNodeRepository.GetListAsync(nodeQuery);

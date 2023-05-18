@@ -8,22 +8,16 @@
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
-using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
-using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
-using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using IdGen;
-using System.Linq;
-using System.Security.Policy;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Plan
@@ -190,7 +184,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="bindActivationWorkOrder"></param>
         /// <returns></returns>
-        public async Task BindActivationWorkOrder(BindActivationWorkOrderDto bindActivationWorkOrder)
+        public async Task BindActivationWorkOrderAsync(BindActivationWorkOrderDto bindActivationWorkOrder)
         {
             //检查当前这些工单 是否属于当前资源对应的线体
             var workCenterEntity = await _inteWorkCenterRepository.GetByResourceIdAsync(bindActivationWorkOrder.ResourceId);
@@ -333,7 +327,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="resourceId"></param>
         /// <returns></returns>
-        public async Task<List<HasBindWorkOrderInfoDto>> GetHasBindWorkOrder(long resourceId) 
+        public async Task<List<HasBindWorkOrderInfoDto>> GetHasBindWorkOrderAsync(long resourceId) 
         {
             List<HasBindWorkOrderInfoDto> hasBindWorkOrderInfoDtos = new List<HasBindWorkOrderInfoDto>();
 

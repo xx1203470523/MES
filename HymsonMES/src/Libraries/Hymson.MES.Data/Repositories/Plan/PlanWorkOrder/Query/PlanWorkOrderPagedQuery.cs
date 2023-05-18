@@ -62,5 +62,10 @@ namespace Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query
         /// 查询状态集合
         /// </summary>
         public IEnumerable<PlanWorkOrderStatusEnum>? Statuss { get; set; }
+
+        /// <summary>
+        /// 物料版本
+        /// </summary>
+        public string? MaterialVersion { get; set; }
     }
 }

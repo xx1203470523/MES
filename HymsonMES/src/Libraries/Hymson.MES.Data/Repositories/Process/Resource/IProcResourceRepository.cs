@@ -55,14 +55,14 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="resourceCode"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcResourceEntity>> GetByResourceCodeAsync(string resourceCode);
+        Task<IEnumerable<ProcResourceEntity>> GetByResourceCodeAsync(ProcResourceQuery query);
 
         /// <summary>
         /// 根据设备Code查询数据
         /// </summary>
         /// <param name="equipmentCode"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcResourceEntity>> GetByEquipmentCodeAsync(string equipmentCode);
+        Task<IEnumerable<ProcResourceEntity>> GetByEquipmentCodeAsync(ProcResourceQuery query);
 
         /// <summary>
         /// 判断资源是否存在
