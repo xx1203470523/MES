@@ -111,7 +111,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         [Route("bindActivationWorkOrder")]
         public async Task BindActivationWorkOrder(BindActivationWorkOrderDto bindActivationWorkOrder) 
         {
-            await _planWorkOrderBindService.BindActivationWorkOrder(bindActivationWorkOrder);
+            await _planWorkOrderBindService.BindActivationWorkOrderAsync(bindActivationWorkOrder);
         }
 
         /// <summary>
@@ -123,7 +123,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         [Route("getHasBindWorkOrder/{resourceId}")]
         public async Task<List<HasBindWorkOrderInfoDto>> GetHasBindWorkOrder(long resourceId) 
         {
-             return await _planWorkOrderBindService.GetHasBindWorkOrder(resourceId);
+             return await _planWorkOrderBindService.GetHasBindWorkOrderAsync(resourceId);
         }
     }
 }

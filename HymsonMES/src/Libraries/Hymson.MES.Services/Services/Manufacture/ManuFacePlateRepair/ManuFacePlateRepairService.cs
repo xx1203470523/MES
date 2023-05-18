@@ -26,7 +26,6 @@ using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Minio.DataModel;
 using System.Text.Json;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -350,7 +349,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="manuSfcProduceEntit"></param>
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
-        private async Task<ManuFacePlateRepairOpenInfoDto> GetManuFacePlateRepairOpenInfoDto(ManuSfcProduceEntity manuSfcProduceEntit)
+        private async Task<ManuFacePlateRepairOpenInfoDto> GetManuFacePlateRepairOpenInfoDtoAsync(ManuSfcProduceEntity manuSfcProduceEntit)
         {
             //获取产品信息
             var manuSfcProduce = await _manuSfcProduceRepository.GetPagedInfoAsync(new ManuSfcProducePagedQuery { PageSize = 1, PageIndex = 1, SiteId = _currentSite.SiteId, Sfc = manuSfcProduceEntit.SFC });
