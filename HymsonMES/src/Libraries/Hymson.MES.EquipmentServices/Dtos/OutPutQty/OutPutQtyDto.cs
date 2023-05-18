@@ -24,12 +24,12 @@ namespace Hymson.MES.EquipmentServices.Dtos.OutPutQty
         /// <summary>
         /// 产出NG列表 可空
         /// </summary>
-        public object[]? NGList { get; set; }
+        public IEnumerable<NGList>? NGList { get; set; }
 
         /// <summary>
         /// 产品参数列表 可空
         /// </summary>
-        public object[]? ParamList { get; set; }
+        public IEnumerable<ParamList>? ParamList { get; set; }
 
         /// <summary>
         /// 绑定原材料 可空
@@ -41,5 +41,41 @@ namespace Hymson.MES.EquipmentServices.Dtos.OutPutQty
         /// </summary>
         public string[]? BindProductCodes { get; set; }
 
+    }
+
+    /// <summary>
+    /// 产出NG列表
+    /// </summary>
+    public class NGList
+    {
+        /// <summary>
+        /// NG代码 
+        /// </summary>
+        public string NGCode { get; set; } = string.Empty;
+
+        /// <summary>
+        /// NG数量 
+        /// </summary>
+        public int NGQty { get; set; }
+    }
+
+    /// <summary>
+    /// 产出NG列表
+    /// </summary>
+    public class ParamList
+    {
+        /// <summary>
+        /// 参数代码 
+        /// </summary>
+        public string ParamCode { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 参数值
+        /// </summary>
+        public string ParamValue { get; set; } = string.Empty;
+        /// <summary>
+        /// 时间戳 
+        /// </summary>
+        public string Timestamp { get; set; } = string.Empty;
     }
 }

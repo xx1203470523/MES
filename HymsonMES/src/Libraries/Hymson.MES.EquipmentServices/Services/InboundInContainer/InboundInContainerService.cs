@@ -47,8 +47,7 @@ namespace Hymson.MES.EquipmentServices.Services.InboundInContainer
             {
                 list.Add(item.SFC);
             }
-            //进攻   冲~
-            throw new NotImplementedException();
+            // 进站
         }
     }
 }

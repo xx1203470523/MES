@@ -16,7 +16,6 @@ namespace Hymson.MES.EquipmentServices.Services.OutPutQty
     {
         private readonly ICurrentEquipment _currentEquipment;
         private readonly AbstractValidator<OutPutQtyDto> _validationOutPutQtyDtoRules;
-
         /// <summary>
         /// 
         /// </summary>

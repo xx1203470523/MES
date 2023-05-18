@@ -20,5 +20,10 @@ namespace Hymson.MES.EquipmentServices.Dtos.GenerateModuleSFC
         /// 生产个数
         /// </summary>
         public int Qty { get; set; } = 0;
+
+        /// <summary>
+        /// 版本
+        /// </summary>
+        public string Version { get; set; } = string.Empty;
     }
 }

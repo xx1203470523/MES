@@ -766,6 +766,10 @@
         public const string MES19110 = "产品条码参数列表不能为空";
         public const string MES19111 = "托盘条码不能为空";
         public const string MES19112 = "上传SFC信息不能为空";
+        public const string MES19113 = "条码：{SFC}不存在";
+        public const string MES19114 = "产品编码：{Code}不存在";
+        public const string MES19115 = "产品编码不能为空";
+        public const string MES19116 = "请维护产品编码：{Code}的编码规则";
 
         #endregion
 
