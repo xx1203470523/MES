@@ -237,6 +237,17 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         }
 
         /// <summary>
+        /// 更新状态（批量）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> UpdatePointByBarCodesAsync(IEnumerable<UpdateStatusByBarCodeCommand> commands)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpPointByBarCode, commands);
+        }
+
+        /// <summary>
         /// 清空库存
         /// </summary>
         /// <param name="command"></param>

@@ -75,6 +75,6 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="activationWorkOrderDto"></param>
         /// <returns></returns>
-        Task ActivationWorkOrder(ActivationWorkOrderDto activationWorkOrderDto);
+        Task ActivationWorkOrderAsync(ActivationWorkOrderDto activationWorkOrderDto);
     }
 }

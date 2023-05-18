@@ -5,6 +5,7 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public class ProcProcessRouteDetailNodeQuery
     {
+        public long SiteId { get; set; }
         /// <summary>
         /// 
         /// </summary>

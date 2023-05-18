@@ -99,6 +99,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
 
         /// <summary>
         /// 设备心跳
+        /// HY-MES-EQU-002
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -110,6 +111,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
 
         /// <summary>
         /// 设备状态监控
+        /// HY-MES-EQU-003
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -121,6 +123,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
 
         /// <summary>
         /// 设备报警
+        /// HY-MES-EQU-004
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -132,6 +135,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
 
         /// <summary>
         /// 设备停机原因
+        /// HY-MES-EQU-005
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -144,6 +148,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
 
         /// <summary>
         /// 设备过程参数采集（无在制品条码）
+        /// HY-MES-EQU-010
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -155,17 +160,19 @@ namespace Hymson.MES.Equipment.Api.Controllers
 
         /// <summary>
         /// 设备产品过程参数采集(无在制品条码)
+        /// HY-MES-EQU-011
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("EquipmentProductProcessParamInNotCanSFC")]
-        public async Task EquipmentProductProcessParamInNotCanSFCAsync(EquipmentProductProcessParamInNotCanSFCDto request)
+        public async Task<string> EquipmentProductProcessParamInNotCanSFCAsync(EquipmentProductProcessParamInNotCanSFCDto request)
         {
-            await _equipmentService.EquipmentProductProcessParamInNotCanSFCAsync(request);
+            return await _equipmentService.EquipmentProductProcessParamInNotCanSFCAsync(request);
         }
 
         /// <summary>
         /// 设备产品过程参数采集
+        /// HY-MES-EQU-012
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -178,6 +185,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
 
         /// <summary>
         /// 上料-原材料上料
+        /// HY-MES-EQU-013
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -189,6 +197,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
 
         /// <summary>
         /// 卸料
+        /// HY-MES-EQU-014
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>

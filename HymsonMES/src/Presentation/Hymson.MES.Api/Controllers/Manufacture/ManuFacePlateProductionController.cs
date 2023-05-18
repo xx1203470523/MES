@@ -38,7 +38,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [HttpGet("getPlateProductionPackageInfo")]
         public async Task<ManuFacePlateProductionPackageDto> GetsManuFacePlateProductionPackageInfo([FromQuery] ManuFacePlateProductionPackageQueryDto param)
         {
-            return await _manuFacePlateProductionService.GetManuFacePlateProductionPackageInfo(param);
+            return await _manuFacePlateProductionService.GetManuFacePlateProductionPackageInfoAsync(param);
         }
 
         ///// <summary>

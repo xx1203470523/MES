@@ -122,21 +122,21 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
         /// </summary>
         /// <param name="sfcs"></param>
         /// <returns></returns>
-        Task<List<ManuUpdateViewDto>> GetManuUpdateList(string[] sfcs);
+        Task<List<ManuUpdateViewDto>> GetManuUpdateListAsync(string[] sfcs);
 
         /// <summary>
         /// 获取更改生产列表数据
         /// </summary>
         /// <param name="workOrderId"></param>
         /// <returns></returns>
-        Task<List<ManuUpdateProcedureViewDto>> GetProcedureByOrderIdList(long workOrderId);
+        Task<List<ManuUpdateProcedureViewDto>> GetProcedureByOrderIdListAsync(long workOrderId);
 
         /// <summary>
         /// 保存生产更改
         /// </summary>
         /// <param name="manuUpdateSaveDto"></param>
         /// <returns></returns>
-        Task SaveManuUpdateList(ManuUpdateSaveDto manuUpdateSaveDto);
+        Task SaveManuUpdateListAsync(ManuUpdateSaveDto manuUpdateSaveDto);
 
         /// <summary>
         /// 获取工艺路线末尾工序

@@ -683,7 +683,7 @@
         #region 条码打印 MES17000
         public const string MES17001 = "条码打印，打印模板文件未找到";
         public const string MES17002 = "条码打印，打印机信息未找到";
-        public const string MES17003 = "条码打印，条码的包装维护记录未找到";
+        public const string MES17003 = "条码打印，打印失败msg:{msg}.";
         #endregion
 
         #region 在制品步骤控制 MES18000
@@ -766,10 +766,12 @@
         public const string MES19110 = "产品条码参数列表不能为空";
         public const string MES19111 = "托盘条码不能为空";
         public const string MES19112 = "上传SFC信息不能为空";
-        public const string MES19113 = "条码：{SFC}不存在";
+        public const string MES19113 = "该设备已经设置临时SFC";
         public const string MES19114 = "产品编码：{Code}不存在";
         public const string MES19115 = "产品编码不能为空";
         public const string MES19116 = "请维护产品编码：{Code}的编码规则";
+        public const string MES19117 = "条码：{SFC}不存在"; 
+
 
         #endregion
 

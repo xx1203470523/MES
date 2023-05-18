@@ -3,7 +3,9 @@
 namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
 {
     /// <summary>
-    /// 设备接口
+    /// 设备信息收集服务接口
+    /// @author Czhipu
+    /// @date 2023-05-16 04:51:15
     /// </summary>
     public interface IEquipmentCollectService
     {
@@ -49,7 +51,7 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task EquipmentProductProcessParamInNotCanSFCAsync(EquipmentProductProcessParamInNotCanSFCDto request);
+        Task<string> EquipmentProductProcessParamInNotCanSFCAsync(EquipmentProductProcessParamInNotCanSFCDto request);
 
         /// <summary>
         /// 设备产品过程参数采集

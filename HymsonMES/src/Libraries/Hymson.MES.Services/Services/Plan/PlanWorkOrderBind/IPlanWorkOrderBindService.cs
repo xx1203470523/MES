@@ -62,13 +62,13 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="bindActivationWorkOrder"></param>
         /// <returns></returns>
-        Task BindActivationWorkOrder(BindActivationWorkOrderDto bindActivationWorkOrder);
+        Task BindActivationWorkOrderAsync(BindActivationWorkOrderDto bindActivationWorkOrder);
 
         /// <summary>
         /// 获取资源id上已经绑定的工单
         /// </summary>
         /// <param name="resourceId"></param>
         /// <returns></returns>
-        Task<List<HasBindWorkOrderInfoDto>> GetHasBindWorkOrder(long resourceId);
+        Task<List<HasBindWorkOrderInfoDto>> GetHasBindWorkOrderAsync(long resourceId);
     }
 }

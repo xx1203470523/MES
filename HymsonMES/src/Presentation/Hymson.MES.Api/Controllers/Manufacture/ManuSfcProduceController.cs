@@ -179,7 +179,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [HttpPost("getManuUpdateList")]
         public async Task<List<ManuUpdateViewDto>> GetManuUpdateList(string[] sfcs)
         {
-            return await _manuSfcProduceService.GetManuUpdateList(sfcs);
+            return await _manuSfcProduceService.GetManuUpdateListAsync(sfcs);
         }
 
         /// <summary>
@@ -190,7 +190,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [HttpGet("getProcedureByOrderId/{workOrderId}")]
         public async Task<List<ManuUpdateProcedureViewDto>> GetProcedureByOrderIdList(long workOrderId)
         {
-            return await _manuSfcProduceService.GetProcedureByOrderIdList(workOrderId);
+            return await _manuSfcProduceService.GetProcedureByOrderIdListAsync(workOrderId);
         }
 
         /// <summary>
@@ -201,7 +201,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [HttpPost("saveManuUpdate")]
         public async Task SaveManuUpdateList(ManuUpdateSaveDto manuUpdateSaveDto)
         {
-            await _manuSfcProduceService.SaveManuUpdateList(manuUpdateSaveDto);
+            await _manuSfcProduceService.SaveManuUpdateListAsync(manuUpdateSaveDto);
         }
 
         /// <summary>

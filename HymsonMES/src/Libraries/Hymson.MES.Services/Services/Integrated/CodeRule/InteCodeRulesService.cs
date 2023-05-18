@@ -95,7 +95,7 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
             inteCodeRulesEntity.SiteId = _currentSite.SiteId ?? 0;
 
             //判断是否已经存在该物料数据
-            var hasCodeRulesEntities = await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery { ProductId = inteCodeRulesCreateDto.ProductId });
+            var hasCodeRulesEntities = await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery { SiteId = _currentSite.SiteId ?? 0, ProductId = inteCodeRulesCreateDto.ProductId });
             if (hasCodeRulesEntities != null && hasCodeRulesEntities.Any())
             {
                 IEnumerable<InteCodeRulesEntity> repeats = new List<InteCodeRulesEntity>();
@@ -104,12 +104,12 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
                 {
                     repeats = hasCodeRulesEntities.Where(x => x.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode).ToList();
                 }
-                else 
+                else
                 {
-                    repeats = hasCodeRulesEntities.Where(x => x.CodeType == CodeRuleCodeTypeEnum.PackagingSeqCode && x.PackType== inteCodeRulesCreateDto.PackType).ToList();
+                    repeats = hasCodeRulesEntities.Where(x => x.CodeType == CodeRuleCodeTypeEnum.PackagingSeqCode && x.PackType == inteCodeRulesCreateDto.PackType).ToList();
                 }
 
-                if (repeats != null && repeats.Any()) 
+                if (repeats != null && repeats.Any())
                 {
                     if (inteCodeRulesCreateDto.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode)
                         throw new BusinessException(nameof(ErrorCode.MES12401)).WithData("productId", inteCodeRulesCreateDto.ProductId);
@@ -187,7 +187,7 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
         public async Task<PagedInfo<InteCodeRulesPageViewDto>> GetPageListAsync(InteCodeRulesPagedQueryDto inteCodeRulesPagedQueryDto)
         {
             var inteCodeRulesPagedQuery = inteCodeRulesPagedQueryDto.ToQuery<InteCodeRulesPagedQuery>();
-            inteCodeRulesPagedQuery.SiteId = _currentSite.SiteId??0;
+            inteCodeRulesPagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _inteCodeRulesRepository.GetPagedInfoAsync(inteCodeRulesPagedQuery);
 
             //实体到DTO转换 装载数据
@@ -233,7 +233,7 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
 
 
             //判断是否已经存在该物料数据
-            var hasCodeRulesEntities = await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery { ProductId = inteCodeRulesModifyDto.ProductId });
+            var hasCodeRulesEntities = await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery { SiteId=_currentSite.SiteId??0,ProductId = inteCodeRulesModifyDto.ProductId });
             if (hasCodeRulesEntities != null && hasCodeRulesEntities.Any())
             {
                 IEnumerable<InteCodeRulesEntity> repeats = new List<InteCodeRulesEntity>();
@@ -325,7 +325,7 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
                 }
 
                 //查询关联的编码规则组成
-                var inteCodeRulesMakeEntitys = await _inteCodeRulesMakeRepository.GetInteCodeRulesMakeEntitiesAsync(new InteCodeRulesMakeQuery { SiteId=_currentSite.SiteId ?? 0, CodeRulesId = inteCodeRulesEntity.Id });
+                var inteCodeRulesMakeEntitys = await _inteCodeRulesMakeRepository.GetInteCodeRulesMakeEntitiesAsync(new InteCodeRulesMakeQuery { SiteId = _currentSite.SiteId ?? 0, CodeRulesId = inteCodeRulesEntity.Id });
 
                 List<InteCodeRulesMakeDto> inteCodeRulesDtos = new List<InteCodeRulesMakeDto>();
                 if (inteCodeRulesMakeEntitys != null && inteCodeRulesMakeEntitys.Count() > 0)

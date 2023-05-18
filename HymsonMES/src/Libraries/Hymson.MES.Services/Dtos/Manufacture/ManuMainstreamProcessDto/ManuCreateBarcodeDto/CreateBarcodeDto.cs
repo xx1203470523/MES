@@ -17,6 +17,28 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCrea
         /// </summary>
         public decimal Qty { set; get; }
     }
+    public class CreateBarcodeByWorkOrderAndPrintDto
+    {
+        /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long WorkOrderId { set; get; }
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public decimal Qty { set; get; }
+        /// <summary>
+        /// 打印机id
+        /// </summary>
+        public long PrintId { get; set; }
+
+
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long ProcedureId { get; set; }
+    }
 
     /// <summary>
     /// 根据资源下达条码
