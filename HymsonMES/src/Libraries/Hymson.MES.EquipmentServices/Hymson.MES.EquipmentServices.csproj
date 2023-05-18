@@ -21,6 +21,7 @@
   <ItemGroup>
     <Folder Include="Dtos\" />
     <Folder Include="Services\" />
+    <Folder Include="Validators\EquipmentCollect\" />
   </ItemGroup>
 
 </Project>
