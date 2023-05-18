@@ -4,10 +4,12 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.EquipmentServices.Dtos.BindSFC;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
+using Hymson.MES.EquipmentServices.Dtos.OutBound;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Web.Framework.WorkContext;
@@ -64,8 +66,8 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                 throw new ValidationException(nameof(ErrorCode.MES10100));
             }
             //已经验证过资源是否存在直接使用
-            var procResource = await _procResourceRepository.GetByResourceCodeAsync(inBoundDto.ResourceCode);
-            ManuSfcStepEntity manuSfcStepEntity = PrepareSetpEntity(procResource.First().Id, inBoundDto.SFC);
+            var procResource = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentEquipment.SiteId, Code = inBoundDto.ResourceCode });
+            ManuSfcStepEntity manuSfcStepEntity = PrepareSetpEntity(procResource.Id, inBoundDto.SFC);
             await _manuSfcStepRepository.InsertAsync(manuSfcStepEntity);
         }
 
@@ -86,11 +88,11 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                 throw new ValidationException(nameof(ErrorCode.MES19101));
             }
             //已经验证过资源是否存在直接使用
-            var procResource = await _procResourceRepository.GetByResourceCodeAsync(inBoundMoreDto.ResourceCode);
+            var procResource = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentEquipment.SiteId, Code = inBoundMoreDto.ResourceCode });
             List<ManuSfcStepEntity> sfcStepList = new();
             foreach (var sfc in inBoundMoreDto.SFCs)
             {
-                ManuSfcStepEntity manuSfcStepEntity = PrepareSetpEntity(procResource.First().Id, sfc);
+                ManuSfcStepEntity manuSfcStepEntity = PrepareSetpEntity(procResource.Id, sfc);
                 sfcStepList.Add(manuSfcStepEntity);
             }
             await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);

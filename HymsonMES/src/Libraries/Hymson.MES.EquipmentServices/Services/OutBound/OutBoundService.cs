@@ -128,8 +128,8 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 throw new ValidationException(nameof(ErrorCode.MES19101));
             }
             //已经验证过资源是否存在直接使用
-            var procResource = await _procResourceRepository.GetByResourceCodeAsync(outBoundMoreDto.ResourceCode);
-            long procResourceId = procResource.First().Id;
+            var procResource = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentEquipment.SiteId, Code = outBoundMoreDto.ResourceCode });
+            long procResourceId = procResource.Id;
             List<ManuSfcStepEntity> sfcStepList = new();
             foreach (var item in outBoundMoreDto.SFCs)
             {
