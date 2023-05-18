@@ -14,5 +14,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         /// <returns></returns>
         Task<int> InsertAsync(ManuFeedingRecordEntity entity);
 
+        /// <summary>
+        /// 批量新增
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        Task<int> InsertsAsync(IEnumerable<ManuFeedingRecordEntity> entities);
+
     }
 }

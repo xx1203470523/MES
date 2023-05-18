@@ -120,7 +120,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         [Route("activationWorkOrder")]
         public async Task ActivationWorkOrderAsync(ActivationWorkOrderDto activationWorkOrderDto) 
         {
-            await _planWorkOrderActivationService.ActivationWorkOrder(activationWorkOrderDto);
+            await _planWorkOrderActivationService.ActivationWorkOrderAsync(activationWorkOrderDto);
         }
 
     }

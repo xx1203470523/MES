@@ -1,5 +1,6 @@
 using Dapper;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -28,6 +29,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertSql, entity);
+        }
+
+        /// <summary>
+        /// 批量新增
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        public async Task<int> InsertsAsync(IEnumerable<ManuFeedingRecordEntity> entities)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(InsertSql, entities);
         }
 
     }

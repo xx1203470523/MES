@@ -105,6 +105,18 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("pp.ResourceTypeId=@ResourceTypeId");
             }
+            //产品编码
+            if (!string.IsNullOrWhiteSpace(query.MaterialCode))
+            {
+                query.MaterialCode = $"%{query.MaterialCode}%";
+                sqlBuilder.Where("pm.MaterialCode like @MaterialCode");
+            }
+            //产品版本
+            if (!string.IsNullOrWhiteSpace(query.Version))
+            {
+                query.Version = $"%{query.Version}%";
+                sqlBuilder.Where("pm.Version like @Version");
+            }
 
             var offSet = (query.PageIndex - 1) * query.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });

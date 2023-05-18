@@ -214,7 +214,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 if (material.DataCollectionWay == MaterialSerialNumberEnum.Batch)
                 {
                     // 进行扣料
-                    await UpdateDeductQty(sfcProduceEntity, material);
+                    await UpdateDeductQtyAsync(sfcProduceEntity, material);
                     continue;
                 }
 
@@ -222,7 +222,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 if (materialEntity.SerialNumber != MaterialSerialNumberEnum.Batch) continue;
 
                 // 进行扣料
-                await UpdateDeductQty(sfcProduceEntity, material);
+                await UpdateDeductQtyAsync(sfcProduceEntity, material);
             }
 
             // 更新数据
@@ -278,7 +278,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 });
 
                 // 入库
-                rows += await SaveToWarehouse(sfcProduceEntity);
+                rows += await SaveToWarehouseAsync(sfcProduceEntity);
             }
             // 未完工
             else
@@ -406,7 +406,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// <param name="sfcProduceEntity"></param>
         /// <param name="material"></param>
         /// <returns></returns>
-        private async Task<int> UpdateDeductQty(ManuSfcProduceEntity sfcProduceEntity, MaterialDeductBo material)
+        private async Task<int> UpdateDeductQtyAsync(ManuSfcProduceEntity sfcProduceEntity, MaterialDeductBo material)
         {
             // 取得当前物料的库存
             var feedingEntities = await _manuFeedingRepository.GetByResourceIdAndMaterialIdAsync(new GetByResourceIdAndMaterialIdQuery
@@ -478,7 +478,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// </summary>
         /// <param name="manuSfcProduceEntity"></param>
         /// <returns></returns>
-        private async Task<int> SaveToWarehouse(ManuSfcProduceEntity manuSfcProduceEntity)
+        private async Task<int> SaveToWarehouseAsync(ManuSfcProduceEntity manuSfcProduceEntity)
         {
             var rows = 0;
 
