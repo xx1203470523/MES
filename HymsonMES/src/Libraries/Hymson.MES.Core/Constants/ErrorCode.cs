@@ -771,6 +771,12 @@
         public const string MES19112 = "上传SFC信息不能为空";
         public const string MES19113 = "该设备已经设置临时SFC";
         public const string MES19114 = "NG编码{Code}不存在";
+        public const string MES19115 = "产品编码不能为空";
+        public const string MES19116 = "请维护产品编码：{Code}的编码规则";
+        public const string MES19117 = "条码：{SFC}不存在";
+        public const string MES19118 = "产品编码：{Code}不存在";
+
+
 
         #endregion
 

@@ -17,6 +17,6 @@ namespace Hymson.MES.EquipmentServices.Services.GenerateModuleSFC
         /// </summary>
         /// <param name="generateModuleSFCDto"></param>
         /// <returns></returns>
-        Task GenerateModuleSFCAsync(GenerateModuleSFCDto generateModuleSFCDto);
+        Task<GenerateModuleSFCModelDto> GenerateModuleSFCAsync(GenerateModuleSFCDto generateModuleSFCDto);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.EquipmentServices.Dtos.GenerateModuleSFC;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,9 @@ namespace Hymson.MES.EquipmentServices.Validators.GenerateModuleSFC
     {
         public GenerateModuleSFCValidator()
         {
-
+            //RuleFor(x => x.EquipmentCode).NotEmpty().WithErrorCode(ErrorCode.MES19001);
+            //RuleFor(x => x.ResourceCode).NotEmpty().WithErrorCode(ErrorCode.MES19002);
+            RuleFor(x => x.ProductCode).NotEmpty().WithErrorCode(ErrorCode.MES19115);
         }
     }
 }

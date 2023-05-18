@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.EquipmentServices.Dtos.SingleBarCodeLoadingVerification;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,9 @@ namespace Hymson.MES.EquipmentServices.Validators.SingleBarCodeLoadingVerificati
     {
         public SingleBarCodeLoadingVerificationValidator()
         {
-
+            //RuleFor(x => x.EquipmentCode).NotEmpty().WithErrorCode(ErrorCode.MES19001);
+            //RuleFor(x => x.ResourceCode).NotEmpty().WithErrorCode(ErrorCode.MES19002);
+            RuleFor(x => x.SFC).NotEmpty().WithErrorCode(ErrorCode.MES19003);
         }
     }
 }
