@@ -261,7 +261,7 @@ namespace Hymson.MES.Services.Services.Plan
             using var ts = TransactionHelper.GetTransactionScope(TransactionScopeOption.Suppress);
             if (param.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)
             {
-                await _manuCreateBarcodeService.CreateBarcodeByOldMESSFC(new CreateBarcodeByOldMesSFCDto
+                await _manuCreateBarcodeService.CreateBarcodeByOldMESSFCAsync(new CreateBarcodeByOldMesSFCDto
                 {
                     WorkOrderId = param.WorkOrderId,
                     OldSFCs = barcodeList
@@ -276,7 +276,7 @@ namespace Hymson.MES.Services.Services.Plan
             }
             else
             {
-                await _manuCreateBarcodeService.CreateBarcodeByExternalSFC(new CreateBarcodeByExternalSFCDto
+                await _manuCreateBarcodeService.CreateBarcodeByExternalSFCAsync(new CreateBarcodeByExternalSFCDto
                 {
                     WorkOrderId = param.WorkOrderId,
                     ExternalSFCs = barcodeList

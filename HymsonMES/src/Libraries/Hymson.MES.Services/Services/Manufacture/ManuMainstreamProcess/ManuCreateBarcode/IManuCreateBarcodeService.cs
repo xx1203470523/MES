@@ -13,26 +13,26 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<List<ManuSfcEntity>> CreateBarcodeByWorkOrderId(CreateBarcodeByWorkOrderDto param);
+        Task<List<ManuSfcEntity>> CreateBarcodeByWorkOrderIdAsync(CreateBarcodeByWorkOrderDto param);
         /// <summary>
         /// 工单下达条码
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task CreateBarcodeByWorkOrderIdAndPrint(CreateBarcodeByWorkOrderAndPrintDto param);
+        Task CreateBarcodeByWorkOrderIdAndPrintAsync(CreateBarcodeByWorkOrderAndPrintDto param);
 
         /// <summary>
         /// 根据外部条码下达条码
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task CreateBarcodeByExternalSFC(CreateBarcodeByExternalSFCDto param);
+        Task CreateBarcodeByExternalSFCAsync(CreateBarcodeByExternalSFCDto param);
 
         /// <summary>
         /// 内部条码复用
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task CreateBarcodeByOldMESSFC(CreateBarcodeByOldMesSFCDto param);
+        Task CreateBarcodeByOldMESSFCAsync(CreateBarcodeByOldMesSFCDto param);
     }
 }
