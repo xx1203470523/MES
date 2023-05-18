@@ -57,7 +57,7 @@ namespace Hymson.MES.Api.Controllers.Report
         [Route("getSfcInOut/{sfc}")]
         public async Task<WorkshopJobControlStepReportDto> QuerySfcInOutRecordAsync(string sfc)
         {
-            return await _workshopJobControlReportService.GetSfcInOutInfo(sfc);
+            return await _workshopJobControlReportService.GetSfcInOutInfoAsync(sfc);
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Hymson.MES.Api.Controllers.Report
         [Route("getSfcStepBySFCPageList")]
         public async Task<PagedInfo<ManuSfcStepBySFCViewDto>> QueryPagedSFCStepBySFCAsync([FromQuery] ManuSfcStepBySFCPagedQueryDto param)
         {
-            return await _workshopJobControlReportService.GetSFCStepsBySFCPageList(param);
+            return await _workshopJobControlReportService.GetSFCStepsBySFCPageListAsync(param);
         }
     }
 }
