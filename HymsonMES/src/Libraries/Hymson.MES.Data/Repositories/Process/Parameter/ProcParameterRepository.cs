@@ -99,10 +99,10 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
-            if (procParameterPagedQuery.SiteId != 0)
-            {
+            //if (procParameterPagedQuery.SiteId != 0)
+            //{
                 sqlBuilder.Where(" SiteId=@SiteId ");
-            }
+            //}
             if (!string.IsNullOrWhiteSpace(procParameterPagedQuery.ParameterCode))
             {
                 procParameterPagedQuery.ParameterCode = $"%{procParameterPagedQuery.ParameterCode}%";
@@ -145,10 +145,10 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
 
-            if (procParameterQuery.SiteId != 0)
-            {
+            //if (procParameterQuery.SiteId != 0)
+            //{
                 sqlBuilder.Where(" SiteId=@SiteId ");
-            }
+            //}
             if (!string.IsNullOrWhiteSpace(procParameterQuery.ParameterCode))
             {
                 //procParameterQuery.ParameterCode = $"%{procParameterQuery.ParameterCode}%";

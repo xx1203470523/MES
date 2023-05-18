@@ -60,6 +60,11 @@ namespace Hymson.MES.Data.Repositories.Process.Resource
         /// 空值 : false  
         /// </summary>
         public int? Status { get; set; }
+
+        /// <summary>
+        /// 设备编码
+        /// </summary>
+        public string EquipmentCode { get; set; }
     }
 
 

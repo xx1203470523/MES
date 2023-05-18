@@ -705,6 +705,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 //根据编码类型，包装等级查询编码规则
                 var inteCodeRulesResult = await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery
                 {
+                    SiteId = _currentSite.SiteId ?? 0,
                     ProductId = ProductId,
                     CodeType = CodeRuleCodeTypeEnum.PackagingSeqCode,
                     PackType = packType

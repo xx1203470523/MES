@@ -683,7 +683,7 @@
         #region 条码打印 MES17000
         public const string MES17001 = "条码打印，打印模板文件未找到";
         public const string MES17002 = "条码打印，打印机信息未找到";
-        public const string MES17003 = "条码打印，条码的包装维护记录未找到";
+        public const string MES17003 = "条码打印，打印失败msg:{msg}.";
         #endregion
 
         #region 在制品步骤控制 MES18000

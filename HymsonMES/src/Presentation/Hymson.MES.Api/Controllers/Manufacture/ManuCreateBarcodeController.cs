@@ -30,5 +30,16 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         {
             await _manuCreateBarcodeService.CreateBarcodeByWorkOrderId(parm);
         }
+        /// <summary>
+        /// 生成条码并打印
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("CreateBarcodeByWorkOrderAndPrint")]
+        public async Task GenerateBarcodeAndPrintAsync(CreateBarcodeByWorkOrderAndPrintDto parm)
+        {
+            await _manuCreateBarcodeService.CreateBarcodeByWorkOrderIdAndPrint(parm);
+        }
     }
 }

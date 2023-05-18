@@ -168,11 +168,19 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             switch (queryDto.Source)
             {
                 case FeedingSourceEnum.Equipment:
-                    resources.AddRange(await _procResourceRepository.GetByEquipmentCodeAsync(queryDto.Code));
+                    resources.AddRange(await _procResourceRepository.GetByEquipmentCodeAsync(new Data.Repositories.Process.Resource.ProcResourceQuery
+                    {
+                        SiteId = _currentSite.SiteId ?? 0,
+                        EquipmentCode = queryDto.Code
+                    }));
                     break;
                 default:
                 case FeedingSourceEnum.Resource:
-                    resources.AddRange(await _procResourceRepository.GetByResourceCodeAsync(queryDto.Code));
+                    resources.AddRange(await _procResourceRepository.GetByResourceCodeAsync(new Data.Repositories.Process.Resource.ProcResourceQuery
+                    {
+                        SiteId=_currentSite.SiteId??0,
+                        ResCode= queryDto.Code
+                    }));
                     break;
             }
 

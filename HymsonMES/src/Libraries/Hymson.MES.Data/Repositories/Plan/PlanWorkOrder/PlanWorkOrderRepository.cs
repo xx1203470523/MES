@@ -153,6 +153,11 @@ namespace Hymson.MES.Data.Repositories.Plan
                 pageQuery.MaterialCode = $"%{pageQuery.MaterialCode}%";
                 sqlBuilder.Where("m.MaterialCode LIKE @MaterialCode");
             }
+            if (!string.IsNullOrWhiteSpace(pageQuery.MaterialVersion))
+            {
+                pageQuery.MaterialVersion = $"%{pageQuery.MaterialVersion}%";
+                sqlBuilder.Where("m.Version LIKE @MaterialVersion");
+            }
             if (!string.IsNullOrWhiteSpace(pageQuery.WorkCenterCode))
             {
                 pageQuery.WorkCenterCode = $"%{pageQuery.WorkCenterCode}%";
