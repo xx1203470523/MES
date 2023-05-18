@@ -430,13 +430,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             // 查询物料
             var materials = await _procMaterialRepository.GetByIdsAsync(feeds.Select(s => s.ProductId).ToArray());
 
-            var rows = 0;
+
             var now = HymsonClock.Now();
 
             List<WhMaterialStandingbookEntity> whMaterialStandingbookEntities = new();
             List<UpdateStatusByBarCodeCommand> updateStatusByBarCodeCommands = new();
             List<ManuFeedingRecordEntity> manuFeedingRecordEntities = new();
-
             foreach (var entity in entities)
             {
                 entity.UpdatedBy = _currentUser.UserName;
@@ -483,12 +482,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             }
 
             // 开启事务
+            var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
 
             // 保存物料台账记录
             rows += await _whMaterialStandingbookRepository.InsertsAsync(whMaterialStandingbookEntities);
 
-            // 将状态恢复为"待使用"
+            // 更新状态
             rows += await _whMaterialInventoryRepository.UpdatePointByBarCodesAsync(updateStatusByBarCodeCommands);
 
             // 卸料
@@ -496,7 +496,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
 
             // 保存操作记录
             rows += await _manuFeedingRecordRepository.InsertsAsync(manuFeedingRecordEntities);
-
             trans.Complete();
 
             return rows;
