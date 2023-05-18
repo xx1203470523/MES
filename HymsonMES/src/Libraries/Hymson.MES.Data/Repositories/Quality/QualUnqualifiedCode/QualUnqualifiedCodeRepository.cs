@@ -114,6 +114,17 @@ namespace Hymson.MES.Data.Repositories.Quality
         }
 
         /// <summary>
+        /// 根据编码批量获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualUnqualifiedCodeEntity>> GetByCodesAsync(QualUnqualifiedCodeByCodesQuery param)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<QualUnqualifiedCodeEntity>(GetByCodesSql, param);
+        }
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="param"></param>
@@ -237,5 +248,9 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string GetByCodeSql = @"SELECT 
                                Id, SiteId, UnqualifiedCode, UnqualifiedCodeName, Status, Type, Degree, ProcessRouteId, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted
                             FROM `qual_unqualified_code`  WHERE UnqualifiedCode = @Code  AND SiteId=@Site AND IsDeleted=0 ";
+
+        const string GetByCodesSql = @"SELECT 
+                               Id, SiteId, UnqualifiedCode, UnqualifiedCodeName, Status, Type, Degree, ProcessRouteId, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted
+                            FROM `qual_unqualified_code`  WHERE UnqualifiedCode IN @Code  AND SiteId=@Site AND IsDeleted=0 ";
     }
 }

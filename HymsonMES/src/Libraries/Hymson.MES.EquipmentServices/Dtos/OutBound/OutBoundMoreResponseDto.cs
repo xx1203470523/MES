@@ -14,7 +14,7 @@ namespace Hymson.MES.EquipmentServices.Dtos.InBound
         /// <summary>
         /// 出站条码
         /// </summary>
-        public OutBoundMoreSFC[]? SFCs { get; set; }
+        public OutBoundMoreSFC[] SFCs { get; set; }
     }
 
     /// <summary>

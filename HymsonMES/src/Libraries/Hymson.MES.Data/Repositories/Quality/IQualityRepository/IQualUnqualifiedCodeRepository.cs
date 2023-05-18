@@ -82,6 +82,13 @@ namespace Hymson.MES.Data.Repositories.Quality.IQualityRepository
         Task<QualUnqualifiedCodeEntity> GetByCodeAsync(QualUnqualifiedCodeByCodeQuery parm);
 
         /// <summary>
+        /// 根据编码批量获取数据
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<IEnumerable<QualUnqualifiedCodeEntity>> GetByCodesAsync(QualUnqualifiedCodeByCodesQuery param);
+
+        /// <summary>
         /// 获取不合格代码关联不合格代码关系表
         /// </summary>
         /// <param name="Id"></param>
