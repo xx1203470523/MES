@@ -3,7 +3,7 @@
     /// <summary>
     /// 请求参数（上料-原材料上料）
     /// </summary>
-    public record FeedingLoadDto : BaseDto
+    public record FeedingLoadingDto : BaseDto
     {
         /// <summary>
         /// 上料条码
