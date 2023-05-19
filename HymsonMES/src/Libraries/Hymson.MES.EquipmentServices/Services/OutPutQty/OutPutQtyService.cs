@@ -213,6 +213,8 @@ namespace Hymson.MES.EquipmentServices.Services.OutPutQty
                     LocalTime = outPutQtyDto.LocalTime,
                     ParamValue = item.ParamValue,
                     SFC = outPutQtyDto.SFC,
+                    StandardUpperLimit = item.StandardUpperLimit,
+                    StandardLowerLimit = item.StandardLowerLimit,
 
                     Id = IdGenProvider.Instance.CreateId(),
                     CreatedBy = _currentEquipment.Name,
