@@ -45,7 +45,12 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public long? ProductId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 传输时间
+        /// </summary>
+        public DateTime LocalTime { get; set; }
+
+        /// <summary>
         /// 标准参数Id
         /// </summary>
         public long ParameterId { get; set; }
@@ -55,10 +60,35 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public string ParamValue { get; set; }
 
-       /// <summary>
-        /// 传输时间
+        /// <summary>
+        /// 标准上限
         /// </summary>
-        public DateTime LocalTime { get; set; }
+        public string? StandardUpperLimit { get; set; }
+
+        /// <summary>
+        /// 标准下限
+        /// </summary>
+        public string? StandardLowerLimit { get; set; }
+
+        /// <summary>
+        /// 判定结果
+        /// </summary>
+        public string? JudgmentResult { get; set; }
+
+        /// <summary>
+        /// 测试时长
+        /// </summary>
+        public string? TestDuration { get; set; }
+
+        /// <summary>
+        /// 测试时间
+        /// </summary>
+        public string? TestTime { get; set; }
+
+        /// <summary>
+        /// 测试结果
+        /// </summary>
+        public string? TestResult { get; set; }
 
         /// <summary>
         /// 参数采集到的时间

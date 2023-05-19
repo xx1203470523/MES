@@ -411,6 +411,8 @@
 
         #region 物料加载 15500
         public const string MES15501 = "当前线体无激活工单，请先激活工单！";
+        public const string MES15502 = "条码{Code}已被使用！";
+        public const string MES15503 = "条码{Code}不存在！";
         #endregion
 
         #region 工单 16000

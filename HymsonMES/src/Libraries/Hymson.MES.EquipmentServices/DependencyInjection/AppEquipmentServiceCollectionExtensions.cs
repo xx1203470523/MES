@@ -15,7 +15,7 @@ using Hymson.MES.EquipmentServices.Services.BindContainer;
 using Hymson.MES.EquipmentServices.Services.BindSFC;
 using Hymson.MES.EquipmentServices.Services.CCDFileUploadComplete;
 using Hymson.MES.EquipmentServices.Services.EquipmentCollect;
-using Hymson.MES.EquipmentServices.Services.FeedingConsumption;
+using Hymson.MES.EquipmentServices.Services.Feeding;
 using Hymson.MES.EquipmentServices.Services.GenerateModuleSFC;
 using Hymson.MES.EquipmentServices.Services.InBound;
 using Hymson.MES.EquipmentServices.Services.InboundInContainer;
@@ -45,7 +45,6 @@ namespace Microsoft.Extensions.DependencyInjection
     /// </summary>
     public static class AppEquipmentServiceCollectionExtensions
     {
-
         /// <summary>
         /// 业务逻辑层依赖服务添加
         /// </summary>
@@ -85,6 +84,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
 
             services.AddSingleton<IEquipmentCollectService, EquipmentCollectService>();   // 设备信息采集
+            services.AddSingleton<IFeedingService, FeedingService>();      // 上卸料
         }
 
         /// <summary>

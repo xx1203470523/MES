@@ -168,6 +168,8 @@ namespace Microsoft.Extensions.DependencyInjection
             #region Manufacture
             services.AddSingleton<IManuFeedingRepository, ManuFeedingRepository>();
             services.AddSingleton<IManuFeedingRecordRepository, ManuFeedingRecordRepository>();
+            services.AddSingleton<IManuFeedingLiteRepository, ManuFeedingLiteRepository>();
+            services.AddSingleton<IManuFeedingLiteRecordRepository, ManuFeedingLiteRecordRepository>();
             services.AddSingleton<IManuProductBadRecordRepository, ManuProductBadRecordRepository>();
             services.AddSingleton<IManuSfcCirculationRepository, ManuSfcCirculationRepository>();
             services.AddSingleton<IManuSfcInfoRepository, ManuSfcInfoRepository>();

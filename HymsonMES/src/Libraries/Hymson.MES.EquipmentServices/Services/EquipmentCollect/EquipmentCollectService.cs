@@ -247,6 +247,12 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
                 ResourceId = resourceEntity.Id,
                 ParameterId = GetParameterIdByParameterCode(s.ParamCode, parameterEntities),
                 ParamValue = s.ParamValue,
+                StandardUpperLimit = s.StandardUpperLimit,
+                StandardLowerLimit = s.StandardLowerLimit,
+                JudgmentResult = s.JudgmentResult,
+                TestDuration = s.TestDuration,
+                TestTime = s.TestTime,
+                TestResult = s.TestResult,
                 Timestamp = s.Timestamp
             });
 
@@ -294,6 +300,12 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
                 ResourceId = resourceEntity.Id,
                 ParameterId = GetParameterIdByParameterCode(s.ParamCode, parameterEntities),
                 ParamValue = s.ParamValue,
+                StandardUpperLimit = s.StandardUpperLimit,
+                StandardLowerLimit = s.StandardLowerLimit,
+                JudgmentResult = s.JudgmentResult,
+                TestDuration = s.TestDuration,
+                TestTime = s.TestTime,
+                TestResult = s.TestResult,
                 Timestamp = s.Timestamp
             });
 
@@ -348,6 +360,12 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
                 ResourceId = resourceEntity.Id,
                 ParameterId = GetParameterIdByParameterCode(s.ParamCode, parameterEntities),
                 ParamValue = s.ParamValue,
+                StandardUpperLimit = s.StandardUpperLimit,
+                StandardLowerLimit = s.StandardLowerLimit,
+                JudgmentResult = s.JudgmentResult,
+                TestDuration = s.TestDuration,
+                TestTime = s.TestTime,
+                TestResult = s.TestResult,
                 Timestamp = s.Timestamp
             });
 
@@ -438,6 +456,7 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
 
             return entity.Id;
         }
+        
         #endregion
 
 

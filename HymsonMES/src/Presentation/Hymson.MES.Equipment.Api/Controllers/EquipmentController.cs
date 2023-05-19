@@ -14,13 +14,14 @@ using Hymson.MES.EquipmentServices.Services.BindContainer;
 using Hymson.MES.EquipmentServices.Services.BindSFC;
 using Hymson.MES.EquipmentServices.Services.CCDFileUploadComplete;
 using Hymson.MES.EquipmentServices.Services.EquipmentCollect;
-using Hymson.MES.EquipmentServices.Services.FeedingConsumption;
+using Hymson.MES.EquipmentServices.Services.Feeding;
 using Hymson.MES.EquipmentServices.Services.GenerateModuleSFC;
 using Hymson.MES.EquipmentServices.Services.InboundInContainer;
 using Hymson.MES.EquipmentServices.Services.InboundInSFCContainer;
 using Hymson.MES.EquipmentServices.Services.OutPutQty;
 using Hymson.MES.EquipmentServices.Services.QueryContainerBindSfc;
 using Hymson.MES.EquipmentServices.Services.SingleBarCodeLoadingVerification;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Equipment.Api.Controllers
@@ -28,7 +29,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
     /// <summary>
     /// 设备接口（海目星设备）
     /// </summary>
-    [Route("api/v1/EquApi")]
+    [Route("EquipmentService/api/v1/EquApi")]
     [ApiController]
     public class EquipmentController : Controller
     {
@@ -44,6 +45,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         private readonly IBindSFCService _bindSFCService;
         private readonly IBindContainerService _bindContainerService;
         private readonly ICCDFileUploadCompleteService _cCDFileUploadCompleteService;
+        private readonly IFeedingService _feedingService;
         private readonly IFeedingConsumptionService _feedingConsumptionService;
         private readonly IGenerateModuleSFCService _generateModuleSFCService;
         private readonly IInboundInContainerService _inboundInContainerService;
@@ -62,6 +64,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="bindSFCService"></param>
         /// <param name="bindContainerService"></param>
         /// <param name="cCDFileUploadCompleteService"></param>
+        /// <param name="feedingService"></param>
         /// <param name="feedingConsumptionService"></param>
         /// <param name="generateModuleSFCService"></param>
         /// <param name="inboundInContainerService"></param>
@@ -74,6 +77,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
             IBindSFCService bindSFCService,
             IBindContainerService bindContainerService,
             ICCDFileUploadCompleteService cCDFileUploadCompleteService,
+            IFeedingService feedingService,
             IFeedingConsumptionService feedingConsumptionService,
             IGenerateModuleSFCService generateModuleSFCService,
             IInboundInContainerService inboundInContainerService,
@@ -87,6 +91,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
             _bindSFCService = bindSFCService;
             _bindContainerService = bindContainerService;
             _cCDFileUploadCompleteService = cCDFileUploadCompleteService;
+            _feedingService = feedingService;
             _feedingConsumptionService = feedingConsumptionService;
             _generateModuleSFCService = generateModuleSFCService;
             _inboundInContainerService = inboundInContainerService;
@@ -189,10 +194,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpPost("Feeding")]
-        public async Task FeedingLoadingAsync(FeedingLoadDto request)
+        public async Task FeedingLoadingAsync(FeedingLoadingDto request)
         {
-            await Task.CompletedTask;
+            await _feedingService.FeedingLoadingAsync(request);
         }
 
         /// <summary>
@@ -204,7 +210,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [HttpPost("Unloading")]
         public async Task FeedingUnloadingAsync(FeedingUnloadingDto request)
         {
-            await Task.CompletedTask;
+            await _feedingService.FeedingUnloadingAsync(request);
         }
 
 
@@ -236,7 +242,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
 
         /// <summary>
         /// 条码解绑
-        /// HY-MES-EQU-020
+        /// HY-MES-EQU-021
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
