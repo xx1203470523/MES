@@ -6,25 +6,11 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Plan;
-using Hymson.MES.Core.Enums;
-using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query;
 using Hymson.MES.Data.Repositories.Plan;
-using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Quality;
-using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
-using Hymson.MES.Services.Dtos.Integrated;
-using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Report;
-using Hymson.MES.Services.Services.Report;
-using Hymson.Snowflake;
-using Hymson.Utils;
-using Hymson.Utils.Tools;
-using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Report
 {
@@ -92,7 +78,7 @@ namespace Hymson.MES.Services.Services.Report
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        public async Task<WorkshopJobControlStepReportDto> GetSfcInOutInfo(string sfc) 
+        public async Task<WorkshopJobControlStepReportDto> GetSfcInOutInfoAsync(string sfc) 
         {
             var workshopJobControlStepReportDto = new WorkshopJobControlStepReportDto() { SFC=sfc};
 
@@ -192,7 +178,7 @@ namespace Hymson.MES.Services.Services.Report
         /// </summary>
         /// <param name="queryParam"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ManuSfcStepBySFCViewDto>> GetSFCStepsBySFCPageList(ManuSfcStepBySFCPagedQueryDto queryParam)
+        public async Task<PagedInfo<ManuSfcStepBySFCViewDto>> GetSFCStepsBySFCPageListAsync(ManuSfcStepBySFCPagedQueryDto queryParam)
         {
             var pagedQuery = queryParam.ToQuery<ManuSfcStepBySFCPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId.Value;

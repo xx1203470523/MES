@@ -72,10 +72,7 @@ namespace Hymson.MES.Data.Repositories.Process
             }
 
             //sqlBuilder.Select("*");
-            if (query.SiteId > 0)
-            {
-                sqlBuilder.Where("a.SiteId = @SiteId");
-            }
+            sqlBuilder.Where("a.SiteId = @SiteId");
             if (!string.IsNullOrWhiteSpace(query.ResType))
             {
                 query.ResType = $"%{query.ResType}%";
@@ -124,10 +121,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
-            if (query.SiteId > 0)
-            {
-                sqlBuilder.Where("SiteId = @SiteId");
-            }
+            sqlBuilder.Where("SiteId = @SiteId");
             if (!string.IsNullOrWhiteSpace(query.ResType))
             {
                 query.ResType = $"%{query.ResType}%";

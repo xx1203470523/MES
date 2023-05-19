@@ -8,7 +8,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query
     public class EquEquipmentGroupPagedQuery : PagerInfo
     {
         /// <summary>
-        /// 站点编码 
+        /// 站点Id 
         /// </summary>
         public long? SiteId { get; set; }
 

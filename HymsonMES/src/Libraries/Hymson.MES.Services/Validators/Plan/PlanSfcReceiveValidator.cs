@@ -29,7 +29,7 @@ namespace Hymson.MES.Services.Validators.Plan
             RuleFor(x => x.WorkOrderId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16102));
             RuleFor(x => x.SFCs).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16104));
             RuleFor(x => x.SFCs).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16126));
-            RuleFor(x => x).MustAsync(ManuSfcProduceSFCSValidator).WithErrorCode(nameof(ErrorCode.MES16126));
+            RuleFor(x => x).MustAsync(ManuSfcProduceSFCSValidatorAsync).WithErrorCode(nameof(ErrorCode.MES16126));
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace Hymson.MES.Services.Validators.Plan
         /// <param name="param"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<bool> ManuSfcProduceSFCSValidator(PlanSfcReceiveCreateDto param, CancellationToken cancellationToken)
+        private async Task<bool> ManuSfcProduceSFCSValidatorAsync(PlanSfcReceiveCreateDto param, CancellationToken cancellationToken)
         {
             if (param.RelevanceWorkOrderId==param.WorkOrderId)
             {
@@ -58,7 +58,7 @@ namespace Hymson.MES.Services.Validators.Plan
             RuleFor(x => x.ReceiveType).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16101));
             RuleFor(x => x.WorkOrderId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16102));
             RuleFor(x => x.SFC).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16104));
-            RuleFor(x => x).MustAsync(ManuSfcProduceSFCSValidator).WithErrorCode(nameof(ErrorCode.MES16126));
+            RuleFor(x => x).MustAsync(ManuSfcProduceSFCSValidatorAsync).WithErrorCode(nameof(ErrorCode.MES16126));
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace Hymson.MES.Services.Validators.Plan
         /// <param name="param"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<bool> ManuSfcProduceSFCSValidator(PlanSfcReceiveScanCodeDto param, CancellationToken cancellationToken)
+        private async Task<bool> ManuSfcProduceSFCSValidatorAsync(PlanSfcReceiveScanCodeDto param, CancellationToken cancellationToken)
         {
             if (param.RelevanceWorkOrderId == param.WorkOrderId)
             {

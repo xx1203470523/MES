@@ -79,7 +79,7 @@ namespace Hymson.MES.Services.Services.Plan
 
             //DTO转换实体
             var planWorkOrderActivationEntity = planWorkOrderActivationCreateDto.ToEntity<PlanWorkOrderActivationEntity>();
-            planWorkOrderActivationEntity.Id= IdGenProvider.Instance.CreateId();
+            planWorkOrderActivationEntity.Id = IdGenProvider.Instance.CreateId();
             planWorkOrderActivationEntity.CreatedBy = _currentUser.UserName;
             planWorkOrderActivationEntity.UpdatedBy = _currentUser.UserName;
             planWorkOrderActivationEntity.CreatedOn = HymsonClock.Now();
@@ -117,34 +117,34 @@ namespace Hymson.MES.Services.Services.Plan
         /// <returns></returns>
         public async Task<PagedInfo<PlanWorkOrderActivationListDetailViewDto>> GetPageListAsync(PlanWorkOrderActivationPagedQueryDto planWorkOrderActivationPagedQueryDto)
         {
-            if (!planWorkOrderActivationPagedQueryDto.LineId.HasValue) 
+            if (!planWorkOrderActivationPagedQueryDto.LineId.HasValue)
             {
                 throw new BusinessException(nameof(ErrorCode.MES16401));
             }
 
             //查询当前线体
-           var line = await _inteWorkCenterRepository.GetByIdAsync(planWorkOrderActivationPagedQueryDto.LineId.Value);
-            if (line == null ) 
+            var line = await _inteWorkCenterRepository.GetByIdAsync(planWorkOrderActivationPagedQueryDto.LineId.Value);
+            if (line == null)
             {
                 throw new BusinessException(nameof(ErrorCode.MES16402));
             }
-            if (line.Type!=WorkCenterTypeEnum.Line)
+            if (line.Type != WorkCenterTypeEnum.Line)
             {
                 throw new BusinessException(nameof(ErrorCode.MES16403));
             }
 
             //查询线体上级车间
-            var workCenter = await _inteWorkCenterRepository.GetHigherInteWorkCenterAsync(planWorkOrderActivationPagedQueryDto.LineId??0);
+            var workCenter = await _inteWorkCenterRepository.GetHigherInteWorkCenterAsync(planWorkOrderActivationPagedQueryDto.LineId ?? 0);
 
             var planWorkOrderActivationPagedQuery = planWorkOrderActivationPagedQueryDto.ToQuery<PlanWorkOrderActivationPagedQuery>();
             planWorkOrderActivationPagedQuery.SiteId = _currentSite.SiteId.Value;
 
             //将对应的工作中心ID放置查询条件中
-            planWorkOrderActivationPagedQuery.WorkCenterIds.Add(planWorkOrderActivationPagedQueryDto.LineId??0);
-            if (workCenter != null && workCenter.Id>0) 
+            planWorkOrderActivationPagedQuery.WorkCenterIds.Add(planWorkOrderActivationPagedQueryDto.LineId ?? 0);
+            if (workCenter != null && workCenter.Id > 0)
             {
                 planWorkOrderActivationPagedQuery.WorkCenterIds.Add(workCenter.Id);
-            }            
+            }
 
             var pagedInfo = await _planWorkOrderActivationRepository.GetPagedInfoAsync(planWorkOrderActivationPagedQuery);
 
@@ -160,7 +160,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// <returns></returns>
         public async Task<PagedInfo<PlanWorkOrderActivationListDetailViewDto>> GetPageListAboutResAsync(PlanWorkOrderActivationAboutResPagedQueryDto param)
         {
-            if (!param.ResourceId.HasValue) 
+            if (!param.ResourceId.HasValue)
             {
                 throw new BusinessException(nameof(ErrorCode.MES16412));
             }
@@ -196,7 +196,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="pagedInfo"></param>
         /// <returns></returns>
-        private static List<PlanWorkOrderActivationListDetailViewDto> PreparePlanWorkOrderActivationDtos(PagedInfo<PlanWorkOrderActivationListDetailView>   pagedInfo)
+        private static List<PlanWorkOrderActivationListDetailViewDto> PreparePlanWorkOrderActivationDtos(PagedInfo<PlanWorkOrderActivationListDetailView> pagedInfo)
         {
             var planWorkOrderActivationDtos = new List<PlanWorkOrderActivationListDetailViewDto>();
             foreach (var planWorkOrderActivation in pagedInfo.Data)
@@ -213,7 +213,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="activationWorkOrderDto"></param>
         /// <returns></returns>
-        public async Task ActivationWorkOrder(ActivationWorkOrderDto activationWorkOrderDto) 
+        public async Task ActivationWorkOrderAsync(ActivationWorkOrderDto activationWorkOrderDto)
         {
             //查询当前线体
             var line = await _inteWorkCenterRepository.GetByIdAsync(activationWorkOrderDto.LineId);
@@ -237,7 +237,7 @@ namespace Hymson.MES.Services.Services.Plan
             var workOrderActivation = (await _planWorkOrderActivationRepository.GetPlanWorkOrderActivationEntitiesAsync(new PlanWorkOrderActivationQuery()
             {
                 WorkOrderId = workOrder.Id,
-                SiteId=_currentSite.SiteId??0
+                SiteId = _currentSite.SiteId ?? 0
             })).FirstOrDefault();
 
             var isActivationed = workOrderActivation != null;//是否已经激活
@@ -245,13 +245,13 @@ namespace Hymson.MES.Services.Services.Plan
             {
                 throw new BusinessException(nameof(ErrorCode.MES16406)).WithData("orderCode", workOrder.OrderCode);
             }
-            else if (!isActivationed && isActivationed == activationWorkOrderDto.IsNeedActivation) 
+            else if (!isActivationed && isActivationed == activationWorkOrderDto.IsNeedActivation)
             {
                 throw new BusinessException(nameof(ErrorCode.MES16407)).WithData("orderCode", workOrder.OrderCode);
             }
 
             //取消激活
-            if (!activationWorkOrderDto.IsNeedActivation) 
+            if (!activationWorkOrderDto.IsNeedActivation)
             {
                 using (TransactionScope ts = new TransactionScope())
                 {
@@ -280,19 +280,19 @@ namespace Hymson.MES.Services.Services.Plan
 
             if (line.IsMixLine.Value)
             {//混线
-                await DoActivationWorkOrder(workOrder, activationWorkOrderDto);
+                await DoActivationWorkOrderAsync(workOrder, activationWorkOrderDto);
             }
-            else 
+            else
             {//不混线
                 //判断当前线体是否有无激活的工单
-                var hasActivation= (await _planWorkOrderActivationRepository.GetPlanWorkOrderActivationEntitiesAsync(new PlanWorkOrderActivationQuery { LineId = activationWorkOrderDto.LineId, SiteId = _currentSite.SiteId ?? 0 })).FirstOrDefault();
-                if (hasActivation != null) 
+                var hasActivation = (await _planWorkOrderActivationRepository.GetPlanWorkOrderActivationEntitiesAsync(new PlanWorkOrderActivationQuery { LineId = activationWorkOrderDto.LineId, SiteId = _currentSite.SiteId ?? 0 })).FirstOrDefault();
+                if (hasActivation != null)
                 {
                     var activationWorkOrder = await _planWorkOrderRepository.GetByIdAsync(hasActivation.WorkOrderId);
                     throw new BusinessException(nameof(ErrorCode.MES16409)).WithData("orderCode", activationWorkOrder.OrderCode);
                 }
 
-                await DoActivationWorkOrder(workOrder, activationWorkOrderDto);
+                await DoActivationWorkOrderAsync(workOrder, activationWorkOrderDto);
             }
         }
 
@@ -302,7 +302,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="workOrder"></param>
         /// <param name="activationWorkOrderDto"></param>
         /// <returns></returns>
-        private async Task DoActivationWorkOrder(PlanWorkOrderEntity workOrder, ActivationWorkOrderDto activationWorkOrderDto) 
+        private async Task DoActivationWorkOrderAsync(PlanWorkOrderEntity workOrder, ActivationWorkOrderDto activationWorkOrderDto)
         {
             if (workOrder.IsLocked == Core.Enums.YesOrNoEnum.Yes)
             {
@@ -332,7 +332,7 @@ namespace Hymson.MES.Services.Services.Plan
             record.SiteId = _currentSite.SiteId ?? 0;
             record.IsDeleted = 0;
 
-            using (TransactionScope ts = new TransactionScope()) 
+            using (TransactionScope ts = new TransactionScope())
             {
                 switch (workOrder.Status)
                 {
@@ -404,7 +404,7 @@ namespace Hymson.MES.Services.Services.Plan
 
                 ts.Complete();
             }
-                
+
 
         }
 
@@ -412,11 +412,11 @@ namespace Hymson.MES.Services.Services.Plan
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="planWorkOrderActivationDto"></param>
+        /// <param name="planWorkOrderActivationModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyPlanWorkOrderActivationAsync(PlanWorkOrderActivationModifyDto planWorkOrderActivationModifyDto)
         {
-             //验证DTO
+            //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(planWorkOrderActivationModifyDto);
 
             //DTO转换实体
@@ -432,13 +432,13 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<PlanWorkOrderActivationDto> QueryPlanWorkOrderActivationByIdAsync(long id) 
+        public async Task<PlanWorkOrderActivationDto> QueryPlanWorkOrderActivationByIdAsync(long id)
         {
-           var planWorkOrderActivationEntity = await _planWorkOrderActivationRepository.GetByIdAsync(id);
-           if (planWorkOrderActivationEntity != null) 
-           {
-               return planWorkOrderActivationEntity.ToModel<PlanWorkOrderActivationDto>();
-           }
+            var planWorkOrderActivationEntity = await _planWorkOrderActivationRepository.GetByIdAsync(id);
+            if (planWorkOrderActivationEntity != null)
+            {
+                return planWorkOrderActivationEntity.ToModel<PlanWorkOrderActivationDto>();
+            }
             return null;
         }
     }

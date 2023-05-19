@@ -5,7 +5,6 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
@@ -25,10 +24,7 @@ using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using IdGen;
 using Newtonsoft.Json;
-using System.Linq;
-using System.Text.Json;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -411,7 +407,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             // IEnumerable<long> sfcInfoIds = new[] { manuSfc.Id };
             // 判断是否已存在返修信息,是否锁定
             //  var sfcProduceBusinessEntities = await _manuSfcProduceRepository.GetSfcProduceBusinessBySFCIdsAsync(sfcInfoIds);
-            await VerifyLockOrRepair(sfc, manuSfc.ProcedureId, manuSfc.Id);
+            await VerifyLockOrRepairAsync(sfc, manuSfc.ProcedureId, manuSfc.Id);
 
             //判断是否关闭所有不合格信息
             var allunqualifiedIds = badRecordList.Select(x => x.UnqualifiedId.ParseToLong()).Distinct().ToArray();
@@ -802,7 +798,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="procedureId"></param>
         /// <param name="sfcInfoId"></param>
         /// <returns></returns>
-        private async Task VerifyLockOrRepair(string sfc, long procedureId, long sfcInfoId)
+        private async Task VerifyLockOrRepairAsync(string sfc, long procedureId, long sfcInfoId)
         {
             IEnumerable<long> sfcInfoIds = new[] { sfcInfoId };
             var sfcProduceBusinessEntities = await _manuSfcProduceRepository.GetSfcProduceBusinessBySFCIdsAsync(sfcInfoIds);
@@ -824,6 +820,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="processRouteId"></param>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
         private async Task<bool> IsLastProcedureIdAsync(long processRouteId, long procedureId)
         {
             var processRouteNodes = await _manuCommonService.GetProcessRouteAsync(processRouteId);

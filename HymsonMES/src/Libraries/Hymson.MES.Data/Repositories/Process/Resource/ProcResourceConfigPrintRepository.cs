@@ -40,7 +40,7 @@ namespace Hymson.MES.Data.Repositories.Process
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("a.IsDeleted=0");
             sqlBuilder.Where("a.ResourceId=@ResourceId");
-            //TODO 按更新时间倒序排列
+            sqlBuilder.OrderBy("a.UpdatedOn DESC");
 
             var offSet = (query.PageIndex - 1) * query.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });

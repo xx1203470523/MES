@@ -366,7 +366,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16617));
             }
-            await VerifyLockOrRepair(removeDto.Sfc, manuSfcProduce.ProcedureId, manuSfcProduce.Id);
+            await VerifyLockOrRepairAsync(removeDto.Sfc, manuSfcProduce.ProcedureId, manuSfcProduce.Id);
 
             var inventoryEntity = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery
             {
@@ -435,7 +435,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16617));
             }
-            await VerifyLockOrRepair(addDto.Sfc, manuSfcProduce.ProcedureId, manuSfcProduce.Id);
+            await VerifyLockOrRepairAsync(addDto.Sfc, manuSfcProduce.ProcedureId, manuSfcProduce.Id);
 
             //用量
             var queryDto = new BarCodeQueryDto
@@ -661,7 +661,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16617));
             }
-            await VerifyLockOrRepair(replaceDto.Sfc, manuSfcProduce.ProcedureId, manuSfcProduce.Id);
+            await VerifyLockOrRepairAsync(replaceDto.Sfc, manuSfcProduce.ProcedureId, manuSfcProduce.Id);
 
             var circulationEntity = await _circulationRepository.GetByIdAsync(replaceDto.Id);
             if (circulationEntity == null)
@@ -1169,7 +1169,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="procedureId"></param>
         /// <param name="sfcInfoId"></param>
         /// <returns></returns>
-        private async Task VerifyLockOrRepair(string sfc, long procedureId, long sfcInfoId)
+        private async Task VerifyLockOrRepairAsync(string sfc, long procedureId, long sfcInfoId)
         {
             IEnumerable<long> sfcInfoIds = new[] { sfcInfoId };
             var sfcProduceBusinessEntities = await _manuSfcProduceRepository.GetSfcProduceBusinessBySFCIdsAsync(sfcInfoIds);

@@ -78,7 +78,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="param"></param>
         /// <returns></returns>
         /// <exception cref="BusinessException"></exception>
-        public async Task<ManuFacePlateProductionPackageDto> GetManuFacePlateProductionPackageInfo(ManuFacePlateProductionPackageQueryDto param)
+        public async Task<ManuFacePlateProductionPackageDto> GetManuFacePlateProductionPackageInfoAsync(ManuFacePlateProductionPackageQueryDto param)
         {
             var manuSfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
             {
@@ -220,7 +220,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
         /// <exception cref="BusinessException"></exception>
-        public async Task<string> AddPackageCom(ManuFacePlateProductionPackageAddDto addDto)
+        public async Task<string> AddPackageComAsync(ManuFacePlateProductionPackageAddDto addDto)
         {
             #region 验证
             if (addDto == null)

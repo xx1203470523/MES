@@ -265,6 +265,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         public async Task<IEnumerable<EquEquipmentDictionaryDto>> GetEquEquipmentDictionaryAsync()
         {
             var dics = new List<EquEquipmentDictionaryDto> { };
+            //TODO SiteId
             var list = await _equEquipmentRepository.GetBaseListAsync();
             var equipmentTypeDic = list.ToLookup(g => g.EquipmentType);
             foreach (var item in equipmentTypeDic)
@@ -328,6 +329,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
 
             // TODO 
             var pagedQuery = pagedQueryDto.ToQuery<EquEquipmentLinkApiPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _equEquipmentLinkApiRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
@@ -367,6 +369,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
 
             // TODO 
             var pagedQuery = pagedQueryDto.ToQuery<EquEquipmentLinkHardwarePagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _equEquipmentLinkHardwareRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据

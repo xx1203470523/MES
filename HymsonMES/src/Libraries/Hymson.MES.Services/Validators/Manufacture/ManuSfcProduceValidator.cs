@@ -12,9 +12,9 @@ namespace Hymson.MES.Services.Validators.Manufacture
     {
         public ManuSfcProduceLockValidator()
         {
-            RuleFor(x => x.Sfcs).MustAsync(ManuSfcProduceSFCSValidator).WithErrorCode(nameof(ErrorCode.MES15301));
-            RuleFor(x => x.Sfcs).MustAsync(ManuSfcProduceSFCSLenghtValidator).WithErrorCode(nameof(ErrorCode.MES15305));
-            RuleFor(x => x).MustAsync(ManuSfcProduceValidator).WithErrorCode(nameof(ErrorCode.MES15300));
+            RuleFor(x => x.Sfcs).MustAsync(ManuSfcProduceSFCSValidatorAsync).WithErrorCode(nameof(ErrorCode.MES15301));
+            RuleFor(x => x.Sfcs).MustAsync(ManuSfcProduceSFCSLenghtValidatorAsync).WithErrorCode(nameof(ErrorCode.MES15305));
+            RuleFor(x => x).MustAsync(ManuSfcProduceValidatorAsync).WithErrorCode(nameof(ErrorCode.MES15300));
         }
 
         /// <summary>
@@ -23,7 +23,7 @@ namespace Hymson.MES.Services.Validators.Manufacture
         /// <param name="sfcs"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<bool> ManuSfcProduceSFCSValidator(string[] sfcs, CancellationToken cancellationToken)
+        private async Task<bool> ManuSfcProduceSFCSValidatorAsync(string[] sfcs, CancellationToken cancellationToken)
         {
             if (sfcs == null || !sfcs.Any())
             {
@@ -38,7 +38,7 @@ namespace Hymson.MES.Services.Validators.Manufacture
         /// <param name="sfcs"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<bool> ManuSfcProduceSFCSLenghtValidator(string[] sfcs, CancellationToken cancellationToken)
+        private async Task<bool> ManuSfcProduceSFCSLenghtValidatorAsync(string[] sfcs, CancellationToken cancellationToken)
         {
             if (sfcs != null && sfcs.Any() && sfcs.Length > 100)
             {
@@ -53,7 +53,7 @@ namespace Hymson.MES.Services.Validators.Manufacture
         /// <param name="parm"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<bool> ManuSfcProduceValidator(ManuSfcProduceLockDto parm, CancellationToken cancellationToken)
+        private async Task<bool> ManuSfcProduceValidatorAsync(ManuSfcProduceLockDto parm, CancellationToken cancellationToken)
         {
             if (parm.OperationType == QualityLockEnum.FutureLock)
             {

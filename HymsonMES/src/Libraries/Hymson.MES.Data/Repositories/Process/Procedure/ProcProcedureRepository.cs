@@ -51,10 +51,7 @@ namespace Hymson.MES.Data.Repositories.Process
                 sqlBuilder.OrderBy(query.Sorting);
             }
 
-            if (query.SiteId > 0)
-            {
-                sqlBuilder.Where("a.SiteId = @SiteId");
-            }
+            sqlBuilder.Where("a.SiteId = @SiteId");
             if (!string.IsNullOrWhiteSpace(query.Code))
             {
                 query.Code = $"%{query.Code}%";

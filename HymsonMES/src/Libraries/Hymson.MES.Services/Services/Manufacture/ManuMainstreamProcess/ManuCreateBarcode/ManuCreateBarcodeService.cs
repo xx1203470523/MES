@@ -19,6 +19,7 @@ using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCreateBa
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGenerateBarcodeDto;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
+using Hymson.MES.Services.Services.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -44,6 +45,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
         private readonly ILocalizationService _localizationService;
+        private readonly IPlanSfcPrintService _planSfcPrintService;
 
         /// <summary>
         /// 
@@ -71,6 +73,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
              IManuSfcProduceRepository manuSfcProduceRepository,
              IManuSfcStepRepository manuSfcStepRepository,
              IPlanWorkOrderRepository planWorkOrderRepository,
+             IPlanSfcPrintService planSfcPrintService,
              ILocalizationService localizationService)
         {
             _currentUser = currentUser;
@@ -85,6 +88,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
             _manuSfcStepRepository = manuSfcStepRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _localizationService = localizationService;
+            _planSfcPrintService = planSfcPrintService;
         }
 
         /// <summary>
@@ -92,7 +96,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task CreateBarcodeByWorkOrderId(CreateBarcodeByWorkOrderDto param)
+        public async Task<List<ManuSfcEntity>> CreateBarcodeByWorkOrderIdAsync(CreateBarcodeByWorkOrderDto param)
         {
             var planWorkOrderEntity = await _manuCommonService.GetProduceWorkOrderByIdAsync(param.WorkOrderId);
 
@@ -204,24 +208,35 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
             await _manuSfcProduceRepository.InsertRangeAsync(manuSfcProduceList);
             await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
             ts.Complete();
+            return manuSfcList;
         }
-
         /// <summary>
-        /// 设备请求条码
+        /// 工单下达及打印
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task CreateBarcodeByResourceId(CreateBarcodeByResourceDto param)
+        public async Task CreateBarcodeByWorkOrderIdAndPrintAsync(CreateBarcodeByWorkOrderAndPrintDto param)
         {
-
+            var lst = await CreateBarcodeByWorkOrderIdAsync(new CreateBarcodeByWorkOrderDto() { Qty = param.Qty, WorkOrderId = param.WorkOrderId });
+            foreach (var item in lst)
+            {
+                await _planSfcPrintService.CreatePrintAsync(new Dtos.Plan.PlanSfcPrintCreatePrintDto()
+                {
+                    PrintId = param.PrintId,
+                    ProcedureId = param.ProcedureId,
+                    SFC = item.SFC,
+                    WorkOrderId = param.WorkOrderId
+                });
+            }
         }
+
 
         /// <summary>
         /// 根据外部条码下达条码
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task CreateBarcodeByExternalSFC(CreateBarcodeByExternalSFCDto param)
+        public async Task CreateBarcodeByExternalSFCAsync(CreateBarcodeByExternalSFCDto param)
         {
             var planWorkOrderEntity = await _manuCommonService.GetWorkOrderByIdAsync(param.WorkOrderId);
             var sfclist = await _manuSfcRepository.GetBySFCsAsync(param.ExternalSFCs.Select(x => x.SFC));
@@ -346,7 +361,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task CreateBarcodeByOldMESSFC(CreateBarcodeByOldMesSFCDto param)
+        public async Task CreateBarcodeByOldMESSFCAsync(CreateBarcodeByOldMesSFCDto param)
         {
             var planWorkOrderEntity = await _manuCommonService.GetWorkOrderByIdAsync(param.WorkOrderId);
             var sfclist = await _manuSfcRepository.GetBySFCsAsync(param.OldSFCs.Select(x => x.SFC));
