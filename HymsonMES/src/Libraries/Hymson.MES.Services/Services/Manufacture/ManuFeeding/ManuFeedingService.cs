@@ -20,7 +20,6 @@ using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
-using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -43,14 +42,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
-        ///  仓储（资源）
-        /// </summary>
-        private readonly IProcResourceRepository _procResourceRepository;
-
-        /// <summary>
         ///  仓储（工作中心资源关联）
         /// </summary>
         private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
+
+        /// <summary>
+        ///  仓储（资源）
+        /// </summary>
+        private readonly IProcResourceRepository _procResourceRepository;
 
         /// <summary>
         ///  仓储（上料点）
@@ -61,16 +60,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         ///  仓储（上料点物料关联）
         /// </summary>
         private readonly IProcLoadPointLinkMaterialRepository _procLoadPointLinkMaterialRepository;
-
-        /// <summary>
-        ///  仓储（工单）
-        /// </summary>
-        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
-
-        /// <summary>
-        ///  仓储（工单激活）
-        /// </summary>
-        private readonly IPlanWorkOrderActivationRepository _planWorkOrderActivationRepository;
 
         /// <summary>
         ///  仓储（Bom明细）
@@ -88,9 +77,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         private readonly IProcMaterialRepository _procMaterialRepository;
 
         /// <summary>
-        ///  仓储（物料库存）
+        ///  仓储（工单）
         /// </summary>
-        private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
+        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
+
+        /// <summary>
+        ///  仓储（工单激活）
+        /// </summary>
+        private readonly IPlanWorkOrderActivationRepository _planWorkOrderActivationRepository;
 
         /// <summary>
         ///  仓储（物料加载）
@@ -103,10 +97,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         private readonly IManuFeedingRecordRepository _manuFeedingRecordRepository;
 
         /// <summary>
+        ///  仓储（物料库存）
+        /// </summary>
+        private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
+
+        /// <summary>
         ///  仓储（物料台账）
         /// </summary>
         private readonly IWhMaterialStandingbookRepository _whMaterialStandingbookRepository;
-
 
 
         /// <summary>
@@ -114,52 +112,51 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="sequenceService"></param>
-        /// <param name="procResourceRepository"></param>
         /// <param name="inteWorkCenterRepository"></param>
+        /// <param name="procResourceRepository"></param>
         /// <param name="procLoadPointRepository"></param>
         /// <param name="procLoadPointLinkMaterialRepository"></param>
-        /// <param name="planWorkOrderRepository"></param>
-        /// <param name="planWorkOrderActivationRepository"></param>
         /// <param name="procBomDetailRepository"></param>
         /// <param name="procMaterialRepository"></param>
-        /// <param name="whMaterialInventoryRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
+        /// <param name="planWorkOrderActivationRepository"></param>
         /// <param name="manuFeedingRepository"></param>
         /// <param name="manuFeedingRecordRepository"></param>
+        /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="whMaterialStandingbookRepository"></param>
-        public ManuFeedingService(ICurrentUser currentUser, ICurrentSite currentSite, ISequenceService sequenceService,
-            IProcResourceRepository procResourceRepository,
+        public ManuFeedingService(ICurrentUser currentUser, ICurrentSite currentSite,
             IInteWorkCenterRepository inteWorkCenterRepository,
+            IProcResourceRepository procResourceRepository,
             IProcLoadPointRepository procLoadPointRepository,
             IProcLoadPointLinkMaterialRepository procLoadPointLinkMaterialRepository,
-            IPlanWorkOrderRepository planWorkOrderRepository,
-            IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
             IProcBomDetailRepository procBomDetailRepository,
             IProcMaterialRepository procMaterialRepository,
-            IWhMaterialInventoryRepository whMaterialInventoryRepository,
+            IPlanWorkOrderRepository planWorkOrderRepository,
+            IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
             IManuFeedingRepository manuFeedingRepository,
             IManuFeedingRecordRepository manuFeedingRecordRepository,
+            IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IWhMaterialStandingbookRepository whMaterialStandingbookRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _procResourceRepository = procResourceRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
+            _procResourceRepository = procResourceRepository;
             _procLoadPointRepository = procLoadPointRepository;
             _procLoadPointLinkMaterialRepository = procLoadPointLinkMaterialRepository;
-            _planWorkOrderRepository = planWorkOrderRepository;
-            _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
             _procBomDetailRepository = procBomDetailRepository;
             _procMaterialRepository = procMaterialRepository;
-            _whMaterialInventoryRepository = whMaterialInventoryRepository;
+            _planWorkOrderRepository = planWorkOrderRepository;
+            _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
             _manuFeedingRepository = manuFeedingRepository;
             _manuFeedingRecordRepository = manuFeedingRecordRepository;
+            _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
         }
 
 
         /// <summary>
-        /// 查询资源（物料加载）
+        /// 查询资源
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
@@ -194,7 +191,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         }
 
         /// <summary>
-        /// 查询上料点（物料加载）
+        /// 查询上料点
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
@@ -213,7 +210,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         }
 
         /// <summary>
-        /// 查询工单（物料加载）
+        /// 查询工单
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
@@ -236,7 +233,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         }
 
         /// <summary>
-        /// 查询物料（物料加载）
+        /// 查询物料
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
@@ -323,7 +320,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         }
 
         /// <summary>
-        /// 添加（物料加载）
+        /// 物料添加
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
@@ -409,7 +406,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         }
 
         /// <summary>
-        /// 删除（物料加载）
+        /// 物料移除
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
@@ -430,9 +427,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             // 查询物料
             var materials = await _procMaterialRepository.GetByIdsAsync(feeds.Select(s => s.ProductId).ToArray());
 
-
             var now = HymsonClock.Now();
-
             List<WhMaterialStandingbookEntity> whMaterialStandingbookEntities = new();
             List<UpdateStatusByBarCodeCommand> updateStatusByBarCodeCommands = new();
             List<ManuFeedingRecordEntity> manuFeedingRecordEntities = new();

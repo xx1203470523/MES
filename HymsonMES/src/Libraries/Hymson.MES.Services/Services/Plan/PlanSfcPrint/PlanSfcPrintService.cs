@@ -180,7 +180,12 @@ namespace Hymson.MES.Services.Services.Plan
                             {
                                 ParamName = "SFC",
                                 ParamValue = createDto.SFC
-                            }
+                            },
+                            new PrintRequest.ParamEntity()
+                            {
+                                ParamName = "SiteId",
+                                ParamValue = _currentSite.SiteId.ToString()
+                            },
                         }
                     };
                     var result = await _labelPrintRequest.PrintAsync(printEntity);
