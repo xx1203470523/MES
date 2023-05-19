@@ -242,7 +242,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
 
         /// <summary>
         /// 条码解绑
-        /// HY-MES-EQU-020
+        /// HY-MES-EQU-021
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
