@@ -1,4 +1,6 @@
-﻿namespace Hymson.MES.EquipmentServices.Dtos.Feeding
+﻿using Hymson.MES.Core.Enums.Manufacture;
+
+namespace Hymson.MES.EquipmentServices.Dtos.Feeding
 {
     /// <summary>
     /// 请求参数（卸料）
@@ -13,6 +15,6 @@
         /// <summary>
         /// 卸料类型（2：代表剩余物料卸料；3：代表剩余物料卸料并报废）
         /// </summary>
-        public int Type { get; set; }
+        public FeedingUnloadingTypeEnum Type { get; set; }
     }
 }
