@@ -14,7 +14,7 @@ using Hymson.MES.EquipmentServices.Services.BindContainer;
 using Hymson.MES.EquipmentServices.Services.BindSFC;
 using Hymson.MES.EquipmentServices.Services.CCDFileUploadComplete;
 using Hymson.MES.EquipmentServices.Services.EquipmentCollect;
-using Hymson.MES.EquipmentServices.Services.FeedingConsumption;
+using Hymson.MES.EquipmentServices.Services.Feeding;
 using Hymson.MES.EquipmentServices.Services.GenerateModuleSFC;
 using Hymson.MES.EquipmentServices.Services.InboundInContainer;
 using Hymson.MES.EquipmentServices.Services.InboundInSFCContainer;

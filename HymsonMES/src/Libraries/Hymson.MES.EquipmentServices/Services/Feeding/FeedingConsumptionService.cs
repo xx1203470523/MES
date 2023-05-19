@@ -1,13 +1,8 @@
 ﻿using FluentValidation;
 using Hymson.MES.EquipmentServices.Dtos.FeedingConsumption;
 using Hymson.Web.Framework.WorkContext;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Hymson.MES.EquipmentServices.Services.FeedingConsumption
+namespace Hymson.MES.EquipmentServices.Services.Feeding
 {
     /// <summary>
     /// 上报物料消耗服务
