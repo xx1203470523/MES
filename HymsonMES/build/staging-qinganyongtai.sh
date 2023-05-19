@@ -16,6 +16,6 @@ docker service create \
   --env TZ="Asia/Shanghai" \
   --env SERVICE_CHECK_HTTP=/health \
   --env SERVICE_NAME={{.Service.Name}} \
-  --hostname="{{.Node.ID}}-{{.Service.Name}}"\
+  --hostname="{{.Node.ID}}-{{.Service.Name}}" \
    --mount type=volume,src=hymsonvolume,dst=/logs \
   $registryUrl/$imageName:$timestamp

@@ -14,6 +14,6 @@ docker service create \
   --env DOTNET_ENVIRONMENT=Development \
   --env TZ="Asia/Shanghai" \
   --env SERVICE_NAME={{.Service.Name}} \
-  --hostname="{{.Node.ID}}-{{.Service.Name}}"\
+  --hostname="{{.Node.ID}}-{{.Service.Name}}" \
    --mount type=volume,src=hymsonvolume,dst=/logs \
   $registryUrl/$imageName:$timestamp
