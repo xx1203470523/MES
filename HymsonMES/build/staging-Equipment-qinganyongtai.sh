@@ -11,7 +11,7 @@ docker service rm $serviceName
 docker service create \
   --name $serviceName \
   --mode global \
-  --publish mode=host,published=20028,target=80 \
+  --publish mode=host,published=20029,target=80 \
   --env ASPNETCORE_ENVIRONMENT=Staging \
   --env TZ="Asia/Shanghai" \
   --env SERVICE_CHECK_HTTP=/health \
