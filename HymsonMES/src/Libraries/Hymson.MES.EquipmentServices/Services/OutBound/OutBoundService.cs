@@ -14,7 +14,6 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
-using Org.BouncyCastle.Asn1.Ocsp;
 using System.Transactions;
 
 namespace Hymson.MES.EquipmentServices.Services.OutBound
@@ -79,26 +78,26 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             {
                 throw new ValidationException(nameof(ErrorCode.MES10100));
             }
-            List<ManuProductParameterEntity> manuProductParameterEntities = new();
-            List<ManuSfcStepNgEntity> manuProductNGEntities = new();
             //已经验证过资源是否存在直接使用
             var procResource = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentEquipment.SiteId, Code = outBoundDto.ResourceCode });
+            //使用批量出站Dto
+            OutBoundMoreDto outBoundMoreDto = new()
+            {
+                EquipmentCode = _currentEquipment.Code,
+                ResourceCode = outBoundDto.ResourceCode,
+                LocalTime = outBoundDto.LocalTime,
+                SFCs = new OutBoundDto[] { outBoundDto }
+            };
             //条码步骤
-            ManuSfcStepEntity manuSfcStepEntity = PrepareSetpEntity(outBoundDto, procResource.Id);
+            List<ManuSfcStepEntity> manuSfcStepEntitys = PrepareSetpEntity(outBoundMoreDto, procResource.Id);
             //标准参数
-            if (outBoundDto?.ParamList?.Length > 0)
-            {
-                manuProductParameterEntities = await PrepareProductParameterEntity(outBoundDto, procResource.Id);
-            }
+            List<ManuProductParameterEntity> manuProductParameterEntities = await PrepareProductParameterEntity(outBoundMoreDto, procResource.Id);
             //NG
-            if (outBoundDto?.NG?.Length > 0)
-            {
-                manuProductNGEntities = await PrepareProductNgEntity(outBoundDto, manuSfcStepEntity.Id);
-            }
+            List<ManuSfcStepNgEntity> manuProductNGEntities = await PrepareProductNgEntity(outBoundMoreDto, manuSfcStepEntitys);
 
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
-                await _manuSfcStepRepository.InsertAsync(manuSfcStepEntity);
+                await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepEntitys);
                 if (manuProductParameterEntities.Any())
                 {
                     await _manuProductParameterRepository.InsertsAsync(manuProductParameterEntities);
@@ -129,116 +128,182 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             }
             //已经验证过资源是否存在直接使用
             var procResource = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentEquipment.SiteId, Code = outBoundMoreDto.ResourceCode });
-            long procResourceId = procResource.Id;
-            List<ManuSfcStepEntity> sfcStepList = new();
-            foreach (var item in outBoundMoreDto.SFCs)
+            //条码步骤
+            List<ManuSfcStepEntity> manuSfcStepEntitys = PrepareSetpEntity(outBoundMoreDto, procResource.Id);
+            //标准参数
+            List<ManuProductParameterEntity> manuProductParameterEntities = await PrepareProductParameterEntity(outBoundMoreDto, procResource.Id);
+            //NG
+            List<ManuSfcStepNgEntity> manuProductNGEntities = await PrepareProductNgEntity(outBoundMoreDto, manuSfcStepEntitys);
+
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
-                ManuSfcStepEntity manuSfcStepEntity = PrepareSetpEntity(item, procResourceId);
-                sfcStepList.Add(manuSfcStepEntity);
+                await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepEntitys);
+                if (manuProductParameterEntities.Any())
+                {
+                    await _manuProductParameterRepository.InsertsAsync(manuProductParameterEntities);
+                }
+                if (manuProductNGEntities.Any())
+                {
+                    await _manuSfcStepNgRepository.InsertsAsync(manuProductNGEntities);
+                }
+                ts.Complete();
             }
-            await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
         }
 
         /// <summary>
         /// 组装SetpEntity
         /// </summary>
-        /// <param name="outBoundDto"></param>
+        /// <param name="outBoundMoreDto"></param>
         /// <param name="procResourceId"></param>
         /// <returns></returns>
-        private ManuSfcStepEntity PrepareSetpEntity(OutBoundDto outBoundDto, long procResourceId)
+        private List<ManuSfcStepEntity> PrepareSetpEntity(OutBoundMoreDto outBoundMoreDto, long procResourceId)
         {
-            return new ManuSfcStepEntity
+            List<ManuSfcStepEntity> manuSfcStepEntities = new();
+            foreach (var item in outBoundMoreDto.SFCs)
             {
-                Id = IdGenProvider.Instance.CreateId(),
-                SiteId = _currentEquipment.SiteId,
-                SFC = outBoundDto.SFC,
-                Qty = 1,//出站数量
-                Passed = outBoundDto.Passed,
-                EquipmentId = _currentEquipment.Id,
-                ResourceId = procResourceId,
-                CurrentStatus = SfcProduceStatusEnum.Activity,
-                Operatetype = ManuSfcStepTypeEnum.OutStock,
-                CreatedBy = _currentEquipment.Name,
-                CreatedOn = HymsonClock.Now(),
-                UpdatedBy = _currentEquipment.Name,
-                UpdatedOn = HymsonClock.Now()
-            };
+                manuSfcStepEntities.Add(new ManuSfcStepEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentEquipment.SiteId,
+                    SFC = item.SFC,
+                    Qty = 1,//出站数量
+                    Passed = item.Passed,
+                    EquipmentId = _currentEquipment.Id,
+                    ResourceId = procResourceId,
+                    CurrentStatus = SfcProduceStatusEnum.Activity,
+                    Operatetype = ManuSfcStepTypeEnum.OutStock,
+                    CreatedBy = _currentEquipment.Name,
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedBy = _currentEquipment.Name,
+                    UpdatedOn = HymsonClock.Now()
+                });
+            }
+            return manuSfcStepEntities;
         }
 
         /// <summary>
         /// 组装参数信息
         /// </summary>
-        /// <param name="outBoundDto"></param>
+        /// <param name="outBoundMoreDto"></param>
         /// <param name="procResourceId"></param>
         /// <returns></returns>
-        private async Task<List<ManuProductParameterEntity>> PrepareProductParameterEntity(OutBoundDto outBoundDto, long procResourceId)
+        private async Task<List<ManuProductParameterEntity>> PrepareProductParameterEntity(OutBoundMoreDto outBoundMoreDto, long procResourceId)
         {
-            var paramCodeArray = outBoundDto.ParamList.Select(c => c.ParamCode).ToArray();
+            List<ManuProductParameterEntity> manuProductParameterEntities = new();
+            //所有参数
+            List<string> paramCodeList = new();
+            foreach (var item in outBoundMoreDto.SFCs)
+            {
+                if (item.ParamList != null)
+                {
+                    var paramCodes = item.ParamList.Select(c => c.ParamCode);
+                    paramCodeList.AddRange(paramCodes);
+                }
+            }
+            //如果所有参数都为空
+            if (paramCodeList.Count <= 0)
+            {
+                return manuProductParameterEntities;
+            }
+
             var codesQuery = new EntityByCodesQuery
             {
                 Site = _currentEquipment.SiteId,
-                Codes = paramCodeArray
+                Codes = paramCodeList.ToArray()
             };
             var procParameter = await _procParameterRepository.GetByCodesAsync(codesQuery);
             //如果有不存在的参数编码就提示
-            var noIncludeCodes = paramCodeArray.Where(w => procParameter.Select(s => s.ParameterCode).Contains(w) == false);
+            var noIncludeCodes = paramCodeList.Where(w => procParameter.Select(s => s.ParameterCode).Contains(w) == false);
             if (noIncludeCodes.Any() == true)
                 throw new CustomerValidationException(nameof(ErrorCode.MES19108)).WithData("Code", string.Join(',', noIncludeCodes));
 
-            return outBoundDto.ParamList.Select(s =>
-                new ManuProductParameterEntity
+            foreach (var outBoundDto in outBoundMoreDto.SFCs)
+            {
+                if (outBoundDto.ParamList != null)
                 {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentEquipment.SiteId,
-                    CreatedBy = _currentEquipment.Code,
-                    UpdatedBy = _currentEquipment.Code,
-                    CreatedOn = HymsonClock.Now(),
-                    UpdatedOn = HymsonClock.Now(),
-                    EquipmentId = _currentEquipment.Id ?? 0,
-                    LocalTime = outBoundDto.LocalTime,
-                    SFC = outBoundDto.SFC,
-                    ResourceId = procResourceId,
-                    ParameterId = procParameter.Where(c => c.ParameterCode.Equals(s.ParamCode)).First().Id,
-                    ParamValue = s.ParamValue,
-                    Timestamp = s.Timestamp
+                    var paramList = outBoundDto.ParamList.Select(s =>
+                         new ManuProductParameterEntity
+                         {
+                             Id = IdGenProvider.Instance.CreateId(),
+                             SiteId = _currentEquipment.SiteId,
+                             CreatedBy = _currentEquipment.Code,
+                             UpdatedBy = _currentEquipment.Code,
+                             CreatedOn = HymsonClock.Now(),
+                             UpdatedOn = HymsonClock.Now(),
+                             EquipmentId = _currentEquipment.Id ?? 0,
+                             LocalTime = outBoundDto.LocalTime,
+                             SFC = outBoundDto.SFC,
+                             ResourceId = procResourceId,
+                             ParameterId = procParameter.Where(c => c.ParameterCode.Equals(s.ParamCode)).First().Id,
+                             ParamValue = s.ParamValue,
+                             Timestamp = s.Timestamp
+                         }
+                     );
+                    manuProductParameterEntities.AddRange(paramList);
                 }
-           ).ToList();
+            }
+            return manuProductParameterEntities;
         }
 
 
         /// <summary>
         /// 组装NG信息
         /// </summary>
-        /// <param name="outBoundDto"></param>
-        /// <param name="stepId"></param>
+        /// <param name="outBoundMoreDto"></param>
+        /// <param name="manuSfcStepEntities"></param>
         /// <returns></returns>
-        private async Task<List<ManuSfcStepNgEntity>> PrepareProductNgEntity(OutBoundDto outBoundDto, long stepId)
+        private async Task<List<ManuSfcStepNgEntity>> PrepareProductNgEntity(OutBoundMoreDto outBoundMoreDto, List<ManuSfcStepEntity> manuSfcStepEntities)
         {
-            var ngCodeArray = outBoundDto.NG.Select(c => c.NGCode).ToArray();
+
+            List<ManuSfcStepNgEntity> manuSfcStepNgEntities = new();
+            //所有NG编码
+            List<string> ngCodeList = new();
+            foreach (var item in outBoundMoreDto.SFCs)
+            {
+                if (item.NG != null)
+                {
+                    var ngCodes = item.NG.Select(c => c.NGCode);
+                    ngCodeList.AddRange(ngCodes);
+                }
+            }
+            //如果所有NG都为空
+            if (ngCodeList.Count <= 0)
+            {
+                return manuSfcStepNgEntities;
+            }
+
             var codesQuery = new QualUnqualifiedCodeByCodesQuery
             {
                 Site = _currentEquipment.SiteId,
-                Codes = ngCodeArray
+                Codes = ngCodeList.ToArray()
             };
             var qualUnqualifiedCodes = await _qualUnqualifiedCodeRepository.GetByCodesAsync(codesQuery);
             //如果有不存在的参数编码就提示
-            var noIncludeCodes = ngCodeArray.Where(w => qualUnqualifiedCodes.Select(s => s.UnqualifiedCode).Contains(w) == false);
+            var noIncludeCodes = ngCodeList.Where(w => qualUnqualifiedCodes.Select(s => s.UnqualifiedCode).Contains(w) == false);
             if (noIncludeCodes.Any() == true)
                 throw new CustomerValidationException(nameof(ErrorCode.MES19114)).WithData("Code", string.Join(',', noIncludeCodes));
 
-            return outBoundDto.NG.Select(s =>
-                new ManuSfcStepNgEntity
+            foreach (var outBoundDto in outBoundMoreDto.SFCs)
+            {
+                var stepId = manuSfcStepEntities.Where(c => c.SFC == outBoundDto.SFC).First().Id;
+                if (outBoundDto.NG != null)
                 {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentEquipment.SiteId,
-                    BarCodeStepId = stepId,
-                    UnqualifiedCode = s.NGCode,
-                    CreatedBy = _currentEquipment.Code,
-                    UpdatedBy = _currentEquipment.Code,
-                    CreatedOn = HymsonClock.Now(),
-                    UpdatedOn = HymsonClock.Now()
+                    var ngList = outBoundDto.NG.Select(s =>
+                     new ManuSfcStepNgEntity
+                     {
+                         Id = IdGenProvider.Instance.CreateId(),
+                         SiteId = _currentEquipment.SiteId,
+                         BarCodeStepId = stepId,
+                         UnqualifiedCode = s.NGCode,
+                         CreatedBy = _currentEquipment.Code,
+                         UpdatedBy = _currentEquipment.Code,
+                         CreatedOn = HymsonClock.Now(),
+                         UpdatedOn = HymsonClock.Now()
+                     });
+                    manuSfcStepNgEntities.AddRange(ngList);
                 }
-           ).ToList();
+            }
+            return manuSfcStepNgEntities;
         }
     }
 }
