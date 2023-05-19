@@ -1,6 +1,8 @@
 ﻿using FluentValidation;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Dtos.InboundInContainer;
+using Hymson.MES.EquipmentServices.Services.InBound;
 using Hymson.Web.Framework.WorkContext;
 using System;
 using System.Collections.Generic;
@@ -17,16 +19,20 @@ namespace Hymson.MES.EquipmentServices.Services.InboundInContainer
     {
         private readonly ICurrentEquipment _currentEquipment;
         private readonly IManuTraySfcRelationRepository _manuTraySfcRelationRepository;
+        private readonly IInBoundService _inBoundService;
 
         private readonly AbstractValidator<InboundInContainerDto> _validationInboundInContainerDtoRules;
 
         /// <summary>
-        /// 
+        ///  
         /// </summary>
+        /// <param name="inBoundService"></param>
+        /// <param name="manuTraySfcRelationRepository"></param>
         /// <param name="validationInboundInContainerDtoRules"></param>
         /// <param name="currentEquipment"></param>
-        public InboundInContainerService(IManuTraySfcRelationRepository manuTraySfcRelationRepository, AbstractValidator<InboundInContainerDto> validationInboundInContainerDtoRules, ICurrentEquipment currentEquipment)
+        public InboundInContainerService(IInBoundService inBoundService, IManuTraySfcRelationRepository manuTraySfcRelationRepository, AbstractValidator<InboundInContainerDto> validationInboundInContainerDtoRules, ICurrentEquipment currentEquipment)
         {
+            _inBoundService = inBoundService;
             _manuTraySfcRelationRepository = manuTraySfcRelationRepository;
             _validationInboundInContainerDtoRules = validationInboundInContainerDtoRules;
             _currentEquipment = currentEquipment;
@@ -48,6 +54,7 @@ namespace Hymson.MES.EquipmentServices.Services.InboundInContainer
                 list.Add(item.SFC);
             }
             // 进站
+            await _inBoundService.InBoundMore(new InBoundMoreDto { SFCs = list.ToArray(), EquipmentCode = inboundInContainerDto.EquipmentCode, LocalTime = inboundInContainerDto.LocalTime, ResourceCode = inboundInContainerDto.ResourceCode });
         }
     }
 }

@@ -7,6 +7,7 @@ using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.EquipmentServices.Dtos.GenerateModuleSFC;
 using Hymson.MES.EquipmentServices.Dtos.SingleBarCodeLoadingVerification;
+using Hymson.Utils;
 using Hymson.Web.Framework.WorkContext;
 using System;
 using System.Collections.Generic;
@@ -64,14 +65,15 @@ namespace Hymson.MES.EquipmentServices.Services.GenerateModuleSFC
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19116)).WithData("Code", generateModuleSFCDto.ProductCode);
             }
-            //生成条码
+            ////生成条码
             //var barcodeList = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new GenerateBarcodeDto
             //{
             //    CodeRuleId = inteCodeRulesEntit.Id,
             //    Count = generateModuleSFCDto.Qty
             //});
             //return new GenerateModuleSFCModelDto { SFCs = barcodeList };
-            throw new NotImplementedException();
+            return new GenerateModuleSFCModelDto();
         }
+
     }
 }
