@@ -73,6 +73,17 @@ namespace Hymson.MES.EquipmentServices.Dtos.OutPutQty
         /// 参数值
         /// </summary>
         public string ParamValue { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 标准上限
+        /// </summary>
+        public string? StandardUpperLimit { get; set; }
+
+        /// <summary>
+        /// 标准下限
+        /// </summary>
+        public string? StandardLowerLimit { get; set; }
+
         /// <summary>
         /// 时间戳 
         /// </summary>

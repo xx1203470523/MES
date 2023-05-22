@@ -46,6 +46,7 @@ namespace Hymson.MES.Equipment.Api
 
             builder.Services.AddJwtBearerService(builder.Configuration);
             builder.Services.AddEquipmentService(builder.Configuration);
+            builder.Services.AddCoreServices(builder.Configuration); 
             builder.Services.AddSqlLocalization(builder.Configuration);
             builder.Services.AddSequenceService(builder.Configuration);
             builder.Services.AddLocalization();

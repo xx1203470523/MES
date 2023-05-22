@@ -54,7 +54,7 @@ namespace Hymson.MES.EquipmentServices.Services.CCDFileUploadComplete
                     Passed = item.Passed,
                     SFC = item.SFC,
                     Timestamp = item.Timestamp,
-                    URI = item.URI,
+                    URI = item.URL,
                     Id = IdGenProvider.Instance.CreateId(),
                     CreatedBy = _currentEquipment.Name,
                     UpdatedBy = _currentEquipment.Name,

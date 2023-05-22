@@ -3,10 +3,13 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.CoreServices.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGenerateBarcodeDto;
+using Hymson.MES.CoreServices.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.EquipmentServices.Dtos.GenerateModuleSFC;
 using Hymson.MES.EquipmentServices.Dtos.SingleBarCodeLoadingVerification;
+using Hymson.Utils;
 using Hymson.Web.Framework.WorkContext;
 using System;
 using System.Collections.Generic;
@@ -26,18 +29,21 @@ namespace Hymson.MES.EquipmentServices.Services.GenerateModuleSFC
         private readonly AbstractValidator<GenerateModuleSFCDto> _validationGenerateModuleSFCDtoRules;
         private readonly IInteCodeRulesRepository _inteCodeRulesRepository;
         private readonly IProcMaterialRepository _procMaterialRepository;
+        private readonly IManuGenerateBarcodeService _manuGenerateBarcodeService;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="validationGenerateModuleSFCDtoRules"></param>
         /// <param name="currentEquipment"></param> 
-        public GenerateModuleSFCService(IInteCodeRulesRepository inteCodeRulesRepository, IProcMaterialRepository procMaterialRepository, AbstractValidator<GenerateModuleSFCDto> validationGenerateModuleSFCDtoRules, ICurrentEquipment currentEquipment)
+        public GenerateModuleSFCService(IInteCodeRulesRepository inteCodeRulesRepository, IProcMaterialRepository procMaterialRepository,
+            IManuGenerateBarcodeService manuGenerateBarcodeService, AbstractValidator<GenerateModuleSFCDto> validationGenerateModuleSFCDtoRules, ICurrentEquipment currentEquipment)
         {
             _validationGenerateModuleSFCDtoRules = validationGenerateModuleSFCDtoRules;
             _currentEquipment = currentEquipment;
             _inteCodeRulesRepository = inteCodeRulesRepository;
             _procMaterialRepository = procMaterialRepository;
+            _manuGenerateBarcodeService = manuGenerateBarcodeService;
         }
 
         /// <summary>
@@ -52,7 +58,7 @@ namespace Hymson.MES.EquipmentServices.Services.GenerateModuleSFC
             var materialEntit = await _procMaterialRepository.GetByCodeAsync(new ProcMaterialQuery { MaterialCode = generateModuleSFCDto.ProductCode, Version = generateModuleSFCDto.Version, SiteId = _currentEquipment.SiteId });
             if (materialEntit == null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19114)).WithData("Code", generateModuleSFCDto.ProductCode);
+                throw new CustomerValidationException(nameof(ErrorCode.MES19118)).WithData("Code", generateModuleSFCDto.ProductCode);
             }
             var inteCodeRulesResult = await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery
             {
@@ -64,14 +70,15 @@ namespace Hymson.MES.EquipmentServices.Services.GenerateModuleSFC
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19116)).WithData("Code", generateModuleSFCDto.ProductCode);
             }
-            //生成条码
-            //var barcodeList = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new GenerateBarcodeDto
-            //{
-            //    CodeRuleId = inteCodeRulesEntit.Id,
-            //    Count = generateModuleSFCDto.Qty
-            //});
-            //return new GenerateModuleSFCModelDto { SFCs = barcodeList };
-            throw new NotImplementedException();
+            ////生成条码
+            var barcodeList = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new GenerateBarcodeDto
+            {
+                CodeRuleId = inteCodeRulesEntit.Id,
+                Count = generateModuleSFCDto.Qty,
+                SiteId = _currentEquipment.SiteId
+            });
+            return new GenerateModuleSFCModelDto { SFCs = barcodeList };
         }
+
     }
 }

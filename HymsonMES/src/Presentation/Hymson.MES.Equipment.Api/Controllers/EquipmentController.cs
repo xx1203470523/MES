@@ -23,6 +23,7 @@ using Hymson.MES.EquipmentServices.Services.QueryContainerBindSfc;
 using Hymson.MES.EquipmentServices.Services.SingleBarCodeLoadingVerification;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace Hymson.MES.Equipment.Api.Controllers
 {
@@ -31,6 +32,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
     /// </summary>
     [Route("EquipmentService/api/v1/EquApi")]
     [ApiController]
+    [AllowAnonymous]
     public class EquipmentController : Controller
     {
         /// <summary>
@@ -215,7 +217,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
 
 
         /// <summary>
-        /// 条码绑定
+        /// 容器绑定
         /// HY-MES-EQU-019
         /// </summary>
         /// <param name="request"></param>
@@ -242,7 +244,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
 
         /// <summary>
         /// 条码解绑
-        /// HY-MES-EQU-020
+        /// HY-MES-EQU-021
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -277,6 +279,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [Route("InboundInContainer")]
         public async Task InboundInContainerAsync(InboundInContainerDto request)
         {
+            _logger.LogInformation("进站-容器：InboundInContainer,msg:", request);
             await _inboundInContainerService.InboundInContainerAsync(request);
         }
 
@@ -290,21 +293,22 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [Route("GenerateModuleSFC")]
         public async Task GenerateModuleSFCAsync(GenerateModuleSFCDto request)
         {
+            _logger.LogInformation("请求生成模组码-电芯堆叠：GenerateModuleSFC,msg:", request);
             await _generateModuleSFCService.GenerateModuleSFCAsync(request);
         }
 
-        /// <summary>
-        ///进站-电芯和托盘-装盘2
-        /// HY-MES-EQU-025 
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("InboundInSFCContainer")]
-        public async Task InboundInSFCContainerAsync(InboundInSFCContainerDto request)
-        {
-            await _inboundInSFCContainerService.InboundInSFCContainerAsync(request);
-        }
+        ///// <summary>
+        /////进站-电芯和托盘-装盘2
+        ///// HY-MES-EQU-025 
+        ///// </summary>
+        ///// <param name="request"></param>
+        ///// <returns></returns>
+        //[HttpPost]
+        //[Route("InboundInSFCContainer")]
+        //public async Task InboundInSFCContainerAsync(InboundInSFCContainerDto request)
+        //{
+        //    await _inboundInSFCContainerService.InboundInSFCContainerAsync(request);
+        //}
 
 
         /// <summary>
@@ -317,21 +321,22 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [Route("CCDFileUploadComplete")]
         public async Task CCDFileUploadCompleteAsync(CCDFileUploadCompleteDto request)
         {
+            _logger.LogInformation("CCD文件上传完成：CCDFileUploadComplete,msg:", request);
             await _cCDFileUploadCompleteService.CCDFileUploadCompleteAsync(request);
         }
 
-        /// <summary>
-        /// 上报物料消耗
-        ///HY-MES-EQU-027
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("FeedingConsumption")]
-        public async Task FeedingConsumptionAsync(FeedingConsumptionDto request)
-        {
-            await _feedingConsumptionService.FeedingConsumptionAsync(request);
-        }
+        ///// <summary>
+        ///// 上报物料消耗
+        /////HY-MES-EQU-027
+        ///// </summary>
+        ///// <param name="request"></param>
+        ///// <returns></returns>
+        //[HttpPost]
+        //[Route("FeedingConsumption")]
+        //public async Task FeedingConsumptionAsync(FeedingConsumptionDto request)
+        //{
+        //    await _feedingConsumptionService.FeedingConsumptionAsync(request);
+        //}
 
 
         /// <summary>
@@ -344,6 +349,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [Route("SingleBarCodeLoadingVerification")]
         public async Task SingleBarCodeLoadingVerificationAsync(SingleBarCodeLoadingVerificationDto request)
         {
+            _logger.LogInformation("单体条码上料校验：SingleBarCodeLoadingVerification,msg:", request);
             await _singleBarCodeLoadingVerificationService.SingleBarCodeLoadingVerificationAsync(request);
         }
 
@@ -358,6 +364,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [Route("OutPutQty")]
         public async Task OutPutQtyAsync(OutPutQtyDto request)
         {
+            _logger.LogInformation("产出上报数量：OutPutQty,msg:", request);
             await _outPutQtyService.OutPutQtyAsync(request);
         }
 
@@ -372,6 +379,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [Route("QueryContainerBindSfc")]
         public async Task QueryContainerBindSfcAsync(QueryContainerBindSfcDto request)
         {
+            _logger.LogInformation("容器内条码查询：QueryContainerBindSfc,msg:", request);
             await _queryContainerBindSfcService.QueryContainerBindSfcAsync(request);
         }
 

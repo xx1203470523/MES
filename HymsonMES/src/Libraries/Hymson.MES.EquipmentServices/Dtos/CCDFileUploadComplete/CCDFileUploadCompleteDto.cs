@@ -36,7 +36,7 @@ namespace Hymson.MES.EquipmentServices.Dtos.CCDFileUploadComplete
         /// <summary>
         /// 上传完成路径
         /// </summary>
-        public string URI { get; set; } = string.Empty;
+        public string URL { get; set; } = string.Empty;
 
         /// <summary>
         /// 采集完成时间

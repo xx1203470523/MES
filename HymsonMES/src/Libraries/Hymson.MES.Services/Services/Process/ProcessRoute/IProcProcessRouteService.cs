@@ -39,7 +39,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<List<ProcProcessRouteDetailNodeViewDto>> GetNodesByRouteIdAsync(long id);
+        Task<IEnumerable<ProcProcessRouteDetailNodeViewDto>> GetNodesByRouteIdAsync(long id);
 
         /// <summary>
         /// 新增
