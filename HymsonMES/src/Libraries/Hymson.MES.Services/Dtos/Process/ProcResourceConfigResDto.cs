@@ -87,7 +87,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 设置值
         /// </summary>
-        public int? Value { get; set; }
+        public long? Value { get; set; }
 
         /// <summary>
         /// Id
@@ -108,7 +108,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 设置值
         /// </summary>
-        public int? Value { get; set; }
+        public long? Value { get; set; }
 
         /// <summary>
         /// Id
