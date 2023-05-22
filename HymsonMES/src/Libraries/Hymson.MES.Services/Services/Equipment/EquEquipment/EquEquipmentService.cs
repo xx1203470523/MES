@@ -101,7 +101,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             entity.Id = IdGenProvider.Instance.CreateId();
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
-            entity.SiteId = _currentSite.SiteId;
+            entity.SiteId = _currentSite.SiteId ?? 0;
 
             if (entity.QualTime > 0 && entity.EntryDate > SqlDateTime.MinValue.Value) entity.ExpireDate = entity.EntryDate.AddMonths(entity.QualTime);
 
@@ -250,7 +250,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         public async Task<PagedInfo<EquEquipmentListDto>> GetPagedListAsync(EquEquipmentPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<EquEquipmentPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId;
+            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _equEquipmentRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
