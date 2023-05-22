@@ -41,6 +41,7 @@ namespace Hymson.MES.EquipmentServices.Services.SingleBarCodeLoadingVerification
             _manuSfcRepository = manuSfcRepository;
         }
 
+
         /// <summary>
         /// 单体条码上料校验
         /// </summary>
@@ -53,7 +54,7 @@ namespace Hymson.MES.EquipmentServices.Services.SingleBarCodeLoadingVerification
             var manuSfcEntit = await _manuSfcRepository.GetBySFCAsync(new GetBySFCQuery { SFC = singleBarCodeLoadingVerificationDto.SFC, SiteId = _currentEquipment.SiteId });
             if (manuSfcEntit == null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19113)).WithData("SFC", singleBarCodeLoadingVerificationDto.SFC);
+                throw new CustomerValidationException(nameof(ErrorCode.MES19117)).WithData("SFC", singleBarCodeLoadingVerificationDto.SFC);
             }
         }
     }

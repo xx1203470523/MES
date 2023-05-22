@@ -192,7 +192,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<IEnumerable<ManuTraySfcRelationEntity>> GetManuTraySfcRelationByTrayCodeAsync(ManuTraySfcRelationByTrayCodeQuery manuTraySfcRelationByTrayCode)
         {
             var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
+            var template = sqlBuilder.AddTemplate(GetManuTraySfcRelationEntitiesSqlTemplate);
             sqlBuilder.Select("mtsr.*");
             sqlBuilder.InnerJoin(" manu_tray_load mtl ON  mtsr.TrayLoadId=mtl.id");
             sqlBuilder.Where(" mtl.TrayCode=@TrayCode");
@@ -214,7 +214,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `manu_tray_sfc_relation` /**where**/ ";
         const string GetManuTraySfcRelationEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
-                                           FROM `manu_tray_sfc_relation` /**where**/  ";
+                                           FROM `manu_tray_sfc_relation` mtsr /**innerjoin**/ /**leftjoin**/ /**where**/ ";
 
         const string InsertSql = "INSERT INTO `manu_tray_sfc_relation`(  `Id`, `SiteId`, `TrayLoadId`, `Seq`, `SFC`, `LoadQty`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @TrayLoadId, @Seq, @SFC, @LoadQty, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `manu_tray_sfc_relation`(  `Id`, `SiteId`, `TrayLoadId`, `Seq`, `SFC`, `LoadQty`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @TrayLoadId, @Seq, @SFC, @LoadQty, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
