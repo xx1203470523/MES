@@ -24,12 +24,12 @@ namespace Hymson.MES.EquipmentServices.Validators.InBound
             _procResourceRepository = procResourceRepository;
             _currentEquipment = currentEquipment;
             //条码列表不允许为空
-            RuleFor(x => x.SFCs).NotEmpty().Must(list => list.Length <= 0).WithErrorCode(ErrorCode.MES19101);
+            RuleFor(x => x.SFCs).NotEmpty().Must(list => list.Any()).WithErrorCode(ErrorCode.MES19101);
             //每个条码都不允许为空
             RuleFor(x => x.SFCs).Must(list =>
-                list.Where(sfc => string.IsNullOrEmpty(sfc.Trim())).Any()).WithErrorCode(ErrorCode.MES19003);
+                list.Where(sfc => !string.IsNullOrEmpty(sfc.Trim())).Any()).WithErrorCode(ErrorCode.MES19003);
             //条码不允许重复
-            RuleFor(x => x.SFCs).Must(list => list.GroupBy(sfc => sfc.Trim()).Where(c => c.Count() > 1).Any()).WithErrorCode(ErrorCode.MES19007);
+            RuleFor(x => x.SFCs).Must(list => list.GroupBy(sfc => sfc.Trim()).Where(c => c.Count() < 2).Any()).WithErrorCode(ErrorCode.MES19007);
             //资源编码校验
             RuleFor(x => x).MustAsync(async (inBoundMoreDto, cancellation) =>
             {

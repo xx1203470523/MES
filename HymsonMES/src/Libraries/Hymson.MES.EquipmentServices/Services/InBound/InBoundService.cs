@@ -1,23 +1,16 @@
 ﻿using FluentValidation;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.EquipmentServices.Dtos.BindSFC;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
-using Hymson.MES.EquipmentServices.Dtos.OutBound;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Web.Framework.WorkContext;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.EquipmentServices.Services.InBound
 {
@@ -63,7 +56,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             await _validationInBoundDtoRules.ValidateAndThrowAsync(inBoundDto);
             if (inBoundDto == null)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10100));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
             //已经验证过资源是否存在直接使用
             var procResource = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentEquipment.SiteId, Code = inBoundDto.ResourceCode });
@@ -81,11 +74,11 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             await _validationInBoundMoreDtoRules.ValidateAndThrowAsync(inBoundMoreDto);
             if (inBoundMoreDto == null)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10100));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
             if (inBoundMoreDto.SFCs.Length <= 0)
             {
-                throw new ValidationException(nameof(ErrorCode.MES19101));
+                throw new CustomerValidationException(nameof(ErrorCode.MES19101));
             }
             //已经验证过资源是否存在直接使用
             var procResource = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentEquipment.SiteId, Code = inBoundMoreDto.ResourceCode });

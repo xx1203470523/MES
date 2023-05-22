@@ -26,6 +26,8 @@ namespace Hymson.MES.EquipmentServices.Validators.InBound
             _currentEquipment = currentEquipment;
 
             RuleFor(x => x.SFC).NotEmpty().WithErrorCode(nameof(ErrorCode.MES19003));
+            //每个条码都不允许为空
+            RuleFor(x => x.SFC).Must(sfc => !string.IsNullOrEmpty(sfc.Trim())).WithErrorCode(ErrorCode.MES19003);
             RuleFor(x => x).MustAsync(async (inBoundDto, cancellation) =>
             {
                 var query = new ProcResourceQuery
