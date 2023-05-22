@@ -21,7 +21,7 @@ namespace Hymson.MES.EquipmentServices.Validators.BindSFC
             RuleFor(x => x.BindSFCs).NotEmpty().Must(list => list.Length > 0).WithErrorCode(ErrorCode.MES19101);
             //每个条码都不允许为空
             RuleFor(x => x.BindSFCs).Must(list =>
-                list.Where(c => !string.IsNullOrEmpty(c.Trim())).Any()).WithErrorCode(ErrorCode.MES19003);
+                list.Where(c => !string.IsNullOrEmpty(c.Trim())).Any()).WithErrorCode(ErrorCode.MES19120);
             //条码不允许重复
             RuleFor(x => x.BindSFCs).Must(list => list.GroupBy(sfc => sfc.Trim()).Where(sfc => sfc.Count() < 2).Any()).WithErrorCode(ErrorCode.MES19007);
         }
