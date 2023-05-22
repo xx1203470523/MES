@@ -195,6 +195,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuProductParameterRepository, ManuProductParameterRepository>();
             services.AddSingleton<IManuCcdFileRepository, ManuCcdFileRepository>();
             services.AddSingleton<IManuSfcStepNgRepository, ManuSfcStepNgRepository>();
+            services.AddSingleton<IManuOutputBindMaterialRepository, ManuOutputBindMaterialRepository>();
+            services.AddSingleton<IManuOutputNgRepository, ManuOutputNgRepository>();
+            services.AddSingleton<IManuOutputRepository, ManuOutputRepository>();
             #endregion
 
             #region Warehouse 
