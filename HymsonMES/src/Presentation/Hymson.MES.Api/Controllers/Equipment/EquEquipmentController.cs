@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipment;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -40,6 +41,8 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
+        [LogDescription("设备注册", BusinessType.INSERT)]
+        [PermissionDescription("equ:equipment:insert")]
         public async Task CreateAsync(EquEquipmentSaveDto createDto)
         {
             await _equEquipmentService.CreateAsync(createDto);
@@ -51,6 +54,8 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
+        [LogDescription("设备注册", BusinessType.UPDATE)]
+        [PermissionDescription("equ:equipment:update")]
         public async Task ModifyAsync(EquEquipmentSaveDto modifyDto)
         {
             await _equEquipmentService.ModifyAsync(modifyDto);
@@ -62,6 +67,8 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
+        [LogDescription("设备注册", BusinessType.DELETE)]
+        [PermissionDescription("equ:equipment:delete")]
         public async Task DeletesAsync(long[] ids)
         {
             await _equEquipmentService.DeletesAsync(ids);

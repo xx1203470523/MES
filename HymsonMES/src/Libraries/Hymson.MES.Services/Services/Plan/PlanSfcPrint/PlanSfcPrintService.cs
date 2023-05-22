@@ -7,6 +7,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -156,16 +157,31 @@ namespace Hymson.MES.Services.Services.Plan
             var print = await _procPrintConfigRepository.GetByIdAsync(createDto.PrintId);
             if(print==null)
                 throw new CustomerValidationException(nameof(ErrorCode.MES17002));
-            var work = await _planWorkOrderRepository.GetByIdAsync(createDto.WorkOrderId);
+            PlanWorkOrderEntity work;
+            if (createDto.WorkOrderId==0)
+            {
+                work = await _planWorkOrderRepository.GetByCodeAsync(new Data.Repositories.Plan.PlanWorkOrder.Query.PlanWorkOrderQuery()
+                {
+                    OrderCode = createDto.OrderCode,
+                    SiteId = _currentSite.SiteId ?? 123456
+                });
+                
+            }
+            else
+            {
+                work = await _planWorkOrderRepository.GetByIdAsync(createDto.WorkOrderId);
+            }
             var material = await _procMaterialRepository.GetByIdAsync(work.ProductId);
             var ppr = await _procProcedurePrintRelationRepository.GetProcProcedurePrintReleationEntitiesAsync(new ProcProcedurePrintReleationQuery()
             {
                 MaterialId = material.Id,
                 ProcedureId = createDto.ProcedureId,
-                Version = material?.Version??""
+                Version = material?.Version ?? "",
+                SiteId = _currentSite.SiteId??0
+                
             });
             var pprp = ppr.FirstOrDefault();
-            if(pprp!= null)
+            if (pprp!= null)
             {
                 var tl = await _procLabelTemplateRepository.GetByIdAsync(pprp.TemplateId);
                 if (tl != null)
@@ -184,8 +200,8 @@ namespace Hymson.MES.Services.Services.Plan
                             new PrintRequest.ParamEntity()
                             {
                                 ParamName = "SiteId",
-                                ParamValue = _currentSite.SiteId.ToString()
-                            },
+                                ParamValue = (_currentSite.SiteId??123456).ToString()
+                            }
                         }
                     };
                     var result = await _labelPrintRequest.PrintAsync(printEntity);
