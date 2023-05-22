@@ -18,6 +18,9 @@ namespace Hymson.MES.EquipmentServices.Validators.BindContainer
         {
             RuleFor(x => x.ResourceCode).NotEmpty().WithErrorCode(ErrorCode.MES19002);
             RuleFor(x => x.ContainerCode).NotEmpty().WithErrorCode(ErrorCode.MES19102);
+            //每个条码都不允许为空
+            RuleFor(x => x.ContainerSFCs).Must(list =>
+                list.Where(c => !string.IsNullOrEmpty(c.Trim())).Any()).WithErrorCode(ErrorCode.MES19003);
             RuleFor(x => x.ContainerSFCs).NotEmpty().Must(list => list.Length > 0).WithErrorCode(ErrorCode.MES19103);
         }
     }
