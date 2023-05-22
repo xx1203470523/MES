@@ -320,7 +320,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [Route("CCDFileUploadComplete")]
         public async Task CCDFileUploadCompleteAsync(CCDFileUploadCompleteDto request)
         {
-            _logger.LogInformation("CCD文件上传完成：CCDFileUploadComplete,msg:", request);
+            _logger.LogInformation("CCD文件上传完成：CCDFileUploadComplete,msg:", JsonConvert.SerializeObject(request));
             await _cCDFileUploadCompleteService.CCDFileUploadCompleteAsync(request);
         }
 
