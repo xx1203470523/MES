@@ -32,6 +32,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
     /// </summary>
     [Route("EquipmentService/api/v1/EquApi")]
     [ApiController]
+    [AllowAnonymous]
     public class EquipmentController : Controller
     {
         /// <summary>
