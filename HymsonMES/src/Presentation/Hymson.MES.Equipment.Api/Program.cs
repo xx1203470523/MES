@@ -173,7 +173,7 @@ namespace Hymson.MES.Equipment.Api
             //create and sort instances of mapper configurations
             var instances = mapperConfigurations
                 .Select(mapperConfiguration => (IOrderedMapperProfile)Activator.CreateInstance(mapperConfiguration))
-                .OrderBy(mapperConfiguration => mapperConfiguration.Order);
+                .OrderBy(mapperConfiguration => mapperConfiguration?.Order);
 
             //create AutoMapper configuration
             var config = new MapperConfiguration(cfg =>
