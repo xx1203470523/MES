@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
@@ -55,7 +56,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindContainer
             //容器不存在
             if (inteTrayLoad == null)
             {
-                throw new ValidationException(nameof(ErrorCode.MES19104));
+                throw new CustomerValidationException(nameof(ErrorCode.MES19104));
             }
             List<ManuTraySfcRelationEntity> traySfcRelations = new List<ManuTraySfcRelationEntity>();
             List<ManuTraySfcRecordEntity> traySfcRecord = new List<ManuTraySfcRecordEntity>();
@@ -122,13 +123,13 @@ namespace Hymson.MES.EquipmentServices.Services.BindContainer
             //容器不存在
             if (inteTrayLoad == null)
             {
-                throw new ValidationException(nameof(ErrorCode.MES19104));
+                throw new CustomerValidationException(nameof(ErrorCode.MES19104));
             }
             //查找已装载记录
             var trayLoads = await _manuTraySfcRelationRepository.GetByTrayLoadIdAsync(inteTrayLoad.Id);
             if (trayLoads == null)
             {
-                throw new ValidationException(nameof(ErrorCode.MES19105));
+                throw new CustomerValidationException(nameof(ErrorCode.MES19105));
             }
 
             //需要解绑的SFC

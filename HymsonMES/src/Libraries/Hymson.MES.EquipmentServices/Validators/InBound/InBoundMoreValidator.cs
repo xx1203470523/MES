@@ -24,7 +24,7 @@ namespace Hymson.MES.EquipmentServices.Validators.InBound
             _procResourceRepository = procResourceRepository;
             _currentEquipment = currentEquipment;
             //条码列表不允许为空
-            RuleFor(x => x.SFCs).NotEmpty().Must(list => list.Length <= 0).WithErrorCode(ErrorCode.MES19101);
+            RuleFor(x => x.SFCs).NotEmpty().Must(list => list.Length > 0).WithErrorCode(ErrorCode.MES19101);
             //每个条码都不允许为空
             RuleFor(x => x.SFCs).Must(list =>
                 list.Where(sfc => string.IsNullOrEmpty(sfc.Trim())).Any()).WithErrorCode(ErrorCode.MES19003);

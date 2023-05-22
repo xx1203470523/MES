@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums.Manufacture;
@@ -100,7 +101,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
             if (!bindSfcs.Any())
             {
                 //不需要解绑
-                throw new ValidationException(nameof(ErrorCode.MES19106));
+                throw new CustomerValidationException(nameof(ErrorCode.MES19106));
             }
 
             //需要解绑的SFC

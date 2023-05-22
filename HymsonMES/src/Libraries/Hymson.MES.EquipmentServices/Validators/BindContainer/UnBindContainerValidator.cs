@@ -18,7 +18,7 @@ namespace Hymson.MES.EquipmentServices.Validators.BindContainer
         {
             RuleFor(x => x.ResourceCode).NotEmpty().WithErrorCode(ErrorCode.MES19002);
             RuleFor(x => x.ContainerCode).NotEmpty().WithErrorCode(ErrorCode.MES19102);
-            RuleFor(x => x.ContainerSFCs).NotEmpty().Must(list => list.Length <= 0).WithErrorCode(ErrorCode.MES19103);
+            RuleFor(x => x.ContainerSFCs).NotEmpty().Must(list => list.Length > 0).WithErrorCode(ErrorCode.MES19103);
         }
     }
 }

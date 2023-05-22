@@ -76,7 +76,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             await _validationOutBoundDtoRules.ValidateAndThrowAsync(outBoundDto);
             if (outBoundDto == null)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10100));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
             //已经验证过资源是否存在直接使用
             var procResource = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentEquipment.SiteId, Code = outBoundDto.ResourceCode });
@@ -120,11 +120,11 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             await _validationOutBoundMoreDtoRules.ValidateAndThrowAsync(outBoundMoreDto);
             if (outBoundMoreDto == null)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10100));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
             if (outBoundMoreDto.SFCs.Length <= 0)
             {
-                throw new ValidationException(nameof(ErrorCode.MES19101));
+                throw new CustomerValidationException(nameof(ErrorCode.MES19101));
             }
             //已经验证过资源是否存在直接使用
             var procResource = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentEquipment.SiteId, Code = outBoundMoreDto.ResourceCode });
