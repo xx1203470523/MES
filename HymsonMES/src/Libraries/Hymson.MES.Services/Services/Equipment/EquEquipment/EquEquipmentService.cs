@@ -429,7 +429,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         {
             return (await _equEquipmentRepository.GetByEquipmentCodeAsync(new EntityByCodeQuery
             {
-                Site = _currentSite.SiteId,
+                Site = _currentSite.SiteId ?? 0,
                 Code = equipmentCode.ToUpper()
             })).ToModel<EquEquipmentDto>();
         }
