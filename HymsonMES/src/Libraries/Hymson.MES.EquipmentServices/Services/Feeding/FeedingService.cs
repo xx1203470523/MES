@@ -152,6 +152,11 @@ namespace Hymson.MES.EquipmentServices.Services.Feeding
                 Code = request.SFC
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES15503)).WithData("Code", request.SFC);
 
+            if (entity.ResourceId != resourceEntity.Id)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19008));
+            }
+
             entity.UpdatedBy = _currentEquipment.Code;
             entity.UpdatedOn = nowTime;
 
