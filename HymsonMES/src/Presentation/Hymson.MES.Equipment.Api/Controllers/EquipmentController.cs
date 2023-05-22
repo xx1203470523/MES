@@ -216,7 +216,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
 
 
         /// <summary>
-        /// 条码绑定
+        /// 容器绑定
         /// HY-MES-EQU-019
         /// </summary>
         /// <param name="request"></param>
