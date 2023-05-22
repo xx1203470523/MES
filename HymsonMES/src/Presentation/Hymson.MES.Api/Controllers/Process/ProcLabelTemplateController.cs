@@ -100,6 +100,14 @@ namespace Hymson.MES.Api.Controllers.Process
             //long[] idsArr = StringExtension.SpitLongArrary(ids);
             await _procLabelTemplateService.DeletesProcLabelTemplateAsync(deleteDto.Ids);
         }
+        [HttpGet]
+        [Route("preview/{content}")]
+        public async Task<PreviewImageDataDto> PreviewProcLabelTemplateAsync(string content)
+        {
+            //long[] idsArr = StringExtension.SpitLongArrary(ids);
+            var foo = await _procLabelTemplateService.PreviewProcLabelTemplateAsync(content);
+            return new PreviewImageDataDto() { base64Str = foo.base64Str, result = foo.result };    
+        }
         ///// <summary>
         ///// 下载模板文件
         ///// </summary>
@@ -108,8 +116,8 @@ namespace Hymson.MES.Api.Controllers.Process
         //[Route("downloadFile")]
         //public void downloadFile(string url)
         //{
-            
+
         //}
 
-}
+    }
 }
