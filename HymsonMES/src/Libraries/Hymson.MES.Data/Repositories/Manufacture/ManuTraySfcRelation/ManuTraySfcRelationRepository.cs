@@ -85,7 +85,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
-        /// 根据trayLoadId 获取转载记录
+        /// 根据trayLoadId 获取装载记录
         /// </summary>
         /// <param name="trayLoadId"></param>
         /// <returns></returns>
@@ -93,6 +93,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuTraySfcRelationEntity>(GetByTrayLoadIdSql, new { TrayLoadId = trayLoadId });
+        }
+
+
+
+        /// <summary>
+        /// 根据trayLoadId 和SFC获取装载记录
+        /// </summary>
+        /// <param name="trayLoadId"></param>
+        /// <param name="sfcs"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuTraySfcRelationEntity>> GetByTrayLoadSFCAsync(long trayLoadId, string[] sfcs)
+        {
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuTraySfcRelationEntity>(GetByTrayLoadSFCSql, new { TrayLoadId = trayLoadId, SFCs = sfcs });
         }
 
         /// <summary>
@@ -235,6 +250,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByTrayLoadIdSql = @"SELECT 
                                `Id`, `SiteId`, `TrayLoadId`, `Seq`, `SFC`, `LoadQty`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_tray_sfc_relation`  WHERE TrayLoadId = @TrayLoadId ";
+
+        const string GetByTrayLoadSFCSql = @"SELECT 
+                               `Id`, `SiteId`, `TrayLoadId`, `Seq`, `SFC`, `LoadQty`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `manu_tray_sfc_relation`  WHERE TrayLoadId = @TrayLoadId AND SFC IN @SFCs ";
 
         const string DeleteTruesSql = @"Delete FROM `manu_tray_sfc_relation`  WHERE Id IN @Ids ";
         #endregion

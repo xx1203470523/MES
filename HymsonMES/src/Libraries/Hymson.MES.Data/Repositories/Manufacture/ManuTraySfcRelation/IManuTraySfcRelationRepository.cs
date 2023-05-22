@@ -88,6 +88,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<IEnumerable<ManuTraySfcRelationEntity>> GetByTrayLoadIdAsync(long trayLoadId);
 
+
+        /// <summary>
+        ///  根据TrayLoadIdD和SFC获取数据
+        /// </summary>
+        /// <param name="trayLoadId"></param>
+        /// <param name="sfcs"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuTraySfcRelationEntity>> GetByTrayLoadSFCAsync(long trayLoadId, string[] sfcs);
+
         /// <summary>
         /// 获取List
         /// </summary>
