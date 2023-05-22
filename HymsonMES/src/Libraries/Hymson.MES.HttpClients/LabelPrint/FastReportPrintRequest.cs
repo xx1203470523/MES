@@ -1,7 +1,10 @@
 ﻿using Hymson.MES.HttpClients.Requests.Print;
+
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 
 namespace Hymson.MES.HttpClients
 {
@@ -25,9 +28,25 @@ namespace Hymson.MES.HttpClients
             {
                 using var contentStream =
                     await httpResponseMessage.Content.ReadAsStreamAsync();
+               
+                try
+                {
 
-                return await JsonSerializer.DeserializeAsync
-                    <(string base64Str, bool result)>(contentStream);
+                    var r = await System.Text.Json.JsonSerializer.DeserializeAsync
+                    <PrintResponse>(contentStream);
+                    return (base64Str: r.Data, result: r.Success);
+                   
+                    
+                   // dynamic dynParam = JsonConvert.DeserializeObject(Convert.ToString(r));
+                   // return (base64Str: dynParam.Item1,result: dynParam.Item2);
+                   
+                }
+                catch (Exception)
+                {
+                   
+                    throw;
+                }
+                
             }
             return ("调用失败",false);
         }
@@ -42,8 +61,9 @@ namespace Hymson.MES.HttpClients
                 using var contentStream =
                     await httpResponseMessage.Content.ReadAsStreamAsync();
 
-                return await JsonSerializer.DeserializeAsync
-                    <(string msg, bool result)>(contentStream);
+                var r = await System.Text.Json.JsonSerializer.DeserializeAsync
+                    <PrintResponse>(contentStream);
+                return (msg: r.Message, result: r.Success);
             }
             return ("调用失败", false);
         }

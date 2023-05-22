@@ -77,6 +77,11 @@ namespace Hymson.MES.Services.Dtos.Process
 
        
     }
+    public record PreviewImageDataDto : BaseEntityDto
+    {
+        public string base64Str { get; set; }
+        public bool result { get; set; }
+    }
 
 
     /// <summary>
