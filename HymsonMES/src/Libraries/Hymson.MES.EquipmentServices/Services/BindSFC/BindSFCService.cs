@@ -7,6 +7,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.EquipmentServices.Dtos.BindContainer;
 using Hymson.MES.EquipmentServices.Dtos.BindSFC;
+using Hymson.MES.EquipmentServices.Dtos.GenerateModuleSFC;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -46,6 +47,13 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
             await _validationBindDtoRules.ValidateAndThrowAsync(bindSFCDto);
             List<ManuSfcBindEntity> sfcBindList = new();
             List<ManuSfcBindRecordEntity> sfcBindRecordList = new();
+            var existsBindSfc = await _manuSfcBindRepository.GetByBindSFCAsync(bindSFCDto.SFC, bindSFCDto.BindSFCs);
+            if (existsBindSfc.Any())
+            {
+                var bindSfcs = string.Join(",", existsBindSfc.Select(c => c.BindSFC));
+                throw new CustomerValidationException(nameof(ErrorCode.MES19121)).WithData("SFC", bindSFCDto.SFC).WithData("BindSFC", bindSfcs);
+            }
+
             foreach (var item in bindSFCDto.BindSFCs)
             {
                 sfcBindList.Add(new ManuSfcBindEntity

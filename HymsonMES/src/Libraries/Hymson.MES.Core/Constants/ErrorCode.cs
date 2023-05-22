@@ -780,6 +780,7 @@
         public const string MES19118 = "产品编码：{Code}不存在";
         public const string MES19119 = "绑定条码列表不能为空";
         public const string MES19120 = "解绑条码列表不能为空";
+        public const string MES19121 = "绑定条码:{SFC}和BindSFC:{BindSFC}绑定关系已经存在";
 
 
 
