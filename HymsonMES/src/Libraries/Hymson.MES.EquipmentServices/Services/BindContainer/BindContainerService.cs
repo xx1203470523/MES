@@ -136,7 +136,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindContainer
             }
             //查找已装载记录
             var trayLoads = await _manuTraySfcRelationRepository.GetByTrayLoadIdAsync(inteTrayLoad.Id);
-            if (trayLoads == null)
+            if (!trayLoads.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19105));
             }
