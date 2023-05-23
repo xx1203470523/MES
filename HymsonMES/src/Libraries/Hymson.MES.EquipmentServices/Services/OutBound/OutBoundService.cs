@@ -86,7 +86,15 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 EquipmentCode = _currentEquipment.Code,
                 ResourceCode = outBoundDto.ResourceCode,
                 LocalTime = outBoundDto.LocalTime,
-                SFCs = new OutBoundDto[] { outBoundDto }
+                SFCs = new OutBoundSFCDto[] {
+                    new OutBoundSFCDto{
+                        SFC=outBoundDto.SFC,
+                        BindFeedingCodes= outBoundDto.BindFeedingCodes,
+                        NG=outBoundDto.NG,
+                        ParamList=outBoundDto.ParamList,
+                        Passed = outBoundDto.Passed
+                    }
+                }
             };
             //条码步骤
             List<ManuSfcStepEntity> manuSfcStepEntitys = PrepareSetpEntity(outBoundMoreDto, procResource.Id);
@@ -231,7 +239,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                              CreatedOn = HymsonClock.Now(),
                              UpdatedOn = HymsonClock.Now(),
                              EquipmentId = _currentEquipment.Id ?? 0,
-                             LocalTime = outBoundDto.LocalTime,
+                             LocalTime = outBoundMoreDto.LocalTime,
                              SFC = outBoundDto.SFC,
                              ResourceId = procResourceId,
                              ParameterId = procParameter.Where(c => c.ParameterCode.Equals(s.ParamCode)).First().Id,
