@@ -108,7 +108,7 @@ namespace Hymson.MES.EquipmentServices.Services.CCDFileUploadComplete
 
             }
             //入库
-            var trans = TransactionHelper.GetTransactionScope();
+            using var trans = TransactionHelper.GetTransactionScope();
             if (updateList != null && updateList.Any())
             {
                 var res = await _manuCcdFileRepository.UpdatesAsync(updateList);
