@@ -3,6 +3,7 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
@@ -218,7 +219,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             var manuFeedingsDictionary = allFeedingEntities.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
 
             // 过滤扣料集合
-            //List<>
+            List<UpdateQtyByProductIdCommand> updates = new();
+            List<ManuSfcCirculationEntity> adds = new();
             foreach (var materialBo in initialMaterials)
             {
                 var materialEntity = materialEntities.FirstOrDefault(f => f.Id == materialBo.MaterialId);
@@ -234,7 +236,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 if (materialBo.DataCollectionWay == MaterialSerialNumberEnum.Batch)
                 {
                     // 进行扣料
-                    await GetUpdateDeductQtyCommandAsync(sfcProduceEntity, materialBo, feedingEntities);
+                    DeductMaterialQty(ref updates, ref adds, materialBo, sfcProduceEntity, feedingEntities);
                     continue;
                 }
 
@@ -242,8 +244,20 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 if (materialEntity.SerialNumber != MaterialSerialNumberEnum.Batch) continue;
 
                 // 进行扣料
-                await GetUpdateDeductQtyCommandAsync(sfcProduceEntity, materialBo, feedingEntities);
+                DeductMaterialQty(ref updates, ref adds, materialBo, sfcProduceEntity, feedingEntities);
             }
+
+            // manu_sfc_info 修改为完成 且入库
+            // 条码信息
+            var sfcInfo = await _manuSfcRepository.GetBySFCAsync(new GetBySFCQuery
+            {
+                SiteId = _currentSite.SiteId,
+                SFC = sfcProduceEntity.SFC
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES17102)).WithData("SFC", sfcProduceEntity.SFC);
+
+            // 读取产品基础信息
+            var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(sfcProduceEntity.ProductId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES17103));
 
             // 更新数据
             using var trans = TransactionHelper.GetTransactionScope();
@@ -251,6 +265,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             // 完工
             if (nextProcedure == null)
             {
+                // 更新物料库存
+                if (updates.Any() == true) rows += await _manuFeedingRepository.UpdateQtyByProductIdAsync(updates);
+
+                // 添加流转记录
+                if (adds.Any() == true) rows += await _manuSfcCirculationRepository.InsertRangeAsync(adds);
+
                 // 删除 manu_sfc_produce
                 rows += await _manuSfcProduceRepository.DeletePhysicalAsync(new DeletePhysicalBySfcCommand()
                 {
@@ -262,10 +282,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 sfcStep.Operatetype = ManuSfcStepTypeEnum.OutStock;    // TODO 这里的状态？？
                 sfcStep.CurrentStatus = SfcProduceStatusEnum.Complete;  // TODO 这里的状态？？
                 rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
-
-                // manu_sfc_info 修改为完成 且入库
-                // 条码信息
-                var sfcInfo = await _manuSfcRepository.GetBySFCAsync(new GetBySFCQuery { SFC = sfcProduceEntity.SFC, SiteId = _currentSite.SiteId });
 
                 // 删除 manu_sfc_produce_business
                 rows += await _manuSfcProduceRepository.DeleteSfcProduceBusinessBySfcInfoIdAsync(new DeleteSfcProduceBusinesssBySfcInfoIdCommand
@@ -298,7 +314,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 });
 
                 // 入库
-                rows += await SaveToWarehouseAsync(sfcProduceEntity);
+                rows += await SaveToWarehouseAsync(sfcProduceEntity, procMaterialEntity);
             }
             // 未完工
             else
@@ -349,6 +365,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             // 出站
             return await OutStationAsync(sfcProduceEntity);
         }
+
 
         /// <summary>
         /// 获取即将扣料的物料数据
@@ -421,83 +438,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         }
 
         /// <summary>
-        /// 进行扣料（单一物料）
-        /// </summary>
-        /// <param name="sfcProduceEntity"></param>
-        /// <param name="material"></param>
-        /// <param name="feedingEntities"></param>
-        /// <returns></returns>
-        private async Task<int> GetUpdateDeductQtyCommandAsync(ManuSfcProduceEntity sfcProduceEntity, MaterialDeductBo material, IEnumerable<ManuFeedingEntity> feedingEntities)
-        {
-            // 待执行
-            List<UpdateQtyByProductIdCommand> updateQtyByProductIdCommands = new();
-            List<ManuSfcCirculationEntity> manuSfcCirculationEntities = new();
-
-            // 需扣减数量 = 用量 * 损耗 * 消耗系数
-            decimal qty = material.Usages * (material.Loss ?? 0) * material.ConsumeRatio;
-
-            // 剩余需扣减的数量
-            var residue = qty;
-            foreach (var item in feedingEntities)
-            {
-                // 数量足够
-                if (residue < item.Qty)
-                {
-                    residue -= item.Qty;
-                    item.Qty -= qty;
-
-                    // 添加到扣减物料库存
-                    updateQtyByProductIdCommands.Add(new UpdateQtyByProductIdCommand
-                    {
-                        UpdatedBy = sfcProduceEntity.UpdatedBy ?? _currentUser.UserName,
-                        UpdatedOn = sfcProduceEntity.UpdatedOn,
-                        ResourceId = sfcProduceEntity.ResourceId,
-                        ProductId = material.MaterialId,
-                        Qty = item.Qty
-                    });
-
-                    // 条码流转
-                    /*
-                    manuSfcCirculationEntities.Add(new ManuSfcCirculationEntity
-                    {
-
-                    });
-                    */
-                    break;
-                }
-                // 数量不够
-                else
-                {
-                    residue -= item.Qty;
-
-                    // 继续下一个
-                    item.Qty = 0;
-                }
-            }
-
-            // 物料库存不够，启用替代料
-            if (residue > 0)
-            {
-                // TODO
-            }
-
-            // 扣减物料库存
-            _ = await _manuFeedingRepository.UpdateQtyByProductIdAsync(updateQtyByProductIdCommands);
-
-            return 0;
-        }
-
-        /// <summary>
         /// 入库
         /// </summary>
         /// <param name="manuSfcProduceEntity"></param>
+        /// <param name="procMaterialEntity"></param>
         /// <returns></returns>
-        private async Task<int> SaveToWarehouseAsync(ManuSfcProduceEntity manuSfcProduceEntity)
+        private async Task<int> SaveToWarehouseAsync(ManuSfcProduceEntity manuSfcProduceEntity, ProcMaterialEntity procMaterialEntity)
         {
             var rows = 0;
-
-            var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(manuSfcProduceEntity.ProductId)
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES15101));
 
             // 新增 wh_material_inventory
             rows += await _whMaterialInventoryRepository.InsertAsync(new WhMaterialInventoryEntity
@@ -539,6 +487,73 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
 
             return rows;
         }
+
+
+        /// <summary>
+        /// 进行扣料（单一物料）
+        /// </summary>
+        /// <param name="updates"></param>
+        /// <param name="adds"></param>
+        /// <param name="materialBo"></param>
+        /// <param name="sfcProduceEntity"></param>
+        /// <param name="feedingEntities"></param>
+        private static void DeductMaterialQty(ref List<UpdateQtyByProductIdCommand> updates,
+            ref List<ManuSfcCirculationEntity> adds,
+            MaterialDeductBo materialBo,
+            ManuSfcProduceEntity sfcProduceEntity,
+            IEnumerable<ManuFeedingEntity> feedingEntities)
+        {
+            // Dictionary<long, IGrouping<long, ManuFeedingEntity>>
+
+            // 需扣减数量 = 用量 * 损耗 * 消耗系数
+            decimal qty = materialBo.Usages * (materialBo.Loss ?? 0) * materialBo.ConsumeRatio;
+
+            // 剩余需扣减的数量
+            var residue = qty;
+            foreach (var item in feedingEntities)
+            {
+                // 数量足够
+                if (residue < item.Qty)
+                {
+                    residue -= item.Qty;
+                    item.Qty -= qty;
+
+                    // 添加到扣减物料库存
+                    updates.Add(new UpdateQtyByProductIdCommand
+                    {
+                        UpdatedBy = sfcProduceEntity.UpdatedBy ?? sfcProduceEntity.CreatedBy,
+                        UpdatedOn = sfcProduceEntity.UpdatedOn,
+                        ResourceId = sfcProduceEntity.ResourceId,
+                        ProductId = materialBo.MaterialId,
+                        Qty = item.Qty
+                    });
+
+                    // 条码流转
+                    /*
+                    manuSfcCirculationEntities.Add(new ManuSfcCirculationEntity
+                    {
+
+                    });
+                    */
+                    break;
+                }
+                // 数量不够
+                else
+                {
+                    residue -= item.Qty;
+
+                    // 继续下一个
+                    item.Qty = 0;
+                }
+            }
+
+            // 物料库存不够，启用替代料
+            if (residue > 0)
+            {
+                // TODO
+            }
+        }
+
 
     }
 }
