@@ -23,7 +23,6 @@ using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Minio.DataModel;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOutStation
 {
@@ -529,35 +528,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 {
                     residue -= feeding.Qty;
                     feeding.Qty -= qty;
-
-                    // 添加到扣减物料库存
-                    updates.Add(new UpdateQtyByProductIdCommand
-                    {
-                        UpdatedBy = sfcProduceEntity.UpdatedBy ?? sfcProduceEntity.CreatedBy,
-                        UpdatedOn = sfcProduceEntity.UpdatedOn,
-                        ResourceId = sfcProduceEntity.ResourceId,
-                        ProductId = currentBo.MaterialId,
-                        Qty = feeding.Qty
-                    });
-
-                    // 条码流转
-                    adds.Add(new ManuSfcCirculationEntity
-                    {
-                        Id = IdGenProvider.Instance.CreateId(),
-                        SiteId = sfcProduceEntity.SiteId,
-                        ProcedureId = sfcProduceEntity.ProcedureId,
-                        ResourceId = sfcProduceEntity.ResourceId,
-                        SFC = sfcProduceEntity.SFC,
-                        WorkOrderId = sfcProduceEntity.WorkOrderId,
-                        ProductId = sfcProduceEntity.ProductId,
-                        CirculationBarCode = feeding.BarCode,
-                        CirculationProductId = currentBo.MaterialId,
-                        CirculationMainProductId = mainMaterialBo.MaterialId,
-                        CirculationQty = feeding.Qty,
-                        CirculationType = SfcCirculationTypeEnum.ModuleAdd,
-                        CreatedBy = sfcProduceEntity.CreatedBy,
-                        UpdatedBy = sfcProduceEntity.UpdatedBy
-                    });
                 }
                 // 数量不够
                 else
@@ -567,6 +537,35 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                     // 继续下一个
                     feeding.Qty = 0;
                 }
+
+                // 添加到扣减物料库存
+                updates.Add(new UpdateQtyByProductIdCommand
+                {
+                    UpdatedBy = sfcProduceEntity.UpdatedBy ?? sfcProduceEntity.CreatedBy,
+                    UpdatedOn = sfcProduceEntity.UpdatedOn,
+                    ResourceId = sfcProduceEntity.ResourceId,
+                    ProductId = currentBo.MaterialId,
+                    Qty = feeding.Qty
+                });
+
+                // 条码流转
+                adds.Add(new ManuSfcCirculationEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = sfcProduceEntity.SiteId,
+                    ProcedureId = sfcProduceEntity.ProcedureId,
+                    ResourceId = sfcProduceEntity.ResourceId,
+                    SFC = sfcProduceEntity.SFC,
+                    WorkOrderId = sfcProduceEntity.WorkOrderId,
+                    ProductId = sfcProduceEntity.ProductId,
+                    CirculationBarCode = feeding.BarCode,
+                    CirculationProductId = currentBo.MaterialId,
+                    CirculationMainProductId = mainMaterialBo.MaterialId,
+                    CirculationQty = feeding.Qty,
+                    CirculationType = SfcCirculationTypeEnum.ModuleAdd,
+                    CreatedBy = sfcProduceEntity.CreatedBy,
+                    UpdatedBy = sfcProduceEntity.UpdatedBy
+                });
             }
 
             // 主物料才扣除检索下级替代料，当还有剩余未扣除的数量时，扣除替代料（替代料不再递归扣除下级替代料库存）
