@@ -95,5 +95,10 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public DateTime Timestamp { get; set; }
 
+        /// <summary>
+        /// 步骤表ID
+        /// </summary>
+        public long? StepId { get; set; }
+
     }
 }

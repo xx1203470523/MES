@@ -99,7 +99,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             //条码步骤
             List<ManuSfcStepEntity> manuSfcStepEntitys = PrepareSetpEntity(outBoundMoreDto, procResource.Id);
             //标准参数
-            List<ManuProductParameterEntity> manuProductParameterEntities = await PrepareProductParameterEntity(outBoundMoreDto, procResource.Id);
+            List<ManuProductParameterEntity> manuProductParameterEntities = await PrepareProductParameterEntity(outBoundMoreDto, manuSfcStepEntitys, procResource.Id);
             //NG
             List<ManuSfcStepNgEntity> manuProductNGEntities = await PrepareProductNgEntity(outBoundMoreDto, manuSfcStepEntitys);
 
@@ -139,7 +139,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             //条码步骤
             List<ManuSfcStepEntity> manuSfcStepEntitys = PrepareSetpEntity(outBoundMoreDto, procResource.Id);
             //标准参数
-            List<ManuProductParameterEntity> manuProductParameterEntities = await PrepareProductParameterEntity(outBoundMoreDto, procResource.Id);
+            List<ManuProductParameterEntity> manuProductParameterEntities = await PrepareProductParameterEntity(outBoundMoreDto, manuSfcStepEntitys, procResource.Id);
             //NG
             List<ManuSfcStepNgEntity> manuProductNGEntities = await PrepareProductNgEntity(outBoundMoreDto, manuSfcStepEntitys);
 
@@ -193,9 +193,10 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
         /// 组装参数信息
         /// </summary>
         /// <param name="outBoundMoreDto"></param>
+        /// <param name="manuSfcStepEntities"></param>
         /// <param name="procResourceId"></param>
         /// <returns></returns>
-        private async Task<List<ManuProductParameterEntity>> PrepareProductParameterEntity(OutBoundMoreDto outBoundMoreDto, long procResourceId)
+        private async Task<List<ManuProductParameterEntity>> PrepareProductParameterEntity(OutBoundMoreDto outBoundMoreDto, List<ManuSfcStepEntity> manuSfcStepEntities, long procResourceId)
         {
             List<ManuProductParameterEntity> manuProductParameterEntities = new();
             //所有参数
@@ -230,11 +231,13 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             {
                 if (outBoundDto.ParamList != null)
                 {
+                    var stepId = manuSfcStepEntities.Where(c => c.SFC == outBoundDto.SFC).First().Id;
                     var paramList = outBoundDto.ParamList.Select(s =>
                          new ManuProductParameterEntity
                          {
                              Id = IdGenProvider.Instance.CreateId(),
                              SiteId = _currentEquipment.SiteId,
+                             StepId = stepId,//记录步骤ID
                              CreatedBy = _currentEquipment.Code,
                              UpdatedBy = _currentEquipment.Code,
                              CreatedOn = HymsonClock.Now(),
