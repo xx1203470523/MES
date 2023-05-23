@@ -96,5 +96,10 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 备注
         /// </summary>
         public string Remark { get; set; }
+
+        /// <summary>
+        /// 是否过站
+        /// </summary>
+        public bool? IsPassingStation { get; set; }
     }
 }

@@ -180,10 +180,11 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                     ResourceId = procResourceId,
                     CurrentStatus = SfcProduceStatusEnum.Activity,
                     Operatetype = ManuSfcStepTypeEnum.OutStock,
-                    CreatedBy = _currentEquipment.Name,
+                    CreatedBy = _currentEquipment.Code,
                     CreatedOn = HymsonClock.Now(),
-                    UpdatedBy = _currentEquipment.Name,
-                    UpdatedOn = HymsonClock.Now()
+                    UpdatedBy = _currentEquipment.Code,
+                    UpdatedOn = HymsonClock.Now(),
+                    IsPassingStation = item.IsPassingStation
                 });
             }
             return manuSfcStepEntities;
