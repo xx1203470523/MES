@@ -99,6 +99,17 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 根据IDs批量获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcMaterialEntity>> GetByIdsAsync(IEnumerable<long> ids)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcMaterialEntity>(GetByIdsSql, new { ids });
+        }
+
+        /// <summary>
         /// 根据物料组ID查询物料
         /// </summary>
         /// <param name="groupIds"></param>
@@ -151,7 +162,7 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 sqlBuilder.Where(" Origin = @Origin ");
             }
-            if (procMaterialPagedQuery.BuyTypes != null&& procMaterialPagedQuery.BuyTypes.Length>0)
+            if (procMaterialPagedQuery.BuyTypes != null && procMaterialPagedQuery.BuyTypes.Length > 0)
             {
                 sqlBuilder.Where(" BuyType IN @BuyTypes ");
             }
