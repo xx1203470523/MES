@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hymson.MES.Core.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -31,7 +32,7 @@ namespace Hymson.MES.EquipmentServices.Dtos.CCDFileUploadComplete
         /// <summary>
         /// 是否合格
         /// </summary>
-        public int Passed { get; set; } = 1;
+        public TrueOrFalseEnum Passed { get; set; } = TrueOrFalseEnum.Yes;
 
         /// <summary>
         /// 上传完成路径

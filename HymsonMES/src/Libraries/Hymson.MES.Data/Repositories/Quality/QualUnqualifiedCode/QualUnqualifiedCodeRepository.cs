@@ -251,6 +251,6 @@ namespace Hymson.MES.Data.Repositories.Quality
 
         const string GetByCodesSql = @"SELECT 
                                Id, SiteId, UnqualifiedCode, UnqualifiedCodeName, Status, Type, Degree, ProcessRouteId, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted
-                            FROM `qual_unqualified_code`  WHERE UnqualifiedCode IN @Code  AND SiteId=@Site AND IsDeleted=0 ";
+                            FROM `qual_unqualified_code`  WHERE UnqualifiedCode IN @Codes  AND SiteId=@Site AND IsDeleted=0 ";
     }
 }

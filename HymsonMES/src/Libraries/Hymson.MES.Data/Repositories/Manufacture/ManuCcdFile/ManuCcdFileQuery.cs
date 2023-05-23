@@ -13,5 +13,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public class ManuCcdFileQuery
     {
+        /// <summary>
+        /// 站点
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public IEnumerable<string> Sfcs { get; set; }
     }
 }

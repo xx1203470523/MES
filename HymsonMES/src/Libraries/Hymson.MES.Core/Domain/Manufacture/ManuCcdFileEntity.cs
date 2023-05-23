@@ -6,6 +6,7 @@
  *build datetime: 2023-05-17 11:09:19
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Manufacture
 {
@@ -30,12 +31,12 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 是否合格;空认为合格 1合格，0不合格
         /// </summary>
-        public int Passed { get; set; }
+        public TrueOrFalseEnum Passed { get; set; }
 
         /// <summary>
         /// 上传完成路径
         /// </summary>
-        public string URI { get; set; }
+        public string URL { get; set; }
 
         /// <summary>
         /// 采集完成时间

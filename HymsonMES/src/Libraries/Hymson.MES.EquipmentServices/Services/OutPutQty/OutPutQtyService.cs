@@ -82,6 +82,10 @@ namespace Hymson.MES.EquipmentServices.Services.OutPutQty
             await _validationOutPutQtyDtoRules.ValidateAndThrowAsync(outPutQtyDto);
 
             var procResource = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentEquipment.SiteId, Code = outPutQtyDto.ResourceCode });
+            if (procResource == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19006));
+            }
             await _manuOutputRepository.InsertAsync(new ManuOutputEntity
             {
                 EquipmentId = _currentEquipment.Id ?? 0,
@@ -115,7 +119,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutPutQty
             //绑定物料
             bindMaterialList = await BindMaterialListAsync(outPutQtyDto, procResource.Id);
 
-            var trans = TransactionHelper.GetTransactionScope();
+            using var trans = TransactionHelper.GetTransactionScope();
             if (ngList != null && ngList.Any())
             {
                 await _manuOutputNgRepository.InsertsAsync(ngList);
@@ -146,6 +150,10 @@ namespace Hymson.MES.EquipmentServices.Services.OutPutQty
                 Codes = ngCodeArray
             };
             var qualUnqualifiedCodes = await _qualUnqualifiedCodeRepository.GetByCodesAsync(codesQuery);
+            if (qualUnqualifiedCodes == null || !qualUnqualifiedCodes.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19114)).WithData("Code", string.Join(',', ngCodeArray));
+            }
             //如果有不存在的参数编码就提示
             var noIncludeCodes = ngCodeArray.Where(w => qualUnqualifiedCodes.Select(s => s.UnqualifiedCode).Contains(w) == false);
             if (noIncludeCodes.Any() == true)
@@ -196,6 +204,10 @@ namespace Hymson.MES.EquipmentServices.Services.OutPutQty
                 Codes = paramCodeArray
             };
             var procParameter = await _procParameterRepository.GetByCodesAsync(codesQuery);
+            if (procParameter == null || !procParameter.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19108)).WithData("Code", string.Join(',', paramCodeArray));
+            }
             //如果有不存在的参数编码就提示
             var noIncludeCodes = paramCodeArray.Where(w => procParameter.Select(s => s.ParameterCode).Contains(w) == false);
             if (noIncludeCodes.Any() == true)

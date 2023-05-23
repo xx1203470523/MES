@@ -282,7 +282,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuMainstreamProcess.Gen
         /// </summary>
         /// <param name="year"></param>
         /// <returns></returns>
-        private string GetYY(int year)
+        private static string GetYY(int year)
         {
             var dic = new Dictionary<string, int>
             {
@@ -294,7 +294,12 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuMainstreamProcess.Gen
                 { "F", 2026 },
                 { "G", 2027 },
                 { "H", 2028 },
-                { "I", 2029 }
+                { "I", 2029 },
+                { "G", 2030 },
+                { "K", 2031 },
+                { "L", 2032 },
+                { "M", 2033 },
+                { "N", 2034 },
             };
             return dic.Where(it => it.Value == year).FirstOrDefault().Key;
         }
@@ -303,7 +308,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuMainstreamProcess.Gen
         /// </summary>
         /// <param name="month"></param>
         /// <returns></returns>
-        private string GetMonth(int month)
+        private static string GetMonth(int month)
         {
             if (month < 10)
             {
@@ -324,7 +329,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuMainstreamProcess.Gen
         /// </summary>
         /// <param name="day"></param>
         /// <returns></returns>
-        private string GetDay(int day)
+        private static string GetDay(int day)
         {
             if (day < 10)
             {

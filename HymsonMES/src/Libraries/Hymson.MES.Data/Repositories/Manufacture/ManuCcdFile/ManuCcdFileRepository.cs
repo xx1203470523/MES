@@ -19,10 +19,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// <summary>
     /// CCD文件仓储
     /// </summary>
-    public partial class ManuCcdFileRepository :BaseRepository, IManuCcdFileRepository
+    public partial class ManuCcdFileRepository : BaseRepository, IManuCcdFileRepository
     {
 
-        public ManuCcdFileRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        public ManuCcdFileRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
         }
 
@@ -43,7 +43,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -57,7 +57,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<ManuCcdFileEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ManuCcdFileEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ManuCcdFileEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -65,10 +65,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuCcdFileEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ManuCcdFileEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<ManuCcdFileEntity>(GetByIdsSql, new { Ids = ids});
+            return await conn.QueryAsync<ManuCcdFileEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
-           
+
             var offSet = (manuCcdFilePagedQuery.PageIndex - 1) * manuCcdFilePagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = manuCcdFilePagedQuery.PageSize });
@@ -111,6 +111,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetManuCcdFileEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where(" SiteId=@SiteId");
+            sqlBuilder.Where(" IsDeleted=0");
+            sqlBuilder.Where(" SFC IN @Sfcs");
             using var conn = GetMESDbConnection();
             var manuCcdFileEntities = await conn.QueryAsync<ManuCcdFileEntity>(template.RawSql, manuCcdFileQuery);
             return manuCcdFileEntities;
@@ -172,20 +176,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                             /**select**/
                                            FROM `manu_ccd_file` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `manu_ccd_file`(  `Id`, `SiteId`, `SFC`, `Passed`, `URI`, `Timestamp`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SFC, @Passed, @URI, @Timestamp, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `manu_ccd_file`(  `Id`, `SiteId`, `SFC`, `Passed`, `URI`, `Timestamp`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SFC, @Passed, @URI, @Timestamp, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `manu_ccd_file`(  `Id`, `SiteId`, `SFC`, `Passed`, `URL`, `Timestamp`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SFC, @Passed, @URL, @Timestamp, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsSql = "INSERT INTO `manu_ccd_file`(  `Id`, `SiteId`, `SFC`, `Passed`, `URL`, `Timestamp`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SFC, @Passed, @URL, @Timestamp, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
-        const string UpdateSql = "UPDATE `manu_ccd_file` SET   SiteId = @SiteId, SFC = @SFC, Passed = @Passed, URI = @URI, Timestamp = @Timestamp, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `manu_ccd_file` SET   SiteId = @SiteId, SFC = @SFC, Passed = @Passed, URI = @URI, Timestamp = @Timestamp, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `manu_ccd_file` SET   SiteId = @SiteId, SFC = @SFC, Passed = @Passed, URL = @URL, Timestamp = @Timestamp, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `manu_ccd_file` SET   SiteId = @SiteId, SFC = @SFC, Passed = @Passed, URL = @URL, Timestamp = @Timestamp, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `manu_ccd_file` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `manu_ccd_file` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteId`, `SFC`, `Passed`, `URI`, `Timestamp`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                               `Id`, `SiteId`, `SFC`, `Passed`, `URL`, `Timestamp`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_ccd_file`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteId`, `SFC`, `Passed`, `URI`, `Timestamp`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                                          `Id`, `SiteId`, `SFC`, `Passed`, `URL`, `Timestamp`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_ccd_file`  WHERE Id IN @Ids ";
         #endregion
     }
