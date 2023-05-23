@@ -64,7 +64,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<ProcMaterialView> GetByIdAsync(long id, long SiteId)
         {
-            var key = $"proc_material_{id}";
+            var key = $"proc_material&proc_material_group&proc_process_route&proc_bom&{id}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
@@ -79,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<ProcMaterialEntity> GetByIdAsync(long id)
         {
-            var key = $"proc_material_{id}";
+            var key = $"proc_material&{id}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
