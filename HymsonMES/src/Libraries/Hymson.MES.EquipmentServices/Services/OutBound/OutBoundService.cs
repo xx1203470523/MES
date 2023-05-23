@@ -204,7 +204,8 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             {
                 if (item.ParamList != null)
                 {
-                    var paramCodes = item.ParamList.Select(c => c.ParamCode);
+                    //系统中参数编码为大写
+                    var paramCodes = item.ParamList.Select(c => c.ParamCode.ToUpper());
                     paramCodeList.AddRange(paramCodes);
                 }
             }
@@ -221,7 +222,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             };
             var procParameter = await _procParameterRepository.GetByCodesAsync(codesQuery);
             //如果有不存在的参数编码就提示
-            var noIncludeCodes = paramCodeList.Where(w => procParameter.Select(s => s.ParameterCode).Contains(w) == false);
+            var noIncludeCodes = paramCodeList.Where(w => procParameter.Select(s => s.ParameterCode.ToUpper()).Contains(w.ToUpper()) == false);
             if (noIncludeCodes.Any() == true)
                 throw new CustomerValidationException(nameof(ErrorCode.MES19108)).WithData("Code", string.Join(',', noIncludeCodes));
 
@@ -242,7 +243,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                              LocalTime = outBoundMoreDto.LocalTime,
                              SFC = outBoundDto.SFC,
                              ResourceId = procResourceId,
-                             ParameterId = procParameter.Where(c => c.ParameterCode.Equals(s.ParamCode)).First().Id,
+                             ParameterId = procParameter.Where(c => c.ParameterCode.ToUpper().Equals(s.ParamCode.ToUpper())).First().Id,
                              ParamValue = s.ParamValue,
                              Timestamp = s.Timestamp
                          }
@@ -270,7 +271,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             {
                 if (item.NG != null)
                 {
-                    var ngCodes = item.NG.Select(c => c.NGCode);
+                    var ngCodes = item.NG.Select(c => c.NGCode.ToUpper());
                     ngCodeList.AddRange(ngCodes);
                 }
             }
@@ -287,7 +288,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             };
             var qualUnqualifiedCodes = await _qualUnqualifiedCodeRepository.GetByCodesAsync(codesQuery);
             //如果有不存在的参数编码就提示
-            var noIncludeCodes = ngCodeList.Where(w => qualUnqualifiedCodes.Select(s => s.UnqualifiedCode).Contains(w) == false);
+            var noIncludeCodes = ngCodeList.Where(w => qualUnqualifiedCodes.Select(s => s.UnqualifiedCode.ToUpper()).Contains(w.ToUpper()) == false);
             if (noIncludeCodes.Any() == true)
                 throw new CustomerValidationException(nameof(ErrorCode.MES19114)).WithData("Code", string.Join(',', noIncludeCodes));
 
@@ -302,7 +303,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                          Id = IdGenProvider.Instance.CreateId(),
                          SiteId = _currentEquipment.SiteId,
                          BarCodeStepId = stepId,
-                         UnqualifiedCode = s.NGCode,
+                         UnqualifiedCode = s.NGCode.ToUpper(),
                          CreatedBy = _currentEquipment.Code,
                          UpdatedBy = _currentEquipment.Code,
                          CreatedOn = HymsonClock.Now(),
