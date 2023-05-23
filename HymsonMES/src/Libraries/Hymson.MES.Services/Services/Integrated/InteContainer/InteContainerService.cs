@@ -125,7 +125,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(modifyDto);
             await ValidationSaveDto(modifyDto);
-            var inteContainerEntity = await  _inteContainerRepository.GetByIdAsync(modifyDto.Id ?? 0);
+            var inteContainerEntity = await _inteContainerRepository.GetByIdAsync(modifyDto.Id ?? 0);
             if (inteContainerEntity.Status != SysDataStatusEnum.Build && modifyDto.Status == SysDataStatusEnum.Build)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12510));
@@ -178,7 +178,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
         public async Task<PagedInfo<InteContainerDto>> GetPagedListAsync(InteContainerPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<InteContainerPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId;
+            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _inteContainerRepository.GetPagedInfoAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
