@@ -523,18 +523,19 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             // 遍历当前物料的所有的物料库存
             foreach (var feeding in feedingEntities)
             {
+                if (residue <= 0) break;
+
                 // 数量足够
-                if (residue < feeding.Qty)
+                if (qty <= feeding.Qty)
                 {
-                    residue -= feeding.Qty;
+                    residue = 0;
                     feeding.Qty -= qty;
                 }
                 // 数量不够
                 else
                 {
-                    residue -= feeding.Qty;
-
                     // 继续下一个
+                    residue = qty - feeding.Qty;
                     feeding.Qty = 0;
                 }
 
@@ -548,7 +549,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                     Qty = feeding.Qty
                 });
 
-                // 条码流转
+                // 添加条码流转记录（消耗）
                 adds.Add(new ManuSfcCirculationEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
