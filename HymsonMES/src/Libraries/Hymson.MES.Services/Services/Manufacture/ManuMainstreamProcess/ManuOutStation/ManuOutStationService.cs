@@ -562,7 +562,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                     CirculationProductId = currentBo.MaterialId,
                     CirculationMainProductId = mainMaterialBo.MaterialId,
                     CirculationQty = feeding.Qty,
-                    CirculationType = SfcCirculationTypeEnum.ModuleAdd,
+                    CirculationType = SfcCirculationTypeEnum.Consume,
                     CreatedBy = sfcProduceEntity.CreatedBy,
                     UpdatedBy = sfcProduceEntity.UpdatedBy
                 });
