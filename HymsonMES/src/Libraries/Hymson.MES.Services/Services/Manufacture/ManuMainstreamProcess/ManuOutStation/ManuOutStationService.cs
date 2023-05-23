@@ -513,6 +513,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             MaterialDeductBo currentBo,
             bool isMain = true)
         {
+            // 主物料才扣除检索下级替代料，当还有剩余未扣除的数量时，扣除替代料（替代料不再递归扣除下级替代料库存）
+            if (isMain == false || residue <= 0) return;
+
             // 取得当前物料的库存
             if (manuFeedingsDictionary.TryGetValue(currentBo.MaterialId, out var feedingEntities) == false) return;
             if (feedingEntities.Any() == false) return;
@@ -569,9 +572,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 });
             }
 
-            // 主物料才扣除检索下级替代料，当还有剩余未扣除的数量时，扣除替代料（替代料不再递归扣除下级替代料库存）
-            if (isMain == false || residue <= 0) return;
-
+            // 扣除替代料
             foreach (var replaceFeeding in currentBo.ReplaceMaterials)
             {
                 // 递归扣除替代料库存
