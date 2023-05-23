@@ -89,6 +89,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<IEnumerable<ManuSfcBindEntity>> GetBySFCAsync(string sfc);
 
         /// <summary>
+        /// 根据SFC和BindSfc查询已存在绑定关系
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <param name="bindSfcs"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcBindEntity>> GetByBindSFCAsync(string sfc, string[] bindSfcs);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="manuSfcBindQuery"></param>

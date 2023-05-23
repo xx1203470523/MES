@@ -36,6 +36,11 @@ namespace Hymson.MES.EquipmentServices.Dtos.OutBound
         /// Ng代码
         /// </summary>
         public OutBoundNG[]? NG { get; set; }
+
+        /// <summary>
+        /// 是否过站
+        /// </summary>
+        public bool IsPassingStation { get; set; } = false;
     }
 
 }

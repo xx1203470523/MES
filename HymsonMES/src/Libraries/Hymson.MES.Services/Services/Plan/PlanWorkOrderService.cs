@@ -246,7 +246,7 @@ namespace Hymson.MES.Services.Services.Plan
             List<PlanWorkOrderEntity> planWorkOrderEntities = new List<PlanWorkOrderEntity>();
             List<long> updateWorkOrderRealEndList = new List<long>();
             List<long> deleteActivationWorkOrderIds = new List<long>();//需要取消激活工单
-           
+
             foreach (var item in parms)
             {
                 planWorkOrderEntities.Add(new PlanWorkOrderEntity()
@@ -259,7 +259,7 @@ namespace Hymson.MES.Services.Services.Plan
                 });
 
                 //对是需要修改为完工状态的做特殊处理： 给 工单记录表 更新 真实结束时间
-                if (item.Status == PlanWorkOrderStatusEnum.Finish) 
+                if (item.Status == PlanWorkOrderStatusEnum.Finish)
                 {
                     updateWorkOrderRealEndList.Add(item.Id);
                 }
@@ -272,7 +272,7 @@ namespace Hymson.MES.Services.Services.Plan
             }
 
             List<PlanWorkOrderActivationRecordEntity> planWorkOrderActivationRecordEntitys = new List<PlanWorkOrderActivationRecordEntity>();//对取消激活的做记录
-            if (deleteActivationWorkOrderIds.Any()) 
+            if (deleteActivationWorkOrderIds.Any())
             {
                 var deleteActivationWorkOrders = await _planWorkOrderActivationRepository.GetByWorkOrderIdsAsync(deleteActivationWorkOrderIds.ToArray());
                 foreach (var item in deleteActivationWorkOrders)
@@ -327,10 +327,10 @@ namespace Hymson.MES.Services.Services.Plan
                 }
 
                 //对是需要修改为关闭状态的做特殊处理： 取消掉 对应工单激活的信息
-                if (deleteActivationWorkOrderIds.Any()) 
+                if (deleteActivationWorkOrderIds.Any())
                 {
                     await _planWorkOrderActivationRepository.DeletesTrueAsync(deleteActivationWorkOrderIds.ToArray());
-                    if (planWorkOrderActivationRecordEntitys.Any()) 
+                    if (planWorkOrderActivationRecordEntitys.Any())
                     {
                         await _planWorkOrderActivationRecordRepository.InsertsAsync(planWorkOrderActivationRecordEntitys);
                     }
@@ -477,7 +477,7 @@ namespace Hymson.MES.Services.Services.Plan
         public async Task<PagedInfo<PlanWorkOrderListDetailViewDto>> GetPageListAsync(PlanWorkOrderPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<PlanWorkOrderPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId;
+            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _planWorkOrderRepository.GetPagedInfoAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据

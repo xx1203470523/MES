@@ -65,19 +65,19 @@ namespace Hymson.MES.Services.Services.Process
             }
             procParameterCreateDto.ParameterCode = procParameterCreateDto.ParameterCode.ToTrimSpace().ToUpperInvariant();
             procParameterCreateDto.ParameterName = procParameterCreateDto.ParameterName.Trim();
-            procParameterCreateDto.Remark = procParameterCreateDto.Remark??"".Trim();
+            procParameterCreateDto.Remark = procParameterCreateDto.Remark ?? "".Trim();
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procParameterCreateDto);
 
             //DTO转换实体
             var procParameterEntity = procParameterCreateDto.ToEntity<ProcParameterEntity>();
-            procParameterEntity.Id= IdGenProvider.Instance.CreateId();
+            procParameterEntity.Id = IdGenProvider.Instance.CreateId();
             procParameterEntity.CreatedBy = _currentUser.UserName;
             procParameterEntity.UpdatedBy = _currentUser.UserName;
             procParameterEntity.CreatedOn = HymsonClock.Now();
             procParameterEntity.UpdatedOn = HymsonClock.Now();
             procParameterEntity.ParameterCode = procParameterEntity.ParameterCode;
-            procParameterEntity.SiteId = _currentSite.SiteId;
+            procParameterEntity.SiteId = _currentSite.SiteId ?? 0;
 
             //判断编号是否已经存在
             var exists = await _procParameterRepository.GetProcParameterEntitiesAsync(new ProcParameterQuery()
@@ -85,7 +85,7 @@ namespace Hymson.MES.Services.Services.Process
                 SiteId = procParameterEntity.SiteId,
                 ParameterCode = procParameterEntity.ParameterCode,
             });
-            if (exists != null && exists.Count() > 0) 
+            if (exists != null && exists.Count() > 0)
             {
                 throw new BusinessException(nameof(ErrorCode.MES10502)).WithData("parameterCode", procParameterEntity.ParameterCode);
             }
@@ -117,8 +117,8 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             //查询参数是否关联产品参数和设备参数
-            var lists= await _procParameterLinkTypeRepository.GetByParameterIdsAsync(idsArr);
-            if (lists!=null&&lists.Count() > 0)
+            var lists = await _procParameterLinkTypeRepository.GetByParameterIdsAsync(idsArr);
+            if (lists != null && lists.Count() > 0)
             {
                 throw new BusinessException(nameof(ErrorCode.MES10506));
             }
@@ -148,7 +148,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="pagedInfo"></param>
         /// <returns></returns>
-        private static List<ProcParameterDto> PrepareProcParameterDtos(PagedInfo<ProcParameterEntity>   pagedInfo)
+        private static List<ProcParameterDto> PrepareProcParameterDtos(PagedInfo<ProcParameterEntity> pagedInfo)
         {
             var procParameterDtos = new List<ProcParameterDto>();
             foreach (var procParameterEntity in pagedInfo.Data)
@@ -194,7 +194,7 @@ namespace Hymson.MES.Services.Services.Process
                 SiteId = procParameterEntity.SiteId,
                 ParameterCode = procParameterEntity.ParameterCode,
             });
-            var exists = procParams.Count()>0? procParams.Where(x=>x.Id!= procParameterEntity.Id).ToList():null;
+            var exists = procParams.Count() > 0 ? procParams.Where(x => x.Id != procParameterEntity.Id).ToList() : null;
             if (exists != null && exists.Count() > 0)
             {
                 throw new BusinessException(nameof(ErrorCode.MES10502)).WithData("parameterCode", procParameterEntity.ParameterCode);
@@ -208,23 +208,23 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ProcParameterDto> QueryProcParameterByIdAsync(long id) 
+        public async Task<ProcParameterDto> QueryProcParameterByIdAsync(long id)
         {
             var siteId = _currentSite.SiteId;
 
             var procParameterEntity = await _procParameterRepository.GetByIdAsync(id);
-           if (procParameterEntity != null) 
-           {
-               var dto= procParameterEntity.ToModel<CustomProcParameterDto>();
-               var linkTypes =  await _procParameterLinkTypeRepository.GetProcParameterLinkTypeEntitiesAsync(new ProcParameterLinkTypeQuery()
+            if (procParameterEntity != null)
+            {
+                var dto = procParameterEntity.ToModel<CustomProcParameterDto>();
+                var linkTypes = await _procParameterLinkTypeRepository.GetProcParameterLinkTypeEntitiesAsync(new ProcParameterLinkTypeQuery()
                 {
-                   SiteId = siteId,
-                   ParameterID= dto.Id
-               });
-               dto.Type = (ParameterTypeShowEnum)linkTypes.GroupBy(x => x.ParameterType).Select(x => (int)x.Key).ToList().Sum();
+                    SiteId = siteId,
+                    ParameterID = dto.Id
+                });
+                dto.Type = (ParameterTypeShowEnum)linkTypes.GroupBy(x => x.ParameterType).Select(x => (int)x.Key).ToList().Sum();
 
                 return dto;
-           }
+            }
             return null;
         }
     }

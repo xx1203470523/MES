@@ -19,10 +19,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// <summary>
     /// 条码绑定关系表仓储
     /// </summary>
-    public partial class ManuSfcBindRepository :BaseRepository, IManuSfcBindRepository
+    public partial class ManuSfcBindRepository : BaseRepository, IManuSfcBindRepository
     {
 
-        public ManuSfcBindRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        public ManuSfcBindRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
         }
 
@@ -43,7 +43,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -68,7 +68,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<ManuSfcBindEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ManuSfcBindEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ManuSfcBindEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -76,10 +76,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcBindEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ManuSfcBindEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<ManuSfcBindEntity>(GetByIdsSql, new { Ids = ids});
+            return await conn.QueryAsync<ManuSfcBindEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -91,6 +91,18 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuSfcBindEntity>(GetBySFCSql, new { SFC = sfc });
+        }
+
+        /// <summary>
+        /// 根据SFC和BindSfc查询已存在绑定关系
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <param name="bindSfcs"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcBindEntity>> GetByBindSFCAsync(string sfc, string[] bindSfcs)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuSfcBindEntity>(GetByBindSFCSql, new { SFC = sfc, BindSFC = bindSfcs });
         }
 
         /// <summary>
@@ -110,7 +122,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
-           
+
             var offSet = (manuSfcBindPagedQuery.PageIndex - 1) * manuSfcBindPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = manuSfcBindPagedQuery.PageSize });
@@ -213,6 +225,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetBySFCSql = @"SELECT 
                                `Id`,`SiteId`,  `SFC`, `BindSFC`, `Type`, `Status`, `BindingTime`, `UnbindingTime`, `Location`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_sfc_bind`  WHERE SFC = @SFC ";
+
+        const string GetByBindSFCSql = @"SELECT 
+                               `Id`,`SiteId`,  `SFC`, `BindSFC`, `Type`, `Status`, `BindingTime`, `UnbindingTime`, `Location`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `manu_sfc_bind`  WHERE SFC = @SFC AND BindSFC IN @BindSFC ";
 
         //硬删除
         const string DeleteTruesSql = "Delete FROM  `manu_sfc_bind` WHERE Id IN @Ids";

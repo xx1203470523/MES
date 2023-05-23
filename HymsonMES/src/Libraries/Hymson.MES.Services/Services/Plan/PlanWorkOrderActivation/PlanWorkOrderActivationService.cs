@@ -137,7 +137,7 @@ namespace Hymson.MES.Services.Services.Plan
             var workCenter = await _inteWorkCenterRepository.GetHigherInteWorkCenterAsync(planWorkOrderActivationPagedQueryDto.LineId ?? 0);
 
             var planWorkOrderActivationPagedQuery = planWorkOrderActivationPagedQueryDto.ToQuery<PlanWorkOrderActivationPagedQuery>();
-            planWorkOrderActivationPagedQuery.SiteId = _currentSite.SiteId.Value;
+            planWorkOrderActivationPagedQuery.SiteId = _currentSite.SiteId ?? 0;
 
             //将对应的工作中心ID放置查询条件中
             planWorkOrderActivationPagedQuery.WorkCenterIds.Add(planWorkOrderActivationPagedQueryDto.LineId ?? 0);
@@ -178,7 +178,7 @@ namespace Hymson.MES.Services.Services.Plan
             }
 
             var planWorkOrderActivationPagedQuery = param.ToQuery<PlanWorkOrderActivationPagedQuery>();
-            planWorkOrderActivationPagedQuery.SiteId = _currentSite.SiteId.Value;
+            planWorkOrderActivationPagedQuery.SiteId = _currentSite.SiteId ?? 0;
 
             //将对应的工作中心ID放置查询条件中
             planWorkOrderActivationPagedQuery.WorkCenterIds.Add(workCenterEntity.Id);

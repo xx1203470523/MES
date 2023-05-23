@@ -109,9 +109,9 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                 ResourceId = procResourceId,
                 CurrentStatus = SfcProduceStatusEnum.Activity,
                 Operatetype = ManuSfcStepTypeEnum.InStock,
-                CreatedBy = _currentEquipment.Name,
+                CreatedBy = _currentEquipment.Code,
                 CreatedOn = HymsonClock.Now(),
-                UpdatedBy = _currentEquipment.Name,
+                UpdatedBy = _currentEquipment.Code,
                 UpdatedOn = HymsonClock.Now()
             };
         }

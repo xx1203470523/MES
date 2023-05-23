@@ -58,6 +58,15 @@ namespace Hymson.MES.EquipmentServices.Services.BindContainer
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19104));
             }
+            var sfcs = bindContainerDto.ContainerSFCs.Select(c => c.SFC);
+            var existsBindSfc = await _manuTraySfcRelationRepository.GetByTrayLoadSFCAsync(inteTrayLoad.Id, sfcs.ToArray());
+            if (existsBindSfc.Any())
+            {
+                var sfcStr = string.Join(",", existsBindSfc.Select(c => c.SFC));
+                throw new CustomerValidationException(nameof(ErrorCode.MES19122)).WithData("ContainerCode", inteTrayLoad.TrayCode)
+                    .WithData("SFC", sfcStr);
+            }
+
             List<ManuTraySfcRelationEntity> traySfcRelations = new List<ManuTraySfcRelationEntity>();
             List<ManuTraySfcRecordEntity> traySfcRecord = new List<ManuTraySfcRecordEntity>();
             foreach (var item in bindContainerDto.ContainerSFCs)
@@ -127,13 +136,13 @@ namespace Hymson.MES.EquipmentServices.Services.BindContainer
             }
             //查找已装载记录
             var trayLoads = await _manuTraySfcRelationRepository.GetByTrayLoadIdAsync(inteTrayLoad.Id);
-            if (trayLoads == null)
+            if (!trayLoads.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19105));
             }
 
-            //需要解绑的SFC
-            var unBindSFCs = trayLoads.Where(c => unBindContainerDto.ContainerSFCs.Contains(c.SFC));
+            //需要解绑的SFC 忽略大小写
+            var unBindSFCs = trayLoads.Where(c => unBindContainerDto.ContainerSFCs.Where(p => p.ToUpper().Equals(c.SFC.ToUpper())).Any());
             List<long> idsList = new List<long>();
             List<ManuTraySfcRecordEntity> traySfcRecord = new List<ManuTraySfcRecordEntity>();
             foreach (var item in unBindSFCs)

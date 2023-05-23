@@ -86,12 +86,20 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 EquipmentCode = _currentEquipment.Code,
                 ResourceCode = outBoundDto.ResourceCode,
                 LocalTime = outBoundDto.LocalTime,
-                SFCs = new OutBoundDto[] { outBoundDto }
+                SFCs = new OutBoundSFCDto[] {
+                    new OutBoundSFCDto{
+                        SFC=outBoundDto.SFC,
+                        BindFeedingCodes= outBoundDto.BindFeedingCodes,
+                        NG=outBoundDto.NG,
+                        ParamList=outBoundDto.ParamList,
+                        Passed = outBoundDto.Passed
+                    }
+                }
             };
             //条码步骤
             List<ManuSfcStepEntity> manuSfcStepEntitys = PrepareSetpEntity(outBoundMoreDto, procResource.Id);
             //标准参数
-            List<ManuProductParameterEntity> manuProductParameterEntities = await PrepareProductParameterEntity(outBoundMoreDto, procResource.Id);
+            List<ManuProductParameterEntity> manuProductParameterEntities = await PrepareProductParameterEntity(outBoundMoreDto, manuSfcStepEntitys, procResource.Id);
             //NG
             List<ManuSfcStepNgEntity> manuProductNGEntities = await PrepareProductNgEntity(outBoundMoreDto, manuSfcStepEntitys);
 
@@ -131,7 +139,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             //条码步骤
             List<ManuSfcStepEntity> manuSfcStepEntitys = PrepareSetpEntity(outBoundMoreDto, procResource.Id);
             //标准参数
-            List<ManuProductParameterEntity> manuProductParameterEntities = await PrepareProductParameterEntity(outBoundMoreDto, procResource.Id);
+            List<ManuProductParameterEntity> manuProductParameterEntities = await PrepareProductParameterEntity(outBoundMoreDto, manuSfcStepEntitys, procResource.Id);
             //NG
             List<ManuSfcStepNgEntity> manuProductNGEntities = await PrepareProductNgEntity(outBoundMoreDto, manuSfcStepEntitys);
 
@@ -172,10 +180,11 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                     ResourceId = procResourceId,
                     CurrentStatus = SfcProduceStatusEnum.Activity,
                     Operatetype = ManuSfcStepTypeEnum.OutStock,
-                    CreatedBy = _currentEquipment.Name,
+                    CreatedBy = _currentEquipment.Code,
                     CreatedOn = HymsonClock.Now(),
-                    UpdatedBy = _currentEquipment.Name,
-                    UpdatedOn = HymsonClock.Now()
+                    UpdatedBy = _currentEquipment.Code,
+                    UpdatedOn = HymsonClock.Now(),
+                    IsPassingStation = item.IsPassingStation
                 });
             }
             return manuSfcStepEntities;
@@ -185,9 +194,10 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
         /// 组装参数信息
         /// </summary>
         /// <param name="outBoundMoreDto"></param>
+        /// <param name="manuSfcStepEntities"></param>
         /// <param name="procResourceId"></param>
         /// <returns></returns>
-        private async Task<List<ManuProductParameterEntity>> PrepareProductParameterEntity(OutBoundMoreDto outBoundMoreDto, long procResourceId)
+        private async Task<List<ManuProductParameterEntity>> PrepareProductParameterEntity(OutBoundMoreDto outBoundMoreDto, List<ManuSfcStepEntity> manuSfcStepEntities, long procResourceId)
         {
             List<ManuProductParameterEntity> manuProductParameterEntities = new();
             //所有参数
@@ -196,7 +206,8 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             {
                 if (item.ParamList != null)
                 {
-                    var paramCodes = item.ParamList.Select(c => c.ParamCode);
+                    //系统中参数编码为大写
+                    var paramCodes = item.ParamList.Select(c => c.ParamCode.ToUpper());
                     paramCodeList.AddRange(paramCodes);
                 }
             }
@@ -213,7 +224,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             };
             var procParameter = await _procParameterRepository.GetByCodesAsync(codesQuery);
             //如果有不存在的参数编码就提示
-            var noIncludeCodes = paramCodeList.Where(w => procParameter.Select(s => s.ParameterCode).Contains(w) == false);
+            var noIncludeCodes = paramCodeList.Where(w => procParameter.Select(s => s.ParameterCode.ToUpper()).Contains(w.ToUpper()) == false);
             if (noIncludeCodes.Any() == true)
                 throw new CustomerValidationException(nameof(ErrorCode.MES19108)).WithData("Code", string.Join(',', noIncludeCodes));
 
@@ -221,20 +232,22 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             {
                 if (outBoundDto.ParamList != null)
                 {
+                    var stepId = manuSfcStepEntities.Where(c => c.SFC == outBoundDto.SFC).First().Id;
                     var paramList = outBoundDto.ParamList.Select(s =>
                          new ManuProductParameterEntity
                          {
                              Id = IdGenProvider.Instance.CreateId(),
                              SiteId = _currentEquipment.SiteId,
+                             StepId = stepId,//记录步骤ID
                              CreatedBy = _currentEquipment.Code,
                              UpdatedBy = _currentEquipment.Code,
                              CreatedOn = HymsonClock.Now(),
                              UpdatedOn = HymsonClock.Now(),
                              EquipmentId = _currentEquipment.Id ?? 0,
-                             LocalTime = outBoundDto.LocalTime,
+                             LocalTime = outBoundMoreDto.LocalTime,
                              SFC = outBoundDto.SFC,
                              ResourceId = procResourceId,
-                             ParameterId = procParameter.Where(c => c.ParameterCode.Equals(s.ParamCode)).First().Id,
+                             ParameterId = procParameter.Where(c => c.ParameterCode.ToUpper().Equals(s.ParamCode.ToUpper())).First().Id,
                              ParamValue = s.ParamValue,
                              Timestamp = s.Timestamp
                          }
@@ -262,7 +275,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             {
                 if (item.NG != null)
                 {
-                    var ngCodes = item.NG.Select(c => c.NGCode);
+                    var ngCodes = item.NG.Select(c => c.NGCode.ToUpper());
                     ngCodeList.AddRange(ngCodes);
                 }
             }
@@ -279,7 +292,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             };
             var qualUnqualifiedCodes = await _qualUnqualifiedCodeRepository.GetByCodesAsync(codesQuery);
             //如果有不存在的参数编码就提示
-            var noIncludeCodes = ngCodeList.Where(w => qualUnqualifiedCodes.Select(s => s.UnqualifiedCode).Contains(w) == false);
+            var noIncludeCodes = ngCodeList.Where(w => qualUnqualifiedCodes.Select(s => s.UnqualifiedCode.ToUpper()).Contains(w.ToUpper()) == false);
             if (noIncludeCodes.Any() == true)
                 throw new CustomerValidationException(nameof(ErrorCode.MES19114)).WithData("Code", string.Join(',', noIncludeCodes));
 
@@ -294,7 +307,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                          Id = IdGenProvider.Instance.CreateId(),
                          SiteId = _currentEquipment.SiteId,
                          BarCodeStepId = stepId,
-                         UnqualifiedCode = s.NGCode,
+                         UnqualifiedCode = s.NGCode.ToUpper(),
                          CreatedBy = _currentEquipment.Code,
                          UpdatedBy = _currentEquipment.Code,
                          CreatedOn = HymsonClock.Now(),

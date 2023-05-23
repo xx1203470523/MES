@@ -3,10 +3,10 @@ using Hymson.MES.EquipmentServices.Dtos.BindSFC;
 using Hymson.MES.EquipmentServices.Dtos.CCDFileUploadComplete;
 using Hymson.MES.EquipmentServices.Dtos.EquipmentCollect;
 using Hymson.MES.EquipmentServices.Dtos.Feeding;
-using Hymson.MES.EquipmentServices.Dtos.FeedingConsumption;
 using Hymson.MES.EquipmentServices.Dtos.GenerateModuleSFC;
+using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Dtos.InboundInContainer;
-using Hymson.MES.EquipmentServices.Dtos.InboundInSFCContainer;
+using Hymson.MES.EquipmentServices.Dtos.OutBound;
 using Hymson.MES.EquipmentServices.Dtos.OutPutQty;
 using Hymson.MES.EquipmentServices.Dtos.QueryContainerBindSfc;
 using Hymson.MES.EquipmentServices.Dtos.SingleBarCodeLoadingVerification;
@@ -16,8 +16,10 @@ using Hymson.MES.EquipmentServices.Services.CCDFileUploadComplete;
 using Hymson.MES.EquipmentServices.Services.EquipmentCollect;
 using Hymson.MES.EquipmentServices.Services.Feeding;
 using Hymson.MES.EquipmentServices.Services.GenerateModuleSFC;
+using Hymson.MES.EquipmentServices.Services.InBound;
 using Hymson.MES.EquipmentServices.Services.InboundInContainer;
 using Hymson.MES.EquipmentServices.Services.InboundInSFCContainer;
+using Hymson.MES.EquipmentServices.Services.OutBound;
 using Hymson.MES.EquipmentServices.Services.OutPutQty;
 using Hymson.MES.EquipmentServices.Services.QueryContainerBindSfc;
 using Hymson.MES.EquipmentServices.Services.SingleBarCodeLoadingVerification;
@@ -54,6 +56,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
         private readonly IOutPutQtyService _outPutQtyService;
         private readonly IQueryContainerBindSfcService _queryContainerBindSfcService;
         private readonly ISingleBarCodeLoadingVerificationService _singleBarCodeLoadingVerificationService;
+        private readonly IInBoundService _inBoundService;
+        private readonly IOutBoundService _outBoundService;
 
 
 
@@ -73,6 +77,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="outPutQtyService"></param>
         /// <param name="queryContainerBindSfcService"></param>
         /// <param name="singleBarCodeLoadingVerificationService"></param>
+        /// <param name="inBoundService"></param>
+        /// <param name="outBoundService"></param>
         public EquipmentController(ILogger<EquipmentController> logger,
             IEquipmentCollectService equipmentService,
             IBindSFCService bindSFCService,
@@ -85,7 +91,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
             IInboundInSFCContainerService inboundInSFCContainerService,
             IOutPutQtyService outPutQtyService,
             IQueryContainerBindSfcService queryContainerBindSfcService,
-            ISingleBarCodeLoadingVerificationService singleBarCodeLoadingVerificationService)
+            ISingleBarCodeLoadingVerificationService singleBarCodeLoadingVerificationService,
+            IInBoundService inBoundService,
+            IOutBoundService outBoundService)
         {
             _logger = logger;
             _equipmentService = equipmentService;
@@ -100,6 +108,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
             _outPutQtyService = outPutQtyService;
             _queryContainerBindSfcService = queryContainerBindSfcService;
             _singleBarCodeLoadingVerificationService = singleBarCodeLoadingVerificationService;
+            _inBoundService = inBoundService;
+            _outBoundService = outBoundService;
         }
 
 
@@ -214,6 +224,49 @@ namespace Hymson.MES.Equipment.Api.Controllers
             await _feedingService.FeedingUnloadingAsync(request);
         }
 
+        /// <summary>
+        /// 进站 HY-MES-EQU-015
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost("InBound")]
+        public async Task InBound(InBoundDto request)
+        {
+            await _inBoundService.InBound(request);
+        }
+
+        /// <summary>
+        /// 进站（多个）HY-MES-EQU-016
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost("InBoundMore")]
+        public async Task InBoundMore(InBoundMoreDto request)
+        {
+            await _inBoundService.InBoundMore(request);
+        }
+
+        /// <summary>
+        /// 出站 HY-MES-EQU-017
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost("OutBound")]
+        public async Task OutBound(OutBoundDto request)
+        {
+            await _outBoundService.OutBound(request);
+        }
+
+        /// <summary>
+        /// 出站（多个） HY-MES-EQU-018
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost("OutBoundMore")]
+        public async Task OutBoundMore(OutBoundMoreDto request)
+        {
+            await _outBoundService.OutBoundMore(request);
+        }
 
         /// <summary>
         /// 容器绑定
