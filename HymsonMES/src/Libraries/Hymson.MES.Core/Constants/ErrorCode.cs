@@ -81,6 +81,8 @@
         public const string MES10346 = "打印机名称不能为空!";
         public const string MES10347 = "打印机IP不能为空!";
         public const string MES10348 = "打印机IP重复！";
+        public const string MES10349 = "模板预览内容为空！";
+        public const string MES10350 = "未找到指定模板！";
         #endregion
 
         #region 工序 10400
@@ -684,6 +686,7 @@
         public const string MES17001 = "条码打印，打印模板文件未找到";
         public const string MES17002 = "条码打印，打印机信息未找到";
         public const string MES17003 = "条码打印，打印失败msg:{msg}.";
+        public const string MES17004 = "条码打印，预览失败";
         #endregion
 
         #region 在制品步骤控制 MES18000

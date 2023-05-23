@@ -22,5 +22,6 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 空值 : true  
         /// </summary>
         public string Version { get; set; }
+        public long SiteId { get; set; }
     }
 }

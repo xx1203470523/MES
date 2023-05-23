@@ -106,6 +106,7 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// <summary>
         /// 工单ID
         /// </summary>
+        public string OrderCode { get; set; }
         public long WorkOrderId { get; set; }
 
         /// <summary>

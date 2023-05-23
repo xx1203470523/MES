@@ -139,22 +139,20 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<List<ProcProcessRouteDetailNodeViewDto>> GetNodesByRouteIdAsync(long id)
+        public async Task<IEnumerable<ProcProcessRouteDetailNodeViewDto>> GetNodesByRouteIdAsync(long id)
         {
             var nodeQuery = new ProcProcessRouteDetailNodeQuery { ProcessRouteId = id };
             var nodes = await _procProcessRouteNodeRepository.GetListAsync(nodeQuery);
-            var detailNodeViewDtos = new List<ProcProcessRouteDetailNodeViewDto>();
+
+            List<ProcProcessRouteDetailNodeViewDto> detailNodeViewDtos = new();
             foreach (var node in nodes)
             {
-                //实体转换
+                // 实体转换
                 var nodeViewDto = node.ToModel<ProcProcessRouteDetailNodeViewDto>();
                 nodeViewDto.ProcessType = node.Type;
                 nodeViewDto.Code = ConvertProcedureCode(nodeViewDto.ProcedureId, nodeViewDto.Code);
                 nodeViewDto.Name = ConvertProcedureName(nodeViewDto.ProcedureId, nodeViewDto.Name);
-                if (!string.IsNullOrWhiteSpace(nodeViewDto.Code))
-                {
-                    detailNodeViewDtos.Add(nodeViewDto);
-                }
+                if (string.IsNullOrWhiteSpace(nodeViewDto.Code) == false) detailNodeViewDtos.Add(nodeViewDto);
             }
 
             return detailNodeViewDtos;

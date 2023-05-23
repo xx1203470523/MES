@@ -75,7 +75,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpGet]
         [Route("nodeList/{id}")]
-        public async Task<List<ProcProcessRouteDetailNodeViewDto>> GetNodesByRouteId(long id)
+        public async Task<IEnumerable<ProcProcessRouteDetailNodeViewDto>> GetNodesByRouteId(long id)
         {
             return await _procProcessRouteService.GetNodesByRouteIdAsync(id);
         }
