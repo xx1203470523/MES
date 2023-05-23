@@ -113,7 +113,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
             }
 
             //需要解绑的SFC
-            var unBindSFCs = bindSfcs.Where(c => unBindSFCDto.BindSFCs.Contains(c.BindSFC));
+            var unBindSFCs = bindSfcs.Where(c => unBindSFCDto.BindSFCs.Where(p => p.ToUpper().Equals(c.BindSFC.ToUpper())).Any());
             List<long> idsList = new List<long>();
             List<ManuSfcBindRecordEntity> sfcBindRecordList = new();
             foreach (var item in unBindSFCs)

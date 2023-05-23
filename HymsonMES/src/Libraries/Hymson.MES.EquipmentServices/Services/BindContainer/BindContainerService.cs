@@ -141,8 +141,8 @@ namespace Hymson.MES.EquipmentServices.Services.BindContainer
                 throw new CustomerValidationException(nameof(ErrorCode.MES19105));
             }
 
-            //需要解绑的SFC
-            var unBindSFCs = trayLoads.Where(c => unBindContainerDto.ContainerSFCs.Contains(c.SFC));
+            //需要解绑的SFC 忽略大小写
+            var unBindSFCs = trayLoads.Where(c => unBindContainerDto.ContainerSFCs.Where(p => p.ToUpper().Equals(c.SFC.ToUpper())).Any());
             List<long> idsList = new List<long>();
             List<ManuTraySfcRecordEntity> traySfcRecord = new List<ManuTraySfcRecordEntity>();
             foreach (var item in unBindSFCs)
