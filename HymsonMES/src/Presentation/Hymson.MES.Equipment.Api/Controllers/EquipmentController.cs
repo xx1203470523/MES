@@ -23,9 +23,7 @@ using Hymson.MES.EquipmentServices.Services.OutBound;
 using Hymson.MES.EquipmentServices.Services.OutPutQty;
 using Hymson.MES.EquipmentServices.Services.QueryContainerBindSfc;
 using Hymson.MES.EquipmentServices.Services.SingleBarCodeLoadingVerification;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace Hymson.MES.Equipment.Api.Controllers
 {
@@ -205,7 +203,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [AllowAnonymous]
         [HttpPost("Feeding")]
         public async Task FeedingLoadingAsync(FeedingLoadingDto request)
         {
@@ -223,6 +220,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
             await _feedingService.FeedingUnloadingAsync(request);
         }
+
 
         /// <summary>
         /// 进站 HY-MES-EQU-015
@@ -267,6 +265,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
             await _outBoundService.OutBoundMore(request);
         }
+
 
         /// <summary>
         /// 容器绑定
