@@ -34,15 +34,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// </summary>
         public string Remark { get; set; } = "";
 
-        /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string UpdatedBy { get; set; } = "";
-
-        /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
+     
 
         /// <summary>
         /// 设备组名称
