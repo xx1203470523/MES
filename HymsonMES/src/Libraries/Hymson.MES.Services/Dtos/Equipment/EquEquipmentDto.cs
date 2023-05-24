@@ -1,7 +1,5 @@
 using Hymson.Infrastructure;
-using Hymson.Infrastructure.Constants;
 using Hymson.MES.Core.Enums;
-using System.ComponentModel.DataAnnotations;
 
 namespace Hymson.MES.Services.Dtos.Equipment
 {

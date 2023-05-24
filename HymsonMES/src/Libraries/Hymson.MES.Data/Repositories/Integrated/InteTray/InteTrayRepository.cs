@@ -1,16 +1,10 @@
-/*
- *creator: Karl
- *
- *describe: 托盘信息 仓储类 | 代码由框架生成
- *builder:  chenjianxiong
- *build datetime: 2023-05-16 10:57:03
- */
-
 using Dapper;
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteTray.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -20,7 +14,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
     /// <summary>
     /// 托盘信息仓储
     /// </summary>
-    public partial class InteTrayRepository :IInteTrayRepository
+    public partial class InteTrayRepository : IInteTrayRepository
     {
 
         private readonly ConnectionOptions _connectionOptions;
@@ -64,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         public async Task<InteTrayEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<InteTrayEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<InteTrayEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -75,50 +69,57 @@ namespace Hymson.MES.Data.Repositories.Integrated
         public async Task<IEnumerable<InteTrayEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<InteTrayEntity>(GetByIdsSql, new { Ids = ids});
+            return await conn.QueryAsync<InteTrayEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
-        /// 根据容器编码获取数据
+        /// 根据Code查询对象
         /// </summary>
-        /// <param name="containerCode"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<InteTrayEntity> GetByCodeAsync(string containerCode)
+        public async Task<InteTrayEntity> GetByCodeAsync(EntityByCodeQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<InteTrayEntity>(GetByCodeSql, new { Code = containerCode });
+            return await conn.QueryFirstOrDefaultAsync<InteTrayEntity>(GetByCodeSql, query);
         }
-
 
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="inteTrayPagedQuery"></param>
+        /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<InteTrayEntity>> GetPagedInfoAsync(InteTrayPagedQuery inteTrayPagedQuery)
+        public async Task<PagedInfo<InteTrayEntity>> GetPagedInfoAsync(InteTrayPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-           
-            var offSet = (inteTrayPagedQuery.PageIndex - 1) * inteTrayPagedQuery.PageSize;
+            if (string.IsNullOrWhiteSpace(pagedQuery.Code) == false)
+            {
+                pagedQuery.Code = $"%{pagedQuery.Code}%";
+                sqlBuilder.Where("Code LIKE @Code");
+            }
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Name) == false)
+            {
+                pagedQuery.Name = $"%{pagedQuery.Name}%";
+                sqlBuilder.Where("Name LIKE @Name");
+            }
+
+            var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = inteTrayPagedQuery.PageSize });
-            sqlBuilder.AddParameters(inteTrayPagedQuery);
+            sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
+            sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var inteTrayEntitiesTask = conn.QueryAsync<InteTrayEntity>(templateData.RawSql, templateData.Parameters);
+            var entitiesTask = conn.QueryAsync<InteTrayEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
-            var inteTrayEntities = await inteTrayEntitiesTask;
+            var entities = await entitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<InteTrayEntity>(inteTrayEntities, inteTrayPagedQuery.PageIndex, inteTrayPagedQuery.PageSize, totalCount);
+            return new PagedInfo<InteTrayEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
         /// <summary>
@@ -194,7 +195,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string InsertSql = "INSERT INTO `inte_tray`(  `Id`, `SiteId`, `Code`, `Name`, `MaxLoadQty`, `MaxSeq`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @MaxLoadQty, @MaxSeq, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `inte_tray`(  `Id`, `SiteId`, `Code`, `Name`, `MaxLoadQty`, `MaxSeq`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @MaxLoadQty, @MaxSeq, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
-        const string UpdateSql = "UPDATE `inte_tray` SET   SiteId = @SiteId, Code = @Code, Name = @Name, MaxLoadQty = @MaxLoadQty, MaxSeq = @MaxSeq, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE inte_tray SET Name = @Name, MaxLoadQty = @MaxLoadQty, MaxSeq = @MaxSeq, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `inte_tray` SET   SiteId = @SiteId, Code = @Code, Name = @Name, MaxLoadQty = @MaxLoadQty, MaxSeq = @MaxSeq, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `inte_tray` SET IsDeleted = Id WHERE Id = @Id ";
@@ -207,9 +208,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
                                           `Id`, `SiteId`, `Code`, `Name`, `MaxLoadQty`, `MaxSeq`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `inte_tray`  WHERE Id IN @Ids ";
 
-        const string GetByCodeSql = @"SELECT 
-                               `Id`, `SiteId`, `Code`, `Name`, `MaxLoadQty`, `MaxSeq`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `inte_tray`  WHERE Code = @Code ";
+        const string GetByCodeSql = "SELECT * FROM inte_tray WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code LIMIT 1";
         #endregion
     }
 }
