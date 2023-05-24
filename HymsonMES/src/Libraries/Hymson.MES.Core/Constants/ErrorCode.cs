@@ -529,6 +529,8 @@
 
         #region 生产
         public const string MES17101 = "物料条码:{barCode}不存在！";
+        public const string MES17102 = "获取条码{SFC}信息失败！";
+        public const string MES17103 = "获取出站产品信息失败！";
 
         #region 面板维护
         public const string MES17201 = "面板类型不能为空";
@@ -540,7 +542,6 @@
         public const string MES17207 = "面板名称最大长度为255";
         public const string MES17208 = "面板有更新，请刷新页面！";
         #endregion
-
 
         #region 在制维修
         public const string MES17301 = "工序不能为空";
@@ -601,7 +602,7 @@
         public const string MES16505 = "条码不存在，无法复用。";
         public const string MES16506 = "条码不为完成和在库状态，无法复用。";
         #endregion
-      
+
 
         #region 在制品移除添加 16600
 
@@ -653,10 +654,10 @@
         public const string MES16724 = "容器包装，资源信息未找到";
         public const string MES16725 = "容器包装，资源对应资源类型和工序对应资源类型不一致";
         public const string MES16726 = "容器编码不存在";
-        public const string MES16727= "容器包装，二级包装只能装一级容器!";
+        public const string MES16727 = "容器包装，二级包装只能装一级容器!";
         public const string MES16728 = "容器包装，三级包装只能装二级容器!";
         public const string MES16729 = "容器包装，容器{barcode}未关闭!";
-        public const string MES16730= "同一个容器不允许不同物料进行包装!";
+        public const string MES16730 = "同一个容器不允许不同物料进行包装!";
         public const string MES16731 = "容器包装，容器包装等级跟工序包装等级不匹配!";
         #endregion
 
@@ -684,6 +685,7 @@
         public const string MES16912 = "条码为空！";
         public const string MES16913 = "不能删除启用或保留的记录！";
         #endregion
+
         #region 条码打印 MES17000
         public const string MES17001 = "条码打印，打印模板文件未找到";
         public const string MES17002 = "条码打印，打印机信息未找到";

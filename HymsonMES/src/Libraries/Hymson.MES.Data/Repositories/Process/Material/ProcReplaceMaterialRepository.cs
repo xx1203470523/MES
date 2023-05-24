@@ -140,6 +140,11 @@ namespace Hymson.MES.Data.Repositories.Process
             return procReplaceMaterialEntities;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="procReplaceMaterialQuery"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<ProcReplaceMaterialView>> GetProcReplaceMaterialViewsAsync(ProcReplaceMaterialQuery procReplaceMaterialQuery)
         {
             var sqlBuilder = new SqlBuilder();
@@ -150,6 +155,28 @@ namespace Hymson.MES.Data.Repositories.Process
             if (procReplaceMaterialQuery.MaterialId != 0)
             {
                 sqlBuilder.Where(" r.MaterialId = @MaterialId ");
+            }
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var ProcReplaceMaterialViews = await conn.QueryAsync<ProcReplaceMaterialView>(template.RawSql, procReplaceMaterialQuery);
+            return ProcReplaceMaterialViews;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="procReplaceMaterialQuery"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcReplaceMaterialView>> GetProcReplaceMaterialViewsAsync(ProcReplaceMaterialsQuery procReplaceMaterialQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetProcReplaceMaterialViewsSqlTemplate);
+            sqlBuilder.Where("r.IsDeleted = 0");
+            sqlBuilder.Where("r.SiteId = @SiteId");
+
+            if (procReplaceMaterialQuery.MaterialIds.Any() == true)
+            {
+                sqlBuilder.Where(" r.MaterialId IN @MaterialIds ");
             }
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
