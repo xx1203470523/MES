@@ -786,6 +786,8 @@
         public const string MES19120 = "解绑条码列表不能为空";
         public const string MES19121 = "绑定条码:{SFC}和BindSFC:{BindSFC}绑定关系已经存在";
         public const string MES19122 = "容器:{ContainerCode}和SFC:{SFC}绑定关系已经存在";
+        public const string MES19123 = "资源:{ResourceCode}未找到关联的产线信息";
+        public const string MES19124 = "产线:{WorkCenterCode}未找到激活的工单信息";
 
 
 
