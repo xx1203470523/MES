@@ -95,16 +95,6 @@ namespace Hymson.MES.Services.Services.Integrated
         }
 
         /// <summary>
-        /// 删除
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<int> DeleteAsync(long id)
-        {
-            return await _inteTrayRepository.DeleteAsync(id);
-        }
-
-        /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="ids"></param>

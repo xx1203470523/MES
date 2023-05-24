@@ -11,42 +11,19 @@ namespace Hymson.MES.Data.Repositories.Integrated
     /// </summary>
     public interface IInteTrayRepository
     {
-        #region 
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="inteTrayEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(InteTrayEntity inteTrayEntity);
-
-        /// <summary>
-        /// 批量新增
-        /// </summary>
-        /// <param name="inteTrayEntitys"></param>
-        /// <returns></returns>
-        Task<int> InsertsAsync(List<InteTrayEntity> inteTrayEntitys);
+        Task<int> InsertAsync(InteTrayEntity entity);
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="inteTrayEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(InteTrayEntity inteTrayEntity);
-
-        /// <summary>
-        /// 批量更新 
-        /// </summary>
-        /// <param name="inteTrayEntitys"></param>
-        /// <returns></returns>
-        Task<int> UpdatesAsync(List<InteTrayEntity> inteTrayEntitys);
-
-        /// <summary>
-        /// 删除  
-        /// 最好使用批量删除，可以设置更新人和更新时间
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<int> DeleteAsync(long id);
+        Task<int> UpdateAsync(InteTrayEntity entity);
 
         /// <summary>
         /// 批量删除
@@ -77,18 +54,11 @@ namespace Hymson.MES.Data.Repositories.Integrated
         Task<InteTrayEntity> GetByCodeAsync(EntityByCodeQuery query);
 
         /// <summary>
-        /// 获取List
-        /// </summary>
-        /// <param name="inteTrayQuery"></param>
-        /// <returns></returns>
-        Task<IEnumerable<InteTrayEntity>> GetInteTrayEntitiesAsync(InteTrayQuery inteTrayQuery);
-
-        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<InteTrayEntity>> GetPagedInfoAsync(InteTrayPagedQuery pagedQuery);
-        #endregion
+
     }
 }

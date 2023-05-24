@@ -30,13 +30,6 @@ namespace Hymson.MES.Services.Services.Integrated
         Task<int> ModifyAsync(InteTraySaveDto parm);
 
         /// <summary>
-        /// 删除
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<int> DeleteAsync(long id);
-
-        /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="ids"></param>
