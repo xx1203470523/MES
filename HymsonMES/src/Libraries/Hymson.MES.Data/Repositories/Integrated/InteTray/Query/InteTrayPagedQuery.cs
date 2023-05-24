@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 托盘信息 分页查询类 | 代码由框架生成
- *builder:  chenjianxiong
- *build datetime: 2023-05-16 10:57:03
- */
 using Hymson.Infrastructure;
 
 namespace Hymson.MES.Data.Repositories.Integrated.InteTray.Query
@@ -14,6 +7,20 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteTray.Query
     /// </summary>
     public class InteTrayPagedQuery : PagerInfo
     {
+        /// <summary>
+        /// 站点编码 
+        /// </summary>
+        public long? SiteId { get; set; }
+
+        /// <summary>
+        /// 编码（托盘信息）
+        /// </summary>
+        public string? Code { get; set; }
+
+        /// <summary>
+        /// 名称（托盘信息）
+        /// </summary>
+        public string? Name { get; set; }
 
     }
 }

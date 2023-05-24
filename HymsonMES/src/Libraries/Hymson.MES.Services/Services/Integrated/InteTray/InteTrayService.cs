@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 托盘信息    服务 | 代码由框架生成
- *builder:  chenjianxiong
- *build datetime: 2023-05-16 10:57:03
- */
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -14,12 +7,12 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.InteTray.Query;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Integrated
 {
@@ -28,6 +21,9 @@ namespace Hymson.MES.Services.Services.Integrated
     /// </summary>
     public class InteTrayService : IInteTrayService
     {
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
 
@@ -35,55 +31,67 @@ namespace Hymson.MES.Services.Services.Integrated
         /// 托盘信息 仓储
         /// </summary>
         private readonly IInteTrayRepository _inteTrayRepository;
-        private readonly AbstractValidator<InteTrayCreateDto> _validationCreateRules;
-        private readonly AbstractValidator<InteTrayModifyDto> _validationModifyRules;
+        private readonly AbstractValidator<InteTraySaveDto> _validationSaveRules;
 
-        public InteTrayService(ICurrentUser currentUser, ICurrentSite currentSite, IInteTrayRepository inteTrayRepository, AbstractValidator<InteTrayCreateDto> validationCreateRules, AbstractValidator<InteTrayModifyDto> validationModifyRules)
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="currentUser"></param>
+        /// <param name="currentSite"></param>
+        /// <param name="validationSaveRules"></param>
+        /// <param name="inteTrayRepository"></param>
+        public InteTrayService(ICurrentUser currentUser, ICurrentSite currentSite,
+            AbstractValidator<InteTraySaveDto> validationSaveRules,
+            IInteTrayRepository inteTrayRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _validationSaveRules = validationSaveRules;
             _inteTrayRepository = inteTrayRepository;
-            _validationCreateRules = validationCreateRules;
-            _validationModifyRules = validationModifyRules;
         }
+
 
         /// <summary>
         /// 创建
         /// </summary>
-        /// <param name="inteTrayCreateDto"></param>
+        /// <param name="parm"></param>
         /// <returns></returns>
-        public async Task CreateInteTrayAsync(InteTrayCreateDto inteTrayCreateDto)
+        public async Task<int> CreateAsync(InteTraySaveDto parm)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
-            }
+            // 验证DTO
+            await _validationSaveRules.ValidateAndThrowAsync(parm);
 
-            //验证DTO
-            await _validationCreateRules.ValidateAndThrowAsync(inteTrayCreateDto);
+            // DTO转换实体
+            var entity = parm.ToEntity<InteTrayEntity>();
+            entity.Id = IdGenProvider.Instance.CreateId();
+            entity.CreatedBy = _currentUser.UserName;
+            entity.UpdatedBy = _currentUser.UserName;
+            entity.SiteId = _currentSite.SiteId ?? 0;
 
-            //DTO转换实体
-            var inteTrayEntity = inteTrayCreateDto.ToEntity<InteTrayEntity>();
-            inteTrayEntity.Id= IdGenProvider.Instance.CreateId();
-            inteTrayEntity.CreatedBy = _currentUser.UserName;
-            inteTrayEntity.UpdatedBy = _currentUser.UserName;
-            inteTrayEntity.CreatedOn = HymsonClock.Now();
-            inteTrayEntity.UpdatedOn = HymsonClock.Now();
-            inteTrayEntity.SiteId = _currentSite.SiteId ?? 0;
+            // 编码唯一性验证
+            var checkEntity = await _inteTrayRepository.GetByCodeAsync(new EntityByCodeQuery { Site = entity.SiteId, Code = entity.Code });
+            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES10900)).WithData("Code", entity.Code);
 
-            //入库
-            await _inteTrayRepository.InsertAsync(inteTrayEntity);
+            // 入库
+            return await _inteTrayRepository.InsertAsync(entity);
         }
 
         /// <summary>
-        /// 删除
+        /// 修改
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="parm"></param>
         /// <returns></returns>
-        public async Task DeleteInteTrayAsync(long id)
+        public async Task<int> ModifyAsync(InteTraySaveDto parm)
         {
-            await _inteTrayRepository.DeleteAsync(id);
+            // 验证DTO
+            await _validationSaveRules.ValidateAndThrowAsync(parm);
+
+            // DTO转换实体
+            var entity = parm.ToEntity<InteTrayEntity>();
+            entity.UpdatedBy = _currentUser.UserName;
+
+            return await _inteTrayRepository.UpdateAsync(entity);
         }
 
         /// <summary>
@@ -91,7 +99,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesInteTrayAsync(long[] ids)
+        public async Task<int> DeletesAsync(long[] ids)
         {
             return await _inteTrayRepository.DeletesAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
         }
@@ -99,57 +107,17 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <summary>
         /// 根据查询条件获取分页数据
         /// </summary>
-        /// <param name="inteTrayPagedQueryDto"></param>
+        /// <param name="parm"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<InteTrayDto>> GetPagedListAsync(InteTrayPagedQueryDto inteTrayPagedQueryDto)
+        public async Task<PagedInfo<InteTrayDto>> GetPagedListAsync(InteTrayPagedQueryDto parm)
         {
-            var inteTrayPagedQuery = inteTrayPagedQueryDto.ToQuery<InteTrayPagedQuery>();
-            var pagedInfo = await _inteTrayRepository.GetPagedInfoAsync(inteTrayPagedQuery);
+            var pagedQuery = parm.ToQuery<InteTrayPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            var pagedInfo = await _inteTrayRepository.GetPagedInfoAsync(pagedQuery);
 
-            //实体到DTO转换 装载数据
-            List<InteTrayDto> inteTrayDtos = PrepareInteTrayDtos(pagedInfo);
-            return new PagedInfo<InteTrayDto>(inteTrayDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="pagedInfo"></param>
-        /// <returns></returns>
-        private static List<InteTrayDto> PrepareInteTrayDtos(PagedInfo<InteTrayEntity>   pagedInfo)
-        {
-            var inteTrayDtos = new List<InteTrayDto>();
-            foreach (var inteTrayEntity in pagedInfo.Data)
-            {
-                var inteTrayDto = inteTrayEntity.ToModel<InteTrayDto>();
-                inteTrayDtos.Add(inteTrayDto);
-            }
-
-            return inteTrayDtos;
-        }
-
-        /// <summary>
-        /// 修改
-        /// </summary>
-        /// <param name="inteTrayModifyDto"></param>
-        /// <returns></returns>
-        public async Task ModifyInteTrayAsync(InteTrayModifyDto inteTrayModifyDto)
-        {
-             // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
-            }
-
-             //验证DTO
-            await _validationModifyRules.ValidateAndThrowAsync(inteTrayModifyDto);
-
-            //DTO转换实体
-            var inteTrayEntity = inteTrayModifyDto.ToEntity<InteTrayEntity>();
-            inteTrayEntity.UpdatedBy = _currentUser.UserName;
-            inteTrayEntity.UpdatedOn = HymsonClock.Now();
-
-            await _inteTrayRepository.UpdateAsync(inteTrayEntity);
+            // 实体到DTO转换 装载数据
+            var dtos = pagedInfo.Data.Select(s => s.ToModel<InteTrayDto>());
+            return new PagedInfo<InteTrayDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
         /// <summary>
@@ -157,14 +125,13 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<InteTrayDto> QueryInteTrayByIdAsync(long id) 
+        public async Task<InteTrayDto> QueryByIdAsync(long id)
         {
-           var inteTrayEntity = await _inteTrayRepository.GetByIdAsync(id);
-           if (inteTrayEntity != null) 
-           {
-               return inteTrayEntity.ToModel<InteTrayDto>();
-           }
-            return null;
+            var entity = await _inteTrayRepository.GetByIdAsync(id);
+            if (entity == null) return null;
+
+            return entity.ToModel<InteTrayDto>();
         }
+
     }
 }

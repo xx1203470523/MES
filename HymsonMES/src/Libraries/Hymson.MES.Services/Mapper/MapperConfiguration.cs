@@ -19,6 +19,7 @@ using Hymson.MES.Data.Repositories.Integrated.InteCalendar.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
+using Hymson.MES.Data.Repositories.Integrated.InteTray.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.View;
@@ -158,6 +159,13 @@ namespace Hymson.MES.Services.Mapper
         /// </summary>
         protected virtual void CreateIntegratedMaps()
         {
+            #region InteTray
+            CreateMap<InteTraySaveDto, InteTrayEntity>();
+            CreateMap<InteTrayPagedQueryDto, InteTrayPagedQuery>();
+
+            CreateMap<InteTrayEntity, InteTrayDto>();
+            #endregion
+
             #region InteCalendar
             CreateMap<InteCalendarSaveDto, InteCalendarEntity>();
             CreateMap<InteCalendarPagedQueryDto, InteCalendarPagedQuery>();
@@ -538,7 +546,10 @@ namespace Hymson.MES.Services.Mapper
 
         }
 
-        protected virtual void CreateReportMaps() 
+        /// <summary>
+        /// 
+        /// </summary>
+        protected virtual void CreateReportMaps()
         {
             #region BadRecordReport
             CreateMap<BadRecordReportDto, ManuProductBadRecordReportPagedQuery>();
@@ -550,13 +561,13 @@ namespace Hymson.MES.Services.Mapper
             #region WorkshopJobControl
             CreateMap<WorkshopJobControlReportPagedQueryDto, WorkshopJobControlReportPagedQuery>();
             CreateMap<WorkshopJobControlReportView, WorkshopJobControlReportViewDto>();
-            
+
             CreateMap<ManuSfcStepBySFCPagedQueryDto, ManuSfcStepBySFCPagedQuery>();
             #endregion
 
             #region ComUsageReport
             CreateMap<ComUsageReportPagedQueryDto, ComUsageReportPagedQuery>();
-            
+
             #endregion
 
         }

@@ -1,13 +1,7 @@
-/*
- *creator: Karl
- *
- *describe: 托盘信息仓储类 | 代码由框架生成
- *builder:  chenjianxiong
- *build datetime: 2023-05-16 10:57:03
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteTray.Query;
 
 namespace Hymson.MES.Data.Repositories.Integrated
@@ -17,43 +11,20 @@ namespace Hymson.MES.Data.Repositories.Integrated
     /// </summary>
     public interface IInteTrayRepository
     {
-        #region 
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="inteTrayEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(InteTrayEntity inteTrayEntity);
-        
-        /// <summary>
-        /// 批量新增
-        /// </summary>
-        /// <param name="inteTrayEntitys"></param>
-        /// <returns></returns>
-        Task<int> InsertsAsync(List<InteTrayEntity> inteTrayEntitys);
+        Task<int> InsertAsync(InteTrayEntity entity);
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="inteTrayEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(InteTrayEntity inteTrayEntity);
-        
-        /// <summary>
-        /// 批量更新 
-        /// </summary>
-        /// <param name="inteTrayEntitys"></param>
-        /// <returns></returns>
-        Task<int> UpdatesAsync(List<InteTrayEntity> inteTrayEntitys);
+        Task<int> UpdateAsync(InteTrayEntity entity);
 
-        /// <summary>
-        /// 删除  
-        /// 最好使用批量删除，可以设置更新人和更新时间
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<int> DeleteAsync(long id);
-        
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -67,7 +38,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="id"></param>
         /// <returns></returns>
         Task<InteTrayEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -75,27 +46,19 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         Task<IEnumerable<InteTrayEntity>> GetByIdsAsync(long[] ids);
 
-
         /// <summary>
-        /// 根据Code获取数据
+        /// 根据Code查询对象
         /// </summary>
-        /// <param name="containerCode"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        Task<InteTrayEntity> GetByCodeAsync(string containerCode);
+        Task<InteTrayEntity> GetByCodeAsync(EntityByCodeQuery query);
 
-        /// <summary>
-        /// 获取List
-        /// </summary>
-        /// <param name="inteTrayQuery"></param>
-        /// <returns></returns>
-        Task<IEnumerable<InteTrayEntity>> GetInteTrayEntitiesAsync(InteTrayQuery inteTrayQuery);
-        
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="inteTrayPagedQuery"></param>
+        /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<InteTrayEntity>> GetPagedInfoAsync(InteTrayPagedQuery inteTrayPagedQuery);
-        #endregion
+        Task<PagedInfo<InteTrayEntity>> GetPagedInfoAsync(InteTrayPagedQuery pagedQuery);
+
     }
 }

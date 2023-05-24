@@ -1,21 +1,6 @@
-/*
- *creator: Karl
- *
- *describe: 物料维护    Dto | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-02-08 04:47:44
- */
-
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Dtos.Process
 {

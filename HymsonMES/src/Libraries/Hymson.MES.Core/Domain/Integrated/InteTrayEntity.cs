@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 托盘信息    实体类 | 代码由框架生成  如果数据库字段发生变化,则手动调整
- *builder:  chenjianxiong
- *build datetime: 2023-05-16 10:57:03
- */
 using Hymson.Infrastructure;
 
 namespace Hymson.MES.Core.Domain.Integrated

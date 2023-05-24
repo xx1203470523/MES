@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 托盘信息    控制器 | 代码由框架生成  
- *builder:  chenjianxiong
- *build datetime: 2023-05-16 10:57:03
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated;
@@ -24,22 +17,25 @@ namespace Hymson.MES.Api.Controllers.Integrated
     public class InteTrayController : ControllerBase
     {
         /// <summary>
+        /// 日志
+        /// </summary>
+        private readonly ILogger<InteTrayController> _logger;
+        /// <summary>
         /// 接口（托盘信息）
         /// </summary>
         private readonly IInteTrayService _inteTrayService;
-        private readonly ILogger<InteTrayController> _logger;
 
         /// <summary>
         /// 构造函数（托盘信息）
         /// </summary>
+        /// <param name="logger"></param>
         /// <param name="inteTrayService"></param>
-        public InteTrayController(IInteTrayService inteTrayService, ILogger<InteTrayController> logger)
+        public InteTrayController(ILogger<InteTrayController> logger, IInteTrayService inteTrayService)
         {
-            _inteTrayService = inteTrayService;
             _logger = logger;
+            _inteTrayService = inteTrayService;
         }
 
-        #region 框架生成方法
 
         /// <summary>
         /// 分页查询列表（托盘信息）
@@ -47,8 +43,8 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("pagelist")]
-        public async Task<PagedInfo<InteTrayDto>> QueryPagedInteTrayAsync([FromQuery] InteTrayPagedQueryDto parm)
+        [Route("page")]
+        public async Task<PagedInfo<InteTrayDto>> GetPagedListAsync([FromQuery] InteTrayPagedQueryDto parm)
         {
             return await _inteTrayService.GetPagedListAsync(parm);
         }
@@ -59,9 +55,9 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<InteTrayDto> QueryInteTrayByIdAsync(long id)
+        public async Task<InteTrayDto> QueryByIdAsync(long id)
         {
-            return await _inteTrayService.QueryInteTrayByIdAsync(id);
+            return await _inteTrayService.QueryByIdAsync(id);
         }
 
         /// <summary>
@@ -70,10 +66,9 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("create")]
-        public async Task AddInteTrayAsync([FromBody] InteTrayCreateDto parm)
+        public async Task CreateAsync([FromBody] InteTraySaveDto parm)
         {
-             await _inteTrayService.CreateInteTrayAsync(parm);
+            await _inteTrayService.CreateAsync(parm);
         }
 
         /// <summary>
@@ -82,10 +77,9 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPut]
-        [Route("update")]
-        public async Task UpdateInteTrayAsync([FromBody] InteTrayModifyDto parm)
+        public async Task ModifyAsync([FromBody] InteTraySaveDto parm)
         {
-             await _inteTrayService.ModifyInteTrayAsync(parm);
+            await _inteTrayService.ModifyAsync(parm);
         }
 
         /// <summary>
@@ -94,12 +88,10 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
-        [Route("delete")]
-        public async Task DeleteInteTrayAsync([FromBody] long[] ids)
+        public async Task DeletesAsync([FromBody] long[] ids)
         {
-            await _inteTrayService.DeletesInteTrayAsync(ids);
+            await _inteTrayService.DeletesAsync(ids);
         }
 
-        #endregion
     }
 }
