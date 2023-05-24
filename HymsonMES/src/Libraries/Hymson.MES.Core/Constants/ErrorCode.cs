@@ -5,6 +5,7 @@
     /// </summary>
     public class ErrorCode
     {
+
         #region  用户端错误 
         public const string MES10100 = "请求实体不能为空";
         public const string MES10101 = "站点码获取失败，请重新登录！";
@@ -71,7 +72,7 @@
         public const string MES10355 = $"资源已被工作中心引用,不能删除!";
         #endregion
 
-        #region 标签模板
+        #region 标签模板 MES10340
         public const string MES10340 = "模板名称已经存在!";
         public const string MES10341 = "打印机名称重复!";
         public const string MES10342 = "模板名称最大长度为50";
@@ -83,6 +84,7 @@
         public const string MES10348 = "打印机IP重复！";
         public const string MES10349 = "模板预览内容为空！";
         public const string MES10350 = "未找到指定模板！";
+        public const string MES10356 = "上传模板到打印服务器失败,模板名称:{name}！";
         #endregion
 
         #region 工序 10400
