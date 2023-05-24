@@ -194,7 +194,7 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
         public async Task<PagedInfo<ProcMaskCodeDto>> GetPagedListAsync(ProcMaskCodePagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<ProcMaskCodePagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId;
+            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _procMaskCodeRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
@@ -260,7 +260,7 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
                             }
                             validationFailure.ErrorCode = nameof(ErrorCode.MES10806);
                             validationFailures.Add(validationFailure);
-                           // errorMessage.Append(_localizationService.GetResource(nameof(ErrorCode.MES10806)));
+                            // errorMessage.Append(_localizationService.GetResource(nameof(ErrorCode.MES10806)));
                         }
                         break;
                     case MatchModeEnum.Middle:
@@ -280,7 +280,7 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
                             validationFailure.ErrorCode = nameof(ErrorCode.MES10807);
                             validationFailures.Add(validationFailure);
                             //errorMessage.Append($"中间方式掩码首位和末尾不能为特殊字符\"?\";");
-                           // errorMessage.Append(_localizationService.GetResource(nameof(ErrorCode.MES10807)));
+                            // errorMessage.Append(_localizationService.GetResource(nameof(ErrorCode.MES10807)));
                         }
                         break;
                     case MatchModeEnum.End:
@@ -300,7 +300,7 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
                             validationFailure.ErrorCode = nameof(ErrorCode.MES10808);
                             validationFailures.Add(validationFailure);
                             // errorMessage.Append($"结束方式掩码首位不能为特殊字符\"?\";");
-                           // errorMessage.Append(_localizationService.GetResource(nameof(ErrorCode.MES10808)));
+                            // errorMessage.Append(_localizationService.GetResource(nameof(ErrorCode.MES10808)));
                         }
                         break;
                     default:
