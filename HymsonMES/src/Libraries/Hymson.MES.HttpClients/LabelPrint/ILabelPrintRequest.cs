@@ -24,5 +24,12 @@ namespace Hymson.MES.HttpClients
         /// <param name="ShowDialog"></param>
         /// <returns></returns>
         public Task<(string msg, bool result)> PrintAsync(PrintRequest printRequest, bool ShowDialog = false);
+        /// <summary>
+        /// 上传标签模板到打印服务器
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="templateName"></param>
+        /// <returns></returns>
+        public Task<(string msg, bool result)> UploadTemplateAsync(string url, string templateName);
     }
 }

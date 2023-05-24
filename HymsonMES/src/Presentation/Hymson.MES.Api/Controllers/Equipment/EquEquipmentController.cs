@@ -97,7 +97,6 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
             return await _equEquipmentService.GetDetailAsync(id);
         }
 
-
         /// <summary>
         /// 查询字典（设备注册）
         /// </summary>
