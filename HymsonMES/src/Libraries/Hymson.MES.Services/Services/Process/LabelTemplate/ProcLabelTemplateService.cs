@@ -163,7 +163,7 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
             procLabelTemplateModifyDto.Name = procLabelTemplateModifyDto.Name.ToTrimSpace();
             procLabelTemplateModifyDto.Path = procLabelTemplateModifyDto.Path.ToTrimSpace();
             procLabelTemplateModifyDto.Remark = procLabelTemplateModifyDto.Remark ?? "".Trim();
-            //procLabelTemplateModifyDto.Content = procLabelTemplateModifyDto.Content.Trim();
+            procLabelTemplateModifyDto.Content = procLabelTemplateModifyDto.Content ?? "".Trim();
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(procLabelTemplateModifyDto);
 
