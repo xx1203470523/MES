@@ -77,6 +77,11 @@ namespace Hymson.MES.Services.Dtos.Process
 
        
     }
+    public record PreviewImageDataDto : BaseEntityDto
+    {
+        public string base64Str { get; set; }
+        public bool result { get; set; }
+    }
 
 
     /// <summary>
@@ -98,8 +103,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 备注
         /// </summary>
         public string? Remark { get; set; }
+        /// <summary>
+        /// 模板内容
+        /// </summary>
+        public string Content { get; set; }
 
-       
+
     }
 
     /// <summary>
@@ -126,8 +135,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 备注
         /// </summary>
         public string Remark { get; set; }
+        /// <summary>
+        /// 模板内容
+        /// </summary>
+        public string Content { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }

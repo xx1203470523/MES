@@ -9,10 +9,12 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter;
+using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
@@ -80,6 +82,9 @@ namespace Hymson.MES.Services.Services.Process
         private readonly IInteJobRepository _inteJobRepository;
         private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
 
+        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
+        private readonly IProcMaterialRepository _procMaterialRepository;
+
         private readonly AbstractValidator<ProcResourceCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcResourceModifyDto> _validationModifyRules;
 
@@ -95,6 +100,8 @@ namespace Hymson.MES.Services.Services.Process
                   IInteJobBusinessRelationRepository jobBusinessRelationRepository,
                   IInteJobRepository inteJobRepository,
                   IInteWorkCenterRepository inteWorkCenterRepository,
+                  IPlanWorkOrderRepository planWorkOrderRepository,
+                  IProcMaterialRepository procMaterialRepository,
                   AbstractValidator<ProcResourceCreateDto> validationCreateRules,
                   AbstractValidator<ProcResourceModifyDto> validationModifyRules)
         {
@@ -108,6 +115,8 @@ namespace Hymson.MES.Services.Services.Process
             _jobBusinessRelationRepository = jobBusinessRelationRepository;
             _inteJobRepository = inteJobRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
+            _planWorkOrderRepository = planWorkOrderRepository;
+            _procMaterialRepository = procMaterialRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
         }
@@ -238,11 +247,19 @@ namespace Hymson.MES.Services.Services.Process
             var resPagedQuery = query.ToQuery<ProcResourceConfigResPagedQuery>();
             var pagedInfo = await _procResourceConfigResRepository.GetPagedInfoAsync(resPagedQuery);
 
+            var pageData = pagedInfo.Data;
+            var orderIds = pageData.Where(x => x.SetType == (int)ResourceSetTypeEnum.Workorder).Select(x => x.Value.ParseToLong()).Distinct().ToArray();
+            var materialIds = pageData.Where(x => x.SetType == (int)ResourceSetTypeEnum.Material).Select(x => x.Value.ParseToLong()).Distinct().ToArray();
+            var planWorkOrders = await _planWorkOrderRepository.GetByIdsAsync(orderIds);
+            var procMaterials = await _procMaterialRepository.GetByIdsAsync(materialIds);
+
             //实体到DTO转换 装载数据
             var resourceConfigResDtos = new List<ProcResourceConfigResDto>();
             foreach (var entity in pagedInfo.Data)
             {
                 var resourceTypeDto = entity.ToModel<ProcResourceConfigResDto>();
+                resourceTypeDto.MaterialCode = entity.SetType == (int)ResourceSetTypeEnum.Material ? procMaterials.FirstOrDefault(x => x.Id == entity.Value.ParseToLong())?.MaterialCode??"" : "";
+                resourceTypeDto.OrderCode = entity.SetType == (int)ResourceSetTypeEnum.Workorder ? planWorkOrders.FirstOrDefault(x => x.Id == entity.Value.ParseToLong())?.OrderCode??"":"";
                 resourceConfigResDtos.Add(resourceTypeDto);
             }
             return new PagedInfo<ProcResourceConfigResDto>(resourceConfigResDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);

@@ -12,11 +12,15 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.HttpClients;
+using Hymson.MES.HttpClients.Requests.Print;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Newtonsoft.Json;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process.LabelTemplate
@@ -34,14 +38,19 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
         private readonly IProcLabelTemplateRepository _procLabelTemplateRepository;
         private readonly AbstractValidator<ProcLabelTemplateCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcLabelTemplateModifyDto> _validationModifyRules;
+        private readonly ILabelPrintRequest _labelPrintRequest;
 
-        public ProcLabelTemplateService(ICurrentUser currentUser, ICurrentSite currentSite, IProcLabelTemplateRepository procLabelTemplateRepository, AbstractValidator<ProcLabelTemplateCreateDto> validationCreateRules, AbstractValidator<ProcLabelTemplateModifyDto> validationModifyRules)
+        public ProcLabelTemplateService(ICurrentUser currentUser, ICurrentSite currentSite
+            , IProcLabelTemplateRepository procLabelTemplateRepository
+            , AbstractValidator<ProcLabelTemplateCreateDto> validationCreateRules
+            , AbstractValidator<ProcLabelTemplateModifyDto> validationModifyRules, ILabelPrintRequest labelPrintRequest)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _procLabelTemplateRepository = procLabelTemplateRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
+            _labelPrintRequest = labelPrintRequest;
         }
 
         /// <summary>
@@ -96,6 +105,20 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
             //  var idsArr = StringExtension.SpitLongArrary(ids);
             return await _procLabelTemplateRepository.DeletesAsync(idsArr);
         }
+        public async Task<(string base64Str, bool result)> PreviewProcLabelTemplateAsync(string content)
+        {
+            
+            if(string.IsNullOrEmpty(content))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10350));
+            }
+            
+            var request = JsonConvert.DeserializeObject<PrintRequest>(content);
+            var result = await _labelPrintRequest.PreviewFromImageBase64Async(request??new PrintRequest());
+            if (!result.result)
+                throw new CustomerValidationException(nameof(ErrorCode.MES17004));
+            return result;
+        }
 
         /// <summary>
         /// 根据查询条件获取分页数据
@@ -140,7 +163,7 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
             procLabelTemplateModifyDto.Name = procLabelTemplateModifyDto.Name.ToTrimSpace();
             procLabelTemplateModifyDto.Path = procLabelTemplateModifyDto.Path.ToTrimSpace();
             procLabelTemplateModifyDto.Remark = procLabelTemplateModifyDto.Remark ?? "".Trim();
-            //procLabelTemplateModifyDto.Content = procLabelTemplateModifyDto.Content.Trim();
+            procLabelTemplateModifyDto.Content = procLabelTemplateModifyDto.Content ?? "".Trim();
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(procLabelTemplateModifyDto);
 

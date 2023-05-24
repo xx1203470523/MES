@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -35,5 +36,11 @@ namespace Hymson.MES.HttpClients.Requests.Print
             public string ParamValue { get; set; }
 
         }
+    }
+    public class PrintResponse
+    {
+        public string Data { get; set;}
+        public bool Success { get; set; }
+        public string Message { get; set; }
     }
 }

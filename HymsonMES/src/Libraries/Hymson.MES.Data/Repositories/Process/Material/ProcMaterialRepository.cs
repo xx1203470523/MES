@@ -64,7 +64,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<ProcMaterialView> GetByIdAsync(long id, long SiteId)
         {
-            var key = $"proc_material_{id}";
+            var key = $"proc_material&proc_material_group&proc_process_route&proc_bom&{id}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
@@ -79,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<ProcMaterialEntity> GetByIdAsync(long id)
         {
-            var key = $"proc_material_{id}";
+            var key = $"proc_material&{id}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
@@ -96,6 +96,17 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ProcMaterialEntity>(GetByIdsSql, new { ids = ids });
+        }
+
+        /// <summary>
+        /// 根据IDs批量获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcMaterialEntity>> GetByIdsAsync(IEnumerable<long> ids)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcMaterialEntity>(GetByIdsSql, new { ids });
         }
 
         /// <summary>
@@ -151,7 +162,7 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 sqlBuilder.Where(" Origin = @Origin ");
             }
-            if (procMaterialPagedQuery.BuyTypes != null&& procMaterialPagedQuery.BuyTypes.Length>0)
+            if (procMaterialPagedQuery.BuyTypes != null && procMaterialPagedQuery.BuyTypes.Length > 0)
             {
                 sqlBuilder.Where(" BuyType IN @BuyTypes ");
             }
