@@ -51,6 +51,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
         private readonly IProcProcessRouteDetailLinkRepository _procProcessRouteDetailLinkRepository;
         private readonly IProcProcessRouteDetailNodeRepository _procProcessRouteDetailNodeRepository;
         private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
+        private readonly IManuSfcStepMaterialRepository _manuSfcStepMaterialRepository;
 
         public OutBoundService(AbstractValidator<OutBoundDto> validationOutBoundDtoRules,
             ICurrentEquipment currentEquipment,
@@ -69,7 +70,8 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
-            IInteWorkCenterRepository inteWorkCenterRepository)
+            IInteWorkCenterRepository inteWorkCenterRepository,
+            IManuSfcStepMaterialRepository manuSfcStepMaterialRepository)
         {
             _validationOutBoundDtoRules = validationOutBoundDtoRules;
             _currentEquipment = currentEquipment;
@@ -89,6 +91,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
+            _manuSfcStepMaterialRepository = manuSfcStepMaterialRepository;
         }
 
         /// <summary>
@@ -201,7 +204,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                     WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
                     SFC = outBoundSFCDto.SFC,
                     Qty = 1,//出站数量
-                    Passed = outBoundSFCDto.Passed,
+                    Passed = outBoundSFCDto.Passed,//是否合格
                     EquipmentId = _currentEquipment.Id,
                     ResourceId = procResource.Id,
                     CurrentStatus = SfcProduceStatusEnum.Complete,
@@ -211,10 +214,9 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                     CreatedOn = HymsonClock.Now(),
                     UpdatedBy = _currentEquipment.Code,
                     UpdatedOn = HymsonClock.Now(),
-                    IsPassingStation = outBoundSFCDto.IsPassingStation
+                    IsPassingStation = outBoundSFCDto.IsPassingStation//是否是过站
                 };
 
-                // 合格品出站
                 // 获取下一个工序（如果没有了，就表示完工） TODO 这里GetNextProcedureAsync里需要缓存
                 var nextProcedure = await GetNextProcedureAsync(sfcProduceEntity.WorkOrderId, sfcProduceEntity.ProcessRouteId, sfcProduceEntity.ProcedureId);
                 //完工
@@ -270,7 +272,10 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             List<ManuProductParameterEntity> manuProductParameterEntities = await PrepareProductParameterEntity(outBoundMoreDto, manuSfcStepEntities, procResource.Id);
             //NG
             List<ManuSfcStepNgEntity> manuProductNGEntities = await PrepareProductNgEntity(outBoundMoreDto, manuSfcStepEntities);
+            //批次码信息
+            List<ManuSfcStepMaterialEntity> manuProductMaterialEntities = PrepareProductMaterialEntity(outBoundMoreDto, manuSfcStepEntities);
 
+            //数据提交
             using var trans = TransactionHelper.GetTransactionScope();
             int rows = 0;
             // 添加流转记录
@@ -305,13 +310,19 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             //产品参数信息
             if (manuProductParameterEntities.Any())
             {
-                await _manuProductParameterRepository.InsertsAsync(manuProductParameterEntities);
+                rows += await _manuProductParameterRepository.InsertsAsync(manuProductParameterEntities);
             }
             //Ng信息
             if (manuProductNGEntities.Any())
             {
-                await _manuSfcStepNgRepository.InsertsAsync(manuProductNGEntities);
+                rows += await _manuSfcStepNgRepository.InsertsAsync(manuProductNGEntities);
             }
+            //批次码信息
+            if (manuProductMaterialEntities.Any())
+            {
+                rows += await _manuSfcStepMaterialRepository.InsertsAsync(manuProductMaterialEntities);
+            }
+
             // 更新工单统计表的 RealEnd
             rows += await _planWorkOrderRepository.UpdatePlanWorkOrderRealEndByWorkOrderIdAsync(new UpdateWorkOrderRealTimeCommand
             {
@@ -535,6 +546,39 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 }
             }
             return manuSfcStepNgEntities;
+        }
+
+        /// <summary>
+        /// 组装Material信息
+        /// </summary>
+        /// <param name="outBoundMoreDto"></param>
+        /// <param name="manuSfcStepEntities"></param>
+        /// <returns></returns>
+        private List<ManuSfcStepMaterialEntity> PrepareProductMaterialEntity(OutBoundMoreDto outBoundMoreDto, List<ManuSfcStepEntity> manuSfcStepEntities)
+        {
+            List<ManuSfcStepMaterialEntity> manuSfcStepMaterialEntities = new();
+
+            foreach (var outBoundDto in outBoundMoreDto.SFCs)
+            {
+                var stepId = manuSfcStepEntities.Where(c => c.SFC == outBoundDto.SFC).First().Id;
+                if (outBoundDto.BindFeedingCodes != null && outBoundDto.BindFeedingCodes.Any())
+                {
+                    var materialList = outBoundDto.BindFeedingCodes.Select(materialCode =>
+                     new ManuSfcStepMaterialEntity
+                     {
+                         Id = IdGenProvider.Instance.CreateId(),
+                         SiteId = _currentEquipment.SiteId,
+                         SFC = outBoundDto.SFC,
+                         MaterialBarcode = materialCode,
+                         CreatedBy = _currentEquipment.Code,
+                         UpdatedBy = _currentEquipment.Code,
+                         CreatedOn = HymsonClock.Now(),
+                         UpdatedOn = HymsonClock.Now()
+                     });
+                    manuSfcStepMaterialEntities.AddRange(materialList);
+                }
+            }
+            return manuSfcStepMaterialEntities;
         }
     }
 }
