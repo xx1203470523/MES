@@ -142,6 +142,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _localizationService = localizationService;
             _manuInStationService = manuInStationService;
             _manuInStationService = manuInStationService;
+            _manuSfcStepRepository = manuSfcStepRepository;
         }
 
         /// <summary>
@@ -487,7 +488,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                 UserId = _currentUser.UserName,
                 UpdatedOn = HymsonClock.Now()
             };
-            //步骤
 
             // 初始化步骤
             var sfcStep = new ManuSfcStepEntity
@@ -501,13 +501,15 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ProductBOMId = manuSfcProduceEntit.ProductBOMId,
                 ProcedureId = manuSfcProduceEntit.ProcedureId,
                 Qty = manuSfcProduceEntit.Qty,
-                Operatetype = ManuSfcStepTypeEnum.InStock,
+                IsRepair = true,
+                Operatetype = ManuSfcStepTypeEnum.RepairComplete,
+                CurrentStatus = SfcProduceStatusEnum.lineUp,
                 EquipmentId = manuSfcProduceEntit.EquipmentId,
                 ResourceId = manuSfcProduceEntit.ResourceId,
-                CreatedBy = manuSfcProduceEntit.UpdatedBy,
-                CreatedOn = manuSfcProduceEntit.UpdatedOn.Value,
-                UpdatedBy = manuSfcProduceEntit.UpdatedBy,
-                UpdatedOn = manuSfcProduceEntit.UpdatedOn.Value,
+                CreatedBy = _currentUser.UserName,
+                CreatedOn = HymsonClock.Now(),
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now(),
             };
             #endregion
 
@@ -532,6 +534,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     SfcInfoId = manuSfcProduceEntit.Id
                 });
                 //步骤
+
                 rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
 
                 trans.Complete();

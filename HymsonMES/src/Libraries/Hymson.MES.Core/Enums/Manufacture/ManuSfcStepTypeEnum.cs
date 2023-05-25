@@ -108,6 +108,11 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 生产更改
         /// </summary>
         [Description("生产更改")]
-        ManuUpdate = 20
+        ManuUpdate = 20,
+        /// <summary>
+        /// 维修完成
+        /// </summary>
+        [Description("维修完成")]
+        RepairComplete = 21,
     }
 }

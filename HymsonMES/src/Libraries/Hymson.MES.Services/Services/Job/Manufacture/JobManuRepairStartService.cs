@@ -109,6 +109,10 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
                 sfcProduceEntity.ProcessRouteId = bo.ProcedureId;
             }
 
+            // 校验工序和资源是否对应
+            var resourceIds = await _manuCommonService.GetProcResourceIdByProcedureIdAsync(bo.ProcedureId);
+            if (resourceIds.Any(a => a == bo.ResourceId) == false) throw new CustomerValidationException(nameof(ErrorCode.MES16317));
+
             // 开始维修
             sfcProduceEntity.ResourceId = bo.ResourceId;
             var rows = await _manuRepairService.StartAsync(sfcProduceEntity);
