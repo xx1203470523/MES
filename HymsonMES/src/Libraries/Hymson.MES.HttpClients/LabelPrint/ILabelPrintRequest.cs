@@ -30,6 +30,6 @@ namespace Hymson.MES.HttpClients
         /// <param name="url"></param>
         /// <param name="templateName"></param>
         /// <returns></returns>
-        public Task<(string msg, bool result)> UploadTemplateAsync(string url, string templateName);
+        public Task<(string msg, bool result, string data)> UploadTemplateAsync(string url, string templateName);
     }
 }
