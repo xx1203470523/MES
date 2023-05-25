@@ -11,6 +11,7 @@ using Hymson.WebApi.Filters;
 using Hymson.Web.Framework.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Swashbuckle.AspNetCore.Filters;
+using Microsoft.AspNetCore.HttpLogging;
 
 namespace Hymson.MES.Equipment.Api
 {
@@ -50,7 +51,12 @@ namespace Hymson.MES.Equipment.Api
             builder.Services.AddSqlLocalization(builder.Configuration);
             builder.Services.AddSequenceService(builder.Configuration);
             builder.Services.AddLocalization();
-
+#if DEBUG
+            builder.Services.AddHttpLogging(logging =>
+            {
+                logging.LoggingFields = HttpLoggingFields.All;
+            });
+#endif
             // 注入nlog日志服务
             builder.AddNLogWeb(builder.Configuration);
             AddAutoMapper();
@@ -63,6 +69,7 @@ namespace Hymson.MES.Equipment.Api
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
+                app.UseHttpLogging();
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
