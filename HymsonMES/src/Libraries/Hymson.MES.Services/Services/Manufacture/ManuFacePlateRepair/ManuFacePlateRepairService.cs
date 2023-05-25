@@ -499,7 +499,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 WorkOrderId = manuSfcProduceEntit.WorkOrderId,
                 WorkCenterId = manuSfcProduceEntit.WorkCenterId,
                 ProductBOMId = manuSfcProduceEntit.ProductBOMId,
-                ProcedureId = manuSfcProduceEntit.ProcedureId,
+                ProcedureId = confirmSubmitDto.ReturnProcedureId,
                 Qty = manuSfcProduceEntit.Qty,
                 IsRepair = true,
                 Operatetype = ManuSfcStepTypeEnum.RepairComplete,
@@ -534,7 +534,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                     SfcInfoId = manuSfcProduceEntit.Id
                 });
                 //步骤
-
                 rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
 
                 trans.Complete();
