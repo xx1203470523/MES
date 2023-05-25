@@ -19,7 +19,7 @@ namespace Hymson.MES.HttpClients
             _httpClient = httpClient;
         }
 
-        public async Task<(string msg, bool result)> UploadTemplateAsync(string url, string templateName)
+        public async Task<(string msg, bool result,string data)> UploadTemplateAsync(string url, string templateName)
         {
             string api = $"api/LabelPrint/uploadtemplate?url={url}&templateName={templateName}";
             var httpResponseMessage = await _httpClient.GetAsync(api);
@@ -34,16 +34,16 @@ namespace Hymson.MES.HttpClients
 
                     var r = await System.Text.Json.JsonSerializer.DeserializeAsync
                     <PrintResponse>(contentStream);
-                    return (msg: r.Message, result: r.Success);
+                    return (msg: r.Message, result: r.Success,data:r.Data);
                 }
                 catch (Exception ex)
                 {
-                    return (msg: ex.Message, result: false);
+                    return (msg: ex.Message, result: false,data:"");
                 }
             }
             else
             {
-                return (msg: "调用失败", result: false);
+                return (msg: "调用失败", result: false, data: "");
             }
         }
 

@@ -20,6 +20,7 @@ using Hymson.MES.HttpClients.Requests.Print;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System.Transactions;
 
@@ -81,17 +82,20 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
             procLabelTemplateEntity.CreatedOn = HymsonClock.Now();
             procLabelTemplateEntity.UpdatedOn = HymsonClock.Now();
             procLabelTemplateEntity.SiteId = _currentSite.SiteId ?? 0;
-            //入库
-            await _procLabelTemplateRepository.InsertAsync(procLabelTemplateEntity);
             //同步模板文件到打印服务器
-            if(!string.IsNullOrEmpty(procLabelTemplateEntity.Path))
+            if (!string.IsNullOrEmpty(procLabelTemplateEntity.Path))
             {
                 var result = await _labelPrintRequest.UploadTemplateAsync(procLabelTemplateEntity.Path, procLabelTemplateEntity.Name);
                 if (!result.result)
                 {
                     throw new BusinessException(nameof(ErrorCode.MES10356)).WithData("name", procLabelTemplateEntity.Name);
                 }
+                procLabelTemplateEntity.Content = result.data;
             }
+
+            //入库
+            await _procLabelTemplateRepository.InsertAsync(procLabelTemplateEntity);
+            
         }
 
         /// <summary>
@@ -117,16 +121,18 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
         public async Task<(string base64Str, bool result)> PreviewProcLabelTemplateAsync(string content)
         {
             
-            if(string.IsNullOrEmpty(content))
+            if (string.IsNullOrEmpty(content))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10350));
             }
+          
+                var request = JsonConvert.DeserializeObject<PrintRequest>(content);
+                var result = await _labelPrintRequest.PreviewFromImageBase64Async(request ?? new PrintRequest());
+                if (!result.result)
+                    throw new CustomerValidationException(nameof(ErrorCode.MES17004));
+                return result;
             
-            var request = JsonConvert.DeserializeObject<PrintRequest>(content);
-            var result = await _labelPrintRequest.PreviewFromImageBase64Async(request??new PrintRequest());
-            if (!result.result)
-                throw new CustomerValidationException(nameof(ErrorCode.MES17004));
-            return result;
+            
         }
 
         /// <summary>
@@ -188,9 +194,8 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
             procLabelTemplateEntity.UpdatedBy = _currentUser.UserName;
             procLabelTemplateEntity.UpdatedOn = HymsonClock.Now();
 
-            await _procLabelTemplateRepository.UpdateAsync(procLabelTemplateEntity);
             //同步模板文件到打印服务器
-            if (!string.Equals(foo.Path,procLabelTemplateEntity.Path, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(foo.Path, procLabelTemplateEntity.Path, StringComparison.OrdinalIgnoreCase))
             {
                 if (!string.IsNullOrEmpty(procLabelTemplateEntity.Path))
                 {
@@ -199,8 +204,12 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
                     {
                         throw new BusinessException(nameof(ErrorCode.MES10356)).WithData("name", procLabelTemplateEntity.Name);
                     }
+                    procLabelTemplateEntity.Content = result.data;
                 }
             }
+
+            await _procLabelTemplateRepository.UpdateAsync(procLabelTemplateEntity);
+            
             
             
         }
