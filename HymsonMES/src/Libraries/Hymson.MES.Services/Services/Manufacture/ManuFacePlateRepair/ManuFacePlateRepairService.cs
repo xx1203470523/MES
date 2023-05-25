@@ -17,6 +17,7 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Services.Bos.Manufacture;
@@ -479,11 +480,23 @@ namespace Hymson.MES.Services.Services.Manufacture
                 manuSfcRepairDetailList.Add(manuSfcRepairDetailEntity);
             }
             var sfcProduceRepairBo = await GetSfcProduceRepairBo(manuSfcProduceEntit.SFC);
+
+            var resources = await _procResourceRepository.GetProcResourceListByProcedureIdAsync(new ProcResourceListByProcedureIdQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                ProcedureId = confirmSubmitDto.ReturnProcedureId
+            });
+            if (resources == null || !resources.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17327));
+            }
+            long resourcesId = resources.FirstOrDefault().Id;
             // 返回工序
             var updateProcedureCommand = new UpdateProcedureCommand
             {
                 Id = manuSfcProduceEntit.Id,
                 ProcedureId = confirmSubmitDto.ReturnProcedureId,
+                ResourceId = resourcesId,
                 ProcessRouteId = sfcProduceRepairBo.ProcessRouteId,
                 UserId = _currentUser.UserName,
                 UpdatedOn = HymsonClock.Now()
@@ -499,7 +512,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 WorkOrderId = manuSfcProduceEntit.WorkOrderId,
                 WorkCenterId = manuSfcProduceEntit.WorkCenterId,
                 ProductBOMId = manuSfcProduceEntit.ProductBOMId,
-                ProcedureId = manuSfcProduceEntit.ProcedureId,
+                ProcedureId = confirmSubmitDto.ReturnProcedureId,
                 Qty = manuSfcProduceEntit.Qty,
                 IsRepair = true,
                 Operatetype = ManuSfcStepTypeEnum.RepairComplete,
@@ -534,7 +547,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                     SfcInfoId = manuSfcProduceEntit.Id
                 });
                 //步骤
-
                 rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
 
                 trans.Complete();

@@ -4,6 +4,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.Web.Framework.Filters;
 using Hymson.WebApi.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -42,7 +43,12 @@ namespace Hymson.MES.Api
             builder.Services.AddMemoryCache();
             builder.Services.AddClearCacheService(builder.Configuration);
             //builder.Services.AddHostedService<WorkService>();
-         
+#if DEBUG
+            builder.Services.AddHttpLogging(logging =>
+            {
+                logging.LoggingFields = HttpLoggingFields.All;
+            });
+#endif
             AddSwaggerGen(builder.Services);
 
             builder.Services.AddJwtBearerService(builder.Configuration);
@@ -64,6 +70,7 @@ namespace Hymson.MES.Api
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
+                app.UseHttpLogging();
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
