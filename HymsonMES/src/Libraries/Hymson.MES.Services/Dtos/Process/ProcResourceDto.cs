@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -109,6 +110,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 工序id
         /// </summary>
         public long? ProcedureId { get; set; }
+
+        /// <summary>
+        /// 描述 :状态 
+        /// 空值 : false  
+        /// </summary>
+        public SysDataStatusEnum? Status { get; set; }
     }
 
     public record ProcResourceViewDto : ProcResourceDto
