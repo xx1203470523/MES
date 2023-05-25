@@ -578,6 +578,7 @@
         public const string MES17323 = "排队中";
         public const string MES17324 = "活动中";
         public const string MES17325 = "未获取到维修业务";
+        public const string MES17326 = "未获取到维修业务内容"; 
 
 
         #endregion

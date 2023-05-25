@@ -31,7 +31,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 类型
         /// </summary>
-        public int? Type { get; set; } 
+        public ProcessRouteTypeEnum? Type { get; set; } 
 
         /// <summary>
         /// 版本

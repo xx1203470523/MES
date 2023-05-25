@@ -38,7 +38,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :类型 
         /// 空值 : true  
         /// </summary>
-        public string Type { get; set; }
+        public ProcessRouteTypeEnum Type { get; set; }
 
         /// <summary>
         /// 描述 :版本 
