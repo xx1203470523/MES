@@ -104,6 +104,10 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         private readonly IManuInStationService _manuInStationService;
 
+        /// <summary>
+        /// 仓储接口（条码步骤）
+        /// </summary>
+        private readonly IManuSfcStepRepository _manuSfcStepRepository;
 
 
         private readonly ILocalizationService _localizationService;
@@ -117,7 +121,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             IManuProductBadRecordRepository manuProductBadRecordRepository, IProcResourceRepository procResourceRepository,
             IProcProcessRouteDetailNodeRepository procProcessRouteNodeRepository, IManuFacePlateButtonService manuFacePlateButtonService,
             IManuOutStationService manuOutStationService, ILocalizationService localizationService,
-            IManuInStationService manuInStationService,
+            IManuInStationService manuInStationService, IManuSfcStepRepository manuSfcStepRepository,
         AbstractValidator<ManuFacePlateRepairCreateDto> validationCreateRules, AbstractValidator<ManuFacePlateRepairModifyDto> validationModifyRules)
         {
             _currentUser = currentUser;
@@ -136,6 +140,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _localizationService = localizationService;
+            _manuInStationService = manuInStationService;
             _manuInStationService = manuInStationService;
         }
 
@@ -473,7 +478,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 manuSfcRepairDetailList.Add(manuSfcRepairDetailEntity);
             }
             var sfcProduceRepairBo = await GetSfcProduceRepairBo(manuSfcProduceEntit.SFC);
-            // 返回工序(出站更改)
+            // 返回工序
             var updateProcedureCommand = new UpdateProcedureCommand
             {
                 Id = manuSfcProduceEntit.Id,
@@ -481,6 +486,28 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ProcessRouteId = sfcProduceRepairBo.ProcessRouteId,
                 UserId = _currentUser.UserName,
                 UpdatedOn = HymsonClock.Now()
+            };
+            //步骤
+
+            // 初始化步骤
+            var sfcStep = new ManuSfcStepEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = manuSfcProduceEntit.SiteId,
+                SFC = manuSfcProduceEntit.SFC,
+                ProductId = manuSfcProduceEntit.ProductId,
+                WorkOrderId = manuSfcProduceEntit.WorkOrderId,
+                WorkCenterId = manuSfcProduceEntit.WorkCenterId,
+                ProductBOMId = manuSfcProduceEntit.ProductBOMId,
+                ProcedureId = manuSfcProduceEntit.ProcedureId,
+                Qty = manuSfcProduceEntit.Qty,
+                Operatetype = ManuSfcStepTypeEnum.InStock,
+                EquipmentId = manuSfcProduceEntit.EquipmentId,
+                ResourceId = manuSfcProduceEntit.ResourceId,
+                CreatedBy = manuSfcProduceEntit.UpdatedBy,
+                CreatedOn = manuSfcProduceEntit.UpdatedOn.Value,
+                UpdatedBy = manuSfcProduceEntit.UpdatedBy,
+                UpdatedOn = manuSfcProduceEntit.UpdatedOn.Value,
             };
             #endregion
 
@@ -496,7 +523,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 rows += await _manuProductBadRecordRepository.UpdateRangeAsync(badRecordsList);
                 //出站 
                 rows += await _manuOutStationService.OutStationRepiarAsync(new ManufactureRepairBo { SFC = confirmSubmitDto.SFC, ProcedureId = confirmSubmitDto.ProcedureId, ReturnProcedureId = confirmSubmitDto.ReturnProcedureId, ResourceId = confirmSubmitDto.ResourceId });
-                //返回工序(出站更改)
+                //返回工序
                 rows += await _manuSfcProduceRepository.UpdateProcedureIdAsync(updateProcedureCommand);
                 // 删除 manu_sfc_produce_business
                 rows += await _manuSfcProduceRepository.DeleteSfcProduceBusinessBySfcInfoIdAsync(new DeleteSfcProduceBusinesssBySfcInfoIdCommand
@@ -504,6 +531,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                     SiteId = manuSfcProduceEntit.SiteId,
                     SfcInfoId = manuSfcProduceEntit.Id
                 });
+                //步骤
+                rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
+
                 trans.Complete();
             }
             if (rows == 0)
