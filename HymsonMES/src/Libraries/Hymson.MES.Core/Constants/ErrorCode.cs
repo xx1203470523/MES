@@ -798,6 +798,7 @@
         public const string MES19123 = "资源:{ResourceCode}未找到关联的产线信息";
         public const string MES19124 = "产线:{WorkCenterCode}未找到激活的工单信息";
         public const string MES19125 = "条码:{SFCS}未找到相关信息,请先执行进站操作";
+        public const string MES19126 = "条码:{SFCS}未找到生产信息";
 
 
 

@@ -155,6 +155,10 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                 var procProcedures = await _procProcedureRepository.GetByIdsAsync(sfcProduceList.Select(c => c.ProcedureId).ToArray());
                 procedureEntityList = procProcedures.ToList();
             }
+            //如果有条码信息，但已经没有生产信息不允许进站
+            var noIncludeSfcs = sfclist.Where(w => sfcProduceList.Select(s => s.SFC.ToUpper()).Contains(w.SFC.ToUpper()) == false);
+            if (noIncludeSfcs.Any() == true)
+                throw new CustomerValidationException(nameof(ErrorCode.MES19126)).WithData("SFCS", string.Join(',', noIncludeSfcs));
 
             //获取工艺路线首工序
             var processRouteFirstProcedure = await GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
