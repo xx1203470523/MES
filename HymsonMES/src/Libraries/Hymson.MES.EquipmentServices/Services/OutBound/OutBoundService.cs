@@ -178,6 +178,10 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             var sfclist = await _manuSfcRepository.GetBySFCsAsync(sfcs);
             //查询已经存在条码的生产信息
             var sfcProduceList = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery { Sfcs = sfcs, SiteId = _currentEquipment.SiteId });
+            //如果有不存在的SFC就提示
+            var noIncludeSfcs = sfcs.Where(w => sfclist.Select(s => s.SFC.ToUpper()).Contains(w.ToUpper()) == false);
+            if (noIncludeSfcs.Any() == true)
+                throw new CustomerValidationException(nameof(ErrorCode.MES19125)).WithData("SFCS", string.Join(',', noIncludeSfcs));
 
             //条码流转信息
             List<ManuSfcCirculationEntity> manuSfcCirculationEntities = new List<ManuSfcCirculationEntity>();
