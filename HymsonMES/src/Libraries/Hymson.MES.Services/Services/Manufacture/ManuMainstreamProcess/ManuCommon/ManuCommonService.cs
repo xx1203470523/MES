@@ -445,17 +445,17 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <returns></returns>
         public async Task<ProcProcedureEntity?> GetNextProcedureAsync(ManuSfcProduceEntity manuSfcProduce)
         {
-            return await GetNextProcedureAsync(manuSfcProduce.WorkOrderId, manuSfcProduce.ProcessRouteId, manuSfcProduce.ProcedureId);
+            return await GetNextProcedureAsync(manuSfcProduce.ProcessRouteId, manuSfcProduce.ProcedureId, manuSfcProduce.WorkOrderId);
         }
 
         /// <summary>
         /// 获当前工序对应的下一工序
         /// </summary>
-        /// <param name="workOrderId"></param>
         /// <param name="processRouteId"></param>
         /// <param name="procedureId"></param>
+        /// <param name="workOrderId"></param>
         /// <returns></returns>
-        public async Task<ProcProcedureEntity?> GetNextProcedureAsync(long workOrderId, long processRouteId, long procedureId)
+        public async Task<ProcProcedureEntity?> GetNextProcedureAsync(long processRouteId, long procedureId, long workOrderId = 0)
         {
             // 因为可能有分叉，所以返回的下一步工序是集合
             var netxtProcessRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetNextProcessRouteDetailLinkAsync(new ProcProcessRouteDetailLinkQuery

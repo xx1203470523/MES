@@ -23,6 +23,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
         public long ProcedureId { get; set; }
 
         /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
+
+        /// <summary>
         /// 工艺路线
         /// </summary>
         public long ProcessRouteId { get; set; }
