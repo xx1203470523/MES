@@ -204,8 +204,8 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                         Qty = 1,//数量1
                         Operatetype = ManuSfcStepTypeEnum.InStock,
                         CurrentStatus = SfcProduceStatusEnum.Activity,
-                        EquipmentId = sfcProduce.EquipmentId,
-                        ResourceId = sfcProduce.ResourceId,
+                        EquipmentId = _currentEquipment.Id,
+                        ResourceId = procResource.Id,
                         CreatedBy = _currentEquipment.Name,
                         CreatedOn = HymsonClock.Now(),
                         UpdatedBy = _currentEquipment.Name,

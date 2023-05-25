@@ -214,9 +214,9 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                     CurrentStatus = SfcProduceStatusEnum.Complete,
                     Operatetype = ManuSfcStepTypeEnum.OutStock,
                     ProcedureId = sfcProduceEntity.ProcedureId,
-                    CreatedBy = _currentEquipment.Code,
+                    CreatedBy = _currentEquipment.Name,
                     CreatedOn = HymsonClock.Now(),
-                    UpdatedBy = _currentEquipment.Code,
+                    UpdatedBy = _currentEquipment.Name,
                     UpdatedOn = HymsonClock.Now(),
                     IsPassingStation = outBoundSFCDto.IsPassingStation//是否是过站
                 };
@@ -475,8 +475,8 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                              Id = IdGenProvider.Instance.CreateId(),
                              SiteId = _currentEquipment.SiteId,
                              StepId = stepId,//记录步骤ID
-                             CreatedBy = _currentEquipment.Code,
-                             UpdatedBy = _currentEquipment.Code,
+                             CreatedBy = _currentEquipment.Name,
+                             UpdatedBy = _currentEquipment.Name,
                              CreatedOn = HymsonClock.Now(),
                              UpdatedOn = HymsonClock.Now(),
                              EquipmentId = _currentEquipment.Id ?? 0,
@@ -575,8 +575,8 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                          SiteId = _currentEquipment.SiteId,
                          SFC = outBoundDto.SFC,
                          MaterialBarcode = materialCode,
-                         CreatedBy = _currentEquipment.Code,
-                         UpdatedBy = _currentEquipment.Code,
+                         CreatedBy = _currentEquipment.Name,
+                         UpdatedBy = _currentEquipment.Name,
                          CreatedOn = HymsonClock.Now(),
                          UpdatedOn = HymsonClock.Now()
                      });
