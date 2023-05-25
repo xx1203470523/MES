@@ -179,6 +179,8 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                 {
                     //当前SFC的生产信息
                     var sfcProduce = sfcProduceList.Where(c => c.SFC == sfc).First();
+                    //进站修改未激活
+                    sfcProduce.Status = SfcProduceStatusEnum.Activity;
                     //当前SFC的工序信息
                     var sfcprocedureEntity = procedureEntityList.Where(c => c.Id == sfcProduce.ProcedureId).First();
                     // 检查是否测试工序

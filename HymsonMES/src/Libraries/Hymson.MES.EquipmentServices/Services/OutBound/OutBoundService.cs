@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Hymson.Infrastructure.Exceptions;
+using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Process;
@@ -21,6 +22,8 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
+using IdGen;
+using System.Text.Json;
 using System.Transactions;
 
 namespace Hymson.MES.EquipmentServices.Services.OutBound
@@ -118,7 +121,8 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                         BindFeedingCodes= outBoundDto.BindFeedingCodes,
                         NG=outBoundDto.NG,
                         ParamList=outBoundDto.ParamList,
-                        Passed = outBoundDto.Passed
+                        Passed = outBoundDto.Passed,
+                        IsPassingStation = outBoundDto.IsPassingStation
                     }
                 }
             };
@@ -183,6 +187,28 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             if (noIncludeSfcs.Any() == true)
                 throw new CustomerValidationException(nameof(ErrorCode.MES19125)).WithData("SFCS", string.Join(',', noIncludeSfcs));
 
+            //排队中的条码没进站不允许出站
+            if (sfcProduceList.Any())
+            {
+                //必须进站再出站
+                var outBoundMoreSfcs = outBoundMoreDto.SFCs.Where(w =>
+                                            sfcProduceList.Where(c => c.Status == SfcProduceStatusEnum.lineUp)
+                                            .Select(s => s.SFC.ToUpper())
+                                            .Contains(w.SFC.ToUpper()) && w.IsPassingStation != true);
+                if (outBoundMoreSfcs.Any())
+                    throw new CustomerValidationException(nameof(ErrorCode.MES19127)).WithData("SFCS", string.Join(',', outBoundMoreSfcs.Select(c => c.SFC)));
+            }
+            //已经进站条码不允许过站
+            if (sfcProduceList.Any())
+            {
+                var outBoundMoreSfcs = outBoundMoreDto.SFCs.Where(w =>
+                                            sfcProduceList.Where(c => c.Status == SfcProduceStatusEnum.Activity)
+                                            .Select(s => s.SFC.ToUpper())
+                                            .Contains(w.SFC.ToUpper()) && w.IsPassingStation == true);
+                if (outBoundMoreSfcs.Any())
+                    throw new CustomerValidationException(nameof(ErrorCode.MES19128)).WithData("SFCS", string.Join(',', outBoundMoreSfcs.Select(c => c.SFC)));
+            }
+
             //条码流转信息
             List<ManuSfcCirculationEntity> manuSfcCirculationEntities = new List<ManuSfcCirculationEntity>();
             List<string> delManuSfcProduces = new List<string>();
@@ -211,7 +237,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                     Passed = outBoundSFCDto.Passed,//是否合格
                     EquipmentId = _currentEquipment.Id,
                     ResourceId = procResource.Id,
-                    CurrentStatus = SfcProduceStatusEnum.Complete,
+                    CurrentStatus = SfcProduceStatusEnum.Activity,
                     Operatetype = ManuSfcStepTypeEnum.OutStock,
                     ProcedureId = sfcProduceEntity.ProcedureId,
                     CreatedBy = _currentEquipment.Name,
@@ -260,16 +286,32 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                     //Sfc生成信息
                     manuSfcProduceEntities.Add(sfcProduceEntity);
                 }
-                else
-                { //未完工
+                else//未完工
+                {
+                    //如果是过站
+                    if (outBoundSFCDto.IsPassingStation)
+                    {
+                        var manuSfcStepPassingEntity = JsonSerializer.Deserialize<ManuSfcStepEntity>(JsonSerializer.Serialize(manuSfcStepEntity));
+                        if (manuSfcStepPassingEntity != null)
+                        {
+                            //插入 manu_sfc_step 状态为 进站
+                            manuSfcStepPassingEntity.Id = IdGenProvider.Instance.CreateId();
+                            manuSfcStepPassingEntity.Operatetype = ManuSfcStepTypeEnum.InStock;
+                            manuSfcStepPassingEntity.CreatedOn = HymsonClock.Now().AddSeconds(-1);//方便区分进站和出站时间
+                            manuSfcStepPassingEntity.UpdatedOn = HymsonClock.Now().AddSeconds(-1);
+                            manuSfcStepEntities.Add(manuSfcStepPassingEntity);
+                        }
+                    }
                     // 修改 manu_sfc_produce 为排队, 工序修改为下一工序的id
                     sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
                     sfcProduceEntity.ProcedureId = nextProcedure.Id;
                     manuSfcProduceEntities.Add(sfcProduceEntity);
-                    //插入 manu_sfc_step 状态为 进站
+                    //插入 manu_sfc_step 状态为 出站
+                    manuSfcStepEntity.Id = IdGenProvider.Instance.CreateId();
                     manuSfcStepEntity.CurrentStatus = SfcProduceStatusEnum.Activity;
                     manuSfcStepEntity.Operatetype = ManuSfcStepTypeEnum.OutStock;
                     manuSfcStepEntities.Add(manuSfcStepEntity);
+
                 }
             }
             //标准参数
