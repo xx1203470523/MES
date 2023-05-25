@@ -567,6 +567,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                      new ManuSfcStepMaterialEntity
                      {
                          Id = IdGenProvider.Instance.CreateId(),
+                         StepId = stepId,
                          SiteId = _currentEquipment.SiteId,
                          SFC = outBoundDto.SFC,
                          MaterialBarcode = materialCode,
