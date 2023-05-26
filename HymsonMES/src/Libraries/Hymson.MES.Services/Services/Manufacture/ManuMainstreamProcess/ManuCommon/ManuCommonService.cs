@@ -22,7 +22,6 @@ using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Services.Bos.Manufacture;
-using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
 using Hymson.Sequences;
 using Hymson.Snowflake;
@@ -234,11 +233,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             if (string.IsNullOrWhiteSpace(sfc) == true
                 || sfc.Contains(' ') == true) throw new CustomerValidationException(nameof(ErrorCode.MES16305));
 
+            // 条码在制表
             var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 Sfc = sfc
             });
+
+            // 不存在在制表的话，就去库存查找
             if (sfcProduceEntity == null)
             {
                 var whMaterialInventoryEntity = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery
@@ -443,17 +445,17 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <returns></returns>
         public async Task<ProcProcedureEntity?> GetNextProcedureAsync(ManuSfcProduceEntity manuSfcProduce)
         {
-            return await GetNextProcedureAsync(manuSfcProduce.WorkOrderId, manuSfcProduce.ProcessRouteId, manuSfcProduce.ProcedureId);
+            return await GetNextProcedureAsync(manuSfcProduce.ProcessRouteId, manuSfcProduce.ProcedureId, manuSfcProduce.WorkOrderId);
         }
 
         /// <summary>
         /// 获当前工序对应的下一工序
         /// </summary>
-        /// <param name="workOrderId"></param>
         /// <param name="processRouteId"></param>
         /// <param name="procedureId"></param>
+        /// <param name="workOrderId"></param>
         /// <returns></returns>
-        public async Task<ProcProcedureEntity?> GetNextProcedureAsync(long workOrderId, long processRouteId, long procedureId)
+        public async Task<ProcProcedureEntity?> GetNextProcedureAsync(long processRouteId, long procedureId, long workOrderId = 0)
         {
             // 因为可能有分叉，所以返回的下一步工序是集合
             var netxtProcessRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetNextProcessRouteDetailLinkAsync(new ProcProcessRouteDetailLinkQuery
@@ -659,7 +661,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <returns></returns>
         public async Task VerifySfcsLockAsync(string[] sfcs, long procedureId)
         {
-            var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery {SiteId=_currentSite.SiteId??0, Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
+            var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { SiteId = _currentSite.SiteId ?? 0, Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
             if (sfcProduceBusinesss != null && sfcProduceBusinesss.Any())
             {
                 var validationFailures = new List<ValidationFailure>();

@@ -2,7 +2,10 @@
 
 namespace Hymson.MES.Core.Enums
 {
-    public enum ProcessRouteTypeEnum:sbyte
+    /// <summary>
+    /// 
+    /// </summary>
+    public enum ProcessRouteTypeEnum : sbyte
     {
         /// <summary>
         /// 生产主工艺路线

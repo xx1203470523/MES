@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Data.Repositories.Process.Resource
 {
@@ -82,5 +83,11 @@ namespace Hymson.MES.Data.Repositories.Process.Resource
         /// 工序编码
         /// </summary>
         public long? ProcedureId { get; set; }
+
+        /// <summary>
+        /// 描述 :状态 
+        /// 空值 : false  
+        /// </summary>
+        public SysDataStatusEnum? Status { get; set; }
     }
 }

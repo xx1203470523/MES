@@ -86,7 +86,19 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         Task<IEnumerable<ProcReplaceMaterialEntity>> GetProcReplaceMaterialEntitiesAsync(ProcReplaceMaterialQuery procReplaceMaterialQuery);
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="procReplaceMaterialQuery"></param>
+        /// <returns></returns>
         Task<IEnumerable<ProcReplaceMaterialView>> GetProcReplaceMaterialViewsAsync(ProcReplaceMaterialQuery procReplaceMaterialQuery);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="procReplaceMaterialQuery"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcReplaceMaterialView>> GetProcReplaceMaterialViewsAsync(ProcReplaceMaterialsQuery procReplaceMaterialQuery);
 
         /// <summary>
         /// 分页查询

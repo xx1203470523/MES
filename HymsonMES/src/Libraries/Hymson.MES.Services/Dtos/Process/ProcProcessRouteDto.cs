@@ -32,7 +32,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 类型
         /// </summary>
-        public int Type { get; set; }
+        public ProcessRouteTypeEnum Type { get; set; }
 
        /// <summary>
         /// 版本
@@ -227,7 +227,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 类型
         /// </summary>
-        public int Type { get; set; }
+        public ProcessRouteTypeEnum Type { get; set; }
 
        /// <summary>
         /// 版本
@@ -283,7 +283,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 类型
         /// </summary>
-        public int Type { get; set; }
+        public ProcessRouteTypeEnum Type { get; set; }
 
         /// <summary>
         /// 工序集合
@@ -319,7 +319,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 类型
         /// </summary>
-        public int? Type { get; set; }
+        public ProcessRouteTypeEnum? Type { get; set; }
 
         /// <summary>
         /// 版本
