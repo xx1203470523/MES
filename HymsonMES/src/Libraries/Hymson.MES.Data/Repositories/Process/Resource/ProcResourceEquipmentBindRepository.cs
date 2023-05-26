@@ -78,6 +78,10 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 sqlBuilder.Where("EquipmentId in @Ids");
             }
+            if (query.SiteId.HasValue)
+            {
+                sqlBuilder.Where("SiteId = @SiteId");
+            }
             sqlBuilder.AddParameters(query);
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ProcResourceEquipmentBindView>(templateData.RawSql, templateData.Parameters);

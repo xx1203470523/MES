@@ -52,6 +52,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
         private readonly IProcProcessRouteDetailNodeRepository _procProcessRouteDetailNodeRepository;
         private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
         private readonly IManuSfcStepMaterialRepository _manuSfcStepMaterialRepository;
+        private readonly IProcResourceEquipmentBindRepository _procResourceEquipmentBindRepository;
 
         public OutBoundService(AbstractValidator<OutBoundDto> validationOutBoundDtoRules,
             ICurrentEquipment currentEquipment,
@@ -71,7 +72,8 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
-            IManuSfcStepMaterialRepository manuSfcStepMaterialRepository)
+            IManuSfcStepMaterialRepository manuSfcStepMaterialRepository,
+            IProcResourceEquipmentBindRepository procResourceEquipmentBindRepository)
         {
             _validationOutBoundDtoRules = validationOutBoundDtoRules;
             _currentEquipment = currentEquipment;
@@ -92,6 +94,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
             _manuSfcStepMaterialRepository = manuSfcStepMaterialRepository;
+            _procResourceEquipmentBindRepository = procResourceEquipmentBindRepository;
         }
 
         /// <summary>
@@ -156,6 +159,18 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
         {
             //已经验证过资源是否存在直接使用
             var procResource = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentEquipment.SiteId, Code = outBoundMoreDto.ResourceCode });
+            //查询资源和设备是否绑定
+            var resourceEquipmentBindQuery = new ProcResourceEquipmentBindQuery
+            {
+                SiteId = _currentEquipment.SiteId,
+                Ids = new long[] { _currentEquipment.Id ?? 0 },
+                ResourceId = procResource.Id
+            };
+            var resEquipentBind = await _procResourceEquipmentBindRepository.GetByResourceIdAsync(resourceEquipmentBindQuery);
+            if (resEquipentBind.Any() == false)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19131)).WithData("ResCode", procResource.ResCode).WithData("EquCode", _currentEquipment.Code);
+            }
             //查找当前工作中心（产线）
             var workLine = await _inteWorkCenterRepository.GetByResourceIdAsync(procResource.Id);
             if (workLine == null)

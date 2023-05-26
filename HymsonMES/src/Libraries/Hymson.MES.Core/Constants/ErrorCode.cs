@@ -795,16 +795,17 @@
         public const string MES19118 = "产品编码：{Code}不存在";
         public const string MES19119 = "绑定条码列表不能为空";
         public const string MES19120 = "解绑条码列表不能为空";
-        public const string MES19121 = "绑定条码:{SFC}和BindSFC:{BindSFC}绑定关系已经存在";
-        public const string MES19122 = "容器:{ContainerCode}和SFC:{SFC}绑定关系已经存在";
-        public const string MES19123 = "资源:{ResourceCode}未找到关联的产线信息";
-        public const string MES19124 = "产线:{WorkCenterCode}未找到激活的工单信息";
-        public const string MES19125 = "条码:{SFCS}未找到条码信息,请先执行进站操作";
-        public const string MES19126 = "条码:{SFCS}未找到生产信息";
-        public const string MES19127 = "条码:{SFCS}未进站不能操作出站";
-        public const string MES19128 = "条码:{SFCS}已进站不能操作过站";
-        public const string MES19129 = "条码:{SFCS}当前状态不是排队状态，不允许进站";
-        public const string MES19130 = "条码:{SFCS}超过或达到最大复投次数限制，不允许进站";
+        public const string MES19121 = "绑定条码：{SFC}和BindSFC：{BindSFC}绑定关系已经存在";
+        public const string MES19122 = "容器：{ContainerCode}和SFC：{SFC}绑定关系已经存在";
+        public const string MES19123 = "资源：{ResourceCode}未找到关联的产线信息";
+        public const string MES19124 = "产线：{WorkCenterCode}未找到激活的工单信息";
+        public const string MES19125 = "条码：{SFCS}未找到条码信息,请先执行进站操作";
+        public const string MES19126 = "条码：{SFCS}未找到生产信息";
+        public const string MES19127 = "条码：{SFCS}未进站不能操作出站";
+        public const string MES19128 = "条码：{SFCS}已进站不能操作过站";
+        public const string MES19129 = "条码：{SFCS}当前状态不是排队状态，不允许进站";
+        public const string MES19130 = "条码：{SFCS}超过或达到最大复投次数限制，不允许进站";
+        public const string MES19131 = "资源：{ResCode}和设备：{EquCode}不存在绑定关系，请检查配置";
 
 
 
