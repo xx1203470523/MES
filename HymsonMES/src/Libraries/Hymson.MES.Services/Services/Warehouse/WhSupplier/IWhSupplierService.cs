@@ -61,5 +61,12 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <param name="id"></param>
         /// <returns></returns>
         Task<WhSupplierDto> QueryWhSupplierByIdAsync(long id);
+
+        /// <summary>
+        /// 根据ID查询(更改供应商)
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<UpdateWhSupplierDto> QueryUpdateWhSupplierByIdAsync(long id);
     }
 }

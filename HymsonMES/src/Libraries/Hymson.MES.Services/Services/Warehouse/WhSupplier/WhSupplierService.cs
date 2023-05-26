@@ -190,7 +190,24 @@ namespace Hymson.MES.Services.Services.Warehouse
             var whSupplierEntity = await _whSupplierRepository.GetByIdAsync(id);
             if (whSupplierEntity != null)
             {
-                return whSupplierEntity.ToModel<WhSupplierDto>();
+                return new WhSupplierDto { Id = whSupplierEntity.Id, Code = whSupplierEntity.Code, Name = whSupplierEntity.Name, Remark = whSupplierEntity.Remark, CreatedBy = whSupplierEntity.CreatedBy, CreatedOn = whSupplierEntity.CreatedOn };
+                //return whSupplierEntity.ToModel<WhSupplierDto>();
+            }
+            return null;
+        }
+
+
+        /// <summary>
+        /// 根据ID查询(更改供应商)
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<UpdateWhSupplierDto> QueryUpdateWhSupplierByIdAsync(long id)
+        {
+            var whSupplierEntity = await _whSupplierRepository.GetByIdAsync(id);
+            if (whSupplierEntity != null)
+            {
+                return new UpdateWhSupplierDto { Id = whSupplierEntity.Id, Code = whSupplierEntity.Code, Name = whSupplierEntity.Name, Remark = whSupplierEntity.Remark };
             }
             return null;
         }

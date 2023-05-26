@@ -20,7 +20,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
     /// @author pengxin
     /// @date 2023-03-03 01:51:43
     /// </summary>
-    
+
     [ApiController]
     [Route("api/v1/[controller]")]
     public class WhSupplierController : ControllerBase
@@ -62,6 +62,17 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         public async Task<WhSupplierDto> QueryWhSupplierByIdAsync(long id)
         {
             return await _whSupplierService.QueryWhSupplierByIdAsync(id);
+        }
+
+        /// <summary>
+        /// 根据ID查询(更改供应商)
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("updatedto/{id}")]
+        public async Task<UpdateWhSupplierDto> QueryUpdateWhSupplierByIdAsync(long id)
+        {
+            return await _whSupplierService.QueryUpdateWhSupplierByIdAsync(id);
         }
 
         /// <summary>
