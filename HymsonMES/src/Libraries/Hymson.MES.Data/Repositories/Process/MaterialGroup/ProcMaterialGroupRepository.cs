@@ -262,7 +262,7 @@ o.MaterialCode,
 o.MaterialName,
 o.Version
                                                             FROM `proc_material_group` g
-                                                            LEFT JOIN proc_material o on o.GroupId = g.Id
+                                                            LEFT JOIN proc_material o on o.GroupId = g.Id and o.IsDeleted=0
 /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedCustomInfoCountSqlTemplate = @"SELECT COUNT(*) 
                                                 FROM `proc_material_group` g
