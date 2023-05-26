@@ -148,17 +148,15 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             var sfclist = await _manuSfcRepository.GetBySFCsAsync(inBoundMoreDto.SFCs);
             //查询已经存在条码的生产信息
             var sfcProduceList = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery { Sfcs = inBoundMoreDto.SFCs, SiteId = _currentEquipment.SiteId });
-            //查询已存在条码的工序信息
-            List<ProcProcedureEntity> procedureEntityList = new List<ProcProcedureEntity>();
-            if (sfcProduceList.Any())
-            {
-                var procProcedures = await _procProcedureRepository.GetByIdsAsync(sfcProduceList.Select(c => c.ProcedureId).ToArray());
-                procedureEntityList = procProcedures.ToList();
-            }
             //SFC有条码信息，但已经没有生产信息不允许进站
             var noIncludeSfcs = sfclist.Where(w => sfcProduceList.Select(s => s.SFC.ToUpper()).Contains(w.SFC.ToUpper()) == false);
             if (noIncludeSfcs.Any())
                 throw new CustomerValidationException(nameof(ErrorCode.MES19126)).WithData("SFCS", string.Join(',', noIncludeSfcs));
+
+            //查询已存在条码的工序信息
+            List<ProcProcedureEntity> procedureEntityList = new List<ProcProcedureEntity>();
+            var procProcedures = await _procProcedureRepository.GetByIdsAsync(sfcProduceList.Select(c => c.ProcedureId).ToArray());
+            procedureEntityList = procProcedures.ToList();
 
             //不是排队状态不允许进站
             var noLinUpSFCs = sfcProduceList.Where(c => c.Status != SfcProduceStatusEnum.lineUp);
