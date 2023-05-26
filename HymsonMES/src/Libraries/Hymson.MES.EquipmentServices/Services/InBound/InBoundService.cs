@@ -155,10 +155,15 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                 var procProcedures = await _procProcedureRepository.GetByIdsAsync(sfcProduceList.Select(c => c.ProcedureId).ToArray());
                 procedureEntityList = procProcedures.ToList();
             }
-            //如果有条码信息，但已经没有生产信息不允许进站
+            //SFC有条码信息，但已经没有生产信息不允许进站
             var noIncludeSfcs = sfclist.Where(w => sfcProduceList.Select(s => s.SFC.ToUpper()).Contains(w.SFC.ToUpper()) == false);
-            if (noIncludeSfcs.Any() == true)
+            if (noIncludeSfcs.Any())
                 throw new CustomerValidationException(nameof(ErrorCode.MES19126)).WithData("SFCS", string.Join(',', noIncludeSfcs));
+
+            //不是排队状态不允许进站
+            var noLinUpSFCs = sfcProduceList.Where(c => c.Status != SfcProduceStatusEnum.lineUp);
+            if (noLinUpSFCs.Any())
+                throw new CustomerValidationException(nameof(ErrorCode.MES19129)).WithData("SFCS", string.Join(',', noLinUpSFCs));
 
             //获取工艺路线首工序
             var processRouteFirstProcedure = await GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
@@ -179,7 +184,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                 {
                     //当前SFC的生产信息
                     var sfcProduce = sfcProduceList.Where(c => c.SFC == sfc).First();
-                    //进站修改未激活
+                    //进站修改为激活
                     sfcProduce.Status = SfcProduceStatusEnum.Activity;
                     //当前SFC的工序信息
                     var sfcprocedureEntity = procedureEntityList.Where(c => c.Id == sfcProduce.ProcedureId).First();

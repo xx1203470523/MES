@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Hymson.Infrastructure.Exceptions;
-using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Process;
@@ -22,9 +21,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
-using IdGen;
 using System.Text.Json;
-using System.Transactions;
 
 namespace Hymson.MES.EquipmentServices.Services.OutBound
 {
@@ -183,9 +180,14 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             //查询已经存在条码的生产信息
             var sfcProduceList = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery { Sfcs = sfcs, SiteId = _currentEquipment.SiteId });
             //如果有不存在的SFC就提示
-            var noIncludeSfcs = sfcs.Where(w => sfclist.Select(s => s.SFC.ToUpper()).Contains(w.ToUpper()) == false);
+            var noIncludeSfcs = sfcs.Where(sfc => sfclist.Select(s => s.SFC).Contains(sfc) == false);
             if (noIncludeSfcs.Any() == true)
                 throw new CustomerValidationException(nameof(ErrorCode.MES19125)).WithData("SFCS", string.Join(',', noIncludeSfcs));
+
+            //SFC有条码信息，但已经没有生产信息不允许出站
+            var noProduceSfcs = sfclist.Where(w => sfcProduceList.Select(s => s.SFC).Contains(w.SFC) == false);
+            if (noProduceSfcs.Any())
+                throw new CustomerValidationException(nameof(ErrorCode.MES19126)).WithData("SFCS", string.Join(',', noProduceSfcs));
 
             //排队中的条码没进站不允许出站
             if (sfcProduceList.Any())
@@ -193,8 +195,8 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 //必须进站再出站
                 var outBoundMoreSfcs = outBoundMoreDto.SFCs.Where(w =>
                                             sfcProduceList.Where(c => c.Status == SfcProduceStatusEnum.lineUp)
-                                            .Select(s => s.SFC.ToUpper())
-                                            .Contains(w.SFC.ToUpper()) && w.IsPassingStation != true);
+                                            .Select(s => s.SFC)
+                                            .Contains(w.SFC) && w.IsPassingStation != true);
                 if (outBoundMoreSfcs.Any())
                     throw new CustomerValidationException(nameof(ErrorCode.MES19127)).WithData("SFCS", string.Join(',', outBoundMoreSfcs.Select(c => c.SFC)));
             }
@@ -203,8 +205,8 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             {
                 var outBoundMoreSfcs = outBoundMoreDto.SFCs.Where(w =>
                                             sfcProduceList.Where(c => c.Status == SfcProduceStatusEnum.Activity)
-                                            .Select(s => s.SFC.ToUpper())
-                                            .Contains(w.SFC.ToUpper()) && w.IsPassingStation == true);
+                                            .Select(s => s.SFC)
+                                            .Contains(w.SFC) && w.IsPassingStation == true);
                 if (outBoundMoreSfcs.Any())
                     throw new CustomerValidationException(nameof(ErrorCode.MES19128)).WithData("SFCS", string.Join(',', outBoundMoreSfcs.Select(c => c.SFC)));
             }
