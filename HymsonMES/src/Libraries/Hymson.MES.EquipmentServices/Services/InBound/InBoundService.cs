@@ -19,6 +19,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
+using System.Linq;
 
 namespace Hymson.MES.EquipmentServices.Services.InBound
 {
@@ -158,8 +159,16 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             var procProcedures = await _procProcedureRepository.GetByIdsAsync(sfcProduceList.Select(c => c.ProcedureId).ToArray());
             procedureEntityList = procProcedures.ToList();
 
-            //不是排队状态不允许进站
-            var noLinUpSFCs = sfcProduceList.Where(c => c.Status != SfcProduceStatusEnum.lineUp);
+            //复投次数限制，对于测试类型工序，条码复投数量大于等于工序循环次数限制进站
+            var noNeedRepeat = sfcProduceList.Where(c => procedureEntityList.Where(p => p.Type == ProcedureTypeEnum.Test && (p.Cycle ?? 1) <= c.RepeatedCount)
+                                                         .Select(p => p.Id).Contains(c.ProcedureId));
+            if (noNeedRepeat.Any())
+                throw new CustomerValidationException(nameof(ErrorCode.MES19130)).WithData("SFCS", string.Join(',', noNeedRepeat));
+
+            //当前所在工序不是测试工序，条码不是排队状态不允许进站
+            var noLinUpSFCs = sfcProduceList.Where(c => c.Status != SfcProduceStatusEnum.lineUp
+                                                        && procedureEntityList.Where(p => p.Type == ProcedureTypeEnum.Test)
+                                                        .Select(p => p.Id).Contains(c.ProcedureId) == false);
             if (noLinUpSFCs.Any())
                 throw new CustomerValidationException(nameof(ErrorCode.MES19129)).WithData("SFCS", string.Join(',', noLinUpSFCs));
 
@@ -190,7 +199,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     if (sfcprocedureEntity.Type == ProcedureTypeEnum.Test)
                     {
                         // 超过复投次数，标识为NG
-                        if (sfcProduce.RepeatedCount > sfcprocedureEntity.Cycle) throw new CustomerValidationException(nameof(ErrorCode.MES16036));
+                        //if (sfcProduce.RepeatedCount > sfcprocedureEntity.Cycle) throw new CustomerValidationException(nameof(ErrorCode.MES16036));
                         sfcProduce.RepeatedCount++;
                     }
                     //是否首工序

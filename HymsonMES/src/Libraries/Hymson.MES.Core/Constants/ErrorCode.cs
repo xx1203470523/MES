@@ -804,6 +804,7 @@
         public const string MES19127 = "条码:{SFCS}未进站不能操作出站";
         public const string MES19128 = "条码:{SFCS}已进站不能操作过站";
         public const string MES19129 = "条码:{SFCS}当前状态不是排队状态，不允许进站";
+        public const string MES19130 = "条码:{SFCS}超过或达到最大复投次数限制，不允许进站";
 
 
 
