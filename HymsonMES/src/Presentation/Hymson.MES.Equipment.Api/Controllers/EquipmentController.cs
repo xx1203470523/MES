@@ -267,18 +267,18 @@ namespace Hymson.MES.Equipment.Api.Controllers
         }
 
 
-        /// <summary>
-        /// 容器绑定
-        /// HY-MES-EQU-019
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("BindContainer")]
-        public async Task BindContainerAsync(BindContainerDto request)
-        {
-            await _bindContainerService.BindContainerAsync(request);
-        }
+        ///// <summary>
+        ///// 容器绑定
+        ///// HY-MES-EQU-019
+        ///// </summary>
+        ///// <param name="request"></param>
+        ///// <returns></returns>
+        //[HttpPost]
+        //[Route("BindContainer")]
+        //public async Task BindContainerAsync(BindContainerDto request)
+        //{
+        //    await _bindContainerService.BindContainerAsync(request);
+        //}
 
         /// <summary>
         /// 条码绑定
@@ -306,33 +306,33 @@ namespace Hymson.MES.Equipment.Api.Controllers
             await _bindSFCService.UnBindSFCAsync(request);
         }
 
-        /// <summary>
-        /// 容器解绑
-        /// HY-MES-EQU-022
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("UnBindContainer")]
-        public async Task UnBindContainerAsync(UnBindContainerDto request)
-        {
-            await _bindContainerService.UnBindContainerAsync(request);
-        }
+        ///// <summary>
+        ///// 容器解绑
+        ///// HY-MES-EQU-022
+        ///// </summary>
+        ///// <param name="request"></param>
+        ///// <returns></returns>
+        //[HttpPost]
+        //[Route("UnBindContainer")]
+        //public async Task UnBindContainerAsync(UnBindContainerDto request)
+        //{
+        //    await _bindContainerService.UnBindContainerAsync(request);
+        //}
 
 
-        /// <summary>
-        /// 进站-容器
-        /// HY-MES-EQU-023 
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("InboundInContainer")]
-        public async Task InboundInContainerAsync(InboundInContainerDto request)
-        {
-            _logger.LogInformation("进站-容器：InboundInContainer,msg:{request}", request);
-            await _inboundInContainerService.InboundInContainerAsync(request);
-        }
+        ///// <summary>
+        ///// 进站-容器
+        ///// HY-MES-EQU-023 
+        ///// </summary>
+        ///// <param name="request"></param>
+        ///// <returns></returns>
+        //[HttpPost]
+        //[Route("InboundInContainer")]
+        //public async Task InboundInContainerAsync(InboundInContainerDto request)
+        //{
+        //    _logger.LogInformation("进站-容器：InboundInContainer,msg:{request}", request);
+        //    await _inboundInContainerService.InboundInContainerAsync(request);
+        //}
 
         /// <summary>
         /// 请求生成模组码-电芯堆叠
@@ -420,19 +420,19 @@ namespace Hymson.MES.Equipment.Api.Controllers
         }
 
 
-        /// <summary>
-        ///容器内条码查询
-        ///HY-MES-EQU-035  
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("QueryContainerBindSfc")]
-        public async Task QueryContainerBindSfcAsync(QueryContainerBindSfcDto request)
-        {
-            _logger.LogInformation("容器内条码查询：QueryContainerBindSfc,msg:{request}", request);
-            await _queryContainerBindSfcService.QueryContainerBindSfcAsync(request);
-        }
+        ///// <summary>
+        /////容器内条码查询
+        /////HY-MES-EQU-035  
+        ///// </summary>
+        ///// <param name="request"></param>
+        ///// <returns></returns>
+        //[HttpPost]
+        //[Route("QueryContainerBindSfc")]
+        //public async Task QueryContainerBindSfcAsync(QueryContainerBindSfcDto request)
+        //{
+        //    _logger.LogInformation("容器内条码查询：QueryContainerBindSfc,msg:{request}", request);
+        //    await _queryContainerBindSfcService.QueryContainerBindSfcAsync(request);
+        //}
 
     }
 }
