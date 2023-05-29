@@ -1398,7 +1398,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             //生产中/已完工的工单
             if (planWorkOrderEntity.Status != PlanWorkOrderStatusEnum.InProduction && planWorkOrderEntity.Status != PlanWorkOrderStatusEnum.Finish)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES18009)).WithData("OrderCode", planWorkOrderEntity.OrderCode).WithData("Status", planWorkOrderEntity.Status);
+                var statusMsg = _localizationService.GetResource($"Hymson.MES.Core.Enums.PlanWorkOrderStatusEnum.{Enum.GetName(typeof(PlanWorkOrderStatusEnum), planWorkOrderEntity.Status) ?? ""}");
+                throw new CustomerValidationException(nameof(ErrorCode.MES18009)).WithData("OrderCode", planWorkOrderEntity.OrderCode).WithData("Status", statusMsg);
             }
             //验证同一工艺路线 
             var processRouteIds = planWorkOrders.Select(it => it.ProcessRouteId).Distinct();
