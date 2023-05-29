@@ -2,8 +2,12 @@
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Core.Enums.QualUnqualifiedCode;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
@@ -35,6 +39,10 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// 服务接口（不良录入）
         /// </summary>
         private readonly IManuProductBadRecordRepository _manuProductBadRecordRepository;
+        /// <summary>
+        /// 条码生产信息（物理删除） 仓储 
+        /// </summary>
+        private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
         /// <summary>
         /// 构造函数
@@ -43,14 +51,17 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <param name="currentSite"></param>
         /// <param name="manuCommonService"></param>
         /// <param name="manuProductBadRecordRepository"></param>
+        /// <param name="manuSfcProduceRepository"></param>
         public JobManuBadRecordService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonService manuCommonService,
-            IManuProductBadRecordRepository manuProductBadRecordRepository)
+            IManuProductBadRecordRepository manuProductBadRecordRepository,
+            IManuSfcProduceRepository manuSfcProduceRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _manuCommonService = manuCommonService;
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
+            _manuSfcProduceRepository = manuSfcProduceRepository;
         }
 
 
@@ -97,15 +108,24 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
                             .VerifyProcedure(bo.ProcedureId)
                             .VerifyResource(bo.ResourceId);
 
-            // 读取之前的录入记录
-            var manuProductBadRecordViews = await _manuProductBadRecordRepository.GetBadRecordsBySfcAsync(new ManuProductBadRecordQuery
+            //// 读取之前的录入记录
+            //var manuProductBadRecordViews = await _manuProductBadRecordRepository.GetBadRecordsBySfcAsync(new ManuProductBadRecordQuery
+            //{
+            //    SiteId = _currentSite.SiteId ?? 0,
+            //    Type= QualUnqualifiedCodeTypeEnum.Defect,
+            //    Status= ProductBadRecordStatusEnum.Open,
+            //    SFC = bo.SFC,
+            //});
+            // 获取维修业务
+            var sfcProduceBusinessEntity = await _manuSfcProduceRepository.GetSfcProduceBusinessBySFCAsync(new SfcProduceBusinessQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
-                SFC = bo.SFC,
+                Sfc = bo.SFC,
+                BusinessType = ManuSfcProduceBusinessType.Repair
             });
 
             // 判断面板是否显示
-            var isShow = manuProductBadRecordViews == null || manuProductBadRecordViews.Any() == false;
+            var isShow = sfcProduceBusinessEntity != null == false;
 
             defaultDto.Content?.Add("BadEntryCom", $"{isShow}".ToString());
             if (param.ContainsKey("IsClear")) defaultDto.Content?.Add("IsClear", param["IsClear"]);

@@ -131,7 +131,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
                 case WorkCenterTypeEnum.Line:
                     sqlBuilder.Where("IWCR.WorkCenterId = @ParentId");
                     break;
-                case WorkCenterTypeEnum.Factory:
+                //case WorkCenterTypeEnum.Factory:
                 default:
                     break;
             }
