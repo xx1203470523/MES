@@ -665,6 +665,45 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// 批量验证条码是否锁定
         /// </summary>
         /// <param name="sfcs"></param>
+        /// <returns></returns>
+        public async Task VerifySfcsLockAsync(IEnumerable<string> sfcs)
+        {
+            var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                Sfcs = sfcs,
+                BusinessType = ManuSfcProduceBusinessType.Lock
+            });
+
+            if (sfcProduceBusinesss == null || sfcProduceBusinesss.Any() == false) return;
+
+            List<ValidationFailure> validationFailures = new();
+            foreach (var item in sfcProduceBusinesss)
+            {
+                var sfcProduceLockBo = JsonSerializer.Deserialize<SfcProduceLockBo>(item.BusinessContent);
+                if (sfcProduceLockBo == null) continue;
+
+                if (sfcProduceLockBo.Lock != QualityLockEnum.InstantLock
+                    && sfcProduceLockBo.Lock != QualityLockEnum.FutureLock) continue;
+
+                validationFailures.Add(new ValidationFailure
+                {
+                    FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", item.Sfc } },
+                    ErrorCode = nameof(ErrorCode.MES18010)
+                });
+            }
+
+            // 是否存在错误
+            if (validationFailures.Any() == true)
+            {
+                throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
+            }
+        }
+
+        /// <summary>
+        /// 批量验证条码是否锁定
+        /// </summary>
+        /// <param name="sfcs"></param>
         /// <param name="procedureId"></param>
         /// <returns></returns>
         public async Task VerifySfcsLockAsync(string[] sfcs, long procedureId)
