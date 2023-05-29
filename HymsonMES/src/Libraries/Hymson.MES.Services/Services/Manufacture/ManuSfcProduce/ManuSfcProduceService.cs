@@ -312,7 +312,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         private async Task FutureLockAsync(FutureLockDto parm)
         {
-            var sfcListTask = _manuSfcProduceRepository.GetManuSfcProduceInfoEntitiesAsync(
+            var sfcListTask = _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(
            new ManuSfcProduceQuery
            {
                Sfcs = parm.Sfcs.Distinct().ToArray(),
@@ -504,7 +504,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         private async Task InstantLockAsync(InstantLockDto parm)
         {
-            var sfcListTask = _manuSfcProduceRepository.GetManuSfcProduceInfoEntitiesAsync(
+            var sfcListTask = _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(
             new ManuSfcProduceQuery
             {
                 Sfcs = parm.Sfcs.Distinct().ToArray(),
@@ -655,7 +655,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         private async Task UnLockAsync(UnLockDto parm)
         {
-            var sfcListTask = _manuSfcProduceRepository.GetManuSfcProduceInfoEntitiesAsync(
+            var sfcListTask = _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(
          new ManuSfcProduceQuery
          {
              Sfcs = parm.Sfcs.Distinct().ToArray(),
@@ -795,7 +795,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var sfc = parm.Sfcs.Distinct();
             var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = parm.Sfcs, SiteId = _currentSite.SiteId ?? 00 };
             //获取条码列表
-            var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceInfoEntitiesAsync(manuSfcProducePagedQuery);
+            var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
             if (!manuSfcs.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15402));
@@ -869,7 +869,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var sfc = parm.Sfcs.Distinct();
             var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = parm.Sfcs, SiteId = _currentSite.SiteId ?? 00 };
             //获取条码列表
-            var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceInfoEntitiesAsync(manuSfcProducePagedQuery);
+            var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
             if (!manuSfcs.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15402));
@@ -2099,7 +2099,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="manuSfcs"></param>
         /// <returns></returns>
-        private async Task VerifySfcsLockAsync(ManuSfcProduceInfoView[] manuSfcs)
+        private async Task VerifySfcsLockAsync(ManuSfcProduceEntity[] manuSfcs)
         {
             var sfcs = manuSfcs.Select(x => x.SFC).ToArray();
             var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery {SiteId = _currentSite.SiteId ?? 0, Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
@@ -2144,7 +2144,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="sfcList"></param>
         /// <param name="lockProductionId"></param>
         /// <returns></returns>
-        private async Task VeifyQualityLockProductionAsync(ManuSfcProduceInfoView[] sfcList, long lockProductionId)
+        private async Task VeifyQualityLockProductionAsync(ManuSfcProduceEntity[] sfcList, long lockProductionId)
         {
             var processRouteId = sfcList.FirstOrDefault()?.ProcessRouteId ?? 0;
             var sfcProcedureIds = sfcList.Select(x => x.ProcedureId).Distinct().ToList();
