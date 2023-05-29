@@ -761,7 +761,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                 await _manuSfcProduceRepository.UnLockedSfcProcedureAsync(new UnLockedProcedureCommand
                 {
-                    SiteId=_currentSite.SiteId??0,
+                    SiteId = _currentSite.SiteId ?? 0,
                     Sfcs = lockSfc,
                     UserId = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now()
@@ -1247,7 +1247,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             //在制数据
             var manuSfcs = sfcs.Select(it => it.Sfc).ToArray();
-            var manuSfcProduceEntit = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery {SiteId=_currentSite.SiteId??0, Sfcs = manuSfcs });
+            var manuSfcProduceEntit = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery { SiteId = _currentSite.SiteId ?? 0, Sfcs = manuSfcs });
             foreach (var item in manuSfcProduceEntit)
             {
 
@@ -1711,11 +1711,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                         if (sfcProduceStepDto.ProcedureId == endProcessRouteDetailId)
                         {
                             // 删除条码记录
-                            await _manuSfcProduceRepository.DeletePhysicalRangeAsync(new DeletePhysicalBySfcsCommand() 
+                            await _manuSfcProduceRepository.DeletePhysicalRangeAsync(new DeletePhysicalBySfcsCommand()
                             {
-                                SiteId=_currentSite.SiteId??0,
-                                Sfcs= sfcsArray
-                            } );
+                                SiteId = _currentSite.SiteId ?? 0,
+                                Sfcs = sfcsArray
+                            });
 
                             // 状态和是否再用一起改
                             await _manuSfcRepository.UpdateSfcStatusAndIsUsedAsync(new ManuSfcUpdateStatusAndIsUsedCommand
@@ -1742,7 +1742,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             // 指定工序
                             await _manuSfcProduceRepository.UpdateProcedureAndStatusRangeAsync(new UpdateProcedureAndStatusCommand
                             {
-                                SiteId =_currentSite.SiteId??0,
+                                SiteId = _currentSite.SiteId ?? 0,
                                 Sfcs = sfcsArray,
                                 ProcedureId = sfcProduceStepDto.ProcedureId,
                                 Status = sfcProduceStepDto.Type,
@@ -1987,6 +1987,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 item.ProcessRouteId = newPlanWorkOrderEntity.ProcessRouteId;
                 item.ProductBOMId = newPlanWorkOrderEntity.ProductBOMId;
                 item.WorkOrderId = newPlanWorkOrderEntity.Id;
+                item.ResourceId = null; //更改步骤后 更改资源为null   为null则不限制匹配
 
                 // 初始化步骤
                 var sfcStep = new ManuSfcStepEntity
@@ -2102,10 +2103,10 @@ namespace Hymson.MES.Services.Services.Manufacture
         private async Task VerifySfcsLockAsync(ManuSfcProduceEntity[] manuSfcs)
         {
             var sfcs = manuSfcs.Select(x => x.SFC).ToArray();
-            var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery {SiteId = _currentSite.SiteId ?? 0, Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
+            var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { SiteId = _currentSite.SiteId ?? 0, Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
             if (sfcProduceBusinesss != null && sfcProduceBusinesss.Any())
             {
-              //  var sfcInfoIds = sfcProduceBusinesss.Select(it => it.SfcProduceId).ToArray();
+                //  var sfcInfoIds = sfcProduceBusinesss.Select(it => it.SfcProduceId).ToArray();
                 var sfcProduceBusinesssList = sfcProduceBusinesss.ToList();
                 var instantLockSfcs = new List<string>();
                 foreach (var business in sfcProduceBusinesssList)
