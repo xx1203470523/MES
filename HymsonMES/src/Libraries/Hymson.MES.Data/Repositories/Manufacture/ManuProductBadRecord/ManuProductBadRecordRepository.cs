@@ -487,8 +487,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                     from manu_product_bad_record rbr
                     LEFT JOIN proc_procedure p on p.Id=rbr.OutflowOperationId -- 为了查询工序编码
 
-                    LEFT join manu_sfc s on s.SFC=rbr.SFC
-                    left join manu_sfc_info si on si.SfcId= s.Id -- 为了获取关联信息
+                    -- LEFT join manu_sfc s on s.SFC=rbr.SFC
+                    left join manu_sfc_info si on si.Id= rbr.SfcInfoId -- 为了获取关联信息
 
                     LEFT JOIN proc_material m on m.Id=si.ProductId  -- 为了查询物料编码
                     LEFT join plan_work_order o on o.Id=si.WorkOrderId -- 为了查询工单编码
@@ -505,8 +505,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                     from manu_product_bad_record rbr
                     LEFT JOIN proc_procedure p on p.Id=rbr.OutflowOperationId -- 为了查询工序编码
 
-                    LEFT join manu_sfc s on s.SFC=rbr.SFC
-                    left join manu_sfc_info si on si.SfcId= s.Id -- 为了获取关联信息
+                    -- LEFT join manu_sfc s on s.SFC=rbr.SFC
+                    left join manu_sfc_info si on si.Id= rbr.SfcInfoId -- 为了获取关联信息
 
                     LEFT JOIN proc_material m on m.Id=si.ProductId  -- 为了查询物料编码
                     LEFT join plan_work_order o on o.Id=si.WorkOrderId -- 为了查询工单编码
