@@ -1,8 +1,6 @@
 using Hymson.Infrastructure;
-using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Services.Plan;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Plan
@@ -12,7 +10,7 @@ namespace Hymson.MES.Api.Controllers.Plan
     /// @author pengxin
     /// @date 2023-03-21 04:33:58
     /// </summary>
-    
+
     [ApiController]
     [Route("api/v1/[controller]")]
     public class PlanSfcPrintController : ControllerBase
