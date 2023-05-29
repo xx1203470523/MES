@@ -481,22 +481,23 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             var sfcProduceRepairBo = await GetSfcProduceRepairBo(manuSfcProduceEntit.SFC);
 
-            var resources = await _procResourceRepository.GetProcResourceListByProcedureIdAsync(new ProcResourceListByProcedureIdQuery
-            {
-                SiteId = _currentSite.SiteId ?? 0,
-                ProcedureId = confirmSubmitDto.ReturnProcedureId
-            });
-            if (resources == null || !resources.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES17327));
-            }
-            long resourcesId = resources.FirstOrDefault().Id;
-            // 返回工序
+            //var resources = await _procResourceRepository.GetProcResourceListByProcedureIdAsync(new ProcResourceListByProcedureIdQuery
+            //{
+            //    SiteId = _currentSite.SiteId ?? 0,
+            //    ProcedureId = confirmSubmitDto.ReturnProcedureId
+            //});
+            //if (resources == null || !resources.Any())
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES17327));
+            //}
+            //long resourcesId = resources.FirstOrDefault().Id;
+
+            // 返回工序 
             var updateProcedureCommand = new UpdateProcedureCommand
             {
                 Id = manuSfcProduceEntit.Id,
                 ProcedureId = confirmSubmitDto.ReturnProcedureId,
-                ResourceId = resourcesId,
+                ResourceId = null, //resourcesId, //资源这里 直接设置为null 为null生产不检测匹配工序
                 ProcessRouteId = sfcProduceRepairBo.ProcessRouteId,
                 UserId = _currentUser.UserName,
                 UpdatedOn = HymsonClock.Now()

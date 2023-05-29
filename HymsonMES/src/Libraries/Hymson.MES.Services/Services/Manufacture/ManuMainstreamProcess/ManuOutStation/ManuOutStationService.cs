@@ -219,7 +219,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             // 读取物料加载数据（批量）
             var allFeedingEntities = await _manuFeedingRepository.GetByResourceIdAndMaterialIdsAsync(new GetByResourceIdAndMaterialIdsQuery
             {
-                ResourceId = sfcProduceEntity.ResourceId,
+                ResourceId = sfcProduceEntity.ResourceId ?? 0,
                 MaterialIds = materialIds
             });
 
@@ -321,6 +321,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                     sfcInfo.UpdatedOn = sfcProduceEntity.UpdatedOn;
                     rows += await _manuSfcRepository.UpdateAsync(sfcInfo);
 
+                    /*
+                     * 2023.05.29 克明说不在这里更新完成时间
                     // 更新工单统计表的 RealEnd
                     rows += await _planWorkOrderRepository.UpdatePlanWorkOrderRealEndByWorkOrderIdAsync(new UpdateWorkOrderRealTimeCommand
                     {
@@ -328,6 +330,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                         UpdatedBy = sfcProduceEntity.UpdatedBy,
                         WorkOrderIds = new long[] { sfcProduceEntity.WorkOrderId }
                     });
+                    */
 
                     // 入库
                     rows += await SaveToWarehouseAsync(sfcProduceEntity, procMaterialEntity);
@@ -546,19 +549,22 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             // 遍历当前物料的所有的物料库存
             foreach (var feeding in feedingEntities)
             {
+                var consume = 0m;
                 if (residue <= 0) break;
 
                 // 数量足够
                 if (qty <= feeding.Qty)
                 {
+                    consume = qty;
                     residue = 0;
-                    feeding.Qty -= qty;
+                    feeding.Qty -= consume;
                 }
                 // 数量不够
                 else
                 {
                     // 继续下一个
-                    residue = qty - feeding.Qty;
+                    consume = feeding.Qty;
+                    residue = qty - consume;
                     feeding.Qty = 0;
                 }
 
@@ -567,7 +573,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 {
                     UpdatedBy = sfcProduceEntity.UpdatedBy ?? sfcProduceEntity.CreatedBy,
                     UpdatedOn = sfcProduceEntity.UpdatedOn,
-                    ResourceId = sfcProduceEntity.ResourceId,
+                    ResourceId = sfcProduceEntity.ResourceId ?? 0,
                     ProductId = currentBo.MaterialId,
                     Qty = feeding.Qty
                 });
@@ -585,7 +591,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                     CirculationBarCode = feeding.BarCode,
                     CirculationProductId = currentBo.MaterialId,
                     CirculationMainProductId = mainMaterialBo.MaterialId,
-                    CirculationQty = feeding.Qty,
+                    CirculationQty = consume,
                     CirculationType = SfcCirculationTypeEnum.Consume,
                     CreatedBy = sfcProduceEntity.CreatedBy,
                     UpdatedBy = sfcProduceEntity.UpdatedBy

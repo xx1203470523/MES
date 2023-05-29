@@ -351,7 +351,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             //验证条码
             var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = new string[] { removeDto.Sfc }, SiteId = _currentSite.SiteId ?? 0 };
             // 获取条码列表
-            var manuSfcProduces = await _manuSfcProduceRepository.GetManuSfcProduceInfoEntitiesAsync(manuSfcProducePagedQuery);
+            var manuSfcProduces = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
             if (manuSfcProduces == null || !manuSfcProduces.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16600));
@@ -420,7 +420,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             //验证条码
             var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = new string[] { addDto.Sfc }, SiteId = _currentSite.SiteId ?? 0 };
             // 获取条码列表
-            var manuSfcProduces = await _manuSfcProduceRepository.GetManuSfcProduceInfoEntitiesAsync(manuSfcProducePagedQuery);
+            var manuSfcProduces = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
             if (manuSfcProduces == null || !manuSfcProduces.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16600));
@@ -646,7 +646,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             //验证条码
             var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = new string[] { replaceDto.Sfc }, SiteId = _currentSite.SiteId ?? 0 };
             // 获取条码列表
-            var manuSfcProduces = await _manuSfcProduceRepository.GetManuSfcProduceInfoEntitiesAsync(manuSfcProducePagedQuery);
+            var manuSfcProduces = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
             if (manuSfcProduces == null || !manuSfcProduces.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16600));

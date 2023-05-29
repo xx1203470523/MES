@@ -99,6 +99,9 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.lineUp);
             sfcProduceBusinessEntity.VerifyProcedureLock(bo.SFC, bo.ProcedureId);
 
+            // 验证条码是否被容器包装
+            await _manuCommonService.VerifyContainerAsync(new string[] { bo.SFC });
+
             // 如果工序对应不上
             if (sfcProduceEntity.ProcedureId != bo.ProcedureId)
             {

@@ -390,7 +390,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             #region 组装数据
             var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = sfcs, SiteId = _currentSite.SiteId ?? 0 };
             // 获取条码信息
-            var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceInfoEntitiesAsync(manuSfcProducePagedQuery);
+            var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
             if (manuSfcs == null || !manuSfcs.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15402));
