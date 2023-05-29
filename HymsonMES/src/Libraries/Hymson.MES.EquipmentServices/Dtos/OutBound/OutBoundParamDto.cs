@@ -25,6 +25,35 @@ namespace Hymson.MES.EquipmentServices.Dtos.OutBound
         /// 时间
         /// </summary>
         public DateTime Timestamp { get; set; }
+        /// <summary>
+        /// 标准上限
+        /// </summary>
+        public string? StandardUpperLimit { get; set; }
+
+        /// <summary>
+        /// 标准下限
+        /// </summary>
+        public string? StandardLowerLimit { get; set; }
+
+        /// <summary>
+        /// 判定结果
+        /// </summary>
+        public string? JudgmentResult { get; set; }
+
+        /// <summary>
+        /// 测试时长
+        /// </summary>
+        public string? TestDuration { get; set; }
+
+        /// <summary>
+        /// 测试时间
+        /// </summary>
+        public string? TestTime { get; set; }
+
+        /// <summary>
+        /// 测试结果
+        /// </summary>
+        public string? TestResult { get; set; }
     }
 
     /// <summary>

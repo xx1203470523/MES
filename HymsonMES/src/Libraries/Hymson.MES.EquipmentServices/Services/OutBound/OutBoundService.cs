@@ -544,7 +544,13 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                              ResourceId = procResourceId,
                              ParameterId = procParameter.Where(c => c.ParameterCode.ToUpper().Equals(s.ParamCode.ToUpper())).First().Id,
                              ParamValue = s.ParamValue,
-                             Timestamp = s.Timestamp
+                             Timestamp = s.Timestamp,
+                             JudgmentResult = s.JudgmentResult,
+                             StandardLowerLimit = s.StandardLowerLimit,
+                             StandardUpperLimit = s.StandardUpperLimit,
+                             TestDuration = s.TestDuration,
+                             TestResult = s.TestResult,
+                             TestTime = s.TestTime
                          }
                      );
                     manuProductParameterEntities.AddRange(paramList);
