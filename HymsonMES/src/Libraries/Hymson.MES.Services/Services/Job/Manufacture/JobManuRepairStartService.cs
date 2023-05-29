@@ -91,13 +91,6 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             // 获取生产条码信息
             var (sfcProduceEntity, _) = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
 
-            // 当前工序是否是排队状态
-            if (sfcProduceEntity.Status == SfcProduceStatusEnum.Activity)
-            {
-                // 如果状态已经为活动中，就直接返回成功
-                return defaultDto;
-            }
-
             // 如果工序对应不上
             if (sfcProduceEntity.ProcedureId != bo.ProcedureId)
             {
@@ -107,6 +100,17 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
 
                 // 将SFC对应的工序改为当前工序
                 sfcProduceEntity.ProcessRouteId = bo.ProcedureId;
+            }
+
+            // 校验工序和资源是否对应
+            var resourceIds = await _manuCommonService.GetProcResourceIdByProcedureIdAsync(bo.ProcedureId);
+            if (resourceIds.Any(a => a == bo.ResourceId) == false) throw new CustomerValidationException(nameof(ErrorCode.MES16317));
+
+            // 当前工序是否是排队状态
+            if (sfcProduceEntity.Status == SfcProduceStatusEnum.Activity)
+            {
+                // 如果状态已经为活动中，就直接返回成功
+                return defaultDto;
             }
 
             // 开始维修
