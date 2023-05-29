@@ -1388,15 +1388,17 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES18002));
             }
             var planWorkOrders = await _planWorkOrderRepository.GetByIdsAsync(workOrderArr);
-            if (planWorkOrders == null)
+            if (planWorkOrders == null || !planWorkOrders.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18003));
             }
-            var planWorkOrdersWhStatus = planWorkOrders.Where(it => it.Status != PlanWorkOrderStatusEnum.InProduction && it.Status != PlanWorkOrderStatusEnum.Finish).Any();
+            //工单同一个
+            var planWorkOrderEntity = planWorkOrders.FirstOrDefault();
+            // var planWorkOrdersWhStatus = planWorkOrders.Where(it => it.Status != PlanWorkOrderStatusEnum.InProduction && it.Status != PlanWorkOrderStatusEnum.Finish).Any();
             //生产中/已完工的工单
-            if (planWorkOrdersWhStatus)
+            if (planWorkOrderEntity.Status != PlanWorkOrderStatusEnum.InProduction && planWorkOrderEntity.Status != PlanWorkOrderStatusEnum.Finish)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES18009));
+                throw new CustomerValidationException(nameof(ErrorCode.MES18009)).WithData("OrderCode", planWorkOrderEntity.OrderCode).WithData("Status", planWorkOrderEntity.Status);
             }
             //验证同一工艺路线 
             var processRouteIds = planWorkOrders.Select(it => it.ProcessRouteId).Distinct();

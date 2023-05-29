@@ -702,10 +702,10 @@
         public const string MES18003 = "工单信息不存在";
         public const string MES18004 = "需扫描相同工艺路线条码";
         public const string MES18005 = "工艺路线不存在节点";
-        public const string MES18006 = "条码:{SFC}不允许操作";
+        public const string MES18006 = "未获取到条码:{SFC}";
         public const string MES18007 = "条码没有对应的生产工序";
         public const string MES18008 = "条码生产状态异常:{Status}";
-        public const string MES18009 = "工单状态不允许";
+        public const string MES18009 = "工单:{OrderCode},状态为:{Status}不允许操作";
         public const string MES18010 = "条码已锁定不允许操作";
         public const string MES18011 = "获取工序信息失败";
 
