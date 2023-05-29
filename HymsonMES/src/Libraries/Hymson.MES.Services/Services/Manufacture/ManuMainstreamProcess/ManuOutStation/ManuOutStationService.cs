@@ -549,19 +549,22 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             // 遍历当前物料的所有的物料库存
             foreach (var feeding in feedingEntities)
             {
+                var consume = 0m;
                 if (residue <= 0) break;
 
                 // 数量足够
                 if (qty <= feeding.Qty)
                 {
+                    consume = qty;
                     residue = 0;
-                    feeding.Qty -= qty;
+                    feeding.Qty -= consume;
                 }
                 // 数量不够
                 else
                 {
                     // 继续下一个
-                    residue = qty - feeding.Qty;
+                    consume = feeding.Qty;
+                    residue = qty - consume;
                     feeding.Qty = 0;
                 }
 
@@ -588,7 +591,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                     CirculationBarCode = feeding.BarCode,
                     CirculationProductId = currentBo.MaterialId,
                     CirculationMainProductId = mainMaterialBo.MaterialId,
-                    CirculationQty = feeding.Qty,
+                    CirculationQty = consume,
                     CirculationType = SfcCirculationTypeEnum.Consume,
                     CreatedBy = sfcProduceEntity.CreatedBy,
                     UpdatedBy = sfcProduceEntity.UpdatedBy
