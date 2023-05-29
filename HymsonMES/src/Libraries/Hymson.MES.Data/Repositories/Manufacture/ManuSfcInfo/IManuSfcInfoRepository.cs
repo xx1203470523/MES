@@ -118,5 +118,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="pageQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<WorkshopJobControlReportView>> GetPagedInfoWorkshopJobControlReportAsync(WorkshopJobControlReportPagedQuery pageQuery);
+
+        /// <summary>
+        /// 根据SFC获取已经使用的
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        Task<ManuSfcInfoEntity> GetUsedBySFCAsync(string sfc);
     }
 }
