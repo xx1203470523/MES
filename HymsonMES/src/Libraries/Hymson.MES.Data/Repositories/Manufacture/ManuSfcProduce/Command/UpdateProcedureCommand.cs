@@ -25,7 +25,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
         /// <summary>
         /// 资源ID
         /// </summary>
-        public long ResourceId { get; set; }
+        public long? ResourceId { get; set; }
 
         /// <summary>
         /// 工艺路线
