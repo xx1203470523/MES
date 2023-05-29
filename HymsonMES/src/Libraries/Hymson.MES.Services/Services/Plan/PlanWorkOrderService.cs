@@ -258,8 +258,8 @@ namespace Hymson.MES.Services.Services.Plan
                     UpdatedOn = HymsonClock.Now()
                 });
 
-                //对是需要修改为完工状态的做特殊处理： 给 工单记录表 更新 真实结束时间
-                if (item.Status == PlanWorkOrderStatusEnum.Finish) 
+                //对是需要修改为关闭状态的做特殊处理： 给 工单记录表 更新 真实结束时间
+                if (item.Status == PlanWorkOrderStatusEnum.Closed) 
                 {
                     updateWorkOrderRealEndList.Add(item.Id);
                 }
@@ -315,7 +315,7 @@ namespace Hymson.MES.Services.Services.Plan
             {
                 var response = await _planWorkOrderRepository.ModifyWorkOrderStatusAsync(planWorkOrderEntities);
 
-                if (updateWorkOrderRealEndList.Any()) //对是需要修改为完工状态的做特殊处理： 给 工单记录表 更新 真实结束时间
+                if (updateWorkOrderRealEndList.Any()) //对是需要修改为关闭状态的做特殊处理： 给 工单记录表 更新 真实结束时间
                 {
                     UpdateWorkOrderRealTimeCommand command = new UpdateWorkOrderRealTimeCommand()
                     {
