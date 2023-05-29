@@ -159,7 +159,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
             sqlBuilder.Select("msp.*,msi.Id as SfcInfoId");
             sqlBuilder.LeftJoin("manu_sfc mf  on mf.SFC =msp.sfc  and mf.IsDeleted=0");
-            sqlBuilder.LeftJoin("manu_sfc_info msi on msi.SfcId =mf.Id  and msi.IsDeleted=0");
+            sqlBuilder.LeftJoin("manu_sfc_info msi on msi.SfcId =mf.Id  and msi.IsDeleted=0 and msi.WorkOrderId =MSP.WorkOrderId ");
 
             sqlBuilder.Where("msp.SiteId = @SiteId");
             if (query.Sfcs != null && query.Sfcs.Length > 0)
