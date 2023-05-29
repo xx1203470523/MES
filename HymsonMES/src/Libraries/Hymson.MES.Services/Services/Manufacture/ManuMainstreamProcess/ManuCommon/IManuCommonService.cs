@@ -120,6 +120,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         Task VerifySfcsLockAsync(string[] sfcs, long procedureId);
 
         /// <summary>
+        /// 批量验证条码是否被容器包装
+        /// </summary>
+        /// <param name="sfcs"></param>
+        /// <returns></returns>
+        Task VerifyContainerAsync(string[] sfcs);
+
+        /// <summary>
         /// 验证条码BOM清单用量
         /// </summary>
         /// <param name="bomId"></param>
