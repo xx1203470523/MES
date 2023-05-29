@@ -58,6 +58,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
 
         /// <summary>
+        /// 仓储接口（容器包装）
+        /// </summary>
+        private readonly IManuContainerPackRepository _manuContainerPackRepository;
+
+        /// <summary>
         /// 仓储接口（工单信息）
         /// </summary>
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
@@ -130,6 +135,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="sequenceService"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="manuSfcCirculationRepository"></param>
+        /// <param name="manuContainerPackRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="planWorkOrderActivationRepository"></param>
         /// <param name="procProcessRouteDetailNodeRepository"></param>
@@ -146,6 +152,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         public ManuCommonService(ICurrentSite currentSite, ISequenceService sequenceService,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
+            IManuContainerPackRepository manuContainerPackRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
@@ -164,6 +171,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             _sequenceService = sequenceService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
+            _manuContainerPackRepository = manuContainerPackRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
@@ -701,6 +709,26 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 {
                     throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
                 }
+            }
+        }
+
+        /// <summary>
+        /// 批量验证条码是否被容器包装
+        /// </summary>
+        /// <param name="sfcs"></param>
+        /// <returns></returns>
+        public async Task VerifyContainerAsync(string[] sfcs)
+        {
+            var manuContainerPackEntities = await _manuContainerPackRepository.GetByLadeBarCodesAsync(new ManuContainerPackQuery
+            {
+                LadeBarCodes = sfcs,
+                SiteId = _currentSite.SiteId ?? 0,
+            });
+
+            if (manuContainerPackEntities != null && manuContainerPackEntities.Any() == true)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18015)).WithData("SFCs", string.Join(",", sfcs));
+                //throw new CustomerValidationException(nameof(ErrorCode.MES18019)).WithData("SFC", string.Join(",", sfcs));
             }
         }
 
