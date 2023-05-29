@@ -1987,7 +1987,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 item.ProcessRouteId = newPlanWorkOrderEntity.ProcessRouteId;
                 item.ProductBOMId = newPlanWorkOrderEntity.ProductBOMId;
                 item.WorkOrderId = newPlanWorkOrderEntity.Id;
-                item.ResourceId = null; //更改步骤后 更改资源为null   为null则不限制匹配
+                item.ResourceId = null; //更改步骤后 更改资源为null   为null则生产不限制匹配
 
                 // 初始化步骤
                 var sfcStep = new ManuSfcStepEntity
