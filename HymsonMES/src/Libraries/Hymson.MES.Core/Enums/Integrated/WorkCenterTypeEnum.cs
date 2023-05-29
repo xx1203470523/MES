@@ -23,7 +23,5 @@ namespace Hymson.MES.Core.Enums.Integrated
         /// </summary>
         [Description("产线")]
         Line = 3,
-
-  
     }
 }
