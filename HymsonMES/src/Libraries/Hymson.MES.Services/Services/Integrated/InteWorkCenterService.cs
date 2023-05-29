@@ -205,7 +205,7 @@ namespace Hymson.MES.Services.Services.Integrated
 
             switch (param.Type)
             {
-                case WorkCenterTypeEnum.Factory:
+                //case WorkCenterTypeEnum.Factory:
                 case WorkCenterTypeEnum.Farm:
                     param.WorkCenterIds ??= new List<long>();
                     inteWorkCenterRelations.AddRange(param.WorkCenterIds.Select(s => new InteWorkCenterRelation
@@ -306,7 +306,7 @@ namespace Hymson.MES.Services.Services.Integrated
 
             switch (param.Type)
             {
-                case WorkCenterTypeEnum.Factory:
+                //case WorkCenterTypeEnum.Factory:
                 case WorkCenterTypeEnum.Farm:
                     param.WorkCenterIds ??= new List<long>();
                     inteWorkCenterRelations.AddRange(param.WorkCenterIds.Select(s => new InteWorkCenterRelation
