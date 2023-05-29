@@ -219,7 +219,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             // 读取物料加载数据（批量）
             var allFeedingEntities = await _manuFeedingRepository.GetByResourceIdAndMaterialIdsAsync(new GetByResourceIdAndMaterialIdsQuery
             {
-                ResourceId = sfcProduceEntity.ResourceId,
+                ResourceId = sfcProduceEntity.ResourceId ?? 0,
                 MaterialIds = materialIds
             });
 
@@ -570,7 +570,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 {
                     UpdatedBy = sfcProduceEntity.UpdatedBy ?? sfcProduceEntity.CreatedBy,
                     UpdatedOn = sfcProduceEntity.UpdatedOn,
-                    ResourceId = sfcProduceEntity.ResourceId,
+                    ResourceId = sfcProduceEntity.ResourceId ?? 0,
                     ProductId = currentBo.MaterialId,
                     Qty = feeding.Qty
                 });
