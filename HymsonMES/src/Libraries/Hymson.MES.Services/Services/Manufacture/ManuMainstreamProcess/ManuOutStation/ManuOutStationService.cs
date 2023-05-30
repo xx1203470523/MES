@@ -543,29 +543,44 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             if (feedingEntities.Any() == false) return;
 
             // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
-            decimal qty = currentBo.Usages * (currentBo.Loss ?? 1);
-            if (currentBo.ConsumeRatio > 0) qty *= (currentBo.ConsumeRatio / 100);
+            decimal originQty = currentBo.Usages * (currentBo.Loss ?? 1);
+            if (currentBo.ConsumeRatio > 0) originQty *= (currentBo.ConsumeRatio / 100);
 
             // 遍历当前物料的所有的物料库存
             foreach (var feeding in feedingEntities)
             {
+                decimal targetQty = originQty;
                 var consume = 0m;
                 if (residue <= 0) break;
                 if (feeding.Qty <= 0) continue;
 
-                // 数量足够
-                if (qty <= feeding.Qty)
+                // 如果是替代料条码，就将替代料的消耗数值重新算下
+                if (currentBo.MaterialId != feeding.MaterialId)
                 {
-                    consume = qty;
+                    var replaceBo = currentBo.ReplaceMaterials.FirstOrDefault(f => f.MaterialId == feeding.MaterialId);
+                    if (replaceBo != null)
+                    {
+                        // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
+                        targetQty = replaceBo.Usages * (replaceBo.Loss ?? 1);
+                        if (replaceBo.ConsumeRatio > 0) targetQty *= (replaceBo.ConsumeRatio / 100);
+                    }
+                }
+
+                // 剩余折算成原数量
+                var feedingQty = ToTargetValue(originQty, targetQty, feeding.Qty);
+
+                // 数量足够
+                if (residue <= feedingQty)
+                {
+                    consume = ToTargetValue(originQty, targetQty, residue);
                     residue = 0;
                     feeding.Qty -= consume;
                 }
-                // 数量不够
+                // 数量不够，继续下一个
                 else
                 {
-                    // 继续下一个
-                    consume = feeding.Qty;
-                    residue = qty - consume;
+                    consume = feedingQty;
+                    residue -= consume;
                     feeding.Qty = 0;
                 }
 
@@ -619,6 +634,18 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
 
         }
 
+        /// <summary>
+        /// 转换数量
+        /// </summary>
+        /// <param name="originQty"></param>
+        /// <param name="targetQty"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        private static decimal ToTargetValue(decimal originQty, decimal targetQty, decimal value)
+        {
+            if (targetQty == 0) return value;
+            return originQty * value / targetQty;
+        }
 
     }
 }

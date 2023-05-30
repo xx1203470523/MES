@@ -112,7 +112,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
     /// </summary>
     public partial class ManuFeedingRepository
     {
-        const string InsertSql = "INSERT INTO `manu_feeding`(  `Id`, `ResourceId`, `FeedingPointId`, `ProductId`, SupplierId, `BarCode`, `InitQty`, `Qty`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @ResourceId, @FeedingPointId, @ProductId, @SupplierId, @BarCode, @InitQty, @Qty, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
+        const string InsertSql = "INSERT INTO `manu_feeding`(  `Id`, `ResourceId`, `FeedingPointId`, `ProductId`, SupplierId, `BarCode`, MaterialId, `InitQty`, `Qty`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @ResourceId, @FeedingPointId, @ProductId, @SupplierId, @BarCode, @MaterialId, @InitQty, @Qty, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string UpdateQtyByIdSql = "UPDATE manu_feeding SET Qty = @Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id; ";
         const string DeleteSql = "UPDATE manu_feeding SET `IsDeleted` = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids;";
         const string DeleteByIds = "DELETE FROM manu_feeding WHERE Id IN @ids; ";
