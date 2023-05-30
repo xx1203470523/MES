@@ -568,7 +568,7 @@
         public const string MES17322 = "请先开始维修";
         public const string MES17323 = "排队中";
         public const string MES17324 = "活动中";
-        public const string MES17325 = "未获取到维修业务";
+        public const string MES17325 = "未获取到维修业务表的数据";
         public const string MES17326 = "未获取到维修业务内容";
         public const string MES17327 = "工序未关联到资源";
         public const string MES17328 = "不合格代码:{0}";
@@ -639,7 +639,7 @@
         public const string MES16704 = "容器包装，配置面板编号为空";
         public const string MES16705 = "容器包装，配置面板不存在或未启用";
         public const string MES16706 = "容器包装，配置面板不允许混工单,当前容器工单{first},当前条码工单{second}";
-        public const string MES16707 = "容器包装，包装码不能为空";
+        //public const string MES16707 = "容器包装，包装码不能为空";
         public const string MES16710 = "不识别的类型：{key}";
         public const string MES16708 = "产品条码不能为空";
         public const string MES16709 = "作业返回空，请检查作业是否正确配置";
@@ -699,7 +699,7 @@
         #endregion
 
         #region 在制品步骤控制 MES18000
-        public const string MES18000 = "在制品步骤控制错误";
+        //public const string MES18000 = "在制品步骤控制错误";
         public const string MES18001 = "条码信息不存在";
         public const string MES18002 = "请扫描相同工单的条码";
         public const string MES18003 = "工单信息不存在";
