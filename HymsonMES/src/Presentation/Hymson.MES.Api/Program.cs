@@ -46,7 +46,7 @@ namespace Hymson.MES.Api
 #if DEBUG
             builder.Services.AddHttpLogging(logging =>
             {
-                logging.LoggingFields = HttpLoggingFields.All;
+                logging.LoggingFields = HttpLoggingFields.RequestBody| HttpLoggingFields.ResponseBody;
             });
 #endif
             AddSwaggerGen(builder.Services);
