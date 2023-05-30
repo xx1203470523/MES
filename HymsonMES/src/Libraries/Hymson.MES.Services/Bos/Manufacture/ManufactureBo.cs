@@ -93,7 +93,7 @@ namespace Hymson.MES.Services.Bos.Manufacture
         /// <summary>
         /// 消耗系数
         /// </summary>
-        public decimal ConsumeRatio { get; set; } = 1;
+        public decimal ConsumeRatio { get; set; } = 100;
     }
 
 

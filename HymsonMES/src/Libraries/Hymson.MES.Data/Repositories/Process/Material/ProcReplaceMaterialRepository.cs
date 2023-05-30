@@ -7,7 +7,6 @@
  */
 
 using Dapper;
-using FluentValidation.Validators;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
@@ -229,6 +228,9 @@ namespace Hymson.MES.Data.Repositories.Process
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class ProcReplaceMaterialRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_replace_material` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
@@ -239,7 +241,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetProcReplaceMaterialViewsSqlTemplate = @"SELECT 
                             r.ReplaceMaterialId as Id , m.MaterialName, m.MaterialCode, m.Version, m.SerialNumber, r.IsUse as IsEnabled
                         FROM `proc_replace_material` r
-                        LEFT JOIN proc_material m on r.ReplaceMaterialId=m.id and m.IsDeleted=0
+                        LEFT JOIN proc_material m on r.ReplaceMaterialId = m.id AND m.IsDeleted = 0
                     /**where**/  
                 ";
 

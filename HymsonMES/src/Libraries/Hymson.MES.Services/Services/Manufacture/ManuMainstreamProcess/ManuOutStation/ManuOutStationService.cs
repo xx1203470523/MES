@@ -1,4 +1,5 @@
-﻿using Hymson.Authentication;
+﻿using Dapper;
+using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
@@ -415,6 +416,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             });
             var replaceMaterialsForMainDic = replaceMaterialsForMain.ToLookup(w => w.MaterialId).ToDictionary(d => d.Key, d => d);
 
+            // 查询所有替代料基础信息
+            var materialEntities = await _procMaterialRepository.GetByIdsAsync(replaceMaterialsForBOM.Select(s => s.ReplaceMaterialId));
+
             // 获取初始扣料数据
             List<MaterialDeductBo> initialMaterials = new();
             foreach (var item in mainMaterials)
@@ -438,6 +442,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                             MaterialId = s.ReplaceMaterialId,
                             Usages = s.Usages,
                             Loss = s.Loss,
+                            ConsumeRatio = GetConsumeRatio(materialEntities, s.ReplaceMaterialId)
                         });
                     }
                 }
@@ -451,7 +456,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                         {
                             MaterialId = s.MaterialId,
                             Usages = item.Usages,
-                            Loss = item.Loss
+                            Loss = item.Loss,
+                            ConsumeRatio = GetConsumeRatio(materialEntities, s.MaterialId)
                         });
                     }
                 }
@@ -632,6 +638,24 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                     }, false);
             }
 
+        }
+
+        /// <summary>
+        /// 取得消耗系数
+        /// </summary>
+        /// <param name="materialEntities"></param>
+        /// <param name="replaceMaterialId"></param>
+        /// <returns></returns>
+        private static decimal GetConsumeRatio(IEnumerable<ProcMaterialEntity> materialEntities, long replaceMaterialId)
+        {
+            decimal defaultConsumeRatio = 100;
+
+            if (materialEntities == null || materialEntities.Any() == false) return defaultConsumeRatio;
+
+            var materialEntity = materialEntities.FirstOrDefault(f => f.Id == replaceMaterialId);
+            if (materialEntity == null || materialEntity.ConsumeRatio.HasValue == false) return defaultConsumeRatio;
+
+            return materialEntity.ConsumeRatio.Value;
         }
 
         /// <summary>
