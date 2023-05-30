@@ -35,6 +35,12 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 自动处理
         /// </summary>
         [Description("自动处理")]
-        AutoHandle = 5
+        AutoHandle = 5,
+
+        /// <summary>
+        /// 维修
+        /// </summary>
+        [Description("维修")]
+        repair = 6,
     }
 }
