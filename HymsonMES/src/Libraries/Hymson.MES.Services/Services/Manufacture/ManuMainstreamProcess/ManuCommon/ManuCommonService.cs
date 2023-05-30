@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using FluentValidation.Results;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
@@ -29,6 +28,7 @@ using Hymson.Utils;
 using System.Data;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using ValidationFailure = FluentValidation.Results.ValidationFailure;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon
 {
@@ -56,6 +56,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// 仓储接口（条码流转信息）
         /// </summary>
         private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
+
+        /// <summary>
+        /// 仓储接口（容器包装）
+        /// </summary>
+        private readonly IManuContainerPackRepository _manuContainerPackRepository;
 
         /// <summary>
         /// 仓储接口（工单信息）
@@ -130,6 +135,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="sequenceService"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="manuSfcCirculationRepository"></param>
+        /// <param name="manuContainerPackRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="planWorkOrderActivationRepository"></param>
         /// <param name="procProcessRouteDetailNodeRepository"></param>
@@ -146,6 +152,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         public ManuCommonService(ICurrentSite currentSite, ISequenceService sequenceService,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
+            IManuContainerPackRepository manuContainerPackRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
@@ -164,6 +171,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             _sequenceService = sequenceService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
+            _manuContainerPackRepository = manuContainerPackRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
@@ -657,6 +665,45 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// 批量验证条码是否锁定
         /// </summary>
         /// <param name="sfcs"></param>
+        /// <returns></returns>
+        public async Task VerifySfcsLockAsync(IEnumerable<string> sfcs)
+        {
+            var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                Sfcs = sfcs,
+                BusinessType = ManuSfcProduceBusinessType.Lock
+            });
+
+            if (sfcProduceBusinesss == null || sfcProduceBusinesss.Any() == false) return;
+
+            List<ValidationFailure> validationFailures = new();
+            foreach (var item in sfcProduceBusinesss)
+            {
+                var sfcProduceLockBo = JsonSerializer.Deserialize<SfcProduceLockBo>(item.BusinessContent);
+                if (sfcProduceLockBo == null) continue;
+
+                if (sfcProduceLockBo.Lock != QualityLockEnum.InstantLock
+                    && sfcProduceLockBo.Lock != QualityLockEnum.FutureLock) continue;
+
+                validationFailures.Add(new ValidationFailure
+                {
+                    FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", item.Sfc } },
+                    ErrorCode = nameof(ErrorCode.MES18010)
+                });
+            }
+
+            // 是否存在错误
+            if (validationFailures.Any() == true)
+            {
+                throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
+            }
+        }
+
+        /// <summary>
+        /// 批量验证条码是否锁定
+        /// </summary>
+        /// <param name="sfcs"></param>
         /// <param name="procedureId"></param>
         /// <returns></returns>
         public async Task VerifySfcsLockAsync(string[] sfcs, long procedureId)
@@ -701,6 +748,26 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 {
                     throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
                 }
+            }
+        }
+
+        /// <summary>
+        /// 批量验证条码是否被容器包装
+        /// </summary>
+        /// <param name="sfcs"></param>
+        /// <returns></returns>
+        public async Task VerifyContainerAsync(string[] sfcs)
+        {
+            var manuContainerPackEntities = await _manuContainerPackRepository.GetByLadeBarCodesAsync(new ManuContainerPackQuery
+            {
+                LadeBarCodes = sfcs,
+                SiteId = _currentSite.SiteId ?? 0,
+            });
+
+            if (manuContainerPackEntities != null && manuContainerPackEntities.Any() == true)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18015)).WithData("SFCs", string.Join(",", sfcs));
+                //throw new CustomerValidationException(nameof(ErrorCode.MES18019)).WithData("SFC", string.Join(",", sfcs));
             }
         }
 
@@ -840,7 +907,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         public static ManuSfcProduceEntity VerifyResource(this ManuSfcProduceEntity sfcProduceEntity, long resourceId)
         {
             // 当前资源是否对于的上
-            if (sfcProduceEntity.ResourceId != resourceId) throw new CustomerValidationException(nameof(ErrorCode.MES16316)).WithData("SFC", sfcProduceEntity.SFC);
+            if (sfcProduceEntity.ResourceId.HasValue == true && sfcProduceEntity.ResourceId != resourceId)
+                throw new CustomerValidationException(nameof(ErrorCode.MES16316)).WithData("SFC", sfcProduceEntity.SFC);
 
             return sfcProduceEntity;
         }

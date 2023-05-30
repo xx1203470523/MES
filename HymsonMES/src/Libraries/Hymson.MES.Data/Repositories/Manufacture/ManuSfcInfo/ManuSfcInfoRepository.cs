@@ -286,6 +286,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return new PagedInfo<WorkshopJobControlReportView>(reportData, pageQuery.PageIndex, pageQuery.PageSize, totalCount);
         }
 
+        /// <summary>
+        /// 根据SFC获取已经使用的
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        public async Task<ManuSfcInfoEntity> GetUsedBySFCAsync(string sfc) 
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(GetUsedBySFC, new { sfc });
+        } 
     }
 
     /// <summary>
@@ -364,5 +374,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                         /**leftjoin**/
                         /**where**/ 
         ";
+        const string GetUsedBySFC = @"select si.* 
+                                               from manu_sfc_info  si
+                                               Left join manu_sfc s on s.id=si.SfcId
+                                               where si.IsDeleted=0 and si.IsUsed=1 
+                                               and s.sfc=@sfc ";
     }
 }

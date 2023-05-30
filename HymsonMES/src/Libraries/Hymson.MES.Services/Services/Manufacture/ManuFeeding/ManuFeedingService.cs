@@ -117,6 +117,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// <param name="procLoadPointRepository"></param>
         /// <param name="procLoadPointLinkMaterialRepository"></param>
         /// <param name="procBomDetailRepository"></param>
+        /// <param name="procBomDetailReplaceMaterialRepository"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="planWorkOrderActivationRepository"></param>
@@ -130,6 +131,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             IProcLoadPointRepository procLoadPointRepository,
             IProcLoadPointLinkMaterialRepository procLoadPointLinkMaterialRepository,
             IProcBomDetailRepository procBomDetailRepository,
+            IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository,
             IProcMaterialRepository procMaterialRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
@@ -145,6 +147,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             _procLoadPointRepository = procLoadPointRepository;
             _procLoadPointLinkMaterialRepository = procLoadPointLinkMaterialRepository;
             _procBomDetailRepository = procBomDetailRepository;
+            _procBomDetailReplaceMaterialRepository = procBomDetailReplaceMaterialRepository;
             _procMaterialRepository = procMaterialRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
@@ -452,7 +455,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                     MaterialVersion = material.Version ?? "",
                     MaterialBarCode = entity.BarCode,
                     Batch = inventory.Batch,
-                    Quantity = entity.InitQty,
+                    Quantity = entity.Qty,
                     Unit = material.Unit ?? "",
                     Type = WhMaterialInventoryTypeEnum.MaterialReturn,
                     Source = inventory.Source,

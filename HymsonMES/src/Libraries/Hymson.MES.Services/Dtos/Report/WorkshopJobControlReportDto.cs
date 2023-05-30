@@ -143,6 +143,11 @@ namespace Hymson.MES.Services.Dtos.Report
     public class WorkshopJobControlInOutSteptDto 
     {
         /// <summary>
+        /// 工单号
+        /// </summary>
+        public string WorkOrderCode { get; set; }
+
+        /// <summary>
         /// 工序编码
         /// </summary>
         public string ProcedureCode { get; set; }

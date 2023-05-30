@@ -219,7 +219,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             // 读取物料加载数据（批量）
             var allFeedingEntities = await _manuFeedingRepository.GetByResourceIdAndMaterialIdsAsync(new GetByResourceIdAndMaterialIdsQuery
             {
-                ResourceId = sfcProduceEntity.ResourceId,
+                ResourceId = sfcProduceEntity.ResourceId ?? 0,
                 MaterialIds = materialIds
             });
 
@@ -227,7 +227,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             var manuFeedingsDictionary = allFeedingEntities.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
 
             // 过滤扣料集合
-            List<UpdateQtyByProductIdCommand> updates = new();
+            List<UpdateQtyByIdCommand> updates = new();
             List<ManuSfcCirculationEntity> adds = new();
             foreach (var materialBo in initialMaterials)
             {
@@ -237,9 +237,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 // 如有设置消耗系数
                 if (materialEntity.ConsumeRatio.HasValue == true) materialBo.ConsumeRatio = materialEntity.ConsumeRatio.Value;
 
-                // 需扣减数量 = 用量 * 损耗 * 消耗系数
+                // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
                 decimal residue = materialBo.Usages * (materialBo.Loss ?? 1);
-                if (materialBo.ConsumeRatio > 0) residue *= materialBo.ConsumeRatio;
+                if (materialBo.ConsumeRatio > 0) residue *= (materialBo.ConsumeRatio / 100);
 
                 // 收集方式是批次
                 if (materialBo.DataCollectionWay == MaterialSerialNumberEnum.Batch)
@@ -276,7 +276,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             using var trans = TransactionHelper.GetTransactionScope();
 
             // 更新物料库存
-            if (updates.Any() == true) rows += await _manuFeedingRepository.UpdateQtyByProductIdAsync(updates);
+            if (updates.Any() == true) rows += await _manuFeedingRepository.UpdateQtyByIdAsync(updates);
 
             // 添加流转记录
             if (adds.Any() == true) rows += await _manuSfcCirculationRepository.InsertRangeAsync(adds);
@@ -321,6 +321,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                     sfcInfo.UpdatedOn = sfcProduceEntity.UpdatedOn;
                     rows += await _manuSfcRepository.UpdateAsync(sfcInfo);
 
+                    /*
+                     * 2023.05.29 克明说不在这里更新完成时间
                     // 更新工单统计表的 RealEnd
                     rows += await _planWorkOrderRepository.UpdatePlanWorkOrderRealEndByWorkOrderIdAsync(new UpdateWorkOrderRealTimeCommand
                     {
@@ -328,6 +330,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                         UpdatedBy = sfcProduceEntity.UpdatedBy,
                         WorkOrderIds = new long[] { sfcProduceEntity.WorkOrderId }
                     });
+                    */
 
                     // 入库
                     rows += await SaveToWarehouseAsync(sfcProduceEntity, procMaterialEntity);
@@ -523,7 +526,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// <param name="mainMaterialBo">主物料BO对象</param>
         /// <param name="currentBo">替代料BO对象</param>
         /// <param name="isMain">是否主物料</param>
-        private static void DeductMaterialQty(ref List<UpdateQtyByProductIdCommand> updates,
+        private static void DeductMaterialQty(ref List<UpdateQtyByIdCommand> updates,
             ref List<ManuSfcCirculationEntity> adds,
             ref decimal residue,
             ManuSfcProduceEntity sfcProduceEntity,
@@ -539,37 +542,40 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             if (manuFeedingsDictionary.TryGetValue(currentBo.MaterialId, out var feedingEntities) == false) return;
             if (feedingEntities.Any() == false) return;
 
-            // 需扣减数量 = 用量 * 损耗 * 消耗系数
+            // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
             decimal qty = currentBo.Usages * (currentBo.Loss ?? 1);
-            if (currentBo.ConsumeRatio > 0) qty *= currentBo.ConsumeRatio;
+            if (currentBo.ConsumeRatio > 0) qty *= (currentBo.ConsumeRatio / 100);
 
             // 遍历当前物料的所有的物料库存
             foreach (var feeding in feedingEntities)
             {
+                var consume = 0m;
                 if (residue <= 0) break;
+                if (feeding.Qty <= 0) continue;
 
                 // 数量足够
                 if (qty <= feeding.Qty)
                 {
+                    consume = qty;
                     residue = 0;
-                    feeding.Qty -= qty;
+                    feeding.Qty -= consume;
                 }
                 // 数量不够
                 else
                 {
                     // 继续下一个
-                    residue = qty - feeding.Qty;
+                    consume = feeding.Qty;
+                    residue = qty - consume;
                     feeding.Qty = 0;
                 }
 
                 // 添加到扣减物料库存
-                updates.Add(new UpdateQtyByProductIdCommand
+                updates.Add(new UpdateQtyByIdCommand
                 {
                     UpdatedBy = sfcProduceEntity.UpdatedBy ?? sfcProduceEntity.CreatedBy,
                     UpdatedOn = sfcProduceEntity.UpdatedOn,
-                    ResourceId = sfcProduceEntity.ResourceId,
-                    ProductId = currentBo.MaterialId,
-                    Qty = feeding.Qty
+                    Qty = feeding.Qty,
+                    Id = feeding.Id
                 });
 
                 // 添加条码流转记录（消耗）
@@ -585,7 +591,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                     CirculationBarCode = feeding.BarCode,
                     CirculationProductId = currentBo.MaterialId,
                     CirculationMainProductId = mainMaterialBo.MaterialId,
-                    CirculationQty = feeding.Qty,
+                    CirculationQty = consume,
                     CirculationType = SfcCirculationTypeEnum.Consume,
                     CreatedBy = sfcProduceEntity.CreatedBy,
                     UpdatedBy = sfcProduceEntity.UpdatedBy

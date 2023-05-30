@@ -82,6 +82,12 @@ namespace Hymson.MES.Services.Services.Report
         {
             var workshopJobControlStepReportDto = new WorkshopJobControlStepReportDto() { SFC=sfc};
 
+            var sfcInfo = await _manuSfcInfoRepository.GetUsedBySFCAsync(sfc);
+            if (sfcInfo == null) 
+            {
+                throw new BusinessException(nameof(ErrorCode.MES18106)).WithData("sfc", sfc);
+            }
+
             var sfcSteps= await _manuSfcStepRepository.GetSFCInOutStepAsync(new SFCInOutStepQuery() { SiteId=_currentSite.SiteId??0,Sfc=sfc});
 
             if (sfcSteps==null|| !sfcSteps.Any()) 
@@ -89,9 +95,9 @@ namespace Hymson.MES.Services.Services.Report
                 throw new BusinessException(nameof(ErrorCode.MES18101)).WithData("sfc", sfc);
             }
             #region 查询基础数据
-            var oneSfcStep = sfcSteps.FirstOrDefault();
+            //var oneSfcStep = sfcSteps.Where(x=>x.WorkOrderId == sfcInfo.WorkOrderId).FirstOrDefault();
             //查询工单信息
-            var workOrder= await _planWorkOrderRepository.GetByIdAsync(oneSfcStep.WorkOrderId);
+            var workOrder= await _planWorkOrderRepository.GetByIdAsync(sfcInfo.WorkOrderId);
             if (workOrder == null) 
             {
                 throw new BusinessException(nameof(ErrorCode.MES18102)).WithData("sfc", sfc);
@@ -99,7 +105,7 @@ namespace Hymson.MES.Services.Services.Report
             workshopJobControlStepReportDto.OrderCode=workOrder.OrderCode;
 
             //查询物料信息
-            var material = await _procMaterialRepository.GetByIdAsync(oneSfcStep.ProductId);
+            var material = await _procMaterialRepository.GetByIdAsync(sfcInfo.ProductId);
             if (material == null)
             {
                 throw new BusinessException(nameof(ErrorCode.MES18103)).WithData("sfc", sfc);
@@ -124,6 +130,8 @@ namespace Hymson.MES.Services.Services.Report
 
             #endregion
 
+            //查询工单信息
+            var workOrders= await _planWorkOrderRepository.GetByIdsAsync(sfcSteps.Select(x => x.WorkOrderId).Distinct().ToArray());
 
             //入站
             var inSfcSteps = sfcSteps.Where(x => x.Operatetype == Core.Enums.Manufacture.ManuSfcStepTypeEnum.InStock).OrderBy(x=>x.CreatedOn).ToList();
@@ -162,6 +170,7 @@ namespace Hymson.MES.Services.Services.Report
 
                     workshopJobControlStepReportDto.WorkshopJobControlInOutSteptDtos.Add(new WorkshopJobControlInOutSteptDto() 
                     {
+                        WorkOrderCode= workOrders.FirstOrDefault(x=>x.Id== currentStep.WorkOrderId)?.OrderCode?? string.Empty,
                         ProcedureCode = procedures.FirstOrDefault(x => x.Id == currentStep.ProcedureId)?.Code ?? string.Empty,
                         Status = nextStep != null || outStep!=null ? "完成" : "活动",
                         InDateTime = currentStep.CreatedOn,

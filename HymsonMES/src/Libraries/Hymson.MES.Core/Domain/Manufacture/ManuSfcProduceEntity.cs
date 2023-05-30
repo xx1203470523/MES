@@ -64,7 +64,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 资源id
         /// </summary>
-        public long ResourceId { get; set; }
+        public long? ResourceId { get; set; }
 
         /// <summary>
         /// 工序id
