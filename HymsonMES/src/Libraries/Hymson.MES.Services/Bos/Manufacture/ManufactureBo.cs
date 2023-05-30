@@ -66,7 +66,7 @@ namespace Hymson.MES.Services.Bos.Manufacture
         /// <summary>
         /// 替代料集合
         /// </summary>
-        public IEnumerable<MaterialDeductItemBo> ReplaceMaterials { get; set; }
+        public IEnumerable<MaterialDeductItemBo> ReplaceMaterials { get; set; } = new List<MaterialDeductItemBo>();
 
     }
 
