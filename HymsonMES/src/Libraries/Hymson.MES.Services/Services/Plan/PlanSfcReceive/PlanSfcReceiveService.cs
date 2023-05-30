@@ -330,6 +330,10 @@ namespace Hymson.MES.Services.Services.Plan
                     throw new CustomerValidationException(nameof(ErrorCode.MES16129));
                 }
                 qty = whMaterialInventoryEntity.QuantityResidue;
+                if (qty <= 0)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES18021));
+                }
                 procMaterialEntity = await _procMaterialRepository.GetByIdAsync(whMaterialInventoryEntity.MaterialId);
             }
             else
@@ -343,6 +347,10 @@ namespace Hymson.MES.Services.Services.Plan
                     throw new CustomerValidationException(nameof(ErrorCode.MES16122)).WithData("sfc", param.SFC);
                 }
                 qty = procMaterialEntity.Batch;
+                if (qty <= 0)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16610)).WithData("sfc", param.SFC);
+                }
             }
             var relevanceOrderCode = string.Empty;
             if (param.RelevanceWorkOrderId.HasValue)
