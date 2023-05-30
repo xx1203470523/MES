@@ -329,8 +329,8 @@ namespace Hymson.MES.Services.Services.Plan
                 //对是需要修改为关闭状态的做特殊处理： 取消掉 对应工单激活的信息
                 if (deleteActivationWorkOrderIds.Any())
                 {
-                    await _planWorkOrderActivationRepository.DeletesTrueAsync(deleteActivationWorkOrderIds.ToArray());
-                    if (planWorkOrderActivationRecordEntitys.Any())
+                    await _planWorkOrderActivationRepository.DeletesTrueByWorkOrderIdsAsync(deleteActivationWorkOrderIds.ToArray());
+                    if (planWorkOrderActivationRecordEntitys.Any()) 
                     {
                         await _planWorkOrderActivationRecordRepository.InsertsAsync(planWorkOrderActivationRecordEntitys);
                     }

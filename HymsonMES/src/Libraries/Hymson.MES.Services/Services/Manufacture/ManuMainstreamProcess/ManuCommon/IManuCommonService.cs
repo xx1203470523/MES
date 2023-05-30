@@ -112,12 +112,26 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         Task<IEnumerable<long>> GetProcResourceIdByProcedureIdAsync(long procedureId);
 
         /// <summary>
+        /// 批量验证条码是否锁定
+        /// </summary>
+        /// <param name="sfcs"></param>
+        /// <returns></returns>
+        Task VerifySfcsLockAsync(IEnumerable<string> sfcs);
+
+        /// <summary>
         /// 批量判断条码是否锁定
         /// </summary>
         /// <param name="sfcs"></param>
         /// <param name="procedureId"></param>
         /// <returns></returns>
         Task VerifySfcsLockAsync(string[] sfcs, long procedureId);
+
+        /// <summary>
+        /// 批量验证条码是否被容器包装
+        /// </summary>
+        /// <param name="sfcs"></param>
+        /// <returns></returns>
+        Task VerifyContainerAsync(string[] sfcs);
 
         /// <summary>
         /// 验证条码BOM清单用量

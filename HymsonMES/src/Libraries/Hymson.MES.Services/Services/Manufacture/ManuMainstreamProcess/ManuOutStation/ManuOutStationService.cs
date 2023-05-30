@@ -237,9 +237,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 // 如有设置消耗系数
                 if (materialEntity.ConsumeRatio.HasValue == true) materialBo.ConsumeRatio = materialEntity.ConsumeRatio.Value;
 
-                // 需扣减数量 = 用量 * 损耗 * 消耗系数
+                // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
                 decimal residue = materialBo.Usages * (materialBo.Loss ?? 1);
-                if (materialBo.ConsumeRatio > 0) residue *= materialBo.ConsumeRatio;
+                if (materialBo.ConsumeRatio > 0) residue *= (materialBo.ConsumeRatio / 100);
 
                 // 收集方式是批次
                 if (materialBo.DataCollectionWay == MaterialSerialNumberEnum.Batch)
@@ -542,26 +542,29 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             if (manuFeedingsDictionary.TryGetValue(currentBo.MaterialId, out var feedingEntities) == false) return;
             if (feedingEntities.Any() == false) return;
 
-            // 需扣减数量 = 用量 * 损耗 * 消耗系数
+            // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
             decimal qty = currentBo.Usages * (currentBo.Loss ?? 1);
-            if (currentBo.ConsumeRatio > 0) qty *= currentBo.ConsumeRatio;
+            if (currentBo.ConsumeRatio > 0) qty *= (currentBo.ConsumeRatio / 100);
 
             // 遍历当前物料的所有的物料库存
             foreach (var feeding in feedingEntities)
             {
+                var consume = 0m;
                 if (residue <= 0) break;
 
                 // 数量足够
                 if (qty <= feeding.Qty)
                 {
+                    consume = qty;
                     residue = 0;
-                    feeding.Qty -= qty;
+                    feeding.Qty -= consume;
                 }
                 // 数量不够
                 else
                 {
                     // 继续下一个
-                    residue = qty - feeding.Qty;
+                    consume = feeding.Qty;
+                    residue = qty - consume;
                     feeding.Qty = 0;
                 }
 
@@ -588,7 +591,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                     CirculationBarCode = feeding.BarCode,
                     CirculationProductId = currentBo.MaterialId,
                     CirculationMainProductId = mainMaterialBo.MaterialId,
-                    CirculationQty = feeding.Qty,
+                    CirculationQty = consume,
                     CirculationType = SfcCirculationTypeEnum.Consume,
                     CreatedBy = sfcProduceEntity.CreatedBy,
                     UpdatedBy = sfcProduceEntity.UpdatedBy
