@@ -1,4 +1,5 @@
 using FluentValidation;
+using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
@@ -13,11 +14,13 @@ using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFacePlateRepair.Query;
+using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Resource;
+using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Services.Bos.Manufacture;
@@ -28,6 +31,7 @@ using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Minio.DataModel;
 using System.Text.Json;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -110,6 +114,12 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
 
+        /// <summary>
+        /// 不合格代码
+        /// </summary>
+        private readonly IQualUnqualifiedCodeRepository _qualUnqualifiedCodeRepository;
+
+
 
         private readonly ILocalizationService _localizationService;
         private readonly AbstractValidator<ManuFacePlateRepairCreateDto> _validationCreateRules;
@@ -123,6 +133,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             IProcProcessRouteDetailNodeRepository procProcessRouteNodeRepository, IManuFacePlateButtonService manuFacePlateButtonService,
             IManuOutStationService manuOutStationService, ILocalizationService localizationService,
             IManuInStationService manuInStationService, IManuSfcStepRepository manuSfcStepRepository,
+            IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
         AbstractValidator<ManuFacePlateRepairCreateDto> validationCreateRules, AbstractValidator<ManuFacePlateRepairModifyDto> validationModifyRules)
         {
             _currentUser = currentUser;
@@ -144,6 +155,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuInStationService = manuInStationService;
             _manuInStationService = manuInStationService;
             _manuSfcStepRepository = manuSfcStepRepository;
+            _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
         }
 
         /// <summary>
@@ -408,18 +420,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17318));
             }
-            //检查缺陷是否关闭
-            var isCloseALL = confirmSubmitDto.confirmSubmitDetail.Where(it => it.IsClose == ProductBadRecordStatusEnum.Open).Any();
-            if (isCloseALL)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES17307));
-            }
-            //获取面版
-            //var facePlateEntit = await _manuFacePlateRepairRepository.GetByFacePlateIdAsync(confirmSubmitDto.FacePlateId);
-            //if (facePlateEntit == null)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES17309));
-            //}
+
+
             //获取条码生产信息
             var manuSfcProduceEntit = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
             {
@@ -452,14 +454,100 @@ namespace Hymson.MES.Services.Services.Manufacture
             //不良录入
             var badRecordsList = new List<ManuProductBadRecordEntity>();
             var manuSfcRepairDetailList = new List<ManuSfcRepairDetailEntity>();
+            var BadRecordIds = confirmSubmitDto.confirmSubmitDetail.Select(it => it.BadRecordId).ToArray();
+            var badRecordList = await _manuProductBadRecordRepository.GetByIdsAsync(BadRecordIds);
+            if (badRecordList == null || !badRecordList.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17331));
+            }
+            var updateCommandList = new List<ManuProductBadRecordUpdateCommand>();
+
+            var validationFailures = new List<ValidationFailure>();
             foreach (var item in confirmSubmitDto.confirmSubmitDetail)
             {
-                var badRecordEntit = await _manuProductBadRecordRepository.GetByIdAsync(item.BadRecordId);
+                var validationFailure = new ValidationFailure();
+                var badRecordEntit = badRecordList.Where(it => it.Id == item.BadRecordId).FirstOrDefault();
                 if (badRecordEntit == null)
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES17316));
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", item.UnqualifiedCode}
+                        };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.UnqualifiedCode);
+                    }
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES17316);
+                    validationFailures.Add(validationFailure);
+                    continue;
                 }
+                if (item.IsClose == ProductBadRecordStatusEnum.Open)
+                {
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", item.UnqualifiedCode}
+                        };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.UnqualifiedCode);
+                    }
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES17307);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
+                if (string.IsNullOrWhiteSpace(item.CauseAnalyse))
+                {
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", item.UnqualifiedCode}
+                        };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.UnqualifiedCode);
+                    }
+
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES17329);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
+                if (string.IsNullOrWhiteSpace(item.RepairMethod))
+                {
+
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", item.UnqualifiedCode}
+                        };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.UnqualifiedCode);
+                    }
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES17330);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
+
+
+                updateCommandList.Add(new ManuProductBadRecordUpdateCommand
+                {
+                    SiteId = _currentSite.SiteId ?? 0,
+                    Id = item.BadRecordId,
+                    DisposalResult = ProductBadDisposalResultEnum.repair,
+                    Remark = confirmSubmitDto.Remark ?? "",
+                    Status = ProductBadRecordStatusEnum.Close,
+                    UserId = _currentUser.UserName,
+                    UpdatedOn = HymsonClock.Now(),
+                });
                 badRecordEntit.Status = ProductBadRecordStatusEnum.Close;
+                badRecordEntit.UpdatedBy = _currentUser.UserName;
+                badRecordEntit.UpdatedOn = HymsonClock.Now();
 
                 //维修明细
                 ManuSfcRepairDetailEntity manuSfcRepairDetailEntity = new ManuSfcRepairDetailEntity();
@@ -478,6 +566,10 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                 badRecordsList.Add(badRecordEntit);
                 manuSfcRepairDetailList.Add(manuSfcRepairDetailEntity);
+            }
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource(nameof(ErrorCode.MES17328)), validationFailures);
             }
             var sfcProduceRepairBo = await GetSfcProduceRepairBo(manuSfcProduceEntit.SFC);
 
@@ -536,7 +628,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                 //维修明细
                 rows += await _manuFacePlateRepairRepository.InsertsDetailAsync(manuSfcRepairDetailList);
                 //不良录入
-                rows += await _manuProductBadRecordRepository.UpdateRangeAsync(badRecordsList);
+                //rows += await _manuProductBadRecordRepository.UpdateRangeAsync(badRecordsList);
+                await _manuProductBadRecordRepository.UpdateStatusByIdRangeAsync(updateCommandList);
+
                 //出站 
                 rows += await _manuOutStationService.OutStationRepiarAsync(new ManufactureRepairBo { SFC = confirmSubmitDto.SFC, ProcedureId = confirmSubmitDto.ProcedureId, ReturnProcedureId = confirmSubmitDto.ReturnProcedureId, ResourceId = confirmSubmitDto.ResourceId });
                 //返回工序
