@@ -551,6 +551,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             {
                 var consume = 0m;
                 if (residue <= 0) break;
+                if (feeding.Qty <= 0) continue;
 
                 // 数量足够
                 if (qty <= feeding.Qty)
@@ -575,6 +576,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                     UpdatedOn = sfcProduceEntity.UpdatedOn,
                     ResourceId = sfcProduceEntity.ResourceId ?? 0,
                     ProductId = currentBo.MaterialId,
+                    Id = feeding.Id,
                     Qty = feeding.Qty
                 });
 
