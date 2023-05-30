@@ -53,7 +53,6 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
         }
 
-
         /// <summary>
         /// 验证参数
         /// </summary>

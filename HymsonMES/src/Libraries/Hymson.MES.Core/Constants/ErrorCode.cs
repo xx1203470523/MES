@@ -363,7 +363,7 @@
         public const string MES15206 = "物料流程类型不能为空";
         public const string MES15207 = "物料流程类型不符合规则：1.物料接收/2.物料退料/3.物料加载";
         public const string MES15208 = "物料来源不能为空";
-        public const string MES15209 = "物料来源不符合规则：1.手动录入/2.WMS/3.上料点编号";
+        public const string MES15209 = "物料来源不符合规则：1.手动录入/2.WMS";
         public const string MES152010 = "物料超出，一次最多扫描100个";
         public const string MES152011 = "物料不存在";
         public const string MES152012 = "物料条码：{MaterialCode}未关联到供应商";
@@ -470,9 +470,9 @@
         public const string MES16110 = "扫描条码失败";
         public const string MES16111 = "条码:{SFC}已使用，不允许删除";
         public const string MES16112 = "扫描SN与关联工单号不符，请重新扫描！";
-        public const string MES16113 = "请配置当前工单产品的编码规则！";
-        public const string MES16114 = "扫描SN与工单产品编码规则不符！基数为:{Base}位";
-        public const string MES16115 = "扫描SN与工单产品编码规则不符！需包含{ValuesType}值:{SegmentedValue}";
+        //public const string MES16113 = "请配置当前工单产品的编码规则！";
+        //public const string MES16114 = "扫描SN与工单产品编码规则不符！基数为:{Base}位";
+        //public const string MES16115 = "扫描SN与工单产品编码规则不符！需包含{ValuesType}值:{SegmentedValue}";
         public const string MES16116 = "已使用的条码，不允许删除";
 
         public const string MES16117 = "工单{OrderCode}已经被锁定，无法继续生产";
@@ -497,7 +497,7 @@
         public const string MES16202 = "基数只有 10,16,32";
         public const string MES16203 = "未找到条码生成规则";
         public const string MES16204 = "{base}进制字符串全部忽略,无法生成条码";
-        public const string MES16205 = "通配符{value}未实现";
+        public const string MES16205 = "通配符{value}未定义";
         public const string MES16206 = "流水号转换只实现了16,32进制";
         #endregion
 
@@ -605,7 +605,6 @@
         public const string MES16506 = "条码不为完成和在库状态，无法复用。";
         #endregion
 
-
         #region 在制品移除添加 16600
 
         public const string MES16600 = "条码不存在或不是在制品!";
@@ -632,7 +631,7 @@
         #region 容器包装 MES 16700
         public const string MES16701 = "容器包装，条码信息未找到";
         public const string MES16702 = "容器包装，包装码不存在";
-        public const string MES16703 = "容器包装，条码的包装维护记录未找到";
+        //public const string MES16703 = "容器包装，条码的包装维护记录未找到";
         public const string MES16704 = "容器包装，配置面板编号为空";
         public const string MES16705 = "容器包装，配置面板不存在或未启用";
         public const string MES16706 = "容器包装，配置面板不允许混工单,当前容器工单{first},当前条码工单{second}";
@@ -735,7 +734,6 @@
 
         public const string MES18110 = "没有传入SFC条码信息";
         #endregion
-
 
         #region 生产更改 MES18200
         public const string MES18200 = "最大扫描{number}个";
