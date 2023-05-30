@@ -452,7 +452,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                     MaterialVersion = material.Version ?? "",
                     MaterialBarCode = entity.BarCode,
                     Batch = inventory.Batch,
-                    Quantity = entity.InitQty,
+                    Quantity = entity.Qty,
                     Unit = material.Unit ?? "",
                     Type = WhMaterialInventoryTypeEnum.MaterialReturn,
                     Source = inventory.Source,
