@@ -373,6 +373,13 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             //产品参数信息
             if (manuProductParameterEntities.Any())
             {
+                foreach (var entity in manuProductParameterEntities)
+                {
+                    var sfcProduceEntity = sfcProduceList.Where(c => c.SFC == entity.SFC).First();
+                    entity.ProcedureId = sfcProduceEntity.ProcedureId;
+                    entity.ProductId = sfcProduceEntity.ProductId;
+                    entity.WorkOrderId = sfcProduceEntity.WorkOrderId;
+                }
                 rows += await _manuProductParameterRepository.InsertsAsync(manuProductParameterEntities);
             }
             //Ng信息
