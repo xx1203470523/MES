@@ -95,6 +95,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<int> UpdateStatusRangeAsync(List<ManuProductBadRecordCommand> commands);
 
+        /// <summary>
+        /// 根据ID关闭条码不合格标识和缺陷
+        /// </summary>
+        /// <param name="manuSfcInfoEntity"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusByIdRangeAsync(List<ManuProductBadRecordUpdateCommand> commands);
 
         /// <summary>
         /// 报表分页查询

@@ -127,6 +127,10 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     public record ManuFacePlateRepairConfirmSubmitDetailDto
     {
         /// <summary>
+        /// 不合格编码
+        /// </summary>
+        public string UnqualifiedCode { get; set; }
+        /// <summary>
         /// 不良录入Id
         /// </summary>
         public long BadRecordId { get; set; }
@@ -138,12 +142,12 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 维修方法
         /// </summary>
-        public string RepairMethod { get; set; }
+        public string? RepairMethod { get; set; }
 
         /// <summary>
         /// 原因分析
         /// </summary>
-        public string CauseAnalyse { get; set; }
+        public string? CauseAnalyse { get; set; }
 
         /// <summary>
         /// 是否关闭

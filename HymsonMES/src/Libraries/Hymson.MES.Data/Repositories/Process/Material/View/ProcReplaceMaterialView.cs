@@ -1,14 +1,11 @@
 ﻿using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class ProcReplaceMaterialView : BaseEntity
     {
         /// <summary>
@@ -38,8 +35,6 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 是否启用
         /// </summary>
         public bool IsEnabled { get; set; }
-
-
 
         /// <summary>
         /// 数据收集方式 （等同于 DataCollectionWay ）

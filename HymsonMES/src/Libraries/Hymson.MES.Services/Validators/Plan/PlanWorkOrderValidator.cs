@@ -26,7 +26,7 @@ namespace Hymson.MES.Services.Validators.Plan
             RuleFor(x => x.OrderCode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16020));
             RuleFor(x => x.ProductId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16021));
             RuleFor(x => x.Qty).GreaterThanOrEqualTo(0).WithErrorCode(nameof(ErrorCode.MES16022));
-            RuleFor(x => x.ProductBOMId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16023));
+            //RuleFor(x => x.ProductBOMId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16023));
             RuleFor(x => x.ProcessRouteId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16024));
             RuleFor(x => x.WorkCenterId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16025));
             RuleFor(x => x.Type).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16026));
@@ -56,7 +56,7 @@ namespace Hymson.MES.Services.Validators.Plan
             RuleFor(x => x.OrderCode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16020));
             RuleFor(x => x.ProductId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16021));
             RuleFor(x => x.Qty).GreaterThanOrEqualTo(0).WithErrorCode(nameof(ErrorCode.MES16022));
-            RuleFor(x => x.ProductBOMId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16023));
+            //RuleFor(x => x.ProductBOMId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16023));
             RuleFor(x => x.ProcessRouteId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16024));
             RuleFor(x => x.WorkCenterId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16025));
             RuleFor(x => x.Type).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16026));
