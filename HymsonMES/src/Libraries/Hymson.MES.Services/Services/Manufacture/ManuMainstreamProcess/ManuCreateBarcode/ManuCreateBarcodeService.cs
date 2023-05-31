@@ -61,6 +61,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="manuSfcStepRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
+        /// <param name="planSfcPrintService"></param>
         /// <param name="localizationService"></param>
         public ManuCreateBarcodeService(ICurrentUser currentUser,
              ICurrentSite currentSite,
@@ -98,10 +99,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         /// <returns></returns>
         public async Task<List<ManuSfcEntity>> CreateBarcodeByWorkOrderIdAsync(CreateBarcodeByWorkOrderDto param)
         {
-            var planWorkOrderEntity = await _manuCommonService.GetProduceWorkOrderByIdAsync(param.WorkOrderId);
+            var planWorkOrderEntity = await _manuCommonService.GetProduceWorkOrderByIdAsync(param.WorkOrderId, false);
 
             var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(planWorkOrderEntity.ProductId);
-            var inteCodeRulesEntity = await _inteCodeRulesRepository.GetInteCodeRulesByProductIdAsync( new InteCodeRulesByProductQuery { ProductId = planWorkOrderEntity.ProductId,CodeType= CodeRuleCodeTypeEnum.ProcessControlSeqCode } );
+            var inteCodeRulesEntity = await _inteCodeRulesRepository.GetInteCodeRulesByProductIdAsync(new InteCodeRulesByProductQuery { ProductId = planWorkOrderEntity.ProductId, CodeType = CodeRuleCodeTypeEnum.ProcessControlSeqCode });
             if (inteCodeRulesEntity == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16501)).WithData("product", procMaterialEntity.MaterialCode);
@@ -110,6 +111,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16502)).WithData("product", procMaterialEntity.MaterialCode);
             }
+
             var discuss = (int)Math.Ceiling(param.Qty / procMaterialEntity.Batch);
             var barcodeList = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new GenerateBarcodeDto
             {

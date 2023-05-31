@@ -572,7 +572,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                     }
                 }
 
-                // 剩余折算成原数量
+                // 剩余折算成目标数量
                 var convertResidue = ToTargetValue(originQty, targetQty, residue);
 
                 // 数量足够
