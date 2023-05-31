@@ -552,7 +552,7 @@
         public const string MES17306 = "获取条码生产信息失败";
         public const string MES17307 = "存在未关闭的缺陷，请检查！";
         public const string MES17308 = "返回工序失败！";
-        public const string MES17309 = "当前面板不存在在制维修信息！";
+        public const string MES17309 = "当前面板不存在！";
         public const string MES17310 = "结束维修，保存数据失败！";
         public const string MES17311 = "未获取到工序信息";
         public const string MES17312 = "未获取到资源信息";
@@ -681,13 +681,13 @@
         public const string MES16903 = "当前工序与条码生产信息中的不一致！";
         public const string MES16904 = "找不到实际使用的物料信息!";
         public const string MES16905 = "找不到实际物料{materialCode}对应的数据收集方式!";
-        public const string MES16906 = "物料选择不符合!";
-        public const string MES16907 = "bom没有配置替代物料,物料选择不符合!";
+        //public const string MES16906 = "物料选择不符合!";
+        //public const string MES16907 = "bom没有配置替代物料,物料选择不符合!";
         public const string MES16908 = "物料条码{barCode}库存不存在!";
         public const string MES16909 = "物料条码{barCode}库存不足,请检查!";
         public const string MES16910 = "实际使用的物料为空!";
         public const string MES16911 = "实际使用的物料与条码不合!";
-        public const string MES16912 = "条码为空！";
+        //public const string MES16912 = "条码为空！";
         public const string MES16913 = "不能删除启用或保留的记录！";
         #endregion
 
@@ -704,7 +704,7 @@
         public const string MES18002 = "请扫描相同工单的条码";
         public const string MES18003 = "工单信息不存在";
         public const string MES18004 = "需扫描相同工艺路线条码";
-        public const string MES18005 = "工艺路线不存在节点";
+        public const string MES18005 = "工艺路线不存在该工序";
         public const string MES18006 = "未获取到条码:{SFC}";
         public const string MES18007 = "条码没有对应的生产工序";
         public const string MES18008 = "条码生产状态异常:{Status}";
@@ -717,7 +717,7 @@
         public const string MES18013 = "类型不能为空";
         public const string MES18014 = "条码不能为空";
         public const string MES18015 = "条码:{SFC}已装箱，请先解包";
-        public const string MES18016 = "在制品步骤控制入库失败";
+        public const string MES18016 = "在制品步骤控制保存失败";
         public const string MES18017 = "工艺路线不存在尾工序";
         public const string MES18018 = "工艺路线存在多个尾工序";
         public const string MES18019 = "条码:{SFCs}已包装，不允许操作";
