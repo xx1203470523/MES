@@ -363,7 +363,7 @@
         public const string MES15206 = "物料流程类型不能为空";
         public const string MES15207 = "物料流程类型不符合规则：1.物料接收/2.物料退料/3.物料加载";
         public const string MES15208 = "物料来源不能为空";
-        public const string MES15209 = "物料来源不符合规则：1.手动录入/2.WMS/3.上料点编号";
+        public const string MES15209 = "物料来源不符合规则：1.手动录入/2.WMS";
         public const string MES152010 = "物料超出，一次最多扫描100个";
         public const string MES152011 = "物料不存在";
         public const string MES152012 = "物料条码：{MaterialCode}未关联到供应商";
@@ -470,9 +470,9 @@
         public const string MES16110 = "扫描条码失败";
         public const string MES16111 = "条码:{SFC}已使用，不允许删除";
         public const string MES16112 = "扫描SN与关联工单号不符，请重新扫描！";
-        public const string MES16113 = "请配置当前工单产品的编码规则！";
-        public const string MES16114 = "扫描SN与工单产品编码规则不符！基数为:{Base}位";
-        public const string MES16115 = "扫描SN与工单产品编码规则不符！需包含{ValuesType}值:{SegmentedValue}";
+        //public const string MES16113 = "请配置当前工单产品的编码规则！";
+        //public const string MES16114 = "扫描SN与工单产品编码规则不符！基数为:{Base}位";
+        //public const string MES16115 = "扫描SN与工单产品编码规则不符！需包含{ValuesType}值:{SegmentedValue}";
         public const string MES16116 = "已使用的条码，不允许删除";
 
         public const string MES16117 = "工单{OrderCode}已经被锁定，无法继续生产";
@@ -497,7 +497,7 @@
         public const string MES16202 = "基数只有 10,16,32";
         public const string MES16203 = "未找到条码生成规则";
         public const string MES16204 = "{base}进制字符串全部忽略,无法生成条码";
-        public const string MES16205 = "通配符{value}未实现";
+        public const string MES16205 = "通配符{value}未定义";
         public const string MES16206 = "流水号转换只实现了16,32进制";
         #endregion
 
@@ -552,7 +552,7 @@
         public const string MES17306 = "获取条码生产信息失败";
         public const string MES17307 = "存在未关闭的缺陷，请检查！";
         public const string MES17308 = "返回工序失败！";
-        public const string MES17309 = "当前面板不存在在制维修信息！";
+        public const string MES17309 = "当前面板不存在！";
         public const string MES17310 = "结束维修，保存数据失败！";
         public const string MES17311 = "未获取到工序信息";
         public const string MES17312 = "未获取到资源信息";
@@ -568,9 +568,13 @@
         public const string MES17322 = "请先开始维修";
         public const string MES17323 = "排队中";
         public const string MES17324 = "活动中";
-        public const string MES17325 = "未获取到维修业务";
+        public const string MES17325 = "未获取到维修业务表的数据";
         public const string MES17326 = "未获取到维修业务内容";
         public const string MES17327 = "工序未关联到资源";
+        public const string MES17328 = "不合格代码:{0}";
+        public const string MES17329 = "分析原因不能为空！";
+        public const string MES17330 = "维修方法不能为空！";
+        public const string MES17331 = "未找到不良录入信息！";
 
 
         #endregion
@@ -605,7 +609,6 @@
         public const string MES16506 = "条码不为完成和在库状态，无法复用。";
         #endregion
 
-
         #region 在制品移除添加 16600
 
         public const string MES16600 = "条码不存在或不是在制品!";
@@ -632,11 +635,11 @@
         #region 容器包装 MES 16700
         public const string MES16701 = "容器包装，条码信息未找到";
         public const string MES16702 = "容器包装，包装码不存在";
-        public const string MES16703 = "容器包装，条码的包装维护记录未找到";
+        //public const string MES16703 = "容器包装，条码的包装维护记录未找到";
         public const string MES16704 = "容器包装，配置面板编号为空";
         public const string MES16705 = "容器包装，配置面板不存在或未启用";
         public const string MES16706 = "容器包装，配置面板不允许混工单,当前容器工单{first},当前条码工单{second}";
-        public const string MES16707 = "容器包装，包装码不能为空";
+        //public const string MES16707 = "容器包装，包装码不能为空";
         public const string MES16710 = "不识别的类型：{key}";
         public const string MES16708 = "产品条码不能为空";
         public const string MES16709 = "作业返回空，请检查作业是否正确配置";
@@ -678,13 +681,13 @@
         public const string MES16903 = "当前工序与条码生产信息中的不一致！";
         public const string MES16904 = "找不到实际使用的物料信息!";
         public const string MES16905 = "找不到实际物料{materialCode}对应的数据收集方式!";
-        public const string MES16906 = "物料选择不符合!";
-        public const string MES16907 = "bom没有配置替代物料,物料选择不符合!";
+        //public const string MES16906 = "物料选择不符合!";
+        //public const string MES16907 = "bom没有配置替代物料,物料选择不符合!";
         public const string MES16908 = "物料条码{barCode}库存不存在!";
         public const string MES16909 = "物料条码{barCode}库存不足,请检查!";
         public const string MES16910 = "实际使用的物料为空!";
         public const string MES16911 = "实际使用的物料与条码不合!";
-        public const string MES16912 = "条码为空！";
+        //public const string MES16912 = "条码为空！";
         public const string MES16913 = "不能删除启用或保留的记录！";
         #endregion
 
@@ -696,12 +699,12 @@
         #endregion
 
         #region 在制品步骤控制 MES18000
-        public const string MES18000 = "在制品步骤控制错误";
+        //public const string MES18000 = "在制品步骤控制错误";
         public const string MES18001 = "条码信息不存在";
         public const string MES18002 = "请扫描相同工单的条码";
         public const string MES18003 = "工单信息不存在";
         public const string MES18004 = "需扫描相同工艺路线条码";
-        public const string MES18005 = "工艺路线不存在节点";
+        public const string MES18005 = "工艺路线不存在该工序";
         public const string MES18006 = "未获取到条码:{SFC}";
         public const string MES18007 = "条码没有对应的生产工序";
         public const string MES18008 = "条码生产状态异常:{Status}";
@@ -714,7 +717,7 @@
         public const string MES18013 = "类型不能为空";
         public const string MES18014 = "条码不能为空";
         public const string MES18015 = "条码:{SFC}已装箱，请先解包";
-        public const string MES18016 = "在制品步骤控制入库失败";
+        public const string MES18016 = "在制品步骤控制保存失败";
         public const string MES18017 = "工艺路线不存在尾工序";
         public const string MES18018 = "工艺路线存在多个尾工序";
         public const string MES18019 = "条码:{SFCs}已包装，不允许操作";
@@ -732,10 +735,10 @@
         public const string MES18103 = "没有获取到{sfc}对应步骤中的产品信息";
         public const string MES18104 = "没有获取到{sfc}对应步骤中的工艺路线信息";
         public const string MES18105 = "没有获取到{sfc}对应步骤中的BOM信息";
+        public const string MES18106 = "没有获取到{sfc}对应正在使用的条码信息";
 
         public const string MES18110 = "没有传入SFC条码信息";
         #endregion
-
 
         #region 生产更改 MES18200
         public const string MES18200 = "最大扫描{number}个";

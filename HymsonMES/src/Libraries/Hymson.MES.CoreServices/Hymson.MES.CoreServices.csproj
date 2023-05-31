@@ -10,4 +10,8 @@
     <ProjectReference Include="..\Hymson.MES.Data\Hymson.MES.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\Manufacture\Common\" />
+  </ItemGroup>
+
 </Project>

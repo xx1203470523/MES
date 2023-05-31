@@ -208,6 +208,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 根据ID关闭条码不合格标识和缺陷
+        /// </summary>
+        /// <param name="manuSfcInfoEntity"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateStatusByIdRangeAsync(List<ManuProductBadRecordUpdateCommand> commands)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateStatusByIdSql, commands);
+        }
+
+        /// <summary>
         /// 报表分页查询
         /// </summary>
         /// <param name="pageQuery"></param>
@@ -470,7 +481,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/  FROM `manu_product_bad_record` br  /**innerjoin**/ /**leftjoin**/ /**where**/ ";
 
         const string InsertSql = "INSERT INTO `manu_product_bad_record`(  `Id`, `SiteId`, `FoundBadOperationId`, `FoundBadResourceId`,`OutflowOperationId`, `UnqualifiedId`,`SFC`,`SfcInfoId`,`Qty`, `Status`, `Source`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @FoundBadOperationId,@FoundBadResourceId, @OutflowOperationId, @UnqualifiedId, @SFC,@SfcInfoId,@Qty, @Status, @Source, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string UpdateSql = "UPDATE `manu_product_bad_record` SET   SiteId = @SiteId, FoundBadOperationId = @FoundBadOperationId, OutflowOperationId = @OutflowOperationId, UnqualifiedId = @UnqualifiedId, SFC = @SFC, Qty = @Qty, Status = @Status, Source = @Source, Remark = @Remark, DisposalResult = @DisposalResult, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `manu_product_bad_record` SET   FoundBadOperationId = @FoundBadOperationId, OutflowOperationId = @OutflowOperationId, UnqualifiedId = @UnqualifiedId, SFC = @SFC, Qty = @Qty, Status = @Status, Source = @Source, Remark = @Remark, DisposalResult = @DisposalResult, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `manu_product_bad_record` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteId`, `FoundBadOperationId`, `OutflowOperationId`, `UnqualifiedId`, `SFC`, `SfcInfoId`,`Qty`, `Status`, `Source`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
@@ -481,14 +492,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string UpdateStatusSql = "UPDATE `manu_product_bad_record` SET Remark = @Remark,Status=@Status,DisposalResult=@DisposalResult,UpdatedBy=@UserId,UpdatedOn=@UpdatedOn WHERE SFC=@Sfc  AND UnqualifiedId=@UnqualifiedId  and  Status!=@Status ";
 
+        const string UpdateStatusByIdSql = "UPDATE `manu_product_bad_record` SET Remark = @Remark,Status=@Status,DisposalResult=@DisposalResult,UpdatedBy=@UserId,UpdatedOn=@UpdatedOn WHERE Id=@Id  AND  Status!=@Status ";
+
         const string GetPagedInfoReportDataSqlTemplate = @"
                     select 
                         rbr.UnqualifiedId, Sum(rbr.Qty)  as num
                     from manu_product_bad_record rbr
                     LEFT JOIN proc_procedure p on p.Id=rbr.OutflowOperationId -- 为了查询工序编码
 
-                    LEFT join manu_sfc s on s.SFC=rbr.SFC
-                    left join manu_sfc_info si on si.SfcId= s.Id -- 为了获取关联信息
+                    -- LEFT join manu_sfc s on s.SFC=rbr.SFC
+                    left join manu_sfc_info si on si.Id= rbr.SfcInfoId -- 为了获取关联信息
 
                     LEFT JOIN proc_material m on m.Id=si.ProductId  -- 为了查询物料编码
                     LEFT join plan_work_order o on o.Id=si.WorkOrderId -- 为了查询工单编码
@@ -505,15 +518,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                     from manu_product_bad_record rbr
                     LEFT JOIN proc_procedure p on p.Id=rbr.OutflowOperationId -- 为了查询工序编码
 
-                    LEFT join manu_sfc s on s.SFC=rbr.SFC
-                    left join manu_sfc_info si on si.SfcId= s.Id -- 为了获取关联信息
+                    -- LEFT join manu_sfc s on s.SFC=rbr.SFC
+                    left join manu_sfc_info si on si.Id= rbr.SfcInfoId -- 为了获取关联信息
 
                     LEFT JOIN proc_material m on m.Id=si.ProductId  -- 为了查询物料编码
                     LEFT join plan_work_order o on o.Id=si.WorkOrderId -- 为了查询工单编码
                     /**where**/   ";
 
         const string GetPagedInfoLogReportDataSqlTemplate = @"
-                select  rbr.SFC,  
+                SELECT  rbr.SFC,  
                         m.MaterialCode,m.MaterialName,
                         o.OrderCode,
                         p.`Code` as ProcedureCode,
@@ -525,33 +538,33 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                         rbr.CreatedBy,
                         rbr.CreatedOn
                 
-                from manu_product_bad_record rbr
+                FROM manu_product_bad_record rbr
                 LEFT JOIN proc_procedure p on p.Id=rbr.OutflowOperationId -- 为了查询工序编码
-                LEFT join proc_resource r on r.id=rbr.FoundBadResourceId  -- 为了查询资源
-                LEFT join qual_unqualified_code uc on uc.id=rbr.UnqualifiedId -- 为了查询不合格代码
+                LEFT JOIN proc_resource r on r.id=rbr.FoundBadResourceId  -- 为了查询资源
+                LEFT JOIN qual_unqualified_code uc on uc.id=rbr.UnqualifiedId -- 为了查询不合格代码
 
-                LEFT join manu_sfc s on s.SFC=rbr.SFC
-                left join manu_sfc_info si on si.SfcId= s.Id -- 为了获取关联信息
+                -- LEFT JOIN manu_sfc s on s.SFC=rbr.SFC
+                LEFT JOIN manu_sfc_info si on si.id= rbr.SfcInfoId -- 为了获取关联信息
 
                 LEFT JOIN proc_material m on m.Id=si.ProductId  -- 为了查询物料编码
-                LEFT join plan_work_order o on o.Id=si.WorkOrderId -- 为了查询工单编码
+                LEFT JOIN plan_work_order o on o.Id=si.WorkOrderId -- 为了查询工单编码
                 /**where**/
                 ORDER BY rbr.CreatedOn desc
 
                 LIMIT @Offset,@Rows 
         ";
         const string GetPagedInfoLogReportCountSqlTemplate = @" 
-                select  COUNT(1) 
-                from manu_product_bad_record rbr
+                SELECT  COUNT(1) 
+                FROM manu_product_bad_record rbr
                 LEFT JOIN proc_procedure p on p.Id=rbr.OutflowOperationId -- 为了查询工序编码
-                LEFT join proc_resource r on r.id=rbr.FoundBadResourceId  -- 为了查询资源
-                LEFT join qual_unqualified_code uc on uc.id=rbr.UnqualifiedId -- 为了查询不合格代码
+                LEFT JOIN proc_resource r on r.id=rbr.FoundBadResourceId  -- 为了查询资源
+                LEFT JOIN qual_unqualified_code uc on uc.id=rbr.UnqualifiedId -- 为了查询不合格代码
 
-                LEFT join manu_sfc s on s.SFC=rbr.SFC
-                left join manu_sfc_info si on si.SfcId= s.Id -- 为了获取关联信息
+                -- LEFT JOIN manu_sfc s on s.SFC=rbr.SFC
+                LEFT JOIN manu_sfc_info si on si.id= rbr.SfcInfoId -- 为了获取关联信息
 
                 LEFT JOIN proc_material m on m.Id=si.ProductId  -- 为了查询物料编码
-                LEFT join plan_work_order o on o.Id=si.WorkOrderId -- 为了查询工单编码
+                LEFT JOIN plan_work_order o on o.Id=si.WorkOrderId -- 为了查询工单编码
                 /**where**/  ";
     }
 }

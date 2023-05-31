@@ -64,9 +64,15 @@ namespace Hymson.MES.Services.Bos.Manufacture
         public MaterialSerialNumberEnum? DataCollectionWay { get; set; }
 
         /// <summary>
+        /// 描述 :数据收集方式
+        /// 空值 : true  
+        /// </summary>
+        public MaterialSerialNumberEnum? SerialNumber { get; set; }
+
+        /// <summary>
         /// 替代料集合
         /// </summary>
-        public IEnumerable<MaterialDeductItemBo> ReplaceMaterials { get; set; }
+        public IEnumerable<MaterialDeductItemBo> ReplaceMaterials { get; set; } = new List<MaterialDeductItemBo>();
 
     }
 
@@ -93,7 +99,7 @@ namespace Hymson.MES.Services.Bos.Manufacture
         /// <summary>
         /// 消耗系数
         /// </summary>
-        public decimal ConsumeRatio { get; set; } = 1;
+        public decimal ConsumeRatio { get; set; } = 100;
     }
 
 

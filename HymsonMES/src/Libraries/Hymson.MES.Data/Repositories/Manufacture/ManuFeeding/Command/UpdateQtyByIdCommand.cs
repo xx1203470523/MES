@@ -5,8 +5,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command
     /// <summary>
     /// 
     /// </summary>
-    public class UpdateQtyByProductIdCommand : UpdateCommand
+    public class UpdateQtyByIdCommand : UpdateCommand
     {
+        /// <summary>
+        /// ID（主键）
+        /// </summary>
+        public long Id { get; set; }
+
+        /*
         /// <summary>
         /// ID（资源）
         /// </summary>
@@ -16,6 +22,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command
         /// ID（物料）
         /// </summary>
         public long ProductId { get; set; }
+        */
 
         /// <summary>
         /// ID（物料）
