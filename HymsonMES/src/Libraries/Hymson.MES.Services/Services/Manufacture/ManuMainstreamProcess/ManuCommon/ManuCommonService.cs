@@ -276,8 +276,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// 获取生产工单
         /// </summary>
         /// <param name="workOrderId"></param>
+        /// <param name="isVerifyActivation"></param>
         /// <returns></returns>
-        public async Task<PlanWorkOrderEntity> GetProduceWorkOrderByIdAsync(long workOrderId)
+        public async Task<PlanWorkOrderEntity> GetProduceWorkOrderByIdAsync(long workOrderId, bool isVerifyActivation = true)
         {
             var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(workOrderId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES16301));
@@ -288,9 +289,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 throw new CustomerValidationException(nameof(ErrorCode.MES16302)).WithData("ordercode", planWorkOrderEntity.OrderCode);
             }
 
-            // 判断是否是激活的工单
-            _ = await _planWorkOrderActivationRepository.GetByWorkOrderIdAsync(planWorkOrderEntity.Id)
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16410));
+            if (isVerifyActivation == true)
+            {
+                // 判断是否是激活的工单
+                _ = await _planWorkOrderActivationRepository.GetByWorkOrderIdAsync(planWorkOrderEntity.Id)
+                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES16410));
+            }
 
             switch (planWorkOrderEntity.Status)
             {
