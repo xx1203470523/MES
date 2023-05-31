@@ -64,6 +64,12 @@ namespace Hymson.MES.Services.Bos.Manufacture
         public MaterialSerialNumberEnum? DataCollectionWay { get; set; }
 
         /// <summary>
+        /// 描述 :数据收集方式
+        /// 空值 : true  
+        /// </summary>
+        public MaterialSerialNumberEnum? SerialNumber { get; set; }
+
+        /// <summary>
         /// 替代料集合
         /// </summary>
         public IEnumerable<MaterialDeductItemBo> ReplaceMaterials { get; set; } = new List<MaterialDeductItemBo>();

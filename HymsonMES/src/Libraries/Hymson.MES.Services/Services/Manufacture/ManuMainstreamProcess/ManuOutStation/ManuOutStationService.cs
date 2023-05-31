@@ -214,9 +214,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             // 物料ID集合
             var materialIds = initialMaterials.Select(s => s.MaterialId);
 
-            // 读取物料基本信息（仅仅为了读取消耗系数和收集方式）（批量）
-            var materialEntities = await _procMaterialRepository.GetByIdsAsync(materialIds);
-
             // 读取物料加载数据（批量）
             var allFeedingEntities = await _manuFeedingRepository.GetByResourceIdAndMaterialIdsAsync(new GetByResourceIdAndMaterialIdsQuery
             {
@@ -232,12 +229,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             List<ManuSfcCirculationEntity> adds = new();
             foreach (var materialBo in initialMaterials)
             {
-                var materialEntity = materialEntities.FirstOrDefault(f => f.Id == materialBo.MaterialId);
-                if (materialEntity == null) continue;
-
-                // 如有设置消耗系数
-                if (materialEntity.ConsumeRatio.HasValue == true) materialBo.ConsumeRatio = materialEntity.ConsumeRatio.Value;
-
                 // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
                 decimal residue = materialBo.Usages * (materialBo.Loss ?? 1);
                 if (materialBo.ConsumeRatio > 0) residue *= (materialBo.ConsumeRatio / 100);
@@ -251,7 +242,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 }
 
                 // 2.确认主物料的收集方式，不是"批次"就结束（不对该物料进行扣料）
-                if (materialEntity.SerialNumber != MaterialSerialNumberEnum.Batch) continue;
+                if (materialBo.SerialNumber != MaterialSerialNumberEnum.Batch) continue;
 
                 // 进行扣料
                 DeductMaterialQty(ref updates, ref adds, ref residue, sfcProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
@@ -416,20 +407,29 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             });
             var replaceMaterialsForMainDic = replaceMaterialsForMain.ToLookup(w => w.MaterialId).ToDictionary(d => d.Key, d => d);
 
-            // 查询所有替代料基础信息
-            var materialEntities = await _procMaterialRepository.GetByIdsAsync(replaceMaterialsForBOM.Select(s => s.ReplaceMaterialId));
+            // 组合主物料ID和替代料ID
+            var materialIds = mainMaterials.Select(s => s.MaterialId).AsList();
+            materialIds.AddRange(replaceMaterialsForBOM.Select(s => s.ReplaceMaterialId));
+
+            // 查询所有主物料和替代料的基础信息（为了读取消耗系数和收集方式）
+            var materialEntities = await _procMaterialRepository.GetByIdsAsync(materialIds);
 
             // 获取初始扣料数据
             List<MaterialDeductBo> initialMaterials = new();
             foreach (var item in mainMaterials)
             {
+                var materialEntitiy = materialEntities.FirstOrDefault(f => f.Id == item.MaterialId);
+                if (materialEntitiy == null) continue;
+
                 var deduct = new MaterialDeductBo
                 {
                     MaterialId = item.MaterialId,
                     Usages = item.Usages,
                     Loss = item.Loss,
-                    DataCollectionWay = item.DataCollectionWay
+                    DataCollectionWay = item.DataCollectionWay,
+                    SerialNumber = materialEntitiy.SerialNumber
                 };
+                if (materialEntitiy.ConsumeRatio.HasValue) deduct.ConsumeRatio = materialEntitiy.ConsumeRatio.Value;
 
                 // 填充BOM替代料
                 if (item.IsEnableReplace == false)
@@ -573,20 +573,20 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 }
 
                 // 剩余折算成原数量
-                var feedingQty = ToTargetValue(originQty, targetQty, feeding.Qty);
+                var convertResidue = ToTargetValue(originQty, targetQty, residue);
 
                 // 数量足够
-                if (residue <= feedingQty)
+                if (convertResidue <= feeding.Qty)
                 {
-                    consume = ToTargetValue(originQty, targetQty, residue);
+                    consume = convertResidue;
                     residue = 0;
                     feeding.Qty -= consume;
                 }
                 // 数量不够，继续下一个
                 else
                 {
-                    consume = feedingQty;
-                    residue -= consume;
+                    consume = feeding.Qty;
+                    residue -= ToTargetValue(targetQty, originQty, consume);
                     feeding.Qty = 0;
                 }
 
@@ -663,12 +663,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// </summary>
         /// <param name="originQty"></param>
         /// <param name="targetQty"></param>
-        /// <param name="value"></param>
+        /// <param name="originValue"></param>
         /// <returns></returns>
-        private static decimal ToTargetValue(decimal originQty, decimal targetQty, decimal value)
+        private static decimal ToTargetValue(decimal originQty, decimal targetQty, decimal originValue)
         {
-            if (targetQty == 0) return value;
-            return originQty * value / targetQty;
+            if (originQty == 0) return originValue;
+            return targetQty * originValue / originQty;
         }
 
     }
