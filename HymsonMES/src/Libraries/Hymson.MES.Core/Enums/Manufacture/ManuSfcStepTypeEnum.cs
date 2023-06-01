@@ -10,15 +10,15 @@ namespace Hymson.MES.Core.Enums.Manufacture
         // ; 跟枚举的对应不上了，具体以枚举的为准
         // 步骤类型;1：创建；3：进站；4：出站；5：将来锁定；6：及时锁定；7：解锁；9：报废；14：转换；15;关闭标识;16:关闭缺陷;17:删除;18:维修;19:步骤控制;20:生产更改
         /// <summary>
-        /// 创建
+        /// 条码创建
         /// </summary>
-        [Description("创建")]
+        [Description("条码创建")]
         Create = 1,
-        ///// <summary>
-        ///// 复用
-        ///// </summary>
-        //[Description("复用")]
-        //Multiplex = 2,
+        /// <summary>
+        /// 条码接收
+        /// </summary>
+        [Description("条码接收")]
+        Receive = 2,
         /// <summary>
         /// 进站
         /// </summary>

@@ -6,7 +6,6 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Plan;
@@ -39,11 +38,8 @@ namespace Hymson.MES.Services.Services.Plan
         /// <summary>
         /// 条码接收 仓储
         /// </summary>
-        private readonly IPlanSfcReceiveRepository _planSfcInfoRepository;
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
         private readonly IManuSfcRepository _manuSfcRepository;
-        private readonly IInteCodeRulesRepository _inteCodeRulesRepository;
-        private readonly IInteCodeRulesMakeRepository _inteCodeRulesMakeRepository;
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
         private readonly ILocalizationService _localizationService;
         private readonly IManuCreateBarcodeService _manuCreateBarcodeService;
@@ -58,11 +54,8 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="planSfcInfoRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="manuSfcRepository"></param>
-        /// <param name="inteCodeRulesRepository"></param>
-        /// <param name="inteCodeRulesMakeRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="localizationService"></param>
         /// <param name="manuCreateBarcodeService"></param>
@@ -72,11 +65,8 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="validationCreateRules"></param>
         /// <param name="validationModifyRules"></param>
         public PlanSfcReceiveService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IPlanSfcReceiveRepository planSfcInfoRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IManuSfcRepository manuSfcRepository,
-            IInteCodeRulesRepository inteCodeRulesRepository,
-            IInteCodeRulesMakeRepository inteCodeRulesMakeRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             ILocalizationService localizationService,
             IManuCreateBarcodeService manuCreateBarcodeService,
@@ -88,11 +78,8 @@ namespace Hymson.MES.Services.Services.Plan
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _planSfcInfoRepository = planSfcInfoRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _manuSfcRepository = manuSfcRepository;
-            _inteCodeRulesRepository = inteCodeRulesRepository;
-            _inteCodeRulesMakeRepository = inteCodeRulesMakeRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _localizationService = localizationService;
             _manuCreateBarcodeService = manuCreateBarcodeService;
