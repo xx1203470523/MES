@@ -114,6 +114,11 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// </summary>
         [Description("完成维修")]
         RepairComplete = 21,
+        /// <summary>
+        /// 完成维修
+        /// </summary>
+        [Description("维修返回")]
+        RepairReturn = 22,
         ///// <summary>
         ///// 拆解
         ///// </summary>

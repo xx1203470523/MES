@@ -634,7 +634,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ProcedureId = confirmSubmitDto.ReturnProcedureId,
                 Qty = manuSfcProduceEntit.Qty,
                 IsRepair = true,
-                Operatetype = ManuSfcStepTypeEnum.RepairComplete,
+                Operatetype = ManuSfcStepTypeEnum.RepairReturn,
                 CurrentStatus = SfcProduceStatusEnum.lineUp,
                 EquipmentId = manuSfcProduceEntit.EquipmentId,
                 ResourceId = manuSfcProduceEntit.ResourceId,
