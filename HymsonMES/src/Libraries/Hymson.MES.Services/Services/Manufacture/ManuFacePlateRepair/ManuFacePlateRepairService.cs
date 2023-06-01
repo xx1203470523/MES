@@ -250,8 +250,32 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             #endregion
 
+
             // 这方法里面包含有验证
             var manuFacePlateRepairOpenInfoDto = await GetManuFacePlateRepairOpenInfoDtoAsync(sfcProduceEntity);
+
+            // 初始化步骤
+            var sfcStep = new ManuSfcStepEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = sfcProduceEntity.SiteId,
+                SFC = sfcProduceEntity.SFC,
+                ProductId = sfcProduceEntity.ProductId,
+                WorkOrderId = sfcProduceEntity.WorkOrderId,
+                WorkCenterId = sfcProduceEntity.WorkCenterId,
+                ProductBOMId = sfcProduceEntity.ProductBOMId,
+                ProcedureId = sfcProduceEntity.ProductId,
+                Qty = sfcProduceEntity.Qty,
+                IsRepair = true,
+                Operatetype = ManuSfcStepTypeEnum.Repair,
+                CurrentStatus = SfcProduceStatusEnum.lineUp,
+                EquipmentId = sfcProduceEntity.EquipmentId,
+                ResourceId = sfcProduceEntity.ResourceId,
+                CreatedBy = _currentUser.UserName,
+                CreatedOn = HymsonClock.Now(),
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now(),
+            };
 
             // 更改状态，将条码由"排队"改为"活动"
             sfcProduceEntity.Status = SfcProduceStatusEnum.Activity;
@@ -259,6 +283,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             sfcProduceEntity.UpdatedOn = HymsonClock.Now();
             _ = await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
 
+            await _manuSfcStepRepository.InsertAsync(sfcStep);
             return manuFacePlateRepairOpenInfoDto;
         }
 
@@ -602,6 +627,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SiteId = manuSfcProduceEntit.SiteId,
                 SFC = manuSfcProduceEntit.SFC,
                 ProductId = manuSfcProduceEntit.ProductId,
+                Remark = confirmSubmitDto.Remark,
                 WorkOrderId = manuSfcProduceEntit.WorkOrderId,
                 WorkCenterId = manuSfcProduceEntit.WorkCenterId,
                 ProductBOMId = manuSfcProduceEntit.ProductBOMId,
