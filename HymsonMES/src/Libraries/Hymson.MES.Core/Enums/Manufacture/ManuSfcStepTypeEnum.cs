@@ -10,9 +10,9 @@ namespace Hymson.MES.Core.Enums.Manufacture
         // ; 跟枚举的对应不上了，具体以枚举的为准
         // 步骤类型;1：创建；3：进站；4：出站；5：将来锁定；6：及时锁定；7：解锁；9：报废；14：转换；15;关闭标识;16:关闭缺陷;17:删除;18:维修;19:步骤控制;20:生产更改
         /// <summary>
-        /// 条码创建
+        /// 下达
         /// </summary>
-        [Description("条码创建")]
+        [Description("下达")]
         Create = 1,
         /// <summary>
         /// 条码接收
@@ -20,14 +20,14 @@ namespace Hymson.MES.Core.Enums.Manufacture
         [Description("条码接收")]
         Receive = 2,
         /// <summary>
-        /// 进站
+        /// 开始
         /// </summary>
-        [Description("进站")]
+        [Description("开始")]
         InStock = 3,
         /// <summary>
-        /// 出站
+        /// 完成
         /// </summary>
-        [Description("出站")]
+        [Description("完成")]
         OutStock = 4,
         /// <summary>
         /// 将来锁定
@@ -45,25 +45,25 @@ namespace Hymson.MES.Core.Enums.Manufacture
         [Description("解锁")]
         Unlock = 7,
         /// <summary>
-        /// 新增维修单
+        /// 不良录入
         /// </summary>
-        [Description("新增维修单")]
-        AddRepair = 8,
+        [Description("不良录入")]
+        BadEntry = 8,
         /// <summary>
         /// 报废
         /// </summary>
         [Description("报废")]
         Discard = 9,
-        ///// <summary>
-        ///// NG标识
-        ///// </summary>
-        //[Description("NG标识")]
-        //NGMark = 10,
-        ///// <summary>
-        ///// 拆解
-        ///// </summary>
-        //[Description("拆解")]
-        //Split = 11,
+        /// <summary>
+        /// 停止
+        /// </summary>
+        [Description("停止")]
+        Stop = 10,
+        /// <summary>
+        /// 不良复判
+        /// </summary>
+        [Description("不良复判")]
+        BadRejudgment = 11,
         ///// <summary>
         ///// 合并
         ///// </summary>
@@ -95,9 +95,9 @@ namespace Hymson.MES.Core.Enums.Manufacture
         [Description("删除")]
         Delete = 17,
         /// <summary>
-        /// 维修
+        /// 开始维修
         /// </summary>
-        [Description("维修")]
+        [Description("开始维修")]
         Repair = 18,
         /// <summary>
         /// 步骤控制
@@ -110,9 +110,9 @@ namespace Hymson.MES.Core.Enums.Manufacture
         [Description("生产更改")]
         ManuUpdate = 20,
         /// <summary>
-        /// 维修完成
+        /// 完成维修
         /// </summary>
-        [Description("维修完成")]
+        [Description("完成维修")]
         RepairComplete = 21,
     }
 }
