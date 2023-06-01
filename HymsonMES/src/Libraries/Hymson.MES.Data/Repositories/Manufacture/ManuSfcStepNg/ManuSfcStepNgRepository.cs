@@ -72,6 +72,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 根据BarCodeStepId批量获取数据
+        /// </summary>
+        /// <param name="manuSfcStepIdsNgQuery"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcStepNgEntity>> GetByBarCodeStepIdsAsync(ManuSfcStepIdsNgQuery manuSfcStepIdsNgQuery)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuSfcStepNgEntity>(GetByBarCodeStepIdsSql, manuSfcStepIdsNgQuery);
+        }
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="manuSfcStepNgPagedQuery"></param>
@@ -187,6 +198,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `BarCodeStepId`, `UnqualifiedCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `manu_sfc_step_ng`  WHERE Id IN @Ids ";
+
+        const string GetByBarCodeStepIdsSql = @"SELECT 
+                                          `Id`, `BarCodeStepId`, `UnqualifiedCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
+                            FROM `manu_sfc_step_ng`  WHERE BarCodeStepId IN @BarCodeStepIds AND SiteId = @SiteId";
         #endregion
     }
 }

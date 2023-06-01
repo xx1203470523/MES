@@ -42,7 +42,7 @@ namespace Hymson.MES.Api
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddMemoryCache();
             builder.Services.AddClearCacheService(builder.Configuration);
-            //builder.Services.AddHostedService<WorkService>();
+            builder.Services.AddHostedService<WorkService>();
 #if DEBUG
             builder.Services.AddHttpLogging(logging =>
             {

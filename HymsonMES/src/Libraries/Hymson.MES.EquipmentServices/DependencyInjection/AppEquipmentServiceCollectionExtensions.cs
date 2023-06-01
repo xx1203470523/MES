@@ -11,6 +11,7 @@ using Hymson.MES.EquipmentServices.Dtos.OutBound;
 using Hymson.MES.EquipmentServices.Dtos.OutPutQty;
 using Hymson.MES.EquipmentServices.Dtos.QueryContainerBindSfc;
 using Hymson.MES.EquipmentServices.Dtos.SingleBarCodeLoadingVerification;
+using Hymson.MES.EquipmentServices.Services;
 using Hymson.MES.EquipmentServices.Services.BindContainer;
 using Hymson.MES.EquipmentServices.Services.BindSFC;
 using Hymson.MES.EquipmentServices.Services.CCDFileUploadComplete;
@@ -71,8 +72,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IBindContainerService, BindContainerService>();//容器解绑绑定
             services.AddSingleton<IInBoundService, InBoundService>();//进站
             services.AddSingleton<IOutBoundService, OutBoundService>();//出站
-
-
             services.AddSingleton<IInboundInContainerService, InboundInContainerService>();// 进站-容器
             services.AddSingleton<IGenerateModuleSFCService, GenerateModuleSFCService>();//请求生成模组码-电芯堆叠
             services.AddSingleton<IInboundInSFCContainerService, InboundInSFCContainerService>();//进站-电芯和托盘-装盘2
@@ -81,10 +80,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<ISingleBarCodeLoadingVerificationService, SingleBarCodeLoadingVerificationService>();//单体条码上料校验
             services.AddSingleton<IOutPutQtyService, OutPutQtyService>();//产出上报数量
             services.AddSingleton<IQueryContainerBindSfcService, QueryContainerBindSfcService>();//容器绑定条码查询
-
-
             services.AddSingleton<IEquipmentCollectService, EquipmentCollectService>();   // 设备信息采集
             services.AddSingleton<IFeedingService, FeedingService>();      // 上卸料
+            services.AddSingleton<INGDataService, NGDataService>();//NG数据
         }
 
         /// <summary>

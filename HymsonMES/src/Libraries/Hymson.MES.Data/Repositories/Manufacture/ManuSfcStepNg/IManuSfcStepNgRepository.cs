@@ -75,6 +75,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<IEnumerable<ManuSfcStepNgEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
+        /// 根据BarCodeStepId批量获取数据
+        /// </summary>
+        /// <param name="manuSfcStepIdsNgQuery"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcStepNgEntity>> GetByBarCodeStepIdsAsync(ManuSfcStepIdsNgQuery manuSfcStepIdsNgQuery);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="manuSfcStepNgQuery"></param>

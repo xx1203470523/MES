@@ -6,10 +6,12 @@ using Hymson.MES.EquipmentServices.Dtos.Feeding;
 using Hymson.MES.EquipmentServices.Dtos.GenerateModuleSFC;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Dtos.InboundInContainer;
+using Hymson.MES.EquipmentServices.Dtos.NGData;
 using Hymson.MES.EquipmentServices.Dtos.OutBound;
 using Hymson.MES.EquipmentServices.Dtos.OutPutQty;
 using Hymson.MES.EquipmentServices.Dtos.QueryContainerBindSfc;
 using Hymson.MES.EquipmentServices.Dtos.SingleBarCodeLoadingVerification;
+using Hymson.MES.EquipmentServices.Services;
 using Hymson.MES.EquipmentServices.Services.BindContainer;
 using Hymson.MES.EquipmentServices.Services.BindSFC;
 using Hymson.MES.EquipmentServices.Services.CCDFileUploadComplete;
@@ -56,6 +58,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         private readonly ISingleBarCodeLoadingVerificationService _singleBarCodeLoadingVerificationService;
         private readonly IInBoundService _inBoundService;
         private readonly IOutBoundService _outBoundService;
+        private readonly INGDataService _ngDataService;
 
 
 
@@ -77,6 +80,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="singleBarCodeLoadingVerificationService"></param>
         /// <param name="inBoundService"></param>
         /// <param name="outBoundService"></param>
+        /// <param name="ngDataService"></param>
         public EquipmentController(ILogger<EquipmentController> logger,
             IEquipmentCollectService equipmentService,
             IBindSFCService bindSFCService,
@@ -91,7 +95,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
             IQueryContainerBindSfcService queryContainerBindSfcService,
             ISingleBarCodeLoadingVerificationService singleBarCodeLoadingVerificationService,
             IInBoundService inBoundService,
-            IOutBoundService outBoundService)
+            IOutBoundService outBoundService,
+            INGDataService ngDataService)
         {
             _logger = logger;
             _equipmentService = equipmentService;
@@ -108,6 +113,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
             _singleBarCodeLoadingVerificationService = singleBarCodeLoadingVerificationService;
             _inBoundService = inBoundService;
             _outBoundService = outBoundService;
+            _ngDataService = ngDataService;
         }
 
 
@@ -434,5 +440,16 @@ namespace Hymson.MES.Equipment.Api.Controllers
         //    await _queryContainerBindSfcService.QueryContainerBindSfcAsync(request);
         //}
 
+        /// <summary>
+        /// 获取NG数据
+        /// </summary>
+        /// <param name="sfc">产品条码</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetNGData")]
+        public async Task<NGDataDto> GetNGDataAsync(string sfc)
+        {
+            return await _ngDataService.GetNGData(sfc);
+        }
     }
 }
