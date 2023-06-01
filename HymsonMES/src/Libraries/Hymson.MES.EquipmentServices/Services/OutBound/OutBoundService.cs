@@ -281,6 +281,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                         SFC = sfcProduceEntity.SFC,
                         WorkOrderId = sfcProduceEntity.WorkOrderId,
                         ProductId = sfcProduceEntity.ProductId,
+                        EquipmentId = _currentEquipment.Id,
                         CirculationBarCode = "",//不关联上料
                         CirculationProductId = manuSfcStepEntity.ProductId,
                         CirculationMainProductId = manuSfcStepEntity.ProductId,
