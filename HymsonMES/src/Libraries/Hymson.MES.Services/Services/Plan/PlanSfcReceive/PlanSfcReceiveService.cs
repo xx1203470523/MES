@@ -5,6 +5,7 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
@@ -20,6 +21,7 @@ using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCreateBarcode;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.Collections.Generic;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Plan
@@ -46,6 +48,7 @@ namespace Hymson.MES.Services.Services.Plan
         private readonly IProcMaterialRepository _procMaterialRepository;
         private readonly IManuCommonService _manuCommonService;
         private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
+        private readonly IManuContainerPackRepository _manuContainerPackRepository;
         private readonly AbstractValidator<PlanSfcReceiveCreateDto> _validationCreateRules;
         private readonly AbstractValidator<PlanSfcReceiveScanCodeDto> _validationModifyRules;
 
@@ -62,6 +65,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="procMaterialRepository"></param>
         /// <param name="manuCommonService"></param>
         /// <param name="manuSfcInfoRepository"></param>
+        /// <param name="manuContainerPackRepository"></param>
         /// <param name="validationCreateRules"></param>
         /// <param name="validationModifyRules"></param>
         public PlanSfcReceiveService(ICurrentUser currentUser, ICurrentSite currentSite,
@@ -73,6 +77,7 @@ namespace Hymson.MES.Services.Services.Plan
             IProcMaterialRepository procMaterialRepository,
             IManuCommonService manuCommonService,
             IManuSfcInfoRepository manuSfcInfoRepository,
+            IManuContainerPackRepository manuContainerPackRepository,
         AbstractValidator<PlanSfcReceiveCreateDto> validationCreateRules,
         AbstractValidator<PlanSfcReceiveScanCodeDto> validationModifyRules)
         {
@@ -87,10 +92,10 @@ namespace Hymson.MES.Services.Services.Plan
             _procMaterialRepository = procMaterialRepository;
             _manuCommonService = manuCommonService;
             _manuSfcInfoRepository = manuSfcInfoRepository;
+            _manuContainerPackRepository = manuContainerPackRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
         }
-
 
         /// <summary>
         /// 条码接收
@@ -110,7 +115,15 @@ namespace Hymson.MES.Services.Services.Plan
 
             var validationFailures = new List<ValidationFailure>();
             var barcodeList = new List<BarcodeDto>();
-
+            IEnumerable<ManuContainerPackEntity> ManuContainerPackList = new List<ManuContainerPackEntity>();
+            if (param.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)
+            {
+                ManuContainerPackList = await _manuContainerPackRepository.GetByLadeBarCodesAsync(new ManuContainerPackQuery
+                {
+                    SiteId = _currentSite.SiteId ?? 0,
+                    LadeBarCodes = param.SFCs,
+                });
+            }
             var whMaterialInventoryList = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
             {
                 BarCodes = param.SFCs,
@@ -168,13 +181,30 @@ namespace Hymson.MES.Services.Services.Plan
                             {
                                 validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
                             { "CollectionIndex", sfc}
-                        };
+                                   };
                             }
                             else
                             {
                                 validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
                             }
                             validationFailure.ErrorCode = nameof(ErrorCode.MES16129);
+                            validationFailures.Add(validationFailure);
+                        }
+
+                        if (whMaterialInventoryEntity.QuantityResidue <= 0)
+                        {
+                            var validationFailure = new ValidationFailure();
+                            if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", sfc}
+                                   };
+                            }
+                            else
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
+                            }
+                            validationFailure.ErrorCode = nameof(ErrorCode.MES18021);
                             validationFailures.Add(validationFailure);
                         }
                         qty = whMaterialInventoryEntity.QuantityResidue;
@@ -193,6 +223,23 @@ namespace Hymson.MES.Services.Services.Plan
                             validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
                         }
                         validationFailure.ErrorCode = nameof(ErrorCode.MES16124);
+                        validationFailures.Add(validationFailure);
+                    }
+
+                    if (ManuContainerPackList.Any(x => x.LadeBarCode == sfc))
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", sfc}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES16133);
                         validationFailures.Add(validationFailure);
                     }
                 }
@@ -230,6 +277,24 @@ namespace Hymson.MES.Services.Services.Plan
                             validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
                         }
                         validationFailure.ErrorCode = nameof(ErrorCode.MES16125);
+                        validationFailures.Add(validationFailure);
+                    }
+
+                    qty = procMaterialEntity.Batch;
+                    if (qty <= 0)
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", sfc}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES16131);
                         validationFailures.Add(validationFailure);
                     }
                 }
@@ -305,6 +370,13 @@ namespace Hymson.MES.Services.Services.Plan
                 if (manuSfcInfoEntity != null && manuSfcInfoEntity.WorkOrderId != param.RelevanceWorkOrderId)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16127));
+                }
+
+                var manuContainerPackEntity = await _manuContainerPackRepository.GetByLadeBarCodeAsync(new ManuContainerPackQuery {LadeBarCode= param.SFC ,SiteId=_currentSite.SiteId??0 });
+
+                if (manuContainerPackEntity != null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16132)).WithData("sfc", param.SFC);
                 }
 
                 var whMaterialInventoryEntity = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery { SiteId = _currentSite.SiteId, BarCode = param.SFC });
