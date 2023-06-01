@@ -39,8 +39,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// 获取生产工单
         /// </summary>
         /// <param name="workOrderId"></param>
+        /// <param name="isVerifyActivation"></param>
         /// <returns></returns>
-        Task<PlanWorkOrderEntity> GetProduceWorkOrderByIdAsync(long workOrderId);
+        Task<PlanWorkOrderEntity> GetProduceWorkOrderByIdAsync(long workOrderId, bool isVerifyActivation = true);
 
         /// <summary>
         /// 获取生产工单

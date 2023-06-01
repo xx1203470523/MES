@@ -64,7 +64,6 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             _manuSfcProduceRepository = manuSfcProduceRepository;
         }
 
-
         /// <summary>
         /// 验证参数
         /// </summary>

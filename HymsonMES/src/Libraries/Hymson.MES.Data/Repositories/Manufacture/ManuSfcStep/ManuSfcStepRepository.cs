@@ -91,7 +91,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var manuSfcStepEntities = await conn.QueryAsync<ManuSfcStepEntity>(template.RawSql, manuSfcStepQuery);
             return manuSfcStepEntities;
         }
-
+            
         /// <summary>
         /// 新增
         /// </summary>

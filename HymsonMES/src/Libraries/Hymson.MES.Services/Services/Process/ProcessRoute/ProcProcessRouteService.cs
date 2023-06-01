@@ -470,6 +470,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
 
             childNodes = UpdateNodesSortAndGetChildNodes(ref nodesOfSorted, allNodes, allLinks, targetNodes);
             if (childNodes.Any() == false) return;
+            if (nodesOfSorted.Count() >= allNodes.Count()) return;
 
             SortNodes(ref nodesOfSorted, allNodes, allLinks, childNodes);
         }
