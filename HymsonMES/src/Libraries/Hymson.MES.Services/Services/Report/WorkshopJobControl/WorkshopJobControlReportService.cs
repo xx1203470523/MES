@@ -209,7 +209,7 @@ namespace Hymson.MES.Services.Services.Report
             var materialIds = pagedInfo.Data.Select(x => x.ProductId).Distinct().ToArray();
             var materials = await _procMaterialRepository.GetByIdsAsync(materialIds);
 
-            var procedureIds= pagedInfo.Data.Select(x => x.ProcedureId.Value).Distinct().ToArray();
+            var procedureIds= pagedInfo.Data.Select(x => x.ProcedureId == null ? 0 : x.ProcedureId.Value).Distinct().ToArray();
             var procedures = procedureIds!=null&&procedureIds.Any()? await _procProcedureRepository.GetByIdsAsync(procedureIds):null;
 
             var workOrderIds= pagedInfo.Data.Select(x => x.WorkOrderId).Distinct().ToArray();
