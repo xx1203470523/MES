@@ -757,6 +757,7 @@
         public const string MES18209 = "工单:{Code}状态不允许操作！";
         public const string MES18210 = "生产更改错误";
         public const string MES18211 = "条码非在制状态，不允许操作";
+        public const string MES18212 = "相同工单{Code}，不允许操作";
 
 
         #endregion
