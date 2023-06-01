@@ -31,4 +31,5 @@ namespace Hymson.MES.Core.Enums
         [Description("锁定")]
         Locked = 4
     }
+
 }

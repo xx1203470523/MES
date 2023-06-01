@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.EquEquipmentGroup;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -38,6 +39,8 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
+        [LogDescription("设备组", BusinessType.INSERT)]
+        [PermissionDescription("equ:equipmentGroup:insert")]
         public async Task CreateAsync(EquEquipmentGroupSaveDto createDto)
         {
             await _equEquipmentGroupService.CreateAsync(createDto);
@@ -49,6 +52,8 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
+        [LogDescription("设备组", BusinessType.UPDATE)]
+        [PermissionDescription("equ:equipmentGroup:update")]
         public async Task ModifyAsync(EquEquipmentGroupSaveDto modifyDto)
         {
             await _equEquipmentGroupService.ModifyAsync(modifyDto);
@@ -60,6 +65,8 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
+        [LogDescription("设备组", BusinessType.DELETE)]
+        [PermissionDescription("equ:equipmentGroup:delete")]
         public async Task DeletesAsync(long[] ids)
         {
             await _equEquipmentGroupService.DeletesAsync(ids);
@@ -72,6 +79,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpGet]
         [Route("page")]
+        [PermissionDescription("equ:equipmentGroup:list")]
         public async Task<PagedInfo<EquEquipmentGroupListDto>> GetPagedListAsync([FromQuery] EquEquipmentGroupPagedQueryDto pagedQueryDto)
         {
             return await _equEquipmentGroupService.GetPagedListAsync(pagedQueryDto);
@@ -83,6 +91,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
+        [PermissionDescription("equ:equipmentGroup:detail")]
         public async Task<EquEquipmentGroupDto> GetDetailAsync(long id)
         {
             return await _equEquipmentGroupService.GetDetailAsync(id);
