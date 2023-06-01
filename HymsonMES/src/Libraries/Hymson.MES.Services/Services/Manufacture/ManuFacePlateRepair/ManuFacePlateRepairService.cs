@@ -264,7 +264,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 WorkOrderId = sfcProduceEntity.WorkOrderId,
                 WorkCenterId = sfcProduceEntity.WorkCenterId,
                 ProductBOMId = sfcProduceEntity.ProductBOMId,
-                ProcedureId = sfcProduceEntity.ProductId,
+                ProcedureId = sfcProduceEntity.ProcedureId,
                 Qty = sfcProduceEntity.Qty,
                 IsRepair = true,
                 Operatetype = ManuSfcStepTypeEnum.Repair,
