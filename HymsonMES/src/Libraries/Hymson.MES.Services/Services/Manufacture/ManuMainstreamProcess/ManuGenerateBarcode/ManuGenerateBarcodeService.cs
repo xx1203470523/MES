@@ -1,5 +1,4 @@
-﻿using Hymson.Authentication;
-using Hymson.Authentication.JwtBearer.Security;
+﻿using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums.Integrated;
@@ -17,24 +16,32 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
     /// </summary>
     public class ManuGenerateBarcodeService : IManuGenerateBarcodeService
     {
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly ISequenceService _sequenceService;
+        private readonly ICurrentSite _currentSite;
         private readonly IInteCodeRulesRepository _inteCodeRulesRepository;
         private readonly IInteCodeRulesMakeRepository _inteCodeRulesMakeRepository;
-        private readonly ICurrentSite _currentSite;
+
 
         /// <summary>
-        /// 条码生成
+        /// 构造函数
         /// </summary>
         /// <param name="sequenceService"></param>
+        /// <param name="currentSite"></param>
         /// <param name="inteCodeRulesMakeRepository"></param>
         /// <param name="inteCodeRulesRepository"></param>
-        public ManuGenerateBarcodeService(ISequenceService sequenceService, IInteCodeRulesMakeRepository inteCodeRulesMakeRepository, IInteCodeRulesRepository inteCodeRulesRepository, ICurrentSite currentSite)
+        public ManuGenerateBarcodeService(ISequenceService sequenceService, ICurrentSite currentSite,
+            IInteCodeRulesMakeRepository inteCodeRulesMakeRepository,
+            IInteCodeRulesRepository inteCodeRulesRepository)
         {
             _sequenceService = sequenceService;
+            _currentSite = currentSite;
             _inteCodeRulesMakeRepository = inteCodeRulesMakeRepository;
             _inteCodeRulesRepository = inteCodeRulesRepository;
-            _currentSite = currentSite;
         }
+
 
         /// <summary>
         /// 生成流水号
@@ -43,7 +50,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         /// <returns></returns>
         public async Task<IEnumerable<string>> GenerateBarcodeSerialNumberAsync(BarcodeSerialNumberDto param)
         {
-            List<int> serialList = new List<int>();
+            // 因为测试提出计数器需要包含起始数字，而计时器是用startNumber往后开始计数的
+            param.StartNumber -= 1;
+
+            List<int> serialList = new();
             if (param.Count == 1)
             {
                 var seq = await _sequenceService.GetSerialNumberAsync(param.ResetType, param.CodeRuleKey, param.StartNumber, param.Increment, 9);
@@ -51,33 +61,30 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
             }
             else
             {
-                serialList =( await _sequenceService.GetSerialNumbersAsync(param.ResetType, param.CodeRuleKey, param.Count, param.StartNumber, param.Increment, 9)).ToList();
+                serialList = (await _sequenceService.GetSerialNumbersAsync(param.ResetType, param.CodeRuleKey, param.Count, param.StartNumber, param.Increment, 9)).ToList();
             }
 
-            List<string> list = new List<string>();
+            List<string> list = new();
             foreach (var item in serialList)
             {
                 //var number = item * param.Increment + param.StartNumber;
                 var str = string.Empty;
-                switch (param.Base)
+                str = param.Base switch
                 {
-                    case 10:
-                        str = item.ToString();
-                        break;
-                    case 16:
-                    case 32:
-                        str = ConvertNumber(item, param.IgnoreChar, param.Base);
-                        break;
-                    default:
-                        throw new CustomerValidationException(nameof(ErrorCode.MES16202));
-                }
-                if (param.OrderLength>0&& str.Length > param.OrderLength)
+                    10 => item.ToString(),
+                    16 or 32 => ConvertNumber(item, param.IgnoreChar, param.Base),
+                    _ => throw new CustomerValidationException(nameof(ErrorCode.MES16202)),
+                };
+
+                if (param.OrderLength > 0 && str.Length > param.OrderLength)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16201));
                 }
+
                 str = str.PadLeft(param.OrderLength, '0');
                 list.Add(str);
             }
+
             return list;
         }
 
@@ -157,7 +164,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                 Count = param.Count,
                 Base = codeRule.Base,
                 Increment = codeRule.Increment,
-                IgnoreChar= codeRule.IgnoreChar,
+                IgnoreChar = codeRule.IgnoreChar,
                 OrderLength = codeRule.OrderLength,
                 ResetType = codeRule.ResetType,
                 StartNumber = codeRule.StartNumber
@@ -213,7 +220,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                 CodeRuleKey = param.IsTest ? param.ProductId.ToString() + "Test" : param.ProductId.ToString(),
                 Count = param.Count,
                 Base = param.Base,
-                IgnoreChar= param.IgnoreChar??"",
+                IgnoreChar = param.IgnoreChar ?? "",
                 Increment = param.Increment,
                 OrderLength = param.OrderLength,
                 ResetType = param.ResetType,
