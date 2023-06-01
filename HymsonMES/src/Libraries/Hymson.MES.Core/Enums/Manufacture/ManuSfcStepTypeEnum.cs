@@ -44,11 +44,11 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// </summary>
         [Description("解锁")]
         Unlock = 7,
-        ///// <summary>
-        ///// 完成
-        ///// </summary>
-        //[Description("完成")]
-        //Complete = 8,
+        /// <summary>
+        /// 新增维修单
+        /// </summary>
+        [Description("新增维修单")]
+        AddRepair = 8,
         /// <summary>
         /// 报废
         /// </summary>
