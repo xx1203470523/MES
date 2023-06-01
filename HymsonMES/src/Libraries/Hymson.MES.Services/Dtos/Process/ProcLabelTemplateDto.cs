@@ -106,7 +106,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 模板内容
         /// </summary>
-        public string Content { get; set; }
+        public string? Content { get; set; }
 
 
     }
@@ -138,7 +138,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 模板内容
         /// </summary>
-        public string Content { get; set; }
+        public string? Content { get; set; }
 
         /// <summary>
         /// 创建人
