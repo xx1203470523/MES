@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipmentUnit;
 using Hymson.Utils;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -38,6 +39,8 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
+        [LogDescription("单位维护", BusinessType.INSERT)]
+        [PermissionDescription("equ:equipmentUnit:insert")]
         public async Task CreateAsync(EquEquipmentUnitSaveDto createDto)
         {
             await _equipmentUnitService.CreateAsync(createDto);
@@ -49,6 +52,8 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
+        [LogDescription("单位维护", BusinessType.UPDATE)]
+        [PermissionDescription("equ:equipmentUnit:update")]
         public async Task ModifyAsync(EquEquipmentUnitSaveDto modifyDto)
         {
             await _equipmentUnitService.ModifyAsync(modifyDto);
@@ -60,6 +65,8 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
+        [LogDescription("单位维护", BusinessType.DELETE)]
+        [PermissionDescription("equ:equipmentUnit:delete")]
         public async Task DeletesAsync(long[] ids)
         {
             await _equipmentUnitService.DeletesAsync(ids);
@@ -72,6 +79,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [Route("page")]
         [HttpGet]
+        [PermissionDescription("equ:equipmentUnit:list")]
         public async Task<PagedInfo<EquEquipmentUnitDto>> GetPagedListAsync([FromQuery] EquEquipmentUnitPagedQueryDto pagedQueryDto)
         {
             return await _equipmentUnitService.GetPagedListAsync(pagedQueryDto);

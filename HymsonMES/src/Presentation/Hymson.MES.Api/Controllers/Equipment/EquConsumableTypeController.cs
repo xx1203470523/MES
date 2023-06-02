@@ -92,7 +92,6 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        [PermissionDescription("equ:consumableType:detail")]
         public async Task<EquConsumableTypeDto> GetDetailAsync(long id)
         {
             return await _equConsumableTypeService.GetDetailAsync(id);

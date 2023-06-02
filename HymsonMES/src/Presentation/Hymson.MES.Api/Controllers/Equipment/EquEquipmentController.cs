@@ -93,7 +93,6 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        [PermissionDescription("equ:equipment:detail")]
         public async Task<EquEquipmentDto> GetDetailAsync(long id)
         {
             return await _equEquipmentService.GetDetailAsync(id);

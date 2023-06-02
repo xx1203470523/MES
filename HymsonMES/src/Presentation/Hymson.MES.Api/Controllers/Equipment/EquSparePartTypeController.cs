@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquSparePartType;
 using Hymson.Utils;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -40,6 +41,8 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
+        [LogDescription("备件类型", BusinessType.INSERT)]
+        [PermissionDescription("equ:sparePartType:insert")]
         public async Task CreateAsync(EquSparePartTypeSaveDto createDto)
         {
             await _equSparePartTypeService.CreateAsync(createDto);
@@ -51,6 +54,8 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
+        [LogDescription("备件类型", BusinessType.UPDATE)]
+        [PermissionDescription("equ:sparePartType:update")]
         public async Task ModifyAsync(EquSparePartTypeSaveDto modifyDto)
         {
             await _equSparePartTypeService.ModifyAsync(modifyDto);
@@ -62,6 +67,8 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
+        [LogDescription("备件类型", BusinessType.DELETE)]
+        [PermissionDescription("equ:sparePartType:delete")]
         public async Task DeletesAsync(long[] ids)
         {
             await _equSparePartTypeService.DeletesAsync(ids);
@@ -74,6 +81,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpGet]
         [Route("page")]
+        [PermissionDescription("equ:sparePartType:list")]
         public async Task<PagedInfo<EquSparePartTypeDto>> GetPagedListAsync([FromQuery] EquSparePartTypePagedQueryDto pagedQueryDto)
         {
             return await _equSparePartTypeService.GetPagedListAsync(pagedQueryDto);
