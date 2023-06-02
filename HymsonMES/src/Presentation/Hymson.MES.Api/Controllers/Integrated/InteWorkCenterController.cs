@@ -38,7 +38,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpGet]
         [Route("pagelist")]
-        [PermissionDescription("inte:workCenter:list")]
+        //[PermissionDescription("inte:workCenter:list")]
         public async Task<PagedInfo<InteWorkCenterDto>> QueryPagedInteWorkCenterAsync([FromQuery] InteWorkCenterPagedQueryDto param)
         {
             return await _inteWorkCenterService.GetPageListAsync(param);

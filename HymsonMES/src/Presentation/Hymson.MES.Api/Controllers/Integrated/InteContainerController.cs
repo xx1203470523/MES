@@ -79,7 +79,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [Route("page")]
         [HttpGet]
-        [PermissionDescription("inte:container:list")]
+        //[PermissionDescription("inte:container:list")]
         public async Task<PagedInfo<InteContainerDto>> GetPagedListAsync([FromQuery] InteContainerPagedQueryDto pagedQueryDto)
         {
             return await _inteContainerService.GetPagedListAsync(pagedQueryDto);

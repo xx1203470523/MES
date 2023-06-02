@@ -48,7 +48,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpGet]
         [Route("pagelist")]
-        [PermissionDescription("inte:codeRules:list")]
+        //[PermissionDescription("inte:codeRules:list")]
         public async Task<PagedInfo<InteCodeRulesPageViewDto>> QueryPagedInteCodeRulesAsync([FromQuery] InteCodeRulesPagedQueryDto parm)
         {
             return await _inteCodeRulesService.GetPageListAsync(parm);
