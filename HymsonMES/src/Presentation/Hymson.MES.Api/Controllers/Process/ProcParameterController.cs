@@ -9,6 +9,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
 using Hymson.Utils;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Extensions;
@@ -71,6 +72,8 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("标准参数", BusinessType.INSERT)]
+        [PermissionDescription("proc:parameter:insert")]
         public async Task<int> AddProcParameterAsync([FromBody] ProcParameterCreateDto parm)
         {
              return await _procParameterService.CreateProcParameterAsync(parm);
@@ -83,6 +86,8 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("标准参数", BusinessType.UPDATE)]
+        [PermissionDescription("proc:parameter:update")]
         public async Task UpdateProcParameterAsync([FromBody] ProcParameterModifyDto parm)
         {
              await _procParameterService.ModifyProcParameterAsync(parm);
@@ -95,6 +100,8 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("标准参数", BusinessType.DELETE)]
+        [PermissionDescription("proc:parameter:delete")]
         public async Task<int> DeleteProcParameterAsync([FromBody] long[] ids)
         {
             //long[] idsArr = StringExtension.SpitLongArrary(ids);

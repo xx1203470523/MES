@@ -10,6 +10,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
 using Hymson.Utils;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Extensions;
@@ -68,7 +69,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <summary>
         /// 查询Bom维护表详情
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="bomId"></param>
         /// <returns></returns>
         [HttpGet("material/list")]
         public async Task<List<ProcBomDetailView>> GetProcBomMaterialAsync(long bomId)
@@ -83,6 +84,8 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("BOM维护", BusinessType.INSERT)]
+        [PermissionDescription("proc:bom:insert")]
         public async Task AddProcBomAsync([FromBody] ProcBomCreateDto parm)
         {
              await _procBomService.CreateProcBomAsync(parm);
@@ -95,6 +98,8 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("update")]
+        [LogDescription("BOM维护", BusinessType.UPDATE)]
+        [PermissionDescription("proc:bom:update")]
         public async Task UpdateProcBomAsync([FromBody] ProcBomModifyDto parm)
         {
              await _procBomService.ModifyProcBomAsync(parm);
@@ -107,6 +112,8 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("delete")]
+        [LogDescription("BOM维护", BusinessType.DELETE)]
+        [PermissionDescription("proc:bom:delete")]
         public async Task DeleteProcBomAsync(long[] ids)
         {
             await _procBomService.DeletesProcBomAsync(ids);

@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Equipment.EquEquipmentUnit;
 using Hymson.MES.Services.Services.Process.MaskCode;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -38,6 +39,8 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
+        [LogDescription("ÑÚÂëÎ¬»¤", BusinessType.INSERT)]
+        [PermissionDescription("proc:maskCode:insert")]
         public async Task CreateAsync(ProcMaskCodeSaveDto createDto)
         {
             await _procMaskCodeService.CreateAsync(createDto);
@@ -49,6 +52,8 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
+        [LogDescription("ÑÚÂëÎ¬»¤", BusinessType.UPDATE)]
+        [PermissionDescription("proc:maskCode:update")]
         public async Task ModifyAsync(ProcMaskCodeSaveDto modifyDto)
         {
             await _procMaskCodeService.ModifyAsync(modifyDto);
@@ -60,6 +65,8 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
+        [LogDescription("ÑÚÂëÎ¬»¤", BusinessType.DELETE)]
+        [PermissionDescription("proc:maskCode:delete")]
         public async Task DeletesAsync(long[] ids)
         {
             await _procMaskCodeService.DeletesAsync(ids);
