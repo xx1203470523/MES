@@ -38,7 +38,6 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("create")]
         [LogDescription("ÈÝÆ÷Î¬»¤", BusinessType.INSERT)]
         [PermissionDescription("inte:container:insert")]
         public async Task CreateAsync(InteContainerSaveDto createDto)

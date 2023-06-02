@@ -71,6 +71,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// 仓储接口（物料库存）
         /// </summary>
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
+        private readonly IManuSfcStepRepository _manuSfcStepRepository;
 
         // private readonly AbstractValidator<ManuContainerBarcodeCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ManuContainerBarcodeModifyDto> _validationModifyRules;
