@@ -115,49 +115,49 @@ namespace Hymson.MES.Core.Enums.Manufacture
         [Description("完成维修")]
         RepairComplete = 21,
         /// <summary>
-        /// 完成维修
+        /// 维修返回
         /// </summary>
         [Description("维修返回")]
         RepairReturn = 22,
-        ///// <summary>
-        ///// 拆解
-        ///// </summary>
-        //[Description("拆解")]
-        //Disassembly = 22,
-        ///// <summary>
-        ///// 添加
-        ///// </summary>
-        //[Description("添加")]
-        //Add = 23,
-        ///// <summary>
-        ///// 组装
-        ///// </summary>
-        //[Description("组装")]
-        //Assemble= 24,
-        ///// <summary>
-        ///// 替换
-        ///// </summary>
-        //[Description("替换")]
-        //Replace = 25,
+        /// <summary>
+        /// 拆解
+        /// </summary>
+        [Description("拆解")]
+        Disassembly = 23,
+        /// <summary>
+        /// 添加
+        /// </summary>
+        [Description("添加")]
+        Add = 24,
+        /// <summary>
+        /// 组装
+        /// </summary>
+        [Description("组装")]
+        Assemble = 25,
+        /// <summary>
+        /// 替换
+        /// </summary>
+        [Description("替换")]
+        Replace = 26,
         ///// <summary>
         ///// 条码绑定
         ///// </summary>
         //[Description("条码绑定")]
-        //BarcodeBinding = 26,
+        //BarcodeBinding = 27,
         ///// <summary>
         ///// 条码解绑
         ///// </summary>
         //[Description("条码解绑")]
-        //BarcodeUnbinding = 27,
+        //BarcodeUnbinding = 28,
         ///// <summary>
         ///// 包装
         ///// </summary>
         //[Description("包装")]
-        //Package = 28,
+        //Package = 29,
         ///// <summary>
         ///// 解包
         ///// </summary>
         //[Description("解包")]
-        //Unpack = 29
+        //Unpack = 30
     }
 }
