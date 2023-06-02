@@ -8,6 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.MES.Services.Services.Warehouse;
+using Hymson.Web.Framework.Attributes;
 //using Hymson.Utils.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -87,8 +88,6 @@ namespace Hymson.MES.Api.Controllers.Warehouse
             await _whMaterialInventoryService.CreateWhMaterialInventoryAsync(parm);
         }
 
-
-
         /// <summary>
         /// 批量添加（物料库存）
         /// </summary>
@@ -96,6 +95,8 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <returns></returns>
         [HttpPost]
         [Route("createList")]
+        [LogDescription("物料库存", BusinessType.INSERT)]
+        [PermissionDescription("wh:materialInventory:insert")]
         public async Task AddWhMaterialInventoryListAsync([FromBody] List<WhMaterialInventoryListCreateDto> parm)
         {
             await _whMaterialInventoryService.CreateWhMaterialInventoryListAsync(parm);
@@ -108,6 +109,8 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <returns></returns>
         [HttpPost]
         [Route("update")]
+        [LogDescription("物料库存", BusinessType.UPDATE)]
+        [PermissionDescription("wh:materialInventory:update")]
         public async Task UpdateWhMaterialInventoryAsync([FromBody] WhMaterialInventoryModifyDto parm)
         {
             await _whMaterialInventoryService.ModifyWhMaterialInventoryAsync(parm);
@@ -120,6 +123,8 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <returns></returns>
         [HttpPost]
         [Route("delete")]
+        [LogDescription("物料库存", BusinessType.DELETE)]
+        [PermissionDescription("wh:materialInventory:delete")]
         public async Task DeleteWhMaterialInventoryAsync(string ids)
         {
             //long[] idsArr = StringExtension.SpitLongArrary(ids);
