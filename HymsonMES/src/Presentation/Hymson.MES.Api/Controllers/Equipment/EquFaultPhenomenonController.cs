@@ -81,7 +81,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpGet]
         [Route("page")]
-        [PermissionDescription("equ:faultPhenomenon:list")]
+        //[PermissionDescription("equ:faultPhenomenon:list")]
         public async Task<PagedInfo<EquFaultPhenomenonDto>> GetPagedListAsync([FromQuery] EquFaultPhenomenonPagedQueryDto pagedQueryDto)
         {
             return await _equFaultPhenomenonService.GetPagedListAsync(pagedQueryDto);

@@ -80,7 +80,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpGet]
         [Route("page")]
-        [PermissionDescription("equ:consumableType:list")]
+        //[PermissionDescription("equ:consumableType:list")]
         public async Task<PagedInfo<EquConsumableTypeDto>> GetPagedListAsync([FromQuery] EquConsumableTypePagedQueryDto pagedQueryDto)
         {
             return await _equConsumableTypeService.GetPagedListAsync(pagedQueryDto);
