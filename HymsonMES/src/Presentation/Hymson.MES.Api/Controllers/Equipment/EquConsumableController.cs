@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquSparePart;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -39,6 +40,8 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
+        [LogDescription("工装注册", BusinessType.INSERT)]
+        [PermissionDescription("equ:consumable:insert")]
         public async Task CreateAsync(EquConsumableSaveDto createDto)
         {
             await _equConsumableService.CreateAsync(createDto);
@@ -50,6 +53,8 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
+        [LogDescription("工装注册", BusinessType.UPDATE)]
+        [PermissionDescription("equ:consumable:update")]
         public async Task ModifyAsync(EquConsumableSaveDto modifyDto)
         {
             await _equConsumableService.ModifyAsync(modifyDto);
@@ -61,6 +66,8 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
+        [LogDescription("工装注册", BusinessType.DELETE)]
+        [PermissionDescription("equ:consumable:delete")]
         public async Task DeletesAsync(long[] ids)
         {
             await _equConsumableService.DeletesAsync(ids);
@@ -73,6 +80,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpGet]
         [Route("page")]
+        //[PermissionDescription("equ:consumable:list")]
         public async Task<PagedInfo<EquConsumableDto>> GetPagedListAsync([FromQuery] EquConsumablePagedQueryDto pagedQueryDto)
         {
             return await _equConsumableService.GetPagedListAsync(pagedQueryDto);

@@ -201,6 +201,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 组件条码
         /// </summary>
         public string CirculationBarCode { get; set; }
+
+        /// <summary>
+        /// 是否组装
+        /// </summary>
+        public bool IsAssemble { get; set; }
     }
 
     public class InProductDismantleReplaceDto: InProductDismantleAddDto

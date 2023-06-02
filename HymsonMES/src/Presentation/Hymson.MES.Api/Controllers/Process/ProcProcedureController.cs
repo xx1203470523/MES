@@ -3,6 +3,7 @@ using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.Procedure;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -87,6 +88,8 @@ namespace Hymson.MES.Api.Controllers
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
+        [LogDescription("工序维护", BusinessType.INSERT)]
+        [PermissionDescription("proc:procedure:insert")]
         public async Task AddProcProcedureAsync([FromBody] AddProcProcedureDto parm)
         {
             await _procProcedureService.AddProcProcedureAsync(parm);
@@ -98,6 +101,8 @@ namespace Hymson.MES.Api.Controllers
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPut]
+        [LogDescription("工序维护", BusinessType.UPDATE)]
+        [PermissionDescription("proc:procedure:update")]
         public async Task UpdateProcProcedureAsync([FromBody] UpdateProcProcedureDto parm)
         {
             await _procProcedureService.UpdateProcProcedureAsync(parm);
@@ -109,6 +114,8 @@ namespace Hymson.MES.Api.Controllers
         /// <param name="deleteDto"></param>
         /// <returns></returns>
         [HttpDelete]
+        [LogDescription("工序维护", BusinessType.DELETE)]
+        [PermissionDescription("proc:procedure:delete")]
         public async Task DeleteProcProcedureAsync(DeleteDto deleteDto)
         {
             await _procProcedureService.DeleteProcProcedureAsync(deleteDto.Ids);

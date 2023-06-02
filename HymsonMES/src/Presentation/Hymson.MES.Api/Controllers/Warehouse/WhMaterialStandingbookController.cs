@@ -8,6 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.MES.Services.Services.Warehouse;
+using Hymson.Web.Framework.Attributes;
 //using Hymson.Utils.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -71,6 +72,8 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("物料台账", BusinessType.INSERT)]
+        [PermissionDescription("wh:materialStandingbook:insert")]
         public async Task AddWhMaterialStandingbookAsync([FromBody] WhMaterialStandingbookCreateDto parm)
         {
             await _whMaterialStandingbookService.CreateWhMaterialStandingbookAsync(parm);
@@ -83,6 +86,8 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <returns></returns>
         [HttpPost]
         [Route("update")]
+        [LogDescription("物料台账", BusinessType.UPDATE)]
+        [PermissionDescription("wh:materialStandingbook:update")]
         public async Task UpdateWhMaterialStandingbookAsync([FromBody] WhMaterialStandingbookModifyDto parm)
         {
             await _whMaterialStandingbookService.ModifyWhMaterialStandingbookAsync(parm);
@@ -95,6 +100,8 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <returns></returns>
         [HttpPost]
         [Route("delete")]
+        [LogDescription("物料台账", BusinessType.DELETE)]
+        [PermissionDescription("wh:materialStandingbook:delete")]
         public async Task DeleteWhMaterialStandingbookAsync(string ids)
         {
             //long[] idsArr = StringExtension.SpitLongArrary(ids);

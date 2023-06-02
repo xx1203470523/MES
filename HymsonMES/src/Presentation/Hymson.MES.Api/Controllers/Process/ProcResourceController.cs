@@ -4,6 +4,7 @@ using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.Resource;
 using Hymson.Utils;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -151,6 +152,8 @@ namespace Hymson.MES.Api.Controllers
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
+        [LogDescription("资源维护", BusinessType.INSERT)]
+        [PermissionDescription("proc:resource:insert")]
         public async Task AddProcResourceAsync([FromBody] ProcResourceCreateDto parm)
         {
             await _procResourceService.AddProcResourceAsync(parm);
@@ -162,6 +165,8 @@ namespace Hymson.MES.Api.Controllers
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPut]
+        [LogDescription("资源维护", BusinessType.UPDATE)]
+        [PermissionDescription("proc:resource:update")]
         public async Task UpdateProcResourceAsync([FromBody] ProcResourceModifyDto parm)
         {
             await _procResourceService.UpdateProcResrouceAsync(parm);
@@ -173,6 +178,8 @@ namespace Hymson.MES.Api.Controllers
         /// <param name="deleteDto"></param>
         /// <returns></returns>
         [HttpDelete]
+        [LogDescription("资源维护", BusinessType.DELETE)]
+        [PermissionDescription("proc:resource:delete")]
         public async Task DeleteProcResourceAsync(DeleteDto deleteDto)
         {
             await _procResourceService.DeleteProcResourceAsync(deleteDto.Ids);

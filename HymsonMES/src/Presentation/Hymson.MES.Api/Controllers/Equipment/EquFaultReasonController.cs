@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -40,6 +41,8 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
+        [LogDescription("设备故障原因", BusinessType.INSERT)]
+        [PermissionDescription("equ:faultReason:insert")]
         public async Task AddEquFaultReasonAsync(EquFaultReasonSaveDto parm)
         {
             await _EquFaultReasonService.CreateEquFaultReasonAsync(parm);
@@ -51,6 +54,8 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPut]
+        [LogDescription("设备故障原因", BusinessType.UPDATE)]
+        [PermissionDescription("equ:faultReason:update")]
         public async Task UpdateEquFaultReasonAsync(EquFaultReasonSaveDto parm)
         {
             await _EquFaultReasonService.ModifyEquFaultReasonAsync(parm);
@@ -62,6 +67,8 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
+        [LogDescription("设备故障原因", BusinessType.DELETE)]
+        [PermissionDescription("equ:faultReason:delete")]
         public async Task DeleteEquFaultReasonAsync(long[] ids)
         {
             await _EquFaultReasonService.DeletesEquFaultReasonAsync(ids);
@@ -74,6 +81,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpGet]
         [Route("page")]
+        //[PermissionDescription("equ:faultReason:list")]
         public async Task<PagedInfo<EquFaultReasonDto>> QueryPagedEquFaultReasonAsync([FromQuery] EquFaultReasonPagedQueryDto parm)
         {
             return await _EquFaultReasonService.GetPageListAsync(parm);

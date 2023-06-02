@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -64,6 +65,8 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("上料点维护", BusinessType.INSERT)]
+        [PermissionDescription("proc:loadPoint:insert")]
         public async Task AddProcLoadPointAsync([FromBody] ProcLoadPointCreateDto parm)
         {
              await _procLoadPointService.CreateProcLoadPointAsync(parm);
@@ -76,6 +79,8 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("上料点维护", BusinessType.UPDATE)]
+        [PermissionDescription("proc:loadPoint:update")]
         public async Task UpdateProcLoadPointAsync([FromBody] ProcLoadPointModifyDto parm)
         {
              await _procLoadPointService.ModifyProcLoadPointAsync(parm);
@@ -88,6 +93,8 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("上料点维护", BusinessType.DELETE)]
+        [PermissionDescription("proc:loadPoint:delete")]
         public async Task DeleteProcLoadPointAsync([FromBody] long[] ids)
         {
             //long[] idsArr = StringExtension.SpitLongArrary(ids);

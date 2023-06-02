@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon;
 using Hymson.Utils;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -40,6 +41,8 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
+        [LogDescription("设备故障现象", BusinessType.INSERT)]
+        [PermissionDescription("equ:faultPhenomenon:insert")]
         public async Task CreateAsync(EquFaultPhenomenonSaveDto createDto)
         {
             await _equFaultPhenomenonService.CreateAsync(createDto);
@@ -51,6 +54,8 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
+        [LogDescription("设备故障现象", BusinessType.UPDATE)]
+        [PermissionDescription("equ:faultPhenomenon:update")]
         public async Task ModifyAsync(EquFaultPhenomenonSaveDto modifyDto)
         {
             await _equFaultPhenomenonService.ModifyAsync(modifyDto);
@@ -62,6 +67,8 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
+        [LogDescription("设备故障现象", BusinessType.DELETE)]
+        [PermissionDescription("equ:faultPhenomenon:delete")]
         public async Task DeletesAsync(long[] ids)
         {
             await _equFaultPhenomenonService.DeletesAsync(ids);
@@ -74,6 +81,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpGet]
         [Route("page")]
+        //[PermissionDescription("equ:faultPhenomenon:list")]
         public async Task<PagedInfo<EquFaultPhenomenonDto>> GetPagedListAsync([FromQuery] EquFaultPhenomenonPagedQueryDto pagedQueryDto)
         {
             return await _equFaultPhenomenonService.GetPagedListAsync(pagedQueryDto);

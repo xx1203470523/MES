@@ -8,6 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.MES.Services.Services.Warehouse;
+using Hymson.Web.Framework.Attributes;
 //using Hymson.Utils.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -82,6 +83,8 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("供应商管理", BusinessType.INSERT)]
+        [PermissionDescription("wh:supplier:insert")]
         public async Task AddWhSupplierAsync([FromBody] WhSupplierCreateDto parm)
         {
             await _whSupplierService.CreateWhSupplierAsync(parm);
@@ -94,6 +97,8 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <returns></returns>
         [HttpPost]
         [Route("update")]
+        [LogDescription("供应商管理", BusinessType.UPDATE)]
+        [PermissionDescription("wh:supplier:update")]
         public async Task UpdateWhSupplierAsync([FromBody] WhSupplierModifyDto parm)
         {
             await _whSupplierService.ModifyWhSupplierAsync(parm);
@@ -106,6 +111,8 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <returns></returns>
         [HttpPost]
         [Route("delete")]
+        [LogDescription("供应商管理", BusinessType.DELETE)]
+        [PermissionDescription("wh:supplier:delete")]
         public async Task DeleteWhSupplierAsync([FromBody] long[] ids)
         {
             await _whSupplierService.DeletesWhSupplierAsync(ids);

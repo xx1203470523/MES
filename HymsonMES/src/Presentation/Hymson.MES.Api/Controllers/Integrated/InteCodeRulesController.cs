@@ -8,6 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Extensions;
@@ -47,6 +48,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpGet]
         [Route("pagelist")]
+        //[PermissionDescription("inte:codeRules:list")]
         public async Task<PagedInfo<InteCodeRulesPageViewDto>> QueryPagedInteCodeRulesAsync([FromQuery] InteCodeRulesPagedQueryDto parm)
         {
             return await _inteCodeRulesService.GetPageListAsync(parm);
@@ -70,6 +72,8 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("编码规则", BusinessType.INSERT)]
+        [PermissionDescription("inte:codeRules:insert")]
         public async Task AddInteCodeRulesAsync([FromBody] InteCodeRulesCreateDto parm)
         {
              await _inteCodeRulesService.CreateInteCodeRulesAsync(parm);
@@ -82,6 +86,8 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("编码规则", BusinessType.UPDATE)]
+        [PermissionDescription("inte:codeRules:update")]
         public async Task UpdateInteCodeRulesAsync([FromBody] InteCodeRulesModifyDto parm)
         {
              await _inteCodeRulesService.ModifyInteCodeRulesAsync(parm);
@@ -94,6 +100,8 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("编码规则", BusinessType.DELETE)]
+        [PermissionDescription("inte:codeRules:delete")]
         public async Task DeleteInteCodeRulesAsync([FromBody] long[] ids)
         {
             //long[] idsArr = StringExtension.SpitLongArrary(ids);

@@ -489,6 +489,9 @@
         public const string MES16128 = "条码{sfc}不存在";
         public const string MES16129 = "条码物料和工单物料编码不一致";
         public const string MES16130 = "已报废的条码，不允许删除";
+        public const string MES16131 = "组件条码对应的批次大小未维护";
+        public const string MES16132 = "条码{sfc}已经被装箱了";
+        public const string MES16133 = "已经被装箱了";
         #endregion
 
         #region 条码生成 MES16200
@@ -499,6 +502,7 @@
         public const string MES16204 = "{base}进制字符串全部忽略,无法生成条码";
         public const string MES16205 = "通配符{value}未定义";
         public const string MES16206 = "流水号转换只实现了16,32进制";
+        public const string MES16207 = "生成的序列号{BarCode}超过规则限制";
         #endregion
 
         #region 生产通用 MES16300
@@ -754,6 +758,7 @@
         public const string MES18209 = "工单:{Code}状态不允许操作！";
         public const string MES18210 = "生产更改错误";
         public const string MES18211 = "条码非在制状态，不允许操作";
+        public const string MES18212 = "相同工单{Code}，不允许操作";
 
 
         #endregion

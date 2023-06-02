@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Process
@@ -74,6 +75,8 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("物料组维护", BusinessType.INSERT)]
+        [PermissionDescription("proc:materialGroup:insert")]
         public async Task AddProcMaterialGroupAsync([FromBody] ProcMaterialGroupCreateDto parm)
         {
              await _procMaterialGroupService.CreateProcMaterialGroupAsync(parm);
@@ -86,6 +89,8 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("物料组维护", BusinessType.UPDATE)]
+        [PermissionDescription("proc:materialGroup:update")]
         public async Task UpdateProcMaterialGroupAsync([FromBody] ProcMaterialGroupModifyDto parm)
         {
              await _procMaterialGroupService.ModifyProcMaterialGroupAsync(parm);
@@ -98,6 +103,8 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("物料组维护", BusinessType.DELETE)]
+        [PermissionDescription("proc:materialGroup:delete")]
         public async Task DeleteProcMaterialGroupAsync(long[] ids)
         {
             //long[] idsArr = StringExtension.SpitLongArrary(ids);

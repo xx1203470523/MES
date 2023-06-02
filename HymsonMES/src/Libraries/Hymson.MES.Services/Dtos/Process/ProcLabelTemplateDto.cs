@@ -106,9 +106,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 模板内容
         /// </summary>
-        public string Content { get; set; }
-
-
+        public string? Content { get; set; }
     }
 
     /// <summary>
@@ -138,7 +136,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 模板内容
         /// </summary>
-        public string Content { get; set; }
+        public string? Content { get; set; }
 
         /// <summary>
         /// 创建人
@@ -169,9 +167,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
-
-       
-
     }
 
     /// <summary>
