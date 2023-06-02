@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquSparePartType;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -39,6 +40,8 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
+        [LogDescription("工装类型", BusinessType.INSERT)]
+        [PermissionDescription("equ:consumableType:insert")]
         public async Task CreateAsync(EquConsumableTypeSaveDto createDto)
         {
             await _equConsumableTypeService.CreateAsync(createDto);
@@ -50,6 +53,8 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
+        [LogDescription("工装类型", BusinessType.UPDATE)]
+        [PermissionDescription("equ:consumableType:update")]
         public async Task ModifyAsync(EquConsumableTypeSaveDto modifyDto)
         {
             await _equConsumableTypeService.ModifyAsync(modifyDto);
@@ -61,6 +66,8 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
+        [LogDescription("工装类型", BusinessType.DELETE)]
+        [PermissionDescription("equ:consumableType:delete")]
         public async Task DeletesAsync(long[] ids)
         {
             await _equConsumableTypeService.DeletesAsync(ids);
@@ -73,6 +80,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpGet]
         [Route("page")]
+        [PermissionDescription("equ:consumableType:list")]
         public async Task<PagedInfo<EquConsumableTypeDto>> GetPagedListAsync([FromQuery] EquConsumableTypePagedQueryDto pagedQueryDto)
         {
             return await _equConsumableTypeService.GetPagedListAsync(pagedQueryDto);
@@ -84,6 +92,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
+        [PermissionDescription("equ:consumableType:detail")]
         public async Task<EquConsumableTypeDto> GetDetailAsync(long id)
         {
             return await _equConsumableTypeService.GetDetailAsync(id);

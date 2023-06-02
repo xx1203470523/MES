@@ -1,9 +1,4 @@
 ﻿using Hymson.MES.CoreServices.Dtos.Manufacture.ManuInStation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.CoreServices.Services.Manufacture.ManuInStation
 {
@@ -14,6 +9,9 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuInStation
     /// </summary>
     public class ManuInStationService : IManuInStationService
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public ManuInStationService()
         {
 
@@ -26,7 +24,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuInStation
         /// <returns></returns>
         public async Task InStationByEquipment(EquipmentInStationDto param)
         {
-
+          
         }   
 
         /// <summary>
@@ -57,6 +55,11 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuInStation
         public async Task InStationRangeByResource(ResourceInStationsDto param)
         {
 
+        }
+
+        private async Task ExecuteInStation()
+        { 
+        
         }
     }
 }

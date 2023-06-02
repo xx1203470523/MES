@@ -1685,6 +1685,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SiteId = _currentSite.SiteId ?? 0,
                 SFC = item.SFC,
                 ProductId = item.ProductId,
+                ProcedureId = sfcProduceStepDto.ProcedureId,
+                Remark = sfcProduceStepDto.Remark ?? "",
                 WorkOrderId = item.WorkOrderId,
                 WorkCenterId = item.WorkCenterId,
                 ProductBOMId = item.ProductBOMId,
@@ -1964,14 +1966,20 @@ namespace Hymson.MES.Services.Services.Manufacture
             var workOrderId = manuSfcProduces.First().WorkOrderId;
             var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(workOrderId);
             var workOrderQty = manuSfcProduces.Sum(it => it.Qty);
+            if (workOrderId == manuUpdateSaveDto.WorkOrderId)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18212)).WithData("Code", planWorkOrderEntity.OrderCode);
+            }
             //新工单
             var newPlanWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuUpdateSaveDto.WorkOrderId);
+
             PlanWorkOrderStatusEnum[] statusArr = { PlanWorkOrderStatusEnum.NotStarted, PlanWorkOrderStatusEnum.Finish, PlanWorkOrderStatusEnum.Closed };
             var workOrdersOrLosck = statusArr.Contains(newPlanWorkOrderEntity.Status) || newPlanWorkOrderEntity.IsLocked == YesOrNoEnum.Yes;
             if (workOrdersOrLosck)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18209)).WithData("Code", newPlanWorkOrderEntity.OrderCode);
             }
+
 
             var orderRecord = await _planWorkOrderRepository.GetByWorkOrderIdAsync(newPlanWorkOrderEntity.Id);
             var PlanQuantity = newPlanWorkOrderEntity.Qty * (1 + newPlanWorkOrderEntity.OverScale / 100);
@@ -1999,6 +2007,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                     SiteId = _currentSite.SiteId ?? 0,
                     SFC = item.SFC,
                     ProductId = item.ProductId,
+                    ProcedureId = manuUpdateSaveDto.ProcedureId,
+                    Remark = manuUpdateSaveDto.Remark,
                     WorkOrderId = item.WorkOrderId,
                     WorkCenterId = item.WorkCenterId,
                     ProductBOMId = item.ProductBOMId,
