@@ -202,6 +202,18 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoWorkshopJobControlReportDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoWorkshopJobControlReportCountSqlTemplate);
 
+            sqlBuilder.Select(@"s.SFC,
+                            s.`Status` as SFCStatus,
+                            sp.`Status` as SFCProduceStatus,
+                            CONCAT_WS('/',m.MaterialCode,m.Version) as MaterialCodeVersion,
+                            m.MaterialName,
+                            o.OrderCode,
+                            o.Type as OrderType,
+                            p.`Code` as ProcedureCode,
+                            p.`Name` as ProcedureName,
+                            CONCAT_WS('/',b.BomCode,b.Version) as BomCodeVersion,
+                            b.BomName,
+                            s.Qty ");
             //where si.IsDeleted = 0
             //AND si.IsUsed = 1
 
@@ -260,18 +272,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 sqlBuilder.Where(" sp.`Status` =  @SFCProduceStatus ");
             }
 
-            if (pageQuery.SFCIsLock.HasValue)
-            {
-                sqlBuilder.LeftJoin(" manu_sfc_produce_business spb on spb.SfcInfoId=si.Id ");
-                if (pageQuery.SFCIsLock == Core.Enums.TrueOrFalseEnum.Yes)
-                {
-                    sqlBuilder.Where(" spb.BusinessType=2 ");
-                }
-                else
-                {
-                    sqlBuilder.Where(" spb.BusinessType!=2 ");
-                }
-            }
+            //if (pageQuery.SFCIsLock.HasValue)
+            //{
+            //    sqlBuilder.Select(@"spb.BusinessType");
+
+            //    sqlBuilder.LeftJoin(" manu_sfc_produce_business spb on spb.SfcInfoId=si.Id ");
+            //    if (pageQuery.SFCIsLock == Core.Enums.TrueOrFalseEnum.Yes)
+            //    {
+            //        sqlBuilder.Where(" spb.BusinessType=2 ");
+            //    }
+            //    else
+            //    {
+            //        sqlBuilder.Where(" spb.BusinessType!=2 ");
+            //    }
+            //}
 
             var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -330,19 +344,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string GetPagedInfoWorkshopJobControlReportDataSqlTemplate = @"
                         select 
-                            s.SFC,
-                            s.`Status` as SFCStatus,
-                            CONCAT_WS('/',m.MaterialCode,m.Version) as MaterialCodeVersion,
-                            m.MaterialName,
-                            o.OrderCode,
-                            o.Type as OrderType,
+                            /**select**/
 
-                            p.`Code` as ProcedureCode,
-                            p.`Name` as ProcedureName,
-                            CONCAT_WS('/',b.BomCode,b.Version) as BomCodeVersion,
-                            b.BomName,
-
-                            s.Qty 
                         from manu_sfc_info si
                         LEFT JOIN Manu_sfc s on s.id=si.SfcId -- 为了查询状态
                         LEFT JOIN proc_material m on m.Id=si.ProductId  -- 为了查询物料编码
