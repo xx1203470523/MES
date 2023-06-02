@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated.IIntegratedService;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Integrated
@@ -35,6 +36,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpGet]
         [Route("pagelist")]
+        [PermissionDescription("inte:job:list")]
         public async Task<PagedInfo<InteJobDto>> QueryPagedInteJobAsync([FromQuery] InteJobPagedQueryDto param)
         {
             return await _inteJobService.GetPageListAsync(param);
@@ -57,6 +59,8 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="param"></param>
         /// <returns></returns>
         [HttpPost]
+        [LogDescription("作业", BusinessType.INSERT)]
+        [PermissionDescription("inte:job:insert")]
         public async Task AddInteJobAsync([FromBody] InteJobCreateDto param)
         {
             await _inteJobService.CreateInteJobAsync(param);
@@ -68,6 +72,8 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="param"></param>
         /// <returns></returns>
         [HttpPut]
+        [LogDescription("作业", BusinessType.UPDATE)]
+        [PermissionDescription("inte:job:update")]
         public async Task UpdateInteJobAsync([FromBody] InteJobModifyDto param)
         {
             await _inteJobService.ModifyInteJobAsync(param);
@@ -79,6 +85,8 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
+        [LogDescription("作业", BusinessType.DELETE)]
+        [PermissionDescription("inte:job:delete")]
         public async Task DeleteInteJobAsync(long[] ids)
         {
             await _inteJobService.DeleteRangInteJobAsync(ids);

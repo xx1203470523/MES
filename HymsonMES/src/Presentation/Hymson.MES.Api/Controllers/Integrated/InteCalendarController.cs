@@ -3,6 +3,7 @@ using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated.InteCalendar;
 using Hymson.Utils;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -42,6 +43,8 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
+        [LogDescription("日历维护", BusinessType.INSERT)]
+        [PermissionDescription("inte:calendar:insert")]
         public async Task CreateAsync(InteCalendarSaveDto createDto)
         {
             await _inteCalendarService.CreateAsync(createDto);
@@ -53,6 +56,8 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
+        [LogDescription("日历维护", BusinessType.UPDATE)]
+        [PermissionDescription("inte:calendar:update")]
         public async Task ModifyAsync(InteCalendarSaveDto modifyDto)
         {
             await _inteCalendarService.ModifyAsync(modifyDto);
@@ -64,6 +69,8 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
+        [LogDescription("日历维护", BusinessType.DELETE)]
+        [PermissionDescription("inte:calendar:delete")]
         public async Task DeletesAsync(long[] ids)
         {
             await _inteCalendarService.DeletesAsync(ids);
@@ -75,6 +82,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         [HttpGet("page")]
+        [PermissionDescription("inte:calendar:list")]
         public async Task<PagedInfo<InteCalendarDto>> GetPagedListAsync([FromQuery] InteCalendarPagedQueryDto pagedQueryDto)
         {
             return await _inteCalendarService.GetPagedListAsync(pagedQueryDto);

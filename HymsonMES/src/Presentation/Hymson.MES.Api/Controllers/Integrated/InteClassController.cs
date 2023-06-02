@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated.InteClass;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,14 +34,14 @@ namespace Hymson.MES.Api.Controllers.Integrated
             _logger = logger;
         }
 
-
-
         /// <summary>
         /// 添加（班制维护）
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
+        [LogDescription("班制维护", BusinessType.INSERT)]
+        [PermissionDescription("inte:class:insert")]
         public async Task CreateAsync(InteClassSaveDto createDto)
         {
             await _inteClassService.CreateAsync(createDto);
@@ -52,6 +53,8 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
+        [LogDescription("班制维护", BusinessType.UPDATE)]
+        [PermissionDescription("inte:class:update")]
         public async Task ModifyAsync(InteClassSaveDto modifyDto)
         {
             await _inteClassService.ModifyAsync(modifyDto);
@@ -63,6 +66,8 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
+        [LogDescription("班制维护", BusinessType.DELETE)]
+        [PermissionDescription("inte:class:delete")]
         public async Task DeletesAsync(long[] ids)
         {
             await _inteClassService.DeletesAsync(ids);
@@ -75,6 +80,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpGet]
         [Route("page")]
+        [PermissionDescription("inte:class:list")]
         public async Task<PagedInfo<InteClassDto>> GetPagedListAsync([FromQuery] InteClassPagedQueryDto pagedQueryDto)
         {
             return await _inteClassService.GetPagedListAsync(pagedQueryDto);
