@@ -3,6 +3,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGenerateBarcodeDto;
 using Hymson.Sequences;
 using Hymson.Utils;
@@ -44,47 +45,140 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
 
 
         /// <summary>
-        /// 生成流水号
+        /// 条码生成
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<string>> GenerateBarcodeSerialNumberAsync(BarcodeSerialNumberDto param)
+        /// <exception cref="CustomerValidationException">未找到生成规则</exception>
+        public async Task<IEnumerable<string>> GenerateBarcodeListByIdAsync(GenerateBarcodeDto param)
         {
-            // 因为测试提出计数器需要包含起始数字，而计时器是用startNumber往后开始计数的
-            param.StartNumber -= 1;
+            var getCodeRulesTask = _inteCodeRulesRepository.GetByIdAsync(param.CodeRuleId);
+            var getCodeRulesMakeListTask = _inteCodeRulesMakeRepository.GetInteCodeRulesMakeEntitiesAsync(new InteCodeRulesMakeQuery { SiteId = _currentSite.SiteId ?? 0, CodeRulesId = param.CodeRuleId });
+            var codeRulesMakeList = await getCodeRulesMakeListTask;
+            var codeRule = await getCodeRulesTask;
 
-            List<int> serialList = new();
-            if (param.Count == 1)
+            return await GenerateBarCodeSerialNumberAsync(new BarCodeSerialNumberBo
             {
-                var seq = await _sequenceService.GetSerialNumberAsync(param.ResetType, param.CodeRuleKey, param.StartNumber, param.Increment, 9);
-                serialList.Add(seq);
-            }
-            else
-            {
-                serialList = (await _sequenceService.GetSerialNumbersAsync(param.ResetType, param.CodeRuleKey, param.Count, param.StartNumber, param.Increment, 9)).ToList();
-            }
-
-            List<string> list = new();
-            foreach (var item in serialList)
-            {
-                //var number = item * param.Increment + param.StartNumber;
-                var str = string.Empty;
-                str = param.Base switch
+                IsTest = param.IsTest,
+                CodeRulesMakeBos = codeRulesMakeList.Select(s => new CodeRulesMakeBo
                 {
-                    10 => item.ToString(),
-                    16 or 32 => ConvertNumber(item, param.IgnoreChar, param.Base),
+                    Seq = s.Seq,
+                    ValueTakingType = s.ValueTakingType,
+                    SegmentedValue = s.SegmentedValue,
+                }),
+
+                CodeRuleKey = $"{param.CodeRuleId}",
+                Count = param.Count,
+                Base = codeRule.Base,
+                Increment = codeRule.Increment,
+                IgnoreChar = codeRule.IgnoreChar,
+                OrderLength = codeRule.OrderLength,
+                ResetType = codeRule.ResetType,
+                StartNumber = codeRule.StartNumber
+            });
+        }
+
+        /// <summary>
+        /// 条码生成
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException">未找到生成规则</exception>
+        public async Task<IEnumerable<string>> GenerateBarcodeListAsync(CodeRuleDto param)
+        {
+            return await GenerateBarCodeSerialNumberAsync(new BarCodeSerialNumberBo
+            {
+                IsTest = param.IsTest,
+                CodeRulesMakeBos = param.CodeRulesMakeList.Select(s => new CodeRulesMakeBo
+                {
+                    Seq = s.Seq,
+                    ValueTakingType = s.ValueTakingType,
+                    SegmentedValue = s.SegmentedValue,
+                }),
+
+                CodeRuleKey = $"{param.ProductId}",
+                Count = param.Count,
+                Base = param.Base,
+                IgnoreChar = param.IgnoreChar ?? "",
+                Increment = param.Increment,
+                OrderLength = param.OrderLength,
+                ResetType = param.ResetType,
+                StartNumber = param.StartNumber
+            });
+        }
+
+
+        /// <summary>
+        /// 生成流水号
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<string>> GenerateBarCodeSerialNumberAsync(BarCodeSerialNumberBo bo)
+        {
+            var serialNumbers = await GenerateBarCodeSerialNumbersWithTryAsync(bo);
+
+            List<string> serialStrings = new();
+            foreach (var item in serialNumbers)
+            {
+                var str = bo.Base switch
+                {
+                    10 => $"{item}",
+                    16 or 32 => ConvertNumber(item, bo.IgnoreChar, bo.Base),
                     _ => throw new CustomerValidationException(nameof(ErrorCode.MES16202)),
                 };
 
-                if (param.OrderLength > 0 && str.Length > param.OrderLength)
+                if (bo.OrderLength > 0 && str.Length > bo.OrderLength)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16201));
                 }
 
-                str = str.PadLeft(param.OrderLength, '0');
-                list.Add(str);
+                str = str.PadLeft(bo.OrderLength, '0');
+                serialStrings.Add(str);
             }
 
+            if (serialStrings == null || serialStrings.Any() == false)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16203));
+            }
+
+            List<string> list = new();
+            StringBuilder stringBuilder = new();
+            foreach (var item in serialStrings)
+            {
+                stringBuilder.Clear();
+                bo.CodeRulesMakeBos = bo.CodeRulesMakeBos.OrderBy(x => x.Seq);
+
+                foreach (var rule in bo.CodeRulesMakeBos)
+                {
+                    if (rule.ValueTakingType == CodeValueTakingTypeEnum.FixedValue)
+                    {
+                        stringBuilder.Append(rule.SegmentedValue);
+                        continue;
+                    }
+
+                    // TODO  暂时使用这种写法  王克明
+                    if (rule.SegmentedValue == "%ACTIVITY%")
+                    {
+                        stringBuilder.Append(item);
+                    }
+                    else if (rule.SegmentedValue == "%YYMMDD%")
+                    {
+                        stringBuilder.Append(HymsonClock.Now().ToString("yyMMdd"));
+                    }
+                    else
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", rule.SegmentedValue);
+                    }
+                }
+                list.Add(stringBuilder.ToString());
+            }
+
+            // 如果不是测试，且有模拟验证通过一次，就直接真实生成
+            if (bo.IsTest == false && bo.IsSimulation == true)
+            {
+                bo.IsSimulation = false;
+                await GenerateBarCodeSerialNumberAsync(bo);
+            }
             return list;
         }
 
@@ -97,7 +191,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         /// <returns></returns>
         private string ConvertNumber(int number, string ignoreChar, int type)
         {
-            List<string> list = new List<string>();
+            List<string> list = new();
             if (type != 16 && type != 32)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16206));
@@ -128,7 +222,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         /// <returns></returns>
         private string Convert(int number, List<string> list)
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            StringBuilder stringBuilder = new();
             int remainder = number % list.Count;
             stringBuilder.Insert(0, list[remainder]);
             int quotient = number / list.Count;
@@ -146,121 +240,73 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
             return stringBuilder.ToString();
         }
 
+
+
+        #region 内部方法
         /// <summary>
-        /// 条码生成
+        /// 获取条码
         /// </summary>
         /// <param name="param"></param>
+        /// <param name="maxLength">最大长度</param>
         /// <returns></returns>
-        /// <exception cref="CustomerValidationException">未找到生成规则</exception>
-        public async Task<IEnumerable<string>> GenerateBarcodeListByIdAsync(GenerateBarcodeDto param)
+        private async Task<IEnumerable<int>> GenerateBarCodeSerialNumbersWithTryAsync(BarCodeSerialNumberBo param, int maxLength = 9)
         {
-            var getCodeRulesTask = _inteCodeRulesRepository.GetByIdAsync(param.CodeRuleId);
-            var getCodeRulesMakeListTask = _inteCodeRulesMakeRepository.GetInteCodeRulesMakeEntitiesAsync(new InteCodeRulesMakeQuery { SiteId = _currentSite.SiteId ?? 0, CodeRulesId = param.CodeRuleId });
-            var codeRulesMakeList = await getCodeRulesMakeListTask;
-            var codeRule = await getCodeRulesTask;
-            var barcodeSerialNumberList = await GenerateBarcodeSerialNumberAsync(new BarcodeSerialNumberDto
-            {
-                CodeRuleKey = param.IsTest ? param.CodeRuleId.ToString() + "Test" : param.CodeRuleId.ToString(),
-                Count = param.Count,
-                Base = codeRule.Base,
-                Increment = codeRule.Increment,
-                IgnoreChar = codeRule.IgnoreChar,
-                OrderLength = codeRule.OrderLength,
-                ResetType = codeRule.ResetType,
-                StartNumber = codeRule.StartNumber
-            });
+            List<int> sequences = new(param.Count);
 
-            if (barcodeSerialNumberList == null || !barcodeSerialNumberList.Any())
+            // 因为测试提出计数器需要包含起始数字，而计时器是用startNumber往后开始计数的
+            var startNumber = param.StartNumber - 1;
+
+            // 真实生成
+            if (param.IsSimulation == false)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16203));
+                var serialNumbers = await _sequenceService.GetSerialNumbersAsync(param.ResetType, param.CodeRuleKey, param.Count, startNumber, param.Increment, maxLength)
+                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES16200));
+
+                sequences.AddRange(serialNumbers);
+                return sequences;
             }
-            List<string> list = new List<string>();
-            foreach (var item in barcodeSerialNumberList)
+
+            // 模拟生成
+            var count = param.Count;
+            var currentValue = await _sequenceService.GetCurrentValueAsync(param.ResetType, param.CodeRuleKey, startNumber);
+            do
             {
-                StringBuilder stringBuilder = new StringBuilder();
-                foreach (var rule in codeRulesMakeList.OrderBy(x => x.Seq))
-                {
-                    if (rule.ValueTakingType == CodeValueTakingTypeEnum.FixedValue)
-                    {
-                        stringBuilder.Append(rule.SegmentedValue);
-                    }
-                    else
-                    {
-                        // TODO  暂时使用这种写法  王克明
-                        if (rule.SegmentedValue == "%ACTIVITY%")
-                        {
-                            stringBuilder.Append(item);
-                        }
-                        else if (rule.SegmentedValue == "%YYMMDD%")
-                        {
-                            stringBuilder.Append(HymsonClock.Now().ToString("yyMMdd"));
-                        }
-                        else
-                        {
-                            throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", rule.SegmentedValue);
-                        }
-                    }
-                }
-                list.Add(stringBuilder.ToString());
+                currentValue += param.Increment;
+                sequences.Add(currentValue);
+                count--;
+            } while (count > 0);
+
+            if (currentValue >= GetMaxValue(maxLength))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16207)).WithData("BarCode", currentValue);
             }
-            return list;
+
+            return sequences;
         }
 
         /// <summary>
-        /// 条码生成
+        /// 获取十进制位数最大值
         /// </summary>
-        /// <param name="param"></param>
+        /// <param name="numberDigits">十进制位数</param>
         /// <returns></returns>
-        /// <exception cref="CustomerValidationException">未找到生成规则</exception>
-        public async Task<IEnumerable<string>> GenerateBarcodeListAsync(CodeRuleDto param)
+        private static int GetMaxValue(int numberDigits)
         {
-
-            var barcodeSerialNumberList = await GenerateBarcodeSerialNumberAsync(new BarcodeSerialNumberDto
+            return numberDigits switch
             {
-                CodeRuleKey = param.IsTest ? param.ProductId.ToString() + "Test" : param.ProductId.ToString(),
-                Count = param.Count,
-                Base = param.Base,
-                IgnoreChar = param.IgnoreChar ?? "",
-                Increment = param.Increment,
-                OrderLength = param.OrderLength,
-                ResetType = param.ResetType,
-                StartNumber = param.StartNumber
-            });
-
-            if (barcodeSerialNumberList == null || !barcodeSerialNumberList.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16203));
-            }
-            List<string> list = new List<string>();
-            foreach (var item in barcodeSerialNumberList)
-            {
-                StringBuilder stringBuilder = new StringBuilder();
-                foreach (var rule in param.CodeRulesMakeList.OrderBy(x => x.Seq))
-                {
-                    if (rule.ValueTakingType == CodeValueTakingTypeEnum.FixedValue)
-                    {
-                        stringBuilder.Append(rule.SegmentedValue);
-                    }
-                    else
-                    {
-                        // TODO  暂时使用这种写法  王克明
-                        if (rule.SegmentedValue == "%ACTIVITY%")
-                        {
-                            stringBuilder.Append(item);
-                        }
-                        else if (rule.SegmentedValue == "%YYMMDD%")
-                        {
-                            stringBuilder.Append(HymsonClock.Now().ToString("yyMMdd"));
-                        }
-                        else
-                        {
-                            throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", rule.SegmentedValue);
-                        }
-                    }
-                }
-                list.Add(stringBuilder.ToString());
-            }
-            return list;
+                1 => 10,
+                2 => 100,
+                3 => 1000,
+                4 => 10000,
+                5 => 100000,
+                6 => 1000000,
+                7 => 10000000,
+                8 => 100000000,
+                9 => 1000000000,
+                _ => 1000000000,
+            };
         }
+
+        #endregion
+
     }
 }

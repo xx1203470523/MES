@@ -502,6 +502,7 @@
         public const string MES16204 = "{base}进制字符串全部忽略,无法生成条码";
         public const string MES16205 = "通配符{value}未定义";
         public const string MES16206 = "流水号转换只实现了16,32进制";
+        public const string MES16207 = "生成的序列号{BarCode}超过规则限制";
         #endregion
 
         #region 生产通用 MES16300
