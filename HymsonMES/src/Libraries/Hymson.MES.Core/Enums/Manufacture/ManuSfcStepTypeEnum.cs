@@ -154,10 +154,10 @@ namespace Hymson.MES.Core.Enums.Manufacture
         ///// </summary>
         //[Description("包装")]
         //Package = 29,
-        /// <summary>
-        /// 解包
-        /// </summary>
-        [Description("解包")]
-        Unpack = 30
+        ///// <summary>
+        ///// 解包
+        ///// </summary>
+        //[Description("解包")]
+        //Unpack = 30
     }
 }
