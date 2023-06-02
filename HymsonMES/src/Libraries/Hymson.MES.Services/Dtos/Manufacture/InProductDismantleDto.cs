@@ -205,7 +205,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 是否组装
         /// </summary>
-        public bool IsAssemble { get; set; }
+        public bool IsAssemble { get; set; }=true;
     }
 
     public class InProductDismantleReplaceDto: InProductDismantleAddDto
