@@ -192,7 +192,7 @@ namespace Hymson.MES.Services.Services.Plan
                 MaterialId = material.Id,
                 ProcedureId = createDto.ProcedureId,
                 Version = material?.Version ?? "",
-                SiteId = _currentSite.SiteId ?? 0
+                SiteId = _currentSite.SiteId ?? 123456
 
             });
             var pprp = ppr.FirstOrDefault();
@@ -219,10 +219,13 @@ namespace Hymson.MES.Services.Services.Plan
                             }
                         }
                     };
-                    var result = await _labelPrintRequest.PrintAsync(printEntity);
-                    if (!result.result)
-                        throw new CustomerValidationException(nameof(ErrorCode.MES17003)).WithData("msg", result.msg);
-
+                    var loop = pprp.Copy ?? 1;
+                    for (int i = 0; i < loop; i++)
+                    {
+                        var result = await _labelPrintRequest.PrintAsync(printEntity);
+                        if (!result.result)
+                            throw new CustomerValidationException(nameof(ErrorCode.MES17003)).WithData("msg", result.msg);
+                    }
                 }
                 else
                     throw new CustomerValidationException(nameof(ErrorCode.MES17001));
