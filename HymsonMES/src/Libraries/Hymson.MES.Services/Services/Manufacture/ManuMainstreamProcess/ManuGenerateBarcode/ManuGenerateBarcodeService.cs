@@ -49,7 +49,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        /// <exception cref="CustomerValidationException">未找到生成规则</exception>
         public async Task<IEnumerable<string>> GenerateBarcodeListByIdAsync(GenerateBarcodeDto param)
         {
             var getCodeRulesTask = _inteCodeRulesRepository.GetByIdAsync(param.CodeRuleId);
@@ -83,7 +82,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        /// <exception cref="CustomerValidationException">未找到生成规则</exception>
         public async Task<IEnumerable<string>> GenerateBarcodeListAsync(CodeRuleDto param)
         {
             return await GenerateBarCodeSerialNumberAsync(new BarCodeSerialNumberBo
