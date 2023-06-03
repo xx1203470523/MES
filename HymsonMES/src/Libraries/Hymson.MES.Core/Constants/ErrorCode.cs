@@ -668,6 +668,7 @@
         public const string MES16729 = "容器包装，容器{barcode}未关闭!";
         public const string MES16730 = "同一个容器不允许不同物料进行包装!";
         public const string MES16731 = "容器包装，容器包装等级跟工序包装等级不匹配!";
+        public const string MES16732 = "装载信息不存在!";
         #endregion
 
         #region 绑定工单激活  MES16800

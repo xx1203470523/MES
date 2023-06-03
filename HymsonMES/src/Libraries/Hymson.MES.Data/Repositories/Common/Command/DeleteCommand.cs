@@ -16,7 +16,7 @@ namespace Hymson.MES.Data.Repositories.Common.Command
         /// <summary>
         /// 主键Ids
         /// </summary>
-        public  long[] Ids { get; set; }
+        public IEnumerable<long> Ids { get; set; }
 
         /// <summary>
         /// 操作人员

@@ -143,7 +143,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
             sqlBuilder.Where("SiteId = @SiteId");
 
-            if (query.Sfcs != null && query.Sfcs.Length > 0)
+            if (query.Sfcs != null && query.Sfcs.Any())
             {
                 sqlBuilder.Where("Sfc in @Sfcs");
             }
@@ -162,7 +162,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.LeftJoin("manu_sfc_info msi on msi.SfcId =mf.Id  and msi.IsDeleted=0 and msi.WorkOrderId =MSP.WorkOrderId ");
 
             sqlBuilder.Where("msp.SiteId = @SiteId");
-            if (query.Sfcs != null && query.Sfcs.Length > 0)
+            if (query.Sfcs != null && query.Sfcs.Any())
             {
                 sqlBuilder.Where("msp.Sfc in @Sfcs");
             }
