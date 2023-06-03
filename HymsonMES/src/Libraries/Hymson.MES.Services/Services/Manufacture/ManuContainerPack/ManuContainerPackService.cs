@@ -151,14 +151,13 @@ namespace Hymson.MES.Services.Services.Manufacture
             IEnumerable<ManuSfcProduceEntity> manuSfcProduceList = new List<ManuSfcProduceEntity>();
             if (manuContainerBarcodeEntity.PackLevel == (int)LevelEnum.One)
             {
-                var manuSfclistTask = _manuSfcRepository.GetBySFCsAsync(manuContainerPackList.Select(x => x.LadeBarCode));
+                 manuSfclist = await _manuSfcRepository.GetBySFCsAsync(manuContainerPackList.Select(x => x.LadeBarCode));
                 var manuSfcInfolistTask = _manuSfcInfoRepository.GetBySFCIdsAsync(manuSfclist.Select(x => x.Id));
                 var manuSfcProduceListTask = _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery
                 {
                     Sfcs = manuContainerPackList.Select(x => x.LadeBarCode),
                     SiteId = _currentSite.SiteId ?? 0
                 });
-                manuSfclist = await manuSfclistTask;
                 manuSfcInfolist = await manuSfcInfolistTask;
                 manuSfcProduceList = await manuSfcProduceListTask;
             }
@@ -236,14 +235,13 @@ namespace Hymson.MES.Services.Services.Manufacture
             IEnumerable<ManuSfcProduceEntity> manuSfcProduceList = new List<ManuSfcProduceEntity>();
             if (manuContainerBarcodeEntity.PackLevel == (int)LevelEnum.One)
             {
-                var manuSfclistTask = _manuSfcRepository.GetBySFCsAsync(manuContainerPackList.Select(x => x.LadeBarCode));
+                manuSfclist = await _manuSfcRepository.GetBySFCsAsync(manuContainerPackList.Select(x => x.LadeBarCode));
                 var manuSfcInfolistTask = _manuSfcInfoRepository.GetBySFCIdsAsync(manuSfclist.Select(x => x.Id));
                 var manuSfcProduceListTask = _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery
                 {
                     Sfcs = manuContainerPackList.Select(x => x.LadeBarCode),
                     SiteId = _currentSite.SiteId ?? 0
                 });
-                manuSfclist = await manuSfclistTask;
                 manuSfcInfolist = await manuSfcInfolistTask;
                 manuSfcProduceList = await manuSfcProduceListTask;
             }
