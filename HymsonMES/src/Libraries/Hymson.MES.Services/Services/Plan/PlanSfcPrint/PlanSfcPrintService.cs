@@ -192,12 +192,13 @@ namespace Hymson.MES.Services.Services.Plan
                 MaterialId = material.Id,
                 ProcedureId = createDto.ProcedureId,
                 Version = material?.Version ?? "",
-                SiteId = _currentSite.SiteId ?? 123456
+                SiteId = _currentSite.SiteId ?? 0
 
             });
-            var pprp = ppr.FirstOrDefault();
-            if (pprp != null)
+            foreach (var pprp in ppr)
             {
+                //if (pprp != null)
+                //{
                 var tl = await _procLabelTemplateRepository.GetByIdAsync(pprp.TemplateId);
                 if (tl != null)
                 {
@@ -230,11 +231,11 @@ namespace Hymson.MES.Services.Services.Plan
                 else
                     throw new CustomerValidationException(nameof(ErrorCode.MES17001));
             }
-            else
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES17001));
-            }
-
+            //}
+            //else
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES17001));
+            //}
         }
 
         /// <summary>
