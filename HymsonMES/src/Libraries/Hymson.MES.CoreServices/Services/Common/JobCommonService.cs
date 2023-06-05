@@ -1,8 +1,8 @@
 ﻿using Hymson.MES.Core.Domain.Integrated;
-using Hymson.MES.EquipmentServices.Services.Job.Implementing;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Hymson.MES.EquipmentServices.Services.Job.Common
+namespace Hymson.MES.CoreServices.Services.Common
 {
     /// <summary>
     /// 生产通用
@@ -29,10 +29,12 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Common
         /// <param name="jobs"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task ExecuteJobAsync(IEnumerable<InteJobEntity> jobs, Dictionary<string, string>? param)
+        public async Task<Dictionary<string, JobResponseDto>> ExecuteJobAsync(IEnumerable<InteJobEntity> jobs, Dictionary<string, string>? param)
         {
+            var result = new Dictionary<string, JobResponseDto>(); // 返回结果
+
             // 获取所有实现类
-            var services = _serviceProvider.GetServices<IJobImplementingService>();
+            var services = _serviceProvider.GetServices<IJobManufactureService>();
             foreach (var job in jobs)
             {
                 var service = services.FirstOrDefault(f => f.GetType().Name == job.ClassProgram);
@@ -45,8 +47,30 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Common
                 await service.VerifyParamAsync(param);
 
                 // 执行job
-                await service.ExecuteAsync(param);
+                result.Add(job.ClassProgram, await service.ExecuteAsync(param));
             }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 查询类
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<SelectOptionDto>> GetClassProgramListAsync()
+        {
+            // 获取所有实现类
+            var services = _serviceProvider.GetServices<IJobManufactureService>();
+            return await Task.FromResult(services.Select(s =>
+            {
+                var name = s.GetType().Name;
+                return new SelectOptionDto
+                {
+                    Key = $"{name}",
+                    Label = name,
+                    Value = $"{name}"
+                };
+            }));
         }
 
     }
