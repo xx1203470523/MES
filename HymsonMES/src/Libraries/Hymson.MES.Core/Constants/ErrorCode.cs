@@ -701,6 +701,7 @@
         public const string MES17002 = "条码打印，打印机信息未找到";
         public const string MES17003 = "条码打印，打印失败msg:{msg}.";
         public const string MES17004 = "条码打印，预览失败";
+        public const string MES17005 = "条码打印，模板数据格式错误";
         #endregion
 
         #region 在制品步骤控制 MES18000
