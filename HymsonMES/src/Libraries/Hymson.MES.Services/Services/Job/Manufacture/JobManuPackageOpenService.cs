@@ -2,12 +2,11 @@
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Dtos.Common;
+using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Bos.Manufacture;
-using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Utils;
 
@@ -32,6 +31,10 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// 服务接口（生产通用）
         /// </summary>
         private readonly IManuCommonService _manuCommonService;
+
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly IManuContainerBarcodeRepository _manuContainerBarcodeRepository;
 
 

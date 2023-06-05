@@ -3,6 +3,8 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Dtos.Common;
+using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
@@ -21,9 +23,8 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
     /// <summary>
     /// SFC转换
     /// </summary>
-    public class JobManuSfcConvertService : IJobImplementingService
+    public class JobManuSfcConvertService : IJobManufactureService
     {
-
         private readonly ICurrentEquipment _currentEquipment;
         private readonly IProcResourceRepository _procResourceRepository;
         private readonly IManuSfcRepository _manuSfcRepository;
@@ -126,8 +127,10 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task ExecuteAsync(Dictionary<string, string>? param)
+        public async Task<JobResponseDto> ExecuteAsync(Dictionary<string, string>? param)
         {
+            var defaultDto = new JobResponseDto { };
+
             var bo = new ManufactureDto
             {
                 SFC = param["SFC"],
@@ -278,6 +281,8 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
             await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
 
             ts.Complete();
+
+            return defaultDto;
         }
     }
 }

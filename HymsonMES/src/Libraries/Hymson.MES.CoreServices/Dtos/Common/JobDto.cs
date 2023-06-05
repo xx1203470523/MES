@@ -1,6 +1,6 @@
 ﻿using Hymson.Utils;
 
-namespace Hymson.MES.Services.Dtos.Common
+namespace Hymson.MES.CoreServices.Dtos.Common
 {
     /// <summary>
     /// 按钮Dto（请求）
