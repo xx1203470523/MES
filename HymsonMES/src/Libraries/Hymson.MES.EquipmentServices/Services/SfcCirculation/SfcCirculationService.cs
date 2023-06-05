@@ -169,6 +169,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             //绑定条码信息
             if (mpManuSfc == null)
             {
+                var sfcProduceEntity = sfcProduceList.First();
                 manuSfc = new ManuSfcEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
@@ -224,7 +225,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                     WorkOrderId = planWorkOrder.Id,
                     WorkCenterId = planWorkOrder.WorkCenterId,
                     ProductBOMId = planWorkOrder.ProductBOMId,
-                    ProcedureId = sfcProduceList.First().ProcedureId,//当前绑定条码所在工序
+                    ProcedureId = sfcProduceEntity.ProcedureId,//当前绑定条码所在工序
                     Qty = 1,//数量1
                     Operatetype = ManuSfcStepTypeEnum.InStock,
                     CurrentStatus = SfcProduceStatusEnum.Activity,
@@ -235,6 +236,27 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                     UpdatedBy = _currentEquipment.Name,
                     UpdatedOn = HymsonClock.Now(),
                 };
+                //记录流转信息
+                manuSfcCirculationEntities.Add(new ManuSfcCirculationEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentEquipment.SiteId,
+                    ProcedureId = sfcProduceEntity.ProcedureId,
+                    ResourceId = sfcProduceEntity.ResourceId,
+                    SFC = sfcCirculationBindDto.SFC,
+                    WorkOrderId = sfcProduceEntity.WorkOrderId,
+                    ProductId = sfcProduceEntity.ProductId,
+                    EquipmentId = _currentEquipment.Id,
+                    CirculationBarCode = string.Empty,
+                    CirculationProductId = sfcProduceEntity.ProductId,//暂时使用原有产品ID
+                    CirculationMainProductId = sfcProduceEntity.ProductId,
+                    CirculationQty = 1,
+                    CirculationType = SfcCirculationTypeEnum.Merge,
+                    CreatedBy = _currentEquipment.Name,
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedBy = _currentEquipment.Name,
+                    UpdatedOn = HymsonClock.Now()
+                });
             }
 
             //数据提交
