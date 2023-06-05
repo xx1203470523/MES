@@ -13,7 +13,6 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process.ProductSet.Query;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -111,6 +110,13 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<IEnumerable<ProcProductSetEntity>> GetProcProductSetEntitiesAsync(ProcProductSetQuery procProductSetQuery)
         {
             var sqlBuilder = new SqlBuilder();
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (procProductSetQuery.SetPointId > 0)
+            {
+                sqlBuilder.Where("SetPointId=@SetPointId");
+            }
+
             var template = sqlBuilder.AddTemplate(GetProcProductSetEntitiesSqlTemplate);
             using var conn = GetMESDbConnection();
             var procProductSetEntities = await conn.QueryAsync<ProcProductSetEntity>(template.RawSql, procProductSetQuery);

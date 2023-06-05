@@ -16,6 +16,7 @@ using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.ProductSet.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Services.Dtos.Integrated;
@@ -85,6 +86,11 @@ namespace Hymson.MES.Services.Services.Process
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
         private readonly IProcMaterialRepository _procMaterialRepository;
 
+        /// <summary>
+        /// 产出设置
+        /// </summary>
+        private readonly IProcProductSetRepository _procProductSetRepository;
+
         private readonly AbstractValidator<ProcResourceCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcResourceModifyDto> _validationModifyRules;
 
@@ -102,6 +108,7 @@ namespace Hymson.MES.Services.Services.Process
                   IInteWorkCenterRepository inteWorkCenterRepository,
                   IPlanWorkOrderRepository planWorkOrderRepository,
                   IProcMaterialRepository procMaterialRepository,
+                  IProcProductSetRepository procProductSetRepository,
                   AbstractValidator<ProcResourceCreateDto> validationCreateRules,
                   AbstractValidator<ProcResourceModifyDto> validationModifyRules)
         {
@@ -117,6 +124,7 @@ namespace Hymson.MES.Services.Services.Process
             _inteWorkCenterRepository = inteWorkCenterRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _procMaterialRepository = procMaterialRepository;
+            _procProductSetRepository = procProductSetRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
         }
@@ -258,8 +266,8 @@ namespace Hymson.MES.Services.Services.Process
             foreach (var entity in pagedInfo.Data)
             {
                 var resourceTypeDto = entity.ToModel<ProcResourceConfigResDto>();
-                resourceTypeDto.MaterialCode = entity.SetType == (int)ResourceSetTypeEnum.Material ? procMaterials.FirstOrDefault(x => x.Id == entity.Value.ParseToLong())?.MaterialCode??"" : "";
-                resourceTypeDto.OrderCode = entity.SetType == (int)ResourceSetTypeEnum.Workorder ? planWorkOrders.FirstOrDefault(x => x.Id == entity.Value.ParseToLong())?.OrderCode??"":"";
+                resourceTypeDto.MaterialCode = entity.SetType == (int)ResourceSetTypeEnum.Material ? procMaterials.FirstOrDefault(x => x.Id == entity.Value.ParseToLong())?.MaterialCode ?? "" : "";
+                resourceTypeDto.OrderCode = entity.SetType == (int)ResourceSetTypeEnum.Workorder ? planWorkOrders.FirstOrDefault(x => x.Id == entity.Value.ParseToLong())?.OrderCode ?? "" : "";
                 resourceConfigResDtos.Add(resourceTypeDto);
             }
             return new PagedInfo<ProcResourceConfigResDto>(resourceConfigResDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
@@ -349,6 +357,56 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             return new PagedInfo<ProcedureJobReleationDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 获取资源产出设置
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcProductSetDto>> GetResourceProductSetListAsync(ProcProductSetQueryDto queryDto)
+        {
+            var query = new ProcProductSetQuery()
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                SetPointId = queryDto.SetPointId
+            };
+            var procProductSetEntities = await _procProductSetRepository.GetProcProductSetEntitiesAsync(query);
+
+            //实体到DTO转换 装载数据
+            List<ProcProductSetDto> jobReleationDtos = new List<ProcProductSetDto>();
+            if (procProductSetEntities != null && procProductSetEntities.Any())
+            {
+                var materialIds = new List<long> { };
+                IEnumerable<ProcMaterialEntity> procMaterialList = new List<ProcMaterialEntity>();
+                materialIds.AddRange(procProductSetEntities.Select(a => a.ProductId).ToArray());
+                materialIds.AddRange(procProductSetEntities.Select(a => a.SemiProductId).ToArray());
+                var materialIdList = materialIds.Distinct();
+                if (materialIdList.Any())
+                {
+                    procMaterialList = await _procMaterialRepository.GetByIdsAsync(materialIdList);
+                }
+
+                foreach (var entity in procProductSetEntities)
+                {
+                    var product = procMaterialList.FirstOrDefault(x => x.Id == entity.ProductId);
+                    var semiProduct = procMaterialList.FirstOrDefault(x => x.Id == entity.ProductId);
+                    jobReleationDtos.Add(new ProcProductSetDto()
+                    {
+                        ProductId = entity.ProductId,
+                        ProductCode = product?.MaterialCode??"",
+                        MaterialName= product?.MaterialName??"",
+                        Version =product?.Version??"",
+                        SetPointId = entity.SetPointId,
+                        SemiProductId = entity.SemiProductId,
+                        SemiMaterialCode = semiProduct?.MaterialCode ?? "",
+                        SemiMaterialName = semiProduct?.MaterialName ??"",
+                        SemiVersion = semiProduct?.Version ?? "",
+                    }); ;
+                }
+            }
+
+            return jobReleationDtos;
         }
 
         /// <summary>

@@ -13,6 +13,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.ProductSet.Query;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
@@ -64,6 +65,10 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// 仓库标签模板 仓储
         /// </summary>
         private readonly IProcLabelTemplateRepository _procLabelTemplateRepository;
+        /// <summary>
+        /// 产出设置
+        /// </summary>
+        private readonly IProcProductSetRepository _procProductSetRepository;
 
         private readonly AbstractValidator<ProcProcedureCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcProcedureModifyDto> _validationModifyRules;
@@ -80,6 +85,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             IProcMaterialRepository procMaterialRepository,
             IInteJobRepository inteJobRepository,
             IProcLabelTemplateRepository procLabelTemplateRepository,
+            IProcProductSetRepository procProductSetRepository,
             AbstractValidator<ProcProcedureCreateDto> validationCreateRules,
             AbstractValidator<ProcProcedureModifyDto> validationModifyRules)
         {
@@ -92,6 +98,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             _procMaterialRepository = procMaterialRepository;
             _inteJobRepository = inteJobRepository;
             _procLabelTemplateRepository = procLabelTemplateRepository;
+            _procProductSetRepository = procProductSetRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
         }
@@ -246,6 +253,56 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 }
             }
             return new PagedInfo<ProcedureJobReleationDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 获取工序产出设置
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcProductSetDto>> GetProcedureProductSetListAsync(ProcProductSetQueryDto queryDto)
+        {
+            var query = new ProcProductSetQuery()
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                SetPointId = queryDto.SetPointId
+            };
+            var procProductSetEntities = await _procProductSetRepository.GetProcProductSetEntitiesAsync(query);
+
+            //实体到DTO转换 装载数据
+            List<ProcProductSetDto> jobReleationDtos = new List<ProcProductSetDto>();
+            if (procProductSetEntities != null && procProductSetEntities.Any())
+            {
+                var materialIds = new List<long> { };
+                IEnumerable<ProcMaterialEntity> procMaterialList = new List<ProcMaterialEntity>();
+                materialIds.AddRange(procProductSetEntities.Select(a => a.ProductId).ToArray());
+                materialIds.AddRange(procProductSetEntities.Select(a => a.SemiProductId).ToArray());
+                var materialIdList = materialIds.Distinct();
+                if (materialIdList.Any())
+                {
+                    procMaterialList = await _procMaterialRepository.GetByIdsAsync(materialIdList);
+                }
+
+                foreach (var entity in procProductSetEntities)
+                {
+                    var product = procMaterialList.FirstOrDefault(x => x.Id == entity.ProductId);
+                    var semiProduct = procMaterialList.FirstOrDefault(x => x.Id == entity.ProductId);
+                    jobReleationDtos.Add(new ProcProductSetDto()
+                    {
+                        ProductId = entity.ProductId,
+                        ProductCode = product?.MaterialCode ?? "",
+                        MaterialName = product?.MaterialName ??"",
+                        Version = product?.Version ?? "",
+                        SetPointId = entity.SetPointId,
+                        SemiProductId = entity.SemiProductId,
+                        SemiMaterialCode = semiProduct?.MaterialCode ?? "",
+                        SemiMaterialName = semiProduct?.MaterialName ??"",
+                        SemiVersion = semiProduct?.Version ?? "",
+                    }); ;
+                }
+            }
+
+            return jobReleationDtos;
         }
 
         /// <summary>

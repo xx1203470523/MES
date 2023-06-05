@@ -249,6 +249,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 工序工作配置信息
         /// </summary>
         public List<InteJobBusinessRelationCreateDto> ProcedureJobList { get; set; }
+
+        /// <summary>
+        ///产出设置信息
+        /// </summary>
+        //public List<ProcProductSetCreateDto> ProductSetList { get; set; }
     }
 
     /// <summary>
