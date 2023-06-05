@@ -28,8 +28,8 @@ namespace Hymson.MES.Equipment.Api
             var equipmentModel = new EquipmentModel
             {
                 FactoryId = 123456,
-                Id = 1,
-                Name = "设备1",
+                Id = 14066323700695040,
+                Name = "小新的测试设备",
                 SiteId = 123456,
             };
             var token = JwtHelper.GenerateJwtToken(equipmentModel, _jwtOptions);

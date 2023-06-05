@@ -19,5 +19,19 @@ namespace Hymson.MES.Data.Repositories.Integrated
     /// </summary>
     public class InteJobBusinessRelationQuery
     {
+        /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long SiteId { get; set; } = 0;
+
+        /// <summary>
+        /// 1资源  2工序 3不合格代码
+        /// </summary>
+        public int? BusinessType { get; set; }
+
+        /// <summary>
+        /// 关联的业务表的ID
+        /// </summary>
+        public long BusinessId { get; set; }
     }
 }

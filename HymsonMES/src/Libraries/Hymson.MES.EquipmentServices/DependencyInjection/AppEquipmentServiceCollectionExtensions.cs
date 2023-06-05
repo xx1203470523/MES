@@ -1,4 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Hymson.MES.EquipmentServices.Services.Common;
+using Hymson.MES.EquipmentServices.Services.Job.Common;
+using Hymson.MES.EquipmentServices.Services.Job.Implementing;
+using Hymson.MES.EquipmentServices.Services.Manufacture.InStation;
+using Hymson.MES.EquipmentServices.Services.SfcBinding;
+using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -7,7 +12,7 @@ namespace Microsoft.Extensions.DependencyInjection
     /// </summary>
     public static class AppEquipmentServiceCollectionExtensions
     {
-        
+
         /// <summary>
         /// 业务逻辑层依赖服务添加
         /// </summary>
@@ -30,7 +35,11 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         private static void AddServices(this IServiceCollection services)
         {
-            
+            services.AddSingleton<ICommonService, CommonService>();
+            services.AddSingleton<IInStationService, InStationService>();
+            services.AddSingleton<IJobCommonService, JobCommonService>();
+            services.AddSingleton<IJobImplementingService, JobManuSfcConvertService>();
+            services.AddSingleton<ISfcBindingService, SfcBindingService>();
 
         }
 
@@ -53,8 +62,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         private static void AddValidators(IServiceCollection services)
         {
-            
+
         }
-       
+
     }
 }

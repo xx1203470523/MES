@@ -760,6 +760,73 @@
 
         #endregion
 
+
+        #region 设备对接错误
+
+        #region 设备对接公用
+        public const string MES19001 = "设备编码不能为空";
+        public const string MES19002 = "资源编码不能为空";
+        public const string MES19003 = "SFC条码不能为空";
+        public const string MES19004 = "调用本地时间不能为空";
+        public const string MES19005 = "设备编码：{Code}不存在";
+        public const string MES19006 = "资源编码不存在";
+        public const string MES19007 = "SFC条码不允许重复";
+        public const string MES19008 = "资源不匹配";
+        #endregion
+
+        public const string MES19101 = "条码列表不能为空";
+        public const string MES19102 = "容器编码不能为空";
+        public const string MES19103 = "容器条码列表不能为空";
+        public const string MES19104 = "托盘装载信息不存在";
+        public const string MES19105 = "此托盘未装载任何信息";
+        public const string MES19106 = "不存在任何绑定关系不需要解绑";
+        public const string MES19107 = "参数列表不能为空";
+        public const string MES19108 = "参数编码{Code}不存在";
+        public const string MES19109 = "资源编码{Code}不存在";
+        public const string MES19110 = "产品条码参数列表不能为空";
+        public const string MES19111 = "托盘条码不能为空";
+        public const string MES19112 = "上传SFC信息不能为空";
+        public const string MES19113 = "该设备已经设置临时SFC";
+        public const string MES19114 = "NG编码：{Code}不存在";
+        public const string MES19115 = "产品编码不能为空";
+        public const string MES19116 = "请维护产品编码：{Code}的编码规则";
+        public const string MES19117 = "条码：{SFC}不存在";
+        public const string MES19118 = "产品编码：{Code}不存在";
+        public const string MES19119 = "绑定条码列表不能为空";
+        public const string MES19120 = "解绑条码列表不能为空";
+        public const string MES19121 = "绑定条码：{SFC}和BindSFC：{BindSFC}绑定关系已经存在";
+        public const string MES19122 = "容器：{ContainerCode}和SFC：{SFC}绑定关系已经存在";
+        public const string MES19123 = "资源：{ResourceCode}未找到关联的产线信息";
+        public const string MES19124 = "产线：{WorkCenterCode}未找到激活的工单信息";
+        public const string MES19125 = "条码：{SFCS}未找到条码信息,请先执行进站操作";
+        public const string MES19126 = "条码：{SFCS}未找到生产信息";
+        public const string MES19127 = "条码：{SFCS}未进站不能操作出站";
+        public const string MES19128 = "条码：{SFCS}已进站不能操作过站";
+        public const string MES19129 = "条码：{SFCS}当前状态不是排队状态，不允许进站";
+        public const string MES19130 = "条码：{SFCS}超过或达到最大复投次数限制，不允许进站";
+        public const string MES19131 = "资源：{ResCode}和设备：{EquCode}不存在绑定关系，请检查配置";
+        public const string MES19132 = "资源：{ResCode}未绑定工序，请检查配置";
+        public const string MES19133 = "工单：{OrderCode}未绑定BOM，请检查配置";
+
+
+        public const string MES19910 = "资源：{ResCode}和设备：{EquCode}不存在绑定关系，请检查配置";
+        public const string MES19911 = "资源：{ResourceCode}未找到关联的产线信息";
+        public const string MES19912 = "产线：{WorkCenterCode}未找到激活的工单信息";
+        public const string MES19913 = "资源：{ResCode}未绑定工序，请检查配置";
+        public const string MES19914 = "工单：{OrderCode}未绑定BOM，请检查配置";
+        public const string MES19915 = "Bom：{BomCode}未绑定物料明细，请检查配置";
+        public const string MES19916 = "条码：{SFC}不符合掩码规则，请检查配置";
+        public const string MES19917 = "条码：{SFC}已存在";
+        public const string MES19918 = "条码：{SFC}不存在生产信息";
+        public const string MES19919 = "资源：{ResCode}不存在";
+        public const string MES19920 = "条码：{SFC}不在当前工序活动";
+        public const string MES19921 = "子条码：{SFC}已经绑定其它主条码";
+        public const string MES19922 = "主条码：{SFC}已经使用";
+        public const string MES19923 = "未获取到工单信息"; 
+
+
+
+        #endregion
         #endregion
 
         #region 系统执行出错 业务逻辑出错
