@@ -150,11 +150,11 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                     SiteId = _currentEquipment.SiteId,
                     ProcedureId = sfcProduceEntity.ProcedureId,
                     ResourceId = sfcProduceEntity.ResourceId,
-                    SFC = sfcProduceEntity.SFC,
+                    SFC = circulationBindSFC.SFC,
                     WorkOrderId = sfcProduceEntity.WorkOrderId,
                     ProductId = sfcProduceEntity.ProductId,
                     EquipmentId = _currentEquipment.Id,
-                    CirculationBarCode = circulationBindSFC.SFC,
+                    CirculationBarCode = sfcCirculationBindDto.SFC,
                     CirculationProductId = sfcProduceEntity.ProductId,//暂时使用原有产品ID
                     CirculationMainProductId = sfcProduceEntity.ProductId,
                     Location = circulationBindSFC.Location,
