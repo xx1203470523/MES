@@ -227,7 +227,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     var manuSfc = manuSfcs.FirstOrDefault(x => x.SFC == item.SFC);
                     // 条码步骤
-                    var sfcStepEntity = CreateSFCStepEntity(manuSfc, ManuSfcStepTypeEnum.Repair, createDto.Remark ?? "");
+                    var sfcStepEntity = CreateSFCStepEntity(manuSfc, ManuSfcStepTypeEnum.BadEntry, createDto.Remark ?? "");
                     sfcStepList.Add(sfcStepEntity);
                     // 在制品业务
                     var manuSfcProduceBusinessEntity = new ManuSfcProduceBusinessEntity
@@ -509,7 +509,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 }
                 var processRouteProcedure = await _manuCommonService.GetFirstProcedureAsync(badReJudgmentDto.BadProcessRouteId ?? 0);
                 // 条码步骤
-                sfcStepEntity = CreateSFCStepEntity(manuSfc, ManuSfcStepTypeEnum.Repair, badReJudgmentDto.Remark ?? "");
+                sfcStepEntity = CreateSFCStepEntity(manuSfc, ManuSfcStepTypeEnum.BadRejudgment, badReJudgmentDto.Remark ?? "");
 
                 // 在制品业务
                 manuSfcProduceBusinessEntity = new ManuSfcProduceBusinessEntity

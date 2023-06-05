@@ -21,7 +21,6 @@
   </ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Hymson.Authentication.JwtBearer" Version="2.1.28" />
-		<PackageReference Include="Hymson.Sequences" Version="2.1.28" />
 		<PackageReference Include="Hymson.Snowflake" Version="2.1.28" />
 		<PackageReference Include="Hymson.Web.Framework" Version="2.1.28" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
