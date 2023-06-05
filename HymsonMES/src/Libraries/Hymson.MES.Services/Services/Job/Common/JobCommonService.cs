@@ -1,7 +1,13 @@
 ﻿using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Services.Dtos.Common;
+using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Job.Manufacture;
 using Microsoft.Extensions.DependencyInjection;
+using MySqlX.XDevAPI.Common;
+using System.ComponentModel;
 
 namespace Hymson.MES.Services.Services.Job.Common
 {
@@ -54,6 +60,25 @@ namespace Hymson.MES.Services.Services.Job.Common
             return result;
         }
 
+        /// <summary>
+        /// 查询类
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<SelectOptionDto>> GetClassProgramListAsync()
+        {
+            // 获取所有实现类
+            var services = _serviceProvider.GetServices<IJobManufactureService>();
+            return await Task.FromResult(services.Select(s =>
+            {
+                var name = s.GetType().Name;
+                return new SelectOptionDto
+                {
+                    Key = $"{name}",
+                    Label = name,
+                    Value = $"{name}"
+                };
+            }));
+        }
 
     }
 }

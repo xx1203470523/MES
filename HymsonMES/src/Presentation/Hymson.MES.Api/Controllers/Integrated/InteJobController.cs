@@ -1,7 +1,10 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated.IIntegratedService;
+using Hymson.MES.Services.Services.Job.Common;
 using Hymson.Web.Framework.Attributes;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Integrated
@@ -15,19 +18,29 @@ namespace Hymson.MES.Api.Controllers.Integrated
     [Route("api/v1/[controller]")]
     public class InteJobController : ControllerBase
     {
-        private readonly IInteJobService _inteJobService;
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly ILogger<InteJobController> _logger;
+        private readonly IInteJobService _inteJobService;
+        private readonly IJobCommonService _jobCommonService;
+
 
         /// <summary>
         /// 作业表控制器
         /// </summary>
-        /// <param name="inteJobService"></param>
         /// <param name="logger"></param>
-        public InteJobController(IInteJobService inteJobService, ILogger<InteJobController> logger)
+        /// <param name="inteJobService"></param>
+        /// <param name="jobCommonService"></param>
+        public InteJobController(ILogger<InteJobController> logger,
+            IInteJobService inteJobService,
+            IJobCommonService jobCommonService)
         {
-            _inteJobService = inteJobService;
             _logger = logger;
+            _inteJobService = inteJobService;
+            _jobCommonService = jobCommonService;
         }
+
 
         /// <summary>
         /// 分页查询列表
@@ -51,6 +64,17 @@ namespace Hymson.MES.Api.Controllers.Integrated
         public async Task<InteJobDto> QueryInteJobByIdAsync(long id)
         {
             return await _inteJobService.QueryInteJobByIdAsync(id);
+        }
+
+        /// <summary>
+        /// 查询类
+        /// </summary>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpGet("classProgram")]
+        public async Task<IEnumerable<SelectOptionDto>> GetClassProgramListAsync()
+        {
+            return await _jobCommonService.GetClassProgramListAsync();
         }
 
         /// <summary>
