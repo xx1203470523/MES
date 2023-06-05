@@ -1748,6 +1748,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             await _manuSfcProduceRepository.UpdateProcedureAndStatusRangeAsync(new UpdateProcedureAndStatusCommand
                             {
                                 SiteId = _currentSite.SiteId ?? 0,
+                                ResourceId = null,
                                 Sfcs = sfcsArray,
                                 ProcedureId = sfcProduceStepDto.ProcedureId,
                                 Status = sfcProduceStepDto.Type,
@@ -1766,6 +1767,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         {
                             SiteId = _currentSite.SiteId ?? 0,
                             Sfcs = sfcsArray,
+                            ResourceId = null,
                             ProcedureId = sfcProduceStepDto.ProcedureId,
                             Status = sfcProduceStepDto.Type,
                             UpdatedOn = HymsonClock.Now(),
