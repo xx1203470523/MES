@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.ProcessRoute;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Process
@@ -86,6 +87,8 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
+        [LogDescription("工艺路线", BusinessType.INSERT)]
+        [PermissionDescription("proc:processRoute:insert")]
         public async Task AddProcProcessRouteAsync([FromBody] ProcProcessRouteCreateDto parm)
         {
              await _procProcessRouteService.AddProcProcessRouteAsync(parm);
@@ -97,6 +100,8 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPut]
+        [LogDescription("工艺路线", BusinessType.UPDATE)]
+        [PermissionDescription("proc:processRoute:update")]
         public async Task UpdateProcProcessRouteAsync([FromBody] ProcProcessRouteModifyDto parm)
         {
             await _procProcessRouteService.UpdateProcProcessRouteAsync(parm);
@@ -108,6 +113,8 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <param name="deleteDto"></param>
         /// <returns></returns>
         [HttpDelete]
+        [LogDescription("工艺路线", BusinessType.DELETE)]
+        [PermissionDescription("proc:processRoute:delete")]
         public async Task DeleteProcProcessRouteAsync(DeleteDto deleteDto)
         {
             await _procProcessRouteService.DeleteProcProcessRouteAsync(deleteDto.Ids);

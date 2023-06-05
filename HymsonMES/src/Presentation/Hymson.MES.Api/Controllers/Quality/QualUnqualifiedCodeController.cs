@@ -3,6 +3,7 @@ using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Quality;
 using Hymson.MES.Services.Services.Quality.IQualityService;
 using Hymson.Utils;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Extensions;
 
@@ -83,6 +84,8 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
+        [LogDescription("不合格代码", BusinessType.INSERT)]
+        [PermissionDescription("qual:unqualifiedCode:insert")]
         public async Task AddQualUnqualifiedCodeAsync([FromBody] QualUnqualifiedCodeCreateDto parm)
         {
             await _qualUnqualifiedCodeService.CreateQualUnqualifiedCodeAsync(parm);
@@ -94,6 +97,8 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPut]
+        [LogDescription("不合格代码", BusinessType.UPDATE)]
+        [PermissionDescription("qual:unqualifiedCode:update")]
         public async Task UpdateQualUnqualifiedCodeAsync([FromBody] QualUnqualifiedCodeModifyDto parm)
         {
             await _qualUnqualifiedCodeService.ModifyQualUnqualifiedCodeAsync(parm);
@@ -105,6 +110,8 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
+        [LogDescription("不合格代码", BusinessType.DELETE)]
+        [PermissionDescription("qual:unqualifiedCode:delete")]
         public async Task DeleteQualUnqualifiedCodeAsync(long[] ids)
         {
             await _qualUnqualifiedCodeService.DeletesQualUnqualifiedCodeAsync(ids);

@@ -22,6 +22,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         public SfcStatusEnum SFCStatus { get; set; }
 
+        public SfcProduceStatusEnum SFCProduceStatus { get; set; }
+
         /// <summary>
         /// 物料编码/版本
         /// </summary>

@@ -16,5 +16,11 @@ namespace Hymson.MES.Services.Services.Job.Common
         /// <returns></returns>
         Task<Dictionary<string, JobResponseDto>> ExecuteJobAsync(IEnumerable<InteJobEntity> jobs, Dictionary<string, string>? param);
 
+        /// <summary>
+        /// 查询类
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<SelectOptionDto>> GetClassProgramListAsync();
+
     }
 }

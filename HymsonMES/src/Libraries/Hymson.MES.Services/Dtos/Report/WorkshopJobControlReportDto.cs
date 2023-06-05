@@ -23,6 +23,8 @@ namespace Hymson.MES.Services.Dtos.Report
         /// </summary>
         public SfcStatusEnum SFCStatus { get; set; }
 
+        public SfcProduceStatusEnum SFCProduceStatus { get; set; }
+
         /// <summary>
         /// 物料编码/版本
         /// </summary>
@@ -109,10 +111,10 @@ namespace Hymson.MES.Services.Dtos.Report
         /// </summary>
         public SfcProduceStatusEnum? SFCProduceStatus { get; set; }
 
-        /// <summary>
-        /// 是否锁
-        /// </summary>
-        public TrueOrFalseEnum? SFCIsLock { get; set; }
+        ///// <summary>
+        ///// 是否锁
+        ///// </summary>
+        //public TrueOrFalseEnum? SFCIsLock { get; set; }
 
         /// <summary>
         /// 工序编码

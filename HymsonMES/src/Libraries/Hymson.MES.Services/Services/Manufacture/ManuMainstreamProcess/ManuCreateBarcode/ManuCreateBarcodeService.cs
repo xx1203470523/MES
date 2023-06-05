@@ -61,6 +61,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="manuSfcStepRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
+        /// <param name="planSfcPrintService"></param>
         /// <param name="localizationService"></param>
         public ManuCreateBarcodeService(ICurrentUser currentUser,
              ICurrentSite currentSite,
@@ -91,6 +92,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
             _planSfcPrintService = planSfcPrintService;
         }
 
+
         /// <summary>
         /// 工单下达条码
         /// </summary>
@@ -98,29 +100,32 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         /// <returns></returns>
         public async Task<List<ManuSfcEntity>> CreateBarcodeByWorkOrderIdAsync(CreateBarcodeByWorkOrderDto param)
         {
-            var planWorkOrderEntity = await _manuCommonService.GetProduceWorkOrderByIdAsync(param.WorkOrderId);
+            var planWorkOrderEntity = await _manuCommonService.GetProduceWorkOrderByIdAsync(param.WorkOrderId, false);
 
             var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(planWorkOrderEntity.ProductId);
-            var inteCodeRulesEntity = await _inteCodeRulesRepository.GetInteCodeRulesByProductIdAsync( new InteCodeRulesByProductQuery { ProductId = planWorkOrderEntity.ProductId,CodeType= CodeRuleCodeTypeEnum.ProcessControlSeqCode } );
-            if (inteCodeRulesEntity == null)
+            var inteCodeRulesEntity = await _inteCodeRulesRepository.GetInteCodeRulesByProductIdAsync(new InteCodeRulesByProductQuery
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16501)).WithData("product", procMaterialEntity.MaterialCode);
-            }
+                ProductId = planWorkOrderEntity.ProductId,
+                CodeType = CodeRuleCodeTypeEnum.ProcessControlSeqCode
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES16501)).WithData("product", procMaterialEntity.MaterialCode);
+
             if (procMaterialEntity.Batch == 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16502)).WithData("product", procMaterialEntity.MaterialCode);
             }
+
             var discuss = (int)Math.Ceiling(param.Qty / procMaterialEntity.Batch);
             var barcodeList = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new GenerateBarcodeDto
             {
                 CodeRuleId = inteCodeRulesEntity.Id,
                 Count = discuss
             });
+
             var processRouteFirstProcedure = await _manuCommonService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
-            List<ManuSfcEntity> manuSfcList = new List<ManuSfcEntity>();
-            List<ManuSfcInfoEntity> manuSfcInfoList = new List<ManuSfcInfoEntity>();
-            List<ManuSfcProduceEntity> manuSfcProduceList = new List<ManuSfcProduceEntity>();
-            List<ManuSfcStepEntity> manuSfcStepList = new List<ManuSfcStepEntity>();
+            List<ManuSfcEntity> manuSfcList = new();
+            List<ManuSfcInfoEntity> manuSfcInfoList = new();
+            List<ManuSfcProduceEntity> manuSfcProduceList = new();
+            List<ManuSfcStepEntity> manuSfcStepList = new();
             var issQty = param.Qty;
             foreach (var item in barcodeList)
             {
@@ -189,6 +194,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                     UpdatedBy = _currentUser.UserName
                 });
             }
+
             using var ts = TransactionHelper.GetTransactionScope();
             var row = await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderId(new UpdatePassDownQuantityCommand
             {
@@ -203,13 +209,16 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16503)).WithData("workorder", planWorkOrderEntity.OrderCode);
             }
+
             await _manuSfcRepository.InsertRangeAsync(manuSfcList);
             await _manuSfcInfoRepository.InsertsAsync(manuSfcInfoList);
             await _manuSfcProduceRepository.InsertRangeAsync(manuSfcProduceList);
             await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
             ts.Complete();
+
             return manuSfcList;
         }
+
         /// <summary>
         /// 工单下达及打印
         /// </summary>
@@ -229,7 +238,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                 });
             }
         }
-
 
         /// <summary>
         /// 根据外部条码下达条码
@@ -468,7 +476,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                     WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
                     Qty = item.Qty,
                     ProcedureId = processRouteFirstProcedure.ProcedureId,
-                    Operatetype = ManuSfcStepTypeEnum.Create,
+                    Operatetype = ManuSfcStepTypeEnum.Receive,
                     CurrentStatus = SfcProduceStatusEnum.lineUp,
                     CreatedBy = _currentUser.UserName,
                     UpdatedBy = _currentUser.UserName

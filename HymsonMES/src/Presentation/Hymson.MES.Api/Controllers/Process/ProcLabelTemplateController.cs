@@ -9,6 +9,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.LabelTemplate;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Extensions;
@@ -71,6 +72,8 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("标签模板", BusinessType.INSERT)]
+        [PermissionDescription("proc:labelTemplate:insert")]
         public async Task AddProcLabelTemplateAsync([FromBody] ProcLabelTemplateCreateDto parm)
         {
              await _procLabelTemplateService.CreateProcLabelTemplateAsync(parm);
@@ -83,6 +86,8 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("update")]
+        [LogDescription("标签模板", BusinessType.UPDATE)]
+        [PermissionDescription("proc:labelTemplate:update")]
         public async Task UpdateProcLabelTemplateAsync([FromBody] ProcLabelTemplateModifyDto parm)
         {
              await _procLabelTemplateService.ModifyProcLabelTemplateAsync(parm);
@@ -91,10 +96,12 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <summary>
         /// 删除（仓库标签模板）
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="deleteDto"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("delete")]
+        [LogDescription("标签模板", BusinessType.DELETE)]
+        [PermissionDescription("proc:labelTemplate:delete")]
         public async Task DeleteProcLabelTemplateAsync(DeleteDto deleteDto)
         {
             //long[] idsArr = StringExtension.SpitLongArrary(ids);

@@ -94,6 +94,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
 
+        /// <summary>
+        /// 条码步骤表仓储 仓储
+        /// </summary>
+        private readonly IManuSfcStepRepository _manuSfcStepRepository;
+
 
         /// <summary>
         /// 构造函数
@@ -111,6 +116,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="circulationRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
+        /// <param name="manuSfcStepRepository"></param>
         public InProductDismantleService(ICurrentUser currentUser, ICurrentSite currentSite,
          IProcBomRepository procBomRepository,
         IProcBomDetailRepository procBomDetailRepository,
@@ -122,7 +128,8 @@ namespace Hymson.MES.Services.Services.Manufacture
         IManuCommonService manuCommonService,
         IManuSfcCirculationRepository circulationRepository,
         IManuSfcProduceRepository manuSfcProduceRepository,
-        IWhMaterialInventoryRepository whMaterialInventoryRepository)
+        IWhMaterialInventoryRepository whMaterialInventoryRepository,
+        IManuSfcStepRepository manuSfcStepRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -138,6 +145,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _resourceRepository = resourceRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
+            _manuSfcStepRepository = manuSfcStepRepository;
         }
 
         /// <summary>
@@ -388,9 +396,14 @@ namespace Hymson.MES.Services.Services.Manufacture
                 UpdatedBy = _currentUser.UserName
             };
 
+            var sfcStepEntity = CreateSFCStepEntity(manuSfcProduce, ManuSfcStepTypeEnum.Disassembly, "");
+
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
+                //记录step信息
+                rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+
                 //修改组件状态
                 rows += await _circulationRepository.DisassemblyUpdateAsync(command);
 
@@ -612,11 +625,17 @@ namespace Hymson.MES.Services.Services.Manufacture
                 QuantityResidue = circulationQty,
                 UpdatedBy = _currentUser.UserName
             };
+
+            var type = addDto.IsAssemble == false ? ManuSfcStepTypeEnum.Add : ManuSfcStepTypeEnum.Assemble;
+            var sfcStepEntity = CreateSFCStepEntity(manuSfcProduce, type, "");
             #endregion
 
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
+                //记录step信息
+                rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+
                 //添加组件信息
                 rows += await _circulationRepository.InsertAsync(sfcCirculationEntity);
 
@@ -874,11 +893,16 @@ namespace Hymson.MES.Services.Services.Manufacture
                 CreatedBy = _currentUser.UserName,
                 UpdatedBy = _currentUser.UserName
             };
+
+            var sfcStepEntity = CreateSFCStepEntity(manuSfcProduce, ManuSfcStepTypeEnum.Replace, "");
             #endregion
 
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
+                //记录step信息
+                rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+
                 //修改组件状态
                 rows += await _circulationRepository.DisassemblyUpdateAsync(command);
 
@@ -1189,6 +1213,36 @@ namespace Hymson.MES.Services.Services.Manufacture
                     throw new CustomerValidationException(nameof(ErrorCode.MES16319)).WithData("SFC", sfc);
                 }
             }
+        }
+
+        /// <summary>
+        /// 创建条码步骤数据
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <param name="type"></param>
+        /// <param name="remark"></param>
+        /// <returns></returns>
+        private ManuSfcStepEntity CreateSFCStepEntity(ManuSfcProduceEntity sfc, ManuSfcStepTypeEnum type, string remark = "")
+        {
+            return new ManuSfcStepEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SFC = sfc.SFC,
+                ProductId = sfc.ProductId,
+                WorkOrderId = sfc.WorkOrderId,
+                WorkCenterId = sfc.WorkCenterId,
+                ProductBOMId = sfc.ProductBOMId,
+                Qty = sfc.Qty,
+                EquipmentId = sfc.EquipmentId,
+                ResourceId = sfc.ResourceId,
+                ProcedureId = sfc.ProcedureId,
+                Operatetype = type,
+                CurrentStatus = sfc.Status,
+                Remark = remark,
+                SiteId = _currentSite.SiteId ?? 0,
+                CreatedBy = sfc.CreatedBy,
+                UpdatedBy = sfc.UpdatedBy
+            };
         }
     }
 }

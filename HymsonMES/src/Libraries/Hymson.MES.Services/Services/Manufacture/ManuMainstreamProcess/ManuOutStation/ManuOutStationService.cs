@@ -1,4 +1,5 @@
-﻿using Hymson.Authentication;
+﻿using Dapper;
+using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
@@ -213,9 +214,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             // 物料ID集合
             var materialIds = initialMaterials.Select(s => s.MaterialId);
 
-            // 读取物料基本信息（仅仅为了读取消耗系数和收集方式）（批量）
-            var materialEntities = await _procMaterialRepository.GetByIdsAsync(materialIds);
-
             // 读取物料加载数据（批量）
             var allFeedingEntities = await _manuFeedingRepository.GetByResourceIdAndMaterialIdsAsync(new GetByResourceIdAndMaterialIdsQuery
             {
@@ -231,14 +229,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             List<ManuSfcCirculationEntity> adds = new();
             foreach (var materialBo in initialMaterials)
             {
-                var materialEntity = materialEntities.FirstOrDefault(f => f.Id == materialBo.MaterialId);
-                if (materialEntity == null) continue;
-
-                // 如有设置消耗系数
-                if (materialEntity.ConsumeRatio.HasValue == true) materialBo.ConsumeRatio = materialEntity.ConsumeRatio.Value;
-
                 // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
-                decimal residue = materialBo.Usages * (materialBo.Loss ?? 1);
+                decimal residue = materialBo.Usages;
+                if (materialBo.Loss.HasValue == true && materialBo.Loss > 0) residue *= (materialBo.Loss.Value / 100);
                 if (materialBo.ConsumeRatio > 0) residue *= (materialBo.ConsumeRatio / 100);
 
                 // 收集方式是批次
@@ -250,7 +243,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 }
 
                 // 2.确认主物料的收集方式，不是"批次"就结束（不对该物料进行扣料）
-                if (materialEntity.SerialNumber != MaterialSerialNumberEnum.Batch) continue;
+                if (materialBo.SerialNumber != MaterialSerialNumberEnum.Batch) continue;
 
                 // 进行扣料
                 DeductMaterialQty(ref updates, ref adds, ref residue, sfcProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
@@ -285,7 +278,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             if (nextProcedure == null)
             {
                 // 插入 manu_sfc_step 状态为 完成
-                sfcStep.Operatetype = ManuSfcStepTypeEnum.OutStock;    // TODO 这里的状态？？
+                sfcStep.Operatetype = currentProcessRoute.Type == ProcessRouteTypeEnum.UnqualifiedRoute ? ManuSfcStepTypeEnum.RepairComplete : ManuSfcStepTypeEnum.OutStock;    // TODO 这里的状态？？
                 sfcStep.CurrentStatus = SfcProduceStatusEnum.Complete;  // TODO 这里的状态？？
                 rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
 
@@ -415,17 +408,29 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             });
             var replaceMaterialsForMainDic = replaceMaterialsForMain.ToLookup(w => w.MaterialId).ToDictionary(d => d.Key, d => d);
 
+            // 组合主物料ID和替代料ID
+            var materialIds = mainMaterials.Select(s => s.MaterialId).AsList();
+            materialIds.AddRange(replaceMaterialsForBOM.Select(s => s.ReplaceMaterialId));
+
+            // 查询所有主物料和替代料的基础信息（为了读取消耗系数和收集方式）
+            var materialEntities = await _procMaterialRepository.GetByIdsAsync(materialIds);
+
             // 获取初始扣料数据
             List<MaterialDeductBo> initialMaterials = new();
             foreach (var item in mainMaterials)
             {
+                var materialEntitiy = materialEntities.FirstOrDefault(f => f.Id == item.MaterialId);
+                if (materialEntitiy == null) continue;
+
                 var deduct = new MaterialDeductBo
                 {
                     MaterialId = item.MaterialId,
                     Usages = item.Usages,
                     Loss = item.Loss,
-                    DataCollectionWay = item.DataCollectionWay
+                    DataCollectionWay = item.DataCollectionWay,
+                    SerialNumber = materialEntitiy.SerialNumber
                 };
+                if (materialEntitiy.ConsumeRatio.HasValue) deduct.ConsumeRatio = materialEntitiy.ConsumeRatio.Value;
 
                 // 填充BOM替代料
                 if (item.IsEnableReplace == false)
@@ -438,6 +443,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                             MaterialId = s.ReplaceMaterialId,
                             Usages = s.Usages,
                             Loss = s.Loss,
+                            ConsumeRatio = GetConsumeRatio(materialEntities, s.ReplaceMaterialId)
                         });
                     }
                 }
@@ -451,7 +457,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                         {
                             MaterialId = s.MaterialId,
                             Usages = item.Usages,
-                            Loss = item.Loss
+                            Loss = item.Loss,
+                            ConsumeRatio = GetConsumeRatio(materialEntities, s.MaterialId)
                         });
                     }
                 }
@@ -543,29 +550,46 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             if (feedingEntities.Any() == false) return;
 
             // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
-            decimal qty = currentBo.Usages * (currentBo.Loss ?? 1);
-            if (currentBo.ConsumeRatio > 0) qty *= (currentBo.ConsumeRatio / 100);
+            decimal originQty = currentBo.Usages;
+            if (currentBo.Loss.HasValue == true && currentBo.Loss > 0) originQty *= (currentBo.Loss.Value / 100);
+            if (currentBo.ConsumeRatio > 0) originQty *= (currentBo.ConsumeRatio / 100);
 
             // 遍历当前物料的所有的物料库存
             foreach (var feeding in feedingEntities)
             {
+                decimal targetQty = originQty;
                 var consume = 0m;
                 if (residue <= 0) break;
                 if (feeding.Qty <= 0) continue;
 
-                // 数量足够
-                if (qty <= feeding.Qty)
+                // 如果是替代料条码，就将替代料的消耗数值重新算下
+                if (currentBo.MaterialId != feeding.MaterialId)
                 {
-                    consume = qty;
+                    var replaceBo = currentBo.ReplaceMaterials.FirstOrDefault(f => f.MaterialId == feeding.MaterialId);
+                    if (replaceBo != null)
+                    {
+                        // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
+                        targetQty = replaceBo.Usages;
+                        if (replaceBo.Loss.HasValue == true && replaceBo.Loss > 0) targetQty *= (replaceBo.Loss.Value / 100);
+                        if (replaceBo.ConsumeRatio > 0) targetQty *= (replaceBo.ConsumeRatio / 100);
+                    }
+                }
+
+                // 剩余折算成目标数量
+                var convertResidue = ToTargetValue(originQty, targetQty, residue);
+
+                // 数量足够
+                if (convertResidue <= feeding.Qty)
+                {
+                    consume = convertResidue;
                     residue = 0;
                     feeding.Qty -= consume;
                 }
-                // 数量不够
+                // 数量不够，继续下一个
                 else
                 {
-                    // 继续下一个
                     consume = feeding.Qty;
-                    residue = qty - consume;
+                    residue -= ToTargetValue(targetQty, originQty, consume);
                     feeding.Qty = 0;
                 }
 
@@ -619,6 +643,36 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
 
         }
 
+        /// <summary>
+        /// 取得消耗系数
+        /// </summary>
+        /// <param name="materialEntities"></param>
+        /// <param name="replaceMaterialId"></param>
+        /// <returns></returns>
+        private static decimal GetConsumeRatio(IEnumerable<ProcMaterialEntity> materialEntities, long replaceMaterialId)
+        {
+            decimal defaultConsumeRatio = 100;
+
+            if (materialEntities == null || materialEntities.Any() == false) return defaultConsumeRatio;
+
+            var materialEntity = materialEntities.FirstOrDefault(f => f.Id == replaceMaterialId);
+            if (materialEntity == null || materialEntity.ConsumeRatio.HasValue == false) return defaultConsumeRatio;
+
+            return materialEntity.ConsumeRatio.Value;
+        }
+
+        /// <summary>
+        /// 转换数量
+        /// </summary>
+        /// <param name="originQty"></param>
+        /// <param name="targetQty"></param>
+        /// <param name="originValue"></param>
+        /// <returns></returns>
+        private static decimal ToTargetValue(decimal originQty, decimal targetQty, decimal originValue)
+        {
+            if (originQty == 0) return originValue;
+            return targetQty * originValue / originQty;
+        }
 
     }
 }

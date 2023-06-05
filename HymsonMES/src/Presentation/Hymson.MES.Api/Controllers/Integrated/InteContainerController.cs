@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated.InteContainer;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -37,6 +38,8 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
+        [LogDescription("ÈÝÆ÷Î¬»¤", BusinessType.INSERT)]
+        [PermissionDescription("inte:container:insert")]
         public async Task CreateAsync(InteContainerSaveDto createDto)
         {
             await _inteContainerService.CreateAsync(createDto);
@@ -48,6 +51,8 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
+        [LogDescription("ÈÝÆ÷Î¬»¤", BusinessType.UPDATE)]
+        [PermissionDescription("inte:container:update")]
         public async Task ModifyAsync(InteContainerSaveDto modifyDto)
         {
             await _inteContainerService.ModifyAsync(modifyDto);
@@ -59,6 +64,8 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
+        [LogDescription("ÈÝÆ÷Î¬»¤", BusinessType.DELETE)]
+        [PermissionDescription("inte:container:delete")]
         public async Task DeletesAsync(long[] ids)
         {
             await _inteContainerService.DeletesAsync(ids);
@@ -71,6 +78,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [Route("page")]
         [HttpGet]
+        //[PermissionDescription("inte:container:list")]
         public async Task<PagedInfo<InteContainerDto>> GetPagedListAsync([FromQuery] InteContainerPagedQueryDto pagedQueryDto)
         {
             return await _inteContainerService.GetPagedListAsync(pagedQueryDto);

@@ -60,7 +60,6 @@ namespace Hymson.MES.Api
 
                 _logger.LogError(e, "初始化失败");
             }
-
         }
 
         /// <summary>

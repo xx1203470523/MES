@@ -1,10 +1,6 @@
 ﻿using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGenerateBarcodeDto;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode
 {
@@ -20,7 +16,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<IEnumerable<string>> GenerateBarcodeSerialNumberAsync(BarcodeSerialNumberDto param);
+        Task<IEnumerable<string>> GenerateBarCodeSerialNumberAsync(BarCodeSerialNumberBo param);
 
         /// <summary>
         /// 条码生成

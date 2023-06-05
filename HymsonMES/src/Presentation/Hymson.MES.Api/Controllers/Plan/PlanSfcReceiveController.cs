@@ -8,6 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Services.Plan;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -46,6 +47,8 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <returns></returns>
         [HttpPost]
         [Route("receive")]
+        [LogDescription("条码接收", BusinessType.INSERT)]
+        [PermissionDescription("plan:sfcReceive:receive")]
         public async Task AddPlanSfcInfoAsync([FromBody] PlanSfcReceiveCreateDto parm)
         {
             await _planSfcInfoService.CreatePlanSfcInfoAsync(parm);

@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Quality.IQualityService;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Quality
@@ -91,18 +92,21 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
+        [LogDescription("不合格代码组", BusinessType.INSERT)]
+        [PermissionDescription("qual:unqualifiedGroup:insert")]
         public async Task AddQualUnqualifiedGroupAsync([FromBody] QualUnqualifiedGroupCreateDto parm)
         {
             await _qualUnqualifiedGroupService.CreateQualUnqualifiedGroupAsync(parm);
         }
-
-       
+   
         /// <summary>
         /// 更新（不合格代码组）
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPut]
+        [LogDescription("不合格代码组", BusinessType.UPDATE)]
+        [PermissionDescription("qual:unqualifiedGroup:update")]
         public async Task UpdateQualUnqualifiedGroupAsync([FromBody] QualUnqualifiedGroupModifyDto parm)
         {
             await _qualUnqualifiedGroupService.ModifyQualUnqualifiedGroupAsync(parm);
@@ -114,6 +118,8 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
+        [LogDescription("不合格代码组", BusinessType.DELETE)]
+        [PermissionDescription("qual:unqualifiedGroup:delete")]
         public async Task DeleteQualUnqualifiedGroupAsync(long[] ids)
         {
             await _qualUnqualifiedGroupService.DeletesQualUnqualifiedGroupAsync(ids);

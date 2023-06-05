@@ -31,4 +31,26 @@ namespace Hymson.MES.Core.Enums
         [Description("锁定")]
         Locked = 4
     }
+
+    public enum SfcProduceStatusDisplayEnum : sbyte
+    {
+        /// <summary>
+        /// 排队中
+        /// </summary>
+        [Description("排队中")]
+        lineUp = 1,
+
+        /// <summary>
+        /// 活动中
+        /// </summary>
+        [Description("活动中")]
+        Activity = 2,
+
+        /// <summary>
+        /// 锁定
+        /// </summary>
+        [Description("锁定")]
+        Locked = 4
+    }
+
 }

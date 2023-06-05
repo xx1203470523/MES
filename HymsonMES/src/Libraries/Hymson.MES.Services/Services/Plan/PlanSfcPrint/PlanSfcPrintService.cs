@@ -195,9 +195,10 @@ namespace Hymson.MES.Services.Services.Plan
                 SiteId = _currentSite.SiteId ?? 0
 
             });
-            var pprp = ppr.FirstOrDefault();
-            if (pprp != null)
+            foreach (var pprp in ppr)
             {
+                //if (pprp != null)
+                //{
                 var tl = await _procLabelTemplateRepository.GetByIdAsync(pprp.TemplateId);
                 if (tl != null)
                 {
@@ -219,19 +220,22 @@ namespace Hymson.MES.Services.Services.Plan
                             }
                         }
                     };
-                    var result = await _labelPrintRequest.PrintAsync(printEntity);
-                    if (!result.result)
-                        throw new CustomerValidationException(nameof(ErrorCode.MES17003)).WithData("msg", result.msg);
-
+                    var loop = pprp.Copy ?? 1;
+                    for (int i = 0; i < loop; i++)
+                    {
+                        var result = await _labelPrintRequest.PrintAsync(printEntity);
+                        if (!result.result)
+                            throw new CustomerValidationException(nameof(ErrorCode.MES17003)).WithData("msg", result.msg);
+                    }
                 }
                 else
                     throw new CustomerValidationException(nameof(ErrorCode.MES17001));
             }
-            else
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES17001));
-            }
-
+            //}
+            //else
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES17001));
+            //}
         }
 
         /// <summary>

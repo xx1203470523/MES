@@ -14,12 +14,14 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 using System.Collections.Generic;
 using System.Transactions;
 
@@ -101,6 +103,32 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task DeleteManuContainerPackRecordAsync(long id)
         {
             await _manuContainerPackRecordRepository.DeleteAsync(id);
+            //var manuContainerPackEntity = await _manuContainerPackRepository.GetByIdAsync(id);
+            //if (manuContainerPackEntity == null)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES16701));
+            //}
+            //using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            //{
+            //    var foo = new ManuContainerPackRecordCreateDto()
+            //    {
+            //        ResourceId = resourceId,
+            //        ProcedureId = procedureId,
+            //        ContainerBarCodeId = manuContainerPackEntity.ContainerBarCodeId,
+            //        LadeBarCode = manuContainerPackEntity.LadeBarCode,
+            //        OperateType = (int)ManuContainerBarcodeOperateTypeEnum.Unload
+            //    };
+            //    await _manuContainerPackRecordService.CreateManuContainerPackRecordAsync(foo);
+
+            //    await _manuContainerPackRepository.DeleteAsync(id);
+            //    //step
+            //    var sfcinfo = await _manuSfcInfoRepository.GetUsedBySFCAsync(foo.LadeBarCode);
+            //    ManuSfcStepEntity manuSfcStepEntity = new ManuSfcStepEntity();
+            //    manuSfcStepEntity.SFC = foo.LadeBarCode;
+
+
+            //    ts.Complete();
+            //}
         }
 
         /// <summary>

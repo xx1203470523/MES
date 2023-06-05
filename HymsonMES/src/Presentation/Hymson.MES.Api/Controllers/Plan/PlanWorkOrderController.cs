@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Services.Plan;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Plan
@@ -73,6 +74,8 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("生产工单", BusinessType.INSERT)]
+        [PermissionDescription("plan:workOrder:insert")]
         public async Task AddPlanWorkOrderAsync([FromBody] PlanWorkOrderCreateDto parm)
         {
             await _planWorkOrderService.CreatePlanWorkOrderAsync(parm);
@@ -85,6 +88,8 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("生产工单", BusinessType.UPDATE)]
+        [PermissionDescription("plan:workOrder:update")]
         public async Task UpdatePlanWorkOrderAsync([FromBody] PlanWorkOrderModifyDto parm)
         {
             await _planWorkOrderService.ModifyPlanWorkOrderAsync(parm);
@@ -97,17 +102,20 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("生产工单", BusinessType.DELETE)]
+        [PermissionDescription("plan:workOrder:delete")]
         public async Task DeletePlanWorkOrderAsync([FromBody] long[] ids)
         {
             await _planWorkOrderService.DeletesPlanWorkOrderAsync(ids);
         }
 
         /// <summary>
-        /// 修改订单状态
+        /// 修改订单状态,工单下达
         /// </summary>
         /// <returns></returns>
         [HttpPut]
         [Route("changWorkOrderStatus")]
+        [PermissionDescription("plan:workOrder:changWorkOrderStatus")]
         public async Task ChangWorkOrderStatusAsync(List<PlanWorkOrderChangeStatusDto> parms)
         {
             await _planWorkOrderService.ModifyWorkOrderStatusAsync(parms);
@@ -120,6 +128,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <returns></returns>
         [HttpPut]
         [Route("changLocked")]
+        [PermissionDescription("plan:workOrder:changLocked")]
         public async Task ChangLockedAsync(List<PlanWorkOrderLockedDto> parms)
         {
             await _planWorkOrderService.ModifyWorkOrderLockedAsync(parms);

@@ -20,7 +20,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
@@ -65,27 +65,27 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 删除标识
         /// </summary>
         public long IsDeleted { get; set; }
 
-       
+
     }
 
 
@@ -99,7 +99,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
@@ -119,37 +119,37 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long? ContainerBarCodeId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 装载条码
         /// </summary>
         public string LadeBarCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 删除标识
         /// </summary>
         public long IsDeleted { get; set; }
 
-       
+
     }
 
     /// <summary>
@@ -162,7 +162,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
@@ -181,38 +181,75 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long? ContainerBarCodeId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 装载条码
         /// </summary>
         public string LadeBarCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 删除标识
         /// </summary>
         public long IsDeleted { get; set; }
+    }
 
-       
+    /// <summary>
+    /// 容器解包Dto
+    /// </summary>
+    public record ManuContainerPackUnpackDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public IEnumerable<long> Ids { get; set; }
 
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long? ResourceId { get; set; }
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long? ProcedureId { get; set; }
+    }
+
+    /// <summary>
+    /// 清空容器Dto
+    /// </summary>
+    public record ContainerUnpackDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long ContainerBarCodeId { get; set; }
+
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long? ResourceId { get; set; }
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long? ProcedureId { get; set; }
     }
 
     /// <summary>
@@ -234,7 +271,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public string? LadeBarCode { get; set; }
     }
-
 
     /// <summary>
     /// 容器包装 执行作业
