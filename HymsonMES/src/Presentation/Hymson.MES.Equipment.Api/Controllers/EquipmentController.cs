@@ -10,6 +10,7 @@ using Hymson.MES.EquipmentServices.Dtos.NGData;
 using Hymson.MES.EquipmentServices.Dtos.OutBound;
 using Hymson.MES.EquipmentServices.Dtos.OutPutQty;
 using Hymson.MES.EquipmentServices.Dtos.QueryContainerBindSfc;
+using Hymson.MES.EquipmentServices.Dtos.SfcCirculation;
 using Hymson.MES.EquipmentServices.Dtos.SingleBarCodeLoadingVerification;
 using Hymson.MES.EquipmentServices.Services;
 using Hymson.MES.EquipmentServices.Services.BindContainer;
@@ -24,6 +25,7 @@ using Hymson.MES.EquipmentServices.Services.InboundInSFCContainer;
 using Hymson.MES.EquipmentServices.Services.OutBound;
 using Hymson.MES.EquipmentServices.Services.OutPutQty;
 using Hymson.MES.EquipmentServices.Services.QueryContainerBindSfc;
+using Hymson.MES.EquipmentServices.Services.SfcCirculation;
 using Hymson.MES.EquipmentServices.Services.SingleBarCodeLoadingVerification;
 using Microsoft.AspNetCore.Mvc;
 
@@ -59,6 +61,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         private readonly IInBoundService _inBoundService;
         private readonly IOutBoundService _outBoundService;
         private readonly INGDataService _ngDataService;
+        private readonly ISfcCirculationService _sfcCirculationService;
 
 
 
@@ -81,6 +84,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="inBoundService"></param>
         /// <param name="outBoundService"></param>
         /// <param name="ngDataService"></param>
+        /// <param name="sfcCirculationService"></param>
         public EquipmentController(ILogger<EquipmentController> logger,
             IEquipmentCollectService equipmentService,
             IBindSFCService bindSFCService,
@@ -96,7 +100,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
             ISingleBarCodeLoadingVerificationService singleBarCodeLoadingVerificationService,
             IInBoundService inBoundService,
             IOutBoundService outBoundService,
-            INGDataService ngDataService)
+            INGDataService ngDataService,
+            ISfcCirculationService sfcCirculationService)
         {
             _logger = logger;
             _equipmentService = equipmentService;
@@ -114,6 +119,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
             _inBoundService = inBoundService;
             _outBoundService = outBoundService;
             _ngDataService = ngDataService;
+            _sfcCirculationService = sfcCirculationService;
         }
 
 
@@ -450,6 +456,54 @@ namespace Hymson.MES.Equipment.Api.Controllers
         public async Task<NGDataDto> GetNGDataAsync(string sfc)
         {
             return await _ngDataService.GetNGData(sfc);
+        }
+
+        /// <summary>
+        /// 条码流转绑定
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("SfcCirculationBind")]
+        public async Task SfcCirculationBind(SfcCirculationBindDto request)
+        {
+            await _sfcCirculationService.SfcCirculationBindAsync(request);
+        }
+
+        /// <summary>
+        /// 条码流转解绑
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("SfcCirculationUnBind")]
+        public async Task SfcCirculationUnBind(SfcCirculationUnBindDto request)
+        {
+            await _sfcCirculationService.SfcCirculationUnBindAsync(request);
+        }
+
+        /// <summary>
+        /// 条码组件添加
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("SfcCirculationModuleAdd")]
+        public async Task SfcCirculationModuleAdd(SfcCirculationBindDto request)
+        {
+            await _sfcCirculationService.SfcCirculationModuleAdd(request);
+        }
+
+        /// <summary>
+        /// 条码组件移除
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("SfcCirculationModuleRemove")]
+        public async Task SfcCirculationModuleRemove(SfcCirculationUnBindDto request)
+        {
+            await _sfcCirculationService.SfcCirculationModuleRemove(request);
         }
     }
 }
