@@ -110,6 +110,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<IEnumerable<ProcProductSetEntity>> GetProcProductSetEntitiesAsync(ProcProductSetQuery procProductSetQuery)
         {
             var sqlBuilder = new SqlBuilder();
+            sqlBuilder.Select("*");
             sqlBuilder.Where("SiteId = @SiteId");
 
             if (procProductSetQuery.SetPointId > 0)
@@ -166,6 +167,17 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, procProductSetEntitys);
         }
+
+        /// <summary>
+        /// 删除（物料删除）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteBySetPointIdAsync(long id)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteBySetPointIdSql, new { SetPointId = id });
+        }
         #endregion
 
     }
@@ -174,26 +186,28 @@ namespace Hymson.MES.Data.Repositories.Process
     {
         #region 
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_product_set ` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_product_set ` /**where**/ ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_product_set` /**where**/ ";
         const string GetProcProductSetEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
-                                           FROM `proc_product_set ` /**where**/  ";
+                                           FROM `proc_product_set` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `proc_product_set `(  `Id`, `SiteId`, `CreatedBy`, `CreatedOn`, `ProductId`, `SetPointId`, `SemiProductId`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @CreatedBy, @CreatedOn, @ProductId, @SetPointId, @SemiProductId, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `proc_product_set `(  `Id`, `SiteId`, `CreatedBy`, `CreatedOn`, `ProductId`, `SetPointId`, `SemiProductId`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @CreatedBy, @CreatedOn, @ProductId, @SetPointId, @SemiProductId, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `proc_product_set`(  `Id`, `SiteId`, `CreatedBy`, `CreatedOn`, `ProductId`, `SetPointId`, `SemiProductId`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @CreatedBy, @CreatedOn, @ProductId, @SetPointId, @SemiProductId, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsSql = "INSERT INTO `proc_product_set`(  `Id`, `SiteId`, `CreatedBy`, `CreatedOn`, `ProductId`, `SetPointId`, `SemiProductId`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @CreatedBy, @CreatedOn, @ProductId, @SetPointId, @SemiProductId, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
-        const string UpdateSql = "UPDATE `proc_product_set ` SET   SiteId = @SiteId, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, ProductId = @ProductId, SetPointId = @SetPointId, SemiProductId = @SemiProductId, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `proc_product_set ` SET   SiteId = @SiteId, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, ProductId = @ProductId, SetPointId = @SetPointId, SemiProductId = @SemiProductId, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `proc_product_set` SET   SiteId = @SiteId, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, ProductId = @ProductId, SetPointId = @SetPointId, SemiProductId = @SemiProductId, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `proc_product_set` SET   SiteId = @SiteId, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, ProductId = @ProductId, SetPointId = @SetPointId, SemiProductId = @SemiProductId, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
 
-        const string DeleteSql = "UPDATE `proc_product_set ` SET IsDeleted = Id WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE `proc_product_set ` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
+        const string DeleteSql = "UPDATE `proc_product_set` SET IsDeleted = Id WHERE Id = @Id ";
+        const string DeletesSql = "UPDATE `proc_product_set` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteId`, `CreatedBy`, `CreatedOn`, `ProductId`, `SetPointId`, `SemiProductId`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `proc_product_set `  WHERE Id = @Id ";
+                            FROM `proc_product_set`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `CreatedBy`, `CreatedOn`, `ProductId`, `SetPointId`, `SemiProductId`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `proc_product_set `  WHERE Id IN @Ids ";
+                            FROM `proc_product_set`  WHERE Id IN @Ids ";
+
+        const string DeleteBySetPointIdSql = "delete from `proc_product_set` WHERE SetPointId = @SetPointId ";
         #endregion
     }
 }

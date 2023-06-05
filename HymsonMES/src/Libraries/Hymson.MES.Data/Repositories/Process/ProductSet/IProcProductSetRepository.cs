@@ -24,7 +24,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procProductSetEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ProcProductSetEntity procProductSetEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -38,7 +38,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procProductSetEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ProcProductSetEntity procProductSetEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -53,7 +53,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -67,7 +67,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcProductSetEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -81,13 +81,20 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procProductSetQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcProductSetEntity>> GetProcProductSetEntitiesAsync(ProcProductSetQuery procProductSetQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="procProductSetPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ProcProductSetEntity>> GetPagedInfoAsync(ProcProductSetPagedQuery procProductSetPagedQuery);
+
+        /// <summary>
+        /// 删除（物料删除）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<int> DeleteBySetPointIdAsync(long id);
         #endregion
     }
 }
