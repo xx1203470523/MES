@@ -368,7 +368,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         private async Task GetPubInfoByResourceCode(string resourceCode)
         {
             //已经验证过资源是否存在直接使用
-            var procResource = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentEquipment.SiteId, Code = resourceCode });
+            procResource = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentEquipment.SiteId, Code = resourceCode });
             //查询资源和设备是否绑定
             var resourceEquipmentBindQuery = new ProcResourceEquipmentBindQuery
             {
