@@ -9,6 +9,7 @@ using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
@@ -30,6 +31,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
     /// </summary>
     public class OutBoundService : IOutBoundService
     {
+        #region Repository
         private readonly ICurrentEquipment _currentEquipment;
         /// <summary>
         /// 序列号服务
@@ -96,6 +98,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             _manuSfcStepMaterialRepository = manuSfcStepMaterialRepository;
             _procResourceEquipmentBindRepository = procResourceEquipmentBindRepository;
         }
+        #endregion
 
         /// <summary>
         /// 出站
@@ -233,6 +236,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             List<ManuSfcEntity> manuSfcEntities = new List<ManuSfcEntity>();
             List<ManuSfcProduceEntity> manuSfcProduceEntities = new List<ManuSfcProduceEntity>();
 
+            //SFC信息处理
             foreach (var outBoundSFCDto in outBoundMoreDto.SFCs)
             {
                 var sfcEntity = sfclist.Where(c => c.SFC == outBoundSFCDto.SFC).First();
@@ -301,7 +305,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                     sfcEntity.UpdatedBy = _currentEquipment.Name;
                     sfcEntity.UpdatedOn = HymsonClock.Now();
                     manuSfcEntities.Add(sfcEntity);
-                    //Sfc生成信息
+                    //Sfc生产信息
                     manuSfcProduceEntities.Add(sfcProduceEntity);
                 }
                 else//未完工
@@ -332,6 +336,44 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
 
                 }
             }
+
+            //SFC关联绑定流转信息处理
+            var manuSfcCirculationBarCodeQuery = new ManuSfcCirculationBarCodeQuery
+            {
+                CirculationType = SfcCirculationTypeEnum.Merge,
+                ResourceId = procResource.Id,
+                IsDisassemble = TrueOrFalseEnum.No,
+                SiteId = _currentEquipment.SiteId,
+                CirculationBarCodes = outBoundMoreDto.SFCs.Select(c => c.SFC).ToArray()
+            };
+            //查询流转条码绑定记录
+            var circulationBarCodeEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntities(manuSfcCirculationBarCodeQuery);
+            if (circulationBarCodeEntities.Any())
+            {
+                //当前资源
+                var circulationSfc = circulationBarCodeEntities.Select(c => c.SFC).ToArray();
+                //条码信息
+                var circulationSfclist = await _manuSfcRepository.GetBySFCsAsync(circulationSfc);
+                foreach (var sfc in circulationSfclist)
+                {
+                    //更新条码信息
+                    sfc.Status = SfcStatusEnum.Complete;
+                    sfc.UpdatedBy = _currentEquipment.Name;
+                    sfc.UpdatedOn = HymsonClock.Now();
+                    manuSfcEntities.Add(sfc);
+                }
+                //查询已经存在条码的生产信息
+                var circulationSfcProduceList = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery { Sfcs = circulationSfc, SiteId = _currentEquipment.SiteId });
+                foreach (var sfc in circulationSfcProduceList)
+                {
+                    sfc.UpdatedBy = _currentEquipment.Name;
+                    sfc.UpdatedOn = HymsonClock.Now();
+                    sfc.Status = SfcProduceStatusEnum.Complete;
+                    manuSfcProduceEntities.Add(sfc);
+                }
+            }
+
+
             //标准参数
             List<ManuProductParameterEntity> manuProductParameterEntities = await PrepareProductParameterEntity(outBoundMoreDto, manuSfcStepEntities, procResource.Id);
             //NG

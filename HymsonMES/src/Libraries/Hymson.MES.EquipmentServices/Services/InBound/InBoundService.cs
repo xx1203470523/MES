@@ -19,7 +19,6 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
-using System.Linq;
 
 namespace Hymson.MES.EquipmentServices.Services.InBound
 {
@@ -28,6 +27,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
     /// </summary>
     public class InBoundService : IInBoundService
     {
+        #region Repository
         private readonly ICurrentEquipment _currentEquipment;
         private readonly AbstractValidator<InBoundDto> _validationInBoundDtoRules;
         private readonly AbstractValidator<InBoundMoreDto> _validationInBoundMoreDtoRules;
@@ -37,7 +37,6 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
-        private readonly ILocalizationService _localizationService;
         private readonly IProcProcessRouteDetailNodeRepository _processRouteDetailNodeRepository;
         private readonly IProcProcedureRepository _procedureRepository;
         private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
@@ -54,7 +53,6 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             IManuSfcInfoRepository manuSfcInfoRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
-            ILocalizationService localizationService,
             IProcProcessRouteDetailNodeRepository processRouteDetailNodeRepository,
             IProcProcedureRepository procedureRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
@@ -71,7 +69,6 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
-            _localizationService = localizationService;
             _processRouteDetailNodeRepository = processRouteDetailNodeRepository;
             _procedureRepository = procedureRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
@@ -79,6 +76,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             _procProcedureRepository = procProcedureRepository;
             _procResourceEquipmentBindRepository = procResourceEquipmentBindRepository;
         }
+        #endregion
 
         /// <summary>
         /// 进站
@@ -188,6 +186,8 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                                                         .Select(p => p.Id).Contains(c.ProcedureId) == false);
             if (noLinUpSFCs.Any())
                 throw new CustomerValidationException(nameof(ErrorCode.MES19129)).WithData("SFCS", string.Join(',', noLinUpSFCs));
+            //查询已有的条码信息
+            var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfclist.Select(c => c.Id));
 
             //获取工艺路线首工序
             var processRouteFirstProcedure = await GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
@@ -200,7 +200,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             List<ManuSfcProduceEntity> updateManuSfcProduceList = new List<ManuSfcProduceEntity>();
             List<ManuSfcEntity> updateManuSfcList = new List<ManuSfcEntity>();
 
-            var validationFailures = new List<ValidationFailure>();
+            //var validationFailures = new List<ValidationFailure>();
             foreach (var sfc in inBoundMoreDto.SFCs)
             {
                 var sfcEntity = sfclist.FirstOrDefault(x => x.SFC == sfc);
@@ -249,6 +249,50 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     sfcEntity.UpdatedOn = HymsonClock.Now();
                     sfcEntity.IsUsed = YesOrNoEnum.Yes;
                     updateManuSfcList.Add(sfcEntity);
+
+                    //查询已有条码信息
+                    var sfcInfoEntity = sfcInfoEntities.Where(c => c.SfcId == sfcEntity.Id).First();
+                    //已有条码信息不是当前工单
+                    if ((sfcInfoEntity != null && sfcInfoEntity.WorkOrderId != planWorkOrderEntity.Id) || sfcInfoEntity == null)
+                    {
+                        manuSfcInfoList.Add(new ManuSfcInfoEntity
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            SiteId = _currentEquipment.SiteId,
+                            SfcId = sfcEntity.Id,
+                            WorkOrderId = planWorkOrderEntity.Id,
+                            ProductId = planWorkOrderEntity.ProductId,
+                            IsUsed = true,
+                            CreatedBy = _currentEquipment.Name,
+                            UpdatedBy = _currentEquipment.Name
+                        });
+                    }
+                    //条码生成信息
+                    var manuSfcProduceEntity = sfcProduceList.Where(c => c.SFC == sfcEntity.SFC).First();
+                    if ((manuSfcProduceEntity != null && manuSfcProduceEntity.WorkOrderId != planWorkOrderEntity.Id) || manuSfcProduceEntity == null)
+                    {
+                        manuSfcProduceList.Add(new ManuSfcProduceEntity
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            SiteId = _currentEquipment.SiteId,
+                            SFC = sfc,
+                            ProductId = planWorkOrderEntity.ProductId,
+                            WorkOrderId = planWorkOrderEntity.Id,
+                            BarCodeInfoId = sfcEntity.Id,
+                            ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
+                            WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
+                            ProductBOMId = planWorkOrderEntity.ProductBOMId,
+                            EquipmentId = _currentEquipment.Id ?? 0,
+                            ResourceId = procResource.Id,
+                            Qty = 1,//电芯进站默认都是1个
+                            ProcedureId = processRouteFirstProcedure.ProcedureId,
+                            Status = SfcProduceStatusEnum.Activity,//接口进站直接为活动
+                            RepeatedCount = 0,
+                            IsScrap = TrueOrFalseEnum.No,
+                            CreatedBy = _currentEquipment.Name,
+                            UpdatedBy = _currentEquipment.Name
+                        });
+                    }
                     continue;
                 }
 
@@ -261,7 +305,9 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     IsUsed = YesOrNoEnum.Yes,
                     Status = SfcStatusEnum.InProcess,
                     CreatedBy = _currentEquipment.Name,
-                    UpdatedBy = _currentEquipment.Name
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedBy = _currentEquipment.Name,
+                    UpdatedOn = HymsonClock.Now(),
                 };
                 manuSfcList.Add(manuSfcEntity);
 
@@ -274,7 +320,9 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     ProductId = planWorkOrderEntity.ProductId,
                     IsUsed = true,
                     CreatedBy = _currentEquipment.Name,
-                    UpdatedBy = _currentEquipment.Name
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedBy = _currentEquipment.Name,
+                    UpdatedOn = HymsonClock.Now(),
                 });
 
                 manuSfcProduceList.Add(new ManuSfcProduceEntity
@@ -296,7 +344,9 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     RepeatedCount = 0,
                     IsScrap = TrueOrFalseEnum.No,
                     CreatedBy = _currentEquipment.Name,
-                    UpdatedBy = _currentEquipment.Name
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedBy = _currentEquipment.Name,
+                    UpdatedOn = HymsonClock.Now(),
                 });
 
                 manuSfcStepList.Add(new ManuSfcStepEntity
@@ -315,13 +365,15 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     EquipmentId = _currentEquipment.Id,
                     ResourceId = procResource.Id,
                     CreatedBy = _currentEquipment.Name,
-                    UpdatedBy = _currentEquipment.Name
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedBy = _currentEquipment.Name,
+                    UpdatedOn = HymsonClock.Now(),
                 });
             }
-            if (validationFailures.Any())
-            {
-                throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
-            }
+            //if (validationFailures.Any())
+            //{
+            //    throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
+            //}
 
             using var ts = TransactionHelper.GetTransactionScope();
             //更新下达数量

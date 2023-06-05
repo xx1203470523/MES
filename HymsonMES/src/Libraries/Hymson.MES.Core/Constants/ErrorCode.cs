@@ -778,6 +778,7 @@
         public const string MES19006 = "资源编码不存在";
         public const string MES19007 = "SFC条码不允许重复";
         public const string MES19008 = "资源不匹配";
+        public const string MES19009 = "SFC：{SFC}条码已经存在";
         #endregion
 
         public const string MES19101 = "条码列表不能为空";
@@ -811,6 +812,7 @@
         public const string MES19129 = "条码：{SFCS}当前状态不是排队状态，不允许进站";
         public const string MES19130 = "条码：{SFCS}超过或达到最大复投次数限制，不允许进站";
         public const string MES19131 = "资源：{ResCode}和设备：{EquCode}不存在绑定关系，请检查配置";
+        public const string MES19132 = "条码：{SFCS}未进站不能操作绑定";
 
 
 

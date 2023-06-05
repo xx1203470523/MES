@@ -1,0 +1,29 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Hymson.MES.EquipmentServices.Dtos.SfcCirculation
+{
+    /// <summary>
+    /// 绑定条码流转表
+    /// </summary>
+    public record SfcCirculationBindDto : BaseDto
+    {
+        /// <summary>
+        /// 模组/Pack条码
+        /// </summary>
+        public string SFC { get; set; } = string.Empty;
+        /// <summary>
+        /// 模组绑电芯条码/Pack绑模组条码
+        /// </summary>
+        public CirculationBindDto[] BindSFCs { get; set; }
+    }
+
+    public class CirculationBindDto
+    {
+        public int Location { get; set; } = 0;
+        public string SFC { get; set; }
+    }
+}

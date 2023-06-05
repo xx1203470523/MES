@@ -10,6 +10,7 @@ using Hymson.MES.EquipmentServices.Dtos.InboundInSFCContainer;
 using Hymson.MES.EquipmentServices.Dtos.OutBound;
 using Hymson.MES.EquipmentServices.Dtos.OutPutQty;
 using Hymson.MES.EquipmentServices.Dtos.QueryContainerBindSfc;
+using Hymson.MES.EquipmentServices.Dtos.SfcCirculation;
 using Hymson.MES.EquipmentServices.Dtos.SingleBarCodeLoadingVerification;
 using Hymson.MES.EquipmentServices.Services;
 using Hymson.MES.EquipmentServices.Services.BindContainer;
@@ -24,6 +25,7 @@ using Hymson.MES.EquipmentServices.Services.InboundInSFCContainer;
 using Hymson.MES.EquipmentServices.Services.OutBound;
 using Hymson.MES.EquipmentServices.Services.OutPutQty;
 using Hymson.MES.EquipmentServices.Services.QueryContainerBindSfc;
+using Hymson.MES.EquipmentServices.Services.SfcCirculation;
 using Hymson.MES.EquipmentServices.Services.SingleBarCodeLoadingVerification;
 using Hymson.MES.EquipmentServices.Validators.BindContainer;
 using Hymson.MES.EquipmentServices.Validators.BindSFC;
@@ -36,6 +38,7 @@ using Hymson.MES.EquipmentServices.Validators.InboundInSFCContainer;
 using Hymson.MES.EquipmentServices.Validators.OutBound;
 using Hymson.MES.EquipmentServices.Validators.OutPutQty;
 using Hymson.MES.EquipmentServices.Validators.QueryContainerBindSfc;
+using Hymson.MES.EquipmentServices.Validators.SfcCirculation;
 using Hymson.MES.EquipmentServices.Validators.SingleBarCodeLoadingVerification;
 using Microsoft.Extensions.Configuration;
 
@@ -83,6 +86,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquipmentCollectService, EquipmentCollectService>();   // 设备信息采集
             services.AddSingleton<IFeedingService, FeedingService>();      // 上卸料
             services.AddSingleton<INGDataService, NGDataService>();//NG数据
+            services.AddSingleton<ISfcCirculationService, SfcCirculationService>();//流转表绑定
         }
 
         /// <summary>
@@ -112,6 +116,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<InBoundMoreDto>, InBoundMoreValidator>();//进站（多个）
             services.AddSingleton<AbstractValidator<OutBoundDto>, OutBoundValidator>();//出站
             services.AddSingleton<AbstractValidator<OutBoundMoreDto>, OutBoundMoreValidator>();//出站（多个）
+            services.AddSingleton<AbstractValidator<SfcCirculationBindDto>, SfcCirculationBindValidator>();//条码流转绑定
+            services.AddSingleton<AbstractValidator<SfcCirculationUnBindDto>, SfcCirculationUnBindValidator>();//条码流转解绑
 
 
 

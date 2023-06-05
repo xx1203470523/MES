@@ -106,5 +106,10 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 换件id manu_sfc_circulation id
         /// </summary>
         public long? SubstituteId { get; set; }
+
+        /// <summary>
+        /// 合并时绑定位置
+        /// </summary>
+        public int? Location { get; set; }
     }
 }

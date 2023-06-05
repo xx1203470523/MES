@@ -47,6 +47,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<PagedInfo<ManuSfcCirculationEntity>> GetPagedInfoAsync(ManuSfcCirculationPagedQuery manuSfcCirculationPagedQuery);
 
         /// <summary>
+        /// 根据流转前和流转后条码获取绑定记录
+        /// </summary>
+        /// <param name="manuSfcCirculationBarCodeQuery"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcCirculationEntity>> GetManuSfcCirculationBarCodeEntities(ManuSfcCirculationBarCodeQuery manuSfcCirculationBarCodeQuery);
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="manuSfcCirculationEntity"></param>
