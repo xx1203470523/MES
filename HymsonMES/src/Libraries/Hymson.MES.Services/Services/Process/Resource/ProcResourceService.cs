@@ -25,6 +25,8 @@ using Hymson.MES.Services.Services.Process.Resource;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Minio.DataModel;
+using System.Security.Policy;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -374,7 +376,7 @@ namespace Hymson.MES.Services.Services.Process
             var procProductSetEntities = await _procProductSetRepository.GetProcProductSetEntitiesAsync(query);
 
             //实体到DTO转换 装载数据
-            List<ProcProductSetDto> jobReleationDtos = new List<ProcProductSetDto>();
+            List<ProcProductSetDto> procProductSetDtos = new List<ProcProductSetDto>();
             if (procProductSetEntities != null && procProductSetEntities.Any())
             {
                 var materialIds = new List<long> { };
@@ -390,23 +392,23 @@ namespace Hymson.MES.Services.Services.Process
                 foreach (var entity in procProductSetEntities)
                 {
                     var product = procMaterialList.FirstOrDefault(x => x.Id == entity.ProductId);
-                    var semiProduct = procMaterialList.FirstOrDefault(x => x.Id == entity.ProductId);
-                    jobReleationDtos.Add(new ProcProductSetDto()
+                    var semiProduct = procMaterialList.FirstOrDefault(x => x.Id == entity.SemiProductId);
+                    procProductSetDtos.Add(new ProcProductSetDto()
                     {
                         ProductId = entity.ProductId,
-                        ProductCode = product?.MaterialCode??"",
-                        MaterialName= product?.MaterialName??"",
-                        Version =product?.Version??"",
+                        ProductCode = product?.MaterialCode ?? "",
+                        MaterialName = product?.MaterialName ?? "",
+                        Version = product?.Version ?? "",
                         SetPointId = entity.SetPointId,
                         SemiProductId = entity.SemiProductId,
                         SemiMaterialCode = semiProduct?.MaterialCode ?? "",
-                        SemiMaterialName = semiProduct?.MaterialName ??"",
+                        SemiMaterialName = semiProduct?.MaterialName ?? "",
                         SemiVersion = semiProduct?.Version ?? "",
                     }); ;
                 }
             }
 
-            return jobReleationDtos;
+            return procProductSetDtos;
         }
 
         /// <summary>
@@ -584,6 +586,24 @@ namespace Hymson.MES.Services.Services.Process
                     jobList.Add(job);
                 }
             }
+
+            //productSet
+            List<ProcProductSetEntity> productSetList = new List<ProcProductSetEntity>();
+            if (parm.ProductSetList != null && parm.ProductSetList.Count > 0)
+            {
+                foreach (var item in parm.ProductSetList)
+                {
+                    var relationEntity = new ProcProductSetEntity(); ;
+                    relationEntity.Id = IdGenProvider.Instance.CreateId();
+                    relationEntity.ProductId = item.ProductId;
+                    relationEntity.SetPointId = entity.Id;
+                    relationEntity.SemiProductId = item.SemiProductId;
+                    relationEntity.SiteId = siteId;
+                    relationEntity.CreatedBy = userName;
+                    relationEntity.UpdatedBy = userName;
+                    productSetList.Add(relationEntity);
+                }
+            }
             #endregion
 
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
@@ -607,7 +627,10 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     await _jobBusinessRelationRepository.InsertRangeAsync(jobList);
                 }
-
+                if (productSetList != null && productSetList.Count > 0)
+                {
+                    await _procProductSetRepository.InsertsAsync(productSetList);
+                }
                 ts.Complete();
             }
         }
@@ -791,6 +814,24 @@ namespace Hymson.MES.Services.Services.Process
                 }
             }
 
+            //productSet
+            List<ProcProductSetEntity> productSetList = new List<ProcProductSetEntity>();
+            if (param.ProductSetList != null && param.ProductSetList.Count > 0)
+            {
+                foreach (var item in param.ProductSetList)
+                {
+                    var relationEntity = new ProcProductSetEntity(); ;
+                    relationEntity.Id = IdGenProvider.Instance.CreateId();
+                    relationEntity.ProductId = item.ProductId;
+                    relationEntity.SetPointId = param.Id;
+                    relationEntity.SemiProductId = item.SemiProductId;
+                    relationEntity.SiteId = _currentSite.SiteId ?? 0;
+                    relationEntity.CreatedBy = userName;
+                    relationEntity.UpdatedBy = userName;
+                    productSetList.Add(relationEntity);
+                }
+            }
+
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
                 //入库
@@ -829,6 +870,13 @@ namespace Hymson.MES.Services.Services.Process
                 if (addJobList != null && addJobList.Count > 0)
                 {
                     await _jobBusinessRelationRepository.InsertRangeAsync(addJobList);
+                }
+
+                //产出设置
+                await _procProductSetRepository.DeleteBySetPointIdAsync(param.Id);
+                if (productSetList != null && productSetList.Count > 0)
+                {
+                    await _procProductSetRepository.InsertsAsync(productSetList);
                 }
 
                 ts.Complete();

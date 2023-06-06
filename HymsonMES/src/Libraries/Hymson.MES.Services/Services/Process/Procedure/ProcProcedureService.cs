@@ -286,7 +286,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 foreach (var entity in procProductSetEntities)
                 {
                     var product = procMaterialList.FirstOrDefault(x => x.Id == entity.ProductId);
-                    var semiProduct = procMaterialList.FirstOrDefault(x => x.Id == entity.ProductId);
+                    var semiProduct = procMaterialList.FirstOrDefault(x => x.Id == entity.SemiProductId);
                     procProductSetDtos.Add(new ProcProductSetDto()
                     {
                         ProductId = entity.ProductId,
