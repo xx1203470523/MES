@@ -74,7 +74,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [HttpGet("classProgram")]
         public async Task<IEnumerable<SelectOptionDto>> GetClassProgramListAsync()
         {
-            return await _jobCommonService.GetClassProgramListAsync();
+            return await _jobCommonService.GetClassProgramOptionsAsync();
         }
 
         /// <summary>

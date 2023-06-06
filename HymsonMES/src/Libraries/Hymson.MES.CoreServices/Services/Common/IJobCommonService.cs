@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.CoreServices.Bos;
 using Hymson.MES.CoreServices.Dtos.Common;
 
 namespace Hymson.MES.CoreServices.Services.Common
@@ -20,7 +21,13 @@ namespace Hymson.MES.CoreServices.Services.Common
         /// 查询类
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<SelectOptionDto>> GetClassProgramListAsync();
+        Task<IEnumerable<JobClassBo>> GetJobClassBoListAsync();
+
+        /// <summary>
+        /// 查询类
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<SelectOptionDto>> GetClassProgramOptionsAsync();
 
     }
 }

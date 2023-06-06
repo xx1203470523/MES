@@ -13,6 +13,7 @@ using Hymson.MES.Data.Repositories.Integrated.InteCalendar;
 using Hymson.MES.Data.Repositories.Integrated.InteClass;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer;
 using Hymson.MES.Data.Repositories.Integrated.InteJob;
+using Hymson.MES.Data.Repositories.Integrated.InteJobClass;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding;
@@ -79,6 +80,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteClassDetailRepository, InteClassDetailRepository>();
             services.AddSingleton<IInteClassRepository, InteClassRepository>();
             services.AddSingleton<IInteContainerRepository, InteContainerRepository>();
+            services.AddSingleton<IInteJobClassRepository, InteJobClassRepository>();
 
             //InteJob
             services.AddSingleton<IInteJobBusinessRelationRepository, InteJobBusinessRelationRepository>();
