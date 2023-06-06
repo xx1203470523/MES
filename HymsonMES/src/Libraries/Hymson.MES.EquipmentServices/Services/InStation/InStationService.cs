@@ -115,14 +115,16 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture.InStation
                 { "EquipmentId", (_currentEquipment.Id??0).ToString() },
                 { "ResourceId", resourceEntitys.Id.ToString() }
             };
-            await _manuCommonService.ExecuteManuJobAsync(new InStationRequestDto { ProcedureId = procedureEntity.Id, ResourceId = resourceEntitys.Id, Param = dic });
 
-            var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery { Sfc = "", SiteId = _currentEquipment.SiteId });
+            //读取挂载的Job并执行
+            await _manuCommonService.ReadAndExecuteJobAsync(new InStationRequestDto { ProcedureId = procedureEntity.Id, ResourceId = resourceEntitys.Id, Param = dic });
+
+            var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery { Sfc = inStationDto.SFC, SiteId = _currentEquipment.SiteId });
             if (sfcProduceEntity == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19918));
             }
-
+            //执行进站
             return await InStationExecuteAsync(sfcProduceEntity);
         }
 

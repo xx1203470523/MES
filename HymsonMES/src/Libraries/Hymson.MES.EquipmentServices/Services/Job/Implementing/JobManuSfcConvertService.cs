@@ -194,7 +194,7 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
             }
             //获取SFC
             var sfcEntity = await _manuSfcRepository.GetBySFCAsync(new GetBySFCQuery { SFC = bo.SFC, SiteId = _currentEquipment.SiteId });
-            if (sfcEntity == null)
+            if (sfcEntity != null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19917)).WithData("SFC", bo.SFC);
             }
@@ -261,11 +261,12 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
                 WorkCenterId = planWorkOrder.WorkCenterId ?? 0,
                 Qty = 1,
                 ProcedureId = processRouteFirstProcedure.ProcedureId,
-                Operatetype = ManuSfcStepTypeEnum.Create,
+                Operatetype = ManuSfcStepTypeEnum.Change,
                 CurrentStatus = SfcProduceStatusEnum.lineUp,
                 CreatedBy = _currentEquipment.Name,
                 UpdatedBy = _currentEquipment.Name
             });
+
             //事务入库
             using var ts = TransactionHelper.GetTransactionScope();
 
@@ -278,6 +279,7 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
             await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
 
             ts.Complete();
+
         }
     }
 }

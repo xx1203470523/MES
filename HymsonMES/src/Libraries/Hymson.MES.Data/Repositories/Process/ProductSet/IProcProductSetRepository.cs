@@ -24,7 +24,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procProductSetEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ProcProductSetEntity procProductSetEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -38,7 +38,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procProductSetEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ProcProductSetEntity procProductSetEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -53,7 +53,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -67,7 +67,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcProductSetEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -76,12 +76,19 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<IEnumerable<ProcProductSetEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
+        /// 根据资源/工序ID或者产品ID批量获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<ProcProductSetEntity> GetByProcedureIdAndProductIdAsync(GetByProcedureIdAndProductIdQuery query);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="procProductSetQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcProductSetEntity>> GetProcProductSetEntitiesAsync(ProcProductSetQuery procProductSetQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>

@@ -272,11 +272,11 @@ namespace Hymson.MES.EquipmentServices.Services.Common
 
 
         /// <summary>
-        /// 执行生产Job
+        /// 读取并执行Job
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task ExecuteManuJobAsync(InStationRequestDto dto)
+        public async Task ReadAndExecuteJobAsync(InStationRequestDto dto)
         {
             List<long> jobIds = new();
             // 获取资源Job
@@ -308,7 +308,7 @@ namespace Hymson.MES.EquipmentServices.Services.Common
                 {
                     if (jobIds.Contains(item.JobId))
                     {
-                        continue;
+                            continue;
                     }
                     jobIds.Add(item.JobId);
                 }

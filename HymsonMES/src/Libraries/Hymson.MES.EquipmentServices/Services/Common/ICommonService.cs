@@ -2,12 +2,12 @@
 using Hymson.MES.EquipmentServices.Dtos.Common;
 using Hymson.MES.EquipmentServices.Dtos.ManuCommonDto;
 
-namespace Hymson.MES.EquipmentServices.Services.Common 
+namespace Hymson.MES.EquipmentServices.Services.Common
 {
     /// <summary>
     /// 生产共用
     /// </summary>
-    public interface ICommonService 
+    public interface ICommonService
     {
         /// <summary>
         /// 验证条码掩码规则
@@ -40,10 +40,10 @@ namespace Hymson.MES.EquipmentServices.Services.Common
         Task<PlanWorkOrderEntity> GetProduceWorkOrderByIdAsync(long workOrderId);
 
         /// <summary>
-        /// 执行生产Job
+        /// 读取并执行Job
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task ExecuteManuJobAsync(InStationRequestDto dto);
+        Task ReadAndExecuteJobAsync(InStationRequestDto dto);
     }
 }
