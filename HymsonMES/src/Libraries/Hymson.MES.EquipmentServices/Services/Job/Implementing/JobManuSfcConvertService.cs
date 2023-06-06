@@ -7,6 +7,7 @@ using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
@@ -250,23 +251,16 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
                         {
                             throw new CustomerValidationException(nameof(ErrorCode.MES19930)).WithData("SFC", bo.SFC);
                         }
-                        //在制处理
-                        switch (manuSfcProduceEntity.Status)
+                        //当前工序在制
+                        if (manuSfcProduceEntity.Status == SfcProduceStatusEnum.lineUp && procedureEntity.Id == manuSfcProduceEntity.ResourceId)
                         {
-                            //排队 =》 进站
-                            case SfcProduceStatusEnum.lineUp:
-                                await _inStationService.InStationExecuteAsync(manuSfcProduceEntity);
-                                break;
-                            //TODO完成或活动？
-                            case SfcProduceStatusEnum.Activity:
-                            case SfcProduceStatusEnum.Complete:
-
-
-                                break;
-                            case SfcProduceStatusEnum.Locked:
-                                throw new CustomerValidationException(nameof(ErrorCode.MES19931)).WithData("SFC", bo.SFC);
+                            //进站
+                            await _inStationService.InStationExecuteAsync(manuSfcProduceEntity);
                         }
-
+                        else
+                        {
+                            throw new CustomerValidationException(nameof(ErrorCode.MES19933)).WithData("SFC", bo.SFC);
+                        }
                         break;
                     //完成或入库=》扣减库存
                     case SfcStatusEnum.Complete:
@@ -278,6 +272,15 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
                             BarCode = bo.SFC,
                             QuantityResidue = 1,
                             UpdatedBy = _currentEquipment.Name
+                        };
+                        //SFC
+                        var updateSfc = new ManuSfcUpdateStatusAndIsUsedCommand
+                        {
+                            Sfcs = new string[] { bo.SFC },
+                            Status = SfcStatusEnum.InProcess,
+                            IsUsed = YesOrNoEnum.Yes,
+                            UserId = _currentEquipment.Name,
+                            UpdatedOn = HymsonClock.Now()
                         };
 
                         //更新旧条码在用
@@ -344,6 +347,8 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
                         using (var trans = TransactionHelper.GetTransactionScope())
                         {
                             await _whMaterialInventoryRepository.UpdateReduceQuantityResidueAsync(updateQuantityCommand);
+
+                            await _manuSfcRepository.UpdateSfcStatusAndIsUsedAsync(updateSfc);
 
                             await _manuSfcInfoRepository.UpdatesIsUsedAsync(updateSfcInfoIsUsed);
 
