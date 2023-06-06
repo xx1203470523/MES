@@ -1,8 +1,13 @@
-﻿using Hymson.MES.CoreServices.Services.Common;
+﻿using FluentValidation;
+using Hymson.MES.CoreServices.Services.Common;
+using Hymson.MES.EquipmentServices;
+using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Services.Common;
 using Hymson.MES.EquipmentServices.Services.Job.Implementing;
 using Hymson.MES.EquipmentServices.Services.Manufacture.InStation;
 using Hymson.MES.EquipmentServices.Services.SfcBinding;
+using Hymson.MES.EquipmentServices.Validators.InStation;
+using Hymson.MES.EquipmentServices.Validators.SfcBinding;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -61,7 +66,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         private static void AddValidators(IServiceCollection services)
         {
-
+            services.AddSingleton<AbstractValidator<InStationDto>, InStationValidator>();
+            services.AddSingleton<AbstractValidator<SfcBindingDto>, SfcBindingValidator>();
         }
 
     }

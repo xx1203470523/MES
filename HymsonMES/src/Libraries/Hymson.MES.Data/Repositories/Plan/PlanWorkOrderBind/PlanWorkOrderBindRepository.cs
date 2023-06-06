@@ -20,10 +20,10 @@ namespace Hymson.MES.Data.Repositories.Plan
     /// <summary>
     /// 工单激活（物理删除）仓储
     /// </summary>
-    public partial class PlanWorkOrderBindRepository :BaseRepository, IPlanWorkOrderBindRepository
+    public partial class PlanWorkOrderBindRepository : BaseRepository, IPlanWorkOrderBindRepository
     {
 
-        public PlanWorkOrderBindRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        public PlanWorkOrderBindRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
         }
 
@@ -44,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -58,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         public async Task<PlanWorkOrderBindEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderBindEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderBindEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -66,10 +66,10 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<PlanWorkOrderBindEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<PlanWorkOrderBindEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<PlanWorkOrderBindEntity>(GetByIdsSql, new { Ids = ids});
+            return await conn.QueryAsync<PlanWorkOrderBindEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace Hymson.MES.Data.Repositories.Plan
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
-           
+
             var offSet = (planWorkOrderBindPagedQuery.PageIndex - 1) * planWorkOrderBindPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = planWorkOrderBindPagedQuery.PageSize });
@@ -181,7 +181,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         public async Task<int> DeletesTrueByResourceIdAsync(long resourceId)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(DeletesTrueByResourceIdSql, new { ResourceId= resourceId });
+            return await conn.ExecuteAsync(DeletesTrueByResourceIdSql, new { ResourceId = resourceId });
         }
 
         /// <summary>
@@ -193,6 +193,18 @@ namespace Hymson.MES.Data.Repositories.Plan
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesTrueByResourceIdAndWorkOrderIdsSql, comm);
+        }
+
+
+        /// <summary>
+        /// 根据ResourceID获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<PlanWorkOrderBindEntity> GetByResourceIDAsync(PlanWorkOrderBindByResourceIdQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderBindEntity>(GetByIdSql, query);
         }
     }
 
@@ -222,7 +234,11 @@ namespace Hymson.MES.Data.Repositories.Plan
                             FROM `plan_work_order_bind`  WHERE Id IN @Ids ";
         #endregion
 
-        const string DeletesTrueByResourceIdSql = "Delete from `plan_work_order_bind` WHERE ResourceId=@ResourceId "; 
+        const string DeletesTrueByResourceIdSql = "Delete from `plan_work_order_bind` WHERE ResourceId=@ResourceId ";
         const string DeletesTrueByResourceIdAndWorkOrderIdsSql = "Delete from `plan_work_order_bind` WHERE ResourceId=@ResourceId And WorkOrderId in @WorkOrderIds ";
+
+        const string GetByResourceIdSql = @"SELECT  
+                               `Id`, `EquipmentId`, `ResourceId`, `WorkOrderId`, `CreatedBy`, `CreatedOn`, `SiteId`,UpdatedBy ,UpdatedOn ,IsDeleted
+                            FROM `plan_work_order_bind`  WHERE  IsDeleted=0 AND SiteId=@SiteId AND ResourceId = @ResourceId  AND EquipmentId=@EquipmentId";
     }
 }

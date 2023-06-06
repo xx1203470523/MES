@@ -796,6 +796,13 @@
         public const string MES19923 = "未获取到工单信息";
         public const string MES19924 = "子条码位置重复,请检查！";
         public const string MES19925 = "子条码重复,请检查！";
+        public const string MES19926 = "子条码列表不允许为空！";
+        public const string MES19927 = "子条码不能为空";
+        public const string MES19928 = "资源：{ResCode}未绑定工单，请检查配置";
+        public const string MES19929 = "工单不存在";
+        public const string MES19930 = "条码：{SFC}状态为在制，但没有获取到在制信息";
+        public const string MES19931 = "条码：{SFC}已锁定";
+        public const string MES19932 = "条码：{SFC}已报废";
 
 
 
