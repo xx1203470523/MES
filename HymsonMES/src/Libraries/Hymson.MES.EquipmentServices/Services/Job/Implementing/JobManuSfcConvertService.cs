@@ -239,11 +239,6 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
             //    throw new CustomerValidationException(nameof(ErrorCode.MES19917)).WithData("SFC", bo.SFC);
             //}
             var processRouteFirstProcedure = await _manuCommonService.GetFirstProcedureAsync(planWorkOrder.ProcessRouteId);
-            List<ManuSfcEntity> manuSfcList = new();
-            List<ManuSfcInfoEntity> manuSfcInfoList = new();
-            ManuSfcProduceEntity manuSfcProduce = new();
-            List<ManuSfcStepEntity> manuSfcStepList = new();
-            UpdateQuantityCommand quantityCommand = new();
             if (sfcEntity != null)
             {
                 switch (sfcEntity.Status)
@@ -278,15 +273,37 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
                     case SfcStatusEnum.Received:
                         var manuSfcInfoEntity = _manuSfcInfoRepository.GetBySFCAsync(sfcEntity.Id);
                         //库存
-                        quantityCommand = new UpdateQuantityCommand
+                        var updateQuantityCommand = new UpdateQuantityCommand
                         {
                             BarCode = bo.SFC,
                             QuantityResidue = 1,
                             UpdatedBy = _currentEquipment.Name
                         };
 
+                        //更新旧条码在用
+                        var updateSfcInfoIsUsed = new ManuSfcInfoUpdateIsUsedCommand
+                        {
+                            IsUsed = false,
+                            SfcIds = new long[] { sfcEntity.Id },
+                            UpdatedOn = HymsonClock.Now(),
+                            UserId = _currentEquipment.Name
+                        };
+
+                        //新增条码明细
+                        ManuSfcInfoEntity createSfcInfo = new()
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            SiteId = _currentEquipment.SiteId,
+                            IsUsed = true,
+                            ProductId = bomDetail.MaterialId,
+                            SfcId = sfcEntity.Id,
+                            WorkOrderId = planWorkOrder.Id,
+                            CreatedBy = _currentEquipment.Name,
+                            UpdatedBy = _currentEquipment.Name
+                        };
+
                         //在制
-                        manuSfcProduce = new ManuSfcProduceEntity
+                        var createManuSfcProduce = new ManuSfcProduceEntity
                         {
                             Id = IdGenProvider.Instance.CreateId(),
                             SiteId = _currentEquipment.SiteId,
@@ -306,7 +323,7 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
                             UpdatedBy = _currentEquipment.Name
                         };
                         //步骤 进站
-                        manuSfcStepList.Add(new ManuSfcStepEntity
+                        var createManuSfcStep = new ManuSfcStepEntity
                         {
                             Id = IdGenProvider.Instance.CreateId(),
                             SiteId = _currentEquipment.SiteId,
@@ -321,16 +338,20 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
                             CurrentStatus = SfcProduceStatusEnum.Activity,
                             CreatedBy = _currentEquipment.Name,
                             UpdatedBy = _currentEquipment.Name
-                        });
+                        };
 
                         //入库
                         using (var trans = TransactionHelper.GetTransactionScope())
                         {
-                            await _whMaterialInventoryRepository.UpdateReduceQuantityResidueAsync(quantityCommand);
+                            await _whMaterialInventoryRepository.UpdateReduceQuantityResidueAsync(updateQuantityCommand);
 
-                            await _manuSfcProduceRepository.InsertAsync(manuSfcProduce);
+                            await _manuSfcInfoRepository.UpdatesIsUsedAsync(updateSfcInfoIsUsed);
 
-                            await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
+                            await _manuSfcInfoRepository.InsertAsync(createSfcInfo);
+
+                            await _manuSfcProduceRepository.InsertAsync(createManuSfcProduce);
+
+                            await _manuSfcStepRepository.InsertAsync(createManuSfcStep);
 
                             trans.Complete();
                         }
@@ -344,7 +365,7 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
             else
             {
                 //条码
-                var manuSfcEntity = new ManuSfcEntity
+                var createmanuSfcEntity = new ManuSfcEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = _currentEquipment.SiteId,
@@ -355,28 +376,29 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
                     CreatedBy = _currentEquipment.Name,
                     UpdatedBy = _currentEquipment.Name
                 };
-                manuSfcList.Add(manuSfcEntity);
+
                 //明细
-                manuSfcInfoList.Add(new ManuSfcInfoEntity
+                var createManuSfcInfo = new ManuSfcInfoEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = _currentEquipment.SiteId,
-                    SfcId = manuSfcEntity.Id,
+                    SfcId = createmanuSfcEntity.Id,
                     WorkOrderId = planWorkOrder.Id,
                     ProductId = planWorkOrder.ProductId,
                     IsUsed = true,
                     CreatedBy = _currentEquipment.Name,
                     UpdatedBy = _currentEquipment.Name
-                });
+                };
+
                 //在制
-                manuSfcProduce = new ManuSfcProduceEntity
+                var createManuSfcProduce = new ManuSfcProduceEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = _currentEquipment.SiteId,
                     SFC = bo.SFC,
                     ProductId = planWorkOrder.ProductId,
                     WorkOrderId = planWorkOrder.Id,
-                    BarCodeInfoId = manuSfcEntity.Id,
+                    BarCodeInfoId = createmanuSfcEntity.Id,
                     ProcessRouteId = planWorkOrder.ProcessRouteId,
                     WorkCenterId = planWorkOrder.WorkCenterId ?? 0,
                     ProductBOMId = planWorkOrder.ProductBOMId,
@@ -388,51 +410,55 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
                     CreatedBy = _currentEquipment.Name,
                     UpdatedBy = _currentEquipment.Name
                 };
-                //步骤 转换
-                manuSfcStepList.Add(new ManuSfcStepEntity
+
+                var createManuSfcStepList = new List<ManuSfcStepEntity>
                 {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentEquipment.SiteId,
-                    SFC = bo.SFC,
-                    ProductId = planWorkOrder.ProductId,
-                    WorkOrderId = planWorkOrder.Id,
-                    ProductBOMId = planWorkOrder.ProductBOMId,
-                    WorkCenterId = planWorkOrder.WorkCenterId ?? 0,
-                    Qty = 1,
-                    ProcedureId = processRouteFirstProcedure.ProcedureId,
-                    Operatetype = ManuSfcStepTypeEnum.Change,
-                    CurrentStatus = SfcProduceStatusEnum.lineUp,
-                    CreatedBy = _currentEquipment.Name,
-                    UpdatedBy = _currentEquipment.Name
-                });
-                //步骤 进站
-                manuSfcStepList.Add(new ManuSfcStepEntity
-                {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentEquipment.SiteId,
-                    SFC = bo.SFC,
-                    ProductId = planWorkOrder.ProductId,
-                    WorkOrderId = planWorkOrder.Id,
-                    ProductBOMId = planWorkOrder.ProductBOMId,
-                    WorkCenterId = planWorkOrder.WorkCenterId ?? 0,
-                    Qty = 1,
-                    ProcedureId = processRouteFirstProcedure.ProcedureId,
-                    Operatetype = ManuSfcStepTypeEnum.InStock,
-                    CurrentStatus = SfcProduceStatusEnum.Activity,
-                    CreatedBy = _currentEquipment.Name,
-                    UpdatedBy = _currentEquipment.Name
-                });
+                    //步骤 转换
+                    new ManuSfcStepEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = _currentEquipment.SiteId,
+                        SFC = bo.SFC,
+                        ProductId = planWorkOrder.ProductId,
+                        WorkOrderId = planWorkOrder.Id,
+                        ProductBOMId = planWorkOrder.ProductBOMId,
+                        WorkCenterId = planWorkOrder.WorkCenterId ?? 0,
+                        Qty = 1,
+                        ProcedureId = processRouteFirstProcedure.ProcedureId,
+                        Operatetype = ManuSfcStepTypeEnum.Change,
+                        CurrentStatus = SfcProduceStatusEnum.lineUp,
+                        CreatedBy = _currentEquipment.Name,
+                        UpdatedBy = _currentEquipment.Name
+                    },
+                    //步骤 进站
+                    new ManuSfcStepEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = _currentEquipment.SiteId,
+                        SFC = bo.SFC,
+                        ProductId = planWorkOrder.ProductId,
+                        WorkOrderId = planWorkOrder.Id,
+                        ProductBOMId = planWorkOrder.ProductBOMId,
+                        WorkCenterId = planWorkOrder.WorkCenterId ?? 0,
+                        Qty = 1,
+                        ProcedureId = processRouteFirstProcedure.ProcedureId,
+                        Operatetype = ManuSfcStepTypeEnum.InStock,
+                        CurrentStatus = SfcProduceStatusEnum.Activity,
+                        CreatedBy = _currentEquipment.Name,
+                        UpdatedBy = _currentEquipment.Name
+                    }
+                };
 
                 //事务入库
                 using var ts = TransactionHelper.GetTransactionScope();
 
-                await _manuSfcRepository.InsertRangeAsync(manuSfcList);
+                await _manuSfcRepository.InsertAsync(createmanuSfcEntity);
 
-                await _manuSfcInfoRepository.InsertsAsync(manuSfcInfoList);
+                await _manuSfcInfoRepository.InsertAsync(createManuSfcInfo);
 
-                await _manuSfcProduceRepository.InsertAsync(manuSfcProduce);
+                await _manuSfcProduceRepository.InsertAsync(createManuSfcProduce);
 
-                await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
+                await _manuSfcStepRepository.InsertRangeAsync(createManuSfcStepList);
 
                 ts.Complete();
             }
