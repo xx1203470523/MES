@@ -95,6 +95,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procProductSetPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ProcProductSetEntity>> GetPagedInfoAsync(ProcProductSetPagedQuery procProductSetPagedQuery);
+
+        /// <summary>
+        /// 删除（物料删除）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<int> DeleteBySetPointIdAsync(long id);
         #endregion
     }
 }

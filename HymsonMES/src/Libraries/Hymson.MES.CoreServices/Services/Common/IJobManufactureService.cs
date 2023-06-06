@@ -1,6 +1,6 @@
-﻿using Hymson.MES.Services.Dtos.Common;
+﻿using Hymson.MES.CoreServices.Dtos.Common;
 
-namespace Hymson.MES.Services.Services.Job.Manufacture
+namespace Hymson.MES.CoreServices.Services.Common
 {
     /// <summary>
     /// 生产作业接口

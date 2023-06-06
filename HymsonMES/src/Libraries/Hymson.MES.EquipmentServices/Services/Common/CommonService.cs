@@ -6,6 +6,7 @@ using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Plan;
@@ -14,11 +15,8 @@ using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.EquipmentServices.Dtos.Common;
 using Hymson.MES.EquipmentServices.Dtos.ManuCommonDto;
-using Hymson.MES.EquipmentServices.Services.Job.Common;
 using Hymson.Utils;
 using Hymson.Web.Framework.WorkContext;
-using System.Collections;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Hymson.MES.EquipmentServices.Services.Common

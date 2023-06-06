@@ -13,6 +13,15 @@ namespace Hymson.MES.Data.Repositories.Process.ProductSet.Query
     /// </summary>
     public class ProcProductSetQuery
     {
+        /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long SiteId { get; set; } = 0;
+
+        /// <summary>
+        /// 工序和资源半成品产品设置表
+        /// </summary>
+        public long SetPointId { get; set; }
     }
 
 

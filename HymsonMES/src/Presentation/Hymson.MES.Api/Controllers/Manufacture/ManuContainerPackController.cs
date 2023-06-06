@@ -1,5 +1,5 @@
 using Hymson.Infrastructure;
-using Hymson.MES.Services.Dtos.Common;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
 using Microsoft.AspNetCore.Mvc;
