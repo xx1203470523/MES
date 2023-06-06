@@ -37,6 +37,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         private readonly ICurrentSite _currentSite;
         private readonly IManuCommonService _manuCommonService;
         private readonly IProcMaterialRepository _procMaterialRepository;
+        private readonly IProcResourceRepository _procResourceRepository;
+        private readonly IProcProcedureRepository _procProcedureRepository;
         private readonly IInteCodeRulesRepository _inteCodeRulesRepository;
         private readonly IManuGenerateBarcodeService _manuGenerateBarcodeService;
         private readonly IManuSfcRepository _manuSfcRepository;
@@ -48,12 +50,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         private readonly IPlanSfcPrintService _planSfcPrintService;
 
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="manuCommonService"></param>
         /// <param name="procMaterialRepository"></param>
+        /// <param name="procResourceRepository"></param>
+        /// <param name="procProcedureRepository"></param>
         /// <param name="inteCodeRulesRepository"></param>
         /// <param name="manuGenerateBarcodeService"></param>
         /// <param name="manuSfcRepository"></param>
@@ -67,6 +71,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
              ICurrentSite currentSite,
              IManuCommonService manuCommonService,
              IProcMaterialRepository procMaterialRepository,
+             IProcResourceRepository procResourceRepository,
+             IProcProcedureRepository procProcedureRepository,
              IInteCodeRulesRepository inteCodeRulesRepository,
              IManuGenerateBarcodeService manuGenerateBarcodeService,
              IManuSfcRepository manuSfcRepository,
@@ -81,6 +87,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
             _currentSite = currentSite;
             _manuCommonService = manuCommonService;
             _procMaterialRepository = procMaterialRepository;
+            _procResourceRepository = procResourceRepository;
+            _procProcedureRepository = procProcedureRepository;
             _inteCodeRulesRepository = inteCodeRulesRepository;
             _manuGenerateBarcodeService = manuGenerateBarcodeService;
             _manuSfcRepository = manuSfcRepository;
@@ -226,7 +234,23 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         /// <returns></returns>
         public async Task CreateBarcodeByWorkOrderIdAndPrintAsync(CreateBarcodeByWorkOrderAndPrintDto param)
         {
-            var lst = await CreateBarcodeByWorkOrderIdAsync(new CreateBarcodeByWorkOrderDto() { Qty = param.Qty, WorkOrderId = param.WorkOrderId });
+            var resourceEntity = await _procResourceRepository.GetResByIdAsync(param.ResourceId);
+            var procedureEntity = await _procProcedureRepository.GetByIdAsync(param.ProcedureId);
+            if (resourceEntity != null && procedureEntity != null && procedureEntity.ResourceTypeId.HasValue == true)
+            {
+                // 对工序资源类型和资源的资源类型校验
+                if (resourceEntity.ResTypeId != procedureEntity.ResourceTypeId.Value)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16507));
+                }
+            }
+
+            var lst = await CreateBarcodeByWorkOrderIdAsync(new CreateBarcodeByWorkOrderDto()
+            {
+                Qty = param.Qty,
+                WorkOrderId = param.WorkOrderId
+            });
+
             foreach (var item in lst)
             {
                 await _planSfcPrintService.CreatePrintAsync(new Dtos.Plan.PlanSfcPrintCreatePrintDto()
