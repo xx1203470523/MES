@@ -192,7 +192,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             //当前所在工序不是测试工序，条码不是排队状态不允许进站
             var noLinUpSFCs = sfcProduceList.Where(c => c.Status != SfcProduceStatusEnum.lineUp
                                                         && procedureEntityList.Where(p => p.Type == ProcedureTypeEnum.Test)
-                                                        .Select(p => p.Id).Contains(c.ProcedureId) == false);
+                                                        .Select(p => p.Id).Contains(c.ProcedureId) == false).Select(p => p.SFC);
             if (noLinUpSFCs.Any())
                 throw new CustomerValidationException(nameof(ErrorCode.MES19129)).WithData("SFCS", string.Join(',', noLinUpSFCs));
             //查询已有的条码信息
@@ -260,7 +260,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     updateManuSfcList.Add(sfcEntity);
 
                     //查询已有条码信息
-                    var sfcInfoEntity = sfcInfoEntities.Where(c => c.SfcId == sfcEntity.Id).First();
+                    var sfcInfoEntity = sfcInfoEntities.Where(c => c.SfcId == sfcEntity.Id).FirstOrDefault();
                     //已有条码信息不是当前工单
                     if ((sfcInfoEntity != null && sfcInfoEntity.WorkOrderId != planWorkOrderEntity.Id) || sfcInfoEntity == null)
                     {
@@ -277,7 +277,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                         });
                     }
                     //条码生成信息
-                    var manuSfcProduceEntity = sfcProduceList.Where(c => c.SFC == sfcEntity.SFC).First();
+                    var manuSfcProduceEntity = sfcProduceList.Where(c => c.SFC == sfcEntity.SFC).FirstOrDefault();
                     if ((manuSfcProduceEntity != null && manuSfcProduceEntity.WorkOrderId != planWorkOrderEntity.Id) || manuSfcProduceEntity == null)
                     {
                         manuSfcProduceList.Add(new ManuSfcProduceEntity

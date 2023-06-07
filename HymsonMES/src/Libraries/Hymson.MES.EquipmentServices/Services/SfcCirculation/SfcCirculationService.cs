@@ -274,7 +274,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             //数据提交
             using var trans = TransactionHelper.GetTransactionScope();
             int rows = 0;
-            if (mpManuSfc == null)
+            if (mpManuSfc == null && sfcCirculationBindDto.IsVirtualSFC != true)
             {
                 await _manuSfcRepository.InsertAsync(manuSfc);
                 await _manuSfcInfoRepository.InsertAsync(manuSfcInfo);

@@ -57,6 +57,6 @@ namespace Hymson.MES.EquipmentServices.Dtos.OutBound
         /// 出站是否绑定模组虚拟条码参数
         /// 为兼容永泰虚拟条码场景
         /// </summary>
-        public bool? IsBindVirtualSFC { get; set; } = false;
+        public bool IsBindVirtualSFC { get; set; } = false;
     }
 }

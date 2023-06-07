@@ -25,6 +25,6 @@ namespace Hymson.MES.EquipmentServices.Dtos.SfcCirculation
         /// 是否为模组虚拟条码参数
         /// 为兼容永泰虚拟条码场景
         /// </summary>
-        public bool? IsVirtualSFC { get; set; } = false;
+        public bool IsVirtualSFC { get; set; } = false;
     }
 }
