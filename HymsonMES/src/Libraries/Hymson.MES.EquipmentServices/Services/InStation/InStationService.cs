@@ -95,7 +95,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture.InStation
         /// </summary>
         /// <param name="inStationDto"></param>
         /// <returns></returns>
-        public async Task<int> InStationAsync(InStationDto inStationDto)
+        public async Task InStationExecuteAsync(InStationDto inStationDto)
         {
             var resourceEntitys = await _procResourceRepository.GetResourceByResourceCodeAsync(new ProcResourceQuery { Status = (int)SysDataStatusEnum.Enable, ResCode = inStationDto.ResourceCode, SiteId = _currentEquipment.SiteId });
             if (resourceEntitys == null)
@@ -119,13 +119,13 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture.InStation
             //读取挂载的Job并执行
             await _manuCommonService.ReadAndExecuteJobAsync(new InStationRequestDto { ProcedureId = procedureEntity.Id, ResourceId = resourceEntitys.Id, Param = dic });
 
-            var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery { Sfc = inStationDto.SFC, SiteId = _currentEquipment.SiteId });
-            if (sfcProduceEntity == null)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19918));
-            }
-            //执行进站
-            return await InStationExecuteAsync(sfcProduceEntity);
+            //var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery { Sfc = inStationDto.SFC, SiteId = _currentEquipment.SiteId });
+            //if (sfcProduceEntity == null)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES19918));
+            //}
+            ////执行进站
+            //return await InStationExecuteAsync(sfcProduceEntity);
         }
 
         /// <summary>
@@ -133,7 +133,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture.InStation
         /// </summary>
         /// <param name="sfcProduceEntity"></param>
         /// <returns></returns>
-        public async Task<int> InStationExecuteAsync(ManuSfcProduceEntity sfcProduceEntity)
+        public async Task<int> InStationAsync(ManuSfcProduceEntity sfcProduceEntity)
         {
             var rows = 0;
 

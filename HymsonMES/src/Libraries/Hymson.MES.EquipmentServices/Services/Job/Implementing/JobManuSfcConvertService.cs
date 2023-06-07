@@ -1,4 +1,6 @@
 ﻿using Hymson.Infrastructure.Exceptions;
+using Hymson.Kafka.Debezium;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
@@ -75,6 +77,11 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
 
         /// <summary>
+        /// 
+        /// </summary>
+        private readonly ILocalizationService _localizationService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentEquipment"></param>
@@ -93,7 +100,8 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
         /// <param name="manuCommonService"></param>
         /// <param name="planWorkOrderBindRepository"></param>
         /// <param name="inStationService"></param>
-        /// <param name="whMaterialInventoryRepository"></param> 
+        /// <param name="whMaterialInventoryRepository"></param>
+        /// <param name="localizationService"></param> 
         public JobManuSfcConvertService(ICurrentEquipment currentEquipment, IProcMaskCodeRuleRepository procMaskCodeRuleRepository,
             IProcResourceRepository procResourceRepository,
             IManuSfcStepRepository manuSfcStepRepository,
@@ -107,7 +115,7 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
             IProcBomRepository procBomRepository,
             IProcBomDetailRepository procBomDetailRepository, ICommonService manuCommonService,
             IPlanWorkOrderBindRepository planWorkOrderBindRepository, IInStationService inStationService,
-            IWhMaterialInventoryRepository whMaterialInventoryRepository)
+            IWhMaterialInventoryRepository whMaterialInventoryRepository, ILocalizationService localizationService)
         {
             _currentEquipment = currentEquipment;
             _procMaskCodeRuleRepository = procMaskCodeRuleRepository;
@@ -126,6 +134,7 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
             _planWorkOrderBindRepository = planWorkOrderBindRepository;
             _inStationService = inStationService;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
+            _localizationService = localizationService;
         }
 
 
@@ -252,14 +261,17 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
                             throw new CustomerValidationException(nameof(ErrorCode.MES19930)).WithData("SFC", bo.SFC);
                         }
                         //当前工序在制
-                        if (manuSfcProduceEntity.Status == SfcProduceStatusEnum.lineUp && procedureEntity.Id == manuSfcProduceEntity.ResourceId)
+                        if (manuSfcProduceEntity.Status == SfcProduceStatusEnum.lineUp && procedureEntity.Id == manuSfcProduceEntity.ProcedureId)
                         {
                             //进站
-                            await _inStationService.InStationExecuteAsync(manuSfcProduceEntity);
+                            await _inStationService.InStationAsync(manuSfcProduceEntity);
                         }
                         else
                         {
-                            throw new CustomerValidationException(nameof(ErrorCode.MES19933)).WithData("SFC", bo.SFC);
+                            var statusMsg = _localizationService.GetResource($"Hymson.MES.Core.Enums.SfcProduceStatusEnum.{Enum.GetName(typeof(SfcProduceStatusEnum), manuSfcProduceEntity.Status) ?? ""}");
+                            var procedure = await _procProcedureRepository.GetByIdAsync(manuSfcProduceEntity.ProcedureId);
+                            var procedureMsg = procedure == null ? "" : procedure.Code;
+                            throw new CustomerValidationException(nameof(ErrorCode.MES19933)).WithData("SFC", bo.SFC).WithData("Procedure", procedureMsg).WithData("Status", statusMsg);
                         }
                         break;
                     //完成或入库=》扣减库存
@@ -363,7 +375,7 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
 
                         break;
                     case SfcStatusEnum.Scrapping:
-                        throw new CustomerValidationException(nameof(ErrorCode.MES19931)).WithData("SFC", bo.SFC);
+                        throw new CustomerValidationException(nameof(ErrorCode.MES19932)).WithData("SFC", bo.SFC);
                 }
 
             }
