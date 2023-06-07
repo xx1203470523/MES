@@ -191,9 +191,7 @@ namespace Hymson.MES.Services.Services.Plan
             {
                 MaterialId = material.Id,
                 ProcedureId = createDto.ProcedureId,
-                Version = material?.Version ?? "",
                 SiteId = _currentSite.SiteId ?? 0
-
             });
             foreach (var pprp in ppr)
             {

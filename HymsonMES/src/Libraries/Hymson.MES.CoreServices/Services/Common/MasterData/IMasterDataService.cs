@@ -1,40 +1,16 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
-using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.Services.Bos.Manufacture;
-using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
+using Hymson.MES.CoreServices.Bos.Manufacture;
+using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
 
-namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon
+namespace Hymson.MES.CoreServices.Services.Common.MasterData
 {
     /// <summary>
-    /// 生产共用
+    /// 
     /// </summary>
-    public interface IManuCommonService
+    public interface IMasterDataService
     {
-        /// <summary>
-        /// 验证条码掩码规则
-        /// </summary>
-        /// <param name="barCode"></param>
-        /// <param name="materialId"></param>
-        /// <returns></returns>
-        Task<bool> CheckBarCodeByMaskCodeRuleAsync(string barCode, long materialId);
-
-        /// <summary>
-        /// 检查条码是否可以执行某流程
-        /// </summary>
-        /// <param name="bo"></param>
-        /// <param name="sfcCirculationType"></param>
-        /// <returns></returns>
-        Task<bool> CheckSFCIsCanDoneStepAsync(ManufactureBo bo, SfcCirculationTypeEnum sfcCirculationType);
-
-        /// <summary>
-        /// 获取生产条码信息
-        /// </summary>
-        /// <param name="sfc"></param>
-        /// <returns></returns>
-        Task<(ManuSfcProduceEntity, ManuSfcProduceBusinessEntity)> GetProduceSFCAsync(string sfc);
-
         /// <summary>
         /// 获取生产工单
         /// </summary>
@@ -49,6 +25,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="workOrderId"></param>
         /// <returns></returns>
         Task<PlanWorkOrderEntity> GetWorkOrderByIdAsync(long workOrderId);
+
+        /// <summary>
+        /// 通过BomId获取物料集合（包含替代料）
+        /// </summary>
+        /// <param name="bomId"></param>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<BomMaterialBo>> GetProcMaterialEntitiesByBomIdAndProcedureIdAsync(long bomId, long procedureId);
 
         /// <summary>
         /// 获取首工序
@@ -90,13 +74,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         Task<bool> IsFirstProcedureAsync(long processRouteId, long procedureId);
 
         /// <summary>
-        /// 获取工艺路线
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<IEnumerable<ProcessRouteDetailDto>> GetProcessRouteAsync(long id);
-
-        /// <summary>
         /// 验证开始工序是否在结束工序之前
         /// </summary>
         /// <param name="processRouteId"></param>
@@ -113,34 +90,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         Task<IEnumerable<long>> GetProcResourceIdByProcedureIdAsync(long procedureId);
 
         /// <summary>
-        /// 批量验证条码是否锁定
+        /// 获取工艺路线
         /// </summary>
-        /// <param name="sfcs"></param>
+        /// <param name="processRouteId"></param>
         /// <returns></returns>
-        Task VerifySfcsLockAsync(IEnumerable<string> sfcs);
-
-        /// <summary>
-        /// 批量判断条码是否锁定
-        /// </summary>
-        /// <param name="sfcs"></param>
-        /// <param name="procedureId"></param>
-        /// <returns></returns>
-        Task VerifySfcsLockAsync(string[] sfcs, long procedureId);
-
-        /// <summary>
-        /// 批量验证条码是否被容器包装
-        /// </summary>
-        /// <param name="sfcs"></param>
-        /// <returns></returns>
-        Task VerifyContainerAsync(string[] sfcs);
-
-        /// <summary>
-        /// 验证条码BOM清单用量
-        /// </summary>
-        /// <param name="bomId"></param>
-        /// <param name="procedureId"></param>
-        /// <param name="sfc"></param>
-        /// <returns></returns>
-        Task VerifyBomQtyAsync(long bomId, long procedureId, string sfc);
+        Task<IEnumerable<ProcessRouteDetailDto>> GetProcessRouteAsync(long processRouteId);
     }
 }

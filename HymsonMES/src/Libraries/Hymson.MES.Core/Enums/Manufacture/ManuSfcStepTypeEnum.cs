@@ -7,8 +7,6 @@ namespace Hymson.MES.Core.Enums.Manufacture
     /// </summary>
     public enum ManuSfcStepTypeEnum : short
     {
-        // ; 跟枚举的对应不上了，具体以枚举的为准
-        // 步骤类型;1：创建；3：进站；4：出站；5：将来锁定；6：及时锁定；7：解锁；9：报废；14：转换；15;关闭标识;16:关闭缺陷;17:删除;18:维修;19:步骤控制;20:生产更改
         /// <summary>
         /// 下达
         /// </summary>

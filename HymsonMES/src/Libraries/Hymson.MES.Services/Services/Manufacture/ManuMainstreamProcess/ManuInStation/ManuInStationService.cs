@@ -185,8 +185,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
                 trans.Complete();
             }
 
-            return rows;
+            return rows;    
         }
-
     }
 }

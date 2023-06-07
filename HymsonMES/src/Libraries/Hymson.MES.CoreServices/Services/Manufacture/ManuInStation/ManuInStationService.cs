@@ -59,7 +59,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuInStation
 
         private async Task ExecuteInStation()
         { 
-        
+              
         }
     }
 }
