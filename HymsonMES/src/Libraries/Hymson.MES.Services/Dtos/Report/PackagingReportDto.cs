@@ -88,6 +88,11 @@ namespace Hymson.MES.Services.Dtos.Report
     public record PlanWorkPackingDto :BaseEntityDto
     {
         /// <summary>
+        /// 父级容器编码
+        /// </summary>
+        public string ParentContainerCode { get; set; }
+
+        /// <summary>
         /// 容器条码
         /// </summary>
         public string BarCode { get; set; }
