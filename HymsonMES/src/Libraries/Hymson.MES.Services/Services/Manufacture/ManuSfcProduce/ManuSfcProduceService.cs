@@ -837,14 +837,19 @@ namespace Hymson.MES.Services.Services.Manufacture
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
-                //1.插入数据操作类型为报废
-                rows += await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
-
-                //2.修改在制品表,IsScrap
+                //1.修改在制品表,IsScrap
                 rows += await _manuSfcProduceRepository.UpdateIsScrapAsync(isScrapCommand);
+                if (rows < sfcs.Count())
+                {
+                    //报错
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15413)).WithData("sfcs", string.Join("','", sfcs));
+                }
 
-                //3.条码信息表
+                //2.条码信息表
                 rows += await _manuSfcRepository.UpdateStatusAsync(manuSfcInfoUpdate);
+
+                //3.插入数据操作类型为报废
+                rows += await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
                 trans.Complete();
             }
         }

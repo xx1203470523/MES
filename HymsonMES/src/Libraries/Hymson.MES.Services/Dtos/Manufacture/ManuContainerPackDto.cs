@@ -26,6 +26,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long SiteId { get; set; }
 
         /// <summary>
+        /// 包装等级
+        /// </summary>
+        public int PackLevel { get; set; }
+
+        /// <summary>
         /// 资源ID
         /// </summary>
         public long ResourceId { get; set; }
