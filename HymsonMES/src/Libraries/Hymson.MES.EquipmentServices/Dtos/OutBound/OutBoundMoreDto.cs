@@ -52,5 +52,11 @@ namespace Hymson.MES.EquipmentServices.Dtos.OutBound
         /// 是否过站
         /// </summary>
         public bool IsPassingStation { get; set; } = false;
+
+        /// <summary>
+        /// 出站是否绑定模组虚拟条码参数
+        /// 为兼容永泰虚拟条码场景
+        /// </summary>
+        public bool? IsBindVirtualSFC { get; set; } = false;
     }
 }

@@ -20,5 +20,11 @@ namespace Hymson.MES.EquipmentServices.Dtos.SfcCirculation
         /// 解绑的条码列表
         /// </summary>
         public string[] UnBindSFCs { get; set; } = Array.Empty<string>();
+
+        /// <summary>
+        /// 是否为模组虚拟条码参数
+        /// 为兼容永泰虚拟条码场景
+        /// </summary>
+        public bool? IsVirtualSFC { get; set; } = false;
     }
 }

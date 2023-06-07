@@ -1,5 +1,6 @@
 ﻿using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Process;
@@ -25,11 +26,6 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
     /// </summary>
     public class EquipmentCollectService : IEquipmentCollectService
     {
-        /// <summary>
-        /// 默认条码（应该统一出处存放常量）
-        /// </summary>
-        private const string DefaultSFC = "HYM123456789";
-
         /// <summary>
         /// 
         /// </summary>
@@ -280,7 +276,7 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
                 SiteId = resourceEntity.SiteId,
                 EquipmentId = _currentEquipment.Id ?? 0,
                 ResourceId = resourceEntity.Id,
-                SFC = DefaultSFC
+                SFC = ManuProductParameter.DefaultSFC
             });
             if (isExists == true) throw new CustomerValidationException(nameof(ErrorCode.MES19113));
 
@@ -296,7 +292,7 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
                 LocalTime = request.LocalTime,
 
                 //ProcedureId = 0,
-                SFC = DefaultSFC,
+                SFC = ManuProductParameter.DefaultSFC,
                 ResourceId = resourceEntity.Id,
                 ParameterId = GetParameterIdByParameterCode(s.ParamCode, parameterEntities),
                 ParamValue = s.ParamValue,
@@ -311,7 +307,7 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
 
             await _manuProductParameterRepository.InsertsAsync(entities);
 
-            return DefaultSFC;
+            return ManuProductParameter.DefaultSFC;
         }
 
         /// <summary>

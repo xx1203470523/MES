@@ -29,5 +29,27 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<bool> IsExistsAsync(EquipmentIdQuery query);
 
+
+        /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="manuProductParameterEntity"></param>
+        /// <returns></returns>
+        Task<int> UpdateAsync(ManuProductParameterEntity manuProductParameterEntity);
+
+        /// <summary>
+        /// 批量更新 
+        /// </summary>
+        /// <param name="manuProductParameterEntities"></param>
+        /// <returns></returns>
+        Task<int> UpdateRangeAsync(IEnumerable<ManuProductParameterEntity> manuProductParameterEntities);
+
+        /// <summary>
+        /// 查询ManuProductParameter
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuProductParameterEntity>> GetManuProductParameterAsync(ManuProductParameterQuery query);
+
     }
 }

@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
@@ -9,6 +10,7 @@ using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuProductParameter.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Plan;
@@ -16,6 +18,7 @@ using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
+using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Dtos.OutBound;
 using Hymson.Sequences;
 using Hymson.Snowflake;
@@ -125,7 +128,8 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                         NG=outBoundDto.NG,
                         ParamList=outBoundDto.ParamList,
                         Passed = outBoundDto.Passed,
-                        IsPassingStation = outBoundDto.IsPassingStation
+                        IsPassingStation = outBoundDto.IsPassingStation,
+                        IsBindVirtualSFC = outBoundDto.IsBindVirtualSFC
                     }
                 }
             };
@@ -169,6 +173,14 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 Ids = new long[] { _currentEquipment.Id ?? 0 },
                 ResourceId = procResource.Id
             };
+
+            //出站时IsBindVirtualSFC 为true 不能多条一起出站
+            var bindVirtualSfcCount = outBoundMoreDto.SFCs.Where(c => c.IsBindVirtualSFC == true).Count();
+            if (bindVirtualSfcCount > 1)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19135));
+            }
+
             var resEquipentBind = await _procResourceEquipmentBindRepository.GetByResourceIdAsync(resourceEquipmentBindQuery);
             if (resEquipentBind.Any() == false)
             {
@@ -228,14 +240,12 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 if (outBoundMoreSfcs.Any())
                     throw new CustomerValidationException(nameof(ErrorCode.MES19128)).WithData("SFCS", string.Join(',', outBoundMoreSfcs.Select(c => c.SFC)));
             }
-
             //条码流转信息
             List<ManuSfcCirculationEntity> manuSfcCirculationEntities = new List<ManuSfcCirculationEntity>();
             List<string> delManuSfcProduces = new List<string>();
             List<ManuSfcStepEntity> manuSfcStepEntities = new List<ManuSfcStepEntity>();
             List<ManuSfcEntity> manuSfcEntities = new List<ManuSfcEntity>();
             List<ManuSfcProduceEntity> manuSfcProduceEntities = new List<ManuSfcProduceEntity>();
-
             //SFC信息处理
             foreach (var outBoundSFCDto in outBoundMoreDto.SFCs)
             {
@@ -267,7 +277,6 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                     UpdatedOn = HymsonClock.Now(),
                     IsPassingStation = outBoundSFCDto.IsPassingStation//是否是过站
                 };
-
                 // 获取下一个工序（如果没有了，就表示完工） TODO 这里GetNextProcedureAsync里需要缓存
                 var nextProcedure = await GetNextProcedureAsync(sfcProduceEntity.WorkOrderId, sfcProduceEntity.ProcessRouteId, sfcProduceEntity.ProcedureId);
                 //完工
@@ -333,9 +342,13 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                     manuSfcStepEntity.CurrentStatus = SfcProduceStatusEnum.Activity;
                     manuSfcStepEntity.Operatetype = ManuSfcStepTypeEnum.OutStock;
                     manuSfcStepEntities.Add(manuSfcStepEntity);
-
                 }
             }
+
+            //虚拟条码绑定流转信息处理
+            var manuSfcCirculationUpdateEntities = await BindVirtualSFCCirculation(outBoundMoreDto);
+            //虚拟条码更新为实际模组条码
+            var manuProductParameterUpdateEntities = await BindBirtualProductParameter(outBoundMoreDto);
 
             //SFC关联绑定流转信息处理
             var manuSfcCirculationBarCodeQuery = new ManuSfcCirculationBarCodeQuery
@@ -373,7 +386,6 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 }
             }
 
-
             //标准参数
             List<ManuProductParameterEntity> manuProductParameterEntities = await PrepareProductParameterEntity(outBoundMoreDto, manuSfcStepEntities, procResource.Id);
             //NG
@@ -388,6 +400,11 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             if (manuSfcCirculationEntities.Any())
             {
                 rows += await _manuSfcCirculationRepository.InsertRangeAsync(manuSfcCirculationEntities);
+            }
+            //修改原有虚拟条码绑定记录
+            if (manuSfcCirculationUpdateEntities.Any())
+            {
+                rows += await _manuSfcCirculationRepository.UpdateRangeAsync(manuSfcCirculationUpdateEntities);
             }
             //删除完工条码信息
             if (delManuSfcProduces.Any())
@@ -425,6 +442,18 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 }
                 rows += await _manuProductParameterRepository.InsertsAsync(manuProductParameterEntities);
             }
+            //虚拟条码产品参数更新
+            if (manuProductParameterUpdateEntities.Any())
+            {
+                foreach (var entity in manuProductParameterUpdateEntities)
+                {
+                    var sfcProduceEntity = sfcProduceList.Where(c => c.SFC == entity.SFC).First();
+                    entity.ProcedureId = sfcProduceEntity.ProcedureId;
+                    entity.ProductId = sfcProduceEntity.ProductId;
+                    entity.WorkOrderId = sfcProduceEntity.WorkOrderId;
+                }
+                rows += await _manuProductParameterRepository.UpdateRangeAsync(manuProductParameterUpdateEntities);
+            }
             //Ng信息
             if (manuProductNGEntities.Any())
             {
@@ -435,7 +464,6 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             {
                 rows += await _manuSfcStepMaterialRepository.InsertsAsync(manuProductMaterialEntities);
             }
-
             // 更新工单统计表的 RealEnd
             rows += await _planWorkOrderRepository.UpdatePlanWorkOrderRealEndByWorkOrderIdAsync(new UpdateWorkOrderRealTimeCommand
             {
@@ -452,6 +480,68 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 Qty = outBoundMoreDto.SFCs.Length,
             });
             trans.Complete();
+        }
+
+        /// <summary>
+        /// 绑定前段工序传递的虚拟条码
+        /// </summary>
+        /// <param name="outBoundMoreDto"></param>
+        /// <returns></returns>
+        private async Task<IEnumerable<ManuSfcCirculationEntity>> BindVirtualSFCCirculation(OutBoundMoreDto outBoundMoreDto)
+        {
+            //虚拟码绑定处理
+            List<ManuSfcCirculationEntity> manuSfcCirculationUpdateEntities = new List<ManuSfcCirculationEntity>();
+            //虚拟条码绑定时只会存在一个SFC同时出站（业务调研时确认过）
+            var outBindVirtualSFC = outBoundMoreDto.SFCs.Where(c => c.IsBindVirtualSFC == true)?.FirstOrDefault();
+            if (outBindVirtualSFC != null)
+            {
+                var bindVirtualSFCCirculationBarCodeQuery = new ManuSfcCirculationBarCodeQuery
+                {
+                    CirculationType = SfcCirculationTypeEnum.Change,//虚拟条码绑定关系为转换
+                    IsDisassemble = TrueOrFalseEnum.No,
+                    SiteId = _currentEquipment.SiteId,
+                    CirculationBarCodes = new string[] { ManuProductParameter.DefaultSFC }
+                };
+                var manuSfcCirculationBarCodeEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntities(bindVirtualSFCCirculationBarCodeQuery);
+                foreach (var item in manuSfcCirculationBarCodeEntities)
+                {
+                    item.CirculationBarCode = outBindVirtualSFC.SFC;
+                    item.UpdatedBy = _currentEquipment.Name;
+                    item.UpdatedOn = HymsonClock.Now();
+                    manuSfcCirculationUpdateEntities.Add(item);
+                }
+            }
+            return manuSfcCirculationUpdateEntities;
+        }
+
+        /// <summary>
+        /// 前段工序传递的虚拟条码参数
+        /// </summary>
+        /// <param name="outBoundMoreDto"></param>
+        /// <returns></returns>
+        private async Task<IEnumerable<ManuProductParameterEntity>> BindBirtualProductParameter(OutBoundMoreDto outBoundMoreDto)
+        {
+            //虚拟码绑定处理
+            var manuProductParameterEntities = new List<ManuProductParameterEntity>();
+            //虚拟条码绑定时只会存在一个SFC同时出站
+            var outBindVirtualSFC = outBoundMoreDto.SFCs.Where(c => c.IsBindVirtualSFC == true)?.FirstOrDefault();
+            if (outBindVirtualSFC != null)
+            {
+                var manuProductParameterQuery = new ManuProductParameterQuery
+                {
+                    SiteId = _currentEquipment.SiteId,
+                    SFC = ManuProductParameter.DefaultSFC
+                };
+                var manuProductParameters = await _manuProductParameterRepository.GetManuProductParameterAsync(manuProductParameterQuery);
+                foreach (var item in manuProductParameters)
+                {
+                    item.SFC = outBindVirtualSFC.SFC;
+                    item.UpdatedBy = _currentEquipment.Name;
+                    item.UpdatedOn = HymsonClock.Now();
+                    manuProductParameterEntities.Add(item);
+                }
+            }
+            return manuProductParameterEntities;
         }
 
         /// <summary>

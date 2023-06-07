@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
@@ -95,6 +96,16 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
+            if (sfcCirculationBindDto.IsVirtualSFC == true && !string.IsNullOrEmpty(sfcCirculationBindDto.SFC))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19133));
+            }
+            //如果为虚拟条码绑定
+            if (sfcCirculationBindDto.IsVirtualSFC == true)
+            {
+                sfcCirculationBindDto.SFC = ManuProductParameter.DefaultSFC;
+            }
+
             await GetPubInfoByResourceCode(sfcCirculationBindDto.ResourceCode);
 
             var sfcs = sfcCirculationBindDto.BindSFCs.Select(c => c.SFC).ToArray();
@@ -159,7 +170,8 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                     CirculationMainProductId = sfcProduceEntity.ProductId,
                     Location = circulationBindSFC.Location,
                     CirculationQty = 1,
-                    CirculationType = SfcCirculationTypeEnum.Merge,
+                    //使用虚拟码记录为转换
+                    CirculationType = sfcCirculationBindDto.IsVirtualSFC == true ? SfcCirculationTypeEnum.Change : SfcCirculationTypeEnum.Merge,
                     CreatedBy = _currentEquipment.Name,
                     CreatedOn = HymsonClock.Now(),
                     UpdatedBy = _currentEquipment.Name,
@@ -167,7 +179,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                 });
             }
             //绑定条码信息
-            if (mpManuSfc == null)
+            if (mpManuSfc == null && sfcCirculationBindDto.IsVirtualSFC != true)
             {
                 var sfcProduceEntity = sfcProduceList.First();
                 manuSfc = new ManuSfcEntity
@@ -294,6 +306,15 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
+            if (sfcCirculationUnBindDto.IsVirtualSFC == true && !string.IsNullOrEmpty(sfcCirculationUnBindDto.SFC))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19133));
+            }
+            //如果为虚拟条码
+            if (sfcCirculationUnBindDto.IsVirtualSFC == true)
+            {
+                sfcCirculationUnBindDto.SFC = ManuProductParameter.DefaultSFC;
+            }
             var manuSfcCirculationBarCodequery = new ManuSfcCirculationBarCodeQuery
             {
                 CirculationType = SfcCirculationTypeEnum.Merge,
@@ -333,7 +354,15 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         public async Task SfcCirculationModuleAdd(SfcCirculationBindDto sfcCirculationBindDto)
         {
             await GetPubInfoByResourceCode(sfcCirculationBindDto.ResourceCode);
-
+            if (sfcCirculationBindDto.IsVirtualSFC == true && !string.IsNullOrEmpty(sfcCirculationBindDto.SFC))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19133));
+            }
+            //如果为虚拟条码
+            if (sfcCirculationBindDto.IsVirtualSFC == true)
+            {
+                sfcCirculationBindDto.SFC = ManuProductParameter.DefaultSFC;
+            }
             //获取主条码信息
             var sfcEntity = await _manuSfcRepository.GetBySFCAsync(new GetBySFCQuery { SFC = sfcCirculationBindDto.SFC, SiteId = _currentEquipment.SiteId });
             //查询已经存在条码的生产信息

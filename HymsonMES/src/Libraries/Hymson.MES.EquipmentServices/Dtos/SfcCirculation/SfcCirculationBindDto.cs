@@ -19,6 +19,12 @@ namespace Hymson.MES.EquipmentServices.Dtos.SfcCirculation
         /// 模组绑电芯条码/Pack绑模组条码
         /// </summary>
         public CirculationBindDto[] BindSFCs { get; set; }
+
+        /// <summary>
+        /// 是否为模组虚拟条码参数
+        /// 为兼容永泰虚拟条码场景
+        /// </summary>
+        public bool? IsVirtualSFC { get; set; } = false;
     }
 
     public class CirculationBindDto

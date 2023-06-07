@@ -818,6 +818,9 @@
         public const string MES19130 = "条码：{SFCS}超过或达到最大复投次数限制，不允许进站";
         public const string MES19131 = "资源：{ResCode}和设备：{EquCode}不存在绑定关系，请检查配置";
         public const string MES19132 = "条码：{SFCS}未进站不能操作绑定";
+        public const string MES19133 = "IsVirtualSFC为True时不需要传递SFC";
+        public const string MES19134 = "条码：{SFCS}没找到关联虚拟码绑定关系";
+        public const string MES19135 = "IsBindVirtualSFC为True时不能传递多个条码";
 
 
 

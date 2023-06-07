@@ -1,7 +1,5 @@
 ﻿using FluentValidation;
-using FluentValidation.Results;
 using Hymson.Infrastructure.Exceptions;
-using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Process;
@@ -10,11 +8,13 @@ using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
+using Hymson.MES.EquipmentServices.Dtos.OutBound;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -43,6 +43,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
         private readonly IProcProcedureRepository _procProcedureRepository;
         private readonly IProcProcessRouteDetailNodeRepository _procProcessRouteDetailNodeRepository;
         private readonly IProcResourceEquipmentBindRepository _procResourceEquipmentBindRepository;
+        private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
 
         public InBoundService(AbstractValidator<InBoundDto> validationInBoundDtoRules,
             ICurrentEquipment currentEquipment,
@@ -58,7 +59,8 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             IInteWorkCenterRepository inteWorkCenterRepository,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
             IProcProcedureRepository procProcedureRepository,
-            IProcResourceEquipmentBindRepository procResourceEquipmentBindRepository)
+            IProcResourceEquipmentBindRepository procResourceEquipmentBindRepository,
+            IManuSfcCirculationRepository manuSfcCirculationRepository)
         {
             _validationInBoundDtoRules = validationInBoundDtoRules;
             _currentEquipment = currentEquipment;
@@ -75,6 +77,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
             _procProcedureRepository = procProcedureRepository;
             _procResourceEquipmentBindRepository = procResourceEquipmentBindRepository;
+            _manuSfcCirculationRepository = manuSfcCirculationRepository;
         }
         #endregion
 
@@ -95,7 +98,8 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             {
                 SFCs = new string[] { inBoundDto.SFC },
                 ResourceCode = inBoundDto.ResourceCode,
-                LocalTime = inBoundDto.LocalTime
+                LocalTime = inBoundDto.LocalTime,
+                IsVerifyVirtualSFC = inBoundDto.IsVerifyVirtualSFC
             };
             await SFCInBound(inBoundMore);
         }
@@ -142,6 +146,11 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             if (resEquipentBind.Any() == false)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19131)).WithData("ResCode", procResource.ResCode).WithData("EquCode", _currentEquipment.Code);
+            }
+            //验证虚拟条码
+            if (inBoundMoreDto.IsVerifyVirtualSFC == true)
+            {
+                await VerifyVirtualSFC(inBoundMoreDto);
             }
 
             //查找当前工作中心（产线）
@@ -422,6 +431,28 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             await _manuSfcProduceRepository.InsertRangeAsync(manuSfcProduceList);
             await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
             ts.Complete();
+        }
+
+        /// <summary>
+        /// 校验虚拟码
+        /// </summary>
+        /// <param name="inBoundMoreDto"></param>
+        /// <returns></returns>
+        private async Task VerifyVirtualSFC(InBoundMoreDto inBoundMoreDto)
+        {
+            //SFC流转信息处理
+            var manuSfcCirculationBarCodeQuery = new ManuSfcCirculationBarCodeQuery
+            {
+                CirculationType = SfcCirculationTypeEnum.Change,
+                IsDisassemble = TrueOrFalseEnum.No,
+                SiteId = _currentEquipment.SiteId,
+                Sfcs = inBoundMoreDto.SFCs.Select(sfc => sfc).ToArray()
+            };
+            var manuSfcCirculationBarCodeEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntities(manuSfcCirculationBarCodeQuery);
+            //如果有不存在的SFC就提示
+            var noIncludeSfcs = inBoundMoreDto.SFCs.Where(sfc => manuSfcCirculationBarCodeEntities.Select(s => s.SFC).Contains(sfc) == false);
+            if (noIncludeSfcs.Any() == true)
+                throw new CustomerValidationException(nameof(ErrorCode.MES19134)).WithData("SFCS", string.Join(',', noIncludeSfcs));
         }
 
         /// <summary>
