@@ -295,7 +295,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                         WorkOrderId = sfcProduceEntity.WorkOrderId,
                         ProductId = sfcProduceEntity.ProductId,
                         EquipmentId = _currentEquipment.Id,
-                        CirculationBarCode = "",//不关联上料
+                        CirculationBarCode = "",
                         CirculationProductId = manuSfcStepEntity.ProductId,
                         CirculationMainProductId = manuSfcStepEntity.ProductId,
                         CirculationQty = 1,
@@ -505,6 +505,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 var manuSfcCirculationBarCodeEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntities(bindVirtualSFCCirculationBarCodeQuery);
                 foreach (var item in manuSfcCirculationBarCodeEntities)
                 {
+                    item.CirculationType = SfcCirculationTypeEnum.Change;
                     item.CirculationBarCode = outBindVirtualSFC.SFC;
                     item.UpdatedBy = _currentEquipment.Name;
                     item.UpdatedOn = HymsonClock.Now();
