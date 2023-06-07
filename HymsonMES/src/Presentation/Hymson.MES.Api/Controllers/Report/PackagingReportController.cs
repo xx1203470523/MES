@@ -65,6 +65,18 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <param name="queryDto"></param>
         /// <returns></returns>
         [HttpGet]
+        [Route("packPagelist")]
+        public async Task<PagedInfo<ManuContainerPackDto>> GetContainerPackPagedListAsync([FromQuery] ManuContainerPackPagedQueryDto queryDto)
+        {
+            return await _packagingReportService.GetContainerPackPagedListAsync(queryDto);
+        }
+
+        /// <summary>
+        /// 根据查询条件获取分页数据
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        [HttpGet]
         [Route("orderPagelist")]
         public async Task<PagedInfo<PlanWorkPackingDto>> GetPagedListAsync([FromQuery] ManuContainerBarcodePagedQueryDto queryDto)
         {
