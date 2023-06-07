@@ -19,10 +19,10 @@ namespace Hymson.MES.Data.Repositories.Process
     /// <summary>
     /// 工序和资源半成品产品设置表仓储
     /// </summary>
-    public partial class ProcProductSetRepository :BaseRepository, IProcProductSetRepository
+    public partial class ProcProductSetRepository : BaseRepository, IProcProductSetRepository
     {
 
-        public ProcProductSetRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        public ProcProductSetRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
         }
 
@@ -43,7 +43,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -57,7 +57,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<ProcProductSetEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ProcProductSetEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ProcProductSetEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -65,10 +65,21 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcProductSetEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ProcProductSetEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<ProcProductSetEntity>(GetByIdsSql, new { Ids = ids});
+            return await conn.QueryAsync<ProcProductSetEntity>(GetByIdsSql, new { Ids = ids });
+        }
+
+        /// <summary>
+        /// 根据资源/工序ID或者产品ID批量获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<ProcProductSetEntity> GetByProcedureIdAndProductIdAsync(GetByProcedureIdAndProductIdQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ProcProductSetEntity>(GetByProcedureIdAndProductIdSql, query);
         }
 
         /// <summary>
@@ -88,7 +99,7 @@ namespace Hymson.MES.Data.Repositories.Process
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
-           
+
             var offSet = (procProductSetPagedQuery.PageIndex - 1) * procProductSetPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = procProductSetPagedQuery.PageSize });
@@ -205,7 +216,12 @@ namespace Hymson.MES.Data.Repositories.Process
                             FROM `proc_product_set`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `CreatedBy`, `CreatedOn`, `ProductId`, `SetPointId`, `SemiProductId`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `proc_product_set`  WHERE Id IN @Ids ";
+                            FROM `proc_product_set `  WHERE Id IN @Ids ";
+
+
+        const string GetByProcedureIdAndProductIdSql = @"SELECT  
+                               `Id`, `SiteId`, `CreatedBy`, `CreatedOn`, `ProductId`, `SetPointId`, `SemiProductId`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM  proc_product_set   WHERE   SiteId=@SiteId AND IsDeleted=0 AND SetPointId = @SetPointId AND ProductId=@ProductId";
 
         const string DeleteBySetPointIdSql = "delete from `proc_product_set` WHERE SetPointId = @SetPointId ";
         #endregion

@@ -48,7 +48,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         private readonly IPlanSfcPrintService _planSfcPrintService;
 
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
@@ -226,7 +226,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         /// <returns></returns>
         public async Task CreateBarcodeByWorkOrderIdAndPrintAsync(CreateBarcodeByWorkOrderAndPrintDto param)
         {
-            var lst = await CreateBarcodeByWorkOrderIdAsync(new CreateBarcodeByWorkOrderDto() { Qty = param.Qty, WorkOrderId = param.WorkOrderId });
+            var lst = await CreateBarcodeByWorkOrderIdAsync(new CreateBarcodeByWorkOrderDto()
+            {
+                Qty = param.Qty,
+                WorkOrderId = param.WorkOrderId
+            });
+
             foreach (var item in lst)
             {
                 await _planSfcPrintService.CreatePrintAsync(new Dtos.Plan.PlanSfcPrintCreatePrintDto()

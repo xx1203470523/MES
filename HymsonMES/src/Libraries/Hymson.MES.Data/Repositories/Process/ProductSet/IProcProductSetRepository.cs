@@ -76,6 +76,13 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<IEnumerable<ProcProductSetEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
+        /// 根据资源/工序ID或者产品ID批量获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<ProcProductSetEntity> GetByProcedureIdAndProductIdAsync(GetByProcedureIdAndProductIdQuery query);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="procProductSetQuery"></param>
