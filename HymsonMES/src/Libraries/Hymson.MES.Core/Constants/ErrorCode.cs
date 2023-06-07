@@ -411,6 +411,7 @@
         public const string MES15409 = "不合格代码{codes}已录入,请勿重复录入!";
         public const string MES15410 = "SFC {sfcs}已存在返修信息，不可再执行当前操作!";
         public const string MES15411 = "条码{sfcs}已报废,不可再执行当前操作！";
+        public const string MES15412 = "条码{sfcs}已取消报废,不能重复取消!";
         #endregion
 
         #region 物料加载 15500
@@ -804,7 +805,7 @@
         public const string MES19930 = "条码：{SFC}状态为在制，但没有获取到在制信息";
         public const string MES19931 = "条码：{SFC}已锁定";
         public const string MES19932 = "条码：{SFC}已报废";
-        public const string MES19933 = "条码：{SFC}在{procedure}工序状态为{status}，不允许操作";
+        public const string MES19933 = "条码：{SFC}在{Procedure}工序状态为{Status}，不允许操作";
 
 
 

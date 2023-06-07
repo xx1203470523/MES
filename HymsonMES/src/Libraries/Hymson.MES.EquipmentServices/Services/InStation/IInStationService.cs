@@ -12,14 +12,14 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture.InStation
         /// </summary>
         /// <param name="inStationDto"></param>
         /// <returns></returns>
-        Task<int> InStationAsync(InStationDto inStationDto);
+        Task InStationExecuteAsync(InStationDto inStationDto); 
 
         /// <summary>
         /// 执行（进站）
         /// </summary>
         /// <param name="sfcProduceEntity"></param>
         /// <returns></returns> 
-        Task<int> InStationExecuteAsync(ManuSfcProduceEntity sfcProduceEntity);
+        Task<int> InStationAsync(ManuSfcProduceEntity sfcProduceEntity);
 
     }
 }

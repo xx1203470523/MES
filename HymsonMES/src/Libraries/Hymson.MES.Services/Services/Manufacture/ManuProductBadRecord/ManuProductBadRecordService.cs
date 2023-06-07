@@ -277,7 +277,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Sfcs = sfcs,
                     UserId = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now(),
-                    IsScrap = TrueOrFalseEnum.Yes
+                    IsScrap = TrueOrFalseEnum.Yes,
+                    CurrentIsScrap = TrueOrFalseEnum.No
                 };
                 using (var trans = TransactionHelper.GetTransactionScope())
                 {

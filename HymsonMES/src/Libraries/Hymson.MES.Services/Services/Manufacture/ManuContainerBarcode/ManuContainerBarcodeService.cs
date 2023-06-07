@@ -631,7 +631,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     var barcodeobj = await _manuContainerBarcodeRepository.GetByCodeAsync(new ManuContainerBarcodeQuery { BarCode = createManuContainerBarcodeDto.ContainerCode, SiteId = _currentSite.SiteId ?? 0 });
 
                     //容器跟选择的工序等级不匹配
-                    if (barcodeobj.PackLevel != (int)LevelEnum.One)
+                    if (barcodeobj.PackLevel != level)
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES16731));
                     }

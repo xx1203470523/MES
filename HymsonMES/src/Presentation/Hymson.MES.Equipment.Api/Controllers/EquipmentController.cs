@@ -52,7 +52,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [Route("InStation")]
         public async Task InStationAsync(InStationDto inStationDto)
         {
-            await _InStationService.InStationAsync(inStationDto);
+            await _InStationService.InStationExecuteAsync(inStationDto);
         }
 
         /// <summary>
