@@ -22,4 +22,26 @@ namespace Hymson.MES.Data.Repositories.Plan
 
 
     }
+
+
+    /// <summary>
+    /// 工单激活（物理删除） 查询参数(根据资源ID)
+    /// </summary>
+    public class PlanWorkOrderBindByResourceIdQuery
+    {
+        /// <summary>
+        /// 站点ID
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 设备ID
+        /// </summary>
+        public long EquipmentId { get; set; }
+    }
 }

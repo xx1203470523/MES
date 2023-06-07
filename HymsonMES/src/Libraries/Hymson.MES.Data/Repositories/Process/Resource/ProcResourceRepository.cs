@@ -89,6 +89,17 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 根据资源Code查询资源数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ProcResourceEntity> GetResourceByResourceCodeAsync(ProcResourceQuery query) 
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<ProcResourceEntity>(GetResourceByResourceCode, query);
+        }
+
+        /// <summary>
         /// 根据资源Code查询数据
         /// </summary>
         /// <param name="resourceCode"></param>
@@ -411,5 +422,8 @@ namespace Hymson.MES.Data.Repositories.Process
         const string UpdateResTypeSql = "UPDATE `proc_resource` SET ResTypeId = @ResTypeId,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id in @Ids;";
         const string UpdatedByResTypeSql = "UPDATE `proc_resource` SET ResTypeId =0,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE ResTypeId = @ResTypeId;";
         const string ClearResourceTypeIds = "UPDATE proc_resource SET ResTypeId = 0, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE ResTypeId IN @ResourceTypeIds; ";
+   
+        const string GetResourceByResourceCode = "SELECT Id, ResCode FROM proc_resource WHERE IsDeleted = 0 AND Status=@Status AND ResCode = @ResCode and SiteId =@SiteId ";
+
     }
 }

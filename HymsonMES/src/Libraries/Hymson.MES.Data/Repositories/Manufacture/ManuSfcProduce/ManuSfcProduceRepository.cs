@@ -540,14 +540,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                                              BusinessContent = @BusinessContent,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  ";
         //质量锁定sql
         const string UpdateQualityLockSql = "update  manu_sfc_produce set `Lock`=@Lock,LockProductionId=@LockProductionId,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn where SFC in  @Sfcs  and SiteId=@SiteId ";
-        const string UpdateIsScrapSql = "UPDATE `manu_sfc_produce` SET IsScrap = @IsScrap, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE SFC in @Sfcs and SiteId=SiteId ";
+        const string UpdateIsScrapSql = "UPDATE `manu_sfc_produce` SET IsScrap = @IsScrap, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE SFC in @Sfcs and SiteId=@SiteId and IsScrap =@CurrentIsScrap  ";
 
         //在制维修 
         const string UpdateStatusSql = "UPDATE `manu_sfc_produce` SET Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string UpdateProcedureIdSql = "UPDATE `manu_sfc_produce` SET  ResourceId=@ResourceId,ProcessRouteId = @ProcessRouteId, ProcedureId=@ProcedureId, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
 
         //在制品步骤控制 
-        const string UpdateProcedureAndStatusSql = "UPDATE `manu_sfc_produce` SET ProcedureId = @ProcedureId,Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE SFC in @Sfcs and SiteId=@SiteId ";
+        const string UpdateProcedureAndStatusSql = "UPDATE `manu_sfc_produce` SET ProcedureId = @ProcedureId, ResourceId=@ResourceId,Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE SFC in @Sfcs and SiteId=@SiteId ";
         //不良录入修改工艺路线和工序信息
         const string UpdateRouteSql = "UPDATE `manu_sfc_produce` SET ProcessRouteId = @ProcessRouteId, ProcedureId=@ProcedureId,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id in @Ids ";
         const string LockSfcProcedureSql = "UPDATE `manu_sfc_produce`  SET  BeforeLockedStatus=Status,Status = @Status,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE  SFC in  @Sfcs and SiteId=@SiteId ";

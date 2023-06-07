@@ -1,7 +1,8 @@
 ﻿using Hymson.MES.Core.Domain.Integrated;
-using Hymson.MES.Services.Dtos.Common;
+using Hymson.MES.CoreServices.Bos;
+using Hymson.MES.CoreServices.Dtos.Common;
 
-namespace Hymson.MES.Services.Services.Job.Common
+namespace Hymson.MES.CoreServices.Services.Common
 {
     /// <summary>
     /// 生产共用
@@ -15,6 +16,18 @@ namespace Hymson.MES.Services.Services.Job.Common
         /// <param name="param"></param>
         /// <returns></returns>
         Task<Dictionary<string, JobResponseDto>> ExecuteJobAsync(IEnumerable<InteJobEntity> jobs, Dictionary<string, string>? param);
+
+        /// <summary>
+        /// 查询类
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<JobClassBo>> GetJobClassBoListAsync();
+
+        /// <summary>
+        /// 查询类
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<SelectOptionDto>> GetClassProgramOptionsAsync();
 
     }
 }

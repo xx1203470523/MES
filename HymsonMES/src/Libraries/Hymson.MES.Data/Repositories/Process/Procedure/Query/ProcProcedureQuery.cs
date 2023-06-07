@@ -15,4 +15,21 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         public long SiteId { get; set; } = 0;
     }
+
+
+    /// <summary>
+    /// 根据资源获取工序 查询参数
+    /// </summary>
+    public class ProcProdureByResourceIdQuery
+    {
+        /// <summary>
+        ///资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 所属站点id
+        /// </summary>
+        public long SiteId { get; set; } = 0;
+    }
 }

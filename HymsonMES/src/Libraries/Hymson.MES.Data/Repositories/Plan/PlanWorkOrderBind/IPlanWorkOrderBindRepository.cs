@@ -23,7 +23,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="planWorkOrderBindEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(PlanWorkOrderBindEntity planWorkOrderBindEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -37,7 +37,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="planWorkOrderBindEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(PlanWorkOrderBindEntity planWorkOrderBindEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -52,7 +52,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -66,7 +66,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="id"></param>
         /// <returns></returns>
         Task<PlanWorkOrderBindEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -80,7 +80,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="planWorkOrderBindQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<PlanWorkOrderBindEntity>> GetPlanWorkOrderBindEntitiesAsync(PlanWorkOrderBindQuery planWorkOrderBindQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>
@@ -102,5 +102,14 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="comm"></param>
         /// <returns></returns>
         Task<int> DeletesTrueByResourceIdAndWorkOrderIdsAsync(DeleteplanWorkOrderBindCommand comm);
+
+
+        /// <summary>
+        /// 根据ResourceID获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<PlanWorkOrderBindEntity> GetByResourceIDAsync(PlanWorkOrderBindByResourceIdQuery query);
+
     }
 }

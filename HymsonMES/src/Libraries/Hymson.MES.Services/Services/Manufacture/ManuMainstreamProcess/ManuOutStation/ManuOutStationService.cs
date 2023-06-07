@@ -230,7 +230,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             foreach (var materialBo in initialMaterials)
             {
                 // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
-                decimal residue = materialBo.Usages * (materialBo.Loss ?? 1);
+                decimal residue = materialBo.Usages;
+                if (materialBo.Loss.HasValue == true && materialBo.Loss > 0) residue *= (materialBo.Loss.Value / 100);
                 if (materialBo.ConsumeRatio > 0) residue *= (materialBo.ConsumeRatio / 100);
 
                 // 收集方式是批次
@@ -549,7 +550,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             if (feedingEntities.Any() == false) return;
 
             // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
-            decimal originQty = currentBo.Usages * (currentBo.Loss ?? 1);
+            decimal originQty = currentBo.Usages;
+            if (currentBo.Loss.HasValue == true && currentBo.Loss > 0) originQty *= (currentBo.Loss.Value / 100);
             if (currentBo.ConsumeRatio > 0) originQty *= (currentBo.ConsumeRatio / 100);
 
             // 遍历当前物料的所有的物料库存
@@ -567,7 +569,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                     if (replaceBo != null)
                     {
                         // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
-                        targetQty = replaceBo.Usages * (replaceBo.Loss ?? 1);
+                        targetQty = replaceBo.Usages;
+                        if (replaceBo.Loss.HasValue == true && replaceBo.Loss > 0) targetQty *= (replaceBo.Loss.Value / 100);
                         if (replaceBo.ConsumeRatio > 0) targetQty *= (replaceBo.ConsumeRatio / 100);
                     }
                 }

@@ -61,12 +61,14 @@ namespace Hymson.MES.Api
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
+#if DEBUG
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+#endif
             #region snippet_ConfigureLocalization
             var supportedCultures = new List<CultureInfo>
             {

@@ -822,7 +822,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 Sfcs = sfcs,
                 UserId = _currentUser.UserName,
                 UpdatedOn = HymsonClock.Now(),
-                IsScrap = TrueOrFalseEnum.Yes
+                IsScrap = TrueOrFalseEnum.Yes,
+                CurrentIsScrap= TrueOrFalseEnum.No
             };
             var manuSfcInfoUpdate = new ManuSfcUpdateCommand
             {
@@ -836,14 +837,19 @@ namespace Hymson.MES.Services.Services.Manufacture
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
-                //1.插入数据操作类型为报废
-                rows += await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
-
-                //2.修改在制品表,IsScrap
+                //1.修改在制品表,IsScrap
                 rows += await _manuSfcProduceRepository.UpdateIsScrapAsync(isScrapCommand);
+                if (rows < sfcs.Count())
+                {
+                    //报错
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15413)).WithData("sfcs", string.Join("','", sfcs));
+                }
 
-                //3.条码信息表
+                //2.条码信息表
                 rows += await _manuSfcRepository.UpdateStatusAsync(manuSfcInfoUpdate);
+
+                //3.插入数据操作类型为报废
+                rows += await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
                 trans.Complete();
             }
         }
@@ -866,7 +872,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES15400));
             }
 
-            var sfc = parm.Sfcs.Distinct();
             var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = parm.Sfcs, SiteId = _currentSite.SiteId ?? 00 };
             //获取条码列表
             var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
@@ -910,14 +915,17 @@ namespace Hymson.MES.Services.Services.Manufacture
             var sfcStepList = GetSfcStepList(manuSfcs, parm.Remark ?? "", ManuSfcStepTypeEnum.CancelDiscard);
 
             var sfcs = manuSfcs.Select(a => a.SFC).ToArray();
+            //把更改前的状态作为状态传入
             var isScrapCommand = new UpdateIsScrapCommand
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 Sfcs = sfcs,
                 UserId = _currentUser.UserName,
                 UpdatedOn = HymsonClock.Now(),
-                IsScrap = TrueOrFalseEnum.No
+                IsScrap = TrueOrFalseEnum.No,
+                CurrentIsScrap= TrueOrFalseEnum.Yes
             };
+
             var manuSfcInfoUpdate = new ManuSfcUpdateCommand
             {
                 Sfcs = sfcs,
@@ -931,14 +939,20 @@ namespace Hymson.MES.Services.Services.Manufacture
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
-                //1.插入数据操作类型为取消报废
+                //1.修改在制品表,IsScrap
+                rows += await _manuSfcProduceRepository.UpdateIsScrapAsync(isScrapCommand);
+                if(rows!= sfcs.Count() )
+                {
+                    //报错
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15412)).WithData("sfcs", string.Join("','", sfcs));
+                }
+
+                //2.条码信息表状态更改
+                rows += await _manuSfcRepository.UpdateStatusAsync(manuSfcInfoUpdate);
+
+                //3.插入数据操作类型为取消报废
                 rows += await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
 
-                //2.修改在制品表,IsScrap
-                rows += await _manuSfcProduceRepository.UpdateIsScrapAsync(isScrapCommand);
-
-                //3.条码信息表
-                rows += await _manuSfcRepository.UpdateStatusAsync(manuSfcInfoUpdate);
                 trans.Complete();
             }
         }
@@ -1748,6 +1762,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             await _manuSfcProduceRepository.UpdateProcedureAndStatusRangeAsync(new UpdateProcedureAndStatusCommand
                             {
                                 SiteId = _currentSite.SiteId ?? 0,
+                                ResourceId = null,
                                 Sfcs = sfcsArray,
                                 ProcedureId = sfcProduceStepDto.ProcedureId,
                                 Status = sfcProduceStepDto.Type,
@@ -1766,6 +1781,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         {
                             SiteId = _currentSite.SiteId ?? 0,
                             Sfcs = sfcsArray,
+                            ResourceId = null,
                             ProcedureId = sfcProduceStepDto.ProcedureId,
                             Status = sfcProduceStepDto.Type,
                             UpdatedOn = HymsonClock.Now(),

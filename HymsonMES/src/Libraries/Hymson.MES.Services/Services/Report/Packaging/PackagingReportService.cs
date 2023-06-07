@@ -12,6 +12,8 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Report;
+using Minio.DataModel;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace Hymson.MES.Services.Services.Report
@@ -80,8 +82,8 @@ namespace Hymson.MES.Services.Services.Report
                 //根据装载的条码获取到容器的id
                 var query = new ManuContainerPackQuery
                 {
-                    LadeBarCode= queryDto.Code,
-                    SiteId=_currentSite.SiteId ?? 0,
+                    LadeBarCode = queryDto.Code,
+                    SiteId = _currentSite.SiteId ?? 0,
                 };
                 var containerPackEntity = await _manuContainerPackRepository.GetByLadeBarCodeAsync(query);
                 if (containerPackEntity == null)
@@ -133,30 +135,103 @@ namespace Hymson.MES.Services.Services.Report
         /// <summary>
         /// 根据查询条件获取分页数据
         /// </summary>
+        /// <param name="manuContainerPackPagedQueryDto"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ManuContainerPackDto>> GetContainerPackPagedListAsync(ManuContainerPackPagedQueryDto manuContainerPackPagedQueryDto)
+        {
+            var manuContainerPackPagedQuery = manuContainerPackPagedQueryDto.ToQuery<ManuContainerPackPagedQuery>();
+            manuContainerPackPagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            var pagedInfo = await _manuContainerPackRepository.GetPagedInfoAsync(manuContainerPackPagedQuery);
+
+            //实体到DTO转换 装载数据
+            var manuContainerPackDtos = new List<ManuContainerPackDto>();
+            if (pagedInfo.Data == null || !pagedInfo.Data.Any())
+            {
+                return new PagedInfo<ManuContainerPackDto>(manuContainerPackDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            }
+
+            //查询容器的父容器信息
+            var ladeBarCodes = pagedInfo.Data.Select(X => X.BarCode).Distinct().ToArray();
+            var query = new ManuContainerPackQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                LadeBarCodes = ladeBarCodes
+            };
+            var manuContainerPacks = await _manuContainerPackRepository.GetByLadeBarCodesAsync(query);
+            IEnumerable<ManuContainerBarcodeEntity> parentContainers = new List<ManuContainerBarcodeEntity>();
+            if (manuContainerPacks.Any())
+            {
+                //父容器id列表
+                var parentContainerIds = manuContainerPacks.Select(x => x.ContainerBarCodeId).ToArray();
+                parentContainers = await _manuContainerBarcodeRepository.GetByIdsAsync(parentContainerIds);
+            }
+
+            foreach (var item in pagedInfo.Data)
+            {
+                var pack = manuContainerPacks.FirstOrDefault(x => x.LadeBarCode == item.BarCode);
+                manuContainerPackDtos.Add(new ManuContainerPackDto
+                {
+                    BarCode = item.BarCode,
+                    LadeBarCode = item.LadeBarCode,
+                    CreatedBy = item.CreatedBy,
+                    CreatedOn = item.CreatedOn,
+                    ParentContainerCode = parentContainers.FirstOrDefault(x => x.Id == pack?.ContainerBarCodeId)?.BarCode ?? ""
+                });
+            }
+            return new PagedInfo<ManuContainerPackDto>(manuContainerPackDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 根据查询条件获取分页数据
+        /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
         public async Task<PagedInfo<PlanWorkPackingDto>> GetPagedListAsync(ManuContainerBarcodePagedQueryDto queryDto)
         {
             var manuContainerBarcodePagedQuery = queryDto.ToQuery<ManuContainerBarcodePagedQuery>();
             manuContainerBarcodePagedQuery.SiteId = _currentSite.SiteId;
-            manuContainerBarcodePagedQuery.PackLevel=(int)LevelEnum.One;
+            manuContainerBarcodePagedQuery.PackLevel = (int)LevelEnum.One;
             var pagedInfo = await _manuContainerBarcodeRepository.GetPagedListAsync(manuContainerBarcodePagedQuery);
 
-            var list = pagedInfo.Data;
-            var containerIds = list.Select(x => x.Id).ToArray();
-            var containerPackEntities = await _manuContainerPackRepository.GetByContainerBarCodeIdsAsync(containerIds,_currentSite.SiteId??0);
-
             var workPackingDtos = new List<PlanWorkPackingDto>();
+            var list = pagedInfo.Data;
+            if (list == null || !list.Any())
+            {
+                return new PagedInfo<PlanWorkPackingDto>(workPackingDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            }
+
+            //查询容器的父容器信息
+            var ladeBarCodes = pagedInfo.Data.Select(X => X.BarCode).ToArray();
+            var query = new ManuContainerPackQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                LadeBarCodes = ladeBarCodes
+            };
+            var manuContainerPacks = await _manuContainerPackRepository.GetByLadeBarCodesAsync(query);
+            IEnumerable<ManuContainerBarcodeEntity> parentContainers = new List<ManuContainerBarcodeEntity>();
+            if (manuContainerPacks.Any())
+            {
+                //父容器id列表
+                var parentContainerIds = manuContainerPacks.Select(x => x.ContainerBarCodeId).ToArray();
+                parentContainers = await _manuContainerBarcodeRepository.GetByIdsAsync(parentContainerIds);
+            }
+
+            //查询当前容器的子容器信息
+            var containerIds = list.Select(x => x.Id).ToArray();
+            var containerPackEntities = await _manuContainerPackRepository.GetByContainerBarCodeIdsAsync(containerIds, _currentSite.SiteId ?? 0);
+
             foreach (var item in pagedInfo.Data)
             {
+                var pack = manuContainerPacks.FirstOrDefault(x => x.LadeBarCode == item.BarCode);
                 workPackingDtos.Add(new PlanWorkPackingDto
                 {
                     BarCode = item.BarCode,
                     ContainerBarCodeId = item.ContainerId,
                     Status = item.Status,
-                    PackLevel=item.PackLevel,
+                    PackLevel = item.PackLevel,
                     CreatedBy = item.CreatedBy,
                     CreatedOn = item.CreatedOn,
+                    ParentContainerCode = parentContainers.FirstOrDefault(x => x.Id == pack?.ContainerBarCodeId)?.BarCode ?? "",
                     PackQuantity = containerPackEntities.Where(x => x.ContainerBarCodeId == item.Id).Count()
                 });
             }

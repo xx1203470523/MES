@@ -81,6 +81,56 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.QueryAsync<ManuSfcCirculationEntity>(templateData.RawSql, templateData.Parameters);
         }
 
+
+        /// <summary>
+        /// 根据SFCs获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>  
+        public async Task<IEnumerable<ManuSfcCirculationEntity>> GetSfcMoudulesAsync(ManuSfcCirculationBySfcsQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetManuSfcCirculationEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Where("IsDeleted = 0");
+
+            if (query.Sfc != null && query.Sfc.Any())
+            {
+                sqlBuilder.Where("SFC IN @Sfc");
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.CirculationBarCode))
+            {
+                sqlBuilder.Where("CirculationBarCode = @CirculationBarCode");
+            }
+
+            if (query.CirculationTypes != null && query.CirculationTypes.Length > 0)
+            {
+                sqlBuilder.Where("CirculationType IN @CirculationTypes");
+            }
+
+            if (query.IsDisassemble.HasValue)
+            {
+                sqlBuilder.Where("IsDisassemble = @IsDisassemble");
+            }
+
+            if (query.ProcedureId.HasValue)
+            {
+                sqlBuilder.Where("ProcedureId = @ProcedureId");
+            }
+            if (query.CirculationMainProductId.HasValue)
+            {
+                sqlBuilder.Where("CirculationMainProductId = @CirculationMainProductId");
+            }
+
+            sqlBuilder.AddParameters(query);
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ManuSfcCirculationEntity>(templateData.RawSql, templateData.Parameters);
+        }
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -230,7 +280,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             //    and sc.ProcedureId = ''
             //    and sc.ResourceId-- 查询资源
 
-            if (queryParam.CirculationProductId.HasValue) 
+            if (queryParam.CirculationProductId.HasValue)
             {
                 sqlBuilder.Where(" CirculationProductId=@CirculationProductId ");
             }
@@ -269,7 +319,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 sqlBuilder.Where(" ResourceId=@ResourceId ");
             }
 
-            if (queryParam.CirculationMainSupplierId.HasValue) 
+            if (queryParam.CirculationMainSupplierId.HasValue)
             {
                 sqlBuilder.Where(" CirculationMainSupplierId=@CirculationMainSupplierId ");
             }

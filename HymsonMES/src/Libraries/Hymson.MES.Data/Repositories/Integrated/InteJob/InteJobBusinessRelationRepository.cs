@@ -78,7 +78,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
 
             //if (query.SiteId > 0)
             //{
-                sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Where("SiteId = @SiteId");
             //}
             //if (query.BusinessType.HasValue)
             //{
@@ -110,6 +110,21 @@ namespace Hymson.MES.Data.Repositories.Integrated
         public async Task<IEnumerable<InteJobBusinessRelationEntity>> GetInteJobBusinessRelationEntitiesAsync(InteJobBusinessRelationQuery inteJobBusinessRelationQuery)
         {
             var sqlBuilder = new SqlBuilder();
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.OrderBy("OrderNumber DESC");
+            sqlBuilder.Select("*");
+
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (inteJobBusinessRelationQuery.BusinessType.HasValue)
+            {
+                sqlBuilder.Where("BusinessType=@BusinessType");
+            }
+            if (inteJobBusinessRelationQuery.BusinessId > 0)
+            {
+                sqlBuilder.Where("BusinessId=@BusinessId");
+            }
+
             var template = sqlBuilder.AddTemplate(GetInteJobBusinessRelationEntitiesSqlTemplate);
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var inteJobBusinessRelationEntities = await conn.QueryAsync<InteJobBusinessRelationEntity>(template.RawSql, inteJobBusinessRelationQuery);

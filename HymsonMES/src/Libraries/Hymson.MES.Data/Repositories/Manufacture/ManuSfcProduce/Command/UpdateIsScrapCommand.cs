@@ -30,5 +30,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
         /// 更新时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
+
+        /// <summary>
+        /// 条码的当前状态
+        /// </summary>
+        public TrueOrFalseEnum CurrentIsScrap { get; set; }
     }
 }

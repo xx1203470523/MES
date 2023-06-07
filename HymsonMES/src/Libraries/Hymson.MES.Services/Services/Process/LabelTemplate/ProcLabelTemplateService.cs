@@ -120,17 +120,23 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
         }
         public async Task<(string base64Str, bool result)> PreviewProcLabelTemplateAsync(string content)
         {
-            
+            PrintRequest request; 
             if (string.IsNullOrEmpty(content))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10350));
             }
-          
-                var request = JsonConvert.DeserializeObject<PrintRequest>(content);
-                var result = await _labelPrintRequest.PreviewFromImageBase64Async(request ?? new PrintRequest());
-                if (!result.result)
-                    throw new CustomerValidationException(nameof(ErrorCode.MES17004));
-                return result;
+            try
+            {
+                request = JsonConvert.DeserializeObject<PrintRequest>(content);
+            }
+            catch 
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17005));
+            }
+            var result = await _labelPrintRequest.PreviewFromImageBase64Async(request ?? new PrintRequest());
+            if (!result.result)
+                throw new CustomerValidationException(nameof(ErrorCode.MES17004));
+            return result;
             
             
         }

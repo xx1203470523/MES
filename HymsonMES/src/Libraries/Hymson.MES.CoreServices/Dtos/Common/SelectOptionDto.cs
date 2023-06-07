@@ -1,4 +1,4 @@
-﻿namespace Hymson.MES.Services.Dtos.Common
+﻿namespace Hymson.MES.CoreServices.Dtos.Common
 {
     /// <summary>
     /// 下拉框选项实体

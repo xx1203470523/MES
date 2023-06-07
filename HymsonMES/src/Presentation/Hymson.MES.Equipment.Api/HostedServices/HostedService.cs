@@ -28,8 +28,8 @@ namespace Hymson.MES.Equipment.Api
             var equipmentModel = new EquipmentModel
             {
                 FactoryId = 123456,
-                Id = 1,
-                Name = "设备1",
+                Id = 12870073632952320,
+                Name = "盖板转接片激光焊接机1#",
                 SiteId = 123456,
             };
             var token = JwtHelper.GenerateJwtToken(equipmentModel, _jwtOptions);

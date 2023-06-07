@@ -147,6 +147,18 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
+        /// 获取资源关联产出数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        [Route("product/list")]
+        [HttpGet]
+        public async Task<IEnumerable<ProcProductSetDto>> GetResourceProductSetListAsync(ProcProductSetQueryDto query)
+        {
+            return await _procResourceService.GetResourceProductSetListAsync(query);
+        }
+
+        /// <summary>
         /// 添加资源数据
         /// </summary>
         /// <param name="parm"></param>

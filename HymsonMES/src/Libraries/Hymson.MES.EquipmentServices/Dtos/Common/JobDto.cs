@@ -1,7 +1,28 @@
 ﻿using Hymson.Utils;
 
-namespace Hymson.MES.Services.Dtos.Common
+namespace Hymson.MES.EquipmentServices.Dtos.Common
 {
+
+    /// <summary>
+    /// 进站Dto（请求） 
+    /// </summary>
+    public class InStationRequestDto
+    {
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 参数
+        /// </summary>
+        public Dictionary<string, string>? Param { get; set; }
+    }
     /// <summary>
     /// 按钮Dto（请求）
     /// </summary>

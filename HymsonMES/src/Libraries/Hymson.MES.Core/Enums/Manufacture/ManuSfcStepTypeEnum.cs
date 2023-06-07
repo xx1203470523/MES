@@ -67,11 +67,11 @@ namespace Hymson.MES.Core.Enums.Manufacture
         ///// </summary>
         //[Description("合并")]
         //Merge = 12,
-        ///// <summary>
-        ///// 转换
-        ///// </summary>
-        //[Description("转换")]
-        //Change = 13,
+        /// <summary>
+        /// 转换
+        /// </summary>
+        [Description("转换")]
+        Change = 13,
         /// <summary>
         /// 取消报废
         /// </summary>
