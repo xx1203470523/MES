@@ -804,7 +804,7 @@
         public const string MES19930 = "条码：{SFC}状态为在制，但没有获取到在制信息";
         public const string MES19931 = "条码：{SFC}已锁定";
         public const string MES19932 = "条码：{SFC}已报废";
-        public const string MES19933 = "条码：{SFC}在{procedure}工序状态为{status}，不允许操作";
+        public const string MES19933 = "条码：{SFC}在{Procedure}工序状态为{Status}，不允许操作";
 
 
 
