@@ -38,10 +38,12 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// 服务接口（不良录入）
         /// </summary>
         private readonly IManuProductBadRecordRepository _manuProductBadRecordRepository;
+
         /// <summary>
         /// 条码生产信息（物理删除） 仓储 
         /// </summary>
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
+
 
         /// <summary>
         /// 构造函数

@@ -8,6 +8,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
@@ -67,6 +68,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// </summary>
         private readonly ILocalizationService _localizationService;
 
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -98,21 +100,22 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             _localizationService = localizationService;
         }
 
+
         /// <summary>
         /// 获取生产条码信息
         /// </summary>
-        /// <param name="sfc"></param>
+        /// <param name="bo"></param>
         /// <returns></returns>
-        public async Task<(ManuSfcProduceEntity, ManuSfcProduceBusinessEntity)> GetProduceSFCAsync(string sfc, long siteId)
+        public async Task<(ManuSfcProduceEntity, ManuSfcProduceBusinessEntity)> GetProduceSFCAsync(SingleSFCBo bo)
         {
-            if (string.IsNullOrWhiteSpace(sfc) == true
-                || sfc.Contains(' ') == true) throw new CustomerValidationException(nameof(ErrorCode.MES16305));
+            if (string.IsNullOrWhiteSpace(bo.SFC) == true
+                || bo.SFC.Contains(' ') == true) throw new CustomerValidationException(nameof(ErrorCode.MES16305));
 
             // 条码在制表
-            var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
+            var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery
             {
-                SiteId = siteId,
-                Sfc = sfc
+                SiteId = bo.SiteId,
+                Sfc = bo.SFC
             });
 
             // 不存在在制表的话，就去库存查找
@@ -120,8 +123,8 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             {
                 var whMaterialInventoryEntity = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery
                 {
-                    SiteId = siteId,
-                    BarCode = sfc
+                    SiteId = bo.SiteId,
+                    BarCode = bo.SFC
                 });
                 if (whMaterialInventoryEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES16318));
 
@@ -131,7 +134,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             // 获取锁状态
             var sfcProduceBusinessEntity = await _manuSfcProduceRepository.GetSfcProduceBusinessBySFCAsync(new SfcProduceBusinessQuery
             {
-                SiteId = siteId,
+                SiteId = bo.SiteId,
                 Sfc = sfcProduceEntity.SFC,
                 BusinessType = ManuSfcProduceBusinessType.Lock
             });
@@ -314,6 +317,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                 IsDisassemble = TrueOrFalseEnum.No
             });
         }
+
     }
 
     /// <summary>
