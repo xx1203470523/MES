@@ -129,7 +129,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
             {
                 case WorkCenterTypeEnum.Farm:
                 case WorkCenterTypeEnum.Line:
-                    sqlBuilder.Where("IWCR.WorkCenterId = @ParentId");
+                    if (query.ParentId.HasValue == true && query.ParentId.Value > 0) sqlBuilder.Where("IWCR.WorkCenterId = @ParentId");
                     break;
                 //case WorkCenterTypeEnum.Factory:
                 default:

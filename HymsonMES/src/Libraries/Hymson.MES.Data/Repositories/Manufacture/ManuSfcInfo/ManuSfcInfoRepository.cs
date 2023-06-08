@@ -184,10 +184,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfcIds"></param>
         /// <returns></returns>
-        public async Task<int> UpdatesIsUsedAsync(ManuSfcInfoUpdateCommand manuSfcInfoUpdate)
+        public async Task<int> UpdatesIsUsedAsync(ManuSfcInfoUpdateIsUsedCommand  manuSfcInfoUpdateIsUsedCommand)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdatesIsUsedSql, manuSfcInfoUpdate);
+            return await conn.ExecuteAsync(UpdatesIsUsedSql, manuSfcInfoUpdateIsUsedCommand);
         }
         #endregion
 

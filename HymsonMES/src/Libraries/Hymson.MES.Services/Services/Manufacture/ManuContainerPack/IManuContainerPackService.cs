@@ -6,8 +6,7 @@
  *build datetime: 2023-04-12 02:33:13
  */
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.Services.Dtos.Common;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 
 namespace Hymson.MES.Services.Services.Manufacture

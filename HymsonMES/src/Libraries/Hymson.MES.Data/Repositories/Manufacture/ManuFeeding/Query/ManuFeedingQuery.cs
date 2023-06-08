@@ -29,6 +29,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query
         /// <summary>
         /// ID集合（物料）
         /// </summary>
-        public IEnumerable<long> MaterialIds { get; set; }
+        public IEnumerable<long>? MaterialIds { get; set; }
     }
 }

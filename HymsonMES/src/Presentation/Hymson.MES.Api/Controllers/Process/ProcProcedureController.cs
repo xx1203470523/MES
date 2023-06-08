@@ -6,6 +6,7 @@ using Hymson.MES.Services.Services.Process.Procedure;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Minio.DataModel;
 
 namespace Hymson.MES.Api.Controllers
 {
@@ -14,7 +15,7 @@ namespace Hymson.MES.Api.Controllers
     /// @author zhaoqing
     /// @date 2023-02-13 09:06:05
     /// </summary>
-    
+
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcProcedureController : ControllerBase
@@ -80,6 +81,18 @@ namespace Hymson.MES.Api.Controllers
         public async Task<PagedInfo<ProcedureJobReleationDto>> GetProcedureBomConfigJobList([FromQuery] InteJobBusinessRelationPagedQueryDto parm)
         {
             return await _procProcedureService.GetProcedureConfigJobListAsync(parm);
+        }
+
+        /// <summary>
+        /// 获取工序产出设置
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("product/list")]
+        public async Task<IEnumerable<ProcProductSetDto>> GetProcedureProductSetListAsync([FromQuery] ProcProductSetQueryDto parm)
+        {
+            return await _procProcedureService.GetProcedureProductSetListAsync(parm);
         }
 
         /// <summary>

@@ -1,6 +1,6 @@
 using FluentValidation;
 using Hymson.Infrastructure;
-using Hymson.MES.Services.Dtos.Common;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 
 namespace Hymson.MES.Services.Services.Integrated.IIntegratedService

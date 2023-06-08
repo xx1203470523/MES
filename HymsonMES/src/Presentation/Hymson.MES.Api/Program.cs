@@ -1,6 +1,7 @@
 using AutoMapper;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
+using Hymson.MES.CoreServices.DependencyInjection;
 using Hymson.Web.Framework.Filters;
 using Hymson.WebApi.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -26,7 +27,7 @@ namespace Hymson.MES.Api
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            
+
             // Add services to the container.
             builder.Services.AddControllers(options =>
             {
@@ -42,10 +43,11 @@ namespace Hymson.MES.Api
             builder.Services.AddMemoryCache();
             builder.Services.AddClearCacheService(builder.Configuration);
             builder.Services.AddHostedService<WorkService>();
-         
+
             AddSwaggerGen(builder.Services);
 
             builder.Services.AddJwtBearerService(builder.Configuration);
+            builder.Services.AddCoreService(builder.Configuration);
             builder.Services.AddAppService(builder.Configuration);
             builder.Services.AddSqlLocalization(builder.Configuration);
             builder.Services.AddSequenceService(builder.Configuration);
@@ -61,12 +63,14 @@ namespace Hymson.MES.Api
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
+#if DEBUG
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+#endif
             #region snippet_ConfigureLocalization
             var supportedCultures = new List<CultureInfo>
             {

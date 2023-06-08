@@ -305,6 +305,16 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 产品名称 对应物料表名称
         /// </summary>
         public string? ProductName { get; set; }
+
+        /// <summary>
+        /// 产品名称 对应物料版本
+        /// </summary>
+        public string? Version { get; set; }
+
+        /// <summary>
+        /// 状态;1：打开 2：关闭
+        /// </summary>
+        public int? Status { get; set; }
     }
 
 

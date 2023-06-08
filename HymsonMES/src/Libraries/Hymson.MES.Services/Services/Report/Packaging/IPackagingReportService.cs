@@ -29,6 +29,13 @@ namespace Hymson.MES.Services.Services.Report
         Task<PlanWorkPackDto> GetByWorkOrderCodeAsync(PackagingQueryDto queryDto);
 
         /// <summary>
+        /// 根据查询条件获取分页数据:根据容器编号、sfc查询包装信息
+        /// </summary>
+        /// <param name="manuContainerPackPagedQueryDto"></param>
+        /// <returns></returns>
+         Task<PagedInfo<ManuContainerPackDto>> GetContainerPackPagedListAsync(ManuContainerPackPagedQueryDto manuContainerPackPagedQueryDto);
+
+        /// <summary>
         /// 根据查询条件获取分页数据
         /// </summary>
         /// <param name="queryDto"></param>

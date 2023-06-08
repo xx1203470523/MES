@@ -33,5 +33,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 是否主设备
         /// </summary>
         public bool IsMain { get; set; } = false;
+
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long? SiteId { get; set; }
     }
 }

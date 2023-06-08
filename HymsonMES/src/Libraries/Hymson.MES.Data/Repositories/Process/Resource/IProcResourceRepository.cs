@@ -43,6 +43,14 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<IEnumerable<ProcResourceEntity>> GetListByIdsAsync(long[] ids);
 
         /// <summary>
+        /// 根据资源Code查询资源数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<ProcResourceEntity> GetResourceByResourceCodeAsync(ProcResourceQuery query);
+
+
+        /// <summary>
         /// 根据资源Code查询数据
         /// </summary>
         /// <param name="resourceCode"></param>
@@ -94,9 +102,9 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 查询工序关联的资源列表
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="procedureId"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcResourceEntity>> GetProcResourceListByProcedureIdAsync(ProcResourceListByProcedureIdQuery query);
+        Task<IEnumerable<ProcResourceEntity>> GetProcResourceListByProcedureIdAsync(long procedureId);
 
         /// <summary>
         /// 添加资源类型数据

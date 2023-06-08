@@ -26,6 +26,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long SiteId { get; set; }
 
         /// <summary>
+        /// 包装等级
+        /// </summary>
+        public int PackLevel { get; set; }
+
+        /// <summary>
         /// 资源ID
         /// </summary>
         public long ResourceId { get; set; }
@@ -38,6 +43,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 容器条码id
         /// </summary>
         public long? ContainerBarCodeId { get; set; }
+
+        /// <summary>
+        /// 父级容器编码
+        /// </summary>
+        public string ParentContainerCode { get; set; }
 
         /// <summary>
         /// 容器条码
