@@ -13,7 +13,7 @@
         /// <summary>
         /// 条码集合
         /// </summary>
-        public IEnumerable<string> SFC { get; set; } = new List<string>();
+        public IEnumerable<string> SFCs { get; set; } = new List<string>();
 
     }
 }

@@ -9,6 +9,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
@@ -1203,7 +1204,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var lockEntity = sfcProduceBusinessEntities.FirstOrDefault(x => x.BusinessType == ManuSfcProduceBusinessType.Lock);
                 if (lockEntity != null)
                 {
-                    ManuSfcProduceExtensions.VerifyProcedureLock(lockEntity, sfc, procedureId);
+                    lockEntity.VerifyProcedureLock(sfc, procedureId);
                 }
 
                 //有缺陷的返修业务

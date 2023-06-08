@@ -9,6 +9,7 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.QualUnqualifiedCode;
+using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Command;
@@ -273,7 +274,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 };
                 var isScrapCommand = new UpdateIsScrapCommand
                 {
-                    SiteId=_currentSite.SiteId??0,
+                    SiteId = _currentSite.SiteId ?? 0,
                     Sfcs = sfcs,
                     UserId = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now(),
@@ -624,7 +625,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 //1.修改状态为关闭
                 rows += await _manuProductBadRecordRepository.UpdateStatusRangeAsync(updateCommandList);
-                if (rows <updateCommandList.Count())
+                if (rows < updateCommandList.Count())
                 {
                     //报错
                     throw new CustomerValidationException(nameof(ErrorCode.MES15414)).WithData("sfcs", string.Join("','", sfcs));
@@ -761,7 +762,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         private async Task VerifySfcsLockAsync(ManuSfcProduceInfoView[] manuSfcs)
         {
             var sfcs = manuSfcs.Select(x => x.SFC).ToArray();
-            var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery {SiteId = _currentSite.SiteId ?? 0, Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
+            var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { SiteId = _currentSite.SiteId ?? 0, Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
             if (sfcProduceBusinesss != null && sfcProduceBusinesss.Any())
             {
                 //var sfcInfoIds = sfcProduceBusinesss.Select(it => it.SfcProduceId).ToArray();
@@ -814,7 +815,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var lockEntity = sfcProduceBusinessEntities.FirstOrDefault(x => x.BusinessType == ManuSfcProduceBusinessType.Lock);
                 if (lockEntity != null)
                 {
-                    ManuSfcProduceExtensions.VerifyProcedureLock(lockEntity, sfc, procedureId);
+                    lockEntity.VerifyProcedureLock(sfc, procedureId);
                 }
 
                 //有缺陷的返修业务
