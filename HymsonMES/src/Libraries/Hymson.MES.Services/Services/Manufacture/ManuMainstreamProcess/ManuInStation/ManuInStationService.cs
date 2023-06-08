@@ -139,6 +139,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
             // 更新数据
             using (var trans = TransactionHelper.GetTransactionScope())
             {
+                /*
+                 * 目前条码好像默认就是已使用，所以这里不需要再更新条码状态
                 // 修改条码使用状态为"已使用"
                 rows = await _manuSfcRepository.UpdateSfcIsUsedAsync(new ManuSfcUpdateIsUsedCommand
                 {
@@ -147,6 +149,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
                     UpdatedOn = sfcProduceEntity.UpdatedOn,
                     IsUsed = YesOrNoEnum.Yes
                 });
+                */
+
+                // 更改状态
+                rows += await _manuSfcProduceRepository.UpdateWithStatusCheckAsync(sfcProduceEntity);
 
                 // 未更新到数据，事务回滚
                 if (rows <= 0)
@@ -154,9 +160,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
                     trans.Dispose();
                     return rows;
                 }
-
-                // 更改状态
-                rows += await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
 
                 // 更新工单统计表的 RealStart
                 rows += await _planWorkOrderRepository.UpdatePlanWorkOrderRealStartByWorkOrderIdAsync(new UpdateWorkOrderRealTimeCommand
