@@ -3,11 +3,12 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Common;
+using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
-using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInStation;
 using Hymson.Utils;
@@ -32,6 +33,11 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <summary>
         /// 服务接口（生产通用）
         /// </summary>
+        private readonly IManuCommonService _manuCommonService;
+
+        /// <summary>
+        /// 服务接口（生产通用）
+        /// </summary>
         private readonly IManuCommonOldService _manuCommonOldService;
 
         /// <summary>
@@ -44,14 +50,17 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
+        /// <param name="manuCommonService"></param>
         /// <param name="manuCommonOldService"></param>
         /// <param name="manuInStationService"></param>
         public JobManuStartService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IManuCommonService manuCommonService,
             IManuCommonOldService manuCommonOldService,
             IManuInStationService manuInStationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _manuCommonService = manuCommonService;
             _manuCommonOldService = manuCommonOldService;
             _manuInStationService = manuInStationService;
         }
@@ -103,7 +112,11 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             sfcProduceBusinessEntity.VerifyProcedureLock(bo.SFC, bo.ProcedureId);
 
             // 验证条码是否被容器包装
-            await _manuCommonOldService.VerifyContainerAsync(new string[] { bo.SFC });
+            await _manuCommonService.VerifyContainerAsync(new MultiSFCBo
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                SFCs = new string[] { bo.SFC }
+            });
 
             // 如果工序对应不上
             if (sfcProduceEntity.ProcedureId != bo.ProcedureId)

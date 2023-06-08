@@ -13,14 +13,12 @@ using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
-using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
 using Hymson.Sequences;
 using Hymson.Snowflake;
@@ -658,89 +656,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         }
 
 
-        /// <summary>
-        /// 批量验证条码是否被容器包装
-        /// </summary>
-        /// <param name="sfcs"></param>
-        /// <returns></returns>
-        public async Task VerifyContainerAsync(string[] sfcs)
-        {
-            var manuContainerPackEntities = await _manuContainerPackRepository.GetByLadeBarCodesAsync(new ManuContainerPackQuery
-            {
-                LadeBarCodes = sfcs,
-                SiteId = _currentSite.SiteId ?? 0,
-            });
-
-            if (manuContainerPackEntities != null && manuContainerPackEntities.Any() == true)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES18015)).WithData("SFCs", string.Join(",", sfcs));
-                //throw new CustomerValidationException(nameof(ErrorCode.MES18019)).WithData("SFC", string.Join(",", sfcs));
-            }
-        }
-
-        /// <summary>
-        /// 验证条码BOM清单用量
-        /// </summary>
-        /// <param name="bomId"></param>
-        /// <param name="procedureId"></param>
-        /// <param name="sfc"></param>
-        /// <returns></returns>
-        public async Task VerifyBomQtyAsync(long bomId, long procedureId, string sfc)
-        {
-            var procBomDetailEntities = await _procBomDetailRepository.GetByBomIdAsync(bomId);
-            if (procBomDetailEntities == null) return;
-
-            // 过滤出当前工序对应的物料（数据收集方式为内部和外部）
-            procBomDetailEntities = procBomDetailEntities.Where(w => w.ProcedureId == procedureId && w.DataCollectionWay != MaterialSerialNumberEnum.Batch);
-            if (procBomDetailEntities == null) return;
-
-            // 流转信息
-            var sfcCirculationEntities = await GetBarCodeCirculationListAsync(procedureId, sfc);
-            if (sfcCirculationEntities == null) return;
-
-            // 根据物料分组
-            var procBomDetailDictionary = procBomDetailEntities.ToLookup(w => w.MaterialId).ToDictionary(d => d.Key, d => d);
-            foreach (var item in procBomDetailDictionary)
-            {
-                // 检查每个物料是否已经满足BOM用量要求
-                var currentQty = sfcCirculationEntities.Where(w => w.CirculationMainProductId == item.Key)
-                    .Sum(s => s.CirculationQty);
-
-                // 目标用量
-                var targetQty = item.Value.Sum(s => s.Usages);
-
-                if (currentQty < targetQty)
-                {
-                    var materialEntity = await _procMaterialRepository.GetByIdAsync(item.Key);
-                    if (materialEntity == null) continue;
-
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16321)).WithData("Code", materialEntity.MaterialCode);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 获取挂载的活动组件信息
-        /// </summary>
-        /// <param name="procedureId"></param>
-        /// <param name="sfc"></param>
-        /// <returns></returns>
-        private async Task<IEnumerable<ManuSfcCirculationEntity>> GetBarCodeCirculationListAsync(long procedureId, string sfc)
-        {
-            return await _manuSfcCirculationRepository.GetSfcMoudulesAsync(new ManuSfcCirculationQuery
-            {
-                Sfc = sfc,
-                SiteId = _currentSite.SiteId ?? 0,
-                CirculationTypes = new SfcCirculationTypeEnum[] {
-                    SfcCirculationTypeEnum.Consume ,
-                    SfcCirculationTypeEnum.ModuleAdd,
-                    SfcCirculationTypeEnum.ModuleReplace
-                },
-                ProcedureId = procedureId,
-                IsDisassemble = TrueOrFalseEnum.No
-            });
-        }
-
+        
+        
         /// <summary>
         /// 组装工艺路线
         /// </summary>

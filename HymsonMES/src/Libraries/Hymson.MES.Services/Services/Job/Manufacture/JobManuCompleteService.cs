@@ -6,8 +6,8 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Common;
+using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
-using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
 using Hymson.Utils;
@@ -32,6 +32,11 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <summary>
         /// 服务接口（生产通用）
         /// </summary>
+        private readonly IManuCommonService _manuCommonService;
+
+        /// <summary>
+        /// 服务接口（生产通用）
+        /// </summary>
         private readonly IManuCommonOldService _manuCommonOldService;
 
         /// <summary>
@@ -45,14 +50,17 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
+        /// <param name="manuCommonService"></param>
         /// <param name="manuCommonOldService"></param>
         /// <param name="manuOutStationService"></param>
         public JobManuCompleteService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IManuCommonService manuCommonService,
             IManuCommonOldService manuCommonOldService,
             IManuOutStationService manuOutStationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _manuCommonService = manuCommonService;
             _manuCommonOldService = manuCommonOldService;
             _manuOutStationService = manuOutStationService;
         }
@@ -101,7 +109,13 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
                             .VerifyResource(bo.ResourceId);
 
             // 验证BOM主物料数量
-            await _manuCommonOldService.VerifyBomQtyAsync(sfcProduceEntity.ProductBOMId, bo.ProcedureId, bo.SFC);
+            await _manuCommonService.VerifyBomQtyAsync(new ManuProcedureBomBo
+            {
+                SiteId = sfcProduceEntity.SiteId,
+                SFC = bo.SFC,
+                ProcedureId = bo.ProcedureId,
+                BomId = sfcProduceEntity.ProductBOMId
+            });
 
             // 出站
             _ = await _manuOutStationService.OutStationAsync(sfcProduceEntity);
