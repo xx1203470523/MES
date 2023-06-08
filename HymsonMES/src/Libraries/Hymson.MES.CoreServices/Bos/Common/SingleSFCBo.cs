@@ -3,6 +3,7 @@
     /// <summary>
     /// 单条码
     /// </summary>
+    //[Obsolete("建议使用 MultiSFCBo")]
     public class SingleSFCBo
     {
         /// <summary>

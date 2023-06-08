@@ -112,7 +112,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             await _manuCommonService.VerifyBomQtyAsync(new ManuProcedureBomBo
             {
                 SiteId = sfcProduceEntity.SiteId,
-                SFC = bo.SFC,
+                SFCs = new string[] { bo.SFC },
                 ProcedureId = bo.ProcedureId,
                 BomId = sfcProduceEntity.ProductBOMId
             });

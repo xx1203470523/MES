@@ -81,7 +81,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.QueryAsync<ManuSfcCirculationEntity>(templateData.RawSql, templateData.Parameters);
         }
 
-
         /// <summary>
         /// 根据SFCs获取数据
         /// </summary>

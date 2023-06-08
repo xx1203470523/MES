@@ -218,9 +218,20 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             procBomDetailEntities = procBomDetailEntities.Where(w => w.ProcedureId == procedureBomBo.ProcedureId && w.DataCollectionWay != MaterialSerialNumberEnum.Batch);
             if (procBomDetailEntities == null) return;
 
-            // 流转信息
-            var sfcCirculationEntities = await GetBarCodeCirculationListAsync(procedureBomBo, procedureBomBo.ProcedureId);
-            if (sfcCirculationEntities == null) return;
+            // 流转信息（多条码）
+            var sfcCirculationEntities = await _manuSfcCirculationRepository.GetSfcMoudulesAsync(new ManuSfcCirculationBySfcsQuery
+            {
+                SiteId = procedureBomBo.SiteId,
+                Sfc = procedureBomBo.SFCs,
+                CirculationTypes = new SfcCirculationTypeEnum[] {
+                    SfcCirculationTypeEnum.Consume ,
+                    SfcCirculationTypeEnum.ModuleAdd,
+                    SfcCirculationTypeEnum.ModuleReplace
+                },
+                ProcedureId = procedureBomBo.ProcedureId,
+                IsDisassemble = TrueOrFalseEnum.No
+            });
+            if (sfcCirculationEntities == null || sfcCirculationEntities.Any() == false) return;
 
             // 根据物料分组
             var procBomDetailDictionary = procBomDetailEntities.ToLookup(w => w.MaterialId).ToDictionary(d => d.Key, d => d);
@@ -246,27 +257,6 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
 
 
         #region 内部方法
-        /// <summary>
-        /// 获取挂载的活动组件信息
-        /// </summary>
-        /// <param name="sfcBo"></param>
-        /// <param name="procedureId"></param>
-        /// <returns></returns>
-        private async Task<IEnumerable<ManuSfcCirculationEntity>> GetBarCodeCirculationListAsync(SingleSFCBo sfcBo, long procedureId)
-        {
-            return await _manuSfcCirculationRepository.GetSfcMoudulesAsync(new ManuSfcCirculationQuery
-            {
-                SiteId = sfcBo.SiteId,
-                Sfc = sfcBo.SFC,
-                CirculationTypes = new SfcCirculationTypeEnum[] {
-                    SfcCirculationTypeEnum.Consume ,
-                    SfcCirculationTypeEnum.ModuleAdd,
-                    SfcCirculationTypeEnum.ModuleReplace
-                },
-                ProcedureId = procedureId,
-                IsDisassemble = TrueOrFalseEnum.No
-            });
-        }
 
         #endregion
 
