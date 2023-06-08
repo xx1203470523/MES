@@ -1,4 +1,6 @@
-﻿using Hymson.MES.CoreServices.Services.Common.ManuCommon;
+﻿using Hymson.MES.CoreServices.Services.Common;
+using Hymson.MES.CoreServices.Services.Common.ManuCommon;
+using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -29,6 +31,8 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         private static IServiceCollection AddServices(this IServiceCollection services)
         {
             services.AddSingleton<IManuCommonService, ManuCommonService>();
+            services.AddSingleton<IMasterDataService, MasterDataService>();
+            services.AddSingleton<IJobCommonService, JobCommonService>();
 
             return services;
         }

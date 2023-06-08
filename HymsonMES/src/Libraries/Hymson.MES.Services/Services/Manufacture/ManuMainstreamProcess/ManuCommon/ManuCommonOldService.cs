@@ -10,6 +10,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.Process;
+using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
@@ -24,8 +25,6 @@ using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDt
 using Hymson.Sequences;
 using Hymson.Snowflake;
 using System.Data;
-using System.Text.Json;
-using ValidationFailure = FluentValidation.Results.ValidationFailure;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon
 {
@@ -658,95 +657,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             return list;
         }
 
-        /// <summary>
-        /// 批量验证条码是否锁定
-        /// </summary>
-        /// <param name="sfcs"></param>
-        /// <returns></returns>
-        public async Task VerifySfcsLockAsync(IEnumerable<string> sfcs)
-        {
-            var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery
-            {
-                SiteId = _currentSite.SiteId ?? 0,
-                Sfcs = sfcs,
-                BusinessType = ManuSfcProduceBusinessType.Lock
-            });
-
-            if (sfcProduceBusinesss == null || sfcProduceBusinesss.Any() == false) return;
-
-            List<ValidationFailure> validationFailures = new();
-            foreach (var item in sfcProduceBusinesss)
-            {
-                var sfcProduceLockBo = JsonSerializer.Deserialize<SfcProduceLockBo>(item.BusinessContent);
-                if (sfcProduceLockBo == null) continue;
-
-                if (sfcProduceLockBo.Lock != QualityLockEnum.InstantLock
-                    && sfcProduceLockBo.Lock != QualityLockEnum.FutureLock) continue;
-
-                validationFailures.Add(new ValidationFailure
-                {
-                    FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", item.Sfc } },
-                    ErrorCode = nameof(ErrorCode.MES18010)
-                });
-            }
-
-            // 是否存在错误
-            if (validationFailures.Any() == true)
-            {
-                throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
-            }
-        }
-
-        /// <summary>
-        /// 批量验证条码是否锁定
-        /// </summary>
-        /// <param name="sfcs"></param>
-        /// <param name="procedureId"></param>
-        /// <returns></returns>
-        public async Task VerifySfcsLockAsync(string[] sfcs, long procedureId)
-        {
-            var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { SiteId = _currentSite.SiteId ?? 0, Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
-            if (sfcProduceBusinesss != null && sfcProduceBusinesss.Any())
-            {
-                var validationFailures = new List<ValidationFailure>();
-
-                foreach (var item in sfcProduceBusinesss)
-                {
-                    var sfcProduceLockBo = JsonSerializer.Deserialize<SfcProduceLockBo>(item.BusinessContent);
-                    if (sfcProduceLockBo == null) continue;
-
-                    var validationFailure = new ValidationFailure();
-                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
-                    {
-                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
-                            { "CollectionIndex", item.Sfc}
-                        };
-                    }
-                    else
-                    {
-                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.Sfc);
-                    }
-
-                    if (sfcProduceLockBo.Lock == QualityLockEnum.InstantLock)
-                    {
-                        validationFailure.ErrorCode = nameof(ErrorCode.MES18010);
-                        validationFailures.Add(validationFailure);
-                    }
-
-                    if (sfcProduceLockBo.Lock == QualityLockEnum.FutureLock && sfcProduceLockBo.LockProductionId == procedureId)
-                    {
-                        validationFailure.ErrorCode = nameof(ErrorCode.MES18010);
-                        validationFailures.Add(validationFailure);
-                    }
-                }
-
-                //是否存在错误
-                if (validationFailures.Any())
-                {
-                    throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
-                }
-            }
-        }
 
         /// <summary>
         /// 批量验证条码是否被容器包装

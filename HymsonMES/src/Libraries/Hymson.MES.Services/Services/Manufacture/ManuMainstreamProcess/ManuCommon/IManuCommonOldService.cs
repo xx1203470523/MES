@@ -2,7 +2,7 @@
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.Services.Bos.Manufacture;
+using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon
@@ -111,23 +111,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="procedureId"></param>
         /// <returns></returns>
         Task<IEnumerable<long>> GetProcResourceIdByProcedureIdAsync(long procedureId);
-
-        /*
-        /// <summary>
-        /// 批量验证条码是否锁定
-        /// </summary>
-        /// <param name="sfcs"></param>
-        /// <returns></returns>
-        Task VerifySfcsLockAsync(IEnumerable<string> sfcs);
-        */
-
-        /// <summary>
-        /// 批量判断条码是否锁定
-        /// </summary>
-        /// <param name="sfcs"></param>
-        /// <param name="procedureId"></param>
-        /// <returns></returns>
-        Task VerifySfcsLockAsync(string[] sfcs, long procedureId);
 
         /// <summary>
         /// 批量验证条码是否被容器包装

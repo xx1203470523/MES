@@ -12,6 +12,8 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Bos.Manufacture;
+using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
@@ -24,7 +26,6 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
-using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
@@ -77,6 +78,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// 工单激活 仓储
         /// </summary>
         private readonly IPlanWorkOrderActivationRepository _planWorkOrderActivationRepository;
+
+        /// <summary>
+        /// 服务接口（生产通用）
+        /// </summary>
+        private readonly IManuCommonService _manuCommonService;
 
         /// <summary>
         /// 
@@ -155,6 +161,31 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <summary>
         /// 构造函数
         /// </summary>
+        /// <param name="currentUser"></param>
+        /// <param name="currentSite"></param>
+        /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="manuSfcStepRepository"></param>
+        /// <param name="resourceRepository"></param>
+        /// <param name="manuSfcRepository"></param>
+        /// <param name="planWorkOrderActivationRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
+        /// <param name="manuCommonService"></param>
+        /// <param name="manuCommonOldService"></param>
+        /// <param name="procProcessRouteDetailNodeRepository"></param>
+        /// <param name="procProcedureRepository"></param>
+        /// <param name="localizationService"></param>
+        /// <param name="manuContainerPackRepository"></param>
+        /// <param name="manuSfcInfoRepository"></param>
+        /// <param name="whMaterialInventoryRepository"></param>
+        /// <param name="whMaterialInventoryService"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="procProcessRouteDetailLinkRepository"></param>
+        /// <param name="whMaterialStandingbookRepository"></param>
+        /// <param name="procProcessRouteRepository"></param>
+        /// <param name="procBomRepository"></param>
+        /// <param name="validationLockRules"></param>
+        /// <param name="validationModifyRules"></param>
+        /// <param name="logger"></param>
         public ManuSfcProduceService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcStepRepository manuSfcStepRepository,
@@ -162,6 +193,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             IManuSfcRepository manuSfcRepository,
             IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
+            IManuCommonService manuCommonService,
             IManuCommonOldService manuCommonOldService,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
             IProcProcedureRepository procProcedureRepository,
@@ -187,6 +219,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuSfcRepository = manuSfcRepository;
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
+            _manuCommonService = manuCommonService;
             _manuCommonOldService = manuCommonOldService;
             _procProcedureRepository = procProcedureRepository;
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
@@ -823,7 +856,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 UserId = _currentUser.UserName,
                 UpdatedOn = HymsonClock.Now(),
                 IsScrap = TrueOrFalseEnum.Yes,
-                CurrentIsScrap= TrueOrFalseEnum.No
+                CurrentIsScrap = TrueOrFalseEnum.No
             };
             var manuSfcInfoUpdate = new ManuSfcUpdateCommand
             {
@@ -919,7 +952,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 UserId = _currentUser.UserName,
                 UpdatedOn = HymsonClock.Now(),
                 IsScrap = TrueOrFalseEnum.No,
-                CurrentIsScrap= TrueOrFalseEnum.Yes
+                CurrentIsScrap = TrueOrFalseEnum.Yes
             };
 
             var manuSfcInfoUpdate = new ManuSfcUpdateCommand
@@ -937,7 +970,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 //1.修改在制品表,IsScrap
                 rows += await _manuSfcProduceRepository.UpdateIsScrapAsync(isScrapCommand);
-                if(rows< sfcs.Count() )
+                if (rows < sfcs.Count())
                 {
                     //报错
                     throw new CustomerValidationException(nameof(ErrorCode.MES15412)).WithData("sfcs", string.Join("','", sfcs));
@@ -1370,8 +1403,13 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES18006)).WithData("SFC", string.Join(",", differentSfcs));
             }
 
-            //验证条码锁定
-            await _manuCommonOldService.VerifySfcsLockAsync(manuSfcs, procedureId);
+            // 验证条码锁定
+            await _manuCommonService.VerifySfcsLockAsync(new ManuProcedureBo
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                SFCs = manuSfcs,
+                ProcedureId = procedureId
+            });
 
             //这个是物料删除 所以查到就是有锁
             //var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = manuSfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
@@ -1924,7 +1962,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             // 验证条码锁定
-            await _manuCommonOldService.VerifySfcsLockAsync(sfcs, procedureId);
+            await _manuCommonService.VerifySfcsLockAsync(new ManuProcedureBo
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                SFCs = sfcs,
+                ProcedureId = procedureId
+            });
 
             //这个是物料删除 所以查到就是有锁
             //var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
