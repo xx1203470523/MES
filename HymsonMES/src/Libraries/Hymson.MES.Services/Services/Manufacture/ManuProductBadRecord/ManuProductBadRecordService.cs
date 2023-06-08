@@ -613,7 +613,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Remark = unqualified.Remark ?? "",
                     Status = ProductBadRecordStatusEnum.Close,
                     UserId = _currentUser.UserName,
-                    UpdatedOn = HymsonClock.Now(),
+                    UpdatedOn = HymsonClock.Now()
                 });
             }
             #endregion
@@ -622,11 +622,16 @@ namespace Hymson.MES.Services.Services.Manufacture
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
-                //1.记录数据
-                rows += await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
-
-                //2.修改状态为关闭
+                //1.修改状态为关闭
                 rows += await _manuProductBadRecordRepository.UpdateStatusRangeAsync(updateCommandList);
+                if (rows <updateCommandList.Count())
+                {
+                    //报错
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15414)).WithData("sfcs", string.Join("','", sfcs));
+                }
+
+                //2.记录数据
+                rows += await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
 
                 trans.Complete();
             }

@@ -413,6 +413,7 @@
         public const string MES15411 = "条码{sfcs}已报废,不可再执行当前操作！";
         public const string MES15412 = "条码{sfcs}已取消报废,不能重复取消!";
         public const string MES15413 = "条码{sfcs}已报废,不能重复报废!";
+        public const string MES15414= "条码{sfcs}标识已取消,不能重复取消!";
         #endregion
 
         #region 物料加载 15500
