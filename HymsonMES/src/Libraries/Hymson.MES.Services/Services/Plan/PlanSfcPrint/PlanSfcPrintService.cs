@@ -180,7 +180,6 @@ namespace Hymson.MES.Services.Services.Plan
                     OrderCode = createDto.OrderCode,
                     SiteId = _currentSite.SiteId ?? 123456
                 });
-
             }
             else
             {
@@ -192,50 +191,50 @@ namespace Hymson.MES.Services.Services.Plan
                 MaterialId = material.Id,
                 ProcedureId = createDto.ProcedureId,
                 Version = material?.Version ?? "",
-                SiteId = _currentSite.SiteId ?? 0
+                SiteId = _currentSite.SiteId ?? 123456
 
             });
             foreach (var pprp in ppr)
             {
-                //if (pprp != null)
-                //{
                 var tl = await _procLabelTemplateRepository.GetByIdAsync(pprp.TemplateId);
                 if (tl != null)
                 {
                     PrintRequest printEntity = new PrintRequest()
                     {
-                        TemplateName = tl.Name,
-                        PrinterName = print.PrintName,
-                        Params = new List<PrintRequest.ParamEntity>()
+                        Bodies = new PrintBody[]
                         {
-                            new PrintRequest.ParamEntity()
+                            new PrintBody()
                             {
-                                ParamName = "SFC",
-                                ParamValue = createDto.SFC
-                            },
-                            new PrintRequest.ParamEntity()
-                            {
-                                ParamName = "SiteId",
-                                ParamValue = (_currentSite.SiteId??123456).ToString()
+                                TemplatePath = tl.Path,
+                                PrinterName = print.PrintName,
+                                PrintCount = pprp.Copy??1,
+                                Params = new List<PrintBody.ParamEntity>()
+                                {
+                                    new PrintBody.ParamEntity()
+                                    {
+                                        ParamName = "SFC",
+                                        ParamValue = createDto.SFC
+                                    },
+                                    new PrintBody.ParamEntity()
+                                    {
+                                        ParamName = "SiteId",
+                                        ParamValue = (_currentSite.SiteId??123456).ToString()
+                                    }
+                                }
                             }
                         }
+                        
                     };
-                    var loop = pprp.Copy ?? 1;
-                    for (int i = 0; i < loop; i++)
-                    {
-                        var result = await _labelPrintRequest.PrintAsync(printEntity);
-                        if (!result.result)
-                            throw new CustomerValidationException(nameof(ErrorCode.MES17003)).WithData("msg", result.msg);
-                    }
+                   
+                    var result = await _labelPrintRequest.PrintAsync(printEntity);
+                    if (!result.result)
+                        throw new CustomerValidationException(nameof(ErrorCode.MES17003)).WithData("msg", result.msg);
+                    
                 }
                 else
                     throw new CustomerValidationException(nameof(ErrorCode.MES17001));
             }
-            //}
-            //else
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES17001));
-            //}
+            
         }
 
         /// <summary>
