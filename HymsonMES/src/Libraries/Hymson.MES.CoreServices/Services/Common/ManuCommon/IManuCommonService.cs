@@ -1,6 +1,5 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.CoreServices.Bos.Manufacture;
+using Hymson.MES.CoreServices.Bos.Common;
 
 namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
 {
@@ -12,9 +11,9 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// <summary>
         /// 获取生产条码信息
         /// </summary>
-        /// <param name="sfc"></param>
+        /// <param name="bo"></param>
         /// <returns></returns>
-        Task<(ManuSfcProduceEntity, ManuSfcProduceBusinessEntity)> GetProduceSFCAsync(string sfc, long siteId);
+        Task<(ManuSfcProduceEntity, ManuSfcProduceBusinessEntity)> GetProduceSFCAsync(SingleSFCBo bo);
 
         /// <summary>
         /// 批量验证条码是否锁定
