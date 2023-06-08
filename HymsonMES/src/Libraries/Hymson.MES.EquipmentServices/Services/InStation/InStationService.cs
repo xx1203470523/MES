@@ -182,25 +182,21 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture.InStation
             // 更新数据
             using (var trans = TransactionHelper.GetTransactionScope())
             {
-                if (isFirstProcedure == true)
-                {
-                    rows += await _planWorkOrderRepository.UpdateInputQtyByWorkOrderId(new UpdateQtyCommand
-                    {
-                        UpdatedBy = sfcProduceEntity.UpdatedBy,
-                        UpdatedOn = sfcProduceEntity.UpdatedOn,
-                        WorkOrderId = sfcProduceEntity.WorkOrderId,
-                        Qty = 1,
-                    });
-                }
-
                 // 修改条码使用状态为"已使用"
-                rows += await _manuSfcRepository.UpdateSfcIsUsedAsync(new ManuSfcUpdateIsUsedCommand
+                rows = await _manuSfcRepository.UpdateSfcIsUsedAsync(new ManuSfcUpdateIsUsedCommand
                 {
                     Sfcs = new string[] { sfcProduceEntity.SFC },
                     UserId = sfcProduceEntity.UpdatedBy,
                     UpdatedOn = sfcProduceEntity.UpdatedOn,
                     IsUsed = YesOrNoEnum.Yes
                 });
+
+                // 未更新到数据，事务回滚
+                if (rows <= 0)
+                {
+                    trans.Dispose();
+                    return rows;
+                }
 
                 // 更改状态
                 rows += await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
@@ -216,6 +212,18 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture.InStation
                 // 插入 manu_sfc_step 状态为 进站
                 sfcStep.Operatetype = ManuSfcStepTypeEnum.InStock;
                 rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
+
+                // 如果是首工序，更新工单的 InputQty
+                if (isFirstProcedure == true)
+                {
+                    rows += await _planWorkOrderRepository.UpdateInputQtyByWorkOrderId(new UpdateQtyCommand
+                    {
+                        UpdatedBy = sfcProduceEntity.UpdatedBy,
+                        UpdatedOn = sfcProduceEntity.UpdatedOn,
+                        WorkOrderId = sfcProduceEntity.WorkOrderId,
+                        Qty = 1,
+                    });
+                }
 
                 trans.Complete();
             }
