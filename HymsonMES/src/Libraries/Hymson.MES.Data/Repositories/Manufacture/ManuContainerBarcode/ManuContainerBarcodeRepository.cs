@@ -12,8 +12,6 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
-using System.Security.Policy;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -274,7 +272,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string UpdateSql = "UPDATE `manu_container_barcode` SET   SiteId = @SiteId, ProductId = @ProductId, BarCode = @BarCode, ContainerId = @ContainerId, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `manu_container_barcode` SET   SiteId = @SiteId, ProductId = @ProductId, BarCode = @BarCode, ContainerId = @ContainerId, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdateStatusSql = "UPDATE `manu_container_barcode` SET   Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdateStatusSql = "UPDATE `manu_container_barcode` SET Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Status <> @Status AND Id = @Id ";
 
 
         const string DeleteSql = "UPDATE `manu_container_barcode` SET IsDeleted = Id WHERE Id = @Id ";
