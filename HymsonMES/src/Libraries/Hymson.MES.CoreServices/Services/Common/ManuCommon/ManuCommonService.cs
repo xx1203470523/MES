@@ -4,9 +4,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Manufacture;
@@ -17,9 +15,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.Sequences;
-using Hymson.Utils;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 
 namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
 {
@@ -184,15 +180,14 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// <summary>
         /// 批量验证条码是否锁定
         /// </summary>
-        /// <param name="sfcBos"></param>
-        /// <param name="procedureId"></param>
+        /// <param name="procedureBo"></param>
         /// <returns></returns>
-        public async Task VerifySfcsLockAsync(MultiSFCBo sfcBos, long? procedureId = null)
+        public async Task VerifySfcsLockAsync(ManuProcedureBo procedureBo)
         {
             var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery
             {
-                SiteId = sfcBos.SiteId,
-                Sfcs = sfcBos.SFCs,
+                SiteId = procedureBo.SiteId,
+                Sfcs = procedureBo.SFCs,
                 BusinessType = ManuSfcProduceBusinessType.Lock
             });
 
@@ -211,7 +206,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                 if (sfcProduceLockBo.Lock != QualityLockEnum.FutureLock) continue;
 
                 // 如果锁的不是目标工序，就跳过
-                if (procedureId.HasValue == true && sfcProduceLockBo.LockProductionId != procedureId) continue;
+                if (procedureBo.ProcedureId.HasValue == true && sfcProduceLockBo.LockProductionId != procedureBo.ProcedureId) continue;
 
                 validationFailures.Add(new ValidationFailure
                 {
@@ -250,21 +245,19 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// <summary>
         /// 验证条码BOM清单用量
         /// </summary>
-        /// <param name="sfcBo"></param>
-        /// <param name="bomId"></param>
-        /// <param name="procedureId"></param>
+        /// <param name="procedureBomBo"></param>
         /// <returns></returns>
-        public async Task VerifyBomQtyAsync(SingleSFCBo sfcBo, long bomId, long procedureId)
+        public async Task VerifyBomQtyAsync(ManuProcedureBomBo procedureBomBo)
         {
-            var procBomDetailEntities = await _procBomDetailRepository.GetByBomIdAsync(bomId);
+            var procBomDetailEntities = await _procBomDetailRepository.GetByBomIdAsync(procedureBomBo.BomId);
             if (procBomDetailEntities == null) return;
 
             // 过滤出当前工序对应的物料（数据收集方式为内部和外部）
-            procBomDetailEntities = procBomDetailEntities.Where(w => w.ProcedureId == procedureId && w.DataCollectionWay != MaterialSerialNumberEnum.Batch);
+            procBomDetailEntities = procBomDetailEntities.Where(w => w.ProcedureId == procedureBomBo.ProcedureId && w.DataCollectionWay != MaterialSerialNumberEnum.Batch);
             if (procBomDetailEntities == null) return;
 
             // 流转信息
-            var sfcCirculationEntities = await GetBarCodeCirculationListAsync(sfcBo, procedureId);
+            var sfcCirculationEntities = await GetBarCodeCirculationListAsync(procedureBomBo, procedureBomBo.ProcedureId);
             if (sfcCirculationEntities == null) return;
 
             // 根据物料分组
@@ -288,6 +281,9 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             }
         }
 
+
+
+        #region 内部方法
         /// <summary>
         /// 获取挂载的活动组件信息
         /// </summary>
@@ -309,6 +305,8 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                 IsDisassemble = TrueOrFalseEnum.No
             });
         }
+
+        #endregion
 
     }
 
