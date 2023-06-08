@@ -76,7 +76,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <summary>
         /// 生产公共服务
         /// </summary>
-        private readonly IManuCommonService _manuCommonService;
+        private readonly IManuCommonOldService _manuCommonOldService;
 
         /// <summary>
         /// 
@@ -94,7 +94,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         IManuSfcStepRepository manuSfcStepRepository,
         IManuProductBadRecordRepository manuProductBadRecordRepository,
         IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
-        IManuCommonService manuCommonService,
+        IManuCommonOldService manuCommonOldService,
         AbstractValidator<ManuProductBadRecordCreateDto> validationCreateRules,
         AbstractValidator<ManuProductBadRecordModifyDto> validationModifyRules)
         {
@@ -106,7 +106,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuSfcStepRepository = manuSfcStepRepository;
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
             _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
-            _manuCommonService = manuCommonService;
+            _manuCommonOldService = manuCommonOldService;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
         }
@@ -196,7 +196,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     var strs = string.Join(",", sfcRepairs.Select(x => x.Sfc));
                     throw new CustomerValidationException(nameof(ErrorCode.MES15410)).WithData("sfcs", strs);
                 }
-                processRouteProcedure = await _manuCommonService.GetFirstProcedureAsync(createDto.BadProcessRouteId ?? 0);
+                processRouteProcedure = await _manuCommonOldService.GetFirstProcedureAsync(createDto.BadProcessRouteId ?? 0);
             }
             var sfcStepList = new List<ManuSfcStepEntity>();
             var manuSfcProduceList = new List<ManuSfcProduceBusinessEntity>();
@@ -509,7 +509,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES15408));
                 }
-                var processRouteProcedure = await _manuCommonService.GetFirstProcedureAsync(badReJudgmentDto.BadProcessRouteId ?? 0);
+                var processRouteProcedure = await _manuCommonOldService.GetFirstProcedureAsync(badReJudgmentDto.BadProcessRouteId ?? 0);
                 // 条码步骤
                 sfcStepEntity = CreateSFCStepEntity(manuSfc, ManuSfcStepTypeEnum.BadRejudgment, badReJudgmentDto.Remark ?? "");
 
@@ -835,7 +835,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         private async Task<bool> IsLastProcedureIdAsync(long processRouteId, long procedureId)
         {
-            var processRouteNodes = await _manuCommonService.GetProcessRouteAsync(processRouteId);
+            var processRouteNodes = await _manuCommonOldService.GetProcessRouteAsync(processRouteId);
             var isLast = false;
             if (processRouteNodes.Any())
             {

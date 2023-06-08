@@ -161,7 +161,7 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Manufacture
-            services.AddSingleton<IManuCommonService, ManuCommonService>();
+            services.AddSingleton<IManuCommonOldService, ManuCommonOldService>();
             services.AddSingleton<IManuFeedingService, ManuFeedingService>();
             services.AddSingleton<IManuSfcService, ManuSfcService>();
             services.AddSingleton<IManuSfcProduceService, ManuSfcProduceService>();

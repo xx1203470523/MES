@@ -32,7 +32,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
     /// <summary>
     /// 生产通用
     /// </summary>
-    public class ManuCommonService : IManuCommonService
+    public class ManuCommonOldService : IManuCommonOldService
     {
         /// <summary>
         /// 当前对象（站点）
@@ -146,7 +146,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="procMaskCodeRuleRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="localizationService"></param>
-        public ManuCommonService(ICurrentSite currentSite, ISequenceService sequenceService,
+        public ManuCommonOldService(ICurrentSite currentSite, ISequenceService sequenceService,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
             IManuContainerPackRepository manuContainerPackRepository,

@@ -82,7 +82,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// 仓储接口（条码生产信息）
         /// </summary>
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
-        //private readonly IManuCommonService _manuCommonService;
+        //private readonly IManuCommonService _manuCommonOldService;
 
         public ManuContainerBarcodeService(ICurrentUser currentUser, ICurrentSite currentSite, IManuContainerBarcodeRepository manuContainerBarcodeRepository
             //, AbstractValidator<ManuContainerBarcodeCreateDto> validationCreateRules
@@ -104,7 +104,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             , AbstractValidator<CreateManuContainerBarcodeDto> validationCreateManuContainerBarcodeRules,
              AbstractValidator<UpdateManuContainerBarcodeStatusDto> validationUpdateStatusRules
              , IManuSfcProduceRepository manuSfcProduceRepository
-            // IManuCommonService manuCommonService
+            // IManuCommonService manuCommonOldService
             , IProcResourceRepository procResourceRepository
             , IManuSfcRepository manuSfcRepository,
            IWhMaterialInventoryRepository whMaterialInventoryRepository,
@@ -132,7 +132,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuFacePlateContainerPackRepository = manuFacePlateContainerPackRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _procProcedureRepository = procProcedureRepository;
-            //_manuCommonService = manuCommonService;
+            //_manuCommonOldService = manuCommonOldService;
             _procResourceRepository = procResourceRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
@@ -220,7 +220,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
 
             //获取条码生产信息
-            //var produceSFCobj = await _manuCommonService.GetProduceSFCAsync(createManuContainerBarcodeDto.BarCode);
+            //var produceSFCobj = await _manuCommonOldService.GetProduceSFCAsync(createManuContainerBarcodeDto.BarCode);
             //var sfcProduceEntity = produceSFCobj.Item1;
             var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
             {

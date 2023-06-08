@@ -10,7 +10,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
     /// <summary>
     /// 生产共用
     /// </summary>
-    public interface IManuCommonService
+    public interface IManuCommonOldService
     {
         /// <summary>
         /// 验证条码掩码规则
@@ -112,12 +112,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <returns></returns>
         Task<IEnumerable<long>> GetProcResourceIdByProcedureIdAsync(long procedureId);
 
+        /*
         /// <summary>
         /// 批量验证条码是否锁定
         /// </summary>
         /// <param name="sfcs"></param>
         /// <returns></returns>
         Task VerifySfcsLockAsync(IEnumerable<string> sfcs);
+        */
 
         /// <summary>
         /// 批量判断条码是否锁定

@@ -31,7 +31,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <summary>
         /// 服务接口（生产通用）
         /// </summary>
-        private readonly IManuCommonService _manuCommonService;
+        private readonly IManuCommonOldService _manuCommonOldService;
 
         /// <summary>
         /// 服务接口（出站）
@@ -44,15 +44,15 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="manuCommonService"></param>
+        /// <param name="manuCommonOldService"></param>
         /// <param name="manuOutStationService"></param>
         public JobManuCompleteService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IManuCommonService manuCommonService,
+            IManuCommonOldService manuCommonOldService,
             IManuOutStationService manuOutStationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _manuCommonService = manuCommonService;
+            _manuCommonOldService = manuCommonOldService;
             _manuOutStationService = manuOutStationService;
         }
 
@@ -92,7 +92,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             };
 
             // 获取生产条码信息
-            var (sfcProduceEntity, _) = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
+            var (sfcProduceEntity, _) = await _manuCommonOldService.GetProduceSFCAsync(bo.SFC);
 
             // 合法性校验
             sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity)
@@ -100,7 +100,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
                             .VerifyResource(bo.ResourceId);
 
             // 验证BOM主物料数量
-            await _manuCommonService.VerifyBomQtyAsync(sfcProduceEntity.ProductBOMId, bo.ProcedureId, bo.SFC);
+            await _manuCommonOldService.VerifyBomQtyAsync(sfcProduceEntity.ProductBOMId, bo.ProcedureId, bo.SFC);
 
             // 出站
             _ = await _manuOutStationService.OutStationAsync(sfcProduceEntity);

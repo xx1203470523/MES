@@ -35,7 +35,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
     {
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
-        private readonly IManuCommonService _manuCommonService;
+        private readonly IManuCommonOldService _manuCommonOldService;
         private readonly IProcMaterialRepository _procMaterialRepository;
         private readonly IInteCodeRulesRepository _inteCodeRulesRepository;
         private readonly IManuGenerateBarcodeService _manuGenerateBarcodeService;
@@ -52,7 +52,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="manuCommonService"></param>
+        /// <param name="manuCommonOldService"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="inteCodeRulesRepository"></param>
         /// <param name="manuGenerateBarcodeService"></param>
@@ -65,7 +65,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         /// <param name="localizationService"></param>
         public ManuCreateBarcodeService(ICurrentUser currentUser,
              ICurrentSite currentSite,
-             IManuCommonService manuCommonService,
+             IManuCommonOldService manuCommonOldService,
              IProcMaterialRepository procMaterialRepository,
              IInteCodeRulesRepository inteCodeRulesRepository,
              IManuGenerateBarcodeService manuGenerateBarcodeService,
@@ -79,7 +79,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _manuCommonService = manuCommonService;
+            _manuCommonOldService = manuCommonOldService;
             _procMaterialRepository = procMaterialRepository;
             _inteCodeRulesRepository = inteCodeRulesRepository;
             _manuGenerateBarcodeService = manuGenerateBarcodeService;
@@ -100,7 +100,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         /// <returns></returns>
         public async Task<List<ManuSfcEntity>> CreateBarcodeByWorkOrderIdAsync(CreateBarcodeByWorkOrderDto param)
         {
-            var planWorkOrderEntity = await _manuCommonService.GetProduceWorkOrderByIdAsync(param.WorkOrderId, false);
+            var planWorkOrderEntity = await _manuCommonOldService.GetProduceWorkOrderByIdAsync(param.WorkOrderId, false);
 
             var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(planWorkOrderEntity.ProductId);
             var inteCodeRulesEntity = await _inteCodeRulesRepository.GetInteCodeRulesByProductIdAsync(new InteCodeRulesByProductQuery
@@ -121,7 +121,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                 Count = discuss
             });
 
-            var processRouteFirstProcedure = await _manuCommonService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
+            var processRouteFirstProcedure = await _manuCommonOldService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
             List<ManuSfcEntity> manuSfcList = new();
             List<ManuSfcInfoEntity> manuSfcInfoList = new();
             List<ManuSfcProduceEntity> manuSfcProduceList = new();
@@ -251,10 +251,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         /// <returns></returns>
         public async Task CreateBarcodeByExternalSFCAsync(CreateBarcodeByExternalSFCDto param)
         {
-            var planWorkOrderEntity = await _manuCommonService.GetWorkOrderByIdAsync(param.WorkOrderId);
+            var planWorkOrderEntity = await _manuCommonOldService.GetWorkOrderByIdAsync(param.WorkOrderId);
             var sfclist = await _manuSfcRepository.GetBySFCsAsync(param.ExternalSFCs.Select(x => x.SFC));
 
-            var processRouteFirstProcedure = await _manuCommonService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
+            var processRouteFirstProcedure = await _manuCommonOldService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
 
             List<ManuSfcEntity> manuSfcList = new List<ManuSfcEntity>();
             List<ManuSfcInfoEntity> manuSfcInfoList = new List<ManuSfcInfoEntity>();
@@ -376,10 +376,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         /// <returns></returns>
         public async Task CreateBarcodeByOldMESSFCAsync(CreateBarcodeByOldMesSFCDto param)
         {
-            var planWorkOrderEntity = await _manuCommonService.GetWorkOrderByIdAsync(param.WorkOrderId);
+            var planWorkOrderEntity = await _manuCommonOldService.GetWorkOrderByIdAsync(param.WorkOrderId);
             var sfclist = await _manuSfcRepository.GetBySFCsAsync(param.OldSFCs.Select(x => x.SFC));
             var sfcInfoList = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfclist.Select(x => x.Id));
-            var processRouteFirstProcedure = await _manuCommonService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
+            var processRouteFirstProcedure = await _manuCommonOldService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
 
             List<ManuSfcEntity> manuSfcList = new List<ManuSfcEntity>();
             List<ManuSfcInfoEntity> manuSfcInfoList = new List<ManuSfcInfoEntity>();

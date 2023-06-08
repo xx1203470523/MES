@@ -31,7 +31,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <summary>
         /// 服务接口（生产通用）
         /// </summary>
-        private readonly IManuCommonService _manuCommonService;
+        private readonly IManuCommonOldService _manuCommonOldService;
         private readonly IManuContainerBarcodeRepository _manuContainerBarcodeRepository;
         private readonly IManuContainerPackRepository _manuContainerPackRepository;
         private readonly IInteContainerRepository _inteContainerRepository;
@@ -41,16 +41,16 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="manuCommonService"></param>
+        /// <param name="manuCommonOldService"></param>
         /// <param name="manuContainerBarcodeRepository"></param>
         /// <param name="manuContainerPackRepository"></param>
         /// <param name="inteContainerRepository"></param>
         public JobManuPackageCloseService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IManuCommonService manuCommonService, IManuContainerBarcodeRepository manuContainerBarcodeRepository, IManuContainerPackRepository manuContainerPackRepository, IInteContainerRepository inteContainerRepository)
+            IManuCommonOldService manuCommonOldService, IManuContainerBarcodeRepository manuContainerBarcodeRepository, IManuContainerPackRepository manuContainerPackRepository, IInteContainerRepository inteContainerRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _manuCommonService = manuCommonService;
+            _manuCommonOldService = manuCommonOldService;
             _manuContainerBarcodeRepository = manuContainerBarcodeRepository;
             _manuContainerPackRepository = manuContainerPackRepository;
             _inteContainerRepository = inteContainerRepository;

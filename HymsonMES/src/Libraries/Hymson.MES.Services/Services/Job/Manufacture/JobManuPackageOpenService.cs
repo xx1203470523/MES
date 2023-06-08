@@ -30,7 +30,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <summary>
         /// 服务接口（生产通用）
         /// </summary>
-        private readonly IManuCommonService _manuCommonService;
+        private readonly IManuCommonOldService _manuCommonOldService;
 
         /// <summary>
         /// 
@@ -43,14 +43,14 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="manuCommonService"></param>
+        /// <param name="manuCommonOldService"></param>
         /// <param name="manuContainerBarcodeRepository"></param>
         public JobManuPackageOpenService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IManuCommonService manuCommonService, IManuContainerBarcodeRepository manuContainerBarcodeRepository)
+            IManuCommonOldService manuCommonOldService, IManuContainerBarcodeRepository manuContainerBarcodeRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _manuCommonService = manuCommonService;
+            _manuCommonOldService = manuCommonOldService;
             _manuContainerBarcodeRepository = manuContainerBarcodeRepository;
         }
 

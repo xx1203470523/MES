@@ -1,5 +1,6 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.CoreServices.Bos.Common;
+using Hymson.MES.CoreServices.Bos.Manufacture;
 
 namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
 {
@@ -18,35 +19,23 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// <summary>
         /// 批量验证条码是否锁定
         /// </summary>
-        /// <param name="sfcs"></param>
-        /// <param name="siteId"></param>
+        /// <param name="procedureBo"></param>
         /// <returns></returns>
-        /// <exception cref="ValidationException"></exception>
-        Task VerifySfcsLockAsync(IEnumerable<string> sfcs, long siteId);
-
-        /// <summary>
-        /// 批量验证条码是否锁定
-        /// </summary>
-        /// <param name="sfcs"></param>
-        /// <param name="procedureId"></param>
-        /// <returns></returns>
-         Task VerifySfcsLockAsync(string[] sfcs, long procedureId);
+        Task VerifySfcsLockAsync(ManuProcedureBo procedureBo);
 
         /// <summary>
         /// 批量验证条码是否被容器包装
         /// </summary>
-        /// <param name="sfcs"></param>
-        /// <param name="siteId"></param>
+        /// <param name="sfcBos"></param>
         /// <returns></returns>
-         Task VerifyContainerAsync(string[] sfcs, long siteId);
+        Task VerifyContainerAsync(MultiSFCBo sfcBos);
 
         /// <summary>
         /// 验证条码BOM清单用量
         /// </summary>
-        /// <param name="bomId"></param>
-        /// <param name="procedureId"></param>
-        /// <param name="sfc"></param>
+        /// <param name="procedureBomBo"></param>
         /// <returns></returns>
-        Task VerifyBomQtyAsync(long bomId, long procedureId, string sfc, long siteId);
+        Task VerifyBomQtyAsync(ManuProcedureBomBo procedureBomBo);
+
     }
 }
