@@ -292,31 +292,31 @@ namespace Hymson.MES.Equipment.Api.Controllers
         //    await _bindContainerService.BindContainerAsync(request);
         //}
 
-        /// <summary>
-        /// 条码绑定
-        /// HY-MES-EQU-020
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("BindSFCAsync")]
-        public async Task BindSFCAsync(BindSFCDto request)
-        {
-            await _bindSFCService.BindSFCAsync(request);
-        }
+        ///// <summary>
+        ///// 条码绑定
+        ///// HY-MES-EQU-020
+        ///// </summary>
+        ///// <param name="request"></param>
+        ///// <returns></returns>
+        //[HttpPost]
+        //[Route("BindSFCAsync")]
+        //public async Task BindSFCAsync(BindSFCDto request)
+        //{
+        //    await _bindSFCService.BindSFCAsync(request);
+        //}
 
-        /// <summary>
-        /// 条码解绑
-        /// HY-MES-EQU-021
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("UnBindSFCAsync")]
-        public async Task UnBindSFCAsync(UnBindSFCDto request)
-        {
-            await _bindSFCService.UnBindSFCAsync(request);
-        }
+        ///// <summary>
+        ///// 条码解绑
+        ///// HY-MES-EQU-021
+        ///// </summary>
+        ///// <param name="request"></param>
+        ///// <returns></returns>
+        //[HttpPost]
+        //[Route("UnBindSFCAsync")]
+        //public async Task UnBindSFCAsync(UnBindSFCDto request)
+        //{
+        //    await _bindSFCService.UnBindSFCAsync(request);
+        //}
 
         ///// <summary>
         ///// 容器解绑
