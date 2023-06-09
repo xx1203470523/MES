@@ -118,6 +118,13 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
             //  var idsArr = StringExtension.SpitLongArrary(ids);
             return await _procLabelTemplateRepository.DeletesAsync(idsArr);
         }
+        public async Task<(string base64Str, bool result)> PreviewProcLabelTemplateAsync(long id)
+        {
+            var foo = await _procLabelTemplateRepository.GetByIdAsync(id);
+            return await PreviewProcLabelTemplateAsync(foo.Content);
+
+
+        }
         public async Task<(string base64Str, bool result)> PreviewProcLabelTemplateAsync(string content)
         {
             PreviewRequest request; 
