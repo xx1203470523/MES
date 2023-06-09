@@ -319,7 +319,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        public async Task<int> ModifyWorkOrderStatusAsync(IEnumerable<PlanWorkOrderEntity> parms)
+        public async Task<int> ModifyWorkOrderStatusAsync(IEnumerable<UpdateStatusCommand> parms)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateWorkOrderStatusSql, parms);
@@ -473,7 +473,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string GetByWorkLineId = "SELECT PWO.* FROM plan_work_order_activation PWOA " +
             "LEFT JOIN plan_work_order PWO ON PWO.Id = PWOA.WorkOrderId " +
             "WHERE PWO.IsDeleted = 0 AND PWO.WorkCenterType = @WorkCenterType AND PWOA.LineId = @workLineId ";
-        const string UpdateWorkOrderStatusSql = @"UPDATE `plan_work_order` SET Status = @Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdateWorkOrderStatusSql = @"UPDATE `plan_work_order` SET Status = @Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id AND  Status=@BeforeStatus";
         const string UpdateWorkOrderLockedSql = @"UPDATE `plan_work_order` SET IsLocked = @IsLocked, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string UpdateRecordRealStartSql = "UPDATE plan_work_order_record SET RealStart = @UpdatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND RealStart IS NULL AND WorkOrderId IN @WorkOrderIds ";
         const string UpdateRecordRealEndSql = "UPDATE plan_work_order_record SET RealEnd = @UpdatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE WorkOrderId IN @WorkOrderIds AND IsDeleted = 0 ";
