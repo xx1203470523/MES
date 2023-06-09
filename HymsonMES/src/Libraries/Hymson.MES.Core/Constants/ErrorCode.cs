@@ -296,6 +296,7 @@
         public const string MES12601 = "设备编码不能为空";
         public const string MES12602 = "设备名称不能为空";
         public const string MES12603 = "请求实体不能为空！";
+        public const string MES12604 = "设备信息不存在！";
         #endregion
 
         #region 设备组 12700
