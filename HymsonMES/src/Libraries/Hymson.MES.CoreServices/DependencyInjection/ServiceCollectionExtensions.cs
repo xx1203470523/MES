@@ -35,6 +35,8 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSingleton<IMasterDataService, MasterDataService>();
             services.AddSingleton<IJobCommonService, JobCommonService>();
 
+            services.AddSingleton<IManuGenerateBarcodeService, ManuGenerateBarcodeService>();//条码生成
+
             return services;
         }
 
