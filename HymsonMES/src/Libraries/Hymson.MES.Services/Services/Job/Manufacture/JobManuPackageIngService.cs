@@ -28,7 +28,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <summary>
         /// 服务接口（生产通用）
         /// </summary>
-        private readonly IManuCommonService _manuCommonService;
+        private readonly IManuCommonOldService _manuCommonOldService;
 
 
         /// <summary>
@@ -36,13 +36,13 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="manuCommonService"></param>
+        /// <param name="manuCommonOldService"></param>
         public JobManuPackageIngService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IManuCommonService manuCommonService)
+            IManuCommonOldService manuCommonOldService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _manuCommonService = manuCommonService;
+            _manuCommonOldService = manuCommonOldService;
         }
 
 
@@ -87,7 +87,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
 
             // 获取生产条码信息
             //二三级包装时候 条码就是包装码了，不需要校验条码
-            // var (sfcProduceEntity, _) = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
+            // var (sfcProduceEntity, _) = await _manuCommonOldService.GetProduceSFCAsync(bo.SFC);
 
             // 合法性校验
             //sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity).VerifyProcedure(bo.ProcedureId);

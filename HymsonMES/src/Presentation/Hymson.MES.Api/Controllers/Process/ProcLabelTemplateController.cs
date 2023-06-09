@@ -115,16 +115,7 @@ namespace Hymson.MES.Api.Controllers.Process
             var foo = await _procLabelTemplateService.PreviewProcLabelTemplateAsync(content);
             return new PreviewImageDataDto() { base64Str = foo.base64Str, result = foo.result };    
         }
-        ///// <summary>
-        ///// 下载模板文件
-        ///// </summary>
-        ///// <param name="url"></param>
-        //[HttpGet("{url}")]
-        //[Route("downloadFile")]
-        //public void downloadFile(string url)
-        //{
-
-        //}
+       
 
     }
 }

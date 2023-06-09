@@ -4,8 +4,10 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Common;
+using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Services.Bos.Manufacture;
@@ -32,33 +34,35 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <summary>
         /// 服务接口（生产通用）
         /// </summary>
-        private readonly IManuCommonService _manuCommonService;
+        private readonly IManuCommonOldService _manuCommonOldService;
 
         /// <summary>
         /// 服务接口（不良录入）
         /// </summary>
         private readonly IManuProductBadRecordRepository _manuProductBadRecordRepository;
+
         /// <summary>
         /// 条码生产信息（物理删除） 仓储 
         /// </summary>
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
+
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="manuCommonService"></param>
+        /// <param name="manuCommonOldService"></param>
         /// <param name="manuProductBadRecordRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
         public JobManuBadRecordService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IManuCommonService manuCommonService,
+            IManuCommonOldService manuCommonOldService,
             IManuProductBadRecordRepository manuProductBadRecordRepository,
             IManuSfcProduceRepository manuSfcProduceRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _manuCommonService = manuCommonService;
+            _manuCommonOldService = manuCommonOldService;
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
         }
@@ -99,7 +103,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             };
 
             // 获取生产条码信息
-            var (sfcProduceEntity, _) = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
+            var (sfcProduceEntity, _) = await _manuCommonOldService.GetProduceSFCAsync(bo.SFC);
 
             // 合法性校验
             sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity)

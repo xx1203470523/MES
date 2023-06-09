@@ -5,11 +5,12 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Common;
+using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Bos.Manufacture;
-using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -35,7 +36,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <summary>
         /// 服务接口（生产通用）
         /// </summary>
-        private readonly IManuCommonService _manuCommonService;
+        private readonly IManuCommonOldService _manuCommonOldService;
 
         /// <summary>
         /// 仓储接口（条码步骤）
@@ -53,17 +54,17 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="manuCommonService"></param>
+        /// <param name="manuCommonOldService"></param>
         /// <param name="manuSfcStepRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
         public JobManuStopService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IManuCommonService manuCommonService,
+            IManuCommonOldService manuCommonOldService,
             IManuSfcStepRepository manuSfcStepRepository,
             IManuSfcProduceRepository manuSfcProduceRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _manuCommonService = manuCommonService;
+            _manuCommonOldService = manuCommonOldService;
             _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
         }
@@ -104,7 +105,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             };
 
             // 获取生产条码信息
-            var (sfcProduceEntity, _) = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
+            var (sfcProduceEntity, _) = await _manuCommonOldService.GetProduceSFCAsync(bo.SFC);
 
             // 合法性校验
             sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity)

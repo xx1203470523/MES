@@ -1,5 +1,4 @@
 ﻿using Hymson.Authentication;
-using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
@@ -28,14 +27,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
         private readonly ICurrentUser _currentUser;
 
         /// <summary>
-        /// 当前对象（站点）
-        /// </summary>
-        private readonly ICurrentSite _currentSite;
-
-        /// <summary>
         /// 服务接口（生产通用）
         /// </summary>
-        private readonly IManuCommonService _manuCommonService;
+        private readonly IManuCommonOldService _manuCommonOldService;
 
         /// <summary>
         /// 仓储接口（条码信息）
@@ -67,15 +61,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
-        /// <param name="currentSite"></param>
-        /// <param name="manuCommonService"></param>
+        /// <param name="manuCommonOldService"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcStepRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="procProcedureRepository"></param>
-        public ManuInStationService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IManuCommonService manuCommonService,
+        public ManuInStationService(ICurrentUser currentUser,
+            IManuCommonOldService manuCommonOldService,
             IManuSfcRepository manuSfcRepository,
             IManuSfcStepRepository manuSfcStepRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
@@ -83,8 +76,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
             IProcProcedureRepository procProcedureRepository)
         {
             _currentUser = currentUser;
-            _currentSite = currentSite;
-            _manuCommonService = manuCommonService;
+            _manuCommonOldService = manuCommonOldService;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
@@ -108,7 +100,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
             sfcProduceEntity.UpdatedOn = HymsonClock.Now();
 
             // 获取生产工单（附带工单状态校验）
-            _ = await _manuCommonService.GetProduceWorkOrderByIdAsync(sfcProduceEntity.WorkOrderId);
+            _ = await _manuCommonOldService.GetProduceWorkOrderByIdAsync(sfcProduceEntity.WorkOrderId);
 
             // 获取当前工序信息
             var procedureEntity = await _procProcedureRepository.GetByIdAsync(sfcProduceEntity.ProcedureId);
@@ -122,7 +114,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
             }
 
             // 检查是否首工序
-            var isFirstProcedure = await _manuCommonService.IsFirstProcedureAsync(sfcProduceEntity.ProcessRouteId, sfcProduceEntity.ProcedureId);
+            var isFirstProcedure = await _manuCommonOldService.IsFirstProcedureAsync(sfcProduceEntity.ProcessRouteId, sfcProduceEntity.ProcedureId);
 
             // 初始化步骤
             var sfcStep = new ManuSfcStepEntity
@@ -147,28 +139,27 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
             // 更新数据
             using (var trans = TransactionHelper.GetTransactionScope())
             {
-                if (isFirstProcedure == true)
-                {
-                    rows += await _planWorkOrderRepository.UpdateInputQtyByWorkOrderId(new UpdateQtyCommand
-                    {
-                        UpdatedBy = sfcProduceEntity.UpdatedBy,
-                        UpdatedOn = sfcProduceEntity.UpdatedOn,
-                        WorkOrderId = sfcProduceEntity.WorkOrderId,
-                        Qty = 1,
-                    });
-                }
-
+                /*
+                 * 目前条码好像默认就是已使用，所以这里不需要再更新条码状态
                 // 修改条码使用状态为"已使用"
-                rows += await _manuSfcRepository.UpdateSfcIsUsedAsync(new ManuSfcUpdateIsUsedCommand
+                rows = await _manuSfcRepository.UpdateSfcIsUsedAsync(new ManuSfcUpdateIsUsedCommand
                 {
                     Sfcs = new string[] { sfcProduceEntity.SFC },
                     UserId = sfcProduceEntity.UpdatedBy,
                     UpdatedOn = sfcProduceEntity.UpdatedOn,
                     IsUsed = YesOrNoEnum.Yes
                 });
+                */
 
                 // 更改状态
-                rows += await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
+                rows += await _manuSfcProduceRepository.UpdateWithStatusCheckAsync(sfcProduceEntity);
+
+                // 未更新到数据，事务回滚
+                if (rows <= 0)
+                {
+                    trans.Dispose();
+                    return rows;
+                }
 
                 // 更新工单统计表的 RealStart
                 rows += await _planWorkOrderRepository.UpdatePlanWorkOrderRealStartByWorkOrderIdAsync(new UpdateWorkOrderRealTimeCommand
@@ -182,10 +173,22 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
                 sfcStep.Operatetype = ManuSfcStepTypeEnum.InStock;
                 rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
 
+                // 如果是首工序，更新工单的 InputQty
+                if (isFirstProcedure == true)
+                {
+                    rows += await _planWorkOrderRepository.UpdateInputQtyByWorkOrderId(new UpdateQtyCommand
+                    {
+                        UpdatedBy = sfcProduceEntity.UpdatedBy,
+                        UpdatedOn = sfcProduceEntity.UpdatedOn,
+                        WorkOrderId = sfcProduceEntity.WorkOrderId,
+                        Qty = 1,
+                    });
+                }
+
                 trans.Complete();
             }
 
-            return rows;    
+            return rows;
         }
     }
 }

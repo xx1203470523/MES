@@ -9,6 +9,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
@@ -72,7 +73,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <summary>
         /// 服务接口（生产通用）
         /// </summary>
-        private readonly IManuCommonService _manuCommonService;
+        private readonly IManuCommonOldService _manuCommonOldService;
 
         /// <summary>
         /// 条码流转表仓储
@@ -112,7 +113,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="procReplaceMaterialRepository"></param>
         /// <param name="procProcedureRepository"></param>
         /// <param name="resourceRepository"></param>
-        /// <param name="manuCommonService"></param>
+        /// <param name="manuCommonOldService"></param>
         /// <param name="circulationRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
@@ -125,7 +126,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         IProcReplaceMaterialRepository procReplaceMaterialRepository,
         IProcProcedureRepository procProcedureRepository,
         IProcResourceRepository resourceRepository,
-        IManuCommonService manuCommonService,
+        IManuCommonOldService manuCommonOldService,
         IManuSfcCirculationRepository circulationRepository,
         IManuSfcProduceRepository manuSfcProduceRepository,
         IWhMaterialInventoryRepository whMaterialInventoryRepository,
@@ -140,7 +141,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _procMaterialRepository = procMaterialRepository;
             _procReplaceMaterialRepository = procReplaceMaterialRepository;
             _procProcedureRepository = procProcedureRepository;
-            _manuCommonService = manuCommonService;
+            _manuCommonOldService = manuCommonOldService;
             _circulationRepository = circulationRepository;
             _resourceRepository = resourceRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
@@ -401,11 +402,18 @@ namespace Hymson.MES.Services.Services.Manufacture
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
-                //记录step信息
-                rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
-
                 //修改组件状态
                 rows += await _circulationRepository.DisassemblyUpdateAsync(command);
+
+                // 未更新到数据，事务回滚
+                if (rows <= 0)
+                {
+                    trans.Dispose();
+                    return;
+                }
+
+                //记录step信息
+                rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
 
                 if (inventoryEntity != null)
                 {
@@ -492,7 +500,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 if (serialNumber == MaterialSerialNumberEnum.Outside)
                 {
                     // 验证外部条码合法性
-                    var isCorrect = await _manuCommonService.CheckBarCodeByMaskCodeRuleAsync(addDto.CirculationBarCode, addDto.CirculationProductId ?? 0);
+                    var isCorrect = await _manuCommonOldService.CheckBarCodeByMaskCodeRuleAsync(addDto.CirculationBarCode, addDto.CirculationProductId ?? 0);
                     if (isCorrect == false) throw new CustomerValidationException(nameof(ErrorCode.MES16605)).WithData("barCode", addDto.CirculationBarCode);
 
                     circulationQty = await GetOutsideQtyAsync(addDto.CirculationProductId.Value);
@@ -746,7 +754,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 if (serialNumber == MaterialSerialNumberEnum.Outside)
                 {
                     // 验证外部条码合法性
-                    var isCorrect = await _manuCommonService.CheckBarCodeByMaskCodeRuleAsync(replaceDto.CirculationBarCode, replaceDto.CirculationProductId ?? 0);
+                    var isCorrect = await _manuCommonOldService.CheckBarCodeByMaskCodeRuleAsync(replaceDto.CirculationBarCode, replaceDto.CirculationProductId ?? 0);
                     if (isCorrect == false) throw new CustomerValidationException(nameof(ErrorCode.MES16605)).WithData("barCode", replaceDto.CirculationBarCode);
 
                     circulationQty = await GetOutsideQtyAsync(replaceDto.CirculationProductId.Value);
@@ -900,11 +908,18 @@ namespace Hymson.MES.Services.Services.Manufacture
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
+                // 修改组件状态
+                rows += await _circulationRepository.DisassemblyUpdateAsync(command);
+
+                // 未更新到数据，事务回滚
+                if (rows <= 0)
+                {
+                    trans.Dispose();
+                    return;
+                }
+
                 //记录step信息
                 rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
-
-                //修改组件状态
-                rows += await _circulationRepository.DisassemblyUpdateAsync(command);
 
                 //旧件如果不是外部的需要去加库存
                 if (replaceOld != null)
@@ -1203,7 +1218,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var lockEntity = sfcProduceBusinessEntities.FirstOrDefault(x => x.BusinessType == ManuSfcProduceBusinessType.Lock);
                 if (lockEntity != null)
                 {
-                    ManuSfcProduceExtensions.VerifyProcedureLock(lockEntity, sfc, procedureId);
+                    lockEntity.VerifyProcedureLock(sfc, procedureId);
                 }
 
                 //有缺陷的返修业务

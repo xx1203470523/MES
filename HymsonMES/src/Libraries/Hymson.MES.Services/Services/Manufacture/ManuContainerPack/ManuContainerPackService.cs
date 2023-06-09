@@ -19,6 +19,7 @@ using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.Collections.Generic;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -148,7 +149,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             IEnumerable<ManuSfcProduceEntity> manuSfcProduceList = new List<ManuSfcProduceEntity>();
             if (manuContainerBarcodeEntity.PackLevel == (int)LevelEnum.One)
             {
-                 manuSfclist = await _manuSfcRepository.GetBySFCsAsync(manuContainerPackList.Select(x => x.LadeBarCode));
+                manuSfclist = await _manuSfcRepository.GetBySFCsAsync(manuContainerPackList.Select(x => x.LadeBarCode));
                 var manuSfcInfolistTask = _manuSfcInfoRepository.GetBySFCIdsAsync(manuSfclist.Select(x => x.Id));
                 var manuSfcProduceListTask = _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery
                 {
@@ -252,7 +253,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     SiteId = item.SiteId,
                     CreatedBy = _currentUser.UserName,
                     UpdatedBy = _currentUser.UserName,
-                    ResourceId = param.ResourceId??0,
+                    ResourceId = param.ResourceId ?? 0,
                     ProcedureId = param.ProcedureId ?? 0,
                     ContainerBarCodeId = item.ContainerBarCodeId,
                     LadeBarCode = item.LadeBarCode,
@@ -320,21 +321,24 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             var containerPackEntities = new List<ManuContainerPackEntity>();
             var barCodes = manuContainerPackDtos.Select(x => x.LadeBarCode).ToArray();
-            var packBarCodesEntities = await _manuContainerBarcodeRepository.GetByCodesAsync(new ManuContainerBarcodeQuery
+            IEnumerable<ManuContainerBarcodeEntity> packBarCodesEntities = new List<ManuContainerBarcodeEntity>();
+            if (barCodes.Any())
             {
-                BarCodes = barCodes,
-                SiteId = _currentSite.SiteId ?? 0
-            });
-
-            if (packBarCodesEntities.Any())
-            {
-                var packBarCodeIds = packBarCodesEntities.Select(x => x.Id).ToArray();
-                containerPackEntities = (await _manuContainerPackRepository.GetByContainerBarCodeIdsAsync(packBarCodeIds, _currentSite.SiteId ?? 0)).ToList();
+                packBarCodesEntities = await _manuContainerBarcodeRepository.GetByCodesAsync(new ManuContainerBarcodeQuery
+                {
+                    BarCodes = barCodes,
+                    SiteId = _currentSite.SiteId ?? 0
+                });
+                if (packBarCodesEntities.Any())
+                {
+                    var packBarCodeIds = packBarCodesEntities.Select(x => x.Id).ToArray();
+                    containerPackEntities = (await _manuContainerPackRepository.GetByContainerBarCodeIdsAsync(packBarCodeIds, _currentSite.SiteId ?? 0)).ToList();
+                }
             }
 
             foreach (var item in manuContainerPackDtos)
             {
-                var barCode = packBarCodesEntities.FirstOrDefault(x => x.BarCode == item.LadeBarCode);
+                var barCode = packBarCodesEntities?.FirstOrDefault(x => x.BarCode == item.LadeBarCode);
                 var count = barCode == null ? 1 : containerPackEntities.Count(x => x.ContainerBarCodeId == barCode?.Id);
                 item.Count = count;
             }

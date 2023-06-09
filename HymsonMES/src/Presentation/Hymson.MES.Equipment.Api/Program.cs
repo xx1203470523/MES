@@ -1,19 +1,23 @@
-using Hymson.Infrastructure.Mapper;
+using AutoMapper;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Mapper;
+using Hymson.MES.CoreServices.DependencyInjection;
+using Hymson.Web.Framework.Filters;
+using Hymson.WebApi.Filters;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 using System.Globalization;
 using System.Reflection;
-using AutoMapper;
-using Hymson.WebApi.Filters;
-using Hymson.Web.Framework.Filters;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Swashbuckle.AspNetCore.Filters;
 
 namespace Hymson.MES.Equipment.Api
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class Program
     {
         /// <summary>
@@ -44,6 +48,7 @@ namespace Hymson.MES.Equipment.Api
             AddSwaggerGen(builder.Services);
 
             builder.Services.AddJwtBearerService(builder.Configuration);
+            builder.Services.AddCoreService(builder.Configuration);
             builder.Services.AddEquipmentService(builder.Configuration);
             builder.Services.AddSqlLocalization(builder.Configuration);
             builder.Services.AddSequenceService(builder.Configuration);
@@ -186,5 +191,6 @@ namespace Hymson.MES.Equipment.Api
             //register
             AutoMapperConfiguration.Init(config);
         }
+
     }
 }

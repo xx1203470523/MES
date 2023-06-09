@@ -81,7 +81,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.QueryAsync<ManuSfcCirculationEntity>(templateData.RawSql, templateData.Parameters);
         }
 
-
         /// <summary>
         /// 根据SFCs获取数据
         /// </summary>
@@ -338,6 +337,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class ManuSfcCirculationRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_circulation` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
@@ -352,12 +354,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `EquipmentId`, `FeedingPointId`, `SFC`, `WorkOrderId`, `ProductId`, `CirculationBarCode`, `CirculationWorkOrderId`, `CirculationProductId`, CirculationMainProductId, CirculationQty, `CirculationType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_sfc_circulation`  WHERE Id = @Id ";
-        const string GetBySfcSql = @"SELECT * FROM manu_sfc_circulation WHERE IsDeleted = 0 AND SFC = @sfc ";
+        
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `EquipmentId`, `FeedingPointId`, `SFC`, `WorkOrderId`, `ProductId`, `CirculationBarCode`, `CirculationWorkOrderId`, `CirculationProductId`,CirculationMainProductId, CirculationQty, `CirculationType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_sfc_circulation`  WHERE Id IN @ids ";
 
-        const string DisassemblyUpdateSql = "UPDATE `manu_sfc_circulation` SET CirculationType=@CirculationType, IsDisassemble=@IsDisassemble,DisassembledBy=@UserId,DisassembledOn=@UpdatedOn,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn WHERE Id =@Id   ";
+        const string DisassemblyUpdateSql = "UPDATE manu_sfc_circulation SET " +
+            "CirculationType = @CirculationType, IsDisassemble = @IsDisassemble," +
+            "DisassembledBy = @UserId, DisassembledOn = @UpdatedOn, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn WHERE Id = @Id AND IsDisassemble <> @IsDisassemble ";
 
         const string GetReportPagedInfoDataSqlTemplate = @"
                 SELECT 

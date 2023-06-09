@@ -82,7 +82,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
         /// <summary>
         /// 仓储接口（公共方法）
         /// </summary>
-        private readonly ICommonService _manuCommonService;
+        private readonly ICommonService _manuCommonOldService;
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -96,7 +96,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
         /// <param name="manuSfcInfoRepository"></param>
         /// <param name="manuSfcStepRepository"></param>
         /// <param name="procProductSetRepository"></param>
-        /// <param name="manuCommonService"></param>
+        /// <param name="manuCommonOldService"></param>
         public SfcBindingService(
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
@@ -108,7 +108,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
             IManuSfcInfoRepository manuSfcInfoRepository,
             IManuSfcStepRepository manuSfcStepRepository,
             IProcProductSetRepository procProductSetRepository,
-            ICommonService manuCommonService)
+            ICommonService manuCommonOldService)
         {
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
@@ -120,7 +120,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _procProductSetRepository = procProductSetRepository;
-            _manuCommonService = manuCommonService;
+            _manuCommonOldService = manuCommonOldService;
         }
 
         /// <summary>
@@ -208,7 +208,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
             }
 
             //验证掩码规则
-            var isCodeRule = await _manuCommonService.CheckBarCodeByMaskCodeRuleAsync(sfcBindingDto.SFC, productId);
+            var isCodeRule = await _manuCommonOldService.CheckBarCodeByMaskCodeRuleAsync(sfcBindingDto.SFC, productId);
             if (!isCodeRule)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19916)).WithData("SFC", sfcBindingDto.SFC);

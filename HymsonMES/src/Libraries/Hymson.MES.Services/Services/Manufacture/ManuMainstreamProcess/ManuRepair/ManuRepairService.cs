@@ -29,7 +29,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPac
         /// <summary>
         /// 服务接口（生产通用）
         /// </summary>
-        private readonly IManuCommonService _manuCommonService;
+        private readonly IManuCommonOldService _manuCommonOldService;
 
         /// <summary>
         /// 仓储接口（条码生产信息）
@@ -46,17 +46,17 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPac
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="manuCommonService"></param>
+        /// <param name="manuCommonOldService"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="procProcedureRepository"></param>
         public ManuRepairService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IManuCommonService manuCommonService,
+            IManuCommonOldService manuCommonOldService,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IProcProcedureRepository procProcedureRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _manuCommonService = manuCommonService;
+            _manuCommonOldService = manuCommonOldService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _procProcedureRepository = procProcedureRepository;
         }
@@ -72,7 +72,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPac
             var rows = 0;
 
             // 获取生产工单（附带工单状态校验）
-            _ = await _manuCommonService.GetProduceWorkOrderByIdAsync(sfcProduceEntity.WorkOrderId);
+            _ = await _manuCommonOldService.GetProduceWorkOrderByIdAsync(sfcProduceEntity.WorkOrderId);
 
             // 获取当前工序信息
             var procedureEntity = await _procProcedureRepository.GetByIdAsync(sfcProduceEntity.ProcedureId);

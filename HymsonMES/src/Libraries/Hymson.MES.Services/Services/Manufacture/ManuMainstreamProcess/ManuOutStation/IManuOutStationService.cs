@@ -1,5 +1,5 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Services.Bos.Manufacture;
+using Hymson.MES.CoreServices.Bos.Manufacture;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation
 {
