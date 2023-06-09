@@ -436,6 +436,7 @@
         public const string MES16012 = "修改生产工单状态失败：有工单不为完工,不允许关闭";
         public const string MES16013 = "工单状态不为未开始,不允许删除";
         public const string MES16014 = "有工单不存在";
+        public const string MES16015 = "工单没有锁定前的状态，无法解锁";
 
         public const string MES16020 = "工单号 不能为空！";
         public const string MES16021 = "物料编码 不能为空！";
@@ -456,6 +457,7 @@
         public const string MES16034 = "超生产比例 不能小于0！";
         public const string MES16035 = "SFC对应工单状态为非生产中状态，不可执行操作！";
         public const string MES16036 = "SFC超过最大复投次数，不允许生产！";
+        public const string MES16037 = "工单状态已经被修改，请刷新重试";
         #endregion
 
         #region 条码接收 16100
@@ -604,6 +606,7 @@
         public const string MES16412 = "根据资源查询工单激活必须有资源Id参数！";
         public const string MES16413 = "没有找到该资源对应的工作中心";
         public const string MES16414 = "当前资源所对应的工作中心不是线体";
+        public const string MES16415 = "工单[{orderCode}]处于暂停中，无法操作！";
         #endregion
 
         #region 条码下达 MES16500

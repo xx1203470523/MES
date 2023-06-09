@@ -402,11 +402,18 @@ namespace Hymson.MES.Services.Services.Manufacture
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
-                //记录step信息
-                rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
-
                 //修改组件状态
                 rows += await _circulationRepository.DisassemblyUpdateAsync(command);
+
+                // 未更新到数据，事务回滚
+                if (rows <= 0)
+                {
+                    trans.Dispose();
+                    return;
+                }
+
+                //记录step信息
+                rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
 
                 if (inventoryEntity != null)
                 {
@@ -901,11 +908,18 @@ namespace Hymson.MES.Services.Services.Manufacture
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
+                // 修改组件状态
+                rows += await _circulationRepository.DisassemblyUpdateAsync(command);
+
+                // 未更新到数据，事务回滚
+                if (rows <= 0)
+                {
+                    trans.Dispose();
+                    return;
+                }
+
                 //记录step信息
                 rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
-
-                //修改组件状态
-                rows += await _circulationRepository.DisassemblyUpdateAsync(command);
 
                 //旧件如果不是外部的需要去加库存
                 if (replaceOld != null)

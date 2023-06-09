@@ -130,14 +130,14 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        Task<int> ModifyWorkOrderStatusAsync(IEnumerable<PlanWorkOrderEntity> parms);
+        Task<int> ModifyWorkOrderStatusAsync(IEnumerable<UpdateStatusCommand> parms);
 
         /// <summary>
         /// 修改工单是否锁定
         /// </summary>
         /// <param name="parms"></param>
         /// <returns></returns>
-        Task<int> ModifyWorkOrderLockedAsync(IEnumerable<PlanWorkOrderEntity> parms);
+        Task<int> ModifyWorkOrderLockedAsync(IEnumerable<UpdateLockedCommand> parms);
 
         /// <summary>
         /// 更新下达数量
