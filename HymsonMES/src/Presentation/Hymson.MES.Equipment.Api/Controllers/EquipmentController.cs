@@ -1,15 +1,12 @@
-﻿using Hymson.MES.EquipmentServices.Dtos.BindContainer;
-using Hymson.MES.EquipmentServices.Dtos.BindSFC;
+﻿using Hymson.MES.EquipmentServices;
 using Hymson.MES.EquipmentServices.Dtos.CCDFileUploadComplete;
 using Hymson.MES.EquipmentServices.Dtos.EquipmentCollect;
 using Hymson.MES.EquipmentServices.Dtos.Feeding;
 using Hymson.MES.EquipmentServices.Dtos.GenerateModuleSFC;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
-using Hymson.MES.EquipmentServices.Dtos.InboundInContainer;
 using Hymson.MES.EquipmentServices.Dtos.NGData;
 using Hymson.MES.EquipmentServices.Dtos.OutBound;
 using Hymson.MES.EquipmentServices.Dtos.OutPutQty;
-using Hymson.MES.EquipmentServices.Dtos.QueryContainerBindSfc;
 using Hymson.MES.EquipmentServices.Dtos.SfcCirculation;
 using Hymson.MES.EquipmentServices.Dtos.SingleBarCodeLoadingVerification;
 using Hymson.MES.EquipmentServices.Services;
@@ -22,9 +19,11 @@ using Hymson.MES.EquipmentServices.Services.GenerateModuleSFC;
 using Hymson.MES.EquipmentServices.Services.InBound;
 using Hymson.MES.EquipmentServices.Services.InboundInContainer;
 using Hymson.MES.EquipmentServices.Services.InboundInSFCContainer;
+using Hymson.MES.EquipmentServices.Services.Manufacture.InStation;
 using Hymson.MES.EquipmentServices.Services.OutBound;
 using Hymson.MES.EquipmentServices.Services.OutPutQty;
 using Hymson.MES.EquipmentServices.Services.QueryContainerBindSfc;
+using Hymson.MES.EquipmentServices.Services.SfcBinding;
 using Hymson.MES.EquipmentServices.Services.SfcCirculation;
 using Hymson.MES.EquipmentServices.Services.SingleBarCodeLoadingVerification;
 using Microsoft.AspNetCore.Mvc;
@@ -42,6 +41,17 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// 日志
         /// </summary>
         private readonly ILogger<EquipmentController> _logger;
+
+        /// <summary>
+        /// 进站
+        /// </summary>
+        private readonly IInStationService _InStationService;
+
+        /// <summary>
+        /// 条码绑定
+        /// </summary>
+        private readonly ISfcBindingService _sfcBindingService;
+
 
         /// <summary>
         /// 业务接口（设备监控服务）
@@ -69,6 +79,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// 构造函数
         /// </summary>
         /// <param name="logger"></param>
+        /// <param name="manuInStationService"></param>
+        /// <param name="sfcBindingService"></param>
         /// <param name="equipmentService"></param>
         /// <param name="bindSFCService"></param>
         /// <param name="bindContainerService"></param>
@@ -86,6 +98,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="ngDataService"></param>
         /// <param name="sfcCirculationService"></param>
         public EquipmentController(ILogger<EquipmentController> logger,
+            IInStationService manuInStationService, 
+            ISfcBindingService sfcBindingService,
             IEquipmentCollectService equipmentService,
             IBindSFCService bindSFCService,
             IBindContainerService bindContainerService,
@@ -104,6 +118,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
             ISfcCirculationService sfcCirculationService)
         {
             _logger = logger;
+
+            _InStationService = manuInStationService;
+            _sfcBindingService = sfcBindingService;
+
+
             _equipmentService = equipmentService;
             _bindSFCService = bindSFCService;
             _bindContainerService = bindContainerService;
@@ -120,7 +139,38 @@ namespace Hymson.MES.Equipment.Api.Controllers
             _outBoundService = outBoundService;
             _ngDataService = ngDataService;
             _sfcCirculationService = sfcCirculationService;
+
+
+
         }
+
+
+
+
+        /// <summary>
+        ///进站
+        /// </summary>
+        /// <param name="inStationDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("InStation")]
+        public async Task InStationAsync(InStationDto inStationDto)
+        {
+            await _InStationService.InStationExecuteAsync(inStationDto);
+        }
+
+        /// <summary>
+        ///条码绑定
+        /// </summary>
+        /// <param name="sfcBindingDto"></param> 
+        /// <returns></returns>
+        [HttpPost]
+        [Route("SfcBinding")]
+        public async Task SfcBindingAsync(SfcBindingDto sfcBindingDto)
+        {
+            await _sfcBindingService.SfcBindingAsync(sfcBindingDto);
+        }
+
 
 
         /// <summary>
@@ -252,11 +302,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost("InBoundMore")]
         public async Task InBoundMore(InBoundMoreDto request)
-{
+        {
             await _inBoundService.InBoundMore(request);
         }
 
-    /// <summary>
+        /// <summary>
         /// 出站 HY-MES-EQU-017
         /// </summary>
         /// <param name="request"></param>
@@ -377,7 +427,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <summary>
         /// CCD文件上传完成
         /// HY-MES-EQU-026  
-    /// </summary>
+        /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
@@ -411,7 +461,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [HttpPost]
         [Route("SingleBarCodeLoadingVerification")]
         public async Task SingleBarCodeLoadingVerificationAsync(SingleBarCodeLoadingVerificationDto request)
-    {
+        {
             _logger.LogInformation("单体条码上料校验：SingleBarCodeLoadingVerification,msg:{request}", request);
             await _singleBarCodeLoadingVerificationService.SingleBarCodeLoadingVerificationAsync(request);
         }
@@ -505,5 +555,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
             await _sfcCirculationService.SfcCirculationModuleRemove(request);
         }
+
+
+
+
     }
 }
