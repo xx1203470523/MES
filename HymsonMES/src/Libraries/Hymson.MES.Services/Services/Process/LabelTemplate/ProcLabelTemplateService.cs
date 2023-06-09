@@ -85,7 +85,7 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
             //同步模板文件到打印服务器
             if (!string.IsNullOrEmpty(procLabelTemplateEntity.Path))
             {
-                var result = await _labelPrintRequest.UploadTemplateAsync(procLabelTemplateEntity.Path, procLabelTemplateEntity.Name);
+                var result = await _labelPrintRequest.GetTemplateContextAsync(procLabelTemplateEntity.Path);
                 if (!result.result)
                 {
                     throw new BusinessException(nameof(ErrorCode.MES10356)).WithData("name", procLabelTemplateEntity.Name);
@@ -120,20 +120,20 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
         }
         public async Task<(string base64Str, bool result)> PreviewProcLabelTemplateAsync(string content)
         {
-            PrintRequest request; 
+            PreviewRequest request; 
             if (string.IsNullOrEmpty(content))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10350));
             }
             try
             {
-                request = JsonConvert.DeserializeObject<PrintRequest>(content);
+                request = JsonConvert.DeserializeObject<PreviewRequest>(content);
             }
             catch 
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17005));
             }
-            var result = await _labelPrintRequest.PreviewFromImageBase64Async(request ?? new PrintRequest());
+            var result = await _labelPrintRequest.PreviewFromImageBase64Async(request ?? new PreviewRequest());
             if (!result.result)
                 throw new CustomerValidationException(nameof(ErrorCode.MES17004));
             return result;
@@ -205,7 +205,7 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
             {
                 if (!string.IsNullOrEmpty(procLabelTemplateEntity.Path))
                 {
-                    var result = await _labelPrintRequest.UploadTemplateAsync(procLabelTemplateEntity.Path, procLabelTemplateEntity.Name);
+                    var result = await _labelPrintRequest.GetTemplateContextAsync(procLabelTemplateEntity.Path);
                     if (!result.result)
                     {
                         throw new BusinessException(nameof(ErrorCode.MES10356)).WithData("name", procLabelTemplateEntity.Name);

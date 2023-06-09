@@ -43,7 +43,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInStationService, InStationService>();
             services.AddSingleton<IJobManufactureService, JobManuSfcConvertService>();
             services.AddSingleton<ISfcBindingService, SfcBindingService>();
-            services.AddSingleton<IJobCommonService, JobCommonService>();
 
         }
 

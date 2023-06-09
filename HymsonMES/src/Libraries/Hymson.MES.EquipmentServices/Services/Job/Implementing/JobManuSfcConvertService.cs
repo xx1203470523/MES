@@ -59,7 +59,7 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
         /// <summary>
         /// 仓储接口（公共方法）
         /// </summary>
-        private readonly ICommonService _manuCommonService;
+        private readonly ICommonService _manuCommonOldService;
 
         /// <summary>
         /// 工单激活（物理删除）仓储接口
@@ -97,7 +97,7 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
         /// <param name="procResourceEquipmentBindRepository"></param>
         /// <param name="procBomRepository"></param>
         /// <param name="procBomDetailRepository"></param>
-        /// <param name="manuCommonService"></param>
+        /// <param name="manuCommonOldService"></param>
         /// <param name="planWorkOrderBindRepository"></param>
         /// <param name="inStationService"></param>
         /// <param name="whMaterialInventoryRepository"></param>
@@ -113,7 +113,7 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
             IProcProcedureRepository procProcedureRepository,
             IProcResourceEquipmentBindRepository procResourceEquipmentBindRepository,
             IProcBomRepository procBomRepository,
-            IProcBomDetailRepository procBomDetailRepository, ICommonService manuCommonService,
+            IProcBomDetailRepository procBomDetailRepository, ICommonService manuCommonOldService,
             IPlanWorkOrderBindRepository planWorkOrderBindRepository, IInStationService inStationService,
             IWhMaterialInventoryRepository whMaterialInventoryRepository, ILocalizationService localizationService)
         {
@@ -130,7 +130,7 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
             _procResourceEquipmentBindRepository = procResourceEquipmentBindRepository;
             _procBomRepository = procBomRepository;
             _procBomDetailRepository = procBomDetailRepository;
-            _manuCommonService = manuCommonService;
+            _manuCommonOldService = manuCommonOldService;
             _planWorkOrderBindRepository = planWorkOrderBindRepository;
             _inStationService = inStationService;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
@@ -211,7 +211,7 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
                 throw new CustomerValidationException(nameof(ErrorCode.MES19928)).WithData("ResCode", procResource.ResCode);
             }
             //获取工单  带验证
-            var planWorkOrder = await _manuCommonService.GetProduceWorkOrderByIdAsync(planWorkOrderBindEntity.WorkOrderId);
+            var planWorkOrder = await _manuCommonOldService.GetProduceWorkOrderByIdAsync(planWorkOrderBindEntity.WorkOrderId);
             if (planWorkOrder == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19929));
@@ -237,7 +237,7 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
             }
             var bomDetail = bomDetailList.FirstOrDefault();
             //验证掩码规则
-            var isCodeRule = await _manuCommonService.CheckBarCodeByMaskCodeRuleAsync(bo.SFC, bomDetail.MaterialId);
+            var isCodeRule = await _manuCommonOldService.CheckBarCodeByMaskCodeRuleAsync(bo.SFC, bomDetail.MaterialId);
             if (!isCodeRule)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19916)).WithData("SFC", bo.SFC);
@@ -248,7 +248,7 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
             //{
             //    throw new CustomerValidationException(nameof(ErrorCode.MES19917)).WithData("SFC", bo.SFC);
             //}
-            var processRouteFirstProcedure = await _manuCommonService.GetFirstProcedureAsync(planWorkOrder.ProcessRouteId);
+            var processRouteFirstProcedure = await _manuCommonOldService.GetFirstProcedureAsync(planWorkOrder.ProcessRouteId);
             if (sfcEntity != null)
             {
                 switch (sfcEntity.Status)

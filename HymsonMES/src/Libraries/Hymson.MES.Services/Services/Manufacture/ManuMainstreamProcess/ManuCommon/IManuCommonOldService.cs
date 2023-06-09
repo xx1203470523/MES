@@ -2,7 +2,7 @@
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.Services.Bos.Manufacture;
+using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon
@@ -10,7 +10,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
     /// <summary>
     /// 生产共用
     /// </summary>
-    public interface IManuCommonService
+    public interface IManuCommonOldService
     {
         /// <summary>
         /// 验证条码掩码规则
@@ -111,37 +111,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="procedureId"></param>
         /// <returns></returns>
         Task<IEnumerable<long>> GetProcResourceIdByProcedureIdAsync(long procedureId);
-
-        /// <summary>
-        /// 批量验证条码是否锁定
-        /// </summary>
-        /// <param name="sfcs"></param>
-        /// <returns></returns>
-        Task VerifySfcsLockAsync(IEnumerable<string> sfcs);
-
-        /// <summary>
-        /// 批量判断条码是否锁定
-        /// </summary>
-        /// <param name="sfcs"></param>
-        /// <param name="procedureId"></param>
-        /// <returns></returns>
-        Task VerifySfcsLockAsync(string[] sfcs, long procedureId);
-
-        /// <summary>
-        /// 批量验证条码是否被容器包装
-        /// </summary>
-        /// <param name="sfcs"></param>
-        /// <returns></returns>
-        Task VerifyContainerAsync(string[] sfcs);
-
-        /// <summary>
-        /// 验证条码BOM清单用量
-        /// </summary>
-        /// <param name="bomId"></param>
-        /// <param name="procedureId"></param>
-        /// <param name="sfc"></param>
-        /// <returns></returns>
-        Task VerifyBomQtyAsync(long bomId, long procedureId, string sfc);
 
     }
 }

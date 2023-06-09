@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Hymson.Localization" Version="2.1.37" />
+    <PackageReference Include="Hymson.Sequences" Version="2.1.37" />
+    <PackageReference Include="Hymson.Snowflake" Version="2.1.37" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Hymson.MES.Data\Hymson.MES.Data.csproj" />
   </ItemGroup>
 

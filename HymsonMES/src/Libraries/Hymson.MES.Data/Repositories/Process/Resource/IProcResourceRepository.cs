@@ -102,9 +102,9 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 查询工序关联的资源列表
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="procedureId"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcResourceEntity>> GetProcResourceListByProcedureIdAsync(ProcResourceListByProcedureIdQuery query);
+        Task<IEnumerable<ProcResourceEntity>> GetProcResourceListByProcedureIdAsync(long procedureId);
 
         /// <summary>
         /// 添加资源类型数据

@@ -19,6 +19,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter;
 using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
@@ -366,16 +367,16 @@ namespace Hymson.MES.Services.Services.Plan
 
 
                         //修改工单状态为生产中
-                        List<PlanWorkOrderEntity> planWorkOrderEntities = new List<PlanWorkOrderEntity>();
-                        planWorkOrderEntities.Add(new PlanWorkOrderEntity()
+                        List<UpdateStatusCommand> updateStatusCommands = new List<UpdateStatusCommand>();
+                        updateStatusCommands.Add(new UpdateStatusCommand()
                         {
                             Id = activationWorkOrderDto.Id,
                             Status = Core.Enums.PlanWorkOrderStatusEnum.InProduction,
-
+                            BeforeStatus= workOrder.Status,
                             UpdatedBy = _currentUser.UserName,
                             UpdatedOn = HymsonClock.Now()
                         });
-                        await _planWorkOrderRepository.ModifyWorkOrderStatusAsync(planWorkOrderEntities);
+                        await _planWorkOrderRepository.ModifyWorkOrderStatusAsync(updateStatusCommands);
 
                         //TODO  修改工单状态还需要在 工单记录表中记录
                         await _planWorkOrderStatusRecordRepository.InsertAsync(record);

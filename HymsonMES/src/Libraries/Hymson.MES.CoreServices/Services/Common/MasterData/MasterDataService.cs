@@ -1,96 +1,52 @@
-﻿using FluentValidation;
-using Hymson.Authentication.JwtBearer.Security;
-using Hymson.Infrastructure.Exceptions;
-using Hymson.Localization.Services;
+﻿using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Integrated;
-using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.Process;
-using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
+using Hymson.MES.CoreServices.Bos.Manufacture;
+using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Process.MaskCode;
-using Hymson.MES.Data.Repositories.Process.Resource;
-using Hymson.MES.Data.Repositories.Warehouse;
-using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
-using Hymson.MES.Services.Bos.Manufacture;
-using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
 using Hymson.Sequences;
 using Hymson.Snowflake;
-using Hymson.Utils;
-using System.Data;
-using System.Text.Json;
-using System.Text.RegularExpressions;
-using ValidationFailure = FluentValidation.Results.ValidationFailure;
 
-namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon
+namespace Hymson.MES.CoreServices.Services.Common.MasterData
 {
     /// <summary>
-    /// 生产通用
+    /// 主数据公用类
+    /// @author wangkeming
+    /// @date 2023-06-06
     /// </summary>
-    public class ManuCommonService : IManuCommonService
+    public class MasterDataService : IMasterDataService
     {
-        /// <summary>
-        /// 当前对象（站点）
-        /// </summary>
-        private readonly ICurrentSite _currentSite;
-
         /// <summary>
         /// 序列号服务
         /// </summary>
         private readonly ISequenceService _sequenceService;
 
         /// <summary>
-        /// 仓储接口（条码生产信息）
+        /// 仓储接口（设备模块）
         /// </summary>
-        private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
-
-        /// <summary>
-        /// 仓储接口（条码流转信息）
-        /// </summary>
-        private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
-
-        /// <summary>
-        /// 仓储接口（容器包装）
-        /// </summary>
-        private readonly IManuContainerPackRepository _manuContainerPackRepository;
-
-        /// <summary>
-        /// 仓储接口（工单信息）
-        /// </summary>
-        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
-
-        /// <summary>
-        /// 仓储接口（工单激活信息）
-        /// </summary>
-        private readonly IPlanWorkOrderActivationRepository _planWorkOrderActivationRepository;
-
-        /// <summary>
-        /// 仓储接口（工艺路线工序节点）
-        /// </summary>
-        private readonly IProcProcessRouteDetailNodeRepository _procProcessRouteDetailNodeRepository;
-
-        /// <summary>
-        /// 仓储接口（工艺路线工序连线）
-        /// </summary>
-        private readonly IProcProcessRouteDetailLinkRepository _procProcessRouteDetailLinkRepository;
+        private readonly IEquEquipmentRepository _equEquipmentRepository;
 
         /// <summary>
         /// 仓储接口（资源维护）
         /// </summary>
         private readonly IProcResourceRepository _procResourceRepository;
 
-        /// <summary>
+        /// <summary>sss
         /// 仓储接口（工序维护）
         /// </summary>
         private readonly IProcProcedureRepository _procProcedureRepository;
+
+        /// <summary>
+        /// 仓储接口（工单信息）
+        /// </summary>
+        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
         /// <summary>
         /// 仓储接口（BOM明细）
@@ -103,9 +59,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         private readonly IProcBomDetailReplaceMaterialRepository _procBomDetailReplaceMaterialRepository;
 
         /// <summary>
-        /// 仓储接口（物料维护）
+        /// 仓储接口（工单激活信息）
         /// </summary>
-        private readonly IProcMaterialRepository _procMaterialRepository;
+        private readonly IPlanWorkOrderActivationRepository _planWorkOrderActivationRepository;
+
 
         /// <summary>
         /// 仓储接口（物料替代料）
@@ -113,163 +70,48 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         private readonly IProcReplaceMaterialRepository _procReplaceMaterialRepository;
 
         /// <summary>
-        /// 仓储接口（掩码规则维护）
+        /// 仓储接口（工艺路线工序节点）
         /// </summary>
-        private readonly IProcMaskCodeRuleRepository _procMaskCodeRuleRepository;
+        private readonly IProcProcessRouteDetailNodeRepository _procProcessRouteDetailNodeRepository;
 
         /// <summary>
-        /// 仓储接口（物料库存）
+        /// 仓储接口（工艺路线工序连线）
         /// </summary>
-        private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
+        private readonly IProcProcessRouteDetailLinkRepository _procProcessRouteDetailLinkRepository;
 
         /// <summary>
-        /// 
+        /// 主数据公用类
         /// </summary>
-        private readonly ILocalizationService _localizationService;
-
-
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        /// <param name="currentSite"></param>
         /// <param name="sequenceService"></param>
-        /// <param name="manuSfcProduceRepository"></param>
-        /// <param name="manuSfcCirculationRepository"></param>
-        /// <param name="manuContainerPackRepository"></param>
-        /// <param name="planWorkOrderRepository"></param>
-        /// <param name="planWorkOrderActivationRepository"></param>
-        /// <param name="procProcessRouteDetailNodeRepository"></param>
-        /// <param name="procProcessRouteDetailLinkRepository"></param>
+        /// <param name="equEquipmentRepository"></param>
         /// <param name="procResourceRepository"></param>
         /// <param name="procProcedureRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
+        /// <param name="procReplaceMaterialRepository"></param>
+        /// <param name="planActivationRepository"></param>
         /// <param name="procBomDetailRepository"></param>
         /// <param name="procBomDetailReplaceMaterialRepository"></param>
-        /// <param name="procMaterialRepository"></param>
-        /// <param name="procReplaceMaterialRepository"></param>
-        /// <param name="procMaskCodeRuleRepository"></param>
-        /// <param name="whMaterialInventoryRepository"></param>
-        /// <param name="localizationService"></param>
-        public ManuCommonService(ICurrentSite currentSite, ISequenceService sequenceService,
-            IManuSfcProduceRepository manuSfcProduceRepository,
-            IManuSfcCirculationRepository manuSfcCirculationRepository,
-            IManuContainerPackRepository manuContainerPackRepository,
-            IPlanWorkOrderRepository planWorkOrderRepository,
-            IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
-            IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
-            IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
+        public MasterDataService(
+            ISequenceService sequenceService,
+            IEquEquipmentRepository equEquipmentRepository,
             IProcResourceRepository procResourceRepository,
             IProcProcedureRepository procProcedureRepository,
-            IProcBomDetailRepository procBomDetailRepository,
-            IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository,
-            IProcMaterialRepository procMaterialRepository,
+            IPlanWorkOrderRepository planWorkOrderRepository,
             IProcReplaceMaterialRepository procReplaceMaterialRepository,
-            IProcMaskCodeRuleRepository procMaskCodeRuleRepository,
-            IWhMaterialInventoryRepository whMaterialInventoryRepository,
-            ILocalizationService localizationService)
+            IPlanWorkOrderActivationRepository planActivationRepository,
+            IProcBomDetailRepository procBomDetailRepository,
+            IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository
+            )
         {
-            _currentSite = currentSite;
-            _sequenceService = sequenceService;
-            _manuSfcProduceRepository = manuSfcProduceRepository;
-            _manuSfcCirculationRepository = manuSfcCirculationRepository;
-            _manuContainerPackRepository = manuContainerPackRepository;
-            _planWorkOrderRepository = planWorkOrderRepository;
-            _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
-            _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
-            _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
+            _sequenceService= sequenceService;
+            _equEquipmentRepository = equEquipmentRepository;
             _procResourceRepository = procResourceRepository;
             _procProcedureRepository = procProcedureRepository;
-            _procBomDetailRepository = procBomDetailRepository;
-            _procBomDetailReplaceMaterialRepository = procBomDetailReplaceMaterialRepository;
-            _procMaterialRepository = procMaterialRepository;
-            _procReplaceMaterialRepository = procReplaceMaterialRepository;
-            _procMaskCodeRuleRepository = procMaskCodeRuleRepository;
-            _whMaterialInventoryRepository = whMaterialInventoryRepository;
-            _localizationService = localizationService;
-        }
-
-
-        /// <summary>
-        /// 验证条码掩码规则
-        /// </summary>
-        /// <param name="barCode"></param>
-        /// <param name="materialId"></param>
-        /// <returns></returns>
-        public async Task<bool> CheckBarCodeByMaskCodeRuleAsync(string barCode, long materialId)
-        {
-            var material = await _procMaterialRepository.GetByIdAsync(materialId)
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10204));
-
-            // 物料未设置掩码
-            if (material.MaskCodeId.HasValue == false) throw new CustomerValidationException(nameof(ErrorCode.MES16616)).WithData("barCode", barCode);
-
-            // 未设置规则
-            var maskCodeRules = await _procMaskCodeRuleRepository.GetByMaskCodeIdAsync(material.MaskCodeId.Value);
-            if (maskCodeRules == null || maskCodeRules.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES16616)).WithData("barCode", barCode);
-
-            return barCode.VerifyBarCode(maskCodeRules);
-        }
-
-        /// <summary>
-        /// 检查条码是否可以执行某流程
-        /// </summary>
-        /// <param name="bo"></param>
-        /// <param name="sfcCirculationType"></param>
-        /// <returns></returns>
-        public async Task<bool> CheckSFCIsCanDoneStepAsync(ManufactureBo bo, SfcCirculationTypeEnum sfcCirculationType)
-        {
-            if (bo == null) return false;
-
-            // 读取指定类型的流转信息
-            var manuSfcCirculationEntities = await _manuSfcCirculationRepository.GetSfcMoudulesAsync(new Data.Repositories.Manufacture.ManuSfcCirculation.Query.ManuSfcCirculationQuery
-            {
-                SiteId = _currentSite.SiteId ?? 0,
-                Sfc = bo.SFC,
-                CirculationTypes = new SfcCirculationTypeEnum[] { sfcCirculationType }
-            });
-
-            if (manuSfcCirculationEntities == null || manuSfcCirculationEntities.Any() == false) return true;
-            return false;
-        }
-
-        /// <summary>
-        /// 获取生产条码信息
-        /// </summary>
-        /// <param name="sfc"></param>
-        /// <returns></returns>
-        public async Task<(ManuSfcProduceEntity, ManuSfcProduceBusinessEntity)> GetProduceSFCAsync(string sfc)
-        {
-            if (string.IsNullOrWhiteSpace(sfc) == true
-                || sfc.Contains(' ') == true) throw new CustomerValidationException(nameof(ErrorCode.MES16305));
-
-            // 条码在制表
-            var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
-            {
-                SiteId = _currentSite.SiteId ?? 0,
-                Sfc = sfc
-            });
-
-            // 不存在在制表的话，就去库存查找
-            if (sfcProduceEntity == null)
-            {
-                var whMaterialInventoryEntity = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery
-                {
-                    SiteId = _currentSite.SiteId,
-                    BarCode = sfc
-                });
-                if (whMaterialInventoryEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES16318));
-
-                throw new CustomerValidationException(nameof(ErrorCode.MES16306));
-            }
-
-            // 获取锁状态
-            var sfcProduceBusinessEntity = await _manuSfcProduceRepository.GetSfcProduceBusinessBySFCAsync(new SfcProduceBusinessQuery
-            {
-                SiteId = _currentSite.SiteId ?? 0,
-                Sfc = sfcProduceEntity.SFC,
-                BusinessType = ManuSfcProduceBusinessType.Lock
-            });
-
-            return (sfcProduceEntity, sfcProduceBusinessEntity);
+            _planWorkOrderRepository=planWorkOrderRepository;
+            _procReplaceMaterialRepository =procReplaceMaterialRepository;
+            _procBomDetailRepository =procBomDetailRepository;
+            _planWorkOrderActivationRepository =planActivationRepository;
+            _procBomDetailReplaceMaterialRepository=procBomDetailReplaceMaterialRepository;
         }
 
         /// <summary>
@@ -284,7 +126,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES16301));
 
             // 判断是否被锁定
-            if (planWorkOrderEntity.Status == PlanWorkOrderStatusEnum.Pending)
+            if (planWorkOrderEntity.IsLocked == YesOrNoEnum.Yes)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16302)).WithData("ordercode", planWorkOrderEntity.OrderCode);
             }
@@ -322,7 +164,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES16301));
 
             // 判断是否被锁定
-            if (planWorkOrderEntity.Status == PlanWorkOrderStatusEnum.Pending)
+            if (planWorkOrderEntity.IsLocked == YesOrNoEnum.Yes)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16302)).WithData("ordercode", planWorkOrderEntity.OrderCode);
             }
@@ -630,11 +472,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <returns></returns>
         public async Task<IEnumerable<long>> GetProcResourceIdByProcedureIdAsync(long procedureId)
         {
-            var resources = await _procResourceRepository.GetProcResourceListByProcedureIdAsync(new ProcResourceListByProcedureIdQuery
-            {
-                SiteId = _currentSite.SiteId ?? 0,
-                ProcedureId = procedureId
-            });
+            var resources = await _procResourceRepository.GetProcResourceListByProcedureIdAsync(procedureId);
 
             if (resources == null || resources.Any() == false) return Array.Empty<long>();
             return resources.Select(s => s.Id);
@@ -663,179 +501,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 }
             }
             return list;
-        }
-
-        /// <summary>
-        /// 批量验证条码是否锁定
-        /// </summary>
-        /// <param name="sfcs"></param>
-        /// <returns></returns>
-        public async Task VerifySfcsLockAsync(IEnumerable<string> sfcs)
-        {
-            var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery
-            {
-                SiteId = _currentSite.SiteId ?? 0,
-                Sfcs = sfcs,
-                BusinessType = ManuSfcProduceBusinessType.Lock
-            });
-
-            if (sfcProduceBusinesss == null || sfcProduceBusinesss.Any() == false) return;
-
-            List<ValidationFailure> validationFailures = new();
-            foreach (var item in sfcProduceBusinesss)
-            {
-                var sfcProduceLockBo = JsonSerializer.Deserialize<SfcProduceLockBo>(item.BusinessContent);
-                if (sfcProduceLockBo == null) continue;
-
-                if (sfcProduceLockBo.Lock != QualityLockEnum.InstantLock
-                    && sfcProduceLockBo.Lock != QualityLockEnum.FutureLock) continue;
-
-                validationFailures.Add(new ValidationFailure
-                {
-                    FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", item.Sfc } },
-                    ErrorCode = nameof(ErrorCode.MES18010)
-                });
-            }
-
-            // 是否存在错误
-            if (validationFailures.Any() == true)
-            {
-                throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
-            }
-        }
-
-        /// <summary>
-        /// 批量验证条码是否锁定
-        /// </summary>
-        /// <param name="sfcs"></param>
-        /// <param name="procedureId"></param>
-        /// <returns></returns>
-        public async Task VerifySfcsLockAsync(string[] sfcs, long procedureId)
-        {
-            var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { SiteId = _currentSite.SiteId ?? 0, Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
-            if (sfcProduceBusinesss != null && sfcProduceBusinesss.Any())
-            {
-                var validationFailures = new List<ValidationFailure>();
-
-                foreach (var item in sfcProduceBusinesss)
-                {
-                    var sfcProduceLockBo = JsonSerializer.Deserialize<SfcProduceLockBo>(item.BusinessContent);
-                    if (sfcProduceLockBo == null) continue;
-
-                    var validationFailure = new ValidationFailure();
-                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
-                    {
-                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
-                            { "CollectionIndex", item.Sfc}
-                        };
-                    }
-                    else
-                    {
-                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.Sfc);
-                    }
-
-                    if (sfcProduceLockBo.Lock == QualityLockEnum.InstantLock)
-                    {
-                        validationFailure.ErrorCode = nameof(ErrorCode.MES18010);
-                        validationFailures.Add(validationFailure);
-                    }
-
-                    if (sfcProduceLockBo.Lock == QualityLockEnum.FutureLock && sfcProduceLockBo.LockProductionId == procedureId)
-                    {
-                        validationFailure.ErrorCode = nameof(ErrorCode.MES18010);
-                        validationFailures.Add(validationFailure);
-                    }
-                }
-
-                //是否存在错误
-                if (validationFailures.Any())
-                {
-                    throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 批量验证条码是否被容器包装
-        /// </summary>
-        /// <param name="sfcs"></param>
-        /// <returns></returns>
-        public async Task VerifyContainerAsync(string[] sfcs)
-        {
-            var manuContainerPackEntities = await _manuContainerPackRepository.GetByLadeBarCodesAsync(new ManuContainerPackQuery
-            {
-                LadeBarCodes = sfcs,
-                SiteId = _currentSite.SiteId ?? 0,
-            });
-
-            if (manuContainerPackEntities != null && manuContainerPackEntities.Any() == true)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES18015)).WithData("SFCs", string.Join(",", sfcs));
-                //throw new CustomerValidationException(nameof(ErrorCode.MES18019)).WithData("SFC", string.Join(",", sfcs));
-            }
-        }
-
-        /// <summary>
-        /// 验证条码BOM清单用量
-        /// </summary>
-        /// <param name="bomId"></param>
-        /// <param name="procedureId"></param>
-        /// <param name="sfc"></param>
-        /// <returns></returns>
-        public async Task VerifyBomQtyAsync(long bomId, long procedureId, string sfc)
-        {
-            var procBomDetailEntities = await _procBomDetailRepository.GetByBomIdAsync(bomId);
-            if (procBomDetailEntities == null) return;
-
-            // 过滤出当前工序对应的物料（数据收集方式为内部和外部）
-            procBomDetailEntities = procBomDetailEntities.Where(w => w.ProcedureId == procedureId && w.DataCollectionWay != MaterialSerialNumberEnum.Batch);
-            if (procBomDetailEntities == null) return;
-
-            // 流转信息
-            var sfcCirculationEntities = await GetBarCodeCirculationListAsync(procedureId, sfc);
-            if (sfcCirculationEntities == null) return;
-
-            // 根据物料分组
-            var procBomDetailDictionary = procBomDetailEntities.ToLookup(w => w.MaterialId).ToDictionary(d => d.Key, d => d);
-            foreach (var item in procBomDetailDictionary)
-            {
-                // 检查每个物料是否已经满足BOM用量要求
-                var currentQty = sfcCirculationEntities.Where(w => w.CirculationMainProductId == item.Key)
-                    .Sum(s => s.CirculationQty);
-
-                // 目标用量
-                var targetQty = item.Value.Sum(s => s.Usages);
-
-                if (currentQty < targetQty)
-                {
-                    var materialEntity = await _procMaterialRepository.GetByIdAsync(item.Key);
-                    if (materialEntity == null) continue;
-
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16321)).WithData("Code", materialEntity.MaterialCode);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 获取挂载的活动组件信息
-        /// </summary>
-        /// <param name="procedureId"></param>
-        /// <param name="sfc"></param>
-        /// <returns></returns>
-        private async Task<IEnumerable<ManuSfcCirculationEntity>> GetBarCodeCirculationListAsync(long procedureId, string sfc)
-        {
-            return await _manuSfcCirculationRepository.GetSfcMoudulesAsync(new ManuSfcCirculationQuery
-            {
-                Sfc = sfc,
-                SiteId = _currentSite.SiteId ?? 0,
-                CirculationTypes = new SfcCirculationTypeEnum[] {
-                    SfcCirculationTypeEnum.Consume ,
-                    SfcCirculationTypeEnum.ModuleAdd,
-                    SfcCirculationTypeEnum.ModuleReplace
-                },
-                ProcedureId = procedureId,
-                IsDisassemble = TrueOrFalseEnum.No
-            });
         }
 
         /// <summary>
@@ -894,128 +559,5 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 }
             }
         }
-
-    }
-
-
-    /// <summary>
-    /// 扩展方法
-    /// </summary>
-    public static class ManuSfcProduceExtensions
-    {
-        /// <summary>
-        /// 条码资源关联校验
-        /// </summary>
-        /// <param name="sfcProduceEntity"></param>
-        /// <param name="resourceId"></param>
-        public static ManuSfcProduceEntity VerifyResource(this ManuSfcProduceEntity sfcProduceEntity, long resourceId)
-        {
-            // 当前资源是否对于的上
-            if (sfcProduceEntity.ResourceId.HasValue == true && sfcProduceEntity.ResourceId != resourceId)
-                throw new CustomerValidationException(nameof(ErrorCode.MES16316)).WithData("SFC", sfcProduceEntity.SFC);
-
-            return sfcProduceEntity;
-        }
-
-        /// <summary>
-        /// 检查条码状态是否合法
-        /// </summary>
-        /// <param name="sfcProduceEntity"></param>
-        /// <param name="produceStatus"></param>
-        public static ManuSfcProduceEntity VerifySFCStatus(this ManuSfcProduceEntity sfcProduceEntity, SfcProduceStatusEnum produceStatus)
-        {
-            // 当前条码是否是被锁定
-            if (sfcProduceEntity.Status == SfcProduceStatusEnum.Locked) throw new CustomerValidationException(nameof(ErrorCode.MES16314)).WithData("SFC", sfcProduceEntity.SFC);
-
-            // 当前条码是否是已报废
-            if (sfcProduceEntity.IsScrap == TrueOrFalseEnum.Yes) throw new CustomerValidationException(nameof(ErrorCode.MES16322)).WithData("SFC", sfcProduceEntity.SFC);
-
-            // 当前工序是否是指定状态
-            if (sfcProduceEntity.Status != produceStatus) throw new CustomerValidationException(nameof(ErrorCode.MES16313)).WithData("Status", produceStatus.GetDescription());
-
-            return sfcProduceEntity;
-        }
-
-        /// <summary>
-        /// 工序活动状态校验
-        /// </summary>
-        /// <param name="sfcProduceEntity"></param>
-        /// <param name="procedureId"></param>
-        /// <returns></returns>
-        public static ManuSfcProduceEntity VerifyProcedure(this ManuSfcProduceEntity sfcProduceEntity, long procedureId)
-        {
-            // 产品编码是否和工序对应
-            if (sfcProduceEntity.ProcedureId != procedureId) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
-
-            return sfcProduceEntity;
-        }
-
-        /// <summary>
-        /// 工序锁校验
-        /// </summary>
-        /// <param name="sfcProduceBusinessEntity"></param>
-        /// <param name="sfc"></param>
-        /// <param name="procedureId"></param>
-        /// <returns></returns>
-        public static ManuSfcProduceBusinessEntity? VerifyProcedureLock(this ManuSfcProduceBusinessEntity sfcProduceBusinessEntity, string sfc, long procedureId)
-        {
-            // 是否被锁定
-            if (sfcProduceBusinessEntity == null) return sfcProduceBusinessEntity;
-            if (sfcProduceBusinessEntity.BusinessType != ManuSfcProduceBusinessType.Lock) return sfcProduceBusinessEntity;
-
-            var sfcProduceLockBo = JsonSerializer.Deserialize<SfcProduceLockBo>(sfcProduceBusinessEntity.BusinessContent);//sfcProduceBusinessEntity.BusinessContent
-            if (sfcProduceLockBo == null) return sfcProduceBusinessEntity;
-
-            if (sfcProduceLockBo.Lock == QualityLockEnum.InstantLock)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16314)).WithData("SFC", sfc);
-            }
-
-            if (sfcProduceLockBo.Lock == QualityLockEnum.FutureLock && sfcProduceLockBo.LockProductionId == procedureId)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16314)).WithData("SFC", sfc);
-            }
-
-            return sfcProduceBusinessEntity;
-        }
-
-        /// <summary>
-        /// 验证条码
-        /// </summary>
-        /// <param name="barCode"></param>
-        /// <param name="maskCodeRules"></param>
-        /// <returns></returns>
-        public static bool VerifyBarCode(this string barCode, IEnumerable<ProcMaskCodeRuleEntity> maskCodeRules)
-        {
-            // 对掩码规则进行校验
-            foreach (var ruleEntity in maskCodeRules)
-            {
-                var rule = Regex.Replace(ruleEntity.Rule, "[?？]", ".");
-                var pattern = $"{rule}";
-
-                switch (ruleEntity.MatchWay)
-                {
-                    case MatchModeEnum.Start:
-                        pattern = $"{rule}.+";
-                        break;
-                    case MatchModeEnum.Middle:
-                        pattern = $".+{rule}.+";
-                        break;
-                    case MatchModeEnum.End:
-                        pattern = $".+{rule}";
-                        break;
-                    case MatchModeEnum.Whole:
-                        pattern = $"^{pattern}$";
-                        break;
-                    default:
-                        break;
-                }
-
-                if (Regex.IsMatch(barCode, pattern) == false) return false;
-            }
-
-            return true;
-        }
-
     }
 }

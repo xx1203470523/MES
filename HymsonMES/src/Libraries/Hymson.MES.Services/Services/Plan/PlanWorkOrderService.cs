@@ -243,20 +243,24 @@ namespace Hymson.MES.Services.Services.Plan
 
             #endregion
 
-            List<PlanWorkOrderEntity> planWorkOrderEntities = new List<PlanWorkOrderEntity>();
+            List<UpdateStatusCommand> planWorkOrderEntities = new List<UpdateStatusCommand>();
             List<long> updateWorkOrderRealEndList = new List<long>();
             List<long> deleteActivationWorkOrderIds = new List<long>();//需要取消激活工单
            
             foreach (var item in parms)
             {
-                planWorkOrderEntities.Add(new PlanWorkOrderEntity()
+                var workOrder = workOrders.FirstOrDefault(x => x.Id == item.Id);
+                if (workOrder != null)
                 {
-                    Id = item.Id,
-                    Status = item.Status,
-
-                    UpdatedBy = _currentUser.UserName,
-                    UpdatedOn = HymsonClock.Now()
-                });
+                    planWorkOrderEntities.Add(new UpdateStatusCommand()
+                    {
+                        Id = item.Id,
+                        Status = item.Status,
+                        BeforeStatus = workOrder.Status,
+                        UpdatedBy = _currentUser.UserName,
+                        UpdatedOn = HymsonClock.Now()
+                    });
+                }
 
                 //对是需要修改为关闭状态的做特殊处理： 给 工单记录表 更新 真实结束时间
                 if (item.Status == PlanWorkOrderStatusEnum.Closed) 
@@ -314,6 +318,10 @@ namespace Hymson.MES.Services.Services.Plan
             using (TransactionScope ts = new TransactionScope())
             {
                 var response = await _planWorkOrderRepository.ModifyWorkOrderStatusAsync(planWorkOrderEntities);
+                if (response != planWorkOrderEntities.Count)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16037));
+                }
 
                 if (updateWorkOrderRealEndList.Any()) //对是需要修改为关闭状态的做特殊处理： 给 工单记录表 更新 真实结束时间
                 {
