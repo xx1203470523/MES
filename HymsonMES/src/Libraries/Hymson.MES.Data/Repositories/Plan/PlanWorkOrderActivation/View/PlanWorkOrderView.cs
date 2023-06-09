@@ -84,10 +84,10 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         public long SiteId { get; set; }
 
-        /// <summary>
-        /// 是否锁定
-        /// </summary>
-        public YesOrNoEnum? IsLocked { get; set; }
+        ///// <summary>
+        ///// 是否锁定
+        ///// </summary>
+        //public YesOrNoEnum? IsLocked { get; set; }
 
         /// <summary>
         /// 超生产比例;默认是0，若允许超产，则写超产的%比例

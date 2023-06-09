@@ -284,7 +284,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES16301));
 
             // 判断是否被锁定
-            if (planWorkOrderEntity.IsLocked == YesOrNoEnum.Yes)
+            if (planWorkOrderEntity.Status == PlanWorkOrderStatusEnum.Pending)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16302)).WithData("ordercode", planWorkOrderEntity.OrderCode);
             }
@@ -322,7 +322,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES16301));
 
             // 判断是否被锁定
-            if (planWorkOrderEntity.IsLocked == YesOrNoEnum.Yes)
+            if (planWorkOrderEntity.Status == PlanWorkOrderStatusEnum.Pending)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16302)).WithData("ordercode", planWorkOrderEntity.OrderCode);
             }

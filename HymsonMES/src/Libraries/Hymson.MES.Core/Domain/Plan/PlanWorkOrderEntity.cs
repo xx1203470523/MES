@@ -86,7 +86,8 @@ namespace Hymson.MES.Core.Domain.Plan
         public long SiteId { get; set; }
 
         /// <summary>
-        /// 是否锁定
+        /// 是否锁定   
+        /// 废弃使用，将锁定状态放到工单状态里
         /// </summary>
         public YesOrNoEnum? IsLocked { get; set; }
 
@@ -99,5 +100,10 @@ namespace Hymson.MES.Core.Domain.Plan
         /// 备注
         /// </summary>
         public string? Remark { get; set; }
+
+        /// <summary>
+        /// 锁定状态时锁定前的工单状态
+        /// </summary>
+        public PlanWorkOrderStatusEnum? LockedStatus { get; set; }
     }
 }

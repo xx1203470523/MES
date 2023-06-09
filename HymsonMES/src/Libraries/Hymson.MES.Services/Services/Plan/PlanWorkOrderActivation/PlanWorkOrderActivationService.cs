@@ -233,6 +233,12 @@ namespace Hymson.MES.Services.Services.Plan
                 throw new BusinessException(nameof(ErrorCode.MES16404));
             }
 
+            //查询是否被暂停
+            if (workOrder.Status == PlanWorkOrderStatusEnum.Pending) 
+            {
+                throw new BusinessException(nameof(ErrorCode.MES16415)).WithData("orderCode", workOrder.OrderCode);
+            }
+
             //查询当前工单是否已经被激活
             var workOrderActivation = (await _planWorkOrderActivationRepository.GetPlanWorkOrderActivationEntitiesAsync(new PlanWorkOrderActivationQuery()
             {
@@ -304,7 +310,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// <returns></returns>
         private async Task DoActivationWorkOrderAsync(PlanWorkOrderEntity workOrder, ActivationWorkOrderDto activationWorkOrderDto)
         {
-            if (workOrder.IsLocked == Core.Enums.YesOrNoEnum.Yes)
+            if (workOrder.Status == PlanWorkOrderStatusEnum.Pending)
             {
                 throw new BusinessException(nameof(ErrorCode.MES16408)).WithData("orderCode", workOrder.OrderCode);
             }
