@@ -13,7 +13,6 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Globalization;
 using System.Reflection;
-using Hymson.MES.CoreServices.DependencyInjection;
 
 namespace Hymson.MES.Equipment.Api
 {
