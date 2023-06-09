@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.Services.Bos.Manufacture
+namespace Hymson.MES.CoreServices.Bos.Manufacture
 {
     /// <summary>
     /// 返修业务

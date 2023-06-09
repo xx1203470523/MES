@@ -46,7 +46,7 @@ namespace Hymson.MES.Services.Services.Plan
         private readonly ILocalizationService _localizationService;
         private readonly IManuCreateBarcodeService _manuCreateBarcodeService;
         private readonly IProcMaterialRepository _procMaterialRepository;
-        private readonly IManuCommonService _manuCommonService;
+        private readonly IManuCommonOldService _manuCommonOldService;
         private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
         private readonly IManuContainerPackRepository _manuContainerPackRepository;
         private readonly AbstractValidator<PlanSfcReceiveCreateDto> _validationCreateRules;
@@ -63,7 +63,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="localizationService"></param>
         /// <param name="manuCreateBarcodeService"></param>
         /// <param name="procMaterialRepository"></param>
-        /// <param name="manuCommonService"></param>
+        /// <param name="manuCommonOldService"></param>
         /// <param name="manuSfcInfoRepository"></param>
         /// <param name="manuContainerPackRepository"></param>
         /// <param name="validationCreateRules"></param>
@@ -75,7 +75,7 @@ namespace Hymson.MES.Services.Services.Plan
             ILocalizationService localizationService,
             IManuCreateBarcodeService manuCreateBarcodeService,
             IProcMaterialRepository procMaterialRepository,
-            IManuCommonService manuCommonService,
+            IManuCommonOldService manuCommonOldService,
             IManuSfcInfoRepository manuSfcInfoRepository,
             IManuContainerPackRepository manuContainerPackRepository,
         AbstractValidator<PlanSfcReceiveCreateDto> validationCreateRules,
@@ -90,7 +90,7 @@ namespace Hymson.MES.Services.Services.Plan
             _manuCreateBarcodeService = manuCreateBarcodeService;
             _manuCreateBarcodeService = manuCreateBarcodeService;
             _procMaterialRepository = procMaterialRepository;
-            _manuCommonService = manuCommonService;
+            _manuCommonOldService = manuCommonOldService;
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuContainerPackRepository = manuContainerPackRepository;
             _validationCreateRules = validationCreateRules;
@@ -106,7 +106,7 @@ namespace Hymson.MES.Services.Services.Plan
         {
             //#region 验证与数据组装
             await _validationCreateRules.ValidateAndThrowAsync(param);
-            var planWorkOrderEntity = await _manuCommonService.GetWorkOrderByIdAsync(param.WorkOrderId);
+            var planWorkOrderEntity = await _manuCommonOldService.GetWorkOrderByIdAsync(param.WorkOrderId);
             var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(planWorkOrderEntity.ProductId);
             if (param.ReceiveType == PlanSFCReceiveTypeEnum.SupplierSfc && procMaterialEntity.Batch == 0)
             {
@@ -245,7 +245,7 @@ namespace Hymson.MES.Services.Services.Plan
                 }
                 else
                 {
-                    if (!await _manuCommonService.CheckBarCodeByMaskCodeRuleAsync(sfc, procMaterialEntity.Id))
+                    if (!await _manuCommonOldService.CheckBarCodeByMaskCodeRuleAsync(sfc, procMaterialEntity.Id))
                     {
                         var validationFailure = new ValidationFailure();
                         if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
@@ -345,7 +345,7 @@ namespace Hymson.MES.Services.Services.Plan
         public async Task<PlanSfcReceiveSFCDto> PlanSfcReceiveScanCodeAsync(PlanSfcReceiveScanCodeDto param)
         {
             await _validationModifyRules.ValidateAndThrowAsync(param);
-            var planWorkOrderEntity = await _manuCommonService.GetWorkOrderByIdAsync(param.WorkOrderId);
+            var planWorkOrderEntity = await _manuCommonOldService.GetWorkOrderByIdAsync(param.WorkOrderId);
             var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(planWorkOrderEntity.ProductId);
             if (param.ReceiveType == PlanSFCReceiveTypeEnum.SupplierSfc && procMaterialEntity.Batch == 0)
             {
@@ -397,7 +397,7 @@ namespace Hymson.MES.Services.Services.Plan
             }
             else
             {
-                if (!await _manuCommonService.CheckBarCodeByMaskCodeRuleAsync(param.SFC, procMaterialEntity.Id))
+                if (!await _manuCommonOldService.CheckBarCodeByMaskCodeRuleAsync(param.SFC, procMaterialEntity.Id))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16121)).WithData("product", procMaterialEntity.MaterialCode);
                 }

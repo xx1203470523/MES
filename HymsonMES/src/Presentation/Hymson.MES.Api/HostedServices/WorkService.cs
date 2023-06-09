@@ -105,7 +105,7 @@ namespace Hymson.MES.Api
                             LanguageId = languageEntity.Id,
                             ResourceName = resourceName,
                             ResourceValue = resourceValue,
-                            ServiceType = Infrastructure.Enums.ServiceTypeEnum.User,
+                            ServiceType = Infrastructure.Enums.ServiceTypeEnum.MES,
                             UpdatedBy = "System",
                             UpdatedOn = HymsonClock.Now(),
                         };

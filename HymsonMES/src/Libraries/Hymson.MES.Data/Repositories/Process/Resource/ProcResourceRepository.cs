@@ -304,10 +304,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcResourceEntity>> GetProcResourceListByProcedureIdAsync(ProcResourceListByProcedureIdQuery query)
+        public async Task<IEnumerable<ProcResourceEntity>> GetProcResourceListByProcedureIdAsync(long procedureId)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcResourceEntity>(GetProcResourceListByProcedureIdSql, query);
+            return await conn.QueryAsync<ProcResourceEntity>(GetProcResourceListByProcedureIdSql, new { ProcedureId= procedureId });
         }
 
         /// <summary>
@@ -413,7 +413,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
         const string GetListSqlTemplate = "SELECT /**select**/ FROM proc_resource  /**where**/  ";
         const string GetProcResourceListByProcedureIdSql = "SELECT R.* FROM proc_resource R INNER JOIN proc_procedure P ON R.ResTypeId = P.ResourceTypeId " +
-            "WHERE R.IsDeleted = 0 AND P.IsDeleted = 0 AND R.SiteId = @SiteId AND P.SiteId = @SiteId AND P.Id = @ProcedureId ";
+            "WHERE R.IsDeleted = 0 AND P.IsDeleted = 0  AND P.Id = @ProcedureId ";
 
         const string InsertSql = "INSERT INTO `proc_resource`(`Id`, `SiteId`, `ResCode`, `ResName`,`Status`,`ResTypeId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @ResCode, @ResName,@Status,@ResTypeId,@Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted); ";
         const string UpdateSql = "UPDATE `proc_resource` SET ResName = @ResName,ResTypeId = @ResTypeId,Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id;";

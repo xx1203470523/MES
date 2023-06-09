@@ -413,6 +413,8 @@
         public const string MES15410 = "SFC {sfcs}已存在返修信息，不可再执行当前操作!";
         public const string MES15411 = "条码{sfcs}已报废,不可再执行当前操作！";
         public const string MES15412 = "条码{sfcs}已取消报废,不能重复取消!";
+        public const string MES15413 = "条码{sfcs}已报废,不能重复报废!";
+        public const string MES15414 = "条码{sfcs}标识已取消,不能重复取消!";
         #endregion
 
         #region 物料加载 15500
@@ -435,6 +437,7 @@
         public const string MES16012 = "修改生产工单状态失败：有工单不为完工,不允许关闭";
         public const string MES16013 = "工单状态不为未开始,不允许删除";
         public const string MES16014 = "有工单不存在";
+        public const string MES16015 = "工单没有锁定前的状态，无法解锁";
 
         public const string MES16020 = "工单号 不能为空！";
         public const string MES16021 = "物料编码 不能为空！";
@@ -455,6 +458,7 @@
         public const string MES16034 = "超生产比例 不能小于0！";
         public const string MES16035 = "SFC对应工单状态为非生产中状态，不可执行操作！";
         public const string MES16036 = "SFC超过最大复投次数，不允许生产！";
+        public const string MES16037 = "工单状态已经被修改，请刷新重试";
         #endregion
 
         #region 条码接收 16100
@@ -603,6 +607,7 @@
         public const string MES16412 = "根据资源查询工单激活必须有资源Id参数！";
         public const string MES16413 = "没有找到该资源对应的工作中心";
         public const string MES16414 = "当前资源所对应的工作中心不是线体";
+        public const string MES16415 = "工单[{orderCode}]处于暂停中，无法操作！";
         #endregion
 
         #region 条码下达 MES16500
@@ -672,6 +677,8 @@
         public const string MES16730 = "同一个容器不允许不同物料进行包装!";
         public const string MES16731 = "容器包装，容器包装等级跟工序包装等级不匹配!";
         public const string MES16732 = "装载信息不存在!";
+        public const string MES16733 = "容器已打开!";
+        public const string MES16734 = "容器已关闭!";
         #endregion
 
         #region 绑定工单激活  MES16800

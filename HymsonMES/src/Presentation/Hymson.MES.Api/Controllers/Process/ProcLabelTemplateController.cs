@@ -108,23 +108,14 @@ namespace Hymson.MES.Api.Controllers.Process
             await _procLabelTemplateService.DeletesProcLabelTemplateAsync(deleteDto.Ids);
         }
         [HttpGet]
-        [Route("preview/{content}")]
-        public async Task<PreviewImageDataDto> PreviewProcLabelTemplateAsync(string content)
+        [Route("preview/{id}")]
+        public async Task<PreviewImageDataDto> PreviewProcLabelTemplateAsync(long id)
         {
             //long[] idsArr = StringExtension.SpitLongArrary(ids);
-            var foo = await _procLabelTemplateService.PreviewProcLabelTemplateAsync(content);
+            var foo = await _procLabelTemplateService.PreviewProcLabelTemplateAsync(id);
             return new PreviewImageDataDto() { base64Str = foo.base64Str, result = foo.result };    
         }
-        ///// <summary>
-        ///// 下载模板文件
-        ///// </summary>
-        ///// <param name="url"></param>
-        //[HttpGet("{url}")]
-        //[Route("downloadFile")]
-        //public void downloadFile(string url)
-        //{
-
-        //}
+       
 
     }
 }

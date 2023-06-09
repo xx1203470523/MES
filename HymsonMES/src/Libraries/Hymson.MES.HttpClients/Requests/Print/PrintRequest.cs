@@ -7,16 +7,31 @@ using System.Threading.Tasks;
 
 namespace Hymson.MES.HttpClients.Requests.Print
 {
+    /// <summary>
+    /// 打印请求
+    /// </summary>
     public class PrintRequest
     {
         /// <summary>
-        /// 模板名称
+        /// 打印body
         /// </summary>
-        public string TemplateName { get; set; }
+        public PrintBody[] Bodies { get; set; }
+    }
+    public class PrintBody
+    {
+       
+        /// <summary>
+        /// 模板路径 
+        /// </summary>
+        public string TemplatePath { get; set; }
         /// <summary>
         /// 打印机名称
         /// </summary>
         public string PrinterName { get; set; }
+        /// <summary>
+        /// 打印份数
+        /// </summary>
+        public int PrintCount { get; set; }
         /// <summary>
         /// 传递给报表的参数集合
         /// </summary>
