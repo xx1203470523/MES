@@ -91,6 +91,10 @@ namespace Hymson.MES.Services.Dtos.Plan
         public PlanSFCReceiveTypeEnum ReceiveType { get; set; }
 
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public record PlanSfcPrintCreatePrintDto : BaseEntityDto
     {
         /// <summary>
@@ -107,16 +111,22 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// 工单ID
         /// </summary>
         public string OrderCode { get; set; }
-        public long WorkOrderId { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public long WorkOrderId { get; set; } = 0;
 
         /// <summary>
         /// 工序ID
         /// </summary>
         public long ProcedureId { get; set; }
 
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
 
     }
-
-
 
 }

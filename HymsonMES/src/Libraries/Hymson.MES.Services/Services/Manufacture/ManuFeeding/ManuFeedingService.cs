@@ -1,3 +1,4 @@
+using Dapper;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
@@ -9,6 +10,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
@@ -18,7 +20,6 @@ using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
-using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -242,11 +243,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// <returns></returns>
         public async Task<IEnumerable<ManuFeedingMaterialDto>> GetFeedingMaterialListAsync(ManuFeedingMaterialQueryDto queryDto)
         {
-            IEnumerable<long>? materialIds = null;
+            IEnumerable<long>? bomMaterialIds = null;
 
             // 读取资源绑定的产线
             var workCenterLineEntity = await _inteWorkCenterRepository.GetByResourceIdAsync(queryDto.ResourceId);
 
+            /*
             if (workCenterLineEntity == null)
             {
                 materialIds = await GetMaterialIdsByResourceIdAsync(queryDto.ResourceId);
@@ -265,29 +267,42 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             {
                 return Array.Empty<ManuFeedingMaterialDto>();
             }
-
-            /*
-            if (workCenter == null) return Array.Empty<ManuFeedingMaterialDto>();
-
-            // 通过产线->工单->BOM->查询物料
-            materialIds = await GetMaterialIdsByWorkCenterIdAsync(workCenter.Id, queryDto.WorkOrderId);
             */
 
-            // 查询不到物料
-            if (materialIds == null || materialIds.Any() == false) return Array.Empty<ManuFeedingMaterialDto>();
+            if (workCenterLineEntity == null) return Array.Empty<ManuFeedingMaterialDto>();
 
-            // 通过物料ID获取物料集合
-            var materials = await _procMaterialRepository.GetByIdsAsync(materialIds.ToArray());
+            // 全部需展示的物料ID
+            List<long> materialIds = new();
+            // 通过物料分组
+            Dictionary<long, IGrouping<long, ManuFeedingEntity>>? manuFeedingsDictionary = new();
+
+            // 通过产线->工单->BOM->查询物料
+            bomMaterialIds = await GetMaterialIdsByWorkCenterIdAsync(workCenterLineEntity.Id, queryDto.WorkOrderId);
+
+            // BOM的物料ID
+            if (bomMaterialIds != null) materialIds.AddRange(bomMaterialIds);
 
             // 通过物料ID获取物料库存信息
             var manuFeedings = await _manuFeedingRepository.GetByResourceIdAndMaterialIdsAsync(new GetByResourceIdAndMaterialIdsQuery
             {
                 ResourceId = queryDto.ResourceId,
-                MaterialIds = materialIds,
+                //MaterialIds = materialIds,
             });
 
-            // 通过物料分组
-            var manuFeedingsDictionary = manuFeedings.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
+            // 已加载的物料ID
+            if (manuFeedings != null)
+            {
+                materialIds.AddRange(manuFeedings.Select(s => s.ProductId));
+                manuFeedingsDictionary = manuFeedings.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
+
+                materialIds = materialIds.Distinct().AsList();
+            }
+
+            // 查询不到物料
+            if (materialIds == null || materialIds.Any() == false) return Array.Empty<ManuFeedingMaterialDto>();
+
+            // 通过物料ID获取物料集合
+            var materials = await _procMaterialRepository.GetByIdsAsync(materialIds);
 
             // 填充返回集合
             List<ManuFeedingMaterialDto> list = new();

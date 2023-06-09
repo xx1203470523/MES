@@ -252,11 +252,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost("InBoundMore")]
         public async Task InBoundMore(InBoundMoreDto request)
-        {
+{
             await _inBoundService.InBoundMore(request);
         }
 
-        /// <summary>
+    /// <summary>
         /// 出站 HY-MES-EQU-017
         /// </summary>
         /// <param name="request"></param>
@@ -377,7 +377,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <summary>
         /// CCD文件上传完成
         /// HY-MES-EQU-026  
-        /// </summary>
+    /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
@@ -411,7 +411,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [HttpPost]
         [Route("SingleBarCodeLoadingVerification")]
         public async Task SingleBarCodeLoadingVerificationAsync(SingleBarCodeLoadingVerificationDto request)
-        {
+    {
             _logger.LogInformation("单体条码上料校验：SingleBarCodeLoadingVerification,msg:{request}", request);
             await _singleBarCodeLoadingVerificationService.SingleBarCodeLoadingVerificationAsync(request);
         }

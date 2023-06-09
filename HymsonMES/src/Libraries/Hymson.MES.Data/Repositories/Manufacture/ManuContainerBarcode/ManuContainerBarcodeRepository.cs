@@ -12,8 +12,6 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
-using System.Security.Policy;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -75,9 +73,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="manuContainerBarcodePagedQuery"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ManuContainerBarcodeQueryView>> GetPagedInfoAsync(ManuContainerBarcodePagedQuery manuContainerBarcodePagedQuery)
+        public async Task<PagedInfo<ManuContainerBarcodeQueryView>> GetPagedInfoAsync(ManuContainerBarcodePagedQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
@@ -88,35 +86,47 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 "barcode.CreatedOn,material.MaterialCode as ProductCode,material.MaterialName as ProductName,material.Version,container.Maximum,container.Minimum");
             sqlBuilder.LeftJoin("proc_material material on material.Id=barcode.ProductId and material.IsDeleted=0");
             sqlBuilder.LeftJoin("inte_container container on container.Id=barcode.ContainerId and container.IsDeleted=0");
-            if (!string.IsNullOrWhiteSpace(manuContainerBarcodePagedQuery.BarCode))
+            if (!string.IsNullOrWhiteSpace(query.BarCode))
             {
-                sqlBuilder.Where("barcode.BarCode=@BarCode");
+                query.BarCode = $"%{query.BarCode}%";
+                sqlBuilder.Where("barcode.BarCode LIKE @BarCode");
             }
-            if (manuContainerBarcodePagedQuery.Level.HasValue)
+            if (query.Level.HasValue)
             {
                 sqlBuilder.Where("barcode.PackLevel=@Level");
             }
-            if (!string.IsNullOrWhiteSpace(manuContainerBarcodePagedQuery.ProductName))
+            if (!string.IsNullOrWhiteSpace(query.ProductName))
             {
-                sqlBuilder.Where("material.MaterialName=@ProductName");
+                query.ProductName = $"%{query.ProductName}%";
+                sqlBuilder.Where("material.MaterialName LIKE @ProductName");
             }
 
-            if (!string.IsNullOrWhiteSpace(manuContainerBarcodePagedQuery.ProductCode))
+            if (!string.IsNullOrWhiteSpace(query.ProductCode))
             {
-                sqlBuilder.Where("material.MaterialCode=@ProductCode");
+                query.ProductCode = $"%{query.ProductCode}%";
+                sqlBuilder.Where("material.MaterialCode LIKE @ProductCode");
+            }
+            if (!string.IsNullOrWhiteSpace(query.Version))
+            {
+                query.Version = $"%{query.Version}%";
+                sqlBuilder.Where("material.Version LIKE @Version");
+            }
+            if (query.Status.HasValue)
+            {
+                sqlBuilder.Where("barcode.Status=@Status");
             }
 
-            var offSet = (manuContainerBarcodePagedQuery.PageIndex - 1) * manuContainerBarcodePagedQuery.PageSize;
+            var offSet = (query.PageIndex - 1) * query.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = manuContainerBarcodePagedQuery.PageSize });
-            sqlBuilder.AddParameters(manuContainerBarcodePagedQuery);
+            sqlBuilder.AddParameters(new { Rows = query.PageSize });
+            sqlBuilder.AddParameters(query);
 
             using var conn = GetMESDbConnection();
             var manuContainerBarcodeEntitiesTask = conn.QueryAsync<ManuContainerBarcodeQueryView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var manuContainerBarcodeEntities = await manuContainerBarcodeEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<ManuContainerBarcodeQueryView>(manuContainerBarcodeEntities, manuContainerBarcodePagedQuery.PageIndex, manuContainerBarcodePagedQuery.PageSize, totalCount);
+            return new PagedInfo<ManuContainerBarcodeQueryView>(manuContainerBarcodeEntities, query.PageIndex, query.PageSize, totalCount);
         }
 
         public async Task<PagedInfo<ManuContainerBarcodeEntity>> GetPagedListAsync(ManuContainerBarcodePagedQuery manuContainerBarcodePagedQuery)
@@ -249,6 +259,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class ManuContainerBarcodeRepository
     {
         #region 
@@ -258,11 +271,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                             /**select**/
                                            FROM `manu_container_barcode` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `manu_container_barcode`(  `Id`, `SiteId`, `ProductId`, `WorkOrderId`,`BarCode`, `ContainerId`,`PackLevel`,`MaterialVersion`,`MaterialCode`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ProductId,@WorkOrderId, @BarCode, @ContainerId,@PackLevel,@MaterialVersion,@MaterialCode,@Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT IGNORE `manu_container_barcode`(  `Id`, `SiteId`, `ProductId`, `WorkOrderId`,`BarCode`, `ContainerId`,`PackLevel`,`MaterialVersion`,`MaterialCode`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ProductId,@WorkOrderId, @BarCode, @ContainerId,@PackLevel,@MaterialVersion,@MaterialCode,@Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
         const string UpdateSql = "UPDATE `manu_container_barcode` SET   SiteId = @SiteId, ProductId = @ProductId, BarCode = @BarCode, ContainerId = @ContainerId, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `manu_container_barcode` SET   SiteId = @SiteId, ProductId = @ProductId, BarCode = @BarCode, ContainerId = @ContainerId, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdateStatusSql = "UPDATE `manu_container_barcode` SET   Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdateStatusSql = "UPDATE `manu_container_barcode` SET Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Status <> @Status AND Id = @Id ";
 
 
         const string DeleteSql = "UPDATE `manu_container_barcode` SET IsDeleted = Id WHERE Id = @Id ";

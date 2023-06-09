@@ -100,6 +100,17 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 根据BomID和工序ID查询物料
+        /// </summary>
+        /// <param name="bomId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcBomDetailEntity>> GetByBomIdAndProcedureIdAsync(ProcBomDetailByBomIdAndProcedureIdQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcBomDetailEntity>(GetByBomIdAndProcedureIdSql, query);
+        }
+
+        /// <summary>
         /// 根据BomID查询物料
         /// </summary>
         /// <param name="bomIds"></param>
@@ -271,6 +282,8 @@ namespace Hymson.MES.Data.Repositories.Process
                             ORDER by a.UpdatedOn DESC ";
         const string GetByBomIdSql = @"SELECT * FROM proc_bom_detail WHERE IsDeleted = 0 AND BomId = @bomId order by Seq ";
         const string GetByBomIdsSql = @"SELECT * FROM proc_bom_detail WHERE IsDeleted = 0 AND BomId IN @bomIds ";
+
+        const string GetByBomIdAndProcedureIdSql = @"SELECT * FROM proc_bom_detail WHERE IsDeleted = 0 AND BomId = @bomId AND ProcedureId=@ProcedureId order by Seq";
 
     }
 }

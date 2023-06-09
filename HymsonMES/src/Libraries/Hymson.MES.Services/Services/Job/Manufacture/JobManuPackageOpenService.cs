@@ -2,12 +2,11 @@
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Bos.Manufacture;
+using Hymson.MES.CoreServices.Dtos.Common;
+using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Services.Bos.Manufacture;
-using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Utils;
 
@@ -31,7 +30,11 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <summary>
         /// 服务接口（生产通用）
         /// </summary>
-        private readonly IManuCommonService _manuCommonService;
+        private readonly IManuCommonOldService _manuCommonOldService;
+
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly IManuContainerBarcodeRepository _manuContainerBarcodeRepository;
 
 
@@ -40,14 +43,14 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="manuCommonService"></param>
+        /// <param name="manuCommonOldService"></param>
         /// <param name="manuContainerBarcodeRepository"></param>
         public JobManuPackageOpenService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IManuCommonService manuCommonService, IManuContainerBarcodeRepository manuContainerBarcodeRepository)
+            IManuCommonOldService manuCommonOldService, IManuContainerBarcodeRepository manuContainerBarcodeRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _manuCommonService = manuCommonService;
+            _manuCommonOldService = manuCommonOldService;
             _manuContainerBarcodeRepository = manuContainerBarcodeRepository;
         }
 

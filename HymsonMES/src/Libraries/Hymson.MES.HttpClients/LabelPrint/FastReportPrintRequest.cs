@@ -19,9 +19,9 @@ namespace Hymson.MES.HttpClients
             _httpClient = httpClient;
         }
 
-        public async Task<(string msg, bool result,string data)> UploadTemplateAsync(string url, string templateName)
+        public async Task<(string msg, bool result,string data)> GetTemplateContextAsync(string url)
         {
-            string api = $"api/LabelPrint/uploadtemplate?url={url}&templateName={templateName}";
+            string api = $"api/LabelPrint/gettc?url={url}";
             var httpResponseMessage = await _httpClient.GetAsync(api);
 
             if (httpResponseMessage.IsSuccessStatusCode)
@@ -47,10 +47,10 @@ namespace Hymson.MES.HttpClients
             }
         }
 
-        async Task<(string base64Str, bool result)> ILabelPrintRequest.PreviewFromImageBase64Async(PrintRequest printRequest)
+        async Task<(string base64Str, bool result)> ILabelPrintRequest.PreviewFromImageBase64Async(PreviewRequest printRequest)
         {
-            string api = "api/LabelPrint/printview";
-            var httpResponseMessage = await _httpClient.PostAsJsonAsync<PrintRequest>(api, printRequest);
+            string api = "api/LabelPrint/preview";
+            var httpResponseMessage = await _httpClient.PostAsJsonAsync<PreviewRequest>(api, printRequest);
 
             if (httpResponseMessage.IsSuccessStatusCode)
             {

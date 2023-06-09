@@ -40,6 +40,16 @@ using Hymson.MES.EquipmentServices.Validators.OutPutQty;
 using Hymson.MES.EquipmentServices.Validators.QueryContainerBindSfc;
 using Hymson.MES.EquipmentServices.Validators.SfcCirculation;
 using Hymson.MES.EquipmentServices.Validators.SingleBarCodeLoadingVerification;
+using FluentValidation;
+using Hymson.MES.CoreServices.Services.Common;
+using Hymson.MES.EquipmentServices;
+using Hymson.MES.EquipmentServices.Dtos.InBound;
+using Hymson.MES.EquipmentServices.Services.Common;
+using Hymson.MES.EquipmentServices.Services.Job.Implementing;
+using Hymson.MES.EquipmentServices.Services.Manufacture.InStation;
+using Hymson.MES.EquipmentServices.Services.SfcBinding;
+using Hymson.MES.EquipmentServices.Validators.InStation;
+using Hymson.MES.EquipmentServices.Validators.SfcBinding;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -87,6 +97,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IFeedingService, FeedingService>();      // 上卸料
             services.AddSingleton<INGDataService, NGDataService>();//NG数据
             services.AddSingleton<ISfcCirculationService, SfcCirculationService>();//流转表绑定
+            services.AddSingleton<ICommonService, CommonService>();
+            services.AddSingleton<IInStationService, InStationService>();
+            services.AddSingleton<IJobManufactureService, JobManuSfcConvertService>();
+            services.AddSingleton<ISfcBindingService, SfcBindingService>();
+
         }
 
         /// <summary>
@@ -129,6 +144,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<SingleBarCodeLoadingVerificationDto>, SingleBarCodeLoadingVerificationValidator>();//单体条码上料校验
             services.AddSingleton<AbstractValidator<OutPutQtyDto>, OutPutQtyValidator>();//产出上报数量
             services.AddSingleton<AbstractValidator<QueryContainerBindSfcDto>, QueryContainerBindSfcValidator>();//容器绑定条码查询
+            services.AddSingleton<AbstractValidator<InStationDto>, InStationValidator>();
+            services.AddSingleton<AbstractValidator<SfcBindingDto>, SfcBindingValidator>();
         }
 
     }

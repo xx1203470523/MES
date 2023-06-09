@@ -75,6 +75,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<int> DeleteAllAsync(long containerBarCodeId);
 
+
+        /// <summary>
+        /// 根据容器Id 查询所有容器装载记录
+        /// </summary>
+        /// <param name="containerBarCodeId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuContainerPackEntity>> GetByContainerBarCodeIdIdAsync(long containerBarCodeId);
+
         /// <summary>
         /// 根据ID获取数据
         /// </summary>
@@ -100,21 +108,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuContainerPackEntity>> GetByContainerBarCodeIdAsync(long cid,long siteid);
+        Task<IEnumerable<ManuContainerPackEntity>> GetByContainerBarCodeIdAsync(long cid, long siteid);
 
         /// <summary>
         /// 根据容器ID获取数据
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuContainerPackEntity>> GetByContainerBarCodeIdsAsync(long[] ids,long siteId);
+        Task<IEnumerable<ManuContainerPackEntity>> GetByContainerBarCodeIdsAsync(long[] ids, long siteId);
 
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuContainerPackEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<ManuContainerPackEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 获取List

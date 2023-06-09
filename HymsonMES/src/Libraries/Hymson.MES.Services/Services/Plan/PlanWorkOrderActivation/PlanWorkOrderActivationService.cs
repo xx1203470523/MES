@@ -19,6 +19,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter;
 using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
@@ -233,6 +234,12 @@ namespace Hymson.MES.Services.Services.Plan
                 throw new BusinessException(nameof(ErrorCode.MES16404));
             }
 
+            //查询是否被暂停
+            if (workOrder.Status == PlanWorkOrderStatusEnum.Pending) 
+            {
+                throw new BusinessException(nameof(ErrorCode.MES16415)).WithData("orderCode", workOrder.OrderCode);
+            }
+
             //查询当前工单是否已经被激活
             var workOrderActivation = (await _planWorkOrderActivationRepository.GetPlanWorkOrderActivationEntitiesAsync(new PlanWorkOrderActivationQuery()
             {
@@ -304,7 +311,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// <returns></returns>
         private async Task DoActivationWorkOrderAsync(PlanWorkOrderEntity workOrder, ActivationWorkOrderDto activationWorkOrderDto)
         {
-            if (workOrder.IsLocked == Core.Enums.YesOrNoEnum.Yes)
+            if (workOrder.Status == PlanWorkOrderStatusEnum.Pending)
             {
                 throw new BusinessException(nameof(ErrorCode.MES16408)).WithData("orderCode", workOrder.OrderCode);
             }
@@ -360,16 +367,16 @@ namespace Hymson.MES.Services.Services.Plan
 
 
                         //修改工单状态为生产中
-                        List<PlanWorkOrderEntity> planWorkOrderEntities = new List<PlanWorkOrderEntity>();
-                        planWorkOrderEntities.Add(new PlanWorkOrderEntity()
+                        List<UpdateStatusCommand> updateStatusCommands = new List<UpdateStatusCommand>();
+                        updateStatusCommands.Add(new UpdateStatusCommand()
                         {
                             Id = activationWorkOrderDto.Id,
                             Status = Core.Enums.PlanWorkOrderStatusEnum.InProduction,
-
+                            BeforeStatus= workOrder.Status,
                             UpdatedBy = _currentUser.UserName,
                             UpdatedOn = HymsonClock.Now()
                         });
-                        await _planWorkOrderRepository.ModifyWorkOrderStatusAsync(planWorkOrderEntities);
+                        await _planWorkOrderRepository.ModifyWorkOrderStatusAsync(updateStatusCommands);
 
                         //TODO  修改工单状态还需要在 工单记录表中记录
                         await _planWorkOrderStatusRecordRepository.InsertAsync(record);

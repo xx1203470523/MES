@@ -83,6 +83,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> UpdateAsync(ManuSfcProduceEntity manuSfcProduceEntity);
 
         /// <summary>
+        /// 更新（带状态检查）
+        /// </summary>
+        /// <param name="manuSfcProduceEntity"></param>
+        /// <returns></returns>
+        Task<int> UpdateWithStatusCheckAsync(ManuSfcProduceEntity manuSfcProduceEntity);
+
+        /// <summary>
         /// 批量更新 
         /// </summary>
         /// <param name="manuSfcProduceEntitys"></param>

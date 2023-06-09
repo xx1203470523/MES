@@ -17,19 +17,20 @@ namespace Hymson.MES.HttpClients
         /// 打印预览图片
         /// </summary>
         /// <returns></returns>
-        public Task<(string base64Str, bool result)> PreviewFromImageBase64Async(PrintRequest  printRequest);
+        public Task<(string base64Str, bool result)> PreviewFromImageBase64Async(PreviewRequest previewRequest );
         /// <summary>
         ///标签打印
         /// </summary>
         /// <param name="ShowDialog"></param>
         /// <returns></returns>
         public Task<(string msg, bool result)> PrintAsync(PrintRequest printRequest, bool ShowDialog = false);
+        
         /// <summary>
         /// 上传标签模板到打印服务器
         /// </summary>
         /// <param name="url"></param>
         /// <param name="templateName"></param>
         /// <returns></returns>
-        public Task<(string msg, bool result, string data)> UploadTemplateAsync(string url, string templateName);
+        public Task<(string msg, bool result, string data)> GetTemplateContextAsync(string url);
     }
 }

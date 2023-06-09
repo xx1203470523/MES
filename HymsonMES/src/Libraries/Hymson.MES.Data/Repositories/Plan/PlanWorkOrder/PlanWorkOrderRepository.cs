@@ -168,25 +168,24 @@ namespace Hymson.MES.Data.Repositories.Plan
             {
                 sqlBuilder.Where("wo.Type = @Type ");
             }
-
-            //觉得别扭的兄弟们 那就对了 TODO  这里需要 查询 锁定和状态  
+            
             if (pageQuery.Status.HasValue)
             {
-                if (pageQuery.Status == Core.Enums.PlanWorkOrderStatusEnum.Pending)
-                {
-                    //pageQuery.IsLocked = Core.Enums.YesOrNoEnum.Yes;
-                    sqlBuilder.AddParameters(new { StatusIsLocked = Core.Enums.YesOrNoEnum.Yes });
-                    sqlBuilder.Where("wo.IsLocked = @StatusIsLocked ");
-                }
-                else
-                {
+                //if (pageQuery.Status == Core.Enums.PlanWorkOrderStatusEnum.Pending)
+                //{
+                //    //pageQuery.IsLocked = Core.Enums.YesOrNoEnum.Yes;
+                //    sqlBuilder.AddParameters(new { StatusIsLocked = Core.Enums.YesOrNoEnum.Yes });
+                //    sqlBuilder.Where("wo.IsLocked = @StatusIsLocked ");
+                //}
+                //else
+                //{
                     //pageQuery.IsLocked = Core.Enums.YesOrNoEnum.No;
-                    sqlBuilder.AddParameters(new { StatusIsLocked = Core.Enums.YesOrNoEnum.No });
+                    //sqlBuilder.AddParameters(new { StatusIsLocked = Core.Enums.YesOrNoEnum.No });
                     sqlBuilder.Where("wo.Status = @Status");
-                    sqlBuilder.Where("wo.IsLocked = @StatusIsLocked ");
-                }
+                    //sqlBuilder.Where("wo.IsLocked = @StatusIsLocked ");
+                //}
             }
-            if (pageQuery.IsLocked.HasValue) sqlBuilder.Where("wo.IsLocked = @IsLocked");
+            //if (pageQuery.IsLocked.HasValue) sqlBuilder.Where("wo.IsLocked = @IsLocked");
             //if (pageQuery.PlanStartTimeS.HasValue || pageQuery.PlanStartTimeE.HasValue)
             //{
             //    if (pageQuery.PlanStartTimeS.HasValue && pageQuery.PlanStartTimeE.HasValue) sqlBuilder.Where("wo.PlanStartTime BETWEEN @PlanStartTimeS AND @PlanStartTimeE");
@@ -319,7 +318,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        public async Task<int> ModifyWorkOrderStatusAsync(IEnumerable<PlanWorkOrderEntity> parms)
+        public async Task<int> ModifyWorkOrderStatusAsync(IEnumerable<UpdateStatusCommand> parms)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateWorkOrderStatusSql, parms);
@@ -330,7 +329,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        public async Task<int> ModifyWorkOrderLockedAsync(IEnumerable<PlanWorkOrderEntity> parms)
+        public async Task<int> ModifyWorkOrderLockedAsync(IEnumerable<UpdateLockedCommand> parms)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateWorkOrderLockedSql, parms);
@@ -452,10 +451,10 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string DeleteSql = "UPDATE `plan_work_order` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `plan_work_order`  SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids ";
         const string GetByIdSql = @"SELECT
-      `Id`, `OrderCode`, `ProductId`, `WorkCenterType`, `WorkCenterId`, `ProcessRouteId`, `ProductBOMId`, `Type`, `Qty`, `Status`, `OverScale`, `PlanStartTime`, `PlanEndTime`, `IsLocked`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
+      `Id`, `OrderCode`, `ProductId`, `WorkCenterType`, `WorkCenterId`, `ProcessRouteId`, `ProductBOMId`, `Type`, `Qty`, `Status`, `OverScale`, `PlanStartTime`, `PlanEndTime`, `IsLocked`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId` ,LockedStatus
     FROM `plan_work_order`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT
-      `Id`, `OrderCode`, `ProductId`, `WorkCenterType`, `WorkCenterId`, `ProcessRouteId`, `ProductBOMId`, `Type`, `Qty`, `Status`, `OverScale`, `PlanStartTime`, `PlanEndTime`, `IsLocked`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
+      `Id`, `OrderCode`, `ProductId`, `WorkCenterType`, `WorkCenterId`, `ProcessRouteId`, `ProductBOMId`, `Type`, `Qty`, `Status`, `OverScale`, `PlanStartTime`, `PlanEndTime`, `IsLocked`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId` ,LockedStatus
     FROM `plan_work_order`  WHERE Id IN @ids ";
         const string GetByWorkOrderIdSql = "SELECT * FROM plan_work_order_record WHERE IsDeleted = 0 AND WorkOrderId = @workOrderId ";
         const string GetByCodeSql = @"SELECT * FROM plan_work_order WHERE IsDeleted = 0 AND OrderCode = @OrderCode and SiteId=@SiteId ";
@@ -473,8 +472,9 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string GetByWorkLineId = "SELECT PWO.* FROM plan_work_order_activation PWOA " +
             "LEFT JOIN plan_work_order PWO ON PWO.Id = PWOA.WorkOrderId " +
             "WHERE PWO.IsDeleted = 0 AND PWO.WorkCenterType = @WorkCenterType AND PWOA.LineId = @workLineId ";
-        const string UpdateWorkOrderStatusSql = @"UPDATE `plan_work_order` SET Status = @Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
-        const string UpdateWorkOrderLockedSql = @"UPDATE `plan_work_order` SET IsLocked = @IsLocked, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
+        const string UpdateWorkOrderStatusSql = @"UPDATE `plan_work_order` SET Status = @Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id  AND  Status=@BeforeStatus ";
+        //const string UpdateWorkOrderLockedSql = @"UPDATE `plan_work_order` SET IsLocked = @IsLocked, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
+        const string UpdateWorkOrderLockedSql = @"UPDATE `plan_work_order` SET Status = @Status, LockedStatus=@LockedStatus,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string UpdateRecordRealStartSql = "UPDATE plan_work_order_record SET RealStart = @UpdatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND RealStart IS NULL AND WorkOrderId IN @WorkOrderIds ";
         const string UpdateRecordRealEndSql = "UPDATE plan_work_order_record SET RealEnd = @UpdatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE WorkOrderId IN @WorkOrderIds AND IsDeleted = 0 ";
     }

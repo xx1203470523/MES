@@ -75,6 +75,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 根据容器Id 查询所有容器装载记录
+        /// </summary>
+        /// <param name="containerBarCodeId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuContainerPackEntity>> GetByContainerBarCodeIdIdAsync(long containerBarCodeId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuContainerPackEntity>(GetByContainerBarCodeIdSql, new { ContainerBarCodeId = containerBarCodeId });
+        }
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -90,7 +101,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuContainerPackEntity>> GetByIdsAsync(long[] ids)
+        public async Task<IEnumerable<ManuContainerPackEntity>> GetByIdsAsync( IEnumerable<long>  ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuContainerPackEntity>(GetByIdsSql, new { Ids = ids });
@@ -108,7 +119,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("pack.IsDeleted=0");
             sqlBuilder.Where("pack.SiteId=@SiteId");
-            sqlBuilder.Select("pack.Id,pack.SiteId,pack.ContainerBarCodeId,pack.CreatedBy,pack.CreatedOn,barcode.BarCode,barcode.ProductId,pack.LadeBarCode,barcode.WorkOrderId,1 as count");
+            sqlBuilder.Select("pack.Id,pack.SiteId,pack.ContainerBarCodeId,pack.CreatedBy,pack.CreatedOn,barcode.BarCode,barcode.ProductId,pack.LadeBarCode,barcode.WorkOrderId,1 as count,barcode.PackLevel ");
             sqlBuilder.LeftJoin("manu_container_barcode barcode on barcode.Id =pack.ContainerBarCodeId and barcode.IsDeleted=0");
             if (!string.IsNullOrWhiteSpace(manuContainerPackPagedQuery.BarCode))
             {
@@ -259,6 +270,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteId`,`ResourceId`,`ProcedureId`,`ContainerBarCodeId`, `LadeBarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_container_pack`  WHERE Id = @Id ";
+        const string GetByContainerBarCodeIdSql = @"SELECT 
+                               `Id`, `SiteId`,`ResourceId`,`ProcedureId`,`ContainerBarCodeId`, `LadeBarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `manu_container_pack`  WHERE ContainerBarCodeId = @ContainerBarCodeId ";
         const string GetBysfcSql = @"SELECT 
                                `Id`, `SiteId`,`ResourceId`,`ProcedureId`, `ContainerBarCodeId`, `LadeBarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_container_pack`  WHERE LadeBarCode = @LadeBarCode  and SiteId=@SiteId ";

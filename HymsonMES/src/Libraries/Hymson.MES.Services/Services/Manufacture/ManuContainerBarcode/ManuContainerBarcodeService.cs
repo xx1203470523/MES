@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 容器条码表    服务 | 代码由框架生成
- *builder:  wxk
- *build datetime: 2023-04-12 02:29:23
- */
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -19,6 +12,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer;
@@ -32,7 +26,6 @@ using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGenerateBarcodeDto;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode;
-using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -71,6 +64,14 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// 仓储接口（物料库存）
         /// </summary>
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
+        /// <summary>
+        /// 条码步骤表仓储 仓储
+        /// </summary>
+        private readonly IManuSfcStepRepository _manuSfcStepRepository;
+        /// <summary>
+        /// 仓储接口（条码信息）
+        /// </summary>
+        private readonly IManuSfcRepository _manuSfcRepository;
 
         // private readonly AbstractValidator<ManuContainerBarcodeCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ManuContainerBarcodeModifyDto> _validationModifyRules;
@@ -81,7 +82,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// 仓储接口（条码生产信息）
         /// </summary>
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
-        //private readonly IManuCommonService _manuCommonService;
+        //private readonly IManuCommonService _manuCommonOldService;
 
         public ManuContainerBarcodeService(ICurrentUser currentUser, ICurrentSite currentSite, IManuContainerBarcodeRepository manuContainerBarcodeRepository
             //, AbstractValidator<ManuContainerBarcodeCreateDto> validationCreateRules
@@ -103,9 +104,11 @@ namespace Hymson.MES.Services.Services.Manufacture
             , AbstractValidator<CreateManuContainerBarcodeDto> validationCreateManuContainerBarcodeRules,
              AbstractValidator<UpdateManuContainerBarcodeStatusDto> validationUpdateStatusRules
              , IManuSfcProduceRepository manuSfcProduceRepository
-            // IManuCommonService manuCommonService
-            , IProcResourceRepository procResourceRepository,
-           IWhMaterialInventoryRepository whMaterialInventoryRepository)
+            // IManuCommonService manuCommonOldService
+            , IProcResourceRepository procResourceRepository
+            , IManuSfcRepository manuSfcRepository,
+           IWhMaterialInventoryRepository whMaterialInventoryRepository,
+           IManuSfcStepRepository manuSfcStepRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -129,9 +132,11 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuFacePlateContainerPackRepository = manuFacePlateContainerPackRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _procProcedureRepository = procProcedureRepository;
-            //_manuCommonService = manuCommonService;
+            //_manuCommonOldService = manuCommonOldService;
             _procResourceRepository = procResourceRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
+            _manuSfcStepRepository = manuSfcStepRepository;
+            _manuSfcRepository = manuSfcRepository;
         }
 
         /// <summary>
@@ -183,7 +188,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             //获取面板信息
-            var facePlateEntity = await _manuFacePlateRepository.GetByCodeAsync(new Data.Repositories.Common.Query.EntityByCodeQuery {Code= createManuContainerBarcodeDto.FacePlateCode,Site=_currentSite.SiteId } );
+            var facePlateEntity = await _manuFacePlateRepository.GetByCodeAsync(new Data.Repositories.Common.Query.EntityByCodeQuery { Code = createManuContainerBarcodeDto.FacePlateCode, Site = _currentSite.SiteId });
             if (facePlateEntity == null)
                 throw new CustomerValidationException(nameof(ErrorCode.MES16705));
             var facePlateContainerPackEntity = await _manuFacePlateContainerPackRepository.GetByFacePlateIdAsync(facePlateEntity.Id);
@@ -215,12 +220,12 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
 
             //获取条码生产信息
-            //var produceSFCobj = await _manuCommonService.GetProduceSFCAsync(createManuContainerBarcodeDto.BarCode);
+            //var produceSFCobj = await _manuCommonOldService.GetProduceSFCAsync(createManuContainerBarcodeDto.BarCode);
             //var sfcProduceEntity = produceSFCobj.Item1;
-            var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery() 
+            var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
             {
-                SiteId=_currentSite.SiteId??0,
-                Sfc= createManuContainerBarcodeDto.BarCode
+                SiteId = _currentSite.SiteId ?? 0,
+                Sfc = createManuContainerBarcodeDto.BarCode
             });
             if (sfcProduceEntity != null)
             {
@@ -242,6 +247,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16713));
                 }
+                sfcProduceEntity.ResourceId = createManuContainerBarcodeDto.ResourceId;
+                sfcProduceEntity.ProcedureId = createManuContainerBarcodeDto.ProcedureId;
             }
             else
             {
@@ -258,11 +265,23 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES16712));
                     }
+                    var sfcEntity = await _manuSfcRepository.GetBySFCAsync(new Data.Repositories.Manufacture.ManuSfc.Query.GetBySFCQuery
+                    {
+                        SiteId = _currentSite.SiteId,
+                        SFC = createManuContainerBarcodeDto.BarCode
+                    });
                     sfcProduceEntity = new ManuSfcProduceEntity
                     {
-                        WorkOrderId = 0,
                         SFC = createManuContainerBarcodeDto.BarCode,
-                        ProductId = whMaterialInventoryEntity.MaterialId
+                        ProductId = whMaterialInventoryEntity.MaterialId,
+                        WorkOrderId = 0,
+                        WorkCenterId = 0,
+                        ProductBOMId = 0,
+                        EquipmentId = 0,
+                        Qty = sfcEntity?.Qty ?? 0,
+                        Status = SfcProduceStatusEnum.Complete,
+                        ResourceId = createManuContainerBarcodeDto.ResourceId,
+                        ProcedureId = createManuContainerBarcodeDto.ProcedureId,
                     };
                 }
                 else
@@ -276,7 +295,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SiteId = _currentSite.SiteId ?? 0,
                 Sfc = sfcProduceEntity.SFC,
                 BusinessType = ManuSfcProduceBusinessType.Lock
-            }) ;
+            });
             if (sfcProduceBusinessEntity != null)
             {
                 sfcProduceBusinessEntity.VerifyProcedureLock(createManuContainerBarcodeDto.BarCode, facePlateContainerPackEntity.ProcedureId);
@@ -309,6 +328,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 //新条码&& 没有指定包装
                 if (string.IsNullOrEmpty(createManuContainerBarcodeDto.ContainerCode))
                 {
+                    #region 查找相同产品ID及打开着的包装
                     //查找相同产品ID及打开着的包装
                     //var barcodeobj = await _manuContainerBarcodeRepository.GetByMaterialCodeAsync(material.MaterialCode, (int)ManuContainerBarcodeStatusEnum.Open, 1);
                     //if (barcodeobj != null)
@@ -372,8 +392,10 @@ namespace Hymson.MES.Services.Services.Manufacture
                     //}
                     //else 
                     //{
+                    #endregion
                     //全新包装
-                    return await CreateNewBarcodeAsync(manuContainerBarcodeEntity, sfcProduceEntity.ProductId, sfcProduceEntity.WorkOrderId, material, facePlateContainerPackEntity);
+                    var sfcStepEntity = CreateSFCStepEntity(sfcProduceEntity);
+                    return await CreateNewBarcodeAsync(manuContainerBarcodeEntity, sfcProduceEntity.ProductId, sfcProduceEntity.WorkOrderId, material, createManuContainerBarcodeDto, (int)LevelEnum.One, sfcStepEntity);
                     //}
                 }
                 else //新条码&& 指定包装
@@ -385,7 +407,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                     var barcodeobj = await _manuContainerBarcodeRepository.GetByCodeAsync(new ManuContainerBarcodeQuery { BarCode = createManuContainerBarcodeDto.ContainerCode, SiteId = manuContainerBarcodeEntity.SiteId });
                     //容器跟选择的工序等级不匹配
-                    if(barcodeobj.PackLevel!=(int)LevelEnum.One)
+                    if (barcodeobj.PackLevel != (int)LevelEnum.One)
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES16731));
                     }
@@ -424,20 +446,23 @@ namespace Hymson.MES.Services.Services.Manufacture
                         var packs = await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(barcodeobj.Id, barcodeobj.SiteId);
                         if (inte.Maximum > packs.Count())
                         {
+                            var sfcStepEntity = CreateSFCStepEntity(sfcProduceEntity);
                             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
                             {
+                                //记录step信息
+                                await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+
                                 await _manuContainerPack.CreateManuContainerPackAsync(new ManuContainerPackCreateDto()
                                 {
-                                    ResourceId = facePlateContainerPackEntity.ResourceId,
-                                    ProcedureId = barcodeobj.ProductId,
+                                    ResourceId = createManuContainerBarcodeDto.ResourceId ?? 0,
+                                    ProcedureId = createManuContainerBarcodeDto.ProcedureId,
                                     ContainerBarCodeId = barcodeobj.Id,
                                     LadeBarCode = createManuContainerBarcodeDto.BarCode
-
                                 });
                                 await _manuContainerPackRecordService.CreateManuContainerPackRecordAsync(new ManuContainerPackRecordCreateDto()
                                 {
-                                    ResourceId = facePlateContainerPackEntity.ResourceId,
-                                    ProcedureId = barcodeobj.ProductId,
+                                    ResourceId = createManuContainerBarcodeDto.ResourceId ?? 0,
+                                    ProcedureId = createManuContainerBarcodeDto.ProcedureId,
                                     ContainerBarCodeId = barcodeobj.Id,
                                     OperateType = (int)ManuContainerBarcodeOperateTypeEnum.Load,
                                     LadeBarCode = createManuContainerBarcodeDto.BarCode
@@ -464,8 +489,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                     }
                     else
                     {
+                        var sfcStepEntity = CreateSFCStepEntity(sfcProduceEntity);
                         //不是相同包装，创建全新包装
-                        return await CreateNewBarcodeAsync(manuContainerBarcodeEntity, sfcProduceEntity.ProductId, sfcProduceEntity.WorkOrderId, material, facePlateContainerPackEntity);
+                        return await CreateNewBarcodeAsync(manuContainerBarcodeEntity, sfcProduceEntity.ProductId, sfcProduceEntity.WorkOrderId, material, createManuContainerBarcodeDto, (int)LevelEnum.One, sfcStepEntity);
                     }
                 }
             }
@@ -516,6 +542,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 //新条码&& 没有指定包装
                 if (string.IsNullOrEmpty(createManuContainerBarcodeDto.ContainerCode))
                 {
+                    #region 查找相同产品ID及打开着的包装
                     //查找相同产品ID及打开着的包装
                     //var barcodeobj = await _manuContainerBarcodeRepository.GetByMaterialCodeAsync(prebarcodeobj.MaterialCode, (int)ManuContainerBarcodeStatusEnum.Open, level);
                     //if (barcodeobj != null)
@@ -580,10 +607,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                     //}
                     //else
                     //{
+                    #endregion
                     //全新包装
                     //获取物料信息
                     var material = await _procMaterialRepository.GetByIdAsync(prebarcodeobj.ProductId);
-                    return await CreateNewBarcodeAsync(manuContainerBarcodeEntity, prebarcodeobj.ProductId, prebarcodeobj.WorkOrderId, material, facePlateContainerPackEntity, level);
+                    return await CreateNewBarcodeAsync(manuContainerBarcodeEntity, prebarcodeobj.ProductId, prebarcodeobj.WorkOrderId, material, createManuContainerBarcodeDto, level);
                     //}
                 }
                 else //新条码&& 指定包装
@@ -594,9 +622,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                      */
 
                     var barcodeobj = await _manuContainerBarcodeRepository.GetByCodeAsync(new ManuContainerBarcodeQuery { BarCode = createManuContainerBarcodeDto.ContainerCode, SiteId = _currentSite.SiteId ?? 0 });
-                   
+
                     //容器跟选择的工序等级不匹配
-                    if (barcodeobj.PackLevel != (int)LevelEnum.One)
+                    if (barcodeobj.PackLevel != level)
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES16731));
                     }
@@ -634,16 +662,16 @@ namespace Hymson.MES.Services.Services.Manufacture
                             {
                                 await _manuContainerPack.CreateManuContainerPackAsync(new ManuContainerPackCreateDto()
                                 {
-                                    ResourceId = facePlateContainerPackEntity.ResourceId,
-                                    ProcedureId = barcodeobj.ProductId,
+                                    ResourceId = createManuContainerBarcodeDto.ResourceId ?? 0,
+                                    ProcedureId = createManuContainerBarcodeDto.ProcedureId,
                                     ContainerBarCodeId = barcodeobj.Id,
                                     LadeBarCode = createManuContainerBarcodeDto.BarCode
 
                                 });
                                 await _manuContainerPackRecordService.CreateManuContainerPackRecordAsync(new ManuContainerPackRecordCreateDto()
                                 {
-                                    ResourceId = facePlateContainerPackEntity.ResourceId,
-                                    ProcedureId = barcodeobj.ProductId,
+                                    ResourceId = createManuContainerBarcodeDto.ResourceId ?? 0,
+                                    ProcedureId = createManuContainerBarcodeDto.ProcedureId,
                                     ContainerBarCodeId = barcodeobj.Id,
                                     OperateType = (int)ManuContainerBarcodeOperateTypeEnum.Load,
                                     LadeBarCode = createManuContainerBarcodeDto.BarCode
@@ -675,7 +703,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         // var workorder = await _planWorkOrderRepository.GetByIdAsync(prebarcodeobj.WorkOrderId);
                         //获取物料信息
                         var material = await _procMaterialRepository.GetByIdAsync(prebarcodeobj.ProductId);
-                        return await CreateNewBarcodeAsync(manuContainerBarcodeEntity, prebarcodeobj.ProductId, prebarcodeobj.WorkOrderId, material, facePlateContainerPackEntity, level);
+                        return await CreateNewBarcodeAsync(manuContainerBarcodeEntity, prebarcodeobj.ProductId, prebarcodeobj.WorkOrderId, material, createManuContainerBarcodeDto, level);
                     }
                 }
             }
@@ -683,7 +711,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
         private async Task<ManuContainerBarcodeView> CreateNewBarcodeAsync(ManuContainerBarcodeEntity manuContainerBarcodeEntity,
            long ProductId, long workorderId,
-           ProcMaterialEntity material, ManuFacePlateContainerPackEntity manuFacePlateContainerPackEntity, int level = 1)
+           ProcMaterialEntity material, CreateManuContainerBarcodeDto createManuContainerBarcodeDto, int level = 1, ManuSfcStepEntity sfcStepEntity = null)
         {
             manuContainerBarcodeEntity.WorkOrderId = workorderId;
             manuContainerBarcodeEntity.MaterialVersion = material.Version ?? "9999—Unknow";
@@ -728,28 +756,43 @@ namespace Hymson.MES.Services.Services.Manufacture
                 });
                 string barcode = manuContainerBarcodeEntity.BarCode;
                 manuContainerBarcodeEntity.BarCode = barcodeList.First();
-                //创建包装
-                using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+
+                // 创建包装
+                var rows = 0;
+                using (TransactionScope trans = TransactionHelper.GetTransactionScope())
                 {
-                    await _manuContainerBarcodeRepository.InsertAsync(manuContainerBarcodeEntity);
+                    if (level == 1)
+                    {
+                        //记录step信息
+                        await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+                    }
+                    rows += await _manuContainerBarcodeRepository.InsertAsync(manuContainerBarcodeEntity);
+
+                    // 未保存到数据，事务回滚
+                    if (rows <= 0)
+                    {
+                        trans.Dispose();
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16721))
+                            .WithData("sfc", sfcStepEntity.SFC)
+                            .WithData("barcode", barcode);
+                    }
+
                     await _manuContainerPack.CreateManuContainerPackAsync(new ManuContainerPackCreateDto()
                     {
-                        ResourceId = manuFacePlateContainerPackEntity.ResourceId,
-                        ProcedureId = manuContainerBarcodeEntity.ProductId,
+                        ResourceId = createManuContainerBarcodeDto.ResourceId ?? 0,
+                        ProcedureId = createManuContainerBarcodeDto.ProcedureId,
                         ContainerBarCodeId = manuContainerBarcodeEntity.Id,
                         LadeBarCode = barcode
-
                     });
                     await _manuContainerPackRecordService.CreateManuContainerPackRecordAsync(new ManuContainerPackRecordCreateDto()
                     {
-                        ResourceId = manuFacePlateContainerPackEntity.ResourceId,
-                        ProcedureId = manuContainerBarcodeEntity.ProductId,
+                        ResourceId = createManuContainerBarcodeDto.ResourceId ?? 0,
+                        ProcedureId = createManuContainerBarcodeDto.ProcedureId,
                         ContainerBarCodeId = manuContainerBarcodeEntity.Id,
                         OperateType = (int)ManuContainerBarcodeOperateTypeEnum.Load,
                         LadeBarCode = barcode
-
                     });
-                    ts.Complete();
+                    trans.Complete();
                 }
 
                 return await GetContainerPackViewAsync(workorderId, material.Id, manuContainerBarcodeEntity, isFirstPackage, entityByRelation);
@@ -778,28 +821,43 @@ namespace Hymson.MES.Services.Services.Manufacture
                         });
                         manuContainerBarcodeEntity.BarCode = barcodeList.First();
                         //入库
-                        using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+                        var rows = 0;
+                        using (TransactionScope trans = TransactionHelper.GetTransactionScope())
                         {
-                            await _manuContainerBarcodeRepository.InsertAsync(manuContainerBarcodeEntity);
+                            if (level == 1)
+                            {
+                                //记录step信息
+                                await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+                            }
+                            rows += await _manuContainerBarcodeRepository.InsertAsync(manuContainerBarcodeEntity);
+
+                            // 未保存到数据，事务回滚
+                            if (rows <= 0)
+                            {
+                                trans.Dispose();
+                                throw new CustomerValidationException(nameof(ErrorCode.MES16721))
+                                    .WithData("sfc", sfcStepEntity.SFC)
+                                    .WithData("barcode", manuContainerBarcodeEntity.BarCode);
+                            }
+
                             await _manuContainerPack.CreateManuContainerPackAsync(new ManuContainerPackCreateDto()
                             {
-                                ResourceId = manuFacePlateContainerPackEntity.ResourceId,
-                                ProcedureId = manuContainerBarcodeEntity.ProductId,
+                                ResourceId = createManuContainerBarcodeDto.ResourceId ?? 0,
+                                ProcedureId = createManuContainerBarcodeDto.ProcedureId,
                                 ContainerBarCodeId = manuContainerBarcodeEntity.Id,
                                 LadeBarCode = manuContainerBarcodeEntity.BarCode
                             });
                             await _manuContainerPackRecordService.CreateManuContainerPackRecordAsync(new ManuContainerPackRecordCreateDto()
                             {
-                                ResourceId = manuFacePlateContainerPackEntity.ResourceId,
-                                ProcedureId = manuContainerBarcodeEntity.ProductId,
+                                ResourceId = createManuContainerBarcodeDto.ResourceId ?? 0,
+                                ProcedureId = createManuContainerBarcodeDto.ProcedureId,
                                 ContainerBarCodeId = manuContainerBarcodeEntity.Id,
                                 OperateType = (int)ManuContainerBarcodeOperateTypeEnum.Load,
                                 LadeBarCode = manuContainerBarcodeEntity.BarCode
 
                             });
-                            ts.Complete();
+                            trans.Complete();
                         }
-
 
                         return await GetContainerPackViewAsync(workorderId, material.Id, manuContainerBarcodeEntity, isFirstPackage, entityByRelation1);
                     }
@@ -853,7 +911,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             else
             {
-                var query = new ManuSfcProduceQuery { SiteId = _currentSite.SiteId ?? 0, Sfcs = packs.Select(x => x.LadeBarCode).ToArray()};
+                var query = new ManuSfcProduceQuery { SiteId = _currentSite.SiteId ?? 0, Sfcs = packs.Select(x => x.LadeBarCode).ToArray() };
                 var sfcProduceEntities = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(query);
                 sfcDatas = sfcProduceEntities.ToList();
                 var orderIds = sfcDatas.Select(x => x.WorkOrderId).ToArray();
@@ -876,7 +934,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     var workOrderId = 0L;
                     if (isFirstPackage)
                     {
-                         workOrderId = sfcDatas.FirstOrDefault(x => x.SFC == m.LadeBarCode)?.WorkOrderId??0;
+                        workOrderId = sfcDatas.FirstOrDefault(x => x.SFC == m.LadeBarCode)?.WorkOrderId ?? 0;
                     }
                     //else
                     //{
@@ -896,7 +954,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         //WorkOrderCode = workorderId.ToString(),
                         MaterialCode = procMateria?.MaterialCode ?? string.Empty,//如果关联结果删除直接返回空
                         SiteId = m.SiteId,
-                        WorkOrderCode = isFirstPackage? planOrders.FirstOrDefault(x => x.Id == workOrderId)?.OrderCode ?? "":"",
+                        WorkOrderCode = isFirstPackage ? planOrders.FirstOrDefault(x => x.Id == workOrderId)?.OrderCode ?? "" : "",
                         Count = count
                     };
                 }).ToList()
@@ -1002,13 +1060,13 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES16726));
             }
 
-            //验证DTO
+            // 验证DTO
             await _validationUpdateStatusRules.ValidateAndThrowAsync(updateManuContainerBarcodeStatusDto);
-            //关闭操作必须要装箱数量达到最小包装数
+            // 关闭操作必须要装箱数量达到最小包装数
             if (updateManuContainerBarcodeStatusDto.Status == 2)
             {
                 var container = await _inteContainerRepository.GetByIdAsync(containerBarcode.ContainerId);
-                //查询已包装数
+                // 查询已包装数
                 var containerPacks = await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(containerBarcode.Id, _currentSite.SiteId.Value);
                 if (containerPacks.Count() < container.Minimum)
                 {
@@ -1016,13 +1074,19 @@ namespace Hymson.MES.Services.Services.Manufacture
                 }
             }
 
-            //DTO转换实体
+            // DTO转换实体
             var manuContainerBarcodeEntity = new ManuContainerBarcodeEntity();
             manuContainerBarcodeEntity.Id = updateManuContainerBarcodeStatusDto.Id;
             manuContainerBarcodeEntity.Status = updateManuContainerBarcodeStatusDto.Status;
             manuContainerBarcodeEntity.UpdatedBy = _currentUser.UserName;
             manuContainerBarcodeEntity.UpdatedOn = HymsonClock.Now();
-            await _manuContainerBarcodeRepository.UpdateStatusAsync(manuContainerBarcodeEntity);
+
+            var rows = await _manuContainerBarcodeRepository.UpdateStatusAsync(manuContainerBarcodeEntity);
+            if (rows <= 0)
+            {
+                string errorCode = updateManuContainerBarcodeStatusDto.Status == 1 ? nameof(ErrorCode.MES16733) : nameof(ErrorCode.MES16734);
+                throw new CustomerValidationException(errorCode);
+            }
         }
 
         /// <summary>
@@ -1066,6 +1130,36 @@ namespace Hymson.MES.Services.Services.Manufacture
                 return barcodeDto;
             }
             return null;
+        }
+
+        /// <summary>
+        /// 创建条码步骤数据
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <param name="type"></param>
+        /// <param name="remark"></param>
+        /// <returns></returns>
+        private ManuSfcStepEntity CreateSFCStepEntity(ManuSfcProduceEntity sfc)
+        {
+            return new ManuSfcStepEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SFC = sfc.SFC,
+                ProductId = sfc.ProductId,
+                WorkOrderId = sfc.WorkOrderId,
+                WorkCenterId = sfc.WorkCenterId,
+                ProductBOMId = sfc.ProductBOMId,
+                Qty = sfc.Qty,
+                EquipmentId = sfc.EquipmentId,
+                ResourceId = sfc.ResourceId,
+                ProcedureId = sfc.ProcedureId,
+                Operatetype = ManuSfcStepTypeEnum.Package,
+                CurrentStatus = sfc.Status,
+                Remark = "容器包装",
+                SiteId = _currentSite.SiteId ?? 0,
+                CreatedBy = sfc.CreatedBy,
+                UpdatedBy = _currentUser.UserName ?? ""
+            };
         }
     }
 }

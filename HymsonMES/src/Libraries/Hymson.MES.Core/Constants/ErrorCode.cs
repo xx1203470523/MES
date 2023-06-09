@@ -418,6 +418,9 @@
         public const string MES15409 = "不合格代码{codes}已录入,请勿重复录入!";
         public const string MES15410 = "SFC {sfcs}已存在返修信息，不可再执行当前操作!";
         public const string MES15411 = "条码{sfcs}已报废,不可再执行当前操作！";
+        public const string MES15412 = "条码{sfcs}已取消报废,不能重复取消!";
+        public const string MES15413 = "条码{sfcs}已报废,不能重复报废!";
+        public const string MES15414 = "条码{sfcs}标识已取消,不能重复取消!";
         #endregion
 
         #region 物料加载 15500
@@ -442,6 +445,7 @@
         public const string MES16012 = "修改生产工单状态失败：有工单不为完工,不允许关闭";
         public const string MES16013 = "工单状态不为未开始,不允许删除";
         public const string MES16014 = "有工单不存在";
+        public const string MES16015 = "工单没有锁定前的状态，无法解锁";
 
         public const string MES16020 = "工单号 不能为空！";
         public const string MES16021 = "物料编码 不能为空！";
@@ -462,6 +466,7 @@
         public const string MES16034 = "超生产比例 不能小于0！";
         public const string MES16035 = "SFC对应工单状态为非生产中状态，不可执行操作！";
         public const string MES16036 = "SFC超过最大复投次数，不允许生产！";
+        public const string MES16037 = "工单状态已经被修改，请刷新重试";
         #endregion
 
         #region 条码接收 16100
@@ -610,6 +615,7 @@
         public const string MES16412 = "根据资源查询工单激活必须有资源Id参数！";
         public const string MES16413 = "没有找到该资源对应的工作中心";
         public const string MES16414 = "当前资源所对应的工作中心不是线体";
+        public const string MES16415 = "工单[{orderCode}]处于暂停中，无法操作！";
         #endregion
 
         #region 条码下达 MES16500
@@ -620,6 +626,7 @@
         public const string MES16504 = "条码已经存在。";
         public const string MES16505 = "条码不存在，无法复用。";
         public const string MES16506 = "条码不为完成和在库状态，无法复用。";
+        public const string MES16507 = "资源和工序对应的资源类型不匹配。";
         #endregion
 
         #region 在制品移除添加 16600
@@ -677,6 +684,9 @@
         public const string MES16729 = "容器包装，容器{barcode}未关闭!";
         public const string MES16730 = "同一个容器不允许不同物料进行包装!";
         public const string MES16731 = "容器包装，容器包装等级跟工序包装等级不匹配!";
+        public const string MES16732 = "装载信息不存在!";
+        public const string MES16733 = "容器已打开!";
+        public const string MES16734 = "容器已关闭!";
         #endregion
 
         #region 绑定工单激活  MES16800
@@ -709,6 +719,7 @@
         public const string MES17002 = "条码打印，打印机信息未找到";
         public const string MES17003 = "条码打印，打印失败msg:{msg}.";
         public const string MES17004 = "条码打印，预览失败";
+        public const string MES17005 = "条码打印，模板数据格式错误";
         #endregion
 
         #region 在制品步骤控制 MES18000
@@ -826,6 +837,49 @@
 
         #endregion
 
+
+        #region 设备对接错误
+
+        #region 设备对接公用
+        public const string MES19001 = "设备编码不能为空";
+        public const string MES19002 = "资源编码不能为空";
+        public const string MES19003 = "SFC条码不能为空";
+        public const string MES19004 = "调用本地时间不能为空";
+        public const string MES19005 = "设备编码：{Code}不存在";
+        public const string MES19006 = "资源编码不存在";
+        public const string MES19007 = "SFC条码不允许重复";
+        public const string MES19008 = "资源不匹配";
+        #endregion
+
+
+        public const string MES19910 = "资源：{ResCode}和设备：{EquCode}不存在绑定关系，请检查配置";
+        public const string MES19911 = "资源：{ResourceCode}未找到关联的产线信息";
+        public const string MES19912 = "产线：{WorkCenterCode}未找到激活的工单信息";
+        public const string MES19913 = "资源：{ResCode}未绑定工序，请检查配置";
+        public const string MES19914 = "工单：{OrderCode}未绑定BOM，请检查配置";
+        public const string MES19915 = "Bom：{BomCode}未绑定物料明细，请检查配置";
+        public const string MES19916 = "条码：{SFC}不符合掩码规则，请检查配置";
+        public const string MES19917 = "条码：{SFC}已存在";
+        public const string MES19918 = "条码：{SFC}不存在生产信息";
+        public const string MES19919 = "资源：{ResCode}不存在";
+        public const string MES19920 = "条码：{SFC}不在当前工序活动";
+        public const string MES19921 = "子条码：{SFC}已经绑定其它主条码";
+        public const string MES19922 = "主条码：{SFC}已经使用";
+        public const string MES19923 = "未获取到工单信息";
+        public const string MES19924 = "子条码位置重复,请检查！";
+        public const string MES19925 = "子条码重复,请检查！";
+        public const string MES19926 = "子条码列表不允许为空！";
+        public const string MES19927 = "子条码不能为空";
+        public const string MES19928 = "资源：{ResCode}未绑定工单，请检查配置";
+        public const string MES19929 = "工单不存在";
+        public const string MES19930 = "条码：{SFC}状态为在制，但没有获取到在制信息";
+        public const string MES19931 = "条码：{SFC}已锁定";
+        public const string MES19932 = "条码：{SFC}已报废";
+        public const string MES19933 = "条码：{SFC}在{Procedure}工序状态为{Status}，不允许操作";
+
+
+
+        #endregion
         #endregion
 
         #region 系统执行出错 业务逻辑出错

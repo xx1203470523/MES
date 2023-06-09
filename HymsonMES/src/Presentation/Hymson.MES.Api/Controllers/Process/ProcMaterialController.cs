@@ -9,6 +9,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
 using Hymson.Utils;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Extensions;
@@ -93,6 +94,8 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("物料维护", BusinessType.INSERT)]
+        [PermissionDescription("proc:material:insert")]
         public async Task AddProcMaterialAsync([FromBody] ProcMaterialCreateDto parm)
         {
              await _procMaterialService.CreateProcMaterialAsync(parm);
@@ -105,6 +108,8 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("物料维护", BusinessType.UPDATE)]
+        [PermissionDescription("proc:material:update")]
         public async Task UpdateProcMaterialAsync([FromBody] ProcMaterialModifyDto parm)
         {
              await _procMaterialService.ModifyProcMaterialAsync(parm);
@@ -117,6 +122,8 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("物料维护", BusinessType.DELETE)]
+        [PermissionDescription("proc:material:delete")]
         public async Task<int> DeleteProcMaterialAsync([FromBody] long[] ids)
         {
             //long[] idsArr = StringExtension.SpitLongArrary(ids);

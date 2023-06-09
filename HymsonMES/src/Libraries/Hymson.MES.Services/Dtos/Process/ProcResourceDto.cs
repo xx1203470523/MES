@@ -188,6 +188,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public List<ProcResourceConfigJobCreateDto> JobList { get; set; }
 
+        /// <summary>
+        ///产出设置信息
+        /// </summary>
+        public List<ProcProductSetCreateDto> ProductSetList { get; set; }
+
         ///// <summary>
         ///// 自定义
         ///// </summary>
@@ -249,6 +254,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 工作
         /// </summary>
         public List<ProcResourceConfigJobModifyDto> JobList { get; set; }
+
+        /// <summary>
+        ///产出设置信息
+        /// </summary>
+        public List<ProcProductSetCreateDto> ProductSetList { get; set; }
 
         ///// <summary>
         ///// 自定义

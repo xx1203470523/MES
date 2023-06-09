@@ -82,6 +82,55 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 根据SFCs获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>  
+        public async Task<IEnumerable<ManuSfcCirculationEntity>> GetSfcMoudulesAsync(ManuSfcCirculationBySfcsQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetManuSfcCirculationEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Where("IsDeleted = 0");
+
+            if (query.Sfc != null && query.Sfc.Any())
+            {
+                sqlBuilder.Where("SFC IN @Sfc");
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.CirculationBarCode))
+            {
+                sqlBuilder.Where("CirculationBarCode = @CirculationBarCode");
+            }
+
+            if (query.CirculationTypes != null && query.CirculationTypes.Length > 0)
+            {
+                sqlBuilder.Where("CirculationType IN @CirculationTypes");
+            }
+
+            if (query.IsDisassemble.HasValue)
+            {
+                sqlBuilder.Where("IsDisassemble = @IsDisassemble");
+            }
+
+            if (query.ProcedureId.HasValue)
+            {
+                sqlBuilder.Where("ProcedureId = @ProcedureId");
+            }
+            if (query.CirculationMainProductId.HasValue)
+            {
+                sqlBuilder.Where("CirculationMainProductId = @CirculationMainProductId");
+            }
+
+            sqlBuilder.AddParameters(query);
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ManuSfcCirculationEntity>(templateData.RawSql, templateData.Parameters);
+        }
+
+        /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
         /// <param name="ids"></param>
@@ -325,6 +374,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class ManuSfcCirculationRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_circulation` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
@@ -339,12 +391,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `EquipmentId`, `FeedingPointId`, `SFC`, `WorkOrderId`, `ProductId`, `CirculationBarCode`, `CirculationWorkOrderId`, `CirculationProductId`, CirculationMainProductId, CirculationQty, `CirculationType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Location`
                             FROM `manu_sfc_circulation`  WHERE Id = @Id ";
-        const string GetBySfcSql = @"SELECT * FROM manu_sfc_circulation WHERE IsDeleted = 0 AND SFC = @sfc ";
+        
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `EquipmentId`, `FeedingPointId`, `SFC`, `WorkOrderId`, `ProductId`, `CirculationBarCode`, `CirculationWorkOrderId`, `CirculationProductId`,CirculationMainProductId, CirculationQty, `CirculationType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Location`
                             FROM `manu_sfc_circulation`  WHERE Id IN @ids ";
 
-        const string DisassemblyUpdateSql = "UPDATE `manu_sfc_circulation` SET CirculationType=@CirculationType, IsDisassemble=@IsDisassemble,DisassembledBy=@UserId,DisassembledOn=@UpdatedOn,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn WHERE Id =@Id   ";
+        const string DisassemblyUpdateSql = "UPDATE manu_sfc_circulation SET " +
+            "CirculationType = @CirculationType, IsDisassemble = @IsDisassemble," +
+            "DisassembledBy = @UserId, DisassembledOn = @UpdatedOn, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn WHERE Id = @Id AND IsDisassemble <> @IsDisassemble ";
 
         const string GetReportPagedInfoDataSqlTemplate = @"
                 SELECT 

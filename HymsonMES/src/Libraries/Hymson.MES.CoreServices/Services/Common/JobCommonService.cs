@@ -1,9 +1,10 @@
 ﻿using Hymson.MES.Core.Domain.Integrated;
-using Hymson.MES.Services.Dtos.Common;
-using Hymson.MES.Services.Services.Job.Manufacture;
+using Hymson.MES.CoreServices.Bos;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Microsoft.Extensions.DependencyInjection;
+using System.Text.RegularExpressions;
 
-namespace Hymson.MES.Services.Services.Job.Common
+namespace Hymson.MES.CoreServices.Services.Common
 {
     /// <summary>
     /// 生产通用
@@ -54,6 +55,44 @@ namespace Hymson.MES.Services.Services.Job.Common
             return result;
         }
 
+        /// <summary>
+        /// 查询类
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<JobClassBo>> GetJobClassBoListAsync()
+        {
+            // 获取所有实现类
+            var services = _serviceProvider.GetServices<IJobManufactureService>();
+            return await Task.FromResult(services.Select(s =>
+            {
+                var type = s.GetType();
+                var classModule = Regex.Replace(type.Module.Name, ".dll", "");
+                return new JobClassBo
+                {
+                    ClassName = type.Name,
+                    ClassNamespace = type.Namespace ?? "",
+                    ClassModule = classModule
+                };
+            }));
+        }
+
+        /// <summary>
+        /// 查询类
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<SelectOptionDto>> GetClassProgramOptionsAsync()
+        {
+            var services = await GetJobClassBoListAsync();
+            return services.Select(s =>
+            {
+                return new SelectOptionDto
+                {
+                    Key = $"{s.ClassName}",
+                    Label = $"【{s.ClassModule}】 {s.ClassName}",
+                    Value = $"{s.ClassName}"
+                };
+            });
+        }
 
     }
 }

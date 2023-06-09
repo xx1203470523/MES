@@ -1,5 +1,5 @@
 using Hymson.Infrastructure;
-using Hymson.MES.Services.Dtos.Common;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
 using Microsoft.AspNetCore.Mvc;
@@ -66,7 +66,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [Route("create")]
         public async Task AddManuContainerPackAsync([FromBody] ManuContainerPackCreateDto parm)
         {
-             await _manuContainerPackService.CreateManuContainerPackAsync(parm);
+            await _manuContainerPackService.CreateManuContainerPackAsync(parm);
         }
 
         /// <summary>
@@ -78,31 +78,31 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [Route("update")]
         public async Task UpdateManuContainerPackAsync([FromBody] ManuContainerPackModifyDto parm)
         {
-             await _manuContainerPackService.ModifyManuContainerPackAsync(parm);
+            await _manuContainerPackService.ModifyManuContainerPackAsync(parm);
         }
 
         /// <summary>
         /// 删除（容器装载表（物理删除））
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        [HttpDelete]
+        [HttpPost]
         [Route("delete")]
-        public async Task DeleteManuContainerPackAsync([FromBody] long[] ids)
+        public async Task DeleteManuContainerPackAsync(ManuContainerPackUnpackDto param)
         {
-            await _manuContainerPackService.DeletesManuContainerPackAsync(ids);
+            await _manuContainerPackService.DeletesManuContainerPackAsync(param);
         }
 
         /// <summary>
         /// 根据容器Id 删除所有容器装载记录（物理删除）
         /// </summary>
-        /// <param name="containerBarCodeId"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        [HttpDelete]
+        [HttpPost]
         [Route("deleteAll")]
-        public async Task DeleteManuContainerPackAsync([FromBody] long containerBarCodeId)
+        public async Task DeleteManuContainerPackAsync( ContainerUnpackDto param)
         {
-            await _manuContainerPackService.DeleteAllByContainerBarCodeIdAsync(containerBarCodeId);
+            await _manuContainerPackService.DeleteAllByContainerBarCodeIdAsync(param);
         }
 
         #endregion

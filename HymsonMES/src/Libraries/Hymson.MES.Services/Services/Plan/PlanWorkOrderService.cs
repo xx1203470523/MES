@@ -243,20 +243,24 @@ namespace Hymson.MES.Services.Services.Plan
 
             #endregion
 
-            List<PlanWorkOrderEntity> planWorkOrderEntities = new List<PlanWorkOrderEntity>();
+            List<UpdateStatusCommand> planWorkOrderEntities = new List<UpdateStatusCommand>();
             List<long> updateWorkOrderRealEndList = new List<long>();
             List<long> deleteActivationWorkOrderIds = new List<long>();//需要取消激活工单
 
             foreach (var item in parms)
             {
-                planWorkOrderEntities.Add(new PlanWorkOrderEntity()
+                var workOrder = workOrders.FirstOrDefault(x => x.Id == item.Id);
+                if (workOrder != null)
                 {
-                    Id = item.Id,
-                    Status = item.Status,
-
-                    UpdatedBy = _currentUser.UserName,
-                    UpdatedOn = HymsonClock.Now()
-                });
+                    planWorkOrderEntities.Add(new UpdateStatusCommand()
+                    {
+                        Id = item.Id,
+                        Status = item.Status,
+                        BeforeStatus = workOrder.Status,
+                        UpdatedBy = _currentUser.UserName,
+                        UpdatedOn = HymsonClock.Now()
+                    });
+                }
 
                 //对是需要修改为关闭状态的做特殊处理： 给 工单记录表 更新 真实结束时间
                 if (item.Status == PlanWorkOrderStatusEnum.Closed) 
@@ -314,6 +318,10 @@ namespace Hymson.MES.Services.Services.Plan
             using (TransactionScope ts = new TransactionScope())
             {
                 var response = await _planWorkOrderRepository.ModifyWorkOrderStatusAsync(planWorkOrderEntities);
+                if (response != planWorkOrderEntities.Count)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16037));
+                }
 
                 if (updateWorkOrderRealEndList.Any()) //对是需要修改为关闭状态的做特殊处理： 给 工单记录表 更新 真实结束时间
                 {
@@ -361,7 +369,7 @@ namespace Hymson.MES.Services.Services.Plan
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
 
-            #region//判断订单是否可以继续修改为锁定/解锁
+            #region//判断订单是否可以继续修改为锁定/解锁  且组装数据
             //查询需要改变的工单
             var workOrders = await _planWorkOrderRepository.GetByIdsAsync(parms.Select(x => x.Id).ToArray());
             if (workOrders == null || workOrders.Count() == 0 || workOrders.Any(x => x.IsDeleted > 0) || workOrders.Count() != parms.Count())
@@ -369,41 +377,55 @@ namespace Hymson.MES.Services.Services.Plan
                 throw new CustomerValidationException(nameof(ErrorCode.MES16014));
             }
 
+            List<UpdateLockedCommand> updateLockedCommands = new List<UpdateLockedCommand>();
+
             if (parms.First().IsLocked == YesOrNoEnum.Yes) //需要修改为锁定
             {
+                if (workOrders.Any(x=>x.Status != PlanWorkOrderStatusEnum.InProduction))//判断是否有不是生产中的则无法更改为锁定
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16007));
+                }
+
                 foreach (var item in workOrders)
                 {
-                    if (item.Status != PlanWorkOrderStatusEnum.InProduction)//判断是否有不是生产中的则无法更改为锁定
+                    updateLockedCommands.Add(new UpdateLockedCommand()
                     {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES16007));
-                    }
+                        Id = item.Id,
+                        Status = PlanWorkOrderStatusEnum.Pending,
+                        LockedStatus =item.Status,
+
+                        UpdatedBy = _currentUser.UserName,
+                        UpdatedOn = HymsonClock.Now()
+                    });
                 }
             }
             else  //解锁操作
             {
+                if (workOrders.Any(x => x.Status != PlanWorkOrderStatusEnum.Pending))//判断是否是锁定中
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16008));
+                }
+
+                if (workOrders.Any(x => !x.LockedStatus.HasValue))//判断是否锁定前是否有值
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16015));
+                }
+
                 foreach (var item in workOrders)
                 {
-                    if (item.IsLocked != YesOrNoEnum.Yes)//判断是否是锁定中
+                    updateLockedCommands.Add(new UpdateLockedCommand()
                     {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES16008));
-                    }
+                        Id = item.Id,
+                        Status = item.LockedStatus.Value,
+                        LockedStatus = null,
+
+                        UpdatedBy = _currentUser.UserName,
+                        UpdatedOn = HymsonClock.Now()
+                    });
                 }
             }
 
             #endregion
-
-            List<PlanWorkOrderEntity> planWorkOrderEntities = new List<PlanWorkOrderEntity>();
-            foreach (var item in parms)
-            {
-                planWorkOrderEntities.Add(new PlanWorkOrderEntity()
-                {
-                    Id = item.Id,
-                    IsLocked = item.IsLocked,
-
-                    UpdatedBy = _currentUser.UserName,
-                    UpdatedOn = HymsonClock.Now()
-                });
-            }
 
             //组装工单状态变化记录
             List<PlanWorkOrderStatusRecordEntity> planWorkOrderStatusRecordEntities = new List<PlanWorkOrderStatusRecordEntity>();
@@ -423,7 +445,7 @@ namespace Hymson.MES.Services.Services.Plan
 
             using (TransactionScope ts = new TransactionScope())
             {
-                var response = await _planWorkOrderRepository.ModifyWorkOrderLockedAsync(planWorkOrderEntities);
+                var response = await _planWorkOrderRepository.ModifyWorkOrderLockedAsync(updateLockedCommands);
 
                 await _planWorkOrderStatusRecordRepository.InsertsAsync(planWorkOrderStatusRecordEntities);//新增工单变化记录表
 

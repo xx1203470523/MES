@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Services.Plan;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Plan
@@ -45,12 +46,16 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("条码打印", BusinessType.INSERT)]
+        [PermissionDescription("plan:sfcPrint:insert")]
         public async Task CreateAsync([FromBody] PlanSfcPrintCreateDto createDto)
         {
             await _planSfcPrintService.CreateAsync(createDto);
         }
+
         [HttpPost]
         [Route("print")]
+        [PermissionDescription("plan:sfcPrint:print")]
         public async Task PrintAsync([FromBody] PlanSfcPrintCreatePrintDto createDto)
         {
             await _planSfcPrintService.CreatePrintAsync(createDto);
@@ -63,6 +68,8 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("条码打印", BusinessType.DELETE)]
+        [PermissionDescription("plan:sfcPrint:delete")]
         public async Task DeletesAsync(long[] ids)
         {
             await _planSfcPrintService.DeletesAsync(ids);

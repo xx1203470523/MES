@@ -12,6 +12,8 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Bos.Manufacture;
+using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
@@ -24,7 +26,6 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
-using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
@@ -79,9 +80,14 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IPlanWorkOrderActivationRepository _planWorkOrderActivationRepository;
 
         /// <summary>
-        /// 
+        /// 服务接口（生产通用）
         /// </summary>
         private readonly IManuCommonService _manuCommonService;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly IManuCommonOldService _manuCommonOldService;
 
         /// <summary>
         /// 工单信息表 仓储
@@ -155,6 +161,31 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <summary>
         /// 构造函数
         /// </summary>
+        /// <param name="currentUser"></param>
+        /// <param name="currentSite"></param>
+        /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="manuSfcStepRepository"></param>
+        /// <param name="resourceRepository"></param>
+        /// <param name="manuSfcRepository"></param>
+        /// <param name="planWorkOrderActivationRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
+        /// <param name="manuCommonService"></param>
+        /// <param name="manuCommonOldService"></param>
+        /// <param name="procProcessRouteDetailNodeRepository"></param>
+        /// <param name="procProcedureRepository"></param>
+        /// <param name="localizationService"></param>
+        /// <param name="manuContainerPackRepository"></param>
+        /// <param name="manuSfcInfoRepository"></param>
+        /// <param name="whMaterialInventoryRepository"></param>
+        /// <param name="whMaterialInventoryService"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="procProcessRouteDetailLinkRepository"></param>
+        /// <param name="whMaterialStandingbookRepository"></param>
+        /// <param name="procProcessRouteRepository"></param>
+        /// <param name="procBomRepository"></param>
+        /// <param name="validationLockRules"></param>
+        /// <param name="validationModifyRules"></param>
+        /// <param name="logger"></param>
         public ManuSfcProduceService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcStepRepository manuSfcStepRepository,
@@ -163,6 +194,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IManuCommonService manuCommonService,
+            IManuCommonOldService manuCommonOldService,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
             IProcProcedureRepository procProcedureRepository,
             ILocalizationService localizationService,
@@ -188,6 +220,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _manuCommonService = manuCommonService;
+            _manuCommonOldService = manuCommonOldService;
             _procProcedureRepository = procProcedureRepository;
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
             _localizationService = localizationService;
@@ -400,7 +433,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 }
 
                 //验证将来锁工序是否在条码所在工序之后
-                if (await _manuCommonService.IsProcessStartBeforeEndAsync(sfcEntity.ProcessRouteId, sfcEntity.ProcedureId, parm.LockProductionId))
+                if (await _manuCommonOldService.IsProcessStartBeforeEndAsync(sfcEntity.ProcessRouteId, sfcEntity.ProcedureId, parm.LockProductionId))
                 {
                     var validationFailure = new ValidationFailure();
                     if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
@@ -822,7 +855,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 Sfcs = sfcs,
                 UserId = _currentUser.UserName,
                 UpdatedOn = HymsonClock.Now(),
-                IsScrap = TrueOrFalseEnum.Yes
+                IsScrap = TrueOrFalseEnum.Yes,
+                CurrentIsScrap = TrueOrFalseEnum.No
             };
             var manuSfcInfoUpdate = new ManuSfcUpdateCommand
             {
@@ -910,14 +944,17 @@ namespace Hymson.MES.Services.Services.Manufacture
             var sfcStepList = GetSfcStepList(manuSfcs, parm.Remark ?? "", ManuSfcStepTypeEnum.CancelDiscard);
 
             var sfcs = manuSfcs.Select(a => a.SFC).ToArray();
+            //把更改前的状态作为状态传入
             var isScrapCommand = new UpdateIsScrapCommand
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 Sfcs = sfcs,
                 UserId = _currentUser.UserName,
                 UpdatedOn = HymsonClock.Now(),
-                IsScrap = TrueOrFalseEnum.No
+                IsScrap = TrueOrFalseEnum.No,
+                CurrentIsScrap = TrueOrFalseEnum.Yes
             };
+
             var manuSfcInfoUpdate = new ManuSfcUpdateCommand
             {
                 Sfcs = sfcs,
@@ -931,14 +968,20 @@ namespace Hymson.MES.Services.Services.Manufacture
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
-                //1.插入数据操作类型为取消报废
+                //1.修改在制品表,IsScrap
+                rows += await _manuSfcProduceRepository.UpdateIsScrapAsync(isScrapCommand);
+                if (rows < sfcs.Count())
+                {
+                    //报错
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15412)).WithData("sfcs", string.Join("','", sfcs));
+                }
+
+                //2.条码信息表状态更改
+                rows += await _manuSfcRepository.UpdateStatusAsync(manuSfcInfoUpdate);
+
+                //3.插入数据操作类型为取消报废
                 rows += await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
 
-                //2.修改在制品表,IsScrap
-                rows += await _manuSfcProduceRepository.UpdateIsScrapAsync(isScrapCommand);
-
-                //3.条码信息表
-                rows += await _manuSfcRepository.UpdateStatusAsync(manuSfcInfoUpdate);
                 trans.Complete();
             }
         }
@@ -1184,7 +1227,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             //}
             //var processRouteId = processRouteIds.FirstOrDefault();
             ////获取工艺路线节点
-            //var processRouteNodes = await _manuCommonService.GetProcessRoute(processRouteId);
+            //var processRouteNodes = await _manuCommonOldService.GetProcessRoute(processRouteId);
             //if (processRouteNodes == null || processRouteIds.Count() == 0)
             //{
             //    throw new CustomerValidationException(nameof(ErrorCode.MES18005));
@@ -1360,8 +1403,13 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES18006)).WithData("SFC", string.Join(",", differentSfcs));
             }
 
-            //验证条码锁定
-            await _manuCommonService.VerifySfcsLockAsync(manuSfcs, procedureId);
+            // 验证条码锁定
+            await _manuCommonService.VerifySfcsLockAsync(new ManuProcedureBo
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                SFCs = manuSfcs,
+                ProcedureId = procedureId
+            });
 
             //这个是物料删除 所以查到就是有锁
             //var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = manuSfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
@@ -1409,7 +1457,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             var processRouteId = processRouteIds.FirstOrDefault();
             //获取工艺路线节点
-            var processRouteNodes = await _manuCommonService.GetProcessRouteAsync(processRouteId);
+            var processRouteNodes = await _manuCommonOldService.GetProcessRouteAsync(processRouteId);
             if (processRouteNodes == null || processRouteIds.Count() == 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18005));
@@ -1748,6 +1796,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             await _manuSfcProduceRepository.UpdateProcedureAndStatusRangeAsync(new UpdateProcedureAndStatusCommand
                             {
                                 SiteId = _currentSite.SiteId ?? 0,
+                                ResourceId = null,
                                 Sfcs = sfcsArray,
                                 ProcedureId = sfcProduceStepDto.ProcedureId,
                                 Status = sfcProduceStepDto.Type,
@@ -1766,6 +1815,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         {
                             SiteId = _currentSite.SiteId ?? 0,
                             Sfcs = sfcsArray,
+                            ResourceId = null,
                             ProcedureId = sfcProduceStepDto.ProcedureId,
                             Status = sfcProduceStepDto.Type,
                             UpdatedOn = HymsonClock.Now(),
@@ -1912,7 +1962,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             // 验证条码锁定
-            await _manuCommonService.VerifySfcsLockAsync(sfcs, procedureId);
+            await _manuCommonService.VerifySfcsLockAsync(new ManuProcedureBo
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                SFCs = sfcs,
+                ProcedureId = procedureId
+            });
 
             //这个是物料删除 所以查到就是有锁
             //var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
@@ -1929,7 +1984,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var WorkOrderIds = manuSfcProduces.Select(it => it.WorkOrderId).ToArray();
             var workOrders = await _planWorkOrderRepository.GetByIdsAsync(WorkOrderIds);
             PlanWorkOrderStatusEnum[] statusArr = { PlanWorkOrderStatusEnum.NotStarted, PlanWorkOrderStatusEnum.Finish, PlanWorkOrderStatusEnum.Closed };
-            var workOrdersOrLosck = workOrders.Where(it => statusArr.Contains(it.Status) || it.IsLocked == YesOrNoEnum.Yes);
+            var workOrdersOrLosck = workOrders.Where(it => statusArr.Contains(it.Status) || it.Status == PlanWorkOrderStatusEnum.Pending);
             if (workOrdersOrLosck.Any())
             {
                 var sfcInfoIds = manuSfcProduces.Where(it => workOrdersOrLosck.Where(order => order.Id == it.WorkOrderId).Any()).Select(it => it.SFC).ToArray();
@@ -1974,7 +2029,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var newPlanWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuUpdateSaveDto.WorkOrderId);
 
             PlanWorkOrderStatusEnum[] statusArr = { PlanWorkOrderStatusEnum.NotStarted, PlanWorkOrderStatusEnum.Finish, PlanWorkOrderStatusEnum.Closed };
-            var workOrdersOrLosck = statusArr.Contains(newPlanWorkOrderEntity.Status) || newPlanWorkOrderEntity.IsLocked == YesOrNoEnum.Yes;
+            var workOrdersOrLosck = statusArr.Contains(newPlanWorkOrderEntity.Status) || newPlanWorkOrderEntity.Status == PlanWorkOrderStatusEnum.Pending;
             if (workOrdersOrLosck)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18209)).WithData("Code", newPlanWorkOrderEntity.OrderCode);
@@ -2100,7 +2155,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
             long id = 0;
             //获取工艺路线节点
-            var processRouteNodes = await _manuCommonService.GetProcessRouteAsync(processRouteId);
+            var processRouteNodes = await _manuCommonOldService.GetProcessRouteAsync(processRouteId);
             if (processRouteNodes.Any())
             {
                 id = processRouteNodes?.FirstOrDefault()?.ProcedureIds.Last() ?? 0;
@@ -2164,7 +2219,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var sfcProcedureIds = sfcList.Select(x => x.ProcedureId).Distinct().ToList();
 
             //判断将来工序是不是工艺路线上的工序，而且是选择的条码的接下来的工序
-            var processRouteNodes = await _manuCommonService.GetProcessRouteAsync(processRouteId);
+            var processRouteNodes = await _manuCommonOldService.GetProcessRouteAsync(processRouteId);
             if (processRouteNodes == null || !processRouteNodes.Any())
             {
                 var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(lockProductionId);

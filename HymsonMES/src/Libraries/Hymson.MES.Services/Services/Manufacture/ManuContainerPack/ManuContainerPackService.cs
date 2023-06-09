@@ -10,15 +10,16 @@ using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.Collections.Generic;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -41,6 +42,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IManuContainerPackRepository _manuContainerPackRepository;
         private readonly IProcMaterialRepository _procMaterialRepository;
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
+        /// <summary>
+        /// 容器装载记录 仓储
+        /// </summary>
+        private readonly IManuContainerPackRecordRepository _manuContainerPackRecordRepository;
+
         private readonly AbstractValidator<ManuContainerPackCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ManuContainerPackModifyDto> _validationModifyRules;
         private readonly IManuContainerPackRecordService _manuContainerPackRecordService;
@@ -48,12 +54,21 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// 接口（操作面板按钮）
         /// </summary>
         private readonly IManuFacePlateButtonService _manuFacePlateButtonService;
+        private readonly IManuSfcStepRepository _manuSfcStepRepository;
+        private readonly IManuSfcRepository _manuSfcRepository;
+        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
+        private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
         public ManuContainerPackService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuContainerBarcodeRepository manuContainerBarcodeRepository,
             IManuContainerPackRepository manuContainerPackRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IManuContainerPackRecordService manuContainerPackRecordService,
+            IManuContainerPackRecordRepository manuContainerPackRecordRepository,
+            IManuSfcStepRepository manuSfcStepRepository,
+            IManuSfcRepository manuSfcRepository,
+            IManuSfcInfoRepository manuSfcInfoRepository,
+            IManuSfcProduceRepository manuSfcProduceRepository,
             AbstractValidator<ManuContainerPackCreateDto> validationCreateRules,
             AbstractValidator<ManuContainerPackModifyDto> validationModifyRules,
             IProcMaterialRepository procMaterialRepository,
@@ -67,6 +82,11 @@ namespace Hymson.MES.Services.Services.Manufacture
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _procMaterialRepository = procMaterialRepository;
+            _manuContainerPackRecordRepository = manuContainerPackRecordRepository;
+            _manuSfcStepRepository = manuSfcStepRepository;
+            _manuSfcInfoRepository = manuSfcInfoRepository;
+            _manuSfcRepository = manuSfcRepository;
+            _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuFacePlateButtonService = manuFacePlateButtonService;
             _manuContainerPackRecordService = manuContainerPackRecordService;
         }
@@ -113,45 +133,175 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> DeletesManuContainerPackAsync(long[] ids)
+        public async Task DeletesManuContainerPackAsync(ManuContainerPackUnpackDto param)
         {
-            return await _manuContainerPackRepository.DeleteTrueAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
+            var manuContainerPackList = await _manuContainerPackRepository.GetByIdsAsync(param.Ids);
+            if (manuContainerPackList == null || !manuContainerPackList.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16732));
+            }
+            var manuContainerBarcodeEntity = await _manuContainerBarcodeRepository.GetByIdAsync(manuContainerPackList.FirstOrDefault().ContainerBarCodeId);
+
+            IEnumerable<ManuSfcEntity> manuSfclist = new List<ManuSfcEntity>();
+            IEnumerable<ManuSfcInfoEntity> manuSfcInfolist = new List<ManuSfcInfoEntity>();
+            IEnumerable<ManuSfcProduceEntity> manuSfcProduceList = new List<ManuSfcProduceEntity>();
+            if (manuContainerBarcodeEntity.PackLevel == (int)LevelEnum.One)
+            {
+                manuSfclist = await _manuSfcRepository.GetBySFCsAsync(manuContainerPackList.Select(x => x.LadeBarCode));
+                var manuSfcInfolistTask = _manuSfcInfoRepository.GetBySFCIdsAsync(manuSfclist.Select(x => x.Id));
+                var manuSfcProduceListTask = _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery
+                {
+                    Sfcs = manuContainerPackList.Select(x => x.LadeBarCode),
+                    SiteId = _currentSite.SiteId ?? 0
+                });
+                manuSfcInfolist = await manuSfcInfolistTask;
+                manuSfcProduceList = await manuSfcProduceListTask;
+            }
+            var manuSfcStepList = new List<ManuSfcStepEntity>();
+            var lst = new List<ManuContainerPackRecordEntity>();
+            foreach (var item in manuContainerPackList)
+            {
+                lst.Add(new ManuContainerPackRecordEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = item.SiteId,
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName,
+                    ResourceId = param.ResourceId ?? 0,
+                    ProcedureId = param.ProcedureId ?? 0,
+                    ContainerBarCodeId = item.ContainerBarCodeId,
+                    LadeBarCode = item.LadeBarCode,
+                    OperateType = (int)ManuContainerBarcodeOperateTypeEnum.Unload
+                });
+
+                if (manuContainerBarcodeEntity.PackLevel == (int)LevelEnum.One)
+                {
+                    var manuSfcEntity = manuSfclist.FirstOrDefault(x => x.SFC == item.LadeBarCode);
+                    if (manuSfcEntity != null)
+                    {
+                        var manuSfcInfoEntity = manuSfcInfolist.FirstOrDefault(x => x.SfcId == manuSfcEntity.Id);
+                        if (manuSfcInfoEntity != null)
+                        {
+                            var manuSfcProduceEntity = manuSfcProduceList.FirstOrDefault(x => x.SFC == item.LadeBarCode);
+                            manuSfcStepList.Add(new ManuSfcStepEntity
+                            {
+                                Id = IdGenProvider.Instance.CreateId(),
+                                SiteId = _currentSite.SiteId ?? 0,
+                                CreatedBy = _currentUser.UserName,
+                                UpdatedBy = _currentUser.UserName,
+                                SFC = item.LadeBarCode,
+                                ProductId = manuSfcInfoEntity.ProductId,
+                                WorkOrderId = manuSfcInfoEntity.WorkOrderId,
+                                ResourceId = param.ResourceId,
+                                ProcedureId = param.ProcedureId,
+                                Operatetype = ManuSfcStepTypeEnum.Unpack,
+                                Qty = manuSfcEntity.Qty,
+                                WorkCenterId = manuSfcProduceEntity == null ? null : manuSfcProduceEntity.WorkCenterId,
+                                ProductBOMId = manuSfcProduceEntity == null ? null : manuSfcProduceEntity.WorkCenterId,
+                                CurrentStatus = manuSfcProduceEntity == null ? SfcProduceStatusEnum.Complete : manuSfcProduceEntity.Status
+                            });
+                        }
+                    }
+                }
+            }
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            {
+                if (manuSfcStepList != null && manuSfcStepList.Any())
+                {
+                    await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
+                }
+                await _manuContainerPackRecordRepository.InsertsAsync(lst);
+                await _manuContainerPackRepository.DeleteTrueAsync(new DeleteCommand { Ids = param.Ids, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
+                ts.Complete();
+            }
         }
 
         /// <summary>
         /// 根据容器Id 删除所有容器装载记录（物理删除）
         /// </summary>
-        /// <param name="containerBarCodeId"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task DeleteAllByContainerBarCodeIdAsync(long containerBarCodeId)
+        public async Task DeleteAllByContainerBarCodeIdAsync(ContainerUnpackDto param)
         {
+            var manuContainerBarcodeEntity = await _manuContainerBarcodeRepository.GetByIdAsync(param.ContainerBarCodeId);
+
+            var manuContainerPackList = await _manuContainerPackRepository.GetByContainerBarCodeIdIdAsync(param.ContainerBarCodeId);
+            IEnumerable<ManuSfcEntity> manuSfclist = new List<ManuSfcEntity>();
+            IEnumerable<ManuSfcInfoEntity> manuSfcInfolist = new List<ManuSfcInfoEntity>();
+            IEnumerable<ManuSfcProduceEntity> manuSfcProduceList = new List<ManuSfcProduceEntity>();
+            if (manuContainerBarcodeEntity.PackLevel == (int)LevelEnum.One)
+            {
+                manuSfclist = await _manuSfcRepository.GetBySFCsAsync(manuContainerPackList.Select(x => x.LadeBarCode));
+                var manuSfcInfolistTask = _manuSfcInfoRepository.GetBySFCIdsAsync(manuSfclist.Select(x => x.Id));
+                var manuSfcProduceListTask = _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery
+                {
+                    Sfcs = manuContainerPackList.Select(x => x.LadeBarCode),
+                    SiteId = _currentSite.SiteId ?? 0
+                });
+                manuSfcInfolist = await manuSfcInfolistTask;
+                manuSfcProduceList = await manuSfcProduceListTask;
+            }
+            var manuSfcStepList = new List<ManuSfcStepEntity>();
+            var lst = new List<ManuContainerPackRecordEntity>();
+            foreach (var item in manuContainerPackList)
+            {
+                lst.Add(new ManuContainerPackRecordEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = item.SiteId,
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName,
+                    ResourceId = param.ResourceId ?? 0,
+                    ProcedureId = param.ProcedureId ?? 0,
+                    ContainerBarCodeId = item.ContainerBarCodeId,
+                    LadeBarCode = item.LadeBarCode,
+                    OperateType = (int)ManuContainerBarcodeOperateTypeEnum.Unload
+                });
+
+                if (manuContainerBarcodeEntity.PackLevel == (int)LevelEnum.One)
+                {
+                    var manuSfcEntity = manuSfclist.FirstOrDefault(x => x.SFC == item.LadeBarCode);
+                    if (manuSfcEntity != null)
+                    {
+                        var manuSfcInfoEntity = manuSfcInfolist.FirstOrDefault(x => x.SfcId == manuSfcEntity.Id);
+                        if (manuSfcInfoEntity != null)
+                        {
+                            var manuSfcProduceEntity = manuSfcProduceList.FirstOrDefault(x => x.SFC == item.LadeBarCode);
+                            manuSfcStepList.Add(new ManuSfcStepEntity
+                            {
+                                Id = IdGenProvider.Instance.CreateId(),
+                                SiteId = _currentSite.SiteId ?? 0,
+                                CreatedBy = _currentUser.UserName,
+                                UpdatedBy = _currentUser.UserName,
+                                SFC = item.LadeBarCode,
+                                ProductId = manuSfcInfoEntity.ProductId,
+                                WorkOrderId = manuSfcInfoEntity.WorkOrderId,
+                                ResourceId = param.ResourceId,
+                                ProcedureId = param.ProcedureId,
+                                Operatetype = ManuSfcStepTypeEnum.Unpack,
+                                Qty = manuSfcEntity.Qty,
+                                WorkCenterId = manuSfcProduceEntity == null ? null : manuSfcProduceEntity.WorkCenterId,
+                                ProductBOMId = manuSfcProduceEntity == null ? null : manuSfcProduceEntity.WorkCenterId,
+                                CurrentStatus = manuSfcProduceEntity == null ? SfcProduceStatusEnum.Complete : manuSfcProduceEntity.Status
+                            });
+                        }
+                    }
+                }
+            }
             //生成删除记录
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
-                await _manuContainerPackRepository.GetByContainerBarCodeIdAsync(containerBarCodeId, _currentSite.SiteId ?? 0).ContinueWith(async t =>
+                if (manuSfcStepList != null && manuSfcStepList.Any())
                 {
-                    var packs = t.Result.Select(m =>
-                    {
-                        return new ManuContainerPackRecordCreateDto()
-                        {
-                            ResourceId = m.ResourceId,
-                            ProcedureId = m.ProcedureId,
-                            ContainerBarCodeId = m.ContainerBarCodeId,
-                            LadeBarCode = m.LadeBarCode,
-                            OperateType = (int)ManuContainerBarcodeOperateTypeEnum.Unload
-                        };
-                    });
-                    await _manuContainerPackRecordService.CreateManuContainerPackRecordsAsync(packs.ToList());
-
-                });
-                await _manuContainerPackRepository.DeleteAllAsync(containerBarCodeId);
+                    await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
+                }
+                await _manuContainerPackRecordRepository.InsertsAsync(lst);
+                await _manuContainerPackRepository.DeleteAllAsync(param.ContainerBarCodeId);
                 ts.Complete();
             }
             //物理删除
-
-
         }
 
         /// <summary>
@@ -171,22 +321,25 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             var containerPackEntities = new List<ManuContainerPackEntity>();
             var barCodes = manuContainerPackDtos.Select(x => x.LadeBarCode).ToArray();
-            var packBarCodesEntities = await _manuContainerBarcodeRepository.GetByCodesAsync(new ManuContainerBarcodeQuery
+            IEnumerable<ManuContainerBarcodeEntity> packBarCodesEntities = new List<ManuContainerBarcodeEntity>();
+            if (barCodes.Any())
             {
-                BarCodes = barCodes,
-                SiteId = _currentSite.SiteId ?? 0
-            });
-
-            if (packBarCodesEntities.Any())
-            {
-                var packBarCodeIds = packBarCodesEntities.Select(x => x.Id).ToArray();
-                containerPackEntities = (await _manuContainerPackRepository.GetByContainerBarCodeIdsAsync(packBarCodeIds, _currentSite.SiteId ?? 0)).ToList();
+                packBarCodesEntities = await _manuContainerBarcodeRepository.GetByCodesAsync(new ManuContainerBarcodeQuery
+                {
+                    BarCodes = barCodes,
+                    SiteId = _currentSite.SiteId ?? 0
+                });
+                if (packBarCodesEntities.Any())
+                {
+                    var packBarCodeIds = packBarCodesEntities.Select(x => x.Id).ToArray();
+                    containerPackEntities = (await _manuContainerPackRepository.GetByContainerBarCodeIdsAsync(packBarCodeIds, _currentSite.SiteId ?? 0)).ToList();
+                }
             }
 
             foreach (var item in manuContainerPackDtos)
             {
-                var barCode = packBarCodesEntities.FirstOrDefault(x => x.BarCode == item.LadeBarCode);
-                var count = barCode==null?1:  containerPackEntities.Count(x => x.ContainerBarCodeId == barCode?.Id);
+                var barCode = packBarCodesEntities?.FirstOrDefault(x => x.BarCode == item.LadeBarCode);
+                var count = barCode == null ? 1 : containerPackEntities.Count(x => x.ContainerBarCodeId == barCode?.Id);
                 item.Count = count;
             }
             return new PagedInfo<ManuContainerPackDto>(manuContainerPackDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);

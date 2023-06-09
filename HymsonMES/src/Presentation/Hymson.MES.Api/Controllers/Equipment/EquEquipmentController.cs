@@ -81,7 +81,7 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// <returns></returns>
         [Route("page")]
         [HttpGet]
-        [PermissionDescription("equ:equipment:list")]
+        //[PermissionDescription("equ:equipment:list")]
         public async Task<PagedInfo<EquEquipmentListDto>> GetPageListAsync([FromQuery] EquEquipmentPagedQueryDto pagedQueryDto)
         {
             return await _equEquipmentService.GetPagedListAsync(pagedQueryDto);
@@ -93,7 +93,6 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        [PermissionDescription("equ:equipment:detail")]
         public async Task<EquEquipmentDto> GetDetailAsync(long id)
         {
             return await _equEquipmentService.GetDetailAsync(id);

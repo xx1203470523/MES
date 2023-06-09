@@ -3,8 +3,11 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Services.Bos.Manufacture;
-using Hymson.MES.Services.Dtos.Common;
+using Hymson.MES.CoreServices.Bos.Manufacture;
+using Hymson.MES.CoreServices.Dtos.Common;
+using Hymson.MES.CoreServices.Services.Common;
+using Hymson.MES.CoreServices.Services.Common.ManuCommon;
+using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
 using Hymson.Utils;
@@ -32,6 +35,11 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         private readonly IManuCommonService _manuCommonService;
 
         /// <summary>
+        /// 服务接口（生产通用）
+        /// </summary>
+        private readonly IManuCommonOldService _manuCommonOldService;
+
+        /// <summary>
         /// 服务接口（出站）
         /// </summary>
         private readonly IManuOutStationService _manuOutStationService;
@@ -43,14 +51,17 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="manuCommonService"></param>
+        /// <param name="manuCommonOldService"></param>
         /// <param name="manuOutStationService"></param>
         public JobManuCompleteService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonService manuCommonService,
+            IManuCommonOldService manuCommonOldService,
             IManuOutStationService manuOutStationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _manuCommonService = manuCommonService;
+            _manuCommonOldService = manuCommonOldService;
             _manuOutStationService = manuOutStationService;
         }
 
@@ -90,7 +101,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             };
 
             // 获取生产条码信息
-            var (sfcProduceEntity, _) = await _manuCommonService.GetProduceSFCAsync(bo.SFC);
+            var (sfcProduceEntity, _) = await _manuCommonOldService.GetProduceSFCAsync(bo.SFC);
 
             // 合法性校验
             sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity)
@@ -98,7 +109,13 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
                             .VerifyResource(bo.ResourceId);
 
             // 验证BOM主物料数量
-            await _manuCommonService.VerifyBomQtyAsync(sfcProduceEntity.ProductBOMId, bo.ProcedureId, bo.SFC);
+            await _manuCommonService.VerifyBomQtyAsync(new ManuProcedureBomBo
+            {
+                SiteId = sfcProduceEntity.SiteId,
+                SFCs = new string[] { bo.SFC },
+                ProcedureId = bo.ProcedureId,
+                BomId = sfcProduceEntity.ProductBOMId
+            });
 
             // 出站
             _ = await _manuOutStationService.OutStationAsync(sfcProduceEntity);

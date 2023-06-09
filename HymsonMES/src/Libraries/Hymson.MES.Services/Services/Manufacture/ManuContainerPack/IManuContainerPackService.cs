@@ -6,8 +6,7 @@
  *build datetime: 2023-04-12 02:33:13
  */
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.Services.Dtos.Common;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -48,16 +47,16 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> DeletesManuContainerPackAsync(long[] ids);
+        Task DeletesManuContainerPackAsync(ManuContainerPackUnpackDto param);
 
         /// <summary>
         /// 根据容器Id 删除所有容器装载记录（物理删除）
         /// </summary>
-        /// <param name="containerBarCodeId"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task DeleteAllByContainerBarCodeIdAsync(long containerBarCodeId);
+        Task DeleteAllByContainerBarCodeIdAsync(ContainerUnpackDto param);
 
         /// <summary>
         /// 根据ID查询

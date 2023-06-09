@@ -37,6 +37,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public string? ProductName { get; set; }
 
         /// <summary>
+        /// 产品名称 对应物料版本
+        /// </summary>
+        public string ? Version { get; set; }
+
+        /// <summary>
         /// 工单ID
         /// </summary>
         public long? WorkOrderId { get; set; }
@@ -45,5 +50,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 包装等级
         /// </summary>
         public int? PackLevel { get; set; }
+
+        /// <summary>
+        /// 状态;1：打开 2：关闭
+        /// </summary>
+        public int? Status { get; set; }
     }
 }

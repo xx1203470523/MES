@@ -1,7 +1,8 @@
 ﻿using Hymson.Infrastructure;
-using Hymson.MES.Services.Dtos.Common;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated.IIntegratedService;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Integrated
@@ -37,6 +38,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpGet]
         [Route("pagelist")]
+        //[PermissionDescription("inte:workCenter:list")]
         public async Task<PagedInfo<InteWorkCenterDto>> QueryPagedInteWorkCenterAsync([FromQuery] InteWorkCenterPagedQueryDto param)
         {
             return await _inteWorkCenterService.GetPageListAsync(param);
@@ -92,6 +94,8 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="param"></param>
         /// <returns></returns>
         [HttpPost]
+        [LogDescription("工作中心", BusinessType.INSERT)]
+        [PermissionDescription("inte:workCenter:insert")]
         public async Task AddInteWorkCenterAsync([FromBody] InteWorkCenterCreateDto param)
         {
             await _inteWorkCenterService.CreateInteWorkCenterAsync(param);
@@ -103,6 +107,8 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="param"></param>
         /// <returns></returns>
         [HttpPut]
+        [LogDescription("工作中心", BusinessType.UPDATE)]
+        [PermissionDescription("inte:workCenter:update")]
         public async Task UpdateInteWorkCenterAsync([FromBody] InteWorkCenterModifyDto param)
         {
             await _inteWorkCenterService.ModifyInteWorkCenterAsync(param);
@@ -114,6 +120,8 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
+        [LogDescription("工作中心", BusinessType.DELETE)]
+        [PermissionDescription("inte:workCenter:delete")]
         public async Task DeleteInteWorkCenterAsync(long[] ids)
         {
             await _inteWorkCenterService.DeleteRangInteWorkCenterAsync(ids);

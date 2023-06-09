@@ -4,6 +4,7 @@ using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.PrintConfig;
 using Hymson.Utils;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -90,6 +91,8 @@ namespace Hymson.MES.Api.Controllers
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
+        [LogDescription("打印机配置", BusinessType.INSERT)]
+        [PermissionDescription("proc:printConfig:insert")]
         public async Task AddProcPrintConfigAsync([FromBody] ProcPrinterDto parm)
         {
             await _procPrintConfigService.AddProcPrintConfigAsync(parm);
@@ -101,6 +104,8 @@ namespace Hymson.MES.Api.Controllers
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPut]
+        [LogDescription("打印机配置", BusinessType.UPDATE)]
+        [PermissionDescription("proc:printConfig:update")]
         public async Task UpdateProcPrintConfigAsync([FromBody] ProcPrinterUpdateDto parm)
         {
             await _procPrintConfigService.UpdateProcPrintConfigAsync(parm);
@@ -112,6 +117,8 @@ namespace Hymson.MES.Api.Controllers
         /// <param name="deleteDto"></param>
         /// <returns></returns>
         [HttpDelete]
+        [LogDescription("打印机配置", BusinessType.DELETE)]
+        [PermissionDescription("proc:printConfig:delete")]
         public async Task DeleteProcPrintConfigAsync(DeleteDto deleteDto)
         {
             await _procPrintConfigService.DeleteProcPrintConfigAsync(deleteDto.Ids);

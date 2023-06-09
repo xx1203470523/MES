@@ -79,7 +79,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpGet]
         [Route("page")]
-        [PermissionDescription("equ:equipmentGroup:list")]
+        //[PermissionDescription("equ:equipmentGroup:list")]
         public async Task<PagedInfo<EquEquipmentGroupListDto>> GetPagedListAsync([FromQuery] EquEquipmentGroupPagedQueryDto pagedQueryDto)
         {
             return await _equEquipmentGroupService.GetPagedListAsync(pagedQueryDto);
@@ -91,7 +91,6 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        [PermissionDescription("equ:equipmentGroup:detail")]
         public async Task<EquEquipmentGroupDto> GetDetailAsync(long id)
         {
             return await _equEquipmentGroupService.GetDetailAsync(id);
