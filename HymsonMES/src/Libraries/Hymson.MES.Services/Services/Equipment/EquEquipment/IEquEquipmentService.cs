@@ -89,5 +89,20 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// <returns></returns>
         Task<EquEquipmentLinkHardwareDto> GetLinkHardwareForCodeAndTypeAsync(string hardwareCode, string hardwareType);
 
+
+        /// <summary>
+        /// 创建Token
+        /// </summary>
+        /// <param name="EquipmentId"></param>
+        /// <returns></returns>
+        Task<string> CreateEquEquipmentTokenAsync(long EquipmentId);
+
+        /// <summary>
+        /// 查找Token
+        /// </summary>
+        /// <param name="EquipmentId"></param>
+        /// <returns></returns>
+        Task<string> GetEquEquipmentTokenAsync(long EquipmentId);
+
     }
 }

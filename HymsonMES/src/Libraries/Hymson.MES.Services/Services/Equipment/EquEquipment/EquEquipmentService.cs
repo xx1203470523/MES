@@ -1,5 +1,6 @@
 using FluentValidation;
 using Hymson.Authentication;
+using Hymson.Authentication.JwtBearer;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
@@ -8,14 +9,18 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
 using Hymson.MES.Services.Dtos.Equipment;
+using Hymson.MES.Services.Options;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using IdGen;
+using Microsoft.Extensions.Options;
 using System.Data.SqlTypes;
 
 namespace Hymson.MES.Services.Services.Equipment.EquEquipment
@@ -58,6 +63,13 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         private readonly IEquEquipmentLinkHardwareRepository _equEquipmentLinkHardwareRepository;
 
         /// <summary>
+        /// 仓储（设备Token）
+        /// </summary>
+        private readonly IEquEquipmentTokenRepository _equEquipmentTokenRepository;
+
+        private readonly JwtOptions _jwtOptions;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentSite"></param>
@@ -66,11 +78,14 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// <param name="equEquipmentRepository"></param>
         /// <param name="equEquipmentLinkApiRepository"></param>
         /// <param name="equEquipmentLinkHardwareRepository"></param>
+        /// <param name="equEquipmentTokenRepository"></param>
+        /// <param name="jwtOptions"></param>
         public EquEquipmentService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<EquEquipmentSaveDto> validationSaveRules,
             IEquEquipmentRepository equEquipmentRepository,
             IEquEquipmentLinkApiRepository equEquipmentLinkApiRepository,
-            IEquEquipmentLinkHardwareRepository equEquipmentLinkHardwareRepository)
+            IEquEquipmentLinkHardwareRepository equEquipmentLinkHardwareRepository,
+            IEquEquipmentTokenRepository equEquipmentTokenRepository, IOptions<JwtOptions> jwtOptions)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -78,6 +93,8 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             _equEquipmentRepository = equEquipmentRepository;
             _equEquipmentLinkApiRepository = equEquipmentLinkApiRepository;
             _equEquipmentLinkHardwareRepository = equEquipmentLinkHardwareRepository;
+            _equEquipmentTokenRepository = equEquipmentTokenRepository;
+            _jwtOptions = jwtOptions.Value;
         }
 
 
@@ -418,6 +435,88 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
 
             return (linkApiList, linkHardwareList);
         }
+
+        /// <summary>
+        /// 创建Token
+        /// </summary>
+        /// <param name="EquipmentId"></param>
+        /// <returns></returns>
+        public async Task<string> CreateEquEquipmentTokenAsync(long EquipmentId)
+        {
+            // 判断是否有获取到站点码 
+            if (_currentSite.SiteId == 0)
+            {
+                throw new ValidationException(nameof(ErrorCode.MES10101));
+            }
+            var equEquipmentEntity = await _equEquipmentRepository.GetByIdAsync(EquipmentId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES12604));
+            var equipmentModel = new EquipmentModel
+            {
+                FactoryId = _currentSite.SiteId ?? 0,
+                Id = equEquipmentEntity.Id,
+                Name = equEquipmentEntity.EquipmentName,
+                Code = equEquipmentEntity.EquipmentCode,
+                SiteId = _currentSite.SiteId ?? 0,
+            };
+            var token = JwtHelper.GenerateJwtToken(equipmentModel, _jwtOptions);
+
+            var expirationTime = HymsonClock.Now().AddMinutes(_jwtOptions.ExpiresMinutes);
+            var equEquipmentTokenEntity = await _equEquipmentTokenRepository.GetByEquipmentIdAsync(EquipmentId);
+            if (equEquipmentTokenEntity != null)
+            {
+                equEquipmentTokenEntity.UpdatedBy = _currentUser.UserName;
+                equEquipmentTokenEntity.UpdatedOn = HymsonClock.Now();
+                equEquipmentTokenEntity.Token = token;
+                equEquipmentTokenEntity.ExpirationTime = expirationTime;
+                await _equEquipmentTokenRepository.UpdateAsync(equEquipmentTokenEntity);
+            }
+            else
+            {
+                //DTO转换实体 
+                equEquipmentTokenEntity = new EquEquipmentTokenEntity
+                {
+                    EquipmentId = EquipmentId,
+                    Token = token,
+                    ExpirationTime = expirationTime,
+
+                    Id = IdGenProvider.Instance.CreateId(),
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName,
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedOn = HymsonClock.Now(),
+                    SiteId = _currentSite.SiteId ?? 0
+                };
+                await _equEquipmentTokenRepository.InsertAsync(equEquipmentTokenEntity);
+            }
+            return equEquipmentTokenEntity.Token;
+        }
+
+
+        /// <summary>
+        /// 查找Token
+        /// </summary>
+        /// <param name="EquipmentId"></param>
+        /// <returns></returns>
+        public async Task<string> GetEquEquipmentTokenAsync(long EquipmentId)
+        {
+            var equEquipmentTokenEntity = await _equEquipmentTokenRepository.GetByEquipmentIdAsync(EquipmentId);
+            string token;
+            if (equEquipmentTokenEntity == null)
+            {
+                token = await CreateEquEquipmentTokenAsync(EquipmentId);
+            }
+            else
+            {
+                token = equEquipmentTokenEntity.Token;
+                if (HymsonClock.Now() > equEquipmentTokenEntity.ExpirationTime)
+                {
+                    token = await CreateEquEquipmentTokenAsync(EquipmentId);
+                }
+            }
+            return token;
+        }
+
+
 
         #region 这里是供其他业务层调用的方法，个人觉得应该直接在其他业务层调用各业务仓储层
         /// <summary>
