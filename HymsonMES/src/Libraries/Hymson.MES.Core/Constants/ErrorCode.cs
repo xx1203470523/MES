@@ -84,7 +84,7 @@
         public const string MES10348 = "打印机IP重复！";
         public const string MES10349 = "模板预览内容为空！";
         public const string MES10350 = "未找到指定模板！";
-        public const string MES10356 = "上传模板到打印服务器失败,模板名称:{name}！";
+        public const string MES10356 = "获取模板上下文信息失败,模板名称:{name}！";
         #endregion
 
         #region 工序 10400
