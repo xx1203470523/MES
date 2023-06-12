@@ -41,6 +41,7 @@
         public const string MES10223 = "物料编码最大长度为50";
         public const string MES10224 = "物料名称最大长度为50";
         public const string MES10225 = "有生产中的工单引用其中的物料，不允许删除！";
+        public const string MES10226 = "数据收集方式不能为空！";
         #endregion
 
         #region 资源 10300
@@ -84,7 +85,7 @@
         public const string MES10348 = "打印机IP重复！";
         public const string MES10349 = "模板预览内容为空！";
         public const string MES10350 = "未找到指定模板！";
-        public const string MES10356 = "上传模板到打印服务器失败,模板名称:{name}！";
+        public const string MES10356 = "获取模板上下文信息失败,模板名称:{name}！";
         #endregion
 
         #region 工序 10400
@@ -303,6 +304,7 @@
         public const string MES12601 = "设备编码不能为空";
         public const string MES12602 = "设备名称不能为空";
         public const string MES12603 = "请求实体不能为空！";
+        public const string MES12604 = "设备信息不存在！";
         #endregion
 
         #region 设备组 12700

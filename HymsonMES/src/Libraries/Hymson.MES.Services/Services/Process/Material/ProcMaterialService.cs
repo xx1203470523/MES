@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 物料维护    服务 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-02-08 04:47:44
- */
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -22,7 +15,6 @@ using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using System.Security.Policy;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -48,6 +40,18 @@ namespace Hymson.MES.Services.Services.Process
 
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="currentUser"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="validationCreateRules"></param>
+        /// <param name="validationModifyRules"></param>
+        /// <param name="procReplaceMaterialRepository"></param>
+        /// <param name="currentSite"></param>
+        /// <param name="procMaterialSupplierRelationRepository"></param>
+        /// <param name="procMaskCodeRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
         public ProcMaterialService(ICurrentUser currentUser, IProcMaterialRepository procMaterialRepository,
             AbstractValidator<ProcMaterialCreateDto> validationCreateRules,
             AbstractValidator<ProcMaterialModifyDto> validationModifyRules,
@@ -68,6 +72,7 @@ namespace Hymson.MES.Services.Services.Process
             _procMaskCodeRepository = procMaskCodeRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
         }
+
 
         /// <summary>
         /// 创建
