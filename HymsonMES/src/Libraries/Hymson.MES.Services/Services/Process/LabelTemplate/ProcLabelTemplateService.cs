@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 仓库标签模板    服务 | 代码由框架生成
- *builder:  wxk
- *build datetime: 2023-03-09 02:51:26
- */
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -12,7 +5,6 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.HttpClients;
@@ -20,9 +12,7 @@ using Hymson.MES.HttpClients.Requests.Print;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process.LabelTemplate
 {
