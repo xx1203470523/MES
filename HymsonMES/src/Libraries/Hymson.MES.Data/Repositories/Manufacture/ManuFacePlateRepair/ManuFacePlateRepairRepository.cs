@@ -187,6 +187,19 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         #region 维修记录
 
+
+        /// <summary>
+        /// 根据ProductBadId批量获取维修明细数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcRepairDetailEntity>> ManuSfcRepairDetailByProductBadId(ManuSfcRepairDetailByProductBadIdQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuSfcRepairDetailEntity>(GetManuSfcRepairDetailSql, query);
+        }
+
+
         /// <summary>
         /// 新增维修记录
         /// </summary>
@@ -273,7 +286,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string InsertDetailSql = "INSERT INTO `manu_sfc_repair_detail`(  `Id`, `SiteId`, `SfcRepairId`, `ProductBadId`, `RepairMethod`, `CauseAnalyse`, `IsClose`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcRepairId, @ProductBadId, @RepairMethod, @CauseAnalyse, @IsClose, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsDetailSql = "INSERT INTO `manu_sfc_repair_detail`(  `Id`, `SiteId`, `SfcRepairId`, `ProductBadId`, `RepairMethod`, `CauseAnalyse`, `IsClose`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcRepairId, @ProductBadId, @RepairMethod, @CauseAnalyse, @IsClose, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
-
+        const string GetManuSfcRepairDetailSql = "SELECT `Id`, `SiteId`, `SfcRepairId`, `ProductBadId`, `RepairMethod`, `CauseAnalyse`, `IsClose`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted` FROM manu_sfc_repair_detail WHERE IsDeleted=0 AND SiteId=@SiteId AND  ProductBadId IN @ProductBadId";
 
         #endregion
     }

@@ -104,6 +104,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         #endregion
 
         #region 维修记录
+
+        /// <summary>
+        /// 根据ProductBadId批量获取维修明细数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcRepairDetailEntity>> ManuSfcRepairDetailByProductBadId(ManuSfcRepairDetailByProductBadIdQuery query);
+
         /// <summary>
         /// 新增维修记录
         /// </summary>
