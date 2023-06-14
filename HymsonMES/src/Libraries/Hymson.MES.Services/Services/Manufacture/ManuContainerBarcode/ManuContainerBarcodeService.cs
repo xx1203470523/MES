@@ -710,7 +710,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         }
 
         private async Task<ManuContainerBarcodeView> CreateNewBarcodeAsync(ManuContainerBarcodeEntity manuContainerBarcodeEntity,
-           long ProductId, long workorderId,
+           long productId, long workorderId,
            ProcMaterialEntity material, CreateManuContainerBarcodeDto createManuContainerBarcodeDto, int level = 1, ManuSfcStepEntity sfcStepEntity = null)
         {
             manuContainerBarcodeEntity.WorkOrderId = workorderId;
@@ -732,12 +732,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (entityByRelation != null)
             {
                 manuContainerBarcodeEntity.ContainerId = entityByRelation.Id;
-                manuContainerBarcodeEntity.ProductId = ProductId;
+                manuContainerBarcodeEntity.ProductId = productId;
 
                 //包装等级转换 程序内控制传入
                 var packType = (CodeRulePackTypeEnum)level;
                 string barcode = manuContainerBarcodeEntity.BarCode;
-                manuContainerBarcodeEntity.BarCode = await GenerateBarCode(ProductId, material, packType);
+                manuContainerBarcodeEntity.BarCode = await GenerateBarCode(productId, material, packType);
 
                 // 创建包装
                 var rows = 0;
@@ -787,7 +787,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     var entityByRelation1 = await _inteContainerRepository.GetByRelationIdAsync(new InteContainerQuery
                     {
                         DefinitionMethod = DefinitionMethodEnum.MaterialGroup,
-                         MaterialId = ProductId,
+                         MaterialId = productId,
                         MaterialGroupId = material.GroupId,
                         Status = SysDataStatusEnum.Enable,
                         Level = (LevelEnum)level
@@ -795,10 +795,10 @@ namespace Hymson.MES.Services.Services.Manufacture
                     if (entityByRelation1 != null)
                     {
                         manuContainerBarcodeEntity.ContainerId = entityByRelation1.Id;
-                        manuContainerBarcodeEntity.ProductId = ProductId;
+                        manuContainerBarcodeEntity.ProductId = productId;
                         //包装等级转换 程序内控制传入
                         var packType = (CodeRulePackTypeEnum)level;
-                        manuContainerBarcodeEntity.BarCode = await GenerateBarCode(ProductId, material, packType);
+                        manuContainerBarcodeEntity.BarCode = await GenerateBarCode(productId, material, packType);
                         //入库
                         var rows = 0;
                         using (TransactionScope trans = TransactionHelper.GetTransactionScope())
