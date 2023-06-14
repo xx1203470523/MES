@@ -344,7 +344,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             });
             if (manuProductBads == null || !manuProductBads.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES17316));
 
-            var manuSfcRepairDetailList = await _manuFacePlateRepairRepository.ManuSfcRepairDetailByProductBadId(new ManuSfcRepairDetailByProductBadIdQuery
+            var manuSfcRepairDetailList = await _manuFacePlateRepairRepository.ManuSfcRepairDetailByProductBadIdAsync(new ManuSfcRepairDetailByProductBadIdQuery
             {
                 ProductBadId = manuProductBads.Select(it => it.Id).ToArray(),
                 SiteId = _currentSite.SiteId ?? 0
@@ -480,27 +480,42 @@ namespace Hymson.MES.Services.Services.Manufacture
             #endregion
 
             #region 数据组装
+            var manuSfcRepairRecordEntity = await _manuFacePlateRepairRepository.GetManuSfcRepairBySFCAsync(new GetManuSfcRepairBySFCQuery { SFC = confirmSubmitDto.SFC, SiteId = _currentSite.SiteId ?? 0 });
             //维修记录
-            var manuSfcRepairRecordEntity = new ManuSfcRepairRecordEntity();
-            manuSfcRepairRecordEntity.SFC = confirmSubmitDto.SFC;
-            manuSfcRepairRecordEntity.WorkOrderId = manuSfcProduceEntit.WorkOrderId;
-            manuSfcRepairRecordEntity.ProductId = manuSfcProduceEntit.ProductId;
-            manuSfcRepairRecordEntity.ResourceId = confirmSubmitDto.ResourceId;
-            manuSfcRepairRecordEntity.ProcedureId = confirmSubmitDto.ProcedureId;
-            manuSfcRepairRecordEntity.ReturnProcedureId = confirmSubmitDto.ReturnProcedureId;
-            manuSfcRepairRecordEntity.Remark = confirmSubmitDto.Remark;
+            bool isAddmanuSfcRepairRecordEntity = false;
+            if (manuSfcRepairRecordEntity == null)
+            {
+                isAddmanuSfcRepairRecordEntity = true;
+                manuSfcRepairRecordEntity = new ManuSfcRepairRecordEntity();
+                //维修记录
+                manuSfcRepairRecordEntity.SFC = confirmSubmitDto.SFC;
+                manuSfcRepairRecordEntity.WorkOrderId = manuSfcProduceEntit.WorkOrderId;
+                manuSfcRepairRecordEntity.ProductId = manuSfcProduceEntit.ProductId;
+                manuSfcRepairRecordEntity.ResourceId = confirmSubmitDto.ResourceId;
+                manuSfcRepairRecordEntity.ProcedureId = confirmSubmitDto.ProcedureId;
+                manuSfcRepairRecordEntity.ReturnProcedureId = confirmSubmitDto.ReturnProcedureId;
+                manuSfcRepairRecordEntity.Remark = confirmSubmitDto.Remark;
 
-            manuSfcRepairRecordEntity.Id = IdGenProvider.Instance.CreateId();
-            manuSfcRepairRecordEntity.CreatedBy = _currentUser.UserName;
-            manuSfcRepairRecordEntity.UpdatedBy = _currentUser.UserName;
-            manuSfcRepairRecordEntity.CreatedOn = HymsonClock.Now();
-            manuSfcRepairRecordEntity.UpdatedOn = HymsonClock.Now();
-            manuSfcRepairRecordEntity.SiteId = _currentSite.SiteId ?? 0;
+                manuSfcRepairRecordEntity.Id = IdGenProvider.Instance.CreateId();
+                manuSfcRepairRecordEntity.CreatedBy = _currentUser.UserName;
+                manuSfcRepairRecordEntity.UpdatedBy = _currentUser.UserName;
+                manuSfcRepairRecordEntity.CreatedOn = HymsonClock.Now();
+                manuSfcRepairRecordEntity.UpdatedOn = HymsonClock.Now();
+                manuSfcRepairRecordEntity.SiteId = _currentSite.SiteId ?? 0;
+            }
+
+
             //不良录入
             var badRecordsList = new List<ManuProductBadRecordEntity>();
-            var manuSfcRepairDetailList = new List<ManuSfcRepairDetailEntity>();
+            var createManuSfcRepairDetailList = new List<ManuSfcRepairDetailEntity>();
+            var updateManuSfcRepairDetailList = new List<ManuSfcRepairDetailEntity>();
             var BadRecordIds = confirmSubmitDto.confirmSubmitDetail.Select(it => it.BadRecordId).ToArray();
             var badRecordList = await _manuProductBadRecordRepository.GetByIdsAsync(BadRecordIds);
+            var GetManuSfcRepairDetails = await _manuFacePlateRepairRepository.ManuSfcRepairDetailByProductBadIdAsync(new ManuSfcRepairDetailByProductBadIdQuery
+            {
+                ProductBadId = BadRecordIds,
+                SiteId = _currentSite.SiteId ?? 0
+            });
             if (badRecordList == null || !badRecordList.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17331));
@@ -583,37 +598,61 @@ namespace Hymson.MES.Services.Services.Manufacture
                     }
                 }
 
-                updateCommandList.Add(new ManuProductBadRecordUpdateCommand
+                if (item.IsClose == ProductBadRecordStatusEnum.Close)
                 {
-                    SiteId = _currentSite.SiteId ?? 0,
-                    Id = item.BadRecordId,
-                    DisposalResult = ProductBadDisposalResultEnum.repair,
-                    Remark = confirmSubmitDto.Remark ?? "",
-                    Status = ProductBadRecordStatusEnum.Close,
-                    UserId = _currentUser.UserName,
-                    UpdatedOn = HymsonClock.Now(),
-                });
-                badRecordEntit.Status = ProductBadRecordStatusEnum.Close;
-                badRecordEntit.UpdatedBy = _currentUser.UserName;
-                badRecordEntit.UpdatedOn = HymsonClock.Now();
+                    updateCommandList.Add(new ManuProductBadRecordUpdateCommand
+                    {
+                        SiteId = _currentSite.SiteId ?? 0,
+                        Id = item.BadRecordId,
+                        DisposalResult = ProductBadDisposalResultEnum.repair,
+                        Remark = confirmSubmitDto.Remark ?? "",
+                        Status = item.IsClose,// ProductBadRecordStatusEnum.Close,
+                        UserId = _currentUser.UserName,
+                        UpdatedOn = HymsonClock.Now(),
+                    });
+
+
+                    badRecordEntit.Status = item.IsClose;// ProductBadRecordStatusEnum.Close;
+                    badRecordEntit.UpdatedBy = _currentUser.UserName;
+                    badRecordEntit.UpdatedOn = HymsonClock.Now();
+                    badRecordsList.Add(badRecordEntit);
+                }
+
+                var isClose = item.IsClose == ProductBadRecordStatusEnum.Close ? ManuSfcRepairDetailIsIsCloseEnum.Close : ManuSfcRepairDetailIsIsCloseEnum.Open;
+                //维修明细
+                if (GetManuSfcRepairDetails != null && GetManuSfcRepairDetails.Any())
+                {
+                    var detail = GetManuSfcRepairDetails.Where(it => it.ProductBadId == item.BadRecordId && it.SfcRepairId == manuSfcRepairRecordEntity.Id).FirstOrDefault();
+                    if (detail != null)
+                    {
+                        detail.RepairMethod = item.RepairMethod;
+                        detail.CauseAnalyse = item.CauseAnalyse;
+                        detail.IsClose = isClose;
+                        detail.UpdatedBy = _currentUser.UserName;
+                        detail.UpdatedOn = HymsonClock.Now();
+
+                        updateManuSfcRepairDetailList.Add(detail);
+                        continue;
+                    }
+                }
 
                 //维修明细
-                ManuSfcRepairDetailEntity manuSfcRepairDetailEntity = new ManuSfcRepairDetailEntity();
-                manuSfcRepairDetailEntity.SfcRepairId = manuSfcRepairRecordEntity.Id;
-                manuSfcRepairDetailEntity.ProductBadId = item.BadRecordId;
-                manuSfcRepairDetailEntity.RepairMethod = item.RepairMethod;
-                manuSfcRepairDetailEntity.CauseAnalyse = item.CauseAnalyse;
-                manuSfcRepairDetailEntity.IsClose = ManuSfcRepairDetailIsIsCloseEnum.Close;
+                ManuSfcRepairDetailEntity manuSfcRepairDetailEntity = new ManuSfcRepairDetailEntity
+                {
+                    SfcRepairId = manuSfcRepairRecordEntity.Id,
+                    ProductBadId = item.BadRecordId,
+                    RepairMethod = item.RepairMethod,
+                    CauseAnalyse = item.CauseAnalyse,
+                    IsClose = isClose,// ManuSfcRepairDetailIsIsCloseEnum.Close,
 
-                manuSfcRepairDetailEntity.Id = IdGenProvider.Instance.CreateId();
-                manuSfcRepairDetailEntity.CreatedBy = _currentUser.UserName;
-                manuSfcRepairDetailEntity.UpdatedBy = _currentUser.UserName;
-                manuSfcRepairDetailEntity.CreatedOn = HymsonClock.Now();
-                manuSfcRepairDetailEntity.UpdatedOn = HymsonClock.Now();
-                manuSfcRepairDetailEntity.SiteId = _currentSite.SiteId ?? 0;
-
-                badRecordsList.Add(badRecordEntit);
-                manuSfcRepairDetailList.Add(manuSfcRepairDetailEntity);
+                    Id = IdGenProvider.Instance.CreateId(),
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName,
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedOn = HymsonClock.Now(),
+                    SiteId = _currentSite.SiteId ?? 0
+                };
+                createManuSfcRepairDetailList.Add(manuSfcRepairDetailEntity);
             }
             if (validationFailures.Any())
             {
@@ -674,14 +713,34 @@ namespace Hymson.MES.Services.Services.Manufacture
             using (var trans = TransactionHelper.GetTransactionScope())
             {
                 //维修记录
-                rows += await _manuFacePlateRepairRepository.InsertRecordAsync(manuSfcRepairRecordEntity);
-                //维修明细
-                rows += await _manuFacePlateRepairRepository.InsertsDetailAsync(manuSfcRepairDetailList);
-                //不良录入
-                //rows += await _manuProductBadRecordRepository.UpdateRangeAsync(badRecordsList);
-                rows += await _manuProductBadRecordRepository.UpdateStatusByIdRangeAsync(updateCommandList);
+                if (isAddmanuSfcRepairRecordEntity)
+                {
+                    rows += await _manuFacePlateRepairRepository.InsertRecordAsync(manuSfcRepairRecordEntity);
+                }
+                if (updateManuSfcRepairDetailList != null && updateManuSfcRepairDetailList.Any())
+                {
+                    //维修明细
+                    rows += await _manuFacePlateRepairRepository.UpdateDetailsAsync(updateManuSfcRepairDetailList);
+                }
+                if (createManuSfcRepairDetailList != null && createManuSfcRepairDetailList.Any())
+                {
+                    //维修明细
+                    rows += await _manuFacePlateRepairRepository.InsertsDetailAsync(createManuSfcRepairDetailList);
+                }
+                if (updateCommandList != null && updateCommandList.Any())
+                {
+                    //不良录入
+                    //rows += await _manuProductBadRecordRepository.UpdateRangeAsync(badRecordsList);
+                    rows += await _manuProductBadRecordRepository.UpdateStatusByIdRangeAsync(updateCommandList);
+                }
                 //出站 
-                rows += await _manuOutStationService.OutStationRepiarAsync(new ManufactureRepairBo { SFC = confirmSubmitDto.SFC, ProcedureId = confirmSubmitDto.ProcedureId, ReturnProcedureId = confirmSubmitDto.ReturnProcedureId, ResourceId = confirmSubmitDto.ResourceId });
+                rows += await _manuOutStationService.OutStationRepiarAsync(new ManufactureRepairBo
+                {
+                    SFC = confirmSubmitDto.SFC,
+                    ProcedureId = confirmSubmitDto.ProcedureId,
+                    ReturnProcedureId = confirmSubmitDto.ReturnProcedureId,
+                    ResourceId = confirmSubmitDto.ResourceId
+                });
                 if (confirmSubmitDto.ProcedureId == endProcessRouteDetailId)
                 {
                     //返回工序

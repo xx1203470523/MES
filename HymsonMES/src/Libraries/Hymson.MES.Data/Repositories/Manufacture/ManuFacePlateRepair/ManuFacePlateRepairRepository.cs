@@ -193,10 +193,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcRepairDetailEntity>> ManuSfcRepairDetailByProductBadId(ManuSfcRepairDetailByProductBadIdQuery query)
+        public async Task<IEnumerable<ManuSfcRepairDetailEntity>> ManuSfcRepairDetailByProductBadIdAsync(ManuSfcRepairDetailByProductBadIdQuery query)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuSfcRepairDetailEntity>(GetManuSfcRepairDetailSql, query);
+        }
+
+        /// <summary>
+        /// 根据SFC获取维修记录数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns> 
+        public async Task<ManuSfcRepairRecordEntity> GetManuSfcRepairBySFCAsync(GetManuSfcRepairBySFCQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ManuSfcRepairRecordEntity>(GetManuSfcRepairBySFCSql, query);
         }
 
 
@@ -244,6 +255,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsDetailSql, manuSfcRepairDetailEntities);
         }
+
+        /// <summary>
+        /// 批量修改维修明细
+        /// </summary>
+        /// <param name="manuFacePlateRepairEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateDetailsAsync(List<ManuSfcRepairDetailEntity> manuSfcRepairDetailEntities)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateDetailsSql, manuSfcRepairDetailEntities);
+        }
         #endregion
 
     }
@@ -282,9 +304,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         //维修记录
         const string InsertRecordSql = "INSERT INTO `manu_sfc_repair_record`(  `Id`, `SiteId`, `SFC`, `WorkOrderId`, `ProductId`, `ResourceId`, `ProcedureId`, `ReturnProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SFC, @WorkOrderId, @ProductId, @ResourceId, @ProcedureId, @ReturnProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsRecordSql = "INSERT INTO `manu_sfc_repair_record`(  `Id`, `SiteId`, `SFC`, `WorkOrderId`, `ProductId`, `ResourceId`, `ProcedureId`, `ReturnProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SFC, @WorkOrderId, @ProductId, @ResourceId, @ProcedureId, @ReturnProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string GetManuSfcRepairBySFCSql = "SELECT * FROM manu_sfc_repair_record WHERE SiteId=@SiteId AND SFC=@SFC ";
+
 
         const string InsertDetailSql = "INSERT INTO `manu_sfc_repair_detail`(  `Id`, `SiteId`, `SfcRepairId`, `ProductBadId`, `RepairMethod`, `CauseAnalyse`, `IsClose`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcRepairId, @ProductBadId, @RepairMethod, @CauseAnalyse, @IsClose, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsDetailSql = "INSERT INTO `manu_sfc_repair_detail`(  `Id`, `SiteId`, `SfcRepairId`, `ProductBadId`, `RepairMethod`, `CauseAnalyse`, `IsClose`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcRepairId, @ProductBadId, @RepairMethod, @CauseAnalyse, @IsClose, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string UpdateDetailsSql = "UPDATE `manu_sfc_repair_detail` SET  RepairMethod=@RepairMethod,CauseAnalyse=@CauseAnalyse,IsClose=@IsClose,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
+
 
         const string GetManuSfcRepairDetailSql = "SELECT `Id`, `SiteId`, `SfcRepairId`, `ProductBadId`, `RepairMethod`, `CauseAnalyse`, `IsClose`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted` FROM manu_sfc_repair_detail WHERE IsDeleted=0 AND SiteId=@SiteId AND  ProductBadId IN @ProductBadId";
 
