@@ -65,6 +65,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquFaultPhenomenonRepository, EquFaultPhenomenonRepository>();
             services.AddSingleton<IEquSparePartRepository, EquSparePartRepository>();
             services.AddSingleton<IEquSparePartTypeRepository, EquSparePartTypeRepository>();
+            services.AddSingleton<IEquEquipmentTokenRepository, EquEquipmentTokenRepository>();
 
 
             #region FaultReason

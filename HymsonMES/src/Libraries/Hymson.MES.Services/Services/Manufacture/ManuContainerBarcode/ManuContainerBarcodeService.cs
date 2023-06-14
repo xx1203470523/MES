@@ -756,15 +756,27 @@ namespace Hymson.MES.Services.Services.Manufacture
                 });
                 string barcode = manuContainerBarcodeEntity.BarCode;
                 manuContainerBarcodeEntity.BarCode = barcodeList.First();
-                //创建包装
-                using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+
+                // 创建包装
+                var rows = 0;
+                using (TransactionScope trans = TransactionHelper.GetTransactionScope())
                 {
                     if (level == 1)
                     {
                         //记录step信息
                         await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
                     }
-                    await _manuContainerBarcodeRepository.InsertAsync(manuContainerBarcodeEntity);
+                    rows += await _manuContainerBarcodeRepository.InsertAsync(manuContainerBarcodeEntity);
+
+                    // 未保存到数据，事务回滚
+                    if (rows <= 0)
+                    {
+                        trans.Dispose();
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16721))
+                            .WithData("sfc", sfcStepEntity.SFC)
+                            .WithData("barcode", barcode);
+                    }
+
                     await _manuContainerPack.CreateManuContainerPackAsync(new ManuContainerPackCreateDto()
                     {
                         ResourceId = createManuContainerBarcodeDto.ResourceId ?? 0,
@@ -780,7 +792,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         OperateType = (int)ManuContainerBarcodeOperateTypeEnum.Load,
                         LadeBarCode = barcode
                     });
-                    ts.Complete();
+                    trans.Complete();
                 }
 
                 return await GetContainerPackViewAsync(workorderId, material.Id, manuContainerBarcodeEntity, isFirstPackage, entityByRelation);
@@ -809,14 +821,25 @@ namespace Hymson.MES.Services.Services.Manufacture
                         });
                         manuContainerBarcodeEntity.BarCode = barcodeList.First();
                         //入库
-                        using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+                        var rows = 0;
+                        using (TransactionScope trans = TransactionHelper.GetTransactionScope())
                         {
                             if (level == 1)
                             {
                                 //记录step信息
                                 await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
                             }
-                            await _manuContainerBarcodeRepository.InsertAsync(manuContainerBarcodeEntity);
+                            rows += await _manuContainerBarcodeRepository.InsertAsync(manuContainerBarcodeEntity);
+
+                            // 未保存到数据，事务回滚
+                            if (rows <= 0)
+                            {
+                                trans.Dispose();
+                                throw new CustomerValidationException(nameof(ErrorCode.MES16721))
+                                    .WithData("sfc", sfcStepEntity.SFC)
+                                    .WithData("barcode", manuContainerBarcodeEntity.BarCode);
+                            }
+
                             await _manuContainerPack.CreateManuContainerPackAsync(new ManuContainerPackCreateDto()
                             {
                                 ResourceId = createManuContainerBarcodeDto.ResourceId ?? 0,
@@ -833,7 +856,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                                 LadeBarCode = manuContainerBarcodeEntity.BarCode
 
                             });
-                            ts.Complete();
+                            trans.Complete();
                         }
 
                         return await GetContainerPackViewAsync(workorderId, material.Id, manuContainerBarcodeEntity, isFirstPackage, entityByRelation1);

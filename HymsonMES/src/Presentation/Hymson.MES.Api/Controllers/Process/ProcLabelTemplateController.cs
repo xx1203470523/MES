@@ -1,18 +1,9 @@
-/*
- *creator: Karl
- *
- *describe: 仓库标签模板    控制器 | 代码由框架生成  
- *builder:  wxk
- *build datetime: 2023-03-09 02:51:26
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.LabelTemplate;
 using Hymson.Web.Framework.Attributes;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Extensions;
 
 namespace Hymson.MES.Api.Controllers.Process
 {
@@ -21,7 +12,7 @@ namespace Hymson.MES.Api.Controllers.Process
     /// @author wxk
     /// @date 2023-03-09 02:51:26
     /// </summary>
-    
+
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcLabelTemplateController : ControllerBase
@@ -76,7 +67,7 @@ namespace Hymson.MES.Api.Controllers.Process
         [PermissionDescription("proc:labelTemplate:insert")]
         public async Task AddProcLabelTemplateAsync([FromBody] ProcLabelTemplateCreateDto parm)
         {
-             await _procLabelTemplateService.CreateProcLabelTemplateAsync(parm);
+            await _procLabelTemplateService.CreateProcLabelTemplateAsync(parm);
         }
 
         /// <summary>
@@ -90,7 +81,7 @@ namespace Hymson.MES.Api.Controllers.Process
         [PermissionDescription("proc:labelTemplate:update")]
         public async Task UpdateProcLabelTemplateAsync([FromBody] ProcLabelTemplateModifyDto parm)
         {
-             await _procLabelTemplateService.ModifyProcLabelTemplateAsync(parm);
+            await _procLabelTemplateService.ModifyProcLabelTemplateAsync(parm);
         }
 
         /// <summary>
@@ -108,14 +99,14 @@ namespace Hymson.MES.Api.Controllers.Process
             await _procLabelTemplateService.DeletesProcLabelTemplateAsync(deleteDto.Ids);
         }
         [HttpGet]
-        [Route("preview/{content}")]
-        public async Task<PreviewImageDataDto> PreviewProcLabelTemplateAsync(string content)
+        [Route("preview/{id}")]
+        public async Task<PreviewImageDataDto> PreviewProcLabelTemplateAsync(long id)
         {
             //long[] idsArr = StringExtension.SpitLongArrary(ids);
-            var foo = await _procLabelTemplateService.PreviewProcLabelTemplateAsync(content);
-            return new PreviewImageDataDto() { base64Str = foo.base64Str, result = foo.result };    
+            var foo = await _procLabelTemplateService.PreviewProcLabelTemplateAsync(id);
+            return new PreviewImageDataDto() { base64Str = foo.base64Str, result = foo.result };
         }
-       
+
 
     }
 }

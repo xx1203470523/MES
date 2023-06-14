@@ -1,18 +1,8 @@
-/*
- *creator: Karl
- *
- *describe: 物料维护    控制器 | 代码由框架生成  
- *builder:  Karl
- *build datetime: 2023-02-08 04:47:44
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
-using Hymson.Utils;
 using Hymson.Web.Framework.Attributes;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Extensions;
 
 namespace Hymson.MES.Api.Controllers.Process
 {
@@ -21,7 +11,7 @@ namespace Hymson.MES.Api.Controllers.Process
     /// @author Karl
     /// @date 2023-02-08 04:47:44
     /// </summary>
-    
+
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcMaterialController : ControllerBase

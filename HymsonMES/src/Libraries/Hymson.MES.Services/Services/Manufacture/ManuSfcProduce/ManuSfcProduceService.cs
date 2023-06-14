@@ -1984,7 +1984,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var WorkOrderIds = manuSfcProduces.Select(it => it.WorkOrderId).ToArray();
             var workOrders = await _planWorkOrderRepository.GetByIdsAsync(WorkOrderIds);
             PlanWorkOrderStatusEnum[] statusArr = { PlanWorkOrderStatusEnum.NotStarted, PlanWorkOrderStatusEnum.Finish, PlanWorkOrderStatusEnum.Closed };
-            var workOrdersOrLosck = workOrders.Where(it => statusArr.Contains(it.Status) || it.IsLocked == YesOrNoEnum.Yes);
+            var workOrdersOrLosck = workOrders.Where(it => statusArr.Contains(it.Status) || it.Status == PlanWorkOrderStatusEnum.Pending);
             if (workOrdersOrLosck.Any())
             {
                 var sfcInfoIds = manuSfcProduces.Where(it => workOrdersOrLosck.Where(order => order.Id == it.WorkOrderId).Any()).Select(it => it.SFC).ToArray();
@@ -2029,7 +2029,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var newPlanWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuUpdateSaveDto.WorkOrderId);
 
             PlanWorkOrderStatusEnum[] statusArr = { PlanWorkOrderStatusEnum.NotStarted, PlanWorkOrderStatusEnum.Finish, PlanWorkOrderStatusEnum.Closed };
-            var workOrdersOrLosck = statusArr.Contains(newPlanWorkOrderEntity.Status) || newPlanWorkOrderEntity.IsLocked == YesOrNoEnum.Yes;
+            var workOrdersOrLosck = statusArr.Contains(newPlanWorkOrderEntity.Status) || newPlanWorkOrderEntity.Status == PlanWorkOrderStatusEnum.Pending;
             if (workOrdersOrLosck)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18209)).WithData("Code", newPlanWorkOrderEntity.OrderCode);

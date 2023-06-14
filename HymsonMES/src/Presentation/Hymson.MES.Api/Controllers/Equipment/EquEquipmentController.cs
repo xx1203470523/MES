@@ -13,7 +13,7 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
     /// @author Czhipu
     /// @date 2022-11-08
     /// </summary>
-    
+
     [ApiController]
     [Route("api/v1/[controller]")]
     public class EquEquipmentController : ControllerBase
@@ -128,6 +128,20 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         public async Task<PagedInfo<EquEquipmentLinkApiBaseDto>> GetEquipmentLinkApiAsync(EquEquipmentLinkApiPagedQueryDto pagedQueryDto)
         {
             return await _equEquipmentService.GetEquimentLinkApiAsync(pagedQueryDto);
+        }
+
+
+
+        /// <summary>
+        /// 获取设备Token
+        /// </summary>
+        /// <param name="EquEquipmentId"></param>
+        /// <returns></returns>
+        [Route("token/{equEquipmentId}")]
+        [HttpGet]
+        public async Task<string> GetEquEquipmentTokenAsync(long EquEquipmentId) 
+        {
+            return await _equEquipmentService.GetEquEquipmentTokenAsync(EquEquipmentId);
         }
     }
 }

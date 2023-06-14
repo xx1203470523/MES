@@ -41,6 +41,7 @@
         public const string MES10223 = "物料编码最大长度为50";
         public const string MES10224 = "物料名称最大长度为50";
         public const string MES10225 = "有生产中的工单引用其中的物料，不允许删除！";
+        public const string MES10226 = "数据收集方式不能为空！";
         #endregion
 
         #region 资源 10300
@@ -84,7 +85,7 @@
         public const string MES10348 = "打印机IP重复！";
         public const string MES10349 = "模板预览内容为空！";
         public const string MES10350 = "未找到指定模板！";
-        public const string MES10356 = "上传模板到打印服务器失败,模板名称:{name}！";
+        public const string MES10356 = "获取模板上下文信息失败,模板名称:{name}！";
         #endregion
 
         #region 工序 10400
@@ -296,6 +297,7 @@
         public const string MES12601 = "设备编码不能为空";
         public const string MES12602 = "设备名称不能为空";
         public const string MES12603 = "请求实体不能为空！";
+        public const string MES12604 = "设备信息不存在！";
         #endregion
 
         #region 设备组 12700
@@ -436,6 +438,7 @@
         public const string MES16012 = "修改生产工单状态失败：有工单不为完工,不允许关闭";
         public const string MES16013 = "工单状态不为未开始,不允许删除";
         public const string MES16014 = "有工单不存在";
+        public const string MES16015 = "工单没有锁定前的状态，无法解锁";
 
         public const string MES16020 = "工单号 不能为空！";
         public const string MES16021 = "物料编码 不能为空！";
@@ -605,6 +608,7 @@
         public const string MES16412 = "根据资源查询工单激活必须有资源Id参数！";
         public const string MES16413 = "没有找到该资源对应的工作中心";
         public const string MES16414 = "当前资源所对应的工作中心不是线体";
+        public const string MES16415 = "工单[{orderCode}]处于暂停中，无法操作！";
         #endregion
 
         #region 条码下达 MES16500
