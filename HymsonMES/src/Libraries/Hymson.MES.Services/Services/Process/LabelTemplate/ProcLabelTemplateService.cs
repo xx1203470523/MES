@@ -52,8 +52,8 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
         public async Task CreateProcLabelTemplateAsync(ProcLabelTemplateCreateDto procLabelTemplateCreateDto)
         {
             procLabelTemplateCreateDto.Name = procLabelTemplateCreateDto.Name.ToTrimSpace();
-            procLabelTemplateCreateDto.Path=procLabelTemplateCreateDto.Path.ToTrimSpace();
-            procLabelTemplateCreateDto.Remark = procLabelTemplateCreateDto.Remark??"".Trim();
+            procLabelTemplateCreateDto.Path = procLabelTemplateCreateDto.Path.ToTrimSpace();
+            procLabelTemplateCreateDto.Remark = procLabelTemplateCreateDto.Remark ?? "".Trim();
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procLabelTemplateCreateDto);
 
@@ -72,6 +72,8 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
             procLabelTemplateEntity.CreatedOn = HymsonClock.Now();
             procLabelTemplateEntity.UpdatedOn = HymsonClock.Now();
             procLabelTemplateEntity.SiteId = _currentSite.SiteId ?? 0;
+
+            /*
             //同步模板文件到打印服务器
             if (!string.IsNullOrEmpty(procLabelTemplateEntity.Path))
             {
@@ -82,10 +84,11 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
                 }
                 procLabelTemplateEntity.Content = result.data;
             }
+            */
 
             //入库
             await _procLabelTemplateRepository.InsertAsync(procLabelTemplateEntity);
-            
+
         }
 
         /// <summary>
@@ -108,6 +111,7 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
             //  var idsArr = StringExtension.SpitLongArrary(ids);
             return await _procLabelTemplateRepository.DeletesAsync(idsArr);
         }
+
         public async Task<(string base64Str, bool result)> PreviewProcLabelTemplateAsync(long id)
         {
             var foo = await _procLabelTemplateRepository.GetByIdAsync(id);
@@ -117,7 +121,7 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
         }
         public async Task<(string base64Str, bool result)> PreviewProcLabelTemplateAsync(string content)
         {
-            PreviewRequest request; 
+            PreviewRequest request;
             if (string.IsNullOrEmpty(content))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10350));
@@ -126,7 +130,7 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
             {
                 request = JsonConvert.DeserializeObject<PreviewRequest>(content);
             }
-            catch 
+            catch
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17005));
             }
@@ -134,8 +138,8 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
             if (!result.result)
                 throw new CustomerValidationException(nameof(ErrorCode.MES17004));
             return result;
-            
-            
+
+
         }
 
         /// <summary>
@@ -197,6 +201,7 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
             procLabelTemplateEntity.UpdatedBy = _currentUser.UserName;
             procLabelTemplateEntity.UpdatedOn = HymsonClock.Now();
 
+            /*
             //同步模板文件到打印服务器
             if (!string.Equals(foo.Path, procLabelTemplateEntity.Path, StringComparison.OrdinalIgnoreCase))
             {
@@ -210,11 +215,9 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
                     procLabelTemplateEntity.Content = result.data;
                 }
             }
+            */
 
             await _procLabelTemplateRepository.UpdateAsync(procLabelTemplateEntity);
-            
-            
-            
         }
 
         /// <summary>
@@ -233,7 +236,7 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
         }
         private async Task<ProcLabelTemplateEntity> QueryProcLabelTemplateByNameAsync(string name)
         {
-            return await _procLabelTemplateRepository.GetByNameAsync(new ProcLabelTemplateByNameQuery() {SiteId=_currentSite.SiteId??0,Name=name });
+            return await _procLabelTemplateRepository.GetByNameAsync(new ProcLabelTemplateByNameQuery() { SiteId = _currentSite.SiteId ?? 0, Name = name });
 
         }
     }
