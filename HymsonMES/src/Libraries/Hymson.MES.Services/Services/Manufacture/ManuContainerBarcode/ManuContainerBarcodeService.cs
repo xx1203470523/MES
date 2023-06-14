@@ -723,7 +723,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var entityByRelation = await _inteContainerRepository.GetByRelationIdAsync(new InteContainerQuery
             {
                 DefinitionMethod = DefinitionMethodEnum.Material,
-                MaterialId = ProductId,
+                MaterialId = productId,
                 MaterialGroupId = 0,
                 Status = SysDataStatusEnum.Enable,
                 Level = (LevelEnum)level
