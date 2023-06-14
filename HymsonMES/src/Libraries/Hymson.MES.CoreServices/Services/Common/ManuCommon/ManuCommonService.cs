@@ -254,13 +254,8 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             }
         }
 
-
-
         #region 内部方法
 
         #endregion
-
     }
-
-
 }

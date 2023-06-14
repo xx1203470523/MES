@@ -5,7 +5,7 @@ using Hymson.Localization.Domain;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.CoreServices.Dtos.Common;
-using Hymson.MES.CoreServices.Services.Common;
+using Hymson.MES.CoreServices.Services.Job;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using OfficeOpenXml.Attributes;

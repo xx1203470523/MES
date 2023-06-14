@@ -1,6 +1,6 @@
-﻿using Hymson.MES.CoreServices.Services.Common;
-using Hymson.MES.CoreServices.Services.Common.ManuCommon;
+﻿using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
+using Hymson.MES.CoreServices.Services.Job;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
