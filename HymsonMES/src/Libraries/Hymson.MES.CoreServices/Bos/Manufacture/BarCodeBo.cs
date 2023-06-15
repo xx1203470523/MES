@@ -1,5 +1,4 @@
-﻿using Hymson.MES.Core.Domain.Integrated;
-using Hymson.MES.Core.Enums.Integrated;
+﻿using Hymson.MES.Core.Enums.Integrated;
 using Hymson.Sequences.Enums;
 
 namespace Hymson.MES.CoreServices.Bos.Manufacture
@@ -33,12 +32,12 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// <summary>
         /// 是否测试
         /// </summary>
-        public bool IsTest { get; set; }
+        public bool IsTest { get; set; } = false;
 
         /// <summary>
         /// 是否模拟（默认模拟）
         /// </summary>
-        public bool IsSimulation { get; set; } = true;
+        public bool IsSimulation { get; set; } = false;
 
         /// <summary>
         /// 集合（编码规则）

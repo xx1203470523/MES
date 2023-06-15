@@ -9,6 +9,7 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.InteCodeRule.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -16,7 +17,6 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCreateBarcodeDto;
-using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGenerateBarcodeDto;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.MES.Services.Services.Plan;
@@ -39,6 +39,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         private readonly IManuCommonOldService _manuCommonOldService;
         private readonly IProcMaterialRepository _procMaterialRepository;
         private readonly IInteCodeRulesRepository _inteCodeRulesRepository;
+        private readonly IInteCodeRulesMakeRepository _inteCodeRulesMakeRepository;
         private readonly IManuGenerateBarcodeService _manuGenerateBarcodeService;
         private readonly IManuSfcRepository _manuSfcRepository;
         private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
@@ -56,6 +57,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         /// <param name="manuCommonOldService"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="inteCodeRulesRepository"></param>
+        /// <param name="inteCodeRulesMakeRepository"></param>
         /// <param name="manuGenerateBarcodeService"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcInfoRepository"></param>
@@ -69,6 +71,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
              IManuCommonOldService manuCommonOldService,
              IProcMaterialRepository procMaterialRepository,
              IInteCodeRulesRepository inteCodeRulesRepository,
+             IInteCodeRulesMakeRepository inteCodeRulesMakeRepository,
              IManuGenerateBarcodeService manuGenerateBarcodeService,
              IManuSfcRepository manuSfcRepository,
              IManuSfcInfoRepository manuSfcInfoRepository,
@@ -83,6 +86,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
             _manuCommonOldService = manuCommonOldService;
             _procMaterialRepository = procMaterialRepository;
             _inteCodeRulesRepository = inteCodeRulesRepository;
+            _inteCodeRulesMakeRepository = inteCodeRulesMakeRepository;
             _manuGenerateBarcodeService = manuGenerateBarcodeService;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcInfoRepository = manuSfcInfoRepository;
@@ -118,12 +122,34 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
             var discuss = (int)Math.Ceiling(param.Qty / procMaterialEntity.Batch);
             var processRouteFirstProcedure = await _manuCommonOldService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
 
+            // 读取基础数据
+            var codeRulesMakeList = await _inteCodeRulesMakeRepository.GetInteCodeRulesMakeEntitiesAsync(new InteCodeRulesMakeQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                CodeRulesId = inteCodeRulesEntity.Id
+            });
+
             // 开启事务
             using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
-            var barcodeList = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new GenerateBarcodeDto
+            var barcodeList = await _manuGenerateBarcodeService.GenerateBarCodeSerialNumberAsync(new BarCodeSerialNumberBo
             {
-                CodeRuleId = inteCodeRulesEntity.Id,
-                Count = discuss
+                IsTest = false,
+                IsSimulation = false,
+                CodeRulesMakeBos = codeRulesMakeList.Select(s => new CodeRulesMakeBo
+                {
+                    Seq = s.Seq,
+                    ValueTakingType = s.ValueTakingType,
+                    SegmentedValue = s.SegmentedValue,
+                }),
+
+                CodeRuleKey = $"{inteCodeRulesEntity.Id}",
+                Count = discuss,
+                Base = inteCodeRulesEntity.Base,
+                Increment = inteCodeRulesEntity.Increment,
+                IgnoreChar = inteCodeRulesEntity.IgnoreChar,
+                OrderLength = inteCodeRulesEntity.OrderLength,
+                ResetType = inteCodeRulesEntity.ResetType,
+                StartNumber = inteCodeRulesEntity.StartNumber
             });
 
             List<ManuSfcEntity> manuSfcList = new();

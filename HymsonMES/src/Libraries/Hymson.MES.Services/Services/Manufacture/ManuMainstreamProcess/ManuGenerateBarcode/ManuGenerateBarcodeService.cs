@@ -2,8 +2,8 @@
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.Data.Repositories.Integrated;
-using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGenerateBarcodeDto;
 using Hymson.Sequences;
 using Hymson.Utils;

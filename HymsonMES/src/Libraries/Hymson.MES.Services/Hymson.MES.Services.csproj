@@ -41,4 +41,8 @@
     <ProjectReference Include="..\Hymson.MES.HttpClients\Hymson.MES.HttpClients.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Bos\Manufacture\" />
+  </ItemGroup>
+
 </Project>
