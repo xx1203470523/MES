@@ -479,7 +479,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10440));
 
             // 随机工序Key
-            var cacheKey = $"{procedureId}-{workOrderId}";
+            var cacheKey = $"{processRouteId}-{procedureId}-{workOrderId}";
             var count = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.None, cacheKey);
 
             // 这个Key太长了
