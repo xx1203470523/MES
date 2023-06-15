@@ -2,7 +2,6 @@
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Manufacture;
@@ -140,22 +139,14 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             // 如果工序对应不上
             if (sfcProduceEntity.ProcedureId != bo.ProcedureId)
             {
-                /*
-                var preProcessRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetPreProcessRouteDetailLinkAsync(new ProcProcessRouteDetailLinkQuery
-                {
-                    ProcessRouteId = processRouteId,
-                    ProcedureId = procedureId
-                });
+                var processRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetProcessRouteDetailLinksByProcessRouteIdAsync(sfcProduceEntity.ProcessRouteId)
+                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES18213));
 
-                var procedureNodes = await _procProcessRouteDetailNodeRepository.GetByProcedureIdsAsync(new ProcProcessRouteDetailNodesQuery
-                {
-                    ProcessRouteId = processRouteId,
-                    ProcedureIds = preProcessRouteDetailLinks.Where(w => w.PreProcessRouteDetailId.HasValue).Select(s => s.PreProcessRouteDetailId.Value)
-                }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10442));
-                */
+                var processRouteDetailNodes = await _procProcessRouteDetailNodeRepository.GetProcessRouteDetailNodesByProcessRouteIdAsync(sfcProduceEntity.ProcessRouteId)
+                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES18208));
 
                 // 判断上一个工序是否是随机工序
-                var IsRandomPreProcedure = await _manuCommonOldService.IsRandomPreProcedureAsync(sfcProduceEntity.ProcessRouteId, bo.ProcedureId);
+                var IsRandomPreProcedure = await _manuCommonOldService.IsRandomPreProcedureAsync(processRouteDetailLinks, processRouteDetailNodes, sfcProduceEntity.ProcessRouteId, bo.ProcedureId);
                 if (IsRandomPreProcedure == false) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
 
                 // 将SFC对应的工序改为当前工序
