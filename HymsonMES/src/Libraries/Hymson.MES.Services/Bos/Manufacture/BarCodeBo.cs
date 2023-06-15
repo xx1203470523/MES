@@ -38,7 +38,7 @@ namespace Hymson.MES.Services.Bos.Manufacture
         /// <summary>
         /// 是否模拟（默认模拟）
         /// </summary>
-        public bool IsSimulation { get; set; } = true;
+        public bool IsSimulation { get; set; } = false;
 
         /// <summary>
         /// 集合（编码规则）

@@ -23,6 +23,7 @@ using Hymson.MES.Services.Services.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCreateBarcode
 {
@@ -115,13 +116,16 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
             }
 
             var discuss = (int)Math.Ceiling(param.Qty / procMaterialEntity.Batch);
+            var processRouteFirstProcedure = await _manuCommonOldService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
+
+            // 开启事务
+            using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
             var barcodeList = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new GenerateBarcodeDto
             {
                 CodeRuleId = inteCodeRulesEntity.Id,
                 Count = discuss
             });
 
-            var processRouteFirstProcedure = await _manuCommonOldService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
             List<ManuSfcEntity> manuSfcList = new();
             List<ManuSfcInfoEntity> manuSfcInfoList = new();
             List<ManuSfcProduceEntity> manuSfcProduceList = new();
@@ -195,7 +199,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                 });
             }
 
-            using var ts = TransactionHelper.GetTransactionScope();
             var row = await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderId(new UpdatePassDownQuantityCommand
             {
                 WorkOrderId = planWorkOrderEntity.Id,
@@ -214,7 +217,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
             await _manuSfcInfoRepository.InsertsAsync(manuSfcInfoList);
             await _manuSfcProduceRepository.InsertRangeAsync(manuSfcProduceList);
             await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
-            ts.Complete();
+            trans.Complete();
 
             return manuSfcList;
         }
