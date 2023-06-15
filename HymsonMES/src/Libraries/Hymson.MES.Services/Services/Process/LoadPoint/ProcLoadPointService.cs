@@ -70,7 +70,7 @@ namespace Hymson.MES.Services.Services.Process
 
             procLoadPointCreateDto.LoadPoint = procLoadPointCreateDto.LoadPoint.ToTrimSpace().ToUpperInvariant();
             procLoadPointCreateDto.LoadPointName = procLoadPointCreateDto.LoadPointName.Trim();
-            procLoadPointCreateDto.Remark = procLoadPointCreateDto?.Remark??"".Trim();
+            procLoadPointCreateDto.Remark = procLoadPointCreateDto?.Remark ?? "".Trim();
 
             // 验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procLoadPointCreateDto);
@@ -221,7 +221,7 @@ namespace Hymson.MES.Services.Services.Process
             var modelOrigin = await _procLoadPointRepository.GetByIdAsync(procLoadPointModifyDto.Id) ?? throw new ValidationException(nameof(ErrorCode.MES10705));
             #endregion
 
-            if (modelOrigin.Status != SysDataStatusEnum.Build&& procLoadPointModifyDto.Status== SysDataStatusEnum.Build)
+            if (modelOrigin.Status != SysDataStatusEnum.Build && procLoadPointModifyDto.Status == SysDataStatusEnum.Build)
             {
                 throw new ValidationException(nameof(ErrorCode.MES10716));
             }
