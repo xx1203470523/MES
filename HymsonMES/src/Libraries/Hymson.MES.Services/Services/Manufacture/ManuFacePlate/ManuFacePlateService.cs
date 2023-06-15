@@ -145,7 +145,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (manuFacePlates != null && manuFacePlates.Any())
             {
                 var isAnyEnableOrRetain = manuFacePlates.Select(c => c.Status == SysDataStatusEnum.Enable || c.Status == SysDataStatusEnum.Retain).Any();
-                throw new CustomerValidationException(nameof(ErrorCode.MES16913));
+                if (isAnyEnableOrRetain)
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16913));
             }
             return await _manuFacePlateRepository.DeletesAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
         }
@@ -412,10 +413,10 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task<ManuFacePlateQueryDto> QueryManuFacePlateByCodeAsync(string code)
         {
             ManuFacePlateQueryDto facePlateQueryDto = new ManuFacePlateQueryDto();
-            var manuFacePlateEntity = await _manuFacePlateRepository.GetByCodeAsync(new EntityByCodeQuery 
-            { 
+            var manuFacePlateEntity = await _manuFacePlateRepository.GetByCodeAsync(new EntityByCodeQuery
+            {
                 Code = code,
-                Site=_currentSite.SiteId
+                Site = _currentSite.SiteId
             });
             if (manuFacePlateEntity != null)
             {
