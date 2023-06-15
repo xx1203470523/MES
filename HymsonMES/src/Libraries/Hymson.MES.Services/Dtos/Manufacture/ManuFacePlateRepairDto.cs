@@ -203,6 +203,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public IEnumerable<ManuFacePlateRepairReturnProcedureDto> returnProcedureInfo { get; set; }
 
+        /// <summary>
+        /// 是否展示返回工序
+        /// </summary>
+        public bool IsReturnProcedure { get; set; }
+
     }
 
     /// <summary>

@@ -1,17 +1,5 @@
-/*
- *creator: Karl
- *
- *describe: 仓库标签模板    服务接口 | 代码由框架生成
- *builder:  wxk
- *build datetime: 2023-03-09 02:51:26
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Services.Process.LabelTemplate
 {
