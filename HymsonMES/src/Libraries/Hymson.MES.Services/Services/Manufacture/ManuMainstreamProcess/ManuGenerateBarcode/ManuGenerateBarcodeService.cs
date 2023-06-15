@@ -2,8 +2,8 @@
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.Data.Repositories.Integrated;
-using Hymson.MES.Services.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGenerateBarcodeDto;
 using Hymson.Sequences;
 using Hymson.Utils;
@@ -52,13 +52,18 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         public async Task<IEnumerable<string>> GenerateBarcodeListByIdAsync(GenerateBarcodeDto param)
         {
             var getCodeRulesTask = _inteCodeRulesRepository.GetByIdAsync(param.CodeRuleId);
-            var getCodeRulesMakeListTask = _inteCodeRulesMakeRepository.GetInteCodeRulesMakeEntitiesAsync(new InteCodeRulesMakeQuery { SiteId = _currentSite.SiteId ?? 0, CodeRulesId = param.CodeRuleId });
+            var getCodeRulesMakeListTask = _inteCodeRulesMakeRepository.GetInteCodeRulesMakeEntitiesAsync(new InteCodeRulesMakeQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                CodeRulesId = param.CodeRuleId
+            });
             var codeRulesMakeList = await getCodeRulesMakeListTask;
             var codeRule = await getCodeRulesTask;
 
             return await GenerateBarCodeSerialNumberAsync(new BarCodeSerialNumberBo
             {
                 IsTest = param.IsTest,
+                IsSimulation = false,
                 CodeRulesMakeBos = codeRulesMakeList.Select(s => new CodeRulesMakeBo
                 {
                     Seq = s.Seq,
@@ -113,9 +118,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         /// <returns></returns>
         public async Task<IEnumerable<string>> GenerateBarCodeSerialNumberAsync(BarCodeSerialNumberBo bo)
         {
-            var serialNumbers = await GenerateBarCodeSerialNumbersWithTryAsync(bo);
+            List<string> list = new();
 
             List<string> serialStrings = new();
+            var serialNumbers = await GenerateBarCodeSerialNumbersWithTryAsync(bo);
             foreach (var item in serialNumbers)
             {
                 var str = bo.Base switch
@@ -139,7 +145,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                 throw new CustomerValidationException(nameof(ErrorCode.MES16203));
             }
 
-            List<string> list = new();
             StringBuilder stringBuilder = new();
             foreach (var item in serialStrings)
             {
@@ -177,6 +182,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                 bo.IsSimulation = false;
                 await GenerateBarCodeSerialNumberAsync(bo);
             }
+
             return list;
         }
 
@@ -255,7 +261,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
             var startNumber = param.StartNumber - 1;
 
             // 真实生成
-            if (param.IsSimulation == false)
+            if (param.IsTest = false && param.IsSimulation == false)
             {
                 var serialNumbers = await _sequenceService.GetSerialNumbersAsync(param.ResetType, param.CodeRuleKey, param.Count, startNumber, param.Increment, maxLength)
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES16200));
@@ -264,7 +270,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                 return sequences;
             }
 
-            // 模拟生成
+            // 测试生成/模拟生成
             var count = param.Count;
             var currentValue = await _sequenceService.GetCurrentValueAsync(param.ResetType, param.CodeRuleKey, startNumber);
             do
