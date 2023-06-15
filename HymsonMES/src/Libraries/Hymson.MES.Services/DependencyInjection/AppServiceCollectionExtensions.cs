@@ -108,6 +108,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteJobService, InteJobService>();
             services.AddSingleton<IInteContainerService, InteContainerService>();
             services.AddSingleton<IInteWorkCenterService, InteWorkCenterService>();
+            services.AddSingleton<IInteSystemTokenService, InteSystemTokenService>();
 
             #region CodeRule
             services.AddSingleton<IInteCodeRulesService, InteCodeRulesService>();
