@@ -1,14 +1,7 @@
-/*
- *creator: Karl
- *
- *describe: 工艺路线工序节点明细表 仓储类 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-02-14 10:17:40
- */
-
 using Dapper;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -20,10 +13,11 @@ namespace Hymson.MES.Data.Repositories.Process
     public partial class ProcProcessRouteDetailNodeRepository : IProcProcessRouteDetailNodeRepository
     {
         private readonly ConnectionOptions _connectionOptions;
-
-        public ProcProcessRouteDetailNodeRepository(IOptions<ConnectionOptions> connectionOptions)
+        private readonly IMemoryCache _memoryCache;
+        public ProcProcessRouteDetailNodeRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
         {
             _connectionOptions = connectionOptions.Value;
+            _memoryCache = memoryCache;
         }
 
         /// <summary>
@@ -102,8 +96,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<ProcProcessRouteDetailNodeEntity> GetFirstProcedureByProcessRouteIdAsync(long processRouteId)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcProcessRouteDetailNodeEntity>(GetFirstProcedureByProcessRouteIdSql, new { ProcessRouteId = processRouteId });
+            var key = $"proc_process_route_detail_node&{processRouteId}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                return await conn.QueryFirstOrDefaultAsync<ProcProcessRouteDetailNodeEntity>(GetFirstProcedureByProcessRouteIdSql, new { ProcessRouteId = processRouteId });
+            });
         }
 
         /// <summary>
