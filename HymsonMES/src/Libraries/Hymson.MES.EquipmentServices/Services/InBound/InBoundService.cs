@@ -44,6 +44,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
         private readonly IProcProcessRouteDetailNodeRepository _procProcessRouteDetailNodeRepository;
         private readonly IProcResourceEquipmentBindRepository _procResourceEquipmentBindRepository;
         private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
+        private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
 
         public InBoundService(AbstractValidator<InBoundDto> validationInBoundDtoRules,
             ICurrentEquipment currentEquipment,
@@ -60,7 +61,8 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
             IProcProcedureRepository procProcedureRepository,
             IProcResourceEquipmentBindRepository procResourceEquipmentBindRepository,
-            IManuSfcCirculationRepository manuSfcCirculationRepository)
+            IManuSfcCirculationRepository manuSfcCirculationRepository,
+            IManuSfcSummaryRepository manuSfcSummaryRepository)
         {
             _validationInBoundDtoRules = validationInBoundDtoRules;
             _currentEquipment = currentEquipment;
@@ -78,6 +80,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             _procProcedureRepository = procProcedureRepository;
             _procResourceEquipmentBindRepository = procResourceEquipmentBindRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
+            _manuSfcSummaryRepository = manuSfcSummaryRepository;
         }
         #endregion
 
@@ -142,6 +145,9 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                 Ids = new long[] { _currentEquipment.Id ?? 0 },
                 ResourceId = procResource.Id,
             };
+            //TODO 需要添加资源对应工序和条码对应进站工序检查
+            //TODO 需要添加拦截NG条码进站检查
+
             var resEquipentBind = await _procResourceEquipmentBindRepository.GetByResourceIdAsync(resourceEquipmentBindQuery);
             if (resEquipentBind.Any() == false)
             {
@@ -201,17 +207,29 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             //获取工艺路线首工序
             var processRouteFirstProcedure = await GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
 
+            //查询已有汇总信息
+            ManuSfcSummaryQuery manuSfcSummaryQuery = new ManuSfcSummaryQuery
+            {
+                SiteId = _currentEquipment.SiteId,
+                EquipmentId = _currentEquipment.Id,
+                SFCS = sfclist.Select(c => c.SFC).ToArray()
+            };
+            var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
+
             List<ManuSfcEntity> manuSfcList = new List<ManuSfcEntity>();
             List<ManuSfcInfoEntity> manuSfcInfoList = new List<ManuSfcInfoEntity>();
             List<ManuSfcProduceEntity> manuSfcProduceList = new List<ManuSfcProduceEntity>();
             List<ManuSfcStepEntity> manuSfcStepList = new List<ManuSfcStepEntity>();
+            List<ManuSfcSummaryEntity> manuSfcSummaryList = new List<ManuSfcSummaryEntity>();
             //更新的信息
             List<ManuSfcProduceEntity> updateManuSfcProduceList = new List<ManuSfcProduceEntity>();
             List<ManuSfcEntity> updateManuSfcList = new List<ManuSfcEntity>();
+            List<ManuSfcSummaryEntity> updateManuSfcSummaryList = new List<ManuSfcSummaryEntity>();
 
-            //var validationFailures = new List<ValidationFailure>();
             foreach (var sfc in inBoundMoreDto.SFCs)
             {
+                //汇总信息
+                var manuSfcSummaryEntity = manuSfcSummaryEntities.Where(c => c.SFC == sfc).FirstOrDefault();
                 var sfcEntity = sfclist.FirstOrDefault(x => x.SFC == sfc);
                 if (sfcEntity != null)
                 {
@@ -227,6 +245,14 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                         // 超过复投次数，标识为NG
                         //if (sfcProduce.RepeatedCount > sfcprocedureEntity.Cycle) throw new CustomerValidationException(nameof(ErrorCode.MES16036));
                         sfcProduce.RepeatedCount++;
+                        //更新复投次数
+                        if (manuSfcSummaryEntity != null)
+                        {
+                            manuSfcSummaryEntity.RepeatedCount = sfcProduce.RepeatedCount;
+                            manuSfcSummaryEntity.UpdatedBy = _currentEquipment.Name;
+                            manuSfcSummaryEntity.UpdatedOn = HymsonClock.Now();
+                            updateManuSfcSummaryList.Add(manuSfcSummaryEntity);
+                        }
                     }
                     //是否首工序
                     var isFirstProcedure = await IsFirstProcedureAsync(sfcProduce.ProcessRouteId, sfcProduce.ProcedureId);
@@ -304,7 +330,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     }
                     continue;
                 }
-
+                //条码表
                 var manuSfcEntity = new ManuSfcEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
@@ -319,7 +345,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     UpdatedOn = HymsonClock.Now(),
                 };
                 manuSfcList.Add(manuSfcEntity);
-
+                //条码信息
                 manuSfcInfoList.Add(new ManuSfcInfoEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
@@ -333,7 +359,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     UpdatedBy = _currentEquipment.Name,
                     UpdatedOn = HymsonClock.Now(),
                 });
-
+                //生产表
                 manuSfcProduceList.Add(new ManuSfcProduceEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
@@ -357,7 +383,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     UpdatedBy = _currentEquipment.Name,
                     UpdatedOn = HymsonClock.Now(),
                 });
-
+                //步骤表
                 manuSfcStepList.Add(new ManuSfcStepEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
@@ -378,11 +404,27 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     UpdatedBy = _currentEquipment.Name,
                     UpdatedOn = HymsonClock.Now(),
                 });
+                //汇总表
+                manuSfcSummaryList.Add(new ManuSfcSummaryEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentEquipment.SiteId,
+                    ProcedureId = processRouteFirstProcedure.ProcedureId,
+                    EquipmentId = _currentEquipment.Id ?? 0,
+                    ProductId = planWorkOrderEntity.ProductId,
+                    WorkOrderId = planWorkOrderEntity.Id,
+                    SFC = sfc,
+                    Qty = 1,//电芯进站默认都是1个
+                    ResourceId = procResource.Id,
+                    BeginTime = HymsonClock.Now(),
+                    NgNum = 0,
+                    RepeatedCount = 0,
+                    CreatedBy = _currentEquipment.Name,
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedBy = _currentEquipment.Name,
+                    UpdatedOn = HymsonClock.Now(),
+                });
             }
-            //if (validationFailures.Any())
-            //{
-            //    throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
-            //}
 
             using var ts = TransactionHelper.GetTransactionScope();
             //更新下达数量
@@ -421,10 +463,15 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             {
                 row += await _manuSfcRepository.UpdateRangeAsync(updateManuSfcList);
             }
-
-            if (row == 0)
+            //更新汇总信息
+            if (updateManuSfcSummaryList.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16503)).WithData("workorder", planWorkOrderEntity.OrderCode);
+                row += await _manuSfcSummaryRepository.UpdatesAsync(updateManuSfcSummaryList);
+            }
+            //新增汇总信息
+            if (manuSfcSummaryList.Any())
+            {
+                await _manuSfcSummaryRepository.InsertsAsync(manuSfcSummaryList);
             }
             await _manuSfcRepository.InsertRangeAsync(manuSfcList);
             await _manuSfcInfoRepository.InsertsAsync(manuSfcInfoList);

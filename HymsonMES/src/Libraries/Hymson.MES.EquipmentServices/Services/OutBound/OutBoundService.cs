@@ -18,7 +18,6 @@ using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
-using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Dtos.OutBound;
 using Hymson.Sequences;
 using Hymson.Snowflake;
@@ -58,6 +57,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
         private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
         private readonly IManuSfcStepMaterialRepository _manuSfcStepMaterialRepository;
         private readonly IProcResourceEquipmentBindRepository _procResourceEquipmentBindRepository;
+        private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
 
         public OutBoundService(AbstractValidator<OutBoundDto> validationOutBoundDtoRules,
             ICurrentEquipment currentEquipment,
@@ -78,7 +78,8 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             IManuSfcCirculationRepository manuSfcCirculationRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
             IManuSfcStepMaterialRepository manuSfcStepMaterialRepository,
-            IProcResourceEquipmentBindRepository procResourceEquipmentBindRepository)
+            IProcResourceEquipmentBindRepository procResourceEquipmentBindRepository,
+            IManuSfcSummaryRepository manuSfcSummaryRepository)
         {
             _validationOutBoundDtoRules = validationOutBoundDtoRules;
             _currentEquipment = currentEquipment;
@@ -100,6 +101,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             _inteWorkCenterRepository = inteWorkCenterRepository;
             _manuSfcStepMaterialRepository = manuSfcStepMaterialRepository;
             _procResourceEquipmentBindRepository = procResourceEquipmentBindRepository;
+            _manuSfcSummaryRepository = manuSfcSummaryRepository;
         }
         #endregion
 
@@ -240,17 +242,32 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 if (outBoundMoreSfcs.Any())
                     throw new CustomerValidationException(nameof(ErrorCode.MES19128)).WithData("SFCS", string.Join(',', outBoundMoreSfcs.Select(c => c.SFC)));
             }
+
+            //查询已有汇总信息
+            ManuSfcSummaryQuery manuSfcSummaryQuery = new ManuSfcSummaryQuery
+            {
+                SiteId = _currentEquipment.SiteId,
+                EquipmentId = _currentEquipment.Id,
+                SFCS = sfclist.Select(c => c.SFC).ToArray()
+            };
+            var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
+
             //条码流转信息
             List<ManuSfcCirculationEntity> manuSfcCirculationEntities = new List<ManuSfcCirculationEntity>();
             List<string> delManuSfcProduces = new List<string>();
             List<ManuSfcStepEntity> manuSfcStepEntities = new List<ManuSfcStepEntity>();
             List<ManuSfcEntity> manuSfcEntities = new List<ManuSfcEntity>();
             List<ManuSfcProduceEntity> manuSfcProduceEntities = new List<ManuSfcProduceEntity>();
+            List<ManuSfcSummaryEntity> manuSfcSummaryList = new List<ManuSfcSummaryEntity>();
+            //更新汇总
+            List<ManuSfcSummaryEntity> manuSfcSummaryUpdateList = new List<ManuSfcSummaryEntity>();
             //SFC信息处理
             foreach (var outBoundSFCDto in outBoundMoreDto.SFCs)
             {
                 var sfcEntity = sfclist.Where(c => c.SFC == outBoundSFCDto.SFC).First();
                 var sfcProduceEntity = sfcProduceList.Where(c => c.SFC == outBoundSFCDto.SFC).First();
+                //汇总信息
+                var manuSfcSummaryEntity = manuSfcSummaryEntities.Where(c => c.SFC == outBoundSFCDto.SFC).FirstOrDefault();
                 // 更新时间
                 sfcProduceEntity.UpdatedBy = _currentEquipment.Name;
                 sfcProduceEntity.UpdatedOn = HymsonClock.Now();
@@ -342,6 +359,50 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                     manuSfcStepEntity.CurrentStatus = SfcProduceStatusEnum.Activity;
                     manuSfcStepEntity.Operatetype = ManuSfcStepTypeEnum.OutStock;
                     manuSfcStepEntities.Add(manuSfcStepEntity);
+                }
+
+                //汇总表
+                if (manuSfcSummaryEntity == null)//如果过站汇总信息为空
+                {
+                    manuSfcSummaryList.Add(new ManuSfcSummaryEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = _currentEquipment.SiteId,
+                        ProcedureId = sfcProduceEntity.ProcedureId,
+                        EquipmentId = _currentEquipment.Id ?? 0,
+                        ProductId = planWorkOrderEntity.ProductId,
+                        WorkOrderId = planWorkOrderEntity.Id,
+                        SFC = outBoundSFCDto.SFC,
+                        Qty = 1,
+                        ResourceId = procResource.Id,
+                        BeginTime = HymsonClock.Now().AddSeconds(-1),//方便区分进站和出站时间
+                        EndTime = HymsonClock.Now(),
+                        NgNum = outBoundSFCDto.Passed == 0 ? 1 : 0,//不合格+1
+                        FirstQualityStatus = outBoundSFCDto.Passed == 0 ? 0 : 1,
+                        QualityStatus = outBoundSFCDto.Passed == 0 ? 0 : 1,
+                        RepeatedCount = 0,
+                        CreatedBy = _currentEquipment.Name,
+                        CreatedOn = HymsonClock.Now(),
+                        UpdatedBy = _currentEquipment.Name,
+                        UpdatedOn = HymsonClock.Now(),
+                    });
+                }
+                else
+                {
+                    manuSfcSummaryEntity.EndTime = HymsonClock.Now();
+                    if (manuSfcSummaryEntity.NgNum == 0)
+                    {
+                        manuSfcSummaryEntity.FirstQualityStatus = outBoundSFCDto.Passed == 0 ? 0 : 1;
+                    }
+                    //最终合格状态
+                    manuSfcSummaryEntity.QualityStatus = outBoundSFCDto.Passed == 0 ? 0 : 1;
+                    if (outBoundSFCDto.Passed == 0)
+                    {
+                        manuSfcSummaryEntity.NgNum++;//不合格+1
+                    }
+                    manuSfcSummaryEntity.UpdatedBy = _currentEquipment.Name;
+                    manuSfcSummaryEntity.UpdatedOn = HymsonClock.Now();
+                    manuSfcSummaryUpdateList.Add(manuSfcSummaryEntity);
                 }
             }
 
@@ -465,12 +526,12 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 rows += await _manuSfcStepMaterialRepository.InsertsAsync(manuProductMaterialEntities);
             }
             // 更新工单统计表的 RealEnd
-            rows += await _planWorkOrderRepository.UpdatePlanWorkOrderRealEndByWorkOrderIdAsync(new UpdateWorkOrderRealTimeCommand
-            {
-                UpdatedOn = HymsonClock.Now(),
-                UpdatedBy = _currentEquipment.Name,
-                WorkOrderIds = new long[] { planWorkOrder.Id }
-            });
+            //rows += await _planWorkOrderRepository.UpdatePlanWorkOrderRealEndByWorkOrderIdAsync(new UpdateWorkOrderRealTimeCommand
+            //{
+            //    UpdatedOn = HymsonClock.Now(),
+            //    UpdatedBy = _currentEquipment.Name,
+            //    WorkOrderIds = new long[] { planWorkOrder.Id }
+            //});
             // 更新完工数量
             rows += await _planWorkOrderRepository.UpdateFinishProductQuantityByWorkOrderId(new UpdateQtyCommand
             {
@@ -479,6 +540,17 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 WorkOrderId = planWorkOrder.Id,
                 Qty = outBoundMoreDto.SFCs.Length,
             });
+
+            //更新汇总信息
+            if (manuSfcSummaryUpdateList.Any())
+            {
+                rows += await _manuSfcSummaryRepository.UpdatesAsync(manuSfcSummaryUpdateList);
+            }
+            //新增汇总信息
+            if (manuSfcSummaryList.Any())
+            {
+                rows += await _manuSfcSummaryRepository.InsertsAsync(manuSfcSummaryList);
+            }
             trans.Complete();
         }
 
