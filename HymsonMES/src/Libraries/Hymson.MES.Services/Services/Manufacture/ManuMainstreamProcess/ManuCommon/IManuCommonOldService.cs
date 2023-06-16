@@ -82,6 +82,16 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         Task<bool> IsRandomPreProcedureAsync(long processRouteId, long procedureId);
 
         /// <summary>
+        /// 判断上一工序是否随机工序
+        /// </summary>
+        /// <param name="processRouteDetailLinks"></param>
+        /// <param name="processRouteDetailNodes"></param>
+        /// <param name="processRouteId"></param>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        Task<bool> IsRandomPreProcedureAsync(IEnumerable<ProcProcessRouteDetailLinkEntity> processRouteDetailLinks, IEnumerable<ProcProcessRouteDetailNodeEntity> processRouteDetailNodes, long processRouteId, long procedureId);
+
+        /// <summary>
         /// 判断是否首工序
         /// </summary>
         /// <param name="processRouteId"></param>

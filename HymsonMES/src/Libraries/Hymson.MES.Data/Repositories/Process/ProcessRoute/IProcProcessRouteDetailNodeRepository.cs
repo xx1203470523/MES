@@ -48,7 +48,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="processRouteId"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcProcessRouteDetailNodeEntity>> GetProcProcessRouteDetailNodesByProcessRouteId(long processRouteId);
+        Task<IEnumerable<ProcProcessRouteDetailNodeEntity>> GetProcessRouteDetailNodesByProcessRouteIdAsync(long processRouteId);
 
         /// <summary>
         /// 查询List

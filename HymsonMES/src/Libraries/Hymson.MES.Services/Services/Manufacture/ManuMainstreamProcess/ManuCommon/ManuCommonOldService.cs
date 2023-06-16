@@ -479,7 +479,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10440));
 
             // 随机工序Key
-            var cacheKey = $"{procedureId}-{workOrderId}";
+            var cacheKey = $"{processRouteId}-{procedureId}-{workOrderId}";
             var count = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.None, cacheKey);
 
             // 这个Key太长了
@@ -578,6 +578,40 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         }
 
         /// <summary>
+        /// 判断上一工序是否随机工序
+        /// </summary>
+        /// <param name="processRouteDetailLinks"></param>
+        /// <param name="processRouteDetailNodes"></param>
+        /// <param name="processRouteId"></param>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        public async Task<bool> IsRandomPreProcedureAsync(IEnumerable<ProcProcessRouteDetailLinkEntity> processRouteDetailLinks, IEnumerable<ProcProcessRouteDetailNodeEntity> processRouteDetailNodes,
+            long processRouteId, long procedureId)
+        {
+            processRouteDetailLinks = processRouteDetailLinks.Where(w => w.ProcessRouteDetailId == procedureId);
+            if (processRouteDetailLinks.Any() == false) return false; //throw new CustomerValidationException(nameof(ErrorCode.MES18213));
+
+            processRouteDetailNodes = processRouteDetailNodes.Where(w => processRouteDetailLinks.Select(s => s.PreProcessRouteDetailId).Contains(w.ProcedureId));
+            if (processRouteDetailNodes.Any() == false) return false; //throw new CustomerValidationException(nameof(ErrorCode.MES18208));
+
+            // 有多工序分叉的情况（取第一个当默认值）
+            ProcProcessRouteDetailNodeEntity? defaultPreProcedure = processRouteDetailNodes.FirstOrDefault();
+            if (processRouteDetailLinks.Count() > 1)
+            {
+                // 下工序找上工序，执照正常流程的工序
+                defaultPreProcedure = processRouteDetailNodes.FirstOrDefault(f => f.CheckType == ProcessRouteInspectTypeEnum.None)
+                   ?? throw new CustomerValidationException(nameof(ErrorCode.MES10441));
+            }
+
+            // 获取上一工序
+            if (defaultPreProcedure == null) throw new CustomerValidationException(nameof(ErrorCode.MES10442));
+            if (defaultPreProcedure.CheckType == ProcessRouteInspectTypeEnum.RandomInspection) return true;
+
+            // 继续检查上一工序
+            return await IsRandomPreProcedureAsync(processRouteDetailLinks, processRouteDetailNodes, processRouteId, defaultPreProcedure.Id);
+        }
+
+        /// <summary>
         /// 判断是否首工序
         /// </summary>
         /// <param name="processRouteId"></param>
@@ -638,7 +672,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         public async Task<IEnumerable<ProcessRouteDetailDto>> GetProcessRouteAsync(long processRouteId)
         {
             var processRouteDetailLinkListTask = _procProcessRouteDetailLinkRepository.GetListAsync(new ProcProcessRouteDetailLinkQuery { ProcessRouteId = processRouteId });
-            var processRouteDetailNodeListTask = _procProcessRouteDetailNodeRepository.GetProcProcessRouteDetailNodesByProcessRouteId(processRouteId);
+            var processRouteDetailNodeListTask = _procProcessRouteDetailNodeRepository.GetProcessRouteDetailNodesByProcessRouteIdAsync(processRouteId);
             var processRouteDetailLinkList = await processRouteDetailLinkListTask;
             var processRouteDetailNodeList = await processRouteDetailNodeListTask;
 
@@ -656,8 +690,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         }
 
 
-        
-        
+
+
         /// <summary>
         /// 组装工艺路线
         /// </summary>

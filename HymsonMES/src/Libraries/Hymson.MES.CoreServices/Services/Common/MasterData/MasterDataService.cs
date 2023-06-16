@@ -486,7 +486,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         public async Task<IEnumerable<ProcessRouteDetailDto>> GetProcessRouteAsync(long processRouteId)
         {
             var processRouteDetailLinkListTask = _procProcessRouteDetailLinkRepository.GetListAsync(new ProcProcessRouteDetailLinkQuery { ProcessRouteId = processRouteId });
-            var processRouteDetailNodeListTask = _procProcessRouteDetailNodeRepository.GetProcProcessRouteDetailNodesByProcessRouteId(processRouteId);
+            var processRouteDetailNodeListTask = _procProcessRouteDetailNodeRepository.GetProcessRouteDetailNodesByProcessRouteIdAsync(processRouteId);
             var processRouteDetailLinkList = await processRouteDetailLinkListTask;
             var processRouteDetailNodeList = await processRouteDetailNodeListTask;
 

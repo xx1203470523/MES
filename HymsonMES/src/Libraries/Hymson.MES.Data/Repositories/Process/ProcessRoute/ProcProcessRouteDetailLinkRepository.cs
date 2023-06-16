@@ -2,6 +2,7 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -16,14 +17,16 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 
         /// </summary>
         private readonly ConnectionOptions _connectionOptions;
+        private readonly IMemoryCache _memoryCache;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public ProcProcessRouteDetailLinkRepository(IOptions<ConnectionOptions> connectionOptions)
+        public ProcProcessRouteDetailLinkRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
         {
             _connectionOptions = connectionOptions.Value;
+            _memoryCache = memoryCache;
         }
 
 
@@ -36,6 +39,21 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<ProcProcessRouteDetailLinkEntity>(GetByIdSql, new { Id = id });
+        }
+
+        /// <summary>
+        /// 获某工艺路线下面的连线
+        /// </summary>
+        /// <param name="processRouteId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetProcessRouteDetailLinksByProcessRouteIdAsync(long processRouteId)
+        {
+            var key = $"proc_process_route_detail_link&{processRouteId}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                return await conn.QueryAsync<ProcProcessRouteDetailLinkEntity>(GetByProcessRouteIdSql, new { ProcessRouteId = processRouteId });
+            });
         }
 
         /// <summary>
@@ -85,7 +103,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
-             sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Where("SiteId = @SiteId");
 
             var offSet = (query.PageIndex - 1) * query.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -219,6 +237,7 @@ namespace Hymson.MES.Data.Repositories.Process
                                           `Id`, `SiteId`, `SerialNo`, `ProcessRouteId`, `PreProcessRouteDetailId`, `ProcessRouteDetailId`, `Extra1`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_process_route_detail_link`  WHERE Id IN @ids ";
         const string DeleteByProcessRouteIdSql = "delete from `proc_process_route_detail_link` WHERE ProcessRouteId = @ProcessRouteId ";
+        const string GetByProcessRouteIdSql = "SELECT * FROM proc_process_route_detail_link WHERE ProcessRouteId = @ProcessRouteId; ";
         const string GetPreProcedureIDsSql = "SELECT * FROM proc_process_route_detail_link WHERE ProcessRouteId = @ProcessRouteId AND ProcessRouteDetailId = @ProcedureId; ";
         const string GetNextProcedureIDsSql = "SELECT * FROM proc_process_route_detail_link WHERE ProcessRouteId = @ProcessRouteId AND PreProcessRouteDetailId = @ProcedureId; ";
     }
