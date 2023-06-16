@@ -94,13 +94,13 @@ namespace Hymson.MES.Data.Repositories.Integrated
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.SystemCode))
+            if (!string.IsNullOrWhiteSpace(pagedQuery.SystemCode))
             {
                 pagedQuery.SystemCode = $"%{pagedQuery.SystemCode}%";
                 sqlBuilder.Where("SystemCode LIKE @SystemCode");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.SystemName))
+            if (!string.IsNullOrWhiteSpace(pagedQuery.SystemName))
             {
                 pagedQuery.SystemName = $"%{pagedQuery.SystemName}%";
                 sqlBuilder.Where("SystemName LIKE @SystemName");
