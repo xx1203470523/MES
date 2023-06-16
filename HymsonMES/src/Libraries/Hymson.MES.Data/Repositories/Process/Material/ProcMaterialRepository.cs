@@ -132,7 +132,7 @@ namespace Hymson.MES.Data.Repositories.Process
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
-            sqlBuilder.OrderBy("UpdatedOn DESC");
+            sqlBuilder.OrderBy("UpdatedOn DESC, Id DESC");
             sqlBuilder.Select("*");
 
             if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.MaterialCode))
