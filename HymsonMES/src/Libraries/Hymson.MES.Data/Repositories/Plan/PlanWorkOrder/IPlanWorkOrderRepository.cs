@@ -3,6 +3,7 @@ using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
+using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.View;
 
 namespace Hymson.MES.Data.Repositories.Plan
 {
@@ -11,6 +12,13 @@ namespace Hymson.MES.Data.Repositories.Plan
     /// </summary>
     public interface IPlanWorkOrderRepository
     {
+        /// <summary>
+        /// 工单产量报表查询
+        /// </summary>
+        /// <typeparam name="PlanWorkOrderProductionReportPageListAsync"></typeparam>
+        /// <param name="pageQuery"></param>
+        /// <returns></returns>
+        Task<PagedInfo<PlanWorkOrderProductionReportView>> GetPlanWorkOrderProductionReportPageListAsync(PlanWorkOrderProductionReportPagedQuery pageQuery);
         /// <summary>
         /// 新增
         /// </summary>

@@ -4,8 +4,11 @@ using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
+using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.View;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -30,6 +33,60 @@ namespace Hymson.MES.Data.Repositories.Plan
             _connectionOptions = connectionOptions.Value;
         }
 
+
+        /// <summary>
+        /// 根据查询条件获取工单产量报表分页数据
+        /// </summary>
+        /// <param name="pageQuery"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<PlanWorkOrderProductionReportView>> GetPlanWorkOrderProductionReportPageListAsync(PlanWorkOrderProductionReportPagedQuery pageQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoPlanWorkOrderProductionReportDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoPlanWorkOrderProductionReportCountSqlTemplate);
+
+            sqlBuilder.Where(" pwor.SiteId = @SiteId ");
+            sqlBuilder.Where(" pwor.IsDeleted = 0 ");
+            sqlBuilder.Where(" pwo.SiteId = @SiteId ");
+            sqlBuilder.Where(" pwo.IsDeleted = 0 ");
+
+            if (!string.IsNullOrEmpty(pageQuery.MaterialCode))
+            {
+                pageQuery.MaterialCode = $"%{pageQuery.MaterialCode}%";
+                sqlBuilder.Where(" m.MaterialCode like @MaterialCode ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.OrderCode))
+            {
+                pageQuery.OrderCode = $"%{pageQuery.OrderCode}%";
+                sqlBuilder.Where(" pwo.OrderCode like @OrderCode ");
+            }
+            if (pageQuery.OrderType.HasValue)
+            {
+                sqlBuilder.Where(" pwo.Type = @OrderType ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.WorkCentCode))
+            {
+                sqlBuilder.Where(" iwc.Code = @WorkCentCode ");
+            }
+            if (pageQuery.RealStart.HasValue) {
+                sqlBuilder.Where(" pwor.RealStart >= @RealStart ");
+            }
+            if (pageQuery.RealEnd.HasValue)
+            {
+                sqlBuilder.Where(" pwor.RealEnd < @RealEnd ");
+            }
+            var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = pageQuery.PageSize });
+            sqlBuilder.AddParameters(pageQuery);
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var reportDataTask = conn.QueryAsync<PlanWorkOrderProductionReportView>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var reportData = await reportDataTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<PlanWorkOrderProductionReportView>(reportData, pageQuery.PageIndex, pageQuery.PageSize, totalCount);
+        }
 
         /// <summary>
         /// 删除（软删除）
@@ -168,7 +225,7 @@ namespace Hymson.MES.Data.Repositories.Plan
             {
                 sqlBuilder.Where("wo.Type = @Type ");
             }
-            
+
             if (pageQuery.Status.HasValue)
             {
                 //if (pageQuery.Status == Core.Enums.PlanWorkOrderStatusEnum.Pending)
@@ -179,10 +236,10 @@ namespace Hymson.MES.Data.Repositories.Plan
                 //}
                 //else
                 //{
-                    //pageQuery.IsLocked = Core.Enums.YesOrNoEnum.No;
-                    //sqlBuilder.AddParameters(new { StatusIsLocked = Core.Enums.YesOrNoEnum.No });
-                    sqlBuilder.Where("wo.Status = @Status");
-                    //sqlBuilder.Where("wo.IsLocked = @StatusIsLocked ");
+                //pageQuery.IsLocked = Core.Enums.YesOrNoEnum.No;
+                //sqlBuilder.AddParameters(new { StatusIsLocked = Core.Enums.YesOrNoEnum.No });
+                sqlBuilder.Where("wo.Status = @Status");
+                //sqlBuilder.Where("wo.IsLocked = @StatusIsLocked ");
                 //}
             }
             //if (pageQuery.IsLocked.HasValue) sqlBuilder.Where("wo.IsLocked = @IsLocked");
@@ -196,13 +253,13 @@ namespace Hymson.MES.Data.Repositories.Plan
             //    }
             //}
 
-            if (pageQuery.PlanStartTime != null && pageQuery.PlanStartTime.Length > 0) 
+            if (pageQuery.PlanStartTime != null && pageQuery.PlanStartTime.Length > 0)
             {
-                if (pageQuery.PlanStartTime.Length >= 2) 
+                if (pageQuery.PlanStartTime.Length >= 2)
                 {
                     sqlBuilder.AddParameters(new { PlanStartTimeStart = pageQuery.PlanStartTime[0], PlanStartTimeEnd = pageQuery.PlanStartTime[1] });
                     sqlBuilder.Where("wo.PlanStartTime BETWEEN @PlanStartTimeStart AND @PlanStartTimeEnd");
-                } 
+                }
             }
 
             if (pageQuery.Statuss != null && pageQuery.Statuss.Any())
@@ -477,5 +534,22 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string UpdateWorkOrderLockedSql = @"UPDATE `plan_work_order` SET Status = @Status, LockedStatus=@LockedStatus,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string UpdateRecordRealStartSql = "UPDATE plan_work_order_record SET RealStart = @UpdatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND RealStart IS NULL AND WorkOrderId IN @WorkOrderIds ";
         const string UpdateRecordRealEndSql = "UPDATE plan_work_order_record SET RealEnd = @UpdatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE WorkOrderId IN @WorkOrderIds AND IsDeleted = 0 ";
+
+        const string GetPagedInfoPlanWorkOrderProductionReportDataSqlTemplate = @" select pwo.Id,pwo.OrderCode,pwo.Type,pwo.Qty,iwc.Name as WorkCentName,iwc.Code WorkCentCode,
+                                tm.MaterialCode,m.MaterialName,pwo.PlanStartTime,pwo.PlanEndTime,pwor.RealStart,pwor.RealEnd,
+                                pwor.InputQty,pwor.UnqualifiedQuantity,pwor.FinishProductQuantity,pwor.PassDownQuantity,
+                                (SELECT count(1) FROM manu_sfc_summary mss where mss.WorkOrderId=pwo.Id ) NoPassQty /*不合格数量*/
+                                from plan_work_order_record pwor 
+                                LEFT JOIN plan_work_order pwo on pwor.WorkOrderId=pwo.Id
+                                LEFT JOIN proc_material m on m.Id=pwo.ProductId 
+                                LEFT JOIN proc_bom b on b.id=pwo.ProductBOMId 
+                                LEFT JOIN inte_work_center iwc on iwc.id=pwo.WorkCenterId  /**where**/  ";
+        const string GetPagedInfoPlanWorkOrderProductionReportCountSqlTemplate = @"select COUNT(1) 
+                                from plan_work_order_record pwor 
+                                LEFT JOIN plan_work_order pwo on pwor.WorkOrderId=pwo.Id
+                                LEFT JOIN proc_material m on m.Id=pwo.ProductId 
+                                LEFT JOIN proc_bom b on b.id=pwo.ProductBOMId 
+                                LEFT JOIN inte_work_center iwc on iwc.id=pwo.WorkCenterId  /**where**/  ";
+
     }
 }

@@ -27,6 +27,7 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
+using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.View;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
@@ -518,8 +519,10 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<PlanWorkOrderEntity, PlanWorkOrderDto>();
             CreateMap<PlanWorkOrderEntity, PlanWorkOrderDetailViewDto>();
             CreateMap<PlanWorkOrderListDetailView, PlanWorkOrderListDetailViewDto>();
-
             CreateMap<PlanWorkOrderEntity, PlanWorkOrderStatusRecordEntity>();
+
+            CreateMap<PlanWorkOrderProductionReportView, PlanWorkOrderProductionReportViewDto>();
+            CreateMap<PlanWorkOrderProductionReportPagedQueryDto, PlanWorkOrderProductionReportPagedQuery>();
             #endregion
 
             #region PlanSfcReceive

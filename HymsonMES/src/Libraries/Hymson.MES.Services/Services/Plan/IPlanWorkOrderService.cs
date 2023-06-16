@@ -7,6 +7,7 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Plan;
+using Hymson.MES.Services.Dtos.Report;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -82,6 +83,13 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="parm"></param>
         /// <returns></returns>
         Task ModifyWorkOrderLockedAsync(List<PlanWorkOrderLockedDto> parms);
+
+        /// <summary>
+        /// 查询工单产量报表
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<PlanWorkOrderProductionReportViewDto>> GetPlanWorkOrderProductionReportPageListAsync(PlanWorkOrderProductionReportPagedQueryDto queryDto);
 
     }
 }

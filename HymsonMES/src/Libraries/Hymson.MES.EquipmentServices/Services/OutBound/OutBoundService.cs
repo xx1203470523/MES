@@ -217,7 +217,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 throw new CustomerValidationException(nameof(ErrorCode.MES19125)).WithData("SFCS", string.Join(',', noIncludeSfcs));
 
             //SFC有条码信息，但已经没有生产信息不允许出站
-            var noProduceSfcs = sfclist.Where(w => sfcProduceList.Select(s => s.SFC).Contains(w.SFC) == false);
+            var noProduceSfcs = sfclist.Where(w => sfcProduceList.Select(s => s.SFC).Contains(w.SFC) == false).Select(p => p.SFC);
             if (noProduceSfcs.Any())
                 throw new CustomerValidationException(nameof(ErrorCode.MES19126)).WithData("SFCS", string.Join(',', noProduceSfcs));
 

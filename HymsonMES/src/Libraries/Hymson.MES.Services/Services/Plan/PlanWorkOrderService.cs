@@ -14,6 +14,7 @@ using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Plan;
+using Hymson.MES.Services.Dtos.Report;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -263,7 +264,7 @@ namespace Hymson.MES.Services.Services.Plan
                 }
 
                 //对是需要修改为关闭状态的做特殊处理： 给 工单记录表 更新 真实结束时间
-                if (item.Status == PlanWorkOrderStatusEnum.Closed) 
+                if (item.Status == PlanWorkOrderStatusEnum.Closed)
                 {
                     updateWorkOrderRealEndList.Add(item.Id);
                 }
@@ -338,7 +339,7 @@ namespace Hymson.MES.Services.Services.Plan
                 if (deleteActivationWorkOrderIds.Any())
                 {
                     await _planWorkOrderActivationRepository.DeletesTrueByWorkOrderIdsAsync(deleteActivationWorkOrderIds.ToArray());
-                    if (planWorkOrderActivationRecordEntitys.Any()) 
+                    if (planWorkOrderActivationRecordEntitys.Any())
                     {
                         await _planWorkOrderActivationRecordRepository.InsertsAsync(planWorkOrderActivationRecordEntitys);
                     }
@@ -381,7 +382,7 @@ namespace Hymson.MES.Services.Services.Plan
 
             if (parms.First().IsLocked == YesOrNoEnum.Yes) //需要修改为锁定
             {
-                if (workOrders.Any(x=>x.Status != PlanWorkOrderStatusEnum.InProduction))//判断是否有不是生产中的则无法更改为锁定
+                if (workOrders.Any(x => x.Status != PlanWorkOrderStatusEnum.InProduction))//判断是否有不是生产中的则无法更改为锁定
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16007));
                 }
@@ -392,7 +393,7 @@ namespace Hymson.MES.Services.Services.Plan
                     {
                         Id = item.Id,
                         Status = PlanWorkOrderStatusEnum.Pending,
-                        LockedStatus =item.Status,
+                        LockedStatus = item.Status,
 
                         UpdatedBy = _currentUser.UserName,
                         UpdatedOn = HymsonClock.Now()
@@ -583,6 +584,20 @@ namespace Hymson.MES.Services.Services.Plan
                 return planWorkOrderDetailView;
             }
             return null;
+        }
+
+        /// <summary>
+        /// 工单产量报表分页查询
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<PlanWorkOrderProductionReportViewDto>> GetPlanWorkOrderProductionReportPageListAsync(PlanWorkOrderProductionReportPagedQueryDto queryDto)
+        {
+            var pagedQuery = queryDto.ToQuery<PlanWorkOrderProductionReportPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            var pagedInfo = await _planWorkOrderRepository.GetPlanWorkOrderProductionReportPageListAsync(pagedQuery);
+            var dtos = pagedInfo.Data.Select(s => s.ToModel<PlanWorkOrderProductionReportViewDto>());
+            return new PagedInfo<PlanWorkOrderProductionReportViewDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
     }

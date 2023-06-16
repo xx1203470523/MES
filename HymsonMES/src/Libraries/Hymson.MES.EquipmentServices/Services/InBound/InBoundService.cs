@@ -180,7 +180,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             //查询已经存在条码的生产信息
             var sfcProduceList = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery { Sfcs = inBoundMoreDto.SFCs, SiteId = _currentEquipment.SiteId });
             //SFC有条码信息，但已经没有生产信息不允许进站
-            var noIncludeSfcs = sfclist.Where(w => sfcProduceList.Select(s => s.SFC.ToUpper()).Contains(w.SFC.ToUpper()) == false);
+            var noIncludeSfcs = sfclist.Where(w => sfcProduceList.Select(s => s.SFC.ToUpper()).Contains(w.SFC.ToUpper()) == false).Select(p => p.SFC);
             if (noIncludeSfcs.Any())
                 throw new CustomerValidationException(nameof(ErrorCode.MES19126)).WithData("SFCS", string.Join(',', noIncludeSfcs));
 
@@ -191,7 +191,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
 
             //复投次数限制，对于测试类型工序，条码复投数量大于等于工序循环次数限制进站
             var noNeedRepeat = sfcProduceList.Where(c => procedureEntityList.Where(p => p.Type == ProcedureTypeEnum.Test && (p.Cycle ?? 1) <= c.RepeatedCount)
-                                                         .Select(p => p.Id).Contains(c.ProcedureId));
+                                                         .Select(p => p.Id).Contains(c.ProcedureId)).Select(p => p.SFC);
             if (noNeedRepeat.Any())
                 throw new CustomerValidationException(nameof(ErrorCode.MES19130)).WithData("SFCS", string.Join(',', noNeedRepeat));
 
@@ -226,6 +226,8 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             List<ManuSfcEntity> updateManuSfcList = new List<ManuSfcEntity>();
             List<ManuSfcSummaryEntity> updateManuSfcSummaryList = new List<ManuSfcSummaryEntity>();
 
+            //过滤复投的数量
+            int sfcQty = 0;
             foreach (var sfc in inBoundMoreDto.SFCs)
             {
                 //汇总信息
@@ -239,6 +241,10 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     sfcProduce.Status = SfcProduceStatusEnum.Activity;
                     //当前SFC的工序信息
                     var sfcprocedureEntity = procedureEntityList.Where(c => c.Id == sfcProduce.ProcedureId).First();
+                    //第一次进站
+                    if (sfcProduce.RepeatedCount == 0) {
+                        sfcQty++;
+                    }
                     // 检查是否测试工序
                     if (sfcprocedureEntity.Type == ProcedureTypeEnum.Test)
                     {
@@ -330,6 +336,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     }
                     continue;
                 }
+                sfcQty++;
                 //条码表
                 var manuSfcEntity = new ManuSfcEntity
                 {
@@ -432,7 +439,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             {
                 WorkOrderId = planWorkOrderEntity.Id,
                 PlanQuantity = planWorkOrderEntity.Qty * (1 + planWorkOrderEntity.OverScale / 100),
-                PassDownQuantity = inBoundMoreDto.SFCs.Length,
+                PassDownQuantity = sfcQty,
                 UserName = _currentEquipment.Name,
                 UpdateDate = HymsonClock.Now()
             });
@@ -442,7 +449,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                 UpdatedBy = _currentEquipment.Name,
                 UpdatedOn = HymsonClock.Now(),
                 WorkOrderId = planWorkOrderEntity.Id,
-                Qty = inBoundMoreDto.SFCs.Length,
+                Qty = sfcQty,
             });
 
             // 更新工单统计表的 RealStart
