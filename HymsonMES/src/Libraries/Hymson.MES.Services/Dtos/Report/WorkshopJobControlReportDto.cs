@@ -157,7 +157,7 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; }
+        public SfcInOutStatusEnum Status { get; set; }
 
         /// <summary>
         /// 进站时间

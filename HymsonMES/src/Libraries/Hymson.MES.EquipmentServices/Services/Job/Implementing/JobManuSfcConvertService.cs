@@ -401,7 +401,7 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
                     SiteId = _currentEquipment.SiteId,
                     SfcId = createmanuSfcEntity.Id,
                     WorkOrderId = planWorkOrder.Id,
-                    ProductId = planWorkOrder.ProductId,
+                    ProductId = bomDetail.MaterialId,
                     IsUsed = true,
                     CreatedBy = _currentEquipment.Name,
                     UpdatedBy = _currentEquipment.Name

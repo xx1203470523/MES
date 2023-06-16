@@ -125,7 +125,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(modifyDto);
             await ValidationSaveDto(modifyDto);
-            var inteContainerEntity = await  _inteContainerRepository.GetByIdAsync(modifyDto.Id ?? 0);
+            var inteContainerEntity = await _inteContainerRepository.GetByIdAsync(modifyDto.Id ?? 0);
             if (inteContainerEntity.Status != SysDataStatusEnum.Build && modifyDto.Status == SysDataStatusEnum.Build)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12510));
@@ -210,6 +210,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
             var pattern = @"^[1-9]\d*$";
             if (Regex.IsMatch($"{dto.Minimum}", pattern) == false) throw new CustomerValidationException(nameof(ErrorCode.MES12504));
             if (Regex.IsMatch($"{dto.Maximum}", pattern) == false) throw new CustomerValidationException(nameof(ErrorCode.MES12505));
+            if (!Enum.IsDefined(typeof(SysDataStatusEnum), dto.Status)) throw new CustomerValidationException(nameof(ErrorCode.MES12511));
 
             // 判断物料/物料组是否存在
             switch (dto.DefinitionMethod)
