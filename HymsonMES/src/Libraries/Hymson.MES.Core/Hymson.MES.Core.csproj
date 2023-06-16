@@ -21,9 +21,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Hymson.Infrastructure" Version="2.1.41" />
-    <PackageReference Include="Hymson.Kafka.Debezium" Version="2.1.41" />
-    <PackageReference Include="Hymson.Sequences" Version="2.1.41" />
+    <PackageReference Include="Hymson.Infrastructure" Version="2.1.42" />
+    <PackageReference Include="Hymson.Kafka.Debezium" Version="2.1.42" />
+    <PackageReference Include="Hymson.Sequences" Version="2.1.42" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
   </ItemGroup>
 
