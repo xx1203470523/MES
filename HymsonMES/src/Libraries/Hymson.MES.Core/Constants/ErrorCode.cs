@@ -252,6 +252,10 @@
         public const string MES12119 = "不能配置重复的车间/产线";
         public const string MES12120 = "不能配置重复的资源";
         public const string MES12121 = "新建或者废除状态的资源不能用于工作中心";
+        public const string MES12122 = "工作中心状态不能为空.";
+        public const string MES12123 = "工作中心状态不合法，请检查.";
+        public const string MES12124 = "工作中心类型不合法，请检查.";
+
         #endregion
 
         #region 编码规则 12400
