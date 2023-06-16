@@ -321,6 +321,7 @@
         public const string MES12901 = "故障现象编码不能为空";
         public const string MES12902 = "故障现象名称不能为空";
         public const string MES12903 = "请求实体不能为空！";
+        public const string MES12904 = "设备组不能为空！";
         #endregion
 
         #region 故障原因 13000
@@ -469,6 +470,7 @@
         public const string MES16035 = "SFC对应工单状态为非生产中状态，不可执行操作！";
         public const string MES16036 = "SFC超过最大复投次数，不允许生产！";
         public const string MES16037 = "工单状态已经被修改，请刷新重试";
+        public const string MES16038 = "编码类型不合法，请检查！";
         #endregion
 
         #region 条码接收 16100
