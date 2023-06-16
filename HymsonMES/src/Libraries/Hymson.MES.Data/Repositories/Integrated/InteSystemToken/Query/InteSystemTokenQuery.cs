@@ -13,5 +13,14 @@ namespace Hymson.MES.Data.Repositories.Integrated
     /// </summary>
     public class InteSystemTokenQuery
     {
+        /// <summary>
+        /// 工厂
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 编码
+        /// </summary>
+        public string SystemCode { get; set; }
     }
 }

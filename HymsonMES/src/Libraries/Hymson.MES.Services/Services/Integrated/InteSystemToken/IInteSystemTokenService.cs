@@ -37,13 +37,6 @@ namespace Hymson.MES.Services.Services.Integrated
         Task ModifyInteSystemTokenAsync(InteSystemTokenModifyDto inteSystemTokenModifyDto);
 
         /// <summary>
-        /// 删除
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task DeleteInteSystemTokenAsync(long id);
-
-        /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="ids"></param>

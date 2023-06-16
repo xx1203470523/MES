@@ -14,6 +14,20 @@ namespace Hymson.MES.Data.Repositories.Integrated
     /// </summary>
     public class InteSystemTokenPagedQuery : PagerInfo
     {
+        /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long? SiteId { get; set; }
+
+        /// <summary>
+        /// 系统编码
+        /// </summary>
+        public string? SystemCode { get; set; }
+
+        /// <summary>
+        /// 系统名称
+        /// </summary>
+        public string? SystemName { get; set; }
 
     }
 }

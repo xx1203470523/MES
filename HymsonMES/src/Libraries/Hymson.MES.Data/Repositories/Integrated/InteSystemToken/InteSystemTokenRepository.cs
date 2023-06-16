@@ -12,7 +12,6 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Integrated
 {
@@ -72,11 +71,22 @@ namespace Hymson.MES.Data.Repositories.Integrated
         }
 
         /// <summary>
+        /// 根据系统编码获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<InteSystemTokenEntity> GetByCodeAsync(InteSystemTokenQuery param)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<InteSystemTokenEntity>(GetByCodeSql, param);
+        }
+
+        /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="inteSystemTokenPagedQuery"></param>
+        /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<InteSystemTokenEntity>> GetPagedInfoAsync(InteSystemTokenPagedQuery inteSystemTokenPagedQuery)
+        public async Task<PagedInfo<InteSystemTokenEntity>> GetPagedInfoAsync(InteSystemTokenPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
@@ -84,22 +94,29 @@ namespace Hymson.MES.Data.Repositories.Integrated
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-           
-            var offSet = (inteSystemTokenPagedQuery.PageIndex - 1) * inteSystemTokenPagedQuery.PageSize;
+            if (string.IsNullOrWhiteSpace(pagedQuery.SystemCode))
+            {
+                pagedQuery.SystemCode = $"%{pagedQuery.SystemCode}%";
+                sqlBuilder.Where("SystemCode LIKE @SystemCode");
+            }
+
+            if (string.IsNullOrWhiteSpace(pagedQuery.SystemName))
+            {
+                pagedQuery.SystemName = $"%{pagedQuery.SystemName}%";
+                sqlBuilder.Where("SystemName LIKE @SystemName");
+            }
+
+            var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = inteSystemTokenPagedQuery.PageSize });
-            sqlBuilder.AddParameters(inteSystemTokenPagedQuery);
+            sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
+            sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = GetMESDbConnection();
             var inteSystemTokenEntitiesTask = conn.QueryAsync<InteSystemTokenEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var inteSystemTokenEntities = await inteSystemTokenEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<InteSystemTokenEntity>(inteSystemTokenEntities, inteSystemTokenPagedQuery.PageIndex, inteSystemTokenPagedQuery.PageSize, totalCount);
+            return new PagedInfo<InteSystemTokenEntity>(inteSystemTokenEntities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
         /// <summary>
@@ -135,7 +152,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         public async Task<int> InsertsAsync(List<InteSystemTokenEntity> inteSystemTokenEntitys)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertsSql, inteSystemTokenEntitys);
+            return await conn.ExecuteAsync(InsertSql, inteSystemTokenEntitys);
         }
 
         /// <summary>
@@ -157,10 +174,20 @@ namespace Hymson.MES.Data.Repositories.Integrated
         public async Task<int> UpdatesAsync(List<InteSystemTokenEntity> inteSystemTokenEntitys)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdatesSql, inteSystemTokenEntitys);
+            return await conn.ExecuteAsync(UpdateSql, inteSystemTokenEntitys);
+        }
+
+        /// <summary>
+        /// 更新token信息
+        /// </summary>
+        /// <param name="inteSystemTokenEntity"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateTokenAsync(InteSystemTokenEntity inteSystemTokenEntity)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateTokenSql, inteSystemTokenEntity);
         }
         #endregion
-
     }
 
     public partial class InteSystemTokenRepository
@@ -173,10 +200,8 @@ namespace Hymson.MES.Data.Repositories.Integrated
                                            FROM `inte_system_token` /**where**/  ";
 
         const string InsertSql = "INSERT INTO `inte_system_token`(  `Id`, `SystemCode`, `SystemName`, `Token`, `ExpirationTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @SystemCode, @SystemName, @Token, @ExpirationTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
-        const string InsertsSql = "INSERT INTO `inte_system_token`(  `Id`, `SystemCode`, `SystemName`, `Token`, `ExpirationTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @SystemCode, @SystemName, @Token, @ExpirationTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
-
-        const string UpdateSql = "UPDATE `inte_system_token` SET   SystemCode = @SystemCode, SystemName = @SystemName, Token = @Token, ExpirationTime = @ExpirationTime, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `inte_system_token` SET   SystemCode = @SystemCode, SystemName = @SystemName, Token = @Token, ExpirationTime = @ExpirationTime, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `inte_system_token` SET  SystemCode = @SystemCode, SystemName = @SystemName, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
+        const string UpdateTokenSql = "UPDATE `inte_system_token` SET Token = @Token, ExpirationTime = @ExpirationTime, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `inte_system_token` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `inte_system_token` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
@@ -187,6 +212,9 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SystemCode`, `SystemName`, `Token`, `ExpirationTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `inte_system_token`  WHERE Id IN @Ids ";
+
+        const string GetByCodeSql = @"SELECT Id,SystemCode,SystemName,Token,ExpirationTime,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted,SiteId
+                                                           FROM inte_system_token  WHERE SystemCode=@SystemCode  AND SiteId=@SiteId AND IsDeleted=0 ";
         #endregion
     }
 }

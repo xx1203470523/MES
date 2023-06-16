@@ -22,8 +22,8 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// </summary>
         public string SystemCode { get; set; }
 
-       /// <summary>
-        /// 设备名称
+        /// <summary>
+        /// 系统名称
         /// </summary>
         public string SystemName { get; set; }
 

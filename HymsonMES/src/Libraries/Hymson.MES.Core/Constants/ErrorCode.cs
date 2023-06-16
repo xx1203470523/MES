@@ -777,6 +777,10 @@
         #endregion
 
 
+        #region 系统Token MES18300
+        public const string MES18300 = "系统编码{code}已经存在";
+        #endregion
+
         #region 设备对接错误
 
         #region 设备对接公用

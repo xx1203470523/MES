@@ -23,7 +23,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="inteSystemTokenEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(InteSystemTokenEntity inteSystemTokenEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -37,7 +37,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="inteSystemTokenEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(InteSystemTokenEntity inteSystemTokenEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -46,13 +46,20 @@ namespace Hymson.MES.Data.Repositories.Integrated
         Task<int> UpdatesAsync(List<InteSystemTokenEntity> inteSystemTokenEntitys);
 
         /// <summary>
+        /// 更新token信息
+        /// </summary>
+        /// <param name="inteSystemTokenEntity"></param>
+        /// <returns></returns>
+        Task<int> UpdateTokenAsync(InteSystemTokenEntity inteSystemTokenEntity);
+
+        /// <summary>
         /// 删除  
         /// 最好使用批量删除，可以设置更新人和更新时间
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -66,7 +73,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="id"></param>
         /// <returns></returns>
         Task<InteSystemTokenEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -75,12 +82,19 @@ namespace Hymson.MES.Data.Repositories.Integrated
         Task<IEnumerable<InteSystemTokenEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
+        /// 根据系统编码获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<InteSystemTokenEntity> GetByCodeAsync(InteSystemTokenQuery param);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="inteSystemTokenQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<InteSystemTokenEntity>> GetInteSystemTokenEntitiesAsync(InteSystemTokenQuery inteSystemTokenQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>
