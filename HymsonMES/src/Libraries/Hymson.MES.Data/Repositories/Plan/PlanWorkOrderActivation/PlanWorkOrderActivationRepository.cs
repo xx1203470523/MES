@@ -219,8 +219,8 @@ namespace Hymson.MES.Data.Repositories.Plan
             {
                 if (planWorkOrderActivationPagedQuery.PlanStartTime.Length >= 2)
                 {
-                    sqlBuilder.AddParameters(new { PlanStartTimeStart = planWorkOrderActivationPagedQuery.PlanStartTime[0], PlanStartTimeEnd = planWorkOrderActivationPagedQuery.PlanStartTime[1] });
-                    sqlBuilder.Where("wo.PlanStartTime BETWEEN @PlanStartTimeStart AND @PlanStartTimeEnd");
+                    sqlBuilder.AddParameters(new { PlanStartTimeStart = planWorkOrderActivationPagedQuery.PlanStartTime[0], PlanStartTimeEnd = planWorkOrderActivationPagedQuery.PlanStartTime[1].AddDays(1) });
+                    sqlBuilder.Where("wo.PlanStartTime >= @PlanStartTimeStart AND wo.PlanStartTime < @PlanStartTimeEnd");
                 }
             }
 

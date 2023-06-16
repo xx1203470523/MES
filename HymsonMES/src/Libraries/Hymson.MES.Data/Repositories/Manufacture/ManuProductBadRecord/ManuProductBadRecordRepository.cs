@@ -279,8 +279,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 if (pageQuery.CreatedOn.Length >= 2)
                 {
-                    sqlBuilder.AddParameters(new { CreatedOnStart = pageQuery.CreatedOn[0], CreatedOnEnd = pageQuery.CreatedOn[1] });
-                    sqlBuilder.Where(" rbr.CreatedOn BETWEEN @CreatedOnStart AND @CreatedOnEnd ");
+                    sqlBuilder.AddParameters(new { CreatedOnStart = pageQuery.CreatedOn[0], CreatedOnEnd = pageQuery.CreatedOn[1].AddDays(1) });
+                    sqlBuilder.Where(" rbr.CreatedOn >= @CreatedOnStart rbr.CreatedOn < @CreatedOnEnd ");
                 }
             }
 
@@ -350,8 +350,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 if (pageQuery.CreatedOn.Length >= 2)
                 {
-                    sqlBuilder.AddParameters(new { CreatedOnStart = pageQuery.CreatedOn[0], CreatedOnEnd = pageQuery.CreatedOn[1] });
-                    sqlBuilder.Where(" rbr.CreatedOn BETWEEN @CreatedOnStart AND @CreatedOnEnd ");
+                    sqlBuilder.AddParameters(new { CreatedOnStart = pageQuery.CreatedOn[0], CreatedOnEnd = pageQuery.CreatedOn[1].AddDays(1) });
+                    sqlBuilder.Where(" rbr.CreatedOn >= @CreatedOnStart AND rbr.CreatedOn < @CreatedOnEnd ");
                 }
             }
 
@@ -448,8 +448,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 if (pageQuery.CreatedOn.Length >= 2)
                 {
-                    sqlBuilder.AddParameters(new { CreatedOnStart = pageQuery.CreatedOn[0], CreatedOnEnd = pageQuery.CreatedOn[1] });
-                    sqlBuilder.Where(" rbr.CreatedOn BETWEEN @CreatedOnStart AND @CreatedOnEnd ");
+                    sqlBuilder.AddParameters(new { CreatedOnStart = pageQuery.CreatedOn[0], CreatedOnEnd = pageQuery.CreatedOn[1].AddDays(1) });
+                    sqlBuilder.Where(" rbr.CreatedOn >= @CreatedOnStart AND  rbr.CreatedOn < @CreatedOnEnd ");
                 }
             }
 
