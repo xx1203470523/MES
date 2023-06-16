@@ -288,8 +288,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 if (queryParam.CreatedOn.Length >= 2)
                 {
-                    sqlBuilder.AddParameters(new { CreatedOnStart = queryParam.CreatedOn[0], CreatedOnEnd = queryParam.CreatedOn[1] });
-                    sqlBuilder.Where(" CreatedOn BETWEEN @CreatedOnStart AND @CreatedOnEnd ");
+                    sqlBuilder.AddParameters(new { CreatedOnStart = queryParam.CreatedOn[0], CreatedOnEnd = queryParam.CreatedOn[1].AddDays(1) });
+                    sqlBuilder.Where(" CreatedOn >= @CreatedOnStart AND CreatedOn < @CreatedOnEnd ");
                 }
             }
 

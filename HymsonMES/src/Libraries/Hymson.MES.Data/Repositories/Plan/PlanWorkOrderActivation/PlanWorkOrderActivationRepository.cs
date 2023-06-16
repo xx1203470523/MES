@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -15,14 +16,17 @@ namespace Hymson.MES.Data.Repositories.Plan
     public partial class PlanWorkOrderActivationRepository : IPlanWorkOrderActivationRepository
     {
         private readonly ConnectionOptions _connectionOptions;
+        private readonly IMemoryCache _memoryCache;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public PlanWorkOrderActivationRepository(IOptions<ConnectionOptions> connectionOptions)
+        /// <param name="memoryCache"></param>
+        public PlanWorkOrderActivationRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
         {
             _connectionOptions = connectionOptions.Value;
+            _memoryCache = memoryCache;
         }
 
 
@@ -96,12 +100,16 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <summary>
         /// 根据ID获取数据
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="workOrderId"></param>
         /// <returns></returns>
         public async Task<PlanWorkOrderActivationEntity> GetByWorkOrderIdAsync(long workOrderId)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderActivationEntity>(GetByworkOrderIdSql, new { workOrderId = workOrderId });
+            var key = $"plan_work_order_activation&{workOrderId}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderActivationEntity>(GetByworkOrderIdSql, new { workOrderId });
+            });
         }
 
         /// <summary>
@@ -194,12 +202,12 @@ namespace Hymson.MES.Data.Repositories.Plan
                 //}
                 //else 
                 //{
-                    sqlBuilder.Where(" wo.Status = @Status ");
+                sqlBuilder.Where(" wo.Status = @Status ");
                 //}
             }
             else
             {
-                sqlBuilder.AddParameters(new { NotStatus = new PlanWorkOrderStatusEnum[] { PlanWorkOrderStatusEnum.Closed,PlanWorkOrderStatusEnum.NotStarted } });
+                sqlBuilder.AddParameters(new { NotStatus = new PlanWorkOrderStatusEnum[] { PlanWorkOrderStatusEnum.Closed, PlanWorkOrderStatusEnum.NotStarted } });
                 sqlBuilder.Where(" wo.Status not in  @NotStatus ");//不要显示状态为已关闭的 和未开始的
             }
             //if (planWorkOrderActivationPagedQuery.IsLocked.HasValue)
@@ -211,8 +219,8 @@ namespace Hymson.MES.Data.Repositories.Plan
             {
                 if (planWorkOrderActivationPagedQuery.PlanStartTime.Length >= 2)
                 {
-                    sqlBuilder.AddParameters(new { PlanStartTimeStart = planWorkOrderActivationPagedQuery.PlanStartTime[0], PlanStartTimeEnd = planWorkOrderActivationPagedQuery.PlanStartTime[1] });
-                    sqlBuilder.Where("wo.PlanStartTime BETWEEN @PlanStartTimeStart AND @PlanStartTimeEnd");
+                    sqlBuilder.AddParameters(new { PlanStartTimeStart = planWorkOrderActivationPagedQuery.PlanStartTime[0], PlanStartTimeEnd = planWorkOrderActivationPagedQuery.PlanStartTime[1].AddDays(1) });
+                    sqlBuilder.Where("wo.PlanStartTime >= @PlanStartTimeStart AND wo.PlanStartTime < @PlanStartTimeEnd");
                 }
             }
 
@@ -350,18 +358,10 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string UpdatesSql = "UPDATE `plan_work_order_activation` SET   SiteId = @SiteId, WorkOrderId = @WorkOrderId, LineId = @LineId, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `plan_work_order_activation` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `plan_work_order_activation`  SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids ";
-        const string GetByIdSql = @"SELECT
-      `Id`, `SiteId`, `WorkOrderId`, `LineId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-    FROM `plan_work_order_activation`  WHERE Id = @Id ";
-        const string GetByworkOrderIdSql = @"SELECT
-      `Id`, `SiteId`, `WorkOrderId`, `LineId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-    FROM `plan_work_order_activation`  WHERE WorkOrderId = @WorkOrderId AND  IsDeleted=0";
-        const string GetByworkOrderIdsSql = @"SELECT
-      `Id`, `SiteId`, `WorkOrderId`, `LineId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-    FROM `plan_work_order_activation`  WHERE WorkOrderId in @WorkOrderIds AND  IsDeleted=0";
-        const string GetByIdsSql = @"SELECT
-      `Id`, `SiteId`, `WorkOrderId`, `LineId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-    FROM `plan_work_order_activation`  WHERE Id IN @ids ";
+        const string GetByIdSql = @"SELECT * FROM `plan_work_order_activation`  WHERE Id = @Id ";
+        const string GetByworkOrderIdSql = @"SELECT * FROM `plan_work_order_activation`  WHERE WorkOrderId = @WorkOrderId AND  IsDeleted=0";
+        const string GetByworkOrderIdsSql = @"SELECT * FROM `plan_work_order_activation`  WHERE WorkOrderId in @WorkOrderIds AND  IsDeleted=0";
+        const string GetByIdsSql = @"SELECT * FROM `plan_work_order_activation`  WHERE Id IN @ids ";
         const string GetByWorkCenterIdSql = "SELECT * FROM plan_work_order_activation WHERE IsDeleted = 0 AND LineId = @workCenterId";
         const string DeleteTrueSql = @"DELETE FROM  plan_work_order_activation where Id=@Id ";
         const string DeletesTrueSql = @"DELETE FROM  plan_work_order_activation where Id in @Ids ";
