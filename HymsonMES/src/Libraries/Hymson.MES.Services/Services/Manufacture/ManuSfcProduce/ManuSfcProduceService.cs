@@ -1141,7 +1141,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             var pagedInfo = await _manuSfcRepository.GetManuSfcPagedInfoAsync(manuSfcProducePagedQuery);
             if (pagedInfo == null || !pagedInfo.Data.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES18022)).WithData("SFC", string.Join(",", manuSfcProducePagedQuery.SfcArray));
+                if (manuSfcProducePagedQuery.SfcArray != null && manuSfcProducePagedQuery.SfcArray.Length > 0)
+                    throw new CustomerValidationException(nameof(ErrorCode.MES18022)).WithData("SFC", string.Join(",", manuSfcProducePagedQuery.SfcArray));
             }
 
             //实体到DTO转换 装载数据
@@ -1184,56 +1185,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             #endregion
 
             #region 组装
-
-            #region 主数据
-            //获取条码
-            //var manuSfcs = sfcs.Select(it => it.Sfc).ToArray();
-            //var manuSfcInfoEntitiesParam = new ManuSfcStatusQuery { Sfcs = manuSfcs, Statuss = new SfcStatusEnum?[3] { SfcStatusEnum.InProcess, SfcStatusEnum.Complete, SfcStatusEnum.Received } };
-            //var manuSfcInfos = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(manuSfcInfoEntitiesParam);
-
-            //if (manuSfcInfos == null || manuSfcInfos.Count() == 0)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES18001));
-            //}
-
-            //if (manuSfcs.Count() != manuSfcInfos.Count())
-            //{
-            //    var differentSfcs = sfcs.Where(it => !manuSfcInfos.Where(info => info.SFC.Contains(it.Sfc)).Any()).Select(it => it.Sfc).ToList();
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES18006)).WithData("SFC", string.Join(",", differentSfcs));
-            //}
-
-            ////获取工单
-            //var workOrderArr = manuSfcInfos.Select(it => it.WorkOrderId).Distinct().ToArray();
-            //if (workOrderArr.Count() > 1)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES18002));
-            //}
-            //var planWorkOrders = await _planWorkOrderRepository.GetByIdsAsync(workOrderArr);
-            //if (planWorkOrders == null)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES18003));
-            //}
-            //var planWorkOrdersWhStatus = planWorkOrders.Where(it => it.Status != PlanWorkOrderStatusEnum.InProduction && it.Status != PlanWorkOrderStatusEnum.Finish).Any();
-            ////生产中/已完工的工单
-            //if (planWorkOrdersWhStatus)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES18009));
-            //}
-            ////验证同一工艺路线 
-            //var processRouteIds = planWorkOrders.Select(it => it.ProcessRouteId).Distinct();
-            //if (processRouteIds.Count() > 1)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES18004));
-            //}
-            //var processRouteId = processRouteIds.FirstOrDefault();
-            ////获取工艺路线节点
-            //var processRouteNodes = await _manuCommonOldService.GetProcessRoute(processRouteId);
-            //if (processRouteNodes == null || processRouteIds.Count() == 0)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES18005));
-            //}
-
-            #endregion
 
             var (manuSfcInfos, processRouteNodes, endProcessRouteDetailId) = await VerifySfcAsync(sfcs);
 
