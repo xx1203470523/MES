@@ -5,6 +5,7 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -22,14 +23,17 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 
         /// </summary>
         private readonly ConnectionOptions _connectionOptions;
+        private readonly IMemoryCache _memoryCache;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public ProcResourceRepository(IOptions<ConnectionOptions> connectionOptions)
+        /// <param name="memoryCache"></param>
+        public ProcResourceRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
         {
             _connectionOptions = connectionOptions.Value;
+            _memoryCache = memoryCache;
         }
 
         /// <summary>
@@ -61,8 +65,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<ProcResourceEntity> GetByCodeAsync(EntityByCodeQuery query)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcResourceEntity>(GetByCodeSql, query);
+            var key = $"proc_resource&{query.Site}&{query.Code}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                return await conn.QueryFirstOrDefaultAsync<ProcResourceEntity>(GetByCodeSql, query);
+            });
         }
 
         /// <summary>
@@ -103,7 +111,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ProcResourceEntity> GetResourceByResourceCodeAsync(ProcResourceQuery query) 
+        public async Task<ProcResourceEntity> GetResourceByResourceCodeAsync(ProcResourceQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<ProcResourceEntity>(GetResourceByResourceCode, query);
@@ -117,7 +125,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<IEnumerable<ProcResourceEntity>> GetByResourceCodeAsync(ProcResourceQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcResourceEntity>(GetByResourceCode, new { ResCode = query.ResCode, SiteId = query .SiteId});
+            return await conn.QueryAsync<ProcResourceEntity>(GetByResourceCode, new { ResCode = query.ResCode, SiteId = query.SiteId });
         }
 
         /// <summary>
@@ -128,7 +136,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<IEnumerable<ProcResourceEntity>> GetByEquipmentCodeAsync(ProcResourceQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcResourceEntity>(GetByEquipmentCode, new { EquipmentCode=query.EquipmentCode, SiteId=query.SiteId });
+            return await conn.QueryAsync<ProcResourceEntity>(GetByEquipmentCode, new { EquipmentCode = query.EquipmentCode, SiteId = query.SiteId });
         }
 
         /// <summary>
@@ -328,8 +336,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcResourceEntity>> GetProcResourceListByProcedureIdAsync(long procedureId)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcResourceEntity>(GetProcResourceListByProcedureIdSql, new { ProcedureId= procedureId });
+            var key = $"proc_resource&proc_procedure&{procedureId}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                return await conn.QueryAsync<ProcResourceEntity>(GetProcResourceListByProcedureIdSql, new { ProcedureId = procedureId });
+            });
         }
 
         /// <summary>
@@ -447,7 +459,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string UpdateResTypeSql = "UPDATE `proc_resource` SET ResTypeId = @ResTypeId,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id in @Ids;";
         const string UpdatedByResTypeSql = "UPDATE `proc_resource` SET ResTypeId =0,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE ResTypeId = @ResTypeId;";
         const string ClearResourceTypeIds = "UPDATE proc_resource SET ResTypeId = 0, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE ResTypeId IN @ResourceTypeIds; ";
-   
+
         const string GetResourceByResourceCode = "SELECT Id, ResCode FROM proc_resource WHERE IsDeleted = 0 AND Status=@Status AND ResCode = @ResCode and SiteId =@SiteId ";
 
     }

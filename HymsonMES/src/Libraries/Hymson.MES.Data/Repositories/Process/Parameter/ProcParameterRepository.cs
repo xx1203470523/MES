@@ -1,17 +1,10 @@
-/*
- *creator: Karl
- *
- *describe: 标准参数表 仓储类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-02-13 02:50:20
- */
-
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -23,10 +16,17 @@ namespace Hymson.MES.Data.Repositories.Process
     public partial class ProcParameterRepository : IProcParameterRepository
     {
         private readonly ConnectionOptions _connectionOptions;
+        private readonly IMemoryCache _memoryCache;
 
-        public ProcParameterRepository(IOptions<ConnectionOptions> connectionOptions)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
+        /// <param name="memoryCache"></param>
+        public ProcParameterRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
         {
             _connectionOptions = connectionOptions.Value;
+            _memoryCache = memoryCache;
         }
 
         /// <summary>
@@ -86,9 +86,25 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 查询对象
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcParameterEntity>> GetAllAsync(long siteId)
+        {
+            var key = $"proc_parameter&{siteId}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                return await conn.QueryAsync<ProcParameterEntity>(GetAllSql, new { SiteId = siteId });
+            });
+        }
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="procParameterPagedQuery"></param>
+        /// <returns></returns>
         /// <returns></returns>
         public async Task<PagedInfo<ProcParameterEntity>> GetPagedInfoAsync(ProcParameterPagedQuery procParameterPagedQuery)
         {
@@ -101,7 +117,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
             //if (procParameterPagedQuery.SiteId != 0)
             //{
-                sqlBuilder.Where(" SiteId=@SiteId ");
+            sqlBuilder.Where(" SiteId=@SiteId ");
             //}
             if (!string.IsNullOrWhiteSpace(procParameterPagedQuery.ParameterCode))
             {
@@ -147,7 +163,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
             //if (procParameterQuery.SiteId != 0)
             //{
-                sqlBuilder.Where(" SiteId=@SiteId ");
+            sqlBuilder.Where(" SiteId=@SiteId ");
             //}
             if (!string.IsNullOrWhiteSpace(procParameterQuery.ParameterCode))
             {
@@ -217,6 +233,7 @@ namespace Hymson.MES.Data.Repositories.Process
                                             /**select**/
                                            FROM `proc_parameter` /**where**/  ";
         const string GetByCodesSql = "SELECT * FROM proc_parameter WHERE `IsDeleted` = 0 AND SiteId = @Site AND ParameterCode IN @Codes";
+        const string GetAllSql = "SELECT * FROM proc_parameter WHERE `IsDeleted` = 0 AND SiteId = @SiteId ";
 
         const string InsertSql = "INSERT INTO `proc_parameter`(  `Id`, `SiteId`, `ParameterCode`, `ParameterName`, `ParameterUnit`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ParameterCode, @ParameterName, @ParameterUnit, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `proc_parameter`(  `Id`, `SiteId`, `ParameterCode`, `ParameterName`, `ParameterUnit`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ParameterCode, @ParameterName, @ParameterUnit, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";

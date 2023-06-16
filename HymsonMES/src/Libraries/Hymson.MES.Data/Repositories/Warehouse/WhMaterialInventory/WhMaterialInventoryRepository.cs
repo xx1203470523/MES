@@ -1,17 +1,10 @@
-/*
- *creator: Karl
- *
- *describe: 物料库存 仓储类 | 代码由框架生成
- *builder:  pengxin
- *build datetime: 2023-03-06 03:27:59
- */
-
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -23,10 +16,12 @@ namespace Hymson.MES.Data.Repositories.Warehouse
     public partial class WhMaterialInventoryRepository : IWhMaterialInventoryRepository
     {
         private readonly ConnectionOptions _connectionOptions;
+        private readonly IMemoryCache _memoryCache;
 
-        public WhMaterialInventoryRepository(IOptions<ConnectionOptions> connectionOptions)
+        public WhMaterialInventoryRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
         {
             _connectionOptions = connectionOptions.Value;
+            _memoryCache = memoryCache;
         }
 
         /// <summary>
@@ -70,8 +65,12 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         public async Task<WhMaterialInventoryEntity> GetByBarCodeAsync(WhMaterialInventoryBarCodeQuery query)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<WhMaterialInventoryEntity>(GetByBarCodeSql, query);
+            var key = $"wh_material_inventory&{query.SiteId}&{query.BarCode}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                return await conn.QueryFirstOrDefaultAsync<WhMaterialInventoryEntity>(GetByBarCodeSql, query);
+            });
         }
 
         /// <summary>
@@ -367,7 +366,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         const string GetByIdSql = @"SELECT 
                                `Id`, `SupplierId`, `MaterialId`, `MaterialBarCode`, `Batch`, `QuantityResidue`, `Status`, `DueDate`, `Source`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `wh_material_inventory`  WHERE Id = @Id ";
-        const string GetByBarCode = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND MaterialBarCode = @barCode";
+
         const string GetByBarCodeSql = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND SiteId = @SiteId AND MaterialBarCode = @BarCode";
         const string GetByBarCodes = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND MaterialBarCode in @BarCodes AND SiteId=@SiteId";
         const string GetByIdsSql = @"SELECT 

@@ -1,14 +1,7 @@
-/*
- *creator: Karl
- *
- *describe: 工艺路线工序节点明细表 仓储类 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-02-14 10:17:40
- */
-
 using Dapper;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -20,10 +13,11 @@ namespace Hymson.MES.Data.Repositories.Process
     public partial class ProcProcessRouteDetailNodeRepository : IProcProcessRouteDetailNodeRepository
     {
         private readonly ConnectionOptions _connectionOptions;
-
-        public ProcProcessRouteDetailNodeRepository(IOptions<ConnectionOptions> connectionOptions)
+        private readonly IMemoryCache _memoryCache;
+        public ProcProcessRouteDetailNodeRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
         {
             _connectionOptions = connectionOptions.Value;
+            _memoryCache = memoryCache;
         }
 
         /// <summary>
@@ -56,10 +50,14 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="processRouteId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcProcessRouteDetailNodeEntity>> GetProcProcessRouteDetailNodesByProcessRouteId(long processRouteId)
+        public async Task<IEnumerable<ProcProcessRouteDetailNodeEntity>> GetProcessRouteDetailNodesByProcessRouteIdAsync(long processRouteId)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcProcessRouteDetailNodeEntity>(GetProcedureByProcessRouteIdSql, new { ProcessRouteId = processRouteId });
+            var key = $"proc_process_route_detail_node&{processRouteId}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                return await conn.QueryAsync<ProcProcessRouteDetailNodeEntity>(GetProcedureByProcessRouteIdSql, new { ProcessRouteId = processRouteId });
+            });
         }
 
         /// <summary>
@@ -102,8 +100,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<ProcProcessRouteDetailNodeEntity> GetFirstProcedureByProcessRouteIdAsync(long processRouteId)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcProcessRouteDetailNodeEntity>(GetFirstProcedureByProcessRouteIdSql, new { ProcessRouteId = processRouteId });
+            var key = $"proc_process_route_detail_node&FirstProcedure&{processRouteId}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                return await conn.QueryFirstOrDefaultAsync<ProcProcessRouteDetailNodeEntity>(GetFirstProcedureByProcessRouteIdSql, new { ProcessRouteId = processRouteId });
+            });
         }
 
         /// <summary>
@@ -176,7 +178,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByProcessRouteIdSql = "SELECT * FROM proc_process_route_detail_node WHERE ProcessRouteId = @ProcessRouteId AND ProcedureId = @ProcedureId";
         const string GetByProcedureIdsSql = "SELECT * FROM proc_process_route_detail_node WHERE ProcessRouteId = @ProcessRouteId AND ProcedureId IN @ProcedureIds ORDER BY SerialNo; ";
         const string GetFirstProcedureByProcessRouteIdSql = @"SELECT * FROM `proc_process_route_detail_node`  WHERE ProcessRouteId = @ProcessRouteId and  IsFirstProcess=1";
-        const string GetProcedureByProcessRouteIdSql = @"SELECT * FROM `proc_process_route_detail_node`  WHERE ProcessRouteId = @ProcessRouteId";
+        const string GetProcedureByProcessRouteIdSql = @"SELECT * FROM `proc_process_route_detail_node`  WHERE ProcessRouteId = @ProcessRouteId ORDER BY SerialNo; ";
         const string GetByIdsSql = @"SELECT * FROM `proc_process_route_detail_node`  WHERE Id IN @ids ";
         const string DeleteByProcessRouteIdSql = "delete from `proc_process_route_detail_node` WHERE ProcessRouteId = @ProcessRouteId ";
     }

@@ -226,7 +226,6 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
         {
             if (linkeRuleList.Any(a => string.IsNullOrWhiteSpace(a.Rule))) throw new CustomerValidationException(nameof(ErrorCode.MES10803));
             if (linkeRuleList.Any(a => a.MatchWay < 0)) throw new CustomerValidationException(nameof(ErrorCode.MES10804));
-
             ////全码验证
             //if (linkeRuleList.Any(a => a.MatchWay == (int)MatchModeEnum .Whole&& a.Rule.Trim().Length != 10))
             //{
@@ -242,12 +241,30 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
             var errorMessage = new StringBuilder();
             foreach (var rule in linkeRuleList)
             {
+                var validationFailure = new FluentValidation.Results.ValidationFailure();
+                if (!Enum.IsDefined(typeof(MatchModeEnum), rule.MatchWay))
+                {
+                    validationFailure = new FluentValidation.Results.ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                               { "CollectionIndex", rule.SerialNo}
+                               };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", rule.SerialNo);
+                    }
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES10809);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
                 switch (rule.MatchWay)
                 {
                     case MatchModeEnum.Start:
                         if (rule.Rule.EndsWith("?"))
                         {
-                            var validationFailure = new FluentValidation.Results.ValidationFailure();
+                            validationFailure = new FluentValidation.Results.ValidationFailure();
                             if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
                             {
                                 validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
@@ -266,7 +283,7 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
                     case MatchModeEnum.Middle:
                         if (rule.Rule.StartsWith("?") || rule.Rule.EndsWith("?"))
                         {
-                            var validationFailure = new FluentValidation.Results.ValidationFailure();
+                            validationFailure = new FluentValidation.Results.ValidationFailure();
                             if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
                             {
                                 validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
@@ -286,7 +303,7 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
                     case MatchModeEnum.End:
                         if (rule.Rule.StartsWith("?"))
                         {
-                            var validationFailure = new FluentValidation.Results.ValidationFailure();
+                            validationFailure = new FluentValidation.Results.ValidationFailure();
                             if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
                             {
                                 validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {

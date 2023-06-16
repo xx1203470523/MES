@@ -86,6 +86,13 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<IEnumerable<ProcParameterEntity>> GetByCodesAsync(EntityByCodesQuery query);
 
         /// <summary>
+        /// 查询对象
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcParameterEntity>> GetAllAsync(long siteId);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="procParameterQuery"></param>

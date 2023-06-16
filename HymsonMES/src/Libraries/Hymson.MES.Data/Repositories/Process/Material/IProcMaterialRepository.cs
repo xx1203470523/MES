@@ -95,6 +95,13 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<IEnumerable<ProcMaterialEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
+        /// 批量获取数据
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcMaterialEntity>> GetBySiteIdAsync(long siteId);
+
+        /// <summary>
         /// 根据物料组ID查询物料
         /// </summary>
         /// <param name="groupIds"></param>
