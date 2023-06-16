@@ -419,11 +419,8 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
         /// <returns></returns>
         private async Task<(IEnumerable<ProcParameterEntity>, ProcResourceEntity)> GetEntitiesWithCheckAsync(IEnumerable<string> paramCodes, string resourceCode)
         {
-            var parameterEntities = await _procParameterRepository.GetByCodesAsync(new EntityByCodesQuery
-            {
-                Site = _currentEquipment.SiteId,
-                Codes = paramCodes,
-            });
+            var parameterEntities = await _procParameterRepository.GetAllAsync(_currentEquipment.SiteId);
+            parameterEntities = parameterEntities.Where(w => paramCodes.Contains(w.ParameterCode));
 
             // 找出不在数据库里面的Code
             var noIncludeCodes = paramCodes.Where(w => parameterEntities.Select(s => s.ParameterCode).Contains(w) == false);
@@ -452,7 +449,7 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
 
             return entity.Id;
         }
-        
+
         #endregion
 
 
