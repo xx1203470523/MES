@@ -184,6 +184,9 @@
         public const string MES10806 = "起始方式掩码末尾不能为特殊字符\"?\"";
         public const string MES10807 = "中间方式掩码首位和末尾不能为特殊字符\"?\"";
         public const string MES10808 = "结束方式掩码首位不能为特殊字符\"?\"";
+        public const string MES10809 = "状态不合法，请检查";
+        public const string MES10810 = "掩码编码不能为空";
+
 
         #endregion
 
@@ -223,6 +226,7 @@
         public const string MES12007 = "类程序 超过最大长度，最大长度为255.";
         public const string MES12008 = "备注 超过最大长度，最大长度为255.";
         public const string MES12009 = "作业已经被使用无法删除";
+        public const string MES12010 = "作业不存在，请刷新页面";
         #endregion
 
         #region 工作中心 12100
@@ -290,6 +294,7 @@
         public const string MES12508 = "最大数量须大于最小数量";
         public const string MES12509 = "只能删除新建状态的数据";
         public const string MES12510 = "只能删除新建状态的数据";
+        public const string MES12511 = "状态不合法，请检查";
         #endregion
 
         #region 设备 12600

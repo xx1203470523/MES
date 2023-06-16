@@ -10,11 +10,13 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
+using Hymson.MES.Data.Repositories.Integrated.InteJob;
 using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated.IIntegratedService;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 
 namespace Hymson.MES.Services.Services.Integrated
 {
@@ -127,12 +129,23 @@ namespace Hymson.MES.Services.Services.Integrated
         public async Task<int> DeleteRangInteJobAsync(long[] ids)
         {
             var userId = _currentUser.UserName;
+
             var list = await _jobBusinessRelationRepository.GetByJobIdsAsync(ids);
             if (list != null && list.Any())
             {
                 throw new BusinessException(nameof(ErrorCode.MES12009));
             }
-            return await _inteJobRepository.DeleteRangAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = userId });
+            var row = 0;
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                row = await _inteJobRepository.DeleteRangAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = userId });
+                if (row != ids.Length)
+                {
+                    throw new BusinessException(nameof(ErrorCode.MES12010));
+                }
+                trans.Complete();
+            }
+            return row;
         }
 
         /// <summary>
