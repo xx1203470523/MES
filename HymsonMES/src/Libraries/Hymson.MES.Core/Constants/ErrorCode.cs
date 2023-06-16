@@ -152,6 +152,10 @@
         public const string MES10614 = "Bom编码最大长度不超过50";
         public const string MES10615 = "Bom名称不能为空";
         public const string MES10616 = "Bom名称最大长度不超过50";
+        public const string MES10617 = "状态不合法，请检查";
+        public const string MES10618 = "版本不能为空";
+        public const string MES10619 = "用量不能为空";
+        public const string MES10620 = "收集方式不合法，请检查！";
         #endregion
 
         #region 上料点 10700
