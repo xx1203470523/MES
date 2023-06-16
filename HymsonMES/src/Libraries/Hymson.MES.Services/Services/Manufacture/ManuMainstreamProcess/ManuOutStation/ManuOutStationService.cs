@@ -216,7 +216,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             var materialIds = initialMaterials.Select(s => s.MaterialId);
 
             // 读取物料加载数据（批量）
-            var allFeedingEntities = await _manuFeedingRepository.GetByResourceIdAndMaterialIdsAsync(new GetByResourceIdAndMaterialIdsQuery
+            var allFeedingEntities = await _manuFeedingRepository.GetByResourceIdAndMaterialIdsWithOutZeroAsync(new GetByResourceIdAndMaterialIdsQuery
             {
                 ResourceId = sfcProduceEntity.ResourceId ?? 0,
                 MaterialIds = materialIds
@@ -270,7 +270,17 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             using var trans = TransactionHelper.GetTransactionScope();
 
             // 更新物料库存
-            if (updates.Any() == true) rows += await _manuFeedingRepository.UpdateQtyByIdAsync(updates);
+            if (updates.Any() == true)
+            {
+                rows += await _manuFeedingRepository.UpdateQtyByIdAsync(updates);
+
+                // 未更新到全部需更新的数据，事务回滚
+                if (updates.Count > rows)
+                {
+                    trans.Dispose();
+                    return 0;
+                }
+            }
 
             // 添加流转记录
             if (adds.Any() == true) rows += await _manuSfcCirculationRepository.InsertRangeAsync(adds);
@@ -396,25 +406,23 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
 
             // 取得特定工序的物料
             mainMaterials = mainMaterials.Where(w => w.ProcedureId == sfcProduceEntity.ProcedureId);
+            var materialIds = mainMaterials.Select(s => s.MaterialId).AsList();
 
             // 查询BOM替代料
             var replaceMaterialsForBOM = await _procBomDetailReplaceMaterialRepository.GetByBomIdAsync(sfcProduceEntity.ProductBOMId);
             var replaceMaterialsForBOMDic = replaceMaterialsForBOM.ToLookup(w => w.BomDetailId).ToDictionary(d => d.Key, d => d);
 
             // 查询物料基础数据的替代料
-            var replaceMaterialsForMain = await _procReplaceMaterialRepository.GetProcReplaceMaterialViewsAsync(new ProcReplaceMaterialsQuery
-            {
-                SiteId = sfcProduceEntity.SiteId,
-                MaterialIds = mainMaterials.Select(s => s.MaterialId)
-            });
+            var replaceMaterialsForMain = await _procReplaceMaterialRepository.GetProcReplaceMaterialViewsAsync(sfcProduceEntity.SiteId);
+            replaceMaterialsForMain = replaceMaterialsForMain.Where(w => materialIds.Contains(w.MaterialId));
             var replaceMaterialsForMainDic = replaceMaterialsForMain.ToLookup(w => w.MaterialId).ToDictionary(d => d.Key, d => d);
 
             // 组合主物料ID和替代料ID
-            var materialIds = mainMaterials.Select(s => s.MaterialId).AsList();
             materialIds.AddRange(replaceMaterialsForBOM.Select(s => s.ReplaceMaterialId));
 
             // 查询所有主物料和替代料的基础信息（为了读取消耗系数和收集方式）
-            var materialEntities = await _procMaterialRepository.GetByIdsAsync(materialIds);
+            var materialEntities = await _procMaterialRepository.GetBySiteIdAsync(sfcProduceEntity.SiteId);
+            materialEntities = materialEntities.Where(w => materialIds.Contains(w.Id));
 
             // 获取初始扣料数据
             List<MaterialDeductBo> initialMaterials = new();

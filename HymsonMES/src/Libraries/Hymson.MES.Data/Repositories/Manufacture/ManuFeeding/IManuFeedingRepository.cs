@@ -59,5 +59,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         /// <returns></returns>
         Task<IEnumerable<ManuFeedingEntity>> GetByResourceIdAndMaterialIdsAsync(GetByResourceIdAndMaterialIdsQuery query);
 
+        /// <summary>
+        /// 获取加载数据列表（只读取剩余数量大于0的）
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuFeedingEntity>> GetByResourceIdAndMaterialIdsWithOutZeroAsync(GetByResourceIdAndMaterialIdsQuery query);
+
     }
 }
