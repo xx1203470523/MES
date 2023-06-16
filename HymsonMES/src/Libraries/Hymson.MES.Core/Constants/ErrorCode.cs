@@ -41,6 +41,7 @@
         public const string MES10223 = "物料编码最大长度为50";
         public const string MES10224 = "物料名称最大长度为50";
         public const string MES10225 = "有生产中的工单引用其中的物料，不允许删除！";
+        public const string MES10226 = "数据收集方式不能为空！";
         #endregion
 
         #region 资源 10300
@@ -771,7 +772,7 @@
         public const string MES18210 = "生产更改错误";
         public const string MES18211 = "条码非在制状态，不允许操作";
         public const string MES18212 = "相同工单{Code}，不允许操作";
-
+        public const string MES18213 = "未获取到工艺路线连线信息";
 
         #endregion
 

@@ -1,5 +1,5 @@
 ﻿using Hymson.Infrastructure.Exceptions;
-using Hymson.MES.Services.Bos.Manufacture;
+using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGenerateBarcodeDto;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode
@@ -33,5 +33,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         /// <returns></returns>
         /// <exception cref="BusinessException">未找到生成规则</exception>
         Task<IEnumerable<string>> GenerateBarcodeListAsync(CodeRuleDto param);
+
+
     }
 }

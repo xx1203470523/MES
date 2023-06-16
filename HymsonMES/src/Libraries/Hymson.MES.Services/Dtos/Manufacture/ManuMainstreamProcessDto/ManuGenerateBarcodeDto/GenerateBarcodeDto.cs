@@ -1,10 +1,5 @@
 ﻿using Hymson.MES.Core.Enums.Integrated;
 using Hymson.Sequences.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGenerateBarcodeDto
 {
@@ -29,6 +24,9 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGene
         public bool IsTest { get; set; } = false;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class CodeRuleDto
     {
         /// <summary>
@@ -89,6 +87,9 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGene
         public IEnumerable<CodeRulesMakeDto> CodeRulesMakeList { get; set; }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class CodeRulesMakeDto
     {
         /// <summary>
@@ -107,4 +108,5 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGene
         public string SegmentedValue { get; set; }
 
     }
+
 }

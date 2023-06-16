@@ -5,7 +5,6 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
@@ -152,7 +151,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
                 */
 
                 // 更改状态
-                rows += await _manuSfcProduceRepository.UpdateWithStatusCheckAsync(sfcProduceEntity);
+                rows = await _manuSfcProduceRepository.UpdateWithStatusCheckAsync(sfcProduceEntity);
 
                 // 未更新到数据，事务回滚
                 if (rows <= 0)

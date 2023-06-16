@@ -249,14 +249,8 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string UpdatesSql = "UPDATE `inte_code_rules` SET   ProductId = @ProductId, CodeType = @CodeType, PackType = @PackType, Base = @Base, IgnoreChar = @IgnoreChar, Increment = @Increment, OrderLength = @OrderLength, ResetType = @ResetType, StartNumber=@StartNumber, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `inte_code_rules` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `inte_code_rules` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids ";
-        const string GetByIdSql = @"SELECT 
-                               `Id`, `ProductId`, `CodeType`, `PackType`, `Base`, `IgnoreChar`, `Increment`, `OrderLength`, `ResetType`, StartNumber, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`
-                            FROM `inte_code_rules`  WHERE Id = @Id ";
-        const string GetInteCodeRulesByProductIdSql = @"SELECT 
-                               `Id`, `ProductId`, `CodeType`, `PackType`, `Base`, `IgnoreChar`, `Increment`, `OrderLength`, `ResetType`, StartNumber, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`
-                            FROM `inte_code_rules`  WHERE ProductId = @ProductId AND CodeType=@CodeType AND IsDeleted=0 ";
-        const string GetByIdsSql = @"SELECT 
-                                          `Id`, `ProductId`, `CodeType`, `PackType`, `Base`, `IgnoreChar`, `Increment`, `OrderLength`, `ResetType`, StartNumber, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`
-                            FROM `inte_code_rules`  WHERE Id IN @ids ";
+        const string GetByIdSql = @"SELECT * FROM `inte_code_rules`  WHERE Id = @Id ";
+        const string GetInteCodeRulesByProductIdSql = @"SELECT * FROM `inte_code_rules`  WHERE ProductId = @ProductId AND CodeType=@CodeType AND IsDeleted=0 ";
+        const string GetByIdsSql = @"SELECT * FROM `inte_code_rules`  WHERE Id IN @ids ";
     }
 }

@@ -1,10 +1,5 @@
 ﻿using Hymson.MES.HttpClients.Requests.Print;
-
-using System.Net.Http;
 using System.Net.Http.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Text.Json.Serialization.Metadata;
 
 namespace Hymson.MES.HttpClients
 {
@@ -19,31 +14,30 @@ namespace Hymson.MES.HttpClients
             _httpClient = httpClient;
         }
 
-        public async Task<(string msg, bool result,string data)> GetTemplateContextAsync(string url)
+        /// <summary>
+        /// 上传文件到打印服务器
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public async Task<(string msg, bool result, string data)> GetTemplateContextAsync(string url)
         {
-            string api = $"api/LabelPrint/gettc?url={url}";
-            var httpResponseMessage = await _httpClient.GetAsync(api);
-
-            if (httpResponseMessage.IsSuccessStatusCode)
+            try
             {
-                using var contentStream =
-                    await httpResponseMessage.Content.ReadAsStreamAsync();
+                string api = $"api/LabelPrint/gettc?url={url}";
+                _httpClient.Timeout = TimeSpan.FromSeconds(5);
+                var httpResponseMessage = await _httpClient.GetAsync(api);
 
-                try
-                {
+                if (httpResponseMessage.IsSuccessStatusCode == false) return (msg: "调用失败", result: false, data: "");
 
-                    var r = await System.Text.Json.JsonSerializer.DeserializeAsync
-                    <PrintResponse>(contentStream);
-                    return (msg: r.Message, result: r.Success,data:r.Data);
-                }
-                catch (Exception ex)
-                {
-                    return (msg: ex.Message, result: false,data:"");
-                }
+                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+                var r = await System.Text.Json.JsonSerializer.DeserializeAsync<PrintResponse>(contentStream);
+                return (msg: r.Message, result: r.Success, data: r.Data);
             }
-            else
+            catch (Exception ex)
             {
-                return (msg: "调用失败", result: false, data: "");
+                // 上传文件到打印服务器
+                //return (msg: "上传文件到打印服务器异常", result: false, data: "");
+                return (msg: ex.Message, result: false, data: "");
             }
         }
 
@@ -56,27 +50,27 @@ namespace Hymson.MES.HttpClients
             {
                 using var contentStream =
                     await httpResponseMessage.Content.ReadAsStreamAsync();
-               
+
                 try
                 {
 
                     var r = await System.Text.Json.JsonSerializer.DeserializeAsync
                     <PrintResponse>(contentStream);
                     return (base64Str: r.Data, result: r.Success);
-                   
-                    
-                   // dynamic dynParam = JsonConvert.DeserializeObject(Convert.ToString(r));
-                   // return (base64Str: dynParam.Item1,result: dynParam.Item2);
-                   
+
+
+                    // dynamic dynParam = JsonConvert.DeserializeObject(Convert.ToString(r));
+                    // return (base64Str: dynParam.Item1,result: dynParam.Item2);
+
                 }
                 catch (Exception)
                 {
-                   
+
                     throw;
                 }
-                
+
             }
-            return ("调用失败",false);
+            return ("调用失败", false);
         }
 
         async Task<(string msg, bool result)> ILabelPrintRequest.PrintAsync(PrintRequest printRequest, bool ShowDialog)
@@ -95,5 +89,6 @@ namespace Hymson.MES.HttpClients
             }
             return ("调用失败", false);
         }
+
     }
 }
