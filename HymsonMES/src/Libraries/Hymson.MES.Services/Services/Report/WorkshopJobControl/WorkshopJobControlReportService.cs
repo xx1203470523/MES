@@ -6,6 +6,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query;
 using Hymson.MES.Data.Repositories.Plan;
@@ -172,7 +173,7 @@ namespace Hymson.MES.Services.Services.Report
                     {
                         WorkOrderCode= workOrders.FirstOrDefault(x=>x.Id== currentStep.WorkOrderId)?.OrderCode?? string.Empty,
                         ProcedureCode = procedures.FirstOrDefault(x => x.Id == currentStep.ProcedureId)?.Code ?? string.Empty,
-                        Status = nextStep != null || outStep!=null ? "完成" : "活动",
+                        Status = nextStep != null || outStep!=null ? SfcInOutStatusEnum.Finished : SfcInOutStatusEnum.Activity,
                         InDateTime = currentStep.CreatedOn,
                         OutDatetTime = outStep?.CreatedOn
                     });
