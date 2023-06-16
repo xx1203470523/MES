@@ -261,7 +261,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
             var startNumber = param.StartNumber - 1;
 
             // 真实生成
-            if (param.IsTest = false && param.IsSimulation == false)
+            if (param.IsTest == false && param.IsSimulation == false)
             {
                 var serialNumbers = await _sequenceService.GetSerialNumbersAsync(param.ResetType, param.CodeRuleKey, param.Count, startNumber, param.Increment, maxLength)
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES16200));
