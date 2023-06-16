@@ -6,9 +6,10 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Common;
+using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
-using Hymson.MES.CoreServices.Services.Job;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInStation;
 using Hymson.Utils;
@@ -46,6 +47,17 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         private readonly IManuInStationService _manuInStationService;
 
         /// <summary>
+        /// 仓储接口（工艺路线工序节点）
+        /// </summary>
+        private readonly IProcProcessRouteDetailNodeRepository _procProcessRouteDetailNodeRepository;
+
+        /// <summary>
+        /// 仓储接口（工艺路线工序连线）
+        /// </summary>
+        private readonly IProcProcessRouteDetailLinkRepository _procProcessRouteDetailLinkRepository;
+
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
@@ -53,16 +65,22 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <param name="manuCommonService"></param>
         /// <param name="manuCommonOldService"></param>
         /// <param name="manuInStationService"></param>
+        /// <param name="procProcessRouteDetailLinkRepository"></param>
+        /// <param name="procProcessRouteDetailNodeRepository"></param>
         public JobManuStartService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonService manuCommonService,
             IManuCommonOldService manuCommonOldService,
-            IManuInStationService manuInStationService)
+            IManuInStationService manuInStationService,
+            IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
+            IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _manuCommonService = manuCommonService;
             _manuCommonOldService = manuCommonOldService;
             _manuInStationService = manuInStationService;
+            _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
+            _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
         }
 
 
@@ -121,8 +139,14 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             // 如果工序对应不上
             if (sfcProduceEntity.ProcedureId != bo.ProcedureId)
             {
+                var processRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetProcessRouteDetailLinksByProcessRouteIdAsync(sfcProduceEntity.ProcessRouteId)
+                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES18213));
+
+                var processRouteDetailNodes = await _procProcessRouteDetailNodeRepository.GetProcessRouteDetailNodesByProcessRouteIdAsync(sfcProduceEntity.ProcessRouteId)
+                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES18208));
+
                 // 判断上一个工序是否是随机工序
-                var IsRandomPreProcedure = await _manuCommonOldService.IsRandomPreProcedureAsync(sfcProduceEntity.ProcessRouteId, bo.ProcedureId);
+                var IsRandomPreProcedure = await _manuCommonOldService.IsRandomPreProcedureAsync(processRouteDetailLinks, processRouteDetailNodes, sfcProduceEntity.ProcessRouteId, bo.ProcedureId);
                 if (IsRandomPreProcedure == false) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
 
                 // 将SFC对应的工序改为当前工序

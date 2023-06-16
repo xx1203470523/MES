@@ -1,21 +1,10 @@
-/*
- *creator: Karl
- *
- *describe: 容器装载表（物理删除） 仓储类 | 代码由框架生成
- *builder:  wxk
- *build datetime: 2023-04-12 02:33:13
- */
-
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
-using Org.BouncyCastle.Crypto;
-using System.Security.Cryptography;
-using System.Security.Policy;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -24,9 +13,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public partial class ManuContainerPackRepository : BaseRepository, IManuContainerPackRepository
     {
+        private readonly IMemoryCache _memoryCache;
 
-        public ManuContainerPackRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
+        public ManuContainerPackRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
         {
+            _memoryCache = memoryCache;
         }
 
         #region 方法
@@ -93,7 +84,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<ManuContainerPackEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ManuContainerPackEntity>(GetByIdSql, new { Id = id});
+            return await conn.QueryFirstOrDefaultAsync<ManuContainerPackEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -101,7 +92,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuContainerPackEntity>> GetByIdsAsync( IEnumerable<long>  ids)
+        public async Task<IEnumerable<ManuContainerPackEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuContainerPackEntity>(GetByIdsSql, new { Ids = ids });
@@ -217,11 +208,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<IEnumerable<ManuContainerPackEntity>> GetByLadeBarCodesAsync(ManuContainerPackQuery query)
         {
-            using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<ManuContainerPackEntity>(GetBysfcsSql, new { LadeBarCodes = query.LadeBarCodes, SiteId = query.SiteId });
+            var key = $"manu_container_pack&{query.SiteId}&{query.LadeBarCodes}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                using var conn = GetMESDbConnection();
+                return await conn.QueryAsync<ManuContainerPackEntity>(GetBysfcsSql, new { query.LadeBarCodes, query.SiteId });
+            });
         }
 
-        public async Task<IEnumerable<ManuContainerPackEntity>> GetByContainerBarCodeIdAsync(long cid,long siteId)
+        public async Task<IEnumerable<ManuContainerPackEntity>> GetByContainerBarCodeIdAsync(long cid, long siteId)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuContainerPackEntity>(GetByPackcodeSql, new { ContainerBarCodeId = cid, SiteId = siteId });
@@ -267,31 +262,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string DeleteTrueSql = "DELETE FROM  `manu_container_pack` WHERE Id IN @Ids";
         const string DeleteAllSql = "DELETE FROM `manu_container_pack`  WHERE ContainerBarCodeId = @ContainerBarCodeId ";
 
-        const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteId`,`ResourceId`,`ProcedureId`,`ContainerBarCodeId`, `LadeBarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `manu_container_pack`  WHERE Id = @Id ";
-        const string GetByContainerBarCodeIdSql = @"SELECT 
-                               `Id`, `SiteId`,`ResourceId`,`ProcedureId`,`ContainerBarCodeId`, `LadeBarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `manu_container_pack`  WHERE ContainerBarCodeId = @ContainerBarCodeId ";
-        const string GetBysfcSql = @"SELECT 
-                               `Id`, `SiteId`,`ResourceId`,`ProcedureId`, `ContainerBarCodeId`, `LadeBarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `manu_container_pack`  WHERE LadeBarCode = @LadeBarCode  and SiteId=@SiteId ";
-        const string GetByPackcodeSql = @"SELECT 
-                               `Id`, `SiteId`,`ResourceId`,`ProcedureId`, `ContainerBarCodeId`, `LadeBarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `manu_container_pack`  WHERE ContainerBarCodeId = @ContainerBarCodeId and SiteId=@SiteId ";
+        const string GetByIdSql = @"SELECT * FROM `manu_container_pack`  WHERE Id = @Id ";
+        const string GetByContainerBarCodeIdSql = @"SELECT * FROM `manu_container_pack`  WHERE ContainerBarCodeId = @ContainerBarCodeId ";
+        const string GetBysfcSql = @"SELECT * FROM `manu_container_pack`  WHERE LadeBarCode = @LadeBarCode  and SiteId=@SiteId ";
+        const string GetByPackcodeSql = @"SELECT * FROM `manu_container_pack`  WHERE ContainerBarCodeId = @ContainerBarCodeId and SiteId=@SiteId ";
 
-        const string GetByContainerBarCodeIdsSql = @"SELECT 
-                               `Id`, `SiteId`,`ResourceId`,`ProcedureId`, `ContainerBarCodeId`, `LadeBarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `manu_container_pack`  WHERE ContainerBarCodeId in @Ids  and SiteId=@SiteId";
-
-        const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteId`,`ResourceId`,`ProcedureId`, `ContainerBarCodeId`, `LadeBarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `manu_container_pack`  WHERE Id IN @Ids ";
-
-        const string GetBysfcsSql = @"SELECT 
-                               `Id`, `SiteId`, `ContainerBarCodeId`, `LadeBarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `manu_container_pack`  WHERE LadeBarCode IN @LadeBarCodes  and SiteId=@SiteId ";
-
+        const string GetByContainerBarCodeIdsSql = @"SELECT * FROM `manu_container_pack`  WHERE ContainerBarCodeId in @Ids  and SiteId=@SiteId";
+        const string GetByIdsSql = @"SELECT * FROM `manu_container_pack`  WHERE Id IN @Ids ";
+        const string GetBysfcsSql = @"SELECT * FROM `manu_container_pack`  WHERE LadeBarCode IN @LadeBarCodes  and SiteId=@SiteId ";
         const string GetCountByrBarCodeIdSql = "SELECT COUNT(*) FROM manu_container_pack where ContainerBarCodeId=@ContainerBarCodeId";
         #endregion
     }

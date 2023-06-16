@@ -110,7 +110,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuSfcRepairDetailEntity>> ManuSfcRepairDetailByProductBadId(ManuSfcRepairDetailByProductBadIdQuery query);
+        Task<IEnumerable<ManuSfcRepairDetailEntity>> ManuSfcRepairDetailByProductBadIdAsync(ManuSfcRepairDetailByProductBadIdQuery query);
+
+
+        /// <summary>
+        /// 根据SFC获取维修记录数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<ManuSfcRepairRecordEntity> GetManuSfcRepairBySFCAsync(GetManuSfcRepairBySFCQuery query);
+
 
         /// <summary>
         /// 新增维修记录
@@ -140,6 +149,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuFacePlateRepairEntitys"></param>
         /// <returns></returns>
         Task<int> InsertsDetailAsync(List<ManuSfcRepairDetailEntity> manuSfcRepairDetailEntities);
+
+        /// <summary>
+        /// 批量修改维修明细
+        /// </summary>
+        /// <param name="manuFacePlateRepairEntitys"></param>
+        /// <returns></returns>
+        Task<int> UpdateDetailsAsync(List<ManuSfcRepairDetailEntity> manuSfcRepairDetailEntities);
+
         #endregion
     }
 }

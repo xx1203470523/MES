@@ -710,7 +710,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         }
 
         private async Task<ManuContainerBarcodeView> CreateNewBarcodeAsync(ManuContainerBarcodeEntity manuContainerBarcodeEntity,
-           long ProductId, long workorderId,
+           long productId, long workorderId,
            ProcMaterialEntity material, CreateManuContainerBarcodeDto createManuContainerBarcodeDto, int level = 1, ManuSfcStepEntity sfcStepEntity = null)
         {
             manuContainerBarcodeEntity.WorkOrderId = workorderId;
@@ -723,7 +723,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var entityByRelation = await _inteContainerRepository.GetByRelationIdAsync(new InteContainerQuery
             {
                 DefinitionMethod = DefinitionMethodEnum.Material,
-                MaterialId = ProductId,
+                MaterialId = productId,
                 MaterialGroupId = 0,
                 Status = SysDataStatusEnum.Enable,
                 Level = (LevelEnum)level
@@ -732,30 +732,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (entityByRelation != null)
             {
                 manuContainerBarcodeEntity.ContainerId = entityByRelation.Id;
-                manuContainerBarcodeEntity.ProductId = ProductId;
+                manuContainerBarcodeEntity.ProductId = productId;
 
                 //包装等级转换 程序内控制传入
                 var packType = (CodeRulePackTypeEnum)level;
-                //根据编码类型，包装等级查询编码规则
-                var inteCodeRulesResult = await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery
-                {
-                    SiteId = _currentSite.SiteId ?? 0,
-                    ProductId = ProductId,
-                    CodeType = CodeRuleCodeTypeEnum.PackagingSeqCode,
-                    PackType = packType
-                });
-                var inteCodeRulesEntity = inteCodeRulesResult.FirstOrDefault();
-                if (inteCodeRulesEntity == null || inteCodeRulesEntity.ProductId != ProductId)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16501)).WithData("product", material?.MaterialCode ?? "");
-                }
-                var barcodeList = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new GenerateBarcodeDto
-                {
-                    CodeRuleId = inteCodeRulesEntity.Id,
-                    Count = 1
-                });
                 string barcode = manuContainerBarcodeEntity.BarCode;
-                manuContainerBarcodeEntity.BarCode = barcodeList.First();
+                manuContainerBarcodeEntity.BarCode = await GenerateBarCode(productId, material, packType);
 
                 // 创建包装
                 var rows = 0;
@@ -805,7 +787,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     var entityByRelation1 = await _inteContainerRepository.GetByRelationIdAsync(new InteContainerQuery
                     {
                         DefinitionMethod = DefinitionMethodEnum.MaterialGroup,
-                        MaterialId = ProductId,
+                         MaterialId = productId,
                         MaterialGroupId = material.GroupId,
                         Status = SysDataStatusEnum.Enable,
                         Level = (LevelEnum)level
@@ -813,13 +795,10 @@ namespace Hymson.MES.Services.Services.Manufacture
                     if (entityByRelation1 != null)
                     {
                         manuContainerBarcodeEntity.ContainerId = entityByRelation1.Id;
-                        manuContainerBarcodeEntity.ProductId = ProductId;
-                        var barcodeList = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new GenerateBarcodeDto
-                        {
-                            CodeRuleId = manuContainerBarcodeEntity.Id,
-                            Count = 1
-                        });
-                        manuContainerBarcodeEntity.BarCode = barcodeList.First();
+                        manuContainerBarcodeEntity.ProductId = productId;
+                        //包装等级转换 程序内控制传入
+                        var packType = (CodeRulePackTypeEnum)level;
+                        manuContainerBarcodeEntity.BarCode = await GenerateBarCode(productId, material, packType);
                         //入库
                         var rows = 0;
                         using (TransactionScope trans = TransactionHelper.GetTransactionScope())
@@ -871,6 +850,36 @@ namespace Hymson.MES.Services.Services.Manufacture
                     throw new CustomerValidationException(nameof(ErrorCode.MES16719));
                 }
             }
+        }
+
+        /// <summary>
+        /// 生成容器编码
+        /// </summary>
+        /// <param name="productId"></param>
+        /// <param name="material"></param>
+        /// <param name="packType"></param>
+        /// <returns></returns>
+        private async Task<string> GenerateBarCode(long productId, ProcMaterialEntity material, CodeRulePackTypeEnum packType)
+        {
+            //根据编码类型，包装等级查询编码规则
+            var inteCodeRulesResult = await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                ProductId = productId,
+                CodeType = CodeRuleCodeTypeEnum.PackagingSeqCode,
+                PackType = packType
+            });
+            var inteCodeRulesEntity = inteCodeRulesResult.FirstOrDefault();
+            if (inteCodeRulesEntity == null || inteCodeRulesEntity.ProductId != productId)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16501)).WithData("product", material?.MaterialCode ?? "");
+            }
+            var barcodeList = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new GenerateBarcodeDto
+            {
+                CodeRuleId = inteCodeRulesEntity.Id,
+                Count = 1
+            });
+            return barcodeList.First();
         }
 
         /// <summary>
