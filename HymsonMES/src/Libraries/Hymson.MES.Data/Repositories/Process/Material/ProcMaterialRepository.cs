@@ -1,22 +1,11 @@
-/*
- *creator: Karl
- *
- *describe: 物料维护 仓储类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-02-08 04:47:44
- */
-
 using Dapper;
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Common.Query;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using System.Security.Policy;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -28,6 +17,11 @@ namespace Hymson.MES.Data.Repositories.Process
         private readonly ConnectionOptions _connectionOptions;
         private readonly IMemoryCache _memoryCache;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
+        /// <param name="memoryCache"></param>
         public ProcMaterialRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
         {
             _connectionOptions = connectionOptions.Value;
@@ -107,6 +101,17 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ProcMaterialEntity>(GetByIdsSql, new { ids });
+        }
+
+        /// <summary>
+        /// 批量获取数据
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcMaterialEntity>> GetBySiteIdAsync(long siteId)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcMaterialEntity>(GetBySiteIdSql, new { SiteId = siteId });
         }
 
         /// <summary>
@@ -390,21 +395,16 @@ namespace Hymson.MES.Data.Repositories.Process
                             LEFT JOIN proc_process_route p on g.ProcessRouteId = p.Id
                             LEFT JOIN proc_bom q on g.BomId = q.Id 
                             WHERE g.Id = @Id and g.SiteId=@SiteId ";
-        const string GetMaterialByIdSql = @"SELECT 
-                                        `Id`, `SiteId`, `GroupId`, `MaterialCode`,`MaskCodeId`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `BomId`, `Batch`, `Unit`, `SerialNumber`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, ConsumeRatio
-                            FROM `proc_material`
+        const string GetMaterialByIdSql = @"SELECT * FROM `proc_material`
                             WHERE Id = @Id";
-        const string GetByIdsSql = @"SELECT 
-                                        `Id`, `SiteId`, `GroupId`, `MaterialCode`,`MaskCodeId`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `BomId`, `Batch`, PackageNum, `Unit`, `SerialNumber`,`BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, ConsumeRatio
-                            FROM `proc_material`
+        const string GetByIdsSql = @"SELECT * FROM `proc_material`
                             WHERE Id IN @ids and IsDeleted=0 ";
+        const string GetBySiteIdSql = @"SELECT * FROM proc_material WHERE SiteId = @SiteId AND IsDeleted = 0 ";
 
         /// <summary>
         /// 根据物料组ID查询物料
         /// </summary>
-        const string GetByGroupIdSql = @"SELECT 
-                                        `Id`, `SiteId`,`MaskCodeId`,`GroupId`, `MaterialCode`,`MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `BomId`, `Batch`, PackageNum, `Unit`, `SerialNumber`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`,ConsumeRatio
-                            FROM `proc_material`
+        const string GetByGroupIdSql = @"SELECT * FROM `proc_material`
                             WHERE IsDeleted = 0 and GroupId IN @groupIds ";
         const string UpdateSameMaterialCodeToNoVersionSql = "UPDATE `proc_material` SET IsDefaultVersion= 0 WHERE MaterialCode= @MaterialCode and IsDeleted = 0 ";
 

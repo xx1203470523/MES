@@ -11,8 +11,10 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using System.Security.Policy;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -22,10 +24,17 @@ namespace Hymson.MES.Data.Repositories.Process
     public partial class ProcReplaceMaterialRepository : IProcReplaceMaterialRepository
     {
         private readonly ConnectionOptions _connectionOptions;
+        private readonly IMemoryCache _memoryCache;
 
-        public ProcReplaceMaterialRepository(IOptions<ConnectionOptions> connectionOptions)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
+        /// <param name="memoryCache"></param>
+        public ProcReplaceMaterialRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
         {
             _connectionOptions = connectionOptions.Value;
+            _memoryCache = memoryCache;
         }
 
         /// <summary>
@@ -164,23 +173,48 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcReplaceMaterialView>> GetProcReplaceMaterialViewsAsync(long siteId)
+        {
+            var key = $"proc_replace_material&proc_material";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                var sqlBuilder = new SqlBuilder();
+                var template = sqlBuilder.AddTemplate(GetProcReplaceMaterialViewsSqlTemplate);
+                sqlBuilder.Where("r.IsDeleted = 0");
+                sqlBuilder.Where("r.SiteId = @SiteId");
+
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                var ProcReplaceMaterialViews = await conn.QueryAsync<ProcReplaceMaterialView>(template.RawSql, new { SiteId = siteId });
+                return ProcReplaceMaterialViews;
+            });
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="procReplaceMaterialQuery"></param>
         /// <returns></returns>
         public async Task<IEnumerable<ProcReplaceMaterialView>> GetProcReplaceMaterialViewsAsync(ProcReplaceMaterialsQuery procReplaceMaterialQuery)
         {
-            var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetProcReplaceMaterialViewsSqlTemplate);
-            sqlBuilder.Where("r.IsDeleted = 0");
-            sqlBuilder.Where("r.SiteId = @SiteId");
-
-            if (procReplaceMaterialQuery.MaterialIds.Any() == true)
+            var key = $"proc_replace_material&proc_material&{procReplaceMaterialQuery.SiteId}&{procReplaceMaterialQuery.MaterialIds}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
-                sqlBuilder.Where(" r.MaterialId IN @MaterialIds ");
-            }
+                var sqlBuilder = new SqlBuilder();
+                var template = sqlBuilder.AddTemplate(GetProcReplaceMaterialViewsSqlTemplate);
+                sqlBuilder.Where("r.IsDeleted = 0");
+                sqlBuilder.Where("r.SiteId = @SiteId");
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var ProcReplaceMaterialViews = await conn.QueryAsync<ProcReplaceMaterialView>(template.RawSql, procReplaceMaterialQuery);
-            return ProcReplaceMaterialViews;
+                if (procReplaceMaterialQuery.MaterialIds.Any() == true)
+                {
+                    sqlBuilder.Where(" r.MaterialId IN @MaterialIds ");
+                }
+
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                var ProcReplaceMaterialViews = await conn.QueryAsync<ProcReplaceMaterialView>(template.RawSql, procReplaceMaterialQuery);
+                return ProcReplaceMaterialViews;
+            });
         }
 
         /// <summary>

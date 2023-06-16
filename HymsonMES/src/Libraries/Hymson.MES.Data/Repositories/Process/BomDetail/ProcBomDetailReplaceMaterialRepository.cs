@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -14,14 +15,17 @@ namespace Hymson.MES.Data.Repositories.Process
     public partial class ProcBomDetailReplaceMaterialRepository : IProcBomDetailReplaceMaterialRepository
     {
         private readonly ConnectionOptions _connectionOptions;
+        private readonly IMemoryCache _memoryCache;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public ProcBomDetailReplaceMaterialRepository(IOptions<ConnectionOptions> connectionOptions)
+        /// <param name="memoryCache"></param>
+        public ProcBomDetailReplaceMaterialRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
         {
             _connectionOptions = connectionOptions.Value;
+            _memoryCache = memoryCache;
         }
 
 
@@ -88,8 +92,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcBomDetailReplaceMaterialEntity>> GetByBomIdAsync(long bomId)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcBomDetailReplaceMaterialEntity>(GetByBomIdSql, new { bomId });
+            var key = $"proc_bom_detail_replace_material&{bomId}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                return await conn.QueryAsync<ProcBomDetailReplaceMaterialEntity>(GetByBomIdSql, new { bomId });
+            });
         }
 
         /// <summary>

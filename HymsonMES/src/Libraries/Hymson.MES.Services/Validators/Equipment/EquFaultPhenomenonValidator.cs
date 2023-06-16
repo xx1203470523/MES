@@ -16,6 +16,7 @@ namespace Hymson.MES.Services.Validators.Process
         {
             RuleFor(x => x.FaultPhenomenonCode).NotEmpty().WithErrorCode(ErrorCode.MES12901);
             RuleFor(x => x.FaultPhenomenonName).NotEmpty().WithErrorCode(ErrorCode.MES12902);
+            RuleFor(x => x.EquipmentGroupId).NotEmpty().Must(it => it != 0).WithErrorCode(ErrorCode.MES12904);
         }
     }
 }

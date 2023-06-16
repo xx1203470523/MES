@@ -184,6 +184,9 @@
         public const string MES10806 = "起始方式掩码末尾不能为特殊字符\"?\"";
         public const string MES10807 = "中间方式掩码首位和末尾不能为特殊字符\"?\"";
         public const string MES10808 = "结束方式掩码首位不能为特殊字符\"?\"";
+        public const string MES10809 = "状态不合法，请检查";
+        public const string MES10810 = "掩码编码不能为空";
+
 
         #endregion
 
@@ -223,6 +226,7 @@
         public const string MES12007 = "类程序 超过最大长度，最大长度为255.";
         public const string MES12008 = "备注 超过最大长度，最大长度为255.";
         public const string MES12009 = "作业已经被使用无法删除";
+        public const string MES12010 = "作业不存在，请刷新页面";
         #endregion
 
         #region 工作中心 12100
@@ -248,6 +252,10 @@
         public const string MES12119 = "不能配置重复的车间/产线";
         public const string MES12120 = "不能配置重复的资源";
         public const string MES12121 = "新建或者废除状态的资源不能用于工作中心";
+        public const string MES12122 = "工作中心状态不能为空.";
+        public const string MES12123 = "工作中心状态不合法，请检查.";
+        public const string MES12124 = "工作中心类型不合法，请检查.";
+
         #endregion
 
         #region 编码规则 12400
@@ -290,6 +298,7 @@
         public const string MES12508 = "最大数量须大于最小数量";
         public const string MES12509 = "只能删除新建状态的数据";
         public const string MES12510 = "非新建状态的数据不能修改为新建状态";
+        public const string MES12511 = "状态不合法，请检查";
         #endregion
 
         #region 设备 12600
@@ -312,6 +321,7 @@
         public const string MES12901 = "故障现象编码不能为空";
         public const string MES12902 = "故障现象名称不能为空";
         public const string MES12903 = "请求实体不能为空！";
+        public const string MES12904 = "设备组不能为空！";
         #endregion
 
         #region 故障原因 13000
@@ -460,6 +470,7 @@
         public const string MES16035 = "SFC对应工单状态为非生产中状态，不可执行操作！";
         public const string MES16036 = "SFC超过最大复投次数，不允许生产！";
         public const string MES16037 = "工单状态已经被修改，请刷新重试";
+        public const string MES16038 = "编码类型不合法，请检查！";
         #endregion
 
         #region 条码接收 16100
