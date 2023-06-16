@@ -288,7 +288,7 @@
         public const string MES12507 = "最大数量须大于0";
         public const string MES12508 = "最大数量须大于最小数量";
         public const string MES12509 = "只能删除新建状态的数据";
-        public const string MES12510 = "只能删除新建状态的数据";
+        public const string MES12510 = "非新建状态的数据不能修改为新建状态";
         #endregion
 
         #region 设备 12600
