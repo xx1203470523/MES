@@ -188,7 +188,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         public async Task<int> InsertAsync(WhMaterialInventoryEntity whMaterialInventoryEntity)
         {
             // TODO using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            using var conn = GetMESnstance();
+            var conn = GetMESnstance();
             return await conn.ExecuteAsync(InsertSql, whMaterialInventoryEntity);
         }
 

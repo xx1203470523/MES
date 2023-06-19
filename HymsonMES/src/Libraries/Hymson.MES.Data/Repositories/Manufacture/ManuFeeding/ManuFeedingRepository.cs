@@ -52,7 +52,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         public async Task<int> UpdateQtyByIdAsync(IEnumerable<UpdateQtyByIdCommand> commands)
         {
             // TODO using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            using var conn = GetMESnstance();
+            var conn = GetMESnstance();
             return await conn.ExecuteAsync(UpdateQtyByIdSql, commands);
         }
 

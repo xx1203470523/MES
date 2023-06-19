@@ -99,7 +99,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> InsertAsync(ManuSfcStepEntity manuSfcStepEntity)
         {
             // TODO using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            using var conn = GetMESnstance();
+            var conn = GetMESnstance();
             return await conn.ExecuteAsync(InsertSql, manuSfcStepEntity);
         }
 

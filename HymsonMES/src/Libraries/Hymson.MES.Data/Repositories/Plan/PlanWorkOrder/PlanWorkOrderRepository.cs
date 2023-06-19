@@ -372,7 +372,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         public async Task<int> UpdateFinishProductQuantityByWorkOrderId(UpdateQtyCommand param)
         {
             // TODO using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            using var conn = GetMESnstance();
+            var conn = GetMESnstance();
             return await conn.ExecuteAsync(UpdateFinishProductQuantitySql, param);
         }
 
