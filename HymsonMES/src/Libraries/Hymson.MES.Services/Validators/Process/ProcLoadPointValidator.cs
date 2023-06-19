@@ -7,6 +7,7 @@
  */
 using FluentValidation;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Services.Dtos.Process;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace Hymson.MES.Services.Validators.Process
     /// <summary>
     /// 上料点表 更新 验证
     /// </summary>
-    internal class ProcLoadPointCreateValidator: AbstractValidator<ProcLoadPointCreateDto>
+    internal class ProcLoadPointCreateValidator : AbstractValidator<ProcLoadPointCreateDto>
     {
         public ProcLoadPointCreateValidator()
         {
@@ -27,6 +28,7 @@ namespace Hymson.MES.Services.Validators.Process
             RuleFor(x => x.LoadPoint).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES10714));
             RuleFor(x => x.LoadPointName).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10713));
             RuleFor(x => x.LoadPointName).MaximumLength(60).WithErrorCode(nameof(ErrorCode.MES10715));
+            RuleFor(x => x.Status).NotEmpty().Must(s => Enum.IsDefined(typeof(SysDataStatusEnum), s)).WithErrorCode(nameof(ErrorCode.MES10717));
         }
     }
 
