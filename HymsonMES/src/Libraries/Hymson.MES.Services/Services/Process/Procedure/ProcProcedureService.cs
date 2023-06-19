@@ -464,7 +464,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
 
             if (validationFailures.Any())
             {
-                throw new ValidationException(_localizationService.GetResource("MES10106"), validationFailures);
+                throw new ValidationException(_localizationService.GetResource("MES10107"), validationFailures);
             }
 
             //productSet
@@ -644,7 +644,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             }
             if (validationFailures.Any())
             {
-                throw new ValidationException(_localizationService.GetResource("MES10106"), validationFailures);
+                throw new ValidationException(_localizationService.GetResource("MES10107"), validationFailures);
             }
             //productSet
             List<ProcProductSetEntity> productSetList = new List<ProcProductSetEntity>();
