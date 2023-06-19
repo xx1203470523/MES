@@ -5,14 +5,13 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using static Dapper.SqlBuilder;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 条码步骤表仓储
     /// </summary>
-    public partial class ManuSfcStepRepository : IManuSfcStepRepository
+    public partial class ManuSfcStepRepository : BaseRepositorySingleton, IManuSfcStepRepository
     {
         private readonly ConnectionOptions _connectionOptions;
 
@@ -20,7 +19,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public ManuSfcStepRepository(IOptions<ConnectionOptions> connectionOptions)
+        public ManuSfcStepRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
         }
@@ -99,7 +98,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> InsertAsync(ManuSfcStepEntity manuSfcStepEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            // TODO using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESnstance();
             return await conn.ExecuteAsync(InsertSql, manuSfcStepEntity);
         }
 
