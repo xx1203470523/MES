@@ -73,6 +73,16 @@
         public const string MES10353 = "资源类型名称不能为空";
         public const string MES10354 = "资源类型名称最大长度不超过50";
         public const string MES10355 = $"资源已被工作中心引用,不能删除!";
+
+        public const string MES10380 = "资源状态不合法，请检查！";
+        public const string MES10381 = "打印机不能为空！";
+        public const string MES10382 = "设备不能为空！";
+        public const string MES10383 = "资源设置类型不能为空！";
+        public const string MES10384 = "资源设置值不能为空！";
+        public const string MES10385 = "作业关联点不能为空！";
+        public const string MES10386 = "作业不能为空！";
+        public const string MES10387 = "作业参数不能为空！";
+
         #endregion
 
         #region 标签模板 MES10340

@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Process;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -26,17 +27,17 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 所属资源ID
         /// </summary>
         public long ResourceId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 设置类型(字典配置)
         /// </summary>
         public int SetType { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 设置值
         /// </summary>
         public string Value { get; set; }
@@ -51,37 +52,37 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string MaterialCode { get; set; }
 
-       /// <summary>
-       /// 备注
-       /// </summary>
+        /// <summary>
+        /// 备注
+        /// </summary>
         public string Remark { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 最后修改人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 修改时间
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否逻辑删除
         /// </summary>
         public bool? IsDeleted { get; set; }
 
-       
+
     }
 
     /// <summary>
@@ -89,12 +90,12 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public record ProcResourceConfigResCreateDto : BaseEntityDto
     {
-       /// <summary>
+        /// <summary>
         /// 设置类型(字典配置)
         /// </summary>
-        public int SetType { get; set; }
+        public ResourceSetTypeEnum? SetType { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 设置值
         /// </summary>
         public long? Value { get; set; }
@@ -113,7 +114,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 设置类型
         /// </summary>
-        public int SetType { get; set; }
+        public ResourceSetTypeEnum? SetType { get; set; }
 
         /// <summary>
         /// 设置值
@@ -130,7 +131,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         //[Required(ErrorMessage = "操作类型不可为空")]
         //[Range(1, 3)]
-       // public int OperationType { get; set; }
+        // public int OperationType { get; set; }
     }
 
     /// <summary>
