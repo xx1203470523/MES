@@ -6,6 +6,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment;
@@ -118,6 +119,12 @@ namespace Hymson.MES.Services.Services.Equipment
             if (ids == null || ids.Any() == false)
             {
                 throw new ValidationException(ErrorCode.MES13005);
+            }
+
+            var entities = await _equFaultReasonRepository.GetByIdsAsync(ids);
+            if (entities != null && entities.Any(a => a.UseStatus != SysDataStatusEnum.Build))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10106));
             }
 
             return await _equFaultReasonRepository.DeletesAsync(new DeleteCommand

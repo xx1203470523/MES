@@ -142,12 +142,17 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task<int> DeletesManuFacePlateAsync(long[] ids)
         {
             var manuFacePlates = await _manuFacePlateRepository.GetByIdsAsync(ids);
-            if (manuFacePlates != null && manuFacePlates.Any())
+            //if (manuFacePlates != null && manuFacePlates.Any())
+            //{
+            //    var isAnyEnableOrRetain = manuFacePlates.Where(c => c.Status == SysDataStatusEnum.Enable || c.Status == SysDataStatusEnum.Retain).Any();
+            //    if (isAnyEnableOrRetain)
+            //        throw new CustomerValidationException(nameof(ErrorCode.MES16913));
+            //}
+            if (manuFacePlates != null && manuFacePlates.Any(a => a.Status != SysDataStatusEnum.Build))
             {
-                var isAnyEnableOrRetain = manuFacePlates.Where(c => c.Status == SysDataStatusEnum.Enable || c.Status == SysDataStatusEnum.Retain).Any();
-                if (isAnyEnableOrRetain)
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16913));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10106));
             }
+
             return await _manuFacePlateRepository.DeletesAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
         }
 

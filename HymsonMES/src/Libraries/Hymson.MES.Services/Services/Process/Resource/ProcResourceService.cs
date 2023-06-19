@@ -895,16 +895,21 @@ namespace Hymson.MES.Services.Services.Process
                 throw new CustomerValidationException(nameof(ErrorCode.MES10102));
             }
 
-            //不能删除启用状态的资源
-            var query = new ProcResourceQuery
+            ////不能删除启用状态的资源
+            //var query = new ProcResourceQuery
+            //{
+            //    IdsArr = idsArr,
+            //    Status = (int)SysDataStatusEnum.Enable
+            //};
+            //var resourceList = await _resourceRepository.GetByIdsAsync(query);
+            //if (resourceList != null && resourceList.Any())
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES10319));
+            //}
+            var entitys = await _resourceRepository.GetListByIdsAsync(idsArr);
+            if (entitys != null && entitys.Any(a => a.Status != (int)SysDataStatusEnum.Build))
             {
-                IdsArr = idsArr,
-                Status = (int)SysDataStatusEnum.Enable
-            };
-            var resourceList = await _resourceRepository.GetByIdsAsync(query);
-            if (resourceList != null && resourceList.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10319));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10106));
             }
 
             //资源被工作中心引用不能删除
