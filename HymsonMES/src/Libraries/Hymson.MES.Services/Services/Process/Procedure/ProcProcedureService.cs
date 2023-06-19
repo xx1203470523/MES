@@ -445,19 +445,21 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                         continue;
                     }
 
-                    var relationEntity = item.ToEntity<InteJobBusinessRelationEntity>(); ;
-                    relationEntity.Id = IdGenProvider.Instance.CreateId();
-                    relationEntity.BusinessType = (int)InteJobBusinessTypeEnum.Procedure;
-                    relationEntity.BusinessId = procProcedureEntity.Id;
-                    relationEntity.OrderNumber = "";
-                    relationEntity.LinkPoint = (int)item.LinkPoint;
-                    relationEntity.JobId = item.JobId;
-                    relationEntity.IsUse = item.IsUse;
-                    relationEntity.Parameter = item.Parameter;
-                    relationEntity.Remark = "";
-                    relationEntity.SiteId = siteId;
-                    relationEntity.CreatedBy = userName;
-                    relationEntity.UpdatedBy = userName;
+                    var relationEntity = new InteJobBusinessRelationEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        BusinessType = (int)InteJobBusinessTypeEnum.Procedure,
+                        BusinessId = procProcedureEntity.Id,
+                        OrderNumber = "",
+                        LinkPoint = (int)item.LinkPoint,
+                        JobId = item.JobId,
+                        IsUse = item.IsUse,
+                        Parameter = item.Parameter,
+                        Remark = "",
+                        SiteId = siteId,
+                        CreatedBy = userName,
+                        UpdatedBy = userName
+                    };
                     procedureConfigJobList.Add(relationEntity);
                 }
             }
