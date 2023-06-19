@@ -266,6 +266,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             var currentProcessRoute = await _procProcessRouteRepository.GetByIdAsync(sfcProduceEntity.ProcessRouteId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES18104)).WithData("sfc", sfcProduceEntity.SFC);
 
+            /*
             // 更新数据
             using var trans = TransactionHelper.GetTransactionScope();
 
@@ -325,16 +326,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                     sfcInfo.UpdatedOn = sfcProduceEntity.UpdatedOn;
                     rows += await _manuSfcRepository.UpdateAsync(sfcInfo);
 
-                    /*
-                     * 2023.05.29 克明说不在这里更新完成时间
-                    // 更新工单统计表的 RealEnd
-                    rows += await _planWorkOrderRepository.UpdatePlanWorkOrderRealEndByWorkOrderIdAsync(new UpdateWorkOrderRealTimeCommand
-                    {
-                        UpdatedOn = sfcProduceEntity.UpdatedOn,
-                        UpdatedBy = sfcProduceEntity.UpdatedBy,
-                        WorkOrderIds = new long[] { sfcProduceEntity.WorkOrderId }
-                    });
-                    */
+                    //// 2023.05.29 克明说不在这里更新完成时间
+                    //// 更新工单统计表的 RealEnd
+                    //rows += await _planWorkOrderRepository.UpdatePlanWorkOrderRealEndByWorkOrderIdAsync(new UpdateWorkOrderRealTimeCommand
+                    //{
+                    //    UpdatedOn = sfcProduceEntity.UpdatedOn,
+                    //    UpdatedBy = sfcProduceEntity.UpdatedBy,
+                    //    WorkOrderIds = new long[] { sfcProduceEntity.WorkOrderId }
+                    //});
 
                     // 入库
                     rows += await SaveToWarehouseAsync(sfcProduceEntity, procMaterialEntity);
@@ -354,6 +353,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             }
 
             trans.Complete();
+            */
 
             return rows;
         }

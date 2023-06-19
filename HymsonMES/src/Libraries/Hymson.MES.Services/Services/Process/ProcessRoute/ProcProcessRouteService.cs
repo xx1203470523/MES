@@ -307,9 +307,9 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             var resourceList = await _procProcessRouteRepository.IsIsExistsEnabledAsync(new ProcProcessRouteQuery
             {
                 Ids = idsArr,
-                StatusArr = new int[] { (int)SysDataStatusEnum.Enable, (int)SysDataStatusEnum.Retain }
+                StatusArr = new int[] { (int)SysDataStatusEnum.Enable, (int)SysDataStatusEnum.Retain, (int)SysDataStatusEnum.Abolish }
             });
-            if (resourceList != null) throw new CustomerValidationException(nameof(ErrorCode.MES10430));
+            if (resourceList != null) throw new CustomerValidationException(nameof(ErrorCode.MES10106));
             #endregion
 
             return await _procProcessRouteRepository.DeleteRangeAsync(new DeleteCommand

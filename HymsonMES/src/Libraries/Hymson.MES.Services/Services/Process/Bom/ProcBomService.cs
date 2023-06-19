@@ -288,9 +288,13 @@ namespace Hymson.MES.Services.Services.Process
 
             //判断需要删除的Bom是否是启用状态
             var bomList = await _procBomRepository.GetByIdsAsync(ids);
-            if (bomList.Any(x => x.Status == SysDataStatusEnum.Enable))
+            //if (bomList.Any(x => x.Status == SysDataStatusEnum.Enable))
+            //{
+            //    throw new BusinessException(nameof(ErrorCode.MES10611));
+            //}
+            if (bomList != null && bomList.Any(a => a.Status != SysDataStatusEnum.Build))
             {
-                throw new BusinessException(nameof(ErrorCode.MES10611));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10106));
             }
 
             return await _procBomRepository.DeletesAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = updateBy });

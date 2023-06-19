@@ -398,11 +398,15 @@ namespace Hymson.MES.Services.Services.Integrated
         {
             var userId = _currentUser.UserName;
 
-            // 启用状态或保留状态不可删除
+            // 只可删除新建状态
             var workCenters = await _inteWorkCenterRepository.GetByIdsAsync(ids);
-            if (workCenters.Any(a => a.Status == SysDataStatusEnum.Enable || a.Status == SysDataStatusEnum.Retain))
+            //if (workCenters.Any(a => a.Status == SysDataStatusEnum.Enable || a.Status == SysDataStatusEnum.Retain))
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES12113));
+            //}
+            if (workCenters != null && workCenters.Any(a => a.Status != SysDataStatusEnum.Build))
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES12113));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10106));
             }
 
             // 检查产线是否有下级资源
