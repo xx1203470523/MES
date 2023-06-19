@@ -13,6 +13,7 @@
         public const string MES10103 = "请求参数格式错误!";
         public const string MES10104 = "请求数据不存在!";
         public const string MES10105 = "有生产中工单引用当前物料，不能删除！";
+        public const string MES10106 = "第{0}行:";
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";
@@ -95,6 +96,12 @@
         public const string MES10404 = "工序名称最大长度不超过50";
         public const string MES10405 = "编码:{Code}已存在！";
         public const string MES10406 = "工序不存在！";
+        public const string MES10407 = "工序类型不合法，请检查！";
+        public const string MES10408 = "工序状态不合法，请检查！";
+        public const string MES10409 = "参数不能为空，请检查！";
+        public const string MES10410 = "作业关联点不合法，请检查！";
+        public const string MES10411 = "关联物料不能为空，请检查！";
+        public const string MES10412 = "作业参数不能为空！";
 
         public const string MES10430 = $"不能删除启用和保留状态的工艺路线！";
         public const string MES10431 = $"此工艺路线在系统中已经存在!";
