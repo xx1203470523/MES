@@ -59,6 +59,8 @@ namespace Hymson.MES.Data.Repositories
         /// <returns></returns>
         public static IDbConnection GetMESInstance()
         {
+            // 处理获取实例失败的情况，抛出异常
+            if (_mesDbConnection == null) throw new Exception("Failed to get instance of BaseRepository");
             return _mesDbConnection;
         }
 

@@ -236,8 +236,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> UpdateAsync(ManuSfcProduceEntity manuSfcProduceEntity)
         {
-            // TODO using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var conn = BaseRepositorySingleton.GetMESInstance();
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(UpdateSql, manuSfcProduceEntity);
         }
 
@@ -249,6 +249,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> UpdateWithStatusCheckAsync(ManuSfcProduceEntity manuSfcProduceEntity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(UpdateWithStatusCheckSql, manuSfcProduceEntity);
         }
 
@@ -292,8 +293,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> DeletePhysicalAsync(DeletePhysicalBySfcCommand sfcCommand)
         {
-            // TODO using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var conn = BaseRepositorySingleton.GetMESInstance();
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(DeletePhysicalSql, sfcCommand);
         }
 
@@ -494,8 +495,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> DeleteSfcProduceBusinessBySfcInfoIdAsync(DeleteSfcProduceBusinesssBySfcInfoIdCommand command)
         {
-            // TODO using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var conn = BaseRepositorySingleton.GetMESInstance();
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(DeleteSfcProduceBusinessBySfcInfoIdSql, command);
         }
 

@@ -361,6 +361,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         public async Task<int> UpdateInputQtyByWorkOrderId(UpdateQtyCommand param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(UpdateInputQtySql, param);
         }
 
@@ -371,8 +372,8 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<int> UpdateFinishProductQuantityByWorkOrderId(UpdateQtyCommand param)
         {
-            // TODO using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var conn = BaseRepositorySingleton.GetMESInstance();
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(UpdateFinishProductQuantitySql, param);
         }
 
@@ -396,6 +397,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         public async Task<int> UpdatePlanWorkOrderRealStartByWorkOrderIdAsync(UpdateWorkOrderRealTimeCommand command)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(UpdateRecordRealStartSql, command);
         }
 
