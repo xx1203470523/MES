@@ -57,7 +57,7 @@ namespace Hymson.MES.Data.Repositories
         /// MES库连接
         /// </summary>
         /// <returns></returns>
-        protected static IDbConnection GetMESnstance()
+        public static IDbConnection GetMESInstance()
         {
             return _mesDbConnection;
         }

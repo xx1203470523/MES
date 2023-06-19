@@ -14,11 +14,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// <summary>
     /// 条码生产信息（物理删除）仓储
     /// </summary>
-    public partial class ManuSfcProduceRepository : BaseRepositorySingleton, IManuSfcProduceRepository
+    public partial class ManuSfcProduceRepository : IManuSfcProduceRepository
     {
         private readonly ConnectionOptions _connectionOptions;
 
-        public ManuSfcProduceRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
+        public ManuSfcProduceRepository(IOptions<ConnectionOptions> connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
         }
@@ -237,7 +237,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> UpdateAsync(ManuSfcProduceEntity manuSfcProduceEntity)
         {
             // TODO using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var conn = GetMESnstance();
+            var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(UpdateSql, manuSfcProduceEntity);
         }
 
@@ -293,7 +293,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> DeletePhysicalAsync(DeletePhysicalBySfcCommand sfcCommand)
         {
             // TODO using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var conn = GetMESnstance();
+            var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(DeletePhysicalSql, sfcCommand);
         }
 
@@ -495,7 +495,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> DeleteSfcProduceBusinessBySfcInfoIdAsync(DeleteSfcProduceBusinesssBySfcInfoIdCommand command)
         {
             // TODO using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var conn = GetMESnstance();
+            var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(DeleteSfcProduceBusinessBySfcInfoIdSql, command);
         }
 

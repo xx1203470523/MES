@@ -14,7 +14,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
     /// <summary>
     /// 仓储（物料加载）
     /// </summary>
-    public partial class ManuFeedingRepository : BaseRepositorySingleton, IManuFeedingRepository
+    public partial class ManuFeedingRepository :  IManuFeedingRepository
     {
         /// <summary>
         /// 
@@ -27,7 +27,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         /// </summary>
         /// <param name="connectionOptions"></param>
         /// <param name="memoryCache"></param>
-        public ManuFeedingRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
+        public ManuFeedingRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
         {
             _connectionOptions = connectionOptions.Value;
             _memoryCache = memoryCache;
@@ -52,7 +52,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         public async Task<int> UpdateQtyByIdAsync(IEnumerable<UpdateQtyByIdCommand> commands)
         {
             // TODO using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var conn = GetMESnstance();
+            var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(UpdateQtyByIdSql, commands);
         }
 

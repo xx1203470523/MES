@@ -10,11 +10,11 @@ namespace Hymson.MES.Data.Repositories.Warehouse
     /// <summary>
     /// 物料台账仓储
     /// </summary>
-    public partial class WhMaterialStandingbookRepository : BaseRepositorySingleton, IWhMaterialStandingbookRepository
+    public partial class WhMaterialStandingbookRepository : IWhMaterialStandingbookRepository
     {
         private readonly ConnectionOptions _connectionOptions;
 
-        public WhMaterialStandingbookRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
+        public WhMaterialStandingbookRepository(IOptions<ConnectionOptions> connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
         }
@@ -145,7 +145,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         public async Task<int> InsertAsync(WhMaterialStandingbookEntity whMaterialStandingbookEntity)
         {
             // TODO using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var conn = GetMESnstance();
+            var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(InsertSql, whMaterialStandingbookEntity);
         }
 

@@ -13,7 +13,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// <summary>
     /// 条码流转表仓储
     /// </summary>
-    public partial class ManuSfcCirculationRepository : BaseRepositorySingleton, IManuSfcCirculationRepository
+    public partial class ManuSfcCirculationRepository : IManuSfcCirculationRepository
     {
         private readonly ConnectionOptions _connectionOptions;
 
@@ -21,7 +21,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public ManuSfcCirculationRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
+        public ManuSfcCirculationRepository(IOptions<ConnectionOptions> connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
         }
@@ -205,7 +205,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> InsertRangeAsync(IEnumerable<ManuSfcCirculationEntity> manuSfcCirculationEntitys)
         {
             // TODO using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var conn = GetMESnstance();
+            var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(InsertSql, manuSfcCirculationEntitys);
         }
 
