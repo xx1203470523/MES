@@ -1106,6 +1106,10 @@ namespace Hymson.MES.Services.Services.Process
                 }
             }
 
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("MES10107"), validationFailures);
+            }
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
                 //入库

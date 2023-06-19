@@ -195,6 +195,9 @@
         public const string MES10715 = "上料点名称最大长度为60";
         public const string MES10716 = "无法将其他状态修改成新建状态!";
         public const string MES10717 = "状态不合法，请检查!";
+
+        public const string MES10718 = "关联物料不能为空，请检查!";
+        public const string MES10719 = "关联资源不能为空，请检查!";
         #endregion
 
         #region 掩码维护 10800
