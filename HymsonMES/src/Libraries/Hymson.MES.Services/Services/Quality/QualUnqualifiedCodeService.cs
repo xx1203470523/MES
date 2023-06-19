@@ -207,10 +207,10 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task<int> DeletesQualUnqualifiedCodeAsync(long[] ids)
         {
-         var   qualUnqualifiedList= await _qualUnqualifiedCodeRepository.GetByIdsAsync(ids);
+            var qualUnqualifiedList= await _qualUnqualifiedCodeRepository.GetByIdsAsync(ids);
             if (qualUnqualifiedList != null&& qualUnqualifiedList.Any(x=>x.Status!= SysDataStatusEnum.Build))
             {
-                throw new BusinessException(nameof(ErrorCode.MES11110));
+                throw new BusinessException(nameof(ErrorCode.MES10106));
             }
             var userId = _currentUser.UserName;
             return await _qualUnqualifiedCodeRepository.DeletesAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = userId });
