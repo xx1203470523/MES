@@ -15,7 +15,7 @@ namespace Hymson.MES.Data.Repositories.Plan
     /// <summary>
     /// 工单信息表仓储
     /// </summary>
-    public partial class PlanWorkOrderRepository : IPlanWorkOrderRepository
+    public partial class PlanWorkOrderRepository : BaseRepositorySingleton, IPlanWorkOrderRepository
     {
         /// <summary>
         /// 
@@ -27,7 +27,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public PlanWorkOrderRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
+        public PlanWorkOrderRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
             _memoryCache = memoryCache;
@@ -371,7 +371,8 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<int> UpdateFinishProductQuantityByWorkOrderId(UpdateQtyCommand param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            // TODO using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESnstance();
             return await conn.ExecuteAsync(UpdateFinishProductQuantitySql, param);
         }
 

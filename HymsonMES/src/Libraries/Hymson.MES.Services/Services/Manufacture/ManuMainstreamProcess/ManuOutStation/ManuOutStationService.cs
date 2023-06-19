@@ -266,7 +266,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             var currentProcessRoute = await _procProcessRouteRepository.GetByIdAsync(sfcProduceEntity.ProcessRouteId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES18104)).WithData("sfc", sfcProduceEntity.SFC);
 
-            /*
             // 更新数据
             using var trans = TransactionHelper.GetTransactionScope();
 
@@ -353,7 +352,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             }
 
             trans.Complete();
-            */
 
             return rows;
         }

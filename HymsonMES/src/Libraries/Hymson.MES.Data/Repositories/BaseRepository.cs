@@ -5,6 +5,9 @@ using System.Data;
 
 namespace Hymson.MES.Data.Repositories
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public abstract class BaseRepository
     {
         private readonly ConnectionOptions _connectionOptions;
@@ -20,6 +23,43 @@ namespace Hymson.MES.Data.Repositories
         {
             var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return conn;
+        }
+
+    }
+
+    /// <summary>
+    /// 单例
+    /// </summary>
+    public abstract class BaseRepositorySingleton
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        private static IDbConnection _mesDbConnection;
+        private static readonly object _lock = new();
+
+        /// <summary>
+        /// 构造函数（单例）
+        /// </summary>
+        /// <param name="connectionOptions"></param>
+        protected BaseRepositorySingleton(IOptions<ConnectionOptions> connectionOptions)
+        {
+            if (_mesDbConnection == null)
+            {
+                lock (_lock)
+                {
+                    _mesDbConnection ??= new MySqlConnection(connectionOptions.Value.MESConnectionString);
+                }
+            }
+        }
+
+        /// <summary>
+        /// MES库连接
+        /// </summary>
+        /// <returns></returns>
+        protected static IDbConnection GetMESnstance()
+        {
+            return _mesDbConnection;
         }
 
     }
