@@ -170,9 +170,9 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <summary>
         /// 刷新token
         /// </summary>
-        /// <param name="systemCode"></param>
+        /// <param name="systemId"></param>
         /// <returns></returns>
-        public async Task<string> RefreshSystemTokenAsync(string systemCode)
+        public async Task<string> RefreshSystemTokenAsync(long systemId)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0)
@@ -180,51 +180,28 @@ namespace Hymson.MES.Services.Services.Integrated
                 throw new ValidationException(nameof(ErrorCode.MES10101));
             }
 
-            var inteSystemTokenEntity = await _inteSystemTokenRepository.GetByCodeAsync(new InteSystemTokenQuery
-            {
-                SiteId = _currentSite.SiteId ?? 0,
-                SystemCode = systemCode
-            });
-
-            var id = inteSystemTokenEntity?.Id ?? 0;
+            var inteSystemTokenEntity = await _inteSystemTokenRepository.GetByIdAsync(systemId);
             if (inteSystemTokenEntity == null)
             {
-                id = IdGenProvider.Instance.CreateId();
+                throw new CustomerValidationException(nameof(ErrorCode.MES10104));
             }
+
+            var systemCode = inteSystemTokenEntity.SystemCode;
             var systemModel = new SystemModel
             {
                 FactoryId = _currentSite.SiteId ?? 0,
-                Id = id,
+                Id = inteSystemTokenEntity.Id,
                 Name = systemCode,
                 SiteId = _currentSite.SiteId ?? 0,
             };
             var token = JwtHelper.GenerateJwtToken(systemModel, _jwtOptions);
-
             var expirationTime = HymsonClock.Now().AddMinutes(_jwtOptions.ExpiresMinutes);
-            if (inteSystemTokenEntity != null)
-            {
-                inteSystemTokenEntity.UpdatedBy = _currentUser.UserName;
-                inteSystemTokenEntity.UpdatedOn = HymsonClock.Now();
-                inteSystemTokenEntity.Token = token;
-                inteSystemTokenEntity.ExpirationTime = expirationTime;
-                await _inteSystemTokenRepository.UpdateAsync(inteSystemTokenEntity);
-            }
-            else
-            {
-                //DTO转换实体 
-                inteSystemTokenEntity = new InteSystemTokenEntity
-                {
-                    SystemCode = systemCode,
-                    SystemName = systemCode,
-                    Token = token,
-                    ExpirationTime = expirationTime,
-                    Id = IdGenProvider.Instance.CreateId(),
-                    CreatedBy = _currentUser.UserName,
-                    UpdatedBy = _currentUser.UserName,
-                    SiteId = _currentSite.SiteId ?? 0
-                };
-                await _inteSystemTokenRepository.InsertAsync(inteSystemTokenEntity);
-            }
+
+            inteSystemTokenEntity.UpdatedBy = _currentUser.UserName;
+            inteSystemTokenEntity.UpdatedOn = HymsonClock.Now();
+            inteSystemTokenEntity.Token = token;
+            inteSystemTokenEntity.ExpirationTime = expirationTime;
+            await _inteSystemTokenRepository.UpdateTokenAsync(inteSystemTokenEntity);
             return inteSystemTokenEntity.Token;
         }
 

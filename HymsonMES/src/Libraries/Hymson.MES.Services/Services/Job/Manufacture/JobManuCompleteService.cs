@@ -108,6 +108,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
                             .VerifyProcedure(bo.ProcedureId)
                             .VerifyResource(bo.ResourceId);
 
+            /*
             // 验证BOM主物料数量
             await _manuCommonService.VerifyBomQtyAsync(new ManuProcedureBomBo
             {
@@ -116,6 +117,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
                 ProcedureId = bo.ProcedureId,
                 BomId = sfcProduceEntity.ProductBOMId
             });
+            */
 
             // 出站
             _ = await _manuOutStationService.OutStationAsync(sfcProduceEntity);
