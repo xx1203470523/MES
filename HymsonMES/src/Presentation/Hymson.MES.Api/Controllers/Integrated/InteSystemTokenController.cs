@@ -68,9 +68,10 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
+        [Route("add")]
         public async Task AddInteSystemTokenAsync([FromBody] InteSystemTokenCreateDto parm)
         {
-             await _inteSystemTokenService.CreateInteSystemTokenAsync(parm);
+            await _inteSystemTokenService.CreateInteSystemTokenAsync(parm);
         }
 
         /// <summary>
@@ -81,7 +82,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [HttpPut]
         public async Task UpdateInteSystemTokenAsync([FromBody] InteSystemTokenModifyDto parm)
         {
-             await _inteSystemTokenService.ModifyInteSystemTokenAsync(parm);
+            await _inteSystemTokenService.ModifyInteSystemTokenAsync(parm);
         }
 
         /// <summary>
@@ -93,6 +94,18 @@ namespace Hymson.MES.Api.Controllers.Integrated
         public async Task DeleteInteSystemTokenAsync([FromBody] long[] ids)
         {
             await _inteSystemTokenService.DeletesInteSystemTokenAsync(ids);
+        }
+
+        /// <summary>
+        /// 刷新token
+        /// </summary>
+        /// <param name="systemId"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("refreshToken/{systemId}")]
+        public async Task<string> RefreshSystemTokenAsync(long systemId)
+        {
+            return await _inteSystemTokenService.RefreshSystemTokenAsync(systemId);
         }
     }
 }
