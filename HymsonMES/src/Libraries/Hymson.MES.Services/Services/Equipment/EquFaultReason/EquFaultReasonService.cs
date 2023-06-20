@@ -89,6 +89,13 @@ namespace Hymson.MES.Services.Services.Equipment
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(modifyDto);
 
+            var entityOld = await _equFaultReasonRepository.GetByIdAsync(modifyDto.Id)
+                ?? throw new BusinessException(nameof(ErrorCode.MES13012));
+            if (entityOld.UseStatus != SysDataStatusEnum.Build && modifyDto.UseStatus == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+            }
+
             // DTO转换实体
             var entity = modifyDto.ToEntity<EquFaultReasonEntity>();
             entity.UpdatedBy = _currentUser.UserName;

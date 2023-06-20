@@ -372,6 +372,11 @@ namespace Hymson.MES.Services.Services.Process
                 throw new ValidationException(nameof(ErrorCode.MES10610));
             }
 
+            if (modelOrigin.Status != SysDataStatusEnum.Build && procBomEntity.Status == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+            }
+
             var bomCode = modelOrigin.BomCode.ToUpperInvariant();
             //验证是否存在
             //var exists = (await _procBomRepository.GetProcBomEntitiesAsync(new ProcBomQuery()

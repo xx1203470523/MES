@@ -15,6 +15,7 @@
         public const string MES10105 = "有生产中工单引用当前物料，不能删除！";
         public const string MES10106 = "只能删除新建状态的数据";
         public const string MES10107 = "第{0}行:";
+        public const string MES10108 = "无法将其他状态修改成新建状态!";
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";
@@ -82,7 +83,7 @@
         public const string MES10385 = "作业关联点不能为空！";
         public const string MES10386 = "作业不能为空！";
         public const string MES10387 = "作业参数不能为空！";
-
+        public const string MES10388 = "资源不存在！";
         #endregion
 
         #region 标签模板 MES10340
@@ -352,6 +353,7 @@
         public const string MES12902 = "故障现象名称不能为空";
         public const string MES12903 = "请求实体不能为空！";
         public const string MES12904 = "设备组不能为空！";
+        public const string MES12905 = "设备故障现象不存在！";
         #endregion
 
         #region 故障原因 13000
@@ -367,7 +369,7 @@
         public const string MES13009 = "故障原因编码不能为空";
         public const string MES13010 = "故障原因名称不能为空";
         public const string MES13011 = "此故障原因编码{Code}在系统已经存在！";
-
+        public const string MES13012 = "设备故障原因不存在！";
         #endregion
 
         #region 供应商  15000
@@ -593,6 +595,7 @@
         public const string MES17206 = "面板编码最大长度为255";
         public const string MES17207 = "面板名称最大长度为255";
         public const string MES17208 = "面板有更新，请刷新页面！";
+        public const string MES17209 = "面板不存在！";
         #endregion
 
         #region 在制维修

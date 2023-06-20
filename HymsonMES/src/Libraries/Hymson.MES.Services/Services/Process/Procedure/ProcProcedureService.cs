@@ -533,6 +533,12 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             parm.Procedure.Remark = parm.Procedure.Remark.Trim();
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(parm.Procedure);
+
+            var procProcedureEntityOld = await _procProcedureRepository.GetByIdAsync(parm.Procedure.Id) ?? throw new BusinessException(nameof(ErrorCode.MES10406));
+            if (procProcedureEntityOld.Status != SysDataStatusEnum.Build && parm.Procedure.Status == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+            }
             #endregion
 
             //DTO转换实体

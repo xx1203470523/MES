@@ -210,6 +210,14 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuFacePlateEntity.UpdatedBy = _currentUser.UserName;
             manuFacePlateEntity.UpdatedOn = HymsonClock.Now();
 
+            var entity = await _manuFacePlateRepository.GetByIdAsync(manuFacePlateModifyDto.Id)
+                ?? throw new BusinessException(nameof(ErrorCode.MES17209));
+
+            if (entity.Status != SysDataStatusEnum.Build && manuFacePlateModifyDto.Status == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+            }
+
             await _manuFacePlateRepository.UpdateAsync(manuFacePlateEntity);
         }
 
@@ -718,6 +726,14 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(updateManuFacePlateDto.FacePlate);
+
+            var entity = await _manuFacePlateRepository.GetByIdAsync(updateManuFacePlateDto.FacePlate.Id)
+                ?? throw new BusinessException(nameof(ErrorCode.MES17209));
+
+            if (entity.Status != SysDataStatusEnum.Build && updateManuFacePlateDto.FacePlate.Status == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+            }
 
             //DTO转换实体
             var manuFacePlateEntity = updateManuFacePlateDto.FacePlate.ToEntity<ManuFacePlateEntity>();

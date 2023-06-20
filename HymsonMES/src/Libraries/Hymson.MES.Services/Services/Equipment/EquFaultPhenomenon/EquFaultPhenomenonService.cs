@@ -95,7 +95,13 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         public async Task<int> ModifyAsync(EquFaultPhenomenonSaveDto modifyDto)
         {
             // 验证DTO
+            var entityOld = await _equFaultPhenomenonRepository.GetByIdAsync(modifyDto.Id.Value)
+                ?? throw new BusinessException(nameof(ErrorCode.MES12905));
 
+            if (entityOld.UseStatus != SysDataStatusEnum.Build && modifyDto.UseStatus == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+            }
 
             // DTO转换实体
             var entity = modifyDto.ToEntity<EquFaultPhenomenonEntity>();
