@@ -90,7 +90,7 @@ namespace Hymson.MES.Services.Services.Equipment
             await _validationSaveRules.ValidateAndThrowAsync(modifyDto);
 
             var entityOld = await _equFaultReasonRepository.GetByIdAsync(modifyDto.Id)
-                ?? throw new BusinessException(nameof(ErrorCode.MES13012));
+                ?? throw new BusinessException(nameof(ErrorCode.MES13013));
             if (entityOld.UseStatus != SysDataStatusEnum.Build && modifyDto.UseStatus == SysDataStatusEnum.Build)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10108));
