@@ -39,10 +39,10 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         private static void AddServices(this IServiceCollection services)
         {
-            services.AddScoped<ICommonService, CommonService>();
-            services.AddScoped<IInStationService, InStationService>();
-            services.AddScoped<IJobManufactureService, JobManuSfcConvertService>();
-            services.AddScoped<ISfcBindingService, SfcBindingService>();
+            services.AddSingleton<ICommonService, CommonService>();
+            services.AddSingleton<IInStationService, InStationService>();
+            services.AddSingleton<IJobManufactureService, JobManuSfcConvertService>();
+            services.AddSingleton<ISfcBindingService, SfcBindingService>();
 
         }
 
@@ -65,8 +65,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         private static void AddValidators(IServiceCollection services)
         {
-            services.AddScoped<AbstractValidator<InStationDto>, InStationValidator>();
-            services.AddScoped<AbstractValidator<SfcBindingDto>, SfcBindingValidator>();
+            services.AddSingleton<AbstractValidator<InStationDto>, InStationValidator>();
+            services.AddSingleton<AbstractValidator<SfcBindingDto>, SfcBindingValidator>();
         }
 
     }

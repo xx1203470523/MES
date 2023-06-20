@@ -20,12 +20,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         /// <summary>
         /// 
         /// </summary>
-        private readonly Lazy<IDbConnection> _instance;
-        public IDbConnection Instance => _instance.Value;
-
-        /// <summary>
-        /// 
-        /// </summary>
         private readonly ConnectionOptions _connectionOptions;
         private readonly IMemoryCache _memoryCache;
 
@@ -38,7 +32,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         {
             _connectionOptions = connectionOptions.Value;
             _memoryCache = memoryCache;
-            _instance = new Lazy<IDbConnection>(() => GetMESDbConnection());
         }
 
         /// <summary>
@@ -59,9 +52,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         /// <returns></returns>
         public async Task<int> UpdateQtyByIdAsync(IEnumerable<UpdateQtyByIdCommand> commands)
         {
-            // using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             // TODO var conn = BaseRepositorySingleton.GetMESInstance();
-            return await Instance.ExecuteAsync(UpdateQtyByIdSql, commands);
+            return await conn.ExecuteAsync(UpdateQtyByIdSql, commands);
         }
 
         /// <summary>
