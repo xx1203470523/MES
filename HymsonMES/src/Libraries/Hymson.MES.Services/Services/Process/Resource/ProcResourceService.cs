@@ -811,6 +811,10 @@ namespace Hymson.MES.Services.Services.Process
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10108));
             }
+            if (!Enum.IsDefined(typeof(SysDataStatusEnum), (SysDataStatusEnum)param.Status))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10380));
+            }
 
             //资源类型在系统中不存在,请重新输入!
             if (param.ResTypeId > 0)
@@ -989,7 +993,7 @@ namespace Hymson.MES.Services.Services.Process
                         validationFailures.Add(validationFailure);
                         continue;
                     }
-                    if (item.Value == null || long.TryParse(item.Value.ToString(), out long a))
+                    if (item.Value == null || !long.TryParse(item.Value.ToString(), out long a))
                     {
                         var validationFailure = new ValidationFailure();
                         if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
