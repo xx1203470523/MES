@@ -17,7 +17,6 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Plan;
-using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
@@ -318,6 +317,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                     });
                     tasks.Add(manuSfcProduceDeleteSfcProduceBusinessBySfcInfoIdTask);
 
+                    /*
                     // 更新完工数量
                     var planWorkOrderUpdateFinishProductQuantityByWorkOrderIdTask = _planWorkOrderRepository.UpdateFinishProductQuantityByWorkOrderIdAsync(new UpdateQtyCommand
                     {
@@ -327,6 +327,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                         Qty = 1,
                     });
                     tasks.Add(planWorkOrderUpdateFinishProductQuantityByWorkOrderIdTask);
+                    */
 
                     // 更新状态
                     sfcInfo.Status = SfcStatusEnum.Complete;
