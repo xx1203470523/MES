@@ -77,9 +77,8 @@ namespace Hymson.MES.Services.Services.Process
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
 
-            procLoadPointCreateDto.LoadPoint = procLoadPointCreateDto.LoadPoint.ToTrimSpace().ToUpperInvariant();
-            procLoadPointCreateDto.LoadPointName = procLoadPointCreateDto.LoadPointName.Trim();
-            procLoadPointCreateDto.Remark = procLoadPointCreateDto?.Remark ?? "".Trim();
+            PrepareProcLoadPointCreateDto(procLoadPointCreateDto);
+
 
             // 验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procLoadPointCreateDto);
@@ -233,6 +232,13 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             trans.Complete();
+        }
+
+        private static void PrepareProcLoadPointCreateDto(ProcLoadPointCreateDto procLoadPointCreateDto)
+        {
+            procLoadPointCreateDto.LoadPoint = procLoadPointCreateDto.LoadPoint.ToTrimSpace().ToUpperInvariant();
+            procLoadPointCreateDto.LoadPointName = procLoadPointCreateDto.LoadPointName.Trim();
+            procLoadPointCreateDto.Remark = procLoadPointCreateDto?.Remark ?? "".Trim();
         }
 
         /// <summary>

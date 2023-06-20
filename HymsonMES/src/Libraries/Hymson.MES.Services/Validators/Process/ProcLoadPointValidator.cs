@@ -28,7 +28,7 @@ namespace Hymson.MES.Services.Validators.Process
             RuleFor(x => x.LoadPoint).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES10714));
             RuleFor(x => x.LoadPointName).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10713));
             RuleFor(x => x.LoadPointName).MaximumLength(60).WithErrorCode(nameof(ErrorCode.MES10715));
-            RuleFor(x => x.Status).NotEmpty().Must(s => Enum.IsDefined(typeof(SysDataStatusEnum), s)).WithErrorCode(nameof(ErrorCode.MES10717));
+            RuleFor(x => x.Status).Must(s => Enum.IsDefined(typeof(SysDataStatusEnum), s)).WithErrorCode(nameof(ErrorCode.MES10717));
         }
     }
 
