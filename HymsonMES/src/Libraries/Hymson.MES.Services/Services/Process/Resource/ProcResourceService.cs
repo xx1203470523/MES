@@ -620,7 +620,7 @@ namespace Hymson.MES.Services.Services.Process
                         validationFailures.Add(validationFailure);
                         continue;
                     }
-                    if (item.Value == null || long.TryParse(item.Value.ToString(), out long a))
+                    if (item.Value == null || !long.TryParse(item.Value.ToString(), out long a))
                     {
                         var validationFailure = new ValidationFailure();
                         if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
