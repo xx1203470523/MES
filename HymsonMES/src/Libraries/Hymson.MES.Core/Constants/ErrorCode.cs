@@ -73,6 +73,16 @@
         public const string MES10353 = "资源类型名称不能为空";
         public const string MES10354 = "资源类型名称最大长度不超过50";
         public const string MES10355 = $"资源已被工作中心引用,不能删除!";
+
+        public const string MES10380 = "资源状态不合法，请检查！";
+        public const string MES10381 = "打印机不能为空！";
+        public const string MES10382 = "设备不能为空！";
+        public const string MES10383 = "资源设置类型不能为空！";
+        public const string MES10384 = "资源设置值不能为空！";
+        public const string MES10385 = "作业关联点不能为空！";
+        public const string MES10386 = "作业不能为空！";
+        public const string MES10387 = "作业参数不能为空！";
+
         #endregion
 
         #region 标签模板 MES10340
@@ -139,6 +149,9 @@
         public const string MES10509 = "参数编码不能为空";
         public const string MES10510 = "参数名称不能为空";
         public const string MES10511 = "标准参数代码最大长度为50";
+        public const string MES10512 = "参数单位不合法，请检查！";
+        public const string MES10513 = "参数类型不合法，请检查！";
+        public const string MES10514 = "参数ID不能为空";
 
         #endregion
 
@@ -184,6 +197,10 @@
         public const string MES10714 = "上料点最大长度为50";
         public const string MES10715 = "上料点名称最大长度为60";
         public const string MES10716 = "无法将其他状态修改成新建状态!";
+        public const string MES10717 = "状态不合法，请检查!";
+
+        public const string MES10718 = "关联物料不能为空，请检查!";
+        public const string MES10719 = "关联资源不能为空，请检查!";
         #endregion
 
         #region 掩码维护 10800
@@ -311,6 +328,7 @@
         public const string MES12509 = "只能删除新建状态的数据";
         public const string MES12510 = "非新建状态的数据不能修改为新建状态";
         public const string MES12511 = "状态不合法，请检查";
+        public const string MES12512 = "保证等级不合法，请检查";
         #endregion
 
         #region 设备 12600
@@ -373,7 +391,8 @@
         public const string MES15104 = " 物料条码：{MaterialCode}在车间库存中已存在！";
         public const string MES15105 = " 增加库存失败";
         public const string MES15106 = " 请扫描物料条码";
-        public const string MES15107 = " 物料条码：{MaterialCode}重复扫描！";
+        public const string MES15107 = " 重复扫描！";
+        public const string MES15108 = " 供应商不能为空";
 
         #endregion
 

@@ -14,7 +14,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
     /// <summary>
     /// 仓储（物料加载）
     /// </summary>
-    public partial class ManuFeedingRepository : IManuFeedingRepository
+    public partial class ManuFeedingRepository :  IManuFeedingRepository
     {
         /// <summary>
         /// 
@@ -52,6 +52,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         public async Task<int> UpdateQtyByIdAsync(IEnumerable<UpdateQtyByIdCommand> commands)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(UpdateQtyByIdSql, commands);
         }
 

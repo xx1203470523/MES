@@ -5,7 +5,6 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using static Dapper.SqlBuilder;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -100,6 +99,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> InsertAsync(ManuSfcStepEntity manuSfcStepEntity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(InsertSql, manuSfcStepEntity);
         }
 
