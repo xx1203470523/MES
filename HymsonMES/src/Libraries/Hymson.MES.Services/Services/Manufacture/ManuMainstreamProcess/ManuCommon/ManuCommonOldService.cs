@@ -477,8 +477,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             // 随机工序Key
             //var cacheKey = $"{manuSfcProduce.ProcessRouteId}-{manuSfcProduce.ProcedureId}-{manuSfcProduce.ResourceId}-{manuSfcProduce.WorkOrderId}";
             var cacheKey = $"{workOrderId}-{processRouteId}-{procedureId}";
-            var count = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.None, cacheKey);
-            
+            var count = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.None, cacheKey, maxLength: 9);
+
             // 默认下一工序
             ProcProcessRouteDetailNodeEntity? defaultNextProcedure = null;
 

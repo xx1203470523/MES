@@ -1,5 +1,7 @@
 ﻿using FluentValidation;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.Services.Dtos.Process;
 using System;
 using System.Collections.Generic;
@@ -17,7 +19,8 @@ namespace Hymson.MES.Services.Validators.Process
             RuleFor(x => x.ResCode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10302));
             RuleFor(x => x.ResName).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10303));
             RuleFor(x => x.ResName).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES10304));
-            //RuleFor(x => x.Status).NotEmpty().WithErrorCode(ErrorCode.MES10305);
+            RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(ErrorCode.MES10380);
+
             //RuleFor(x => x.ResTypeId).NotEmpty().WithErrorCode(ErrorCode.MES10320);
             //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
         }

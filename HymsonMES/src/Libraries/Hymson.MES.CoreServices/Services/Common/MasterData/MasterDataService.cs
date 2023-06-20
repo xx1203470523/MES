@@ -327,8 +327,8 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10440));
 
             // 随机工序Key
-            var cacheKey = $"{procedureId}-{workOrderId}";
-            var count = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.None, cacheKey);
+            var cacheKey = $"{workOrderId}-{processRouteId}-{procedureId}";
+            var count = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.None, cacheKey, maxLength: 9);
 
             // 这个Key太长了
             //var cacheKey = $"{manuSfcProduce.ProcessRouteId}-{manuSfcProduce.ProcedureId}-{manuSfcProduce.ResourceId}-{manuSfcProduce.WorkOrderId}";

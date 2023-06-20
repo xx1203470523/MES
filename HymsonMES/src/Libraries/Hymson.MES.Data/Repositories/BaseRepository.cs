@@ -5,6 +5,9 @@ using System.Data;
 
 namespace Hymson.MES.Data.Repositories
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public abstract class BaseRepository
     {
         private readonly ConnectionOptions _connectionOptions;
@@ -23,4 +26,5 @@ namespace Hymson.MES.Data.Repositories
         }
 
     }
+
 }
