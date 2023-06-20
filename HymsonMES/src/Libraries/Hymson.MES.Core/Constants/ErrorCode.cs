@@ -232,6 +232,9 @@
         public const string MES11109 = "不合格代码状态不能为空";
         public const string MES11110 = "不合格代码状态不为新建无法被删除";
         public const string MES11111 = "无法将不合格代码状态由其他状态修改为新建";
+        public const string MES11112 = "状态不合法，请检查!";
+        public const string MES11113 = "类型不合法，请检查!";
+        public const string MES11114 = "等级不合法，请检查!"; 
         #endregion
 
         #region 不合格组 11200

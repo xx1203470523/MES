@@ -1,5 +1,7 @@
 using FluentValidation;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.QualUnqualifiedCode;
 using Hymson.MES.Services.Dtos.Quality;
 
 namespace Hymson.MES.Services.Validators.Quality
@@ -21,6 +23,9 @@ namespace Hymson.MES.Services.Validators.Quality
             RuleFor(x => x.Type).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11105));
             RuleFor(x => x.Degree).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11106));
             RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES11107));
+            RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(nameof(ErrorCode.MES11112));
+            RuleFor(x => x.Type).Must(it => Enum.IsDefined(typeof(QualUnqualifiedCodeTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES11113));
+            RuleFor(x => x.Degree).Must(it => Enum.IsDefined(typeof(QualUnqualifiedCodeDegreeEnum), it)).WithErrorCode(nameof(ErrorCode.MES11114));
         }
     }
 
