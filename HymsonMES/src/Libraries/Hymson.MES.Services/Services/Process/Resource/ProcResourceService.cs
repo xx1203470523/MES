@@ -804,6 +804,14 @@ namespace Hymson.MES.Services.Services.Process
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(param);
 
+            var entityOld = await _resourceRepository.GetByIdAsync(param.Id)
+                ?? throw new BusinessException(nameof(ErrorCode.MES10388));
+
+            if (entityOld.Status != (int)SysDataStatusEnum.Build && param.Status == (int)SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+            }
+
             //资源类型在系统中不存在,请重新输入!
             if (param.ResTypeId > 0)
             {

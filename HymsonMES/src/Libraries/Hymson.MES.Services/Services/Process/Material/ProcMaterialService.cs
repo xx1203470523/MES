@@ -340,6 +340,11 @@ namespace Hymson.MES.Services.Services.Process
                 throw new NotFoundException(nameof(ErrorCode.MES10204));
             }
 
+            if (modelOrigin.Status != SysDataStatusEnum.Build && procMaterialModifyDto.Status == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+            }
+
             if (procMaterialModifyDto.Origin != modelOrigin.Origin)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10205));
