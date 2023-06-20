@@ -7,6 +7,7 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using System.Data;
 using System.Text;
 
 namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
@@ -14,8 +15,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
     /// <summary>
     /// 仓储（物料加载）
     /// </summary>
-    public partial class ManuFeedingRepository :  IManuFeedingRepository
+    public partial class ManuFeedingRepository : BaseRepository, IManuFeedingRepository
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly Lazy<IDbConnection> _instance;
+        public IDbConnection Instance => _instance.Value;
+
         /// <summary>
         /// 
         /// </summary>
@@ -27,10 +34,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         /// </summary>
         /// <param name="connectionOptions"></param>
         /// <param name="memoryCache"></param>
-        public ManuFeedingRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
+        public ManuFeedingRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
             _memoryCache = memoryCache;
+            _instance = new Lazy<IDbConnection>(() => GetMESDbConnection());
         }
 
         /// <summary>
@@ -51,9 +59,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         /// <returns></returns>
         public async Task<int> UpdateQtyByIdAsync(IEnumerable<UpdateQtyByIdCommand> commands)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            // using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             // TODO var conn = BaseRepositorySingleton.GetMESInstance();
-            return await conn.ExecuteAsync(UpdateQtyByIdSql, commands);
+            return await Instance.ExecuteAsync(UpdateQtyByIdSql, commands);
         }
 
         /// <summary>
