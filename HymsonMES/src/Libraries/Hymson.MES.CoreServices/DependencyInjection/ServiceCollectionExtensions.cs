@@ -30,9 +30,9 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddServices(this IServiceCollection services)
         {
-            services.AddScoped<IManuCommonService, ManuCommonService>();
-            services.AddScoped<IMasterDataService, MasterDataService>();
-            services.AddScoped<IJobCommonService, JobCommonService>();
+            services.AddSingleton<IManuCommonService, ManuCommonService>();
+            services.AddSingleton<IMasterDataService, MasterDataService>();
+            services.AddSingleton<IJobCommonService, JobCommonService>();
 
             return services;
         }

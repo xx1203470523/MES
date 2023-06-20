@@ -7,7 +7,6 @@ using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using System.Data;
 
 namespace Hymson.MES.Data.Repositories.Warehouse
 {
@@ -16,12 +15,6 @@ namespace Hymson.MES.Data.Repositories.Warehouse
     /// </summary>
     public partial class WhMaterialInventoryRepository : BaseRepository, IWhMaterialInventoryRepository
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        private readonly Lazy<IDbConnection> _instance;
-        public IDbConnection Instance => _instance.Value;
-
         /// <summary>
         /// 
         /// </summary>
@@ -37,7 +30,6 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         {
             _connectionOptions = connectionOptions.Value;
             _memoryCache = memoryCache;
-            _instance = new Lazy<IDbConnection>(() => GetMESDbConnection());
         }
 
 
@@ -204,9 +196,9 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         public async Task<int> InsertAsync(WhMaterialInventoryEntity whMaterialInventoryEntity)
         {
-            // using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             // TODO var conn = BaseRepositorySingleton.GetMESInstance();
-            return await Instance.ExecuteAsync(InsertSql, whMaterialInventoryEntity);
+            return await conn.ExecuteAsync(InsertSql, whMaterialInventoryEntity);
         }
 
         /// <summary>

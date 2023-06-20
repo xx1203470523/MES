@@ -9,7 +9,6 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.View;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using System.Data;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -18,12 +17,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public partial class ManuSfcRepository : BaseRepository, IManuSfcRepository
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        private readonly Lazy<IDbConnection> _instance;
-        public IDbConnection Instance => _instance.Value;
-
         /// <summary>
         /// 
         /// </summary>
@@ -39,7 +32,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             _connectionOptions = connectionOptions.Value;
             _memoryCache = memoryCache;
-            _instance = new Lazy<IDbConnection>(() => GetMESDbConnection());
         }
 
 
@@ -271,9 +263,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> UpdateAsync(ManuSfcEntity manuSfcEntity)
         {
-            // using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             // TODO var conn = BaseRepositorySingleton.GetMESInstance();
-            return await Instance.ExecuteAsync(UpdateSql, manuSfcEntity);
+            return await conn.ExecuteAsync(UpdateSql, manuSfcEntity);
         }
 
         /// <summary>
