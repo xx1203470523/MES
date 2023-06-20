@@ -2,22 +2,42 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Options;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using System.Data;
 
 namespace Hymson.MES.Data.Repositories.Warehouse
 {
     /// <summary>
     /// 物料台账仓储
     /// </summary>
-    public partial class WhMaterialStandingbookRepository : IWhMaterialStandingbookRepository
+    public partial class WhMaterialStandingbookRepository : BaseRepository, IWhMaterialStandingbookRepository
     {
-        private readonly ConnectionOptions _connectionOptions;
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly Lazy<IDbConnection> _instance;
+        public IDbConnection Instance => _instance.Value;
 
-        public WhMaterialStandingbookRepository(IOptions<ConnectionOptions> connectionOptions)
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly ConnectionOptions _connectionOptions;
+        private readonly IMemoryCache _memoryCache;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
+        /// <param name="memoryCache"></param>
+        public WhMaterialStandingbookRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
+            _memoryCache = memoryCache;
+            _instance = new Lazy<IDbConnection>(() => GetMESDbConnection());
         }
+
 
         /// <summary>
         /// 删除（软删除）
@@ -144,9 +164,9 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         public async Task<int> InsertAsync(WhMaterialStandingbookEntity whMaterialStandingbookEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            // using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             // TODO var conn = BaseRepositorySingleton.GetMESInstance();
-            return await conn.ExecuteAsync(InsertSql, whMaterialStandingbookEntity);
+            return await Instance.ExecuteAsync(InsertSql, whMaterialStandingbookEntity);
         }
 
         /// <summary>

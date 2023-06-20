@@ -9,14 +9,21 @@ using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using System.Data;
 
 namespace Hymson.MES.Data.Repositories.Plan
 {
     /// <summary>
     /// 工单信息表仓储
     /// </summary>
-    public partial class PlanWorkOrderRepository : IPlanWorkOrderRepository
+    public partial class PlanWorkOrderRepository : BaseRepository, IPlanWorkOrderRepository
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly Lazy<IDbConnection> _instance;
+        public IDbConnection Instance => _instance.Value;
+
         /// <summary>
         /// 
         /// </summary>
@@ -27,10 +34,12 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public PlanWorkOrderRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
+        /// <param name="memoryCache"></param>
+        public PlanWorkOrderRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
             _memoryCache = memoryCache;
+            _instance = new Lazy<IDbConnection>(() => GetMESDbConnection());
         }
 
 
@@ -372,9 +381,9 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<int> UpdateFinishProductQuantityByWorkOrderIdAsync(UpdateQtyCommand param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            // using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             // TODO var conn = BaseRepositorySingleton.GetMESInstance();
-            return await conn.ExecuteAsync(UpdateFinishProductQuantitySql, param);
+            return await Instance.ExecuteAsync(UpdateFinishProductQuantitySql, param);
         }
 
         #region 工单记录表

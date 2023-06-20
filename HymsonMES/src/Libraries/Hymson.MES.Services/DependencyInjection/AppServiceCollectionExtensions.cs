@@ -87,166 +87,166 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddServices(this IServiceCollection services)
         {
             #region Equipment
-            services.AddSingleton<IEquConsumableService, EquConsumableService>();
-            services.AddSingleton<IEquConsumableTypeService, EquConsumableTypeService>();
-            services.AddSingleton<IEquEquipmentService, EquEquipmentService>();
-            services.AddSingleton<IEquEquipmentGroupService, EquEquipmentGroupService>();
-            services.AddSingleton<IEquEquipmentUnitService, EquEquipmentUnitService>();
-            services.AddSingleton<IEquFaultPhenomenonService, EquFaultPhenomenonService>();
-            services.AddSingleton<IEquSparePartService, EquSparePartService>();
-            services.AddSingleton<IEquSparePartTypeService, EquSparePartTypeService>();
+            services.AddScoped<IEquConsumableService, EquConsumableService>();
+            services.AddScoped<IEquConsumableTypeService, EquConsumableTypeService>();
+            services.AddScoped<IEquEquipmentService, EquEquipmentService>();
+            services.AddScoped<IEquEquipmentGroupService, EquEquipmentGroupService>();
+            services.AddScoped<IEquEquipmentUnitService, EquEquipmentUnitService>();
+            services.AddScoped<IEquFaultPhenomenonService, EquFaultPhenomenonService>();
+            services.AddScoped<IEquSparePartService, EquSparePartService>();
+            services.AddScoped<IEquSparePartTypeService, EquSparePartTypeService>();
 
             #region FaultReason
-            services.AddSingleton<IEquFaultReasonService, EquFaultReasonService>();
+            services.AddScoped<IEquFaultReasonService, EquFaultReasonService>();
 
             #endregion
             #endregion
 
             #region Integrated
-            services.AddSingleton<IInteCalendarService, InteCalendarService>();
-            services.AddSingleton<IInteClassService, InteClassService>();
-            services.AddSingleton<IInteJobService, InteJobService>();
-            services.AddSingleton<IInteContainerService, InteContainerService>();
-            services.AddSingleton<IInteWorkCenterService, InteWorkCenterService>();
-            services.AddSingleton<IInteSystemTokenService, InteSystemTokenService>();
+            services.AddScoped<IInteCalendarService, InteCalendarService>();
+            services.AddScoped<IInteClassService, InteClassService>();
+            services.AddScoped<IInteJobService, InteJobService>();
+            services.AddScoped<IInteContainerService, InteContainerService>();
+            services.AddScoped<IInteWorkCenterService, InteWorkCenterService>();
+            services.AddScoped<IInteSystemTokenService, InteSystemTokenService>();
 
             #region CodeRule
-            services.AddSingleton<IInteCodeRulesService, InteCodeRulesService>();
-            services.AddSingleton<IInteCodeRulesMakeService, InteCodeRulesMakeService>();
+            services.AddScoped<IInteCodeRulesService, InteCodeRulesService>();
+            services.AddScoped<IInteCodeRulesMakeService, InteCodeRulesMakeService>();
             #endregion
             #endregion
 
             #region Process
-            services.AddSingleton<IProcMaskCodeService, ProcMaskCodeService>();
+            services.AddScoped<IProcMaskCodeService, ProcMaskCodeService>();
 
             #region Material
-            services.AddSingleton<IProcMaterialService, ProcMaterialService>();
-            services.AddSingleton<IProcMaterialGroupService, ProcMaterialGroupService>();
+            services.AddScoped<IProcMaterialService, ProcMaterialService>();
+            services.AddScoped<IProcMaterialGroupService, ProcMaterialGroupService>();
             #endregion
 
             #region Parameter
-            services.AddSingleton<IProcParameterService, ProcParameterService>();
+            services.AddScoped<IProcParameterService, ProcParameterService>();
             #endregion
 
             #region ParameterLinkType
-            services.AddSingleton<IProcParameterLinkTypeService, ProcParameterLinkTypeService>();
+            services.AddScoped<IProcParameterLinkTypeService, ProcParameterLinkTypeService>();
             #endregion
 
             #region Bom
-            services.AddSingleton<IProcBomService, ProcBomService>();
-            services.AddSingleton<IProcBomDetailService, ProcBomDetailService>();
+            services.AddScoped<IProcBomService, ProcBomService>();
+            services.AddScoped<IProcBomDetailService, ProcBomDetailService>();
             #endregion
 
             #region LoadPoint
-            services.AddSingleton<IProcLoadPointService, ProcLoadPointService>();
+            services.AddScoped<IProcLoadPointService, ProcLoadPointService>();
             #endregion
 
             #region Resource
-            services.AddSingleton<IProcResourceTypeService, ProcResourceTypeService>();
-            services.AddSingleton<IProcResourceService, ProcResourceService>();
+            services.AddScoped<IProcResourceTypeService, ProcResourceTypeService>();
+            services.AddScoped<IProcResourceService, ProcResourceService>();
             #endregion
 
             //工序
-            services.AddSingleton<IProcProcedureService, ProcProcedureService>();
+            services.AddScoped<IProcProcedureService, ProcProcedureService>();
             //工艺路线
-            services.AddSingleton<IProcProcessRouteService, ProcProcessRouteService>();
+            services.AddScoped<IProcProcessRouteService, ProcProcessRouteService>();
 
-            services.AddSingleton<IProcPrintConfigService, ProcPrintConfigService>();
+            services.AddScoped<IProcPrintConfigService, ProcPrintConfigService>();
             //标签模板
-            services.AddSingleton<IProcLabelTemplateService, ProcLabelTemplateService>();
+            services.AddScoped<IProcLabelTemplateService, ProcLabelTemplateService>();
             #endregion
 
             #region Quality
-            services.AddSingleton<IQualUnqualifiedCodeService, QualUnqualifiedCodeService>();
-            services.AddSingleton<IQualUnqualifiedGroupService, QualUnqualifiedGroupService>();
+            services.AddScoped<IQualUnqualifiedCodeService, QualUnqualifiedCodeService>();
+            services.AddScoped<IQualUnqualifiedGroupService, QualUnqualifiedGroupService>();
             #endregion
 
             #region Manufacture
-            services.AddSingleton<IManuCommonOldService, ManuCommonOldService>();
-            services.AddSingleton<IManuFeedingService, ManuFeedingService>();
-            services.AddSingleton<IManuSfcService, ManuSfcService>();
-            services.AddSingleton<IManuSfcProduceService, ManuSfcProduceService>();
-            services.AddSingleton<IManuCreateBarcodeService, ManuCreateBarcodeService>();
-            services.AddSingleton<IManuGenerateBarcodeService, ManuGenerateBarcodeService>();
-            services.AddSingleton<IManuProductBadRecordService, ManuProductBadRecordService>();
-            services.AddSingleton<IManuFacePlateService, ManuFacePlateService>();
-            services.AddSingleton<IManuFacePlateButtonService, ManuFacePlateButtonService>();
+            services.AddScoped<IManuCommonOldService, ManuCommonOldService>();
+            services.AddScoped<IManuFeedingService, ManuFeedingService>();
+            services.AddScoped<IManuSfcService, ManuSfcService>();
+            services.AddScoped<IManuSfcProduceService, ManuSfcProduceService>();
+            services.AddScoped<IManuCreateBarcodeService, ManuCreateBarcodeService>();
+            services.AddScoped<IManuGenerateBarcodeService, ManuGenerateBarcodeService>();
+            services.AddScoped<IManuProductBadRecordService, ManuProductBadRecordService>();
+            services.AddScoped<IManuFacePlateService, ManuFacePlateService>();
+            services.AddScoped<IManuFacePlateButtonService, ManuFacePlateButtonService>();
 
-            services.AddSingleton<IManuRepairService, ManuRepairService>();
-            services.AddSingleton<IManuInStationService, ManuInStationService>();
-            services.AddSingleton<IManuOutStationService, ManuOutStationService>();
-            services.AddSingleton<IInProductDismantleService, InProductDismantleService>();
-            services.AddSingleton<IManuFacePlateRepairService, ManuFacePlateRepairService>();
+            services.AddScoped<IManuRepairService, ManuRepairService>();
+            services.AddScoped<IManuInStationService, ManuInStationService>();
+            services.AddScoped<IManuOutStationService, ManuOutStationService>();
+            services.AddScoped<IInProductDismantleService, InProductDismantleService>();
+            services.AddScoped<IManuFacePlateRepairService, ManuFacePlateRepairService>();
 
-            services.AddSingleton<IManuContainerBarcodeService, ManuContainerBarcodeService>();
-            services.AddSingleton<IManuContainerPackService, ManuContainerPackService>();
-            services.AddSingleton<IManuContainerPackRecordService, ManuContainerPackRecordService>();
+            services.AddScoped<IManuContainerBarcodeService, ManuContainerBarcodeService>();
+            services.AddScoped<IManuContainerPackService, ManuContainerPackService>();
+            services.AddScoped<IManuContainerPackRecordService, ManuContainerPackRecordService>();
 
-            services.AddSingleton<IManuFacePlateProductionService, ManuFacePlateProductionService>();
+            services.AddScoped<IManuFacePlateProductionService, ManuFacePlateProductionService>();
 
             #endregion
 
             #region Warehouse 
-            services.AddSingleton<IWhSupplierService, WhSupplierService>();
-            services.AddSingleton<IWhMaterialInventoryService, WhMaterialInventoryService>();
-            services.AddSingleton<IWhMaterialStandingbookService, WhMaterialStandingbookService>();
+            services.AddScoped<IWhSupplierService, WhSupplierService>();
+            services.AddScoped<IWhMaterialInventoryService, WhMaterialInventoryService>();
+            services.AddScoped<IWhMaterialStandingbookService, WhMaterialStandingbookService>();
 
             #endregion
 
             #region Plan
             #region PlanWorkOrder
-            services.AddSingleton<IPlanWorkOrderService, PlanWorkOrderService>();
+            services.AddScoped<IPlanWorkOrderService, PlanWorkOrderService>();
             #endregion
 
             #region PlanSfcReceive
-            services.AddSingleton<IPlanSfcReceiveService, PlanSfcReceiveService>();
+            services.AddScoped<IPlanSfcReceiveService, PlanSfcReceiveService>();
             #endregion
 
             #region PlanWorkOrderActivation
-            services.AddSingleton<IPlanWorkOrderActivationService, PlanWorkOrderActivationService>();
+            services.AddScoped<IPlanWorkOrderActivationService, PlanWorkOrderActivationService>();
             #endregion
 
             #region PlanSfcPrint
-            services.AddSingleton<IPlanSfcPrintService, PlanSfcPrintService>();
+            services.AddScoped<IPlanSfcPrintService, PlanSfcPrintService>();
             #endregion
 
             #region PlanWorkOrderBind
-            services.AddSingleton<IPlanWorkOrderBindService, PlanWorkOrderBindService>();
+            services.AddScoped<IPlanWorkOrderBindService, PlanWorkOrderBindService>();
             #endregion
             #endregion
 
             #region Job
-            services.AddSingleton<IJobManufactureService, JobManuBadRecordService>();
-            services.AddSingleton<IJobManufactureService, JobManuCompleteService>();
-            services.AddSingleton<IJobManufactureService, JobManuPackageService>();
-            services.AddSingleton<IJobManufactureService, JobManuRepairEndService>();
-            services.AddSingleton<IJobManufactureService, JobManuRepairStartService>();
-            services.AddSingleton<IJobManufactureService, JobManuStartService>();
-            services.AddSingleton<IJobManufactureService, JobManuStopService>();
-            services.AddSingleton<IJobManufactureService, JobManuPackageCloseService>();
-            services.AddSingleton<IJobManufactureService, JobManuPackageOpenService>();
-            services.AddSingleton<IJobManufactureService, JobManuPackageIngService>();
+            services.AddScoped<IJobManufactureService, JobManuBadRecordService>();
+            services.AddScoped<IJobManufactureService, JobManuCompleteService>();
+            services.AddScoped<IJobManufactureService, JobManuPackageService>();
+            services.AddScoped<IJobManufactureService, JobManuRepairEndService>();
+            services.AddScoped<IJobManufactureService, JobManuRepairStartService>();
+            services.AddScoped<IJobManufactureService, JobManuStartService>();
+            services.AddScoped<IJobManufactureService, JobManuStopService>();
+            services.AddScoped<IJobManufactureService, JobManuPackageCloseService>();
+            services.AddScoped<IJobManufactureService, JobManuPackageOpenService>();
+            services.AddScoped<IJobManufactureService, JobManuPackageIngService>();
             #endregion
 
             #region Report
             #region BadRecordReport
-            services.AddSingleton<IBadRecordReportService, BadRecordReportService>();
+            services.AddScoped<IBadRecordReportService, BadRecordReportService>();
             #endregion
 
             #region BadRecordReport
-            services.AddSingleton<IWorkshopJobControlReportService, WorkshopJobControlReportService>();
+            services.AddScoped<IWorkshopJobControlReportService, WorkshopJobControlReportService>();
             #endregion
 
             #region Packaging
-            services.AddSingleton<IPackagingReportService, PackagingReportService>();
+            services.AddScoped<IPackagingReportService, PackagingReportService>();
             #endregion
 
             #region OriginalSummary
-            services.AddSingleton<IOriginalSummaryReportService, OriginalSummaryReportService>();
+            services.AddScoped<IOriginalSummaryReportService, OriginalSummaryReportService>();
             #endregion
 
             #region ComUsage
-            services.AddSingleton<IComUsageReportService, ComUsageReportService>();
+            services.AddScoped<IComUsageReportService, ComUsageReportService>();
             #endregion
 
             #endregion
@@ -276,181 +276,181 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddValidators(IServiceCollection services)
         {
             #region Equipment
-            services.AddSingleton<AbstractValidator<EquEquipmentSaveDto>, EquEquipmentValidator>();
-            services.AddSingleton<AbstractValidator<EquEquipmentGroupSaveDto>, EquEquipmentGroupValidator>();
-            services.AddSingleton<AbstractValidator<EquEquipmentUnitSaveDto>, EquipmentUnitCreateValidator>();
-            services.AddSingleton<AbstractValidator<EquFaultPhenomenonSaveDto>, EquFaultPhenomenonValidator>();
-            services.AddSingleton<AbstractValidator<EquFaultReasonSaveDto>, EquFaultReasonCreateValidator>();
+            services.AddScoped<AbstractValidator<EquEquipmentSaveDto>, EquEquipmentValidator>();
+            services.AddScoped<AbstractValidator<EquEquipmentGroupSaveDto>, EquEquipmentGroupValidator>();
+            services.AddScoped<AbstractValidator<EquEquipmentUnitSaveDto>, EquipmentUnitCreateValidator>();
+            services.AddScoped<AbstractValidator<EquFaultPhenomenonSaveDto>, EquFaultPhenomenonValidator>();
+            services.AddScoped<AbstractValidator<EquFaultReasonSaveDto>, EquFaultReasonCreateValidator>();
             #endregion
 
             #region Process
             #region Material
-            services.AddSingleton<AbstractValidator<ProcMaterialCreateDto>, ProcMaterialCreateValidator>();
-            services.AddSingleton<AbstractValidator<ProcMaterialModifyDto>, ProcMaterialModifyValidator>();
+            services.AddScoped<AbstractValidator<ProcMaterialCreateDto>, ProcMaterialCreateValidator>();
+            services.AddScoped<AbstractValidator<ProcMaterialModifyDto>, ProcMaterialModifyValidator>();
 
-            services.AddSingleton<AbstractValidator<ProcMaterialSupplierRelationCreateDto>, ProcMaterialSupplierRelationCreateValidator>();
-            services.AddSingleton<AbstractValidator<ProcMaterialSupplierRelationModifyDto>, ProcMaterialSupplierRelationModifyValidator>();
+            services.AddScoped<AbstractValidator<ProcMaterialSupplierRelationCreateDto>, ProcMaterialSupplierRelationCreateValidator>();
+            services.AddScoped<AbstractValidator<ProcMaterialSupplierRelationModifyDto>, ProcMaterialSupplierRelationModifyValidator>();
             #endregion
 
             #region Parameter
-            services.AddSingleton<AbstractValidator<ProcParameterCreateDto>, ProcParameterCreateValidator>();
-            services.AddSingleton<AbstractValidator<ProcParameterModifyDto>, ProcParameterModifyValidator>();
+            services.AddScoped<AbstractValidator<ProcParameterCreateDto>, ProcParameterCreateValidator>();
+            services.AddScoped<AbstractValidator<ProcParameterModifyDto>, ProcParameterModifyValidator>();
             #endregion
 
             #region ParameterLinkType
-            services.AddSingleton<AbstractValidator<ProcParameterLinkTypeCreateDto>, ProcParameterLinkTypeCreateValidator>();
-            services.AddSingleton<AbstractValidator<ProcParameterLinkTypeModifyDto>, ProcParameterLinkTypeModifyValidator>();
+            services.AddScoped<AbstractValidator<ProcParameterLinkTypeCreateDto>, ProcParameterLinkTypeCreateValidator>();
+            services.AddScoped<AbstractValidator<ProcParameterLinkTypeModifyDto>, ProcParameterLinkTypeModifyValidator>();
             #endregion
 
             #region Bom
-            services.AddSingleton<AbstractValidator<ProcBomCreateDto>, ProcBomCreateValidator>();
-            services.AddSingleton<AbstractValidator<ProcBomModifyDto>, ProcBomModifyValidator>();
+            services.AddScoped<AbstractValidator<ProcBomCreateDto>, ProcBomCreateValidator>();
+            services.AddScoped<AbstractValidator<ProcBomModifyDto>, ProcBomModifyValidator>();
 
-            services.AddSingleton<AbstractValidator<ProcBomDetailCreateDto>, ProcBomDetailCreateValidator>();
-            services.AddSingleton<AbstractValidator<ProcBomDetailModifyDto>, ProcBomDetailModifyValidator>();
+            services.AddScoped<AbstractValidator<ProcBomDetailCreateDto>, ProcBomDetailCreateValidator>();
+            services.AddScoped<AbstractValidator<ProcBomDetailModifyDto>, ProcBomDetailModifyValidator>();
             #endregion
 
             #region LoadPoint
-            services.AddSingleton<AbstractValidator<ProcLoadPointCreateDto>, ProcLoadPointCreateValidator>();
-            services.AddSingleton<AbstractValidator<ProcLoadPointModifyDto>, ProcLoadPointModifyValidator>();
+            services.AddScoped<AbstractValidator<ProcLoadPointCreateDto>, ProcLoadPointCreateValidator>();
+            services.AddScoped<AbstractValidator<ProcLoadPointModifyDto>, ProcLoadPointModifyValidator>();
             #endregion
 
             #region Resource
-            services.AddSingleton<AbstractValidator<ProcResourceCreateDto>, ProcResourceCreateValidator>();
-            services.AddSingleton<AbstractValidator<ProcResourceModifyDto>, ProcResourcelModifyValidator>();
+            services.AddScoped<AbstractValidator<ProcResourceCreateDto>, ProcResourceCreateValidator>();
+            services.AddScoped<AbstractValidator<ProcResourceModifyDto>, ProcResourcelModifyValidator>();
             #endregion
 
             #region ResourceType
-            services.AddSingleton<AbstractValidator<ProcResourceTypeAddDto>, ProcResourceTypeCreateValidator>();
-            services.AddSingleton<AbstractValidator<ProcResourceTypeUpdateDto>, ProcResourceTypeModifyValidator>();
+            services.AddScoped<AbstractValidator<ProcResourceTypeAddDto>, ProcResourceTypeCreateValidator>();
+            services.AddScoped<AbstractValidator<ProcResourceTypeUpdateDto>, ProcResourceTypeModifyValidator>();
             #endregion
 
             #region Procedure
-            services.AddSingleton<AbstractValidator<ProcProcedureCreateDto>, ProcProcedureCreateValidator>();
-            services.AddSingleton<AbstractValidator<ProcProcedureModifyDto>, ProcProcedureModifyValidator>();
+            services.AddScoped<AbstractValidator<ProcProcedureCreateDto>, ProcProcedureCreateValidator>();
+            services.AddScoped<AbstractValidator<ProcProcedureModifyDto>, ProcProcedureModifyValidator>();
             #endregion
 
             #region ProcessRoute
-            services.AddSingleton<AbstractValidator<ProcProcessRouteCreateDto>, ProcProcessRouteCreateValidator>();
-            services.AddSingleton<AbstractValidator<ProcProcessRouteModifyDto>, ProcProcessRouteModifyValidator>();
+            services.AddScoped<AbstractValidator<ProcProcessRouteCreateDto>, ProcProcessRouteCreateValidator>();
+            services.AddScoped<AbstractValidator<ProcProcessRouteModifyDto>, ProcProcessRouteModifyValidator>();
             #endregion
 
             #region LabelTemplate
 
-            services.AddSingleton<AbstractValidator<ProcLabelTemplateCreateDto>, ProcLabelTemplateCreateValidator>();
-            services.AddSingleton<AbstractValidator<ProcLabelTemplateModifyDto>, ProcLabelTemplateModifyValidator>();
-            services.AddSingleton<AbstractValidator<ProcPrinterDto>, ProcPrinterCreateValidator>();
-            services.AddSingleton<AbstractValidator<ProcPrinterUpdateDto>, ProcPrinterModifyValidator>();
+            services.AddScoped<AbstractValidator<ProcLabelTemplateCreateDto>, ProcLabelTemplateCreateValidator>();
+            services.AddScoped<AbstractValidator<ProcLabelTemplateModifyDto>, ProcLabelTemplateModifyValidator>();
+            services.AddScoped<AbstractValidator<ProcPrinterDto>, ProcPrinterCreateValidator>();
+            services.AddScoped<AbstractValidator<ProcPrinterUpdateDto>, ProcPrinterModifyValidator>();
             #endregion
 
             #region MaskCode
-            services.AddSingleton<AbstractValidator<ProcMaskCodeSaveDto>, ProcMaskCodeValidator>();
+            services.AddScoped<AbstractValidator<ProcMaskCodeSaveDto>, ProcMaskCodeValidator>();
             #endregion
 
             #endregion
 
             #region Integrated
-            services.AddSingleton<AbstractValidator<InteContainerSaveDto>, InteContainerValidator>();
-            services.AddSingleton<AbstractValidator<InteClassSaveDto>, InteClassSaveValidator>();
-            services.AddSingleton<AbstractValidator<InteJobCreateDto>, InteJobCreateValidator>();
-            services.AddSingleton<AbstractValidator<InteJobModifyDto>, InteJobModifyValidator>();
-            services.AddSingleton<AbstractValidator<InteWorkCenterCreateDto>, InteWorkCenterCreateValidator>();
-            services.AddSingleton<AbstractValidator<InteWorkCenterModifyDto>, InteWorkCenterModifyValidator>();
-            services.AddSingleton<AbstractValidator<InteSystemTokenCreateDto>, InteSystemTokenCreateValidator>();
-            services.AddSingleton<AbstractValidator<InteSystemTokenModifyDto>, InteSystemTokenModifyValidator>();
+            services.AddScoped<AbstractValidator<InteContainerSaveDto>, InteContainerValidator>();
+            services.AddScoped<AbstractValidator<InteClassSaveDto>, InteClassSaveValidator>();
+            services.AddScoped<AbstractValidator<InteJobCreateDto>, InteJobCreateValidator>();
+            services.AddScoped<AbstractValidator<InteJobModifyDto>, InteJobModifyValidator>();
+            services.AddScoped<AbstractValidator<InteWorkCenterCreateDto>, InteWorkCenterCreateValidator>();
+            services.AddScoped<AbstractValidator<InteWorkCenterModifyDto>, InteWorkCenterModifyValidator>();
+            services.AddScoped<AbstractValidator<InteSystemTokenCreateDto>, InteSystemTokenCreateValidator>();
+            services.AddScoped<AbstractValidator<InteSystemTokenModifyDto>, InteSystemTokenModifyValidator>();
 
             #region CodeRule
-            services.AddSingleton<AbstractValidator<InteCodeRulesCreateDto>, InteCodeRulesCreateValidator>();
-            services.AddSingleton<AbstractValidator<InteCodeRulesModifyDto>, InteCodeRulesModifyValidator>();
+            services.AddScoped<AbstractValidator<InteCodeRulesCreateDto>, InteCodeRulesCreateValidator>();
+            services.AddScoped<AbstractValidator<InteCodeRulesModifyDto>, InteCodeRulesModifyValidator>();
 
-            services.AddSingleton<AbstractValidator<InteCodeRulesMakeCreateDto>, InteCodeRulesMakeCreateValidator>();
-            services.AddSingleton<AbstractValidator<InteCodeRulesMakeModifyDto>, InteCodeRulesMakeModifyValidator>();
+            services.AddScoped<AbstractValidator<InteCodeRulesMakeCreateDto>, InteCodeRulesMakeCreateValidator>();
+            services.AddScoped<AbstractValidator<InteCodeRulesMakeModifyDto>, InteCodeRulesMakeModifyValidator>();
             #endregion
             #endregion
 
             #region Quality
-            services.AddSingleton<AbstractValidator<QualUnqualifiedCodeCreateDto>, QualUnqualifiedCodeCreateValidator>();
-            services.AddSingleton<AbstractValidator<QualUnqualifiedCodeModifyDto>, QualUnqualifiedCodeModifyValidator>();
-            services.AddSingleton<AbstractValidator<QualUnqualifiedGroupCreateDto>, QualUnqualifiedGroupCreateValidator>();
-            services.AddSingleton<AbstractValidator<QualUnqualifiedGroupModifyDto>, QualUnqualifiedGroupModifyValidator>();
+            services.AddScoped<AbstractValidator<QualUnqualifiedCodeCreateDto>, QualUnqualifiedCodeCreateValidator>();
+            services.AddScoped<AbstractValidator<QualUnqualifiedCodeModifyDto>, QualUnqualifiedCodeModifyValidator>();
+            services.AddScoped<AbstractValidator<QualUnqualifiedGroupCreateDto>, QualUnqualifiedGroupCreateValidator>();
+            services.AddScoped<AbstractValidator<QualUnqualifiedGroupModifyDto>, QualUnqualifiedGroupModifyValidator>();
             #endregion
 
             #region Manufacture
 
-            services.AddSingleton<AbstractValidator<ManuSfcProduceLockDto>, ManuSfcProduceLockValidator>();
-            services.AddSingleton<AbstractValidator<ManuSfcProduceModifyDto>, ManuSfcProduceModifyValidator>();
+            services.AddScoped<AbstractValidator<ManuSfcProduceLockDto>, ManuSfcProduceLockValidator>();
+            services.AddScoped<AbstractValidator<ManuSfcProduceModifyDto>, ManuSfcProduceModifyValidator>();
 
-            services.AddSingleton<AbstractValidator<ManuSfcInfoCreateDto>, ManuSfcInfoCreateValidator>();
-            services.AddSingleton<AbstractValidator<ManuSfcInfoModifyDto>, ManuSfcInfoModifyValidator>();
+            services.AddScoped<AbstractValidator<ManuSfcInfoCreateDto>, ManuSfcInfoCreateValidator>();
+            services.AddScoped<AbstractValidator<ManuSfcInfoModifyDto>, ManuSfcInfoModifyValidator>();
 
-            services.AddSingleton<AbstractValidator<ManuProductBadRecordCreateDto>, ManuProductBadRecordCreateValidator>();
-            services.AddSingleton<AbstractValidator<ManuProductBadRecordModifyDto>, ManuProductBadRecordModifyValidator>();
+            services.AddScoped<AbstractValidator<ManuProductBadRecordCreateDto>, ManuProductBadRecordCreateValidator>();
+            services.AddScoped<AbstractValidator<ManuProductBadRecordModifyDto>, ManuProductBadRecordModifyValidator>();
 
-            services.AddSingleton<AbstractValidator<ManuFacePlateCreateDto>, ManuFacePlateCreateValidator>();
-            services.AddSingleton<AbstractValidator<ManuFacePlateModifyDto>, ManuFacePlateModifyValidator>();
+            services.AddScoped<AbstractValidator<ManuFacePlateCreateDto>, ManuFacePlateCreateValidator>();
+            services.AddScoped<AbstractValidator<ManuFacePlateModifyDto>, ManuFacePlateModifyValidator>();
 
-            services.AddSingleton<AbstractValidator<ManuFacePlateButtonCreateDto>, ManuFacePlateButtonCreateValidator>();
-            services.AddSingleton<AbstractValidator<ManuFacePlateButtonModifyDto>, ManuFacePlateButtonModifyValidator>();
+            services.AddScoped<AbstractValidator<ManuFacePlateButtonCreateDto>, ManuFacePlateButtonCreateValidator>();
+            services.AddScoped<AbstractValidator<ManuFacePlateButtonModifyDto>, ManuFacePlateButtonModifyValidator>();
 
-            services.AddSingleton<AbstractValidator<ManuFacePlateProductionCreateDto>, ManuFacePlateProductionCreateValidator>();
-            services.AddSingleton<AbstractValidator<ManuFacePlateProductionModifyDto>, ManuFacePlateProductionModifyValidator>();
+            services.AddScoped<AbstractValidator<ManuFacePlateProductionCreateDto>, ManuFacePlateProductionCreateValidator>();
+            services.AddScoped<AbstractValidator<ManuFacePlateProductionModifyDto>, ManuFacePlateProductionModifyValidator>();
 
-            services.AddSingleton<AbstractValidator<ManuFacePlateRepairCreateDto>, ManuFacePlateRepairCreateValidator>();
-            services.AddSingleton<AbstractValidator<ManuFacePlateRepairModifyDto>, ManuFacePlateRepairModifyValidator>();
+            services.AddScoped<AbstractValidator<ManuFacePlateRepairCreateDto>, ManuFacePlateRepairCreateValidator>();
+            services.AddScoped<AbstractValidator<ManuFacePlateRepairModifyDto>, ManuFacePlateRepairModifyValidator>();
 
-            services.AddSingleton<AbstractValidator<ManuFacePlateContainerPackCreateDto>, ManuFacePlateContainerPackCreateValidator>();
-            services.AddSingleton<AbstractValidator<ManuFacePlateContainerPackModifyDto>, ManuFacePlateContainerPackModifyValidator>();
+            services.AddScoped<AbstractValidator<ManuFacePlateContainerPackCreateDto>, ManuFacePlateContainerPackCreateValidator>();
+            services.AddScoped<AbstractValidator<ManuFacePlateContainerPackModifyDto>, ManuFacePlateContainerPackModifyValidator>();
 
-            services.AddSingleton<AbstractValidator<ManuContainerBarcodeCreateDto>, ManuContainerBarcodeCreateValidator>();
-            services.AddSingleton<AbstractValidator<ManuContainerBarcodeModifyDto>, ManuContainerBarcodeModifyValidator>();
-            services.AddSingleton<AbstractValidator<CreateManuContainerBarcodeDto>, CreateManuContainerBarcodeValidator>();
-            services.AddSingleton<AbstractValidator<UpdateManuContainerBarcodeStatusDto>, UpdateManuContainerBarcodeStatusValidator>();
+            services.AddScoped<AbstractValidator<ManuContainerBarcodeCreateDto>, ManuContainerBarcodeCreateValidator>();
+            services.AddScoped<AbstractValidator<ManuContainerBarcodeModifyDto>, ManuContainerBarcodeModifyValidator>();
+            services.AddScoped<AbstractValidator<CreateManuContainerBarcodeDto>, CreateManuContainerBarcodeValidator>();
+            services.AddScoped<AbstractValidator<UpdateManuContainerBarcodeStatusDto>, UpdateManuContainerBarcodeStatusValidator>();
 
-            services.AddSingleton<AbstractValidator<ManuContainerPackRecordCreateDto>, ManuContainerPackRecordCreateValidator>();
-            services.AddSingleton<AbstractValidator<ManuContainerPackRecordModifyDto>, ManuContainerPackRecordModifyValidator>();
-            services.AddSingleton<AbstractValidator<ManuContainerPackCreateDto>, ManuContainerPackCreateValidator>();
-            services.AddSingleton<AbstractValidator<ManuContainerPackModifyDto>, ManuContainerPackModifyValidator>();
+            services.AddScoped<AbstractValidator<ManuContainerPackRecordCreateDto>, ManuContainerPackRecordCreateValidator>();
+            services.AddScoped<AbstractValidator<ManuContainerPackRecordModifyDto>, ManuContainerPackRecordModifyValidator>();
+            services.AddScoped<AbstractValidator<ManuContainerPackCreateDto>, ManuContainerPackCreateValidator>();
+            services.AddScoped<AbstractValidator<ManuContainerPackModifyDto>, ManuContainerPackModifyValidator>();
             #endregion
 
             #region Warehouse 
 
-            services.AddSingleton<AbstractValidator<WhSupplierCreateDto>, WhSupplierCreateValidator>();
-            services.AddSingleton<AbstractValidator<WhSupplierModifyDto>, WhSupplierModifyValidator>();
+            services.AddScoped<AbstractValidator<WhSupplierCreateDto>, WhSupplierCreateValidator>();
+            services.AddScoped<AbstractValidator<WhSupplierModifyDto>, WhSupplierModifyValidator>();
 
 
-            services.AddSingleton<AbstractValidator<WhMaterialInventoryCreateDto>, WhMaterialInventoryCreateValidator>();
-            services.AddSingleton<AbstractValidator<WhMaterialInventoryModifyDto>, WhMaterialInventoryModifyValidator>();
+            services.AddScoped<AbstractValidator<WhMaterialInventoryCreateDto>, WhMaterialInventoryCreateValidator>();
+            services.AddScoped<AbstractValidator<WhMaterialInventoryModifyDto>, WhMaterialInventoryModifyValidator>();
 
-            services.AddSingleton<AbstractValidator<WhMaterialStandingbookCreateDto>, WhMaterialStandingbookCreateValidator>();
-            services.AddSingleton<AbstractValidator<WhMaterialStandingbookModifyDto>, WhMaterialStandingbookModifyValidator>();
+            services.AddScoped<AbstractValidator<WhMaterialStandingbookCreateDto>, WhMaterialStandingbookCreateValidator>();
+            services.AddScoped<AbstractValidator<WhMaterialStandingbookModifyDto>, WhMaterialStandingbookModifyValidator>();
 
 
             #endregion
 
             #region Plan
             #region PlanWorkOrder
-            services.AddSingleton<AbstractValidator<PlanWorkOrderCreateDto>, PlanWorkOrderCreateValidator>();
-            services.AddSingleton<AbstractValidator<PlanWorkOrderModifyDto>, PlanWorkOrderModifyValidator>();
+            services.AddScoped<AbstractValidator<PlanWorkOrderCreateDto>, PlanWorkOrderCreateValidator>();
+            services.AddScoped<AbstractValidator<PlanWorkOrderModifyDto>, PlanWorkOrderModifyValidator>();
             #endregion
 
             #region PlanSfcReceive
-            services.AddSingleton<AbstractValidator<PlanSfcReceiveCreateDto>, PlanSfcReceiveCreateValidator>();
-            services.AddSingleton<AbstractValidator<PlanSfcReceiveScanCodeDto>, PlanSfcReceiveModifyValidator>();
+            services.AddScoped<AbstractValidator<PlanSfcReceiveCreateDto>, PlanSfcReceiveCreateValidator>();
+            services.AddScoped<AbstractValidator<PlanSfcReceiveScanCodeDto>, PlanSfcReceiveModifyValidator>();
             #endregion
 
             #region PlanWorkOrderActivation
-            services.AddSingleton<AbstractValidator<PlanWorkOrderActivationCreateDto>, PlanWorkOrderActivationCreateValidator>();
-            services.AddSingleton<AbstractValidator<PlanWorkOrderActivationModifyDto>, PlanWorkOrderActivationModifyValidator>();
+            services.AddScoped<AbstractValidator<PlanWorkOrderActivationCreateDto>, PlanWorkOrderActivationCreateValidator>();
+            services.AddScoped<AbstractValidator<PlanWorkOrderActivationModifyDto>, PlanWorkOrderActivationModifyValidator>();
             #endregion
 
             #region PlanSfcPrint
-            services.AddSingleton<AbstractValidator<PlanSfcPrintCreateDto>, PlanSfcPrintCreateValidator>();
-            services.AddSingleton<AbstractValidator<PlanSfcPrintCreatePrintDto>, PlanSfcPrintCreatePrintValidator>();
+            services.AddScoped<AbstractValidator<PlanSfcPrintCreateDto>, PlanSfcPrintCreateValidator>();
+            services.AddScoped<AbstractValidator<PlanSfcPrintCreatePrintDto>, PlanSfcPrintCreatePrintValidator>();
             #endregion
 
             #region PlanWorkOrderBind 
-            services.AddSingleton<AbstractValidator<PlanWorkOrderBindCreateDto>, PlanWorkOrderBindCreateValidator>();
-            services.AddSingleton<AbstractValidator<PlanWorkOrderBindModifyDto>, PlanWorkOrderBindModifyValidator>();
+            services.AddScoped<AbstractValidator<PlanWorkOrderBindCreateDto>, PlanWorkOrderBindCreateValidator>();
+            services.AddScoped<AbstractValidator<PlanWorkOrderBindModifyDto>, PlanWorkOrderBindModifyValidator>();
 
             #endregion
 

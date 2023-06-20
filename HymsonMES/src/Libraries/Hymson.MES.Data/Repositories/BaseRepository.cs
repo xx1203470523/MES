@@ -27,4 +27,46 @@ namespace Hymson.MES.Data.Repositories
 
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public abstract class BaseRepositorySingleton<T> : IDisposable where T : BaseRepositorySingleton<T>, new()
+    {
+        private readonly Lazy<MySqlConnection> _connection;
+        private readonly IOptions<ConnectionOptions> _connectionOptions;
+
+        public BaseRepositorySingleton(IOptions<ConnectionOptions> connectionOptions)
+        {
+            _connectionOptions = connectionOptions;
+            _connection = new Lazy<MySqlConnection>(() => new MySqlConnection(_connectionOptions.Value.MESConnectionString));
+        }
+
+
+        protected async Task<IDbConnection> GetDbConnectionAsync()
+        {
+            await OpenAsync();
+            return _connection.Value;
+        }
+
+        private async Task OpenAsync()
+        {
+            if (_connection.Value.State == ConnectionState.Closed)
+            {
+                await _connection.Value.OpenAsync();
+            }
+        }
+
+        public void Dispose()
+        {
+            //if (_connection.IsValueCreated && _connection.Value.State != ConnectionState.Closed)
+            //{
+            //    _connection.Value.Close();
+            //}
+            //_connection.Value.Dispose();
+
+            GC.SuppressFinalize(this);
+        }
+    }
+
 }
