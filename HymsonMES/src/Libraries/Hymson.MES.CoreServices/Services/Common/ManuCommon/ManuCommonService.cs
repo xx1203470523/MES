@@ -66,6 +66,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         private readonly ILocalizationService _localizationService;
 
 
+
         /// <summary>
         /// 构造函数
         /// </summary>

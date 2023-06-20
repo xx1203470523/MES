@@ -391,7 +391,8 @@
         public const string MES15104 = " 物料条码：{MaterialCode}在车间库存中已存在！";
         public const string MES15105 = " 增加库存失败";
         public const string MES15106 = " 请扫描物料条码";
-        public const string MES15107 = " 物料条码：{MaterialCode}重复扫描！";
+        public const string MES15107 = " 重复扫描！";
+        public const string MES15108 = " 供应商不能为空";
 
         #endregion
 

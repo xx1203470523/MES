@@ -498,12 +498,19 @@ namespace Hymson.MES.Services.Services.Process
             #region 组装数据
 
             //DTO转换实体
-            var entity = parm.ToEntity<ProcResourceEntity>();
-            entity.Id = IdGenProvider.Instance.CreateId();
-            entity.SiteId = siteId;
-            entity.CreatedBy = userName;
-            entity.UpdatedBy = userName;
-            entity.ResCode = resCode;
+            var entity = new ProcResourceEntity
+            {
+                Remark = parm.Remark,
+                ResName = parm.ResName,
+                ResTypeId = parm.ResTypeId ?? 0,
+                Status = (int)parm.Status,
+
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = siteId,
+                CreatedBy = userName,
+                UpdatedBy = userName,
+                ResCode = resCode
+            };
 
             var validationFailures = new List<ValidationFailure>();
 
