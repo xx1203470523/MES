@@ -234,7 +234,7 @@
         public const string MES11111 = "无法将不合格代码状态由其他状态修改为新建";
         public const string MES11112 = "状态不合法，请检查!";
         public const string MES11113 = "类型不合法，请检查!";
-        public const string MES11114 = "等级不合法，请检查!"; 
+        public const string MES11114 = "等级不合法，请检查!";
         #endregion
 
         #region 不合格组 11200
@@ -340,6 +340,8 @@
         public const string MES12602 = "设备名称不能为空";
         public const string MES12603 = "请求实体不能为空！";
         public const string MES12604 = "设备信息不存在！";
+        public const string MES12605 = "状态不合法，请检查！";
+        public const string MES12606 = "存放位置不能为空"; 
         #endregion
 
         #region 设备组 12700
