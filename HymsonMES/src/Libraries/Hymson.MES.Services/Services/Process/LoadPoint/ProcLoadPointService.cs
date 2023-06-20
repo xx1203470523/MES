@@ -188,7 +188,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task ModifyProcLoadPointAsync(ProcLoadPointModifyDto procLoadPointModifyDto)
         {
-            if (procLoadPointModifyDto == null) throw new ValidationException(nameof(ErrorCode.MES10100));
+            if (procLoadPointModifyDto == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
 
             procLoadPointModifyDto.LoadPointName = procLoadPointModifyDto.LoadPointName.Trim();
             procLoadPointModifyDto.Remark = procLoadPointModifyDto?.Remark ?? "".Trim();
@@ -218,12 +218,12 @@ namespace Hymson.MES.Services.Services.Process
             procLoadPointEntity.SiteId = _currentSite.SiteId ?? 0;
 
             #region 数据库验证
-            var modelOrigin = await _procLoadPointRepository.GetByIdAsync(procLoadPointModifyDto.Id) ?? throw new ValidationException(nameof(ErrorCode.MES10705));
+            var modelOrigin = await _procLoadPointRepository.GetByIdAsync(procLoadPointModifyDto.Id) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10705));
             #endregion
 
             if (modelOrigin.Status != SysDataStatusEnum.Build && procLoadPointModifyDto.Status == SysDataStatusEnum.Build)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10716));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10716));
             }
 
             #region 组装数据
@@ -322,7 +322,7 @@ namespace Hymson.MES.Services.Services.Process
         {
             if (idsArr.Length < 1)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10707));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10707));
             }
 
             var loadPoints = await _procLoadPointRepository.GetByIdsAsync(idsArr);
