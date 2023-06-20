@@ -1,5 +1,6 @@
 using FluentValidation;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Services.Dtos.Equipment;
 
 namespace Hymson.MES.Services.Validators.Process
@@ -16,6 +17,8 @@ namespace Hymson.MES.Services.Validators.Process
         {
             RuleFor(x => x.EquipmentCode).NotEmpty().WithErrorCode(ErrorCode.MES12601);
             RuleFor(x => x.EquipmentName).NotEmpty().WithErrorCode(ErrorCode.MES12602);
+            RuleFor(x => x.UseStatus).Must(it => Enum.IsDefined(typeof(EquipmentUseStatusEnum), it)).WithErrorCode(ErrorCode.MES12605);
+            RuleFor(x => x.Location).NotEmpty().WithErrorCode(ErrorCode.MES12606);
         }
     }
 }

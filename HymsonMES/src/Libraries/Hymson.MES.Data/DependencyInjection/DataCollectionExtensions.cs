@@ -55,176 +55,176 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddRepository(this IServiceCollection services)
         {
             #region Equipment
-            //services.AddSingleton<IEquConsumableRepository, EquConsumableRepository>();
-            //services.AddSingleton<IEquConsumableTypeRepository, EquConsumableTypeRepository>();
-            services.AddSingleton<IEquEquipmentRepository, EquEquipmentRepository>();
-            services.AddSingleton<IEquEquipmentGroupRepository, EquEquipmentGroupRepository>();
-            services.AddSingleton<IEquEquipmentLinkApiRepository, EquEquipmentLinkApiRepository>();
-            services.AddSingleton<IEquEquipmentLinkHardwareRepository, EquEquipmentLinkHardwareRepository>();
-            services.AddSingleton<IEquEquipmentUnitRepository, EquEquipmentUnitRepository>();
-            services.AddSingleton<IEquFaultPhenomenonRepository, EquFaultPhenomenonRepository>();
-            services.AddSingleton<IEquSparePartRepository, EquSparePartRepository>();
-            services.AddSingleton<IEquSparePartTypeRepository, EquSparePartTypeRepository>();
-            services.AddSingleton<IEquEquipmentTokenRepository, EquEquipmentTokenRepository>();
+            //services.AddScoped<IEquConsumableRepository, EquConsumableRepository>();
+            //services.AddScoped<IEquConsumableTypeRepository, EquConsumableTypeRepository>();
+            services.AddScoped<IEquEquipmentRepository, EquEquipmentRepository>();
+            services.AddScoped<IEquEquipmentGroupRepository, EquEquipmentGroupRepository>();
+            services.AddScoped<IEquEquipmentLinkApiRepository, EquEquipmentLinkApiRepository>();
+            services.AddScoped<IEquEquipmentLinkHardwareRepository, EquEquipmentLinkHardwareRepository>();
+            services.AddScoped<IEquEquipmentUnitRepository, EquEquipmentUnitRepository>();
+            services.AddScoped<IEquFaultPhenomenonRepository, EquFaultPhenomenonRepository>();
+            services.AddScoped<IEquSparePartRepository, EquSparePartRepository>();
+            services.AddScoped<IEquSparePartTypeRepository, EquSparePartTypeRepository>();
+            services.AddScoped<IEquEquipmentTokenRepository, EquEquipmentTokenRepository>();
 
 
             #region FaultReason
-            services.AddSingleton<IEquFaultReasonRepository, EquFaultReasonRepository>();
+            services.AddScoped<IEquFaultReasonRepository, EquFaultReasonRepository>();
 
             #endregion
             #endregion
 
             #region Integrated
-            services.AddSingleton<IInteCalendarDateDetailRepository, InteCalendarDateDetailRepository>();
-            services.AddSingleton<IInteCalendarDateRepository, InteCalendarDateRepository>();
-            services.AddSingleton<IInteCalendarRepository, InteCalendarRepository>();
-            services.AddSingleton<IInteClassDetailRepository, InteClassDetailRepository>();
-            services.AddSingleton<IInteClassRepository, InteClassRepository>();
-            services.AddSingleton<IInteContainerRepository, InteContainerRepository>();
-            services.AddSingleton<IInteJobClassRepository, InteJobClassRepository>();
+            services.AddScoped<IInteCalendarDateDetailRepository, InteCalendarDateDetailRepository>();
+            services.AddScoped<IInteCalendarDateRepository, InteCalendarDateRepository>();
+            services.AddScoped<IInteCalendarRepository, InteCalendarRepository>();
+            services.AddScoped<IInteClassDetailRepository, InteClassDetailRepository>();
+            services.AddScoped<IInteClassRepository, InteClassRepository>();
+            services.AddScoped<IInteContainerRepository, InteContainerRepository>();
+            services.AddScoped<IInteJobClassRepository, InteJobClassRepository>();
 
             //InteJob
-            services.AddSingleton<IInteJobBusinessRelationRepository, InteJobBusinessRelationRepository>();
-            services.AddSingleton<IInteJobRepository, InteJobRepository>();
-            services.AddSingleton<IInteWorkCenterRepository, InteWorkCenterRepository>();
+            services.AddScoped<IInteJobBusinessRelationRepository, InteJobBusinessRelationRepository>();
+            services.AddScoped<IInteJobRepository, InteJobRepository>();
+            services.AddScoped<IInteWorkCenterRepository, InteWorkCenterRepository>();
 
             #region CodeRule
-            services.AddSingleton<IInteCodeRulesRepository, InteCodeRulesRepository>();
-            services.AddSingleton<IInteCodeRulesMakeRepository, InteCodeRulesMakeRepository>();
+            services.AddScoped<IInteCodeRulesRepository, InteCodeRulesRepository>();
+            services.AddScoped<IInteCodeRulesMakeRepository, InteCodeRulesMakeRepository>();
             #endregion
 
             #region InteSystemToken
-            services.AddSingleton<IInteSystemTokenRepository, InteSystemTokenRepository>();
+            services.AddScoped<IInteSystemTokenRepository, InteSystemTokenRepository>();
             #endregion
             #endregion
 
             #region Process
-            services.AddSingleton<IProcMaskCodeRuleRepository, ProcMaskCodeRuleRepository>();
-            services.AddSingleton<IProcMaskCodeRepository, ProcMaskCodeRepository>();
-            services.AddSingleton<IProcProductSetRepository, ProcProductSetRepository>();
+            services.AddScoped<IProcMaskCodeRuleRepository, ProcMaskCodeRuleRepository>();
+            services.AddScoped<IProcMaskCodeRepository, ProcMaskCodeRepository>();
+            services.AddScoped<IProcProductSetRepository, ProcProductSetRepository>();
 
 
             #region Material
-            services.AddSingleton<IProcMaterialRepository, ProcMaterialRepository>();
-            services.AddSingleton<IProcReplaceMaterialRepository, ProcReplaceMaterialRepository>();
+            services.AddScoped<IProcMaterialRepository, ProcMaterialRepository>();
+            services.AddScoped<IProcReplaceMaterialRepository, ProcReplaceMaterialRepository>();
 
-            services.AddSingleton<IProcMaterialGroupRepository, ProcMaterialGroupRepository>();
+            services.AddScoped<IProcMaterialGroupRepository, ProcMaterialGroupRepository>();
 
-            services.AddSingleton<IProcMaterialSupplierRelationRepository, ProcMaterialSupplierRelationRepository>();
+            services.AddScoped<IProcMaterialSupplierRelationRepository, ProcMaterialSupplierRelationRepository>();
             #endregion
 
             #region Parameter
-            services.AddSingleton<IProcParameterRepository, ProcParameterRepository>();
+            services.AddScoped<IProcParameterRepository, ProcParameterRepository>();
 
             #endregion
 
             #region ParameterLinkType
-            services.AddSingleton<IProcParameterLinkTypeRepository, ProcParameterLinkTypeRepository>();
+            services.AddScoped<IProcParameterLinkTypeRepository, ProcParameterLinkTypeRepository>();
 
             #endregion
 
             #region Bom
-            services.AddSingleton<IProcBomRepository, ProcBomRepository>();
-            services.AddSingleton<IProcBomDetailRepository, ProcBomDetailRepository>();
-            services.AddSingleton<IProcBomDetailReplaceMaterialRepository, ProcBomDetailReplaceMaterialRepository>();
+            services.AddScoped<IProcBomRepository, ProcBomRepository>();
+            services.AddScoped<IProcBomDetailRepository, ProcBomDetailRepository>();
+            services.AddScoped<IProcBomDetailReplaceMaterialRepository, ProcBomDetailReplaceMaterialRepository>();
             #endregion
 
             #region LoadPoint
-            services.AddSingleton<IProcLoadPointRepository, ProcLoadPointRepository>();
+            services.AddScoped<IProcLoadPointRepository, ProcLoadPointRepository>();
 
             #endregion
 
             #region LoadPointLink
-            services.AddSingleton<IProcLoadPointLinkMaterialRepository, ProcLoadPointLinkMaterialRepository>();
-            services.AddSingleton<IProcLoadPointLinkResourceRepository, ProcLoadPointLinkResourceRepository>();
+            services.AddScoped<IProcLoadPointLinkMaterialRepository, ProcLoadPointLinkMaterialRepository>();
+            services.AddScoped<IProcLoadPointLinkResourceRepository, ProcLoadPointLinkResourceRepository>();
             #endregion
 
             #region Resource
-            services.AddSingleton<IProcResourceTypeRepository, ProcResourceTypeRepository>();
-            services.AddSingleton<IProcResourceRepository, ProcResourceRepository>();
-            services.AddSingleton<IProcResourceConfigPrintRepository, ProcResourceConfigPrintRepository>();
-            services.AddSingleton<IProcResourceConfigResRepository, ProcResourceConfigResRepository>();
-            services.AddSingleton<IProcResourceEquipmentBindRepository, ProcResourceEquipmentBindRepository>();
+            services.AddScoped<IProcResourceTypeRepository, ProcResourceTypeRepository>();
+            services.AddScoped<IProcResourceRepository, ProcResourceRepository>();
+            services.AddScoped<IProcResourceConfigPrintRepository, ProcResourceConfigPrintRepository>();
+            services.AddScoped<IProcResourceConfigResRepository, ProcResourceConfigResRepository>();
+            services.AddScoped<IProcResourceEquipmentBindRepository, ProcResourceEquipmentBindRepository>();
             #endregion
 
             #region Procedure
-            services.AddSingleton<IProcProcedureRepository, ProcProcedureRepository>();
-            services.AddSingleton<IProcProcedurePrintRelationRepository, ProcProcedurePrintRelationRepository>();
+            services.AddScoped<IProcProcedureRepository, ProcProcedureRepository>();
+            services.AddScoped<IProcProcedurePrintRelationRepository, ProcProcedurePrintRelationRepository>();
             #endregion
 
             #region ProduceSet
-            services.AddSingleton<IProcProductSetRepository, ProcProductSetRepository>();
+            services.AddScoped<IProcProductSetRepository, ProcProductSetRepository>();
             #endregion
 
             #region ProcessRoute
-            services.AddSingleton<IProcProcessRouteRepository, ProcProcessRouteRepository>();
-            services.AddSingleton<IProcProcessRouteDetailNodeRepository, ProcProcessRouteDetailNodeRepository>();
-            services.AddSingleton<IProcProcessRouteDetailLinkRepository, ProcProcessRouteDetailLinkRepository>();
+            services.AddScoped<IProcProcessRouteRepository, ProcProcessRouteRepository>();
+            services.AddScoped<IProcProcessRouteDetailNodeRepository, ProcProcessRouteDetailNodeRepository>();
+            services.AddScoped<IProcProcessRouteDetailLinkRepository, ProcProcessRouteDetailLinkRepository>();
             #endregion
 
             #region LabelTemplate
-            services.AddSingleton<IProcLabelTemplateRepository, ProcLabelTemplateRepository>();
+            services.AddScoped<IProcLabelTemplateRepository, ProcLabelTemplateRepository>();
             #endregion
 
             #region printConfig
-            services.AddSingleton<IProcPrintConfigRepository, ProcPrintConfigRepository>();
+            services.AddScoped<IProcPrintConfigRepository, ProcPrintConfigRepository>();
             #endregion
             #endregion
 
             #region Quality
-            services.AddSingleton<IQualUnqualifiedCodeRepository, QualUnqualifiedCodeRepository>();
-            services.AddSingleton<IQualUnqualifiedGroupRepository, QualUnqualifiedGroupRepository>();
+            services.AddScoped<IQualUnqualifiedCodeRepository, QualUnqualifiedCodeRepository>();
+            services.AddScoped<IQualUnqualifiedGroupRepository, QualUnqualifiedGroupRepository>();
             #endregion
 
             #region Manufacture
-            services.AddSingleton<IManuFeedingRepository, ManuFeedingRepository>();
-            services.AddSingleton<IManuFeedingRecordRepository, ManuFeedingRecordRepository>();
-            services.AddSingleton<IManuProductBadRecordRepository, ManuProductBadRecordRepository>();
-            services.AddSingleton<IManuSfcCirculationRepository, ManuSfcCirculationRepository>();
-            services.AddSingleton<IManuSfcInfoRepository, ManuSfcInfoRepository>();
-            services.AddSingleton<IManuSfcRepository, ManuSfcRepository>();
-            services.AddSingleton<IManuSfcProduceRepository, ManuSfcProduceRepository>();
-            services.AddSingleton<IManuSfcStepRepository, ManuSfcStepRepository>();
-            services.AddSingleton<IManuFacePlateRepository, ManuFacePlateRepository>();
-            services.AddSingleton<IManuFacePlateProductionRepository, ManuFacePlateProductionRepository>();
-            services.AddSingleton<IManuFacePlateRepairRepository, ManuFacePlateRepairRepository>();
-            services.AddSingleton<IManuFacePlateContainerPackRepository, ManuFacePlateContainerPackRepository>();
-            services.AddSingleton<IManuFacePlateButtonRepository, ManuFacePlateButtonRepository>();
-            services.AddSingleton<IManuFacePlateButtonJobRelationRepository, ManuFacePlateButtonJobRelationRepository>();
+            services.AddScoped<IManuFeedingRepository, ManuFeedingRepository>();
+            services.AddScoped<IManuFeedingRecordRepository, ManuFeedingRecordRepository>();
+            services.AddScoped<IManuProductBadRecordRepository, ManuProductBadRecordRepository>();
+            services.AddScoped<IManuSfcCirculationRepository, ManuSfcCirculationRepository>();
+            services.AddScoped<IManuSfcInfoRepository, ManuSfcInfoRepository>();
+            services.AddScoped<IManuSfcRepository, ManuSfcRepository>();
+            services.AddScoped<IManuSfcProduceRepository, ManuSfcProduceRepository>();
+            services.AddScoped<IManuSfcStepRepository, ManuSfcStepRepository>();
+            services.AddScoped<IManuFacePlateRepository, ManuFacePlateRepository>();
+            services.AddScoped<IManuFacePlateProductionRepository, ManuFacePlateProductionRepository>();
+            services.AddScoped<IManuFacePlateRepairRepository, ManuFacePlateRepairRepository>();
+            services.AddScoped<IManuFacePlateContainerPackRepository, ManuFacePlateContainerPackRepository>();
+            services.AddScoped<IManuFacePlateButtonRepository, ManuFacePlateButtonRepository>();
+            services.AddScoped<IManuFacePlateButtonJobRelationRepository, ManuFacePlateButtonJobRelationRepository>();
 
-            services.AddSingleton<IManuContainerPackRecordRepository, ManuContainerPackRecordRepository>();
-            services.AddSingleton<IManuContainerPackRepository, ManuContainerPackRepository>();
-            services.AddSingleton<IManuContainerBarcodeRepository, ManuContainerBarcodeRepository>();
+            services.AddScoped<IManuContainerPackRecordRepository, ManuContainerPackRecordRepository>();
+            services.AddScoped<IManuContainerPackRepository, ManuContainerPackRepository>();
+            services.AddScoped<IManuContainerBarcodeRepository, ManuContainerBarcodeRepository>();
             #endregion
 
             #region Warehouse 
-            services.AddSingleton<IWhSupplierRepository, WhSupplierRepository>();
-            services.AddSingleton<IWhMaterialInventoryRepository, WhMaterialInventoryRepository>();
-            services.AddSingleton<IWhMaterialStandingbookRepository, WhMaterialStandingbookRepository>();
+            services.AddScoped<IWhSupplierRepository, WhSupplierRepository>();
+            services.AddScoped<IWhMaterialInventoryRepository, WhMaterialInventoryRepository>();
+            services.AddScoped<IWhMaterialStandingbookRepository, WhMaterialStandingbookRepository>();
 
 
             #endregion
 
             #region Plan
-            //services.AddSingleton<IPlanWorkOrderActivationRepository, PlanWorkOrderActivationRepository>();
+            //services.AddScoped<IPlanWorkOrderActivationRepository, PlanWorkOrderActivationRepository>();
 
             #region PlanWorkOrder
-            services.AddSingleton<IPlanWorkOrderRepository, PlanWorkOrderRepository>();
-            services.AddSingleton<IPlanWorkOrderStatusRecordRepository, PlanWorkOrderStatusRecordRepository>();
+            services.AddScoped<IPlanWorkOrderRepository, PlanWorkOrderRepository>();
+            services.AddScoped<IPlanWorkOrderStatusRecordRepository, PlanWorkOrderStatusRecordRepository>();
             #endregion
 
             #region PlanSfcReceive
-            services.AddSingleton<IPlanSfcReceiveRepository, PlanSfcReceiveRepository>();
+            services.AddScoped<IPlanSfcReceiveRepository, PlanSfcReceiveRepository>();
             #endregion
 
             #region PlanWorkOrderActivation
-            services.AddSingleton<IPlanWorkOrderActivationRepository, PlanWorkOrderActivationRepository>();
-            services.AddSingleton<IPlanWorkOrderActivationRecordRepository, PlanWorkOrderActivationRecordRepository>();
+            services.AddScoped<IPlanWorkOrderActivationRepository, PlanWorkOrderActivationRepository>();
+            services.AddScoped<IPlanWorkOrderActivationRecordRepository, PlanWorkOrderActivationRecordRepository>();
             #endregion
 
             #region PlanWorkOrderBind/PlanWorkOrderBindRecord
-            services.AddSingleton<IPlanWorkOrderBindRepository, PlanWorkOrderBindRepository>();
-            services.AddSingleton<IPlanWorkOrderBindRecordRepository, PlanWorkOrderBindRecordRepository>();
+            services.AddScoped<IPlanWorkOrderBindRepository, PlanWorkOrderBindRepository>();
+            services.AddScoped<IPlanWorkOrderBindRecordRepository, PlanWorkOrderBindRecordRepository>();
             #endregion
             #endregion
 
