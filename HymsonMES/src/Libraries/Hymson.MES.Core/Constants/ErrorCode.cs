@@ -367,6 +367,7 @@
         public const string MES13009 = "故障原因编码不能为空";
         public const string MES13010 = "故障原因名称不能为空";
         public const string MES13011 = "此故障原因编码{Code}在系统已经存在！";
+        public const string MES13012 = "状态不合法，请检查!";
 
         #endregion
 
