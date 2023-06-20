@@ -342,7 +342,7 @@
         public const string MES12603 = "请求实体不能为空！";
         public const string MES12604 = "设备信息不存在！";
         public const string MES12605 = "状态不合法，请检查！";
-        public const string MES12606 = "存放位置不能为空"; 
+        public const string MES12606 = "存放位置不能为空";
         #endregion
 
         #region 设备组 12700
@@ -387,6 +387,7 @@
         public const string MES15006 = "供应商编码不能为空";
         public const string MES15007 = "供应商名称不能为空";
         public const string MES15008 = "此供应商编码{Code}不符合规则，字母/数字！";
+        public const string MES15009 = "供应商编码最大长度50";
 
 
         #endregion

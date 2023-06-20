@@ -25,6 +25,7 @@ namespace Hymson.MES.Services.Validators.Warehouse
         {
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES15007));
             RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES15006));
+            RuleFor(x => x.Code).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES15009));
 
         }
     }
@@ -38,6 +39,8 @@ namespace Hymson.MES.Services.Validators.Warehouse
         {
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES15007));
             RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES15006));
+            RuleFor(x => x.Code).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES15009));
+
         }
     }
 }
