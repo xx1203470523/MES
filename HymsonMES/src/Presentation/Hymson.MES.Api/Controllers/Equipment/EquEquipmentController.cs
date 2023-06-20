@@ -130,14 +130,13 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
             return await _equEquipmentService.GetEquimentLinkApiAsync(pagedQueryDto);
         }
 
-
-
         /// <summary>
         /// 获取设备Token
         /// </summary>
         /// <param name="EquEquipmentId"></param>
         /// <returns></returns>
         [Route("token/{equEquipmentId}")]
+        [PermissionDescription("equ:equipment:token")]
         [HttpGet]
         public async Task<string> GetEquEquipmentTokenAsync(long EquEquipmentId) 
         {
