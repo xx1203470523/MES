@@ -169,6 +169,8 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="sfcProduceStepDto"></param>
         /// <returns></returns>
         [HttpPost("saveManuSfcProduceStep")]
+        [LogDescription("在制品步骤控制", BusinessType.INSERT)]
+        [PermissionDescription("manu:manSfcStepControl:saveStep")]
         public async Task SaveManuSfcProduceStepAsync(SaveManuSfcProduceStepDto sfcProduceStepDto)
         {
             await _manuSfcProduceService.SaveManuSfcProduceStepAsync(sfcProduceStepDto);
@@ -203,6 +205,8 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="manuUpdateSaveDto"></param>
         /// <returns></returns>
         [HttpPost("saveManuUpdate")]
+        [LogDescription("生产更改", BusinessType.INSERT)]
+        [PermissionDescription("manu:manuUpdate:saveUpdate")]
         public async Task SaveManuUpdateList(ManuUpdateSaveDto manuUpdateSaveDto)
         {
             await _manuSfcProduceService.SaveManuUpdateListAsync(manuUpdateSaveDto);
