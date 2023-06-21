@@ -596,7 +596,18 @@ namespace Hymson.MES.Services.Services.Plan
             var pagedQuery = queryDto.ToQuery<PlanWorkOrderProductionReportPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _planWorkOrderRepository.GetPlanWorkOrderProductionReportPageListAsync(pagedQuery);
-            var dtos = pagedInfo.Data.Select(s => s.ToModel<PlanWorkOrderProductionReportViewDto>());
+            var dtos = pagedInfo.Data.Select(s =>
+            {
+                if (s.FinishProductQuantity > 0)
+                {
+                    s.NoPassQty = s.UnqualifiedQuantity + s.NGQty;
+                    //合格数量 完工数量-不良数量-NG数量
+                    s.PassQty = s.FinishProductQuantity - s.NoPassQty;
+                    //计算合格率 合格数量/完工数量 *100
+                    s.PassRate = s.PassQty / s.FinishProductQuantity * 100;
+                }
+                return s.ToModel<PlanWorkOrderProductionReportViewDto>();
+            });
             return new PagedInfo<PlanWorkOrderProductionReportViewDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 

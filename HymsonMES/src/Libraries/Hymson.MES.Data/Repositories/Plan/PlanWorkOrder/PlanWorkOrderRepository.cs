@@ -60,23 +60,24 @@ namespace Hymson.MES.Data.Repositories.Plan
             }
             if (!string.IsNullOrEmpty(pageQuery.OrderCode))
             {
-                pageQuery.OrderCode = $"%{pageQuery.OrderCode}%";
-                sqlBuilder.Where(" pwo.OrderCode like @OrderCode ");
+                //pageQuery.OrderCode = $"%{pageQuery.OrderCode}%";
+                sqlBuilder.Where(" pwo.OrderCode = @OrderCode ");
             }
             if (pageQuery.OrderType.HasValue)
             {
                 sqlBuilder.Where(" pwo.Type = @OrderType ");
             }
-            if (!string.IsNullOrEmpty(pageQuery.WorkCentCode))
+            if (!string.IsNullOrEmpty(pageQuery.WorkCenterCode))
             {
-                sqlBuilder.Where(" iwc.Code = @WorkCentCode ");
+                sqlBuilder.Where(" iwc.Code = @WorkCenterCode ");
             }
-            if (pageQuery.RealStart.HasValue) {
-                sqlBuilder.Where(" pwor.RealStart >= @RealStart ");
-            }
-            if (pageQuery.RealEnd.HasValue)
+            if (pageQuery.RealEnd != null && pageQuery.RealEnd.Length > 0)
             {
-                sqlBuilder.Where(" pwor.RealEnd < @RealEnd ");
+                if (pageQuery.RealEnd.Length >= 2)
+                {
+                    sqlBuilder.AddParameters(new { RealEndStart = pageQuery.RealEnd[0], RealEndEnd = pageQuery.RealEnd[1].AddDays(1) });
+                    sqlBuilder.Where(" pwor.RealEnd >= @RealEndStart AND pwor.RealEnd < @RealEndEnd ");
+                }
             }
             var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -541,9 +542,9 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string UpdateRecordRealEndSql = "UPDATE plan_work_order_record SET RealEnd = @UpdatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE WorkOrderId IN @WorkOrderIds AND IsDeleted = 0 ";
 
         const string GetPagedInfoPlanWorkOrderProductionReportDataSqlTemplate = @" select pwo.Id,pwo.OrderCode,pwo.Type,pwo.Qty,iwc.Name as WorkCentName,iwc.Code WorkCentCode,
-                                tm.MaterialCode,m.MaterialName,pwo.PlanStartTime,pwo.PlanEndTime,pwor.RealStart,pwor.RealEnd,
+                                m.MaterialCode,m.MaterialName,pwo.PlanStartTime,pwo.PlanEndTime,pwor.RealStart,pwor.RealEnd,
                                 pwor.InputQty,pwor.UnqualifiedQuantity,pwor.FinishProductQuantity,pwor.PassDownQuantity,
-                                (SELECT count(1) FROM manu_sfc_summary mss where mss.WorkOrderId=pwo.Id ) NoPassQty /*不合格数量*/
+                                (SELECT count(1) FROM manu_sfc_summary mss where mss.WorkOrderId=pwo.Id AND mss.QualityStatus=0 ) NGQty /*NG数量*/
                                 from plan_work_order_record pwor 
                                 LEFT JOIN plan_work_order pwo on pwor.WorkOrderId=pwo.Id
                                 LEFT JOIN proc_material m on m.Id=pwo.ProductId 

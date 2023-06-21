@@ -33,16 +33,11 @@ namespace Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query
         /// <summary>
         /// 产线编码
         /// </summary>
-        public string? WorkCentCode { get; set; }
-
-        /// <summary>
-        /// 实际开始时间
-        /// </summary>
-        public DateTime? RealStart { get; set; }
+        public string? WorkCenterCode { get; set; }
 
         /// <summary>
         /// 实际完成时间
         /// </summary>
-        public DateTime? RealEnd { get; set; }
+        public DateTime[]? RealEnd { get; set; }
     }
 }
