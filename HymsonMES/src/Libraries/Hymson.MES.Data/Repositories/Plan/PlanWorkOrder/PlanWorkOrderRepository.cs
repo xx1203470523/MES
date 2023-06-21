@@ -359,7 +359,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> UpdateInputQtyByWorkOrderId(UpdateQtyCommand param)
+        public async Task<int> UpdateInputQtyByWorkOrderIdAsync(UpdateQtyCommand param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             // TODO var conn = BaseRepositorySingleton.GetMESInstance();

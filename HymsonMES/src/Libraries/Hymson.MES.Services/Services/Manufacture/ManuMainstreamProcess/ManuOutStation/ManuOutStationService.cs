@@ -267,8 +267,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES18104)).WithData("sfc", sfcProduceEntity.SFC);
 
             // 更新数据
-            List<Task> tasks = new();
             using var trans = TransactionHelper.GetTransactionScope();
+            List<Task> tasks = new();
 
             // 更新物料库存
             if (updates.Any() == true)

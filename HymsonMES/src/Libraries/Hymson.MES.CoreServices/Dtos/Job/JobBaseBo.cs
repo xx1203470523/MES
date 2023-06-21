@@ -1,9 +1,15 @@
-﻿namespace Hymson.MES.CoreServices.Bos.Common
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Hymson.MES.CoreServices.Dtos.Job
 {
     /// <summary>
-    /// 多条码
+    /// 作业公共类
     /// </summary>
-    public class MultiSFCBo
+    public class JobBaseBo
     {
         /// <summary>
         /// 工厂Id
@@ -16,4 +22,3 @@
         public IEnumerable<string> SFCs { get; set; } = new List<string>();
     }
 }
-    

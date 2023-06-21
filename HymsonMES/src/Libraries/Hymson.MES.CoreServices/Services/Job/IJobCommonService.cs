@@ -2,7 +2,7 @@
 using Hymson.MES.CoreServices.Bos;
 using Hymson.MES.CoreServices.Dtos.Common;
 
-namespace Hymson.MES.CoreServices.Services.Common
+namespace Hymson.MES.CoreServices.Services.Job
 {
     /// <summary>
     /// 生产共用
@@ -28,6 +28,5 @@ namespace Hymson.MES.CoreServices.Services.Common
         /// </summary>
         /// <returns></returns>
         Task<IEnumerable<SelectOptionDto>> GetClassProgramOptionsAsync();
-
     }
 }
