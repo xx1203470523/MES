@@ -179,6 +179,7 @@
         public const string MES10618 = "版本不能为空";
         public const string MES10619 = "用量不能为空";
         public const string MES10620 = "收集方式不合法，请检查！";
+
         #endregion
 
         #region 上料点 10700
