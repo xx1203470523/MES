@@ -532,8 +532,9 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             //    UpdatedBy = _currentEquipment.Name,
             //    WorkOrderIds = new long[] { planWorkOrder.Id }
             //});
+
             // 更新完工数量
-            rows += await _planWorkOrderRepository.UpdateFinishProductQuantityByWorkOrderId(new UpdateQtyCommand
+            rows += await _planWorkOrderRepository.UpdateFinishProductQuantityByWorkOrderIdAsync(new UpdateQtyCommand
             {
                 UpdatedBy = _currentEquipment.Name,
                 UpdatedOn = HymsonClock.Now(),
