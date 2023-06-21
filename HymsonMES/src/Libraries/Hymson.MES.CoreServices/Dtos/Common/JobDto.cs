@@ -70,8 +70,5 @@ namespace Hymson.MES.CoreServices.Dtos.Common
         /// 时间
         /// </summary>
         public DateTime Time { get; set; } = HymsonClock.Now();
-
     }
-
-
 }

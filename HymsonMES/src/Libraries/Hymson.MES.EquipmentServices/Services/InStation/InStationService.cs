@@ -218,7 +218,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture.InStation
                 // 如果是首工序，更新工单的 InputQty
                 if (isFirstProcedure == true)
                 {
-                    rows += await _planWorkOrderRepository.UpdateInputQtyByWorkOrderId(new UpdateQtyCommand
+                    rows += await _planWorkOrderRepository.UpdateInputQtyByWorkOrderIdAsync(new UpdateQtyCommand
                     {
                         UpdatedBy = sfcProduceEntity.UpdatedBy,
                         UpdatedOn = sfcProduceEntity.UpdatedOn,

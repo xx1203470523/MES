@@ -118,7 +118,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16502)).WithData("product", procMaterialEntity.MaterialCode);
             }
-
+            if (param.Qty <= 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16508));
+            }
             var discuss = (int)Math.Ceiling(param.Qty / procMaterialEntity.Batch);
             var processRouteFirstProcedure = await _manuCommonOldService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
 

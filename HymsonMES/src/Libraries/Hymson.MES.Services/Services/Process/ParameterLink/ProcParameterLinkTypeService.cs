@@ -57,7 +57,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task CreateProcParameterLinkTypeAsync(ProcParameterLinkTypeCreateDto procParameterLinkTypeCreateDto)
         {
             // 检查SiteId
-            //if (_currentSite.SiteId == 0 || _currentSite.SiteId == null) throw new BusinessException(nameof(ErrorCode.MES10101));
+            if (_currentSite.SiteId == 0 || _currentSite.SiteId == null) throw new BusinessException(nameof(ErrorCode.MES10101));
 
             // 验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procParameterLinkTypeCreateDto);

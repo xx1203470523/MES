@@ -99,6 +99,8 @@
         public const string MES10349 = "模板预览内容为空！";
         public const string MES10350 = "未找到指定模板！";
         public const string MES10356 = "获取模板上下文信息失败,模板名称:{name}！";
+        public const string MES10370 = "存储路径超长，最大255!";
+
         #endregion
 
         #region 工序 10400
@@ -179,6 +181,7 @@
         public const string MES10618 = "版本不能为空";
         public const string MES10619 = "用量不能为空";
         public const string MES10620 = "收集方式不合法，请检查！";
+
         #endregion
 
         #region 上料点 10700
@@ -217,6 +220,8 @@
         public const string MES10808 = "结束方式掩码首位不能为特殊字符\"?\"";
         public const string MES10809 = "状态不合法，请检查";
         public const string MES10810 = "掩码编码不能为空";
+        public const string MES10811 = "掩码编码最大长度为50"; 
+        public const string MES10812 = "掩码名称最大长度为50";
 
 
         #endregion
@@ -389,6 +394,7 @@
         public const string MES15007 = "供应商名称不能为空";
         public const string MES15008 = "此供应商编码{Code}不符合规则，字母/数字！";
         public const string MES15009 = "供应商编码最大长度50";
+        public const string MES15010 = "供应商名称最大长度50";
 
 
         #endregion
@@ -673,6 +679,7 @@
         public const string MES16505 = "条码不存在，无法复用。";
         public const string MES16506 = "条码不为完成和在库状态，无法复用。";
         public const string MES16507 = "资源和工序对应的资源类型不匹配。";
+        public const string MES16508 = "下达数量不合法。";
         #endregion
 
         #region 在制品移除添加 16600

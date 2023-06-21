@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Hymson.MES.CoreServices.Services.Common;
+using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.EquipmentServices;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Services.Common;

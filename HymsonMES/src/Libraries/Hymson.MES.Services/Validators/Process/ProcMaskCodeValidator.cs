@@ -15,7 +15,9 @@ namespace Hymson.MES.Services.Validators.Process
         public ProcMaskCodeValidator()
         {
             RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10801));
+            RuleFor(x => x.Code).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES10811));
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10810));
+            RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES10812));
 
         }
     }

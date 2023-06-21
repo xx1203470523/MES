@@ -4,7 +4,7 @@ using Hymson.MES.CoreServices.Dtos.Common;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.RegularExpressions;
 
-namespace Hymson.MES.CoreServices.Services.Common
+namespace Hymson.MES.CoreServices.Services.Job
 {
     /// <summary>
     /// 生产通用
