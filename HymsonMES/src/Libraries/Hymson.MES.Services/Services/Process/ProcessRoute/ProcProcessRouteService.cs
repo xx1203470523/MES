@@ -241,6 +241,10 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             // 判断是否存在
             var processRoute = await _procProcessRouteRepository.GetByIdAsync(parm.Id)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10438));
+            if (processRoute.Status != SysDataStatusEnum.Build && parm.Status == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+            }
 
             // DTO转换实体
             var procProcessRouteEntity = parm.ToEntity<ProcProcessRouteEntity>();
@@ -307,9 +311,9 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             var resourceList = await _procProcessRouteRepository.IsIsExistsEnabledAsync(new ProcProcessRouteQuery
             {
                 Ids = idsArr,
-                StatusArr = new int[] { (int)SysDataStatusEnum.Enable, (int)SysDataStatusEnum.Retain }
+                StatusArr = new int[] { (int)SysDataStatusEnum.Enable, (int)SysDataStatusEnum.Retain, (int)SysDataStatusEnum.Abolish }
             });
-            if (resourceList != null) throw new CustomerValidationException(nameof(ErrorCode.MES10430));
+            if (resourceList != null) throw new CustomerValidationException(nameof(ErrorCode.MES10106));
             #endregion
 
             return await _procProcessRouteRepository.DeleteRangeAsync(new DeleteCommand

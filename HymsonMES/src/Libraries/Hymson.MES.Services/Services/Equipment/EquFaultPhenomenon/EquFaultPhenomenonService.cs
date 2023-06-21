@@ -6,6 +6,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon;
@@ -94,7 +95,13 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         public async Task<int> ModifyAsync(EquFaultPhenomenonSaveDto modifyDto)
         {
             // 验证DTO
+            var entityOld = await _equFaultPhenomenonRepository.GetByIdAsync(modifyDto.Id.Value)
+                ?? throw new BusinessException(nameof(ErrorCode.MES12905));
 
+            if (entityOld.UseStatus != SysDataStatusEnum.Build && modifyDto.UseStatus == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+            }
 
             // DTO转换实体
             var entity = modifyDto.ToEntity<EquFaultPhenomenonEntity>();
@@ -110,6 +117,12 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] idsArr)
         {
+            var entities = await _equFaultPhenomenonRepository.GetByIdsAsync(idsArr);
+            if (entities != null && entities.Any(a => a.UseStatus != SysDataStatusEnum.Build))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10106));
+            }
+
             return await _equFaultPhenomenonRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = idsArr,

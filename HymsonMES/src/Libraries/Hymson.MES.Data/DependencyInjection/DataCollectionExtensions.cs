@@ -93,6 +93,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteCodeRulesRepository, InteCodeRulesRepository>();
             services.AddSingleton<IInteCodeRulesMakeRepository, InteCodeRulesMakeRepository>();
             #endregion
+
+            #region InteSystemToken
+            services.AddSingleton<IInteSystemTokenRepository, InteSystemTokenRepository>();
+            #endregion
             #endregion
 
             #region Process

@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,35 +36,35 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public int LinkPoint { get; set; } = -1;
 
-       /// <summary>
-       /// 所属不合格代码ID
-       /// </summary>
+        /// <summary>
+        /// 所属不合格代码ID
+        /// </summary>
         public long BusinessId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 序号
         /// </summary>
         public string OrderNumber { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 作业ID
         /// </summary>
         public long JobId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否启用
         /// </summary>
         public bool IsUse { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 参数
         /// </summary>
         public string Parameter { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; } 
+        public string Remark { get; set; }
     }
 
 
@@ -75,19 +76,19 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 关联点
         /// </summary>
-        public int LinkPoint { get; set; }
+        public ResourceJobLinkPointEnum LinkPoint { get; set; }
 
         /// <summary>
         /// 1资源  2工序 3不合格代码
         /// </summary>
-       // public int BusinessType { get; set; }
+        // public int BusinessType { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 序号
         /// </summary>
-       // public string OrderNumber { get; set; }
+        // public string OrderNumber { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 作业ID
         /// </summary>
         public long JobId { get; set; }
@@ -97,7 +98,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public bool IsUse { get; set; } = false;
 
-       /// <summary>
+        /// <summary>
         /// 参数
         /// </summary>
         public string Parameter { get; set; }
@@ -113,62 +114,62 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 1资源  2工序 3不合格代码
         /// </summary>
         public int BusinessType { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 所属不合格代码ID
         /// </summary>
         public long BusinessId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 序号
         /// </summary>
         public string OrderNumber { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 作业ID
         /// </summary>
         public long JobId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否启用
         /// </summary>
         public bool IsUse { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 参数
         /// </summary>
         public string Parameter { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备注
         /// </summary>
         public string Remark { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 最后修改人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 修改时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否逻辑删除
         /// </summary>
         public bool IsDeleted { get; set; }

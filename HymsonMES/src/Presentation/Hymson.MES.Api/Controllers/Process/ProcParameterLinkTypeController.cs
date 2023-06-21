@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Process
@@ -62,6 +63,8 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("关联参数", BusinessType.INSERT)]
+       // [PermissionDescription("proc:parameterLink:insert")]
         public async Task AddProcParameterLinkTypeAsync([FromBody] ProcParameterLinkTypeCreateDto parm)
         {
              await _procParameterLinkTypeService.CreateProcParameterLinkTypeAsync(parm);
@@ -74,6 +77,8 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("关联参数", BusinessType.UPDATE)]
+       // [PermissionDescription("proc:parameterLink:update")]
         public async Task UpdateProcParameterLinkTypeAsync([FromBody] ProcParameterLinkTypeModifyDto parm)
         {
              await _procParameterLinkTypeService.ModifyProcParameterLinkTypeAsync(parm);
@@ -86,6 +91,8 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("关联参数", BusinessType.DELETE)]
+       // [PermissionDescription("proc:parameterLink:delete")]
         public async Task<int> DeleteProcParameterLinkTypeAsync(long[] ids)
         {
             //long[] idsArr = StringExtension.SpitLongArrary(ids);

@@ -225,6 +225,13 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteCodeRulesMakeEntity, InteCodeRulesMakeDto>();
             CreateMap<InteCodeRulesMakeDto, InteCodeRulesMakeEntity>();
             #endregion
+
+            #region InteSystemToken
+            CreateMap<InteSystemTokenPagedQueryDto, InteSystemTokenPagedQuery>();
+            CreateMap<InteSystemTokenEntity, InteSystemTokenDto>();
+            CreateMap<InteSystemTokenCreateDto, InteSystemTokenEntity>();
+            CreateMap<InteSystemTokenModifyDto, InteSystemTokenEntity>();
+            #endregion
         }
 
         /// <summary>

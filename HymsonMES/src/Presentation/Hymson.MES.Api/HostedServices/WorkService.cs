@@ -4,8 +4,6 @@ using Hymson.Infrastructure.Enums;
 using Hymson.Localization.Domain;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.CoreServices.Dtos.Common;
-using Hymson.MES.CoreServices.Services.Common;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using OfficeOpenXml.Attributes;
@@ -24,7 +22,6 @@ namespace Hymson.MES.Api
         private readonly ILogger<WorkService> _logger;
         private readonly IResourceService _resourceService;
         private readonly IClearCacheService _clearCacheService;
-        private readonly IJobCommonService _jobCommonService;
         private readonly IResourceRepository _resourceRepository;
         private readonly ILanguageRepository _languageRepository;
 
@@ -34,20 +31,17 @@ namespace Hymson.MES.Api
         /// <param name="resourceService"></param>
         /// <param name="logger"></param>
         /// <param name="clearCacheService"></param>
-        /// <param name="jobCommonService"></param>
         /// <param name="resourceRepository"></param>
         /// <param name="languageRepository"></param>
         public WorkService(ILogger<WorkService> logger,
             IResourceService resourceService,
             IClearCacheService clearCacheService,
-            IJobCommonService jobCommonService,
             IResourceRepository resourceRepository,
             ILanguageRepository languageRepository)
         {
             _logger = logger;
             _resourceService = resourceService;
             _clearCacheService = clearCacheService;
-            _jobCommonService = jobCommonService;
             _resourceRepository = resourceRepository;
             _languageRepository = languageRepository;
         }
@@ -140,19 +134,6 @@ namespace Hymson.MES.Api
             return allExcelDtoTypes;
         }
 
-        /// <summary>
-        /// 查询类程序
-        /// </summary>
-        /// <returns></returns>
-        public async Task<int> GetClassProgramListAsync()
-        {
-            // 获取所有实现类
-            var services = _jobCommonService.GetJobClassBoListAsync();
-
-            // TODO 先去改Bug，这个晚点再来完成
-
-            return 0;
-        }
 
     }
 }

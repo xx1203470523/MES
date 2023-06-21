@@ -3,26 +3,32 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using static Dapper.SqlBuilder;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 条码步骤表仓储
     /// </summary>
-    public partial class ManuSfcStepRepository : IManuSfcStepRepository
+    public partial class ManuSfcStepRepository : BaseRepository, IManuSfcStepRepository
     {
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly ConnectionOptions _connectionOptions;
+        private readonly IMemoryCache _memoryCache;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public ManuSfcStepRepository(IOptions<ConnectionOptions> connectionOptions)
+        /// <param name="memoryCache"></param>
+        public ManuSfcStepRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
+            _memoryCache = memoryCache;
         }
 
         /// <summary>
@@ -91,7 +97,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var manuSfcStepEntities = await conn.QueryAsync<ManuSfcStepEntity>(template.RawSql, manuSfcStepQuery);
             return manuSfcStepEntities;
         }
-            
+
         /// <summary>
         /// 新增
         /// </summary>
@@ -100,6 +106,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> InsertAsync(ManuSfcStepEntity manuSfcStepEntity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(InsertSql, manuSfcStepEntity);
         }
 
@@ -176,7 +183,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcStepEntity>> GetSFCInOutStepAsync(SFCInOutStepQuery sfcQuery) 
+        public async Task<IEnumerable<ManuSfcStepEntity>> GetSFCInOutStepAsync(SFCInOutStepQuery sfcQuery)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var manuSfcStepEntities = await conn.QueryAsync<ManuSfcStepEntity>(GetSFCInOutStepSql, sfcQuery);
