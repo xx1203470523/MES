@@ -6,22 +6,35 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.View;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using System.Data;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 条码生产信息（物理删除）仓储
     /// </summary>
-    public partial class ManuSfcProduceRepository : IManuSfcProduceRepository
+    public partial class ManuSfcProduceRepository : BaseRepository, IManuSfcProduceRepository
     {
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly ConnectionOptions _connectionOptions;
+        private readonly IMemoryCache _memoryCache;
 
-        public ManuSfcProduceRepository(IOptions<ConnectionOptions> connectionOptions)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
+        /// <param name="memoryCache"></param>
+        public ManuSfcProduceRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
+            _memoryCache = memoryCache;
         }
+
 
         /// <summary>
         /// 分页查询

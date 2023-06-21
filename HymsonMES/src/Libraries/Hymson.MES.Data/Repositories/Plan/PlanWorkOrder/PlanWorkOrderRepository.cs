@@ -15,7 +15,7 @@ namespace Hymson.MES.Data.Repositories.Plan
     /// <summary>
     /// 工单信息表仓储
     /// </summary>
-    public partial class PlanWorkOrderRepository : IPlanWorkOrderRepository
+    public partial class PlanWorkOrderRepository : BaseRepository, IPlanWorkOrderRepository
     {
         /// <summary>
         /// 
@@ -27,7 +27,8 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public PlanWorkOrderRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
+        /// <param name="memoryCache"></param>
+        public PlanWorkOrderRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
             _memoryCache = memoryCache;

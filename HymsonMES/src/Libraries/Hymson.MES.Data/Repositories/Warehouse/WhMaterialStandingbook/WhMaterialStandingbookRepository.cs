@@ -2,6 +2,7 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Options;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -10,14 +11,25 @@ namespace Hymson.MES.Data.Repositories.Warehouse
     /// <summary>
     /// 物料台账仓储
     /// </summary>
-    public partial class WhMaterialStandingbookRepository : IWhMaterialStandingbookRepository
+    public partial class WhMaterialStandingbookRepository : BaseRepository, IWhMaterialStandingbookRepository
     {
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly ConnectionOptions _connectionOptions;
+        private readonly IMemoryCache _memoryCache;
 
-        public WhMaterialStandingbookRepository(IOptions<ConnectionOptions> connectionOptions)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
+        /// <param name="memoryCache"></param>
+        public WhMaterialStandingbookRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
+            _memoryCache = memoryCache;
         }
+
 
         /// <summary>
         /// 删除（软删除）

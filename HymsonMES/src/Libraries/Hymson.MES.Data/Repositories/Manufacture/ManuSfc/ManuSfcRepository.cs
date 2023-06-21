@@ -6,6 +6,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.View;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -14,21 +15,25 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// <summary>
     /// 条码表仓储
     /// </summary>
-    public partial class ManuSfcRepository : IManuSfcRepository
+    public partial class ManuSfcRepository : BaseRepository, IManuSfcRepository
     {
         /// <summary>
         /// 
         /// </summary>
         private readonly ConnectionOptions _connectionOptions;
+        private readonly IMemoryCache _memoryCache;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public ManuSfcRepository(IOptions<ConnectionOptions> connectionOptions)
+        /// <param name="memoryCache"></param>
+        public ManuSfcRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
+            _memoryCache = memoryCache;
         }
+
 
         #region 方法
         /// <summary>

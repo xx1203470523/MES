@@ -77,7 +77,7 @@ namespace Hymson.MES.Services.Services.Process
             procBomCreateDto.BomCode = procBomCreateDto.BomCode.ToTrimSpace().ToUpperInvariant();
             procBomCreateDto.BomName = procBomCreateDto.BomName.Trim();
             procBomCreateDto.Version = procBomCreateDto.Version.Trim();
-            procBomCreateDto.Remark = procBomCreateDto.Remark??"".Trim();
+            procBomCreateDto.Remark = procBomCreateDto.Remark ?? "".Trim();
             if (procBomCreateDto == null)
             {
                 throw new ValidationException(nameof(ErrorCode.MES10503));
@@ -155,6 +155,14 @@ namespace Hymson.MES.Services.Services.Process
                     //return apiResult;
                 }
 
+                if (materialList.Any(it => it.Usages <= 0))
+                {
+                    throw new ValidationException(nameof(ErrorCode.MES10619));
+                }
+                if (materialList.Any(it => it.DataCollectionWay == null || Enum.IsDefined(typeof(MaterialSerialNumberEnum), it.DataCollectionWay)))
+                {
+                    throw new ValidationException(nameof(ErrorCode.MES10620));
+                }
                 var replaceList = materialList.Where(a => a.IsMain == 0).ToList();
                 if (replaceList.GroupBy(m => new { m.MaterialId, m.ReplaceMaterialId }).Where(g => g.Count() > 1).Count() > 0)
                 {
@@ -220,7 +228,7 @@ namespace Hymson.MES.Services.Services.Process
                     // 先将同编码的其他bom设置为非当前版本
                     var procBoms = await _procBomRepository.GetProcBomEntitiesAsync(new ProcBomQuery()
                     {
-                        SiteId = _currentSite.SiteId??0,
+                        SiteId = _currentSite.SiteId ?? 0,
                         BomCode = procBomEntity.BomCode,
                     });
 
@@ -372,6 +380,11 @@ namespace Hymson.MES.Services.Services.Process
                 throw new ValidationException(nameof(ErrorCode.MES10610));
             }
 
+            if (modelOrigin.Status != SysDataStatusEnum.Build && procBomEntity.Status == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+            }
+
             var bomCode = modelOrigin.BomCode.ToUpperInvariant();
             //验证是否存在
             //var exists = (await _procBomRepository.GetProcBomEntitiesAsync(new ProcBomQuery()
@@ -451,9 +464,9 @@ namespace Hymson.MES.Services.Services.Process
                             CreatedBy = user,
                             UpdatedBy = user,
 
-                            DataCollectionWay= item.DataCollectionWay,
-                            IsEnableReplace=item.IsEnableReplace??false,
-                            Seq=(int)item.Seq
+                            DataCollectionWay = item.DataCollectionWay,
+                            IsEnableReplace = item.IsEnableReplace ?? false,
+                            Seq = (int)item.Seq
                         };
                         mainId = bomdeail.Id;
                         bomDetails.Add(bomdeail);
@@ -494,11 +507,11 @@ namespace Hymson.MES.Services.Services.Process
                         BomCode = bomCode
                     });
 
-                    var currentVersionProcBoms = procBoms!=null&&procBoms.Any()? procBoms.Where(x => x.IsCurrentVersion = true).ToList():null;
+                    var currentVersionProcBoms = procBoms != null && procBoms.Any() ? procBoms.Where(x => x.IsCurrentVersion = true).ToList() : null;
 
-                    if (currentVersionProcBoms != null&& currentVersionProcBoms.Any())
+                    if (currentVersionProcBoms != null && currentVersionProcBoms.Any())
                     {
-                        await _procBomRepository.UpdateIsCurrentVersionIsFalseAsync(currentVersionProcBoms.Select(x=>x.Id).ToArray());
+                        await _procBomRepository.UpdateIsCurrentVersionIsFalseAsync(currentVersionProcBoms.Select(x => x.Id).ToArray());
                     }
                 }
 
@@ -513,7 +526,7 @@ namespace Hymson.MES.Services.Services.Process
                 DeleteCommand command = new DeleteCommand
                 {
                     UserId = user,
-                    Ids= new long[] { procBomEntity.Id },
+                    Ids = new long[] { procBomEntity.Id },
                     DeleteOn = HymsonClock.Now()
                 };
                 await _procBomDetailRepository.DeleteBomIDAsync(command);
@@ -571,7 +584,7 @@ namespace Hymson.MES.Services.Services.Process
 
             if (mainBomDetails.Count() > 0)
             {
-                mainBomDetails=mainBomDetails.OrderBy(x => x.Seq).ToList();
+                mainBomDetails = mainBomDetails.OrderBy(x => x.Seq).ToList();
 
                 procBomDetailViews.AddRange(mainBomDetails);
             }
