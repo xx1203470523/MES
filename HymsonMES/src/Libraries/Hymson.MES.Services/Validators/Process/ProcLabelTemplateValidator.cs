@@ -19,12 +19,13 @@ namespace Hymson.MES.Services.Validators.Process
     /// <summary>
     /// 仓库标签模板 更新 验证
     /// </summary>
-    internal class ProcLabelTemplateCreateValidator: AbstractValidator<ProcLabelTemplateCreateDto>
+    internal class ProcLabelTemplateCreateValidator : AbstractValidator<ProcLabelTemplateCreateDto>
     {
         public ProcLabelTemplateCreateValidator()
         {
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10343));
             RuleFor(x => x.Path).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10344));
+            RuleFor(x => x.Path).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES10370));
             //RuleFor(x => x.Content).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10345));
             RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES10342));
 
