@@ -157,6 +157,17 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
             var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             return new PagedInfo<EquFaultPhenomenonView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
+
+        /// <summary>
+        /// 根据ID获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<EquFaultPhenomenonEntity>> GetByIdsAsync(long[] ids)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<EquFaultPhenomenonEntity>(GetByIdsSql, new { ids });
+        }
     }
 
     /// <summary>
@@ -178,5 +189,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM equ_fault_phenomenon EFP /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM equ_fault_phenomenon EFP /**innerjoin**/ /**leftjoin**/ /**where**/ ";
 
+        const string GetByIdsSql = @"SELECT * FROM equ_fault_phenomenon WHERE IsDeleted = 0 AND Id IN @ids ";
     }
 }

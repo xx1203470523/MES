@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -26,65 +27,65 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 所属资源ID
         /// </summary>
         public long ResourceId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 关联点(字典key值)
         /// </summary>
         public string LinkPoint { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 作业ID
         /// </summary>
         public long JobId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否启用
         /// </summary>
         public bool? IsUse { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 参数
         /// </summary>
         public string Parameter { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备注
         /// </summary>
         public string Remark { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 最后修改人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 修改时间
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否逻辑删除
         /// </summary>
         public bool? IsDeleted { get; set; }
 
-       
+
     }
 
-    public record ProcResourceConfigJobViewDto: ProcResourceConfigJobDto
+    public record ProcResourceConfigJobViewDto : ProcResourceConfigJobDto
     {
         /// <summary>
         /// 描述 :作业编号 
@@ -107,7 +108,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 关联点
         /// </summary>
-        public int LinkPoint { get; set; }
+        public ResourceJobLinkPointEnum? LinkPoint { get; set; }
 
         /// <summary>
         /// 作业ID
@@ -152,7 +153,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 操作类型
         /// </summary>
         //[Required(ErrorMessage = "操作类型不可为空")]
-       // public int OperationType { get; set; }
+        // public int OperationType { get; set; }
     }
 
     /// <summary>

@@ -285,6 +285,11 @@ namespace Hymson.MES.Services.Services.Integrated
             var entity = await _inteWorkCenterRepository.GetByIdAsync(param.Id)
                 ?? throw new BusinessException(nameof(ErrorCode.MES12111));
 
+            if (entity.Status != SysDataStatusEnum.Build && param.Status == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+            }
+
             // 如果有修改混线类型（从允许混线修改为不允许混线）
             if (entity.Type == WorkCenterTypeEnum.Line && entity.IsMixLine != param.IsMixLine && param.IsMixLine == false)
             {
@@ -398,11 +403,15 @@ namespace Hymson.MES.Services.Services.Integrated
         {
             var userId = _currentUser.UserName;
 
-            // 启用状态或保留状态不可删除
+            // 只可删除新建状态
             var workCenters = await _inteWorkCenterRepository.GetByIdsAsync(ids);
-            if (workCenters.Any(a => a.Status == SysDataStatusEnum.Enable || a.Status == SysDataStatusEnum.Retain))
+            //if (workCenters.Any(a => a.Status == SysDataStatusEnum.Enable || a.Status == SysDataStatusEnum.Retain))
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES12113));
+            //}
+            if (workCenters != null && workCenters.Any(a => a.Status != SysDataStatusEnum.Build))
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES12113));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10106));
             }
 
             // 检查产线是否有下级资源

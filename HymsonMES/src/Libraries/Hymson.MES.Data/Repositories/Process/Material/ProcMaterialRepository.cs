@@ -110,8 +110,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcMaterialEntity>> GetBySiteIdAsync(long siteId)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcMaterialEntity>(GetBySiteIdSql, new { SiteId = siteId });
+            var key = $"proc_material&all&{siteId}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                return await conn.QueryAsync<ProcMaterialEntity>(GetBySiteIdSql, new { SiteId = siteId });
+            });
+
         }
 
         /// <summary>

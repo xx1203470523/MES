@@ -6,11 +6,13 @@
  *build datetime: 2023-03-06 03:27:59
  */
 using FluentValidation;
+using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
@@ -51,6 +53,11 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// </summary>
         private readonly IManuSfcRepository _manuSfcRepository;
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly ILocalizationService _localizationService;
         private readonly AbstractValidator<WhMaterialInventoryCreateDto> _validationCreateRules;
         private readonly AbstractValidator<WhMaterialInventoryModifyDto> _validationModifyRules;
         private readonly ICurrentSite _currentSite;
@@ -63,7 +70,8 @@ namespace Hymson.MES.Services.Services.Warehouse
               IManuSfcRepository manuSfcRepository,
         AbstractValidator<WhMaterialInventoryCreateDto> validationCreateRules,
             AbstractValidator<WhMaterialInventoryModifyDto> validationModifyRules,
-            ICurrentSite currentSite)
+            ICurrentSite currentSite,
+            ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
@@ -74,6 +82,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _currentSite = currentSite;
+            _localizationService = localizationService;
         }
 
 
@@ -114,28 +123,92 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15106));
             }
+            var validationFailures = new List<ValidationFailure>();
+            var procMaterials = await _procMaterialRepository.GetByIdsAsync(whMaterialInventoryLists.Select(it => it.MaterialId).Distinct().ToArray());
+            if (procMaterials == null || !procMaterials.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15101));
+            }
             foreach (var item in whMaterialInventoryLists)
             {
+                #region 校验
+
                 item.MaterialBarCode = item.MaterialBarCode.Trim();
                 var isMaterialBarCodeList = whMaterialInventoryLists.Where(it => it.MaterialBarCode.Trim() == item.MaterialBarCode);
                 if (isMaterialBarCodeList.Count() > 1)
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15107)).WithData("MaterialCode", item.MaterialBarCode);
+                    validationFailures.Add(new ValidationFailure
+                    {
+                        FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", item.MaterialBarCode } },
+                        ErrorCode = nameof(ErrorCode.MES15107)
+                    });
+                    //var validationFailure = new ValidationFailure();
+                    //if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    //{
+                    //    validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                    //        { "CollectionIndex", item.MaterialBarCode}
+                    //    };
+                    //}
+                    //else
+                    //{
+                    //    validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.MaterialBarCode);
+                    //}
+                    //validationFailure.ErrorCode = nameof(ErrorCode.MES15107);
+                    //validationFailures.Add(validationFailure);
+                    continue;
                 }
-                #region 校验
-                //验证DTO
-                //await _validationCreateListRules.ValidateAndThrowAsync(item);
 
+                if (item.SupplierId <= 0)
+                {
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", item.MaterialBarCode}
+                        };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.MaterialBarCode);
+                    }
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15108);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
                 if (item.QuantityResidue <= 0)
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15103)).WithData("MaterialCode", item.MaterialBarCode);
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", item.MaterialBarCode}
+                        };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.MaterialBarCode);
+                    }
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15103);
+                    validationFailures.Add(validationFailure);
+                    continue;
                 }
-                //DTO转换实体 
-                //var whMaterialInventoryEntity = item.ToEntity<WhMaterialInventoryEntity>();
-                var materialInfo = await _whMaterialInventoryRepository.GetProcMaterialByMaterialCodeAsync(item.MaterialId);
+                var materialInfo = procMaterials.Where(it => it.Id == item.MaterialId).FirstOrDefault();
                 if (materialInfo == null)
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15101));
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", item.MaterialBarCode}
+                        };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.MaterialBarCode);
+                    }
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15101);
+                    validationFailures.Add(validationFailure);
+                    continue;
                 }
                 //var supplierInfo = await _whMaterialInventoryRepository.GetWhSupplierByMaterialIdAsync(materialInfo.Id, item.SupplierId);
                 //if (materialInfo == null || supplierInfo.Count() <= 0)
@@ -197,7 +270,11 @@ namespace Hymson.MES.Services.Services.Warehouse
                 listStandingbook.Add(whMaterialStandingbookEntity);
                 #endregion
             }
-
+            // 是否存在错误
+            if (validationFailures.Any() == true)
+            {
+                throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
+            }
             #region 入库
             // 保存实体
             var rows = 0;
@@ -209,7 +286,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             }
             if (rows == 0)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES15105));
+                throw new ValidationException(nameof(ErrorCode.MES15105));
             }
             #endregion
         }

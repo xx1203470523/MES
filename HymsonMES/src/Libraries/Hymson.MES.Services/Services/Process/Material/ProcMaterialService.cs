@@ -234,8 +234,12 @@ namespace Hymson.MES.Services.Services.Process
             //var statusArr = new int[] { 2, 3 }; //可下达和保留 时无法删除
             //判断这些ID 对应的物料是否在 可下达和保留中  （1:新建;2:可下达;3:保留;4:废除）
             var entitys = await _procMaterialRepository.GetByIdsAsync(idsArr);
-            if (entitys.Any(a => a.Status == SysDataStatusEnum.Enable
-            || a.Status == SysDataStatusEnum.Retain) == true) throw new BusinessException(nameof(ErrorCode.MES10212));
+            //if (entitys.Any(a => a.Status == SysDataStatusEnum.Enable
+            //|| a.Status == SysDataStatusEnum.Retain) == true) throw new BusinessException(nameof(ErrorCode.MES10212));
+            if (entitys != null && entitys.Any(a => a.Status != SysDataStatusEnum.Build))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10106));
+            }
 
             //判断这些物料在 生产工单（已下达、生产中）中是否被使用，被使用则无法删除
             var statusList = new List<PlanWorkOrderStatusEnum>();
@@ -334,6 +338,11 @@ namespace Hymson.MES.Services.Services.Process
             if (modelOrigin == null)
             {
                 throw new NotFoundException(nameof(ErrorCode.MES10204));
+            }
+
+            if (modelOrigin.Status != SysDataStatusEnum.Build && procMaterialModifyDto.Status == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10108));
             }
 
             if (procMaterialModifyDto.Origin != modelOrigin.Origin)

@@ -13,16 +13,25 @@ namespace Hymson.MES.Data.Repositories.Warehouse
     /// <summary>
     /// 物料库存仓储
     /// </summary>
-    public partial class WhMaterialInventoryRepository : IWhMaterialInventoryRepository
+    public partial class WhMaterialInventoryRepository : BaseRepository, IWhMaterialInventoryRepository
     {
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly ConnectionOptions _connectionOptions;
         private readonly IMemoryCache _memoryCache;
 
-        public WhMaterialInventoryRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
+        /// <param name="memoryCache"></param>
+        public WhMaterialInventoryRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
             _memoryCache = memoryCache;
         }
+
 
         /// <summary>
         /// 删除（软删除）
@@ -188,6 +197,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         public async Task<int> InsertAsync(WhMaterialInventoryEntity whMaterialInventoryEntity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(InsertSql, whMaterialInventoryEntity);
         }
 

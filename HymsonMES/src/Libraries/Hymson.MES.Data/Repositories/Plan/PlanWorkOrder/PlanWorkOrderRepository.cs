@@ -18,7 +18,7 @@ namespace Hymson.MES.Data.Repositories.Plan
     /// <summary>
     /// 工单信息表仓储
     /// </summary>
-    public partial class PlanWorkOrderRepository : IPlanWorkOrderRepository
+    public partial class PlanWorkOrderRepository : BaseRepository, IPlanWorkOrderRepository
     {
         /// <summary>
         /// 
@@ -30,7 +30,8 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public PlanWorkOrderRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
+        /// <param name="memoryCache"></param>
+        public PlanWorkOrderRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
             _memoryCache = memoryCache;
@@ -266,7 +267,7 @@ namespace Hymson.MES.Data.Repositories.Plan
                 {
                     sqlBuilder.AddParameters(new { PlanStartTimeStart = pageQuery.PlanStartTime[0], PlanStartTimeEnd = pageQuery.PlanStartTime[1].AddDays(1) });
                     sqlBuilder.Where("wo.PlanStartTime >= @PlanStartTimeStart AND wo.PlanStartTime < @PlanStartTimeEnd");
-                } 
+                }
             }
 
             if (pageQuery.Statuss != null && pageQuery.Statuss.Any())
@@ -418,6 +419,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         public async Task<int> UpdateInputQtyByWorkOrderId(UpdateQtyCommand param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(UpdateInputQtySql, param);
         }
 
@@ -426,9 +428,10 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> UpdateFinishProductQuantityByWorkOrderId(UpdateQtyCommand param)
+        public async Task<int> UpdateFinishProductQuantityByWorkOrderIdAsync(UpdateQtyCommand param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(UpdateFinishProductQuantitySql, param);
         }
 
@@ -452,6 +455,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         public async Task<int> UpdatePlanWorkOrderRealStartByWorkOrderIdAsync(UpdateWorkOrderRealTimeCommand command)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(UpdateRecordRealStartSql, command);
         }
 

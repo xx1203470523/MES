@@ -1,9 +1,11 @@
 ﻿using FluentValidation;
+using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
@@ -93,6 +95,12 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         private readonly IProcProductSetRepository _procProductSetRepository;
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly ILocalizationService _localizationService;
+
         private readonly AbstractValidator<ProcResourceCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcResourceModifyDto> _validationModifyRules;
 
@@ -112,7 +120,7 @@ namespace Hymson.MES.Services.Services.Process
                   IProcMaterialRepository procMaterialRepository,
                   IProcProductSetRepository procProductSetRepository,
                   AbstractValidator<ProcResourceCreateDto> validationCreateRules,
-                  AbstractValidator<ProcResourceModifyDto> validationModifyRules)
+                  AbstractValidator<ProcResourceModifyDto> validationModifyRules, ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -129,6 +137,7 @@ namespace Hymson.MES.Services.Services.Process
             _procProductSetRepository = procProductSetRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
+            _localizationService = localizationService;
         }
 
         /// <summary>
@@ -489,19 +498,47 @@ namespace Hymson.MES.Services.Services.Process
             #region 组装数据
 
             //DTO转换实体
-            var entity = parm.ToEntity<ProcResourceEntity>();
-            entity.Id = IdGenProvider.Instance.CreateId();
-            entity.SiteId = siteId;
-            entity.CreatedBy = userName;
-            entity.UpdatedBy = userName;
-            entity.ResCode = resCode;
+            var entity = new ProcResourceEntity
+            {
+                Remark = parm.Remark,
+                ResName = parm.ResName,
+                ResTypeId = parm.ResTypeId ?? 0,
+                Status = (int)parm.Status,
+
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = siteId,
+                CreatedBy = userName,
+                UpdatedBy = userName,
+                ResCode = resCode
+            };
+
+            var validationFailures = new List<ValidationFailure>();
 
             //打印机数据
             List<ProcResourceConfigPrintEntity> printList = new List<ProcResourceConfigPrintEntity>();
             if (parm.PrintList != null && parm.PrintList.Count > 0)
             {
+                int i = 0;
                 foreach (var item in parm.PrintList)
                 {
+                    i++;
+                    if (item.PrintId <= 0)
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", i}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES10381);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
                     ProcResourceConfigPrintEntity print = new ProcResourceConfigPrintEntity();
                     print = new ProcResourceConfigPrintEntity
                     {
@@ -521,8 +558,27 @@ namespace Hymson.MES.Services.Services.Process
             List<ProcResourceEquipmentBindEntity> equList = new List<ProcResourceEquipmentBindEntity>();
             if (parm.EquList != null && parm.EquList.Count > 0)
             {
+                int i = 0;
                 foreach (var item in parm.EquList)
                 {
+                    i++;
+                    if (item.EquipmentId <= 0)
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", i}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES10382);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
                     ProcResourceEquipmentBindEntity equ = new ProcResourceEquipmentBindEntity();
                     equ = new ProcResourceEquipmentBindEntity
                     {
@@ -543,14 +599,50 @@ namespace Hymson.MES.Services.Services.Process
             List<ProcResourceConfigResEntity> resSetList = new List<ProcResourceConfigResEntity>();
             if (parm.ResList != null && parm.ResList.Count > 0)
             {
+                int i = 0;
                 foreach (var item in parm.ResList)
                 {
+                    i++;
+                    if (item.SetType == null || !Enum.IsDefined(typeof(ResourceSetTypeEnum), item.SetType))
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", i}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES10383);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
+                    if (item.Value == null || !long.TryParse(item.Value.ToString(), out long a))
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", i}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES10384);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
                     ProcResourceConfigResEntity resSet = new ProcResourceConfigResEntity();
                     resSet = new ProcResourceConfigResEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         ResourceId = entity.Id,
-                        SetType = item.SetType,
+                        SetType = (int)item.SetType,
                         Value = item.Value.ToString(),
                         Remark = "",
                         SiteId = _currentSite.SiteId ?? 0,
@@ -565,8 +657,62 @@ namespace Hymson.MES.Services.Services.Process
             List<InteJobBusinessRelationEntity> jobList = new List<InteJobBusinessRelationEntity>();
             if (parm.JobList != null && parm.JobList.Count > 0)
             {
+                int i = 0;
                 foreach (var item in parm.JobList)
                 {
+                    i++;
+                    if (item.LinkPoint == null || !Enum.IsDefined(typeof(ResourceJobLinkPointEnum), item.LinkPoint))
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", i}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES10385);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
+                    if (item.JobId <= 0)
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", i}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES10386);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
+                    if (string.IsNullOrWhiteSpace(item.Parameter.Trim()))
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", i}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES10387);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
+
                     InteJobBusinessRelationEntity job = new InteJobBusinessRelationEntity();
                     job = new InteJobBusinessRelationEntity
                     {
@@ -574,7 +720,7 @@ namespace Hymson.MES.Services.Services.Process
                         BusinessId = entity.Id,
                         BusinessType = (int)InteJobBusinessTypeEnum.Resource,
                         OrderNumber = "",
-                        LinkPoint = item.LinkPoint,
+                        LinkPoint = (int)item.LinkPoint,
                         JobId = item.JobId,
                         IsUse = item.IsUse,
                         Parameter = item.Parameter,
@@ -603,6 +749,10 @@ namespace Hymson.MES.Services.Services.Process
                     relationEntity.UpdatedBy = userName;
                     productSetList.Add(relationEntity);
                 }
+            }
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("MES10107"), validationFailures);
             }
             #endregion
 
@@ -653,6 +803,18 @@ namespace Hymson.MES.Services.Services.Process
             param.Remark = param.Remark.Trim();
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(param);
+
+            var entityOld = await _resourceRepository.GetByIdAsync(param.Id)
+                ?? throw new BusinessException(nameof(ErrorCode.MES10388));
+
+            if (entityOld.Status != (int)SysDataStatusEnum.Build && param.Status == (int)SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+            }
+            if (!Enum.IsDefined(typeof(SysDataStatusEnum), (SysDataStatusEnum)param.Status))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10380));
+            }
 
             //资源类型在系统中不存在,请重新输入!
             if (param.ResTypeId > 0)
@@ -723,12 +885,33 @@ namespace Hymson.MES.Services.Services.Process
                 UpdatedBy = userName
             };
 
+            var validationFailures = new List<ValidationFailure>();
+
             //打印机数据
             List<ProcResourceConfigPrintEntity> addPrintList = new List<ProcResourceConfigPrintEntity>();
             if (param.PrintList != null && param.PrintList.Count > 0)
             {
+                int i = 0;
                 foreach (var item in param.PrintList)
                 {
+                    i++;
+                    if (item.PrintId <= 0)
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", i}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES10381);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
                     ProcResourceConfigPrintEntity print = new ProcResourceConfigPrintEntity();
                     print = new ProcResourceConfigPrintEntity
                     {
@@ -748,8 +931,27 @@ namespace Hymson.MES.Services.Services.Process
             List<ProcResourceEquipmentBindEntity> addEquList = new List<ProcResourceEquipmentBindEntity>();
             if (param.EquList != null && param.EquList.Count > 0)
             {
+                int i = 0;
                 foreach (var item in param.EquList)
                 {
+                    i++;
+                    if (item.EquipmentId <= 0)
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", i}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES10382);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
                     ProcResourceEquipmentBindEntity equ = new ProcResourceEquipmentBindEntity();
                     equ = new ProcResourceEquipmentBindEntity
                     {
@@ -770,14 +972,50 @@ namespace Hymson.MES.Services.Services.Process
             List<ProcResourceConfigResEntity> addResSetList = new List<ProcResourceConfigResEntity>();
             if (param.ResList != null && param.ResList.Count > 0)
             {
+                int i = 0;
                 foreach (var item in param.ResList)
                 {
+                    i++;
+                    if (item.SetType == null || !Enum.IsDefined(typeof(ResourceSetTypeEnum), item.SetType))
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", i}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES10383);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
+                    if (item.Value == null || !long.TryParse(item.Value.ToString(), out long a))
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", i}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES10384);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
                     ProcResourceConfigResEntity resSet = new ProcResourceConfigResEntity();
                     resSet = new ProcResourceConfigResEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         ResourceId = param.Id,
-                        SetType = item.SetType,
+                        SetType = (int)item.SetType,
                         Value = item?.Value.ToString(),
                         Remark = "",
                         SiteId = _currentSite.SiteId ?? 0,
@@ -792,8 +1030,63 @@ namespace Hymson.MES.Services.Services.Process
             List<InteJobBusinessRelationEntity> addJobList = new List<InteJobBusinessRelationEntity>();
             if (param.JobList != null && param.JobList.Count > 0)
             {
+                int i = 0;
                 foreach (var item in param.JobList)
                 {
+
+                    i++;
+                    if (item.LinkPoint == null || !Enum.IsDefined(typeof(ResourceJobLinkPointEnum), item.LinkPoint))
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", i}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES10385);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
+                    if (item.JobId <= 0)
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", i}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES10386);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
+                    if (string.IsNullOrWhiteSpace(item.Parameter.Trim()))
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", i}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES10387);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
+
                     InteJobBusinessRelationEntity job = new InteJobBusinessRelationEntity();
                     job = new InteJobBusinessRelationEntity
                     {
@@ -801,7 +1094,7 @@ namespace Hymson.MES.Services.Services.Process
                         BusinessId = param.Id,
                         BusinessType = (int)InteJobBusinessTypeEnum.Resource,
                         OrderNumber = "",
-                        LinkPoint = item.LinkPoint,
+                        LinkPoint = (int)item.LinkPoint,
                         JobId = item.JobId,
                         IsUse = item.IsUse,
                         Parameter = item.Parameter,
@@ -832,6 +1125,10 @@ namespace Hymson.MES.Services.Services.Process
                 }
             }
 
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("MES10107"), validationFailures);
+            }
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
                 //入库
@@ -895,16 +1192,21 @@ namespace Hymson.MES.Services.Services.Process
                 throw new CustomerValidationException(nameof(ErrorCode.MES10102));
             }
 
-            //不能删除启用状态的资源
-            var query = new ProcResourceQuery
+            ////不能删除启用状态的资源
+            //var query = new ProcResourceQuery
+            //{
+            //    IdsArr = idsArr,
+            //    Status = (int)SysDataStatusEnum.Enable
+            //};
+            //var resourceList = await _resourceRepository.GetByIdsAsync(query);
+            //if (resourceList != null && resourceList.Any())
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES10319));
+            //}
+            var entitys = await _resourceRepository.GetListByIdsAsync(idsArr);
+            if (entitys != null && entitys.Any(a => a.Status != (int)SysDataStatusEnum.Build))
             {
-                IdsArr = idsArr,
-                Status = (int)SysDataStatusEnum.Enable
-            };
-            var resourceList = await _resourceRepository.GetByIdsAsync(query);
-            if (resourceList != null && resourceList.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10319));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10106));
             }
 
             //资源被工作中心引用不能删除
