@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Manufacture
@@ -88,6 +89,8 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("delete")]
+        [LogDescription("容器解包", BusinessType.DELETE)]
+        [PermissionDescription("manu:containerPack:delete")]
         public async Task DeleteManuContainerPackAsync(ManuContainerPackUnpackDto param)
         {
             await _manuContainerPackService.DeletesManuContainerPackAsync(param);
@@ -100,6 +103,8 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("deleteAll")]
+        [LogDescription("容器解包", BusinessType.DELETE)]
+        [PermissionDescription("manu:containerPack:deleteAll")]
         public async Task DeleteManuContainerPackAsync( ContainerUnpackDto param)
         {
             await _manuContainerPackService.DeleteAllByContainerBarCodeIdAsync(param);

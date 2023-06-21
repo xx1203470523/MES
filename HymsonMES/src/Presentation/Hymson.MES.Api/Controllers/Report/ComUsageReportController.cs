@@ -3,6 +3,7 @@ using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Services.Plan;
 using Hymson.MES.Services.Services.Report;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Report
@@ -54,6 +55,7 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <returns></returns>
         [HttpGet]
         [Route("export")]
+        [PermissionDescription("report:comUsageReport:export")]
         public async Task<ComUsageExportResultDto> ExprotComUsagePageListAsync([FromQuery] ComUsageReportPagedQueryDto param)
         {
             return await _comUsageReportService.ExprotComUsagePageListAsync(param);
