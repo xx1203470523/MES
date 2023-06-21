@@ -42,6 +42,7 @@ namespace Hymson.MES.Services.Validators.Process
         {
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10343));
             RuleFor(x => x.Path).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10344));
+            RuleFor(x => x.Path).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES10370));
             //RuleFor(x => x.Content).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10345));
             RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES10342));
             //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");

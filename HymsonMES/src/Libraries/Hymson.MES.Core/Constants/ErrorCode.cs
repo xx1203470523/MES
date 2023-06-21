@@ -220,6 +220,8 @@
         public const string MES10808 = "结束方式掩码首位不能为特殊字符\"?\"";
         public const string MES10809 = "状态不合法，请检查";
         public const string MES10810 = "掩码编码不能为空";
+        public const string MES10811 = "掩码编码最大长度为50"; 
+        public const string MES10812 = "掩码名称最大长度为50";
 
 
         #endregion
