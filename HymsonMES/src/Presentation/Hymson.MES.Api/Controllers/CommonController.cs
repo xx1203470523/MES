@@ -1,6 +1,10 @@
 ﻿using Hymson.Localization.Services;
 using Hymson.MES.Services.Dtos.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
+using System.Collections.Concurrent;
+using System.Net;
 
 namespace Hymson.MES.Api.Controllers
 {
@@ -12,13 +16,18 @@ namespace Hymson.MES.Api.Controllers
     public class CommonController : ControllerBase
     {
         private readonly IEnumService _enumService;
+        private readonly IMemoryCache _memoryCache;
+
+       
         /// <summary>
         /// 
         /// </summary>
         /// <param name="enumService"></param>
-        public CommonController(IEnumService enumService)
+        /// <param name="memoryCache"></param>
+        public CommonController(IEnumService enumService,IMemoryCache memoryCache)
         {
             _enumService = enumService;
+            _memoryCache = memoryCache;
         }
 
         /// <summary>
@@ -50,6 +59,37 @@ namespace Hymson.MES.Api.Controllers
 
             return keyValuePairs;
         }
+        /// <summary>
+        /// 打印所有缓存key
+        /// </summary>
+        /// <returns></returns>
+        [Route("cache-keys")]
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult GetCacheKeys()
+        {
+            var caches = _memoryCache.GetCacheKeys();
+            IPHostEntry ipEntry = Dns.GetHostEntry(Dns.GetHostName());
+            ConcurrentBag<string> ips = new ConcurrentBag<string>();
+            foreach (var ip in ipEntry.AddressList)
+            {
+                ips.Add("IP Address: " + ip.ToString());
+            }
+            var hostName = Dns.GetHostName();
+            return Ok(new { caches, ips, hostName });
+        }
 
+        [Route("cache")]
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult GetCache(string key)
+        {
+            var result = _memoryCache.TryGetValue(key, out var cache);
+            if (result)
+            { return Ok(cache); }
+            else
+            { return NotFound(); }
+
+        }
     }
 }

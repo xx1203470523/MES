@@ -1,9 +1,11 @@
 using FluentValidation;
+using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
@@ -20,6 +22,7 @@ using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Minio.DataModel;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process.Procedure
@@ -70,6 +73,11 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// </summary>
         private readonly IProcProductSetRepository _procProductSetRepository;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly ILocalizationService _localizationService;
+
         private readonly AbstractValidator<ProcProcedureCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcProcedureModifyDto> _validationModifyRules;
 
@@ -87,7 +95,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             IProcLabelTemplateRepository procLabelTemplateRepository,
             IProcProductSetRepository procProductSetRepository,
             AbstractValidator<ProcProcedureCreateDto> validationCreateRules,
-            AbstractValidator<ProcProcedureModifyDto> validationModifyRules)
+            AbstractValidator<ProcProcedureModifyDto> validationModifyRules, ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -101,6 +109,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             _procProductSetRepository = procProductSetRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
+            _localizationService = localizationService;
         }
 
         /// <summary>
@@ -350,12 +359,34 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             procProcedureEntity.CreatedBy = userName;
             procProcedureEntity.UpdatedBy = userName;
 
+            var validationFailures = new List<ValidationFailure>();
+
             //打印
             List<ProcProcedurePrintRelationEntity> procedureConfigPrintList = new List<ProcProcedurePrintRelationEntity>();
             if (parm.ProcedurePrintList != null && parm.ProcedurePrintList.Count > 0)
             {
+                int i = 0;
                 foreach (var item in parm.ProcedurePrintList)
                 {
+                    i++;
+                    if (item.MaterialId <= 0)
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", i}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES10411);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
+
                     var releationEntity = item.ToEntity<ProcProcedurePrintRelationEntity>(); ;
                     releationEntity.Id = IdGenProvider.Instance.CreateId();
                     releationEntity.ProcedureId = procProcedureEntity.Id;
@@ -374,23 +405,68 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             List<InteJobBusinessRelationEntity> procedureConfigJobList = new List<InteJobBusinessRelationEntity>();
             if (parm.ProcedureJobList != null && parm.ProcedureJobList.Count > 0)
             {
+                int i = 0;
                 foreach (var item in parm.ProcedureJobList)
                 {
-                    var relationEntity = item.ToEntity<InteJobBusinessRelationEntity>(); ;
-                    relationEntity.Id = IdGenProvider.Instance.CreateId();
-                    relationEntity.BusinessType = (int)InteJobBusinessTypeEnum.Procedure;
-                    relationEntity.BusinessId = procProcedureEntity.Id;
-                    relationEntity.OrderNumber = "";
-                    relationEntity.LinkPoint = item.LinkPoint;
-                    relationEntity.JobId = item.JobId;
-                    relationEntity.IsUse = item.IsUse;
-                    relationEntity.Parameter = item.Parameter;
-                    relationEntity.Remark = "";
-                    relationEntity.SiteId = siteId;
-                    relationEntity.CreatedBy = userName;
-                    relationEntity.UpdatedBy = userName;
+                    i++;
+                    if (item.LinkPoint <= 0 || !Enum.IsDefined(typeof(ResourceJobLinkPointEnum), item.LinkPoint))
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", i}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES10410);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(item.Parameter))
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", i}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES10412);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
+
+                    var relationEntity = new InteJobBusinessRelationEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        BusinessType = (int)InteJobBusinessTypeEnum.Procedure,
+                        BusinessId = procProcedureEntity.Id,
+                        OrderNumber = "",
+                        LinkPoint = (int)item.LinkPoint,
+                        JobId = item.JobId,
+                        IsUse = item.IsUse,
+                        Parameter = item.Parameter,
+                        Remark = "",
+                        SiteId = siteId,
+                        CreatedBy = userName,
+                        UpdatedBy = userName
+                    };
                     procedureConfigJobList.Add(relationEntity);
                 }
+            }
+
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("MES10107"), validationFailures);
             }
 
             //productSet
@@ -410,6 +486,8 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                     productSetList.Add(relationEntity);
                 }
             }
+
+
 
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
@@ -455,6 +533,12 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             parm.Procedure.Remark = parm.Procedure.Remark.Trim();
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(parm.Procedure);
+
+            var procProcedureEntityOld = await _procProcedureRepository.GetByIdAsync(parm.Procedure.Id) ?? throw new BusinessException(nameof(ErrorCode.MES10406));
+            if (procProcedureEntityOld.Status != SysDataStatusEnum.Build && parm.Procedure.Status == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+            }
             #endregion
 
             //DTO转换实体
@@ -463,11 +547,32 @@ namespace Hymson.MES.Services.Services.Process.Procedure
 
             //TODO 现在关联表批量删除批量新增，后面再修改
             //打印
+
+            var validationFailures = new List<ValidationFailure>();
             List<ProcProcedurePrintRelationEntity> procedureConfigPrintList = new List<ProcProcedurePrintRelationEntity>();
             if (parm.ProcedurePrintList != null && parm.ProcedurePrintList.Count > 0)
             {
+                int i = 0;
                 foreach (var item in parm.ProcedurePrintList)
                 {
+                    i++;
+                    if (item.MaterialId <= 0)
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", i}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES10411);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
                     var releationEntity = item.ToEntity<ProcProcedurePrintRelationEntity>(); ;
                     releationEntity.Id = IdGenProvider.Instance.CreateId();
                     releationEntity.ProcedureId = procProcedureEntity.Id;
@@ -486,25 +591,69 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             List<InteJobBusinessRelationEntity> procedureConfigJobList = new List<InteJobBusinessRelationEntity>();
             if (parm.ProcedureJobList != null && parm.ProcedureJobList.Count > 0)
             {
+                int i = 0;
                 foreach (var item in parm.ProcedureJobList)
                 {
-                    var relationEntity = item.ToEntity<InteJobBusinessRelationEntity>(); ;
-                    relationEntity.Id = IdGenProvider.Instance.CreateId();
-                    relationEntity.BusinessType = (int)InteJobBusinessTypeEnum.Procedure;
-                    relationEntity.BusinessId = procProcedureEntity.Id;
-                    relationEntity.OrderNumber = "";
-                    relationEntity.LinkPoint = item.LinkPoint;
-                    relationEntity.JobId = item.JobId;
-                    relationEntity.IsUse = item.IsUse;
-                    relationEntity.Parameter = item.Parameter;
-                    relationEntity.Remark = "";
-                    relationEntity.SiteId = siteId;
-                    relationEntity.CreatedBy = userName;
-                    relationEntity.UpdatedBy = userName;
+                    i++;
+                    if (item.LinkPoint <= 0 || !Enum.IsDefined(typeof(ResourceJobLinkPointEnum), item.LinkPoint))
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", i}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES10410);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(item.Parameter))
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", i}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES10412);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
+
+
+                    var relationEntity = new InteJobBusinessRelationEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        BusinessType = (int)InteJobBusinessTypeEnum.Procedure,
+                        BusinessId = procProcedureEntity.Id,
+                        OrderNumber = "",
+                        LinkPoint = (int)item.LinkPoint,
+                        JobId = item.JobId,
+                        IsUse = item.IsUse,
+                        Parameter = item.Parameter,
+                        Remark = "",
+                        SiteId = siteId,
+                        CreatedBy = userName,
+                        UpdatedBy = userName
+                    };
                     procedureConfigJobList.Add(relationEntity);
                 }
             }
-
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("MES10107"), validationFailures);
+            }
             //productSet
             List<ProcProductSetEntity> productSetList = new List<ProcProductSetEntity>();
             if (parm.ProductSetList != null && parm.ProductSetList.Count > 0)
@@ -564,10 +713,14 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             }
 
             var entitys = await _procProcedureRepository.GetByIdsAsync(idsArr);
-            if (entitys.Any(a => a.Status == SysDataStatusEnum.Enable
-            || a.Status == SysDataStatusEnum.Retain) == true)
+            //if (entitys.Any(a => a.Status == SysDataStatusEnum.Enable
+            //|| a.Status == SysDataStatusEnum.Retain) == true)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES10443));
+            //}
+            if (entitys != null && entitys.Any(a => a.Status != SysDataStatusEnum.Build))
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10443));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10106));
             }
 
             int rows = 0;

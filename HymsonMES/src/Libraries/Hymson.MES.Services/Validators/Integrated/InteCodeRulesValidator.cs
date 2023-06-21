@@ -7,6 +7,7 @@
  */
 using FluentValidation;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Services.Dtos.Integrated;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace Hymson.MES.Services.Validators.Integrated
     /// <summary>
     /// 编码规则 更新 验证
     /// </summary>
-    internal class InteCodeRulesCreateValidator: AbstractValidator<InteCodeRulesCreateDto>
+    internal class InteCodeRulesCreateValidator : AbstractValidator<InteCodeRulesCreateDto>
     {
         public InteCodeRulesCreateValidator()
         {
@@ -30,18 +31,19 @@ namespace Hymson.MES.Services.Validators.Integrated
             RuleFor(x => x.OrderLength).GreaterThanOrEqualTo(0).WithErrorCode(nameof(ErrorCode.MES12414));
             RuleFor(x => x.ResetType).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12415));
 
-            RuleFor(x => x.CodeRulesMakes).Must((x,CodeRulesMakes)=> x.CodeRulesMakes != null && x.CodeRulesMakes.Count != 0).WithErrorCode(nameof(ErrorCode.MES12416));
+            RuleFor(x => x.CodeRulesMakes).Must((x, CodeRulesMakes) => x.CodeRulesMakes != null && x.CodeRulesMakes.Count != 0).WithErrorCode(nameof(ErrorCode.MES12416));
 
             //RuleFor(x => x.CodeRulesMakes).NotEmpty().Must((x, CodeRulesMakes) => x.CodeRulesMakes.Count == 0).WithMessage(ErrorCode.MES12416);
 
             RuleFor(x => x.IgnoreChar).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES16030));
             RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES16030));
+            RuleFor(x => x.CodeType).Must(it => Enum.IsDefined(typeof(CodeRuleCodeTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES16038));
 
             //RuleFor(x => x).Must((x) =>
             //{
             //    foreach (var item in x.CodeRulesMakes)
             //    {
-                    
+
             //    }
             //    return true;
             //}
@@ -65,11 +67,13 @@ namespace Hymson.MES.Services.Validators.Integrated
             RuleFor(x => x.OrderLength).GreaterThanOrEqualTo(0).WithErrorCode(nameof(ErrorCode.MES12414));
             RuleFor(x => x.ResetType).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12415));
 
-            RuleFor(x => x.CodeRulesMakes).Must((x, CodeRulesMakes) => 
-                 x.CodeRulesMakes!=null && x.CodeRulesMakes.Count != 0).WithErrorCode(nameof(ErrorCode.MES12416));
+            RuleFor(x => x.CodeRulesMakes).Must((x, CodeRulesMakes) =>
+                 x.CodeRulesMakes != null && x.CodeRulesMakes.Count != 0).WithErrorCode(nameof(ErrorCode.MES12416));
 
             RuleFor(x => x.IgnoreChar).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES16030));
             RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES16030));
+            RuleFor(x => x.CodeType).Must(it => Enum.IsDefined(typeof(CodeRuleCodeTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES16038));
+
         }
     }
 }

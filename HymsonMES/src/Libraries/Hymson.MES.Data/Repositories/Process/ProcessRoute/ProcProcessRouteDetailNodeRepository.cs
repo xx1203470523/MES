@@ -100,7 +100,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<ProcProcessRouteDetailNodeEntity> GetFirstProcedureByProcessRouteIdAsync(long processRouteId)
         {
-            var key = $"proc_process_route_detail_node&{processRouteId}";
+            var key = $"proc_process_route_detail_node&FirstProcedure&{processRouteId}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);

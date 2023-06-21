@@ -8,6 +8,7 @@ using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Manufacture
@@ -66,6 +67,8 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
+        [LogDescription("产品不良录入", BusinessType.INSERT)]
+        [PermissionDescription("manu:badRecord:insert")]
         public async Task AddManuProductBadRecordAsync([FromBody] ManuProductBadRecordCreateDto parm)
         {
             await _manuProductBadRecordService.CreateManuProductBadRecordAsync(parm);
@@ -90,6 +93,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("badReJudgment")]
+        [PermissionDescription("manu:badReJudgment:reJudgment")]
         public async Task BadReJudgmentAsync(BadReJudgmentDto badReJudgmentDto)
         {
             await _manuProductBadRecordService.BadReJudgmentAsync(badReJudgmentDto);
@@ -102,6 +106,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("cancelIdentify")]
+        [PermissionDescription("manu:cancelIdentify:cancel")]
         public async Task CancelSfcIdentification(CancelSfcIdentificationDto parm)
         {
             await _manuProductBadRecordService.CancelSfcIdentificationAsync(parm);

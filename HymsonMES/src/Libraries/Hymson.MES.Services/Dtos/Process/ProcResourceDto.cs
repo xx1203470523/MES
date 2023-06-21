@@ -154,7 +154,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 状态
         /// </summary>
         //[Required(ErrorMessage = "状态不能为空")]
-        public int Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 所属资源类型

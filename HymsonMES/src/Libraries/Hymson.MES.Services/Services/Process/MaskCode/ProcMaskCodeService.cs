@@ -242,6 +242,23 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
             foreach (var rule in linkeRuleList)
             {
                 var validationFailure = new FluentValidation.Results.ValidationFailure();
+                if (!Enum.IsDefined(typeof(MatchModeEnum), rule.MatchWay))
+                {
+                    validationFailure = new FluentValidation.Results.ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                               { "CollectionIndex", rule.SerialNo}
+                               };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", rule.SerialNo);
+                    }
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES10809);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
                 switch (rule.MatchWay)
                 {
                     case MatchModeEnum.Start:
@@ -304,19 +321,6 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
                         }
                         break;
                     default:
-                        validationFailure = new FluentValidation.Results.ValidationFailure();
-                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
-                        {
-                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
-                               { "CollectionIndex", rule.SerialNo}
-                               };
-                        }
-                        else
-                        {
-                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", rule.SerialNo);
-                        }
-                        validationFailure.ErrorCode = nameof(ErrorCode.MES10809);
-                        validationFailures.Add(validationFailure);
                         break;
                 }
             }

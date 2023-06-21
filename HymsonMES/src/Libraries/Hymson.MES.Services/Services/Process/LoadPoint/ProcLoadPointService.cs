@@ -1,9 +1,11 @@
 using FluentValidation;
+using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
@@ -12,6 +14,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Minio.DataModel;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -37,6 +40,11 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 
         /// </summary>
+        private readonly ILocalizationService _localizationService;
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="procLoadPointRepository"></param>
         /// <param name="validationCreateRules"></param>
@@ -44,7 +52,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="procLoadPointLinkMaterialRepository"></param>
         /// <param name="procLoadPointLinkResourceRepository"></param>
         /// <param name="currentSite"></param>
-        public ProcLoadPointService(ICurrentUser currentUser, IProcLoadPointRepository procLoadPointRepository, AbstractValidator<ProcLoadPointCreateDto> validationCreateRules, AbstractValidator<ProcLoadPointModifyDto> validationModifyRules, IProcLoadPointLinkMaterialRepository procLoadPointLinkMaterialRepository, IProcLoadPointLinkResourceRepository procLoadPointLinkResourceRepository, ICurrentSite currentSite)
+        public ProcLoadPointService(ICurrentUser currentUser, IProcLoadPointRepository procLoadPointRepository, AbstractValidator<ProcLoadPointCreateDto> validationCreateRules, AbstractValidator<ProcLoadPointModifyDto> validationModifyRules, IProcLoadPointLinkMaterialRepository procLoadPointLinkMaterialRepository, IProcLoadPointLinkResourceRepository procLoadPointLinkResourceRepository, ICurrentSite currentSite, ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -53,6 +61,7 @@ namespace Hymson.MES.Services.Services.Process
             _validationModifyRules = validationModifyRules;
             _procLoadPointLinkMaterialRepository = procLoadPointLinkMaterialRepository;
             _procLoadPointLinkResourceRepository = procLoadPointLinkResourceRepository;
+            _localizationService = localizationService;
         }
 
 
@@ -68,9 +77,8 @@ namespace Hymson.MES.Services.Services.Process
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
 
-            procLoadPointCreateDto.LoadPoint = procLoadPointCreateDto.LoadPoint.ToTrimSpace().ToUpperInvariant();
-            procLoadPointCreateDto.LoadPointName = procLoadPointCreateDto.LoadPointName.Trim();
-            procLoadPointCreateDto.Remark = procLoadPointCreateDto?.Remark ?? "".Trim();
+            PrepareProcLoadPointCreateDto(procLoadPointCreateDto);
+
 
             // 验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procLoadPointCreateDto);
@@ -113,12 +121,33 @@ namespace Hymson.MES.Services.Services.Process
             #endregion
 
             #region 准备数据
+
+            var validationFailures = new List<ValidationFailure>();
             //上料点关联物料列表
             var linkMaterials = new List<ProcLoadPointLinkMaterialEntity>();
             if (procLoadPointCreateDto.LinkMaterials != null && procLoadPointCreateDto.LinkMaterials.Any())
             {
+                int i = 0;
                 foreach (var material in procLoadPointCreateDto.LinkMaterials)
                 {
+                    i++;
+                    if (material.MaterialId <= 0)
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", i}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES10718);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
                     linkMaterials.Add(new ProcLoadPointLinkMaterialEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
@@ -137,8 +166,27 @@ namespace Hymson.MES.Services.Services.Process
             var linkResources = new List<ProcLoadPointLinkResourceEntity>();
             if (procLoadPointCreateDto.LinkResources != null && procLoadPointCreateDto.LinkResources.Any())
             {
+                int i = 0;
                 foreach (var resource in procLoadPointCreateDto.LinkResources)
                 {
+                    i++;
+                    if (resource.ResourceId <= 0)
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", i}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES10719);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
                     linkResources.Add(new ProcLoadPointLinkResourceEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
@@ -149,6 +197,11 @@ namespace Hymson.MES.Services.Services.Process
                         CreatedOn = HymsonClock.Now()
                     });
                 }
+            }
+
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("MES10107"), validationFailures);
             }
             #endregion
 
@@ -181,6 +234,13 @@ namespace Hymson.MES.Services.Services.Process
             trans.Complete();
         }
 
+        private static void PrepareProcLoadPointCreateDto(ProcLoadPointCreateDto procLoadPointCreateDto)
+        {
+            procLoadPointCreateDto.LoadPoint = procLoadPointCreateDto.LoadPoint.ToTrimSpace().ToUpperInvariant();
+            procLoadPointCreateDto.LoadPointName = procLoadPointCreateDto.LoadPointName.Trim();
+            procLoadPointCreateDto.Remark = procLoadPointCreateDto?.Remark ?? "".Trim();
+        }
+
         /// <summary>
         /// 修改
         /// </summary>
@@ -188,7 +248,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task ModifyProcLoadPointAsync(ProcLoadPointModifyDto procLoadPointModifyDto)
         {
-            if (procLoadPointModifyDto == null) throw new ValidationException(nameof(ErrorCode.MES10100));
+            if (procLoadPointModifyDto == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
 
             procLoadPointModifyDto.LoadPointName = procLoadPointModifyDto.LoadPointName.Trim();
             procLoadPointModifyDto.Remark = procLoadPointModifyDto?.Remark ?? "".Trim();
@@ -218,21 +278,42 @@ namespace Hymson.MES.Services.Services.Process
             procLoadPointEntity.SiteId = _currentSite.SiteId ?? 0;
 
             #region 数据库验证
-            var modelOrigin = await _procLoadPointRepository.GetByIdAsync(procLoadPointModifyDto.Id) ?? throw new ValidationException(nameof(ErrorCode.MES10705));
+            var modelOrigin = await _procLoadPointRepository.GetByIdAsync(procLoadPointModifyDto.Id) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10705));
             #endregion
 
             if (modelOrigin.Status != SysDataStatusEnum.Build && procLoadPointModifyDto.Status == SysDataStatusEnum.Build)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10716));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10716));
             }
 
             #region 组装数据
+
+            var validationFailures = new List<ValidationFailure>();
             //上料点关联物料列表
             var linkMaterials = new List<ProcLoadPointLinkMaterialEntity>();
             if (procLoadPointModifyDto.LinkMaterials != null && procLoadPointModifyDto.LinkMaterials.Any())
             {
+                int i = 0;
                 foreach (var material in procLoadPointModifyDto.LinkMaterials)
                 {
+                    i++;
+                    if (material.MaterialId <= 0)
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", i}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES10718);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
                     linkMaterials.Add(new ProcLoadPointLinkMaterialEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
@@ -251,8 +332,27 @@ namespace Hymson.MES.Services.Services.Process
             var linkResources = new List<ProcLoadPointLinkResourceEntity>();
             if (procLoadPointModifyDto.LinkResources != null && procLoadPointModifyDto.LinkResources.Any())
             {
+                int i = 0;
                 foreach (var resource in procLoadPointModifyDto.LinkResources)
                 {
+                    i++;
+                    if (resource.ResourceId <= 0)
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", i}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES10719);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
                     linkResources.Add(new ProcLoadPointLinkResourceEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
@@ -265,7 +365,10 @@ namespace Hymson.MES.Services.Services.Process
                 }
             }
 
-
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("MES10107"), validationFailures);
+            }
             #endregion
 
             using (TransactionScope ts = new TransactionScope())
@@ -322,13 +425,17 @@ namespace Hymson.MES.Services.Services.Process
         {
             if (idsArr.Length < 1)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10707));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10707));
             }
 
             var loadPoints = await _procLoadPointRepository.GetByIdsAsync(idsArr);
-            if (loadPoints.Any(x => (SysDataStatusEnum.Enable == x.Status || SysDataStatusEnum.Retain == x.Status)))
+            //if (loadPoints.Any(x => (SysDataStatusEnum.Enable == x.Status || SysDataStatusEnum.Retain == x.Status)))
+            //{
+            //    throw new BusinessException(nameof(ErrorCode.MES10709));
+            //}
+            if (loadPoints != null && loadPoints.Any(a => a.Status != SysDataStatusEnum.Build))
             {
-                throw new BusinessException(nameof(ErrorCode.MES10709));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10106));
             }
 
             int response = 0;
