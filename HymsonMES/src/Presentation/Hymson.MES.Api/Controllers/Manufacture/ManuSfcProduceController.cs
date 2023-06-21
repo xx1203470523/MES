@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Manufacture
@@ -50,6 +51,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("lock")]
+        [PermissionDescription("qual:qualityLock:lock")]
         public async Task QualityLockAsync(ManuSfcProduceLockDto parm)
         {
             await _manuSfcProduceService.QualityLockAsync(parm);
@@ -62,6 +64,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("scrap")]
+        [PermissionDescription("qual:productScrap:scrap")]
         public async Task QualityScrapAsync(ManuSfScrapDto parm)
         {
             await _manuSfcProduceService.QualityScrapAsync(parm);
@@ -74,6 +77,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("cancelScrap")]
+        [PermissionDescription("qual:productScrap:scrap")]
         public async Task QualityCancelScrapAsync(ManuSfScrapDto parm)
         {
             await _manuSfcProduceService.QualityCancelScrapAsync(parm);
