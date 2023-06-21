@@ -153,6 +153,7 @@
         public const string MES10512 = "参数单位不合法，请检查！";
         public const string MES10513 = "参数类型不合法，请检查！";
         public const string MES10514 = "参数ID不能为空";
+        public const string MES10515 = "标准参数名称最大长度为50";
 
         #endregion
 

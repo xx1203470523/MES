@@ -78,6 +78,7 @@ namespace Hymson.MES.Services.Services.Process
             procBomCreateDto.BomName = procBomCreateDto.BomName.Trim();
             procBomCreateDto.Version = procBomCreateDto.Version.Trim();
             procBomCreateDto.Remark = procBomCreateDto.Remark ?? "".Trim();
+            procBomCreateDto.Version = procBomCreateDto.Version.Trim();
             if (procBomCreateDto == null)
             {
                 throw new ValidationException(nameof(ErrorCode.MES10503));
@@ -153,15 +154,6 @@ namespace Hymson.MES.Services.Services.Process
                     //apiResult.Code = (int)ResultCode.PARAM_ERROR;
                     //apiResult.Msg = $"替代物料不能跟主物料重复!";
                     //return apiResult;
-                }
-
-                if (materialList.Any(it => it.Usages <= 0))
-                {
-                    throw new ValidationException(nameof(ErrorCode.MES10619));
-                }
-                if (materialList.Any(it => it.DataCollectionWay == null || Enum.IsDefined(typeof(MaterialSerialNumberEnum), it.DataCollectionWay)))
-                {
-                    throw new ValidationException(nameof(ErrorCode.MES10620));
                 }
                 var replaceList = materialList.Where(a => a.IsMain == 0).ToList();
                 if (replaceList.GroupBy(m => new { m.MaterialId, m.ReplaceMaterialId }).Where(g => g.Count() > 1).Count() > 0)
