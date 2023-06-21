@@ -78,6 +78,7 @@ namespace Hymson.MES.Services.Services.Process
             procBomCreateDto.BomName = procBomCreateDto.BomName.Trim();
             procBomCreateDto.Version = procBomCreateDto.Version.Trim();
             procBomCreateDto.Remark = procBomCreateDto.Remark ?? "".Trim();
+            procBomCreateDto.Version = procBomCreateDto.Version.Trim();
             if (procBomCreateDto == null)
             {
                 throw new ValidationException(nameof(ErrorCode.MES10503));
