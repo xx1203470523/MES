@@ -220,7 +220,7 @@
         public const string MES10808 = "结束方式掩码首位不能为特殊字符\"?\"";
         public const string MES10809 = "状态不合法，请检查";
         public const string MES10810 = "掩码编码不能为空";
-        public const string MES10811 = "掩码编码最大长度为50"; 
+        public const string MES10811 = "掩码编码最大长度为50";
         public const string MES10812 = "掩码名称最大长度为50";
 
 
@@ -365,6 +365,7 @@
         public const string MES12903 = "请求实体不能为空！";
         public const string MES12904 = "设备组不能为空！";
         public const string MES12905 = "设备故障现象不存在！";
+        public const string MES12906 = "状态不合法！";
         #endregion
 
         #region 故障原因 13000
