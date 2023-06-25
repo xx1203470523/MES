@@ -1,9 +1,4 @@
 ﻿using Hymson.MES.Core.Enums.Job;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Core.Attribute.Job
 {
@@ -13,6 +8,11 @@ namespace Hymson.MES.Core.Attribute.Job
     [AttributeUsage(AttributeTargets.Class)]
     public class JobAttribute : System.Attribute
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="type"></param>
         public JobAttribute(string name, JobTypeEnum type)
         {
             this.Type = type;
@@ -28,5 +28,6 @@ namespace Hymson.MES.Core.Attribute.Job
         /// 作业类型
         /// </summary>
         public JobTypeEnum Type { get; set; } = JobTypeEnum.Standard;
+
     }
 }

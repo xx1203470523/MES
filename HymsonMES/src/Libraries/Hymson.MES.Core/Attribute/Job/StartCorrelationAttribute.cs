@@ -1,10 +1,4 @@
-﻿using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Job;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Hymson.MES.Core.Enums.Job;
 
 namespace Hymson.MES.Core.Attribute.Job
 {

@@ -1,10 +1,13 @@
 ﻿using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Dtos.Job;
 using Microsoft.Extensions.DependencyInjection;
 using System.Transactions;
 
 namespace Hymson.MES.CoreServices.Services.NewJob.Execute
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class ExecuteJobService<T> where T : JobBaseBo
     {
         /// <summary>
@@ -28,40 +31,36 @@ namespace Hymson.MES.CoreServices.Services.NewJob.Execute
         public async Task ExecuteAsync(IEnumerable<JobBo> jobBos, T param)
         {
             var services = _serviceProvider.GetServices<IJobService<T>>();
-            //执行参数校验
 
+            // 执行参数校验
             foreach (var job in jobBos)
             {
                 var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
-                if (service != null)
-                {
-                    await service.VerifyParam(param);
-                }
-            }
-            //执行数据组装
+                if (service == null) continue;
 
+                await service.VerifyParamAsync(param);
+            }
+
+            // 执行数据组装
             foreach (var job in jobBos)
             {
                 var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
-                if (service != null)
-                {
-                    await service.DataAssembling(param);
-                }
+                if (service == null) continue;
+
+                await service.DataAssemblingAsync(param);
             }
 
-            //执行入库
-
-            using (TransactionScope ts = new TransactionScope())
+            // 执行入库
+            using var trans = new TransactionScope();
+            foreach (var job in jobBos)
             {
-                foreach (var job in jobBos)
-                {
-                    var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
-                    if (service != null)
-                    {
-                        await service.ExecuteAsync();
-                    }
-                }
+                var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
+                if (service == null) continue;
+
+                await service.ExecuteAsync();
             }
+
+            trans.Complete();
         }
 
         //  获取作业
