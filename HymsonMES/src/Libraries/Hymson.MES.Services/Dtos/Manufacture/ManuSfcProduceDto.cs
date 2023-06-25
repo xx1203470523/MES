@@ -197,7 +197,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 操作类型（报废/取消报废）
         /// </summary>
-       // public ScrapOperateTypeEnum OperationType { get; set; }
+       public ScrapOperateTypeEnum OperationType { get; set; }
 
         /// <summary>
         /// 条码列表

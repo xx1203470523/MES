@@ -89,7 +89,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("delete")]
-        [LogDescription("容器解包", BusinessType.DELETE)]
+        [LogDescription("容器包装", BusinessType.DELETE)]
         [PermissionDescription("manu:containerPack:delete")]
         public async Task DeleteManuContainerPackAsync(ManuContainerPackUnpackDto param)
         {
@@ -103,7 +103,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("deleteAll")]
-        [LogDescription("容器解包", BusinessType.DELETE)]
+        [LogDescription("容器包装", BusinessType.DELETE)]
         [PermissionDescription("manu:containerPack:deleteAll")]
         public async Task DeleteManuContainerPackAsync( ContainerUnpackDto param)
         {
