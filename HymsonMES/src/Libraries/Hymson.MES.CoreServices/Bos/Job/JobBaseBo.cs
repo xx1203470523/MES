@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Hymson.MES.CoreServices.Dtos.Job
+﻿namespace Hymson.MES.CoreServices.Bos.Job
 {
     /// <summary>
     /// 作业公共类
