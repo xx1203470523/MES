@@ -103,9 +103,17 @@ namespace Hymson.MES.Api.Controllers.Manufacture
 
 
         [HttpPost]
-        [Route("updateStatus")]
-        [PermissionDescription("manu:containerUnPackaging:updateStatus")]
-        public async Task UpdateManuContainerBarcodeStatusAsync([FromBody] UpdateManuContainerBarcodeStatusDto parm)
+        [Route("open")]
+        [PermissionDescription("manu:containerUnPackaging:open")]
+        public async Task OpenManuContainerBarcodeStatusAsync([FromBody] UpdateManuContainerBarcodeStatusDto parm)
+        {
+            await _manuContainerBarcodeService.ModifyManuContainerBarcodeStatusAsync(parm);
+        }
+
+        [HttpPost]
+        [Route("close")]
+        [PermissionDescription("manu:containerUnPackaging:close")]
+        public async Task CloseManuContainerBarcodeStatusAsync([FromBody] UpdateManuContainerBarcodeStatusDto parm)
         {
             await _manuContainerBarcodeService.ModifyManuContainerBarcodeStatusAsync(parm);
         }
