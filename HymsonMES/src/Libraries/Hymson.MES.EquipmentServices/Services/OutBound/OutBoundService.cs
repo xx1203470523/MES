@@ -404,7 +404,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                     manuSfcSummaryEntity.QualityStatus = outBoundSFCDto.Passed == 0 ? 0 : 1;
                     if (outBoundSFCDto.Passed == 0)
                     {
-                        manuSfcSummaryEntity.NgNum++;//不合格+1
+                        manuSfcSummaryEntity.NgNum += 1;//不合格+1
                     }
                     manuSfcSummaryEntity.UpdatedBy = _currentEquipment.Name;
                     manuSfcSummaryEntity.UpdatedOn = HymsonClock.Now();
