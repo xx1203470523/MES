@@ -114,22 +114,61 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// </summary>
         /// <returns></returns>
         [HttpPut]
-        [Route("changWorkOrderStatus")]
-        [PermissionDescription("plan:workOrder:changWorkOrderStatus")]
-        public async Task ChangWorkOrderStatusAsync(List<PlanWorkOrderChangeStatusDto> parms)
+        [Route("sendDown")]
+        [PermissionDescription("plan:workOrder:sendDown")]
+        public async Task SendDownWorkOrderStatusAsync(List<PlanWorkOrderChangeStatusDto> parms)
         {
             await _planWorkOrderService.ModifyWorkOrderStatusAsync(parms);
         }
 
         /// <summary>
-        /// 改变锁定/解锁
+        /// 工单完工
         /// </summary>
         /// <param name="parms"></param>
         /// <returns></returns>
         [HttpPut]
-        [Route("changLocked")]
-        [PermissionDescription("plan:workOrder:changLocked")]
-        public async Task ChangLockedAsync(List<PlanWorkOrderLockedDto> parms)
+        [Route("finish")]
+        [PermissionDescription("plan:workOrder:finish")]
+        public async Task FinishWorkOrderStatusAsync(List<PlanWorkOrderChangeStatusDto> parms)
+        {
+            await _planWorkOrderService.ModifyWorkOrderStatusAsync(parms);
+        }
+
+        /// <summary>
+        /// 关闭完工
+        /// </summary>
+        /// <param name="parms"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("closeOrder")]
+        [PermissionDescription("plan:workOrder:closeOrder")]
+        public async Task CloseWorkOrderStatusAsync(List<PlanWorkOrderChangeStatusDto> parms)
+        {
+            await _planWorkOrderService.ModifyWorkOrderStatusAsync(parms);
+        }
+
+        /// <summary>
+        /// 锁定
+        /// </summary>
+        /// <param name="parms"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("locked")]
+        [PermissionDescription("plan:workOrder:locked")]
+        public async Task LockedAsync(List<PlanWorkOrderLockedDto> parms)
+        {
+            await _planWorkOrderService.ModifyWorkOrderLockedAsync(parms);
+        }
+
+        /// <summary>
+        /// 解锁
+        /// </summary>
+        /// <param name="parms"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("cancelLocked")]
+        [PermissionDescription("plan:workOrder:cancelLocked")]
+        public async Task CancelLockedAsync(List<PlanWorkOrderLockedDto> parms)
         {
             await _planWorkOrderService.ModifyWorkOrderLockedAsync(parms);
         }
