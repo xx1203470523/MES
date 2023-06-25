@@ -366,6 +366,7 @@
         public const string MES12904 = "设备组不能为空！";
         public const string MES12905 = "设备故障现象不存在！";
         public const string MES12906 = "状态不合法！";
+        public const string MES12907 = "状态不能为空！";
         #endregion
 
         #region 故障原因 13000

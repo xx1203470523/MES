@@ -36,7 +36,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 设备故障先
         /// </summary>
-        public string Remark { get; set; } = "";
+        public string? Remark { get; set; } = "";
 
     }
 
