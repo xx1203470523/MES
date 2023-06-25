@@ -881,7 +881,7 @@
         public const string MES19123 = "资源：{ResourceCode}未找到关联的产线信息";
         public const string MES19124 = "产线：{WorkCenterCode}未找到激活的工单信息";
         public const string MES19125 = "条码：{SFCS}未找到条码信息,请先执行进站操作";
-        public const string MES19126 = "条码：{SFCS}未找到生产信息";
+        public const string MES19126 = "条码：{SFCS}未找到生产信息,或已完工";
         public const string MES19127 = "条码：{SFCS}未进站不能操作出站";
         public const string MES19128 = "条码：{SFCS}已进站不能操作过站";
         public const string MES19129 = "条码：{SFCS}当前状态不是排队状态，不允许进站";
@@ -891,6 +891,8 @@
         public const string MES19133 = "IsVirtualSFC为True时不需要传递SFC";
         public const string MES19134 = "条码：{SFCS}没找到关联虚拟码绑定关系";
         public const string MES19135 = "IsBindVirtualSFC为True时不能传递多个条码";
+        public const string MES19136 = "条码：{SFCS}出站存在NG信息，Passed字段应传0";
+        public const string MES19137 = "条码：{SFCS}状态为不合格，不允许进站";
 
 
 

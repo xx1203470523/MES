@@ -211,10 +211,15 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             ManuSfcSummaryQuery manuSfcSummaryQuery = new ManuSfcSummaryQuery
             {
                 SiteId = _currentEquipment.SiteId,
-                EquipmentId = _currentEquipment.Id,
                 SFCS = sfclist.Select(c => c.SFC).ToArray()
             };
             var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
+            //进站不允许不合格产品
+            var includeNoQuality = manuSfcSummaryEntities.Where(c => c.QualityStatus == 0);
+            if (includeNoQuality.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19137)).WithData("SFCS", string.Join(',', includeNoQuality.Select(c => c.SFC)));
+            }
 
             List<ManuSfcEntity> manuSfcList = new List<ManuSfcEntity>();
             List<ManuSfcInfoEntity> manuSfcInfoList = new List<ManuSfcInfoEntity>();
@@ -231,7 +236,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             foreach (var sfc in inBoundMoreDto.SFCs)
             {
                 //汇总信息
-                var manuSfcSummaryEntity = manuSfcSummaryEntities.Where(c => c.SFC == sfc).FirstOrDefault();
+                var manuSfcSummaryEntity = manuSfcSummaryEntities.Where(c => c.SFC == sfc && c.EquipmentId == _currentEquipment.Id).FirstOrDefault();
                 var sfcEntity = sfclist.FirstOrDefault(x => x.SFC == sfc);
                 if (sfcEntity != null)
                 {
@@ -242,7 +247,8 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     //当前SFC的工序信息
                     var sfcprocedureEntity = procedureEntityList.Where(c => c.Id == sfcProduce.ProcedureId).First();
                     //第一次进站
-                    if (sfcProduce.RepeatedCount == 0) {
+                    if (sfcProduce.RepeatedCount == 0)
+                    {
                         sfcQty++;
                     }
                     // 检查是否测试工序

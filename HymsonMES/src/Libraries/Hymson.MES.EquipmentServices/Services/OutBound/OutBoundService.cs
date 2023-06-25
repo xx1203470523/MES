@@ -182,6 +182,12 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19135));
             }
+            //出站传入NG数据时Passed字段应传0
+            var ngPassedSfcs = outBoundMoreDto.SFCs.Where(c => c.NG != null && c.NG.Any() && c.Passed == 1);
+            if (ngPassedSfcs.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19136)).WithData("SFCS", string.Join(',', ngPassedSfcs.Select(c => c.SFC)));
+            }
 
             var resEquipentBind = await _procResourceEquipmentBindRepository.GetByResourceIdAsync(resourceEquipmentBindQuery);
             if (resEquipentBind.Any() == false)
