@@ -67,6 +67,8 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         /// <returns></returns>
         public async Task<int> CreateAsync(EquFaultPhenomenonSaveDto createDto)
         {
+            await _validationSaveRules.ValidateAndThrowAsync(createDto);
+
             // 验证DTO
             createDto.FaultPhenomenonCode = createDto.FaultPhenomenonCode.ToTrimSpace();
             createDto.FaultPhenomenonCode = createDto.FaultPhenomenonCode.ToUpperInvariant();
