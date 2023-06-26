@@ -1,12 +1,11 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
     /// <summary>
     /// 
     /// </summary>
-    public class JobDataProxy
+    public class JobContextProxy : IDisposable
     {
         /// <summary>
         /// 
@@ -16,8 +15,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="memoryCache"></param>
-        public JobDataProxy(IMemoryCache memoryCache)
+        public JobContextProxy()
         {
             dictionary = new();
         }
@@ -139,6 +137,15 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         protected bool Remove(string key)
         {
             return dictionary.TryRemove(key.GetHashCode(), out _);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Dispose()
+        {
+            dictionary.Clear();
+            GC.SuppressFinalize(this);
         }
 
     }
