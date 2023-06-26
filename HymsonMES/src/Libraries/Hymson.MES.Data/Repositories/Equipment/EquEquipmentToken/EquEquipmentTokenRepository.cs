@@ -94,11 +94,6 @@ namespace Hymson.MES.Data.Repositories.Equipment
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-
             var offSet = (equEquipmentTokenPagedQuery.PageIndex - 1) * equEquipmentTokenPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = equEquipmentTokenPagedQuery.PageSize });

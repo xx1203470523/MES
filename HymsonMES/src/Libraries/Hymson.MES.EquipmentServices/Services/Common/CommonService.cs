@@ -408,7 +408,7 @@ namespace Hymson.MES.EquipmentServices.Services.Common
                         break;
                 }
 
-                if (Regex.IsMatch(barCode, pattern) == false) return false;
+                if (!Regex.IsMatch(barCode, pattern) ) return false;
             }
 
             return true;

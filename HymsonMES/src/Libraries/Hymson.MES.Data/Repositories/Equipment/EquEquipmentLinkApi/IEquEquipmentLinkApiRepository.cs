@@ -11,7 +11,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
     public interface IEquEquipmentLinkApiRepository
     {
         /// <summary>
-        /// 
+        /// equipmentUnitEntity
         /// </summary>
         /// <param name="equipmentUnitEntity"></param>
         /// <returns></returns>

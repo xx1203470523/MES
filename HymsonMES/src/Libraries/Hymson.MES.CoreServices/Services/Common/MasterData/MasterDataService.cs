@@ -8,7 +8,6 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
-using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.Sequences;
@@ -27,11 +26,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// 序列号服务
         /// </summary>
         private readonly ISequenceService _sequenceService;
-
-        /// <summary>
-        /// 仓储接口（设备模块）
-        /// </summary>
-        private readonly IEquEquipmentRepository _equEquipmentRepository;
 
         /// <summary>
         /// 仓储接口（资源维护）
@@ -82,29 +76,20 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <summary>
         /// 主数据公用类
         /// </summary>
-        /// <param name="sequenceService"></param>
-        /// <param name="equEquipmentRepository"></param>
-        /// <param name="procResourceRepository"></param>
-        /// <param name="procProcedureRepository"></param>
-        /// <param name="planWorkOrderRepository"></param>
-        /// <param name="procReplaceMaterialRepository"></param>
-        /// <param name="planActivationRepository"></param>
-        /// <param name="procBomDetailRepository"></param>
-        /// <param name="procBomDetailReplaceMaterialRepository"></param>
         public MasterDataService(
             ISequenceService sequenceService,
-            IEquEquipmentRepository equEquipmentRepository,
             IProcResourceRepository procResourceRepository,
             IProcProcedureRepository procProcedureRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IProcReplaceMaterialRepository procReplaceMaterialRepository,
             IPlanWorkOrderActivationRepository planActivationRepository,
             IProcBomDetailRepository procBomDetailRepository,
-            IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository
+            IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository,
+            IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
+            IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository
             )
         {
             _sequenceService= sequenceService;
-            _equEquipmentRepository = equEquipmentRepository;
             _procResourceRepository = procResourceRepository;
             _procProcedureRepository = procProcedureRepository;
             _planWorkOrderRepository=planWorkOrderRepository;
@@ -112,6 +97,8 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             _procBomDetailRepository =procBomDetailRepository;
             _planWorkOrderActivationRepository =planActivationRepository;
             _procBomDetailReplaceMaterialRepository=procBomDetailReplaceMaterialRepository;
+            _procProcessRouteDetailNodeRepository=procProcessRouteDetailNodeRepository;
+            _procProcessRouteDetailLinkRepository=procProcessRouteDetailLinkRepository;
         }
 
         /// <summary>
@@ -131,7 +118,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 throw new CustomerValidationException(nameof(ErrorCode.MES16302)).WithData("ordercode", planWorkOrderEntity.OrderCode);
             }
 
-            if (isVerifyActivation == true)
+            if (isVerifyActivation )
             {
                 // 判断是否是激活的工单
                 _ = await _planWorkOrderActivationRepository.GetByWorkOrderIdAsync(planWorkOrderEntity.Id)
@@ -198,7 +185,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             var mainMaterials = await _procBomDetailRepository.GetByBomIdAsync(bomId);
 
             // 未设置物料
-            if (mainMaterials == null || mainMaterials.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES10612));
+            if (mainMaterials == null || !mainMaterials.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10612));
 
             // 取得特定工序的物料
             var materialEntities = mainMaterials.Where(w => w.ProcedureId == procedureId).Select(s => new BomMaterialBo
@@ -226,7 +213,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 // 填充BOM替代料
                 if (item.IsEnableReplace == false)
                 {
-                    if (replaceMaterialsDic.TryGetValue(item.Id, out var replaces) == true)
+                    if (replaceMaterialsDic.TryGetValue(item.Id, out var replaces))
                     {
                         deduct.ReplaceMaterials = replaces.Select(s => new MaterialDeductItemBo
                         {
@@ -317,7 +304,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 ProcessRouteId = processRouteId,
                 ProcedureId = procedureId
             });
-            if (netxtProcessRouteDetailLinks == null || netxtProcessRouteDetailLinks.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES10440));
+            if (netxtProcessRouteDetailLinks == null || !netxtProcessRouteDetailLinks.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10440));
 
             // 获取当前工序在工艺路线里面的扩展信息（这里存放是Node表的工序ID，而不是主键ID，后期建议改为主键ID）
             var procedureNodes = await _procProcessRouteDetailNodeRepository.GetByProcedureIdsAsync(new ProcProcessRouteDetailNodesQuery

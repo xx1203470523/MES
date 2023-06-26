@@ -10,17 +10,17 @@ using MySql.Data.MySqlClient;
 namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
 {
     /// <summary>
-    /// 
+    /// 设备链接
     /// </summary>
     public partial class EquEquipmentLinkApiRepository : IEquEquipmentLinkApiRepository
     {
         /// <summary>
-        /// 
+        /// 链接
         /// </summary>
         private readonly ConnectionOptions _connectionOptions;
 
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="connectionOptions"></param>
         public EquEquipmentLinkApiRepository(IOptions<ConnectionOptions> connectionOptions)
@@ -29,20 +29,20 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         }
 
         /// <summary>
-        /// 
+        /// equipmentUnitEntity
         /// </summary>
-        /// <param name="entity"></param>
+        /// <param name="equipmentUnitEntity"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(EquEquipmentLinkApiEntity entity)
+        public async Task<int> InsertAsync(EquEquipmentLinkApiEntity equipmentUnitEntity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertSql, entity);
+            return await conn.ExecuteAsync(InsertSql, equipmentUnitEntity);
         }
 
         /// <summary>
-        /// 
+        /// 插入
         /// </summary>
-        /// <param name="entity"></param>
+        /// <param name="entitys"></param>
         /// <returns></returns>
         public async Task<int> InsertRangeAsync(IEnumerable<EquEquipmentLinkApiEntity> entitys)
         {
@@ -51,18 +51,18 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         }
 
         /// <summary>
-        /// 
+        /// 更新
         /// </summary>
-        /// <param name="entity"></param>
+        /// <param name="equipmentUnitEntity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(EquEquipmentLinkApiEntity entity)
+        public async Task<int> UpdateAsync(EquEquipmentLinkApiEntity equipmentUnitEntity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateSql, entity);
+            return await conn.ExecuteAsync(UpdateSql, equipmentUnitEntity);
         }
 
         /// <summary>
-        /// 
+        /// 批量更新
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
