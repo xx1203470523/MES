@@ -21,6 +21,65 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         }
 
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public void SetValue(string key, object value)
+        {
+            Set(key, value);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public T? GetValue<T>(string key)
+        {
+            if (Has(key) == false)
+            {
+                return default;
+            }
+            else
+            {
+                var obj = Get(key);
+                if (obj == null) return default;
+
+                return (T)obj;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="func"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public TResult? GetValue<T, TResult>(Func<T, TResult> func, T parameter)
+        {
+            var key = $"{func.Method.Name}{parameter}";
+
+            if (Has(key) == false)
+            {
+                var obj = func(parameter);
+                if (obj == null) return default;
+
+                Set(key, obj);
+                return obj;
+            }
+            else
+            {
+                var obj = Get(key);
+                if (obj == null) return default;
+
+                return (TResult)obj;
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -48,43 +107,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public void SetValue(string key, object value)
-        {
-            Set(key, value);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        public T? GetValue<T>(string key)
-        {
-            if (Has(key) == false)
-            {
-                //var isExistsCache = _memoryCache.TryGetValue(key, out var cache);
-                //if (isExistsCache == false) return default;
-
-                //Set(key, cache);
-                //return (T)cache;
-
-                // TODO
-                return default;
-            }
-            else
-            {
-                var obj = Get(key);
-                if (obj == null) return default;
-
-                return (T)obj;
-            }
-        }
 
 
         /// <summary>
