@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.CoreServices.Services.NewJob.Correlation
+namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Correlation
 {
     internal class CorrelationJobService : ICorrelationJobService
     {

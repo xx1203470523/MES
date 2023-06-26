@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-namespace Hymson.MES.CoreServices.Services.NewJob
+namespace Hymson.MES.CoreServices.Services.Job.JobUtility
 {
     /// <summary>
     /// 

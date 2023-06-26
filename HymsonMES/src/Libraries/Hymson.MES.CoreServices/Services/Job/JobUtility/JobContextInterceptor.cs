@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Hymson.MES.CoreServices.Services.NewJob
+﻿namespace Hymson.MES.CoreServices.Services.Job.JobUtility
 {
-    public  class JobContextInterceptor
+    public class JobContextInterceptor
     {
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly JobContext _context;
 
         public JobContextInterceptor()
@@ -28,18 +24,16 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             if (_context.Has(key))
             {
-                var obj = _context.Get<TResult>(key);
-                if (obj == null) return default(TResult);
-                return obj;
+                var cacheObj = _context.Get<TResult>(key);
+                if (cacheObj == null) return default;
+                return cacheObj;
             }
-            else
-            {
-                var obj = func(parameter);
-                if (obj == null) return default;
 
-                _context.Set(key, obj);
-                return obj;
-            }
+            var obj = func(parameter);
+            if (obj == null) return default;
+
+            _context.Set(key, obj);
+            return obj;
         }
 
         /// <summary>
@@ -54,17 +48,16 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             if (_context.Has(key))
             {
-                var obj = _context.Get<TResult>(key);
-                if (obj == null) return default;
-                return obj;
+                var cacheObj = _context.Get<TResult>(key);
+                if (cacheObj == null) return default;
+                return cacheObj;
             }
-            else
-            {
-                var obj = await func(parameter);
-                if (obj == null) return default;
-                _context.Set(key, obj);
-                return obj;
-            }
+
+            var obj = await func(parameter);
+            if (obj == null) return default;
+            _context.Set(key, obj);
+            return obj;
         }
+
     }
 }
