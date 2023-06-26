@@ -53,11 +53,13 @@ namespace Hymson.MES.Api
             builder.Services.AddSequenceService(builder.Configuration);
             builder.Services.AddHttpClientService(builder.Configuration);
             builder.Services.AddLocalization();
+            builder.Services.AddHealthChecks();
 
             // 注入nlog日志服务
             builder.AddNLogWeb(builder.Configuration);
             AddAutoMapper();
             var app = builder.Build();
+            app.UseHealthChecks("/healthy");
             //https://learn.microsoft.com/zh-cn/aspnet/core/host-and-deploy/linux-nginx?view=aspnetcore-6.0&tabs=linux-ubuntu
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
