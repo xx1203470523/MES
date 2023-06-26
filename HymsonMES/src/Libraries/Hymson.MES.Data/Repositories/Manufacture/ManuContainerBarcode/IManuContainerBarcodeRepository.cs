@@ -121,9 +121,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="manuContainerBarcodePagedQuery"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        Task<PagedInfo<ManuContainerBarcodeQueryView>> GetPagedInfoAsync(ManuContainerBarcodePagedQuery manuContainerBarcodePagedQuery);
+        Task<PagedInfo<ManuContainerBarcodeQueryView>> GetPagedInfoAsync(ManuContainerBarcodePagedQuery query);
 
         Task<PagedInfo<ManuContainerBarcodeEntity>> GetPagedListAsync(ManuContainerBarcodePagedQuery manuContainerBarcodePagedQuery);
         #endregion

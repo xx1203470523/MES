@@ -107,10 +107,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Select("*");
             sqlBuilder.Where("SiteId=@SiteId");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
             if (manuFacePlateButtonPagedQuery.FacePlateId.HasValue)
             {
                 sqlBuilder.Where("FacePlateId=@FacePlateId");

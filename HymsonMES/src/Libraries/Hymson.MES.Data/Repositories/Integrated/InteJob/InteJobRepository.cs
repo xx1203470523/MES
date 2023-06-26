@@ -46,7 +46,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob
                 sqlBuilder.OrderBy(param.Sorting);
             }
             sqlBuilder.Select("SiteId,Id,Code,Name,ClassProgram,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted");
-            //if (param.SiteId != null) { sqlBuilder.Where("SiteId = @SiteId"); }
+
             if (!string.IsNullOrWhiteSpace(param.Code))
             {
                 param.Code = $"%{param.Code}%";

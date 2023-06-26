@@ -96,12 +96,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
-            sqlBuilder.Where("SiteId=@SiteId");
-
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
+            sqlBuilder.Where("SiteId=@SiteId")
 
             var offSet = (inteCodeRulesMakePagedQuery.PageIndex - 1) * inteCodeRulesMakePagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
