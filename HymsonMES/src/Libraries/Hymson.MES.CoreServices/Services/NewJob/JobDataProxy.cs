@@ -6,28 +6,50 @@ namespace Hymson.MES.CoreServices.Services.NewJob
     /// <summary>
     /// 
     /// </summary>
-    public class JobDataHub
+    public class JobDataProxy
     {
         /// <summary>
         /// 
         /// </summary>
-        protected ConcurrentDictionary<int, object> dictionary = new();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private readonly IMemoryCache _memoryCache;
-
+        protected ConcurrentDictionary<int, object> dictionary;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="memoryCache"></param>
-        public JobDataHub(IMemoryCache memoryCache)
+        public JobDataProxy(IMemoryCache memoryCache)
         {
-            _memoryCache = memoryCache;
+            dictionary = new();
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="func"></param>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        public async Task<T?> GetValueAsync<T>(Func<object, Task<object>> func, params object[] values)
+        {
+            // TODO
+            var key = func.GetType().Name;
+
+            if (Has(key) == false)
+            {
+                var obj = await func(values);
+                if (obj == null) return default;
+
+                Set(key, obj);
+                return (T)obj;
+            }
+            else
+            {
+                var obj = Get(key);
+                if (obj == null) return default;
+
+                return (T)obj;
+            }
+        }
 
         /// <summary>
         /// 
@@ -45,7 +67,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public T? GetValue<T>(string key)
+        public T? GetValue1<T>(string key)
         {
             if (Has(key) == false)
             {
@@ -109,8 +131,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         {
             return dictionary.TryRemove(key.GetHashCode(), out _);
         }
-
-
 
     }
 }
