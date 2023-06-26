@@ -232,13 +232,16 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                 ProcedureId = procedureBomBo.ProcedureId,
                 IsDisassemble = TrueOrFalseEnum.No
             });
-            if (sfcCirculationEntities == null || sfcCirculationEntities.Any() == false) return;
+            if (sfcCirculationEntities == null || sfcCirculationEntities.Any() == false)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16323));
+            }
 
             // 根据物料分组
             var procBomDetailDictionary = procBomDetailEntities.ToLookup(w => w.MaterialId).ToDictionary(d => d.Key, d => d);
             foreach (var item in procBomDetailDictionary)
             {
-                // 检查每个物料是否已经满足BOM用量要求
+                // 检查每个物料是否已经满足BOM用量要求（这里可以优化下）
                 var currentQty = sfcCirculationEntities.Where(w => w.CirculationMainProductId == item.Key)
                     .Sum(s => s.CirculationQty);
 
