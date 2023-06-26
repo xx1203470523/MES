@@ -13,7 +13,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         protected ConcurrentDictionary<int, object> dictionary;
 
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         public JobContextProxy()
         {
@@ -21,9 +21,17 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         }
 
 
+        /// <summary>
+        /// 获取字典Key
+        /// </summary>
+        /// <returns></returns>
+        public ICollection<int> GetKeys()
+        {
+            return dictionary.Keys;
+        }
 
         /// <summary>
-        /// 
+        /// 存值
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
@@ -34,7 +42,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         }
 
         /// <summary>
-        /// 
+        /// 取值
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
@@ -54,7 +62,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         }
 
         /// <summary>
-        /// 
+        /// 取值
         /// </summary>
         /// <param name="func"></param>
         /// <param name="parameter"></param>
@@ -81,7 +89,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         }
 
         /// <summary>
-        /// 
+        /// 取值
         /// </summary>
         /// <param name="func"></param>
         /// <param name="parameter"></param>

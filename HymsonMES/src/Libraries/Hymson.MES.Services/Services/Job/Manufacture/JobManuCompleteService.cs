@@ -8,6 +8,7 @@ using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Job;
+using Hymson.MES.CoreServices.Services.NewJob;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
 using Hymson.Utils;
@@ -20,14 +21,9 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
     public class JobManuCompleteService : IJobManufactureService
     {
         /// <summary>
-        /// 当前对象（登录用户）
+        /// 
         /// </summary>
-        private readonly ICurrentUser _currentUser;
-
-        /// <summary>
-        /// 当前对象（站点）
-        /// </summary>
-        private readonly ICurrentSite _currentSite;
+        private readonly JobContextProxy _jobContextProxy;
 
         /// <summary>
         /// 服务接口（生产通用）
@@ -48,18 +44,16 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="currentUser"></param>
-        /// <param name="currentSite"></param>
+        /// <param name="jobContextProxy"></param>
         /// <param name="manuCommonService"></param>
         /// <param name="manuCommonOldService"></param>
         /// <param name="manuOutStationService"></param>
-        public JobManuCompleteService(ICurrentUser currentUser, ICurrentSite currentSite,
+        public JobManuCompleteService(JobContextProxy jobContextProxy,
             IManuCommonService manuCommonService,
             IManuCommonOldService manuCommonOldService,
             IManuOutStationService manuOutStationService)
         {
-            _currentUser = currentUser;
-            _currentSite = currentSite;
+            _jobContextProxy = jobContextProxy;
             _manuCommonService = manuCommonService;
             _manuCommonOldService = manuCommonOldService;
             _manuOutStationService = manuOutStationService;
@@ -102,6 +96,11 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
 
             // 获取生产条码信息
             var (sfcProduceEntity, _) = await _manuCommonOldService.GetProduceSFCAsync(bo.SFC);
+
+            /*
+            var processRouteId = 15968606561873920;
+            var result = await _jobContextProxy.GetValueAsync(_manuCommonOldService.GetProcessRouteAsync, processRouteId);
+            */
 
             // 合法性校验
             sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity)
