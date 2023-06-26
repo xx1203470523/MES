@@ -84,7 +84,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPost]
         [LogDescription("作业", BusinessType.INSERT)]
-        //[PermissionDescription("inte:job:insert")]
+        [PermissionDescription("inte:job:insert")]
         public async Task AddInteJobAsync([FromBody] InteJobCreateDto param)
         {
             await _inteJobService.CreateInteJobAsync(param);
