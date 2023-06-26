@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Hymson.Web.Framework.Attributes;
@@ -67,21 +68,28 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [PermissionDescription("qual:productScrap:scrap")]
         public async Task QualityScrapAsync(ManuSfScrapDto parm)
         {
-            await _manuSfcProduceService.QualityScrapAsync(parm);
+            if(parm.OperationType== ScrapOperateTypeEnum.Scrapping)
+            {
+                await _manuSfcProduceService.QualityScrapAsync(parm);
+            }
+            else
+            {
+                await _manuSfcProduceService.QualityCancelScrapAsync(parm);
+            }
         }
 
-        /// <summary>
-        /// 条码取消报废
-        /// </summary>
-        /// <param name="parm"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("cancelScrap")]
-        [PermissionDescription("qual:productScrap:scrap")]
-        public async Task QualityCancelScrapAsync(ManuSfScrapDto parm)
-        {
-            await _manuSfcProduceService.QualityCancelScrapAsync(parm);
-        }
+        ///// <summary>
+        ///// 条码取消报废
+        ///// </summary>
+        ///// <param name="parm"></param>
+        ///// <returns></returns>
+        //[HttpPost]
+        //[Route("cancelScrap")]
+        //[PermissionDescription("qual:productScrap:scrap")]
+        //public async Task QualityCancelScrapAsync(ManuSfScrapDto parm)
+        //{
+        //    await _manuSfcProduceService.QualityCancelScrapAsync(parm);
+        //}
 
         /// <summary>
         /// 查询详情（条码生产信息（物理删除））
@@ -169,6 +177,8 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="sfcProduceStepDto"></param>
         /// <returns></returns>
         [HttpPost("saveManuSfcProduceStep")]
+        [LogDescription("在制品步骤控制", BusinessType.INSERT)]
+        [PermissionDescription("manu:manSfcStepControl:saveStep")]
         public async Task SaveManuSfcProduceStepAsync(SaveManuSfcProduceStepDto sfcProduceStepDto)
         {
             await _manuSfcProduceService.SaveManuSfcProduceStepAsync(sfcProduceStepDto);
@@ -203,6 +213,8 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="manuUpdateSaveDto"></param>
         /// <returns></returns>
         [HttpPost("saveManuUpdate")]
+        [LogDescription("生产更改", BusinessType.INSERT)]
+        [PermissionDescription("manu:manuUpdate:saveUpdate")]
         public async Task SaveManuUpdateList(ManuUpdateSaveDto manuUpdateSaveDto)
         {
             await _manuSfcProduceService.SaveManuUpdateListAsync(manuUpdateSaveDto);

@@ -163,6 +163,13 @@ namespace Hymson.MES.Services.Services.Process
                     //apiResult.Msg = $"主物料关联的替代物料不能重复!";
                     //return apiResult;
                 }
+                if (materialList.Any(a => a.MaterialId == a.ReplaceMaterialId))
+                {
+                    throw new ValidationException(nameof(ErrorCode.MES10607));
+                    //apiResult.Code = (int)ResultCode.PARAM_ERROR;
+                    //apiResult.Msg = $"替代物料不能跟主物料重复!";
+                    //return apiResult;
+                }
 
                 long mainId = 0;
                 foreach (var item in materialList)

@@ -32,7 +32,7 @@ namespace Hymson.MES.Services.Validators.Process
             RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(nameof(ErrorCode.MES10617));
             RuleFor(x => x.MaterialList).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10603));
             RuleFor(x => x.MaterialList).Must(it => it.Any(a => a.Usages > 0)).WithErrorCode(nameof(ErrorCode.MES10619));
-            RuleFor(x => x.MaterialList).Must(it => it.Any(a => a.DataCollectionWay != null || Enum.IsDefined(typeof(MaterialSerialNumberEnum), a.DataCollectionWay ?? 0))).WithErrorCode(nameof(ErrorCode.MES10620));
+            RuleFor(x => x.MaterialList).Must(it => it.Any(a => a.DataCollectionWay != null && Enum.IsDefined(typeof(MaterialSerialNumberEnum), a.DataCollectionWay ?? 0))).WithErrorCode(nameof(ErrorCode.MES10620));
         }
     }
 
@@ -48,7 +48,7 @@ namespace Hymson.MES.Services.Validators.Process
             RuleFor(x => x.Version).NotEmpty().Must(it => it != "").WithErrorCode(nameof(ErrorCode.MES10618));
             RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(nameof(ErrorCode.MES10617));
             RuleFor(x => x.MaterialList).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10603));
-            RuleFor(x => x.MaterialList).Must(it => it.Any(a => a.Usages > 0)).WithErrorCode(nameof(ErrorCode.MES10619));
+            RuleFor(x => x.MaterialList).Must(it => !it.Any(a => a.Usages == 0)).WithErrorCode(nameof(ErrorCode.MES10619));
             RuleFor(x => x.MaterialList).Must(it => it.Any(a => a.DataCollectionWay != null || Enum.IsDefined(typeof(MaterialSerialNumberEnum), a.DataCollectionWay ?? 0))).WithErrorCode(nameof(ErrorCode.MES10620));
         }
     }

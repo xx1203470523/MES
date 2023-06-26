@@ -2,6 +2,7 @@
 serviceName=hymson-mes-backgroundtasks-prod
 docker service rm $serviceName
 docker service create \
+  --with-registry-auth \
   --name $serviceName \
   --replicas 2 \
   --env DOTNET_ENVIRONMENT=Production \

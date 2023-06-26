@@ -2,6 +2,7 @@
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuFeeding;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -48,6 +49,8 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("removeModule")]
+        [LogDescription("在制品移除添加", BusinessType.DELETE)]
+        [PermissionDescription("manu:inProductDismantle:delete")]
         public async Task RemoveModuleAsync(InProductDismantleRemoveDto removeDto)
         {
             await _inProductDismantleService.RemoveModuleAsync(removeDto);
@@ -60,6 +63,8 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("addModule")]
+        [LogDescription("在制品移除添加", BusinessType.INSERT)]
+        [PermissionDescription("manu:inProductDismantle:insert")]
         public async Task AddModuleAsync(InProductDismantleAddDto addDto)
         {
             await _inProductDismantleService.AddModuleAsync(addDto);
@@ -72,6 +77,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("replaceModule")]
+        [PermissionDescription("manu:inProductDismantle:replace")]
         public async Task ReplaceModuleAsync(InProductDismantleReplaceDto replaceDto)
         {
             await _inProductDismantleService.ReplaceModuleAsync(replaceDto);

@@ -67,10 +67,20 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         /// <returns></returns>
         public async Task<int> CreateAsync(EquFaultPhenomenonSaveDto createDto)
         {
+            await _validationSaveRules.ValidateAndThrowAsync(createDto);
+
             // 验证DTO
             createDto.FaultPhenomenonCode = createDto.FaultPhenomenonCode.ToTrimSpace();
             createDto.FaultPhenomenonCode = createDto.FaultPhenomenonCode.ToUpperInvariant();
-            await _validationSaveRules.ValidateAndThrowAsync(createDto);
+
+            if (createDto.EquipmentGroupId == 0)
+            {
+                throw new ValidationException(nameof(ErrorCode.MES12904));
+            }
+            if (!Enum.IsDefined(typeof(SysDataStatusEnum), createDto.UseStatus))
+            {
+                throw new ValidationException(nameof(ErrorCode.MES12906));
+            }
 
             // DTO转换实体
             var entity = createDto.ToEntity<EquFaultPhenomenonEntity>();
@@ -94,6 +104,8 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         /// <returns></returns>
         public async Task<int> ModifyAsync(EquFaultPhenomenonSaveDto modifyDto)
         {
+            await _validationSaveRules.ValidateAndThrowAsync(modifyDto);
+
             // 验证DTO
             var entityOld = await _equFaultPhenomenonRepository.GetByIdAsync(modifyDto.Id.Value)
                 ?? throw new BusinessException(nameof(ErrorCode.MES12905));

@@ -7,6 +7,8 @@
  */
 using FluentValidation;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
 
@@ -21,17 +23,19 @@ namespace Hymson.MES.Services.Validators.Manufacture
         public ManuFacePlateCreateValidator(IManuFacePlateRepository manuFacePlateRepository)
         {
             _manuFacePlateRepository = manuFacePlateRepository;
-            RuleFor(x => x.Type).NotEmpty().WithErrorCode(nameof(ErrorCode.MES17201));
+            RuleFor(x => x.Type).Must(it => Enum.IsDefined(typeof(ManuFacePlateTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES17210));
             RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES17202));
-            RuleFor(x => x.Code).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES17206));
+            RuleFor(x => x.Code).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES17206));
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES17203));
-            RuleFor(x => x.Name).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES17207));
-            RuleFor(x => x.Status).NotEmpty().WithErrorCode(nameof(ErrorCode.MES17204));
+            RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES17207));
+            RuleFor(x => x.Status).Must(it => it != null && Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(nameof(ErrorCode.MES17211));
             RuleFor(x => x).MustAsync(async (manuFacePlate, cancellation) =>
             {
                 var isExists = await _manuFacePlateRepository.IsExists(manuFacePlate.Code.Trim(), manuFacePlate.Id);
                 return !isExists;
             }).WithErrorCode(nameof(ErrorCode.MES17205));
+            RuleFor(x => x.ConversationTime).Must(it => it > 0).WithErrorCode(nameof(ErrorCode.MES17212));
+
         }
     }
 
@@ -44,17 +48,18 @@ namespace Hymson.MES.Services.Validators.Manufacture
         public ManuFacePlateModifyValidator(IManuFacePlateRepository manuFacePlateRepository)
         {
             _manuFacePlateRepository = manuFacePlateRepository;
-            RuleFor(x => x.Type).NotEmpty().WithErrorCode(nameof(ErrorCode.MES17201));
+            RuleFor(x => x.Type).Must(it => Enum.IsDefined(typeof(ManuFacePlateTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES17210));
             RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES17202));
-            RuleFor(x => x.Code).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES17206));
+            RuleFor(x => x.Code).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES17206));
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES17203));
-            RuleFor(x => x.Name).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES17207));
-            RuleFor(x => x.Status).NotEmpty().WithErrorCode(nameof(ErrorCode.MES17204));
+            RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES17207));
+            RuleFor(x => x.Status).Must(it => it != null && Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(nameof(ErrorCode.MES17211));
             RuleFor(x => x).MustAsync(async (manuFacePlate, cancellation) =>
             {
                 var isExists = await _manuFacePlateRepository.IsExists(manuFacePlate.Code.Trim(), manuFacePlate.Id);
                 return !isExists;
             }).WithErrorCode(nameof(ErrorCode.MES17205));
+            RuleFor(x => x.ConversationTime).Must(it => it > 0).WithErrorCode(nameof(ErrorCode.MES17212));
         }
     }
 }
