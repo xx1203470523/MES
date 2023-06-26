@@ -10,7 +10,12 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// <summary>
         /// 
         /// </summary>
-        protected ConcurrentDictionary<int, object> dictionary;
+        protected ConcurrentDictionary<uint, object> dictionary;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static SemaphoreSlim[] _semaphores;
 
         /// <summary>
         /// 构造函数
@@ -18,6 +23,13 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         public JobContextProxy()
         {
             dictionary = new();
+
+            int num = Math.Max(Environment.ProcessorCount * 8, 32);
+            _semaphores = new SemaphoreSlim[num];
+            for (int i = 0; i < _semaphores.Length; i++)
+            {
+                _semaphores[i] = new SemaphoreSlim(1);
+            }
         }
 
 
@@ -25,7 +37,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// 获取字典Key
         /// </summary>
         /// <returns></returns>
-        public ICollection<int> GetKeys()
+        public ICollection<uint> GetKeys()
         {
             return dictionary.Keys;
         }
@@ -38,7 +50,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// <returns></returns>
         public void SetValue(string key, object value)
         {
-            Set(key, value);
+            Set((uint)key.GetHashCode(), value);
         }
 
         /// <summary>
@@ -48,13 +60,14 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// <returns></returns>
         public TResult? GetValue<TResult>(string key)
         {
-            if (Has(key) == false)
+            var cacheKey = (uint)key.GetHashCode();
+            if (Has(cacheKey) == false)
             {
                 return default;
             }
             else
             {
-                var obj = Get(key);
+                var obj = Get(cacheKey);
                 if (obj == null) return default;
 
                 return (TResult)obj;
@@ -69,22 +82,29 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// <returns></returns>
         public TResult? GetValue<T, TResult>(Func<T, TResult> func, T parameter)
         {
-            var key = $"{func.Method.Name}{parameter}";
+            var cacheKey = (uint)$"{func.Method.DeclaringType?.FullName}.{func.Method.Name}{parameter}".GetHashCode();
 
-            if (Has(key) == false)
+            if (Has(cacheKey))
+            {
+                var cacheObj = Get(cacheKey);
+                if (cacheObj == null) return default;
+
+                return (TResult)cacheObj;
+            }
+
+            uint hash = cacheKey % (uint)_semaphores.Length;
+            _semaphores[hash].Wait();
+            try
             {
                 var obj = func(parameter);
                 if (obj == null) return default;
 
-                Set(key, obj);
+                Set(cacheKey, obj);
                 return obj;
             }
-            else
+            finally
             {
-                var obj = Get(key);
-                if (obj == null) return default;
-
-                return (TResult)obj;
+                _semaphores[hash].Release();
             }
         }
 
@@ -96,24 +116,32 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// <returns></returns>
         public async Task<TResult?> GetValueAsync<T, TResult>(Func<T, Task<TResult>> func, T parameter)
         {
-            var key = $"{func.Method.Name}{parameter}";
+            var cacheKey = (uint)$"{func.Method.DeclaringType?.FullName}.{func.Method.Name}{parameter}".GetHashCode();
 
-            if (Has(key) == false)
+            if (Has(cacheKey))
+            {
+                var cacheObj = Get(cacheKey);
+                if (cacheObj == null) return default;
+
+                return (TResult)cacheObj;
+            }
+
+            uint hash = cacheKey % (uint)_semaphores.Length;
+            await _semaphores[hash].WaitAsync();
+            try
             {
                 var obj = await func(parameter);
                 if (obj == null) return default;
 
-                Set(key, obj);
+                Set(cacheKey, obj);
                 return obj;
             }
-            else
+            finally
             {
-                var obj = Get(key);
-                if (obj == null) return default;
-
-                return (TResult)obj;
+                _semaphores[hash].Release();
             }
         }
+
 
         /// <summary>
         /// 存放
@@ -121,10 +149,10 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        protected object Set(string key, object value)
+        protected object Set(uint key, object value)
         {
             //var valueStr = value.ToSerialize();
-            return dictionary.AddOrUpdate(key.GetHashCode(), value, (k, v) => value);
+            return dictionary.AddOrUpdate(key, value, (k, v) => value);
         }
 
         /// <summary>
@@ -132,9 +160,9 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        protected object? Get(string key)
+        protected object? Get(uint key)
         {
-            return dictionary.TryGetValue(key.GetHashCode(), out var value) ? value : null;
+            return dictionary.TryGetValue(key, out var value) ? value : null;
         }
 
         /// <summary>
@@ -142,9 +170,9 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        protected bool Has(string key)
+        protected bool Has(uint key)
         {
-            return dictionary.ContainsKey(key.GetHashCode());
+            return dictionary.ContainsKey(key);
         }
 
         /// <summary>
@@ -152,9 +180,9 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        protected bool Remove(string key)
+        protected bool Remove(uint key)
         {
-            return dictionary.TryRemove(key.GetHashCode(), out _);
+            return dictionary.TryRemove(key, out _);
         }
 
 
