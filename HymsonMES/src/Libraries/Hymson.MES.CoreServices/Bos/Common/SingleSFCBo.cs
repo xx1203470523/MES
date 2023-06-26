@@ -3,8 +3,8 @@
     /// <summary>
     /// 单条码
     /// </summary>
-    //[Obsolete("建议使用 MultiSFCBo")]
-    public class SingleSFCBo
+    //[Obsolete("建议使用 MultiSfcBo")]
+    public class SingleSfcBo
     {
         /// <summary>
         /// 工厂Id

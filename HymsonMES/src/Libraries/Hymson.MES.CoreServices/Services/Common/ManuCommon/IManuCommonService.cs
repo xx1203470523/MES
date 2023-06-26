@@ -14,7 +14,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// </summary>
         /// <param name="sfcBo"></param>
         /// <returns></returns>
-        Task<(ManuSfcProduceEntity, ManuSfcProduceBusinessEntity)> GetProduceSFCAsync(SingleSFCBo sfcBo);
+        Task<(ManuSfcProduceEntity, ManuSfcProduceBusinessEntity)> GetProduceSFCAsync(SingleSfcBo sfcBo);
 
         /// <summary>
         /// 批量验证条码是否锁定
@@ -28,7 +28,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// </summary>
         /// <param name="sfcBos"></param>
         /// <returns></returns>
-        Task VerifyContainerAsync(MultiSFCBo sfcBos);
+        Task VerifyContainerAsync(MultiSfcBo sfcBos);
 
         /// <summary>
         /// 验证条码BOM清单用量

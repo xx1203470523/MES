@@ -3,7 +3,7 @@
     /// <summary>
     /// 多条码
     /// </summary>
-    public class MultiSFCBo
+    public class MultiSfcBo
     {
         /// <summary>
         /// 工厂Id
