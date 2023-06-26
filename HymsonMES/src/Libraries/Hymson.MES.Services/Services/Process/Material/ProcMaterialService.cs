@@ -89,12 +89,11 @@ namespace Hymson.MES.Services.Services.Process
                 //return responseDto;
                 throw new ValidationException(nameof(ErrorCode.MES10101));
             }
-
             procMaterialCreateDto.MaterialCode = procMaterialCreateDto.MaterialCode.ToTrimSpace().ToUpperInvariant();
             procMaterialCreateDto.MaterialName = procMaterialCreateDto.MaterialName.Trim();
             procMaterialCreateDto.Version = procMaterialCreateDto.Version.Trim();
-            procMaterialCreateDto.Remark = procMaterialCreateDto?.Remark??"".Trim();
-            procMaterialCreateDto.Unit = procMaterialCreateDto?.Unit??"".Trim();
+            procMaterialCreateDto.Remark = procMaterialCreateDto?.Remark ?? "".Trim();
+            procMaterialCreateDto.Unit = procMaterialCreateDto?.Unit ?? "".Trim();
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procMaterialCreateDto);
 
@@ -247,11 +246,11 @@ namespace Hymson.MES.Services.Services.Process
             statusList.Add(PlanWorkOrderStatusEnum.InProduction);
             var useMaterilWorkOrders = await _planWorkOrderRepository.GetEqualPlanWorkOrderEntitiesAsync(new PlanWorkOrderQuery()
             {
-                SiteId=_currentSite.SiteId??0,
+                SiteId = _currentSite.SiteId ?? 0,
                 ProductIds = idsArr.ToList(),
                 StatusList = statusList
             });
-            if (useMaterilWorkOrders != null && useMaterilWorkOrders.Any()) 
+            if (useMaterilWorkOrders != null && useMaterilWorkOrders.Any())
             {
                 throw new BusinessException(nameof(ErrorCode.MES10225));
             }
@@ -323,7 +322,7 @@ namespace Hymson.MES.Services.Services.Process
             procMaterialModifyDto.MaterialName = procMaterialModifyDto.MaterialName.Trim();
             procMaterialModifyDto.Version = procMaterialModifyDto.Version.Trim();
             procMaterialModifyDto.Remark = procMaterialModifyDto?.Remark ?? "".Trim();
-            procMaterialModifyDto.Unit = procMaterialModifyDto?.Unit ??"".Trim();
+            procMaterialModifyDto.Unit = procMaterialModifyDto?.Unit ?? "".Trim();
 
             //DTO转换实体
             var procMaterialEntity = procMaterialModifyDto.ToEntity<ProcMaterialEntity>();
@@ -358,7 +357,7 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             // 判断编号是否已存在
-            var exists= await _procMaterialRepository.GetByCodeAsync(new ProcMaterialQuery()
+            var exists = await _procMaterialRepository.GetByCodeAsync(new ProcMaterialQuery()
             {
                 SiteId = _currentSite.SiteId,
                 MaterialCode = procMaterialEntity.MaterialCode,

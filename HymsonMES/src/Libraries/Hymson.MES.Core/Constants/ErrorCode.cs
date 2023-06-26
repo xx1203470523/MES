@@ -46,6 +46,11 @@
         public const string MES10224 = "物料名称最大长度为50";
         public const string MES10225 = "有生产中的工单引用其中的物料，不允许删除！";
         public const string MES10226 = "数据收集方式不能为空！";
+        public const string MES10227 = "数据收集方式不合法！";
+        public const string MES10228 = "批次需大于0！";
+        public const string MES10229 = "采购类型不合法！";
+        public const string MES10230 = "状态不合法！";
+        public const string MES10231 = "版本不能为空！"; 
         #endregion
 
         #region 资源 10300
@@ -268,7 +273,7 @@
         public const string MES12008 = "备注 超过最大长度，最大长度为255.";
         public const string MES12009 = "作业已经被使用无法删除";
         public const string MES12010 = "作业不存在，请刷新页面";
-        public const string MES12011 = "类程序不合法，请检查"; 
+        public const string MES12011 = "类程序不合法，请检查";
         #endregion
 
         #region 工作中心 12100
