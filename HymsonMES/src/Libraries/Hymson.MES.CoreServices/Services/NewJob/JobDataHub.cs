@@ -49,11 +49,14 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         {
             if (Has(key) == false)
             {
-                var isExistsCache = _memoryCache.TryGetValue(key, out var cache);
-                if (isExistsCache == false) return default;
+                //var isExistsCache = _memoryCache.TryGetValue(key, out var cache);
+                //if (isExistsCache == false) return default;
 
-                Set(key, cache);
-                return (T)cache;
+                //Set(key, cache);
+                //return (T)cache;
+
+                // TODO
+                return default;
             }
             else
             {
