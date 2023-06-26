@@ -268,6 +268,7 @@
         public const string MES12008 = "备注 超过最大长度，最大长度为255.";
         public const string MES12009 = "作业已经被使用无法删除";
         public const string MES12010 = "作业不存在，请刷新页面";
+        public const string MES12011 = "类程序不合法，请检查"; 
         #endregion
 
         #region 工作中心 12100
