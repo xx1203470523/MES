@@ -50,7 +50,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob.Execute
             }
 
             //执行入库
-
             using (TransactionScope ts = new TransactionScope())
             {
                 foreach (var job in jobBos)
