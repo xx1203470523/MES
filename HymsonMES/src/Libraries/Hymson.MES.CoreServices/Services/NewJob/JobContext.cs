@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,13 +13,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
     /// </summary>
     public class JobContext : IDisposable
     {
-        private readonly ConcurrentDictionary<string, object> _data = new ConcurrentDictionary<string, object>();
+        private readonly ConcurrentDictionary<int, object> _data = new ConcurrentDictionary<int, object>();
         private bool _disposed;
 
         // 读取上下文数据对象
-        public T Get<T>(string key) where T : class
+        public T Get<T>(string key) 
         {
-            if (!_disposed && _data.TryGetValue(key, out object value))
+            if (!_disposed && _data.TryGetValue(key.GetHashCode(), out object value))
             {
                 return (T)value;
             }
@@ -33,7 +34,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         {
             if (!_disposed)
             {
-                _data[key] = value;
+                _data[key.GetHashCode()] = value;
             }
         }
 
@@ -42,8 +43,18 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         {
             if (!_disposed)
             {
-                _data.TryRemove(key, out object value);
+                _data.TryRemove(key.GetHashCode(), out object value);
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public bool Has(string key)
+        {
+            return _data.ContainsKey(key.GetHashCode());
         }
 
         // IDisposable 接口的实现
@@ -53,6 +64,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             {
                 // 释放上下文对象的资源
                 _disposed = true;
+
+                //通知垃圾回收器不再调用终结器
+                GC.SuppressFinalize(this);
             }
         }
     }

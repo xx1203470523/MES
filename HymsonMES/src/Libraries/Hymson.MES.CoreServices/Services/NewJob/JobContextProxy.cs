@@ -115,8 +115,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }
         }
 
-
-
         /// <summary>
         /// 存放
         /// </summary>

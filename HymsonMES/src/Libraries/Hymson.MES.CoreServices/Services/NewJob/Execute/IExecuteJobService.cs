@@ -12,6 +12,5 @@ namespace Hymson.MES.CoreServices.Services.NewJob.Execute
         /// </summary>
         /// <returns></returns>
         Task ExecuteAsync(IEnumerable<JobBo> jobBos, T param);
-
     }
 }
