@@ -101,6 +101,7 @@
         public const string MES10350 = "未找到指定模板！";
         public const string MES10356 = "获取模板上下文信息失败,模板名称:{name}！";
         public const string MES10370 = "存储路径超长，最大255!";
+        public const string MES10371 = "IP最大长度为50";
 
         #endregion
 
