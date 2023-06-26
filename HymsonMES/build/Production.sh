@@ -2,6 +2,7 @@
 serviceName=hymson-mes-api-prod
 docker service rm $serviceName
 docker service create \
+  --with-registry-auth \
   --name $serviceName \
   --mode global \
   --publish mode=host,published=30223,target=80 \
