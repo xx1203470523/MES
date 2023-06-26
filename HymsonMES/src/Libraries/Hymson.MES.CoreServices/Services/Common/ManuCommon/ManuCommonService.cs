@@ -232,7 +232,8 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             });
             if (sfcCirculationEntities == null || !sfcCirculationEntities.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16323));
+                return;
+                //throw new CustomerValidationException(nameof(ErrorCode.MES16323));
             }
 
             // 根据物料分组

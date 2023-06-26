@@ -27,27 +27,36 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// 
         /// </summary>
         /// <param name="func"></param>
-        /// <param name="t"></param>
+        /// <param name="parameter"></param>
         /// <returns></returns>
-        public async Task<T?> GetValueAsync<T>(Func<object, Task<object>> func, params object[] values)
+        public async Task<TResult?> GetValueAsync<T, TResult>(Func<T, Task<TResult>> func, T parameter)
         {
             // TODO
-            var key = func.GetType().Name;
+            var key = $"{func.Method.Name}{parameter}";
 
             if (Has(key) == false)
             {
-                var obj = await func(values);
-                if (obj == null) return default;
+                try
+                {
+                    var obj = await func(parameter);
+                    if (obj == null) return default;
 
-                Set(key, obj);
-                return (T)obj;
+                    Set(key, obj);
+                    return obj;
+                }
+                catch (Exception ex)
+                {
+
+                    throw ex;
+                }
+                return default;
             }
             else
             {
                 var obj = Get(key);
                 if (obj == null) return default;
 
-                return (T)obj;
+                return (TResult)obj;
             }
         }
 
