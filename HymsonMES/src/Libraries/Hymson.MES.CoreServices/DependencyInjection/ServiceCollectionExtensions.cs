@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Hymson.MES.CoreServices.DependencyInjection
 {
     /// <summary>
-    /// 
+    /// 依赖注入项配置
     /// </summary>
     public static class ServiceCollectionExtensions
     {
