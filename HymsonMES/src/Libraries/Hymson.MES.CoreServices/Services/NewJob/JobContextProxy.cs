@@ -46,7 +46,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public T? GetValue<T>(string key)
+        public TResult? GetValue<TResult>(string key)
         {
             if (Has(key) == false)
             {
@@ -57,7 +57,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 var obj = Get(key);
                 if (obj == null) return default;
 
-                return (T)obj;
+                return (TResult)obj;
             }
         }
 
