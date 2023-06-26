@@ -17,6 +17,7 @@
         public const string MES10108 = "无法将其他状态修改成新建状态!";
         public const string MES10109 = "编码最大长度为50";
         public const string MES10110 = "名称最大长度为50";
+
         #region 物料 10200
         public const string MES10200 = "物料维护错误";
         public const string MES10201 = "此物料编码{materialCode}版本{version}在系统已经存在！";
@@ -531,7 +532,7 @@
         public const string MES16041 = "工单类型不合法，请检查！";
         public const string MES16042 = "超产比例需大于0";
         public const string MES16043 = "工单号长度最大50";
-        public const string MES16044 = "数量需为整数且大于0"; 
+        public const string MES16044 = "数量需为整数且大于0";
 
         #endregion
 
@@ -630,6 +631,11 @@
         public const string MES17210 = "面板类型不合法！";
         public const string MES17211 = "状态不合法！";
         public const string MES17212 = "会话超时时间不能为空！";
+
+        public const string MES17251 = "按钮名称不能为空！";
+        public const string MES17252 = "按钮序列号必须大于0！";
+        public const string MES17253 = "按钮中存在，作业序列号不合法，请检查！";
+        public const string MES17254 = "按钮中存在，作业为空，请检查！";
         #endregion
 
         #region 在制维修

@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.CoreServices.Bos.Job;
+using Hymson.MES.CoreServices.Services.Job;
 using Microsoft.Extensions.DependencyInjection;
 using System.Transactions;
 

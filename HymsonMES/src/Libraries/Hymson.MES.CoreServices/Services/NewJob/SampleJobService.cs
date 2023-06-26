@@ -1,6 +1,7 @@
 ﻿using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.CoreServices.Bos.Job;
+using Hymson.MES.CoreServices.Services.Job;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {

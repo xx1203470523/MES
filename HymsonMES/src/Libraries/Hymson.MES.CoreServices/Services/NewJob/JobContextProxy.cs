@@ -1,12 +1,11 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
     /// <summary>
     /// 
     /// </summary>
-    public class JobDataProxy
+    public class JobContextProxy : IDisposable
     {
         /// <summary>
         /// 
@@ -14,45 +13,25 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         protected ConcurrentDictionary<int, object> dictionary;
 
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
-        /// <param name="memoryCache"></param>
-        public JobDataProxy(IMemoryCache memoryCache)
+        public JobContextProxy()
         {
             dictionary = new();
         }
 
 
         /// <summary>
-        /// 
+        /// 获取字典Key
         /// </summary>
-        /// <param name="func"></param>
-        /// <param name="t"></param>
         /// <returns></returns>
-        public async Task<T?> GetValueAsync<T>(Func<object, Task<object>> func, params object[] values)
+        public ICollection<int> GetKeys()
         {
-            // TODO
-            var key = func.GetType().Name;
-
-            if (Has(key) == false)
-            {
-                var obj = await func(values);
-                if (obj == null) return default;
-
-                Set(key, obj);
-                return (T)obj;
-            }
-            else
-            {
-                var obj = Get(key);
-                if (obj == null) return default;
-
-                return (T)obj;
-            }
+            return dictionary.Keys;
         }
 
         /// <summary>
-        /// 
+        /// 存值
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
@@ -63,21 +42,14 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         }
 
         /// <summary>
-        /// 
+        /// 取值
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public T? GetValue1<T>(string key)
+        public TResult? GetValue<TResult>(string key)
         {
             if (Has(key) == false)
             {
-                //var isExistsCache = _memoryCache.TryGetValue(key, out var cache);
-                //if (isExistsCache == false) return default;
-
-                //Set(key, cache);
-                //return (T)cache;
-
-                // TODO
                 return default;
             }
             else
@@ -85,9 +57,64 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 var obj = Get(key);
                 if (obj == null) return default;
 
-                return (T)obj;
+                return (TResult)obj;
             }
         }
+
+        /// <summary>
+        /// 取值
+        /// </summary>
+        /// <param name="func"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public TResult? GetValue<T, TResult>(Func<T, TResult> func, T parameter)
+        {
+            var key = $"{func.Method.Name}{parameter}";
+
+            if (Has(key) == false)
+            {
+                var obj = func(parameter);
+                if (obj == null) return default;
+
+                Set(key, obj);
+                return obj;
+            }
+            else
+            {
+                var obj = Get(key);
+                if (obj == null) return default;
+
+                return (TResult)obj;
+            }
+        }
+
+        /// <summary>
+        /// 取值
+        /// </summary>
+        /// <param name="func"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public async Task<TResult?> GetValueAsync<T, TResult>(Func<T, Task<TResult>> func, T parameter)
+        {
+            var key = $"{func.Method.Name}{parameter}";
+
+            if (Has(key) == false)
+            {
+                var obj = await func(parameter);
+                if (obj == null) return default;
+
+                Set(key, obj);
+                return obj;
+            }
+            else
+            {
+                var obj = Get(key);
+                if (obj == null) return default;
+
+                return (TResult)obj;
+            }
+        }
+
 
 
         /// <summary>
@@ -130,6 +157,24 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         protected bool Remove(string key)
         {
             return dictionary.TryRemove(key.GetHashCode(), out _);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Dispose()
+        {
+            dictionary.Clear();
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        ~JobContextProxy()
+        {
+            Dispose();
         }
 
     }
