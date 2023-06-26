@@ -43,38 +43,6 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         }
 
         /// <summary>
-        /// 存值
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public void SetValue(string key, object value)
-        {
-            Set((uint)key.GetHashCode(), value);
-        }
-
-        /// <summary>
-        /// 取值
-        /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        public TResult? GetValue<TResult>(string key)
-        {
-            var cacheKey = (uint)key.GetHashCode();
-            if (Has(cacheKey) == false)
-            {
-                return default;
-            }
-            else
-            {
-                var obj = Get(cacheKey);
-                if (obj == null) return default;
-
-                return (TResult)obj;
-            }
-        }
-
-        /// <summary>
         /// 取值
         /// </summary>
         /// <param name="func"></param>
