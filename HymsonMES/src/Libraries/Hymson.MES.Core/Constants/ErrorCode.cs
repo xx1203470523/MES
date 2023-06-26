@@ -17,7 +17,6 @@
         public const string MES10108 = "无法将其他状态修改成新建状态!";
         public const string MES10109 = "编码最大长度为50";
         public const string MES10110 = "名称最大长度为50";
-        public const string MES10111 = "第{0}行中第{1}行:";
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";
