@@ -74,7 +74,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public T? GetValue1<T>(string key)
+        public T? GetValue<T>(string key)
         {
             if (Has(key) == false)
             {
