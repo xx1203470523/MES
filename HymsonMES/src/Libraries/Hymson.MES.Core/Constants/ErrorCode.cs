@@ -530,7 +530,9 @@
         public const string MES16040 = "工作中心类型不合法，请检查！";
         public const string MES16041 = "工单类型不合法，请检查！";
         public const string MES16042 = "超产比例需大于0";
-        public const string MES16043 = "工单号长度最大50"; 
+        public const string MES16043 = "工单号长度最大50";
+        public const string MES16044 = "数量需为整数且大于0"; 
+
         #endregion
 
         #region 条码接收 16100
