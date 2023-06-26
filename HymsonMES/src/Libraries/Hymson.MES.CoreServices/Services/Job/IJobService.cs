@@ -1,6 +1,6 @@
 ﻿using Hymson.MES.CoreServices.Bos.Job;
 
-namespace Hymson.MES.CoreServices.Services.NewJob
+namespace Hymson.MES.CoreServices.Services.Job
 {
     /// <summary>
     /// 作业模版

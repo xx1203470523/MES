@@ -105,7 +105,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         public async Task<(ManuSfcProduceEntity, ManuSfcProduceBusinessEntity)> GetProduceSFCAsync(SingleSfcBo sfcBo)
         {
             if (string.IsNullOrWhiteSpace(sfcBo.SFC)
-                || sfcBo.SFC.Contains(' ') ) throw new CustomerValidationException(nameof(ErrorCode.MES16305));
+                || sfcBo.SFC.Contains(' ')) throw new CustomerValidationException(nameof(ErrorCode.MES16305));
 
             // 条码在制表
             var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery
@@ -232,8 +232,8 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             });
             if (sfcCirculationEntities == null || !sfcCirculationEntities.Any())
             {
-                return;
-                //throw new CustomerValidationException(nameof(ErrorCode.MES16323));
+                //return;
+                throw new CustomerValidationException(nameof(ErrorCode.MES16323));
             }
 
             // 根据物料分组
