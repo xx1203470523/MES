@@ -122,7 +122,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         public async Task<int> ModifyAsync(EquEquipmentGroupSaveDto modifyDto)
         {
             // 验证DTO
-            //await _validationModifyRules.ValidateAndThrowAsync(modifyDto);
+            await _validationSaveRules.ValidateAndThrowAsync(modifyDto);
             //判断名称重复
 
             // DTO转换实体
