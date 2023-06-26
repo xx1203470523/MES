@@ -1,11 +1,10 @@
 ﻿namespace Hymson.MES.Core.Constants
 {
     /// <summary>
-    /// 
+    /// 错误码
     /// </summary>
-    public class ErrorCode
+    public static class ErrorCode
     {
-
         #region  用户端错误 
         public const string MES10100 = "请求实体不能为空";
         public const string MES10101 = "站点码获取失败，请重新登录！";
@@ -453,7 +452,6 @@
         public const string MES15305 = "条码数量上限为100行";
         public const string MES15306 = "选中的条码状态与选择的操作类型不匹配！";
         public const string MES15307 = "扫描的条码状态都必须是“锁定”或者有未关闭的将来锁定指令存在";
-        //public const string MES15308= " 当前条码状态为{operationType}，与选择的操作类型不匹配";
         public const string MES15308 = "将来锁定操作必须是同一工单下的条码";
         public const string MES15309 = "条码全部不是在制品";
         public const string MES15310 = "将来锁工序{lockproduction}不在条码所用工艺路线中";
@@ -719,11 +717,11 @@
         #region 容器包装 MES 16700
         public const string MES16701 = "容器包装，条码信息未找到";
         public const string MES16702 = "容器包装，包装码不存在";
-        //public const string MES16703 = "容器包装，条码的包装维护记录未找到";
+
         public const string MES16704 = "容器包装，配置面板编号为空";
         public const string MES16705 = "容器包装，配置面板不存在或未启用";
         public const string MES16706 = "容器包装，配置面板不允许混工单,当前容器工单{first},当前条码工单{second}";
-        //public const string MES16707 = "容器包装，包装码不能为空";
+
         public const string MES16710 = "不识别的类型：{key}";
         public const string MES16708 = "产品条码不能为空";
         public const string MES16709 = "作业返回空，请检查作业是否正确配置";
@@ -768,13 +766,12 @@
         public const string MES16903 = "当前工序与条码生产信息中的不一致！";
         public const string MES16904 = "找不到实际使用的物料信息!";
         public const string MES16905 = "找不到实际物料{materialCode}对应的数据收集方式!";
-        //public const string MES16906 = "物料选择不符合!";
-        //public const string MES16907 = "bom没有配置替代物料,物料选择不符合!";
+
         public const string MES16908 = "物料条码{barCode}库存不存在!";
         public const string MES16909 = "物料条码{barCode}库存不足,请检查!";
         public const string MES16910 = "实际使用的物料为空!";
         public const string MES16911 = "实际使用的物料与条码不合!";
-        //public const string MES16912 = "条码为空！";
+
         public const string MES16913 = "不能删除启用或保留的记录！";
         #endregion
 
@@ -787,7 +784,7 @@
         #endregion
 
         #region 在制品步骤控制 MES18000
-        //public const string MES18000 = "在制品步骤控制错误";
+
         public const string MES18001 = "条码信息不存在";
         public const string MES18002 = "请扫描相同工单的条码";
         public const string MES18003 = "工单信息不存在";
@@ -898,15 +895,11 @@
 
         #region 系统执行出错 业务逻辑出错
         //public const string MES20001 = "MES20001";
-        //public const string MES20100 = "MES20100";
-        //public const string MES20101 = "MES20101";
 
         #endregion
 
         #region 调用第三方服务出错
         //public const string MES30001 = "MES30001";
-        //public const string MES30100 = "MES30100";
-        //public const string MES30101 = "MES30101";
         #endregion
     }
 }
