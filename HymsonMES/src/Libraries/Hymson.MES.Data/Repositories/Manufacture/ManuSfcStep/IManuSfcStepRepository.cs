@@ -110,6 +110,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="queryParam"></param>
         /// <returns></returns>
-        Task<PagedInfo<ManuSfcStepEntity>> GetPagedInfoBySFCAsync(ManuSfcStepBySFCPagedQuery queryParam);
+        Task<PagedInfo<ManuSfcStepEntity>> GetPagedInfoBySFCAsync(ManuSfcStepBySfcPagedQuery queryParam);
     }
 }

@@ -19,7 +19,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query
     /// <summary>
     /// 根据SFC查询条码
     /// </summary>
-    public class GetBySFCQuery
+    public class GetBySfcQuery
     {
         /// <summary>
         /// 站点编码 

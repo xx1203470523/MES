@@ -18,20 +18,18 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     public partial class ManuSfcRepository : BaseRepository, IManuSfcRepository
     {
         /// <summary>
-        /// 
+        /// 数据库连接
         /// </summary>
         private readonly ConnectionOptions _connectionOptions;
-        private readonly IMemoryCache _memoryCache;
 
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="connectionOptions"></param>
         /// <param name="memoryCache"></param>
-        public ManuSfcRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
+        public ManuSfcRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
-            _memoryCache = memoryCache;
         }
 
 
@@ -44,7 +42,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> DeleteAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(DeleteSql, new { Id = id });
         }
 
@@ -67,7 +64,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<ManuSfcEntity> GetByIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.QueryFirstOrDefaultAsync<ManuSfcEntity>(GetByIdSql, new { Id = id });
         }
 
@@ -79,7 +75,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<IEnumerable<ManuSfcEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.QueryAsync<ManuSfcEntity>(GetByIdsSql, new { Ids = ids });
         }
 
@@ -103,13 +98,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
             if (pagedQuery.IsUsed.HasValue) sqlBuilder.Where("MS.IsUsed = @IsUsed");
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.OrderCode) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.OrderCode))
             {
                 pagedQuery.OrderCode = $"%{pagedQuery.OrderCode}%";
                 sqlBuilder.Where("PWO.OrderCode LIKE @OrderCode");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.SFC) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.SFC))
             {
                 pagedQuery.SFC = $"%{pagedQuery.SFC}%";
                 sqlBuilder.Where("MS.SFC LIKE @SFC");
@@ -227,7 +222,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var template = sqlBuilder.AddTemplate(GetManuSfcEntitiesSqlTemplate);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             var manuSfcEntities = await conn.QueryAsync<ManuSfcEntity>(template.RawSql, manuSfcQuery);
             return manuSfcEntities;
         }
@@ -240,7 +234,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> InsertAsync(ManuSfcEntity manuSfcEntity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(InsertSql, manuSfcEntity);
         }
 
@@ -252,7 +245,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> InsertRangeAsync(List<ManuSfcEntity> manuSfcEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(InsertsSql, manuSfcEntitys);
         }
 
@@ -264,7 +256,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> UpdateAsync(ManuSfcEntity manuSfcEntity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(UpdateSql, manuSfcEntity);
         }
 
@@ -276,7 +267,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> UpdateRangeAsync(List<ManuSfcEntity> manuSfcEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(UpdatesSql, manuSfcEntitys);
         }
 
@@ -341,10 +331,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        public async Task<ManuSfcEntity> GetBySFCAsync(GetBySFCQuery command)
+        public async Task<ManuSfcEntity> GetBySFCAsync(GetBySfcQuery command)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.QueryFirstOrDefaultAsync<ManuSfcEntity>(GetBySFCSql, command);
         }
 
@@ -356,7 +345,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<IEnumerable<ManuSfcEntity>> GetBySFCsAsync(IEnumerable<string> sfcs)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.QueryAsync<ManuSfcEntity>(GetBySFCsSql, new { SFCs = sfcs });
         }
         #endregion

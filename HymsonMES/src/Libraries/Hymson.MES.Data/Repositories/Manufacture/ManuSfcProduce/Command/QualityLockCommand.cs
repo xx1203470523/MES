@@ -15,11 +15,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public long SiteId { get; set; }
 
         /// <summary>
-        /// 操作类型
-        /// </summary>
-        //public QualityLockEnum OperationType { get; set; }
-
-        /// <summary>
         /// 锁
         /// </summary>
         public int Lock { get; set; }

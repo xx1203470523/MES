@@ -150,7 +150,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             await VerifySfcsLockAsync(manuSfcs.ToArray());
 
             //已经存在的不合格信息不允许重复录入
-            var productBadRecordList = await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new ManuProductBadRecordBySFCQuery
+            var productBadRecordList = await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new ManuProductBadRecordBySfcQuery
             {
                 Sfcs = sfcs,
                 Status = ProductBadRecordStatusEnum.Open,

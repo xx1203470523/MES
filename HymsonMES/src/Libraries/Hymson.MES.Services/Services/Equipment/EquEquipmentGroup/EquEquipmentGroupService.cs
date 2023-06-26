@@ -78,12 +78,12 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         /// <returns></returns>
         public async Task<int> CreateAsync(EquEquipmentGroupSaveDto createDto)
         {
+            if (createDto == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+
             // 验证DTO
             createDto.EquipmentGroupCode = createDto.EquipmentGroupCode.ToTrimSpace();
             createDto.EquipmentGroupCode = createDto.EquipmentGroupCode.ToUpperInvariant();
             await _validationSaveRules.ValidateAndThrowAsync(createDto);
-
-            if (createDto == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
 
             // DTO转换实体
             var entity = createDto.ToEntity<EquEquipmentGroupEntity>();

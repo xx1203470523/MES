@@ -351,7 +351,7 @@ namespace Hymson.MES.Services.Services.Plan
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16502)).WithData("product", procMaterialEntity.MaterialCode);
             }
-            var manuSfcEntity = await _manuSfcRepository.GetBySFCAsync(new GetBySFCQuery { SFC = param.SFC, SiteId = _currentSite.SiteId });
+            var manuSfcEntity = await _manuSfcRepository.GetBySFCAsync(new GetBySfcQuery { SFC = param.SFC, SiteId = _currentSite.SiteId });
 
             decimal qty = 0;
             if (param.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)

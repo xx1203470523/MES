@@ -243,7 +243,7 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
                 throw new CustomerValidationException(nameof(ErrorCode.MES19916)).WithData("SFC", bo.SFC);
             }
             //获取SFC
-            var sfcEntity = await _manuSfcRepository.GetBySFCAsync(new GetBySFCQuery { SFC = bo.SFC, SiteId = _currentEquipment.SiteId });
+            var sfcEntity = await _manuSfcRepository.GetBySFCAsync(new GetBySfcQuery { SFC = bo.SFC, SiteId = _currentEquipment.SiteId });
             //if (sfcEntity != null)
             //{
             //    throw new CustomerValidationException(nameof(ErrorCode.MES19917)).WithData("SFC", bo.SFC);

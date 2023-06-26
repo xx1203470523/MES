@@ -19,20 +19,18 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     public partial class ManuSfcProduceRepository : BaseRepository, IManuSfcProduceRepository
     {
         /// <summary>
-        /// 
+        /// 数据库连接
         /// </summary>
         private readonly ConnectionOptions _connectionOptions;
-        private readonly IMemoryCache _memoryCache;
 
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="connectionOptions"></param>
         /// <param name="memoryCache"></param>
-        public ManuSfcProduceRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
+        public ManuSfcProduceRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
-            _memoryCache = memoryCache;
         }
 
 
@@ -66,12 +64,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("msp.Lock=@Lock");
             }
-            if (query.NoLock.HasValue)
+            if (query.NoLock.HasValue&& query.NoLock != 1)
             {
-                if (query.NoLock != 1)
-                {
                     sqlBuilder.Where("(msp.Lock!=@NoLock or `Lock`  is null)");
-                }
             }
             if (query.IsScrap.HasValue)
             {
@@ -250,7 +245,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> UpdateAsync(ManuSfcProduceEntity manuSfcProduceEntity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(UpdateSql, manuSfcProduceEntity);
         }
 
@@ -262,7 +256,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> UpdateWithStatusCheckAsync(ManuSfcProduceEntity manuSfcProduceEntity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(UpdateWithStatusCheckSql, manuSfcProduceEntity);
         }
 
@@ -307,7 +300,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> DeletePhysicalAsync(DeletePhysicalBySfcCommand sfcCommand)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(DeletePhysicalSql, sfcCommand);
         }
 

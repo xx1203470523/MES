@@ -76,7 +76,6 @@ namespace Hymson.MES.Services.Services.Process
             procParameterEntity.UpdatedBy = _currentUser.UserName;
             procParameterEntity.CreatedOn = HymsonClock.Now();
             procParameterEntity.UpdatedOn = HymsonClock.Now();
-            procParameterEntity.ParameterCode = procParameterEntity.ParameterCode;
             procParameterEntity.SiteId = _currentSite.SiteId;
 
             //判断编号是否已经存在

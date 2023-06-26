@@ -131,7 +131,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Select("*");
             sqlBuilder.Where("SiteId=@SiteId");
 
-
             var offSet = (manuFacePlateButtonJobRelationPagedQuery.PageIndex - 1) * manuFacePlateButtonJobRelationPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = manuFacePlateButtonJobRelationPagedQuery.PageSize });

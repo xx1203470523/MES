@@ -190,7 +190,7 @@ namespace Hymson.MES.Services.Services.Report
         /// <returns></returns>
         public async Task<PagedInfo<ManuSfcStepBySFCViewDto>> GetSFCStepsBySFCPageListAsync(ManuSfcStepBySFCPagedQueryDto queryParam)
         {
-            var pagedQuery = queryParam.ToQuery<ManuSfcStepBySFCPagedQuery>();
+            var pagedQuery = queryParam.ToQuery<ManuSfcStepBySfcPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId.Value;
 
             if (string.IsNullOrEmpty(pagedQuery.SFC)) 

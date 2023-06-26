@@ -42,9 +42,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 获取List
         /// </summary>
-        /// <param name="manuProductBadRecordQuery"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuProductBadRecordEntity>> GetManuProductBadRecordEntitiesBySFCAsync(ManuProductBadRecordBySFCQuery manuProductBadRecordQuery);
+        Task<IEnumerable<ManuProductBadRecordEntity>> GetManuProductBadRecordEntitiesBySFCAsync(ManuProductBadRecordBySfcQuery query);
 
         /// <summary>
         /// 分页查询

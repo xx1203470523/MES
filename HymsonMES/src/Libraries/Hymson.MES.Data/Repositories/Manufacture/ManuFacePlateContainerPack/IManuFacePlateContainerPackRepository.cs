@@ -85,6 +85,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuFacePlateContainerPackPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuFacePlateContainerPackEntity>> GetPagedInfoAsync(ManuFacePlateContainerPackPagedQuery manuFacePlateContainerPackPagedQuery);
+
         /// <summary>
         /// 通过FacePlateId获取明细
         /// </summary>

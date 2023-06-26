@@ -7,6 +7,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public class ManuFacePlateContainerPackPagedQuery : PagerInfo
     {
-
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long SiteId { get; set; }
     }
 }
