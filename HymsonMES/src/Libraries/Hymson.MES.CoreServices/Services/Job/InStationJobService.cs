@@ -6,25 +6,17 @@ using Hymson.MES.CoreServices.Services.Job;
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
     /// <summary>
-    /// 
+    /// 进站
     /// </summary>
-    public class SampleBo : JobBaseBo
-    {
-
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    [Job("演示", JobTypeEnum.Standard)]
-    public class SampleJobService : IJobService<SampleBo>
+    [Job("进站", JobTypeEnum.Standard)]
+    public class InStationJobService : IJobService<InStationJobBo>
     {
         /// <summary>
         /// 参数校验
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task VerifyParamAsync(SampleBo param)
+        public async Task VerifyParamAsync(InStationJobBo param)
         {
             await Task.CompletedTask;
         }
@@ -34,7 +26,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task DataAssemblingAsync(SampleBo param)
+        public async Task DataAssemblingAsync(InStationJobBo param)
         {
             await Task.CompletedTask;
         }

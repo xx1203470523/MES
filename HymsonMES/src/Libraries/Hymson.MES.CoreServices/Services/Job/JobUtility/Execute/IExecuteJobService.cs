@@ -1,6 +1,6 @@
 ﻿using Hymson.MES.CoreServices.Bos.Job;
 
-namespace Hymson.MES.CoreServices.Services.NewJob.Execute
+namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
 {
     /// <summary>
     /// 执行作业
@@ -12,6 +12,5 @@ namespace Hymson.MES.CoreServices.Services.NewJob.Execute
         /// </summary>
         /// <returns></returns>
         Task ExecuteAsync(IEnumerable<JobBo> jobBos, T param);
-
     }
 }

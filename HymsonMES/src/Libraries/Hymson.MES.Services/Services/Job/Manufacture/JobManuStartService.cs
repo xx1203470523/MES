@@ -27,7 +27,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         private readonly ICurrentUser _currentUser;
 
-        /// <summary>
+        /// <summary>   
         /// 当前对象（站点）
         /// </summary>
         private readonly ICurrentSite _currentSite;

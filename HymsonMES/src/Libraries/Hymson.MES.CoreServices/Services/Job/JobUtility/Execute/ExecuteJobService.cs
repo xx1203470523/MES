@@ -3,7 +3,7 @@ using Hymson.MES.CoreServices.Services.Job;
 using Microsoft.Extensions.DependencyInjection;
 using System.Transactions;
 
-namespace Hymson.MES.CoreServices.Services.NewJob.Execute
+namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
 {
     /// <summary>
     /// 
