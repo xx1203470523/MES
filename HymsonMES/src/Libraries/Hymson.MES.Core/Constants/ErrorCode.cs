@@ -49,7 +49,7 @@
         public const string MES10228 = "批次需大于0！";
         public const string MES10229 = "采购类型不合法！";
         public const string MES10230 = "状态不合法！";
-        public const string MES10231 = "版本不能为空！"; 
+        public const string MES10231 = "版本不能为空！";
         #endregion
 
         #region 资源 10300
@@ -526,6 +526,13 @@
         public const string MES16036 = "SFC超过最大复投次数，不允许生产！";
         public const string MES16037 = "工单状态已经被修改，请刷新重试";
         public const string MES16038 = "编码类型不合法，请检查！";
+        public const string MES16039 = "工作中心不合法，请检查！";
+        public const string MES16040 = "工作中心类型不合法，请检查！";
+        public const string MES16041 = "工单类型不合法，请检查！";
+        public const string MES16042 = "超产比例需大于0";
+        public const string MES16043 = "工单号长度最大50";
+        public const string MES16044 = "数量需为整数且大于0"; 
+
         #endregion
 
         #region 条码接收 16100
@@ -620,6 +627,9 @@
         public const string MES17207 = "面板名称最大长度为255";
         public const string MES17208 = "面板有更新，请刷新页面！";
         public const string MES17209 = "面板不存在！";
+        public const string MES17210 = "面板类型不合法！";
+        public const string MES17211 = "状态不合法！";
+        public const string MES17212 = "会话超时时间不能为空！";
         #endregion
 
         #region 在制维修
