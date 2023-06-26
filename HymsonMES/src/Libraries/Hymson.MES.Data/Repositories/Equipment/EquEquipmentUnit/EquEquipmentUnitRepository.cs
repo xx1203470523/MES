@@ -30,7 +30,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
         }
 
         /// <summary>
-        /// 
+        /// 插入
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
@@ -41,7 +41,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
         }
 
         /// <summary>
-        /// 
+        /// 更新
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
@@ -52,7 +52,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
         }
 
         /// <summary>
-        /// 
+        /// 删除
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
@@ -63,7 +63,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
         }
 
         /// <summary>
-        /// 
+        /// 查询详情
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -74,7 +74,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
         }
 
         /// <summary>
-        /// 
+        /// 分页查询
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
@@ -98,13 +98,13 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
                 sqlBuilder.Where("Status = @Status");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.UnitCode) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.UnitCode))
             {
                 pagedQuery.UnitCode = $"%{pagedQuery.UnitCode}%";
                 sqlBuilder.Where("UnitCode LIKE @UnitCode");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.UnitName) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.UnitName))
             {
                 pagedQuery.UnitName = $"%{pagedQuery.UnitName}%";
                 sqlBuilder.Where("UnitName LIKE @UnitName");

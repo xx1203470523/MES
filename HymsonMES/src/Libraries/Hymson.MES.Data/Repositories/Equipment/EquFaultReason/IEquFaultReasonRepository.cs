@@ -13,30 +13,30 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="EquFaultReasonEntity"></param>
+        /// <param name="equFaultReasonEntity"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(EquFaultReasonEntity EquFaultReasonEntity);
+        Task<int> InsertAsync(EquFaultReasonEntity equFaultReasonEntity);
 
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="EquFaultReasonEntitys"></param>
+        /// <param name="equFaultReasonEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertsAsync(IEnumerable<EquFaultReasonEntity> EquFaultReasonEntitys);
+        Task<int> InsertsAsync(IEnumerable<EquFaultReasonEntity> equFaultReasonEntitys);
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="EquFaultReasonEntity"></param>
+        /// <param name="equFaultReasonEntity"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(EquFaultReasonEntity EquFaultReasonEntity);
+        Task<int> UpdateAsync(EquFaultReasonEntity equFaultReasonEntity);
 
         /// <summary>
         /// 批量更新 
         /// </summary>
-        /// <param name="EquFaultReasonEntitys"></param>
+        /// <param name="equFaultReasonEntitys"></param>
         /// <returns></returns>
-        Task<int> UpdatesAsync(IEnumerable<EquFaultReasonEntity> EquFaultReasonEntitys);
+        Task<int> UpdatesAsync(IEnumerable<EquFaultReasonEntity> equFaultReasonEntitys);
 
         /// <summary>
         /// 删除

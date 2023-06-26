@@ -63,9 +63,9 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         /// <summary>
         /// 分页查询（设备故障现象）
         /// </summary>
-        /// <param name="equFaultPhenomenonPagedQuery"></param>
+        /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquFaultPhenomenonView>> GetPagedInfoAsync(EquFaultPhenomenonPagedQuery equFaultPhenomenonPagedQuery);
+        Task<PagedInfo<EquFaultPhenomenonView>> GetPagedInfoAsync(EquFaultPhenomenonPagedQuery pagedQuery);
 
         /// <summary>
         /// 根据ID获取数据

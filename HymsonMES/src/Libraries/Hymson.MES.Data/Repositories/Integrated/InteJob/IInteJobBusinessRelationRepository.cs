@@ -50,9 +50,9 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="inteJobBusinessRelationPagedQuery"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        Task<PagedInfo<InteJobBusinessRelationEntity>> GetPagedInfoAsync(InteJobBusinessRelationPagedQuery inteJobBusinessRelationPagedQuery);
+        Task<PagedInfo<InteJobBusinessRelationEntity>> GetPagedInfoAsync(InteJobBusinessRelationPagedQuery query);
 
         /// <summary>
         /// 新增

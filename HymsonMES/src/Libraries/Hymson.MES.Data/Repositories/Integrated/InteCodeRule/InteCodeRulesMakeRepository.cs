@@ -98,11 +98,6 @@ namespace Hymson.MES.Data.Repositories.Integrated
             sqlBuilder.Select("*");
             sqlBuilder.Where("SiteId=@SiteId");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-
             var offSet = (inteCodeRulesMakePagedQuery.PageIndex - 1) * inteCodeRulesMakePagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = inteCodeRulesMakePagedQuery.PageSize });

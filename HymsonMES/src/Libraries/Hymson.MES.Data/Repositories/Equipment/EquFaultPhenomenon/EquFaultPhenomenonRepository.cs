@@ -32,23 +32,23 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         /// <summary>
         /// 新增（设备故障现象）
         /// </summary>
-        /// <param name="entity"></param>
+        /// <param name="equFaultPhenomenonEntity"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(EquFaultPhenomenonEntity entity)
+        public async Task<int> InsertAsync(EquFaultPhenomenonEntity equFaultPhenomenonEntity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertSql, entity);
+            return await conn.ExecuteAsync(InsertSql, equFaultPhenomenonEntity);
         }
 
         /// <summary>
         /// 更新（设备故障现象）
         /// </summary>
-        /// <param name="entity"></param>
+        /// <param name="equFaultPhenomenonEntity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(EquFaultPhenomenonEntity entity)
+        public async Task<int> UpdateAsync(EquFaultPhenomenonEntity equFaultPhenomenonEntity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateSql, entity);
+            return await conn.ExecuteAsync(UpdateSql, equFaultPhenomenonEntity);
         }
 
         /// <summary>
@@ -124,19 +124,19 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
             sqlBuilder.Select("EFP.Id, EFP.FaultPhenomenonCode, EFP.FaultPhenomenonName, EFP.EquipmentGroupId, EFP.UseStatus, EFP.UpdatedBy, EFP.UpdatedOn, EEG.EquipmentGroupName");
             sqlBuilder.LeftJoin("equ_equipment_group EEG ON EFP.EquipmentGroupId = EEG.Id");
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.FaultPhenomenonCode) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.FaultPhenomenonCode))
             {
                 pagedQuery.FaultPhenomenonCode = $"%{pagedQuery.FaultPhenomenonCode}%";
                 sqlBuilder.Where("EFP.FaultPhenomenonCode LIKE @FaultPhenomenonCode");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.FaultPhenomenonName) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.FaultPhenomenonName))
             {
                 pagedQuery.FaultPhenomenonName = $"%{pagedQuery.FaultPhenomenonName}%";
                 sqlBuilder.Where("EFP.FaultPhenomenonName LIKE @FaultPhenomenonName");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.EquipmentGroupName) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentGroupName) )
             {
                 pagedQuery.EquipmentGroupName = $"%{pagedQuery.EquipmentGroupName}%";
                 sqlBuilder.Where("EEG.EquipmentGroupName LIKE @EquipmentGroupName");

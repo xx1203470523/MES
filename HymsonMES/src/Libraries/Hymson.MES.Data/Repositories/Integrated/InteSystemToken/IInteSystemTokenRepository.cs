@@ -98,9 +98,9 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="inteSystemTokenPagedQuery"></param>
+        /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<InteSystemTokenEntity>> GetPagedInfoAsync(InteSystemTokenPagedQuery inteSystemTokenPagedQuery);
+        Task<PagedInfo<InteSystemTokenEntity>> GetPagedInfoAsync(InteSystemTokenPagedQuery pagedQuery);
         #endregion
     }
 }

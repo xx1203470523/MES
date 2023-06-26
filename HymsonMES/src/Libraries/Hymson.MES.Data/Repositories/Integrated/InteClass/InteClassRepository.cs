@@ -91,7 +91,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.ClassName) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.ClassName))
             {
                 pagedQuery.ClassName = $"%{pagedQuery.ClassName}%";
                 sqlBuilder.Where("ClassName LIKE @ClassName");

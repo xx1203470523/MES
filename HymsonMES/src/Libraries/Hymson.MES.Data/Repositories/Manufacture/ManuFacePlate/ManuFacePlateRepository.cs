@@ -123,13 +123,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 sqlBuilder.Where("Status = @Status");
             }
 
-            if (string.IsNullOrWhiteSpace(manuFacePlatePagedQuery.Code) == false)
+            if (!string.IsNullOrWhiteSpace(manuFacePlatePagedQuery.Code) )
             {
                 manuFacePlatePagedQuery.Code = $"%{manuFacePlatePagedQuery.Code}%";
                 sqlBuilder.Where("Code LIKE @Code");
             }
 
-            if (string.IsNullOrWhiteSpace(manuFacePlatePagedQuery.Name) == false)
+            if (!string.IsNullOrWhiteSpace(manuFacePlatePagedQuery.Name) )
             {
                 manuFacePlatePagedQuery.Name = $"%{manuFacePlatePagedQuery.Name}%";
                 sqlBuilder.Where("Name LIKE @Name");

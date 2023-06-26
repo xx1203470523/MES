@@ -23,13 +23,13 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="entity"></param>
+        /// <param name="inteClassDetailEntity"></param>
         /// <returns></returns>
-        public async Task InsertAsync(InteClassDetailEntity entity)
+        public async Task InsertAsync(InteClassDetailEntity inteClassDetailEntity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var id = await conn.ExecuteScalarAsync<long>(InsertSql, entity);
-            entity.Id = id;
+            var id = await conn.ExecuteScalarAsync<long>(InsertSql, inteClassDetailEntity);
+            inteClassDetailEntity.Id = id;
         }
 
         /// <summary>
@@ -46,12 +46,12 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="entity"></param>
+        /// <param name="inteClassDetailEntity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(InteClassDetailEntity entity)
+        public async Task<int> UpdateAsync(InteClassDetailEntity inteClassDetailEntity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateSql, entity);
+            return await conn.ExecuteAsync(UpdateSql, inteClassDetailEntity);
         }
 
         /// <summary>
@@ -122,12 +122,6 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.OrderBy("UpdatedOn DESC");
-            //sqlBuilder.Select("*");
-
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
 
             var offSet = (inteClassDetailPagedQuery.PageIndex - 1) * inteClassDetailPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -154,7 +148,6 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
             var inteClassDetailEntities = await conn.QueryAsync<InteClassDetailEntity>(template.RawSql, inteClassDetailQuery);
             return inteClassDetailEntities;
         }
-
     }
 
     /// <summary>
