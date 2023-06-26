@@ -159,6 +159,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             return dictionary.TryRemove(key.GetHashCode(), out _);
         }
 
+
         /// <summary>
         /// 
         /// </summary>
@@ -166,6 +167,14 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         {
             dictionary.Clear();
             GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        ~JobContextProxy()
+        {
+            Dispose();
         }
 
     }
