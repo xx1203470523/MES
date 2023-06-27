@@ -16,17 +16,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
     public class InStationJobService : IJobService
     {
         /// <summary>
-        /// 服务接口（生产通用）
-        /// </summary>
-        private readonly ManuCommonService _manuCommonService;
-
-        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="manuCommonService"></param>
-        public InStationJobService(ManuCommonService manuCommonService)
+        public InStationJobService()
         {
-            _manuCommonService = manuCommonService;
         }
 
         /// <summary>
