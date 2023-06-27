@@ -32,6 +32,10 @@ Host.CreateDefaultBuilder(args)
        //});
 
        var mySqlConnection = hostContext.Configuration.GetSection("ConnectionOptions").GetValue<string>("HymsonQUARTZDB");
+
+       //添加后台服务Service
+       services.AddBackgroundServices(hostContext.Configuration);
+
        // Add the required Quartz.NET services
        services.AddQuartz(q =>
        {

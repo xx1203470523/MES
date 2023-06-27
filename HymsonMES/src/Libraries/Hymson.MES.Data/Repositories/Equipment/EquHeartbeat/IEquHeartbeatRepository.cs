@@ -8,6 +8,13 @@ namespace Hymson.MES.Data.Repositories.Equipment
     public interface IEquHeartbeatRepository
     {
         /// <summary>
+        /// 获取设备心跳记录
+        /// </summary>
+        /// <param name="equHeartbeatQuery"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquHeartbeatEntity>> GetEquHeartbeatEntitiesAsync(EquHeartbeatQuery equHeartbeatQuery);
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="equipmentHeartbeatEntity"></param>
@@ -35,6 +42,20 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="entities"></param>
         /// <returns></returns>
         Task<int> InsertRecordsAsync(IEnumerable<EquHeartbeatRecordEntity> entities);
+
+        /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="equHeartbeatEntity"></param>
+        /// <returns></returns>
+        Task<int> UpdateAsync(EquHeartbeatEntity equHeartbeatEntity);
+
+        /// <summary>
+        /// 批量更新
+        /// </summary>
+        /// <param name="equHeartbeatEntitys"></param>
+        /// <returns></returns>
+        Task<int> UpdatesAsync(IEnumerable<EquHeartbeatEntity> equHeartbeatEntitys);
 
     }
 }
