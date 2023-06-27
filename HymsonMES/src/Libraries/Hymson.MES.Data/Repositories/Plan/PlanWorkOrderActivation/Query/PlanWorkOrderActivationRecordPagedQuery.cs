@@ -19,6 +19,9 @@ namespace Hymson.MES.Data.Repositories.Plan
     /// </summary>
     public class PlanWorkOrderActivationRecordPagedQuery : PagerInfo
     {
-
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long SiteId { get; set; }
     }
 }

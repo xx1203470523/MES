@@ -14,6 +14,6 @@ namespace Hymson.MES.Data.Repositories.Plan
     /// </summary>
     public class PlanWorkOrderBindRecordPagedQuery : PagerInfo
     {
-
+        public long SiteId { get; set; }
     }
 }
