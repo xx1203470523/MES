@@ -84,6 +84,11 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
             {
                 await _validationMakeCreateRules.ValidateAndThrowAsync(item);
             }
+            if (!inteCodeRulesCreateDto.CodeRulesMakes.Any(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%ACTIVITY%")) 
+            {
+                throw new BusinessException(nameof(ErrorCode.MES12438));
+            }
+
 
             //DTO转换实体
             var inteCodeRulesEntity = inteCodeRulesCreateDto.ToEntity<InteCodeRulesEntity>();

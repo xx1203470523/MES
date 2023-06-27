@@ -141,7 +141,7 @@ namespace Hymson.MES.Services.Validators.Process
             RuleFor(x => x.IsFirstProcess).Must(it => Enum.IsDefined(typeof(TrueOrFalseEnum), (TrueOrFalseEnum)it)).WithErrorCode(nameof(ErrorCode.MES10472));
             RuleFor(i => i.Extra1).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10468));
 
-            RuleFor(x => x).Must(it => it.CheckType== ProcessRouteInspectTypeEnum.FixedScale && it.CheckRate.HasValue && it.CheckRate>=2 ).WithErrorCode(nameof(ErrorCode.MES10473));
+            RuleFor(x => x).Must(it => it.CheckType != ProcessRouteInspectTypeEnum.FixedScale ||( it.CheckRate.HasValue && it.CheckRate >= 2) ).WithErrorCode(nameof(ErrorCode.MES10473));
         }
     }
 

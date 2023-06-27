@@ -357,6 +357,12 @@
         public const string MES12433 = "编码规则组成分段值 超过最大长度 ，最大长度为100！";
         public const string MES12434 = "编码规则组成备注 超过最大长度 ，最大长度为255！";
 
+        public const string MES12435 = "编码规则编码类型为包装序列码时，包装等级需要有对应的值！";
+        public const string MES12436 = "编码规则忽略字符输入规则为只能是大写字母，用英文分号隔开";
+        public const string MES12437 = "编码规则组成取值方式 不合法！";
+        public const string MES12438 = "编码规则组成必须要有一行取值方式为可变值且分段值为%ACTIVITY%的数据！";
+        public const string MES12439 = "编码规则重置序号 不合法！";
+        public const string MES12440 = "编码规则初始值需要大于等于1的整数！";
         #endregion
 
         #region 容器维护 12500
