@@ -145,7 +145,7 @@
         public const string MES10448 = $"只允许选择启用和保留状态的工艺路线！";
         public const string MES10449 = $"当前工艺路线存在重复的工序！";
         public const string MES10450 = $"版本最大长度为50";
-        public const string MES10451 = $"状态不合法"; 
+        public const string MES10451 = $"状态不合法";
         public const string MES10452 = $"类型不合法";
         public const string MES10453 = $"工艺路线不能为空";
         public const string MES10454 = $"工艺路线的线条不能为空集合";
@@ -884,6 +884,7 @@
         public const string MES18211 = "条码非在制状态，不允许操作";
         public const string MES18212 = "相同工单{Code}，不允许操作";
         public const string MES18213 = "未获取到工艺路线连线信息";
+        public const string MES18214 = "工序不存在";
 
         #endregion
 

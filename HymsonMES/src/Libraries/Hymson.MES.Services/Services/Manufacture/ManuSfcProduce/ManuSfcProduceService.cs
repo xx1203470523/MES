@@ -1957,7 +1957,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18203));
             }
-
+            var procedure = _procProcedureRepository.GetByIdAsync(manuUpdateSaveDto.ProcedureId) ?? throw new CustomerValidationException(nameof(ErrorCode.MES18214));
             #endregion
 
             #region 逻辑
