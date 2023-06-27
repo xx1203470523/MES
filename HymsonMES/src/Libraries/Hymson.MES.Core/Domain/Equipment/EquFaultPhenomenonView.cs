@@ -34,7 +34,11 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// </summary>
         public string Remark { get; set; } = "";
 
-     
+
+        /// <summary>
+        /// 设备组ID
+        /// </summary>
+        public long EquipmentGroupId { get; set; }
 
         /// <summary>
         /// 设备组名称
