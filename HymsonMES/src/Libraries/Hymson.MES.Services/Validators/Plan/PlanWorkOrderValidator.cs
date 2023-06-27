@@ -50,6 +50,7 @@ namespace Hymson.MES.Services.Validators.Plan
             //RuleFor(x => x.OverScale).Must(it => it > 0).WithErrorCode(nameof(ErrorCode.MES16042));
             RuleFor(x => x.ProductId).Must(it => it > 0).WithErrorCode(nameof(ErrorCode.MES16021));
             RuleFor(x => x.Qty).Must(it => it > 0 && new Regex("^[0-9]\\d*$").IsMatch(it.ToString())).WithErrorCode(nameof(ErrorCode.MES16044));
+            //RuleFor(x => x.Qty).Must(it => it > 0 && it % 1 == 0 ).WithErrorCode(nameof(ErrorCode.MES16044));
             RuleFor(x => x.OrderCode).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES16043));
         }
     }
@@ -62,7 +63,7 @@ namespace Hymson.MES.Services.Validators.Plan
         public PlanWorkOrderModifyValidator()
         {
             RuleFor(x => x.Id).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16032));
-            RuleFor(x => x.Status).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16033));
+            //RuleFor(x => x.Status).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16033));
 
             RuleFor(x => x.OrderCode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16020));
             RuleFor(x => x.ProductId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16021));
@@ -91,6 +92,19 @@ namespace Hymson.MES.Services.Validators.Plan
             RuleFor(x => x.ProductId).Must(it => it > 0).WithErrorCode(nameof(ErrorCode.MES16021));
             RuleFor(x => x.Qty).Must(it => it > 0 && new Regex("^[0-9]\\d*$").IsMatch(it.ToString())).WithErrorCode(nameof(ErrorCode.MES16044));
             RuleFor(x => x.OrderCode).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES16043));
+        }
+    }
+
+    /// <summary>
+    /// 工单信息表 修改状态 验证
+    /// </summary>
+    internal class PlanWorkOrderChangeStatusValidator : AbstractValidator<PlanWorkOrderChangeStatusDto>
+    {
+        public PlanWorkOrderChangeStatusValidator()
+        {
+            RuleFor(x => x.Id).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16032));
+            RuleFor(x => x.Status).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16033));
+            RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(PlanWorkOrderStatusEnum), it)).WithErrorCode(ErrorCode.MES16045);
         }
     }
 }
