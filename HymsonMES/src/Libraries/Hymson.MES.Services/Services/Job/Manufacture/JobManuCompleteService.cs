@@ -3,12 +3,14 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.CoreServices.Services.Job.JobUtility;
+using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
 using Hymson.Utils;
@@ -40,6 +42,8 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         private readonly IManuOutStationService _manuOutStationService;
 
+        private readonly ExecuteJobService<InStationRequestBo> _ExecuteJobService;
+
 
         /// <summary>
         /// 构造函数
@@ -51,12 +55,13 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         public JobManuCompleteService(JobContextProxy jobContextProxy,
             IManuCommonService manuCommonService,
             IManuCommonOldService manuCommonOldService,
-            IManuOutStationService manuOutStationService)
+            IManuOutStationService manuOutStationService, ExecuteJobService<InStationRequestBo> ExecuteJobService)
         {
             _jobContextProxy = jobContextProxy;
             _manuCommonService = manuCommonService;
             _manuCommonOldService = manuCommonOldService;
             _manuOutStationService = manuOutStationService;
+            _ExecuteJobService = ExecuteJobService;
         }
 
 
@@ -100,6 +105,13 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             /*
             var processRouteId = 15968606561873920;
             var result = await _jobContextProxy.GetValueAsync(_manuCommonOldService.GetProcessRouteAsync, processRouteId);
+            */
+
+            /*
+            var jobBos = new List<JobBo> { };
+            jobBos.Add(new JobBo { Name = "InStationJobService" });
+
+            await _ExecuteJobService.ExecuteAsync(jobBos, new InStationRequestBo { });
             */
 
             // 合法性校验

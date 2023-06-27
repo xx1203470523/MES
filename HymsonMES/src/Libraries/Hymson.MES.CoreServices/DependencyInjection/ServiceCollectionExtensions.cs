@@ -1,7 +1,9 @@
-﻿using Hymson.MES.CoreServices.Services.Common.ManuCommon;
+﻿using Hymson.MES.CoreServices.Bos.Job;
+using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.CoreServices.Services.Job.JobUtility;
+using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -35,6 +37,8 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSingleton<IMasterDataService, MasterDataService>();
             services.AddSingleton<IJobCommonService, JobCommonService>();
             services.AddSingleton<JobContextProxy, JobContextProxy>();
+            services.AddSingleton<ExecuteJobService<InStationRequestBo>, ExecuteJobService<InStationRequestBo>>();
+            services.AddSingleton<ExecuteJobService<OutStationRequestBo>, ExecuteJobService<OutStationRequestBo>>();
 
             return services;
         }
