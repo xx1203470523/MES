@@ -1,7 +1,9 @@
-﻿using Hymson.MES.Core.Attribute.Job;
+﻿using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Services.Job;
+using Hymson.MES.CoreServices.Services.Job.JobUtility;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -16,8 +18,14 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task VerifyParamAsync<T>(T param) where T : JobBaseBo
+        public async Task VerifyParamAsync<T>(T param, JobContextProxy proxy) where T : JobBaseBo
         {
+            /*
+            // 校验工序和资源是否对应
+            var resourceIds = await _manuCommonOldService.GetProcResourceIdByProcedureIdAsync(bo.ProcedureId);
+            if (resourceIds.Any(a => a == bo.ResourceId) == false) throw new CustomerValidationException(nameof(ErrorCode.MES16317));
+            */
+
             await Task.CompletedTask;
         }
 
@@ -26,7 +34,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<TResult> DataAssemblingAsync<T, TResult>(T param) where T : JobBaseBo where TResult : JobBaseBo, new()
+        public async Task<TResult> DataAssemblingAsync<T, TResult>(T param, JobContextProxy proxy) where T : JobBaseBo where TResult : JobBaseBo, new()
         {
             await Task.CompletedTask;
             return new TResult();
