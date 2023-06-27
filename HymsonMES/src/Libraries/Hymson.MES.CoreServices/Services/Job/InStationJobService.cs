@@ -1,11 +1,9 @@
-﻿using Hymson.Infrastructure.Exceptions;
-using Hymson.MES.Core.Attribute.Job;
+﻿using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.CoreServices.Services.Job.JobUtility;
-using Hymson.MES.Data.Repositories.Plan;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -16,11 +14,17 @@ namespace Hymson.MES.CoreServices.Services.NewJob
     public class InStationJobService : IJobService
     {
         /// <summary>
+        /// 服务接口（生产通用）
+        /// </summary>
+        private readonly IManuCommonService _manuCommonService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="manuCommonService"></param>
-        public InStationJobService()
+        public InStationJobService(IManuCommonService manuCommonService)
         {
+            _manuCommonService = manuCommonService;
         }
 
         /// <summary>
