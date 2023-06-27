@@ -3,7 +3,7 @@
     /// <summary>
     /// 
     /// </summary>
-    public class OutStationRequestBo : JobBaseBo
+    public class InStationRequestBo : JobBaseBo
     {
 
     }
@@ -11,8 +11,9 @@
     /// <summary>
     /// 
     /// </summary>
-    public class OutStationResponseBo
+    public class InStationResponseBo
     {
 
     }
+
 }

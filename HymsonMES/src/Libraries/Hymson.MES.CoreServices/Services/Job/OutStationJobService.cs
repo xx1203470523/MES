@@ -9,14 +9,14 @@ namespace Hymson.MES.CoreServices.Services.NewJob
     /// 出站
     /// </summary>
     [Job("出站", JobTypeEnum.Standard)]
-    public class OutStationJobService : IJobService<OutStationJobBo>
+    public class OutStationJobService : IJobService<OutStationRequestBo, OutStationResponseBo>
     {
         /// <summary>
         /// 参数校验
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task VerifyParamAsync(OutStationJobBo param)
+        public async Task VerifyParamAsync(OutStationRequestBo param)
         {
             await Task.CompletedTask;
         }
@@ -26,9 +26,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task DataAssemblingAsync(OutStationJobBo param)
+        public async Task<OutStationResponseBo> DataAssemblingAsync(OutStationRequestBo param)
         {
             await Task.CompletedTask;
+            return new OutStationResponseBo { };
         }
 
         /// <summary>

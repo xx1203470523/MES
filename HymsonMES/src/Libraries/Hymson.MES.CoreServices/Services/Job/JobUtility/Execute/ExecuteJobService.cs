@@ -1,5 +1,4 @@
 ﻿using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Services.Job;
 using Microsoft.Extensions.DependencyInjection;
 using System.Transactions;
 
@@ -15,14 +14,17 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
         /// 注入反射获取依赖对象
         /// </summary>
         private readonly IServiceProvider _serviceProvider;
+        private readonly JobContextProxy _jobContextProxy;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="serviceProvider"></param>
-        public ExecuteJobService(IServiceProvider serviceProvider)
+        /// <param name="jobContextProxy"></param>
+        public ExecuteJobService(IServiceProvider serviceProvider, JobContextProxy jobContextProxy)
         {
             _serviceProvider = serviceProvider;
+            _jobContextProxy = jobContextProxy;
         }
 
         /// <summary>
@@ -31,7 +33,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
         /// <returns></returns>
         public async Task ExecuteAsync(IEnumerable<JobBo> jobBos, T param)
         {
-            var services = _serviceProvider.GetServices<IJobService<T>>();
+            var services = _serviceProvider.GetServices<IJobService<T, dynamic>>();
 
             // 执行参数校验
             foreach (var job in jobBos)
@@ -48,7 +50,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
                 var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
                 if (service == null) continue;
 
-                await service.DataAssemblingAsync(param);
+                await _jobContextProxy.GetValueAsync(service.DataAssemblingAsync, param);
             }
 
             // 执行入库
