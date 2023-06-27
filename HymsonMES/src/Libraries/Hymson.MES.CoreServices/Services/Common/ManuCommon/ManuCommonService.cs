@@ -14,7 +14,6 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
-using Hymson.Sequences;
 using System.Data;
 using System.Text.Json;
 
@@ -46,6 +45,11 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         private readonly IManuContainerPackRepository _manuContainerPackRepository;
 
         /// <summary>
+        /// 仓储接口（资源维护）
+        /// </summary>
+        private readonly IProcResourceRepository _procResourceRepository;
+
+        /// <summary>
         /// 仓储接口（BOM明细）
         /// </summary>
         private readonly IProcBomDetailRepository _procBomDetailRepository;
@@ -73,6 +77,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="manuSfcCirculationRepository"></param>
         /// <param name="manuContainerPackRepository"></param>
+        /// <param name="procResourceRepository"></param>
         /// <param name="procBomDetailRepository"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
@@ -81,6 +86,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
             IManuContainerPackRepository manuContainerPackRepository,
+            IProcResourceRepository procResourceRepository,
             IProcBomDetailRepository procBomDetailRepository,
             IProcMaterialRepository procMaterialRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
@@ -90,6 +96,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
             _manuContainerPackRepository = manuContainerPackRepository;
+            _procResourceRepository = procResourceRepository;
             _procBomDetailRepository = procBomDetailRepository;
             _procMaterialRepository = procMaterialRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
@@ -257,6 +264,22 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                 }
             }
         }
+
+
+
+        /// <summary>
+        /// 获取工序关联的资源
+        /// </summary>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<long>> GetProcResourceIdByProcedureIdAsync(long procedureId)
+        {
+            var resources = await _procResourceRepository.GetProcResourceListByProcedureIdAsync(procedureId);
+
+            if (resources == null || resources.Any() == false) return Array.Empty<long>();
+            return resources.Select(s => s.Id);
+        }
+
 
         #region 内部方法
 

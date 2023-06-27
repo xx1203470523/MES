@@ -65,14 +65,15 @@ namespace Hymson.MES.Api
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
-#if DEBUG
+            // TODO 龙总说要这么要开放出来
+            //#if DEBUG
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+            if (!app.Environment.IsProduction())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-#endif
+            //#endif
             #region snippet_ConfigureLocalization
             var supportedCultures = new List<CultureInfo>
             {

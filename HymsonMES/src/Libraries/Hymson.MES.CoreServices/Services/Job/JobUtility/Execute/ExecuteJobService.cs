@@ -33,7 +33,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
         /// <returns></returns>
         public async Task ExecuteAsync(IEnumerable<JobBo> jobBos, T param)
         {
-            var services = _serviceProvider.GetServices<IJobService<T, dynamic>>();
+            var services = _serviceProvider.GetServices<IJobService>();
 
             // 执行参数校验
             foreach (var job in jobBos)
@@ -41,7 +41,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
                 var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
                 if (service == null) continue;
 
-                await service.VerifyParamAsync(param);
+                await service.VerifyParamAsync(param, _jobContextProxy);
             }
 
             // 执行数据组装
@@ -50,7 +50,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
                 var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
                 if (service == null) continue;
 
-                await _jobContextProxy.GetValueAsync(service.DataAssemblingAsync, param);
+                //await _jobContextProxy.GetValueAsync(service.DataAssemblingAsync, param);
             }
 
             // 执行入库

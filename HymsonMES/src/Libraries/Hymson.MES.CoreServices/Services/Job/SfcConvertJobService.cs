@@ -7,16 +7,16 @@ using Hymson.MES.CoreServices.Services.Job.JobUtility;
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
     /// <summary>
-    /// 出站
+    /// 条码转换
     /// </summary>
-    [Job("出站", JobTypeEnum.Standard)]
-    public class OutStationJobService : IJobService
+    [Job("条码转换", JobTypeEnum.Standard)]
+    public class SfcConvertJobService : IJobService
     {
         /// <summary>
         /// 参数校验
         /// </summary>
         /// <param name="param"></param>
-        /// <param name="proxy"></param>
+        /// <param name="proxy"></param> 
         /// <returns></returns>
         public async Task VerifyParamAsync<T>(T param, JobContextProxy proxy) where T : JobBaseBo
         {

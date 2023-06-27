@@ -1,6 +1,4 @@
-﻿using Hymson.Authentication;
-using Hymson.Authentication.JwtBearer.Security;
-using Hymson.Infrastructure.Exceptions;
+﻿using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Job;
