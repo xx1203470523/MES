@@ -333,6 +333,9 @@ namespace Microsoft.Extensions.DependencyInjection
             #region ProcessRoute
             services.AddSingleton<AbstractValidator<ProcProcessRouteCreateDto>, ProcProcessRouteCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcProcessRouteModifyDto>, ProcProcessRouteModifyValidator>();
+
+            services.AddSingleton<AbstractValidator<FlowDynamicLinkDto>, ProcFlowDynamicLinkValidator>();
+            services.AddSingleton<AbstractValidator<FlowDynamicNodeDto>, ProcFlowDynamicNodeValidator>();
             #endregion
 
             #region LabelTemplate

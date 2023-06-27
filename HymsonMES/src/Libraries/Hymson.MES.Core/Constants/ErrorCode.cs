@@ -137,6 +137,32 @@
         public const string MES10447 = $"下一工序不存在非空值类型工序";
         public const string MES10448 = $"只允许选择启用和保留状态的工艺路线！";
         public const string MES10449 = $"当前工艺路线存在重复的工序！";
+        public const string MES10450 = $"版本最大长度为50";
+        public const string MES10451 = $"状态不合法"; 
+        public const string MES10452 = $"类型不合法";
+        public const string MES10453 = $"工艺路线不能为空";
+        public const string MES10454 = $"工艺路线的线条不能为空集合";
+        public const string MES10455 = $"工艺路线的工序不能为空集合";
+        public const string MES10456 = $"线条序号不能为空";
+        public const string MES10457 = $"线条中起点工序不能为空";
+        public const string MES10458 = $"线条中终点工序不能为空";
+        public const string MES10459 = $"线条中扩展信息不能为空";
+        public const string MES10460 = $"工序节点序号不能为空";
+        public const string MES10461 = $"工序节点工序ID不能为空";
+        public const string MES10462 = $"工序节点编码不能为空";
+        public const string MES10463 = $"工序节点名称不能为空";
+        public const string MES10464 = $"工序节点工序类型不能为空";
+        public const string MES10465 = $"工序节点抽检类型不能为空";
+        public const string MES10466 = $"工序节点是否报工不能为空";
+        public const string MES10467 = $"工序节点是否首工序不能为空";
+        public const string MES10468 = $"工序节点中扩展信息不能为空";
+        public const string MES10469 = $"工序节点中工序类型不合法";
+        public const string MES10470 = $"工序节点中抽检类型不合法";
+        public const string MES10471 = $"工序节点中是否报工不合法";
+        public const string MES10472 = $"工序节点中是否首工序不合法";
+        public const string MES10473 = $"工序节点中，抽检类型为固定比例时，抽检比例需要大于等于2";
+
+
         #endregion
 
         #region 参数 10500
