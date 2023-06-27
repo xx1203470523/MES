@@ -33,6 +33,7 @@ Host.CreateDefaultBuilder(args)
 
        var mySqlConnection = hostContext.Configuration.GetSection("ConnectionOptions").GetValue<string>("HymsonQUARTZDB");
 
+       services.AddSequenceService(hostContext.Configuration);
        //添加后台服务Service
        services.AddBackgroundServices(hostContext.Configuration);
 
@@ -45,6 +46,7 @@ Host.CreateDefaultBuilder(args)
 
            q.AddJobAndTrigger<HelloWorld1Job>(hostContext.Configuration);
            q.AddJobAndTrigger<HelloWorld2Job>(hostContext.Configuration);
+           q.AddJobAndTrigger<EquHeartbeatJob>(hostContext.Configuration);
 
            #endregion
            q.UsePersistentStore((persistentStoreOptions) =>
