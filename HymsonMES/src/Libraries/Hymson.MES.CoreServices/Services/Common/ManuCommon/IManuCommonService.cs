@@ -37,5 +37,13 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// <returns></returns>
         Task VerifyBomQtyAsync(ManuProcedureBomBo procedureBomBo);
 
+
+        /// <summary>
+        /// 获取工序关联的资源
+        /// </summary>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<long>> GetProcResourceIdByProcedureIdAsync(long procedureId);
+
     }
 }

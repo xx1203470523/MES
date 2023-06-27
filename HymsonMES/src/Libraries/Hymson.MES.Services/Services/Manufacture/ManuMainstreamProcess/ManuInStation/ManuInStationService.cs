@@ -71,7 +71,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
             IManuSfcRepository manuSfcRepository,
             IManuSfcStepRepository manuSfcStepRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
-             IPlanWorkOrderRepository planWorkOrderRepository,
+            IPlanWorkOrderRepository planWorkOrderRepository,
             IProcProcedureRepository procProcedureRepository)
         {
             _currentUser = currentUser;
