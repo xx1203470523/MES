@@ -175,11 +175,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                 badResourceId = createDto.FoundBadResourceId.ParseToLong();
             }
 
-            //TODO
             // 1）如添加不合格代码包含缺陷类型，则将条码置于不合格代码对应不合格工艺路线首工序排队，原工序的状态清除；同时如有多条不合格工艺路线需手动选择；
             //2）如添加不合格代码均为标记类型，则不改变当前条码的状态；
             //3）如添加不合格代码为“SCRAP”，需将条码状态更新为“报废
-
             var isDefect = qualUnqualifiedCodes.Any(x => x.Type == QualUnqualifiedCodeTypeEnum.Defect);
             var processRouteProcedure = new ProcessRouteProcedureDto();
             if (isDefect)
@@ -257,6 +255,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ProcessRouteId = createDto.BadProcessRouteId ?? 0,
                     ProcedureId = processRouteProcedure.ProcedureId,
                     UpdatedBy = _currentUser.UserName,
+                    Status= SfcProduceStatusEnum.lineUp,
                     Ids = manuSfcs.Select(x => x.Id).ToArray()
                 };
             }
@@ -536,6 +535,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ProcessRouteId = badReJudgmentDto.BadProcessRouteId ?? 0,
                     ProcedureId = processRouteProcedure.ProcedureId,
                     UpdatedBy = _currentUser.UserName,
+                    Status = SfcProduceStatusEnum.lineUp,
                     Ids = new long[] { manuSfc.Id }
                 };
                 #endregion

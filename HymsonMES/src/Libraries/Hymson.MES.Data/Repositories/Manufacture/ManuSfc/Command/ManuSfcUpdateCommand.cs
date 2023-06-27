@@ -47,13 +47,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command
         /// 条码在制品id列表
         /// </summary>
         public long[] Ids { get; set; }
+
         /// <summary>
         /// 工艺路线
         /// </summary>
         public long ProcessRouteId { get; set; }
+
         /// <summary>
         /// 工序id
         /// </summary>
         public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 状态;1：排队；2：活动；
+        /// </summary>
+        public SfcProduceStatusEnum Status { get; set; }
     }
 }

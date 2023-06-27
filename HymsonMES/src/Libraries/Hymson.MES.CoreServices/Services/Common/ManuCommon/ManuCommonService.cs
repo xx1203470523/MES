@@ -232,8 +232,9 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             });
             if (sfcCirculationEntities == null || !sfcCirculationEntities.Any())
             {
-                //return;
-                throw new CustomerValidationException(nameof(ErrorCode.MES16323));
+                // TODO 这里存在需要组装却未组装的漏网之鱼
+                return;
+                //throw new CustomerValidationException(nameof(ErrorCode.MES16323));
             }
 
             // 根据物料分组
