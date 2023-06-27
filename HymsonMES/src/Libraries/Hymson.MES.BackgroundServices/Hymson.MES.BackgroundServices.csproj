@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Hymson.Snowflake" Version="2.1.50" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Hymson.MES.Data\Hymson.MES.Data.csproj" />
   </ItemGroup>
 
