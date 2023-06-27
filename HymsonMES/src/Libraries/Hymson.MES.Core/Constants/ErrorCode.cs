@@ -559,7 +559,8 @@
         public const string MES16042 = "超产比例需大于0";
         public const string MES16043 = "工单号长度最大50";
         public const string MES16044 = "数量需为整数且大于0";
-
+        public const string MES16045 = "工单状态不合法！";
+        public const string MES16046 = "工单状态不为未开始，不能编辑！";
         #endregion
 
         #region 条码接收 16100

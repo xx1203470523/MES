@@ -43,6 +43,8 @@ namespace Hymson.MES.Services.Services.Plan
         private readonly IPlanWorkOrderActivationRepository _planWorkOrderActivationRepository;
         private readonly IPlanWorkOrderActivationRecordRepository _planWorkOrderActivationRecordRepository;
 
+        private readonly AbstractValidator<PlanWorkOrderChangeStatusDto> _validationChangeStatusRules;
+
         /// <summary>
         /// 
         /// </summary>
@@ -65,7 +67,7 @@ namespace Hymson.MES.Services.Services.Plan
             IProcProcessRouteRepository procProcessRouteRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
             IPlanWorkOrderStatusRecordRepository planWorkOrderStatusRecordRepository, IPlanWorkOrderActivationRecordRepository planWorkOrderActivationRecordRepository,
-            IPlanWorkOrderActivationRepository planWorkOrderActivationRepository)
+            IPlanWorkOrderActivationRepository planWorkOrderActivationRepository, AbstractValidator<PlanWorkOrderChangeStatusDto> validationChangeStatusRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -80,6 +82,7 @@ namespace Hymson.MES.Services.Services.Plan
             _planWorkOrderStatusRecordRepository = planWorkOrderStatusRecordRepository;
             _planWorkOrderActivationRecordRepository = planWorkOrderActivationRecordRepository;
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
+            _validationChangeStatusRules = validationChangeStatusRules;
         }
 
 
@@ -165,11 +168,14 @@ namespace Hymson.MES.Services.Services.Plan
             await _validationModifyRules.ValidateAndThrowAsync(planWorkOrderModifyDto);
 
             //获取当前最新的数据  进行状态判断
-            var current = _planWorkOrderRepository.GetByIdAsync(planWorkOrderModifyDto.Id);
+            var current = await _planWorkOrderRepository.GetByIdAsync(planWorkOrderModifyDto.Id);
             if (current != null)
             {
-                //判断当前状态  TODO
-
+                //判断当前状态  
+                if (current.Status != PlanWorkOrderStatusEnum.NotStarted) 
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16046));
+                }
             }
             else
             {
@@ -196,14 +202,20 @@ namespace Hymson.MES.Services.Services.Plan
         /// <returns></returns>
         public async Task ModifyWorkOrderStatusAsync(List<PlanWorkOrderChangeStatusDto> parms)
         {
-            if (parms == null || parms.Count == 0)
+            if (parms == null || !parms.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
 
+            foreach (var item in parms)
+            {
+                //校验
+                await _validationChangeStatusRules.ValidateAndThrowAsync(item);
+            }
+
             //查询需要改变的工单
             var workOrders = await _planWorkOrderRepository.GetByIdsAsync(parms.Select(x => x.Id).ToArray());
-            if (workOrders == null || workOrders.Count() == 0 || workOrders.Any(x => x.IsDeleted > 0) || workOrders.Count() != parms.Count())
+            if (workOrders == null || !workOrders.Any() || workOrders.Any(x => x.IsDeleted > 0) || workOrders.Count() != parms.Count())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16014));
             }

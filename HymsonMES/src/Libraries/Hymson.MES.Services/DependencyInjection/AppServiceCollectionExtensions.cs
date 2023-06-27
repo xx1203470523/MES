@@ -434,6 +434,7 @@ namespace Microsoft.Extensions.DependencyInjection
             #region PlanWorkOrder
             services.AddSingleton<AbstractValidator<PlanWorkOrderCreateDto>, PlanWorkOrderCreateValidator>();
             services.AddSingleton<AbstractValidator<PlanWorkOrderModifyDto>, PlanWorkOrderModifyValidator>();
+            services.AddSingleton<AbstractValidator<PlanWorkOrderChangeStatusDto>, PlanWorkOrderChangeStatusValidator>();
             #endregion
 
             #region PlanSfcReceive
