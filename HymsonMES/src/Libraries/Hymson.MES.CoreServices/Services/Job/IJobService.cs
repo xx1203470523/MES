@@ -29,8 +29,9 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <summary>
         /// 执行入库
         /// </summary>
+        /// <param name="proxy"></param>
         /// <returns></returns>
-        Task ExecuteAsync();
+        Task ExecuteAsync(JobContextProxy proxy);
 
     }
 }
