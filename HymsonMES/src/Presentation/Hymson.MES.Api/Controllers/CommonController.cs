@@ -34,6 +34,7 @@ namespace Hymson.MES.Api.Controllers
         /// 获取枚举
         /// </summary>
         /// <returns></returns>
+        [AllowAnonymous]
         [Route("enums")]
         [HttpGet]
         public Dictionary<string, Dictionary<object, string>> GetEnumTypes()
