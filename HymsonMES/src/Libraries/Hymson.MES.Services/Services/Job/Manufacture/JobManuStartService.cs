@@ -27,7 +27,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         private readonly ICurrentUser _currentUser;
 
-        /// <summary>
+        /// <summary>   
         /// 当前对象（站点）
         /// </summary>
         private readonly ICurrentSite _currentSite;
@@ -131,7 +131,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             sfcProduceBusinessEntity.VerifyProcedureLock(bo.SFC, bo.ProcedureId);
 
             // 验证条码是否被容器包装
-            await _manuCommonService.VerifyContainerAsync(new MultiSFCBo
+            await _manuCommonService.VerifyContainerAsync(new MultiSfcBo
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 SFCs = new string[] { bo.SFC }

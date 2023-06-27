@@ -18,16 +18,15 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
     public partial class EquEquipmentGroupRepository : IEquEquipmentGroupRepository
     {
         private readonly ConnectionOptions _connectionOptions;
-        private readonly IMemoryCache _memoryCache;
+        //private readonly IMemoryCache _memoryCache;
 
         /// <summary>
-        /// 
+        /// 构造方法
         /// </summary>
         /// <param name="connectionOptions"></param>
         /// <param name="memoryCache"></param>
-        public EquEquipmentGroupRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
+        public EquEquipmentGroupRepository(IOptions<ConnectionOptions> connectionOptions)
         {
-            _memoryCache = memoryCache;
             _connectionOptions = connectionOptions.Value;
         }
 
@@ -86,12 +85,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<EquEquipmentGroupEntity>(GetByIdSql, new { IsDeleted = 0, Id = id });
-
-            //var key = $"equ_equipment_group_{id}";
-            //return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
-            //{
-            //   // TODO
-            //});
         }
 
         /// <summary>
@@ -120,13 +113,13 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.EquipmentGroupCode) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentGroupCode))
             {
                 pagedQuery.EquipmentGroupCode = $"%{pagedQuery.EquipmentGroupCode}%";
                 sqlBuilder.Where("EquipmentGroupCode LIKE @EquipmentGroupCode");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.EquipmentGroupName) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentGroupName))
             {
                 pagedQuery.EquipmentGroupName = $"%{pagedQuery.EquipmentGroupName}%";
                 sqlBuilder.Where("EquipmentGroupName LIKE @EquipmentGroupName");

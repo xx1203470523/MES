@@ -68,7 +68,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.QueryFirstOrDefaultAsync<ManuFacePlateContainerPackEntity>(GetByFacePlateIdSql, new { FacePlateId = facePlateId });
         }
 
-
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -92,11 +91,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
-
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
+            sqlBuilder.Where("SiteId=@SiteId");
 
             var offSet = (manuFacePlateContainerPackPagedQuery.PageIndex - 1) * manuFacePlateContainerPackPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -139,12 +134,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="manuFacePlateProductionEntitys"></param>
+        /// <param name="manuFacePlateContainerPackEntity"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(List<ManuFacePlateContainerPackEntity> manuFacePlateProductionEntitys)
+        public async Task<int> InsertsAsync(List<ManuFacePlateContainerPackEntity> manuFacePlateContainerPackEntity)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertsSql, manuFacePlateProductionEntitys);
+            return await conn.ExecuteAsync(InsertsSql, manuFacePlateContainerPackEntity);
         }
 
         /// <summary>

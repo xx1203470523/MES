@@ -76,14 +76,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
-            //if (query.SiteId > 0)
-            //{
             sqlBuilder.Where("SiteId = @SiteId");
-            //}
-            //if (query.BusinessType.HasValue)
-            //{
-            //    sqlBuilder.Where("BusinessType=@BusinessType");
-            //}
             if (query.BusinessId > 0)
             {
                 sqlBuilder.Where("BusinessId=@BusinessId");

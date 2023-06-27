@@ -83,11 +83,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IManuProductBadRecordRepository _manuProductBadRecordRepository;
 
         /// <summary>
-        /// 工艺路线表 仓储
-        /// </summary>
-        private readonly IProcProcessRouteRepository _procProcessRouteRepository;
-
-        /// <summary>
         /// 仓储（工艺路线节点）
         /// </summary>
         private readonly IProcProcessRouteDetailNodeRepository _procProcessRouteNodeRepository;
@@ -364,10 +359,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuFacePlateRepairOpenInfoDto.productBadInfo = manuFacePlateRepairProductBadInfoList;
             manuFacePlateRepairOpenInfoDto.productInfo.badInfoDtos = manuFacePlateRepairProductBadInfoList;
 
-            //工艺路线
-            //var procProcessRouteEntit = _procProcessRouteRepository.GetByIdAsync(procMaterialEntit.ProcessRouteId ?? 0);
-
-
             // 获取维修业务
             var sfcProduceBusinessEntity = await _manuSfcProduceRepository.GetSfcProduceBusinessBySFCAsync(new SfcProduceBusinessQuery
             {
@@ -479,7 +470,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             #endregion
 
             #region 数据组装
-            var manuSfcRepairRecordEntity = await _manuFacePlateRepairRepository.GetManuSfcRepairBySFCAsync(new GetManuSfcRepairBySFCQuery { SFC = confirmSubmitDto.SFC, SiteId = _currentSite.SiteId ?? 0 });
+            var manuSfcRepairRecordEntity = await _manuFacePlateRepairRepository.GetManuSfcRepairBySFCAsync(new GetManuSfcRepairBySfcQuery { SFC = confirmSubmitDto.SFC, SiteId = _currentSite.SiteId ?? 0 });
             //维修记录
             bool isAddmanuSfcRepairRecordEntity = false;
             if (manuSfcRepairRecordEntity == null)
@@ -777,12 +768,12 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES17309));
             }
             var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(facePlateEntit.ProcedureId);
-            if (facePlateEntit == null)
+            if (procProcedureEntity == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17311));
             }
             var procResourceEntity = await _procResourceRepository.GetByIdAsync(facePlateEntit.ResourceId);
-            if (facePlateEntit == null)
+            if (procResourceEntity == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17312));
             }

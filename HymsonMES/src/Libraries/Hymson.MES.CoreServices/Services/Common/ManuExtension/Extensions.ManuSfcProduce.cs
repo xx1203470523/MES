@@ -25,7 +25,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
         public static ManuSfcProduceEntity VerifyResource(this ManuSfcProduceEntity sfcProduceEntity, long resourceId)
         {
             // 当前资源是否对于的上
-            if (sfcProduceEntity.ResourceId.HasValue == true && sfcProduceEntity.ResourceId != resourceId)
+            if (sfcProduceEntity.ResourceId.HasValue  && sfcProduceEntity.ResourceId != resourceId)
                 throw new CustomerValidationException(nameof(ErrorCode.MES16316)).WithData("SFC", sfcProduceEntity.SFC);
 
             return sfcProduceEntity;
@@ -125,7 +125,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
                         break;
                 }
 
-                if (Regex.IsMatch(barCode, pattern) == false) return false;
+                if (!Regex.IsMatch(barCode, pattern) ) return false;
             }
 
             return true;

@@ -1,13 +1,14 @@
 ﻿using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Job;
+using Hymson.MES.CoreServices.Services.Job.JobUtility;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Hymson.MES.CoreServices.DependencyInjection
 {
     /// <summary>
-    /// 
+    /// 依赖注入项配置
     /// </summary>
     public static class ServiceCollectionExtensions
     {
@@ -33,6 +34,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSingleton<IManuCommonService, ManuCommonService>();
             services.AddSingleton<IMasterDataService, MasterDataService>();
             services.AddSingleton<IJobCommonService, JobCommonService>();
+            services.AddSingleton<JobContextProxy, JobContextProxy>();
 
             return services;
         }

@@ -73,15 +73,5 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 数量
         /// </summary>
         public decimal Qty { get;set; }
-
-        /// <summary>
-        /// 录入人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-        /// <summary>
-        /// 录入时间
-        /// </summary>
-        public DateTime CreatedOn {get; set; }
     }
 }

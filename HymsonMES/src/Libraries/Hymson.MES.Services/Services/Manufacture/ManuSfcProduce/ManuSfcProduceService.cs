@@ -250,10 +250,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuSfcProducePagedQuery.SiteId = _currentSite.SiteId;
 
             //查询多个条码
-            //if (!string.IsNullOrWhiteSpace(manuSfcProducePagedQueryDto.Sfcs))
-            //{
-            //    manuSfcProducePagedQuery.SfcArray = manuSfcProducePagedQueryDto.Sfcs.Split(',');
-            //}
             if (manuSfcProducePagedQueryDto.Sfcs != null && manuSfcProducePagedQueryDto.Sfcs.Any())
             {
                 manuSfcProducePagedQuery.SfcArray = manuSfcProducePagedQueryDto.Sfcs;

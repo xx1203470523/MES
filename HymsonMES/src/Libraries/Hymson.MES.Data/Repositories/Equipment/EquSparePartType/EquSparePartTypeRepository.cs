@@ -100,13 +100,13 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartType
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.SparePartTypeCode) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.SparePartTypeCode))
             {
                 pagedQuery.SparePartTypeCode = $"%{pagedQuery.SparePartTypeCode}%";
                 sqlBuilder.Where("SparePartTypeCode LIKE @SparePartTypeCode");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.SparePartTypeName) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.SparePartTypeName))
             {
                 pagedQuery.SparePartTypeName = $"%{pagedQuery.SparePartTypeName}%";
                 sqlBuilder.Where("SparePartTypeName LIKE @SparePartTypeName");

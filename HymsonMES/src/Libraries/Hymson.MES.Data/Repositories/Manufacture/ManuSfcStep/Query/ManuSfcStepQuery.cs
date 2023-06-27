@@ -21,7 +21,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     {
     }
 
-    public class SFCInOutStepQuery 
+    public class SfcInOutStepQuery
     {
         public long SiteId { get; set; }
 

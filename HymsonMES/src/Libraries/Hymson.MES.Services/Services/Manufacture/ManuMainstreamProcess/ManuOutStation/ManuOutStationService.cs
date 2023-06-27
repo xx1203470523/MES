@@ -252,7 +252,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
 
             // manu_sfc_info 修改为完成 且入库
             // 条码信息
-            var sfcInfo = await _manuSfcRepository.GetBySFCAsync(new GetBySFCQuery
+            var sfcInfo = await _manuSfcRepository.GetBySFCAsync(new GetBySfcQuery
             {
                 SiteId = _currentSite.SiteId,
                 SFC = sfcProduceEntity.SFC

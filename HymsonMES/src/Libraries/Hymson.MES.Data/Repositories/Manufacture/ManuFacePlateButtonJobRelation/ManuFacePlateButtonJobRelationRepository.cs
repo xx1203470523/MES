@@ -129,11 +129,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
-
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
+            sqlBuilder.Where("SiteId=@SiteId");
 
             var offSet = (manuFacePlateButtonJobRelationPagedQuery.PageIndex - 1) * manuFacePlateButtonJobRelationPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });

@@ -29,45 +29,45 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="entity"></param>
+        /// <param name="equFaultReasonEntity"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(EquFaultReasonEntity entity)
+        public async Task<int> InsertAsync(EquFaultReasonEntity equFaultReasonEntity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertSql, entity);
+            return await conn.ExecuteAsync(InsertSql, equFaultReasonEntity);
         }
 
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="entities"></param>
+        /// <param name="equFaultReasonEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(IEnumerable<EquFaultReasonEntity> entities)
+        public async Task<int> InsertsAsync(IEnumerable<EquFaultReasonEntity> equFaultReasonEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertsSql, entities);
+            return await conn.ExecuteAsync(InsertsSql, equFaultReasonEntitys);
         }
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="entity"></param>
+        /// <param name="equFaultReasonEntity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(EquFaultReasonEntity entity)
+        public async Task<int> UpdateAsync(EquFaultReasonEntity equFaultReasonEntity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateSql, entity);
+            return await conn.ExecuteAsync(UpdateSql, equFaultReasonEntity);
         }
 
         /// <summary>
         /// 批量更新
         /// </summary>
-        /// <param name="entities"></param>
+        /// <param name="equFaultReasonEntitys"></param>
         /// <returns></returns>
-        public async Task<int> UpdatesAsync(IEnumerable<EquFaultReasonEntity> entities)
+        public async Task<int> UpdatesAsync(IEnumerable<EquFaultReasonEntity> equFaultReasonEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdatesSql, entities);
+            return await conn.ExecuteAsync(UpdatesSql, equFaultReasonEntitys);
         }
 
         /// <summary>
@@ -193,7 +193,6 @@ namespace Hymson.MES.Data.Repositories.Equipment
             }
             if (!string.IsNullOrWhiteSpace(EquFaultReasonQuery.FaultReasonCode))
             {
-                //EquFaultReasonQuery.FaultReasonCode = $"%{EquFaultReasonQuery.FaultReasonCode}%";
                 sqlBuilder.Where(" FaultReasonCode = @FaultReasonCode ");
             }
 
@@ -201,8 +200,6 @@ namespace Hymson.MES.Data.Repositories.Equipment
             var EquFaultReasonEntities = await conn.QueryAsync<EquFaultReasonEntity>(template.RawSql, EquFaultReasonQuery);
             return EquFaultReasonEntities;
         }
-
-
     }
 
     /// <summary>

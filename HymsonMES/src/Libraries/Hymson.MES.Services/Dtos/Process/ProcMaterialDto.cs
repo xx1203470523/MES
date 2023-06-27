@@ -29,62 +29,62 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 所属物料组ID
         /// </summary>
         public long GroupId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料编码
         /// </summary>
         public string MaterialCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料名称
         /// </summary>
         public string MaterialName { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态
         /// </summary>
         public SysDataStatusEnum? Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 来源
         /// </summary>
         public MaterialOriginEnum? Origin { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 版本
         /// </summary>
         public string? Version { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否默认版本
         /// </summary>
         public bool? IsDefaultVersion { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料描述
         /// </summary>
         public string? Remark { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 采购类型
         /// </summary>
         public MaterialBuyTypeEnum? BuyType { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工艺路线ID
         /// </summary>
         public long? ProcessRouteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// BomID
         /// </summary>
         public long? BomId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 批次大小
         /// </summary>
         public int Batch { get; set; }
@@ -94,52 +94,52 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public int? PackageNum { get; set; }
 
-       /// <summary>
-       /// 计量单位(字典定义)
-       /// </summary>
+        /// <summary>
+        /// 计量单位(字典定义)
+        /// </summary>
         public string? Unit { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 内/外序列号
         /// </summary>
         public MaterialSerialNumberEnum? SerialNumber { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 验证掩码组
         /// </summary>
         public string? ValidationMaskGroup { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 基于时间(字典定义)
         /// </summary>
         public MaterialBaseTimeEnum? BaseTime { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 消耗公差
         /// </summary>
         public int? ConsumptionTolerance { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 修改人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 修改时间
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否逻辑删除
         /// </summary>
         public bool? IsDeleted { get; set; }
@@ -181,12 +181,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 状态
         /// </summary>
-        public SysDataStatusEnum? Status { get; set; } 
+        public SysDataStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 来源
         /// </summary>
-        public MaterialOriginEnum? Origin { get; set; } 
+        public MaterialOriginEnum? Origin { get; set; }
 
         /// <summary>
         /// 版本
@@ -231,7 +231,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 内/外序列号
         /// </summary>
-        public MaterialSerialNumberEnum? SerialNumber { get; set; } 
+        public MaterialSerialNumberEnum? SerialNumber { get; set; }
 
         /// <summary>
         /// 验证掩码组
@@ -268,7 +268,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public List<ProcMaterialReplaceDto>? DynamicList { get; set; } = new List<ProcMaterialReplaceDto>();
 
-        public List<ProcMaterialSupplierRelationCreateDto>?  MaterialSupplierList { get; set; } = new List<ProcMaterialSupplierRelationCreateDto>();
+        public List<ProcMaterialSupplierRelationCreateDto>? MaterialSupplierList { get; set; } = new List<ProcMaterialSupplierRelationCreateDto>();
     }
 
     /// <summary>
@@ -327,7 +327,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 所属物料组ID
         /// </summary>
         public long? GroupId { get; set; }
@@ -337,7 +337,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string MaterialCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料名称
         /// </summary>
         public string MaterialName { get; set; }
@@ -357,7 +357,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string Version { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否默认版本
         /// </summary>
         public bool? IsDefaultVersion { get; set; }
@@ -377,7 +377,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long? ProcessRouteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// BomID
         /// </summary>
         public long? BomId { get; set; }
@@ -526,7 +526,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string? BomVersion { get; set; }
 
-        public List<ProcMaterialReplaceViewDto> ReplaceMaterialList { get; set; }=new List<ProcMaterialReplaceViewDto>();
+        public List<ProcMaterialReplaceViewDto> ReplaceMaterialList { get; set; } = new List<ProcMaterialReplaceViewDto>();
     }
 
     /// <summary>

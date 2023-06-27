@@ -93,11 +93,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
-
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
+            sqlBuilder.Where("SiteId=@SiteId");
 
             var offSet = (manuProductBadRecordPagedQuery.PageIndex - 1) * manuProductBadRecordPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -117,7 +113,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuProductBadRecordQuery"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuProductBadRecordEntity>> GetManuProductBadRecordEntitiesBySFCAsync(ManuProductBadRecordBySFCQuery query)
+        public async Task<IEnumerable<ManuProductBadRecordEntity>> GetManuProductBadRecordEntitiesBySFCAsync(ManuProductBadRecordBySfcQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var sqlBuilder = new SqlBuilder();
@@ -265,23 +261,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 pageQuery.ProcedureCode = $"%{pageQuery.ProcedureCode}%";
                 sqlBuilder.Where(" p.`Code` like  @ProcedureCode ");
             }
-            //if (pageQuery.CreatedOnS.HasValue || pageQuery.CreatedOnE.HasValue)
-            //{
-            //    if (pageQuery.CreatedOnS.HasValue && pageQuery.CreatedOnE.HasValue)
-            //        sqlBuilder.Where(" rbr.CreatedOn BETWEEN @CreatedOnS AND @CreatedOnE ");
-            //    else
-            //    {
-            //        if (pageQuery.CreatedOnS.HasValue) sqlBuilder.Where("rbr.CreatedOn >= @CreatedOnS");
-            //        if (pageQuery.CreatedOnE.HasValue) sqlBuilder.Where("rbr.CreatedOn < @CreatedOnE");
-            //    }
-            //}
-            if (pageQuery.CreatedOn != null && pageQuery.CreatedOn.Length > 0)
+            if (pageQuery.CreatedOn != null && pageQuery.CreatedOn.Length >= 2)
             {
-                if (pageQuery.CreatedOn.Length >= 2)
-                {
                     sqlBuilder.AddParameters(new { CreatedOnStart = pageQuery.CreatedOn[0], CreatedOnEnd = pageQuery.CreatedOn[1].AddDays(1) });
                     sqlBuilder.Where(" rbr.CreatedOn >= @CreatedOnStart rbr.CreatedOn < @CreatedOnEnd ");
-                }
             }
 
             var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;

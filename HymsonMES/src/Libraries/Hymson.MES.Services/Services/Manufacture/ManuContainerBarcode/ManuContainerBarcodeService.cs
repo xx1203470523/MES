@@ -265,7 +265,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES16712));
                     }
-                    var sfcEntity = await _manuSfcRepository.GetBySFCAsync(new Data.Repositories.Manufacture.ManuSfc.Query.GetBySFCQuery
+                    var sfcEntity = await _manuSfcRepository.GetBySFCAsync(new Data.Repositories.Manufacture.ManuSfc.Query.GetBySfcQuery
                     {
                         SiteId = _currentSite.SiteId,
                         SFC = createManuContainerBarcodeDto.BarCode

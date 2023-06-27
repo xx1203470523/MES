@@ -16,7 +16,9 @@ namespace Hymson.MES.Services.Validators.Process
         public EquEquipmentValidator()
         {
             RuleFor(x => x.EquipmentCode).NotEmpty().WithErrorCode(ErrorCode.MES12601);
+            RuleFor(x => x.EquipmentCode).MaximumLength(50).WithErrorCode(ErrorCode.MES10109);
             RuleFor(x => x.EquipmentName).NotEmpty().WithErrorCode(ErrorCode.MES12602);
+            RuleFor(x => x.EquipmentName).MaximumLength(50).WithErrorCode(ErrorCode.MES10110);
             RuleFor(x => x.UseStatus).Must(it => Enum.IsDefined(typeof(EquipmentUseStatusEnum), it)).WithErrorCode(ErrorCode.MES12605);
             RuleFor(x => x.Location).NotEmpty().WithErrorCode(ErrorCode.MES12606);
         }
