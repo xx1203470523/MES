@@ -5,7 +5,7 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
     /// <summary>
     /// 工序
     /// </summary>
-    public class ManuProcedureBo : MultiSfcBo
+    public class ManuProcedureBo : MultiSFCBo
     {
         /// <summary>
         /// 工序Id

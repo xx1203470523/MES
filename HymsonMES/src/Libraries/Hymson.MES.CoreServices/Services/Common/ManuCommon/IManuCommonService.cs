@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 
@@ -14,22 +15,31 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// </summary>
         /// <param name="sfcBo"></param>
         /// <returns></returns>
-        Task<(ManuSfcProduceEntity, ManuSfcProduceBusinessEntity)> GetProduceSFCAsync(SingleSfcBo sfcBo);
+        Task<(ManuSfcProduceEntity, ManuSfcProduceBusinessEntity)> GetProduceSFCAsync(SingleSFCBo sfcBo);
 
         /// <summary>
         /// 获取生产条码信息
         /// </summary>
         /// <param name="sfcBos"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuSfcProduceEntity>> GetProduceEntitiesBySFCsAsync(MultiSfcBo sfcBos);
+        Task<IEnumerable<ManuSfcProduceEntity>> GetProduceEntitiesBySFCsAsync(MultiSFCBo sfcBos);
 
         /// <summary>
         /// 获取生产条码信息
         /// </summary>
         /// <param name="sfcBos"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuSfcProduceBusinessEntity>> GetProduceBusinessEntitiesBySFCsAsync(MultiSfcBo sfcBos);
+        Task<IEnumerable<ManuSfcProduceBusinessEntity>> GetProduceBusinessEntitiesBySFCsAsync(MultiSFCBo sfcBos);
 
+        /// <summary>
+        /// 判断上一工序是否随机工序
+        /// </summary>
+        /// <param name="processRouteDetailLinks"></param>
+        /// <param name="processRouteDetailNodes"></param>
+        /// <param name="processRouteId"></param>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        Task<bool> IsRandomPreProcedureAsync(IEnumerable<ProcProcessRouteDetailLinkEntity> processRouteDetailLinks, IEnumerable<ProcProcessRouteDetailNodeEntity> processRouteDetailNodes, long processRouteId, long procedureId);
 
 
 
@@ -45,7 +55,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// </summary>
         /// <param name="sfcBos"></param>
         /// <returns></returns>
-        Task VerifyContainerAsync(MultiSfcBo sfcBos);
+        Task VerifyContainerAsync(MultiSFCBo sfcBos);
 
         /// <summary>
         /// 验证条码BOM清单用量

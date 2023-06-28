@@ -4,8 +4,10 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -109,7 +111,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// </summary>
         /// <param name="sfcBo"></param>
         /// <returns></returns>
-        public async Task<(ManuSfcProduceEntity, ManuSfcProduceBusinessEntity)> GetProduceSFCAsync(SingleSfcBo sfcBo)
+        public async Task<(ManuSfcProduceEntity, ManuSfcProduceBusinessEntity)> GetProduceSFCAsync(SingleSFCBo sfcBo)
         {
             if (string.IsNullOrWhiteSpace(sfcBo.SFC)
                 || sfcBo.SFC.Contains(' ')) throw new CustomerValidationException(nameof(ErrorCode.MES16305));
@@ -150,7 +152,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// </summary>
         /// <param name="sfcBos"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcProduceEntity>> GetProduceEntitiesBySFCsAsync(MultiSfcBo sfcBos)
+        public async Task<IEnumerable<ManuSfcProduceEntity>> GetProduceEntitiesBySFCsAsync(MultiSFCBo sfcBos)
         {
             if (sfcBos.SFCs.Any(a => a.Contains(' '))) throw new CustomerValidationException(nameof(ErrorCode.MES16305));
 
@@ -182,7 +184,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// </summary>
         /// <param name="sfcBos"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcProduceBusinessEntity>> GetProduceBusinessEntitiesBySFCsAsync(MultiSfcBo sfcBos)
+        public async Task<IEnumerable<ManuSfcProduceBusinessEntity>> GetProduceBusinessEntitiesBySFCsAsync(MultiSFCBo sfcBos)
         {
             if (sfcBos.SFCs.Any(a => a.Contains(' '))) throw new CustomerValidationException(nameof(ErrorCode.MES16305));
 
@@ -195,6 +197,40 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             });
 
             return sfcProduceBusinessEntities;
+        }
+
+        /// <summary>
+        /// 判断上一工序是否随机工序
+        /// </summary>
+        /// <param name="processRouteDetailLinks"></param>
+        /// <param name="processRouteDetailNodes"></param>
+        /// <param name="processRouteId"></param>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        public async Task<bool> IsRandomPreProcedureAsync(IEnumerable<ProcProcessRouteDetailLinkEntity> processRouteDetailLinks, IEnumerable<ProcProcessRouteDetailNodeEntity> processRouteDetailNodes,
+            long processRouteId, long procedureId)
+        {
+            processRouteDetailLinks = processRouteDetailLinks.Where(w => w.ProcessRouteDetailId == procedureId);
+            if (processRouteDetailLinks.Any() == false) return false; //throw new CustomerValidationException(nameof(ErrorCode.MES18213));
+
+            processRouteDetailNodes = processRouteDetailNodes.Where(w => processRouteDetailLinks.Select(s => s.PreProcessRouteDetailId).Contains(w.ProcedureId));
+            if (processRouteDetailNodes.Any() == false) return false; //throw new CustomerValidationException(nameof(ErrorCode.MES18208));
+
+            // 有多工序分叉的情况（取第一个当默认值）
+            ProcProcessRouteDetailNodeEntity? defaultPreProcedure = processRouteDetailNodes.FirstOrDefault();
+            if (processRouteDetailLinks.Count() > 1)
+            {
+                // 下工序找上工序，执照正常流程的工序
+                defaultPreProcedure = processRouteDetailNodes.FirstOrDefault(f => f.CheckType == ProcessRouteInspectTypeEnum.None)
+                   ?? throw new CustomerValidationException(nameof(ErrorCode.MES10441));
+            }
+
+            // 获取上一工序
+            if (defaultPreProcedure == null) throw new CustomerValidationException(nameof(ErrorCode.MES10442));
+            if (defaultPreProcedure.CheckType == ProcessRouteInspectTypeEnum.RandomInspection) return true;
+
+            // 继续检查上一工序
+            return await IsRandomPreProcedureAsync(processRouteDetailLinks, processRouteDetailNodes, processRouteId, defaultPreProcedure.Id);
         }
 
 
@@ -248,7 +284,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// </summary>
         /// <param name="sfcBos"></param>
         /// <returns></returns>
-        public async Task VerifyContainerAsync(MultiSfcBo sfcBos)
+        public async Task VerifyContainerAsync(MultiSFCBo sfcBos)
         {
             var manuContainerPackEntities = await _manuContainerPackRepository.GetByLadeBarCodesAsync(new ManuContainerPackQuery
             {

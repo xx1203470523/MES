@@ -148,7 +148,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             sfcProduceBusinessEntity.VerifyProcedureLock(bo.SFC, bo.ProcedureId);
 
             // 验证条码是否被容器包装
-            await _manuCommonService.VerifyContainerAsync(new MultiSfcBo
+            await _manuCommonService.VerifyContainerAsync(new MultiSFCBo
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 SFCs = new string[] { bo.SFC }
