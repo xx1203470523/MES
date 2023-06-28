@@ -129,9 +129,9 @@ namespace Hymson.MES.Services.Validators.Process
         {
             RuleFor(i => i.SerialNo).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10460));
             RuleFor(i => i.ProcedureId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10461));
-            RuleFor(i => i.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10462));
+            //RuleFor(i => i.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10462));
             RuleFor(i => i.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10463));
-            RuleFor(i => i.ProcessType).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10464));
+            //RuleFor(i => i.ProcessType).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10464));
             RuleFor(x => x.ProcessType).Must(it => it == null || Enum.IsDefined(typeof(ProcedureTypeEnum), (ProcedureTypeEnum)it )).WithErrorCode(nameof(ErrorCode.MES10469));
             //RuleFor(i => i.CheckType).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10465));
             RuleFor(x => x.CheckType).Must(it => Enum.IsDefined(typeof(ProcessRouteInspectTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES10470));

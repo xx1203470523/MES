@@ -277,6 +277,40 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             // 验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(parm);
 
+            //验证工序集合
+            if (parm.DynamicData != null)
+            {
+                if (parm.DynamicData.Links != null && parm.DynamicData.Links.Any())
+                {
+                    foreach (var item in parm.DynamicData.Links)
+                    {
+                        await _validationFlowDynamicLinkRules.ValidateAndThrowAsync(item);
+                    }
+                }
+                else
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10454));
+                }
+
+                if (parm.DynamicData.Nodes != null && parm.DynamicData.Nodes.Any())
+                {
+                    foreach (var item in parm.DynamicData.Nodes)
+                    {
+                        await _validationFlowDynamicNodeRules.ValidateAndThrowAsync(item);
+                    }
+                }
+                else
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10455));
+                }
+
+
+            }
+            else
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10453));
+            }
+
             // 判断是否存在
             var processRoute = await _procProcessRouteRepository.GetByIdAsync(parm.Id)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10438));
