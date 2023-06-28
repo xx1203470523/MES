@@ -32,7 +32,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
         public async Task ExecuteAsync(IEnumerable<JobBo> jobBos, T param)
         {
             var services = _serviceProvider.GetServices<IJobService>();
-           
+
             //proxy.InitDictionary();
 
             // 执行参数校验
@@ -50,7 +50,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
                 var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
                 if (service == null) continue;
 
-                //await _jobContextProxy.GetValueAsync(service.DataAssemblingAsync, param);
+                //await service.DataAssemblingAsync(param);
             }
 
             // 执行入库
