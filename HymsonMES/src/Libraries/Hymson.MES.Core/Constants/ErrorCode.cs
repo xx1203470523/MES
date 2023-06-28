@@ -363,6 +363,7 @@
         public const string MES12438 = "编码规则组成必须要有一行取值方式为可变值且分段值为%ACTIVITY%的数据！";
         public const string MES12439 = "编码规则重置序号 不合法！";
         public const string MES12440 = "编码规则初始值需要大于等于1的整数！";
+        public const string MES12441 = "编码规则基数不合法！";
         #endregion
 
         #region 容器维护 12500
