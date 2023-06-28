@@ -277,7 +277,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         }
 
         /// <summary>
-        /// 根据外部条码下达条码
+        /// 根据外部条码接收
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
@@ -370,7 +370,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                     WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
                     Qty = item.Qty,
                     ProcedureId = processRouteFirstProcedure.ProcedureId,
-                    Operatetype = ManuSfcStepTypeEnum.Create,
+                    Operatetype = ManuSfcStepTypeEnum.Receive,
                     CurrentStatus = SfcProduceStatusEnum.lineUp,
                     CreatedBy = _currentUser.UserName,
                     UpdatedBy = _currentUser.UserName
