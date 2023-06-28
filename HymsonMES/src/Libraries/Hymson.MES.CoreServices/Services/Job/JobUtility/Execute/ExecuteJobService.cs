@@ -33,8 +33,6 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
         {
             var services = _serviceProvider.GetServices<IJobService>();
 
-            //proxy.InitDictionary();
-
             // 执行参数校验
             foreach (var job in jobBos)
             {
