@@ -580,6 +580,11 @@ namespace Hymson.MES.Services.Mapper
 
             #endregion
 
+            #region EquHeartbeatReport
+            CreateMap<EquHeartbeatReportPagedQueryDto, EquHeartbeatReportPagedQuery>();
+            CreateMap<EquHeartbeatReportView, EquHeartbeatReportViewDto>();
+            #endregion
+
         }
 
         /// <summary>

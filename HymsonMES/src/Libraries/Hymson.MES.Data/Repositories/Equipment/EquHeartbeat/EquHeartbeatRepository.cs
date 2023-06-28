@@ -1,4 +1,5 @@
 using Dapper;
+using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Options;
@@ -52,6 +53,72 @@ namespace Hymson.MES.Data.Repositories.Equipment
             using var conn = GetMESDbConnection();
             var equHeartbeatEntities = await conn.QueryAsync<EquHeartbeatEntity>(template.RawSql, equHeartbeatQuery);
             return equHeartbeatEntities;
+        }
+
+        /// <summary>
+        /// 根据查询条件获取设备心跳状态报表分页数据
+        /// </summary>
+        /// <param name="pageQuery"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<EquHeartbeatReportView>> GetEquHeartbeatReportPageListAsync(EquHeartbeatReportPagedQuery pageQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoEquHeartbeatReportDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoEquHeartbeatReportCountSqlTemplate);
+
+            sqlBuilder.Where(" eh.IsDeleted = 0 ");
+            sqlBuilder.Where(" eh.SiteId = @SiteId ");
+
+            if (!string.IsNullOrEmpty(pageQuery.EquipmentCode))
+            {
+                pageQuery.EquipmentCode = $"%{pageQuery.EquipmentCode}%";
+                sqlBuilder.Where(" ee.EquipmentCode like @EquipmentCode ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.EquipmentName))
+            {
+                pageQuery.EquipmentName = $"%{pageQuery.EquipmentName}%";
+                sqlBuilder.Where(" ee.EquipmentName like @EquipmentName ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.ProcedureName))
+            {
+                pageQuery.ProcedureName = $"%{pageQuery.ProcedureName}%";
+                sqlBuilder.Where(" pp.`Name` like @ProcedureName ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.ProcedureCode))
+            {
+                pageQuery.ProcedureCode = $"%{pageQuery.ProcedureCode}%";
+                sqlBuilder.Where(" pp.`Code` like @ProcedureCode ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.ResCode))
+            {
+                pageQuery.ResCode = $"%{pageQuery.ResCode}%";
+                sqlBuilder.Where(" pr.ResCode like @ResCode ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.ResName))
+            {
+                pageQuery.ResName = $"%{pageQuery.ResName}%";
+                sqlBuilder.Where(" pr.ResName like @ResName ");
+            }
+            if (pageQuery.Status.HasValue)
+            {
+                sqlBuilder.Where(" eh.`Status` = @Status ");
+            }
+            if (pageQuery.AcquisitionTime != null && pageQuery.AcquisitionTime.Length >= 2)
+            {
+                sqlBuilder.AddParameters(new { AcquisitionStart = pageQuery.AcquisitionTime[0], AcquisitionEnd = pageQuery.AcquisitionTime[1].AddDays(1) });
+                sqlBuilder.Where(" eh.CreatedOn >= @AcquisitionStart AND eh.CreatedOn < @AcquisitionEnd ");
+            }
+            var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = pageQuery.PageSize });
+            sqlBuilder.AddParameters(pageQuery);
+
+            using var conn = GetMESDbConnection();
+            var reportDataTask = conn.QueryAsync<EquHeartbeatReportView>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var reportData = await reportDataTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<EquHeartbeatReportView>(reportData, pageQuery.PageIndex, pageQuery.PageSize, totalCount);
         }
 
         /// <summary>
@@ -156,6 +223,21 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
         const string UpdateSql = "UPDATE `equ_heartbeat` SET   SiteId = @SiteId, EquipmentId = @EquipmentId, LastOnLineTime = @LastOnLineTime, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `equ_heartbeat` SET   SiteId = @SiteId, EquipmentId = @EquipmentId, LastOnLineTime = @LastOnLineTime, Status = @Status,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+
+        const string GetPagedInfoEquHeartbeatReportDataSqlTemplate = @" SELECT eh.EquipmentId,ee.EquipmentCode,ee.EquipmentName,eh.`Status`,ee.WorkCenterLineId,
+									pr.ResCode,pr.ResName,pp.`Code` as ProcedureCode,pp.`Name` as ProcedureName,
+								    eh.LastOnLineTime,eh.UpdatedOn,eh.UpdatedBy,eh.CreatedOn,eh.CreatedBy FROM equ_heartbeat eh 
+								    left join equ_equipment ee on eh.EquipmentId=ee.Id and ee.SiteId=eh.SiteId and ee.IsDeleted=0
+								    left join proc_resource_equipment_bind preb on preb.EquipmentId=ee.Id and preb.SiteId=ee.SiteId and preb.IsDeleted=0
+								    left join proc_resource  pr on pr.Id = preb.ResourceId and pr.SiteId= preb.SiteId and pr.IsDeleted=0
+								    left join proc_procedure pp on pp.ResourceTypeId=pr.ResTypeId  and pp.SiteId= pr.SiteId and pp.IsDeleted=0  /**where**/  ";
+
+        const string GetPagedInfoEquHeartbeatReportCountSqlTemplate = @"select COUNT(1) 
+                                    FROM equ_heartbeat eh 
+									left join equ_equipment ee on eh.EquipmentId=ee.Id and ee.SiteId=eh.SiteId and ee.IsDeleted=0
+									left join proc_resource_equipment_bind preb on preb.EquipmentId=ee.Id and preb.SiteId=ee.SiteId and preb.IsDeleted=0
+									left join proc_resource  pr on pr.Id = preb.ResourceId and pr.SiteId= preb.SiteId and pr.IsDeleted=0
+									left join proc_procedure pp on pp.ResourceTypeId=pr.ResTypeId  and pp.SiteId= pr.SiteId and pp.IsDeleted=0  /**where**/  ";
 
     }
 }

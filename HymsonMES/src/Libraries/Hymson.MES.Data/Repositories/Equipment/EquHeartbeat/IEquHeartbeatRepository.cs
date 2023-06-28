@@ -1,3 +1,4 @@
+using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 
 namespace Hymson.MES.Data.Repositories.Equipment
@@ -13,6 +14,13 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="equHeartbeatQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<EquHeartbeatEntity>> GetEquHeartbeatEntitiesAsync(EquHeartbeatQuery equHeartbeatQuery);
+
+        /// <summary>
+        /// 根据查询条件获取设备心跳状态报表分页数据
+        /// </summary>
+        /// <param name="pageQuery"></param>
+        /// <returns></returns>
+        Task<PagedInfo<EquHeartbeatReportView>> GetEquHeartbeatReportPageListAsync(EquHeartbeatReportPagedQuery pageQuery);
 
         /// <summary>
         /// 新增
