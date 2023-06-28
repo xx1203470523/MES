@@ -22,15 +22,14 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <summary>
         /// 服务接口（生产通用）
         /// </summary>
-        private readonly IManuCommonService _manuCommonService;
+        //private readonly IManuCommonService _manuCommonService;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="manuCommonService"></param>
-        public InStationJobService(IManuCommonService manuCommonService, ScopedServiceFactory serviceScopeFactory)
+        public InStationJobService( ScopedServiceFactory serviceScopeFactory)
         {
-            _manuCommonService = manuCommonService;
             _serviceScopeFactory = serviceScopeFactory;
         }
 

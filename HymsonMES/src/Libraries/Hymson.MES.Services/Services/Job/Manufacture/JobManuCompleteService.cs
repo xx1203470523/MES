@@ -35,9 +35,6 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         private readonly IManuOutStationService _manuOutStationService;
 
-        private readonly IExecuteJobService<InStationRequestBo> _ExecuteJobService;
-
-
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -47,12 +44,11 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         public JobManuCompleteService(
             IManuCommonService manuCommonService,
             IManuCommonOldService manuCommonOldService,
-            IManuOutStationService manuOutStationService, IExecuteJobService<InStationRequestBo> ExecuteJobService)
+            IManuOutStationService manuOutStationService)
         {
             _manuCommonService = manuCommonService;
             _manuCommonOldService = manuCommonOldService;
             _manuOutStationService = manuOutStationService;
-            _ExecuteJobService = ExecuteJobService;
         }
 
 
@@ -98,12 +94,13 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             var result = await _jobContextProxy.GetValueAsync(_manuCommonOldService.GetProcessRouteAsync, processRouteId);
             */
 
-        
+        /*
             var jobBos = new List<JobBo> { };
             jobBos.Add(new JobBo { Name = "InStationJobService" });
 
             await _ExecuteJobService.ExecuteAsync(jobBos, new InStationRequestBo { });
-       
+       */
+
             // 合法性校验
             sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity)
                             .VerifyProcedure(bo.ProcedureId)
