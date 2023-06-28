@@ -114,6 +114,37 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
         }
 
         /// <summary>
+        /// 工序锁校验
+        /// </summary>
+        /// <param name="sfcProduceBusinessEntities"></param>
+        /// <param name="SFCs"></param>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        public static IEnumerable<ManuSfcProduceBusinessEntity>? VerifyProcedureLock(this IEnumerable<ManuSfcProduceBusinessEntity> sfcProduceBusinessEntities, IEnumerable<string> SFCs, long procedureId)
+        {
+            /*
+            // 是否被锁定
+            if (sfcProduceBusinessEntity == null) return sfcProduceBusinessEntity;
+            if (sfcProduceBusinessEntity.BusinessType != ManuSfcProduceBusinessType.Lock) return sfcProduceBusinessEntity;
+
+            var sfcProduceLockBo = JsonSerializer.Deserialize<SfcProduceLockBo>(sfcProduceBusinessEntity.BusinessContent);//sfcProduceBusinessEntity.BusinessContent
+            if (sfcProduceLockBo == null) return sfcProduceBusinessEntity;
+
+            if (sfcProduceLockBo.Lock == QualityLockEnum.InstantLock)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16314)).WithData("SFC", sfc);
+            }
+
+            if (sfcProduceLockBo.Lock == QualityLockEnum.FutureLock && sfcProduceLockBo.LockProductionId == procedureId)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16314)).WithData("SFC", sfc);
+            }
+            */
+            // TODO
+            return sfcProduceBusinessEntities;
+        }
+
+        /// <summary>
         /// 验证条码
         /// </summary>
         /// <param name="barCode"></param>

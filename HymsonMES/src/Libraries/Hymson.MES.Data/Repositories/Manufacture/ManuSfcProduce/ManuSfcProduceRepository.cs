@@ -6,10 +6,8 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.View;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using System.Data;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -481,6 +479,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcProduceBusinessEntity>> GetSfcProduceBusinessEntitiesBySFCAsync(SfcListProduceBusinessQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ManuSfcProduceBusinessEntity>(GetEntitiesSql, query);
+        }
+
+        /// <summary>
+        /// 根据SFC获取在制品业务
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<ManuSfcProduceBusinessView>> GetSfcProduceBusinessListBySFCAsync(SfcListProduceBusinessQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
@@ -544,6 +553,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetSfcProduceBusinessBySFCSql = @" SELECT SPB.* FROM manu_sfc_produce_business SPB  
                                           LEFT JOIN manu_sfc_produce sfc on sfc.Id =SPB.SfcProduceId 
                             WHERE SPB.IsDeleted = 0 AND SPB.BusinessType = @BusinessType AND SPB.SiteId=@SiteId AND SFC.SFC = @Sfc ";
+        const string GetEntitiesSql = @" SELECT SPB.* FROM manu_sfc_produce_business SPB  
+                                          LEFT JOIN manu_sfc_produce sfc on sfc.Id =SPB.SfcProduceId 
+                            WHERE SPB.IsDeleted = 0 AND SPB.BusinessType = @BusinessType AND SPB.SiteId=@SiteId AND SFC.SFC IN @Sfcs ";
         const string GetSfcProduceBusinessBySFCsSql = @"SELECT SFC.Sfc,SPB.* FROM manu_sfc_produce_business SPB  
                                         LEFT JOIN manu_sfc_produce SFC on sfc.Id =SPB.SfcProduceId 
                             WHERE SPB.IsDeleted = 0 AND SPB.BusinessType = @BusinessType AND SPB.SiteId=@SiteId AND SFC.SFC IN @Sfcs ";

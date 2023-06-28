@@ -1,5 +1,4 @@
 ﻿using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Services.Job.JobUtility;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
@@ -23,7 +22,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <typeparam name="TResult"></typeparam>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<TResult> DataAssemblingAsync<T, TResult>(T param) where T : JobBaseBo where TResult : JobBaseBo, new();
+        Task<TResult> DataAssemblingAsync<T, TResult>(T param) where T : JobBaseBo where TResult : JobResultBo, new();
 
         /// <summary>
         /// 执行入库
