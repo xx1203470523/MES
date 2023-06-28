@@ -1,4 +1,4 @@
-﻿namespace Hymson.MES.CoreServices.Services.Job.JobUtility
+﻿namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Context
 {
     /// <summary>
     /// 
