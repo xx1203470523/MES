@@ -35,6 +35,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task VerifyParamAsync<T>(T param, JobContextProxy proxy) where T : JobBaseBo
         {
+            var a = proxy.GetValue((int a) => { return a; }, DateTime.Now.Millisecond);
+            var b = proxy.GetValue((int a) => { return a; }, DateTime.Now.Millisecond);
+
             // 校验工序和资源是否对应
             //var resourceIds = await _manuCommonService.GetProcResourceIdByProcedureIdAsync(bo.ProcedureId);
             //if (resourceIds.Any(a => a == bo.ResourceId) == false) throw new CustomerValidationException(nameof(ErrorCode.MES16317));

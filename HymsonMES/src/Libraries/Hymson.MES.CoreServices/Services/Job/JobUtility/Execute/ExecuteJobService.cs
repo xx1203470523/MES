@@ -14,15 +14,20 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
         /// 注入反射获取依赖对象
         /// </summary>
         private readonly IServiceProvider _serviceProvider;
+        /// <summary>
+        /// 作用域
+        /// </summary>
+        private readonly IServiceScopeFactory _serviceScopeFactory;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="serviceProvider"></param>
-        /// <param name="jobContextProxy"></param>
-        public ExecuteJobService(IServiceProvider serviceProvider)
+        /// <param name="serviceScopeFactory"></param>
+        public ExecuteJobService(IServiceProvider serviceProvider, IServiceScopeFactory serviceScopeFactory)
         {
             _serviceProvider = serviceProvider;
+            _serviceScopeFactory = serviceScopeFactory;
         }
 
         /// <summary>
@@ -32,7 +37,10 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
         public async Task ExecuteAsync(IEnumerable<JobBo> jobBos, T param)
         {
             var services = _serviceProvider.GetServices<IJobService>();
-            var proxy = new JobContextProxy { };
+
+            using var scope = _serviceScopeFactory.CreateScope();
+            var proxy = scope.ServiceProvider.GetRequiredService<JobContextProxy>();
+            proxy.InitDictionary();
 
             // 执行参数校验
             foreach (var job in jobBos)
