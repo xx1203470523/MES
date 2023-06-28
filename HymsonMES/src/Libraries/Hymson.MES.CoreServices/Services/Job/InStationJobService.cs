@@ -3,7 +3,6 @@ using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Job;
-using Hymson.MES.CoreServices.Services.Job.JobUtility;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -13,24 +12,18 @@ namespace Hymson.MES.CoreServices.Services.NewJob
     [Job("进站", JobTypeEnum.Standard)]
     public class InStationJobService : IJobService
     {
-
-        /// <summary>
-        /// 作用域
-        /// </summary>
-        private readonly ScopedServiceFactory _serviceScopeFactory;
-
         /// <summary>
         /// 服务接口（生产通用）
         /// </summary>
-        //private readonly IManuCommonService _manuCommonService;
+        private readonly IManuCommonService _manuCommonService;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="manuCommonService"></param>
-        public InStationJobService( ScopedServiceFactory serviceScopeFactory)
+        public InStationJobService(IManuCommonService manuCommonService)
         {
-            _serviceScopeFactory = serviceScopeFactory;
+            _manuCommonService = manuCommonService;
         }
 
         /// <summary>
@@ -40,10 +33,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task VerifyParamAsync<T>(T param) where T : JobBaseBo
         {
-            var scopedService = _serviceScopeFactory.GetScopedService();
-
-            var a = scopedService.GetValue((int a) => { return a; }, DateTime.Now.Millisecond);
-            var b = scopedService.GetValue((int a) => { return a; }, DateTime.Now.Millisecond);
+            var a = param.Proxy.GetValue((int a) => { return a; }, DateTime.Now.Millisecond);
+            var b = param.Proxy.GetValue((int a) => { return a; }, DateTime.Now.Millisecond);
 
             /*
             // 校验工序和资源是否对应

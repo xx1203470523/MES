@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.CoreServices.Bos.Job;
+using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
 using Microsoft.Extensions.DependencyInjection;
 using System.Transactions;
 
@@ -14,12 +15,11 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
         /// 注入反射获取依赖对象
         /// </summary>
         private readonly IServiceProvider _serviceProvider;
-        
+
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="serviceProvider"></param>
-        /// <param name="serviceScopeFactory"></param>
         public ExecuteJobService(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -32,6 +32,10 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
         public async Task ExecuteAsync(IEnumerable<JobBo> jobBos, T param)
         {
             var services = _serviceProvider.GetServices<IJobService>();
+
+            using var scope = _serviceProvider.CreateScope();
+            var scopedService = scope.ServiceProvider.GetRequiredService<IJobContextProxy>();
+            param.Proxy = scopedService;
 
             // 执行参数校验
             foreach (var job in jobBos)
