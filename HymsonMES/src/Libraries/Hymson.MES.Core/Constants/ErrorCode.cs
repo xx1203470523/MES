@@ -648,6 +648,8 @@
         public const string MES16324 = "存在已报废SFC条码，不允许操作。";
         public const string MES16325 = "存在已锁定SFC条码，不允许操作。";
         public const string MES16326 = "存在SFC状态不是{Status}状态，不允许操作。";
+        public const string MES16330= "工序存在多个";  
+        public const string MES16331= "工艺路线存在多个"; 
         #endregion
 
         #region 生产

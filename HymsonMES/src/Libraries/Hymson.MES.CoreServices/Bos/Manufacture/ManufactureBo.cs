@@ -113,4 +113,21 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// </summary>
         public long ContainerId { get; set; }
     }
+
+    /// <summary>
+    /// 判断上一个工序是否是随机工序
+    /// </summary>
+    public class IsRandomPreProcedureBo
+    {
+        /// <summary>
+        /// 工艺路线ID
+        /// </summary>
+        public long ProcessRouteId { get; set; }
+
+        /// <summary>
+        /// 工序Id
+        /// </summary>
+        public long ProcedureId { get; set; }
+    }
+
 }

@@ -3,9 +3,12 @@ using FluentValidation.Results;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -69,7 +72,15 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// </summary>
         private readonly ILocalizationService _localizationService;
 
+        /// <summary>
+        /// 仓储接口（工艺路线工序节点）
+        /// </summary>
+        private readonly IProcProcessRouteDetailNodeRepository _procProcessRouteDetailNodeRepository;
 
+        /// <summary>
+        /// 仓储接口（工艺路线工序连线）
+        /// </summary>
+        private readonly IProcProcessRouteDetailLinkRepository _procProcessRouteDetailLinkRepository;
 
         /// <summary>
         /// 构造函数
@@ -90,7 +101,9 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             IProcBomDetailRepository procBomDetailRepository,
             IProcMaterialRepository procMaterialRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
-            ILocalizationService localizationService)
+            ILocalizationService localizationService,
+            IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
+            IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository)
         {
             // _sequenceService = sequenceService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
@@ -101,6 +114,8 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             _procMaterialRepository = procMaterialRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _localizationService = localizationService;
+            _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
+            _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
         }
 
 
@@ -313,6 +328,47 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             return resources.Select(s => s.Id);
         }
 
+
+        /// <summary>
+        /// 判断上一工序是否随机工序
+        /// </summary>
+        /// <param name="processRouteId"></param>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        public async Task<bool> IsRandomPreProcedureAsync(IsRandomPreProcedureBo randomPreProcedureBo)
+        {
+            // 因为可能有分叉，所以返回的上一步工序是集合
+            var preProcessRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetPreProcessRouteDetailLinkAsync(new ProcProcessRouteDetailLinkQuery
+            {
+                ProcessRouteId = randomPreProcedureBo.ProcessRouteId,
+                ProcedureId = randomPreProcedureBo.ProcedureId
+            });
+            if (preProcessRouteDetailLinks == null || preProcessRouteDetailLinks.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES10442));
+
+            // 获取当前工序在工艺路线里面的扩展信息
+            var procedureNodes = await _procProcessRouteDetailNodeRepository
+                .GetByProcedureIdsAsync(new ProcProcessRouteDetailNodesQuery
+                {
+                    ProcessRouteId = randomPreProcedureBo.ProcessRouteId,
+                    ProcedureIds = preProcessRouteDetailLinks.Where(w => w.PreProcessRouteDetailId.HasValue).Select(s => s.PreProcessRouteDetailId.Value)
+                }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10442));
+
+            // 有多工序分叉的情况（取第一个当默认值）
+            ProcProcessRouteDetailNodeEntity? defaultPreProcedure = procedureNodes.FirstOrDefault();
+            if (preProcessRouteDetailLinks.Count() > 1)
+            {
+                // 下工序找上工序，执照正常流程的工序
+                defaultPreProcedure = procedureNodes.FirstOrDefault(f => f.CheckType == ProcessRouteInspectTypeEnum.None)
+                   ?? throw new CustomerValidationException(nameof(ErrorCode.MES10441));
+            }
+
+            // 获取上一工序
+            if (defaultPreProcedure == null) throw new CustomerValidationException(nameof(ErrorCode.MES10442));
+            if (defaultPreProcedure.CheckType == ProcessRouteInspectTypeEnum.RandomInspection) return true;
+
+            // 继续检查上一工序
+            return await IsRandomPreProcedureAsync(new IsRandomPreProcedureBo { ProcessRouteId = randomPreProcedureBo.ProcessRouteId, ProcedureId = defaultPreProcedure.Id });
+        }
 
         #region 内部方法
 

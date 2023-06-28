@@ -52,5 +52,13 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// <returns></returns>
         Task<IEnumerable<long>> GetProcResourceIdByProcedureIdAsync(long procedureId);
 
+        /// <summary>
+        /// 判断上一工序是否随机工序
+        /// </summary>
+        /// <param name="processRouteId"></param>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        Task<bool> IsRandomPreProcedureAsync(IsRandomPreProcedureBo randomPreProcedureBo);
+
     }
 }

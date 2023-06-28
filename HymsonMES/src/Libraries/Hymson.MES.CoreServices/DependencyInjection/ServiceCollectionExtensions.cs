@@ -43,7 +43,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             //services.AddSingleton(typeof(IJobService<,>), typeof(InStationJobService));
             services.AddSingleton<IJobService, InStationJobService>();
             services.AddSingleton<IJobService, OutStationJobService>();
-            services.AddSingleton<IJobService, SfcConvertJobService>();
+            services.AddSingleton<IJobService, RepairStartJobService>();
             services.AddSingleton(typeof(IExecuteJobService<>), typeof(ExecuteJobService<>));
             //services.AddSingleton<ExecuteJobService<OutStationRequestBo>, ExecuteJobService<OutStationRequestBo>>();
             //services.AddSingleton<ExecuteJobService<SfcConvertRequestBo>, ExecuteJobService<SfcConvertRequestBo>>();
