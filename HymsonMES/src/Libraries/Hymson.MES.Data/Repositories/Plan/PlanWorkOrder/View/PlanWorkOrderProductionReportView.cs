@@ -16,6 +16,11 @@ namespace Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.View
         /// 工单类型
         /// </summary>
         public PlanWorkOrderTypeEnum Type { get; set; }
+
+        /// <summary>
+        /// 工单状态;1：未开始；2：下达；3：生产中；4：完成；5：锁定；6：暂停中；
+        /// </summary>
+        public PlanWorkOrderStatusEnum Status { get; set; }
         /// <summary>
         /// 工单数量
         /// </summary>

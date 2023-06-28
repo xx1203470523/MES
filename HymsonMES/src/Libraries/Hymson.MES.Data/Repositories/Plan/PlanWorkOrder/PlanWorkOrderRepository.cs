@@ -547,7 +547,7 @@ namespace Hymson.MES.Data.Repositories.Plan
 
         const string GetPagedInfoPlanWorkOrderProductionReportDataSqlTemplate = @" select pwo.Id,pwo.OrderCode,pwo.Type,pwo.Qty,iwc.Name as WorkCentName,iwc.Code WorkCentCode,
                                 m.MaterialCode,m.MaterialName,pwo.PlanStartTime,pwo.PlanEndTime,pwor.RealStart,pwor.RealEnd,
-                                pwor.InputQty,pwor.UnqualifiedQuantity,pwor.FinishProductQuantity,pwor.PassDownQuantity,
+                                pwor.InputQty,pwor.UnqualifiedQuantity,pwor.FinishProductQuantity,pwor.PassDownQuantity,pwo.`Status`,
                                 (SELECT count(1) FROM manu_sfc_summary mss where mss.WorkOrderId=pwo.Id AND mss.QualityStatus=0 ) NGQty /*NG数量*/
                                 from plan_work_order_record pwor 
                                 LEFT JOIN plan_work_order pwo on pwor.WorkOrderId=pwo.Id
