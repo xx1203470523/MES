@@ -5,7 +5,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
     /// <summary>
     /// 
     /// </summary>
-    public class JobContextProxy : IDisposable
+    public class JobContextProxy : IDisposable, IJobContextProxy
     {
         /// <summary>
         /// 
@@ -22,7 +22,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// </summary>
         public JobContextProxy()
         {
-            //dictionary = new();
+            dictionary = new();
 
             int num = Math.Max(Environment.ProcessorCount * 8, 32);
             _semaphores = new SemaphoreSlim[num];
@@ -32,13 +32,6 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public void InitDictionary()
-        {
-            dictionary = new();
-        }
 
         /// <summary>
         /// 获取字典Key
@@ -170,13 +163,6 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             GC.SuppressFinalize(this);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        ~JobContextProxy()
-        {
-            Dispose();
-        }
 
     }
 }

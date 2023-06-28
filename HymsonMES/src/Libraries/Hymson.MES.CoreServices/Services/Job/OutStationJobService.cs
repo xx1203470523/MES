@@ -18,7 +18,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="param"></param>
         /// <param name="proxy"></param>
         /// <returns></returns>
-        public async Task VerifyParamAsync<T>(T param, JobContextProxy proxy) where T : JobBaseBo
+        public async Task VerifyParamAsync<T>(T param) where T : JobBaseBo
         {
             await Task.CompletedTask;
         }
@@ -29,7 +29,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="param"></param>
         /// <param name="proxy"></param>
         /// <returns></returns>
-        public async Task<TResult> DataAssemblingAsync<T, TResult>(T param, JobContextProxy proxy) where T : JobBaseBo where TResult : JobBaseBo, new()
+        public async Task<TResult> DataAssemblingAsync<T, TResult>(T param) where T : JobBaseBo where TResult : JobBaseBo, new()
         {
             await Task.CompletedTask;
             return new TResult();
@@ -40,7 +40,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         /// <param name="proxy"></param>
         /// <returns></returns>
-        public async Task ExecuteAsync(JobContextProxy proxy)
+        public async Task ExecuteAsync()
         {
             await Task.CompletedTask;
         }
