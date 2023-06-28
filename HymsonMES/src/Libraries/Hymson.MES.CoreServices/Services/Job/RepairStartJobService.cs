@@ -59,9 +59,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task VerifyParamAsync<T>(T param) where T : JobBaseBo
         {
+
             if ((param is RepairStartRequestBo bo) == false) return;
             // 获取生产条码信息
-            var sfcProduceEntitys = await param.Proxy.GetValueAsync(_manuCommonService.GetProduceEntitiesBySFCsAsync, new MultiSfcBo { SFCs = bo.SFCs, SiteId = bo.SiteId });
+            var sfcProduceEntitys = await param.Proxy.GetValueAsync(_manuCommonService.GetProduceEntitiesBySFCsAsync, new MultiSFCBo { SFCs = bo.SFCs, SiteId = bo.SiteId });
             if (sfcProduceEntitys?.GroupBy(it => it.ProcedureId).Count() > 1)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16330));
@@ -103,7 +104,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="param"></param>
         /// <param name="proxy"></param>
         /// <returns></returns>
-        public async Task<TResult> DataAssemblingAsync<T, TResult>(T param) where T : JobBaseBo where TResult : JobBaseBo, new()
+        public async Task<TResult> DataAssemblingAsync<T, TResult>(T param) where T : JobBaseBo where TResult : JobResultBo, new()
         {
             await Task.CompletedTask;
             return new TResult();
