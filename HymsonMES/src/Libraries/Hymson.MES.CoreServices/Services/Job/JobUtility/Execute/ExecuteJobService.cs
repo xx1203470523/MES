@@ -8,13 +8,13 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
     /// 
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class ExecuteJobService<T> where T : JobBaseBo
+    public class ExecuteJobService<T> : IExecuteJobService<T> where T : JobBaseBo
     {
         /// <summary>
         /// 注入反射获取依赖对象
         /// </summary>
         private readonly IServiceProvider _serviceProvider;
-
+        
         /// <summary>
         /// 构造函数
         /// </summary>

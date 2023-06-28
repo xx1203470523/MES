@@ -11,7 +11,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// <summary>
         /// 
         /// </summary>
-        protected ConcurrentDictionary<uint, object> dictionary;
+        protected ConcurrentDictionary<uint, object> dictionary = new();
 
         /// <summary>
         /// 
@@ -23,7 +23,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// </summary>
         public JobContextProxy()
         {
-            dictionary = new();
+            // dictionary = new();
 
             int num = Math.Max(Environment.ProcessorCount * 8, 32);
             _semaphores = new SemaphoreSlim[num];
