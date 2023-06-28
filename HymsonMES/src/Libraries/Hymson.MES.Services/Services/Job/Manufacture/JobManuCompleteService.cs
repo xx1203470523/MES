@@ -1,13 +1,11 @@
 ﻿using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Job;
-using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
 using Hymson.Utils;
@@ -19,11 +17,6 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
     /// </summary>
     public class JobManuCompleteService : IJobManufactureService
     {
-        /// <summary>
-        /// 服务接口
-        /// </summary>
-        private readonly IExecuteJobService<InStationRequestBo> _executeJobService;
-
         /// <summary>
         /// 服务接口（生产通用）
         /// </summary>
@@ -46,12 +39,10 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <param name="manuCommonService"></param>
         /// <param name="manuCommonOldService"></param>
         /// <param name="manuOutStationService"></param>
-        public JobManuCompleteService(IExecuteJobService<InStationRequestBo> executeJobService,
-            IManuCommonService manuCommonService,
+        public JobManuCompleteService(IManuCommonService manuCommonService,
             IManuCommonOldService manuCommonOldService,
             IManuOutStationService manuOutStationService)
         {
-            _executeJobService = executeJobService;
             _manuCommonService = manuCommonService;
             _manuCommonOldService = manuCommonOldService;
             _manuOutStationService = manuOutStationService;
@@ -91,15 +82,6 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
                 ProcedureId = param["ProcedureId"].ParseToLong(),
                 ResourceId = param["ResourceId"].ParseToLong()
             };
-
-            /*
-            var jobBos = new List<JobBo> { };
-            jobBos.Add(new JobBo { Name = "InStationJobService" });
-            jobBos.Add(new JobBo { Name = "InStationJobService" });
-
-            await _executeJobService.ExecuteAsync(jobBos, new InStationRequestBo { });
-            */
-
 
             /*
             var processRouteId = 15968606561873920;

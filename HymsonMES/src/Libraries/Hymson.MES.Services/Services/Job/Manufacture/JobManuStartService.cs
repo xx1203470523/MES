@@ -4,12 +4,13 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Common;
+using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Common;
-using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Job;
+using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInStation;
@@ -31,6 +32,11 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// 当前对象（站点）
         /// </summary>
         private readonly ICurrentSite _currentSite;
+
+        /// <summary>
+        /// 服务接口
+        /// </summary>
+        private readonly IExecuteJobService<InStationRequestBo> _executeJobService;
 
         /// <summary>
         /// 服务接口（生产通用）
@@ -63,12 +69,14 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
+        /// <param name="executeJobService"></param>
         /// <param name="manuCommonService"></param>
         /// <param name="manuCommonOldService"></param>
         /// <param name="manuInStationService"></param>
         /// <param name="procProcessRouteDetailLinkRepository"></param>
         /// <param name="procProcessRouteDetailNodeRepository"></param>
         public JobManuStartService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IExecuteJobService<InStationRequestBo> executeJobService,
             IManuCommonService manuCommonService,
             IManuCommonOldService manuCommonOldService,
             IManuInStationService manuInStationService,
@@ -77,6 +85,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _executeJobService = executeJobService;
             _manuCommonService = manuCommonService;
             _manuCommonOldService = manuCommonOldService;
             _manuInStationService = manuInStationService;
@@ -118,6 +127,14 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
                 ProcedureId = param["ProcedureId"].ParseToLong(),
                 ResourceId = param["ResourceId"].ParseToLong()
             };
+
+            /*
+            var jobBos = new List<JobBo> { };
+            jobBos.Add(new JobBo { Name = "InStationJobService" });
+            jobBos.Add(new JobBo { Name = "InStationJobService" });
+
+            await _executeJobService.ExecuteAsync(jobBos, new InStationRequestBo { });
+            */
 
             // 校验工序和资源是否对应
             var resourceIds = await _manuCommonOldService.GetProcResourceIdByProcedureIdAsync(bo.ProcedureId);

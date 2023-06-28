@@ -146,6 +146,39 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         }
 
         /// <summary>
+        /// 获取生产条码信息
+        /// </summary>
+        /// <param name="sfcBos"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcProduceEntity>> GetProduceEntitiesBySFCsAsync(MultiSfcBo sfcBos)
+        {
+            if (sfcBos.SFCs.Any(a => a.Contains(' '))) throw new CustomerValidationException(nameof(ErrorCode.MES16305));
+
+            // 条码在制表
+            var sfcProduceEntities = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery
+            {
+                SiteId = sfcBos.SiteId,
+                Sfcs = sfcBos.SFCs
+            });
+
+            // 不存在在制表的话，就去库存查找
+            if (sfcProduceEntities.Any() == false)
+            {
+                var whMaterialInventoryEntity = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
+                {
+                    SiteId = sfcBos.SiteId,
+                    BarCodes = sfcBos.SFCs
+                });
+                if (whMaterialInventoryEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES16318));
+
+                throw new CustomerValidationException(nameof(ErrorCode.MES16306));
+            }
+
+            return sfcProduceEntities;
+        }
+
+
+        /// <summary>
         /// 批量验证条码是否锁定
         /// </summary>
         /// <param name="procedureBo"></param>

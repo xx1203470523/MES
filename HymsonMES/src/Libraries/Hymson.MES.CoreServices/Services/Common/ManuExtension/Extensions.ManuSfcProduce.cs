@@ -25,7 +25,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
         public static ManuSfcProduceEntity VerifyResource(this ManuSfcProduceEntity sfcProduceEntity, long resourceId)
         {
             // 当前资源是否对于的上
-            if (sfcProduceEntity.ResourceId.HasValue  && sfcProduceEntity.ResourceId != resourceId)
+            if (sfcProduceEntity.ResourceId.HasValue && sfcProduceEntity.ResourceId != resourceId)
                 throw new CustomerValidationException(nameof(ErrorCode.MES16316)).WithData("SFC", sfcProduceEntity.SFC);
 
             return sfcProduceEntity;
@@ -49,6 +49,26 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
 
             return sfcProduceEntity;
         }
+
+        /// <summary>
+        /// 检查条码状态是否合法
+        /// </summary>
+        /// <param name="sfcProduceEntities"></param>
+        /// <param name="produceStatus"></param>
+        public static IEnumerable<ManuSfcProduceEntity> VerifySFCStatus(this IEnumerable<ManuSfcProduceEntity> sfcProduceEntities, SfcProduceStatusEnum produceStatus)
+        {
+            // 当前条码是否是已报废
+            if (sfcProduceEntities.Any(a => a.IsScrap == TrueOrFalseEnum.Yes)) throw new CustomerValidationException(nameof(ErrorCode.MES16324));
+
+            // 当前条码是否是被锁定
+            if (sfcProduceEntities.Any(a => a.Status == SfcProduceStatusEnum.Locked)) throw new CustomerValidationException(nameof(ErrorCode.MES16325));
+
+            // 当前工序是否是指定状态
+            if (sfcProduceEntities.Any(a => a.Status != produceStatus)) throw new CustomerValidationException(nameof(ErrorCode.MES16313)).WithData("Status", produceStatus.GetDescription());
+
+            return sfcProduceEntities;
+        }
+
 
         /// <summary>
         /// 工序活动状态校验
@@ -125,7 +145,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
                         break;
                 }
 
-                if (!Regex.IsMatch(barCode, pattern) ) return false;
+                if (!Regex.IsMatch(barCode, pattern)) return false;
             }
 
             return true;

@@ -151,6 +151,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return manuSfcProduceEntities;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<ManuSfcProduceInfoView>> GetManuSfcProduceInfoEntitiesAsync(ManuSfcProduceQuery query)
         {
             var sqlBuilder = new SqlBuilder();

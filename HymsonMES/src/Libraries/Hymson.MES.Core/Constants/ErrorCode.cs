@@ -645,6 +645,9 @@
         public const string MES16321 = "物料{Code}未添加组件，请检查";
         public const string MES16322 = "SFC条码{SFC}已报废，不允许操作。";
         public const string MES16323 = "未添加组件，请检查";
+        public const string MES16324 = "存在已报废SFC条码，不允许操作。";
+        public const string MES16325 = "存在已锁定SFC条码，不允许操作。";
+        public const string MES16326 = "存在SFC状态不是{Status}状态，不允许操作。";
         #endregion
 
         #region 生产

@@ -17,6 +17,13 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         Task<(ManuSfcProduceEntity, ManuSfcProduceBusinessEntity)> GetProduceSFCAsync(SingleSfcBo sfcBo);
 
         /// <summary>
+        /// 获取生产条码信息
+        /// </summary>
+        /// <param name="sfcBos"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcProduceEntity>> GetProduceEntitiesBySFCsAsync(MultiSfcBo sfcBos);
+
+        /// <summary>
         /// 批量验证条码是否锁定
         /// </summary>
         /// <param name="procedureBo"></param>
