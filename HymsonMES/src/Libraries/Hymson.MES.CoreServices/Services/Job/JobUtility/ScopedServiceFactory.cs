@@ -2,16 +2,30 @@
 
 namespace Hymson.MES.CoreServices.Services.Job.JobUtility
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class ScopedServiceFactory : IDisposable
     {
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private IServiceScope _scope;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="serviceScopeFactory"></param>
         public ScopedServiceFactory(IServiceScopeFactory serviceScopeFactory)
         {
             _serviceScopeFactory = serviceScopeFactory;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public IJobContextProxy GetScopedService()
         {
             if (_scope == null)
@@ -24,13 +38,15 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             return _scope.ServiceProvider.GetRequiredService<IJobContextProxy>();
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
         public void Dispose()
         {
             // 释放服务作用域
             _scope?.Dispose();
+            GC.SuppressFinalize(this);
             _scope = null;
         }
     }
-
 }

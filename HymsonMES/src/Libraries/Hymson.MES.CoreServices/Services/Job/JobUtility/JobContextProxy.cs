@@ -32,13 +32,6 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public void InitDictionary()
-        {
-            dictionary = new();
-        }
 
         /// <summary>
         /// 获取字典Key
