@@ -13,6 +13,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
     [Job("进站", JobTypeEnum.Standard)]
     public class InStationJobService : IJobService
     {
+
+        /// <summary>
+        /// 作用域
+        /// </summary>
+        private readonly ScopedServiceFactory _serviceScopeFactory;
+
         /// <summary>
         /// 服务接口（生产通用）
         /// </summary>
@@ -22,25 +28,29 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// 构造函数
         /// </summary>
         /// <param name="manuCommonService"></param>
-        public InStationJobService(IManuCommonService manuCommonService)
+        public InStationJobService(IManuCommonService manuCommonService, ScopedServiceFactory serviceScopeFactory)
         {
             _manuCommonService = manuCommonService;
+            _serviceScopeFactory = serviceScopeFactory;
         }
 
         /// <summary>
         /// 参数校验
         /// </summary>
         /// <param name="param"></param>
-        /// <param name="proxy"></param>
         /// <returns></returns>
-        public async Task VerifyParamAsync<T>(T param, JobContextProxy proxy) where T : JobBaseBo
+        public async Task VerifyParamAsync<T>(T param) where T : JobBaseBo
         {
-            var a = proxy.GetValue((int a) => { return a; }, DateTime.Now.Millisecond);
-            var b = proxy.GetValue((int a) => { return a; }, DateTime.Now.Millisecond);
+            var scopedService = _serviceScopeFactory.GetScopedService();
 
+            var a = scopedService.GetValue((int a) => { return a; }, DateTime.Now.Millisecond);
+            var b = scopedService.GetValue((int a) => { return a; }, DateTime.Now.Millisecond);
+
+            /*
             // 校验工序和资源是否对应
-            //var resourceIds = await _manuCommonService.GetProcResourceIdByProcedureIdAsync(bo.ProcedureId);
-            //if (resourceIds.Any(a => a == bo.ResourceId) == false) throw new CustomerValidationException(nameof(ErrorCode.MES16317));
+            var resourceIds = await _manuCommonService.GetProcResourceIdByProcedureIdAsync(bo.ProcedureId);
+            if (resourceIds.Any(a => a == bo.ResourceId) == false) throw new CustomerValidationException(nameof(ErrorCode.MES16317));
+            */
 
             await Task.CompletedTask;
         }
@@ -49,9 +59,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// 数据组装
         /// </summary>
         /// <param name="param"></param>
-        /// <param name="proxy"></param>
         /// <returns></returns>
-        public async Task<TResult> DataAssemblingAsync<T, TResult>(T param, JobContextProxy proxy) where T : JobBaseBo where TResult : JobBaseBo, new()
+        public async Task<TResult> DataAssemblingAsync<T, TResult>(T param) where T : JobBaseBo where TResult : JobBaseBo, new()
         {
             await Task.CompletedTask;
             return new TResult();
@@ -60,9 +69,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <summary>
         /// 执行入库
         /// </summary>
-        /// <param name="proxy"></param>
         /// <returns></returns>
-        public async Task ExecuteAsync(JobContextProxy proxy)
+        public async Task ExecuteAsync()
         {
             await Task.CompletedTask;
         }

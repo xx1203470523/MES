@@ -37,7 +37,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSingleton<IManuCommonService, ManuCommonService>();
             services.AddSingleton<IMasterDataService, MasterDataService>();
             services.AddSingleton<IJobCommonService, JobCommonService>();
-            services.AddSingleton<JobContextProxy, JobContextProxy>();
+            services.AddScoped<IJobContextProxy, JobContextProxy>();
             //services.AddSingleton(typeof(IJobService<,>), typeof(InStationJobService<,>));
             //services.AddSingleton(typeof(IJobService<,>), typeof(InStationJobService));
             services.AddSingleton<IJobService, InStationJobService>();
