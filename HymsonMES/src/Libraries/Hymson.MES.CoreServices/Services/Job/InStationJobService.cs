@@ -58,16 +58,17 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             // 校验工序和资源是否对应
             var resourceIds = await param.Proxy.GetValueAsync(_manuCommonService.GetProcResourceIdByProcedureIdAsync, bo.ProcedureId);
-            if (resourceIds.Any(a => a == bo.ResourceId) == false) throw new CustomerValidationException(nameof(ErrorCode.MES16317));
+            if (resourceIds == null || resourceIds.Any(a => a == bo.ResourceId) == false) throw new CustomerValidationException(nameof(ErrorCode.MES16317));
 
             // 获取生产条码信息
-            //var (sfcProduceEntity, sfcProduceBusinessEntity) = await _manuCommonOldService.GetProduceSFCAsync(bo.SFC);
             var sfcProduceEntities = await param.Proxy.GetValueAsync(_manuCommonService.GetProduceEntitiesBySFCsAsync, bo);
-            if (sfcProduceEntities.Any() == false) return;
+            if (sfcProduceEntities == null || sfcProduceEntities.Any() == false) return;
+
+            var sfcProduceBusinessEntities = await param.Proxy.GetValueAsync(_manuCommonService.GetProduceBusinessEntitiesBySFCsAsync, bo);
 
             // 合法性校验
             sfcProduceEntities.VerifySFCStatus(SfcProduceStatusEnum.lineUp);
-            //TODO sfcProduceBusinessEntity.VerifyProcedureLock(bo.SFC, bo.ProcedureId);
+            sfcProduceBusinessEntities?.VerifyProcedureLock(bo.SFCs, bo.ProcedureId);
 
             // 验证条码是否被容器包装
             await _manuCommonService.VerifyContainerAsync(bo);

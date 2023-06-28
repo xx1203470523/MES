@@ -177,6 +177,26 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             return sfcProduceEntities;
         }
 
+        /// <summary>
+        /// 获取生产条码信息
+        /// </summary>
+        /// <param name="sfcBos"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcProduceBusinessEntity>> GetProduceBusinessEntitiesBySFCsAsync(MultiSfcBo sfcBos)
+        {
+            if (sfcBos.SFCs.Any(a => a.Contains(' '))) throw new CustomerValidationException(nameof(ErrorCode.MES16305));
+
+            // 获取锁状态
+            var sfcProduceBusinessEntities = await _manuSfcProduceRepository.GetSfcProduceBusinessEntitiesBySFCAsync(new SfcListProduceBusinessQuery
+            {
+                SiteId = sfcBos.SiteId,
+                Sfcs = sfcBos.SFCs,
+                BusinessType = ManuSfcProduceBusinessType.Lock
+            });
+
+            return sfcProduceBusinessEntities;
+        }
+
 
         /// <summary>
         /// 批量验证条码是否锁定
