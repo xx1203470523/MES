@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.CoreServices.Bos.Job;
+using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
 using Microsoft.Extensions.DependencyInjection;
 using System.Transactions;
 
@@ -8,26 +9,20 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
     /// 
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class ExecuteJobService<T> where T : JobBaseBo
+    public class ExecuteJobService<T> : IExecuteJobService<T> where T : JobBaseBo
     {
         /// <summary>
         /// 注入反射获取依赖对象
         /// </summary>
         private readonly IServiceProvider _serviceProvider;
-        /// <summary>
-        /// 作用域
-        /// </summary>
-        private readonly IServiceScopeFactory _serviceScopeFactory;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="serviceProvider"></param>
-        /// <param name="serviceScopeFactory"></param>
-        public ExecuteJobService(IServiceProvider serviceProvider, IServiceScopeFactory serviceScopeFactory)
+        public ExecuteJobService(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
-            _serviceScopeFactory = serviceScopeFactory;
         }
 
         /// <summary>
@@ -38,9 +33,8 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
         {
             var services = _serviceProvider.GetServices<IJobService>();
 
-            using var scope = _serviceScopeFactory.CreateScope();
-            var proxy = scope.ServiceProvider.GetRequiredService<JobContextProxy>();
-            proxy.InitDictionary();
+            using var scope = _serviceProvider.CreateScope();
+            param.Proxy = scope.ServiceProvider.GetRequiredService<IJobContextProxy>();
 
             // 执行参数校验
             foreach (var job in jobBos)
@@ -48,7 +42,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
                 var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
                 if (service == null) continue;
 
-                await service.VerifyParamAsync(param, proxy);
+                await service.VerifyParamAsync(param);
             }
 
             // 执行数据组装
@@ -57,7 +51,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
                 var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
                 if (service == null) continue;
 
-                //await _jobContextProxy.GetValueAsync(service.DataAssemblingAsync, param);
+                //await service.DataAssemblingAsync(param);
             }
 
             // 执行入库
@@ -67,11 +61,10 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
                 var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
                 if (service == null) continue;
 
-                await service.ExecuteAsync(proxy);
+                await service.ExecuteAsync();
             }
 
             trans.Complete();
-            proxy.Dispose();
         }
 
         //  获取作业

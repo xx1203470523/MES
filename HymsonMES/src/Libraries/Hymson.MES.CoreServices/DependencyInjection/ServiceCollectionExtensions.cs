@@ -1,8 +1,8 @@
-﻿using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Services.Common.ManuCommon;
+﻿using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.CoreServices.Services.Job.JobUtility;
+using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
 using Hymson.MES.CoreServices.Services.NewJob;
 using Microsoft.Extensions.Configuration;
@@ -37,15 +37,16 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSingleton<IManuCommonService, ManuCommonService>();
             services.AddSingleton<IMasterDataService, MasterDataService>();
             services.AddSingleton<IJobCommonService, JobCommonService>();
-            services.AddSingleton<JobContextProxy, JobContextProxy>();
+            services.AddSingleton<ScopedServiceFactory>();
+            services.AddScoped<IJobContextProxy, JobContextProxy>();
             //services.AddSingleton(typeof(IJobService<,>), typeof(InStationJobService<,>));
             //services.AddSingleton(typeof(IJobService<,>), typeof(InStationJobService));
             services.AddSingleton<IJobService, InStationJobService>();
             services.AddSingleton<IJobService, OutStationJobService>();
             services.AddSingleton<IJobService, SfcConvertJobService>();
-            services.AddSingleton<ExecuteJobService<InStationRequestBo>, ExecuteJobService<InStationRequestBo>>();
-            services.AddSingleton<ExecuteJobService<OutStationRequestBo>, ExecuteJobService<OutStationRequestBo>>();
-            services.AddSingleton<ExecuteJobService<SfcConvertRequestBo>, ExecuteJobService<SfcConvertRequestBo>>();
+            services.AddSingleton(typeof(IExecuteJobService<>), typeof(ExecuteJobService<>));
+            //services.AddSingleton<ExecuteJobService<OutStationRequestBo>, ExecuteJobService<OutStationRequestBo>>();
+            //services.AddSingleton<ExecuteJobService<SfcConvertRequestBo>, ExecuteJobService<SfcConvertRequestBo>>();
 
             return services;
         }

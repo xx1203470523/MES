@@ -7,7 +7,6 @@ using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Job;
-using Hymson.MES.CoreServices.Services.Job.JobUtility;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
@@ -21,9 +20,9 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
     public class JobManuCompleteService : IJobManufactureService
     {
         /// <summary>
-        /// 
+        /// 服务接口
         /// </summary>
-        private readonly JobContextProxy _jobContextProxy;
+        private readonly IExecuteJobService<InStationRequestBo> _executeJobService;
 
         /// <summary>
         /// 服务接口（生产通用）
@@ -40,26 +39,22 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         private readonly IManuOutStationService _manuOutStationService;
 
-        private readonly ExecuteJobService<InStationRequestBo> _ExecuteJobService;
-
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="jobContextProxy"></param>
         /// <param name="manuCommonService"></param>
         /// <param name="manuCommonOldService"></param>
         /// <param name="manuOutStationService"></param>
-        public JobManuCompleteService(JobContextProxy jobContextProxy,
+        public JobManuCompleteService(IExecuteJobService<InStationRequestBo> executeJobService,
             IManuCommonService manuCommonService,
             IManuCommonOldService manuCommonOldService,
-            IManuOutStationService manuOutStationService, ExecuteJobService<InStationRequestBo> ExecuteJobService)
+            IManuOutStationService manuOutStationService)
         {
-            _jobContextProxy = jobContextProxy;
+            _executeJobService = executeJobService;
             _manuCommonService = manuCommonService;
             _manuCommonOldService = manuCommonOldService;
             _manuOutStationService = manuOutStationService;
-            _ExecuteJobService = ExecuteJobService;
         }
 
 
@@ -97,20 +92,22 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
                 ResourceId = param["ResourceId"].ParseToLong()
             };
 
-            // 获取生产条码信息
-            var (sfcProduceEntity, _) = await _manuCommonOldService.GetProduceSFCAsync(bo.SFC);
+            /*
+            var jobBos = new List<JobBo> { };
+            jobBos.Add(new JobBo { Name = "InStationJobService" });
+            jobBos.Add(new JobBo { Name = "InStationJobService" });
+
+            await _executeJobService.ExecuteAsync(jobBos, new InStationRequestBo { });
+            */
+
 
             /*
             var processRouteId = 15968606561873920;
             var result = await _jobContextProxy.GetValueAsync(_manuCommonOldService.GetProcessRouteAsync, processRouteId);
             */
 
-            /*
-            var jobBos = new List<JobBo> { };
-            jobBos.Add(new JobBo { Name = "InStationJobService" });
-
-            await _ExecuteJobService.ExecuteAsync(jobBos, new InStationRequestBo { });
-            */
+            // 获取生产条码信息
+            var (sfcProduceEntity, _) = await _manuCommonOldService.GetProduceSFCAsync(bo.SFC);
 
             // 合法性校验
             sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity)
