@@ -34,8 +34,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
             var services = _serviceProvider.GetServices<IJobService>();
 
             using var scope = _serviceProvider.CreateScope();
-            var scopedService = scope.ServiceProvider.GetRequiredService<IJobContextProxy>();
-            param.Proxy = scopedService;
+            param.Proxy = scope.ServiceProvider.GetRequiredService<IJobContextProxy>();
 
             // 执行参数校验
             foreach (var job in jobBos)
