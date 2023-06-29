@@ -29,10 +29,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="param"></param>
         /// <param name="proxy"></param>
         /// <returns></returns>
-        public async Task<TResult?> DataAssemblingAsync<T, TResult>(T param) where T : JobBaseBo where TResult : JobResultBo, new()
+        public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
             await Task.CompletedTask;
-            return new TResult();
+            return null;
         }
 
         /// <summary>
