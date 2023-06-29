@@ -32,6 +32,23 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
         }
 
         /// <summary>
+        /// 条码资源关联校验
+        /// </summary>
+        /// <param name="sfcProduceEntities"></param>
+        /// <param name="resourceId"></param>
+        public static IEnumerable<ManuSfcProduceEntity> VerifyResource(this IEnumerable<ManuSfcProduceEntity> sfcProduceEntities, long resourceId)
+        {
+            // 当前资源是否对于的上
+            if (sfcProduceEntities.Any(a => a.ResourceId.HasValue && a.ResourceId != resourceId))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16332));
+            }
+
+            return sfcProduceEntities;
+        }
+
+
+        /// <summary>
         /// 检查条码状态是否合法
         /// </summary>
         /// <param name="sfcProduceEntity"></param>
@@ -83,6 +100,25 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
 
             return sfcProduceEntity;
         }
+
+        /// <summary>
+        /// 工序活动状态校验
+        /// </summary>
+        /// <param name="sfcProduceEntities"></param>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        public static IEnumerable<ManuSfcProduceEntity> VerifyProcedure(this IEnumerable<ManuSfcProduceEntity> sfcProduceEntities, long procedureId)
+        {
+            // 产品编码是否和工序对应
+            if (sfcProduceEntities.Any(a => a.ProcedureId != procedureId))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16308));
+            }
+
+            return sfcProduceEntities;
+        }
+
+
 
         /// <summary>
         /// 工序锁校验

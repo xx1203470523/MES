@@ -12,9 +12,9 @@ using Hymson.MES.Data.Repositories.Process;
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
     /// <summary>
-    /// 进站
+    /// 进站验证
     /// </summary>
-    [Job("进站", JobTypeEnum.Standard)]
+    [Job("进站验证", JobTypeEnum.Standard)]
     public class InStationVerifyJobService : IJobService
     {
         /// <summary>
