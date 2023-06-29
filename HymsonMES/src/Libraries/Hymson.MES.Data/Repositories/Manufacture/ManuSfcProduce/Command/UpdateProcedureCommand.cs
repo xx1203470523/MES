@@ -112,5 +112,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
         /// 更新时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
+
+        public static implicit operator List<object>(UpdateResourceCommand v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -95,7 +95,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="param"></param>
         /// <param name="proxy"></param>
         /// <returns></returns>
-        public async Task<object?> DataAssemblingAsync<T, TResult>(T param) where T : JobBaseBo where TResult : JobResultBo, new()
+        public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
             if ((param is RepairStartRequestBo bo) == false) return null;
             // 获取生产条码信息
@@ -128,7 +128,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (sfcProduceEntity.Status == SfcProduceStatusEnum.Activity)
             {
                 // 如果状态已经为活动中，就直接返回成功
-                return new RepairStartResponseBo() as TResult;
+                return new RepairStartResponseBo();
             }
 
             // 获取生产工单（附带工单状态校验）
@@ -155,7 +155,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             };
 
             await Task.CompletedTask;
-            return new RepairStartResponseBo() { updateResourceCommand = updateResourceCommand } as TResult;
+            return new RepairStartResponseBo() { updateResourceCommand = updateResourceCommand };
         }
 
         /// <summary>

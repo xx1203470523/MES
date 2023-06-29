@@ -94,17 +94,6 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
 
 
-
-        /// <summary>
-        /// 仓储接口（工单信息）
-        /// </summary>
-        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
-
-        /// <summary>
-        /// 仓储接口（工单激活信息）
-        /// </summary>
-        private readonly IPlanWorkOrderActivationRepository _planWorkOrderActivationRepository;
-
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -518,7 +507,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// <param name="workOrderId"></param>
         /// <param name="isVerifyActivation"></param>
         /// <returns></returns>
-        public async Task<PlanWorkOrderEntity> GetProduceWorkOrderByIdAsync(GetProduceWorkOrderByIdBo   produceWorkOrderByIdBo)
+        public async Task<PlanWorkOrderEntity> GetProduceWorkOrderByIdAsync(GetProduceWorkOrderByIdBo produceWorkOrderByIdBo)
         {
             var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(produceWorkOrderByIdBo.WorkOrderId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES16301));
