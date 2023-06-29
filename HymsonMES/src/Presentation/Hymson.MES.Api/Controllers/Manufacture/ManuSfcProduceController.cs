@@ -160,6 +160,19 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         {
             return await _manuSfcProduceService.GetManuSfcPagedInfoAsync(parm);
         }
+
+        /// <summary>
+        /// 分页查询列表（条码生产信息（物理删除））
+        /// 优化
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpGet("getManuSfcSelectPageList")]
+        public async Task<PagedInfo<ManuSfcProduceSelectViewDto>> GetManuSfcSelectPagedInfoAsync([FromQuery] ManuSfcProduceSelectPagedQueryDto parm)
+        {
+            return await _manuSfcProduceService.GetManuSfcSelectPagedInfoAsync(parm);
+        }
+
         /// <summary>
         /// 根据SFC查询在制品步骤列表
         /// </summary>

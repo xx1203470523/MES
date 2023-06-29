@@ -85,4 +85,60 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         public string? Version { get; set; }
     }
+
+    /// <summary>
+    /// 条码生产信息查询 分页参数
+    /// </summary>
+    public class ManuSfcProduceSelectPagedQuery : PagerInfo
+    {
+        /// <summary>
+        /// 站点编码 
+        /// </summary>
+        public long? SiteId { get; set; }
+
+        /// <summary>
+        ///产品条码
+        /// </summary>
+        public string? Sfc { get; set; }
+
+        /// <summary>
+        /// 条码状态
+        /// </summary>
+        public SfcProduceStatusEnum? Status { get; set; }
+
+        /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long? OrderId { get; set; }
+
+        /// <summary>
+        /// 工序Id
+        /// </summary>
+        public long? ProcedureId { get; set; }
+
+        /// <summary>
+        /// 条码列表
+        /// </summary>
+        public string[]? SfcArray { get; set; }
+
+        /// <summary>
+        /// 资源Id
+        /// </summary>
+        public long? ResourceId { get; set; }
+
+        /// <summary>
+        /// 锁定状态
+        /// </summary>
+        public int? Lock { get; set; }
+
+        /// <summary>
+        /// 查询锁定状态不为某个状态的sfc信息，即时锁定的不能操作不查
+        /// </summary>
+        public int? NoLock { get; set; }
+
+        /// <summary>
+        /// 产品编码
+        /// </summary>
+        public string? MaterialCode { get; set; }
+    }
 }

@@ -135,6 +135,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<PagedInfo<ManuSfcProduceView>> GetManuSfcPagedInfoAsync(ManuSfcProducePagedQuery manuSfcProducePagedQuery);
 
         /// <summary>
+        /// 分页查询（查询所有条码信息）
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ManuSfcProduceSelectView>> GetManuSfcSelectPagedInfoAsync(ManuSfcProduceSelectPagedQuery query);
+
+        /// <summary>
         /// 批量更新条码（条码状态与使用状态）
         /// </summary>
         /// <param name="command"></param>
