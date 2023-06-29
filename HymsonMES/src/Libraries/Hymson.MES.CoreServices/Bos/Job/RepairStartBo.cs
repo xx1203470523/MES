@@ -31,7 +31,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 
         /// </summary>
-        public UpdateResourceCommand? updateResourceCommand { get; set; }
+        public UpdateProcedureAndResourceCommand? updateResourceCommand { get; set; }
     }
 
 }

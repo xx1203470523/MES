@@ -145,8 +145,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 sfcProduceEntity.RepeatedCount++;
             }
 
-            var updateResourceCommand = new UpdateResourceCommand()
+            var updateResourceCommand = new UpdateProcedureAndResourceCommand()
             {
+                ProcedureId = sfcProduceEntity.ProcedureId,
                 ResourceId = bo.ResourceId,
                 Sfcs = bo.SFCs.ToArray(),
                 SiteId = bo.SiteId,
@@ -170,7 +171,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             {
                 return rows;
             }
-            rows += await _manuSfcProduceRepository.UpdateResourceRangeAsync(data.updateResourceCommand);
+            rows += await _manuSfcProduceRepository.UpdateProcedureAndResourceRangeAsync(data.updateResourceCommand);
 
             return rows;
         }

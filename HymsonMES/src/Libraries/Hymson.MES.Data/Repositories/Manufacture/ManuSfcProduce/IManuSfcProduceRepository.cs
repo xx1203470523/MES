@@ -172,7 +172,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuSfcInfoEntity"></param 
         /// <returns></returns>
-        Task<int> UpdateResourceRangeAsync(UpdateResourceCommand command);
+        Task<int> UpdateProcedureAndResourceRangeAsync(UpdateProcedureAndResourceCommand command);
 
         /// <summary>
         /// 锁定

@@ -89,7 +89,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
     /// <summary>
     /// 根据SFC批量更新工序与状态 (参数)
     /// </summary>
-    public class UpdateResourceCommand
+    public class UpdateProcedureAndResourceCommand
     {
         public long SiteId { get; set; }
 
@@ -98,6 +98,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
         /// </summary>
         public string[] Sfcs { get; set; }
 
+        /// <summary>
+        /// 工序
+        /// </summary>
+        public long ProcedureId { get; set; } 
+        
         /// <summary>
         /// 资源
         /// </summary>
@@ -113,7 +118,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
         /// </summary>
         public DateTime UpdatedOn { get; set; }
 
-        public static implicit operator List<object>(UpdateResourceCommand v)
+        public static implicit operator List<object>(UpdateProcedureAndResourceCommand v)
         {
             throw new NotImplementedException();
         }

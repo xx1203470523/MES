@@ -388,10 +388,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuSfcInfoEntity"></param 
         /// <returns></returns>
-        public async Task<int> UpdateResourceRangeAsync(UpdateResourceCommand command)
+        public async Task<int> UpdateProcedureAndResourceRangeAsync(UpdateProcedureAndResourceCommand command)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateResourceSql, command);
+            return await conn.ExecuteAsync(UpdateProcedureAndResourceSql, command);
         }
 
         /// <summary>
@@ -596,7 +596,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         //在制维修 
         const string UpdateStatusSql = "UPDATE `manu_sfc_produce` SET Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string UpdateProcedureIdSql = "UPDATE `manu_sfc_produce` SET  ResourceId=@ResourceId,ProcessRouteId = @ProcessRouteId, ProcedureId=@ProcedureId, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
-        const string UpdateResourceSql = "UPDATE `manu_sfc_produce` SET  ResourceId=@ResourceId,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE SFC in @Sfcs and SiteId=@SiteId ";
+        const string UpdateProcedureAndResourceSql = "UPDATE `manu_sfc_produce` SET   ProcedureId = @ProcedureId,ResourceId=@ResourceId,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE SFC in @Sfcs and SiteId=@SiteId ";
 
 
         //在制品步骤控制 
