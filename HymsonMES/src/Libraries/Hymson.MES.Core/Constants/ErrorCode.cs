@@ -652,6 +652,7 @@
         public const string MES16330 = "工序存在多个";
         public const string MES16331 = "工艺路线存在多个";
         public const string MES16332 = "SFC列表不能为空";
+        public const string MES16333 = "SFC条码和资源不匹配！";
         #endregion
 
         #region 生产

@@ -41,7 +41,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
             // 当前资源是否对于的上
             if (sfcProduceEntities.Any(a => a.ResourceId.HasValue && a.ResourceId != resourceId))
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16332));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16333));
             }
 
             return sfcProduceEntities;
