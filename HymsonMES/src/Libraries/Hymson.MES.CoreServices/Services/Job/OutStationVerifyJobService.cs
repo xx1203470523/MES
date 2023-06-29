@@ -33,7 +33,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// 参数校验
         /// </summary>
         /// <param name="param"></param>
-        /// <param name="proxy"></param>
         /// <returns></returns>
         public async Task VerifyParamAsync<T>(T param) where T : JobBaseBo
         {
@@ -74,7 +73,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// 数据组装
         /// </summary>
         /// <param name="param"></param>
-        /// <param name="proxy"></param>
         /// <returns></returns>
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
