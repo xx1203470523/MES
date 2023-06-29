@@ -266,7 +266,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 Qty = sfcProduceEntity.Qty,
                 IsRepair = true,
                 Operatetype = ManuSfcStepTypeEnum.Repair,
-                CurrentStatus = SfcProduceStatusEnum.lineUp,
+                CurrentStatus = SfcProduceStatusEnum.Activity,
                 EquipmentId = sfcProduceEntity.EquipmentId,
                 ResourceId = sfcProduceEntity.ResourceId,
                 CreatedBy = _currentUser.UserName,

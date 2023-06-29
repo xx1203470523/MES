@@ -154,7 +154,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 UpdatedOn = HymsonClock.Now()
             };
 
-            await Task.CompletedTask;
             return new RepairStartResponseBo() { updateResourceCommand = updateResourceCommand };
         }
 
@@ -165,11 +164,15 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<int> ExecuteAsync(object obj)
         {
-            var bo = new RepairStartResponseBo();
-            if (bo?.updateResourceCommand != null)
-                await _manuSfcProduceRepository.UpdateResourceRangeAsync(bo.updateResourceCommand);
-            await Task.CompletedTask;
-            return 0;
+            int rows = 0;
+            if (obj is not RepairStartResponseBo data) return rows;
+            if (data?.updateResourceCommand == null)
+            {
+                return rows;
+            }
+            rows += await _manuSfcProduceRepository.UpdateResourceRangeAsync(data.updateResourceCommand);
+
+            return rows;
         }
 
     }
