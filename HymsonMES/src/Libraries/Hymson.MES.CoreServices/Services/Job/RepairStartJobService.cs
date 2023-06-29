@@ -113,11 +113,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <summary>
         /// 执行入库
         /// </summary>
-        /// <param name="proxy"></param>
+        /// <param name="obj"></param>
         /// <returns></returns>
-        public async Task ExecuteAsync()
+        public async Task<int> ExecuteAsync(object obj)
         {
             await Task.CompletedTask;
+            return 0;
         }
 
     }
