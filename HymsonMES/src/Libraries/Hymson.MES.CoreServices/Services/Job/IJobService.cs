@@ -22,13 +22,14 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <typeparam name="TResult"></typeparam>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<TResult?> DataAssemblingAsync<T, TResult>(T param) where T : JobBaseBo where TResult : JobResultBo, new();
+        Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo;
 
         /// <summary>
         /// 执行入库
         /// </summary>
+        /// <param name="obj"></param>
         /// <returns></returns>
-        Task ExecuteAsync();
+        Task<int> ExecuteAsync(object obj);
 
     }
 }

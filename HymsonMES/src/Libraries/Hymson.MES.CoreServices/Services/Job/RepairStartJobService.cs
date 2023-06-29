@@ -95,7 +95,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="param"></param>
         /// <param name="proxy"></param>
         /// <returns></returns>
-        public async Task<TResult?> DataAssemblingAsync<T, TResult>(T param) where T : JobBaseBo where TResult : JobResultBo, new()
+        public async Task<object?> DataAssemblingAsync<T, TResult>(T param) where T : JobBaseBo where TResult : JobResultBo, new()
         {
             if ((param is RepairStartRequestBo bo) == false) return null;
             // 获取生产条码信息
@@ -161,14 +161,15 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <summary>
         /// 执行入库
         /// </summary>
-        /// <param name="proxy"></param>
+        /// <param name="obj"></param>
         /// <returns></returns>
-        public async Task ExecuteAsync()
+        public async Task<int> ExecuteAsync(object obj)
         {
             var bo = new RepairStartResponseBo();
             if (bo?.updateResourceCommand != null)
                 await _manuSfcProduceRepository.UpdateResourceRangeAsync(bo.updateResourceCommand);
             await Task.CompletedTask;
+            return 0;
         }
 
     }

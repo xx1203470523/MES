@@ -73,10 +73,14 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 验证条码是否被容器包装
             await _manuCommonService.VerifyContainerAsync(bo);
 
-            // 如果工序对应不上
+            //（前提：这些条码都是同一工单同一工序）
             var firstProduceEntity = sfcProduceEntities.FirstOrDefault();
             if (firstProduceEntity == null) return;
 
+            // 获取生产工单（附带工单状态校验）
+            _ = await _manuCommonService.GetProduceWorkOrderByIdAsync(firstProduceEntity.WorkOrderId);
+
+            // 如果工序对应不上
             if (firstProduceEntity.ProcedureId != bo.ProcedureId)
             {
                 var processRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetProcessRouteDetailLinksByProcessRouteIdAsync(firstProduceEntity.ProcessRouteId)
@@ -89,6 +93,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 var IsRandomPreProcedure = await _manuCommonService.IsRandomPreProcedureAsync(processRouteDetailLinks, processRouteDetailNodes, firstProduceEntity.ProcessRouteId, bo.ProcedureId);
                 if (IsRandomPreProcedure == false) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
             }
+
         }
 
         /// <summary>
@@ -96,20 +101,21 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<TResult> DataAssemblingAsync<T, TResult>(T param) where T : JobBaseBo where TResult : JobResultBo, new()
+        public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
             await Task.CompletedTask;
-
-            return new TResult();
+            return null;
         }
 
         /// <summary>
-        /// 执行入库
+        /// 执行
         /// </summary>
+        /// <param name="obj"></param>
         /// <returns></returns>
-        public async Task ExecuteAsync()
+        public async Task<int> ExecuteAsync(object obj)
         {
             await Task.CompletedTask;
+            return 0;
         }
 
     }
