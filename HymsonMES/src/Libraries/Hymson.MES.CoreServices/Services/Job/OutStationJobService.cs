@@ -1,6 +1,8 @@
-﻿using Hymson.MES.Core.Attribute.Job;
+﻿using Dapper;
+using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.CoreServices.Bos.Job;
+using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Job;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
@@ -11,6 +13,21 @@ namespace Hymson.MES.CoreServices.Services.NewJob
     [Job("出站", JobTypeEnum.Standard)]
     public class OutStationJobService : IJobService
     {
+        /// <summary>
+        /// 服务接口（生产通用）
+        /// </summary>
+        private readonly IManuCommonService _manuCommonService;
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="manuCommonService"></param>
+        public OutStationJobService(IManuCommonService manuCommonService)
+        {
+            _manuCommonService = manuCommonService;
+        }
+
+
         /// <summary>
         /// 参数校验
         /// </summary>
@@ -28,6 +45,16 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
+            if ((param is OutStationRequestBo bo) == false) return default;
+
+            // 获取生产条码信息
+            var sfcProduceEntities = await param.Proxy.GetValueAsync(_manuCommonService.GetProduceEntitiesBySFCsAsync, bo);
+            var entities = sfcProduceEntities.AsList();
+            if (entities == null || entities.Any() == false) return default;
+
+            var firstProduceEntity = entities.FirstOrDefault();
+            if (firstProduceEntity == null) return default;
+
             /*
             // 更新时间
             sfcProduceEntity.UpdatedBy = _currentUser.UserName;
