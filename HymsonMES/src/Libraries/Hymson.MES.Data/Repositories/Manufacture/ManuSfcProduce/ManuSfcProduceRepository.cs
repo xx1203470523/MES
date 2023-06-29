@@ -62,9 +62,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("msp.Lock=@Lock");
             }
-            if (query.NoLock.HasValue&& query.NoLock != 1)
+            if (query.NoLock.HasValue && query.NoLock != 1)
             {
-                    sqlBuilder.Where("(msp.Lock!=@NoLock or `Lock`  is null)");
+                sqlBuilder.Where("(msp.Lock!=@NoLock or `Lock`  is null)");
             }
             if (query.IsScrap.HasValue)
             {
@@ -373,6 +373,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 根据SFCs批量更新资源
+        /// </summary>
+        /// <param name="manuSfcInfoEntity"></param 
+        /// <returns></returns>
+        public async Task<int> UpdateResourceRangeAsync(UpdateResourceCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateResourceSql, command);
+        }
+
+        /// <summary>
         /// 锁定
         /// </summary>
         /// <param name="command"></param>
@@ -574,6 +585,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         //在制维修 
         const string UpdateStatusSql = "UPDATE `manu_sfc_produce` SET Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string UpdateProcedureIdSql = "UPDATE `manu_sfc_produce` SET  ResourceId=@ResourceId,ProcessRouteId = @ProcessRouteId, ProcedureId=@ProcedureId, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
+        const string UpdateResourceSql = "UPDATE `manu_sfc_produce` SET  ResourceId=@ResourceId,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE SFC in @Sfcs and SiteId=@SiteId ";
+
 
         //在制品步骤控制 
         const string UpdateProcedureAndStatusSql = "UPDATE `manu_sfc_produce` SET ProcedureId = @ProcedureId, ResourceId=@ResourceId,Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE SFC in @Sfcs and SiteId=@SiteId ";

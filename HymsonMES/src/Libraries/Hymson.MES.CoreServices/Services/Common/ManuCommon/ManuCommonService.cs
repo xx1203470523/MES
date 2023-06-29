@@ -5,6 +5,7 @@ using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
@@ -14,6 +15,7 @@ using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
+using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
@@ -83,6 +85,16 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         private readonly IProcProcessRouteDetailLinkRepository _procProcessRouteDetailLinkRepository;
 
         /// <summary>
+        /// 仓储接口（工单信息）
+        /// </summary>
+        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
+
+        /// <summary>
+        /// 仓储接口（工单激活信息）
+        /// </summary>
+        private readonly IPlanWorkOrderActivationRepository _planWorkOrderActivationRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="manuSfcProduceRepository"></param>
@@ -103,7 +115,9 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             ILocalizationService localizationService,
             IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
-            IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository)
+            IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
+            IPlanWorkOrderRepository planWorkOrderRepository,
+            IPlanWorkOrderActivationRepository planWorkOrderActivationRepository)
         {
             // _sequenceService = sequenceService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
@@ -116,6 +130,8 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             _localizationService = localizationService;
             _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
+            _planWorkOrderRepository = planWorkOrderRepository;
+            _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
         }
 
 
@@ -424,6 +440,46 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             return await IsRandomPreProcedureAsync(new IsRandomPreProcedureBo { ProcessRouteId = randomPreProcedureBo.ProcessRouteId, ProcedureId = defaultPreProcedure.Id });
         }
 
+
+
+        /// <summary>
+        /// 获取生产工单
+        /// </summary>
+        /// <param name="workOrderId"></param>
+        /// <param name="isVerifyActivation"></param>
+        /// <returns></returns>
+        public async Task<PlanWorkOrderEntity> GetProduceWorkOrderByIdAsync(GetProduceWorkOrderByIdBo   produceWorkOrderByIdBo)
+        {
+            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(produceWorkOrderByIdBo.WorkOrderId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16301));
+
+            // 判断是否被锁定
+            if (planWorkOrderEntity.Status == PlanWorkOrderStatusEnum.Pending)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16302)).WithData("ordercode", planWorkOrderEntity.OrderCode);
+            }
+
+            if (produceWorkOrderByIdBo.IsVerifyActivation)
+            {
+                // 判断是否是激活的工单
+                _ = await _planWorkOrderActivationRepository.GetByWorkOrderIdAsync(planWorkOrderEntity.Id)
+                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES16410));
+            }
+
+            switch (planWorkOrderEntity.Status)
+            {
+                case PlanWorkOrderStatusEnum.SendDown:
+                case PlanWorkOrderStatusEnum.InProduction:
+                case PlanWorkOrderStatusEnum.Finish:
+                    break;
+                case PlanWorkOrderStatusEnum.NotStarted:
+                case PlanWorkOrderStatusEnum.Closed:
+                default:
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16303)).WithData("ordercode", planWorkOrderEntity.OrderCode);
+            }
+
+            return planWorkOrderEntity;
+        }
         #region 内部方法
 
         #endregion

@@ -17,6 +17,7 @@
         public const string MES10108 = "无法将其他状态修改成新建状态!";
         public const string MES10109 = "编码最大长度为50";
         public const string MES10110 = "名称最大长度为50";
+        public const string MES10111 = "参数不能为空";
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";
@@ -648,8 +649,9 @@
         public const string MES16324 = "存在已报废SFC条码，不允许操作。";
         public const string MES16325 = "存在已锁定SFC条码，不允许操作。";
         public const string MES16326 = "存在SFC状态不是{Status}状态，不允许操作。";
-        public const string MES16330= "工序存在多个";  
-        public const string MES16331= "工艺路线存在多个"; 
+        public const string MES16330 = "工序存在多个";
+        public const string MES16331 = "工艺路线存在多个";
+        public const string MES16332 = "SFC列表不能为空";
         #endregion
 
         #region 生产

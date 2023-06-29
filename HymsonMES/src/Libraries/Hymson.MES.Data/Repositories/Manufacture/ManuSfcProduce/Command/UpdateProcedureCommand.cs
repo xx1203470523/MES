@@ -84,4 +84,33 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
         /// </summary>
         public DateTime UpdatedOn { get; set; }
     }
+
+
+    /// <summary>
+    /// 根据SFC批量更新工序与状态 (参数)
+    /// </summary>
+    public class UpdateResourceCommand
+    {
+        public long SiteId { get; set; }
+
+        /// <summary>
+        ///SFC
+        /// </summary>
+        public string[] Sfcs { get; set; }
+
+        /// <summary>
+        /// 资源
+        /// </summary>
+        public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 操作人员
+        /// </summary>
+        public string UserId { get; set; }
+
+        /// <summary>
+        /// 更新时间
+        /// </summary>
+        public DateTime UpdatedOn { get; set; }
+    }
 }

@@ -130,4 +130,21 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         public long ProcedureId { get; set; }
     }
 
+    /// <summary>
+    /// 获取生产工单Bo
+    /// </summary>
+    public class GetProduceWorkOrderByIdBo
+    {
+        /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long WorkOrderId { get; set; }
+
+        /// <summary>
+        /// 是否验证激活
+        /// </summary>
+        public bool IsVerifyActivation { get; set; } = true;
+    }
+
+
 }

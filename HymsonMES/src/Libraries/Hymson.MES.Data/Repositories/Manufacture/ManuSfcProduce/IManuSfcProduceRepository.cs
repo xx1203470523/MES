@@ -159,6 +159,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<int> UpdateProcedureAndStatusRangeAsync(UpdateProcedureAndStatusCommand command);
 
+
+        /// <summary>
+        /// 根据SFCs批量更新资源
+        /// </summary>
+        /// <param name="manuSfcInfoEntity"></param 
+        /// <returns></returns>
+        Task<int> UpdateResourceRangeAsync(UpdateResourceCommand command);
+
         /// <summary>
         /// 锁定
         /// </summary>
