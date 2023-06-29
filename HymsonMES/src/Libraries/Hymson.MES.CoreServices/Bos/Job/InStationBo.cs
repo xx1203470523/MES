@@ -6,6 +6,10 @@
     public class InStationRequestBo : JobBaseBo
     {
         /// <summary>
+        /// 用户名
+        /// </summary>
+        public string UserName { get; set; } = "";
+        /// <summary>
         /// 工序ID
         /// </summary>
         public long ProcedureId { get; set; }

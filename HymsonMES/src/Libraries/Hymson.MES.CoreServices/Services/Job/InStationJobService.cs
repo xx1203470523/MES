@@ -1,8 +1,16 @@
-﻿using Hymson.MES.Core.Attribute.Job;
+﻿using Dapper;
+using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Core.Attribute.Job;
+using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Job;
+using Hymson.MES.Data.Repositories.Process;
+using Hymson.Snowflake;
+using Hymson.Utils;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -17,14 +25,22 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         private readonly IManuCommonService _manuCommonService;
 
+        /// <summary>
+        /// 仓储接口（工序维护）
+        /// </summary>
+        private readonly IProcProcedureRepository _procProcedureRepository;
+
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="manuCommonService"></param>
-        public InStationJobService(IManuCommonService manuCommonService)
+        /// <param name="procProcedureRepository"></param>
+        public InStationJobService(IManuCommonService manuCommonService,
+            IProcProcedureRepository procProcedureRepository)
         {
             _manuCommonService = manuCommonService;
+            _procProcedureRepository = procProcedureRepository;
         }
 
         /// <summary>
@@ -44,60 +60,62 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<TResult?> DataAssemblingAsync<T, TResult>(T param) where T : JobBaseBo where TResult : JobResultBo, new()
         {
-            await Task.CompletedTask;
-
             TResult? result = null;
             if ((param is InStationRequestBo bo) == false) return result;
 
             // 获取生产条码信息
             var sfcProduceEntities = await param.Proxy.GetValueAsync(_manuCommonService.GetProduceEntitiesBySFCsAsync, bo);
+            var entities = sfcProduceEntities.AsList();
+            if (entities == null || entities.Any() == false) return result;
 
-            /*
-            // 进站
-            sfcProduceEntity.ResourceId = bo.ResourceId;
-
-            // 更新状态，将条码由"排队"改为"活动"
-            sfcProduceEntity.Status = SfcProduceStatusEnum.Activity;
-            sfcProduceEntity.UpdatedBy = _currentUser.UserName;
-            sfcProduceEntity.UpdatedOn = HymsonClock.Now();
-
-            // 获取生产工单（附带工单状态校验）
-            _ = await _manuCommonOldService.GetProduceWorkOrderByIdAsync(sfcProduceEntity.WorkOrderId);
-
-            // 获取当前工序信息
-            var procedureEntity = await _procProcedureRepository.GetByIdAsync(sfcProduceEntity.ProcedureId);
-
-            // 检查是否测试工序
-            if (procedureEntity.Type == ProcedureTypeEnum.Test)
-            {
-                // 超过复投次数，标识为NG
-                if (sfcProduceEntity.RepeatedCount > procedureEntity.Cycle) throw new CustomerValidationException(nameof(ErrorCode.MES16036));
-                sfcProduceEntity.RepeatedCount++;
-            }
+            var firstProduceEntity = entities.FirstOrDefault();
+            if (firstProduceEntity == null) return result;
 
             // 检查是否首工序
-            var isFirstProcedure = await _manuCommonOldService.IsFirstProcedureAsync(sfcProduceEntity.ProcessRouteId, sfcProduceEntity.ProcedureId);
+            var isFirstProcedure = await _manuCommonService.IsFirstProcedureAsync(firstProduceEntity.ProcessRouteId, firstProduceEntity.ProcedureId);
 
-            // 初始化步骤
-            var sfcStep = new ManuSfcStepEntity
+            // 获取当前工序信息
+            var procedureEntity = await _procProcedureRepository.GetByIdAsync(firstProduceEntity.ProcedureId);
+
+            // 进站
+            var sfcStepList = new List<ManuSfcStepEntity> { };
+            entities.ForEach(sfcProduceEntity =>
             {
-                Id = IdGenProvider.Instance.CreateId(),
-                SiteId = sfcProduceEntity.SiteId,
-                SFC = sfcProduceEntity.SFC,
-                ProductId = sfcProduceEntity.ProductId,
-                WorkOrderId = sfcProduceEntity.WorkOrderId,
-                WorkCenterId = sfcProduceEntity.WorkCenterId,
-                ProductBOMId = sfcProduceEntity.ProductBOMId,
-                ProcedureId = sfcProduceEntity.ProcedureId,
-                Qty = sfcProduceEntity.Qty,
-                EquipmentId = sfcProduceEntity.EquipmentId,
-                ResourceId = sfcProduceEntity.ResourceId,
-                CreatedBy = sfcProduceEntity.UpdatedBy,
-                CreatedOn = sfcProduceEntity.UpdatedOn.Value,
-                UpdatedBy = sfcProduceEntity.UpdatedBy,
-                UpdatedOn = sfcProduceEntity.UpdatedOn.Value,
-            };
-            */
+                // 检查是否测试工序
+                if (procedureEntity.Type == ProcedureTypeEnum.Test)
+                {
+                    // 超过复投次数，标识为NG
+                    if (firstProduceEntity.RepeatedCount > procedureEntity.Cycle) throw new CustomerValidationException(nameof(ErrorCode.MES16036));
+                    firstProduceEntity.RepeatedCount++;
+                }
+
+                sfcProduceEntity.ResourceId = bo.ResourceId;
+
+                // 更新状态，将条码由"排队"改为"活动"
+                sfcProduceEntity.Status = SfcProduceStatusEnum.Activity;
+                sfcProduceEntity.UpdatedBy = bo.UserName;
+                sfcProduceEntity.UpdatedOn = HymsonClock.Now();
+
+                // 初始化步骤
+                sfcStepList.Add(new ManuSfcStepEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = sfcProduceEntity.SiteId,
+                    SFC = sfcProduceEntity.SFC,
+                    ProductId = sfcProduceEntity.ProductId,
+                    WorkOrderId = sfcProduceEntity.WorkOrderId,
+                    WorkCenterId = sfcProduceEntity.WorkCenterId,
+                    ProductBOMId = sfcProduceEntity.ProductBOMId,
+                    ProcedureId = sfcProduceEntity.ProcedureId,
+                    Qty = sfcProduceEntity.Qty,
+                    EquipmentId = sfcProduceEntity.EquipmentId,
+                    ResourceId = sfcProduceEntity.ResourceId,
+                    CreatedBy = sfcProduceEntity.UpdatedBy,
+                    CreatedOn = sfcProduceEntity.UpdatedOn.Value,
+                    UpdatedBy = sfcProduceEntity.UpdatedBy,
+                    UpdatedOn = sfcProduceEntity.UpdatedOn.Value,
+                });
+            });
 
             return new TResult();
         }

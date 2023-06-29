@@ -89,6 +89,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 var IsRandomPreProcedure = await _manuCommonService.IsRandomPreProcedureAsync(processRouteDetailLinks, processRouteDetailNodes, firstProduceEntity.ProcessRouteId, bo.ProcedureId);
                 if (IsRandomPreProcedure == false) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
             }
+
+            // 获取生产工单（附带工单状态校验）
+            _ = await _manuCommonService.GetProduceWorkOrderByIdAsync(firstProduceEntity.WorkOrderId);
         }
 
         /// <summary>

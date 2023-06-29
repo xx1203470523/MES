@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Manufacture;
@@ -40,6 +41,22 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// <param name="procedureId"></param>
         /// <returns></returns>
         Task<bool> IsRandomPreProcedureAsync(IEnumerable<ProcProcessRouteDetailLinkEntity> processRouteDetailLinks, IEnumerable<ProcProcessRouteDetailNodeEntity> processRouteDetailNodes, long processRouteId, long procedureId);
+
+        /// <summary>
+        /// 判断是否首工序
+        /// </summary>
+        /// <param name="processRouteId"></param>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        Task<bool> IsFirstProcedureAsync(long processRouteId, long procedureId);
+
+        /// <summary>
+        /// 获取生产工单
+        /// </summary>
+        /// <param name="workOrderId"></param>
+        /// <param name="isVerifyActivation"></param>
+        /// <returns></returns>
+        Task<PlanWorkOrderEntity> GetProduceWorkOrderByIdAsync(long workOrderId, bool isVerifyActivation = true);
 
 
 
