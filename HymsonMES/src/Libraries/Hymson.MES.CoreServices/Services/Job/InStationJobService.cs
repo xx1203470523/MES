@@ -34,8 +34,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task VerifyParamAsync<T>(T param) where T : JobBaseBo
         {
-            if ((param is InStationRequestBo bo) == false) return;
-
             await Task.CompletedTask;
         }
 
@@ -44,9 +42,15 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<TResult> DataAssemblingAsync<T, TResult>(T param) where T : JobBaseBo where TResult : JobResultBo, new()
+        public async Task<TResult?> DataAssemblingAsync<T, TResult>(T param) where T : JobBaseBo where TResult : JobResultBo, new()
         {
             await Task.CompletedTask;
+
+            TResult? result = null;
+            if ((param is InStationRequestBo bo) == false) return result;
+
+            // 获取生产条码信息
+            var sfcProduceEntities = await param.Proxy.GetValueAsync(_manuCommonService.GetProduceEntitiesBySFCsAsync, bo);
 
             /*
             // 进站

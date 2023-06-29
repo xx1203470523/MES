@@ -96,7 +96,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<TResult> DataAssemblingAsync<T, TResult>(T param) where T : JobBaseBo where TResult : JobResultBo, new()
+        public async Task<TResult?> DataAssemblingAsync<T, TResult>(T param) where T : JobBaseBo where TResult : JobResultBo, new()
         {
             await Task.CompletedTask;
 
