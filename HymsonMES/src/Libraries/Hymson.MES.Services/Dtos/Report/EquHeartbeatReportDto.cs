@@ -47,7 +47,9 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 上报时间
         /// </summary>
-        public DateTime CreateOn { get; set; }
+        public DateTime CreatedOn { get; set; }
+
+        public DateTime UpdatedOn { get; set; }
     }
 
     public class EquHeartbeatReportPagedQueryDto : PagerInfo

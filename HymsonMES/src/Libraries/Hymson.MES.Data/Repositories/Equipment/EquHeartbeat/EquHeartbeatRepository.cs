@@ -67,6 +67,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoEquHeartbeatReportCountSqlTemplate);
 
             sqlBuilder.Where(" eh.IsDeleted = 0 ");
+            sqlBuilder.Where(" ee.EquipmentCode is not null ");
             sqlBuilder.Where(" eh.SiteId = @SiteId ");
 
             if (!string.IsNullOrEmpty(pageQuery.EquipmentCode))
