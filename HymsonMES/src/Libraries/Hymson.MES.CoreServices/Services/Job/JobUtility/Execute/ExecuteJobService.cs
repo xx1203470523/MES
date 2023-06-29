@@ -52,14 +52,6 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
                 if (service == null) continue;
 
                 await param.Proxy.GetValueAsync(service.DataAssemblingAsync<T, JobResultBo>, param);
-
-                /*
-                var data = await service.DataAssemblingAsync<T, JobResultBo>(param);
-                if (data == null) continue;
-
-                // TODO 不能直接传方法DataAssemblingAsync，多job时可能会因方法重名而覆盖
-                //await param.Proxy.GetValueAsync();
-                */
             }
 
             // 执行入库

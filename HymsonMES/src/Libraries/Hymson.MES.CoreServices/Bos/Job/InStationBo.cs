@@ -1,4 +1,7 @@
-﻿namespace Hymson.MES.CoreServices.Bos.Job
+﻿using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
+
+namespace Hymson.MES.CoreServices.Bos.Job
 {
     /// <summary>
     /// 
@@ -22,8 +25,32 @@
     /// <summary>
     /// 
     /// </summary>
-    public class InStationResponseBo
+    public class InStationResponseBo : JobResultBo
     {
+        /// <summary>
+        /// 是否首工序
+        /// </summary>
+        public bool IsFirstProcedure { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IEnumerable<ManuSfcProduceEntity> SFCProduceEntities { get; set; } = new List<ManuSfcProduceEntity>();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IEnumerable<UpdateWorkOrderRealTimeCommand> UpdateWorkOrderRealTimeCommands = new List<UpdateWorkOrderRealTimeCommand>();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IEnumerable<UpdateQtyCommand> UpdateQtyCommands { get; set; } = new List<UpdateQtyCommand>();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IEnumerable<ManuSfcStepEntity> SFCStepEntities { get; set; } = new List<ManuSfcStepEntity>();
 
     }
 
