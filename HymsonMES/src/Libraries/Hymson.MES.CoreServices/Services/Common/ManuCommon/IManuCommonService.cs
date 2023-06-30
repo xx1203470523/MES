@@ -58,6 +58,21 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// <returns></returns>
         Task<PlanWorkOrderEntity> GetProduceWorkOrderByIdAsync(long workOrderId, bool isVerifyActivation = true);
 
+        /// <summary>
+        /// 获当前工序对应的下一工序
+        /// </summary>
+        /// <param name="manuSfcProduce"></param>
+        /// <returns></returns>
+        Task<ProcProcedureEntity?> GetNextProcedureAsync(ManuSfcProduceEntity manuSfcProduce);
+
+        /// <summary>
+        /// 获当前工序对应的下一工序
+        /// </summary>
+        /// <param name="processRouteId"></param>
+        /// <param name="procedureId"></param>
+        /// <param name="workOrderId"></param>
+        /// <returns></returns>
+        Task<ProcProcedureEntity?> GetNextProcedureAsync(long processRouteId, long procedureId, long workOrderId = 0);
 
 
         /// <summary>

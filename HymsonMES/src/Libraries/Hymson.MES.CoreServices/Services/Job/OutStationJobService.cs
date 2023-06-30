@@ -1,9 +1,13 @@
 ﻿using Dapper;
 using Hymson.MES.Core.Attribute.Job;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Job;
+using Hymson.Snowflake;
+using Hymson.Utils;
+using System.Net.Sockets;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -55,35 +59,41 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var firstProduceEntity = entities.FirstOrDefault();
             if (firstProduceEntity == null) return default;
 
-            /*
-            // 更新时间
-            sfcProduceEntity.UpdatedBy = _currentUser.UserName;
-            sfcProduceEntity.UpdatedOn = HymsonClock.Now();
-
-            // 初始化步骤
-            var sfcStep = new ManuSfcStepEntity
+            // 组装（出站数据）
+            List<ManuSfcStepEntity> sfcStepEntities = new();
+            entities.ForEach(sfcProduceEntity =>
             {
-                Id = IdGenProvider.Instance.CreateId(),
-                SiteId = sfcProduceEntity.SiteId,
-                SFC = sfcProduceEntity.SFC,
-                ProductId = sfcProduceEntity.ProductId,
-                WorkOrderId = sfcProduceEntity.WorkOrderId,
-                WorkCenterId = sfcProduceEntity.WorkCenterId,
-                ProductBOMId = sfcProduceEntity.ProductBOMId,
-                ProcedureId = sfcProduceEntity.ProcedureId,
-                Qty = sfcProduceEntity.Qty,
-                EquipmentId = sfcProduceEntity.EquipmentId,
-                ResourceId = sfcProduceEntity.ResourceId,
-                CreatedBy = sfcProduceEntity.UpdatedBy,
-                CreatedOn = sfcProduceEntity.UpdatedOn.Value,
-                UpdatedBy = sfcProduceEntity.UpdatedBy,
-                UpdatedOn = sfcProduceEntity.UpdatedOn.Value,
-            };
+                // 更新时间
+                sfcProduceEntity.UpdatedBy = bo.UserName;
+                sfcProduceEntity.UpdatedOn = HymsonClock.Now();
+
+                // 初始化步骤
+                sfcStepEntities.Add(new ManuSfcStepEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = sfcProduceEntity.SiteId,
+                    SFC = sfcProduceEntity.SFC,
+                    ProductId = sfcProduceEntity.ProductId,
+                    WorkOrderId = sfcProduceEntity.WorkOrderId,
+                    WorkCenterId = sfcProduceEntity.WorkCenterId,
+                    ProductBOMId = sfcProduceEntity.ProductBOMId,
+                    ProcedureId = sfcProduceEntity.ProcedureId,
+                    Qty = sfcProduceEntity.Qty,
+                    EquipmentId = sfcProduceEntity.EquipmentId,
+                    ResourceId = sfcProduceEntity.ResourceId,
+                    CreatedBy = sfcProduceEntity.UpdatedBy,
+                    CreatedOn = sfcProduceEntity.UpdatedOn.Value,
+                    UpdatedBy = sfcProduceEntity.UpdatedBy,
+                    UpdatedOn = sfcProduceEntity.UpdatedOn.Value,
+                });
+            });
+
 
             // 合格品出站
             // 获取下一个工序（如果没有了，就表示完工）
-            var nextProcedure = await _manuCommonOldService.GetNextProcedureAsync(sfcProduceEntity);
+            var nextProcedure = await _manuCommonService.GetNextProcedureAsync(firstProduceEntity);
 
+            /*
             // 扣料
             //await func(sfcProduceEntity.ProductBOMId, sfcProduceEntity.ProcedureId);
             var initialMaterials = await GetInitialMaterialsAsync(sfcProduceEntity);
@@ -141,7 +151,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 读取当前工艺路线信息
             var currentProcessRoute = await _procProcessRouteRepository.GetByIdAsync(sfcProduceEntity.ProcessRouteId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES18104)).WithData("sfc", sfcProduceEntity.SFC);
-
             */
 
             await Task.CompletedTask;
