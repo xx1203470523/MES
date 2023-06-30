@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
+using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -23,12 +24,19 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         private readonly IManuCommonService _manuCommonService;
 
         /// <summary>
+        /// 服务接口（主数据）
+        /// </summary>
+        private readonly IMasterDataService _masterDataService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="manuCommonService"></param>
-        public OutStationJobService(IManuCommonService manuCommonService)
+        /// <param name="masterDataService"></param>
+        public OutStationJobService(IManuCommonService manuCommonService, IMasterDataService masterDataService)
         {
             _manuCommonService = manuCommonService;
+            _masterDataService = masterDataService;
         }
 
 
@@ -52,7 +60,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if ((param is OutStationRequestBo bo) == false) return default;
 
             // 获取生产条码信息
-            var sfcProduceEntities = await param.Proxy.GetValueAsync(_manuCommonService.GetProduceEntitiesBySFCsAsync, bo);
+            var sfcProduceEntities = await param.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, bo);
             var entities = sfcProduceEntities.AsList();
             if (entities == null || entities.Any() == false) return default;
 
@@ -91,7 +99,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             // 合格品出站
             // 获取下一个工序（如果没有了，就表示完工）
-            var nextProcedure = await _manuCommonService.GetNextProcedureAsync(firstProduceEntity);
+            var nextProcedure = await _masterDataService.GetNextProcedureAsync(firstProduceEntity);
 
             /*
             // 扣料

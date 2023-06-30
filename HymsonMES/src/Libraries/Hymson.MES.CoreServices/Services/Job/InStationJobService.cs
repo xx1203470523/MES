@@ -8,6 +8,7 @@ using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
+using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
@@ -29,6 +30,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// 服务接口（生产通用）
         /// </summary>
         private readonly IManuCommonService _manuCommonService;
+
+        /// <summary>
+        /// 服务接口（主数据）
+        /// </summary>
+        private readonly IMasterDataService _masterDataService;
 
         /// <summary>
         /// 仓储接口（条码生产信息）
@@ -55,17 +61,19 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// 构造函数
         /// </summary>
         /// <param name="manuCommonService"></param>
+        /// <param name="masterDataService"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="manuSfcStepRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="procProcedureRepository"></param>
-        public InStationJobService(IManuCommonService manuCommonService,
+        public InStationJobService(IManuCommonService manuCommonService, IMasterDataService masterDataService,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcStepRepository manuSfcStepRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IProcProcedureRepository procProcedureRepository)
         {
             _manuCommonService = manuCommonService;
+            _masterDataService = masterDataService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
@@ -92,7 +100,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if ((param is InStationRequestBo bo) == false) return default;
 
             // 获取生产条码信息
-            var sfcProduceEntities = await param.Proxy.GetValueAsync(_manuCommonService.GetProduceEntitiesBySFCsAsync, bo);
+            var sfcProduceEntities = await param.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, bo);
             var entities = sfcProduceEntities.AsList();
             if (entities == null || entities.Any() == false) return default;
 
@@ -100,7 +108,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (firstProduceEntity == null) return default;
 
             // 检查是否首工序
-            var isFirstProcedure = await _manuCommonService.IsFirstProcedureAsync(firstProduceEntity.ProcessRouteId, firstProduceEntity.ProcedureId);
+            var isFirstProcedure = await _masterDataService.IsFirstProcedureAsync(firstProduceEntity.ProcessRouteId, firstProduceEntity.ProcedureId);
 
             // 获取当前工序信息
             var procedureEntity = await _procProcedureRepository.GetByIdAsync(firstProduceEntity.ProcedureId);

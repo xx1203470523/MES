@@ -10,15 +10,14 @@ using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
+using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Job;
-using Hymson.MES.CoreServices.Services.Job.JobUtility;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using MySqlX.XDevAPI.Common;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -33,6 +32,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// 服务接口（生产通用）
         /// </summary>
         private readonly IManuCommonService _manuCommonService;
+
+        /// <summary>
+        /// 服务接口（主数据）
+        /// </summary>
+        private readonly IMasterDataService _masterDataService;
 
         /// <summary>
         /// 仓储接口（工艺路线工序节点）
@@ -59,18 +63,18 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
 
-
         /// <summary>
         /// 验证器
         /// </summary>
         private readonly AbstractValidator<RepairStartRequestBo> _validationRepairJob;
+
         /// <summary>
         /// 构造函数 
         /// </summary>
         /// <param name="manuCommonService"></param>
         /// <param name="procProcessRouteDetailNodeRepository"></param>
         /// <param name="procProcessRouteDetailLinkRepository"></param>
-        public RepairStartJobService(IManuCommonService manuCommonService,
+        public RepairStartJobService(IManuCommonService manuCommonService, IMasterDataService masterDataService,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
             IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
             IProcProcedureRepository procProcedureRepository,
@@ -79,6 +83,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             AbstractValidator<RepairStartRequestBo> validationRepairJob)
         {
             _manuCommonService = manuCommonService;
+            _masterDataService = masterDataService;
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
             _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
             _procProcedureRepository = procProcedureRepository;
@@ -112,7 +117,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         {
             if ((param is RepairStartRequestBo bo) == false) return null;
             // 获取生产条码信息
-            var sfcProduceEntitys = await param.Proxy.GetValueAsync(_manuCommonService.GetProduceEntitiesBySFCsAsync, new MultiSFCBo { SFCs = bo.SFCs, SiteId = bo.SiteId });
+            var sfcProduceEntitys = await param.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, new MultiSFCBo { SFCs = bo.SFCs, SiteId = bo.SiteId });
             if (sfcProduceEntitys == null || !sfcProduceEntitys.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16306));
