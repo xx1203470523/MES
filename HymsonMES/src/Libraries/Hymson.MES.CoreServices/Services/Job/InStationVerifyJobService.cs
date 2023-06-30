@@ -1,6 +1,8 @@
 ﻿using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.CoreServices.Bos.Job;
@@ -86,7 +88,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (firstProduceEntity == null) return;
 
             // 获取生产工单（附带工单状态校验）
-            _ = await _masterDataService.GetProduceWorkOrderByIdAsync(firstProduceEntity.WorkOrderId);
+            //_ = await param.Proxy.GetValueAsync<long, PlanWorkOrderEntity>(_masterDataService.GetProduceWorkOrderByIdAsync, firstProduceEntity.WorkOrderId);
+            _ = await param.Proxy.GetValueAsync<object[], PlanWorkOrderEntity>(async parameters =>
+            {
+                long workOrderId = (long)parameters[0];
+                bool isVerifyActivation = parameters.Length <= 1 || (bool)parameters[1];
+                return await _masterDataService.GetProduceWorkOrderByIdAsync(workOrderId, isVerifyActivation);
+            }, new object[] { firstProduceEntity.WorkOrderId, true });
 
             // 如果工序对应不上
             if (firstProduceEntity.ProcedureId != bo.ProcedureId)
@@ -98,7 +106,16 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES18208));
 
                 // 判断上一个工序是否是随机工序
-                var IsRandomPreProcedure = await _masterDataService.IsRandomPreProcedureAsync(processRouteDetailLinks, processRouteDetailNodes, firstProduceEntity.ProcessRouteId, bo.ProcedureId);
+                //var IsRandomPreProcedure = await _masterDataService.IsRandomPreProcedureAsync(processRouteDetailLinks, processRouteDetailNodes, firstProduceEntity.ProcessRouteId, bo.ProcedureId);
+                var IsRandomPreProcedure = await param.Proxy.GetValueAsync<object[], bool>(async parameters =>
+                {
+                    var processRouteDetailLinks = (IEnumerable<ProcProcessRouteDetailLinkEntity>)parameters[0];
+                    var processRouteDetailNodes = (IEnumerable<ProcProcessRouteDetailNodeEntity>)parameters[1];
+                    var processRouteId = (long)parameters[2];
+                    var procedureId = (long)parameters[3];
+                    return await _masterDataService.IsRandomPreProcedureAsync(processRouteDetailLinks, processRouteDetailNodes, processRouteId, procedureId);
+                }, new object[] { processRouteDetailLinks, processRouteDetailNodes, firstProduceEntity.ProcessRouteId, bo.ProcedureId });
+
                 if (IsRandomPreProcedure == false) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
             }
 

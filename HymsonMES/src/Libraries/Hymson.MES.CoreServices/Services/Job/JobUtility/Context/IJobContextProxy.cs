@@ -33,5 +33,13 @@
         /// <returns></returns>
         Task<TResult?> GetValueAsync<T, TResult>(Func<T, Task<TResult>> func, T parameter);
 
+        /// <summary>
+        /// 取值
+        /// </summary>
+        /// <param name="func"></param>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        Task<TResult?> GetValueAsync<T, TResult>(Func<T[], Task<TResult>> func, params T[] parameters);
+
     }
 }

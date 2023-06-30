@@ -117,7 +117,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// <param name="func"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public async Task<TResult?> GetValue1Async<T, TResult>(Func<T[], Task<TResult>> func, params T[] parameters)
+        public async Task<TResult?> GetValueAsync<T, TResult>(Func<T[], Task<TResult>> func, params T[] parameters)
         {
             var cacheKey = (uint)$"{func.Method.DeclaringType?.FullName}.{func.Method.Name}{parameters}".GetHashCode();
 
