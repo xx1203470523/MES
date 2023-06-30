@@ -8,7 +8,6 @@ using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Job;
@@ -135,7 +134,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (sfcProduceEntity?.ProcedureId != bo.ProcedureId)
             {
                 // 判断上一个工序是否是随机工序
-                var IsRandomPreProcedure = await param.Proxy.GetValueAsync(_manuCommonService.IsRandomPreProcedureAsync, new IsRandomPreProcedureBo { ProcessRouteId = sfcProduceEntity.ProcessRouteId, ProcedureId = bo.ProcedureId });
+                var IsRandomPreProcedure = await _masterDataService.IsRandomPreProcedureAsync(sfcProduceEntity.ProcessRouteId, bo.ProcedureId);
                 if (IsRandomPreProcedure == false) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
 
                 // 将SFC对应的工序改为当前工序
@@ -143,7 +142,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }
 
             // 校验工序和资源是否对应
-            var resourceIds = await param.Proxy.GetValueAsync(_manuCommonService.GetProcResourceIdByProcedureIdAsync, bo.ProcedureId);
+            var resourceIds = await param.Proxy.GetValueAsync(_masterDataService.GetProcResourceIdByProcedureIdAsync, bo.ProcedureId);
             if (resourceIds == null || resourceIds.Any(a => a == bo.ResourceId) == false) throw new CustomerValidationException(nameof(ErrorCode.MES16317));
 
             // 当前工序是否是排队状态
@@ -154,7 +153,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }
 
             // 获取生产工单（附带工单状态校验）
-            _ = await param.Proxy.GetValueAsync(_manuCommonService.GetProduceWorkOrderByIdAsync, new GetProduceWorkOrderByIdBo { WorkOrderId = sfcProduceEntity.WorkOrderId });
+            _ = await _masterDataService.GetProduceWorkOrderByIdAsync(sfcProduceEntity.WorkOrderId);
 
             // 获取当前工序信息
             var procedureEntity = await param.Proxy.GetValueAsync(_procProcedureRepository.GetByIdAsync, sfcProduceEntity.ProcedureId);

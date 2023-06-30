@@ -1,5 +1,4 @@
-﻿using Hymson.MES.Core.Domain.Plan;
-using Hymson.MES.CoreServices.Bos.Common;
+﻿using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 
 namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
@@ -29,30 +28,6 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// <param name="procedureBomBo"></param>
         /// <returns></returns>
         Task VerifyBomQtyAsync(ManuProcedureBomBo procedureBomBo);
-
-
-        /// <summary>
-        /// 获取工序关联的资源
-        /// </summary>
-        /// <param name="procedureId"></param>
-        /// <returns></returns>
-        Task<IEnumerable<long>> GetProcResourceIdByProcedureIdAsync(long procedureId);
-
-        /// <summary>
-        /// 判断上一工序是否随机工序
-        /// </summary>
-        /// <param name="processRouteId"></param>
-        /// <param name="procedureId"></param>
-        /// <returns></returns>
-        Task<bool> IsRandomPreProcedureAsync(IsRandomPreProcedureBo randomPreProcedureBo);
-
-        /// <summary>
-        /// 获取生产工单
-        /// </summary>
-        /// <param name="workOrderId"></param>
-        /// <param name="isVerifyActivation"></param>
-        /// <returns></returns>
-        Task<PlanWorkOrderEntity> GetProduceWorkOrderByIdAsync(GetProduceWorkOrderByIdBo produceWorkOrderByIdBo);
 
     }
 }
