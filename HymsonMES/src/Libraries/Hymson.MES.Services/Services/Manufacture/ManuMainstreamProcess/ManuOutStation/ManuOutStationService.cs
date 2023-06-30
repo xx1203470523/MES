@@ -247,7 +247,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 if (materialBo.DataCollectionWay == MaterialSerialNumberEnum.Batch)
                 {
                     // 进行扣料
-                    DeductMaterialQty(ref updates, ref adds, ref residue, sfcProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
+                    _masterDataService.DeductMaterialQty(ref updates, ref adds, ref residue, sfcProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
                     continue;
                 }
 
@@ -255,7 +255,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 if (materialBo.SerialNumber != MaterialSerialNumberEnum.Batch) continue;
 
                 // 进行扣料
-                DeductMaterialQty(ref updates, ref adds, ref residue, sfcProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
+                _masterDataService.DeductMaterialQty(ref updates, ref adds, ref residue, sfcProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
             }
 
             // manu_sfc_info 修改为完成 且入库
@@ -456,141 +456,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 UpdatedBy = manuSfcProduceEntity.UpdatedBy,
                 UpdatedOn = manuSfcProduceEntity.UpdatedOn
             }));
-        }
-
-
-        /// <summary>
-        /// 进行扣料（单一物料，包含物料的替代料）
-        /// </summary>
-        /// <param name="updates">需要更新数量的集合</param>
-        /// <param name="adds">需要新增的条码流转集合</param>
-        /// <param name="residue">剩余未扣除的数量</param>
-        /// <param name="sfcProduceEntity">条码在制信息</param>
-        /// <param name="manuFeedingsDictionary">已分组的物料库存集合</param>
-        /// <param name="mainMaterialBo">主物料BO对象</param>
-        /// <param name="currentBo">替代料BO对象</param>
-        /// <param name="isMain">是否主物料</param>
-        private static void DeductMaterialQty(ref List<UpdateQtyByIdCommand> updates,
-            ref List<ManuSfcCirculationEntity> adds,
-            ref decimal residue,
-            ManuSfcProduceEntity sfcProduceEntity,
-            Dictionary<long, IGrouping<long, ManuFeedingEntity>> manuFeedingsDictionary,
-            MaterialDeductBo mainMaterialBo,
-            MaterialDeductBo currentBo,
-            bool isMain = true)
-        {
-            // 没有剩余需要抵扣时，直接返回
-            if (residue <= 0) return;
-
-            // 取得当前物料的库存
-            if (manuFeedingsDictionary.TryGetValue(currentBo.MaterialId, out var feedingEntities) == false) return;
-            if (feedingEntities.Any() == false) return;
-
-            // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
-            decimal originQty = currentBo.Usages;
-            if (currentBo.Loss.HasValue == true && currentBo.Loss > 0) originQty *= (currentBo.Loss.Value / 100);
-            if (currentBo.ConsumeRatio > 0) originQty *= (currentBo.ConsumeRatio / 100);
-
-            // 遍历当前物料的所有的物料库存
-            foreach (var feeding in feedingEntities)
-            {
-                decimal targetQty = originQty;
-                var consume = 0m;
-                if (residue <= 0) break;
-                if (feeding.Qty <= 0) continue;
-
-                // 如果是替代料条码，就将替代料的消耗数值重新算下
-                if (currentBo.MaterialId != feeding.MaterialId)
-                {
-                    var replaceBo = currentBo.ReplaceMaterials.FirstOrDefault(f => f.MaterialId == feeding.MaterialId);
-                    if (replaceBo != null)
-                    {
-                        // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
-                        targetQty = replaceBo.Usages;
-                        if (replaceBo.Loss.HasValue == true && replaceBo.Loss > 0) targetQty *= (replaceBo.Loss.Value / 100);
-                        if (replaceBo.ConsumeRatio > 0) targetQty *= (replaceBo.ConsumeRatio / 100);
-                    }
-                }
-
-                // 剩余折算成目标数量
-                var convertResidue = ToTargetValue(originQty, targetQty, residue);
-
-                // 数量足够
-                if (convertResidue <= feeding.Qty)
-                {
-                    consume = convertResidue;
-                    residue = 0;
-                    feeding.Qty -= consume;
-                }
-                // 数量不够，继续下一个
-                else
-                {
-                    consume = feeding.Qty;
-                    residue -= ToTargetValue(targetQty, originQty, consume);
-                    feeding.Qty = 0;
-                }
-
-                // 添加到扣减物料库存
-                updates.Add(new UpdateQtyByIdCommand
-                {
-                    UpdatedBy = sfcProduceEntity.UpdatedBy ?? sfcProduceEntity.CreatedBy,
-                    UpdatedOn = sfcProduceEntity.UpdatedOn,
-                    Qty = feeding.Qty,
-                    Id = feeding.Id
-                });
-
-                // 添加条码流转记录（消耗）
-                adds.Add(new ManuSfcCirculationEntity
-                {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = sfcProduceEntity.SiteId,
-                    ProcedureId = sfcProduceEntity.ProcedureId,
-                    ResourceId = sfcProduceEntity.ResourceId,
-                    SFC = sfcProduceEntity.SFC,
-                    WorkOrderId = sfcProduceEntity.WorkOrderId,
-                    ProductId = sfcProduceEntity.ProductId,
-                    CirculationBarCode = feeding.BarCode,
-                    CirculationProductId = currentBo.MaterialId,
-                    CirculationMainProductId = mainMaterialBo.MaterialId,
-                    CirculationQty = consume,
-                    CirculationType = SfcCirculationTypeEnum.Consume,
-                    CreatedBy = sfcProduceEntity.CreatedBy,
-                    UpdatedBy = sfcProduceEntity.UpdatedBy
-                });
-            }
-
-            // 主物料才扣除检索下级替代料，当还有剩余未扣除的数量时，扣除替代料（替代料不再递归扣除下级替代料库存）
-            if (isMain == false || residue <= 0) return;
-
-            // 扣除替代料
-            foreach (var replaceFeeding in currentBo.ReplaceMaterials)
-            {
-                // 递归扣除替代料库存
-                DeductMaterialQty(ref updates, ref adds, ref residue,
-                    sfcProduceEntity, manuFeedingsDictionary, mainMaterialBo,
-                    new MaterialDeductBo
-                    {
-                        MaterialId = replaceFeeding.MaterialId,
-                        Usages = replaceFeeding.Usages,
-                        Loss = replaceFeeding.Loss,
-                        ConsumeRatio = replaceFeeding.ConsumeRatio,
-                        DataCollectionWay = mainMaterialBo.DataCollectionWay
-                    }, false);
-            }
-
-        }
-
-        /// <summary>
-        /// 转换数量
-        /// </summary>
-        /// <param name="originQty"></param>
-        /// <param name="targetQty"></param>
-        /// <param name="originValue"></param>
-        /// <returns></returns>
-        private static decimal ToTargetValue(decimal originQty, decimal targetQty, decimal originValue)
-        {
-            if (originQty == 0) return originValue;
-            return targetQty * originValue / originQty;
         }
 
     }

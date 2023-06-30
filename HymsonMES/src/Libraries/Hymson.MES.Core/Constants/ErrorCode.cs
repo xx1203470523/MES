@@ -663,6 +663,7 @@
         public const string MES17101 = "物料条码:{barCode}不存在！";
         public const string MES17102 = "获取条码{SFC}信息失败！";
         public const string MES17103 = "获取出站产品信息失败！";
+        public const string MES17104 = "获取条码信息失败！";
 
         #region 面板维护
         public const string MES17201 = "面板类型不能为空";
@@ -883,7 +884,7 @@
         public const string MES18104 = "没有获取到{sfc}对应步骤中的工艺路线信息";
         public const string MES18105 = "没有获取到{sfc}对应步骤中的BOM信息";
         public const string MES18106 = "没有获取到{sfc}对应正在使用的条码信息";
-
+        public const string MES18107 = "没有获取到条码对应步骤中的工艺路线信息";
         public const string MES18110 = "没有传入SFC条码信息";
         #endregion
 

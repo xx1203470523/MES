@@ -31,11 +31,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         /// <param name="manuCommonService"></param>
         /// <param name="masterDataService"></param>
-        public OutStationVerifyJobService(IManuCommonService manuCommonService, IMasterDataService masterDataService)
+        public OutStationVerifyJobService(IManuCommonService manuCommonService,
+            IMasterDataService masterDataService)
         {
             _manuCommonService = manuCommonService;
             _masterDataService = masterDataService;
         }
+
 
         /// <summary>
         /// 参数校验

@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
+using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
 
 namespace Hymson.MES.CoreServices.Services.Common.MasterData
 {
@@ -12,6 +13,35 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
     /// </summary>
     public interface IMasterDataService
     {
+        /// <summary>
+        /// 获取物料基础信息（带空检查）
+        /// </summary>
+        /// <param name="materialId"></param>
+        /// <returns></returns>
+        Task<ProcMaterialEntity> GetProcMaterialEntityWithNullCheck(long materialId);
+
+        /// <summary>
+        /// 获取工序基础信息（带空检查）
+        /// </summary>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        Task<ProcProcedureEntity> GetProcProcedureEntityWithNullCheck(long procedureId);
+
+        /// <summary>
+        /// 获取物料基础信息（带空检查）
+        /// </summary>
+        /// <param name="materialId"></param>
+        /// <returns></returns>
+        Task<ProcProcessRouteEntity> GetProcProcessRouteEntityWithNullCheck(long processRouteId);
+
+        /// <summary>
+        /// 获取条码基础信息（带空检查）
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcEntity>> GetManuSFCEntitiesWithNullCheck(MultiSFCBo bo);
+
+
         /// <summary>
         /// 获取生产工单
         /// </summary>
@@ -136,6 +166,26 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="sfcProduceEntity"></param>
         /// <returns></returns>
         Task<IEnumerable<MaterialDeductBo>> GetInitialMaterialsAsync(ManuSfcProduceEntity sfcProduceEntity);
+
+        /// <summary>
+        /// 进行扣料（单一物料，包含物料的替代料）
+        /// </summary>
+        /// <param name="updates">需要更新数量的集合</param>
+        /// <param name="adds">需要新增的条码流转集合</param>
+        /// <param name="residue">剩余未扣除的数量</param>
+        /// <param name="sfcProduceEntity">条码在制信息</param>
+        /// <param name="manuFeedingsDictionary">已分组的物料库存集合</param>
+        /// <param name="mainMaterialBo">主物料BO对象</param>
+        /// <param name="currentBo">替代料BO对象</param>
+        /// <param name="isMain">是否主物料</param>
+        void DeductMaterialQty(ref List<UpdateQtyByIdCommand> updates,
+             ref List<ManuSfcCirculationEntity> adds,
+             ref decimal residue,
+             ManuSfcProduceEntity sfcProduceEntity,
+             Dictionary<long, IGrouping<long, ManuFeedingEntity>> manuFeedingsDictionary,
+             MaterialDeductBo mainMaterialBo,
+             MaterialDeductBo currentBo,
+             bool isMain = true);
 
 
     }
