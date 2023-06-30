@@ -5,6 +5,7 @@ using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
+using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Job;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
@@ -21,12 +22,19 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         private readonly IManuCommonService _manuCommonService;
 
         /// <summary>
+        /// 服务接口（主数据）
+        /// </summary>
+        private readonly IMasterDataService _masterDataService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="manuCommonService"></param>
-        public OutStationVerifyJobService(IManuCommonService manuCommonService)
+        /// <param name="masterDataService"></param>
+        public OutStationVerifyJobService(IManuCommonService manuCommonService, IMasterDataService masterDataService)
         {
             _manuCommonService = manuCommonService;
+            _masterDataService = masterDataService;
         }
 
         /// <summary>
@@ -41,10 +49,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if ((param is OutStationRequestBo bo) == false) return;
 
             // 获取生产条码信息
-            var sfcProduceEntities = await param.Proxy.GetValueAsync(_manuCommonService.GetProduceEntitiesBySFCsAsync, bo);
+            var sfcProduceEntities = await param.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, bo);
             if (sfcProduceEntities == null || sfcProduceEntities.Any() == false) return;
 
-            var sfcProduceBusinessEntities = await param.Proxy.GetValueAsync(_manuCommonService.GetProduceBusinessEntitiesBySFCsAsync, bo);
+            var sfcProduceBusinessEntities = await param.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, bo);
 
             // 合法性校验
             sfcProduceEntities.VerifySFCStatus(SfcProduceStatusEnum.Activity)
@@ -56,7 +64,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (firstProduceEntity == null) return;
 
             // 获取生产工单（附带工单状态校验）
-            _ = await _manuCommonService.GetProduceWorkOrderByIdAsync(firstProduceEntity.WorkOrderId);
+            _ = await param.Proxy.GetValueAsync(async parameters =>
+            {
+                long workOrderId = (long)parameters[0];
+                bool isVerifyActivation = parameters.Length <= 1 || (bool)parameters[1];
+                return await _masterDataService.GetProduceWorkOrderByIdAsync(workOrderId, isVerifyActivation);
+            }, new object[] { firstProduceEntity.WorkOrderId, true });
 
             // 验证BOM主物料数量
             await _manuCommonService.VerifyBomQtyAsync(new ManuProcedureBomBo
@@ -66,7 +79,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 ProcedureId = bo.ProcedureId,
                 BomId = firstProduceEntity.ProductBOMId
             });
-
         }
 
         /// <summary>
