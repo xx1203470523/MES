@@ -21,6 +21,7 @@ using Hymson.Utils.Tools;
 using MySqlX.XDevAPI.Common;
 using System.Threading.Tasks.Dataflow;
 using System.Linq;
+using Hymson.MES.CoreServices.Services.Common.MasterData;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -37,6 +38,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         private readonly IManuCommonService _manuCommonService;
 
         /// <summary>
+        /// 服务接口（主数据）
+        /// </summary>
+        private readonly IMasterDataService _masterDataService;
+
+        /// <summary>
         /// 验证器
         /// </summary>
         private readonly AbstractValidator<RepairEndRequestBo> _validationRepairJob;
@@ -47,10 +53,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="procProcessRouteDetailNodeRepository"></param>
         /// <param name="procProcessRouteDetailLinkRepository"></param>
         public RepairEndJobService(IManuCommonService manuCommonService,
-            AbstractValidator<RepairEndRequestBo> validationRepairJob)
+            AbstractValidator<RepairEndRequestBo> validationRepairJob,
+            IMasterDataService masterDataService)
         {
             _manuCommonService = manuCommonService;
             _validationRepairJob = validationRepairJob;
+            _masterDataService = masterDataService;
         }
 
 
@@ -84,7 +92,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 throw new CustomerValidationException(nameof(ErrorCode.MES10103));
             }
             // 获取生产条码信息
-            var sfcProduceEntitys = await param.Proxy.GetValueAsync(_manuCommonService.GetProduceEntitiesBySFCsAsync, new MultiSFCBo { SFCs = bo.SFCs, SiteId = bo.SiteId });
+            var sfcProduceEntitys = await param.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, new MultiSFCBo { SFCs = bo.SFCs, SiteId = bo.SiteId });
             if (sfcProduceEntitys == null || !sfcProduceEntitys.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16306));
