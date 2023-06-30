@@ -14,6 +14,27 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
     public interface IMasterDataService
     {
         /// <summary>
+        /// 获取物料基础信息（带空检查）
+        /// </summary>
+        /// <param name="materialId"></param>
+        /// <returns></returns>
+        Task<ProcMaterialEntity> GetProcMaterialEntityWithNullCheck(long materialId);
+
+        /// <summary>
+        /// 获取工序基础信息（带空检查）
+        /// </summary>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        Task<ProcProcedureEntity> GetProcProcedureEntityWithNullCheck(long procedureId);
+
+        /// <summary>
+        /// 获取物料基础信息（带空检查）
+        /// </summary>
+        /// <param name="materialId"></param>
+        /// <returns></returns>
+        Task<ProcProcessRouteEntity> GetProcProcessRouteEntityWithNullCheck(long processRouteId);
+
+        /// <summary>
         /// 获取生产工单
         /// </summary>
         /// <param name="workOrderId"></param>

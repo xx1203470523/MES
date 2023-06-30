@@ -56,6 +56,11 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         private readonly IProcMaterialRepository _procMaterialRepository;
 
         /// <summary>
+        /// 仓储接口（物料替代料）
+        /// </summary>
+        private readonly IProcReplaceMaterialRepository _procReplaceMaterialRepository;
+
+        /// <summary>
         /// 仓储接口（资源维护）
         /// </summary>
         private readonly IProcResourceRepository _procResourceRepository;
@@ -76,9 +81,9 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         private readonly IProcBomDetailReplaceMaterialRepository _procBomDetailReplaceMaterialRepository;
 
         /// <summary>
-        /// 仓储接口（物料替代料）
+        /// 仓储接口（工艺路线）
         /// </summary>
-        private readonly IProcReplaceMaterialRepository _procReplaceMaterialRepository;
+        private readonly IProcProcessRouteRepository _procProcessRouteRepository;
 
         /// <summary>
         /// 仓储接口（工艺路线工序节点）
@@ -117,11 +122,12 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             IPlanWorkOrderRepository planWorkOrderRepository,
             IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
             IProcMaterialRepository procMaterialRepository,
+            IProcReplaceMaterialRepository procReplaceMaterialRepository,
             IProcResourceRepository procResourceRepository,
             IProcProcedureRepository procProcedureRepository,
             IProcBomDetailRepository procBomDetailRepository,
             IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository,
-            IProcReplaceMaterialRepository procReplaceMaterialRepository,
+            IProcProcessRouteRepository procProcessRouteRepository,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
             IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository)
@@ -131,16 +137,60 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             _planWorkOrderRepository = planWorkOrderRepository;
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
             _procMaterialRepository = procMaterialRepository;
+            _procReplaceMaterialRepository = procReplaceMaterialRepository;
             _procResourceRepository = procResourceRepository;
             _procProcedureRepository = procProcedureRepository;
             _procBomDetailRepository = procBomDetailRepository;
             _procBomDetailReplaceMaterialRepository = procBomDetailReplaceMaterialRepository;
-            _procReplaceMaterialRepository = procReplaceMaterialRepository;
+            _procProcessRouteRepository = procProcessRouteRepository;
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
             _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
         }
 
+
+        /// <summary>
+        /// 获取物料基础信息（带空检查）
+        /// </summary>
+        /// <param name="materialId"></param>
+        /// <returns></returns>
+        public async Task<ProcMaterialEntity> GetProcMaterialEntityWithNullCheck(long materialId)
+        {
+            // 读取产品基础信息
+            var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(materialId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES17103));
+
+            return procMaterialEntity;
+        }
+
+        /// <summary>
+        /// 获取工序基础信息（带空检查）
+        /// </summary>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        public async Task<ProcProcedureEntity> GetProcProcedureEntityWithNullCheck(long procedureId)
+        {
+            // 获取工序信息
+            var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(procedureId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10406));
+
+            return procProcedureEntity;
+        }
+
+
+        /// <summary>
+        /// 获取工艺路线基础信息（带空检查）
+        /// </summary>
+        /// <param name="materialId"></param>
+        /// <returns></returns>
+        public async Task<ProcProcessRouteEntity> GetProcProcessRouteEntityWithNullCheck(long processRouteId)
+        {
+            // 读取当前工艺路线信息
+            var processRouteEntity = await _procProcessRouteRepository.GetByIdAsync(processRouteId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES18107));
+
+            return processRouteEntity;
+        }
 
         /// <summary>
         /// 获取生产工单
