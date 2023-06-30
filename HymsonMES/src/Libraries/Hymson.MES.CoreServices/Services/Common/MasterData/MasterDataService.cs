@@ -13,6 +13,7 @@ using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
@@ -34,6 +35,11 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// 序列号服务
         /// </summary>
         private readonly ISequenceService _sequenceService;
+
+        /// <summary>
+        /// 仓储接口（条码信息）
+        /// </summary>
+        private readonly IManuSfcRepository _manuSfcRepository;
 
         /// <summary>
         /// 仓储接口（条码生产信息）
@@ -105,19 +111,22 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// 构造函数
         /// </summary>
         /// <param name="sequenceService"></param>
+        /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="planWorkOrderActivationRepository"></param>
         /// <param name="procMaterialRepository"></param>
+        /// <param name="procReplaceMaterialRepository"></param>
         /// <param name="procResourceRepository"></param>
         /// <param name="procProcedureRepository"></param>
         /// <param name="procBomDetailRepository"></param>
         /// <param name="procBomDetailReplaceMaterialRepository"></param>
-        /// <param name="procReplaceMaterialRepository"></param>
+        /// <param name="procProcessRouteRepository"></param>
         /// <param name="procProcessRouteDetailNodeRepository"></param>
         /// <param name="procProcessRouteDetailLinkRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
         public MasterDataService(ISequenceService sequenceService,
+            IManuSfcRepository manuSfcRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
@@ -133,6 +142,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             IWhMaterialInventoryRepository whMaterialInventoryRepository)
         {
             _sequenceService = sequenceService;
+            _manuSfcRepository = manuSfcRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
@@ -177,11 +187,10 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             return procProcedureEntity;
         }
 
-
         /// <summary>
         /// 获取工艺路线基础信息（带空检查）
         /// </summary>
-        /// <param name="materialId"></param>
+        /// <param name="processRouteId"></param>
         /// <returns></returns>
         public async Task<ProcProcessRouteEntity> GetProcProcessRouteEntityWithNullCheck(long processRouteId)
         {
@@ -191,6 +200,24 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
 
             return processRouteEntity;
         }
+
+        /// <summary>
+        /// 获取条码基础信息（带空检查）
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcEntity>> GetManuSFCEntitiesWithNullCheck(MultiSFCBo bo)
+        {
+            // 条码信息
+            var manuSfcEntities = await _manuSfcRepository.GetManuSfcEntitiesAsync(new ManuSfcQuery
+            {
+                SiteId = bo.SiteId,
+                SFCs = bo.SFCs
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES17104));
+
+            return manuSfcEntities;
+        }
+
 
         /// <summary>
         /// 获取生产工单

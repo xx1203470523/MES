@@ -1,7 +1,5 @@
 ﻿using Dapper;
-using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Attribute.Job;
-using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
@@ -13,9 +11,9 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -36,31 +34,32 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         private readonly IMasterDataService _masterDataService;
 
         /// <summary>
-        /// 仓储接口（条码信息）
-        /// </summary>
-        private readonly IManuSfcRepository _manuSfcRepository;
-
-        /// <summary>
         /// 仓储接口（上料信息）
         /// </summary>
         private readonly IManuFeedingRepository _manuFeedingRepository;
+
+        /// <summary>
+        /// 仓储接口（条码流转）
+        /// </summary>
+        private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
+
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="manuCommonService"></param>
         /// <param name="masterDataService"></param>
-        /// <param name="manuSfcRepository"></param>
         /// <param name="manuFeedingRepository"></param>
+        /// <param name="manuSfcCirculationRepository"></param>
         public OutStationJobService(IManuCommonService manuCommonService,
             IMasterDataService masterDataService,
-            IManuSfcRepository manuSfcRepository,
-            IManuFeedingRepository manuFeedingRepository)
+            IManuFeedingRepository manuFeedingRepository,
+            IManuSfcCirculationRepository manuSfcCirculationRepository)
         {
             _manuCommonService = manuCommonService;
             _masterDataService = masterDataService;
-            _manuSfcRepository = manuSfcRepository;
             _manuFeedingRepository = manuFeedingRepository;
+            _manuSfcCirculationRepository = manuSfcCirculationRepository;
         }
 
 
@@ -102,6 +101,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 // 初始化步骤
                 sfcStepEntities.Add(new ManuSfcStepEntity
                 {
+                    //Operatetype = ManuSfcStepTypeEnum.OutStock,
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = sfcProduceEntity.SiteId,
                     SFC = sfcProduceEntity.SFC,
@@ -171,11 +171,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             // manu_sfc_info 修改为完成 且入库
             // 条码信息
-            var sfcInfo = await _manuSfcRepository.GetManuSfcEntitiesAsync(new ManuSfcQuery
-            {
-                SiteId = bo.SiteId,
-                SFCs = bo.SFCs
-            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES17104));
+            var manuSfcEntities = await _masterDataService.GetManuSFCEntitiesWithNullCheck(bo);
 
             // 读取产品基础信息
             var procMaterialEntity = await _masterDataService.GetProcMaterialEntityWithNullCheck(firstProduceEntity.ProductId);
@@ -184,7 +180,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var currentProcessRoute = await _masterDataService.GetProcProcessRouteEntityWithNullCheck(firstProduceEntity.ProcessRouteId);
 
             // TODO
-            return null;
+            return new OutStationResponseBo
+            {
+                IsCompleted = nextProcedure == null,
+                UpdateQtyByIdCommands = updates,
+                ManuSfcCirculationEntities = adds,
+                SFCStepEntities = sfcStepEntities
+            };
         }
 
         /// <summary>
@@ -194,18 +196,20 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<int> ExecuteAsync(object obj)
         {
-            /*
+            int rows = 0;
+            if (obj is not OutStationResponseBo data) return rows;
+
             // 更新数据
             using var trans = TransactionHelper.GetTransactionScope();
             List<Task> tasks = new();
 
             // 更新物料库存
-            if (updates.Any() == true)
+            if (data.UpdateQtyByIdCommands.Any() == true)
             {
-                rows += await _manuFeedingRepository.UpdateQtyByIdAsync(updates);
+                rows += await _manuFeedingRepository.UpdateQtyByIdAsync(data.UpdateQtyByIdCommands);
 
                 // 未更新到全部需更新的数据，事务回滚
-                if (updates.Count > rows)
+                if (data.UpdateQtyByIdCommands.Count() > rows)
                 {
                     trans.Dispose();
                     return 0;
@@ -213,15 +217,16 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }
 
             // 添加流转记录
-            if (adds.Any() == true)
+            if (data.ManuSfcCirculationEntities.Any() == true)
             {
-                var manuSfcCirculationInsertRangeTask = _manuSfcCirculationRepository.InsertRangeAsync(adds);
+                var manuSfcCirculationInsertRangeTask = _manuSfcCirculationRepository.InsertRangeAsync(data.ManuSfcCirculationEntities);
                 tasks.Add(manuSfcCirculationInsertRangeTask);
             }
 
             // 完工
-            if (nextProcedure == null)
+            if (data.IsCompleted)
             {
+                /*
                 // 插入 manu_sfc_step 状态为 完成
                 sfcStep.Operatetype = currentProcessRoute.Type == ProcessRouteTypeEnum.UnqualifiedRoute ? ManuSfcStepTypeEnum.RepairComplete : ManuSfcStepTypeEnum.OutStock;    // TODO 这里的状态？？
                 sfcStep.CurrentStatus = SfcProduceStatusEnum.Complete;  // TODO 这里的状态？？
@@ -276,10 +281,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     // 入库
                     SaveToWarehouseAsync(ref tasks, sfcProduceEntity, procMaterialEntity);
                 }
+                */
             }
             // 未完工
             else
             {
+                /*
                 // 修改 manu_sfc_produce 为排队, 工序修改为下一工序的id
                 sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
                 sfcProduceEntity.ProcedureId = nextProcedure.Id;
@@ -290,14 +297,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 sfcStep.Operatetype = ManuSfcStepTypeEnum.OutStock;
                 var manuSfcStepInsertTask = _manuSfcStepRepository.InsertAsync(sfcStep);
                 tasks.Add(manuSfcStepInsertTask);
+                */
             }
 
             await Task.WhenAll(tasks);
             trans.Complete();
-            */
 
-            await Task.CompletedTask;
-            return 0;
+            return rows;
         }
 
     }

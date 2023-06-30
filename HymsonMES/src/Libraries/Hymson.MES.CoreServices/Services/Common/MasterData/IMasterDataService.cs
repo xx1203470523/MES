@@ -35,6 +35,14 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         Task<ProcProcessRouteEntity> GetProcProcessRouteEntityWithNullCheck(long processRouteId);
 
         /// <summary>
+        /// 获取条码基础信息（带空检查）
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcEntity>> GetManuSFCEntitiesWithNullCheck(MultiSFCBo bo);
+
+
+        /// <summary>
         /// 获取生产工单
         /// </summary>
         /// <param name="workOrderId"></param>
