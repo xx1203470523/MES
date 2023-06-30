@@ -169,15 +169,14 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 _masterDataService.DeductMaterialQty(ref updates, ref adds, ref residue, firstProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
             }
 
-            // manu_sfc_info 修改为完成 且入库
-            // 条码信息
+            // 读取条码信息
             var manuSfcEntities = await _masterDataService.GetManuSFCEntitiesWithNullCheck(bo);
 
             // 读取产品基础信息
             var procMaterialEntity = await _masterDataService.GetProcMaterialEntityWithNullCheck(firstProduceEntity.ProductId);
 
             // 读取当前工艺路线信息
-            var currentProcessRoute = await _masterDataService.GetProcProcessRouteEntityWithNullCheck(firstProduceEntity.ProcessRouteId);
+            var procProcessRouteEntity = await _masterDataService.GetProcProcessRouteEntityWithNullCheck(firstProduceEntity.ProcessRouteId);
 
             // TODO
             return new OutStationResponseBo
@@ -262,6 +261,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     });
                     tasks.Add(planWorkOrderUpdateFinishProductQuantityByWorkOrderIdTask);
 
+                    // manu_sfc_info 修改为完成 且入库
                     // 更新状态
                     sfcInfo.Status = SfcStatusEnum.Complete;
                     sfcInfo.UpdatedBy = sfcProduceEntity.UpdatedBy;
