@@ -130,7 +130,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
 
             /*
             var jobBos = new List<JobBo> { };
-            jobBos.Add(new JobBo { Name = "InStationJobService" });
+            jobBos.Add(new JobBo { Name = "InStationVerifyJobService" });
             jobBos.Add(new JobBo { Name = "InStationJobService" });
 
             await _executeJobService.ExecuteAsync(jobBos, new InStationRequestBo { });

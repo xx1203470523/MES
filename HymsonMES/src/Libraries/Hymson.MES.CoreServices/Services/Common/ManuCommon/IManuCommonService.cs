@@ -1,7 +1,4 @@
-﻿using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Plan;
-using Hymson.MES.Core.Domain.Process;
-using Hymson.MES.CoreServices.Bos.Common;
+﻿using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 
 namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
@@ -11,55 +8,6 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
     /// </summary>
     public interface IManuCommonService
     {
-        /// <summary>
-        /// 获取生产条码信息
-        /// </summary>
-        /// <param name="sfcBo"></param>
-        /// <returns></returns>
-        Task<(ManuSfcProduceEntity, ManuSfcProduceBusinessEntity)> GetProduceSFCAsync(SingleSFCBo sfcBo);
-
-        /// <summary>
-        /// 获取生产条码信息
-        /// </summary>
-        /// <param name="sfcBos"></param>
-        /// <returns></returns>
-        Task<IEnumerable<ManuSfcProduceEntity>> GetProduceEntitiesBySFCsAsync(MultiSFCBo sfcBos);
-
-        /// <summary>
-        /// 获取生产条码信息
-        /// </summary>
-        /// <param name="sfcBos"></param>
-        /// <returns></returns>
-        Task<IEnumerable<ManuSfcProduceBusinessEntity>> GetProduceBusinessEntitiesBySFCsAsync(MultiSFCBo sfcBos);
-
-        /// <summary>
-        /// 判断上一工序是否随机工序
-        /// </summary>
-        /// <param name="processRouteDetailLinks"></param>
-        /// <param name="processRouteDetailNodes"></param>
-        /// <param name="processRouteId"></param>
-        /// <param name="procedureId"></param>
-        /// <returns></returns>
-        Task<bool> IsRandomPreProcedureAsync(IEnumerable<ProcProcessRouteDetailLinkEntity> processRouteDetailLinks, IEnumerable<ProcProcessRouteDetailNodeEntity> processRouteDetailNodes, long processRouteId, long procedureId);
-
-        /// <summary>
-        /// 判断是否首工序
-        /// </summary>
-        /// <param name="processRouteId"></param>
-        /// <param name="procedureId"></param>
-        /// <returns></returns>
-        Task<bool> IsFirstProcedureAsync(long processRouteId, long procedureId);
-
-        /// <summary>
-        /// 获取生产工单
-        /// </summary>
-        /// <param name="workOrderId"></param>
-        /// <param name="isVerifyActivation"></param>
-        /// <returns></returns>
-        Task<PlanWorkOrderEntity> GetProduceWorkOrderByIdAsync(long workOrderId, bool isVerifyActivation = true);
-
-
-
         /// <summary>
         /// 批量验证条码是否锁定
         /// </summary>
@@ -80,30 +28,6 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// <param name="procedureBomBo"></param>
         /// <returns></returns>
         Task VerifyBomQtyAsync(ManuProcedureBomBo procedureBomBo);
-
-
-        /// <summary>
-        /// 获取工序关联的资源
-        /// </summary>
-        /// <param name="procedureId"></param>
-        /// <returns></returns>
-        Task<IEnumerable<long>> GetProcResourceIdByProcedureIdAsync(long procedureId);
-
-        /// <summary>
-        /// 判断上一工序是否随机工序
-        /// </summary>
-        /// <param name="processRouteId"></param>
-        /// <param name="procedureId"></param>
-        /// <returns></returns>
-        Task<bool> IsRandomPreProcedureAsync(IsRandomPreProcedureBo randomPreProcedureBo);
-
-        /// <summary>
-        /// 获取生产工单
-        /// </summary>
-        /// <param name="workOrderId"></param>
-        /// <param name="isVerifyActivation"></param>
-        /// <returns></returns>
-        Task<PlanWorkOrderEntity> GetProduceWorkOrderByIdAsync(GetProduceWorkOrderByIdBo produceWorkOrderByIdBo);
 
     }
 }

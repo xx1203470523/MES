@@ -1,10 +1,13 @@
-﻿using Hymson.MES.CoreServices.Services.Common.ManuCommon;
+﻿using FluentValidation;
+using Hymson.MES.CoreServices.Bos.Job;
+using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.CoreServices.Services.Job.JobUtility;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
 using Hymson.MES.CoreServices.Services.NewJob;
+using Hymson.MES.Services.Validators.Equipment;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -24,6 +27,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         public static IServiceCollection AddCoreService(this IServiceCollection services, IConfiguration configuration)
         {
             AddServices(services);
+            AddValidators(services);
             return services;
         }
 
@@ -47,7 +51,20 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSingleton<IJobService, RepairStartJobService>();
             services.AddSingleton(typeof(IExecuteJobService<>), typeof(ExecuteJobService<>));
             //services.AddSingleton<ExecuteJobService<OutStationRequestBo>, ExecuteJobService<OutStationRequestBo>>();
-           
+
+            return services;
+        }
+
+
+        /// <summary>
+        /// 添加验证器相关服务
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        private static IServiceCollection AddValidators(IServiceCollection services)
+        {
+            services.AddSingleton<AbstractValidator<RepairStartRequestBo>, RepairStartJobValidator>();
+
             return services;
         }
 
