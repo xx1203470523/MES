@@ -192,7 +192,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
 
             //TODO 这里应该查资源绑定的工单
-            var planWorkOrderBindEntity = await param.Proxy.GetValueAsync(_planWorkOrderBindRepository.GetByResourceIDAsync, new PlanWorkOrderBindByResourceIdQuery { SiteId = bo.SiteId, EquipmentId = bo.EquipmentId, ResourceId = bo.ResourceId });
+            var planWorkOrderBindEntity = await param.Proxy.GetValueAsync(_planWorkOrderBindRepository.GetByResourceIDAsync, new PlanWorkOrderBindByResourceIdQuery { SiteId = bo.SiteId, EquipmentId = bo.EquipmentId, ResourceId = bo.ResourceId })
               ?? throw new CustomerValidationException(nameof(ErrorCode.MES19928)).WithData("ResCode", procResource.ResCode);
             //获取工单  带验证
             var planWorkOrder = await param.Proxy.GetValueAsync(async paramters =>
