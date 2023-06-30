@@ -1,9 +1,11 @@
-﻿using Hymson.Infrastructure.Exceptions;
+﻿using FluentValidation;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
@@ -13,7 +15,9 @@ using Hymson.MES.CoreServices.Services.Job.JobUtility;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 using MySqlX.XDevAPI.Common;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
@@ -51,6 +55,16 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
         /// <summary>
+        /// 仓储接口（条码步骤）
+        /// </summary>
+        private readonly IManuSfcStepRepository _manuSfcStepRepository;
+
+
+        /// <summary>
+        /// 验证器
+        /// </summary>
+        private readonly AbstractValidator<RepairStartRequestBo> _validationRepairJob;
+        /// <summary>
         /// 构造函数 
         /// </summary>
         /// <param name="manuCommonService"></param>
@@ -60,13 +74,17 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
             IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
             IProcProcedureRepository procProcedureRepository,
-            IManuSfcProduceRepository manuSfcProduceRepository)
+            IManuSfcProduceRepository manuSfcProduceRepository,
+            IManuSfcStepRepository manuSfcStepRepository,
+            AbstractValidator<RepairStartRequestBo> validationRepairJob)
         {
             _manuCommonService = manuCommonService;
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
             _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
             _procProcedureRepository = procProcedureRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
+            _manuSfcStepRepository = manuSfcStepRepository;
+            _validationRepairJob = validationRepairJob;
         }
 
 
@@ -78,14 +96,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task VerifyParamAsync<T>(T param) where T : JobBaseBo
         {
-            if ((param is RepairStartRequestBo bo) == false)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10111));
-            }
-            if (bo.SFCs == null || !bo.SFCs.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16332));
-            }
+            if ((param is RepairStartRequestBo bo) == false) throw new CustomerValidationException(nameof(ErrorCode.MES10103));
+            // 验证DTO
+            await _validationRepairJob.ValidateAndThrowAsync(bo);
             await Task.CompletedTask;
         }
 
@@ -100,15 +113,19 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if ((param is RepairStartRequestBo bo) == false) return null;
             // 获取生产条码信息
             var sfcProduceEntitys = await param.Proxy.GetValueAsync(_manuCommonService.GetProduceEntitiesBySFCsAsync, new MultiSFCBo { SFCs = bo.SFCs, SiteId = bo.SiteId });
-            if (sfcProduceEntitys?.GroupBy(it => it.ProcedureId).Count() > 1)
+            if (sfcProduceEntitys == null || !sfcProduceEntitys.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16306));
+            }
+            if (sfcProduceEntitys.GroupBy(it => it.ProcedureId).Count() > 1)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16330));
             };
-            if (sfcProduceEntitys?.GroupBy(it => it.ProcedureId).Count() > 1)
+            if (sfcProduceEntitys.GroupBy(it => it.ProcedureId).Count() > 1)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16331));
             };
-            var sfcProduceEntity = sfcProduceEntitys?.FirstOrDefault();
+            var sfcProduceEntity = sfcProduceEntitys.FirstOrDefault();
             // 如果工序对应不上
             if (sfcProduceEntity?.ProcedureId != bo.ProcedureId)
             {
@@ -144,9 +161,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 if (sfcProduceEntity.RepeatedCount > procedureEntity.Cycle) throw new CustomerValidationException(nameof(ErrorCode.MES16036));
                 sfcProduceEntity.RepeatedCount++;
             }
-
-            var updateResourceCommand = new UpdateProcedureAndResourceCommand()
+            //在制
+            var updateProcedureAndStatus = new UpdateProcedureAndStatusCommand()
             {
+                Status = SfcProduceStatusEnum.Activity,
                 ProcedureId = sfcProduceEntity.ProcedureId,
                 ResourceId = bo.ResourceId,
                 Sfcs = bo.SFCs.ToArray(),
@@ -154,8 +172,34 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 UserId = bo.UserName,
                 UpdatedOn = HymsonClock.Now()
             };
-
-            return new RepairStartResponseBo() { updateResourceCommand = updateResourceCommand };
+            //步骤
+            var stepList = new List<ManuSfcStepEntity>();
+            foreach (var item in sfcProduceEntitys)
+            {
+                stepList.Add(new ManuSfcStepEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = bo.SiteId,
+                    ResourceId = bo.ResourceId,
+                    SFC = sfcProduceEntity.SFC,
+                    ProductId = sfcProduceEntity.ProductId,
+                    WorkOrderId = sfcProduceEntity.WorkOrderId,
+                    WorkCenterId = sfcProduceEntity.WorkCenterId,
+                    ProductBOMId = sfcProduceEntity.ProductBOMId,
+                    ProcedureId = sfcProduceEntity.ProcedureId,
+                    Qty = sfcProduceEntity.Qty,
+                    EquipmentId = sfcProduceEntity.EquipmentId,
+                    IsRepair = true,
+                    Operatetype = ManuSfcStepTypeEnum.Repair,
+                    CurrentStatus = SfcProduceStatusEnum.Activity,
+                    CreatedBy = bo.UserName,
+                    UpdatedBy = bo.UserName,
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedOn = HymsonClock.Now(),
+                });
+            }
+            //返回
+            return new RepairStartResponseBo() { UpdateResourceCommand = updateProcedureAndStatus, ManuSfcStepList = stepList };
         }
 
         /// <summary>
@@ -167,12 +211,18 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         {
             int rows = 0;
             if (obj is not RepairStartResponseBo data) return rows;
-            if (data?.updateResourceCommand == null)
+            if (data == null || data.UpdateResourceCommand == null || (data.ManuSfcStepList == null || !data.ManuSfcStepList.Any()))
             {
                 return rows;
             }
-            rows += await _manuSfcProduceRepository.UpdateProcedureAndResourceRangeAsync(data.updateResourceCommand);
 
+            //事务入库
+            using var trans = TransactionHelper.GetTransactionScope();
+
+            rows += await _manuSfcProduceRepository.UpdateProcedureAndStatusRangeAsync(data.UpdateResourceCommand);
+            rows += await _manuSfcStepRepository.InsertRangeAsync(data.ManuSfcStepList);
+
+            trans.Complete();
             return rows;
         }
 

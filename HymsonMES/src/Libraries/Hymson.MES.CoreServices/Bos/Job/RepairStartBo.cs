@@ -29,9 +29,14 @@ namespace Hymson.MES.CoreServices.Bos.Job
     public class RepairStartResponseBo : JobResultBo
     {
         /// <summary>
-        /// 
+        /// 在制
         /// </summary>
-        public UpdateProcedureAndResourceCommand? updateResourceCommand { get; set; }
+        public UpdateProcedureAndStatusCommand UpdateResourceCommand { get; set; } = new UpdateProcedureAndStatusCommand();
+
+        /// <summary>
+        /// 步骤
+        /// </summary>
+        public List<ManuSfcStepEntity> ManuSfcStepList { get; set; } = new List<ManuSfcStepEntity>();
     }
 
 }

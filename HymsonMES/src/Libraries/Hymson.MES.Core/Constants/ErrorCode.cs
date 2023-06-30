@@ -18,6 +18,7 @@
         public const string MES10109 = "编码最大长度为50";
         public const string MES10110 = "名称最大长度为50";
         public const string MES10111 = "参数不能为空";
+        public const string MES10112 = "站点不能为空";
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";
@@ -653,6 +654,8 @@
         public const string MES16331 = "工艺路线存在多个";
         public const string MES16332 = "SFC列表不能为空";
         public const string MES16333 = "SFC条码和资源不匹配！";
+        public const string MES16334 = "资源不能为空！";
+        public const string MES16335 = "工序不能为空！";
         #endregion
 
         #region 生产
