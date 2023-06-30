@@ -64,7 +64,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (firstProduceEntity == null) return;
 
             // 获取生产工单（附带工单状态校验）
-            _ = await _masterDataService.GetProduceWorkOrderByIdAsync(firstProduceEntity.WorkOrderId);
+            _ = await param.Proxy.GetValueAsync(async parameters =>
+            {
+                long workOrderId = (long)parameters[0];
+                bool isVerifyActivation = parameters.Length <= 1 || (bool)parameters[1];
+                return await _masterDataService.GetProduceWorkOrderByIdAsync(workOrderId, isVerifyActivation);
+            }, new object[] { firstProduceEntity.WorkOrderId, true });
 
             // 验证BOM主物料数量
             await _manuCommonService.VerifyBomQtyAsync(new ManuProcedureBomBo
@@ -74,7 +79,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 ProcedureId = bo.ProcedureId,
                 BomId = firstProduceEntity.ProductBOMId
             });
-
         }
 
         /// <summary>

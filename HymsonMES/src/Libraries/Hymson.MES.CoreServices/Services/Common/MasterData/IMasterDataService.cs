@@ -128,5 +128,15 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <returns></returns>
         Task<IEnumerable<ProcessRouteDetailDto>> GetProcessRouteAsync(long processRouteId);
 
+
+
+        /// <summary>
+        /// 获取即将扣料的物料数据
+        /// </summary>
+        /// <param name="sfcProduceEntity"></param>
+        /// <returns></returns>
+        Task<IEnumerable<MaterialDeductBo>> GetInitialMaterialsAsync(ManuSfcProduceEntity sfcProduceEntity);
+
+
     }
 }

@@ -1,4 +1,5 @@
-﻿using Hymson.Infrastructure.Exceptions;
+﻿using Dapper;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
@@ -49,6 +50,11 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         private readonly IPlanWorkOrderActivationRepository _planWorkOrderActivationRepository;
 
         /// <summary>
+        /// 仓储接口（物料维护）
+        /// </summary>
+        private readonly IProcMaterialRepository _procMaterialRepository;
+
+        /// <summary>
         /// 仓储接口（资源维护）
         /// </summary>
         private readonly IProcResourceRepository _procResourceRepository;
@@ -96,6 +102,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="planWorkOrderActivationRepository"></param>
+        /// <param name="procMaterialRepository"></param>
         /// <param name="procResourceRepository"></param>
         /// <param name="procProcedureRepository"></param>
         /// <param name="procBomDetailRepository"></param>
@@ -108,6 +115,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             IManuSfcProduceRepository manuSfcProduceRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
+            IProcMaterialRepository procMaterialRepository,
             IProcResourceRepository procResourceRepository,
             IProcProcedureRepository procProcedureRepository,
             IProcBomDetailRepository procBomDetailRepository,
@@ -121,6 +129,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
+            _procMaterialRepository = procMaterialRepository;
             _procResourceRepository = procResourceRepository;
             _procProcedureRepository = procProcedureRepository;
             _procBomDetailRepository = procBomDetailRepository;
@@ -698,6 +707,115 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 }
             }
         }
+
+
+
+        /// <summary>
+        /// 获取即将扣料的物料数据
+        /// </summary>
+        /// <param name="sfcProduceEntity"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<MaterialDeductBo>> GetInitialMaterialsAsync(ManuSfcProduceEntity sfcProduceEntity)
+        {
+            // 获取BOM绑定的物料
+            var mainMaterials = await _procBomDetailRepository.GetByBomIdAsync(sfcProduceEntity.ProductBOMId);
+
+            // 未设置物料
+            if (mainMaterials == null || mainMaterials.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES10612));
+
+            // 取得特定工序的物料
+            mainMaterials = mainMaterials.Where(w => w.ProcedureId == sfcProduceEntity.ProcedureId);
+            var materialIds = mainMaterials.Select(s => s.MaterialId).AsList();
+
+            // 查询BOM替代料
+            var replaceMaterialsForBOM = await _procBomDetailReplaceMaterialRepository.GetByBomIdAsync(sfcProduceEntity.ProductBOMId);
+            var replaceMaterialsForBOMDic = replaceMaterialsForBOM.ToLookup(w => w.BomDetailId).ToDictionary(d => d.Key, d => d);
+
+            // 查询物料基础数据的替代料
+            var replaceMaterialsForMain = await _procReplaceMaterialRepository.GetProcReplaceMaterialViewsAsync(sfcProduceEntity.SiteId);
+            replaceMaterialsForMain = replaceMaterialsForMain.Where(w => materialIds.Contains(w.MaterialId));
+            var replaceMaterialsForMainDic = replaceMaterialsForMain.ToLookup(w => w.MaterialId).ToDictionary(d => d.Key, d => d);
+
+            // 组合主物料ID和替代料ID
+            materialIds.AddRange(replaceMaterialsForBOM.Select(s => s.ReplaceMaterialId));
+
+            // 查询所有主物料和替代料的基础信息（为了读取消耗系数和收集方式）
+            var materialEntities = await _procMaterialRepository.GetBySiteIdAsync(sfcProduceEntity.SiteId);
+            materialEntities = materialEntities.Where(w => materialIds.Contains(w.Id));
+
+            // 获取初始扣料数据
+            List<MaterialDeductBo> initialMaterials = new();
+            foreach (var item in mainMaterials)
+            {
+                var materialEntitiy = materialEntities.FirstOrDefault(f => f.Id == item.MaterialId);
+                if (materialEntitiy == null) continue;
+
+                var deduct = new MaterialDeductBo
+                {
+                    MaterialId = item.MaterialId,
+                    Usages = item.Usages,
+                    Loss = item.Loss,
+                    DataCollectionWay = item.DataCollectionWay,
+                    SerialNumber = materialEntitiy.SerialNumber
+                };
+                if (materialEntitiy.ConsumeRatio.HasValue) deduct.ConsumeRatio = materialEntitiy.ConsumeRatio.Value;
+
+                // 填充BOM替代料
+                if (item.IsEnableReplace == false)
+                {
+                    if (replaceMaterialsForBOMDic.TryGetValue(item.Id, out var replaces) == true)
+                    {
+                        // 启用的替代物料（BOM）
+                        deduct.ReplaceMaterials = replaces.Select(s => new MaterialDeductItemBo
+                        {
+                            MaterialId = s.ReplaceMaterialId,
+                            Usages = s.Usages,
+                            Loss = s.Loss,
+                            ConsumeRatio = GetConsumeRatio(materialEntities, s.ReplaceMaterialId)
+                        });
+                    }
+                }
+                // 填充物料替代料
+                else
+                {
+                    if (replaceMaterialsForMainDic.TryGetValue(item.MaterialId, out var replaces) == true)
+                    {
+                        // 启用的替代物料（物料维护）
+                        deduct.ReplaceMaterials = replaces.Where(w => w.IsEnabled == true).Select(s => new MaterialDeductItemBo
+                        {
+                            MaterialId = s.MaterialId,
+                            Usages = item.Usages,
+                            Loss = item.Loss,
+                            ConsumeRatio = GetConsumeRatio(materialEntities, s.MaterialId)
+                        });
+                    }
+                }
+
+                // 添加到初始扣料集合
+                initialMaterials.Add(deduct);
+            }
+
+            return initialMaterials;
+        }
+
+        /// <summary>
+        /// 取得消耗系数
+        /// </summary>
+        /// <param name="materialEntities"></param>
+        /// <param name="replaceMaterialId"></param>
+        /// <returns></returns>
+        private static decimal GetConsumeRatio(IEnumerable<ProcMaterialEntity> materialEntities, long replaceMaterialId)
+        {
+            decimal defaultConsumeRatio = 100;
+
+            if (materialEntities == null || materialEntities.Any() == false) return defaultConsumeRatio;
+
+            var materialEntity = materialEntities.FirstOrDefault(f => f.Id == replaceMaterialId);
+            if (materialEntity == null || materialEntity.ConsumeRatio.HasValue == false) return defaultConsumeRatio;
+
+            return materialEntity.ConsumeRatio.Value;
+        }
+
 
     }
 }

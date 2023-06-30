@@ -3,7 +3,6 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
@@ -109,8 +108,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (firstProduceEntity == null) return default;
 
             // 检查是否首工序
-            //var isFirstProcedure = await _masterDataService.IsFirstProcedureAsync(firstProduceEntity.ProcessRouteId, firstProduceEntity.ProcedureId);
-            var isFirstProcedure = await param.Proxy.GetValueAsync<object[], bool>(async parameters =>
+            var isFirstProcedure = await param.Proxy.GetValueAsync(async parameters =>
             {
                 var processRouteId = (long)parameters[0];
                 var procedureId = (long)parameters[1];
