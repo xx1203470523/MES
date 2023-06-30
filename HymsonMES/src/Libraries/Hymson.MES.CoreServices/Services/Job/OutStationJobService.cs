@@ -1,13 +1,18 @@
 ﻿using Dapper;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Attribute.Job;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding;
+using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.Snowflake;
 using Hymson.Utils;
 
@@ -105,7 +110,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 });
             });
 
-
             // 合格品出站
             // 获取下一个工序（如果没有了，就表示完工）
             var nextProcedure = await param.Proxy.GetValueAsync(_masterDataService.GetNextProcedureAsync, firstProduceEntity);
@@ -113,9 +117,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 扣料
             //await func(sfcProduceEntity.ProductBOMId, sfcProduceEntity.ProcedureId);
             var initialMaterials = await param.Proxy.GetValueAsync(_masterDataService.GetInitialMaterialsAsync, firstProduceEntity);
+            if (initialMaterials == null) return default;
 
             // 物料ID集合
-            var materialIds = initialMaterials?.Select(s => s.MaterialId);
+            var materialIds = initialMaterials.Select(s => s.MaterialId);
 
             // 读取物料加载数据（批量）
             var allFeedingEntities = await param.Proxy.GetValueAsync(_manuFeedingRepository.GetByResourceIdAndMaterialIdsWithOutZeroAsync, new GetByResourceIdAndMaterialIdsQuery
@@ -127,49 +132,48 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 通过物料分组
             var manuFeedingsDictionary = allFeedingEntities?.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
 
+            // 过滤扣料集合
+            List<UpdateQtyByIdCommand> updates = new();
+            List<ManuSfcCirculationEntity> adds = new();
+            foreach (var materialBo in initialMaterials)
+            {
+                // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
+                decimal residue = materialBo.Usages;
+                if (materialBo.Loss.HasValue == true && materialBo.Loss > 0) residue *= (materialBo.Loss.Value / 100);
+                if (materialBo.ConsumeRatio > 0) residue *= (materialBo.ConsumeRatio / 100);
+
+                // 收集方式是批次
+                if (materialBo.DataCollectionWay == MaterialSerialNumberEnum.Batch)
+                {
+                    // 进行扣料
+                    _masterDataService.DeductMaterialQty(ref updates, ref adds, ref residue, firstProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
+                    continue;
+                }
+
+                // 2.确认主物料的收集方式，不是"批次"就结束（不对该物料进行扣料）
+                if (materialBo.SerialNumber != MaterialSerialNumberEnum.Batch) continue;
+
+                // 进行扣料
+                _masterDataService.DeductMaterialQty(ref updates, ref adds, ref residue, firstProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
+            }
+
             /*
- * 
-// 过滤扣料集合
-List<UpdateQtyByIdCommand> updates = new();
-List<ManuSfcCirculationEntity> adds = new();
-foreach (var materialBo in initialMaterials)
-{
-// 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
-decimal residue = materialBo.Usages;
-if (materialBo.Loss.HasValue == true && materialBo.Loss > 0) residue *= (materialBo.Loss.Value / 100);
-if (materialBo.ConsumeRatio > 0) residue *= (materialBo.ConsumeRatio / 100);
+            // manu_sfc_info 修改为完成 且入库
+            // 条码信息
+            var sfcInfo = await _manuSfcRepository.GetBySFCAsync(new GetBySfcQuery
+            {
+                SiteId = _currentSite.SiteId,
+                SFC = sfcProduceEntity.SFC
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES17102)).WithData("SFC", sfcProduceEntity.SFC);
 
-// 收集方式是批次
-if (materialBo.DataCollectionWay == MaterialSerialNumberEnum.Batch)
-{
-// 进行扣料
-DeductMaterialQty(ref updates, ref adds, ref residue, sfcProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
-continue;
-}
+            // 读取产品基础信息
+            var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(sfcProduceEntity.ProductId)
+            ?? throw new CustomerValidationException(nameof(ErrorCode.MES17103));
 
-// 2.确认主物料的收集方式，不是"批次"就结束（不对该物料进行扣料）
-if (materialBo.SerialNumber != MaterialSerialNumberEnum.Batch) continue;
-
-// 进行扣料
-DeductMaterialQty(ref updates, ref adds, ref residue, sfcProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
-}
-
-// manu_sfc_info 修改为完成 且入库
-// 条码信息
-var sfcInfo = await _manuSfcRepository.GetBySFCAsync(new GetBySfcQuery
-{
-SiteId = _currentSite.SiteId,
-SFC = sfcProduceEntity.SFC
-}) ?? throw new CustomerValidationException(nameof(ErrorCode.MES17102)).WithData("SFC", sfcProduceEntity.SFC);
-
-// 读取产品基础信息
-var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(sfcProduceEntity.ProductId)
-?? throw new CustomerValidationException(nameof(ErrorCode.MES17103));
-
-// 读取当前工艺路线信息
-var currentProcessRoute = await _procProcessRouteRepository.GetByIdAsync(sfcProduceEntity.ProcessRouteId)
-?? throw new CustomerValidationException(nameof(ErrorCode.MES18104)).WithData("sfc", sfcProduceEntity.SFC);
-*/
+            // 读取当前工艺路线信息
+            var currentProcessRoute = await _procProcessRouteRepository.GetByIdAsync(sfcProduceEntity.ProcessRouteId)
+            ?? throw new CustomerValidationException(nameof(ErrorCode.MES18104)).WithData("sfc", sfcProduceEntity.SFC);
+            */
 
             await Task.CompletedTask;
             return null;
