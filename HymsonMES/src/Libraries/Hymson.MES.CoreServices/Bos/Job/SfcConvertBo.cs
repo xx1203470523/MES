@@ -6,9 +6,12 @@ namespace Hymson.MES.CoreServices.Bos.Job
     /// <summary>
     /// 
     /// </summary>
-    public class RepairEndRequestBo : JobBaseBo
+    public class SfcConvertRequestBo : JobBaseBo
     {
-
+        /// <summary>
+        /// 设备Id
+        /// </summary>
+        public long EquipmentId { get; set; }
         /// <summary>
         /// 工序ID
         /// </summary>
@@ -17,13 +20,16 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 资源ID
         /// </summary>
         public long ResourceId { get; set; }
-
+        /// <summary>
+        /// 用户名
+        /// </summary>
+        public string UserName { get; set; } = "";
     }
 
     /// <summary>
     ///  
     /// </summary>
-    public class RepairEndResponseBo : JobResultBo
+    public class SfcConvertResponseBo : JobResultBo
     {
 
     }
