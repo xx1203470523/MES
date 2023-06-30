@@ -212,6 +212,89 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
 
         /// <summary>
+        /// 分页查询（查询所有条码信息）
+        /// 优化
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ManuSfcProduceSelectView>> GetManuSfcSelectPagedInfoAsync(ManuSfcProduceSelectPagedQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
+
+            sqlBuilder.Where("ms.SiteId = @SiteId");
+            sqlBuilder.Where("ms.Status <> 4");
+            sqlBuilder.Where("ms.IsDeleted=0");
+            sqlBuilder.OrderBy("msp.UpdatedOn DESC");
+
+            //sqlBuilder.Select(@"msp.ProductBOMId,msp.Id,msp.Lock,msp.ProcedureId,ms.Sfc,msp.LockProductionId,CASE ms.Status WHEN  1 THEN msp.Status ELSE 3 END AS  Status,pwo.OrderCode,pp.Code,pp.Name,pm.MaterialCode,pm.MaterialName,pm.Version,pr.ResCode ");
+            sqlBuilder.Select(@"msp.ProductBOMId,msp.Id,msp.Lock,msp.ProcedureId,ms.Sfc,msp.LockProductionId,CASE ms.Status WHEN  1 THEN msp.Status ELSE 3 END AS  Status
+                                , msi.WorkOrderId, msp.ResourceId, msi.ProductId ");
+
+            sqlBuilder.InnerJoin("manu_sfc_info  msi on ms.Id=msi.SfcId AND msi.IsUsed=1 AND msi.IsDeleted=0");
+            sqlBuilder.LeftJoin("manu_sfc_produce msp  on msp.SFC =ms.SFC");
+            //sqlBuilder.LeftJoin("proc_material pm  on msi.ProductId =pm.Id  AND pm.IsDeleted=0");
+            //sqlBuilder.LeftJoin("plan_work_order pwo on pwo.Id= msi.WorkOrderId AND pwo.IsDeleted=0");
+            //sqlBuilder.LeftJoin("proc_procedure pp on msp.ProcedureId =pp.Id AND pp.IsDeleted =0");
+            //sqlBuilder.LeftJoin("proc_resource pr on msp.ResourceId =pr.Id AND pr.IsDeleted =0");
+
+            //状态
+            if (query.Status.HasValue)
+            {
+                sqlBuilder.Where("msp.Status=@Status");
+            }
+            if (query.Lock.HasValue)
+            {
+                sqlBuilder.Where("msp.Lock=@Lock");
+            }
+            if (query.NoLock.HasValue)
+            {
+                if (query.NoLock != 1)
+                {
+                    sqlBuilder.Where("(msp.Lock!=@NoLock or `Lock`  is null)");
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(query.Sfc))
+            {
+                query.Sfc = $"%{query.Sfc}%";
+                sqlBuilder.Where("ms.Sfc like @Sfc");
+            }
+            if (query.SfcArray != null && query.SfcArray.Length > 0)
+            {
+                sqlBuilder.Where("ms.Sfc in @SfcArray");
+            }
+            //工单
+            if (query.OrderId.HasValue&& query.OrderId>0)
+            {
+                sqlBuilder.Where(" msi.WorkOrderId = @OrderId ");
+            }
+            //工序
+            if (query.ProcedureId.HasValue && query.ProcedureId > 0)
+            {
+                sqlBuilder.Where("  msp.ProcedureId = @ProcedureId ");
+            }
+            //资源
+            if (query.ResourceId.HasValue && query.ResourceId > 0)
+            {
+                sqlBuilder.Where("  msp.ResourceId = @ResourceId ");
+            }
+
+            var offSet = (query.PageIndex - 1) * query.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = query.PageSize });
+            sqlBuilder.AddParameters(query);
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var manuSfcProduceEntitiesTask = conn.QueryAsync<ManuSfcProduceSelectView>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var manuSfcProduceEntities = await manuSfcProduceEntitiesTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<ManuSfcProduceSelectView>(manuSfcProduceEntities, query.PageIndex, query.PageSize, totalCount);
+        }
+
+
+        /// <summary>
         /// 查询List
         /// </summary>
         /// <param name="manuSfcQuery"></param>

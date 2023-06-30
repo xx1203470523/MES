@@ -1166,6 +1166,79 @@ namespace Hymson.MES.Services.Services.Manufacture
         }
 
         /// <summary>
+        /// 分页查询（查询所有条码信息）
+        /// 优化
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ManuSfcProduceSelectViewDto>> GetManuSfcSelectPagedInfoAsync(ManuSfcProduceSelectPagedQueryDto queryDto)
+        {
+            var pagedQuery = queryDto.ToQuery<ManuSfcProduceSelectPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId;
+
+            //查询多个条码
+            if (queryDto.Sfcs != null && queryDto.Sfcs.Any())
+            {
+                pagedQuery.SfcArray = queryDto.Sfcs;
+            }
+
+            var pagedInfo = await _manuSfcRepository.GetManuSfcSelectPagedInfoAsync(pagedQuery);
+            if (pagedInfo == null || !pagedInfo.Data.Any())
+            {
+                if (pagedQuery.SfcArray != null && pagedQuery.SfcArray.Length > 0)
+                    throw new CustomerValidationException(nameof(ErrorCode.MES18022)).WithData("SFC", string.Join(",", pagedQuery.SfcArray));
+            }
+
+            //实体到DTO转换 装载数据
+            List<ManuSfcProduceSelectViewDto> manuSfcProduceDtos = new List<ManuSfcProduceSelectViewDto>();
+
+            if (pagedInfo != null && pagedInfo.Data.Any()) 
+            {
+                //查询工单
+                var workOrders = await _planWorkOrderRepository.GetByIdsAsync(pagedInfo.Data.Where(x=>x.WorkOrderId>0).Select(x => x.WorkOrderId).ToArray());
+
+                //查询工序
+                var procedures = await _procProcedureRepository.GetByIdsAsync(pagedInfo.Data.Where(x => x.ProcedureId > 0).Select(x => x.ProcedureId).ToArray());
+
+                //查询资源
+                var resources = await _resourceRepository.GetListByIdsAsync(pagedInfo.Data.Where(x => x.ResourceId > 0).Select(x => x.ResourceId).ToArray());
+
+                //查询物料
+                var materials = await _procMaterialRepository.GetByIdsAsync(pagedInfo.Data.Where(x => x.ProductId > 0).Select(x => x.ProductId).ToArray());
+
+                foreach (var item in pagedInfo.Data)
+                {
+                    var workOrder = workOrders!=null&&workOrders.Any()? workOrders.FirstOrDefault(x => x.Id == item.WorkOrderId):null;
+                    var procedure = procedures != null && procedures.Any() ? procedures.FirstOrDefault(x => x.Id == item.ProcedureId):null;
+                    var resource = resources != null && resources.Any() ? resources.FirstOrDefault(x => x.Id == item.ResourceId):null;
+                    var material = materials != null && materials.Any() ? materials.FirstOrDefault(x => x.Id == item.ProductId):null;
+
+                    manuSfcProduceDtos.Add(new ManuSfcProduceSelectViewDto
+                    {
+                        Id = item.Id,
+                        Sfc = item.Sfc,
+                        Lock = item.Lock,
+                        LockProductionId = item.LockProductionId,
+                        ProductBOMId = item.ProductBOMId,
+                        ProcedureId = item.ProcedureId,
+                        Status = item.Status,
+                        OrderCode = workOrder!=null ? workOrder.OrderCode:"",
+                        Code = procedure!=null? procedure.Code:"",
+                        Name = procedure != null ? procedure.Name : "",
+                        ResCode= resource!=null? resource.ResCode:"",
+                        MaterialCode = material!=null? material.MaterialCode:"",
+                        MaterialName = material != null ? material.MaterialName:"",
+                        Version = material != null ? material.Version??"":""
+                    });
+                }
+
+            }
+
+            return new PagedInfo<ManuSfcProduceSelectViewDto>(manuSfcProduceDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+
+        /// <summary>
         /// 根据SFC查询在制品步骤列表
         /// </summary>
         /// <param name="sfcs"></param>

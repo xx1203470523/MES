@@ -440,6 +440,7 @@ namespace Hymson.MES.Services.Mapper
 
             #region QualityLock
             CreateMap<ManuSfcProducePagedQueryDto, ManuSfcProducePagedQuery>();
+            CreateMap<ManuSfcProduceSelectPagedQueryDto, ManuSfcProduceSelectPagedQuery>();
             #endregion
 
             #region ManuProductBadRecord
