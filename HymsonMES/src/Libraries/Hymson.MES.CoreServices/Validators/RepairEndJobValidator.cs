@@ -6,14 +6,14 @@ using Hymson.MES.CoreServices.Bos.Job;
 namespace Hymson.MES.Services.Validators.Equipment
 {
     /// <summary>
-    /// 维修Job 验证（开始）
+    /// 维修Job 验证(结束)
     /// </summary>
-    internal class RepairStartJobValidator : AbstractValidator<RepairStartRequestBo>
+    internal class RepairEndJobValidator : AbstractValidator<RepairStartRequestBo>
     {
         /// <summary>
-        /// 
+        ///  
         /// </summary>
-        public RepairStartJobValidator()
+        public RepairEndJobValidator()
         {
             RuleFor(x => x).NotEmpty().WithErrorCode(ErrorCode.MES16332);
             RuleFor(x => x.SFCs).NotEmpty().Must(it => it.Any(s => s.Trim() != "")).WithErrorCode(ErrorCode.MES16332);

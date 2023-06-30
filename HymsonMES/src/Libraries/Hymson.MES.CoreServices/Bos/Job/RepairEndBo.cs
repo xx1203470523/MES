@@ -6,7 +6,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
     /// <summary>
     /// 
     /// </summary>
-    public class RepairStartRequestBo : JobBaseBo
+    public class RepairEndRequestBo : JobBaseBo
     {
 
         /// <summary>
@@ -24,15 +24,19 @@ namespace Hymson.MES.CoreServices.Bos.Job
     }
 
     /// <summary>
-    /// 
+    ///  
     /// </summary>
-    public class RepairStartResponseBo : JobResultBo
+    public class RepairEndResponseBo : JobResultBo
     {
         /// <summary>
         /// 在制
         /// </summary>
-        public UpdateProcedureAndResourceCommand UpdateResourceCommand { get; set; } = new UpdateProcedureAndResourceCommand();
+        public UpdateProcedureAndStatusCommand UpdateResourceCommand { get; set; } = new UpdateProcedureAndStatusCommand();
 
+        /// <summary>
+        /// 步骤
+        /// </summary>
+        public List<ManuSfcStepEntity> ManuSfcStepList { get; set; } = new List<ManuSfcStepEntity>();
     }
 
 }

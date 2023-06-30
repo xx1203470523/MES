@@ -293,14 +293,8 @@ namespace Hymson.MES.Services.Services.Manufacture
         private async Task<ManuFacePlateRepairOpenInfoDto> GetManuFacePlateRepairOpenInfoDtoAsync(ManuSfcProduceEntity manuSfcProduceEntit)
         {
             // 获取产品信息
-            var manuSfcProducePage = await _manuSfcProduceRepository.GetPagedInfoAsync(new ManuSfcProducePagedQuery
-            {
-                PageSize = 1,
-                PageIndex = 1,
-                SiteId = _currentSite.SiteId,
-                Sfc = manuSfcProduceEntit.SFC
-            });
-            if (manuSfcProducePage.Data.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES17306));
+            var manuSfcProduce = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery { Sfc = manuSfcProduceEntit.SFC, SiteId = _currentSite.SiteId ?? 0 })
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES17306));
 
             // 工单
             var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuSfcProduceEntit.WorkOrderId)

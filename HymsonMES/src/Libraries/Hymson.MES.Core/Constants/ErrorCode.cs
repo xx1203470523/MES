@@ -656,6 +656,7 @@
         public const string MES16333 = "SFC条码和资源不匹配！";
         public const string MES16334 = "资源不能为空！";
         public const string MES16335 = "工序不能为空！";
+        public const string MES16336 = "{SFC}非在制状态，不允许操作！"; 
         #endregion
 
         #region 生产
