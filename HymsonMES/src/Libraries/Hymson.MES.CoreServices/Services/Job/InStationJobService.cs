@@ -13,7 +13,6 @@ using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
-using Hymson.MES.Data.Repositories.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -51,10 +50,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
-        /// <summary>
-        /// 仓储接口（工序维护）
-        /// </summary>
-        private readonly IProcProcedureRepository _procProcedureRepository;
 
 
         /// <summary>
@@ -65,19 +60,17 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="manuSfcStepRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
-        /// <param name="procProcedureRepository"></param>
-        public InStationJobService(IManuCommonService manuCommonService, IMasterDataService masterDataService,
+        public InStationJobService(IManuCommonService manuCommonService,
+            IMasterDataService masterDataService,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcStepRepository manuSfcStepRepository,
-            IPlanWorkOrderRepository planWorkOrderRepository,
-            IProcProcedureRepository procProcedureRepository)
+            IPlanWorkOrderRepository planWorkOrderRepository)
         {
             _manuCommonService = manuCommonService;
             _masterDataService = masterDataService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
-            _procProcedureRepository = procProcedureRepository;
         }
 
         /// <summary>
@@ -116,7 +109,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }, new object[] { firstProduceEntity.ProcessRouteId, firstProduceEntity.ProcedureId });
 
             // 获取当前工序信息
-            var procedureEntity = await _procProcedureRepository.GetByIdAsync(firstProduceEntity.ProcedureId);
+            var procedureEntity = await _masterDataService.GetProcProcedureEntityWithNullCheck(firstProduceEntity.ProcedureId);
 
             // 组装（进站数据）
             List<ManuSfcStepEntity> sfcStepEntities = new();

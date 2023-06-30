@@ -39,6 +39,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         private readonly IProcProcessRouteDetailLinkRepository _procProcessRouteDetailLinkRepository;
 
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -46,7 +47,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="masterDataService"></param>
         /// <param name="procProcessRouteDetailNodeRepository"></param>
         /// <param name="procProcessRouteDetailLinkRepository"></param>
-        public InStationVerifyJobService(IManuCommonService manuCommonService, IMasterDataService masterDataService,
+        public InStationVerifyJobService(IManuCommonService manuCommonService,
+            IMasterDataService masterDataService,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
             IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository)
         {
@@ -55,6 +57,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
             _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
         }
+
 
         /// <summary>
         /// 参数校验

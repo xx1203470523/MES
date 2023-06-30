@@ -6,7 +6,6 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.View;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -301,12 +300,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<IEnumerable<ManuSfcEntity>> GetManuSfcEntitiesAsync(ManuSfcQuery manuSfcQuery)
         {
-            var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetManuSfcEntitiesSqlTemplate);
-
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var manuSfcEntities = await conn.QueryAsync<ManuSfcEntity>(template.RawSql, manuSfcQuery);
-            return manuSfcEntities;
+            return await conn.QueryAsync<ManuSfcEntity>(GetSFCsSql, manuSfcQuery);
         }
 
         /// <summary>
@@ -465,5 +460,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string GetBySFCSql = @"SELECT * FROM `manu_sfc`  WHERE SFC = @SFC AND SiteId=@SiteId";
         const string GetBySFCsSql = @"SELECT * FROM `manu_sfc`  WHERE SFC IN @SFCs AND IsDeleted=0 ";
+        const string GetSFCsSql = @"SELECT * FROM manu_sfc WHERE SiteId = @SiteId AND IsDeleted = 0 AND SFC IN @SFCs; ";
     }
 }

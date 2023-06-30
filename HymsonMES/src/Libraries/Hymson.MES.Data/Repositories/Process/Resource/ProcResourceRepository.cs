@@ -159,21 +159,32 @@ namespace Hymson.MES.Data.Repositories.Process
             if (!string.IsNullOrWhiteSpace(query.ResCode))
             {
                 query.ResCode = $"%{query.ResCode}%";
-                sqlBuilder.Where("ResCode like @ResCode");
+                sqlBuilder.Where("a.ResCode like @ResCode");
             }
             if (!string.IsNullOrWhiteSpace(query.ResName))
             {
                 query.ResName = $"%{query.ResName}%";
-                sqlBuilder.Where("ResName like @ResName");
+                sqlBuilder.Where("a.ResName like @ResName");
             }
             if (!string.IsNullOrWhiteSpace(query.ResType))
             {
                 query.ResType = $"%{query.ResType}%";
-                sqlBuilder.Where("ResType like @ResType");
+                sqlBuilder.Where("b.ResType like @ResType");
             }
             if (query.Status.HasValue)
             {
-                sqlBuilder.Where("Status = @Status");
+                sqlBuilder.Where("a.Status = @Status");
+            }
+            if (query.ResTypeId.HasValue&&query.ResTypeId>0)
+            {
+                //if (query.ResTypeId == 0)
+                //{
+                //    sqlBuilder.Where("a.ResTypeId=0");
+                //}
+                //else
+                //{
+                    sqlBuilder.Where(" a.ResTypeId=@ResTypeId");
+                //}
             }
 
             var offSet = (query.PageIndex - 1) * query.PageSize;
