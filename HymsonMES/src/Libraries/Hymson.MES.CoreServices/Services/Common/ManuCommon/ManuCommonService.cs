@@ -151,7 +151,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
 
             if (manuContainerPackEntities != null && manuContainerPackEntities.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES18015)).WithData("SFCs", string.Join(",", sfcBos.SFCs));
+                throw new CustomerValidationException(nameof(ErrorCode.MES18015)).WithData("SFC", string.Join(",", sfcBos.SFCs));
                 //throw new CustomerValidationException(nameof(ErrorCode.MES18019)).WithData("SFC", string.Join(",", sfcs));
             }
         }

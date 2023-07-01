@@ -1,6 +1,7 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Common;
@@ -63,6 +64,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         private readonly IProcProcessRouteDetailLinkRepository _procProcessRouteDetailLinkRepository;
 
+        private readonly ILocalizationService _localizationService;
 
         /// <summary>
         /// 构造函数
@@ -81,7 +83,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             IManuCommonOldService manuCommonOldService,
             IManuInStationService manuInStationService,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
-            IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository)
+            IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -91,6 +93,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             _manuInStationService = manuInStationService;
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
             _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
+            _localizationService = localizationService;
         }
 
 
@@ -179,7 +182,8 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             defaultDto.Content?.Add("BadEntryCom", "False");
             if (param.ContainsKey("IsClear")) defaultDto.Content?.Add("IsClear", param["IsClear"]);
 
-            defaultDto.Message = $"条码{param["SFC"]}设置为活动状态成功！";
+            //defaultDto.Message = $"条码{param["SFC"]}设置为活动状态成功！";
+            defaultDto.Message = _localizationService.GetResource(nameof(ErrorCode.MES18215), param["SFC"]);
             return defaultDto;
         }
 

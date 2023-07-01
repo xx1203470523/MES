@@ -660,6 +660,8 @@
         public const string MES16337 = "资源不存在";
         public const string MES16338 = "设备不存在";
         public const string MES16339 = "设备不能为空";
+
+        public const string MES16340 = "条码{0}已中止！";
         #endregion
 
         #region 生产
@@ -909,6 +911,7 @@
         public const string MES18213 = "未获取到工艺路线连线信息";
         public const string MES18214 = "工序不存在";
 
+        public const string MES18215 = "条码{0}设置为活动状态成功！";
         #endregion
 
 

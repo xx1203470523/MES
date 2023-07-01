@@ -1,6 +1,7 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
@@ -47,6 +48,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
+        private readonly ILocalizationService _localizationService;
 
         /// <summary>
         /// 构造函数
@@ -59,13 +61,14 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         public JobManuStopService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonOldService manuCommonOldService,
             IManuSfcStepRepository manuSfcStepRepository,
-            IManuSfcProduceRepository manuSfcProduceRepository)
+            IManuSfcProduceRepository manuSfcProduceRepository, ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _manuCommonOldService = manuCommonOldService;
             _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
+            _localizationService = localizationService;
         }
 
 
@@ -149,7 +152,8 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             defaultDto.Content?.Add("BadEntryCom", "False");
             if (param.ContainsKey("IsClear")) defaultDto.Content?.Add("IsClear", param["IsClear"]);
 
-            defaultDto.Message = $"条码{param["SFC"]}已中止！";
+            //defaultDto.Message = $"条码{param["SFC"]}已中止！";
+            defaultDto.Message = _localizationService.GetResource(nameof(ErrorCode.MES16340), param["SFC"]);
             return defaultDto;
         }
 
