@@ -62,7 +62,7 @@
         public const string MES10304 = "资源名称最大长度不超过50";
         public const string MES10305 = "资源状态不能为空";
         public const string MES10306 = "资源配置打印机中，重复配置设备!";
-        public const string MES10307 = "一个资源只能对用对应一个主设备";
+        public const string MES10307 = "一个资源只能对应一个主设备";
         public const string MES10308 = "此资源【{ResCode}】在系统中已经存在!";
         public const string MES10309 = "此资源类型不存在!";
         public const string MES10310 = "资源类型在系统中不存在,请重新输入!";
