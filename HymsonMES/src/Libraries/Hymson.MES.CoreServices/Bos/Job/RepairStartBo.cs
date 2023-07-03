@@ -21,6 +21,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 用户名
         /// </summary>
         public string UserName { get; set; } = "";
+
     }
 
     /// <summary>
