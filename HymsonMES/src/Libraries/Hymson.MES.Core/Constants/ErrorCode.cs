@@ -817,6 +817,7 @@
         public const string MES16732 = "装载信息不存在!";
         public const string MES16733 = "容器已打开!";
         public const string MES16734 = "容器已关闭!";
+        public const string MES16735 = "产品{product}未维护包装编码规则,无法创建容器";
         #endregion
 
         #region 绑定工单激活  MES16800
