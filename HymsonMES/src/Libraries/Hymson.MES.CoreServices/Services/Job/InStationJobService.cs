@@ -8,6 +8,7 @@ using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
+using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -90,10 +91,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>00
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
-            if ((param is InStationRequestBo bo) == false) return default;
+            var bo = param.ToBo<InStationRequestBo>();
+            if (bo == null) return default;
 
             // 获取生产条码信息
-            var sfcProduceEntities = await param.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, bo);
+            var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, bo);
             var entities = sfcProduceEntities.AsList();
             if (entities == null || entities.Any() == false) return default;
 
@@ -101,7 +103,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (firstProduceEntity == null) return default;
 
             // 检查是否首工序
-            var isFirstProcedure = await param.Proxy.GetValueAsync(async parameters =>
+            var isFirstProcedure = await bo.Proxy.GetValueAsync(async parameters =>
             {
                 var processRouteId = (long)parameters[0];
                 var procedureId = (long)parameters[1];

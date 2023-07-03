@@ -55,7 +55,6 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             return services;
         }
 
-
         /// <summary>
         /// 添加验证器相关服务
         /// </summary>
