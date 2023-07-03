@@ -872,7 +872,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var inteCodeRulesEntity = inteCodeRulesResult.FirstOrDefault();
             if (inteCodeRulesEntity == null || inteCodeRulesEntity.ProductId != productId)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16501)).WithData("product", material?.MaterialCode ?? "");
+                throw new CustomerValidationException(nameof(ErrorCode.MES16735)).WithData("product", material?.MaterialCode ?? "");
             }
             var barcodeList = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new GenerateBarcodeDto
             {
