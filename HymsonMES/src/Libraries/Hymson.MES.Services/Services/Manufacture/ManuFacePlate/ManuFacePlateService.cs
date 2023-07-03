@@ -911,6 +911,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     manuFacePlateButtonEntity.UpdatedBy = _currentUser.UserName;
                     manuFacePlateButtonEntity.UpdatedOn = HymsonClock.Now();
                     manuFacePlateButtonEntity.FacePlateId = manuFacePlateEntity.Id;
+                    manuFacePlateButtonEntity.SiteId = _currentSite.SiteId??0;
                     manuFacePlateButtonEntityList.Add(manuFacePlateButtonEntity);
                     int i = 0;
                     //按钮关联JOb关系表

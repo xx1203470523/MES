@@ -64,6 +64,9 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         private readonly IProcProcessRouteDetailLinkRepository _procProcessRouteDetailLinkRepository;
 
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly ILocalizationService _localizationService;
 
         /// <summary>
@@ -77,13 +80,15 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <param name="manuInStationService"></param>
         /// <param name="procProcessRouteDetailLinkRepository"></param>
         /// <param name="procProcessRouteDetailNodeRepository"></param>
+        /// <param name="localizationService"></param>
         public JobManuStartService(ICurrentUser currentUser, ICurrentSite currentSite,
             IExecuteJobService<InStationRequestBo> executeJobService,
             IManuCommonService manuCommonService,
             IManuCommonOldService manuCommonOldService,
             IManuInStationService manuInStationService,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
-            IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,ILocalizationService localizationService)
+            IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
+            ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -133,10 +138,18 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
 
             /*
             var jobBos = new List<JobBo> { };
-            jobBos.Add(new JobBo { Name = "InStationVerifyJobService" });
-            jobBos.Add(new JobBo { Name = "InStationJobService" });
+            //jobBos.Add(new JobBo { Name = "InStationVerifyJobService" });
+            //jobBos.Add(new JobBo { Name = "InStationJobService" });
+            jobBos.Add(new JobBo { Name = "OutStationJobService" });
 
-            await _executeJobService.ExecuteAsync(jobBos, new InStationRequestBo { });
+            await _executeJobService.ExecuteAsync(jobBos, new InStationRequestBo
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                UserName = _currentUser.UserName,
+                ProcedureId = bo.ProcedureId,
+                ResourceId = bo.ResourceId,
+                SFCs = new string[] { bo.SFC }
+            });
             */
 
             // 校验工序和资源是否对应
@@ -147,7 +160,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             var (sfcProduceEntity, sfcProduceBusinessEntity) = await _manuCommonOldService.GetProduceSFCAsync(bo.SFC);
 
             // 合法性校验
-            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.lineUp);
+            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.lineUp, _localizationService.GetResource($"{typeof(SfcProduceStatusEnum).FullName}.{nameof(SfcProduceStatusEnum.lineUp)}"));
             sfcProduceBusinessEntity.VerifyProcedureLock(bo.SFC, bo.ProcedureId);
 
             // 验证条码是否被容器包装

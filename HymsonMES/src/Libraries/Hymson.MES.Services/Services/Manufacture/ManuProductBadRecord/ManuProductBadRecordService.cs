@@ -222,12 +222,13 @@ namespace Hymson.MES.Services.Services.Manufacture
                         UpdatedBy = _currentUser.UserName
                     });
                 }
+
+                var manuSfc = manuSfcs.FirstOrDefault(x => x.SFC == item.SFC);
+                // 条码步骤
+                var sfcStepEntity = CreateSFCStepEntity(manuSfc, ManuSfcStepTypeEnum.BadEntry, createDto.Remark ?? "");
+                sfcStepList.Add(sfcStepEntity);
                 if (isDefect)
                 {
-                    var manuSfc = manuSfcs.FirstOrDefault(x => x.SFC == item.SFC);
-                    // 条码步骤
-                    var sfcStepEntity = CreateSFCStepEntity(manuSfc, ManuSfcStepTypeEnum.BadEntry, createDto.Remark ?? "");
-                    sfcStepList.Add(sfcStepEntity);
                     // 在制品业务
                     var manuSfcProduceBusinessEntity = new ManuSfcProduceBusinessEntity
                     {

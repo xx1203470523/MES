@@ -2048,8 +2048,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             //新工单
             var newPlanWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuUpdateSaveDto.WorkOrderId);
 
-            PlanWorkOrderStatusEnum[] statusArr = { PlanWorkOrderStatusEnum.NotStarted, PlanWorkOrderStatusEnum.Finish, PlanWorkOrderStatusEnum.Closed };
-            var workOrdersOrLosck = statusArr.Contains(newPlanWorkOrderEntity.Status) || newPlanWorkOrderEntity.Status == PlanWorkOrderStatusEnum.Pending;
+            PlanWorkOrderStatusEnum[] statusArr = { PlanWorkOrderStatusEnum.NotStarted, PlanWorkOrderStatusEnum.Pending, PlanWorkOrderStatusEnum.Closed };//PlanWorkOrderStatusEnum.Finish, 
+            var workOrdersOrLosck = statusArr.Contains(newPlanWorkOrderEntity.Status);
             if (workOrdersOrLosck)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18209)).WithData("Code", newPlanWorkOrderEntity.OrderCode);
