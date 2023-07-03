@@ -27,7 +27,12 @@ namespace Hymson.MES.Core.Domain.Process
         /// 空值 : true  
         /// </summary>
         public string SerialNo { get; set; }
-        
+
+        /// <summary>
+        /// 手动排序号  20230703 海龙说加上这个做排序使用，重复也不管
+        /// </summary>
+        public string ManualSortNumber { get; set; }
+
         /// <summary>
         /// 描述 :所属工序ID 
         /// 空值 : false  
