@@ -14,6 +14,7 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.ComponentModel;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -90,35 +91,14 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var firstProduceEntity = entities.FirstOrDefault();
             if (firstProduceEntity == null) return default;
 
-            // 组装（出站数据）
-            List<ManuSfcStepEntity> sfcStepEntities = new();
-            entities.ForEach(sfcProduceEntity =>
-            {
-                // 更新时间
-                sfcProduceEntity.UpdatedBy = bo.UserName;
-                sfcProduceEntity.UpdatedOn = HymsonClock.Now();
+            // 读取条码信息
+            var manuSfcEntities = await _masterDataService.GetManuSFCEntitiesWithNullCheck(bo);
 
-                // 初始化步骤
-                sfcStepEntities.Add(new ManuSfcStepEntity
-                {
-                    //Operatetype = ManuSfcStepTypeEnum.OutStock,
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = sfcProduceEntity.SiteId,
-                    SFC = sfcProduceEntity.SFC,
-                    ProductId = sfcProduceEntity.ProductId,
-                    WorkOrderId = sfcProduceEntity.WorkOrderId,
-                    WorkCenterId = sfcProduceEntity.WorkCenterId,
-                    ProductBOMId = sfcProduceEntity.ProductBOMId,
-                    ProcedureId = sfcProduceEntity.ProcedureId,
-                    Qty = sfcProduceEntity.Qty,
-                    EquipmentId = sfcProduceEntity.EquipmentId,
-                    ResourceId = sfcProduceEntity.ResourceId,
-                    CreatedBy = sfcProduceEntity.UpdatedBy,
-                    CreatedOn = sfcProduceEntity.UpdatedOn.Value,
-                    UpdatedBy = sfcProduceEntity.UpdatedBy,
-                    UpdatedOn = sfcProduceEntity.UpdatedOn.Value,
-                });
-            });
+            // 读取产品基础信息
+            var procMaterialEntity = await _masterDataService.GetProcMaterialEntityWithNullCheck(firstProduceEntity.ProductId);
+
+            // 读取当前工艺路线信息
+            var procProcessRouteEntity = await _masterDataService.GetProcProcessRouteEntityWithNullCheck(firstProduceEntity.ProcessRouteId);
 
             // 合格品出站
             // 获取下一个工序（如果没有了，就表示完工）
@@ -169,19 +149,40 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 _masterDataService.DeductMaterialQty(ref updates, ref adds, ref residue, firstProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
             }
 
-            // 读取条码信息
-            var manuSfcEntities = await _masterDataService.GetManuSFCEntitiesWithNullCheck(bo);
+            // 组装（出站步骤数据）
+            List<ManuSfcStepEntity> sfcStepEntities = new();
+            entities.ForEach(sfcProduceEntity =>
+            {
+                // 更新时间
+                sfcProduceEntity.UpdatedBy = bo.UserName;
+                sfcProduceEntity.UpdatedOn = HymsonClock.Now();
+                
+                // 初始化步骤
+                sfcStepEntities.Add(new ManuSfcStepEntity
+                {
+                    //Operatetype = ManuSfcStepTypeEnum.OutStock,
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = sfcProduceEntity.SiteId,
+                    SFC = sfcProduceEntity.SFC,
+                    ProductId = sfcProduceEntity.ProductId,
+                    WorkOrderId = sfcProduceEntity.WorkOrderId,
+                    WorkCenterId = sfcProduceEntity.WorkCenterId,
+                    ProductBOMId = sfcProduceEntity.ProductBOMId,
+                    ProcedureId = sfcProduceEntity.ProcedureId,
+                    Qty = sfcProduceEntity.Qty,
+                    EquipmentId = sfcProduceEntity.EquipmentId,
+                    ResourceId = sfcProduceEntity.ResourceId,
+                    CreatedBy = sfcProduceEntity.UpdatedBy,
+                    CreatedOn = sfcProduceEntity.UpdatedOn.Value,
+                    UpdatedBy = sfcProduceEntity.UpdatedBy,
+                    UpdatedOn = sfcProduceEntity.UpdatedOn.Value,
+                });
+            });
 
-            // 读取产品基础信息
-            var procMaterialEntity = await _masterDataService.GetProcMaterialEntityWithNullCheck(firstProduceEntity.ProductId);
-
-            // 读取当前工艺路线信息
-            var procProcessRouteEntity = await _masterDataService.GetProcProcessRouteEntityWithNullCheck(firstProduceEntity.ProcessRouteId);
-
-            // TODO
             return new OutStationResponseBo
             {
                 IsCompleted = nextProcedure == null,
+                SFCProduceEntities = entities,
                 UpdateQtyByIdCommands = updates,
                 ManuSfcCirculationEntities = adds,
                 SFCStepEntities = sfcStepEntities
