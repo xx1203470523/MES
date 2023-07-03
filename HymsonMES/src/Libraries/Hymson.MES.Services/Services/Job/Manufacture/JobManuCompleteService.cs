@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure.Exceptions;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Manufacture;
@@ -32,6 +33,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         private readonly IManuOutStationService _manuOutStationService;
 
+        private readonly ILocalizationService _localizationService;
 
         /// <summary>
         /// 构造函数
@@ -41,11 +43,12 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <param name="manuOutStationService"></param>
         public JobManuCompleteService(IManuCommonService manuCommonService,
             IManuCommonOldService manuCommonOldService,
-            IManuOutStationService manuOutStationService)
+            IManuOutStationService manuOutStationService,ILocalizationService localizationService)
         {
             _manuCommonService = manuCommonService;
             _manuCommonOldService = manuCommonOldService;
             _manuOutStationService = manuOutStationService;
+            _localizationService = localizationService;
         }
 
 
@@ -92,7 +95,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             var (sfcProduceEntity, _) = await _manuCommonOldService.GetProduceSFCAsync(bo.SFC);
 
             // 合法性校验
-            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity)
+            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcProduceStatusEnum).FullName}.{nameof(SfcProduceStatusEnum.Activity)}"))
                             .VerifyProcedure(bo.ProcedureId)
                             .VerifyResource(bo.ResourceId);
 

@@ -147,7 +147,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             var (sfcProduceEntity, sfcProduceBusinessEntity) = await _manuCommonOldService.GetProduceSFCAsync(bo.SFC);
 
             // 合法性校验
-            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.lineUp);
+            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.lineUp, _localizationService.GetResource($"{typeof(SfcProduceStatusEnum).FullName}.{nameof(SfcProduceStatusEnum.lineUp)}"));
             sfcProduceBusinessEntity.VerifyProcedureLock(bo.SFC, bo.ProcedureId);
 
             // 验证条码是否被容器包装

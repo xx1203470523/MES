@@ -1,6 +1,7 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
@@ -45,6 +46,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
+        private readonly ILocalizationService _localizationService;
 
         /// <summary>
         /// 构造函数
@@ -57,13 +59,14 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         public JobManuBadRecordService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonOldService manuCommonOldService,
             IManuProductBadRecordRepository manuProductBadRecordRepository,
-            IManuSfcProduceRepository manuSfcProduceRepository)
+            IManuSfcProduceRepository manuSfcProduceRepository, ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _manuCommonOldService = manuCommonOldService;
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
+            _localizationService = localizationService;
         }
 
         /// <summary>
@@ -105,7 +108,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             var (sfcProduceEntity, _) = await _manuCommonOldService.GetProduceSFCAsync(bo.SFC);
 
             // 合法性校验
-            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity)
+            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcProduceStatusEnum).FullName}.{nameof(SfcProduceStatusEnum.Activity)}"))
                             .VerifyProcedure(bo.ProcedureId)
                             .VerifyResource(bo.ResourceId);
 

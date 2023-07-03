@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure.Exceptions;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
@@ -39,6 +40,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         private readonly IProcProcessRouteDetailLinkRepository _procProcessRouteDetailLinkRepository;
 
+        private readonly ILocalizationService _localizationService;
 
         /// <summary>
         /// 构造函数
@@ -50,12 +52,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         public InStationVerifyJobService(IManuCommonService manuCommonService,
             IMasterDataService masterDataService,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
-            IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository)
+            IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,ILocalizationService localizationService)
         {
             _manuCommonService = manuCommonService;
             _masterDataService = masterDataService;
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
             _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
+            _localizationService = localizationService;
         }
 
 
@@ -79,7 +82,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var sfcProduceBusinessEntities = await param.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, bo);
 
             // 合法性校验
-            sfcProduceEntities.VerifySFCStatus(SfcProduceStatusEnum.lineUp);
+            sfcProduceEntities.VerifySFCStatus(SfcProduceStatusEnum.lineUp, _localizationService.GetResource($"{typeof(SfcProduceStatusEnum).FullName}.{nameof(SfcProduceStatusEnum.lineUp)}"));
             sfcProduceBusinessEntities?.VerifyProcedureLock(bo.SFCs, bo.ProcedureId);
 
             // 验证条码是否被容器包装
