@@ -49,12 +49,13 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSingleton<IJobService, InStationVerifyJobService>();
             services.AddSingleton<IJobService, OutStationJobService>();
             services.AddSingleton<IJobService, RepairStartJobService>();
+            services.AddSingleton<IJobService, RepairEndJobService>();
+            services.AddSingleton<IJobService, PackageIngJobService>();
             services.AddSingleton(typeof(IExecuteJobService<>), typeof(ExecuteJobService<>));
             //services.AddSingleton<ExecuteJobService<OutStationRequestBo>, ExecuteJobService<OutStationRequestBo>>();
 
             return services;
         }
-
 
         /// <summary>
         /// 添加验证器相关服务
@@ -64,6 +65,8 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         private static IServiceCollection AddValidators(IServiceCollection services)
         {
             services.AddSingleton<AbstractValidator<RepairStartRequestBo>, RepairStartJobValidator>();
+            services.AddSingleton<AbstractValidator<RepairEndRequestBo>, RepairEndJobValidator>();
+            services.AddSingleton<AbstractValidator<PackageIngRequestBo>, PackageIngJobValidator>();
 
             return services;
         }

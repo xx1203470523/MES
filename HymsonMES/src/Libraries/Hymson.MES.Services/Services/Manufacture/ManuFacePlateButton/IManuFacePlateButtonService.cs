@@ -74,5 +74,12 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         Task<Dictionary<string, JobResponseDto>> ClickAsync(ButtonRequestDto dto);
 
+        /// <summary>
+        ///  新按钮（点击）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<Dictionary<string, JobResponseDto>> NewClickAsync(ButtonRequestDto dto, dynamic bo);
+
     }
 }

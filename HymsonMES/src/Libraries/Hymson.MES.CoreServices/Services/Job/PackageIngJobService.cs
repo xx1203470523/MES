@@ -23,14 +23,15 @@ using System.Threading.Tasks.Dataflow;
 using System.Linq;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Newtonsoft.Json;
+using Hymson.MES.CoreServices.Dtos.Common;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
     /// <summary>
-    /// 维修结束
+    /// 包装
     /// </summary>
-    [Job("维修结束", JobTypeEnum.Standard)]
-    public class RepairEndJobService : IJobService
+    [Job("包装", JobTypeEnum.Standard)]
+    public class PackageIngJobService : IJobService
     {
 
         /// <summary>
@@ -46,15 +47,15 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <summary>
         /// 验证器
         /// </summary>
-        private readonly AbstractValidator<RepairEndRequestBo> _validationRepairJob;
+        private readonly AbstractValidator<PackageIngRequestBo> _validationRepairJob;
         /// <summary>
         /// 构造函数 
         /// </summary>
         /// <param name="manuCommonService"></param>
         /// <param name="procProcessRouteDetailNodeRepository"></param>
         /// <param name="procProcessRouteDetailLinkRepository"></param>
-        public RepairEndJobService(IManuCommonService manuCommonService,
-            AbstractValidator<RepairEndRequestBo> validationRepairJob,
+        public PackageIngJobService(IManuCommonService manuCommonService,
+            AbstractValidator<PackageIngRequestBo> validationRepairJob,
             IMasterDataService masterDataService)
         {
             _manuCommonService = manuCommonService;
@@ -71,7 +72,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task VerifyParamAsync<T>(T param) where T : JobBaseBo
         {
-            if (param is not RepairEndRequestBo bo)
+            if (param is not PackageIngRequestBo bo)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10103));
             }
@@ -88,31 +89,16 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
-            if (param is not RepairEndRequestBo bo)
+            if (param is not PackageIngRequestBo bo)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10103));
             }
-            // 获取生产条码信息
-            var sfcProduceEntitys = await param.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, new MultiSFCBo { SFCs = bo.SFCs, SiteId = bo.SiteId });
-            if (sfcProduceEntitys == null || !sfcProduceEntitys.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16306));
-            }
-            if (sfcProduceEntitys.GroupBy(it => it.ProcedureId).Count() > 1)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16330));
-            };
-            if (sfcProduceEntitys.GroupBy(it => it.ProcedureId).Count() > 1)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16331));
-            };
-            var sfcProduceActivitys = sfcProduceEntitys.Where(it => it.Status != SfcProduceStatusEnum.Activity);
-            if (sfcProduceActivitys.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16336)).WithData("SFC", string.Join(",", sfcProduceActivitys.Select(it => it.SFC).ToArray()));
-            }
-            //返回
-            return true;
+
+            var defaultDto = new JobResponseDto { };
+
+            defaultDto.Content?.Add("Operation", ManuContainerPackagJobReturnTypeEnum.JobManuPackageService.ParseToInt().ToString());
+
+            return await Task.FromResult(defaultDto);
         }
 
         /// <summary>

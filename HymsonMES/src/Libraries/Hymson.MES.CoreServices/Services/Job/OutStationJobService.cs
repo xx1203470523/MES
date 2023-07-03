@@ -7,6 +7,7 @@ using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
+using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -118,13 +119,14 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
-            if ((param is OutStationRequestBo bo) == false) return default;
+            var bo = param.ToBo<OutStationRequestBo>();
+            if (bo == null) return default;
 
             // 待执行的命令
             OutStationResponseBo responseBo = new();
 
             // 获取生产条码信息
-            var sfcProduceEntities = await param.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, bo);
+            var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, bo);
             responseBo.SFCProduceEntities = sfcProduceEntities.AsList();
             if (responseBo.SFCProduceEntities == null || responseBo.SFCProduceEntities.Any() == false) return default;
 
@@ -146,19 +148,19 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             // 合格品出站
             // 获取下一个工序（如果没有了，就表示完工）
-            var nextProcedure = await param.Proxy.GetValueAsync(_masterDataService.GetNextProcedureAsync, firstProduceEntity);
+            var nextProcedure = await bo.Proxy.GetValueAsync(_masterDataService.GetNextProcedureAsync, firstProduceEntity);
             responseBo.IsCompleted = nextProcedure == null;
 
             // 扣料
             //await func(sfcProduceEntity.ProductBOMId, sfcProduceEntity.ProcedureId);
-            var initialMaterials = await param.Proxy.GetValueAsync(_masterDataService.GetInitialMaterialsAsync, firstProduceEntity);
+            var initialMaterials = await bo.Proxy.GetValueAsync(_masterDataService.GetInitialMaterialsAsync, firstProduceEntity);
             if (initialMaterials == null) return default;
 
             // 物料ID集合
             var materialIds = initialMaterials.Select(s => s.MaterialId);
 
             // 读取物料加载数据（批量）
-            var allFeedingEntities = await param.Proxy.GetValueAsync(_manuFeedingRepository.GetByResourceIdAndMaterialIdsWithOutZeroAsync, new GetByResourceIdAndMaterialIdsQuery
+            var allFeedingEntities = await bo.Proxy.GetValueAsync(_manuFeedingRepository.GetByResourceIdAndMaterialIdsWithOutZeroAsync, new GetByResourceIdAndMaterialIdsQuery
             {
                 ResourceId = firstProduceEntity.ResourceId ?? 0,
                 MaterialIds = materialIds
@@ -234,7 +236,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 else
                 {
                     sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
-                    if (nextProcedure != null) sfcProduceEntity.ProcedureId = nextProcedure.Id;
+                    if (nextProcedure != null)
+                    {
+                        sfcProduceEntity.ProcedureId = nextProcedure.Id;
+                        // 不置空的话，可能进站时，可能校验不通过
+                        sfcProduceEntity.ResourceId = null;
+                    }
                 }
 
                 responseBo.SFCStepEntities.Add(stepEntity);
@@ -331,6 +338,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<int> ExecuteAsync(object obj)
         {
+
+            var sdsd = obj as InStationResponseBo;
+
             int rows = 0;
             if (obj is not OutStationResponseBo data) return rows;
 
