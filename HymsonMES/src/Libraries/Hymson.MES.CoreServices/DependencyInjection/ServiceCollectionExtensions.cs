@@ -50,7 +50,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSingleton<IJobService, OutStationJobService>();
             services.AddSingleton<IJobService, RepairStartJobService>();
             services.AddSingleton<IJobService, RepairEndJobService>();
-            //services.AddSingleton<IJobService, PackageIngJobService>();
+            services.AddSingleton<IJobService, PackageIngJobService>();
             services.AddSingleton(typeof(IExecuteJobService<>), typeof(ExecuteJobService<>));
             //services.AddSingleton<ExecuteJobService<OutStationRequestBo>, ExecuteJobService<OutStationRequestBo>>();
 
@@ -66,6 +66,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         {
             services.AddSingleton<AbstractValidator<RepairStartRequestBo>, RepairStartJobValidator>();
             services.AddSingleton<AbstractValidator<RepairEndRequestBo>, RepairEndJobValidator>();
+            services.AddSingleton<AbstractValidator<PackageIngRequestBo>, PackageIngJobValidator>();
 
             return services;
         }
