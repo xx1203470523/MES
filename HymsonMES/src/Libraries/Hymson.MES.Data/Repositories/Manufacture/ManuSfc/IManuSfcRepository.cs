@@ -113,6 +113,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> UpdateSfcIsUsedAsync(ManuSfcUpdateIsUsedCommand command);
 
         /// <summary>
+        /// 批量更新条码（条码状态）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> MultiUpdateSfcStatusAsync(MultiSFCUpdateStatusCommand command);
+
+        /// <summary>
         /// 获取SFC
         /// </summary>
         /// <param name="sfc"></param>

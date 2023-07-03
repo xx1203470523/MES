@@ -1,5 +1,10 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Warehouse;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
+using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 
 namespace Hymson.MES.CoreServices.Bos.Job
 {
@@ -35,7 +40,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 
         /// </summary>
-        public IEnumerable<ManuSfcProduceEntity> SFCProduceEntities { get; set; } = new List<ManuSfcProduceEntity>();
+        public List<ManuSfcProduceEntity> SFCProduceEntities { get; set; } = new();
 
         /// <summary>
         /// 
@@ -50,7 +55,43 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 
         /// </summary>
-        public IEnumerable<ManuSfcStepEntity> SFCStepEntities { get; set; } = new List<ManuSfcStepEntity>();
+        public List<ManuSfcStepEntity> SFCStepEntities { get; set; } = new();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<WhMaterialInventoryEntity> WhMaterialInventoryEntities { get; set; } = new();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<WhMaterialStandingbookEntity> WhMaterialStandingbookEntities { get; set; } = new();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public DeletePhysicalBySfcsCommand DeletePhysicalBySfcsCommand { get; set; } = new();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public UpdateQtyCommand UpdateQtyCommand { get; set; } = new();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public DeleteSfcProduceBusinesssBySfcInfoIdsCommand DeleteSfcProduceBusinesssBySfcInfoIdsCommand { get; set; } = new();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public MultiSFCUpdateStatusCommand MultiSFCUpdateStatusCommand { get; set; } = new();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public ProcessRouteTypeEnum ProcessRouteType { get; set; }
+
 
     }
 }
