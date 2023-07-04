@@ -195,14 +195,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 // 进行扣料
                 _masterDataService.DeductMaterialQty(ref updates, ref adds, ref residue, firstProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
             }
+            responseBo.UpdateQtyByIdCommands = updates;
+            responseBo.ManuSfcCirculationEntities = adds;
 
             // 组装（出站步骤数据）
             responseBo.SFCProduceEntities.ForEach(sfcProduceEntity =>
             {
-                // 更新时间
-                sfcProduceEntity.UpdatedBy = updatedBy;
-                sfcProduceEntity.UpdatedOn = updatedOn;
-
                 // 初始化步骤
                 var stepEntity = new ManuSfcStepEntity
                 {
@@ -210,7 +208,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     Operatetype = ManuSfcStepTypeEnum.OutStock,
                     CurrentStatus = SfcProduceStatusEnum.Activity,
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = sfcProduceEntity.SiteId,
                     SFC = sfcProduceEntity.SFC,
                     ProductId = sfcProduceEntity.ProductId,
                     WorkOrderId = sfcProduceEntity.WorkOrderId,
@@ -220,6 +217,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     Qty = sfcProduceEntity.Qty,
                     EquipmentId = sfcProduceEntity.EquipmentId,
                     ResourceId = sfcProduceEntity.ResourceId,
+                    SiteId = bo.SiteId,
                     CreatedBy = updatedBy,
                     CreatedOn = updatedOn,
                     UpdatedBy = updatedBy,
@@ -235,6 +233,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 // 未完工
                 else
                 {
+                    // 更新时间
+                    sfcProduceEntity.UpdatedBy = updatedBy;
+                    sfcProduceEntity.UpdatedOn = updatedOn;
                     sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
                     if (nextProcedure != null)
                     {
@@ -338,15 +339,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<int> ExecuteAsync(object obj)
         {
-
-            var sdsd = obj as InStationResponseBo;
-
             int rows = 0;
             if (obj is not OutStationResponseBo data) return rows;
 
             // 更新数据
-            using var trans = TransactionHelper.GetTransactionScope();
-            List<Task> tasks = new();
+            List<Task<int>> tasks = new();
 
             // 更新物料库存
             if (data.UpdateQtyByIdCommands.Any())
@@ -356,7 +353,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 // 未更新到全部需更新的数据，事务回滚
                 if (data.UpdateQtyByIdCommands.Count() > rows)
                 {
-                    trans.Dispose();
                     return 0;
                 }
             }
@@ -411,8 +407,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 tasks.Add(_manuSfcProduceRepository.UpdateRangeAsync(data.SFCProduceEntities));
             }
 
-            await Task.WhenAll(tasks);
-            trans.Complete();
+            var rowArray = await Task.WhenAll(tasks);
+            rows = rowArray.Sum();
 
             return rows;
         }
