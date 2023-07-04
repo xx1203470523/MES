@@ -109,10 +109,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         {
             var bo = param.ToBo<RepairStartRequestBo>() ?? throw new CustomerValidationException(nameof(ErrorCode.MES10103));
 
-            //if (param is not RepairStartRequestBo bo)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES10103));
-            //}
             // 验证DTO
             await _validationRepairJob.ValidateAndThrowAsync(bo);
             await Task.CompletedTask;
@@ -127,11 +123,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
             var bo = param.ToBo<RepairStartRequestBo>() ?? throw new CustomerValidationException(nameof(ErrorCode.MES10103));
-
-            //if (param is not RepairStartRequestBo bo)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES10103));
-            //}
             // 获取生产条码信息
             var sfcProduceEntitys = await param.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, new MultiSFCBo { SFCs = bo.SFCs, SiteId = bo.SiteId });
             if (sfcProduceEntitys == null || !sfcProduceEntitys.Any())

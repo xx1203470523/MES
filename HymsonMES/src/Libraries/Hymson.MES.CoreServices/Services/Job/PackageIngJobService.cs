@@ -97,7 +97,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             //    throw new CustomerValidationException(nameof(ErrorCode.MES10103));
             //}
 
-            var defaultDto = new JobResponseDto { };
+            var defaultDto = new PackageIngResponseBo { };
 
             defaultDto.Content?.Add("Operation", ManuContainerPackagJobReturnTypeEnum.JobManuPackageService.ParseToInt().ToString());
 
