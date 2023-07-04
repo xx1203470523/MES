@@ -24,6 +24,7 @@ namespace Hymson.MES.CoreServices.Mapper
         {
             CreateMap<JobRequestBo, InStationRequestBo>();
             CreateMap<JobRequestBo, OutStationRequestBo>();
+            CreateMap<JobRequestBo, StopRequestBo>();
         }
 
         /// <summary>
