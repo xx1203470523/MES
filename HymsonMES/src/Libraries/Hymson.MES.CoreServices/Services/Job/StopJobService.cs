@@ -1,9 +1,18 @@
-﻿using Hymson.MES.Core.Attribute.Job;
+﻿using Dapper;
+using Hymson.Localization.Services;
+using Hymson.MES.Core.Attribute.Job;
+using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
+using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Job;
+using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.Snowflake;
+using Hymson.Utils;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -24,18 +33,40 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         private readonly IMasterDataService _masterDataService;
 
         /// <summary>
+        /// 仓储接口（条码生产信息）
+        /// </summary>
+        private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
+
+        /// <summary>
+        /// 仓储接口（条码步骤）
+        /// </summary>
+        private readonly IManuSfcStepRepository _manuSfcStepRepository;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly ILocalizationService _localizationService;
+
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="manuCommonService"></param>
         /// <param name="masterDataService"></param>
-        /// <param name="procProcessRouteDetailNodeRepository"></param>
-        /// <param name="procProcessRouteDetailLinkRepository"></param>
+        /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="manuSfcStepRepository"></param>
         /// <param name="localizationService"></param>
         public StopJobService(IManuCommonService manuCommonService,
-            IMasterDataService masterDataService)
+            IMasterDataService masterDataService,
+            IManuSfcProduceRepository manuSfcProduceRepository,
+            IManuSfcStepRepository manuSfcStepRepository,
+            ILocalizationService localizationService)
         {
             _manuCommonService = manuCommonService;
             _masterDataService = masterDataService;
+            _manuSfcProduceRepository = manuSfcProduceRepository;
+            _manuSfcStepRepository = manuSfcStepRepository;
+            _localizationService = localizationService;
         }
 
 
@@ -46,7 +77,19 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task VerifyParamAsync<T>(T param) where T : JobBaseBo
         {
-            await Task.CompletedTask;
+            var bo = param.ToBo<StopRequestBo>();
+            if (bo == null) return;
+
+            // 获取生产条码信息
+            var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, bo);
+            if (sfcProduceEntities == null || sfcProduceEntities.Any() == false) return;
+
+            var sfcProduceBusinessEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, bo);
+
+            // 合法性校验
+            sfcProduceEntities.VerifySFCStatus(SfcProduceStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcProduceStatusEnum).FullName}.{nameof(SfcProduceStatusEnum.Activity)}"))
+                              .VerifyProcedure(bo.ProcedureId)
+                              .VerifyResource(bo.ResourceId);
         }
 
         /// <summary>
@@ -56,8 +99,57 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
-            await Task.CompletedTask;
-            return null;
+            var bo = param.ToBo<StopRequestBo>();
+            if (bo == null) return default;
+
+            // 获取生产条码信息
+            var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, bo);
+            var entities = sfcProduceEntities.AsList();
+            if (entities == null || entities.Any() == false) return default;
+
+            var firstProduceEntity = entities.FirstOrDefault();
+            if (firstProduceEntity == null) return default;
+
+            // 更新时间
+            var updatedBy = bo.UserName;
+            var updatedOn = HymsonClock.Now();
+
+            List<ManuSfcStepEntity> sfcStepEntities = new();
+            entities.ForEach(sfcProduceEntity =>
+            {
+                // 更改状态，将条码由"活动"改为"排队"
+                sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
+                sfcProduceEntity.UpdatedBy = updatedBy;
+                sfcProduceEntity.UpdatedOn = updatedOn;
+
+                // 初始化步骤
+                sfcStepEntities.Add(new ManuSfcStepEntity
+                {
+                    // 插入 manu_sfc_step 状态为 停止
+                    Operatetype = ManuSfcStepTypeEnum.Stop,
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SFC = sfcProduceEntity.SFC,
+                    ProductId = sfcProduceEntity.ProductId,
+                    WorkOrderId = sfcProduceEntity.WorkOrderId,
+                    WorkCenterId = sfcProduceEntity.WorkCenterId,
+                    ProductBOMId = sfcProduceEntity.ProductBOMId,
+                    ProcedureId = bo.ProcedureId,
+                    Qty = sfcProduceEntity.Qty,
+                    EquipmentId = sfcProduceEntity.EquipmentId,
+                    ResourceId = bo.ResourceId,
+                    SiteId = bo.SiteId,
+                    CreatedBy = updatedBy,
+                    CreatedOn = updatedOn,
+                    UpdatedBy = updatedBy,
+                    UpdatedOn = updatedOn
+                });
+            });
+
+            return new StopResponseBo
+            {
+                SFCProduceEntities = entities,
+                SFCStepEntities = sfcStepEntities
+            };
         }
 
         /// <summary>
@@ -67,8 +159,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<int> ExecuteAsync(object obj)
         {
-            await Task.CompletedTask;
-            return 0;
+            int rows = 0;
+            if (obj is not StopResponseBo data) return rows;
+
+            rows += await _manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities);
+            rows += await _manuSfcProduceRepository.UpdateRangeAsync(data.SFCProduceEntities);
+
+            return rows;
         }
 
     }

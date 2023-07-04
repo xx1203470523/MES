@@ -210,7 +210,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     Operatetype = ManuSfcStepTypeEnum.OutStock,
                     CurrentStatus = SfcProduceStatusEnum.Activity,
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = sfcProduceEntity.SiteId,
                     SFC = sfcProduceEntity.SFC,
                     ProductId = sfcProduceEntity.ProductId,
                     WorkOrderId = sfcProduceEntity.WorkOrderId,
@@ -220,6 +219,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     Qty = sfcProduceEntity.Qty,
                     EquipmentId = sfcProduceEntity.EquipmentId,
                     ResourceId = sfcProduceEntity.ResourceId,
+                    SiteId = bo.SiteId,
                     CreatedBy = updatedBy,
                     CreatedOn = updatedOn,
                     UpdatedBy = updatedBy,
@@ -338,14 +338,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<int> ExecuteAsync(object obj)
         {
-
-            var sdsd = obj as InStationResponseBo;
-
             int rows = 0;
             if (obj is not OutStationResponseBo data) return rows;
 
             // 更新数据
-            using var trans = TransactionHelper.GetTransactionScope();
             List<Task> tasks = new();
 
             // 更新物料库存
@@ -356,7 +352,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 // 未更新到全部需更新的数据，事务回滚
                 if (data.UpdateQtyByIdCommands.Count() > rows)
                 {
-                    trans.Dispose();
                     return 0;
                 }
             }
@@ -412,7 +407,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }
 
             await Task.WhenAll(tasks);
-            trans.Complete();
 
             return rows;
         }
