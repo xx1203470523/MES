@@ -14,28 +14,16 @@ namespace Hymson.MES.CoreServices.Mapper
         /// </summary>
         public MapperConfiguration()
         {
-            CreateInStationMaps();
-            CreateOutStationMaps();
+            CreateRequestBoMaps();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        protected virtual void CreateInStationMaps()
+        protected virtual void CreateRequestBoMaps()
         {
-            CreateMap<OutStationRequestBo, InStationRequestBo>();
-            CreateMap<RepairStartRequestBo, InStationRequestBo>();
-            CreateMap<RepairEndRequestBo, InStationRequestBo>();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        protected virtual void CreateOutStationMaps()
-        {
-            CreateMap<InStationRequestBo, OutStationRequestBo>();
-            CreateMap<RepairStartRequestBo, OutStationRequestBo>();
-            CreateMap<RepairEndRequestBo, OutStationRequestBo>();
+            CreateMap<JobRequestBo, InStationRequestBo>();
+            CreateMap<JobRequestBo, OutStationRequestBo>();
         }
 
         /// <summary>

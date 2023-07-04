@@ -1,14 +1,13 @@
-﻿using Hymson.Infrastructure.Exceptions;
+﻿using Hymson.Authentication;
+using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Common;
-using Hymson.MES.CoreServices.Services.Common.ManuCommon;
-using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Job;
-using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
-using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
+using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
 using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Job.Manufacture
@@ -19,35 +18,39 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
     public class JobManuCompleteService : IJobManufactureService
     {
         /// <summary>
-        /// 服务接口（生产通用）
+        /// 当前对象（登录用户）
         /// </summary>
-        private readonly IManuCommonService _manuCommonService;
+        private readonly ICurrentUser _currentUser;
 
         /// <summary>
-        /// 服务接口（生产通用）
+        /// 当前对象（站点）
         /// </summary>
-        private readonly IManuCommonOldService _manuCommonOldService;
+        private readonly ICurrentSite _currentSite;
 
         /// <summary>
-        /// 服务接口（出站）
+        /// 服务接口
         /// </summary>
-        private readonly IManuOutStationService _manuOutStationService;
+        private readonly IExecuteJobService<JobRequestBo> _executeJobService;
 
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly ILocalizationService _localizationService;
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="manuCommonService"></param>
-        /// <param name="manuCommonOldService"></param>
-        /// <param name="manuOutStationService"></param>
-        public JobManuCompleteService(IManuCommonService manuCommonService,
-            IManuCommonOldService manuCommonOldService,
-            IManuOutStationService manuOutStationService,ILocalizationService localizationService)
+        /// <param name="currentUser"></param>
+        /// <param name="currentSite"></param>
+        /// <param name="executeJobService"></param>
+        /// <param name="localizationService"></param>
+        public JobManuCompleteService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IExecuteJobService<JobRequestBo> executeJobService,
+            ILocalizationService localizationService)
         {
-            _manuCommonService = manuCommonService;
-            _manuCommonOldService = manuCommonOldService;
-            _manuOutStationService = manuOutStationService;
+            _currentUser = currentUser;
+            _currentSite = currentSite;
+            _executeJobService = executeJobService;
             _localizationService = localizationService;
         }
 
@@ -86,30 +89,18 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
                 ResourceId = param["ResourceId"].ParseToLong()
             };
 
-            /*
-            var processRouteId = 15968606561873920;
-            var result = await _jobContextProxy.GetValueAsync(_manuCommonOldService.GetProcessRouteAsync, processRouteId);
-            */
+            var jobBos = new List<JobBo> { };
+            jobBos.Add(new JobBo { Name = "OutStationVerifyJobService" });
+            jobBos.Add(new JobBo { Name = "OutStationJobService" });
 
-            // 获取生产条码信息
-            var (sfcProduceEntity, _) = await _manuCommonOldService.GetProduceSFCAsync(bo.SFC);
-
-            // 合法性校验
-            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcProduceStatusEnum).FullName}.{nameof(SfcProduceStatusEnum.Activity)}"))
-                            .VerifyProcedure(bo.ProcedureId)
-                            .VerifyResource(bo.ResourceId);
-
-            // 验证BOM主物料数量
-            await _manuCommonService.VerifyBomQtyAsync(new ManuProcedureBomBo
+            await _executeJobService.ExecuteAsync(jobBos, new JobRequestBo
             {
-                SiteId = sfcProduceEntity.SiteId,
-                SFCs = new string[] { bo.SFC },
+                SiteId = _currentSite.SiteId ?? 0,
+                UserName = _currentUser.UserName,
                 ProcedureId = bo.ProcedureId,
-                BomId = sfcProduceEntity.ProductBOMId
+                ResourceId = bo.ResourceId,
+                SFCs = new string[] { bo.SFC }
             });
-
-            // 出站
-            _ = await _manuOutStationService.OutStationAsync(sfcProduceEntity);
 
             defaultDto.Content?.Add("PackageCom", "False");
             defaultDto.Content?.Add("BadEntryCom", "False");
