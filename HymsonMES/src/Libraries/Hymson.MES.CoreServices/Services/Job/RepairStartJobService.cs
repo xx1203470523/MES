@@ -12,6 +12,7 @@ using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
+using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.CoreServices.Services.Job.JobUtility;
@@ -106,10 +107,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task VerifyParamAsync<T>(T param) where T : JobBaseBo
         {
-            if (param is not RepairStartRequestBo bo)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10103));
-            }
+            var bo = param.ToBo<RepairStartRequestBo>() ?? throw new CustomerValidationException(nameof(ErrorCode.MES10103));
+
+            //if (param is not RepairStartRequestBo bo)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES10103));
+            //}
             // 验证DTO
             await _validationRepairJob.ValidateAndThrowAsync(bo);
             await Task.CompletedTask;
@@ -123,10 +126,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
-            if (param is not RepairStartRequestBo bo)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10103));
-            }
+            var bo = param.ToBo<RepairStartRequestBo>() ?? throw new CustomerValidationException(nameof(ErrorCode.MES10103));
+
+            //if (param is not RepairStartRequestBo bo)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES10103));
+            //}
             // 获取生产条码信息
             var sfcProduceEntitys = await param.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, new MultiSFCBo { SFCs = bo.SFCs, SiteId = bo.SiteId });
             if (sfcProduceEntitys == null || !sfcProduceEntitys.Any())
