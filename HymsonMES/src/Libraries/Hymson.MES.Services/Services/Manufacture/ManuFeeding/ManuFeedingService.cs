@@ -381,7 +381,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
 
                 // 检查是否符合替代料
                 var bomDetailReplaceMaterialEntities = await _procBomDetailReplaceMaterialRepository.GetByBomDetailIdAsync(bomDetailEntitiy.Id);
-                if (bomDetailReplaceMaterialEntities.Any(a => a.ReplaceMaterialId != inventory.MaterialId)) throw new CustomerValidationException(nameof(ErrorCode.MES16315)).WithData("barCode", inventory.MaterialBarCode);
+                if (bomDetailReplaceMaterialEntities.Any(a => a.ReplaceMaterialId == inventory.MaterialId) == false) throw new CustomerValidationException(nameof(ErrorCode.MES16315)).WithData("barCode", inventory.MaterialBarCode);
             }
 
             var rows = 0;
