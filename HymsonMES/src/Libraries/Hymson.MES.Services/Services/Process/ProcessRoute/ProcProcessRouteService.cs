@@ -122,7 +122,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             model.Info = processRoute.ToModel<ProcProcessRouteDto>();
 
             var nodes = await _procProcessRouteNodeRepository.GetListAsync(new ProcProcessRouteDetailNodeQuery { ProcessRouteId = id });
-            nodes = nodes.OrderBy(x => x.SerialNo.ParseToInt());
+            nodes = nodes.OrderBy(x => x.ManualSortNumber);
             model.Nodes = nodes.Select(s =>
             {
                 // 实体转换
@@ -490,6 +490,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
                 SiteId = entity.SiteId,
                 ProcessRouteId = entity.Id,
                 SerialNo = "",
+                ManualSortNumber=s.ManualSortNumber,
                 ProcedureId = s.ProcedureId,
                 CheckType = s.CheckType,
                 CheckRate = s.CheckRate,

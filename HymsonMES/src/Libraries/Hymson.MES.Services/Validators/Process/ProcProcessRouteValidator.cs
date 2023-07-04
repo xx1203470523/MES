@@ -128,6 +128,8 @@ namespace Hymson.MES.Services.Validators.Process
         public ProcFlowDynamicNodeValidator()
         {
             RuleFor(i => i.SerialNo).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10460));
+            RuleFor(i => i.ManualSortNumber).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10474));
+            RuleFor(x => x.ManualSortNumber).MaximumLength(18).WithErrorCode(nameof(ErrorCode.MES10475));
             RuleFor(i => i.ProcedureId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10461));
             //RuleFor(i => i.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10462));
             RuleFor(i => i.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10463));

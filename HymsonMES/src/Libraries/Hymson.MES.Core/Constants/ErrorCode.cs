@@ -170,7 +170,8 @@
         public const string MES10471 = $"工序节点中是否报工不合法";
         public const string MES10472 = $"工序节点中是否首工序不合法";
         public const string MES10473 = $"工序节点中，抽检类型为固定比例时，抽检比例需要大于等于2";
-
+        public const string MES10474 = $"工序节点手动排序号不能为空";
+        public const string MES10475 = $"工序节点手动排序号最大长度为18";
 
         #endregion
 
