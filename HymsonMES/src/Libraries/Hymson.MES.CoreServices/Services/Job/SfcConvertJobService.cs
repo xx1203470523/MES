@@ -28,6 +28,7 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
+using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -150,10 +151,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task VerifyParamAsync<T>(T param) where T : JobBaseBo
         {
-            if (param is not SfcConvertRequestBo bo)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10103));
-            }
+            var bo = param.ToBo<SfcConvertRequestBo>() ?? throw new CustomerValidationException(nameof(ErrorCode.MES10103));
+
+            //if (param is not SfcConvertRequestBo bo)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES10103));
+            //}
             // 验证DTO
             await _validationRepairJob.ValidateAndThrowAsync(bo);
             await Task.CompletedTask;
@@ -167,10 +170,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
-            if (param is not SfcConvertRequestBo bo)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10103));
-            }
+            var bo = param.ToBo<SfcConvertRequestBo>() ?? throw new CustomerValidationException(nameof(ErrorCode.MES10103));
+
+            //if (param is not SfcConvertRequestBo bo)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES10103));
+            //}
 
             //获取资源与设备
             var procResource = await param.Proxy.GetValueAsync(_procResourceRepository.GetByIdAsync, bo.ResourceId)

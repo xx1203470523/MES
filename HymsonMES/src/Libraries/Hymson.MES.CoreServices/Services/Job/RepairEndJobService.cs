@@ -23,6 +23,7 @@ using System.Threading.Tasks.Dataflow;
 using System.Linq;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Newtonsoft.Json;
+using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -71,10 +72,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task VerifyParamAsync<T>(T param) where T : JobBaseBo
         {
-            if (param is not RepairEndRequestBo bo)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10103));
-            }
+            var bo = param.ToBo<RepairEndRequestBo>() ?? throw new CustomerValidationException(nameof(ErrorCode.MES10103));
+            //if (param is not RepairEndRequestBo bo)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES10103));
+            //}
             // 验证DTO
             await _validationRepairJob.ValidateAndThrowAsync(bo);
             await Task.CompletedTask;
@@ -88,10 +90,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
-            if (param is not RepairEndRequestBo bo)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10103));
-            }
+            var bo = param.ToBo<RepairEndRequestBo>() ?? throw new CustomerValidationException(nameof(ErrorCode.MES10103));
+            //if (param is not RepairEndRequestBo bo)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES10103));
+            //}
             // 获取生产条码信息
             var sfcProduceEntitys = await param.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, new MultiSFCBo { SFCs = bo.SFCs, SiteId = bo.SiteId });
             if (sfcProduceEntitys == null || !sfcProduceEntitys.Any())
