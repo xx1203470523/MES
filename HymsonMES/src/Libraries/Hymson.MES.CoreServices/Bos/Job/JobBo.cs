@@ -39,14 +39,14 @@ namespace Hymson.MES.CoreServices.Bos.Job
     public class JobResponseBo
     {
         /// <summary>
-        /// 
+        /// 影响行数
         /// </summary>
         public int Rows { get; set; } = 0;
 
         /// <summary>
         /// 内容
         /// </summary>
-        public Dictionary<string, string>? Content { get; set; } = new();
+        public Dictionary<string, string> Content { get; set; } = new();
 
         /// <summary>
         /// 消息
