@@ -6,7 +6,6 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
@@ -21,7 +20,6 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using Hymson.Utils.Tools;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -179,7 +177,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
                 // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
                 decimal residue = materialBo.Usages;
-                if (materialBo.Loss.HasValue == true && materialBo.Loss > 0) residue *= (materialBo.Loss.Value / 100);
+                if (materialBo.Loss.HasValue == true && materialBo.Loss > 0) residue *= materialBo.Loss.Value;
                 if (materialBo.ConsumeRatio > 0) residue *= (materialBo.ConsumeRatio / 100);
 
                 // 收集方式是批次
@@ -366,7 +364,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }
 
             // 插入 manu_sfc_step
-            if (data.ManuSfcCirculationEntities.Any())
+            if (data.SFCStepEntities.Any())
             {
                 tasks.Add(_manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities));
             }
