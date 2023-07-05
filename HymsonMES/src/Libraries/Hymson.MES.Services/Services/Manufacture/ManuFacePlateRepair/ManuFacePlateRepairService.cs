@@ -11,6 +11,7 @@ using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -172,7 +173,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             #endregion
 
             #region 调用作业
-            manuFacePlateRepairExJobDto.SFC = manuFacePlateRepairExJobDto.SFC.Trim();
+            //manuFacePlateRepairExJobDto.SFC = manuFacePlateRepairExJobDto.SFC.Trim();
             var jobDto = new ButtonRequestDto
             {
                 FacePlateId = manuFacePlateRepairExJobDto.FacePlateId,
@@ -186,8 +187,18 @@ namespace Hymson.MES.Services.Services.Manufacture
                 { "ResourceId", $"{manuFacePlateRepairExJobDto.ResourceId}" }
             };
             jobDto.Param = dic;
+            //var sfcs = new List<string>() { manuFacePlateRepairExJobDto.SFC };
+            //RepairStartRequestBo bo = new()
+            //{
+            //    SFCs = sfcs,
+            //    ProcedureId = manuFacePlateRepairExJobDto.ProcedureId,
+            //    ResourceId = manuFacePlateRepairExJobDto.ResourceId,
+            //    SiteId = _currentSite.SiteId ?? 0,
+            //    UserName = _currentUser.UserName
+            //};
             // 调用作业
             var resJob = await _manuFacePlateButtonService.ClickAsync(jobDto);
+            //var resJob = await _manuFacePlateButtonService.NewClickAsync(jobDto, bo);
             if (resJob == null || resJob.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES17320));
 
             var list = new List<ManuFacePlateRepairButJobReturnTypeEnum>();

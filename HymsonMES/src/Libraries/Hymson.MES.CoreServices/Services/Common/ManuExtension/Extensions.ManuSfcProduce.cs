@@ -1,12 +1,13 @@
 ﻿using Hymson.Infrastructure.Exceptions;
+using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
-using Hymson.Utils;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -53,7 +54,8 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
         /// </summary>
         /// <param name="sfcProduceEntity"></param>
         /// <param name="produceStatus"></param>
-        public static ManuSfcProduceEntity VerifySFCStatus(this ManuSfcProduceEntity sfcProduceEntity, SfcProduceStatusEnum produceStatus)
+        /// <param name="produceStatusDescription"></param>
+        public static ManuSfcProduceEntity VerifySFCStatus(this ManuSfcProduceEntity sfcProduceEntity, SfcProduceStatusEnum produceStatus, string produceStatusDescription)
         {
             // 当前条码是否是被锁定
             if (sfcProduceEntity.Status == SfcProduceStatusEnum.Locked) throw new CustomerValidationException(nameof(ErrorCode.MES16314)).WithData("SFC", sfcProduceEntity.SFC);
@@ -62,7 +64,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
             if (sfcProduceEntity.IsScrap == TrueOrFalseEnum.Yes) throw new CustomerValidationException(nameof(ErrorCode.MES16322)).WithData("SFC", sfcProduceEntity.SFC);
 
             // 当前工序是否是指定状态
-            if (sfcProduceEntity.Status != produceStatus) throw new CustomerValidationException(nameof(ErrorCode.MES16313)).WithData("Status", produceStatus.GetDescription());
+            if (sfcProduceEntity.Status != produceStatus) throw new CustomerValidationException(nameof(ErrorCode.MES16313)).WithData("Status", produceStatusDescription);
 
             return sfcProduceEntity;
         }
@@ -72,7 +74,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
         /// </summary>
         /// <param name="sfcProduceEntities"></param>
         /// <param name="produceStatus"></param>
-        public static IEnumerable<ManuSfcProduceEntity> VerifySFCStatus(this IEnumerable<ManuSfcProduceEntity> sfcProduceEntities, SfcProduceStatusEnum produceStatus)
+        public static IEnumerable<ManuSfcProduceEntity> VerifySFCStatus(this IEnumerable<ManuSfcProduceEntity> sfcProduceEntities, SfcProduceStatusEnum produceStatus, string produceStatusDescription)
         {
             // 当前条码是否是已报废
             if (sfcProduceEntities.Any(a => a.IsScrap == TrueOrFalseEnum.Yes)) throw new CustomerValidationException(nameof(ErrorCode.MES16324));
@@ -81,7 +83,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
             if (sfcProduceEntities.Any(a => a.Status == SfcProduceStatusEnum.Locked)) throw new CustomerValidationException(nameof(ErrorCode.MES16325));
 
             // 当前工序是否是指定状态
-            if (sfcProduceEntities.Any(a => a.Status != produceStatus)) throw new CustomerValidationException(nameof(ErrorCode.MES16313)).WithData("Status", produceStatus.GetDescription());
+            if (sfcProduceEntities.Any(a => a.Status != produceStatus)) throw new CustomerValidationException(nameof(ErrorCode.MES16313)).WithData("Status", produceStatusDescription);
 
             return sfcProduceEntities;
         }
@@ -216,6 +218,20 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
             }
 
             return true;
+        }
+
+
+
+        /// <summary>
+        /// 转换BO对象
+        /// </summary>
+        /// <typeparam name="TBo"></typeparam>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        public static TBo ToBo<TBo>(this JobBaseBo bo) where TBo : JobBaseBo
+        {
+            if (bo == null) throw new ArgumentNullException("bo");
+            return AutoMapperConfiguration.Mapper.Map<TBo>(bo);
         }
 
     }

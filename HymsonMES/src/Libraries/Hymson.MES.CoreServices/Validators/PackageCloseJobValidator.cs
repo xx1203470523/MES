@@ -8,12 +8,12 @@ namespace Hymson.MES.Services.Validators.Equipment
     /// <summary>
     /// 维修Job 验证(结束)
     /// </summary>
-    internal class RepairEndJobValidator : AbstractValidator<RepairEndRequestBo>
+    internal class PackageCloseJobValidator : AbstractValidator<PackageCloseRequestBo>
     {
         /// <summary>
         ///  
         /// </summary>
-        public RepairEndJobValidator()
+        public PackageCloseJobValidator()
         {
             RuleFor(x => x).NotEmpty().WithErrorCode(ErrorCode.MES16332);
             RuleFor(x => x.SFCs).NotEmpty().Must(it => it.Any(s => s.Trim() != "")).WithErrorCode(ErrorCode.MES16332);

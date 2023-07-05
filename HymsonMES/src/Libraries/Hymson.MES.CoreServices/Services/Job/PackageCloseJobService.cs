@@ -23,15 +23,17 @@ using System.Threading.Tasks.Dataflow;
 using System.Linq;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Newtonsoft.Json;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
+using Hymson.MES.Data.Repositories.Integrated.InteContainer;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
     /// <summary>
-    /// 维修结束
+    /// 包装（打开）
     /// </summary>
-    [Job("维修结束", JobTypeEnum.Standard)]
-    public class RepairEndJobService : IJobService
+    [Job("包装", JobTypeEnum.Standard)]
+    public class PackageCloseJobService : IJobService
     {
 
         /// <summary>
@@ -44,23 +46,33 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         private readonly IMasterDataService _masterDataService;
 
+        private readonly IManuContainerBarcodeRepository _manuContainerBarcodeRepository;
+        private readonly IManuContainerPackRepository _manuContainerPackRepository;
+        private readonly IInteContainerRepository _inteContainerRepository;
+
         /// <summary>
         /// 验证器
         /// </summary>
-        private readonly AbstractValidator<RepairEndRequestBo> _validationRepairJob;
+        private readonly AbstractValidator<PackageCloseRequestBo> _validationRepairJob;
         /// <summary>
         /// 构造函数 
         /// </summary>
         /// <param name="manuCommonService"></param>
         /// <param name="procProcessRouteDetailNodeRepository"></param>
         /// <param name="procProcessRouteDetailLinkRepository"></param>
-        public RepairEndJobService(IManuCommonService manuCommonService,
-            AbstractValidator<RepairEndRequestBo> validationRepairJob,
-            IMasterDataService masterDataService)
+        public PackageCloseJobService(IManuCommonService manuCommonService,
+            AbstractValidator<PackageCloseRequestBo> validationRepairJob,
+            IMasterDataService masterDataService,
+            IManuContainerBarcodeRepository manuContainerBarcodeRepository,
+            IManuContainerPackRepository manuContainerPackRepository,
+            IInteContainerRepository inteContainerRepository)
         {
             _manuCommonService = manuCommonService;
             _validationRepairJob = validationRepairJob;
             _masterDataService = masterDataService;
+            _manuContainerBarcodeRepository = manuContainerBarcodeRepository;
+            _manuContainerPackRepository = manuContainerPackRepository;
+            _inteContainerRepository = inteContainerRepository;
         }
 
 
@@ -72,7 +84,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task VerifyParamAsync<T>(T param) where T : JobBaseBo
         {
-            var bo = param.ToBo<RepairEndRequestBo>() ?? throw new CustomerValidationException(nameof(ErrorCode.MES10103));
+            var bo = param.ToBo<PackageCloseRequestBo>() ?? throw new CustomerValidationException(nameof(ErrorCode.MES10103));
 
             // 验证DTO
             await _validationRepairJob.ValidateAndThrowAsync(bo);
@@ -87,29 +99,36 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
-            var bo = param.ToBo<RepairEndRequestBo>() ?? throw new CustomerValidationException(nameof(ErrorCode.MES10103));
+            var bo = param.ToBo<PackageCloseRequestBo>() ?? throw new CustomerValidationException(nameof(ErrorCode.MES10103));
 
-            // 获取生产条码信息
-            var sfcProduceEntitys = await param.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, new MultiSFCBo { SFCs = bo.SFCs, SiteId = bo.SiteId });
-            if (sfcProduceEntitys == null || !sfcProduceEntitys.Any())
+            var defaultDto = new PackageCloseResponseBo { };
+
+            string success = "true";
+            var manuContainerBarcodeEntity = await param.Proxy.GetValueAsync(_manuContainerBarcodeRepository.GetByIdAsync, bo.ContainerId);
+            if (manuContainerBarcodeEntity == null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16306));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16702));
             }
-            if (sfcProduceEntitys.GroupBy(it => it.ProcedureId).Count() > 1)
+            int status = 2;//1打开，2关闭
+            defaultDto.Content?.Add("Operation", ManuContainerPackagJobReturnTypeEnum.JobManuPackageCloseService.ParseToInt().ToString());
+            defaultDto.Content?.Add("Status", $"{status}".ToString());
+            //当前状态不等于修改状态
+            if (manuContainerBarcodeEntity.Status != status)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16330));
-            };
-            if (sfcProduceEntitys.GroupBy(it => it.ProcedureId).Count() > 1)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16331));
-            };
-            var sfcProduceActivitys = sfcProduceEntitys.Where(it => it.Status != SfcProduceStatusEnum.Activity);
-            if (sfcProduceActivitys.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16336)).WithData("SFC", string.Join(",", sfcProduceActivitys.Select(it => it.SFC).ToArray()));
+                manuContainerBarcodeEntity.Status = status;
+                manuContainerBarcodeEntity.UpdatedBy = bo.UserName;
+                manuContainerBarcodeEntity.UpdatedOn = HymsonClock.Now();
+                defaultDto.ManuContainerBarcode = manuContainerBarcodeEntity;
+                defaultDto.Message = $"关闭成功！";
             }
-            //返回
-            return true;
+            else
+            {
+                success = "false";
+                defaultDto.Message = $"该容器已经关闭！";
+            }
+            defaultDto.Content?.Add("Success", success);
+
+            return defaultDto;
         }
 
         /// <summary>
@@ -119,6 +138,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<int> ExecuteAsync(object obj)
         {
+            int rows = 0;
+            if (obj is not PackageCloseResponseBo data) return rows;
+
+            await _manuContainerBarcodeRepository.UpdateStatusAsync(data.ManuContainerBarcode);
+
             await Task.CompletedTask;
             return 0;
         }

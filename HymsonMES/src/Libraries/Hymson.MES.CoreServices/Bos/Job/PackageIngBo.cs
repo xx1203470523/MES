@@ -1,12 +1,13 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
+using Hymson.Utils;
 
 namespace Hymson.MES.CoreServices.Bos.Job
 {
     /// <summary>
     /// 
     /// </summary>
-    public class RepairEndRequestBo : JobBaseBo
+    public class PackageIngRequestBo : JobBaseBo
     {
 
         /// <summary>
@@ -28,9 +29,22 @@ namespace Hymson.MES.CoreServices.Bos.Job
     /// <summary>
     ///  
     /// </summary>
-    public class RepairEndResponseBo : JobResultBo
+    public class PackageIngResponseBo : JobResultBo
     {
+        /// <summary>
+        /// 内容
+        /// </summary>
+        public Dictionary<string, string>? Content { get; set; } = new();
 
+        /// <summary>
+        /// 消息
+        /// </summary>
+        public string Message { get; set; } = "";
+
+        /// <summary>
+        /// 时间
+        /// </summary>
+        public DateTime Time { get; set; } = HymsonClock.Now();
     }
 
 }

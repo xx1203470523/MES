@@ -170,7 +170,8 @@
         public const string MES10471 = $"工序节点中是否报工不合法";
         public const string MES10472 = $"工序节点中是否首工序不合法";
         public const string MES10473 = $"工序节点中，抽检类型为固定比例时，抽检比例需要大于等于2";
-
+        public const string MES10474 = $"工序节点手动排序号不能为空";
+        public const string MES10475 = $"工序节点手动排序号最大长度为18";
 
         #endregion
 
@@ -817,6 +818,7 @@
         public const string MES16732 = "装载信息不存在!";
         public const string MES16733 = "容器已打开!";
         public const string MES16734 = "容器已关闭!";
+        public const string MES16735 = "产品{product}未维护包装编码规则,无法创建容器";
         #endregion
 
         #region 绑定工单激活  MES16800

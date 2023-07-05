@@ -32,7 +32,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
         /// 执行作业
         /// </summary>
         /// <returns></returns>
-        public async Task ExecuteAsync(IEnumerable<JobBo> jobBos, T param)
+        public async Task<int> ExecuteAsync(IEnumerable<JobBo> jobBos, T param)
         {
             var services = _serviceProvider.GetServices<IJobService>();
 
@@ -57,6 +57,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
             }
 
             // 执行入库
+            var rowSum = 0;
             using var trans = new TransactionScope();
             foreach (var job in jobBos)
             {
@@ -66,10 +67,18 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
                 var obj = await param.Proxy.GetValueAsync(service.DataAssemblingAsync<T>, param);
                 if (obj == null) continue;
 
-                await service.ExecuteAsync(obj);
+                var rows = await service.ExecuteAsync(obj);
+                if (rows <= 0)
+                {
+                    trans.Dispose();
+                    return 0;
+                }
+
+                rowSum += rows;
             }
 
             trans.Complete();
+            return rowSum;
         }
     }
 }

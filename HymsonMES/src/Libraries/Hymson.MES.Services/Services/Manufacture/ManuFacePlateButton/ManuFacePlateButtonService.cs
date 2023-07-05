@@ -14,8 +14,10 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Job;
+using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -53,6 +55,12 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         private readonly IInteJobRepository _inteJobRepository;
 
+
+        /// <summary>
+        /// 仓储接口（作业）
+        /// </summary>
+        private readonly IExecuteJobService<JobBaseBo> _executeJobService;
+
         /// <summary>
         /// 
         /// </summary>
@@ -76,7 +84,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             IManuFacePlateButtonJobRelationRepository manuFacePlateButtonJobRelationRepository,
             IInteJobRepository inteJobRepository,
             AbstractValidator<ManuFacePlateButtonCreateDto> validationCreateRules,
-            AbstractValidator<ManuFacePlateButtonModifyDto> validationModifyRules)
+            AbstractValidator<ManuFacePlateButtonModifyDto> validationModifyRules, IExecuteJobService<JobBaseBo> executeJobService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -86,6 +94,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _inteJobRepository = inteJobRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
+            _executeJobService = executeJobService;
         }
 
         /// <summary>
@@ -145,7 +154,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task<PagedInfo<ManuFacePlateButtonDto>> GetPagedListAsync(ManuFacePlateButtonPagedQueryDto manuFacePlateButtonPagedQueryDto)
         {
             var manuFacePlateButtonPagedQuery = manuFacePlateButtonPagedQueryDto.ToQuery<ManuFacePlateButtonPagedQuery>();
-            manuFacePlateButtonPagedQuery.SiteId=_currentSite.SiteId ?? 0;
+            manuFacePlateButtonPagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _manuFacePlateButtonRepository.GetPagedInfoAsync(manuFacePlateButtonPagedQuery);
 
             //实体到DTO转换 装载数据
@@ -325,5 +334,41 @@ namespace Hymson.MES.Services.Services.Manufacture
             result = await _jobCommonService.ExecuteJobAsync(jobs, dto.Param);
             return result;
         }
+
+
+        /// <summary>
+        ///  新按钮（点击）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<Dictionary<string, JobResponseDto>> NewClickAsync(ButtonRequestDto dto, dynamic bo)
+        {
+            var result = new Dictionary<string, JobResponseDto> { }; // 返回结果
+
+            // 先检查按钮是否存在
+            var button = await _manuFacePlateButtonRepository.GetByIdAsync(dto.FacePlateButtonId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES17208));
+
+            // 根据面板ID和按钮ID找出绑定的作业job
+            var buttonJobs = await _manuFacePlateButtonJobRelationRepository.GetByFacePlateButtonIdAsync(dto.FacePlateButtonId);
+            if (buttonJobs.Any() == false) return result;
+
+            // 根据 buttonJobs 读取对应的job对象
+            var jobs = await _inteJobRepository.GetByIdsAsync(buttonJobs.Select(s => s.JobId).ToArray());
+
+            // 是否清除条码
+            if (buttonJobs.Any(a => a.IsClear) == true) dto.Param?.Add("IsClear", "True");
+
+            var jobBos = new List<JobBo>();
+            foreach (var job in jobs)
+            {
+                jobBos.Add(new JobBo { Name = job.ClassProgram });
+            }
+            await _executeJobService.ExecuteAsync(jobBos, bo);
+            // 执行Job
+            // result = await _jobCommonService.ExecuteJobAsync(jobs, dto.Param);
+            return result;
+        }
+
     }
 }

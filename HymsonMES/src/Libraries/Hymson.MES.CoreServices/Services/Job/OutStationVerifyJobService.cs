@@ -1,4 +1,5 @@
-﻿using Hymson.MES.Core.Attribute.Job;
+﻿using Hymson.Localization.Services;
+using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.CoreServices.Bos.Job;
@@ -27,15 +28,23 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         private readonly IMasterDataService _masterDataService;
 
         /// <summary>
+        /// 
+        /// </summary>
+        private readonly ILocalizationService _localizationService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="manuCommonService"></param>
         /// <param name="masterDataService"></param>
+        /// <param name="localizationService"></param>
         public OutStationVerifyJobService(IManuCommonService manuCommonService,
-            IMasterDataService masterDataService)
+            IMasterDataService masterDataService,
+            ILocalizationService localizationService)
         {
             _manuCommonService = manuCommonService;
             _masterDataService = masterDataService;
+            _localizationService = localizationService;
         }
 
 
@@ -46,18 +55,17 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task VerifyParamAsync<T>(T param) where T : JobBaseBo
         {
-            await Task.CompletedTask;
-
-            if ((param is OutStationRequestBo bo) == false) return;
+            var bo = param.ToBo<OutStationRequestBo>();
+            if (bo == null) return;
 
             // 获取生产条码信息
-            var sfcProduceEntities = await param.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, bo);
+            var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, bo);
             if (sfcProduceEntities == null || sfcProduceEntities.Any() == false) return;
 
-            var sfcProduceBusinessEntities = await param.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, bo);
+            var sfcProduceBusinessEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, bo);
 
             // 合法性校验
-            sfcProduceEntities.VerifySFCStatus(SfcProduceStatusEnum.Activity)
+            sfcProduceEntities.VerifySFCStatus(SfcProduceStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcProduceStatusEnum).FullName}.{nameof(SfcProduceStatusEnum.Activity)}"))
                               .VerifyProcedure(bo.ProcedureId)
                               .VerifyResource(bo.ResourceId);
 
@@ -66,7 +74,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (firstProduceEntity == null) return;
 
             // 获取生产工单（附带工单状态校验）
-            _ = await param.Proxy.GetValueAsync(async parameters =>
+            _ = await bo.Proxy.GetValueAsync(async parameters =>
             {
                 long workOrderId = (long)parameters[0];
                 bool isVerifyActivation = parameters.Length <= 1 || (bool)parameters[1];

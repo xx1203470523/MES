@@ -8,6 +8,7 @@ using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
+using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -15,7 +16,6 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using Hymson.Utils.Tools;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -90,18 +90,23 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>00
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
-            if ((param is InStationRequestBo bo) == false) return default;
+            var bo = param.ToBo<InStationRequestBo>();
+            if (bo == null) return default;
 
             // 获取生产条码信息
-            var sfcProduceEntities = await param.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, bo);
+            var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, bo);
             var entities = sfcProduceEntities.AsList();
             if (entities == null || entities.Any() == false) return default;
 
             var firstProduceEntity = entities.FirstOrDefault();
             if (firstProduceEntity == null) return default;
 
+            // 更新时间
+            var updatedBy = bo.UserName;
+            var updatedOn = HymsonClock.Now();
+
             // 检查是否首工序
-            var isFirstProcedure = await param.Proxy.GetValueAsync(async parameters =>
+            var isFirstProcedure = await bo.Proxy.GetValueAsync(async parameters =>
             {
                 var processRouteId = (long)parameters[0];
                 var procedureId = (long)parameters[1];
@@ -157,7 +162,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 {
                     Operatetype = ManuSfcStepTypeEnum.InStock,  // 状态为 进站
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = sfcProduceEntity.SiteId,
                     SFC = sfcProduceEntity.SFC,
                     ProductId = sfcProduceEntity.ProductId,
                     WorkOrderId = sfcProduceEntity.WorkOrderId,
@@ -167,10 +171,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     Qty = sfcProduceEntity.Qty,
                     EquipmentId = sfcProduceEntity.EquipmentId,
                     ResourceId = sfcProduceEntity.ResourceId,
-                    CreatedBy = sfcProduceEntity.UpdatedBy,
-                    CreatedOn = sfcProduceEntity.UpdatedOn.Value,
-                    UpdatedBy = sfcProduceEntity.UpdatedBy,
-                    UpdatedOn = sfcProduceEntity.UpdatedOn.Value,
+                    SiteId = bo.SiteId,
+                    CreatedBy = updatedBy,
+                    CreatedOn = updatedOn,
+                    UpdatedBy = updatedBy,
+                    UpdatedOn = updatedOn
                 });
             });
 
@@ -194,7 +199,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             int rows = 0;
             if (obj is not InStationResponseBo data) return rows;
 
-            using var trans = TransactionHelper.GetTransactionScope();
+            // 更新数据
             List<Task> tasks = new();
 
             // 更改状态
@@ -203,8 +208,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 未更新到数据，事务回滚
             if (rows <= 0)
             {
-                trans.Dispose();
-                return rows;
+                // 这里在外层会回滚事务
+                return 0;
             }
 
             // 更新工单统计表的 RealStart
@@ -223,7 +228,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }
 
             await Task.WhenAll(tasks);
-            trans.Complete();
 
             return rows;
         }

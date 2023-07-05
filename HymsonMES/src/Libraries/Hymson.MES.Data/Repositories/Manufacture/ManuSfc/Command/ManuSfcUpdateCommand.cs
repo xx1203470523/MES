@@ -1,6 +1,5 @@
 ﻿using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 
 namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command
 {
@@ -33,6 +32,27 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command
     /// <summary>
     /// 条码状态更新 
     /// </summary>
+    public class MultiSFCUpdateStatusCommand : UpdateCommand
+    {
+        /// <summary>
+        /// 站点编码 
+        /// </summary>
+        public long? SiteId { get; set; }
+
+        /// <summary>
+        /// 条码状态
+        /// </summary>
+        public SfcStatusEnum? Status { get; set; }
+
+        /// <summary>
+        /// 产品条码列表
+        /// </summary>
+        public IEnumerable<string> SFCs { get; set; }
+    }
+
+    /// <summary>
+    /// 条码状态更新 
+    /// </summary>
     public class ManuSfcUpdateStatusAndIsUsedCommand : ManuSfcUpdateCommand
     {
         /// <summary>
@@ -41,7 +61,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command
         public YesOrNoEnum IsUsed { get; set; }
     }
 
-    public class ManuSfcUpdateRouteCommand: UpdateCommand
+    public class ManuSfcUpdateRouteCommand : UpdateCommand
     {
         /// <summary>
         /// 条码在制品id列表
