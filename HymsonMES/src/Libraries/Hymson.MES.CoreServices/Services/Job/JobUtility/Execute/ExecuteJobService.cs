@@ -65,16 +65,20 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
                 if (obj == null) continue;
 
                 var responseDto = await service.ExecuteAsync(obj);
-                if (responseDto.Rows < 0)
-                {
-                    trans.Dispose();
-                    break; ;
-                }
-
                 responseDtos.Add(job.Name, responseDto);
+
+                if (responseDto.Rows < 0) break;
             }
 
-            trans.Complete();
+            if (responseDtos.Any(a => a.Value.Rows < 0))
+            {
+                trans.Dispose();
+            }
+            else
+            {
+                trans.Complete();
+            }
+
             return responseDtos;
         }
     }
