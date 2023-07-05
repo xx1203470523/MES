@@ -66,7 +66,6 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
 
                 var obj = await param.Proxy.GetValueAsync(service.DataAssemblingAsync<T>, param);
                 if (obj == null) continue;
-
                 var rows = await service.ExecuteAsync(obj);
                 if (rows <= 0)
                 {

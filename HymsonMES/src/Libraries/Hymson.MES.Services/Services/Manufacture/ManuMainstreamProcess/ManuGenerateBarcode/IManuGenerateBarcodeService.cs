@@ -33,7 +33,5 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         /// <returns></returns>
         /// <exception cref="BusinessException">未找到生成规则</exception>
         Task<IEnumerable<string>> GenerateBarcodeListAsync(CodeRuleDto param);
-
-
     }
 }

@@ -68,13 +68,6 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <returns></returns>00
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
-            //if ((param is BarcodeSfcReceiveBo bo) == false) return default;
-            //var planWorkOrderEntity = await _masterDataService.GetWorkOrderByIdAsync(bo.WorkOrderId);
-            //var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(planWorkOrderEntity.ProductId);
-            //if (bo.ReceiveType == PlanSFCReceiveTypeEnum.SupplierSfc && procMaterialEntity.Batch == 0)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES16502)).WithData("product", procMaterialEntity.MaterialCode);
-            //}
             await Task.CompletedTask;
             return null;
         }
