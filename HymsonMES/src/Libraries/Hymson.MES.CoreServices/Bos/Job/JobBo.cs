@@ -29,7 +29,11 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 资源ID
         /// </summary>
-        public long ResourceId { get; set; }
+        public long ResourceId { get; set; } 
+        /// <summary>
+        ///  容器ID
+        /// </summary>
+        public long ContainerId { get; set; }
 
     }
 

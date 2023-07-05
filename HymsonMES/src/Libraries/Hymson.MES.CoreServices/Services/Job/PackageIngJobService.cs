@@ -74,13 +74,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         public async Task VerifyParamAsync<T>(T param) where T : JobBaseBo
         {
             var bo = param.ToBo<PackageIngRequestBo>() ?? throw new CustomerValidationException(nameof(ErrorCode.MES10103));
-            //if (param is not PackageIngRequestBo bo)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES10103));
-            //}
+
             // 验证DTO
             await _validationRepairJob.ValidateAndThrowAsync(bo);
-            await Task.CompletedTask;
         }
 
         /// <summary>
@@ -92,16 +88,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
             var bo = param.ToBo<PackageIngRequestBo>() ?? throw new CustomerValidationException(nameof(ErrorCode.MES10103));
-            //if (param is not PackageIngRequestBo bo)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES10103));
-            //}
 
             var defaultDto = new PackageIngResponseBo { };
 
             defaultDto.Content?.Add("Operation", ManuContainerPackagJobReturnTypeEnum.JobManuPackageService.ParseToInt().ToString());
 
-            return await Task.FromResult(defaultDto);
+            return defaultDto;
         }
 
         /// <summary>
@@ -111,7 +103,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<JobResponseBo> ExecuteAsync(object obj)
         {
-            return await Task.FromResult(new JobResponseBo { });
+            JobResponseBo responseBo = new();
+            if (obj is not PackageIngResponseBo data) return responseBo;
+            return await Task.FromResult(new JobResponseBo { Content = data.Content });
         }
 
     }

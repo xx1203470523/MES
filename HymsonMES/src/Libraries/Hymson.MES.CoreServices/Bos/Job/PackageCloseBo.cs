@@ -11,6 +11,10 @@ namespace Hymson.MES.CoreServices.Bos.Job
     {
 
         /// <summary>
+        /// 容器ID 
+        /// </summary>
+        public long ContainerId { get; set; }
+        /// <summary>
         /// 工序ID
         /// </summary>
         public long ProcedureId { get; set; }
@@ -45,6 +49,13 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 时间
         /// </summary>
         public DateTime Time { get; set; } = HymsonClock.Now();
+
+        /// <summary>
+        /// 容器条码
+        /// </summary>
+        public ManuContainerBarcodeEntity ManuContainerBarcode { get; set; } = new ManuContainerBarcodeEntity();
+
+
     }
 
 }

@@ -25,6 +25,7 @@ using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Newtonsoft.Json;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
+using Mysqlx.Resultset;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -45,6 +46,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         private readonly IMasterDataService _masterDataService;
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly IManuContainerBarcodeRepository _manuContainerBarcodeRepository;
+
         /// <summary>
         /// 验证器
         /// </summary>
@@ -57,11 +64,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="procProcessRouteDetailLinkRepository"></param>
         public PackageOpenJobService(IManuCommonService manuCommonService,
             AbstractValidator<PackageOpenRequestBo> validationRepairJob,
-            IMasterDataService masterDataService)
+            IMasterDataService masterDataService,
+            IManuContainerBarcodeRepository manuContainerBarcodeRepository)
         {
             _manuCommonService = manuCommonService;
             _validationRepairJob = validationRepairJob;
             _masterDataService = masterDataService;
+            _manuContainerBarcodeRepository = manuContainerBarcodeRepository;
         }
 
 
@@ -75,7 +84,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         {
             var bo = param.ToBo<PackageOpenRequestBo>() ?? throw new CustomerValidationException(nameof(ErrorCode.MES10103));
             await _validationRepairJob.ValidateAndThrowAsync(bo);
-            await Task.CompletedTask;
         }
 
         /// <summary>
@@ -87,9 +95,33 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
             var bo = param.ToBo<PackageOpenRequestBo>() ?? throw new CustomerValidationException(nameof(ErrorCode.MES10103));
+            var defaultDto = new PackageOpenResponseBo();
+            string success = "true";
+            var manuContainerBarcodeEntity = await param.Proxy.GetValueAsync(_manuContainerBarcodeRepository.GetByIdAsync, bo.ContainerId);
+            if (manuContainerBarcodeEntity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16702));
+            }
+            int status = 1;//1打开，2关闭
+            //当前状态不等于修改状态
+            if (manuContainerBarcodeEntity.Status != status)
+            {
+                //修改容器状态
+                manuContainerBarcodeEntity.Status = status;
+                manuContainerBarcodeEntity.UpdatedBy = bo.UserName;
+                manuContainerBarcodeEntity.UpdatedOn = HymsonClock.Now();
+                defaultDto.Message = $"打开成功！";
+            }
+            else
+            {
+                success = "false";
+                defaultDto.Message = $"该容器已经打开！";
+            }
 
-
-            return null;
+            defaultDto.Content?.Add("Operation", ManuContainerPackagJobReturnTypeEnum.JobManuPackageOpenService.ParseToInt().ToString());
+            defaultDto.Content?.Add("Status", $"{status}".ToString());
+            defaultDto.Content?.Add("Success", success);
+            return defaultDto;
         }
 
         /// <summary>
@@ -99,7 +131,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<JobResponseBo> ExecuteAsync(object obj)
         {
-            return await Task.FromResult(new JobResponseBo { });
+            JobResponseBo responseBo = new();
+
+            if (obj is not PackageOpenResponseBo data) return responseBo;
+
+            var rows = await _manuContainerBarcodeRepository.UpdateStatusAsync(data.ManuContainerBarcode);
+
+            return new JobResponseBo { Content = data.Content, Message = data.Message, Rows = rows, Time = data.Time };
         }
 
     }
