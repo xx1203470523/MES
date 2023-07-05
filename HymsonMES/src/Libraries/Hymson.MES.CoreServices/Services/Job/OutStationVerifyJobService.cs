@@ -109,8 +109,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<int> ExecuteAsync(object obj)
         {
-            await Task.CompletedTask;
-            return 0;
+            return await Task.FromResult(1);
         }
 
     }
