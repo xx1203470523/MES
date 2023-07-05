@@ -6,6 +6,7 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
@@ -337,10 +338,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public async Task<int> ExecuteAsync(object obj)
+        public async Task<JobResponseBo> ExecuteAsync(object obj)
         {
-            int rows = 0;
-            if (obj is not OutStationResponseBo data) return rows;
+            JobResponseBo responseBo = new();
+            if (obj is not OutStationResponseBo data) return responseBo;
 
             // 更新数据
             List<Task<int>> tasks = new();
@@ -348,12 +349,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 更新物料库存
             if (data.UpdateQtyByIdCommands.Any())
             {
-                rows += await _manuFeedingRepository.UpdateQtyByIdAsync(data.UpdateQtyByIdCommands);
+                responseBo.Rows += await _manuFeedingRepository.UpdateQtyByIdAsync(data.UpdateQtyByIdCommands);
 
                 // 未更新到全部需更新的数据，事务回滚
-                if (data.UpdateQtyByIdCommands.Count() > rows)
+                if (data.UpdateQtyByIdCommands.Count() > responseBo.Rows)
                 {
-                    return 0;
+                    responseBo.Rows = -1;
+                    return responseBo;
                 }
             }
 
@@ -408,9 +410,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }
 
             var rowArray = await Task.WhenAll(tasks);
-            rows = rowArray.Sum();
+            responseBo.Rows += rowArray.Sum();
 
-            return rows;
+            return responseBo;
         }
 
     }

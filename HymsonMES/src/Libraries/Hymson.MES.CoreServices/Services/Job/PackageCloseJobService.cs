@@ -136,14 +136,14 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public async Task<int> ExecuteAsync(object obj)
+        public async Task<JobResponseBo> ExecuteAsync(object obj)
         {
-            int rows = 0;
-            if (obj is not PackageCloseResponseBo data) return rows;
+            JobResponseBo responseBo = new();
+            if (obj is not PackageCloseResponseBo data) return responseBo;
 
-            rows += await _manuContainerBarcodeRepository.UpdateStatusAsync(data.ManuContainerBarcode);
+            responseBo.Rows += await _manuContainerBarcodeRepository.UpdateStatusAsync(data.ManuContainerBarcode);
 
-            return rows;
+            return responseBo;
         }
 
     }

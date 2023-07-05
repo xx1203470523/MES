@@ -1,45 +1,37 @@
-﻿using Hymson.Authentication.JwtBearer.Security;
-using Hymson.Infrastructure.Exceptions;
+﻿using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.CoreServices.Bos.Manufacture;
+using Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.Data.Repositories.Integrated;
-using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGenerateBarcodeDto;
 using Hymson.Sequences;
 using Hymson.Utils;
-using System.Data;
 using System.Text;
 
-namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode
+namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
 {
     /// <summary>
-    /// 条码生成
+    /// 生成条码
     /// </summary>
     public class ManuGenerateBarcodeService : IManuGenerateBarcodeService
     {
-        /// <summary>
-        /// 
-        /// </summary>
         private readonly ISequenceService _sequenceService;
-        private readonly ICurrentSite _currentSite;
         private readonly IInteCodeRulesRepository _inteCodeRulesRepository;
         private readonly IInteCodeRulesMakeRepository _inteCodeRulesMakeRepository;
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="sequenceService"></param>
-        /// <param name="currentSite"></param>
-        /// <param name="inteCodeRulesMakeRepository"></param>
         /// <param name="inteCodeRulesRepository"></param>
-        public ManuGenerateBarcodeService(ISequenceService sequenceService, ICurrentSite currentSite,
+        /// <param name="inteCodeRulesMakeRepository"></param>
+        public ManuGenerateBarcodeService(
+            IInteCodeRulesRepository inteCodeRulesRepository,
             IInteCodeRulesMakeRepository inteCodeRulesMakeRepository,
-            IInteCodeRulesRepository inteCodeRulesRepository)
+            ISequenceService sequenceService)
         {
-            _sequenceService = sequenceService;
-            _currentSite = currentSite;
-            _inteCodeRulesMakeRepository = inteCodeRulesMakeRepository;
             _inteCodeRulesRepository = inteCodeRulesRepository;
+            _inteCodeRulesMakeRepository = inteCodeRulesMakeRepository;
+            _sequenceService = sequenceService;
         }
 
         /// <summary>
@@ -47,12 +39,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<string>> GenerateBarcodeListByIdAsync(GenerateBarcodeDto param)
+        public async Task<IEnumerable<string>> GenerateBarcodeListByIdAsync(GenerateBarcodeBo param)
         {
             var getCodeRulesTask = _inteCodeRulesRepository.GetByIdAsync(param.CodeRuleId);
             var getCodeRulesMakeListTask = _inteCodeRulesMakeRepository.GetInteCodeRulesMakeEntitiesAsync(new InteCodeRulesMakeQuery
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = param.SiteId,
                 CodeRulesId = param.CodeRuleId
             });
             var codeRulesMakeList = await getCodeRulesMakeListTask;
@@ -85,7 +77,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<string>> GenerateBarcodeListAsync(CodeRuleDto param)
+        public async Task<IEnumerable<string>> GenerateBarcodeListAsync(CodeRuleBo param)
         {
             return await GenerateBarCodeSerialNumberAsync(new BarCodeSerialNumberBo
             {
@@ -241,8 +233,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
             return stringBuilder.ToString();
         }
 
-
-
         #region 内部方法
         /// <summary>
         /// 获取条码
@@ -306,8 +296,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                 _ => 1000000000,
             };
         }
-
         #endregion
-
     }
 }
