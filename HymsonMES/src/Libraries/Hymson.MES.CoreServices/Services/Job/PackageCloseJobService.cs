@@ -26,6 +26,7 @@ using Newtonsoft.Json;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer;
+using Hymson.Localization.Services;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -50,6 +51,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         private readonly IManuContainerPackRepository _manuContainerPackRepository;
         private readonly IInteContainerRepository _inteContainerRepository;
 
+        private readonly ILocalizationService _localizationService;
+
         /// <summary>
         /// 验证器
         /// </summary>
@@ -65,7 +68,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             IMasterDataService masterDataService,
             IManuContainerBarcodeRepository manuContainerBarcodeRepository,
             IManuContainerPackRepository manuContainerPackRepository,
-            IInteContainerRepository inteContainerRepository)
+            IInteContainerRepository inteContainerRepository, ILocalizationService localizationService)
         {
             _manuCommonService = manuCommonService;
             _validationRepairJob = validationRepairJob;
@@ -73,6 +76,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             _manuContainerBarcodeRepository = manuContainerBarcodeRepository;
             _manuContainerPackRepository = manuContainerPackRepository;
             _inteContainerRepository = inteContainerRepository;
+            _localizationService = localizationService;
         }
 
 
@@ -119,12 +123,14 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 manuContainerBarcodeEntity.UpdatedBy = bo.UserName;
                 manuContainerBarcodeEntity.UpdatedOn = HymsonClock.Now();
                 defaultDto.ManuContainerBarcode = manuContainerBarcodeEntity;
-                defaultDto.Message = $"关闭成功！";
+                //defaultDto.Message = $"关闭成功！";
+                defaultDto.Message = _localizationService.GetResource(nameof(ErrorCode.MES16344));
             }
             else
             {
                 success = "false";
-                defaultDto.Message = $"该容器已经关闭！";
+                //defaultDto.Message = $"该容器已经关闭！";
+                defaultDto.Message = _localizationService.GetResource(nameof(ErrorCode.MES16345));
             }
             defaultDto.Content?.Add("Success", success);
 

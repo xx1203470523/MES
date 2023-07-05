@@ -8,8 +8,6 @@ using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
-using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Job.Manufacture

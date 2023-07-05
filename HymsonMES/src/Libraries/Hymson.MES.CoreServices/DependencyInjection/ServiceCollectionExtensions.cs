@@ -50,6 +50,8 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSingleton<IJobService, OutStationVerifyJobService>();
             services.AddSingleton<IJobService, OutStationJobService>();
             services.AddSingleton<IJobService, StopJobService>();
+            services.AddSingleton<IJobService, BadRecordJobService>();
+            services.AddSingleton<IJobService, PackageVerifyJobService>();
             services.AddSingleton<IJobService, RepairStartJobService>();
             services.AddSingleton<IJobService, RepairEndJobService>();
             services.AddSingleton<IJobService, PackageIngJobService>();

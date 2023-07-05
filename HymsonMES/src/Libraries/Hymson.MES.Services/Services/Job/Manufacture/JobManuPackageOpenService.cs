@@ -1,6 +1,7 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture;
@@ -37,6 +38,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         private readonly IManuContainerBarcodeRepository _manuContainerBarcodeRepository;
 
+        private readonly ILocalizationService _localizationService;
 
         /// <summary>
         /// 构造函数
@@ -46,12 +48,13 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <param name="manuCommonOldService"></param>
         /// <param name="manuContainerBarcodeRepository"></param>
         public JobManuPackageOpenService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IManuCommonOldService manuCommonOldService, IManuContainerBarcodeRepository manuContainerBarcodeRepository)
+            IManuCommonOldService manuCommonOldService, IManuContainerBarcodeRepository manuContainerBarcodeRepository,ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _manuCommonOldService = manuCommonOldService;
             _manuContainerBarcodeRepository = manuContainerBarcodeRepository;
+            _localizationService = localizationService;
         }
 
         /// <summary>
@@ -96,12 +99,14 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
                 manuContainerBarcodeEntity.UpdatedBy = _currentUser.UserName;
                 manuContainerBarcodeEntity.UpdatedOn = HymsonClock.Now();
                 await _manuContainerBarcodeRepository.UpdateStatusAsync(manuContainerBarcodeEntity);
-                defaultDto.Message = $"打开成功！";
+                //defaultDto.Message = $"打开成功！";
+                defaultDto.Message = _localizationService.GetResource(nameof(ErrorCode.MES16346));
             }
             else
             {
                 success = "false";
-                defaultDto.Message = $"该容器已经打开！";
+                //defaultDto.Message = $"该容器已经打开！";
+                defaultDto.Message = _localizationService.GetResource(nameof(ErrorCode.MES16347));
             }
 
             defaultDto.Content?.Add("Operation", ManuContainerPackagJobReturnTypeEnum.JobManuPackageOpenService.ParseToInt().ToString());
