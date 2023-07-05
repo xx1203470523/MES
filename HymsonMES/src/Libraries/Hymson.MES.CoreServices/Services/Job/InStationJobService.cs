@@ -7,6 +7,7 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
@@ -194,22 +195,23 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public async Task<int> ExecuteAsync(object obj)
+        public async Task<JobResponseBo> ExecuteAsync(object obj)
         {
-            int rows = 0;
-            if (obj is not InStationResponseBo data) return rows;
+            JobResponseBo responseBo = new();
+            if (obj is not InStationResponseBo data) return responseBo;
 
             // 更新数据
             List<Task> tasks = new();
 
             // 更改状态
-            rows = await _manuSfcProduceRepository.UpdateRangeWithStatusCheckAsync(data.SFCProduceEntities);
+            responseBo.Rows += await _manuSfcProduceRepository.UpdateRangeWithStatusCheckAsync(data.SFCProduceEntities);
 
             // 未更新到数据，事务回滚
-            if (rows <= 0)
+            if (responseBo.Rows <= 0)
             {
                 // 这里在外层会回滚事务
-                return 0;
+                responseBo.Rows = -1;
+                return responseBo;
             }
 
             // 更新工单统计表的 RealStart
@@ -228,8 +230,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }
 
             await Task.WhenAll(tasks);
-
-            return rows;
+            return responseBo;
         }
 
     }

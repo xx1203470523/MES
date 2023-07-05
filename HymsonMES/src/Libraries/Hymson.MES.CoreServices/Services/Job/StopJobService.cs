@@ -157,15 +157,15 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public async Task<int> ExecuteAsync(object obj)
+        public async Task<JobResponseBo> ExecuteAsync(object obj)
         {
-            int rows = 0;
-            if (obj is not StopResponseBo data) return rows;
+            JobResponseBo responseBo = new();
+            if (obj is not StopResponseBo data) return responseBo;
 
-            rows += await _manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities);
-            rows += await _manuSfcProduceRepository.UpdateRangeAsync(data.SFCProduceEntities);
+            responseBo.Rows += await _manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities);
+            responseBo.Rows += await _manuSfcProduceRepository.UpdateRangeAsync(data.SFCProduceEntities);
 
-            return rows;
+            return responseBo;
         }
 
     }
