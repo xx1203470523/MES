@@ -141,10 +141,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             int rows = 0;
             if (obj is not PackageCloseResponseBo data) return rows;
 
-            await _manuContainerBarcodeRepository.UpdateStatusAsync(data.ManuContainerBarcode);
+            rows += await _manuContainerBarcodeRepository.UpdateStatusAsync(data.ManuContainerBarcode);
 
-            await Task.CompletedTask;
-            return 0;
+            return rows;
         }
 
     }
