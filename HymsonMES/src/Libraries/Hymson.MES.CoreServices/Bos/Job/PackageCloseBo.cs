@@ -1,27 +1,15 @@
-﻿using Hymson.Utils;
+﻿using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
+using Hymson.Utils;
 
 namespace Hymson.MES.CoreServices.Bos.Job
 {
     /// <summary>
     /// 
     /// </summary>
-    public class JobBo
+    public class PackageOpenRequestBo : JobBaseBo
     {
-        /// <summary>
-        /// 作业名称
-        /// </summary>
-        public string Name { get; set; } = "";
-    }
 
-    /// <summary>
-    /// 请求Bo
-    /// </summary>
-    public class JobRequestBo : JobBaseBo
-    {
-        /// <summary>
-        /// 用户名
-        /// </summary>
-        public string UserName { get; set; } = "";
         /// <summary>
         /// 工序ID
         /// </summary>
@@ -31,18 +19,18 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// </summary>
         public long ResourceId { get; set; }
 
+        /// <summary>
+        /// 用户名
+        /// </summary>
+        public string UserName { get; set; } = "";
+
     }
 
     /// <summary>
-    /// 响应Bo
+    ///  
     /// </summary>
-    public class JobResponseBo
+    public class PackageOpenResponseBo : JobResultBo
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public int Rows { get; set; } = 0;
-
         /// <summary>
         /// 内容
         /// </summary>
@@ -57,7 +45,6 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 时间
         /// </summary>
         public DateTime Time { get; set; } = HymsonClock.Now();
-
     }
 
 }

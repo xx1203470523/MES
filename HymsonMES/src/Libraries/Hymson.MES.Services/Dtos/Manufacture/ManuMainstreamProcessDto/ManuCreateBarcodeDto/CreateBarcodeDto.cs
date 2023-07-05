@@ -98,7 +98,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCrea
     }
 
     /// <summary>
-    /// 更具
+    /// 根据外部条码接收
     /// </summary>
     public class CreateBarcodeByExternalSFCDto
     {

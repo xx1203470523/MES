@@ -11,7 +11,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
         /// 执行作业
         /// </summary>
         /// <returns></returns>
-        Task ExecuteAsync(IEnumerable<JobBo> jobBos, T param);
+        Task<Dictionary<string, JobResponseBo>> ExecuteAsync(IEnumerable<JobBo> jobBos, T param);
 
     }
 }

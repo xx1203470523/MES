@@ -54,9 +54,6 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// </summary>
         private readonly IProcMaterialRepository _procMaterialRepository;
 
-
-
-
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -89,7 +86,6 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             _procMaterialRepository = procMaterialRepository;
 
         }
-
 
         /// <summary>
         /// 批量验证条码是否锁定
@@ -210,8 +206,6 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                 }
             }
         }
-
-
 
         #region 内部方法
 

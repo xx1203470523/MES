@@ -97,7 +97,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             //    throw new CustomerValidationException(nameof(ErrorCode.MES10103));
             //}
 
-            var defaultDto = new JobResponseDto { };
+            var defaultDto = new PackageIngResponseBo { };
 
             defaultDto.Content?.Add("Operation", ManuContainerPackagJobReturnTypeEnum.JobManuPackageService.ParseToInt().ToString());
 
@@ -109,10 +109,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public async Task<int> ExecuteAsync(object obj)
+        public async Task<JobResponseBo> ExecuteAsync(object obj)
         {
-            await Task.CompletedTask;
-            return 0;
+            return await Task.FromResult(new JobResponseBo { });
         }
 
     }

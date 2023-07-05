@@ -364,7 +364,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 jobBos.Add(new JobBo { Name = job.ClassProgram });
             }
-            await _executeJobService.ExecuteAsync(jobBos, bo);
+            result = await _executeJobService.ExecuteAsync(jobBos, bo);
             // 执行Job
             // result = await _jobCommonService.ExecuteJobAsync(jobs, dto.Param);
             return result;

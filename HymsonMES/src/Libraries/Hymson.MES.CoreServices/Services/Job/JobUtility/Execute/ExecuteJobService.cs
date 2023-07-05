@@ -29,7 +29,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
         /// 执行作业
         /// </summary>
         /// <returns></returns>
-        public async Task ExecuteAsync(IEnumerable<JobBo> jobBos, T param)
+        public async Task<Dictionary<string, JobResponseBo>> ExecuteAsync(IEnumerable<JobBo> jobBos, T param)
         {
             var services = _serviceProvider.GetServices<IJobService>();
 
@@ -50,11 +50,11 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
             {
                 var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
                 if (service == null) continue;
-
                 await param.Proxy.GetValueAsync(service.DataAssemblingAsync<T>, param);
             }
 
             // 执行入库
+            var responseDtos = new Dictionary<string, JobResponseBo>();
             using var trans = new TransactionScope();
             foreach (var job in jobBos)
             {
@@ -64,12 +64,22 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
                 var obj = await param.Proxy.GetValueAsync(service.DataAssemblingAsync<T>, param);
                 if (obj == null) continue;
 
-                await service.ExecuteAsync(obj);
+                var responseDto = await service.ExecuteAsync(obj);
+                responseDtos.Add(job.Name, responseDto);
+
+                if (responseDto.Rows < 0) break;
             }
 
-            trans.Complete();
-        }
+            if (responseDtos.Any(a => a.Value.Rows < 0))
+            {
+                trans.Dispose();
+            }
+            else
+            {
+                trans.Complete();
+            }
 
-        //  获取作业
+            return responseDtos;
+        }
     }
 }

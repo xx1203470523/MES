@@ -1,7 +1,5 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
-using Hymson.Authentication;
-using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
@@ -10,33 +8,27 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture;
+using Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode;
+using Hymson.MES.CoreServices.Services.Common.MasterData;
+using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.InteCodeRule.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCreateBarcodeDto;
-using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode;
-using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
-using Hymson.MES.Services.Services.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using System.Transactions;
 
-namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCreateBarcode
+namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
 {
     /// <summary>
-    /// 创建条码
-    /// @author wangkeming
-    /// @date 2023-03-30
+    /// 条码下达与生成
     /// </summary>
     public class ManuCreateBarcodeService : IManuCreateBarcodeService
     {
-        private readonly ICurrentUser _currentUser;
-        private readonly ICurrentSite _currentSite;
-        private readonly IManuCommonOldService _manuCommonOldService;
         private readonly IProcMaterialRepository _procMaterialRepository;
         private readonly IInteCodeRulesRepository _inteCodeRulesRepository;
         private readonly IInteCodeRulesMakeRepository _inteCodeRulesMakeRepository;
@@ -47,43 +39,21 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
         private readonly ILocalizationService _localizationService;
-        private readonly IPlanSfcPrintService _planSfcPrintService;
+        private readonly IMasterDataService _masterDataService;
 
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        /// <param name="currentUser"></param>
-        /// <param name="currentSite"></param>
-        /// <param name="manuCommonOldService"></param>
-        /// <param name="procMaterialRepository"></param>
-        /// <param name="inteCodeRulesRepository"></param>
-        /// <param name="inteCodeRulesMakeRepository"></param>
-        /// <param name="manuGenerateBarcodeService"></param>
-        /// <param name="manuSfcRepository"></param>
-        /// <param name="manuSfcInfoRepository"></param>
-        /// <param name="manuSfcProduceRepository"></param>
-        /// <param name="manuSfcStepRepository"></param>
-        /// <param name="planWorkOrderRepository"></param>
-        /// <param name="planSfcPrintService"></param>
-        /// <param name="localizationService"></param>
-        public ManuCreateBarcodeService(ICurrentUser currentUser,
-             ICurrentSite currentSite,
-             IManuCommonOldService manuCommonOldService,
-             IProcMaterialRepository procMaterialRepository,
-             IInteCodeRulesRepository inteCodeRulesRepository,
-             IInteCodeRulesMakeRepository inteCodeRulesMakeRepository,
-             IManuGenerateBarcodeService manuGenerateBarcodeService,
-             IManuSfcRepository manuSfcRepository,
-             IManuSfcInfoRepository manuSfcInfoRepository,
-             IManuSfcProduceRepository manuSfcProduceRepository,
-             IManuSfcStepRepository manuSfcStepRepository,
-             IPlanWorkOrderRepository planWorkOrderRepository,
-             IPlanSfcPrintService planSfcPrintService,
-             ILocalizationService localizationService)
+        public ManuCreateBarcodeService(
+                 IProcMaterialRepository procMaterialRepository,
+                 IInteCodeRulesRepository inteCodeRulesRepository,
+                 IInteCodeRulesMakeRepository inteCodeRulesMakeRepository,
+                 IManuGenerateBarcodeService manuGenerateBarcodeService,
+                 IManuSfcRepository manuSfcRepository,
+                 IManuSfcInfoRepository manuSfcInfoRepository,
+                 IManuSfcProduceRepository manuSfcProduceRepository,
+                 IManuSfcStepRepository manuSfcStepRepository,
+                 IPlanWorkOrderRepository planWorkOrderRepository,
+                 ILocalizationService localizationService,
+                 IMasterDataService masterDataService)
         {
-            _currentUser = currentUser;
-            _currentSite = currentSite;
-            _manuCommonOldService = manuCommonOldService;
             _procMaterialRepository = procMaterialRepository;
             _inteCodeRulesRepository = inteCodeRulesRepository;
             _inteCodeRulesMakeRepository = inteCodeRulesMakeRepository;
@@ -94,7 +64,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
             _manuSfcStepRepository = manuSfcStepRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _localizationService = localizationService;
-            _planSfcPrintService = planSfcPrintService;
+            _masterDataService = masterDataService;
         }
 
         /// <summary>
@@ -102,9 +72,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<List<ManuSfcEntity>> CreateBarcodeByWorkOrderIdAsync(CreateBarcodeByWorkOrderDto param)
+        public async Task<List<ManuSfcEntity>> CreateBarcodeByWorkOrderIdAsync(CreateBarcodeByWorkOrderBo param)
         {
-            var planWorkOrderEntity = await _manuCommonOldService.GetProduceWorkOrderByIdAsync(param.WorkOrderId, false);
+            var planWorkOrderEntity = await _masterDataService.GetProduceWorkOrderByIdAsync(param.WorkOrderId, false);
 
             var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(planWorkOrderEntity.ProductId);
             var inteCodeRulesEntity = await _inteCodeRulesRepository.GetInteCodeRulesByProductIdAsync(new InteCodeRulesByProductQuery
@@ -122,12 +92,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                 throw new CustomerValidationException(nameof(ErrorCode.MES16508));
             }
             var discuss = (int)Math.Ceiling(param.Qty / procMaterialEntity.Batch);
-            var processRouteFirstProcedure = await _manuCommonOldService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
+            var processRouteFirstProcedure = await _masterDataService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
 
             // 读取基础数据
             var codeRulesMakeList = await _inteCodeRulesMakeRepository.GetInteCodeRulesMakeEntitiesAsync(new InteCodeRulesMakeQuery
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = param.SiteId,
                 CodeRulesId = inteCodeRulesEntity.Id
             });
 
@@ -167,33 +137,34 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                 var manuSfcEntity = new ManuSfcEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = param.SiteId,
                     SFC = item,
                     Qty = qty,
                     IsUsed = YesOrNoEnum.No,
                     Status = SfcStatusEnum.InProcess,
-                    CreatedBy = _currentUser.UserName,
-                    UpdatedBy = _currentUser.UserName
+                    CreatedBy = param.UserName,
+                    UpdatedBy = param.UserName
                 };
                 manuSfcList.Add(manuSfcEntity);
 
                 manuSfcInfoList.Add(new ManuSfcInfoEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = param.SiteId,
                     SfcId = manuSfcEntity.Id,
                     WorkOrderId = planWorkOrderEntity.Id,
                     ProductId = planWorkOrderEntity.ProductId,
                     IsUsed = true,
-                    CreatedBy = _currentUser.UserName,
-                    UpdatedBy = _currentUser.UserName
+                    CreatedBy = param.UserName,
+                    UpdatedBy = param.UserName
                 });
 
                 manuSfcProduceList.Add(new ManuSfcProduceEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = param.SiteId,
                     SFC = item,
+                    SFCId= manuSfcEntity.Id,
                     ProductId = planWorkOrderEntity.ProductId,
                     WorkOrderId = planWorkOrderEntity.Id,
                     BarCodeInfoId = manuSfcEntity.Id,
@@ -205,14 +176,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                     Status = SfcProduceStatusEnum.lineUp,
                     RepeatedCount = 0,
                     IsScrap = TrueOrFalseEnum.No,
-                    CreatedBy = _currentUser.UserName,
-                    UpdatedBy = _currentUser.UserName
+                    CreatedBy = param.UserName,
+                    UpdatedBy = param.UserName
                 });
 
                 manuSfcStepList.Add(new ManuSfcStepEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = param.SiteId,
                     SFC = item,
                     ProductId = planWorkOrderEntity.ProductId,
                     WorkOrderId = planWorkOrderEntity.Id,
@@ -222,8 +193,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                     ProcedureId = processRouteFirstProcedure.ProcedureId,
                     Operatetype = ManuSfcStepTypeEnum.Create,
                     CurrentStatus = SfcProduceStatusEnum.lineUp,
-                    CreatedBy = _currentUser.UserName,
-                    UpdatedBy = _currentUser.UserName
+                    CreatedBy = param.UserName,
+                    UpdatedBy = param.UserName
                 });
             }
 
@@ -232,7 +203,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                 WorkOrderId = planWorkOrderEntity.Id,
                 PlanQuantity = planWorkOrderEntity.Qty * (1 + planWorkOrderEntity.OverScale / 100),
                 PassDownQuantity = param.Qty,
-                UserName = _currentUser.UserName,
+                UserName = param.UserName,
                 UpdateDate = HymsonClock.Now()
             });
 
@@ -251,41 +222,16 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         }
 
         /// <summary>
-        /// 工单下达及打印
-        /// </summary>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        public async Task CreateBarcodeByWorkOrderIdAndPrintAsync(CreateBarcodeByWorkOrderAndPrintDto param)
-        {
-            var lst = await CreateBarcodeByWorkOrderIdAsync(new CreateBarcodeByWorkOrderDto()
-            {
-                Qty = param.Qty,
-                WorkOrderId = param.WorkOrderId
-            });
-
-            foreach (var item in lst)
-            {
-                await _planSfcPrintService.CreatePrintAsync(new Dtos.Plan.PlanSfcPrintCreatePrintDto()
-                {
-                    PrintId = param.PrintId,
-                    ProcedureId = param.ProcedureId,
-                    SFC = item.SFC,
-                    WorkOrderId = param.WorkOrderId
-                });
-            }
-        }
-
-        /// <summary>
         /// 根据外部条码接收
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task CreateBarcodeByExternalSFCAsync(CreateBarcodeByExternalSFCDto param)
+        public async Task CreateBarcodeByExternalSFCAsync(CreateBarcodeByExternalSFCBo param)
         {
-            var planWorkOrderEntity = await _manuCommonOldService.GetWorkOrderByIdAsync(param.WorkOrderId);
+            var planWorkOrderEntity = await _masterDataService.GetWorkOrderByIdAsync(param.WorkOrderId);
             var sfclist = await _manuSfcRepository.GetBySFCsAsync(param.ExternalSFCs.Select(x => x.SFC));
 
-            var processRouteFirstProcedure = await _manuCommonOldService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
+            var processRouteFirstProcedure = await _masterDataService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
 
             List<ManuSfcEntity> manuSfcList = new List<ManuSfcEntity>();
             List<ManuSfcInfoEntity> manuSfcInfoList = new List<ManuSfcInfoEntity>();
@@ -316,33 +262,34 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                 var manuSfcEntity = new ManuSfcEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = param.SiteId,
                     SFC = item.SFC,
                     Qty = item.Qty,
                     IsUsed = YesOrNoEnum.Yes,
                     Status = SfcStatusEnum.InProcess,
-                    CreatedBy = _currentUser.UserName,
-                    UpdatedBy = _currentUser.UserName
+                    CreatedBy = param.UserName,
+                    UpdatedBy = param.UserName
                 };
                 manuSfcList.Add(manuSfcEntity);
 
                 manuSfcInfoList.Add(new ManuSfcInfoEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = param.SiteId,
                     SfcId = manuSfcEntity.Id,
                     WorkOrderId = planWorkOrderEntity.Id,
                     ProductId = planWorkOrderEntity.ProductId,
                     IsUsed = true,
-                    CreatedBy = _currentUser.UserName,
-                    UpdatedBy = _currentUser.UserName
+                    CreatedBy = param.UserName,
+                    UpdatedBy = param.UserName
                 });
 
                 manuSfcProduceList.Add(new ManuSfcProduceEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = param.SiteId,
                     SFC = item.SFC,
+                    SFCId = manuSfcEntity.Id,
                     ProductId = planWorkOrderEntity.ProductId,
                     WorkOrderId = planWorkOrderEntity.Id,
                     BarCodeInfoId = manuSfcEntity.Id,
@@ -354,14 +301,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                     Status = SfcProduceStatusEnum.lineUp,
                     RepeatedCount = 0,
                     IsScrap = TrueOrFalseEnum.No,
-                    CreatedBy = _currentUser.UserName,
-                    UpdatedBy = _currentUser.UserName
+                    CreatedBy = param.UserName,
+                    UpdatedBy = param.UserName
                 });
 
                 manuSfcStepList.Add(new ManuSfcStepEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = param.SiteId,
                     SFC = item.SFC,
                     ProductId = planWorkOrderEntity.ProductId,
                     WorkOrderId = planWorkOrderEntity.Id,
@@ -371,8 +318,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                     ProcedureId = processRouteFirstProcedure.ProcedureId,
                     Operatetype = ManuSfcStepTypeEnum.Receive,
                     CurrentStatus = SfcProduceStatusEnum.lineUp,
-                    CreatedBy = _currentUser.UserName,
-                    UpdatedBy = _currentUser.UserName
+                    CreatedBy = param.UserName,
+                    UpdatedBy = param.UserName
                 });
             }
             if (validationFailures.Any())
@@ -385,7 +332,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                 WorkOrderId = planWorkOrderEntity.Id,
                 PlanQuantity = planWorkOrderEntity.Qty * (1 + planWorkOrderEntity.OverScale / 100),
                 PassDownQuantity = param.ExternalSFCs.Sum(x => x.Qty),
-                UserName = _currentUser.UserName,
+                UserName = param.UserName,
                 UpdateDate = HymsonClock.Now()
             });
 
@@ -405,12 +352,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task CreateBarcodeByOldMESSFCAsync(CreateBarcodeByOldMesSFCDto param)
+        public async Task CreateBarcodeByOldMESSFCAsync(CreateBarcodeByOldMesSFCBo param)
         {
-            var planWorkOrderEntity = await _manuCommonOldService.GetWorkOrderByIdAsync(param.WorkOrderId);
+            var planWorkOrderEntity = await _masterDataService.GetWorkOrderByIdAsync(param.WorkOrderId);
             var sfclist = await _manuSfcRepository.GetBySFCsAsync(param.OldSFCs.Select(x => x.SFC));
             var sfcInfoList = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfclist.Select(x => x.Id));
-            var processRouteFirstProcedure = await _manuCommonOldService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
+            var processRouteFirstProcedure = await _masterDataService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
 
             List<ManuSfcEntity> manuSfcList = new List<ManuSfcEntity>();
             List<ManuSfcInfoEntity> manuSfcInfoList = new List<ManuSfcInfoEntity>();
@@ -458,34 +405,35 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                 sfcEntity.Qty = item.Qty;
                 sfcEntity.IsUsed = YesOrNoEnum.Yes;
                 sfcEntity.Status = SfcStatusEnum.InProcess;
-                sfcEntity.UpdatedBy = _currentUser.UserName;
+                sfcEntity.UpdatedBy = param.UserName;
                 sfcEntity.UpdatedOn = HymsonClock.Now();
                 manuSfcList.Add(sfcEntity);
                 var sfcInfo = sfcInfoList.FirstOrDefault(x => x.SfcId == sfcEntity.Id);
                 if (sfcInfo != null)
                 {
                     sfcInfo.IsUsed = false;
-                    sfcInfo.UpdatedBy = _currentUser.UserName;
+                    sfcInfo.UpdatedBy = param.UserName;
                     sfcInfo.UpdatedOn = HymsonClock.Now();
                     updateManuSfcInfoList.Add(sfcInfo);
                 }
                 manuSfcInfoList.Add(new ManuSfcInfoEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = param.SiteId,
                     SfcId = sfcEntity.Id,
                     WorkOrderId = planWorkOrderEntity.Id,
                     ProductId = planWorkOrderEntity.ProductId,
                     IsUsed = true,
-                    CreatedBy = _currentUser.UserName,
-                    UpdatedBy = _currentUser.UserName
+                    CreatedBy = param.UserName,
+                    UpdatedBy = param.UserName
                 });
 
                 manuSfcProduceList.Add(new ManuSfcProduceEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = param.SiteId,
                     SFC = item.SFC,
+                    SFCId = sfcEntity.Id,
                     ProductId = planWorkOrderEntity.ProductId,
                     WorkOrderId = planWorkOrderEntity.Id,
                     BarCodeInfoId = sfcEntity.Id,
@@ -497,14 +445,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                     Status = SfcProduceStatusEnum.lineUp,
                     RepeatedCount = 0,
                     IsScrap = TrueOrFalseEnum.No,
-                    CreatedBy = _currentUser.UserName,
-                    UpdatedBy = _currentUser.UserName
+                    CreatedBy = param.UserName,
+                    UpdatedBy = param.UserName
                 });
 
                 manuSfcStepList.Add(new ManuSfcStepEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = param.SiteId,
                     SFC = item.SFC,
                     ProductId = planWorkOrderEntity.ProductId,
                     WorkOrderId = planWorkOrderEntity.Id,
@@ -514,8 +462,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                     ProcedureId = processRouteFirstProcedure.ProcedureId,
                     Operatetype = ManuSfcStepTypeEnum.Receive,
                     CurrentStatus = SfcProduceStatusEnum.lineUp,
-                    CreatedBy = _currentUser.UserName,
-                    UpdatedBy = _currentUser.UserName
+                    CreatedBy = param.UserName,
+                    UpdatedBy = param.UserName
                 });
             }
             if (validationFailures.Any())
@@ -528,7 +476,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCre
                 WorkOrderId = planWorkOrderEntity.Id,
                 PlanQuantity = planWorkOrderEntity.Qty * (1 + planWorkOrderEntity.OverScale / 100),
                 PassDownQuantity = param.OldSFCs.Sum(x => x.Qty),
-                UserName = _currentUser.UserName,
+                UserName = param.UserName,
                 UpdateDate = HymsonClock.Now()
             });
 

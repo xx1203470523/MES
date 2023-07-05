@@ -17,6 +17,11 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public long SiteId { get; set; }
 
         /// <summary>
+        /// 条码id
+        /// </summary>
+        public long SFCId { get; set; }
+
+        /// <summary>
         /// 条码
         /// </summary>
         public string SFC { get; set; }

@@ -1,4 +1,4 @@
-﻿using Hymson.Utils;
+﻿using Hymson.MES.CoreServices.Bos.Job;
 
 namespace Hymson.MES.CoreServices.Dtos.Common
 {
@@ -54,21 +54,6 @@ namespace Hymson.MES.CoreServices.Dtos.Common
     /// <summary>
     /// 作业Dto（响应）
     /// </summary>
-    public class JobResponseDto
-    {
-        /// <summary>
-        /// 内容
-        /// </summary>
-        public Dictionary<string, string>? Content { get; set; } = new();
+    public class JobResponseDto : JobResponseBo { }
 
-        /// <summary>
-        /// 消息
-        /// </summary>
-        public string Message { get; set; } = "";
-
-        /// <summary>
-        /// 时间
-        /// </summary>
-        public DateTime Time { get; set; } = HymsonClock.Now();
-    }
 }

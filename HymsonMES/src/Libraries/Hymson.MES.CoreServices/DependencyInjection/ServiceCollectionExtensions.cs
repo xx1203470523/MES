@@ -45,12 +45,16 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddScoped<IJobContextProxy, JobContextProxy>();
             //services.AddSingleton(typeof(IJobService<,>), typeof(InStationJobService<,>));
             //services.AddSingleton(typeof(IJobService<,>), typeof(InStationJobService));
-            services.AddSingleton<IJobService, InStationJobService>();
             services.AddSingleton<IJobService, InStationVerifyJobService>();
+            services.AddSingleton<IJobService, InStationJobService>();
+            services.AddSingleton<IJobService, OutStationVerifyJobService>();
             services.AddSingleton<IJobService, OutStationJobService>();
+            services.AddSingleton<IJobService, StopJobService>();
             services.AddSingleton<IJobService, RepairStartJobService>();
             services.AddSingleton<IJobService, RepairEndJobService>();
             services.AddSingleton<IJobService, PackageIngJobService>();
+            services.AddSingleton<IJobService, PackageOpenJobService>();
+            services.AddSingleton<IJobService, PackageCloseJobService>();
             services.AddSingleton(typeof(IExecuteJobService<>), typeof(ExecuteJobService<>));
             //services.AddSingleton<ExecuteJobService<OutStationRequestBo>, ExecuteJobService<OutStationRequestBo>>();
 
@@ -67,6 +71,8 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSingleton<AbstractValidator<RepairStartRequestBo>, RepairStartJobValidator>();
             services.AddSingleton<AbstractValidator<RepairEndRequestBo>, RepairEndJobValidator>();
             services.AddSingleton<AbstractValidator<PackageIngRequestBo>, PackageIngJobValidator>();
+            services.AddSingleton<AbstractValidator<PackageOpenRequestBo>, PackageOpenJobValidator>();
+            services.AddSingleton<AbstractValidator<PackageCloseRequestBo>, PackageCloseJobValidator>(); 
 
             return services;
         }
