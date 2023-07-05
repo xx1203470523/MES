@@ -114,7 +114,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             defaultDto.Content?.Add("BadEntryCom", $"{isShow}".ToString());
             if (param.ContainsKey("IsClear")) defaultDto.Content?.Add("IsClear", param["IsClear"]);
             //defaultDto.Message = $"条码{bo.SFC}" + (isShow ? "开始录入" : "已经完成录入，无需重复录入！");
-            defaultDto.Message = _localizationService.GetResource(isShow?nameof(ErrorCode.MES16342) : nameof(ErrorCode.MES16343), bo.SFC);
+            defaultDto.Message = _localizationService.GetResource(isShow ? nameof(ErrorCode.MES16342) : nameof(ErrorCode.MES16343), bo.SFC);
 
             return defaultDto;
         }
