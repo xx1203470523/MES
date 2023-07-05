@@ -1,12 +1,18 @@
 ﻿using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.Sequences.Enums;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGenerateBarcodeDto
+namespace Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode
 {
     /// <summary>
     /// 生成条码实体
     /// </summary>
-    public class GenerateBarcodeDto
+    public class GenerateBarcodeBo: CoreBaseBo
     {
         /// <summary>
         /// 规则id
@@ -27,7 +33,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGene
     /// <summary>
     /// 
     /// </summary>
-    public class CodeRuleDto
+    public class CodeRuleBo
     {
         /// <summary>
         /// 是否测试

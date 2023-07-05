@@ -28,6 +28,5 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// <param name="procedureBomBo"></param>
         /// <returns></returns>
         Task VerifyBomQtyAsync(ManuProcedureBomBo procedureBomBo);
-
     }
 }

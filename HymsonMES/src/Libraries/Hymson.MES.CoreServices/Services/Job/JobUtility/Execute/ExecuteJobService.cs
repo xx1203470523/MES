@@ -1,4 +1,7 @@
-﻿using Hymson.MES.CoreServices.Bos.Job;
+﻿using AutoMapper;
+using Hymson.Infrastructure.Mapper;
+using Hymson.Kafka.Debezium;
+using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
 using Microsoft.Extensions.DependencyInjection;
 using System.Transactions;
@@ -50,7 +53,6 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
             {
                 var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
                 if (service == null) continue;
-
                 await param.Proxy.GetValueAsync(service.DataAssemblingAsync<T>, param);
             }
 
@@ -69,7 +71,5 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
 
             trans.Complete();
         }
-
-        //  获取作业
     }
 }
