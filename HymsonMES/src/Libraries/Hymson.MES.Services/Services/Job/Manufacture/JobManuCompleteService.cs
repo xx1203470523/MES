@@ -107,7 +107,8 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             defaultDto.Content?.Add("Qty", "1");
             if (param.ContainsKey("IsClear")) defaultDto.Content?.Add("IsClear", param["IsClear"]);
 
-            defaultDto.Message = $"条码{param["SFC"]}完成，已于NF排队！";
+            //defaultDto.Message = $"条码{param["SFC"]}完成，已于NF排队！";
+            defaultDto.Message = _localizationService.GetResource(nameof(ErrorCode.MES16341), param["SFC"]);
             return defaultDto;
         }
 
