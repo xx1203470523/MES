@@ -1,7 +1,5 @@
-﻿using Dapper;
-using Hymson.Localization.Services;
+﻿using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
-using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
@@ -11,16 +9,15 @@ using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.Snowflake;
-using Hymson.Utils;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
     /// <summary>
-    /// 中止
+    /// 不良录入
     /// </summary>
-    [Job("中止", JobTypeEnum.Standard)]
-    public class StopJobService : IJobService
+    [Job("不良录入", JobTypeEnum.Standard)]
+    public class BadRecordJobService : IJobService
     {
         /// <summary>
         /// 服务接口（生产通用）
@@ -38,11 +35,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
         /// <summary>
-        /// 仓储接口（条码步骤）
-        /// </summary>
-        private readonly IManuSfcStepRepository _manuSfcStepRepository;
-
-        /// <summary>
         /// 
         /// </summary>
         private readonly ILocalizationService _localizationService;
@@ -54,18 +46,15 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="manuCommonService"></param>
         /// <param name="masterDataService"></param>
         /// <param name="manuSfcProduceRepository"></param>
-        /// <param name="manuSfcStepRepository"></param>
         /// <param name="localizationService"></param>
-        public StopJobService(IManuCommonService manuCommonService,
+        public BadRecordJobService(IManuCommonService manuCommonService,
             IMasterDataService masterDataService,
             IManuSfcProduceRepository manuSfcProduceRepository,
-            IManuSfcStepRepository manuSfcStepRepository,
             ILocalizationService localizationService)
         {
             _manuCommonService = manuCommonService;
             _masterDataService = masterDataService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
-            _manuSfcStepRepository = manuSfcStepRepository;
             _localizationService = localizationService;
         }
 
@@ -77,7 +66,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task VerifyParamAsync<T>(T param) where T : JobBaseBo
         {
-            var bo = param.ToBo<StopRequestBo>();
+            var bo = param.ToBo<BadRecordRequestBo>();
             if (bo == null) return;
 
             // 获取生产条码信息
@@ -99,57 +88,22 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
-            var bo = param.ToBo<StopRequestBo>();
+            var bo = param.ToBo<BadRecordRequestBo>();
             if (bo == null) return default;
 
-            // 获取生产条码信息
-            var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, bo);
-            var entities = sfcProduceEntities.AsList();
-            if (entities == null || entities.Any() == false) return default;
+            // 待执行的命令
+            BadRecordResponseBo responseBo = new();
 
-            var firstProduceEntity = entities.FirstOrDefault();
-            if (firstProduceEntity == null) return default;
-
-            // 更新时间
-            var updatedBy = bo.UserName;
-            var updatedOn = HymsonClock.Now();
-
-            List<ManuSfcStepEntity> sfcStepEntities = new();
-            entities.ForEach(sfcProduceEntity =>
+            // 获取维修业务
+            var sfcProduceBusinessEntities = await _manuSfcProduceRepository.GetSfcProduceBusinessEntitiesBySFCAsync(new SfcListProduceBusinessQuery
             {
-                // 更改状态，将条码由"活动"改为"排队"
-                sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
-                sfcProduceEntity.UpdatedBy = updatedBy;
-                sfcProduceEntity.UpdatedOn = updatedOn;
-
-                // 初始化步骤
-                sfcStepEntities.Add(new ManuSfcStepEntity
-                {
-                    // 插入 manu_sfc_step 状态为 停止
-                    Operatetype = ManuSfcStepTypeEnum.Stop,
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SFC = sfcProduceEntity.SFC,
-                    ProductId = sfcProduceEntity.ProductId,
-                    WorkOrderId = sfcProduceEntity.WorkOrderId,
-                    WorkCenterId = sfcProduceEntity.WorkCenterId,
-                    ProductBOMId = sfcProduceEntity.ProductBOMId,
-                    ProcedureId = bo.ProcedureId,
-                    Qty = sfcProduceEntity.Qty,
-                    EquipmentId = sfcProduceEntity.EquipmentId,
-                    ResourceId = bo.ResourceId,
-                    SiteId = bo.SiteId,
-                    CreatedBy = updatedBy,
-                    CreatedOn = updatedOn,
-                    UpdatedBy = updatedBy,
-                    UpdatedOn = updatedOn
-                });
+                SiteId = bo.SiteId,
+                Sfcs = bo.SFCs,
+                BusinessType = ManuSfcProduceBusinessType.Repair
             });
 
-            return new StopResponseBo
-            {
-                SFCProduceEntities = entities,
-                SFCStepEntities = sfcStepEntities
-            };
+            responseBo.IsShow = sfcProduceBusinessEntities.Any() == false;
+            return responseBo;
         }
 
         /// <summary>
@@ -160,12 +114,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         public async Task<JobResponseBo> ExecuteAsync(object obj)
         {
             JobResponseBo responseBo = new();
-            if (obj is not StopResponseBo data) return responseBo;
+            if (obj is not BadRecordResponseBo data) return responseBo;
 
-            responseBo.Rows += await _manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities);
-            responseBo.Rows += await _manuSfcProduceRepository.UpdateRangeAsync(data.SFCProduceEntities);
-
-            return responseBo;
+            responseBo.Content.Add("IsShow", $"{data.IsShow}");
+            return await Task.FromResult(responseBo);
         }
 
     }

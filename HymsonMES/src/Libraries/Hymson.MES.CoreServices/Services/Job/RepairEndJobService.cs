@@ -24,6 +24,7 @@ using System.Linq;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Newtonsoft.Json;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
+using Hymson.MES.CoreServices.Dtos.Common;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -117,10 +118,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public async Task<int> ExecuteAsync(object obj)
+        public async Task<JobResponseBo> ExecuteAsync(object obj)
         {
-            await Task.CompletedTask;
-            return 0;
+            return await Task.FromResult(new JobResponseBo { });
         }
 
     }

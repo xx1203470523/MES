@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.CoreServices.Bos.Job;
+using Hymson.MES.CoreServices.Dtos.Common;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
@@ -29,7 +30,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        Task<int> ExecuteAsync(object obj);
+        Task<JobResponseBo> ExecuteAsync(object obj);
 
     }
 }

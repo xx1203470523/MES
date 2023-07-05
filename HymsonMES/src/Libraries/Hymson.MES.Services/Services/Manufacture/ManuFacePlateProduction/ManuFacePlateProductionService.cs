@@ -143,7 +143,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             var mainMaterialReplaces = await _procReplaceMaterialRepository.GetProcReplaceMaterialViewsAsync(new ProcReplaceMaterialQuery
                             {
                                 SiteId = _currentSite.SiteId ?? 0,
-                                MaterialId = item.Id
+                                MaterialId = long.Parse(item.MaterialId)
                             });
                             foreach (var replace in mainMaterialReplaces)
                             {

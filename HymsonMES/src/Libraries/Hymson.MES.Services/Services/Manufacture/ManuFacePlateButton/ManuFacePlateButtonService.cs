@@ -330,7 +330,19 @@ namespace Hymson.MES.Services.Services.Manufacture
             // 是否清除条码
             if (buttonJobs.Any(a => a.IsClear) == true) dto.Param?.Add("IsClear", "True");
 
+            /*
             // 执行Job
+            var jobResponses = await _executeJobService.ExecuteAsync(jobs.Select(s => new JobBo { Name = s.ClassProgram }), new JobRequestBo
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                UserName = _currentUser.UserName,
+                ProcedureId = dto.Param["ProcedureId"].ParseToLong(),
+                ResourceId = dto.Param["ResourceId"].ParseToLong(),
+                SFCs = new string[] { dto.Param["SFC"] }
+            });
+            */
+            //result = jobResponses.Select(s => s.Value == new JobResponseDto { Content = null });
+
             result = await _jobCommonService.ExecuteJobAsync(jobs, dto.Param);
             return result;
         }
@@ -364,7 +376,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 jobBos.Add(new JobBo { Name = job.ClassProgram });
             }
-            await _executeJobService.ExecuteAsync(jobBos, bo);
+            result = await _executeJobService.ExecuteAsync(jobBos, bo);
             // 执行Job
             // result = await _jobCommonService.ExecuteJobAsync(jobs, dto.Param);
             return result;

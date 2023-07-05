@@ -1,7 +1,4 @@
-﻿using AutoMapper;
-using Hymson.Infrastructure.Mapper;
-using Hymson.Kafka.Debezium;
-using Hymson.MES.CoreServices.Bos.Job;
+﻿using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
 using Microsoft.Extensions.DependencyInjection;
 using System.Transactions;
@@ -32,7 +29,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
         /// 执行作业
         /// </summary>
         /// <returns></returns>
-        public async Task<int> ExecuteAsync(IEnumerable<JobBo> jobBos, T param)
+        public async Task<Dictionary<string, JobResponseBo>> ExecuteAsync(IEnumerable<JobBo> jobBos, T param)
         {
             var services = _serviceProvider.GetServices<IJobService>();
 
@@ -57,7 +54,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
             }
 
             // 执行入库
-            var rowSum = 0;
+            var responseDtos = new Dictionary<string, JobResponseBo>();
             using var trans = new TransactionScope();
             foreach (var job in jobBos)
             {
@@ -66,18 +63,23 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
 
                 var obj = await param.Proxy.GetValueAsync(service.DataAssemblingAsync<T>, param);
                 if (obj == null) continue;
-                var rows = await service.ExecuteAsync(obj);
-                if (rows <= 0)
-                {
-                    trans.Dispose();
-                    return 0;
-                }
 
-                rowSum += rows;
+                var responseDto = await service.ExecuteAsync(obj);
+                responseDtos.Add(job.Name, responseDto);
+
+                if (responseDto.Rows < 0) break;
             }
 
-            trans.Complete();
-            return rowSum;
+            if (responseDtos.Any(a => a.Value.Rows < 0))
+            {
+                trans.Dispose();
+            }
+            else
+            {
+                trans.Complete();
+            }
+
+            return responseDtos;
         }
     }
 }

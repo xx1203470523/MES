@@ -77,10 +77,9 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public async Task<int> ExecuteAsync(object obj)
+        public async Task<JobResponseBo> ExecuteAsync(object obj)
         {
-            int rows = 0;
-            return rows;
+            return await Task.FromResult(new JobResponseBo { });
         }
     }
 }

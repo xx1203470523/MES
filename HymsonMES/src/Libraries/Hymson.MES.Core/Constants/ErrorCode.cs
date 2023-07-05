@@ -663,6 +663,14 @@
         public const string MES16339 = "设备不能为空";
 
         public const string MES16340 = "条码{0}已中止！";
+        public const string MES16341 = "条码{0}完成，已于NF排队！";
+        public const string MES16342 = "条码{0}开始录入不良";
+        public const string MES16343 = "条码{0}已经完成录入，无需重复录入！";
+        public const string MES16344 = "关闭成功";
+        public const string MES16345 = "该容器已经关闭！";
+        public const string MES16346 = "打开成功！";
+        public const string MES16347 = "该容器已经打开！";
+        public const string MES16348 = "条码{0}已于NF排队！";
         #endregion
 
         #region 生产

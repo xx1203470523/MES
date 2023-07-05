@@ -11,6 +11,7 @@ using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
@@ -212,22 +213,23 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public async Task<int> ExecuteAsync(object obj)
+        public async Task<JobResponseBo> ExecuteAsync(object obj)
         {
-            int rows = 0;
-            if (obj is not RepairStartResponseBo data) return rows;
+            JobResponseBo responseBo = new();
+            if (obj is not RepairStartResponseBo data) return responseBo;
+
             if (data == null || data.UpdateResourceCommand == null)
             {
-                return rows;
+                return responseBo;
             }
 
             //事务入库
             //using var trans = TransactionHelper.GetTransactionScope();
 
-            rows += await _manuSfcProduceRepository.UpdateProcedureAndResourceRangeAsync(data.UpdateResourceCommand);
+            responseBo.Rows += await _manuSfcProduceRepository.UpdateProcedureAndResourceRangeAsync(data.UpdateResourceCommand);
 
             //trans.Complete();
-            return rows;
+            return responseBo;
         }
 
     }
