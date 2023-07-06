@@ -1,6 +1,7 @@
 ﻿using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
@@ -58,7 +59,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuContainerPackRepository = manuContainerPackRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
-            _planWorkOrderBindRepository= planWorkOrderBindRepository;
+            _planWorkOrderBindRepository = planWorkOrderBindRepository;
         }
 
         /// <summary>
@@ -81,43 +82,52 @@ namespace Hymson.MES.CoreServices.Services.Job
             var bo = param.ToBo<BarcodeSfcReceiveBo>();
             if (bo == null) return default;
             // 获取生产条码信息
-            var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, new MultiSFCBo {SiteId= param.SiteId,SFCs= param .SFCs});
-            if (sfcProduceEntities == null || sfcProduceEntities.Any() == false)
-            {
+            var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, new MultiSFCBo { SiteId = param.SiteId, SFCs = param.SFCs });
 
+            //获取绑定工单
+            var planWorkOrderBindEntity = await _planWorkOrderBindRepository.GetByResourceIDAsync(new PlanWorkOrderBindByResourceIdQuery
+            {
+                SiteId = bo.SiteId,
+                ResourceId = bo.ResourceId
+            });
+
+            if (planWorkOrderBindEntity == null)
+            {
+                throw new BusinessException(nameof(ErrorCode.MES16306));
             }
-            else
+            var manuSfcProduceEntity = await _masterDataService.GetWorkOrderByIdAsync(planWorkOrderBindEntity.WorkOrderId);
+
+            //获取首工序
+            var firstProcedure = _masterDataService.GetFirstProcedureAsync(manuSfcProduceEntity.ProcessRouteId);
+
+            //获取bom TODO BOM逻辑比较牵强
+            var bomMaterials = await _masterDataService.GetProcMaterialEntitiesByBomIdAndProcedureIdAsync(manuSfcProduceEntity.ProductBOMId, manuSfcProduceEntity.ProcessRouteId);
+
+            // 获取库存数据
+            var whMaterialInventorys = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
             {
-                //获取绑定工单
-                var planWorkOrderBindEntity = await _planWorkOrderBindRepository.GetByResourceIDAsync(new PlanWorkOrderBindByResourceIdQuery
-                {
-                    SiteId = bo.SiteId,
-                    ResourceId = bo.ResourceId
-                });
+                SiteId = bo.SiteId,
+                BarCodes = bo.SFCs
+            });
 
-                if (planWorkOrderBindEntity == null)
+            foreach (var sfc in bo.SFCs)
+            {
+                if (sfcProduceEntities != null && sfcProduceEntities.Any(x => x.SFC == sfc)) continue;
+
+                var whMaterialInventory = whMaterialInventorys.FirstOrDefault(x => x.MaterialBarCode == sfc);
+
+                //不存在库存中 则使用bom清单试探
+                if (whMaterialInventory == null)
                 {
-                    throw new  BusinessException(nameof(ErrorCode.MES16306));
+                    // 试探条码物料
+                    foreach (var bom in bomMaterials)
+                    {
+
+                    }
                 }
-                var manuSfcProduceEntity =  await _masterDataService.GetWorkOrderByIdAsync(planWorkOrderBindEntity.WorkOrderId);
-
-                //获取首工序
-                var firstProcedure = _masterDataService.GetFirstProcedureAsync(manuSfcProduceEntity.ProcessRouteId);
-
-                //获取bom TODO BOM逻辑比较牵强
-                var bomMaterials = await _masterDataService.GetProcMaterialEntitiesByBomIdAndProcedureIdAsync(manuSfcProduceEntity.ProductBOMId, manuSfcProduceEntity.ProcessRouteId);
-
-                // 获取库存数据
-               var whMaterialInventorys= await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
+                else
                 {
-                    SiteId = bo.SiteId,
-                    BarCodes = bo.SFCs
-                });
-
-                foreach (var sfc in bo.SFCs)
-                { 
-                  // 试探条码物料
-                  
+                     
                 }
             }
             return null;
