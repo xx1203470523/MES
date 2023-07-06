@@ -117,7 +117,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                         break;
                     case QualityLockEnum.Unlock:
                     default:
-                        break;
+                        continue;
                 }
 
                 validationFailures.Add(new ValidationFailure
