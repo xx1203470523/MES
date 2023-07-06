@@ -245,7 +245,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
             List<int> sequences = new(param.Count);
 
             // 因为测试提出计数器需要包含起始数字，而计时器是用startNumber往后开始计数的
-            var startNumber = param.StartNumber - 1;
+            var startNumber = param.StartNumber - param.Increment;
 
             // 真实生成
             if (param.IsTest == false && param.IsSimulation == false)

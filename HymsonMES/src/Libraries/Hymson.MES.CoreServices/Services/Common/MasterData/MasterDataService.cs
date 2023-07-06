@@ -349,12 +349,12 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             // 不存在在制表的话，就去库存查找
             if (sfcProduceEntities.Any() == false)
             {
-                var whMaterialInventoryEntities = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
-                {
-                    SiteId = sfcBos.SiteId,
-                    BarCodes = sfcBos.SFCs
-                });
-                if (whMaterialInventoryEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES16318));
+                //var whMaterialInventoryEntities = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
+                //{
+                //    SiteId = sfcBos.SiteId,
+                //    BarCodes = sfcBos.SFCs
+                //});
+                //if (whMaterialInventoryEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES16318));
 
                 throw new CustomerValidationException(nameof(ErrorCode.MES16306));
             }

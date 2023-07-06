@@ -1,4 +1,6 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCreateBarcodeDto;
 using Hymson.MES.Services.Dtos.Plan;
 
 namespace Hymson.MES.Services.Services.Plan
@@ -35,5 +37,18 @@ namespace Hymson.MES.Services.Services.Plan
         /// <returns></returns>
         Task<PagedInfo<PlanSfcPrintDto>> GetPagedListAsync(PlanSfcPrintPagedQueryDto pagedQueryDto);
 
+        /// <summary>
+        /// 生成条码
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        Task<List<ManuSfcEntity>> CreateBarcodeByWorkOrderIdAsync(CreateBarcodeByWorkOrderDto parm);
+
+        /// <summary>
+        /// 生成条码并打印
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        Task CreateBarcodeByWorkOrderIdAndPrintAsync(CreateBarcodeByWorkOrderAndPrintDto parm);
     }
 }
