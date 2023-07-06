@@ -608,7 +608,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         //在制维修 
         const string UpdateStatusSql = "UPDATE `manu_sfc_produce` SET Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
-        const string UpdateProcedureIdSql = "UPDATE `manu_sfc_produce` SET  ResourceId=@ResourceId,ProcessRouteId = @ProcessRouteId, ProcedureId=@ProcedureId, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
+        const string UpdateProcedureIdSql = "UPDATE `manu_sfc_produce` SET  ResourceId=@ResourceId,ProcessRouteId = @ProcessRouteId, ProcedureId=@ProcedureId, Status = @Status,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string UpdateProcedureAndResourceSql = "UPDATE `manu_sfc_produce` SET   ProcedureId = @ProcedureId,ResourceId=@ResourceId,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE SFC in @Sfcs and SiteId=@SiteId ";
 
 
