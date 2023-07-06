@@ -306,6 +306,11 @@ namespace Hymson.MES.Data.Repositories.Process
                 }
             }
 
+            if (query.Status.HasValue)
+            {
+                sqlBuilder.Where(" status=@Status ");
+            }
+
             sqlBuilder.AddParameters(query);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
