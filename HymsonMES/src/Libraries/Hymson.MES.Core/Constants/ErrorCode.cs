@@ -673,6 +673,7 @@
         public const string MES16348 = "条码{0}已于NF排队！";
         public const string MES16349 = "条码{0}出站完成！";
         public const string MES16350 = "工单状态为完工，不允许再对工单投入！";
+        public const string MES16351 = "条码{0}完成，已于{1}排队！";
         #endregion
 
         #region 生产
