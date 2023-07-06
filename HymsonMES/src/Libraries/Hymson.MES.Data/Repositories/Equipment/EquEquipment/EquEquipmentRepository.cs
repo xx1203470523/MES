@@ -9,6 +9,7 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using Org.BouncyCastle.Crypto;
 
 namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
 {
@@ -101,6 +102,17 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
                 using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
                 return await conn.QueryFirstOrDefaultAsync<EquEquipmentEntity>(GetByIdSql, new { id });
             });
+        }
+
+        /// <summary>
+        /// 批量获取设备信息（无缓存）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<EquEquipmentEntity>> GetByIdsAsync(long[] ids)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<EquEquipmentEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -242,6 +254,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         const string DeleteSql = "UPDATE `equ_equipment` SET `IsDeleted` = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids;";
         const string GetByCodeSql = "SELECT * FROM equ_equipment WHERE `IsDeleted` = 0 AND SiteId = @Site AND EquipmentCode = @Code LIMIT 1";
         const string GetByIdSql = "SELECT * FROM `equ_equipment` WHERE `Id` = @Id;";
+        const string GetByIdsSql = "SELECT * FROM `equ_equipment` WHERE `Id` IN @Ids;";
         const string GetByGroupIdSql = "SELECT * FROM `equ_equipment` WHERE `IsDeleted` = 0 AND (EquipmentGroupId = 0 AND  SiteId=@SiteId OR EquipmentGroupId = @EquipmentGroupId);";
         const string GetBaseListSql = "SELECT * FROM `equ_equipment` WHERE `IsDeleted` = 0;";
         const string GetByEquipmentCodeSql = "SELECT * FROM `equ_equipment` WHERE IsDeleted = 0 AND SiteId = @Site AND EquipmentCode = @Code;";

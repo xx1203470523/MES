@@ -20,6 +20,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     public class ManuSfcStepPagedQuery : PagerInfo
     {
         /// <summary>
+        /// 条码
+        /// </summary>
+        public string? SFC { get; set; }
+        /// <summary>
         /// 站点id
         /// </summary>
         public long SiteId { get; set; }

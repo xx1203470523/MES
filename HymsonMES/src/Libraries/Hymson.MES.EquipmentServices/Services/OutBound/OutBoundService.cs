@@ -10,7 +10,6 @@ using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuProductParameter.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Plan;
@@ -248,7 +247,6 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 if (outBoundMoreSfcs.Any())
                     throw new CustomerValidationException(nameof(ErrorCode.MES19128)).WithData("SFCS", string.Join(',', outBoundMoreSfcs.Select(c => c.SFC)));
             }
-
             //查询已有汇总信息
             ManuSfcSummaryQuery manuSfcSummaryQuery = new ManuSfcSummaryQuery
             {
@@ -345,6 +343,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                     //如果是过站
                     if (outBoundSFCDto.IsPassingStation)
                     {
+                        //复制对象
                         var manuSfcStepPassingEntity = JsonSerializer.Deserialize<ManuSfcStepEntity>(JsonSerializer.Serialize(manuSfcStepEntity));
                         if (manuSfcStepPassingEntity != null)
                         {
@@ -362,7 +361,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                     manuSfcProduceEntities.Add(sfcProduceEntity);
                     //插入 manu_sfc_step 状态为 出站
                     manuSfcStepEntity.Id = IdGenProvider.Instance.CreateId();
-                    manuSfcStepEntity.CurrentStatus = SfcProduceStatusEnum.Activity;
+                    manuSfcStepEntity.CurrentStatus = SfcProduceStatusEnum.Complete;//出站修改状态为当前工序完成
                     manuSfcStepEntity.Operatetype = ManuSfcStepTypeEnum.OutStock;
                     manuSfcStepEntities.Add(manuSfcStepEntity);
                 }
@@ -427,12 +426,11 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 CirculationBarCodes = outBoundMoreDto.SFCs.Select(c => c.SFC).ToArray()
             };
             //查询流转条码绑定记录
-            var circulationBarCodeEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntities(manuSfcCirculationBarCodeQuery);
+            var circulationBarCodeEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(manuSfcCirculationBarCodeQuery);
             if (circulationBarCodeEntities.Any())
             {
-                //当前资源
-                var circulationSfc = circulationBarCodeEntities.Select(c => c.SFC).ToArray();
                 //条码信息
+                var circulationSfc = circulationBarCodeEntities.Select(c => c.SFC).ToArray();
                 var circulationSfclist = await _manuSfcRepository.GetBySFCsAsync(circulationSfc);
                 foreach (var sfc in circulationSfclist)
                 {
@@ -581,7 +579,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                     SiteId = _currentEquipment.SiteId,
                     CirculationBarCodes = new string[] { ManuProductParameter.DefaultSFC }
                 };
-                var manuSfcCirculationBarCodeEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntities(bindVirtualSFCCirculationBarCodeQuery);
+                var manuSfcCirculationBarCodeEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(bindVirtualSFCCirculationBarCodeQuery);
                 foreach (var item in manuSfcCirculationBarCodeEntities)
                 {
                     item.CirculationType = SfcCirculationTypeEnum.Change;

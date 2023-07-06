@@ -1,5 +1,5 @@
+using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuProductParameter.Query;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -51,5 +51,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<IEnumerable<ManuProductParameterEntity>> GetManuProductParameterAsync(ManuProductParameterQuery query);
 
+        /// <summary>
+        /// 参数分页查询
+        /// </summary>
+        /// <param name="queryParam"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ManuProductParameterView>> GetManuProductParameterPagedInfoAsync(ManuProductParameterPagedQuery queryParam);
     }
 }

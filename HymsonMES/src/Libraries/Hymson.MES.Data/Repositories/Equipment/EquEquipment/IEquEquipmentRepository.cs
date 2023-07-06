@@ -57,6 +57,13 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         Task<EquEquipmentEntity> GetByIdAsync(long id);
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquEquipmentEntity>> GetByIdsAsync(long[] ids);
+
+        /// <summary>
         /// 根据Code查询对象
         /// </summary>
         /// <param name="query"></param>

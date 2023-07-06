@@ -39,5 +39,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query
         /// 是否拆解(0:未拆解，1：拆解)
         /// </summary>
         public TrueOrFalseEnum? IsDisassemble { get; set; }
+
+        /// <summary>
+        /// 当前状态;1：排队；2：激活；3：完工；
+        /// </summary>
+        public SfcProduceStatusEnum? CurrentStatus { get; set; }
     }
 }

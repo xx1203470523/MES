@@ -29,7 +29,13 @@ namespace Hymson.MES.EquipmentServices.Dtos.SfcCirculation
 
     public class CirculationBindDto
     {
+        /// <summary>
+        /// 绑定位置
+        /// </summary>
         public int Location { get; set; } = 0;
+        /// <summary>
+        /// 绑定的条码
+        /// </summary>
         public string SFC { get; set; }
     }
 }

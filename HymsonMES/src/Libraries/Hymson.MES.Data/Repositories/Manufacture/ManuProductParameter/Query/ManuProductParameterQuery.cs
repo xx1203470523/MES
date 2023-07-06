@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.Data.Repositories.Manufacture.ManuProductParameter.Query
+namespace Hymson.MES.Data.Repositories.Manufacture
 {
     public class ManuProductParameterQuery
     {

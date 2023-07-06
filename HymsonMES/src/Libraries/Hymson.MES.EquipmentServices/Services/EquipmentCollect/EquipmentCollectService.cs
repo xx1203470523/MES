@@ -7,8 +7,9 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment;
+using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuProductParameter.Query;
+using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.EquipmentServices.Bos;
 using Hymson.MES.EquipmentServices.Dtos.EquipmentCollect;
@@ -65,6 +66,14 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
         /// 仓储（标准参数）
         /// </summary>
         private readonly IManuProductParameterRepository _manuProductParameterRepository;
+        /// <summary>
+        /// 工作中心
+        /// </summary>
+        private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
+        /// <summary>
+        /// 工单
+        /// </summary>
+        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
 
         /// <summary>
@@ -78,6 +87,8 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
         /// <param name="procResourceRepository"></param>
         /// <param name="procParameterRepository"></param>
         /// <param name="manuProductParameterRepository"></param>
+        /// <param name="inteWorkCenterRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
         public EquipmentCollectService(ICurrentEquipment currentEquipment,
             IEquHeartbeatRepository equipmentHeartbeatRepository,
             IEquAlarmRepository equipmentAlarmRepository,
@@ -85,7 +96,9 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
             IEquProductParameterRepository equProductParameterRepository,
             IProcResourceRepository procResourceRepository,
             IProcParameterRepository procParameterRepository,
-            IManuProductParameterRepository manuProductParameterRepository)
+            IManuProductParameterRepository manuProductParameterRepository,
+            IInteWorkCenterRepository inteWorkCenterRepository,
+            IPlanWorkOrderRepository planWorkOrderRepository)
         {
             _currentEquipment = currentEquipment;
             _equipmentHeartbeatRepository = equipmentHeartbeatRepository;
@@ -95,6 +108,8 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
             _procResourceRepository = procResourceRepository;
             _procParameterRepository = procParameterRepository;
             _manuProductParameterRepository = manuProductParameterRepository;
+            _inteWorkCenterRepository = inteWorkCenterRepository;
+            _planWorkOrderRepository = planWorkOrderRepository;
         }
 
 
@@ -324,6 +339,25 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
             || a.SFC.IsEmpty() == true
             || a.ParamList.Any() == false)) throw new CustomerValidationException(nameof(ErrorCode.MES19107));
 
+            //查询当前资源
+            var procResource = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentEquipment.SiteId, Code = request.ResourceCode });
+            //查找当前工作中心（产线）
+            var workLine = await _inteWorkCenterRepository.GetByResourceIdAsync(procResource.Id);
+            if (workLine == null)
+            {
+                //通过资源未找到关联产线
+                throw new CustomerValidationException(nameof(ErrorCode.MES19123)).WithData("ResourceCode", procResource.ResCode);
+            }
+            //查找激活工单
+            var planWorkOrders = await _planWorkOrderRepository.GetByWorkLineIdAsync(workLine.Id);
+            if (!planWorkOrders.Any())
+            {
+                //产线未激活工单
+                throw new CustomerValidationException(nameof(ErrorCode.MES19124)).WithData("WorkCenterCode", workLine.Code);
+            }
+            //不考虑混线
+            var planWorkOrder = planWorkOrders.First();
+
             // 查询设备参数
             List<EquipmentProductParamBo> paramList = new();
             foreach (var item in request.SFCParams)
@@ -350,8 +384,9 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
                 UpdatedOn = nowTime,
                 EquipmentId = _currentEquipment.Id ?? 0,
                 LocalTime = request.LocalTime,
-
-                //ProcedureId = 0,
+                WorkOrderId = planWorkOrder.Id,//工单ID
+                ProcedureId = planWorkOrder.ProductId,//工序ID
+                ProductId = planWorkOrder.ProductId,//产品ID
                 SFC = s.SFC,
                 ResourceId = resourceEntity.Id,
                 ParameterId = GetParameterIdByParameterCode(s.ParamCode, parameterEntities),

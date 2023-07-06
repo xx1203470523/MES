@@ -508,7 +508,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                 SiteId = _currentEquipment.SiteId,
                 Sfcs = inBoundMoreDto.SFCs.Select(sfc => sfc).ToArray()
             };
-            var manuSfcCirculationBarCodeEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntities(manuSfcCirculationBarCodeQuery);
+            var manuSfcCirculationBarCodeEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(manuSfcCirculationBarCodeQuery);
             //如果有不存在的SFC就提示
             var noIncludeSfcs = inBoundMoreDto.SFCs.Where(sfc => manuSfcCirculationBarCodeEntities.Select(s => s.SFC).Contains(sfc) == false);
             if (noIncludeSfcs.Any() == true)

@@ -64,12 +64,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId=@SiteId");
             sqlBuilder.Select("*");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
+            if (!string.IsNullOrWhiteSpace(manuSfcStepPagedQuery.SFC))
+            {
+                sqlBuilder.Where("SFC=@SFC");
+            }
 
             var offSet = (manuSfcStepPagedQuery.PageIndex - 1) * manuSfcStepPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -93,6 +94,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetManuSfcStepEntitiesSqlTemplate);
+            sqlBuilder.Where("SiteId=@SiteId");
+            if (!string.IsNullOrEmpty(manuSfcStepQuery.SFC))
+            {
+                sqlBuilder.Where("SFC=@SFC");
+            }
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var manuSfcStepEntities = await conn.QueryAsync<ManuSfcStepEntity>(template.RawSql, manuSfcStepQuery);
             return manuSfcStepEntities;
@@ -240,7 +246,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string DeleteSql = "UPDATE `manu_sfc_step` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SFC`, `ProductId`, `WorkOrderId`, `WorkCenterId`, `ProductBOMId`, `Qty`, `EquipmentId`, `ResourceId`, `ProcedureId`, `Type`, `Status`, `Lock`, `IsMultiplex`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `Passed`, `IsPassingStation`
-                            FROM `manu_sfc_step`  WHERE Id = @Id "; 
+                            FROM `manu_sfc_step`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SFC`, `ProductId`, `WorkOrderId`, `WorkCenterId`, `ProductBOMId`, `Qty`, `EquipmentId`, `ResourceId`, `ProcedureId`, `Type`, `Status`, `Lock`, `IsMultiplex`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `Passed`, `IsPassingStation`
                             FROM `manu_sfc_step`  WHERE Id IN @ids ";

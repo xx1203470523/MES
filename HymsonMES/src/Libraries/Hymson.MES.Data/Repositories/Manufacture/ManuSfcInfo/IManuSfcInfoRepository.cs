@@ -94,7 +94,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuSfcInfo1Query"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuSfcInfoEntity>> GetManuSfcInfo1EntitiesAsync(ManuSfcInfo1Query manuSfcInfo1Query);
+        Task<IEnumerable<ManuSfcInfoEntity>> GetManuSfcInfoEntitiesAsync(ManuSfcInfo1Query manuSfcInfo1Query);
 
         /// <summary>
         /// 分页查询

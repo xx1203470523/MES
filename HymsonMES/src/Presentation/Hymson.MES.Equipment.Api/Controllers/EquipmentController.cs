@@ -503,6 +503,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("GetNGData")]
+        [ProducesResponseType(typeof(NGDataDto),200)]
         public async Task<NGDataDto> GetNGDataAsync(string sfc)
         {
             return await _ngDataService.GetNGData(sfc);

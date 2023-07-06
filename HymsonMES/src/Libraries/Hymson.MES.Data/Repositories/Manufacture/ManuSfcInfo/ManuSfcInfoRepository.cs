@@ -71,7 +71,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<ManuSfcInfoEntity> GetBySFCAsync(long sfcId)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(GetBySFCSql, new { SfcId= sfcId });
+            return await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(GetBySFCSql, new { SfcId = sfcId });
         }
 
         /// <summary>
@@ -126,10 +126,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuSfcInfo1Query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcInfoEntity>> GetManuSfcInfo1EntitiesAsync(ManuSfcInfo1Query manuSfcInfo1Query)
+        public async Task<IEnumerable<ManuSfcInfoEntity>> GetManuSfcInfoEntitiesAsync(ManuSfcInfo1Query manuSfcInfo1Query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetManuSfcInfo1EntitiesSqlTemplate);
+            if (manuSfcInfo1Query.SfcId.HasValue)
+            {
+                sqlBuilder.Where("SfcId=@SfcId");
+            }
             using var conn = GetMESDbConnection();
             var manuSfcInfo1Entities = await conn.QueryAsync<ManuSfcInfoEntity>(template.RawSql, manuSfcInfo1Query);
             return manuSfcInfo1Entities;
@@ -184,7 +188,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfcIds"></param>
         /// <returns></returns>
-        public async Task<int> UpdatesIsUsedAsync(ManuSfcInfoUpdateIsUsedCommand  manuSfcInfoUpdateIsUsedCommand)
+        public async Task<int> UpdatesIsUsedAsync(ManuSfcInfoUpdateIsUsedCommand manuSfcInfoUpdateIsUsedCommand)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesIsUsedSql, manuSfcInfoUpdateIsUsedCommand);
@@ -305,11 +309,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        public async Task<ManuSfcInfoEntity> GetUsedBySFCAsync(string sfc) 
+        public async Task<ManuSfcInfoEntity> GetUsedBySFCAsync(string sfc)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(GetUsedBySFC, new { sfc });
-        } 
+        }
     }
 
     /// <summary>

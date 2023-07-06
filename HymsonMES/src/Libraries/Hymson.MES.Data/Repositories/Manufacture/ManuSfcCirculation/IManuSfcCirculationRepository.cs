@@ -30,7 +30,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns> 
-        Task<IEnumerable<ManuSfcCirculationEntity>> GetSfcMoudulesAsync(ManuSfcCirculationBySfcsQuery query); 
+        Task<IEnumerable<ManuSfcCirculationEntity>> GetSfcMoudulesAsync(ManuSfcCirculationBySfcsQuery query);
 
         /// <summary>
         /// 根据IDs批量获取数据
@@ -58,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuSfcCirculationBarCodeQuery"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuSfcCirculationEntity>> GetManuSfcCirculationBarCodeEntities(ManuSfcCirculationBarCodeQuery manuSfcCirculationBarCodeQuery);
+        Task<IEnumerable<ManuSfcCirculationEntity>> GetManuSfcCirculationBarCodeEntitiesAsync(ManuSfcCirculationBarCodeQuery manuSfcCirculationBarCodeQuery);
 
         /// <summary>
         /// 新增
@@ -108,5 +108,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuSfcCirculationPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuSfcCirculationEntity>> GetReportPagedInfoAsync(ComUsageReportPagedQuery queryParam);
+
+        /// <summary>
+        /// 追溯 分页查询
+        /// </summary>
+        /// <param name="queryParam"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ManuSfcCirculationEntity>> GetProductTraceReportPagedInfoAsync(ProductTraceReportPagedQuery queryParam);
     }
 }

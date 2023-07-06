@@ -19,6 +19,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public class ManuSfcStepQuery
     {
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long SiteId { get; set; }
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string SFC { get; set; }
+
     }
 
     public class SFCInOutStepQuery 

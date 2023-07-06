@@ -257,10 +257,14 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IComUsageReportService, ComUsageReportService>();
             #endregion
 
-            #region
-
-            #endregion EquHeartbeatReport
+            #region EquHeartbeatReport
             services.AddSingleton<IEquHeartbeatReportService, EquHeartbeatReportService>();
+            #endregion 
+
+            #region ProductTraceReport
+            services.AddSingleton<IProductTraceReportService, ProductTraceReportService>();
+            #endregion
+
             #endregion
 
             return services;

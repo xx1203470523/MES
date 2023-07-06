@@ -1,4 +1,4 @@
-﻿namespace Hymson.MES.Data.Repositories.Manufacture.ManuProductParameter.Query
+﻿namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 

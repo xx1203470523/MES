@@ -13,5 +13,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public class ManuSfcInfo1Query
     {
+        public long? SfcId { get; set; }
     }
 }

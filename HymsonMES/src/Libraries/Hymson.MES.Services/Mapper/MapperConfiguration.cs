@@ -585,6 +585,15 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquHeartbeatReportView, EquHeartbeatReportViewDto>();
             #endregion
 
+            #region ProductTraceReport
+            CreateMap<ProductTracePagedQueryDto, ProductTraceReportPagedQuery>();
+            CreateMap<ManuSfcCirculationEntity, ManuSfcCirculationViewDto>();
+            CreateMap<ManuProductPrameterPagedQueryDto, ManuProductParameterPagedQuery>(); 
+            CreateMap<ManuProductParameterView, ManuProductParameterViewDto>();
+            CreateMap<ManuSfcStepPagedQuery, ManuSfcStepPagedQueryDto>();
+            CreateMap<ManuSfcStepEntity, ManuSfcStepViewDto>();
+            #endregion
+
         }
 
         /// <summary>

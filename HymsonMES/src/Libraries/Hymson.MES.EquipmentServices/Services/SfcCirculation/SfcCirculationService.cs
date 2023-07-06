@@ -328,7 +328,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                 manuSfcCirculationBarCodequery.Sfcs = sfcCirculationUnBindDto.UnBindSFCs;
             }
             //查询流转条码绑定记录
-            var circulationBarCodeEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntities(manuSfcCirculationBarCodequery);
+            var circulationBarCodeEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(manuSfcCirculationBarCodequery);
             List<ManuSfcCirculationEntity> manuSfcCirculationEntities = new();
             if (circulationBarCodeEntities.Any())
             {
