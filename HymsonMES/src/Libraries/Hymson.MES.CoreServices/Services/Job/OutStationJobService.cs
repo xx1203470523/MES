@@ -256,7 +256,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     if (nextProcedure != null)
                     {
                         sfcProduceEntity.ProcedureId = nextProcedure.Id;
-                        // 不置空的话，可能进站时，可能校验不通过
+                        // 不置空的话，进站时，可能校验不通过
                         sfcProduceEntity.ResourceId = null;
                     }
                 }
@@ -272,7 +272,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 responseBo.DeleteSfcProduceBusinesssBySfcInfoIdsCommand = new DeleteSfcProduceBusinesssBySfcInfoIdsCommand
                 {
                     SiteId = bo.SiteId,
-                    SfcInfoIds = manuSfcEntities.Select(s => s.Id)
+                    SfcInfoIds = responseBo.SFCProduceEntities.Select(s => s.Id) //manuSfcEntities.Select(s => s.Id)
                 };
 
                 // 更新完工数量
@@ -360,10 +360,19 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             // 更新数据
             List<Task<int>> tasks = new();
+            //using var trans = new TransactionScope();
 
             // 更新物料库存
             if (data.UpdateQtyByIdCommands.Any())
             {
+                //tasks.Add(_manuFeedingRepository.UpdateQtyByIdAsync(data.UpdateQtyByIdCommands));
+
+                /*
+                foreach (var item in data.UpdateQtyByIdCommands)
+                {
+                    responseBo.Rows += await _manuFeedingRepository.UpdateQtyByIdAsync(item);
+                }
+                */
                 responseBo.Rows += await _manuFeedingRepository.UpdateQtyByIdAsync(data.UpdateQtyByIdCommands);
 
                 // 未更新到全部需更新的数据，事务回滚
@@ -396,7 +405,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     tasks.Add(_manuSfcProduceRepository.DeletePhysicalRangeAsync(data.DeletePhysicalBySfcsCommand));
 
                     // 删除 manu_sfc_produce_business
-                    tasks.Add(_manuSfcProduceRepository.DeleteSfcProduceBusinessBySfcInfoIdsAsync(data.DeleteSfcProduceBusinesssBySfcInfoIdsCommand));
+                    //tasks.Add(_manuSfcProduceRepository.DeleteSfcProduceBusinessBySfcInfoIdsAsync(data.DeleteSfcProduceBusinesssBySfcInfoIdsCommand));
 
                     // 更新完工数量
                     tasks.Add(_planWorkOrderRepository.UpdateFinishProductQuantityByWorkOrderIdAsync(data.UpdateQtyCommand));
@@ -427,6 +436,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             var rowArray = await Task.WhenAll(tasks);
             responseBo.Rows += rowArray.Sum();
+            //trans.Complete();
 
             return responseBo;
         }

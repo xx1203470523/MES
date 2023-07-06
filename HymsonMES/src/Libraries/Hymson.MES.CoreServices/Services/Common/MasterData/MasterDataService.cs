@@ -972,7 +972,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 {
                     UpdatedBy = sfcProduceEntity.UpdatedBy ?? sfcProduceEntity.CreatedBy,
                     UpdatedOn = sfcProduceEntity.UpdatedOn,
-                    Qty = feeding.Qty,
+                    Qty = consume,  // 因为现在是在SQL语句进行的扣减，所以不能用 feeding.Qty,
                     Id = feeding.Id
                 });
 
