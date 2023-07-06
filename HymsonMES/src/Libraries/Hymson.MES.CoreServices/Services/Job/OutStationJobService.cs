@@ -18,6 +18,7 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
+using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.Snowflake;
 using Hymson.Utils;
 
@@ -69,6 +70,16 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
 
+        /// <summary>
+        /// 仓储接口（物料库存）
+        /// </summary>
+        private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
+
+        /// <summary>
+        /// 仓储接口（物料台账）
+        /// </summary>
+        private readonly IWhMaterialStandingbookRepository _whMaterialStandingbookRepository;
+
 
         /// <summary>
         /// 构造函数
@@ -81,6 +92,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="manuSfcStepRepository"></param>
         /// <param name="manuSfcCirculationRepository"></param>
+        /// <param name="whMaterialInventoryRepository"></param>
+        /// <param name="whMaterialStandingbookRepository"></param>
         public OutStationJobService(IManuCommonService manuCommonService,
             IMasterDataService masterDataService,
             IPlanWorkOrderRepository planWorkOrderRepository,
@@ -88,7 +101,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             IManuSfcRepository manuSfcRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcStepRepository manuSfcStepRepository,
-            IManuSfcCirculationRepository manuSfcCirculationRepository)
+            IManuSfcCirculationRepository manuSfcCirculationRepository,
+            IWhMaterialInventoryRepository whMaterialInventoryRepository,
+            IWhMaterialStandingbookRepository whMaterialStandingbookRepository)
         {
             _manuCommonService = manuCommonService;
             _masterDataService = masterDataService;
@@ -98,6 +113,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
+            _whMaterialInventoryRepository = whMaterialInventoryRepository;
+            _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
         }
 
 
@@ -397,7 +414,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     //});
 
                     // 入库
-
+                    tasks.Add(_whMaterialInventoryRepository.InsertsAsync(data.WhMaterialInventoryEntities));
+                    tasks.Add(_whMaterialStandingbookRepository.InsertsAsync(data.WhMaterialStandingbookEntities));
                 }
             }
             // 未完工
