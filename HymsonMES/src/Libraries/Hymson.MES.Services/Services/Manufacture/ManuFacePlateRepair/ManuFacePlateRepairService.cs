@@ -14,6 +14,7 @@ using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Common;
+using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFacePlateRepair.Query;
@@ -117,6 +118,10 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         private readonly IProcProcessRouteDetailLinkRepository _procProcessRouteDetailLinkRepository;
 
+        /// <summary>
+        /// 服务接口（生产通用）
+        /// </summary>
+        private readonly IManuCommonService _manuCommonService;
 
         private readonly ILocalizationService _localizationService;
         private readonly AbstractValidator<ManuFacePlateRepairCreateDto> _validationCreateRules;
@@ -132,7 +137,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             IManuInStationService manuInStationService, IManuSfcStepRepository manuSfcStepRepository,
             IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
         AbstractValidator<ManuFacePlateRepairCreateDto> validationCreateRules, AbstractValidator<ManuFacePlateRepairModifyDto> validationModifyRules,
-        IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository)
+        IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository, IManuCommonService manuCommonService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -155,6 +160,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuSfcStepRepository = manuSfcStepRepository;
             _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
             _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
+            _manuCommonService = manuCommonService;
         }
 
         /// <summary>
@@ -320,6 +326,19 @@ namespace Hymson.MES.Services.Services.Manufacture
             // 产品
             var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(manuSfcProduceEntit.ProductId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES17314));
+
+            // 验证条码锁定
+            await _manuCommonService.VerifySfcsLockAsync(new ManuProcedureBo
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                SFCs = new List<string> { manuSfcProduceEntit.SFC },
+                ProcedureId = manuSfcProduceEntit.ProcedureId
+            });
+
+            if (manuSfcProduceEntit.IsScrap == TrueOrFalseEnum.Yes)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16322)).WithData("SFC", manuSfcProduceEntit.SFC);
+            }
 
             // 产品信息
             ManuFacePlateRepairOpenInfoDto manuFacePlateRepairOpenInfoDto = new()
