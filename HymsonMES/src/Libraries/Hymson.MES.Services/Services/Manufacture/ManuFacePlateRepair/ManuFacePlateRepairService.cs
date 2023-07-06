@@ -198,37 +198,30 @@ namespace Hymson.MES.Services.Services.Manufacture
             };
             // 调用作业
             //var resJob = await _manuFacePlateButtonService.ClickAsync(jobDto);
-            try
-            {
-                var resJob = await _manuFacePlateButtonService.NewClickAsync(jobDto, bo);
-                if (resJob == null || resJob.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES17320));
 
-                var list = new List<ManuFacePlateRepairButJobReturnTypeEnum>();
-                foreach (var item in resJob)
+            var resJob = await _manuFacePlateButtonService.NewClickAsync(jobDto, bo);
+            if (resJob == null || resJob.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES17320));
+
+            var list = new List<ManuFacePlateRepairButJobReturnTypeEnum>();
+            foreach (var item in resJob)
+            {
+                if (item.Key == ManuFacePlateRepairButJobReturnTypeEnum.RepairStartJobService.ToString())
                 {
-                    if (item.Key == ManuFacePlateRepairButJobReturnTypeEnum.RepairStartJobService.ToString())
-                    {
-                        if (!list.Contains(ManuFacePlateRepairButJobReturnTypeEnum.RepairStartJobService))
-                            list.Add(ManuFacePlateRepairButJobReturnTypeEnum.RepairStartJobService);
-                    }
-                    else if (item.Key == ManuFacePlateRepairButJobReturnTypeEnum.RepairEndJobService.ToString())
-                    {
-                        if (!list.Contains(ManuFacePlateRepairButJobReturnTypeEnum.RepairEndJobService))
-                            list.Add(ManuFacePlateRepairButJobReturnTypeEnum.RepairEndJobService);
-                    }
-                    else
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES17321)).WithData("key", item.Key);
-                    }
+                    if (!list.Contains(ManuFacePlateRepairButJobReturnTypeEnum.RepairStartJobService))
+                        list.Add(ManuFacePlateRepairButJobReturnTypeEnum.RepairStartJobService);
                 }
-
-                return list;
+                else if (item.Key == ManuFacePlateRepairButJobReturnTypeEnum.RepairEndJobService.ToString())
+                {
+                    if (!list.Contains(ManuFacePlateRepairButJobReturnTypeEnum.RepairEndJobService))
+                        list.Add(ManuFacePlateRepairButJobReturnTypeEnum.RepairEndJobService);
+                }
+                else
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES17321)).WithData("key", item.Key);
+                }
             }
-            catch (Exception ex)
-            {
 
-                throw;
-            }
+            return list;
 
             #endregion
         }
@@ -566,6 +559,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                         validationFailures.Add(validationFailure);
                         continue;
                     }
+
+                }
+
+                if (item.IsClose == ProductBadRecordStatusEnum.Close)
+                {
                     if (string.IsNullOrWhiteSpace(item.CauseAnalyse))
                     {
                         if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
@@ -600,10 +598,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                         validationFailures.Add(validationFailure);
                         continue;
                     }
-                }
-
-                if (item.IsClose == ProductBadRecordStatusEnum.Close)
-                {
                     updateCommandList.Add(new ManuProductBadRecordUpdateCommand
                     {
                         SiteId = _currentSite.SiteId ?? 0,
