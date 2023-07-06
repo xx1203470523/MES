@@ -366,13 +366,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (data.UpdateQtyByIdCommands.Any())
             {
                 //tasks.Add(_manuFeedingRepository.UpdateQtyByIdAsync(data.UpdateQtyByIdCommands));
-
-                /*
-                foreach (var item in data.UpdateQtyByIdCommands)
-                {
-                    responseBo.Rows += await _manuFeedingRepository.UpdateQtyByIdAsync(item);
-                }
-                */
                 responseBo.Rows += await _manuFeedingRepository.UpdateQtyByIdAsync(data.UpdateQtyByIdCommands);
 
                 // 未更新到全部需更新的数据，事务回滚
