@@ -6,7 +6,9 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Services.Job;
+using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
@@ -19,6 +21,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.Extensions.DependencyInjection;
+using OfficeOpenXml.ConditionalFormatting;
 
 namespace Hymson.MES.Services.Services.Integrated
 {
@@ -43,7 +46,7 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly AbstractValidator<InteJobModifyDto> _validationModifyRules;
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
-
+        private readonly IExecuteJobService<JobBaseBo> _executeJobService;
         /// <summary>
         /// 作业表服务
         /// </summary>
@@ -56,6 +59,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="serviceProvider"></param>
         public InteJobService(IInteJobRepository inteJobRepository,
             IInteJobBusinessRelationRepository jobBusinessRelationRepository,
+            IExecuteJobService<JobBaseBo> executeJobService,
             AbstractValidator<InteJobCreateDto> validationCreateRules, AbstractValidator<InteJobModifyDto> validationModifyRules, ICurrentUser currentUser, ICurrentSite currentSite, IServiceProvider serviceProvider)
         {
             _inteJobRepository = inteJobRepository;
@@ -65,6 +69,7 @@ namespace Hymson.MES.Services.Services.Integrated
             _currentUser = currentUser;
             _currentSite = currentSite;
             _serviceProvider = serviceProvider;
+            _executeJobService= executeJobService;
         }
 
         /// <summary>
@@ -74,6 +79,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task<PagedInfo<InteJobDto>> GetPageListAsync(InteJobPagedQueryDto pram)
         {
+           //await _executeJobService.ExecuteAsync(new List<JobBo> { new JobBo { Name= "BarcodeReceiveService" }, new JobBo { Name = "InStationJobService" } }, new JobRequestBo { SFCs = new List<string> { "test000011" }, SiteId = 123456});
             var inteJobPagedQuery = pram.ToQuery<InteJobPagedQuery>();
             inteJobPagedQuery.SiteId = _currentSite.SiteId;
             var pagedInfo = await _inteJobRepository.GetPagedInfoAsync(inteJobPagedQuery);

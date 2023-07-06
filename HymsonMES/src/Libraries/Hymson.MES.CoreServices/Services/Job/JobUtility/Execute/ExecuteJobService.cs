@@ -50,7 +50,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
             {
                 var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
                 if (service == null) continue;
-                await param.Proxy.GetValueAsync(service.DataAssemblingAsync<T>, param);
+                await param.Proxy.SetDataBaseValueAsync(service.DataAssemblingAsync<T>, param);
             }
 
             // 执行入库
