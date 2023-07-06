@@ -180,39 +180,40 @@ namespace Hymson.MES.Services.Services.Manufacture
                 FacePlateButtonId = manuFacePlateRepairExJobDto.FacePlateButtonId
             };
 
-            Dictionary<string, string> dic = new Dictionary<string, string>
-            {
-                { "SFC", manuFacePlateRepairExJobDto.SFC },
-                { "ProcedureId", $"{manuFacePlateRepairExJobDto.ProcedureId}" },
-                { "ResourceId", $"{manuFacePlateRepairExJobDto.ResourceId}" }
-            };
-            jobDto.Param = dic;
-            //var sfcs = new List<string>() { manuFacePlateRepairExJobDto.SFC };
-            //RepairStartRequestBo bo = new()
+            //Dictionary<string, string> dic = new Dictionary<string, string>
             //{
-            //    SFCs = sfcs,
-            //    ProcedureId = manuFacePlateRepairExJobDto.ProcedureId,
-            //    ResourceId = manuFacePlateRepairExJobDto.ResourceId,
-            //    SiteId = _currentSite.SiteId ?? 0,
-            //    UserName = _currentUser.UserName
+            //    { "SFC", manuFacePlateRepairExJobDto.SFC },
+            //    { "ProcedureId", $"{manuFacePlateRepairExJobDto.ProcedureId}" },
+            //    { "ResourceId", $"{manuFacePlateRepairExJobDto.ResourceId}" }
             //};
+            //jobDto.Param = dic;
+            var sfcs = new List<string>() { manuFacePlateRepairExJobDto.SFC };
+            JobRequestBo bo = new()
+            {
+                SFCs = sfcs,
+                ProcedureId = manuFacePlateRepairExJobDto.ProcedureId,
+                ResourceId = manuFacePlateRepairExJobDto.ResourceId,
+                SiteId = _currentSite.SiteId ?? 0,
+                UserName = _currentUser.UserName
+            };
             // 调用作业
-            var resJob = await _manuFacePlateButtonService.ClickAsync(jobDto);
-            //var resJob = await _manuFacePlateButtonService.NewClickAsync(jobDto, bo);
+            //var resJob = await _manuFacePlateButtonService.ClickAsync(jobDto);
+
+            var resJob = await _manuFacePlateButtonService.NewClickAsync(jobDto, bo);
             if (resJob == null || resJob.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES17320));
 
             var list = new List<ManuFacePlateRepairButJobReturnTypeEnum>();
             foreach (var item in resJob)
             {
-                if (item.Key == ManuFacePlateRepairButJobReturnTypeEnum.JobManuRepairStartService.ToString())
+                if (item.Key == ManuFacePlateRepairButJobReturnTypeEnum.RepairStartJobService.ToString())
                 {
-                    if (!list.Contains(ManuFacePlateRepairButJobReturnTypeEnum.JobManuRepairStartService))
-                        list.Add(ManuFacePlateRepairButJobReturnTypeEnum.JobManuRepairStartService);
+                    if (!list.Contains(ManuFacePlateRepairButJobReturnTypeEnum.RepairStartJobService))
+                        list.Add(ManuFacePlateRepairButJobReturnTypeEnum.RepairStartJobService);
                 }
-                else if (item.Key == ManuFacePlateRepairButJobReturnTypeEnum.JobManuRepairEndService.ToString())
+                else if (item.Key == ManuFacePlateRepairButJobReturnTypeEnum.RepairEndJobService.ToString())
                 {
-                    if (!list.Contains(ManuFacePlateRepairButJobReturnTypeEnum.JobManuRepairEndService))
-                        list.Add(ManuFacePlateRepairButJobReturnTypeEnum.JobManuRepairEndService);
+                    if (!list.Contains(ManuFacePlateRepairButJobReturnTypeEnum.RepairEndJobService))
+                        list.Add(ManuFacePlateRepairButJobReturnTypeEnum.RepairEndJobService);
                 }
                 else
                 {
@@ -221,6 +222,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             return list;
+
             #endregion
         }
 
@@ -557,6 +559,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                         validationFailures.Add(validationFailure);
                         continue;
                     }
+
+                }
+
+                if (item.IsClose == ProductBadRecordStatusEnum.Close)
+                {
                     if (string.IsNullOrWhiteSpace(item.CauseAnalyse))
                     {
                         if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
@@ -591,10 +598,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                         validationFailures.Add(validationFailure);
                         continue;
                     }
-                }
-
-                if (item.IsClose == ProductBadRecordStatusEnum.Close)
-                {
                     updateCommandList.Add(new ManuProductBadRecordUpdateCommand
                     {
                         SiteId = _currentSite.SiteId ?? 0,

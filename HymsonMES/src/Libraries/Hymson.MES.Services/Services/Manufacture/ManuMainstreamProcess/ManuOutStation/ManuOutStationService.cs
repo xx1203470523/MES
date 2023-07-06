@@ -243,7 +243,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             {
                 // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
                 decimal residue = materialBo.Usages;
-                if (materialBo.Loss.HasValue == true && materialBo.Loss > 0) residue *= (materialBo.Loss.Value / 100);
+                if (materialBo.Loss.HasValue == true && materialBo.Loss > 0) residue *= materialBo.Loss.Value;
                 if (materialBo.ConsumeRatio > 0) residue *= (materialBo.ConsumeRatio / 100);
 
                 // 收集方式是批次

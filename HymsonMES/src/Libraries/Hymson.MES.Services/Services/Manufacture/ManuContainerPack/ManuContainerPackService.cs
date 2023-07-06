@@ -10,6 +10,7 @@ using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -442,7 +443,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="manuFacePlateContainerPackExJobDto"></param>
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
-        public async Task<Dictionary<string, JobResponseDto>> ExecuteJobAsync(ManuFacePlateContainerPackExJobDto manuFacePlateContainerPackExJobDto)
+        public async Task<Dictionary<string, JobResponseBo>> ExecuteJobAsync(ManuFacePlateContainerPackExJobDto manuFacePlateContainerPackExJobDto)
         {
             #region  验证数据
             //if (string.IsNullOrWhiteSpace(manuFacePlateContainerPackExJobDto.SFC))
@@ -459,13 +460,24 @@ namespace Hymson.MES.Services.Services.Manufacture
                 FacePlateButtonId = manuFacePlateContainerPackExJobDto.FacePlateButtonId,
                 Param = new Dictionary<string, string>()
             };
-            jobDto.Param?.Add("SFC", manuFacePlateContainerPackExJobDto.SFC);
-            jobDto.Param?.Add("ProcedureId", $"{manuFacePlateContainerPackExJobDto.ProcedureId}");
-            jobDto.Param?.Add("ResourceId", $"{manuFacePlateContainerPackExJobDto.ResourceId}");
-            jobDto.Param?.Add("ContainerId", $"{manuFacePlateContainerPackExJobDto.ContainerId}");
+            //jobDto.Param?.Add("SFC", manuFacePlateContainerPackExJobDto.SFC);
+            //jobDto.Param?.Add("ProcedureId", $"{manuFacePlateContainerPackExJobDto.ProcedureId}");
+            //jobDto.Param?.Add("ResourceId", $"{manuFacePlateContainerPackExJobDto.ResourceId}");
+            //jobDto.Param?.Add("ContainerId", $"{manuFacePlateContainerPackExJobDto.ContainerId}");
+            var sfcs = new List<string>() { manuFacePlateContainerPackExJobDto.SFC };
+            JobRequestBo bo = new()
+            {
+                SFCs = sfcs,
+                ProcedureId = manuFacePlateContainerPackExJobDto.ProcedureId,
+                ResourceId = manuFacePlateContainerPackExJobDto.ResourceId,
+                ContainerId = manuFacePlateContainerPackExJobDto.ContainerId,
+                SiteId = _currentSite.SiteId ?? 0,
+                UserName = _currentUser.UserName
+            };
 
             // 调用作业
-            var resJob = await _manuFacePlateButtonService.ClickAsync(jobDto);
+            var resJob = await _manuFacePlateButtonService.NewClickAsync(jobDto, bo);
+            //var resJob = await _manuFacePlateButtonService.ClickAsync(jobDto);
             if (resJob == null || resJob.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES16709));
             return resJob;
             #endregion
