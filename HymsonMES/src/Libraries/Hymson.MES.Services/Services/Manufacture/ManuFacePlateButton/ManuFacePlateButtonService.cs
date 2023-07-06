@@ -353,9 +353,9 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task<Dictionary<string, JobResponseDto>> NewClickAsync(ButtonRequestDto dto, dynamic bo)
+        public async Task<Dictionary<string, JobResponseBo>> NewClickAsync(ButtonRequestDto dto, dynamic bo)
         {
-            var result = new Dictionary<string, JobResponseDto> { }; // 返回结果
+            var result = new Dictionary<string, JobResponseBo> { }; // 返回结果
 
             // 先检查按钮是否存在
             var button = await _manuFacePlateButtonRepository.GetByIdAsync(dto.FacePlateButtonId)

@@ -77,7 +77,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             // 验证DTO
             await _validationRepairJob.ValidateAndThrowAsync(bo);
-            await Task.CompletedTask;
         }
 
         /// <summary>
@@ -110,7 +109,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 throw new CustomerValidationException(nameof(ErrorCode.MES16336)).WithData("SFC", string.Join(",", sfcProduceActivitys.Select(it => it.SFC).ToArray()));
             }
             //返回
-            return true;
+            return await Task.FromResult(new JobResponseBo { });
         }
 
         /// <summary>

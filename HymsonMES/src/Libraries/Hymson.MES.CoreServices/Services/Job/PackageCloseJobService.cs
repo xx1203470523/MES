@@ -31,7 +31,7 @@ using Hymson.Localization.Services;
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
     /// <summary>
-    /// 包装（打开）
+    /// 包装（关闭）
     /// </summary>
     [Job("包装", JobTypeEnum.Standard)]
     public class PackageCloseJobService : IJobService
@@ -149,7 +149,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             responseBo.Rows += await _manuContainerBarcodeRepository.UpdateStatusAsync(data.ManuContainerBarcode);
 
-            return responseBo;
+            return new JobResponseBo { Content = data.Content, Message = data.Message, Rows = responseBo.Rows, Time = data.Time };
         }
 
     }
