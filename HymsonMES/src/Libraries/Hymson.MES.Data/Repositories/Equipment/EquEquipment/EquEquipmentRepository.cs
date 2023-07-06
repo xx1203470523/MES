@@ -9,7 +9,6 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using Org.BouncyCastle.Crypto;
 
 namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
 {

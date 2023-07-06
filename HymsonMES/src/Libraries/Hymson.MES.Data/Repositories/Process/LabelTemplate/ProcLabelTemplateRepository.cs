@@ -13,7 +13,6 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using Org.BouncyCastle.Crypto;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
