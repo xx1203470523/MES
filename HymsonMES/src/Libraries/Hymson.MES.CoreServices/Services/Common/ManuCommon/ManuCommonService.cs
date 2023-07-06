@@ -10,10 +10,7 @@ using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
-using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Warehouse;
-using Hymson.Sequences;
 using System.Data;
 using System.Text.Json;
 
@@ -87,6 +84,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
 
         }
 
+
         /// <summary>
         /// 批量验证条码是否锁定
         /// </summary>
@@ -109,14 +107,18 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                 var sfcProduceLockBo = JsonSerializer.Deserialize<SfcProduceLockBo>(item.BusinessContent);
                 if (sfcProduceLockBo == null) continue;
 
-                // 即时锁
-                if (sfcProduceLockBo.Lock != QualityLockEnum.InstantLock) continue;
-
-                // 将来锁
-                if (sfcProduceLockBo.Lock != QualityLockEnum.FutureLock) continue;
-
-                // 如果锁的不是目标工序，就跳过
-                if (procedureBo.ProcedureId.HasValue && sfcProduceLockBo.LockProductionId != procedureBo.ProcedureId) continue;
+                switch (sfcProduceLockBo.Lock)
+                {
+                    case QualityLockEnum.InstantLock:
+                        break;
+                    case QualityLockEnum.FutureLock:
+                        // 如果锁的不是目标工序，就跳过
+                        if (procedureBo.ProcedureId.HasValue && sfcProduceLockBo.LockProductionId != procedureBo.ProcedureId) continue;
+                        break;
+                    case QualityLockEnum.Unlock:
+                    default:
+                        break;
+                }
 
                 validationFailures.Add(new ValidationFailure
                 {

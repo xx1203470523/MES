@@ -429,6 +429,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             var rowArray = await Task.WhenAll(tasks);
             responseBo.Rows += rowArray.Sum();
+
+            // 表示是尾工序
+            responseBo.Content = new Dictionary<string, string> { { "IsLastProcedure", $"{data.IsCompleted}" } };
             //trans.Complete();
 
             return responseBo;

@@ -671,6 +671,7 @@
         public const string MES16346 = "打开成功！";
         public const string MES16347 = "该容器已经打开！";
         public const string MES16348 = "条码{0}已于NF排队！";
+        public const string MES16349 = "条码{0}出站完成！";
         #endregion
 
         #region 生产
