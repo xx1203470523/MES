@@ -9,15 +9,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
     /// @author wangkeming
     /// @date 2023-02-11 04:45:25
     /// </summary>
-    public interface IManuGenerateBarcodeService
+    public interface IManuGenerateBarcodeExampleService
     {
-        /// <summary>
-        /// 生成流水号
-        /// </summary>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        Task<IEnumerable<string>> GenerateBarCodeSerialNumberAsync(BarCodeSerialNumberBo param);
-
         /// <summary>
         /// 条码生成
         /// </summary>
@@ -33,7 +26,5 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         /// <returns></returns>
         /// <exception cref="BusinessException">未找到生成规则</exception>
         Task<IEnumerable<string>> GenerateBarcodeListAsync(CodeRuleDto param);
-
-
     }
 }

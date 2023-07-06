@@ -7,6 +7,9 @@ using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode;
+using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
+using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Plan;
@@ -14,14 +17,10 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
-using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
-using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCreateBarcodeDto;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
-using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCreateBarcode;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using System.Collections.Generic;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Plan
@@ -313,8 +312,10 @@ namespace Hymson.MES.Services.Services.Plan
             using var ts = TransactionHelper.GetTransactionScope(TransactionScopeOption.Suppress);
             if (param.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)
             {
-                await _manuCreateBarcodeService.CreateBarcodeByOldMESSFCAsync(new CreateBarcodeByOldMesSFCDto
+                await _manuCreateBarcodeService.CreateBarcodeByOldMESSFCAsync(new CreateBarcodeByOldMesSFCBo
                 {
+                    SiteId=_currentSite.SiteId??0,
+                    UserName=_currentUser.UserName,
                     WorkOrderId = param.WorkOrderId,
                     OldSFCs = barcodeList
                 });
@@ -328,8 +329,10 @@ namespace Hymson.MES.Services.Services.Plan
             }
             else
             {
-                await _manuCreateBarcodeService.CreateBarcodeByExternalSFCAsync(new CreateBarcodeByExternalSFCDto
+                await _manuCreateBarcodeService.CreateBarcodeByExternalSFCAsync(new CreateBarcodeByExternalSFCBo
                 {
+                    SiteId = _currentSite.SiteId ?? 0,
+                    UserName = _currentUser.UserName,
                     WorkOrderId = param.WorkOrderId,
                     ExternalSFCs = barcodeList
                 });

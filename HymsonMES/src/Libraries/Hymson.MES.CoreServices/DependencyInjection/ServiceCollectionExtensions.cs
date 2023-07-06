@@ -6,6 +6,8 @@ using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.CoreServices.Services.Job.JobUtility;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
+using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
+using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.CoreServices.Services.NewJob;
 using Hymson.MES.Services.Validators.Equipment;
 using Microsoft.Extensions.Configuration;
@@ -38,6 +40,8 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddServices(this IServiceCollection services)
         {
+            services.AddSingleton<IManuCreateBarcodeService, ManuCreateBarcodeService>();
+            services.AddSingleton<IManuGenerateBarcodeService, ManuGenerateBarcodeService>();
             services.AddSingleton<IManuCommonService, ManuCommonService>();
             services.AddSingleton<IMasterDataService, MasterDataService>();
             services.AddSingleton<IJobCommonService, JobCommonService>();

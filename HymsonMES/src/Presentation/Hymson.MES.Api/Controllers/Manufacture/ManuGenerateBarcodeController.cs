@@ -13,8 +13,8 @@ namespace Hymson.MES.Api.Controllers.Manufacture
     [Route("api/v1/[controller]")]
     public class ManuGenerateBarcodeController : ControllerBase
     {
-        private readonly IManuGenerateBarcodeService _manuGenerateBarcodeService;
-        public ManuGenerateBarcodeController(IManuGenerateBarcodeService manuGenerateBarcodeService)
+        private readonly IManuGenerateBarcodeExampleService _manuGenerateBarcodeService;
+        public ManuGenerateBarcodeController(IManuGenerateBarcodeExampleService manuGenerateBarcodeService)
         {
             _manuGenerateBarcodeService = manuGenerateBarcodeService;
         }
@@ -30,7 +30,6 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         {
             return await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(parm);
         }
-
 
         /// <summary>
         /// 生成条码

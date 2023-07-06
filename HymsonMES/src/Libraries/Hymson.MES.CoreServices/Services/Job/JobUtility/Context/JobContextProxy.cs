@@ -1,4 +1,6 @@
-﻿using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
+﻿using Google.Protobuf.WellKnownTypes;
+using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
+using Org.BouncyCastle.Tls.Crypto;
 using System.Collections.Concurrent;
 
 namespace Hymson.MES.CoreServices.Services.Job.JobUtility
@@ -33,7 +35,6 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             }
         }
 
-
         /// <summary>
         /// 获取字典Key
         /// </summary>
@@ -41,6 +42,71 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         public ICollection<uint> GetKeys()
         {
             return dictionary.Keys;
+        }
+
+        /// <summary>
+        /// 取值
+        /// </summary>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        public JobContextData<T> GtContextDataValue<T>(T parameters) 
+        {
+            var cacheKey = (uint)$"{parameters?.GetType()}".GetHashCode();
+
+            if (Has(cacheKey))
+            {
+                var cacheObj = Get(cacheKey);
+                if (cacheObj == null) return default;
+                
+                return new  JobContextData<T> (true,(T)cacheObj);
+            }
+
+            uint hash = cacheKey % (uint)_semaphores.Length;
+            _semaphores[hash].Wait();
+            try
+            {
+                if (parameters != null)
+                {
+                    Set(cacheKey, parameters);
+                    return new JobContextData<T>(true, parameters);
+                }
+                else
+                {
+                    return new JobContextData<T>(false, parameters); 
+                }
+            }
+            finally
+            {
+                _semaphores[hash].Release();
+            }
+        }
+
+        /// <summary>
+        /// 设置值
+        /// </summary>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        public T? SetValue<T>(T parameters) where T : new()
+        {
+            var cacheKey = (uint)$"{parameters?.GetType()}".GetHashCode();
+            uint hash = cacheKey % (uint)_semaphores.Length;
+            _semaphores[hash].Wait();
+            try
+            {
+                if (parameters != null)
+                {
+                    Set(cacheKey, parameters);
+                    return parameters;
+                }
+                else
+                {
+                    return new T();
+                }
+            }
+            finally
+            {
+                _semaphores[hash].Release();
+            }
         }
 
         /// <summary>
@@ -76,6 +142,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                 _semaphores[hash].Release();
             }
         }
+
 
         /// <summary>
         /// 取值
@@ -164,7 +231,24 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             dictionary.Clear();
             GC.SuppressFinalize(this);
         }
+    }
 
+    public class JobContextData<T> 
+    {
+        public JobContextData(bool hasKey, T value)
+        {
+            this.HasKey = hasKey;
+            this.Value = value;
+        }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool HasKey { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public T Value { get; set; }
     }
 }
