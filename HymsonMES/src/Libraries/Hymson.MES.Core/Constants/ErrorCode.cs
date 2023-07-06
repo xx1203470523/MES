@@ -672,6 +672,7 @@
         public const string MES16347 = "该容器已经打开！";
         public const string MES16348 = "条码{0}已于NF排队！";
         public const string MES16349 = "条码{0}出站完成！";
+        public const string MES16350 = "工单状态为完工，不允许再对工单投入！";
         #endregion
 
         #region 生产
