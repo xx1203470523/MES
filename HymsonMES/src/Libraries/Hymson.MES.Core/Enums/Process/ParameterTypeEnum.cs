@@ -20,9 +20,9 @@ namespace Hymson.MES.Core.Enums
         [Description("环境")]
         Environment = 4,
         /// <summary>
-        /// IQC
+        /// 质量
         /// </summary>
-        [Description("IQC")]
+        [Description("质量")]
         IQC = 8,
     }
 
@@ -72,44 +72,44 @@ namespace Hymson.MES.Core.Enums
         [Description("设备+产品+环境")]
         Equ_Pro_Env = 7,
         /// <summary>
-        /// IQC
+        /// 质量
         /// </summary>
-        [Description("IQC")]
+        [Description("质量")]
         IQC = 8,
         /// <summary>
-        /// 设备+IQC
+        /// 设备+质量
         /// </summary>
-        [Description("设备+IQC")]
+        [Description("设备+质量")]
         Equ_IQC = 9,
         /// <summary>
-        /// 产品+IQC
+        /// 产品+质量
         /// </summary>
-        [Description("产品+IQC")]
+        [Description("产品+质量")]
         Pro_IQC = 10,
         /// <summary>
-        /// 设备+产品+IQC
+        /// 设备+产品+质量
         /// </summary>
-        [Description("设备+产品+IQC")]
+        [Description("设备+产品+质量")]
         Equ_Pro_IQC = 11,
         /// <summary>
-        /// 环境+IQC
+        /// 环境+质量
         /// </summary>
-        [Description("环境+IQC")]
+        [Description("环境+质量")]
         Env_IQC = 12,
         /// <summary>
-        /// 设备+环境+IQC
+        /// 设备+环境+质量
         /// </summary>
-        [Description("设备+环境+IQC")]
+        [Description("设备+环境+质量")]
         Equ_Env_IQC = 13,
         /// <summary>
-        /// 产品+环境+IQC
+        /// 产品+环境+质量
         /// </summary>
-        [Description("产品+环境+IQC")]
+        [Description("产品+环境+质量")]
         Pro_Env_IQC = 14,
         /// <summary>
-        /// 设备+产品+环境+IQC
+        /// 设备+产品+环境+质量
         /// </summary>
-        [Description("设备+产品+环境+IQC")]
+        [Description("设备+产品+环境+质量")]
         Equ_Pro_Env_IQC = 15,
     }
 }
