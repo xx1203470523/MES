@@ -647,7 +647,7 @@
         public const string MES16320 = "工单{ordercode}状态不为已下达|生产中，无法继续操作。";
         public const string MES16321 = "物料{Code}未添加组件，请检查";
         public const string MES16322 = "SFC条码{SFC}已报废，不允许操作。";
-        public const string MES16323 = "未添加组件，请检查";
+        public const string MES16323 = "物料未添加组件，请检查";
         public const string MES16324 = "存在已报废SFC条码，不允许操作。";
         public const string MES16325 = "存在已锁定SFC条码，不允许操作。";
         public const string MES16326 = "存在SFC状态不是{Status}状态，不允许操作。";
@@ -672,6 +672,8 @@
         public const string MES16347 = "该容器已经打开！";
         public const string MES16348 = "条码{0}已于NF排队！";
         public const string MES16349 = "条码{0}出站完成！";
+        public const string MES16350 = "工单状态为完工，不允许再对工单投入！";
+        public const string MES16351 = "条码{0}完成，已于{1}排队！";
         #endregion
 
         #region 生产

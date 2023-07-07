@@ -109,17 +109,25 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
 
             // 判断是否尾工序
             var isLastProcedure = false;
-            var currentResponse = result.FirstOrDefault(f => f.Key == "IsLastProcedure").Value;
-            if (currentResponse != null)
+            var nextProcedureCode = "";
+            foreach (var item in result)
             {
-                isLastProcedure = currentResponse.Content["IsLastProcedure"].ParseToBool();
+                var content = item.Value.Content;
+                if (item.Key == "OutStationJobService" && content != null && content.Any())
+                {
+                    isLastProcedure = content["IsLastProcedure"].ParseToBool();
+                    nextProcedureCode = content["NextProcedureCode"];
+                }
             }
 
             //defaultDto.Message = $"条码{param["SFC"]}完成，已于NF排队！";
-            defaultDto.Message = _localizationService.GetResource(nameof(ErrorCode.MES16341), param["SFC"]);
             if (isLastProcedure)
             {
                 defaultDto.Message = _localizationService.GetResource(nameof(ErrorCode.MES16349), param["SFC"]);
+            }
+            else
+            {
+                defaultDto.Message = _localizationService.GetResource(nameof(ErrorCode.MES16351), param["SFC"], nextProcedureCode);
             }
 
             return defaultDto;

@@ -61,6 +61,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSingleton<IJobService, PackageIngJobService>();
             services.AddSingleton<IJobService, PackageOpenJobService>();
             services.AddSingleton<IJobService, PackageCloseJobService>();
+            services.AddSingleton<IJobService, BarcodeReceiveService>();
             services.AddSingleton(typeof(IExecuteJobService<>), typeof(ExecuteJobService<>));
             //services.AddSingleton<ExecuteJobService<OutStationRequestBo>, ExecuteJobService<OutStationRequestBo>>();
 

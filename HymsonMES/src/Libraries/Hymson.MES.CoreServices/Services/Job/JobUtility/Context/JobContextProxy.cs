@@ -1,7 +1,11 @@
 ﻿using Google.Protobuf.WellKnownTypes;
+using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
+using MySqlX.XDevAPI.Common;
 using Org.BouncyCastle.Tls.Crypto;
 using System.Collections.Concurrent;
+using System.Linq;
 
 namespace Hymson.MES.CoreServices.Services.Job.JobUtility
 {
@@ -45,11 +49,76 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         }
 
         /// <summary>
+        /// 设置作业中入库数据缓存
+        /// </summary>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        public async Task<TResult?> SetDataBaseValueAsync<T, TResult>(Func<T, Task<TResult>> func, T parameters)
+        {
+            var obj = await GetValueAsync<T, TResult>(func, parameters);
+            if (obj == null) return default;
+
+            foreach (var po in obj.GetType().GetProperties())
+            {
+                var cacheKey = (uint)$"{po.PropertyType}".GetHashCode();
+                var value = po.GetValue(obj);
+                if (value != null)
+                {
+                    Set(cacheKey, value);
+                }
+            }
+            return (TResult)obj;
+        }
+
+        /// <summary>
+        /// 获取作业中入库的数据缓存
+        /// </summary>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<TResult>?> GetDataBaseValueAsync<T, TResult>(Func<T, Task<IEnumerable<TResult>>> func, T parameters, int expectCount = 0) where TResult : BaseEntity
+        {
+            var name = typeof(IEnumerable<TResult>);
+            var cacheKey = (uint)$"{typeof(IEnumerable<TResult>)}".GetHashCode();
+
+            if (Has(cacheKey))
+            {
+                var cacheObj = Get(cacheKey);
+                if (cacheObj == null) return default;
+                var cacheResult = (IEnumerable<TResult>)cacheObj;
+
+                if (expectCount != 0 && cacheResult.Count() < expectCount)
+                {
+                    var obj = await GetValueAsync<T, IEnumerable<TResult>>(func, parameters);
+                    if (obj != null)
+                    {
+                        cacheResult.Concat(obj.Where(x => !cacheResult.Any(o => o.Id == x.Id)));
+                        Set(cacheKey, cacheResult);
+                    }
+                }
+                return (IEnumerable<TResult>)cacheResult;
+            }
+
+            uint hash = cacheKey % (uint)_semaphores.Length;
+            _semaphores[hash].Wait();
+            try
+            {
+                var obj = await GetValueAsync<T, IEnumerable<TResult>>(func, parameters);
+                if (obj == null) return default;
+                Set(cacheKey, obj);
+                return obj;
+            }
+            finally
+            {
+                _semaphores[hash].Release();
+            }
+        }
+
+        /// <summary>
         /// 取值
         /// </summary>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public JobContextData<T> GtContextDataValue<T>(T parameters) 
+        public JobContextData<T> GtContextDataValue<T>(T parameters)
         {
             var cacheKey = (uint)$"{parameters?.GetType()}".GetHashCode();
 
@@ -57,8 +126,8 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             {
                 var cacheObj = Get(cacheKey);
                 if (cacheObj == null) return default;
-                
-                return new  JobContextData<T> (true,(T)cacheObj);
+
+                return new JobContextData<T>(true, (T)cacheObj);
             }
 
             uint hash = cacheKey % (uint)_semaphores.Length;
@@ -72,7 +141,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                 }
                 else
                 {
-                    return new JobContextData<T>(false, parameters); 
+                    return new JobContextData<T>(false, parameters);
                 }
             }
             finally
@@ -233,7 +302,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         }
     }
 
-    public class JobContextData<T> 
+    public class JobContextData<T>
     {
         public JobContextData(bool hasKey, T value)
         {

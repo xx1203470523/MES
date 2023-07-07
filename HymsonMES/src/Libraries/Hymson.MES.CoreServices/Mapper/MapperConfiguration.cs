@@ -32,6 +32,7 @@ namespace Hymson.MES.CoreServices.Mapper
             CreateMap<JobRequestBo, PackageIngRequestBo>();
             CreateMap<JobRequestBo, PackageOpenRequestBo>();
             CreateMap<JobRequestBo, PackageCloseRequestBo>();
+            CreateMap<JobRequestBo, BarcodeSfcReceiveBo>();
         }
 
         /// <summary>

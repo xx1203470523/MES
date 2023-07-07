@@ -35,7 +35,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 是否完工
         /// </summary>
-        public bool IsCompleted { get; set; }
+        public bool IsCompleted { get; set; } = true;
 
         /// <summary>
         /// 
@@ -92,6 +92,10 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// </summary>
         public ProcessRouteTypeEnum ProcessRouteType { get; set; }
 
+        /// <summary>
+        /// 下一工序编码
+        /// </summary>
+        public string NextProcedureCode { get; set; } = "";
 
     }
 }

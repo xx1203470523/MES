@@ -165,7 +165,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 合格品出站
             // 获取下一个工序（如果没有了，就表示完工）
             var nextProcedure = await bo.Proxy.GetValueAsync(_masterDataService.GetNextProcedureAsync, firstProduceEntity);
-            responseBo.IsCompleted = nextProcedure == null;
+            if (nextProcedure != null)
+            {
+                responseBo.IsCompleted = false;
+                responseBo.NextProcedureCode = nextProcedure.Code;
+            }
 
             // 扣料
             //await func(sfcProduceEntity.ProductBOMId, sfcProduceEntity.ProcedureId);
@@ -431,7 +435,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             responseBo.Rows += rowArray.Sum();
 
             // 表示是尾工序
-            responseBo.Content = new Dictionary<string, string> { { "IsLastProcedure", $"{data.IsCompleted}" } };
+            responseBo.Content = new Dictionary<string, string> {
+                { "IsLastProcedure", $"{data.IsCompleted}" },
+                { "NextProcedureCode", $"{data.NextProcedureCode}" },
+            };
             //trans.Complete();
 
             return responseBo;
