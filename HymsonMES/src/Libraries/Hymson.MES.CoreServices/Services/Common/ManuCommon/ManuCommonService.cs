@@ -11,11 +11,8 @@ using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
-using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
-using Hymson.MES.Data.Repositories.Warehouse;
-using Hymson.Sequences;
 using System.Data;
 using System.Text.Json;
 
@@ -93,7 +90,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             _manuContainerPackRepository = manuContainerPackRepository;
             _procBomDetailRepository = procBomDetailRepository;
             _procMaterialRepository = procMaterialRepository;
-            _procMaskCodeRuleRepository= procMaskCodeRuleRepository;
+            _procMaskCodeRuleRepository = procMaskCodeRuleRepository;
         }
 
         /// <summary>
@@ -188,11 +185,10 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                 ProcedureId = procedureBomBo.ProcedureId,
                 IsDisassemble = TrueOrFalseEnum.No
             });
-            if (sfcCirculationEntities == null || !sfcCirculationEntities.Any())
+
+            if (procBomDetailEntities.Any() && sfcCirculationEntities == null || sfcCirculationEntities.Any() == false)
             {
-                // TODO 这里存在需要组装却未组装的漏网之鱼
-                return;
-                //throw new CustomerValidationException(nameof(ErrorCode.MES16323));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16323));
             }
 
             // 根据物料分组
@@ -200,7 +196,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             foreach (var item in procBomDetailDictionary)
             {
                 // 检查每个物料是否已经满足BOM用量要求（这里可以优化下）
-                var currentQty = sfcCirculationEntities.Where(w => w.CirculationMainProductId == item.Key)
+                var currentQty = sfcCirculationEntities?.Where(w => w.CirculationMainProductId == item.Key)
                     .Sum(s => s.CirculationQty);
 
                 // 目标用量
