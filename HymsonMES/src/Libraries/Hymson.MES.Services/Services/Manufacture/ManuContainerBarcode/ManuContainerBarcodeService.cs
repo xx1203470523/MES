@@ -12,7 +12,9 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
+using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer;
@@ -787,7 +789,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     var entityByRelation1 = await _inteContainerRepository.GetByRelationIdAsync(new InteContainerQuery
                     {
                         DefinitionMethod = DefinitionMethodEnum.MaterialGroup,
-                         MaterialId = productId,
+                        MaterialId = productId,
                         MaterialGroupId = material.GroupId,
                         Status = SysDataStatusEnum.Enable,
                         Level = (LevelEnum)level
@@ -874,8 +876,10 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16735)).WithData("product", material?.MaterialCode ?? "");
             }
-            var barcodeList = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new GenerateBarcodeDto
+            var barcodeList = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new GenerateBarcodeBo
             {
+                SiteId = _currentSite.SiteId ?? 0,
+                UserName = _currentUser.UserName,
                 CodeRuleId = inteCodeRulesEntity.Id,
                 Count = 1
             });

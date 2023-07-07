@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode;
 using Hymson.Sequences.Enums;
 
 namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGenerateBarcodeDto
@@ -85,26 +86,5 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGene
         public int StartNumber { get; set; }
 
         public IEnumerable<CodeRulesMakeDto> CodeRulesMakeList { get; set; }
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public class CodeRulesMakeDto
-    {
-        /// <summary>
-        /// 序号
-        /// </summary>
-        public int Seq { get; set; }
-
-        /// <summary>
-        /// 取值方式;1：固定值；2：可变值；
-        /// </summary>
-        public CodeValueTakingTypeEnum ValueTakingType { get; set; }
-
-        /// <summary>
-        /// 分段值
-        /// </summary>
-        public string SegmentedValue { get; set; }
     }
 }

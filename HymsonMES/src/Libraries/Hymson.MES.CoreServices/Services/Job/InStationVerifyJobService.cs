@@ -6,7 +6,6 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
@@ -100,12 +99,27 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (firstProduceEntity == null) return;
 
             // 获取生产工单（附带工单状态校验）
-            _ = await bo.Proxy.GetValueAsync(async parameters =>
+            var planWorkOrderEntity = await bo.Proxy.GetValueAsync(async parameters =>
             {
                 long workOrderId = (long)parameters[0];
                 bool isVerifyActivation = parameters.Length <= 1 || (bool)parameters[1];
                 return await _masterDataService.GetProduceWorkOrderByIdAsync(workOrderId, isVerifyActivation);
             }, new object[] { firstProduceEntity.WorkOrderId, true });
+
+            // 当工单已激活且完工状态，且条码处于工艺路线的首工序，进站时，提示“工单状态为完工，不允许再对工单投入”
+            if (planWorkOrderEntity?.Status == PlanWorkOrderStatusEnum.Finish)
+            {
+                // 检查是否首工序
+                var isFirstProcedure = await bo.Proxy.GetValueAsync(async parameters =>
+                {
+                    var processRouteId = (long)parameters[0];
+                    var procedureId = (long)parameters[1];
+                    return await _masterDataService.IsFirstProcedureAsync(processRouteId, procedureId);
+                }, new object[] { firstProduceEntity.ProcessRouteId, firstProduceEntity.ProcedureId });
+
+                // 因为获取工单方法已经对激活状态做了校验，这里不需要再校验
+                if (isFirstProcedure) throw new CustomerValidationException(nameof(ErrorCode.MES16350));
+            }
 
             // 如果工序对应不上
             if (firstProduceEntity.ProcedureId != bo.ProcedureId)

@@ -16,4 +16,8 @@
     <ProjectReference Include="..\Hymson.MES.Data\Hymson.MES.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\Manufacture\ManuBarcodeReceive\" />
+  </ItemGroup>
+
 </Project>

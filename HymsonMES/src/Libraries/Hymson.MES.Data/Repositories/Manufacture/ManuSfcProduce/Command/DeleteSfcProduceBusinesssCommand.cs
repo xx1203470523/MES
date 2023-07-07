@@ -29,7 +29,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
         public long? SiteId { get; set; }
 
         /// <summary>
-        /// 删除条码id
+        /// 删除条码id（大坑：用这个值进行搜索的地方其实是在制品表ID）
         /// </summary>
         public IEnumerable<long> SfcInfoIds { get; set; }
     }

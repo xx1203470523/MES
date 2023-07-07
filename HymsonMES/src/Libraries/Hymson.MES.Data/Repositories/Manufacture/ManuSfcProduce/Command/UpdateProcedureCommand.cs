@@ -18,6 +18,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
         public long Id { get; set; }
 
         /// <summary>
+        /// 状态;1：排队；2：活动；
+        /// </summary>
+        public SfcProduceStatusEnum Status { get; set; }
+
+        /// <summary>
         /// 工序
         /// </summary>
         public long ProcedureId { get; set; }

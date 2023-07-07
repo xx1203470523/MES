@@ -28,5 +28,13 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// <param name="procedureBomBo"></param>
         /// <returns></returns>
         Task VerifyBomQtyAsync(ManuProcedureBomBo procedureBomBo);
+
+        /// <summary>
+        /// 验证条码掩码规则
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <param name="materialId"></param>
+        /// <returns></returns>
+        Task<bool> CheckBarCodeByMaskCodeRuleAsync(string barCode, long materialId);
     }
 }
