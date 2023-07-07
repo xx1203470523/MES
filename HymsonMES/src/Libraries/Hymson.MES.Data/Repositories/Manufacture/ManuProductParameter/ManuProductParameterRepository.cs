@@ -143,7 +143,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var templateData = sqlBuilder.AddTemplate(GetProductParameterPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetProductParameterPagedInfoCountSqlTemplate);
             sqlBuilder.Select("T1.Id,T1.SiteId,T1.ProcedureId,T1.ResourceId,T1.EquipmentId,T1.SFC,T1.WorkOrderId,T1.ProductId,T1.LocalTime," +
-                "T2.ParameterCode,T2.ParameterName,T1.ParamValue,T2.ParameterUnit,T1.CreatedOn,T1.CreatedBy,T1.UpdatedOn,T1.UpdatedBy,T1.StepId,T3.ParameterType");
+                "T2.ParameterCode,T2.ParameterName,T1.ParamValue as ParameterValue,T2.ParameterUnit,T1.CreatedOn,T1.CreatedBy,T1.UpdatedOn,T1.UpdatedBy,T1.StepId,T3.ParameterType");
 
             sqlBuilder.LeftJoin("proc_parameter T2 ON T1.ParameterId = T2.Id AND T2.SiteId=T1.SiteId AND T2.IsDeleted=0");
             sqlBuilder.LeftJoin("proc_parameter_link_type T3 ON T3.ParameterID=T1.ParameterId  AND T3.SiteId=T1.SiteId AND T3.IsDeleted=0");

@@ -1,4 +1,6 @@
+using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Data.Repositories.Process.ProcessRoute.Query;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -13,6 +15,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcProcessRouteDetailNodeEntity> GetByIdAsync(long id);
+
+        /// <summary>
+        /// 分页查询节点明细
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ProcProcessRouteDetailNodeView>> GetPagedInfoAsync(ProcProcessRouteDetailNodePagedQuery query);
 
         /// <summary>
         /// 查询节点明细

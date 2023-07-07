@@ -1,6 +1,8 @@
 using Dapper;
+using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Process.ProcessRoute.Query;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -18,6 +20,42 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             _connectionOptions = connectionOptions.Value;
             _memoryCache = memoryCache;
+        }
+
+        /// <summary>
+        /// 分页查询
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ProcProcessRouteDetailNodeView>> GetPagedInfoAsync(ProcProcessRouteDetailNodePagedQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
+            sqlBuilder.Where("a.IsDeleted=0");
+            /*sqlBuilder.Where("a.SiteId=@SiteId")*/;
+            sqlBuilder.Select("a.*,b.Code,b.Name,b.Type");
+            sqlBuilder.LeftJoin("proc_procedure b on a.ProcedureId=b.Id /*AND a.SiteId=b.SiteId*/ AND b.IsDeleted=0");
+            if (query.ProcessRouteId.HasValue)
+            {
+                sqlBuilder.Where("a.ProcessRouteId=@ProcessRouteId");
+            }
+            if (query.ProcedureId.HasValue)
+            {
+                sqlBuilder.Where("a.ProcedureId=@ProcedureId");
+            }
+
+            var offSet = (query.PageIndex - 1) * query.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = query.PageSize });
+            sqlBuilder.AddParameters(query);
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var procProcessRouteDetailNodeViewsTask = conn.QueryAsync<ProcProcessRouteDetailNodeView>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var routeDetailNodeViews = await procProcessRouteDetailNodeViewsTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<ProcProcessRouteDetailNodeView>(routeDetailNodeViews, query.PageIndex, query.PageSize, totalCount);
         }
 
         /// <summary>
@@ -169,6 +207,9 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public partial class ProcProcessRouteDetailNodeRepository
     {
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_process_route_detail_node` a /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_process_route_detail_node` a /**leftjoin**/ /**where**/";
+
         const string GetListSqlTemplate = @"select a.*,b.Code,b.Name,b.Type from proc_process_route_detail_node a left join proc_procedure b on a.ProcedureId=b.Id  /**where**/  ";
 
         const string InsertSql = "INSERT INTO `proc_process_route_detail_node`(  `Id`, `SiteId`, `ProcessRouteId`, `SerialNo`, `ProcedureId`, `CheckType`, `CheckRate`, `IsWorkReport`, `PackingLevel`, `IsFirstProcess`, `Status`, `Extra1`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ProcessRouteId, @SerialNo, @ProcedureId, @CheckType, @CheckRate, @IsWorkReport, @PackingLevel, @IsFirstProcess, @Status, @Extra1, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";

@@ -30,6 +30,7 @@ using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.View;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode.Query;
+using Hymson.MES.Data.Repositories.Process.ProcessRoute.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Process.ResourceType.View;
@@ -590,8 +591,9 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuSfcCirculationEntity, ManuSfcCirculationViewDto>();
             CreateMap<ManuProductPrameterPagedQueryDto, ManuProductParameterPagedQuery>(); 
             CreateMap<ManuProductParameterView, ManuProductParameterViewDto>();
-            CreateMap<ManuSfcStepPagedQuery, ManuSfcStepPagedQueryDto>();
+            CreateMap<ManuSfcStepPagedQueryDto, ManuSfcStepPagedQuery>();
             CreateMap<ManuSfcStepEntity, ManuSfcStepViewDto>();
+            CreateMap<ProcSfcProcessRoutePagedQueryDto, ProcProcessRouteDetailNodePagedQuery>();
             #endregion
 
         }

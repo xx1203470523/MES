@@ -95,6 +95,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetManuSfcStepEntitiesSqlTemplate);
             sqlBuilder.Where("SiteId=@SiteId");
+            sqlBuilder.Select("*");
             if (!string.IsNullOrEmpty(manuSfcStepQuery.SFC))
             {
                 sqlBuilder.Where("SFC=@SFC");

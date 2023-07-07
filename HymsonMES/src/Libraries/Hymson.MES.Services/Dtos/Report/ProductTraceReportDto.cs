@@ -134,6 +134,14 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 合并时绑定位置
         /// </summary>
         public int? Location { get; set; }
+        /// <summary>
+        /// 创建人
+        /// </summary>
+        public string CreatedBy { get; set; }
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime? CreatedOn { get; set; }
     }
     #endregion
 
@@ -239,7 +247,7 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 参数值
         /// </summary>
-        public string ParamValue { get; set; }
+        public string ParameterValue { get; set; }
         /// <summary>
         /// 参数单位
         /// </summary>
@@ -252,6 +260,8 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 参数类型
         /// </summary>
         public ParameterTypeEnum ParameterType { get; set; }
+        public string CreatedBy { get; set; }
+        public DateTime CreatedOn { get; set; }
     }
     #endregion
 
@@ -299,6 +309,30 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 工序名称
         /// </summary>
         public string ProcedureName { get; set; }
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public string ResourceId { get; set; }
+        /// <summary>
+        /// 资源编码
+        /// </summary>
+        public string ResourceCode { get; set; }
+        /// <summary>
+        /// 资源名称
+        /// </summary>
+        public string ResourceName { get; set; }
+        /// <summary>
+        /// 设备ID
+        /// </summary>
+        public long EquipmentId { get; set; }
+        /// <summary>
+        /// 设备编码
+        /// </summary>
+        public string EquipmentCode { get; set; }
+        /// <summary>
+        /// 设备名称
+        /// </summary>
+        public string EquipmentName { get; set; }
 
         /// <summary>
         /// 步骤类型; 跟枚举的对应不上了，具体以枚举的为准
@@ -338,7 +372,7 @@ namespace Hymson.MES.Services.Dtos.Report
     #endregion
 
     #region 生产工艺
-    public class ProcSfcProcessRouteQueryDto
+    public class ProcSfcProcessRoutePagedQueryDto : PagerInfo
     {
         public string SFC { get; set; }
     }

@@ -1,6 +1,7 @@
 ﻿using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
+using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
@@ -13,9 +14,11 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.ProcessRoute.Query;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.Utils;
 using IdGen;
+using System.Drawing.Printing;
 
 namespace Hymson.MES.Services.Services.Report
 {
@@ -183,11 +186,7 @@ namespace Hymson.MES.Services.Services.Report
         public async Task<PagedInfo<ManuProductParameterViewDto>> GetProductPrameterPagedListAsync(ManuProductPrameterPagedQueryDto manuProductPrameterPagedQueryDto)
         {
             var manuProductParameterPagedQuery = manuProductPrameterPagedQueryDto.ToQuery<ManuProductParameterPagedQuery>();
-            //产品参数包含未分类参数，查询SFC参数再排除设备参数
-            if (manuProductParameterPagedQuery.ParameterType == ParameterTypeEnum.Product)
-            {
-                manuProductParameterPagedQuery.ParameterType = null;
-            }
+            manuProductParameterPagedQuery.SiteId = _currentSite.SiteId ?? 0;
             //参数分页查询
             var pagedInfo = await _manuProductParameterRepository.GetManuProductParameterPagedInfoAsync(manuProductParameterPagedQuery);
             //如果查询为产品参数
@@ -254,24 +253,53 @@ namespace Hymson.MES.Services.Services.Report
         {
             //查询条码所有步骤数据
             var manuSfcStepPagedQuery = manuSfcStepPagedQueryDto.ToQuery<ManuSfcStepPagedQuery>();
+            manuSfcStepPagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _manuSfcStepRepository.GetPagedInfoAsync(manuSfcStepPagedQuery);
+            //资源信息
+            IEnumerable<ProcResourceEntity> procResources = new List<ProcResourceEntity>();
+            var procResourcesIds = pagedInfo.Data.Select(c => c.ResourceId ?? -1).ToArray();
+            if (procResourcesIds.Any())
+            {
+                procResources = await _procResourceRepository.GetListByIdsAsync(procResourcesIds);
+            }
             //工序信息
             IEnumerable<ProcProcedureEntity> procProcedures = new List<ProcProcedureEntity>();
-            var procProcedureIds = pagedInfo.Data.Select(c => c.ProcedureId ?? -1).ToArray();
+            var procProcedureIds = pagedInfo.Data.Select(c => c.ProcedureId?? -1).ToArray();
             if (procProcedureIds.Any())
             {
                 procProcedures = await _procProcedureRepository.GetByIdsAsync(procProcedureIds);
+            }
+            //设备信息
+            IEnumerable<EquEquipmentEntity> equEquipments = new List<EquEquipmentEntity>();
+            var equEquipmentIds = pagedInfo.Data.Select(c => c.EquipmentId ?? -1).ToArray();
+            if (equEquipmentIds.Any())
+            {
+                equEquipments = await _equipmentRepository.GetByIdsAsync(equEquipmentIds);
             }
             //填充工序信息
             var returnDtos = pagedInfo.Data.Select(s =>
             {
                 var returnView = s.ToModel<ManuSfcStepViewDto>();
+                //资源信息
+                var procResource = procResources.Where(c => c.Id == s.ResourceId).FirstOrDefault();
+                if (procResource != null)
+                {
+                    returnView.ResourceCode = procResource.ResCode;
+                    returnView.ResourceName = procResource.ResName;
+                }
                 //工序信息
                 var procProcedure = procProcedures.Where(c => c.Id == s.ProcedureId).FirstOrDefault();
                 if (procProcedure != null)
                 {
                     returnView.ProcedureCode = procProcedure.Code;
                     returnView.ProcedureName = procProcedure.Name;
+                }
+                //设备信息
+                var equEquipment = equEquipments.Where(c => c.Id == s.EquipmentId).FirstOrDefault();
+                if (equEquipment != null)
+                {
+                    returnView.EquipmentCode = equEquipment.EquipmentCode;
+                    returnView.EquipmentName = equEquipment.EquipmentName;
                 }
                 return returnView;
             });
@@ -281,35 +309,38 @@ namespace Hymson.MES.Services.Services.Report
         /// <summary>
         /// 查询生产工艺信息
         /// </summary>
-        /// <param name="procSfcProcessRouteQueryDto"></param>
+        /// <param name="procSfcProcessRoutePagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcSfcProcessRouteViewDto>> GetSfcProcessRouteListAsync(ProcSfcProcessRouteQueryDto procSfcProcessRouteQueryDto)
+        public async Task<PagedInfo<ProcSfcProcessRouteViewDto>> GetSfcProcessRoutePagedListAsync(ProcSfcProcessRoutePagedQueryDto procSfcProcessRoutePagedQueryDto)
         {
+            var procProcessRouteDetailNodeQuery = procSfcProcessRoutePagedQueryDto.ToQuery<ProcProcessRouteDetailNodePagedQuery>();
             IEnumerable<ProcSfcProcessRouteViewDto> procSfcProcessRouteViewDtos = new List<ProcSfcProcessRouteViewDto>();
             //查询条码信息
-            var manuSfcEntity = await _manuSfcRepository.GetBySFCAsync(new GetBySFCQuery { SFC = procSfcProcessRouteQueryDto.SFC, SiteId = _currentSite.SiteId });
+            var manuSfcEntity = await _manuSfcRepository.GetBySFCAsync(new GetBySFCQuery { SFC = procSfcProcessRoutePagedQueryDto.SFC, SiteId = _currentSite.SiteId });
             if (manuSfcEntity == null)
             {
-                return procSfcProcessRouteViewDtos;
+                return new PagedInfo<ProcSfcProcessRouteViewDto>(procSfcProcessRouteViewDtos, procSfcProcessRoutePagedQueryDto.PageIndex, procSfcProcessRoutePagedQueryDto.PageSize, 0);
             }
             var sfcinfo = await _manuSfcInfoRepository.GetBySFCAsync(manuSfcEntity?.Id ?? 0);
             if (sfcinfo == null)
             {
-                return procSfcProcessRouteViewDtos;
+                return new PagedInfo<ProcSfcProcessRouteViewDto>(procSfcProcessRouteViewDtos, procSfcProcessRoutePagedQueryDto.PageIndex, procSfcProcessRoutePagedQueryDto.PageSize, 0);
             }
             //条码对应工单信息
             var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(sfcinfo.WorkOrderId);
             //工艺路线明细
-            var nodes = await _procProcessRouteDetailNodeRepository.GetListAsync(new ProcProcessRouteDetailNodeQuery { ProcessRouteId = planWorkOrderEntity.ProcessRouteId });
-            nodes = nodes.OrderBy(x => x.SerialNo.ParseToInt());
+            procProcessRouteDetailNodeQuery.ProcessRouteId = planWorkOrderEntity.ProcessRouteId;
+            var pagedInfo = await _procProcessRouteDetailNodeRepository.GetPagedInfoAsync(procProcessRouteDetailNodeQuery);
+            //过滤结束工序并按序号排序
+            pagedInfo.Data = pagedInfo.Data.Where(c=> !string.IsNullOrEmpty(c.Code)).OrderBy(x => x.SerialNo.ParseToInt());
             //查询条码步骤
             var manuSfcStepEntities = await _manuSfcStepRepository.GetManuSfcStepEntitiesAsync(new ManuSfcStepQuery { SFC = manuSfcEntity.SFC, SiteId = _currentSite.SiteId ?? 0 });
-            var returnViewDto = nodes.Select(c =>
+            procSfcProcessRouteViewDtos = pagedInfo.Data.Select(c =>
             {
                 return GetProcessRouteDetailStep(c, manuSfcStepEntities);
             });
 
-            return returnViewDto;
+            return new PagedInfo<ProcSfcProcessRouteViewDto>(procSfcProcessRouteViewDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
         /// <summary>
@@ -338,7 +369,7 @@ namespace Hymson.MES.Services.Services.Report
             {
                 sfc = inStockSfcStepEntities.First().SFC;
                 inBountTime = inStockSfcStepEntities.First().CreatedOn;
-                currentStatus = SfcProduceStatusEnum.Activity;
+                currentStatus = inStockSfcStepEntities.First().CurrentStatus;
                 createdOn = inStockSfcStepEntities.First().CreatedOn;
                 createdBy = inStockSfcStepEntities.First().CreatedBy;
                 qty = inStockSfcStepEntities.First().Qty;
@@ -347,7 +378,9 @@ namespace Hymson.MES.Services.Services.Report
             {
                 currentStatus = outStockSfcStepEntities.Last().CurrentStatus;
                 outBountTime = outStockSfcStepEntities.Last().CreatedOn;
-                passed = outStockSfcStepEntities.Last().Passed;
+                createdOn = outStockSfcStepEntities.Last().CreatedOn;
+                createdBy = outStockSfcStepEntities.Last().CreatedBy;
+                passed = outStockSfcStepEntities.Last().Passed ?? 1;
                 qty = outStockSfcStepEntities.Last().Qty;
             }
             return new ProcSfcProcessRouteViewDto

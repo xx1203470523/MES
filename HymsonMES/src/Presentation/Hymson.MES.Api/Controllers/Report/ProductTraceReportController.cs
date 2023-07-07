@@ -61,9 +61,9 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <returns></returns>
         [HttpGet]
         [Route("sfcprocessroute")]
-        public async Task<IEnumerable<ProcSfcProcessRouteViewDto>> GetSfcProcessRouteListAsync([FromQuery] ProcSfcProcessRouteQueryDto param)
+        public async Task<PagedInfo<ProcSfcProcessRouteViewDto>> GetSfcProcessRoutePagedListAsync([FromQuery] ProcSfcProcessRoutePagedQueryDto param)
         {
-            return await _productTraceReportService.GetSfcProcessRouteListAsync(param);
+            return await _productTraceReportService.GetSfcProcessRoutePagedListAsync(param);
         }
     }
 }

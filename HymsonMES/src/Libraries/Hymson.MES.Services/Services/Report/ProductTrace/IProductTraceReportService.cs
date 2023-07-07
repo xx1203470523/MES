@@ -38,8 +38,8 @@ namespace Hymson.MES.Services.Services.Report
         /// <summary>
         /// 条码生产工艺
         /// </summary>
-        /// <param name="procSfcProcessRouteQueryDto"></param>
+        /// <param name="procSfcProcessRoutePagedQueryDto"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcSfcProcessRouteViewDto>> GetSfcProcessRouteListAsync(ProcSfcProcessRouteQueryDto procSfcProcessRouteQueryDto);
+        Task<PagedInfo<ProcSfcProcessRouteViewDto>> GetSfcProcessRoutePagedListAsync(ProcSfcProcessRoutePagedQueryDto procSfcProcessRoutePagedQueryDto);
     }
 }
