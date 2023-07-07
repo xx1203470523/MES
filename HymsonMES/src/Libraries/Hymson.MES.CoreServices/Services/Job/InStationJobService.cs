@@ -131,6 +131,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     firstProduceEntity.RepeatedCount++;
                 }
 
+                sfcProduceEntity.ProcedureId = bo.ProcedureId;
                 sfcProduceEntity.ResourceId = bo.ResourceId;
 
                 // 更新状态，将条码由"排队"改为"活动"
