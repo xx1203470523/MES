@@ -170,7 +170,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
 
             // 过滤出当前工序对应的物料（数据收集方式为内部和外部）
             procBomDetailEntities = procBomDetailEntities.Where(w => w.ProcedureId == procedureBomBo.ProcedureId && w.DataCollectionWay != MaterialSerialNumberEnum.Batch);
-            if (procBomDetailEntities == null) return;
+            if (procBomDetailEntities == null || procBomDetailEntities.Any() == false) return;
 
             // 流转信息（多条码）
             var sfcCirculationEntities = await _manuSfcCirculationRepository.GetSfcMoudulesAsync(new ManuSfcCirculationBySfcsQuery
@@ -186,7 +186,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                 IsDisassemble = TrueOrFalseEnum.No
             });
 
-            if (procBomDetailEntities.Any() && sfcCirculationEntities == null || sfcCirculationEntities.Any() == false)
+            if (sfcCirculationEntities == null || sfcCirculationEntities.Any() == false)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16323));
             }
