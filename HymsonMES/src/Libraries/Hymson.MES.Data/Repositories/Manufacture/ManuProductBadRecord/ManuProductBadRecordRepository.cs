@@ -49,7 +49,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where("br.SiteId = @SiteId");
             sqlBuilder.Where("br.IsDeleted =0");
 
-            sqlBuilder.Select("br.Id,br.Status,uc.UnqualifiedCode,uc.UnqualifiedCodeName,br.UnqualifiedId,pr.ResCode,pr.ResName,uc.ProcessRouteId");
+            sqlBuilder.Select("br.Id,br.Status,uc.UnqualifiedCode,uc.UnqualifiedCodeName,br.UnqualifiedId,pr.ResCode,pr.ResName,uc.ProcessRouteId,uc.Type");
             sqlBuilder.LeftJoin("qual_unqualified_code uc on br.UnqualifiedId =uc.Id");
             sqlBuilder.LeftJoin("proc_resource pr on pr.Id =br.FoundBadResourceId");
 

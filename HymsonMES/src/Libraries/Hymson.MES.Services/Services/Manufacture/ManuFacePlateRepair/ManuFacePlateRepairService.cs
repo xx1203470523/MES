@@ -378,6 +378,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     UnqualifiedId = s.UnqualifiedId,
                     UnqualifiedCode = s.UnqualifiedCode,
                     UnqualifiedCodeName = s.UnqualifiedCodeName,
+                    Type = s.Type,
                     CauseAnalyse = manuSfcRepairDetailList == null ? "" : manuSfcRepairDetailList.Where(it => it.ProductBadId == s.Id).FirstOrDefault()?.CauseAnalyse ?? "",
                     RepairMethod = manuSfcRepairDetailList == null ? "" : manuSfcRepairDetailList.Where(it => it.ProductBadId == s.Id).FirstOrDefault()?.RepairMethod ?? "",
                     ResCode = s.ResCode,
