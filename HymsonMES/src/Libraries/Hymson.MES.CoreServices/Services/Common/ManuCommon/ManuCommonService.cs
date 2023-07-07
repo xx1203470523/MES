@@ -115,14 +115,18 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                 var sfcProduceLockBo = JsonSerializer.Deserialize<SfcProduceLockBo>(item.BusinessContent);
                 if (sfcProduceLockBo == null) continue;
 
-                // 即时锁
-                if (sfcProduceLockBo.Lock != QualityLockEnum.InstantLock) continue;
-
-                // 将来锁
-                if (sfcProduceLockBo.Lock != QualityLockEnum.FutureLock) continue;
-
-                // 如果锁的不是目标工序，就跳过
-                if (procedureBo.ProcedureId.HasValue && sfcProduceLockBo.LockProductionId != procedureBo.ProcedureId) continue;
+                switch (sfcProduceLockBo.Lock)
+                {
+                    case QualityLockEnum.InstantLock:
+                        break;
+                    case QualityLockEnum.FutureLock:
+                        // 如果锁的不是目标工序，就跳过
+                        if (procedureBo.ProcedureId.HasValue && sfcProduceLockBo.LockProductionId != procedureBo.ProcedureId) continue;
+                        break;
+                    case QualityLockEnum.Unlock:
+                    default:
+                        continue;
+                }
 
                 validationFailures.Add(new ValidationFailure
                 {
