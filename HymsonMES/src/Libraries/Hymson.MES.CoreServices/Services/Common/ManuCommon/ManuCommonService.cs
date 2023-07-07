@@ -7,13 +7,12 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Manufacture;
+using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
-using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Warehouse;
-using Hymson.Sequences;
+using Hymson.MES.Data.Repositories.Process.MaskCode;
 using System.Data;
 using System.Text.Json;
 
@@ -55,6 +54,12 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         private readonly IProcMaterialRepository _procMaterialRepository;
 
         /// <summary>
+        /// 仓储接口（掩码规则维护）
+        /// </summary>
+        private readonly IProcMaskCodeRuleRepository _procMaskCodeRuleRepository;
+
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="sequenceService"></param>
@@ -76,7 +81,8 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             IManuSfcCirculationRepository manuSfcCirculationRepository,
             IManuContainerPackRepository manuContainerPackRepository,
             IProcBomDetailRepository procBomDetailRepository,
-            IProcMaterialRepository procMaterialRepository)
+            IProcMaterialRepository procMaterialRepository,
+            IProcMaskCodeRuleRepository procMaskCodeRuleRepository)
         {
             _localizationService = localizationService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
@@ -84,7 +90,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             _manuContainerPackRepository = manuContainerPackRepository;
             _procBomDetailRepository = procBomDetailRepository;
             _procMaterialRepository = procMaterialRepository;
-
+            _procMaskCodeRuleRepository = procMaskCodeRuleRepository;
         }
 
         /// <summary>
@@ -179,11 +185,10 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                 ProcedureId = procedureBomBo.ProcedureId,
                 IsDisassemble = TrueOrFalseEnum.No
             });
-            if (sfcCirculationEntities == null || !sfcCirculationEntities.Any())
+
+            if (procBomDetailEntities.Any() && sfcCirculationEntities == null || sfcCirculationEntities.Any() == false)
             {
-                // TODO 这里存在需要组装却未组装的漏网之鱼
-                return;
-                //throw new CustomerValidationException(nameof(ErrorCode.MES16323));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16323));
             }
 
             // 根据物料分组
@@ -191,7 +196,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             foreach (var item in procBomDetailDictionary)
             {
                 // 检查每个物料是否已经满足BOM用量要求（这里可以优化下）
-                var currentQty = sfcCirculationEntities.Where(w => w.CirculationMainProductId == item.Key)
+                var currentQty = sfcCirculationEntities?.Where(w => w.CirculationMainProductId == item.Key)
                     .Sum(s => s.CirculationQty);
 
                 // 目标用量
@@ -205,6 +210,27 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                     throw new CustomerValidationException(nameof(ErrorCode.MES16321)).WithData("Code", materialEntity.MaterialCode);
                 }
             }
+        }
+
+        /// <summary>
+        /// 验证条码掩码规则
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <param name="materialId"></param>
+        /// <returns></returns>
+        public async Task<bool> CheckBarCodeByMaskCodeRuleAsync(string barCode, long materialId)
+        {
+            var material = await _procMaterialRepository.GetByIdAsync(materialId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10204));
+
+            // 物料未设置掩码
+            if (material.MaskCodeId.HasValue == false) throw new CustomerValidationException(nameof(ErrorCode.MES16616)).WithData("barCode", barCode);
+
+            // 未设置规则
+            var maskCodeRules = await _procMaskCodeRuleRepository.GetByMaskCodeIdAsync(material.MaskCodeId.Value);
+            if (maskCodeRules == null || maskCodeRules.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES16616)).WithData("barCode", barCode);
+
+            return barCode.VerifyBarCode(maskCodeRules);
         }
 
         #region 内部方法

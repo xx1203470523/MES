@@ -22,6 +22,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         /// </summary>
         /// <param name="commands"></param>
         /// <returns></returns>
+        Task<int> UpdateQtyByIdAsync(UpdateQtyByIdCommand command);
+
+        /// <summary>
+        /// 更新数量
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
         Task<int> UpdateQtyByIdAsync(IEnumerable<UpdateQtyByIdCommand> commands);
 
         /// <summary>
