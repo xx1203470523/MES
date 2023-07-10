@@ -95,8 +95,9 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob
         public async Task<IEnumerable<InteJobEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<InteJobEntity>(GetByIdsSql, new { ids = ids });
+            return await conn.QueryAsync<InteJobEntity>(GetByIdsSql, new { ids });
         }
+
         /// <summary>
         /// 根据编码获取数据
         /// </summary>
@@ -177,7 +178,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob
         const string UpdateRangSql = "UPDATE `inte_job` SET Name=@Name,ClassProgram=@ClassProgram,Remark=@Remark,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn,IsDeleted=@IsDeleted WHERE Id = @Id AND IsDeleted = @IsDeleted ";
         const string DeleteRangSql = "UPDATE `inte_job` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id in @ids AND IsDeleted=0";
         const string GetByIdSql = @"SELECT SiteId,Id,Code,Name,ClassProgram,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted FROM `inte_job`  WHERE Id = @Id AND IsDeleted=0  ";
-        const string GetByIdsSql = @"SELECT  * FROM `inte_job`  WHERE Id IN @ids AND IsDeleted=0  ";
+        const string GetByIdsSql = @"SELECT * FROM inte_job WHERE IsDeleted = 0 AND Id IN @ids";
         const string GetByCodeSql = @"SELECT SiteId,Id,Code,Name,ClassProgram,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted FROM `inte_job`  WHERE Code = @Code  AND SiteId=@Site AND IsDeleted=0 ";
     }
 }

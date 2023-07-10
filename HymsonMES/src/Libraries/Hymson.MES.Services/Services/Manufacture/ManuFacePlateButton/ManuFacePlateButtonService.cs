@@ -325,7 +325,16 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (buttonJobs.Any() == false) return result;
 
             // 根据 buttonJobs 读取对应的job对象
-            var jobs = await _inteJobRepository.GetByIdsAsync(buttonJobs.Select(s => s.JobId).ToArray());
+            var jobsOfNotSort = await _inteJobRepository.GetByIdsAsync(buttonJobs.Select(s => s.JobId).ToArray());
+
+            List<InteJobEntity> jobs = new();
+            foreach (var item in buttonJobs)
+            {
+                var tempJob = jobsOfNotSort.FirstOrDefault(f => f.Id == item.JobId);
+                if (tempJob == null) continue;
+
+                jobs.Add(tempJob);
+            }
 
             // 是否清除条码
             if (buttonJobs.Any(a => a.IsClear) == true) dto.Param?.Add("IsClear", "True");
