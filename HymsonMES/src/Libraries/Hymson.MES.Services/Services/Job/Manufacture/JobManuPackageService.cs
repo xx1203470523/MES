@@ -92,7 +92,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             var jobBos = new List<JobBo> { };
             jobBos.Add(new JobBo { Name = "PackageVerifyJobService" });
 
-            var responseBo = await _executeJobService.ExecuteAsync(jobBos, new JobRequestBo
+            await _executeJobService.ExecuteAsync(jobBos, new JobRequestBo
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 UserName = _currentUser.UserName,
@@ -100,7 +100,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
                 ResourceId = bo.ResourceId,
                 SFCs = new string[] { bo.SFC }
             });
-
+            
             // 判断面板是否显示
             //var isShow = await _manuCommonOldService.CheckSFCIsCanDoneStep(bo, Core.Enums.Manufacture.SfcCirculationTypeEnum.ModuleAdd);
             var isShow = true;

@@ -1,6 +1,4 @@
-﻿using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
-using Hymson.Utils;
+﻿using Hymson.Utils;
 
 namespace Hymson.MES.CoreServices.Bos.Job
 {
@@ -9,7 +7,6 @@ namespace Hymson.MES.CoreServices.Bos.Job
     /// </summary>
     public class PackageIngRequestBo : JobBaseBo
     {
-
         /// <summary>
         /// 工序ID
         /// </summary>
@@ -23,7 +20,10 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 用户名
         /// </summary>
         public string UserName { get; set; } = "";
-
+        /// <summary>
+        ///  容器ID
+        /// </summary>
+        public long ContainerId { get; set; }
     }
 
     /// <summary>
