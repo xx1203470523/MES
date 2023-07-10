@@ -19,6 +19,7 @@ using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -325,7 +326,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (buttonJobs.Any() == false) return result;
 
             // 根据 buttonJobs 读取对应的job对象
-            var jobsOfNotSort = await _inteJobRepository.GetByIdsAsync(buttonJobs.Select(s => s.JobId).ToArray());
+            var jobsOfNotSort = await _inteJobRepository.GetEntitiesAsync(new EntityBySiteIdQuery { SiteId = _currentSite.SiteId ?? 0 });
 
             List<InteJobEntity> jobs = new();
             foreach (var item in buttonJobs)
