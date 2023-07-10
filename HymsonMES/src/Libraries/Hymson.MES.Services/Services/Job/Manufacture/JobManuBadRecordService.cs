@@ -92,7 +92,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             var jobBos = new List<JobBo> { };
             jobBos.Add(new JobBo { Name = "BadRecordJobService" });
 
-            var result = await _executeJobService.ExecuteAsync(jobBos, new JobRequestBo
+            var responseBo = await _executeJobService.ExecuteAsync(jobBos, new JobRequestBo
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 UserName = _currentUser.UserName,
@@ -103,13 +103,15 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
 
             // 判断面板是否显示
             var isShow = false;
-            foreach (var item in result)
+            foreach (var item in responseBo)
             {
                 var content = item.Value.Content;
                 if (item.Key == "BadRecordJobService" && content != null && content.Any())
                 {
                     isShow = content["IsShow"].ParseToBool();
                 }
+
+                defaultDto.Rows = item.Value.Rows;
             }
 
             defaultDto.Content?.Add("BadEntryCom", $"{isShow}".ToString());

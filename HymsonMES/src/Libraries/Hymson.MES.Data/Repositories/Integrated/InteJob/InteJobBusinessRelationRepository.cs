@@ -1,16 +1,7 @@
-/*
- *creator: Karl
- *
- *describe: job业务配置配置表 仓储类 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-02-14 02:55:48
- */
-
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
-using Hymson.MES.Data.Repositories.Integrated;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
