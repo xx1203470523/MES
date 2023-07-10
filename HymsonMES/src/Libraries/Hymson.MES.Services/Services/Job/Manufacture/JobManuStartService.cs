@@ -93,7 +93,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             jobBos.Add(new JobBo { Name = "InStationVerifyJobService" });
             jobBos.Add(new JobBo { Name = "InStationJobService" });
 
-            await _executeJobService.ExecuteAsync(jobBos, new JobRequestBo
+            var responseBo = await _executeJobService.ExecuteAsync(jobBos, new JobRequestBo
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 UserName = _currentUser.UserName,
@@ -102,6 +102,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
                 SFCs = new string[] { bo.SFC }
             });
 
+            defaultDto.Rows = responseBo.LastOrDefault().Value.Rows;
             defaultDto.Content?.Add("PackageCom", "False");
             defaultDto.Content?.Add("BadEntryCom", "False");
             if (param.ContainsKey("IsClear")) defaultDto.Content?.Add("IsClear", param["IsClear"]);

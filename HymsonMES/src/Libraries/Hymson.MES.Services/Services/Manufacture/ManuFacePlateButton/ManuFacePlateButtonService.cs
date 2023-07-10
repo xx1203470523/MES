@@ -350,8 +350,17 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ResourceId = dto.Param["ResourceId"].ParseToLong(),
                 SFCs = new string[] { dto.Param["SFC"] }
             });
+            foreach (var item in jobResponses)
+            {
+                result.Add(item.Key, new JobResponseDto
+                {
+                    Rows = item.Value.Rows,
+                    Content = item.Value.Content,
+                    Message = item.Value.Message,
+                    Time = item.Value.Time
+                });
+            }
             */
-            //result = jobResponses.Select(s => s.Value == new JobResponseDto { Content = null });
 
             result = await _jobCommonService.ExecuteJobAsync(jobs, dto.Param);
             return result;

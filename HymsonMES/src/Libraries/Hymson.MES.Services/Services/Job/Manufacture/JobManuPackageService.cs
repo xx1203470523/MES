@@ -92,7 +92,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             var jobBos = new List<JobBo> { };
             jobBos.Add(new JobBo { Name = "PackageVerifyJobService" });
 
-            await _executeJobService.ExecuteAsync(jobBos, new JobRequestBo
+            var responseBo = await _executeJobService.ExecuteAsync(jobBos, new JobRequestBo
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 UserName = _currentUser.UserName,
@@ -104,7 +104,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             // 判断面板是否显示
             //var isShow = await _manuCommonOldService.CheckSFCIsCanDoneStep(bo, Core.Enums.Manufacture.SfcCirculationTypeEnum.ModuleAdd);
             var isShow = true;
-
+            defaultDto.Rows = responseBo.LastOrDefault().Value.Rows;
             defaultDto.Content?.Add("PackageCom", $"{isShow}".ToString());
             defaultDto.Content?.Add("BadEntryCom", "False");
             if (param.ContainsKey("IsClear")) defaultDto.Content?.Add("IsClear", param["IsClear"]);
