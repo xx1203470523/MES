@@ -104,7 +104,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             // 判断面板是否显示
             //var isShow = await _manuCommonOldService.CheckSFCIsCanDoneStep(bo, Core.Enums.Manufacture.SfcCirculationTypeEnum.ModuleAdd);
             var isShow = true;
-            defaultDto.Rows = responseBo.LastOrDefault().Value.Rows;
+            defaultDto.Rows = 0;
             defaultDto.Content?.Add("PackageCom", $"{isShow}".ToString());
             defaultDto.Content?.Add("BadEntryCom", "False");
             if (param.ContainsKey("IsClear")) defaultDto.Content?.Add("IsClear", param["IsClear"]);
