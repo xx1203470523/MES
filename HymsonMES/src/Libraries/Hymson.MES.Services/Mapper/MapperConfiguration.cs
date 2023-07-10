@@ -594,6 +594,8 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuSfcStepPagedQueryDto, ManuSfcStepPagedQuery>();
             CreateMap<ManuSfcStepEntity, ManuSfcStepViewDto>();
             CreateMap<ProcSfcProcessRoutePagedQueryDto, ProcProcessRouteDetailNodePagedQuery>();
+            CreateMap<ProductTracePlanWorkOrderPagedQueryDto, PlanWorkOrderPagedQuery>();
+            CreateMap<PlanWorkOrderListDetailView, ProductTracePlanWorkOrderViewDto>();
             #endregion
 
         }

@@ -90,6 +90,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<IEnumerable<ManuSfcInfoEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
+        /// 根据SFC获取数据
+        /// 不检测IsUsed
+        /// </summary>
+        /// <param name="sfcId"></param>
+        /// <returns></returns>
+        Task<ManuSfcInfoEntity> GetBySFCNoCheckUsedAsync(long sfcId);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="manuSfcInfo1Query"></param>

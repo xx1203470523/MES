@@ -135,6 +135,10 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         public string WorkCenterCode { get; set; }
 
+        /// <summary>
+        /// 工作中心名称
+        /// </summary>
+        public string WorkCenterName { get; set; }
 
         /// <summary>
         /// 投入数量

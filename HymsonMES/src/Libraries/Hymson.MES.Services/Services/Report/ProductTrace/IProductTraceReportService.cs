@@ -15,6 +15,12 @@ namespace Hymson.MES.Services.Services.Report
     public interface IProductTraceReportService
     {
         /// <summary>
+        /// 获取工单信息
+        /// </summary>
+        /// <param name="planWorkOrderPagedQueryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ProductTracePlanWorkOrderViewDto>> GetWorkOrderPagedListAsync(ProductTracePlanWorkOrderPagedQueryDto planWorkOrderPagedQueryDto);
+        /// <summary>
         /// 获取条码追溯信息
         /// </summary>
         /// <param name="productTraceReportPagedQueryDto"></param>

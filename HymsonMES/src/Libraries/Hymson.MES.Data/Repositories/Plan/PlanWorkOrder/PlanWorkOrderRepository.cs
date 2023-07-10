@@ -209,6 +209,10 @@ namespace Hymson.MES.Data.Repositories.Plan
             sqlBuilder.Where("wo.IsDeleted = 0");
             sqlBuilder.Where("wo.SiteId = @SiteId");
 
+            if (pageQuery.WorkOrderId.HasValue)
+            {
+                sqlBuilder.Where("wo.Id = @WorkOrderId");
+            }
             if (!string.IsNullOrWhiteSpace(pageQuery.OrderCode))
             {
                 pageQuery.OrderCode = $"%{pageQuery.OrderCode}%";
@@ -485,7 +489,8 @@ namespace Hymson.MES.Data.Repositories.Plan
                           m.MaterialCode, m.MaterialName,m.Version as MaterialVersion,
                           b.BomCode,b.Version as BomVersion,
                           pr.`Code` as ProcessRouteCode ,pr.Version as ProcessRouteVersion,
-                          wc.`Code`  as WorkCenterCode
+                          wc.`Code`  as WorkCenterCode,
+                          wc.`Name`  as WorkCenterName
                          FROM `plan_work_order` wo 
                          LEFT JOIN plan_work_order_record wor on wo.Id = wor.WorkOrderId
                          LEFT JOIN proc_material m on wo.ProductId = m.Id
@@ -553,7 +558,7 @@ namespace Hymson.MES.Data.Repositories.Plan
                                 LEFT JOIN plan_work_order pwo on pwor.WorkOrderId=pwo.Id
                                 LEFT JOIN proc_material m on m.Id=pwo.ProductId 
                                 LEFT JOIN proc_bom b on b.id=pwo.ProductBOMId 
-                                LEFT JOIN inte_work_center iwc on iwc.id=pwo.WorkCenterId  /**where**/  ";
+                                LEFT JOIN inte_work_center iwc on iwc.id=pwo.WorkCenterId  /**where**/  Order by pwo.CreatedOn desc  LIMIT @Offset,@Rows  ";
         const string GetPagedInfoPlanWorkOrderProductionReportCountSqlTemplate = @"select COUNT(1) 
                                 from plan_work_order_record pwor 
                                 LEFT JOIN plan_work_order pwo on pwor.WorkOrderId=pwo.Id

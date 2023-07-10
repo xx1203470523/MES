@@ -433,4 +433,62 @@ namespace Hymson.MES.Services.Dtos.Report
     }
 
     #endregion
+
+    #region 工单信息
+    public class ProductTracePlanWorkOrderPagedQueryDto : PagerInfo
+    {
+        public string SFC { get; set; }
+    }
+    public record ProductTracePlanWorkOrderViewDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 工单号
+        /// </summary>
+        public string OrderCode { get; set; }
+        /// <summary>
+        /// 工单类型
+        /// </summary>
+        public PlanWorkOrderTypeEnum Type { get; set; }
+        /// <summary>
+        /// 工单状态;1：未开始；2：下达；3：生产中；4：完成；5：锁定；6：暂停中；
+        /// </summary>
+        public PlanWorkOrderStatusEnum Status { get; set; }
+        /// <summary>
+        /// 工单数量
+        /// </summary>
+        public decimal Qty { get; set; }
+        /// <summary>
+        /// 工作中心名称
+        /// </summary>
+        public string WorkCenterName { get; set; }
+        /// <summary>
+        /// 工作中心编码
+        /// </summary>
+        public string WorkCenterCode { get; set; }
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string MaterialCode { get; set; }
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string MaterialName { get; set; }
+        /// <summary>
+        /// 计划开始时间
+        /// </summary>
+        public DateTime? PlanStartTime { get; set; }
+        /// <summary>
+        /// 计划结束时间
+        /// </summary>
+        public DateTime? PlanEndTime { get; set; }
+        /// <summary>
+        /// 实际开始时间
+        /// </summary>
+        public DateTime? RealStart { get; set; }
+        /// <summary>
+        /// 实际开始时间
+        /// </summary>
+        public DateTime? RealEnd { get; set; }
+    }
+    #endregion
 }

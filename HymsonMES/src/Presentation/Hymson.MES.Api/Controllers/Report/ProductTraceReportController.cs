@@ -19,6 +19,17 @@ namespace Hymson.MES.Api.Controllers.Report
             _productTraceReportService = productTraceReportService;
         }
         /// <summary>
+        /// 工单查询
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("workorder")]
+        public async Task<PagedInfo<ProductTracePlanWorkOrderViewDto>> GetWorkOrderPagedListAsync([FromQuery] ProductTracePlanWorkOrderPagedQueryDto param)
+        {
+            return await _productTraceReportService.GetWorkOrderPagedListAsync(param);
+        }
+        /// <summary>
         /// 追溯查询
         /// </summary>
         /// <param name="param"></param>

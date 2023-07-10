@@ -9,10 +9,12 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
+using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ProcessRoute.Query;
 using Hymson.MES.Services.Dtos.Report;
@@ -264,7 +266,7 @@ namespace Hymson.MES.Services.Services.Report
             }
             //工序信息
             IEnumerable<ProcProcedureEntity> procProcedures = new List<ProcProcedureEntity>();
-            var procProcedureIds = pagedInfo.Data.Select(c => c.ProcedureId?? -1).ToArray();
+            var procProcedureIds = pagedInfo.Data.Select(c => c.ProcedureId ?? -1).ToArray();
             if (procProcedureIds.Any())
             {
                 procProcedures = await _procProcedureRepository.GetByIdsAsync(procProcedureIds);
@@ -332,7 +334,7 @@ namespace Hymson.MES.Services.Services.Report
             procProcessRouteDetailNodeQuery.ProcessRouteId = planWorkOrderEntity.ProcessRouteId;
             var pagedInfo = await _procProcessRouteDetailNodeRepository.GetPagedInfoAsync(procProcessRouteDetailNodeQuery);
             //过滤结束工序并按序号排序
-            pagedInfo.Data = pagedInfo.Data.Where(c=> !string.IsNullOrEmpty(c.Code)).OrderBy(x => x.SerialNo.ParseToInt());
+            pagedInfo.Data = pagedInfo.Data.Where(c => !string.IsNullOrEmpty(c.Code)).OrderBy(x => x.SerialNo.ParseToInt());
             //查询条码步骤
             var manuSfcStepEntities = await _manuSfcStepRepository.GetManuSfcStepEntitiesAsync(new ManuSfcStepQuery { SFC = manuSfcEntity.SFC, SiteId = _currentSite.SiteId ?? 0 });
             procSfcProcessRouteViewDtos = pagedInfo.Data.Select(c =>
@@ -397,6 +399,35 @@ namespace Hymson.MES.Services.Services.Report
                 CreatedBy = createdBy,
                 Qty = qty
             };
+        }
+
+        /// <summary>
+        /// 查询条码对应工单信息
+        /// </summary>
+        /// <returns></returns>
+        public async Task<PagedInfo<ProductTracePlanWorkOrderViewDto>> GetWorkOrderPagedListAsync(ProductTracePlanWorkOrderPagedQueryDto planWorkOrderPagedQueryDto)
+        {
+            var planWorkOrderPagedQuery = planWorkOrderPagedQueryDto.ToQuery<PlanWorkOrderPagedQuery>();
+            IEnumerable<ProductTracePlanWorkOrderViewDto> productTracePlanWorkOrderViews = new List<ProductTracePlanWorkOrderViewDto>();
+            //查询条码信息
+            var manuSfcEntity = await _manuSfcRepository.GetBySFCAsync(new GetBySFCQuery { SFC = planWorkOrderPagedQueryDto.SFC, SiteId = _currentSite.SiteId });
+            if (manuSfcEntity == null)
+            {
+                return new PagedInfo<ProductTracePlanWorkOrderViewDto>(productTracePlanWorkOrderViews, planWorkOrderPagedQueryDto.PageIndex, planWorkOrderPagedQueryDto.PageSize, 0);
+            }
+            var sfcinfo = await _manuSfcInfoRepository.GetBySFCNoCheckUsedAsync(manuSfcEntity?.Id ?? 0);
+            if (sfcinfo == null)
+            {
+                return new PagedInfo<ProductTracePlanWorkOrderViewDto>(productTracePlanWorkOrderViews, planWorkOrderPagedQueryDto.PageIndex, planWorkOrderPagedQueryDto.PageSize, 0);
+            }
+            planWorkOrderPagedQuery.WorkOrderId = sfcinfo.WorkOrderId;
+            planWorkOrderPagedQuery.SiteId = _currentSite.SiteId;
+            var pagedInfo = await _planWorkOrderRepository.GetPagedInfoAsync(planWorkOrderPagedQuery);
+            var productTracePlanWorkOrderViewDtos = pagedInfo.Data.Select(s =>
+            {
+                return s.ToModel<ProductTracePlanWorkOrderViewDto>();
+            });
+            return new PagedInfo<ProductTracePlanWorkOrderViewDto>(productTracePlanWorkOrderViewDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
     }
 }

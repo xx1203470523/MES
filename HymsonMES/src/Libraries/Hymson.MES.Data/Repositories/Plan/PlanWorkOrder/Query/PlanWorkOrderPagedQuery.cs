@@ -9,6 +9,10 @@ namespace Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query
     public class PlanWorkOrderPagedQuery : PagerInfo
     {
         /// <summary>
+        /// 工单ID
+        /// </summary>
+        public long? WorkOrderId { get; set; }
+        /// <summary>
         /// 站点编码 
         /// </summary>
         public long? SiteId { get; set; }
