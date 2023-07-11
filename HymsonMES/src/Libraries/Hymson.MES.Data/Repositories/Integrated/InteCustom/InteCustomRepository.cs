@@ -50,6 +50,17 @@ namespace Hymson.MES.Data.Repositories.Integrated
         }
 
         /// <summary>
+        /// 根据Code获取数据
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        public async Task<InteCustomEntity> GetByCodeAsync(string code)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<InteCustomEntity>(GetByCodeSql, new { Code = code });
+        }
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -173,7 +184,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
     public partial class InteCustomRepository
     {
         #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_custom` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_custom` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `inte_custom` /**where**/ ";
         const string GetInteCustomEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
@@ -182,8 +193,8 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string InsertSql = "INSERT INTO `inte_custom`(  `Id`, `Code`, `Name`, `Describe`, `Address`, `Telephone`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Describe, @Address, @Telephone, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string InsertsSql = "INSERT INTO `inte_custom`(  `Id`, `Code`, `Name`, `Describe`, `Address`, `Telephone`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Describe, @Address, @Telephone, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
 
-        const string UpdateSql = "UPDATE `inte_custom` SET   Code = @Code, Name = @Name, `Describe` = @Describe, Address = @Address, Telephone = @Telephone, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `inte_custom` SET   Code = @Code, Name = @Name, `Describe` = @Describe, Address = @Address, Telephone = @Telephone, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `inte_custom` SET  Name = @Name, `Describe` = @Describe, Address = @Address, Telephone = @Telephone, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `inte_custom` SET  Name = @Name, `Describe` = @Describe, Address = @Address, Telephone = @Telephone, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `inte_custom` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `inte_custom` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
@@ -194,6 +205,9 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `Code`, `Name`, `Describe`, `Address`, `Telephone`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `inte_custom`  WHERE Id IN @Ids ";
+
+        const string GetByCodeSql = @"SELECT * 
+                            FROM `inte_custom`  WHERE Code = @Code AND IsDeleted=0 ";
         #endregion
     }
 }
