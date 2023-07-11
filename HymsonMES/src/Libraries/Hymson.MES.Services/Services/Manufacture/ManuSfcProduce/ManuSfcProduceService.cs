@@ -1539,8 +1539,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             var notManuSfcInfoList = manuSfcInfos.Where(it => sfcProduces.Where(sp => sp.SFC == it.SFC).Any() == false);
             var notManuSfcs = notManuSfcInfoList.Select(it => it.SFC);
 
-            var firstSFC = sfcProduces.FirstOrDefault();
-            if (firstSFC == null) return;
 
             // 界面的选择步骤操作类型
             switch (sfcProduceStepDto.Type)
