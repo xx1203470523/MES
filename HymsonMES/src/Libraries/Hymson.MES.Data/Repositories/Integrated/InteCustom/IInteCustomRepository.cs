@@ -61,6 +61,13 @@ namespace Hymson.MES.Data.Repositories.Integrated
         Task<int> DeletesAsync(DeleteCommand param);
 
         /// <summary>
+        /// 根据Code获取数据
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        Task<InteCustomEntity> GetByCodeAsync(string code);
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>

@@ -937,6 +937,15 @@
         #region 客户维护
         public const string MES18400 = "客户维护错误";
         public const string MES18401 = "对应客户维护不存在";
+        public const string MES18402 = "客户编码已存在";
+        public const string MES18403 = "客户编码不能为空";
+        public const string MES18404 = "客户名称不能为空";
+        public const string MES18405 = "客户编码最大长度为50";
+        public const string MES18406 = "客户名称最大长度为50";
+        public const string MES18407 = "地址最大长度为255";
+        public const string MES18408 = "描述最大长度为255";
+        public const string MES18409 = "电话最大长度为50";
+
         #endregion
 
         #region 设备对接错误

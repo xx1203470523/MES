@@ -6,6 +6,7 @@
  *build datetime: 2023-07-11 09:33:26
  */
 using FluentValidation;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Services.Dtos.Integrated;
 
 namespace Hymson.MES.Services.Validators.Integrated
@@ -17,8 +18,14 @@ namespace Hymson.MES.Services.Validators.Integrated
     {
         public InteCustomCreateValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111");
+            RuleFor(x => x).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10100));
+            RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES18403));
+            RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES18404));
+            RuleFor(x => x.Code).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18405));
+            RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18406));
+            RuleFor(x => x.Address).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18407));
+            RuleFor(x => x.Describe).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18408));
+            RuleFor(x => x.Telephone).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18409));
         }
     }
 
@@ -29,8 +36,14 @@ namespace Hymson.MES.Services.Validators.Integrated
     {
         public InteCustomModifyValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111");
+            RuleFor(x => x).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10100));
+            //RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES18403));
+            RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES18404));
+            //RuleFor(x => x.Code).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18405));
+            RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18406));
+            RuleFor(x => x.Address).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18407));
+            RuleFor(x => x.Describe).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18408));
+            RuleFor(x => x.Telephone).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18409));
         }
     }
 }

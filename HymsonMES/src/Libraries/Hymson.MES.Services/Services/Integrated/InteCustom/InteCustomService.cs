@@ -71,6 +71,13 @@ namespace Hymson.MES.Services.Services.Integrated
             inteCustomEntity.UpdatedOn = HymsonClock.Now();
             inteCustomEntity.SiteId = _currentSite.SiteId ?? 0;
 
+            //验证是否编码唯一
+            var entity= await _inteCustomRepository.GetByCodeAsync(inteCustomEntity.Code.Trim());
+            if (entity != null) 
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18402));
+            }
+
             //入库
             await _inteCustomRepository.InsertAsync(inteCustomEntity);
         }
