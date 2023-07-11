@@ -1,11 +1,7 @@
-﻿using Google.Protobuf.WellKnownTypes;
-using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.Manufacture;
+﻿using Hymson.Infrastructure;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
-using MySqlX.XDevAPI.Common;
-using Org.BouncyCastle.Tls.Crypto;
+using Hymson.Utils;
 using System.Collections.Concurrent;
-using System.Linq;
 
 namespace Hymson.MES.CoreServices.Services.Job.JobUtility
 {
@@ -38,6 +34,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                 _semaphores[i] = new SemaphoreSlim(1);
             }
         }
+
 
         /// <summary>
         /// 获取字典Key
@@ -186,7 +183,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// <returns></returns>
         public TResult? GetValue<T, TResult>(Func<T, TResult> func, T parameters)
         {
-            var cacheKey = (uint)$"{func.Method.DeclaringType?.FullName}.{func.Method.Name}{parameters}".GetHashCode();
+            var cacheKey = (uint)$"{func.Method.DeclaringType?.FullName}.{func.Method.Name}{parameters?.ToSerialize()}".GetHashCode();
 
             if (Has(cacheKey))
             {
@@ -212,7 +209,6 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             }
         }
 
-
         /// <summary>
         /// 取值
         /// </summary>
@@ -221,7 +217,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// <returns></returns>
         public async Task<TResult?> GetValueAsync<T, TResult>(Func<T, Task<TResult>> func, T parameters)
         {
-            var cacheKey = (uint)$"{func.Method.DeclaringType?.FullName}.{func.Method.Name}{parameters}".GetHashCode();
+            var cacheKey = (uint)$"{func.Method.DeclaringType?.FullName}.{func.Method.Name}{parameters?.ToSerialize()}".GetHashCode();
 
             if (Has(cacheKey))
             {
@@ -302,6 +298,10 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class JobContextData<T>
     {
         public JobContextData(bool hasKey, T value)
