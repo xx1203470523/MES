@@ -1294,7 +1294,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ProcedureId = item.ProcedureId,
                     ProcedureCode = item.Code,
                     ProcedureName = item.Name,
-                    Step = int.Parse(item.SerialNo)
+                    Step = item.ManualSortNumber
                 };
                 manuSfcProduceStepList.Add(manuSfcProduceStep);
             }
