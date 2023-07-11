@@ -1294,7 +1294,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ProcedureId = item.ProcedureId,
                     ProcedureCode = item.Code,
                     ProcedureName = item.Name,
-                    Step = int.Parse(item.SerialNo)
+                    Step = item.ManualSortNumber
                 };
                 manuSfcProduceStepList.Add(manuSfcProduceStep);
             }
@@ -1539,8 +1539,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             var notManuSfcInfoList = manuSfcInfos.Where(it => sfcProduces.Where(sp => sp.SFC == it.SFC).Any() == false);
             var notManuSfcs = notManuSfcInfoList.Select(it => it.SFC);
 
-            var firstSFC = sfcProduces.FirstOrDefault();
-            if (firstSFC == null) return;
 
             // 界面的选择步骤操作类型
             switch (sfcProduceStepDto.Type)
@@ -2061,6 +2059,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 item.ProductBOMId = newPlanWorkOrderEntity.ProductBOMId;
                 item.WorkOrderId = newPlanWorkOrderEntity.Id;
                 item.ResourceId = null; //更改步骤后 更改资源为null   为null则生产不限制匹配
+                item.Status = SfcProduceStatusEnum.lineUp;
 
                 // 初始化步骤
                 var sfcStep = new ManuSfcStepEntity
