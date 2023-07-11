@@ -342,6 +342,7 @@ namespace Hymson.MES.Services.Services.Report
                 if (string.IsNullOrEmpty(sfcProcessRouteViewDto.ProcedureCode))
                 {
                     sfcProcessRouteViewDto.ProcedureName = "结束";
+                    sfcProcessRouteViewDto.CurrentStatus = SfcProduceStatusEnum.Complete;
                 }
                 return sfcProcessRouteViewDto;
             });
