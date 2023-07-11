@@ -1505,7 +1505,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES18004));
                 }
-                processRouteId = sfcProduces.FirstOrDefault().ProcedureId;
+                processRouteId = sfcProduces.FirstOrDefault().ProcessRouteId;
             }
 
             //获取条码信息
