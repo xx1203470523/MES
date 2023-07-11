@@ -1554,8 +1554,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                             BarCodes = manuSfcs
                         });
 
-                        var notwhMaterialInventorySfcs = manuSfcInfos.Where(it => !whMaterialInventorys.Where(wmi => wmi.MaterialBarCode == it.SFC).Any());
-                        var procMaterials = await _procMaterialRepository.GetByIdsAsync(notwhMaterialInventorySfcs.Select(it => it.ProductId).ToArray());
+                        //var notwhMaterialInventorySfcs = manuSfcInfos.Where(it => !whMaterialInventorys.Where(wmi => wmi.MaterialBarCode == it.SFC).Any());
+                        //var procMaterials = await _procMaterialRepository.GetByIdsAsync(notwhMaterialInventorySfcs.Select(it => it.ProductId).ToArray());
+                        var procMaterials = await _procMaterialRepository.GetByIdsAsync(manuSfcInfos.Select(it => it.ProductId).ToArray());
                         bool isWhMaterialInventorys = whMaterialInventorys != null && whMaterialInventorys.Any() == true;
                         foreach (var item in manuSfcInfos)
                         {
