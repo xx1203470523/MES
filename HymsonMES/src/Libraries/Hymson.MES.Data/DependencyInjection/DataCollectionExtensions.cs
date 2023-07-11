@@ -88,6 +88,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteJobRepository, InteJobRepository>();
             services.AddSingleton<IInteWorkCenterRepository, InteWorkCenterRepository>();
 
+            services.AddSingleton<IInteCustomRepository, InteCustomRepository>();
+
             #region CodeRule
             services.AddSingleton<IInteCodeRulesRepository, InteCodeRulesRepository>();
             services.AddSingleton<IInteCodeRulesMakeRepository, InteCodeRulesMakeRepository>();
