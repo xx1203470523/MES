@@ -39,6 +39,13 @@ namespace Hymson.MES.Services.Services.Quality.IQualityService
         Task<IEnumerable<QualUnqualifiedCodeDto>> GetListByGroupIdAsync(long groupId);
 
         /// <summary>
+        /// 根据工序id查询不合格代码列表
+        /// </summary>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<QualUnqualifiedCodeDto>> GetListByProcedureIdAsync(long procedureId);
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="qualUnqualifiedCodeCreateDto"></param>
