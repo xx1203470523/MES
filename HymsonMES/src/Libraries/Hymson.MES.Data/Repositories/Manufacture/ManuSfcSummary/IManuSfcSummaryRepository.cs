@@ -23,7 +23,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuSfcSummaryEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ManuSfcSummaryEntity manuSfcSummaryEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -37,7 +37,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuSfcSummaryEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ManuSfcSummaryEntity manuSfcSummaryEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -52,7 +52,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -66,7 +66,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ManuSfcSummaryEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -80,13 +80,19 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuSfcSummaryQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuSfcSummaryEntity>> GetManuSfcSummaryEntitiesAsync(ManuSfcSummaryQuery manuSfcSummaryQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="manuSfcSummaryPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuSfcSummaryEntity>> GetPagedInfoAsync(ManuSfcSummaryPagedQuery manuSfcSummaryPagedQuery);
+        /// <summary>
+        /// 存在更新，不存在新增
+        /// </summary>
+        /// <param name="manuSfcSummaryEntitys"></param>
+        /// <returns></returns>
+        Task<int> InsertOrUpdateRangeAsync(List<ManuSfcSummaryEntity> manuSfcSummaryEntitys);
         #endregion
     }
 }

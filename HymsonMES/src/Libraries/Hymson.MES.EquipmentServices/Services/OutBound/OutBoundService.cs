@@ -262,9 +262,8 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             List<ManuSfcStepEntity> manuSfcStepEntities = new List<ManuSfcStepEntity>();
             List<ManuSfcEntity> manuSfcEntities = new List<ManuSfcEntity>();
             List<ManuSfcProduceEntity> manuSfcProduceEntities = new List<ManuSfcProduceEntity>();
-            List<ManuSfcSummaryEntity> manuSfcSummaryList = new List<ManuSfcSummaryEntity>();
             //更新汇总
-            List<ManuSfcSummaryEntity> manuSfcSummaryUpdateList = new List<ManuSfcSummaryEntity>();
+            List<ManuSfcSummaryEntity> manuSfcSummaryUpdateOrInsertList = new List<ManuSfcSummaryEntity>();
             //SFC信息处理
             foreach (var outBoundSFCDto in outBoundMoreDto.SFCs)
             {
@@ -369,7 +368,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 //汇总表
                 if (manuSfcSummaryEntity == null)//如果过站汇总信息为空
                 {
-                    manuSfcSummaryList.Add(new ManuSfcSummaryEntity
+                    manuSfcSummaryUpdateOrInsertList.Add(new ManuSfcSummaryEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = _currentEquipment.SiteId,
@@ -407,7 +406,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                     }
                     manuSfcSummaryEntity.UpdatedBy = _currentEquipment.Name;
                     manuSfcSummaryEntity.UpdatedOn = HymsonClock.Now();
-                    manuSfcSummaryUpdateList.Add(manuSfcSummaryEntity);
+                    manuSfcSummaryUpdateOrInsertList.Add(manuSfcSummaryEntity);
                 }
             }
 
@@ -546,15 +545,11 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 Qty = outBoundMoreDto.SFCs.Length,
             });
 
-            //更新汇总信息
-            if (manuSfcSummaryUpdateList.Any())
+            //新增或更新汇总信息
+            if (manuSfcSummaryUpdateOrInsertList.Any())
             {
-                rows += await _manuSfcSummaryRepository.UpdatesAsync(manuSfcSummaryUpdateList);
-            }
-            //新增汇总信息
-            if (manuSfcSummaryList.Any())
-            {
-                rows += await _manuSfcSummaryRepository.InsertsAsync(manuSfcSummaryList);
+                //更新NG数量程序中计算好更新
+                rows += await _manuSfcSummaryRepository.InsertOrUpdateRangeAsync(manuSfcSummaryUpdateOrInsertList);
             }
             trans.Complete();
         }

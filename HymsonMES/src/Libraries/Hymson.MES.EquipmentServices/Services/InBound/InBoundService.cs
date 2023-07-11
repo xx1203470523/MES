@@ -211,7 +211,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             ManuSfcSummaryQuery manuSfcSummaryQuery = new ManuSfcSummaryQuery
             {
                 SiteId = _currentEquipment.SiteId,
-                SFCS = sfclist.Select(c => c.SFC).ToArray()
+                SFCS = inBoundMoreDto.SFCs
             };
             var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
             //进站不允许不合格产品
@@ -315,33 +315,32 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                         });
                     }
                     //条码生产信息
-                    //var manuSfcProduceEntity = sfcProduceList.Where(c => c.SFC == sfcEntity.SFC).FirstOrDefault();
-                    //if ((manuSfcProduceEntity != null && manuSfcProduceEntity.WorkOrderId != planWorkOrderEntity.Id) || manuSfcProduceEntity == null)
-                    //{
-                    //    manuSfcProduceList.Add(new ManuSfcProduceEntity
-                    //    {
-                    //        Id = IdGenProvider.Instance.CreateId(),
-                    //        SiteId = _currentEquipment.SiteId,
-                    //        SFC = sfc,
-                    //        ProductId = planWorkOrderEntity.ProductId,
-                    //        WorkOrderId = planWorkOrderEntity.Id,
-                    //        BarCodeInfoId = sfcEntity.Id,
-                    //        ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
-                    //        WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
-                    //        ProductBOMId = planWorkOrderEntity.ProductBOMId,
-                    //        EquipmentId = _currentEquipment.Id ?? 0,
-                    //        ResourceId = procResource.Id,
-                    //        Qty = 1,//电芯进站默认都是1个
-                    //        ProcedureId = processRouteFirstProcedure.ProcedureId,
-                    //        Status = SfcProduceStatusEnum.Activity,//接口进站直接为活动
-                    //        RepeatedCount = 0,
-                    //        IsScrap = TrueOrFalseEnum.No,
-                    //        CreatedBy = _currentEquipment.Name,
-                    //        UpdatedBy = _currentEquipment.Name
-                    //    });
-                    //}
-                    //允许任意工单条码进站
                     var manuSfcProduceEntity = sfcProduceList.Where(c => c.SFC == sfcEntity.SFC).FirstOrDefault();
+                    if (manuSfcProduceEntity == null)
+                    {
+                        manuSfcProduceList.Add(new ManuSfcProduceEntity
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            SiteId = _currentEquipment.SiteId,
+                            SFC = sfc,
+                            ProductId = planWorkOrderEntity.ProductId,
+                            WorkOrderId = planWorkOrderEntity.Id,
+                            BarCodeInfoId = sfcEntity.Id,
+                            ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
+                            WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
+                            ProductBOMId = planWorkOrderEntity.ProductBOMId,
+                            EquipmentId = _currentEquipment.Id ?? 0,
+                            ResourceId = procResource.Id,
+                            Qty = 1,//电芯进站默认都是1个
+                            ProcedureId = processRouteFirstProcedure.ProcedureId,
+                            Status = SfcProduceStatusEnum.Activity,//接口进站直接为活动
+                            RepeatedCount = 0,
+                            IsScrap = TrueOrFalseEnum.No,
+                            CreatedBy = _currentEquipment.Name,
+                            UpdatedBy = _currentEquipment.Name
+                        });
+                    }
+                    //允许任意工单条码进站
                     if ((manuSfcProduceEntity != null && manuSfcProduceEntity.WorkOrderId != planWorkOrderEntity.Id) )
                     {
                         manuSfcProduceEntity.WorkOrderId= planWorkOrderEntity.Id;
