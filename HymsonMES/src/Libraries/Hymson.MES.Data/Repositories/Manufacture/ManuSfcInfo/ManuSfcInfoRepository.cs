@@ -151,7 +151,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ManuSfcInfoEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(List<ManuSfcInfoEntity> ManuSfcInfoEntitys)
+        public async Task<int> InsertsAsync(IEnumerable<ManuSfcInfoEntity> ManuSfcInfoEntitys)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, ManuSfcInfoEntitys);

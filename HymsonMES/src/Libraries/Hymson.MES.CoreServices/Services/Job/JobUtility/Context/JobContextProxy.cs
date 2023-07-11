@@ -1,11 +1,10 @@
 ﻿using Google.Protobuf.WellKnownTypes;
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
-using MySqlX.XDevAPI.Common;
-using Org.BouncyCastle.Tls.Crypto;
+using System.Collections;
 using System.Collections.Concurrent;
-using System.Linq;
+using System.Reflection;
 
 namespace Hymson.MES.CoreServices.Services.Job.JobUtility
 {
@@ -30,7 +29,6 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         public JobContextProxy()
         {
             // dictionary = new();
-
             int num = Math.Max(Environment.ProcessorCount * 8, 32);
             _semaphores = new SemaphoreSlim[num];
             for (int i = 0; i < _semaphores.Length; i++)
@@ -49,7 +47,6 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         }
 
         /// <summary>
-        /// 设置作业中入库数据缓存
         /// </summary>
         /// <param name="parameters"></param>
         /// <returns></returns>
@@ -58,17 +55,100 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             var obj = await GetValueAsync<T, TResult>(func, parameters);
             if (obj == null) return default;
 
-            foreach (var po in obj.GetType().GetProperties())
+            foreach (var property in obj.GetType().GetProperties())
             {
-                var cacheKey = (uint)$"{po.PropertyType}".GetHashCode();
-                var value = po.GetValue(obj);
-                if (value != null)
+                var cacheKey = (uint)$"{property.PropertyType}".GetHashCode();
+                var value = property.GetValue(obj);
+                //集合
+                if (typeof(IEnumerable).IsAssignableFrom(property.PropertyType))
                 {
-                    Set(cacheKey, value);
+                    var iEnumerableType = property.PropertyType.GetGenericArguments().FirstOrDefault();
+                    if (iEnumerableType != null)
+                    {
+                        if (iEnumerableType.BaseType == typeof(BaseEntity))
+                        {
+                            if (value != null)
+                            {
+                                Set(cacheKey, value);
+                            }
+                        }
+                        else
+                        {
+
+                        }
+                    }
+                }
+                else
+                {
+                    if (property.PropertyType.BaseType == typeof(BaseEntity))
+                    {
+                        if (value != null)
+                        {
+                            Set(cacheKey, value);
+                        }
+                        else
+                        { 
+                        
+                        }
+                    }
+                    else
+                    {
+                        var jobProxyAttribute = property.PropertyType.GetCustomAttribute<JobProxyAttribute>();
+                        if (jobProxyAttribute != null)
+                        {
+                            var primaryKeyName = "";
+                            var dicField = new Dictionary<string, object?>();
+                            foreach (var itemProperty in property.GetType().GetProperties())
+                            {
+                                var primaryKey = itemProperty.PropertyType.GetCustomAttribute<PrimaryKeyAttribute>();
+                                var itemValue = itemProperty.GetValue(value);
+                                if (primaryKey != null)
+                                {
+                                    primaryKeyName = itemProperty.GetType().Name;
+                                    dicField.Add(primaryKeyName, itemValue);
+                                }
+                                else
+                                {
+                                 var ignore=  itemProperty.PropertyType.GetCustomAttribute<IgnoreAttribute>();
+                                    if (ignore == null|| !ignore.IsIgnore)
+                                    {
+                                        dicField.Add(primaryKeyName, itemValue);
+                                    }
+                                }
+                            }
+                            cacheKey = (uint)$"{jobProxyAttribute.TableEntity}".GetHashCode();
+                            var cacheValue = Get(cacheKey);
+                            if (cacheValue != null)
+                            {                              
+                                foreach (var item in (IEnumerable)cacheValue )
+                                { 
+                                   
+                                }
+                            }
+                            else
+                            {
+                                cacheValue = (IEnumerable)(Activator.CreateInstance(type: jobProxyAttribute.TableEntity));
+                                if (cacheValue != null)
+                                {
+                                    //foreach (var iten in cacheValue)
+                                    //{
+                                    //}
+                                }
+
+                                //不完整数据
+                            }
+                        }
+                    }
                 }
             }
             return (TResult)obj;
         }
+
+        private bool IsCollection<T>()
+        {
+            return typeof(T) is { } type && typeof(IEnumerable).IsAssignableFrom(type);
+        }
+
 
         /// <summary>
         /// 获取作业中入库的数据缓存
