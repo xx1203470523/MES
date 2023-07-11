@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 
 namespace Hymson.MES.CoreServices.Bos.Job
@@ -51,6 +52,11 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 
         /// </summary>
         public IEnumerable<ManuSfcStepEntity> SFCStepEntities { get; set; } = new List<ManuSfcStepEntity>();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public MultiSfcUpdateIsUsedCommand MultiSfcUpdateIsUsedCommand { get; set; } = new();
 
     }
 

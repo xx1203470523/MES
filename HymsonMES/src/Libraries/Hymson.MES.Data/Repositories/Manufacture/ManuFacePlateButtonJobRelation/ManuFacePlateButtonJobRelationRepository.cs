@@ -11,6 +11,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
@@ -23,9 +24,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 
         /// </summary>
+        private readonly IMemoryCache _memoryCache;
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="connectionOptions"></param>
-        public ManuFacePlateButtonJobRelationRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
+        /// <param name="memoryCache"></param>
+        public ManuFacePlateButtonJobRelationRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
         {
+            _memoryCache = memoryCache;
         }
 
         #region 方法
@@ -91,8 +99,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<IEnumerable<ManuFacePlateButtonJobRelationEntity>> GetByFacePlateButtonIdAsync(long facePlateButtonId)
         {
-            using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<ManuFacePlateButtonJobRelationEntity>(GetByFacePlateButtonIdSql, new { facePlateButtonId });
+            var key = $"manu_face_plate_button_job_relation&{facePlateButtonId}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                using var conn = GetMESDbConnection();
+                return await conn.QueryAsync<ManuFacePlateButtonJobRelationEntity>(GetByFacePlateButtonIdSql, new { facePlateButtonId });
+            });
         }
 
         /// <summary>

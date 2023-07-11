@@ -19,6 +19,7 @@ using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -325,7 +326,16 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (buttonJobs.Any() == false) return result;
 
             // 根据 buttonJobs 读取对应的job对象
-            var jobs = await _inteJobRepository.GetByIdsAsync(buttonJobs.Select(s => s.JobId).ToArray());
+            var jobsOfNotSort = await _inteJobRepository.GetEntitiesAsync(new EntityBySiteIdQuery { SiteId = _currentSite.SiteId ?? 0 });
+
+            List<InteJobEntity> jobs = new();
+            foreach (var item in buttonJobs)
+            {
+                var tempJob = jobsOfNotSort.FirstOrDefault(f => f.Id == item.JobId);
+                if (tempJob == null) continue;
+
+                jobs.Add(tempJob);
+            }
 
             // 是否清除条码
             if (buttonJobs.Any(a => a.IsClear) == true) dto.Param?.Add("IsClear", "True");
@@ -340,8 +350,17 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ResourceId = dto.Param["ResourceId"].ParseToLong(),
                 SFCs = new string[] { dto.Param["SFC"] }
             });
+            foreach (var item in jobResponses)
+            {
+                result.Add(item.Key, new JobResponseDto
+                {
+                    Rows = item.Value.Rows,
+                    Content = item.Value.Content,
+                    Message = item.Value.Message,
+                    Time = item.Value.Time
+                });
+            }
             */
-            //result = jobResponses.Select(s => s.Value == new JobResponseDto { Content = null });
 
             result = await _jobCommonService.ExecuteJobAsync(jobs, dto.Param);
             return result;

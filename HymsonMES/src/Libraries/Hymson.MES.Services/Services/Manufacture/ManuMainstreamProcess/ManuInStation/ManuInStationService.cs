@@ -144,7 +144,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
                 /*
                  * 目前条码好像默认就是已使用，所以这里不需要再更新条码状态
                 // 修改条码使用状态为"已使用"
-                rows = await _manuSfcRepository.UpdateSfcIsUsedAsync(new ManuSfcUpdateIsUsedCommand
+                rows = await _manuSfcRepository.MultiUpdateSfcIsUsedAsync(new ManuSfcUpdateIsUsedCommand
                 {
                     Sfcs = new string[] { sfcProduceEntity.SFC },
                     UserId = sfcProduceEntity.UpdatedBy,
