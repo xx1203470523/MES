@@ -66,6 +66,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Where("SiteId=@SiteId");
             sqlBuilder.Select("*");
+            sqlBuilder.OrderBy("ProcedureId,CreatedOn");
 
             if (!string.IsNullOrWhiteSpace(manuSfcStepPagedQuery.SFC))
             {
@@ -236,7 +237,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public partial class ManuSfcStepRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_step` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_step` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_sfc_step` /**where**/ ";
         const string GetManuSfcStepEntitiesSqlTemplate = @"SELECT 
                                             /**select**/

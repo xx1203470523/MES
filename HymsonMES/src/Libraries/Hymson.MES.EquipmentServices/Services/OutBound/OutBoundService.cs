@@ -297,6 +297,21 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                     UpdatedOn = HymsonClock.Now(),
                     IsPassingStation = outBoundSFCDto.IsPassingStation//是否是过站
                 };
+                //如果是过站
+                if (outBoundSFCDto.IsPassingStation)
+                {
+                    //复制对象
+                    var manuSfcStepPassingEntity = JsonSerializer.Deserialize<ManuSfcStepEntity>(JsonSerializer.Serialize(manuSfcStepEntity));
+                    if (manuSfcStepPassingEntity != null)
+                    {
+                        //插入 manu_sfc_step 状态为 进站
+                        manuSfcStepPassingEntity.Id = IdGenProvider.Instance.CreateId();
+                        manuSfcStepPassingEntity.Operatetype = ManuSfcStepTypeEnum.InStock;
+                        manuSfcStepPassingEntity.CreatedOn = HymsonClock.Now().AddSeconds(-1);//方便区分进站和出站时间
+                        manuSfcStepPassingEntity.UpdatedOn = HymsonClock.Now().AddSeconds(-1);
+                        manuSfcStepEntities.Add(manuSfcStepPassingEntity);
+                    }
+                }
                 // 获取下一个工序（如果没有了，就表示完工） TODO 这里GetNextProcedureAsync里需要缓存
                 var nextProcedure = await GetNextProcedureAsync(sfcProduceEntity.WorkOrderId, sfcProduceEntity.ProcessRouteId, sfcProduceEntity.ProcedureId);
                 //完工
@@ -339,21 +354,6 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 }
                 else//未完工
                 {
-                    //如果是过站
-                    if (outBoundSFCDto.IsPassingStation)
-                    {
-                        //复制对象
-                        var manuSfcStepPassingEntity = JsonSerializer.Deserialize<ManuSfcStepEntity>(JsonSerializer.Serialize(manuSfcStepEntity));
-                        if (manuSfcStepPassingEntity != null)
-                        {
-                            //插入 manu_sfc_step 状态为 进站
-                            manuSfcStepPassingEntity.Id = IdGenProvider.Instance.CreateId();
-                            manuSfcStepPassingEntity.Operatetype = ManuSfcStepTypeEnum.InStock;
-                            manuSfcStepPassingEntity.CreatedOn = HymsonClock.Now().AddSeconds(-1);//方便区分进站和出站时间
-                            manuSfcStepPassingEntity.UpdatedOn = HymsonClock.Now().AddSeconds(-1);
-                            manuSfcStepEntities.Add(manuSfcStepPassingEntity);
-                        }
-                    }
                     // 修改 manu_sfc_produce 为排队, 工序修改为下一工序的id
                     sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
                     sfcProduceEntity.ProcedureId = nextProcedure.Id;

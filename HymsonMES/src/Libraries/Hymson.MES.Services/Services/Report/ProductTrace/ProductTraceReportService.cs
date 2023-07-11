@@ -333,13 +333,17 @@ namespace Hymson.MES.Services.Services.Report
             //工艺路线明细
             procProcessRouteDetailNodeQuery.ProcessRouteId = planWorkOrderEntity.ProcessRouteId;
             var pagedInfo = await _procProcessRouteDetailNodeRepository.GetPagedInfoAsync(procProcessRouteDetailNodeQuery);
-            //过滤结束工序并按序号排序
-            pagedInfo.Data = pagedInfo.Data.Where(c => !string.IsNullOrEmpty(c.Code)).OrderBy(x => x.SerialNo.ParseToInt());
             //查询条码步骤
             var manuSfcStepEntities = await _manuSfcStepRepository.GetManuSfcStepEntitiesAsync(new ManuSfcStepQuery { SFC = manuSfcEntity.SFC, SiteId = _currentSite.SiteId ?? 0 });
             procSfcProcessRouteViewDtos = pagedInfo.Data.Select(c =>
             {
-                return GetProcessRouteDetailStep(c, manuSfcStepEntities);
+                var sfcProcessRouteViewDto = GetProcessRouteDetailStep(c, manuSfcStepEntities);
+                //处理结束工序编码为空的显示
+                if (string.IsNullOrEmpty(sfcProcessRouteViewDto.ProcedureCode))
+                {
+                    sfcProcessRouteViewDto.ProcedureName = "结束";
+                }
+                return sfcProcessRouteViewDto;
             });
 
             return new PagedInfo<ProcSfcProcessRouteViewDto>(procSfcProcessRouteViewDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
@@ -397,7 +401,9 @@ namespace Hymson.MES.Services.Services.Report
                 Passed = passed,
                 CreatedOn = createdOn,
                 CreatedBy = createdBy,
-                Qty = qty
+                Qty = qty,
+                SerialNo = routeDetailNodeView.SerialNo.ParseToInt(),
+                Remark = routeDetailNodeView.Remark
             };
         }
 

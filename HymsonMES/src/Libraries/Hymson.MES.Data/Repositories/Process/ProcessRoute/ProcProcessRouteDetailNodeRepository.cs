@@ -36,6 +36,7 @@ namespace Hymson.MES.Data.Repositories.Process
             /*sqlBuilder.Where("a.SiteId=@SiteId")*/;
             sqlBuilder.Select("a.*,b.Code,b.Name,b.Type");
             sqlBuilder.LeftJoin("proc_procedure b on a.ProcedureId=b.Id /*AND a.SiteId=b.SiteId*/ AND b.IsDeleted=0");
+            sqlBuilder.Where("SerialNo");
             if (query.ProcessRouteId.HasValue)
             {
                 sqlBuilder.Where("a.ProcessRouteId=@ProcessRouteId");

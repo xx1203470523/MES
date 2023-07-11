@@ -430,6 +430,10 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 出站时间
         /// </summary>
         public DateTime? OutBountTime { get; set; }
+        /// <summary>
+        /// 序号
+        /// </summary>
+        public int SerialNo { get; set; }
     }
 
     #endregion
