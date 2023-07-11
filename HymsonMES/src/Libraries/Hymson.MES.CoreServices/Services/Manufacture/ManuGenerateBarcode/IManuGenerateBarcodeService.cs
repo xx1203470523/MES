@@ -1,7 +1,7 @@
-﻿using Hymson.Infrastructure.Exceptions;
-using Hymson.MES.CoreServices.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGenerateBarcodeDto;
+﻿using Hymson.MES.CoreServices.Bos.Manufacture;
+using Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode;
 
-namespace Hymson.MES.CoreServices.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode
+namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
 {
     /// <summary>
     /// 生成条码接口
@@ -15,7 +15,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuMainstreamProcess.Gen
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<IEnumerable<string>> GenerateBarcodeSerialNumberAsync(BarcodeSerialNumberDto param);
+        Task<IEnumerable<string>> GenerateBarCodeSerialNumberAsync(BarCodeSerialNumberBo param);
 
         /// <summary>
         /// 条码生成
@@ -23,7 +23,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuMainstreamProcess.Gen
         /// <param name="param"></param>
         /// <returns></returns>
         /// <exception cref="BusinessException">未找到生成规则</exception>
-        Task<IEnumerable<string>> GenerateBarcodeListByIdAsync(GenerateBarcodeDto param);
+        Task<IEnumerable<string>> GenerateBarcodeListByIdAsync(GenerateBarcodeBo param);
 
         /// <summary>
         /// 条码生成
@@ -31,6 +31,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuMainstreamProcess.Gen
         /// <param name="param"></param>
         /// <returns></returns>
         /// <exception cref="BusinessException">未找到生成规则</exception>
-        Task<IEnumerable<string>> GenerateBarcodeListAsync(CodeRuleDto param);
+        Task<IEnumerable<string>> GenerateBarcodeListAsync(CodeRuleBo param);
     }
 }
+

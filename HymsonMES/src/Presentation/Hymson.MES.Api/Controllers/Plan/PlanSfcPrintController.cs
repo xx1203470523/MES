@@ -46,8 +46,8 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        [LogDescription("条码打印", BusinessType.INSERT)]
-        [PermissionDescription("plan:sfcPrint:insert")]
+        //[LogDescription("条码打印", BusinessType.INSERT)]
+        //[PermissionDescription("plan:sfcPrint:insert")]
         public async Task CreateAsync([FromBody] PlanSfcPrintCreateDto createDto)
         {
             await _planSfcPrintService.CreateAsync(createDto);

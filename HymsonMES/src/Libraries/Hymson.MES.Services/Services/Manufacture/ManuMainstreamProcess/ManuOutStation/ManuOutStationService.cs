@@ -1,7 +1,7 @@
-﻿using Dapper;
-using Hymson.Authentication;
+﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Process;
@@ -10,6 +10,7 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
+using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
@@ -47,6 +48,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// 服务接口（生产通用）
         /// </summary>
         private readonly IManuCommonOldService _manuCommonOldService;
+
+        /// <summary>
+        /// 服务接口（主数据）
+        /// </summary>
+        private readonly IMasterDataService _masterDataService;
 
         /// <summary>
         /// 仓储接口（条码步骤）
@@ -113,6 +119,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// </summary>
         private readonly IWhMaterialStandingbookRepository _whMaterialStandingbookRepository;
 
+        private readonly ILocalizationService _localizationService;
 
         /// <summary>
         /// 构造函数
@@ -120,6 +127,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="manuCommonOldService"></param>
+        /// <param name="masterDataService"></param>
         /// <param name="manuSfcStepRepository"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
@@ -135,6 +143,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// <param name="whMaterialStandingbookRepository"></param>
         public ManuOutStationService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonOldService manuCommonOldService,
+            IMasterDataService masterDataService,
             IManuSfcStepRepository manuSfcStepRepository,
             IManuSfcRepository manuSfcRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
@@ -147,11 +156,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             IProcReplaceMaterialRepository procReplaceMaterialRepository,
              IProcProcessRouteRepository procProcessRouteRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
-            IWhMaterialStandingbookRepository whMaterialStandingbookRepository)
+            IWhMaterialStandingbookRepository whMaterialStandingbookRepository, ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _manuCommonOldService = manuCommonOldService;
+            _masterDataService = masterDataService;
             _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
@@ -165,6 +175,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             _procProcessRouteRepository = procProcessRouteRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
+            _localizationService = localizationService;
         }
 
 
@@ -210,7 +221,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
 
             // 扣料
             //await func(sfcProduceEntity.ProductBOMId, sfcProduceEntity.ProcedureId);
-            var initialMaterials = await GetInitialMaterialsAsync(sfcProduceEntity);
+            var initialMaterials = await _masterDataService.GetInitialMaterialsAsync(sfcProduceEntity);
 
             // 物料ID集合
             var materialIds = initialMaterials.Select(s => s.MaterialId);
@@ -232,14 +243,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             {
                 // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
                 decimal residue = materialBo.Usages;
-                if (materialBo.Loss.HasValue == true && materialBo.Loss > 0) residue *= (materialBo.Loss.Value / 100);
+                if (materialBo.Loss.HasValue == true && materialBo.Loss > 0) residue *= materialBo.Loss.Value;
                 if (materialBo.ConsumeRatio > 0) residue *= (materialBo.ConsumeRatio / 100);
 
                 // 收集方式是批次
                 if (materialBo.DataCollectionWay == MaterialSerialNumberEnum.Batch)
                 {
                     // 进行扣料
-                    DeductMaterialQty(ref updates, ref adds, ref residue, sfcProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
+                    _masterDataService.DeductMaterialQty(ref updates, ref adds, ref residue, sfcProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
                     continue;
                 }
 
@@ -247,12 +258,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 if (materialBo.SerialNumber != MaterialSerialNumberEnum.Batch) continue;
 
                 // 进行扣料
-                DeductMaterialQty(ref updates, ref adds, ref residue, sfcProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
+                _masterDataService.DeductMaterialQty(ref updates, ref adds, ref residue, sfcProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
             }
 
             // manu_sfc_info 修改为完成 且入库
             // 条码信息
-            var sfcInfo = await _manuSfcRepository.GetBySFCAsync(new GetBySFCQuery
+            var sfcInfo = await _manuSfcRepository.GetBySFCAsync(new GetBySfcQuery
             {
                 SiteId = _currentSite.SiteId,
                 SFC = sfcProduceEntity.SFC
@@ -267,8 +278,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES18104)).WithData("sfc", sfcProduceEntity.SFC);
 
             // 更新数据
-            List<Task> tasks = new();
             using var trans = TransactionHelper.GetTransactionScope();
+            List<Task> tasks = new();
 
             // 更新物料库存
             if (updates.Any() == true)
@@ -354,6 +365,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 // 修改 manu_sfc_produce 为排队, 工序修改为下一工序的id
                 sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
                 sfcProduceEntity.ProcedureId = nextProcedure.Id;
+                // 不置空的话，可能进站时，可能校验不通过
+                sfcProduceEntity.ResourceId = null;
                 var manuSfcProduceUpdateTask = _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
                 tasks.Add(manuSfcProduceUpdateTask);
 
@@ -394,101 +407,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             var (sfcProduceEntity, _) = await _manuCommonOldService.GetProduceSFCAsync(bo.SFC);
 
             // 合法性校验
-            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity)
+            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcProduceStatusEnum).FullName}.{nameof(SfcProduceStatusEnum.Activity)}"))
                             .VerifyProcedure(bo.ProcedureId);
 
             // 出站
             return await OutStationAsync(sfcProduceEntity);
         }
 
-
-        /// <summary>
-        /// 获取即将扣料的物料数据
-        /// </summary>
-        /// <param name="sfcProduceEntity"></param>
-        /// <returns></returns>
-        private async Task<IEnumerable<MaterialDeductBo>> GetInitialMaterialsAsync(ManuSfcProduceEntity sfcProduceEntity)
-        {
-            // 获取BOM绑定的物料
-            var mainMaterials = await _procBomDetailRepository.GetByBomIdAsync(sfcProduceEntity.ProductBOMId);
-
-            // 未设置物料
-            if (mainMaterials == null || mainMaterials.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES10612));
-
-            // 取得特定工序的物料
-            mainMaterials = mainMaterials.Where(w => w.ProcedureId == sfcProduceEntity.ProcedureId);
-            var materialIds = mainMaterials.Select(s => s.MaterialId).AsList();
-
-            // 查询BOM替代料
-            var replaceMaterialsForBOM = await _procBomDetailReplaceMaterialRepository.GetByBomIdAsync(sfcProduceEntity.ProductBOMId);
-            var replaceMaterialsForBOMDic = replaceMaterialsForBOM.ToLookup(w => w.BomDetailId).ToDictionary(d => d.Key, d => d);
-
-            // 查询物料基础数据的替代料
-            var replaceMaterialsForMain = await _procReplaceMaterialRepository.GetProcReplaceMaterialViewsAsync(sfcProduceEntity.SiteId);
-            replaceMaterialsForMain = replaceMaterialsForMain.Where(w => materialIds.Contains(w.MaterialId));
-            var replaceMaterialsForMainDic = replaceMaterialsForMain.ToLookup(w => w.MaterialId).ToDictionary(d => d.Key, d => d);
-
-            // 组合主物料ID和替代料ID
-            materialIds.AddRange(replaceMaterialsForBOM.Select(s => s.ReplaceMaterialId));
-
-            // 查询所有主物料和替代料的基础信息（为了读取消耗系数和收集方式）
-            var materialEntities = await _procMaterialRepository.GetBySiteIdAsync(sfcProduceEntity.SiteId);
-            materialEntities = materialEntities.Where(w => materialIds.Contains(w.Id));
-
-            // 获取初始扣料数据
-            List<MaterialDeductBo> initialMaterials = new();
-            foreach (var item in mainMaterials)
-            {
-                var materialEntitiy = materialEntities.FirstOrDefault(f => f.Id == item.MaterialId);
-                if (materialEntitiy == null) continue;
-
-                var deduct = new MaterialDeductBo
-                {
-                    MaterialId = item.MaterialId,
-                    Usages = item.Usages,
-                    Loss = item.Loss,
-                    DataCollectionWay = item.DataCollectionWay,
-                    SerialNumber = materialEntitiy.SerialNumber
-                };
-                if (materialEntitiy.ConsumeRatio.HasValue) deduct.ConsumeRatio = materialEntitiy.ConsumeRatio.Value;
-
-                // 填充BOM替代料
-                if (item.IsEnableReplace == false)
-                {
-                    if (replaceMaterialsForBOMDic.TryGetValue(item.Id, out var replaces) == true)
-                    {
-                        // 启用的替代物料（BOM）
-                        deduct.ReplaceMaterials = replaces.Select(s => new MaterialDeductItemBo
-                        {
-                            MaterialId = s.ReplaceMaterialId,
-                            Usages = s.Usages,
-                            Loss = s.Loss,
-                            ConsumeRatio = GetConsumeRatio(materialEntities, s.ReplaceMaterialId)
-                        });
-                    }
-                }
-                // 填充物料替代料
-                else
-                {
-                    if (replaceMaterialsForMainDic.TryGetValue(item.MaterialId, out var replaces) == true)
-                    {
-                        // 启用的替代物料（物料维护）
-                        deduct.ReplaceMaterials = replaces.Where(w => w.IsEnabled == true).Select(s => new MaterialDeductItemBo
-                        {
-                            MaterialId = s.MaterialId,
-                            Usages = item.Usages,
-                            Loss = item.Loss,
-                            ConsumeRatio = GetConsumeRatio(materialEntities, s.MaterialId)
-                        });
-                    }
-                }
-
-                // 添加到初始扣料集合
-                initialMaterials.Add(deduct);
-            }
-
-            return initialMaterials;
-        }
 
         /// <summary>
         /// 入库
@@ -536,159 +461,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 UpdatedBy = manuSfcProduceEntity.UpdatedBy,
                 UpdatedOn = manuSfcProduceEntity.UpdatedOn
             }));
-        }
-
-
-        /// <summary>
-        /// 进行扣料（单一物料，包含物料的替代料）
-        /// </summary>
-        /// <param name="updates">需要更新数量的集合</param>
-        /// <param name="adds">需要新增的条码流转集合</param>
-        /// <param name="residue">剩余未扣除的数量</param>
-        /// <param name="sfcProduceEntity">条码在制信息</param>
-        /// <param name="manuFeedingsDictionary">已分组的物料库存集合</param>
-        /// <param name="mainMaterialBo">主物料BO对象</param>
-        /// <param name="currentBo">替代料BO对象</param>
-        /// <param name="isMain">是否主物料</param>
-        private static void DeductMaterialQty(ref List<UpdateQtyByIdCommand> updates,
-            ref List<ManuSfcCirculationEntity> adds,
-            ref decimal residue,
-            ManuSfcProduceEntity sfcProduceEntity,
-            Dictionary<long, IGrouping<long, ManuFeedingEntity>> manuFeedingsDictionary,
-            MaterialDeductBo mainMaterialBo,
-            MaterialDeductBo currentBo,
-            bool isMain = true)
-        {
-            // 没有剩余需要抵扣时，直接返回
-            if (residue <= 0) return;
-
-            // 取得当前物料的库存
-            if (manuFeedingsDictionary.TryGetValue(currentBo.MaterialId, out var feedingEntities) == false) return;
-            if (feedingEntities.Any() == false) return;
-
-            // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
-            decimal originQty = currentBo.Usages;
-            if (currentBo.Loss.HasValue == true && currentBo.Loss > 0) originQty *= (currentBo.Loss.Value / 100);
-            if (currentBo.ConsumeRatio > 0) originQty *= (currentBo.ConsumeRatio / 100);
-
-            // 遍历当前物料的所有的物料库存
-            foreach (var feeding in feedingEntities)
-            {
-                decimal targetQty = originQty;
-                var consume = 0m;
-                if (residue <= 0) break;
-                if (feeding.Qty <= 0) continue;
-
-                // 如果是替代料条码，就将替代料的消耗数值重新算下
-                if (currentBo.MaterialId != feeding.MaterialId)
-                {
-                    var replaceBo = currentBo.ReplaceMaterials.FirstOrDefault(f => f.MaterialId == feeding.MaterialId);
-                    if (replaceBo != null)
-                    {
-                        // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
-                        targetQty = replaceBo.Usages;
-                        if (replaceBo.Loss.HasValue == true && replaceBo.Loss > 0) targetQty *= (replaceBo.Loss.Value / 100);
-                        if (replaceBo.ConsumeRatio > 0) targetQty *= (replaceBo.ConsumeRatio / 100);
-                    }
-                }
-
-                // 剩余折算成目标数量
-                var convertResidue = ToTargetValue(originQty, targetQty, residue);
-
-                // 数量足够
-                if (convertResidue <= feeding.Qty)
-                {
-                    consume = convertResidue;
-                    residue = 0;
-                    feeding.Qty -= consume;
-                }
-                // 数量不够，继续下一个
-                else
-                {
-                    consume = feeding.Qty;
-                    residue -= ToTargetValue(targetQty, originQty, consume);
-                    feeding.Qty = 0;
-                }
-
-                // 添加到扣减物料库存
-                updates.Add(new UpdateQtyByIdCommand
-                {
-                    UpdatedBy = sfcProduceEntity.UpdatedBy ?? sfcProduceEntity.CreatedBy,
-                    UpdatedOn = sfcProduceEntity.UpdatedOn,
-                    Qty = feeding.Qty,
-                    Id = feeding.Id
-                });
-
-                // 添加条码流转记录（消耗）
-                adds.Add(new ManuSfcCirculationEntity
-                {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = sfcProduceEntity.SiteId,
-                    ProcedureId = sfcProduceEntity.ProcedureId,
-                    ResourceId = sfcProduceEntity.ResourceId,
-                    SFC = sfcProduceEntity.SFC,
-                    WorkOrderId = sfcProduceEntity.WorkOrderId,
-                    ProductId = sfcProduceEntity.ProductId,
-                    CirculationBarCode = feeding.BarCode,
-                    CirculationProductId = currentBo.MaterialId,
-                    CirculationMainProductId = mainMaterialBo.MaterialId,
-                    CirculationQty = consume,
-                    CirculationType = SfcCirculationTypeEnum.Consume,
-                    CreatedBy = sfcProduceEntity.CreatedBy,
-                    UpdatedBy = sfcProduceEntity.UpdatedBy
-                });
-            }
-
-            // 主物料才扣除检索下级替代料，当还有剩余未扣除的数量时，扣除替代料（替代料不再递归扣除下级替代料库存）
-            if (isMain == false || residue <= 0) return;
-
-            // 扣除替代料
-            foreach (var replaceFeeding in currentBo.ReplaceMaterials)
-            {
-                // 递归扣除替代料库存
-                DeductMaterialQty(ref updates, ref adds, ref residue,
-                    sfcProduceEntity, manuFeedingsDictionary, mainMaterialBo,
-                    new MaterialDeductBo
-                    {
-                        MaterialId = replaceFeeding.MaterialId,
-                        Usages = replaceFeeding.Usages,
-                        Loss = replaceFeeding.Loss,
-                        ConsumeRatio = replaceFeeding.ConsumeRatio,
-                        DataCollectionWay = mainMaterialBo.DataCollectionWay
-                    }, false);
-            }
-
-        }
-
-        /// <summary>
-        /// 取得消耗系数
-        /// </summary>
-        /// <param name="materialEntities"></param>
-        /// <param name="replaceMaterialId"></param>
-        /// <returns></returns>
-        private static decimal GetConsumeRatio(IEnumerable<ProcMaterialEntity> materialEntities, long replaceMaterialId)
-        {
-            decimal defaultConsumeRatio = 100;
-
-            if (materialEntities == null || materialEntities.Any() == false) return defaultConsumeRatio;
-
-            var materialEntity = materialEntities.FirstOrDefault(f => f.Id == replaceMaterialId);
-            if (materialEntity == null || materialEntity.ConsumeRatio.HasValue == false) return defaultConsumeRatio;
-
-            return materialEntity.ConsumeRatio.Value;
-        }
-
-        /// <summary>
-        /// 转换数量
-        /// </summary>
-        /// <param name="originQty"></param>
-        /// <param name="targetQty"></param>
-        /// <param name="originValue"></param>
-        /// <returns></returns>
-        private static decimal ToTargetValue(decimal originQty, decimal targetQty, decimal originValue)
-        {
-            if (originQty == 0) return originValue;
-            return targetQty * originValue / originQty;
         }
 
     }

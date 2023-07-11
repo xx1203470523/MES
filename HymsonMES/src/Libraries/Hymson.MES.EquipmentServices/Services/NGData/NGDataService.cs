@@ -39,7 +39,7 @@ namespace Hymson.MES.EquipmentServices.Services
                 throw new CustomerValidationException(nameof(ErrorCode.MES19003));
             }
             NGDataDto nGDataDto = new();
-            var queryStep = new SFCInOutStepQuery
+            var queryStep = new SfcInOutStepQuery
             {
                 Sfc = sfc,
                 SiteId = _currentEquipment.SiteId

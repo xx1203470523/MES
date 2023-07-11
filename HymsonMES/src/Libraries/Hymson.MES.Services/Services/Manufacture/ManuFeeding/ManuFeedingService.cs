@@ -346,6 +346,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         {
             // 查询条码
             var inventory = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery { SiteId = _currentSite.SiteId, BarCode = saveDto.BarCode });
+            if (inventory.QuantityResidue <= 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16909)).WithData("barCode", saveDto.BarCode);
+            }
 
             // 查询物料
             var material = await _procMaterialRepository.GetByIdAsync(saveDto.ProductId) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10204));
@@ -368,7 +372,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             {
                 // 读取资源绑定的产线
                 var workCenter = await _inteWorkCenterRepository.GetByResourceIdAsync(entity.ResourceId)
-                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES16315)).WithData("barCode", inventory.MaterialBarCode);    // ErrorCode.MES16803
+                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES16803));    // ErrorCode.MES15502
 
                 // 通过产线->工单->BOM
                 var bomIds = await GetBomIdsByWorkCenterIdAsync(workCenter.Id, null);
@@ -381,7 +385,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
 
                 // 检查是否符合替代料
                 var bomDetailReplaceMaterialEntities = await _procBomDetailReplaceMaterialRepository.GetByBomDetailIdAsync(bomDetailEntitiy.Id);
-                if (bomDetailReplaceMaterialEntities.Any(a => a.ReplaceMaterialId != inventory.MaterialId)) throw new CustomerValidationException(nameof(ErrorCode.MES16315)).WithData("barCode", inventory.MaterialBarCode);
+                if (bomDetailReplaceMaterialEntities.Any(a => a.ReplaceMaterialId == inventory.MaterialId) == false) throw new CustomerValidationException(nameof(ErrorCode.MES16315)).WithData("barCode", inventory.MaterialBarCode);
             }
 
             var rows = 0;

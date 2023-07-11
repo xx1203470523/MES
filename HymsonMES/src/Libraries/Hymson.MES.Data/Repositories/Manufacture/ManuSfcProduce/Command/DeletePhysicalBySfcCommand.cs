@@ -1,6 +1,4 @@
-﻿using Hymson.MES.Core.Enums.Manufacture;
-
-namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
+﻿namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
 {
     /// <summary>
     /// 删除 (物料删除)

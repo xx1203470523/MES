@@ -22,7 +22,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFacePlateRepair.Query
         public long SiteId { get; set; }
     }
 
-    public class GetManuSfcRepairBySFCQuery 
+    public class GetManuSfcRepairBySfcQuery 
     {
         /// <summary>
         /// SFC 

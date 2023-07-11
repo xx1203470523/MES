@@ -1,5 +1,4 @@
-﻿using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.CoreServices.Bos.Common;
+﻿using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 
 namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
@@ -9,13 +8,6 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
     /// </summary>
     public interface IManuCommonService
     {
-        /// <summary>
-        /// 获取生产条码信息
-        /// </summary>
-        /// <param name="sfcBo"></param>
-        /// <returns></returns>
-        Task<(ManuSfcProduceEntity, ManuSfcProduceBusinessEntity)> GetProduceSFCAsync(SingleSFCBo sfcBo);
-
         /// <summary>
         /// 批量验证条码是否锁定
         /// </summary>
@@ -37,5 +29,12 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// <returns></returns>
         Task VerifyBomQtyAsync(ManuProcedureBomBo procedureBomBo);
 
+        /// <summary>
+        /// 验证条码掩码规则
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <param name="materialId"></param>
+        /// <returns></returns>
+        Task<bool> CheckBarCodeByMaskCodeRuleAsync(string barCode, long materialId);
     }
 }

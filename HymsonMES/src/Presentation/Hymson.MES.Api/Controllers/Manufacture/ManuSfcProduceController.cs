@@ -1,6 +1,8 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Manufacture
@@ -50,6 +52,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("lock")]
+        [PermissionDescription("qual:qualityLock:lock")]
         public async Task QualityLockAsync(ManuSfcProduceLockDto parm)
         {
             await _manuSfcProduceService.QualityLockAsync(parm);
@@ -62,22 +65,31 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("scrap")]
+        [PermissionDescription("qual:productScrap:scrap")]
         public async Task QualityScrapAsync(ManuSfScrapDto parm)
         {
-            await _manuSfcProduceService.QualityScrapAsync(parm);
+            if(parm.OperationType== ScrapOperateTypeEnum.Scrapping)
+            {
+                await _manuSfcProduceService.QualityScrapAsync(parm);
+            }
+            else
+            {
+                await _manuSfcProduceService.QualityCancelScrapAsync(parm);
+            }
         }
 
-        /// <summary>
-        /// 条码取消报废
-        /// </summary>
-        /// <param name="parm"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("cancelScrap")]
-        public async Task QualityCancelScrapAsync(ManuSfScrapDto parm)
-        {
-            await _manuSfcProduceService.QualityCancelScrapAsync(parm);
-        }
+        ///// <summary>
+        ///// 条码取消报废
+        ///// </summary>
+        ///// <param name="parm"></param>
+        ///// <returns></returns>
+        //[HttpPost]
+        //[Route("cancelScrap")]
+        //[PermissionDescription("qual:productScrap:scrap")]
+        //public async Task QualityCancelScrapAsync(ManuSfScrapDto parm)
+        //{
+        //    await _manuSfcProduceService.QualityCancelScrapAsync(parm);
+        //}
 
         /// <summary>
         /// 查询详情（条码生产信息（物理删除））
@@ -148,6 +160,19 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         {
             return await _manuSfcProduceService.GetManuSfcPagedInfoAsync(parm);
         }
+
+        /// <summary>
+        /// 分页查询列表（条码生产信息（物理删除））
+        /// 优化
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpGet("getManuSfcSelectPageList")]
+        public async Task<PagedInfo<ManuSfcProduceSelectViewDto>> GetManuSfcSelectPagedInfoAsync([FromQuery] ManuSfcProduceSelectPagedQueryDto parm)
+        {
+            return await _manuSfcProduceService.GetManuSfcSelectPagedInfoAsync(parm);
+        }
+
         /// <summary>
         /// 根据SFC查询在制品步骤列表
         /// </summary>
@@ -165,6 +190,8 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="sfcProduceStepDto"></param>
         /// <returns></returns>
         [HttpPost("saveManuSfcProduceStep")]
+        [LogDescription("在制品步骤控制", BusinessType.INSERT)]
+        [PermissionDescription("manu:manSfcStepControl:saveStep")]
         public async Task SaveManuSfcProduceStepAsync(SaveManuSfcProduceStepDto sfcProduceStepDto)
         {
             await _manuSfcProduceService.SaveManuSfcProduceStepAsync(sfcProduceStepDto);
@@ -199,6 +226,8 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="manuUpdateSaveDto"></param>
         /// <returns></returns>
         [HttpPost("saveManuUpdate")]
+        [LogDescription("生产更改", BusinessType.INSERT)]
+        [PermissionDescription("manu:manuUpdate:saveUpdate")]
         public async Task SaveManuUpdateList(ManuUpdateSaveDto manuUpdateSaveDto)
         {
             await _manuSfcProduceService.SaveManuUpdateListAsync(manuUpdateSaveDto);

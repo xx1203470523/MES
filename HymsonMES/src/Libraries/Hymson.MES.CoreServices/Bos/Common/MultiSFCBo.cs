@@ -14,6 +14,6 @@
         /// 条码集合
         /// </summary>
         public IEnumerable<string> SFCs { get; set; } = new List<string>();
-
     }
 }
+    

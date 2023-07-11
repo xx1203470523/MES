@@ -6,7 +6,7 @@ using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
-using Hymson.MES.CoreServices.Services.Common;
+using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Plan;
@@ -348,7 +348,7 @@ namespace Hymson.MES.EquipmentServices.Services.Common
         /// </summary>
         /// <param name="sfcProduceEntity"></param>
         /// <param name="produceStatus"></param>
-        public static ManuSfcProduceEntity VerifySFCStatus(this ManuSfcProduceEntity sfcProduceEntity, SfcProduceStatusEnum produceStatus)
+        public static ManuSfcProduceEntity VerifySFCStatus(this ManuSfcProduceEntity sfcProduceEntity, SfcProduceStatusEnum produceStatus, string produceStatusDescription)
         {
             // 当前条码是否是被锁定
             if (sfcProduceEntity.Status == SfcProduceStatusEnum.Locked) throw new CustomerValidationException(nameof(ErrorCode.MES16314)).WithData("SFC", sfcProduceEntity.SFC);
@@ -357,7 +357,7 @@ namespace Hymson.MES.EquipmentServices.Services.Common
             if (sfcProduceEntity.IsScrap == TrueOrFalseEnum.Yes) throw new CustomerValidationException(nameof(ErrorCode.MES16322)).WithData("SFC", sfcProduceEntity.SFC);
 
             // 当前工序是否是指定状态
-            if (sfcProduceEntity.Status != produceStatus) throw new CustomerValidationException(nameof(ErrorCode.MES16313)).WithData("Status", produceStatus.GetDescription());
+            if (sfcProduceEntity.Status != produceStatus) throw new CustomerValidationException(nameof(ErrorCode.MES16313)).WithData("Status", produceStatusDescription);
 
             return sfcProduceEntity;
         }
@@ -408,7 +408,7 @@ namespace Hymson.MES.EquipmentServices.Services.Common
                         break;
                 }
 
-                if (Regex.IsMatch(barCode, pattern) == false) return false;
+                if (!Regex.IsMatch(barCode, pattern) ) return false;
             }
 
             return true;

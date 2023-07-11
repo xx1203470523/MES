@@ -50,9 +50,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 获取List
         /// </summary>
-        /// <param name="manuSfcProduceQuery"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuSfcProduceEntity>> GetManuSfcProduceEntitiesAsync(ManuSfcProduceQuery manuSfcProduceQuery);
+        Task<IEnumerable<ManuSfcProduceEntity>> GetManuSfcProduceEntitiesAsync(ManuSfcProduceQuery query);
 
         /// <summary>
         /// 获取带manu_sfc_info的list
@@ -88,6 +88,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuSfcProduceEntity"></param>
         /// <returns></returns>
         Task<int> UpdateWithStatusCheckAsync(ManuSfcProduceEntity manuSfcProduceEntity);
+
+        /// <summary>
+        /// 批量更新（带状态检查）
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        Task<int> UpdateRangeWithStatusCheckAsync(IEnumerable<ManuSfcProduceEntity> entities);
 
         /// <summary>
         /// 批量更新 
@@ -159,6 +166,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<int> UpdateProcedureAndStatusRangeAsync(UpdateProcedureAndStatusCommand command);
 
+
+        /// <summary>
+        /// 根据SFCs批量更新资源
+        /// </summary>
+        /// <param name="manuSfcInfoEntity"></param 
+        /// <returns></returns>
+        Task<int> UpdateProcedureAndResourceRangeAsync(UpdateProcedureAndResourceCommand command);
+
         /// <summary>
         /// 锁定
         /// </summary>
@@ -225,6 +240,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 根据SFC获取在制品业务
         /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcProduceBusinessEntity>> GetSfcProduceBusinessEntitiesBySFCAsync(SfcListProduceBusinessQuery query);
+
+        /// <summary>
+        /// 根据SFC获取在制品业务
+        /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuSfcProduceBusinessView>> GetSfcProduceBusinessListBySFCAsync(SfcListProduceBusinessQuery sfc);
@@ -235,6 +257,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuSfcProduceBusinessEntity>> GetSfcProduceBusinessBySFCIdsAsync(IEnumerable<long> ids);
+
+        /// <summary>
+        /// 批量删除（物理删除）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> DeleteSfcProduceBusinessBySfcInfoIdsAsync(DeleteSfcProduceBusinesssBySfcInfoIdsCommand command);
 
         /// <summary>
         /// 批量删除（物理删除）

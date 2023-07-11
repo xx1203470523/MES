@@ -1,11 +1,12 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Common;
-using Hymson.MES.CoreServices.Services.Common;
+using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
@@ -36,6 +37,8 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         private readonly IManuContainerPackRepository _manuContainerPackRepository;
         private readonly IInteContainerRepository _inteContainerRepository;
 
+        private readonly ILocalizationService _localizationService;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -46,7 +49,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// <param name="manuContainerPackRepository"></param>
         /// <param name="inteContainerRepository"></param>
         public JobManuPackageCloseService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IManuCommonOldService manuCommonOldService, IManuContainerBarcodeRepository manuContainerBarcodeRepository, IManuContainerPackRepository manuContainerPackRepository, IInteContainerRepository inteContainerRepository)
+            IManuCommonOldService manuCommonOldService, IManuContainerBarcodeRepository manuContainerBarcodeRepository, IManuContainerPackRepository manuContainerPackRepository, IInteContainerRepository inteContainerRepository, ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -54,6 +57,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             _manuContainerBarcodeRepository = manuContainerBarcodeRepository;
             _manuContainerPackRepository = manuContainerPackRepository;
             _inteContainerRepository = inteContainerRepository;
+            _localizationService = localizationService;
         }
 
 
@@ -104,7 +108,8 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
                 if (containerPacks.Count() < container.Minimum)
                 {
                     success = "false";
-                    defaultDto.Message = ErrorCode.MES16723;
+                    //defaultDto.Message = ErrorCode.MES16723;
+                    defaultDto.Message = _localizationService.GetResource(nameof(ErrorCode.MES16723));
                     defaultDto.Content?.Add("Success", success);
                     return defaultDto;
                 }
@@ -113,12 +118,14 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
                 manuContainerBarcodeEntity.UpdatedBy = _currentUser.UserName;
                 manuContainerBarcodeEntity.UpdatedOn = HymsonClock.Now();
                 await _manuContainerBarcodeRepository.UpdateStatusAsync(manuContainerBarcodeEntity);
-                defaultDto.Message = $"关闭成功！";
+                //defaultDto.Message = $"关闭成功！";
+                defaultDto.Message = _localizationService.GetResource(nameof(ErrorCode.MES16344));
             }
             else
             {
                 success = "false";
-                defaultDto.Message = $"该容器已经关闭！";
+                //defaultDto.Message = $"该容器已经关闭！";
+                defaultDto.Message = _localizationService.GetResource(nameof(ErrorCode.MES16345));
             }
             defaultDto.Content?.Add("Success", success);
 

@@ -129,9 +129,9 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="planWorkOrderPagedQuery"></param>
+        /// <param name="pageQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<PlanWorkOrderListDetailView>> GetPagedInfoAsync(PlanWorkOrderPagedQuery planWorkOrderPagedQuery);
+        Task<PagedInfo<PlanWorkOrderListDetailView>> GetPagedInfoAsync(PlanWorkOrderPagedQuery pageQuery);
 
         /// <summary>
         /// 修改工单状态
@@ -159,7 +159,14 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> UpdateInputQtyByWorkOrderId(UpdateQtyCommand param);
+        Task<int> UpdateInputQtyByWorkOrderIdAsync(UpdateQtyCommand param);
+
+        /// <summary>
+        /// 更新数量（投入数量）
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        Task<int> UpdateInputQtyByWorkOrderIdAsync(IEnumerable<UpdateQtyCommand> commands);
 
         /// <summary>
         /// 更新数量（完工数量）
@@ -181,6 +188,13 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> UpdatePlanWorkOrderRealStartByWorkOrderIdAsync(UpdateWorkOrderRealTimeCommand command);
+
+        /// <summary>
+        /// 更新生产订单记录的实际开始时间（批量）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> UpdatePlanWorkOrderRealStartByWorkOrderIdAsync(IEnumerable<UpdateWorkOrderRealTimeCommand> commands);
 
         /// <summary>
         /// 更新生产订单记录的实际结束时间

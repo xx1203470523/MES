@@ -341,9 +341,9 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                         });
                     }
                     //允许任意工单条码进站
-                    if ((manuSfcProduceEntity != null && manuSfcProduceEntity.WorkOrderId != planWorkOrderEntity.Id) )
+                    if ((manuSfcProduceEntity != null && manuSfcProduceEntity.WorkOrderId != planWorkOrderEntity.Id))
                     {
-                        manuSfcProduceEntity.WorkOrderId= planWorkOrderEntity.Id;
+                        manuSfcProduceEntity.WorkOrderId = planWorkOrderEntity.Id;
                         manuSfcProduceEntity.UpdatedOn = HymsonClock.Now();
                         manuSfcProduceEntity.UpdatedBy = _currentEquipment.Name;
                         updateManuSfcProduceList.Add(manuSfcProduceEntity);
@@ -458,7 +458,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                 UpdateDate = HymsonClock.Now()
             });
             //更新投入数量
-            row += await _planWorkOrderRepository.UpdateInputQtyByWorkOrderId(new UpdateQtyCommand
+            row += await _planWorkOrderRepository.UpdateInputQtyByWorkOrderIdAsync(new UpdateQtyCommand
             {
                 UpdatedBy = _currentEquipment.Name,
                 UpdatedOn = HymsonClock.Now(),

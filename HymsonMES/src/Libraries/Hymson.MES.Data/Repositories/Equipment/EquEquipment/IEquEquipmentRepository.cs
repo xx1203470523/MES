@@ -15,14 +15,14 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
     public interface IEquEquipmentRepository
     {
         /// <summary>
-        /// 
+        /// equipmentUnitEntity
         /// </summary>
         /// <param name="equipmentUnitEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(EquEquipmentEntity equipmentUnitEntity);
 
         /// <summary>
-        /// 
+        /// equipmentUnitEntity
         /// </summary>
         /// <param name="equipmentUnitEntity"></param>
         /// <returns></returns>
@@ -92,17 +92,17 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         Task<IEnumerable<EquEquipmentEntity>> GetBaseListAsync();
 
         /// <summary>
-        /// 
+        /// equipmentQuery
         /// </summary>
         /// <param name="equipmentQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<EquEquipmentEntity>> GetEntitiesAsync(EquEquipmentQuery equipmentQuery);
 
         /// <summary>
-        /// 
+        /// pagedQuery
         /// </summary>
         /// <param name="equipmentPagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquEquipmentEntity>> GetPagedListAsync(EquEquipmentPagedQuery equipmentPagedQuery);
+        Task<PagedInfo<EquEquipmentEntity>> GetPagedListAsync(EquEquipmentPagedQuery pagedQuery);
     }
 }

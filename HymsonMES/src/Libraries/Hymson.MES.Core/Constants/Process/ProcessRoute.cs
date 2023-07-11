@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 
 namespace Hymson.MES.Core.Constants.Process
 {
-    public class ProcessRoute
+    public static class ProcessRoute
     {
         public const long LastProcedureId = 999999999;
+    }
 }
-}
-    

@@ -9,6 +9,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto;
 using Hymson.MES.Services.Services.Manufacture;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -72,6 +73,8 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("面板维护", BusinessType.INSERT)]
+        [PermissionDescription("manu:facePlate:insert")]
         public async Task AddManuFacePlateAsync([FromBody] AddManuFacePlateDto parm)
         {
             await _manuFacePlateService.AddManuFacePlateAsync(parm);
@@ -84,6 +87,8 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("面板维护", BusinessType.UPDATE)]
+        [PermissionDescription("manu:facePlate:update")]
         public async Task UpdateManuFacePlateAsync([FromBody] UpdateManuFacePlateDto parm)
         {
             await _manuFacePlateService.UpdateManuFacePlateAsync(parm);
@@ -96,6 +101,8 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("面板维护", BusinessType.DELETE)]
+        [PermissionDescription("manu:facePlate:delete")]
         public async Task DeleteManuFacePlateAsync([FromBody] long[] ids)
         {
             await _manuFacePlateService.DeletesManuFacePlateAsync(ids);

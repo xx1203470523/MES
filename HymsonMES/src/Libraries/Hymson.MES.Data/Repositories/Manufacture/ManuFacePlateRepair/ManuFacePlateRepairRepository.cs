@@ -204,7 +204,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns> 
-        public async Task<ManuSfcRepairRecordEntity> GetManuSfcRepairBySFCAsync(GetManuSfcRepairBySFCQuery query)
+        public async Task<ManuSfcRepairRecordEntity> GetManuSfcRepairBySFCAsync(GetManuSfcRepairBySfcQuery query)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ManuSfcRepairRecordEntity>(GetManuSfcRepairBySFCSql, query);

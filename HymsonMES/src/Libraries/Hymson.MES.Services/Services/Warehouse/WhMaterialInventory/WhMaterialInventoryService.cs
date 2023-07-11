@@ -364,7 +364,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 throw new CustomerValidationException(nameof(ErrorCode.MES15104)).WithData("MaterialCode", materialBarCode);
             }
 
-            var sfcEntit = await _manuSfcRepository.GetBySFCAsync(new GetBySFCQuery { SFC = materialBarCode, SiteId = _currentSite.SiteId });
+            var sfcEntit = await _manuSfcRepository.GetBySFCAsync(new GetBySfcQuery { SFC = materialBarCode, SiteId = _currentSite.SiteId });
             if (sfcEntit != null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES152016)).WithData("MaterialCode", materialBarCode);

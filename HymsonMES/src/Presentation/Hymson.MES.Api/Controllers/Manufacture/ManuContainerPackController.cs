@@ -1,7 +1,9 @@
 using Hymson.Infrastructure;
+using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Manufacture
@@ -88,6 +90,8 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("delete")]
+        [LogDescription("容器包装", BusinessType.DELETE)]
+        [PermissionDescription("manu:containerPack:delete")]
         public async Task DeleteManuContainerPackAsync(ManuContainerPackUnpackDto param)
         {
             await _manuContainerPackService.DeletesManuContainerPackAsync(param);
@@ -100,6 +104,8 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("deleteAll")]
+        [LogDescription("容器包装", BusinessType.DELETE)]
+        [PermissionDescription("manu:containerPack:deleteAll")]
         public async Task DeleteManuContainerPackAsync( ContainerUnpackDto param)
         {
             await _manuContainerPackService.DeleteAllByContainerBarCodeIdAsync(param);
@@ -115,7 +121,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("exJob")]
-        public async Task<Dictionary<string, JobResponseDto>> ExecuteJobAsync(ManuFacePlateContainerPackExJobDto manuFacePlateContainerPackExJobDto)
+        public async Task<Dictionary<string, JobResponseBo>> ExecuteJobAsync(ManuFacePlateContainerPackExJobDto manuFacePlateContainerPackExJobDto)
         {
             return await _manuContainerPackService.ExecuteJobAsync(manuFacePlateContainerPackExJobDto);
         }

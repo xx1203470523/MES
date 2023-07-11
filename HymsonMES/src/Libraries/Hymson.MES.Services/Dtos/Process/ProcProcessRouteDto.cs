@@ -129,6 +129,12 @@ namespace Hymson.MES.Services.Dtos.Process
         public string SerialNo { get; set; }
 
         /// <summary>
+        /// 序号
+        /// 手动排序号  20230703 海龙说加上这个做排序使用，重复也不管
+        /// </summary>
+        public string ManualSortNumber { get; set; }
+
+        /// <summary>
         /// 工序明细ID
         /// </summary>
         //[JsonConverter(typeof(ValueToStringConverter))]

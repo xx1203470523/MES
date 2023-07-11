@@ -8,6 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
+using Hymson.Web.Framework.Attributes;
 using IdGen;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -102,8 +103,17 @@ namespace Hymson.MES.Api.Controllers.Manufacture
 
 
         [HttpPost]
-        [Route("updateStatus")]
-        public async Task UpdateManuContainerBarcodeStatusAsync([FromBody] UpdateManuContainerBarcodeStatusDto parm)
+        [Route("open")]
+        [PermissionDescription("manu:containerUnPackaging:open")]
+        public async Task OpenManuContainerBarcodeStatusAsync([FromBody] UpdateManuContainerBarcodeStatusDto parm)
+        {
+            await _manuContainerBarcodeService.ModifyManuContainerBarcodeStatusAsync(parm);
+        }
+
+        [HttpPost]
+        [Route("close")]
+        [PermissionDescription("manu:containerUnPackaging:close")]
+        public async Task CloseManuContainerBarcodeStatusAsync([FromBody] UpdateManuContainerBarcodeStatusDto parm)
         {
             await _manuContainerBarcodeService.ModifyManuContainerBarcodeStatusAsync(parm);
         }

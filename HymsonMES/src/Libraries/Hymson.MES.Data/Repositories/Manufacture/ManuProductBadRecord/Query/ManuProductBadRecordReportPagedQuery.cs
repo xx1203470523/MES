@@ -97,16 +97,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         public DateTime[]? CreatedOn { get; set; }
 
-        ///// <summary>
-        ///// 创建时间-开始
-        ///// </summary>
-        //public DateTime? CreatedOnS { get; set; }
-
-        ///// <summary>
-        ///// 创建时间-结束
-        ///// </summary>
-        //public DateTime? CreatedOnE { get; set; }
-
         /// <summary>
         /// 资源编码
         /// </summary>

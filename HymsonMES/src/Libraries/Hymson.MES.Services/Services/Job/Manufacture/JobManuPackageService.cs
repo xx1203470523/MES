@@ -1,13 +1,13 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Common;
-using Hymson.MES.CoreServices.Services.Common;
-using Hymson.MES.CoreServices.Services.Common.ManuExtension;
-using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
+using Hymson.MES.CoreServices.Services.Job;
+using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
 using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Job.Manufacture
@@ -28,23 +28,30 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
-        /// 服务接口（生产通用）
+        /// 服务接口
         /// </summary>
-        private readonly IManuCommonOldService _manuCommonOldService;
+        private readonly IExecuteJobService<JobRequestBo> _executeJobService;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly ILocalizationService _localizationService;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="manuCommonOldService"></param>
+        /// <param name="executeJobService"></param>
+        /// <param name="localizationService"></param>
         public JobManuPackageService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IManuCommonOldService manuCommonOldService)
+            IExecuteJobService<JobRequestBo> executeJobService,
+            ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _manuCommonOldService = manuCommonOldService;
+            _executeJobService = executeJobService;
+            _localizationService = localizationService;
         }
 
 
@@ -82,18 +89,22 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
                 ResourceId = param["ResourceId"].ParseToLong()
             };
 
-            // 获取生产条码信息
-            var (sfcProduceEntity, _) = await _manuCommonOldService.GetProduceSFCAsync(bo.SFC);
+            var jobBos = new List<JobBo> { };
+            jobBos.Add(new JobBo { Name = "PackageVerifyJobService" });
 
-            // 合法性校验
-            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity)
-                            .VerifyProcedure(bo.ProcedureId)
-                            .VerifyResource(bo.ResourceId);
-
+            await _executeJobService.ExecuteAsync(jobBos, new JobRequestBo
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                UserName = _currentUser.UserName,
+                ProcedureId = bo.ProcedureId,
+                ResourceId = bo.ResourceId,
+                SFCs = new string[] { bo.SFC }
+            });
+            
             // 判断面板是否显示
             //var isShow = await _manuCommonOldService.CheckSFCIsCanDoneStep(bo, Core.Enums.Manufacture.SfcCirculationTypeEnum.ModuleAdd);
             var isShow = true;
-
+            defaultDto.Rows = 0;
             defaultDto.Content?.Add("PackageCom", $"{isShow}".ToString());
             defaultDto.Content?.Add("BadEntryCom", "False");
             if (param.ContainsKey("IsClear")) defaultDto.Content?.Add("IsClear", param["IsClear"]);

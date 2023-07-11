@@ -6,6 +6,7 @@
  *build datetime: 2023-04-01 02:58:19
  */
 using Hymson.Infrastructure;
+using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -73,6 +74,13 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="dto"></param>
         /// <returns></returns>
         Task<Dictionary<string, JobResponseDto>> ClickAsync(ButtonRequestDto dto);
+
+        /// <summary>
+        ///  新按钮（点击）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<Dictionary<string, JobResponseBo>> NewClickAsync(ButtonRequestDto dto, dynamic bo);
 
     }
 }

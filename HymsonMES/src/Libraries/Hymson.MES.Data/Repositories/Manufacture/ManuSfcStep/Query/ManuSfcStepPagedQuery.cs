@@ -32,7 +32,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// <summary>
     /// 条码步骤表 分页参数
     /// </summary>
-    public class ManuSfcStepBySFCPagedQuery : PagerInfo
+    public class ManuSfcStepBySfcPagedQuery : PagerInfo
     {
         /// <summary>
         /// 站点id

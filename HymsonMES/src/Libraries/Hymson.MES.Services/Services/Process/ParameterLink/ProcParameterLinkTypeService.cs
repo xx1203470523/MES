@@ -6,6 +6,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
@@ -69,7 +70,7 @@ namespace Hymson.MES.Services.Services.Process
                 UpdatedBy = _currentUser.UserName,
                 CreatedOn = HymsonClock.Now(),
                 UpdatedOn = HymsonClock.Now(),
-                ParameterType = procParameterLinkTypeCreateDto.ParameterType,
+                ParameterType = procParameterLinkTypeCreateDto.ParameterType ?? ParameterTypeEnum.Equipment,
                 ParameterID = s,
                 SiteId = _currentSite.SiteId ?? 0
             });
@@ -77,7 +78,7 @@ namespace Hymson.MES.Services.Services.Process
             var currentEntities = await _procParameterLinkTypeRepository.GetProcParameterLinkTypeEntitiesAsync(new ProcParameterLinkTypeQuery
             {
                 SiteId = _currentSite.SiteId,
-                ParameterType = procParameterLinkTypeCreateDto.ParameterType
+                ParameterType = procParameterLinkTypeCreateDto.ParameterType ?? ParameterTypeEnum.Equipment
             });
             var adds = links.Where(w => currentEntities.Any(e => e.ParameterID == w.ParameterID) == false);
 
@@ -120,7 +121,7 @@ namespace Hymson.MES.Services.Services.Process
 
             var current = await _procParameterLinkTypeRepository.GetProcParameterLinkTypeEntitiesAsync(new ProcParameterLinkTypeQuery
             {
-                SiteId= _currentSite.SiteId,
+                SiteId = _currentSite.SiteId,
                 ParameterType = procParameterLinkTypeModifyDto.ParameterType
             });
 

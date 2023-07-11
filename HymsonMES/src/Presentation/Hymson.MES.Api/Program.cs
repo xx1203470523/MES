@@ -59,25 +59,28 @@ namespace Hymson.MES.Api
             builder.Services.AddSequenceService(builder.Configuration);
             builder.Services.AddHttpClientService(builder.Configuration);
             builder.Services.AddLocalization();
+            builder.Services.AddHealthChecks();
 
             // 注入nlog日志服务
             builder.AddNLogWeb(builder.Configuration);
             AddAutoMapper();
             var app = builder.Build();
+            app.UseHealthChecks("/healthy");
             //https://learn.microsoft.com/zh-cn/aspnet/core/host-and-deploy/linux-nginx?view=aspnetcore-6.0&tabs=linux-ubuntu
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
-#if DEBUG
+            // TODO 龙总说要这么要开放出来
+            //#if DEBUG
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+            if (!app.Environment.IsProduction())
             {
                 app.UseHttpLogging();
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-#endif
+            //#endif
             #region snippet_ConfigureLocalization
             var supportedCultures = new List<CultureInfo>
             {
@@ -113,7 +116,7 @@ namespace Hymson.MES.Api
         /// <param name="services"></param>
         private static void AddSwaggerGen(IServiceCollection services)
         {
-#if DEBUG
+//#if DEBUG
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             services.AddSwaggerGen(options =>
             {
@@ -171,7 +174,7 @@ namespace Hymson.MES.Api
                 //options.OperationFilter<SecurityRequirementsOperationFilter>();
                 //options.OperationFilter<AuthorizationOperationFilter>();
             });
-#endif
+//#endif
         }
 
         /// <summary>

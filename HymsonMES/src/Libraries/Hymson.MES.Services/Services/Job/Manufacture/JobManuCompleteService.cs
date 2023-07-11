@@ -1,15 +1,13 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Common;
-using Hymson.MES.CoreServices.Services.Common;
-using Hymson.MES.CoreServices.Services.Common.ManuCommon;
-using Hymson.MES.CoreServices.Services.Common.ManuExtension;
-using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
-using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
+using Hymson.MES.CoreServices.Services.Job;
+using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
 using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Job.Manufacture
@@ -30,39 +28,30 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
-        /// 服务接口（生产通用）
+        /// 服务接口
         /// </summary>
-        private readonly IManuCommonService _manuCommonService;
+        private readonly IExecuteJobService<JobRequestBo> _executeJobService;
 
         /// <summary>
-        /// 服务接口（生产通用）
+        /// 
         /// </summary>
-        private readonly IManuCommonOldService _manuCommonOldService;
-
-        /// <summary>
-        /// 服务接口（出站）
-        /// </summary>
-        private readonly IManuOutStationService _manuOutStationService;
-
+        private readonly ILocalizationService _localizationService;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="manuCommonService"></param>
-        /// <param name="manuCommonOldService"></param>
-        /// <param name="manuOutStationService"></param>
+        /// <param name="executeJobService"></param>
+        /// <param name="localizationService"></param>
         public JobManuCompleteService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IManuCommonService manuCommonService,
-            IManuCommonOldService manuCommonOldService,
-            IManuOutStationService manuOutStationService)
+            IExecuteJobService<JobRequestBo> executeJobService,
+            ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _manuCommonService = manuCommonService;
-            _manuCommonOldService = manuCommonOldService;
-            _manuOutStationService = manuOutStationService;
+            _executeJobService = executeJobService;
+            _localizationService = localizationService;
         }
 
 
@@ -100,32 +89,49 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
                 ResourceId = param["ResourceId"].ParseToLong()
             };
 
-            // 获取生产条码信息
-            var (sfcProduceEntity, _) = await _manuCommonOldService.GetProduceSFCAsync(bo.SFC);
+            var jobBos = new List<JobBo> { };
+            jobBos.Add(new JobBo { Name = "OutStationVerifyJobService" });
+            jobBos.Add(new JobBo { Name = "OutStationJobService" });
 
-            // 合法性校验
-            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity)
-                            .VerifyProcedure(bo.ProcedureId)
-                            .VerifyResource(bo.ResourceId);
-
-            // 验证BOM主物料数量
-            await _manuCommonService.VerifyBomQtyAsync(new ManuProcedureBomBo
+            var responseBo = await _executeJobService.ExecuteAsync(jobBos, new JobRequestBo
             {
-                SiteId = sfcProduceEntity.SiteId,
-                SFCs = new string[] { bo.SFC },
+                SiteId = _currentSite.SiteId ?? 0,
+                UserName = _currentUser.UserName,
                 ProcedureId = bo.ProcedureId,
-                BomId = sfcProduceEntity.ProductBOMId
+                ResourceId = bo.ResourceId,
+                SFCs = new string[] { bo.SFC }
             });
-
-            // 出站
-            _ = await _manuOutStationService.OutStationAsync(sfcProduceEntity);
 
             defaultDto.Content?.Add("PackageCom", "False");
             defaultDto.Content?.Add("BadEntryCom", "False");
             defaultDto.Content?.Add("Qty", "1");
             if (param.ContainsKey("IsClear")) defaultDto.Content?.Add("IsClear", param["IsClear"]);
 
-            defaultDto.Message = $"条码{param["SFC"]}完成，已于NF排队！";
+            // 判断是否尾工序
+            var isLastProcedure = false;
+            var nextProcedureCode = "";
+            foreach (var item in responseBo)
+            {
+                var content = item.Value.Content;
+                if (item.Key == "OutStationJobService" && content != null && content.Any())
+                {
+                    isLastProcedure = content["IsLastProcedure"].ParseToBool();
+                    nextProcedureCode = content["NextProcedureCode"];
+                }
+
+                defaultDto.Rows = item.Value.Rows;
+            }
+
+            //defaultDto.Message = $"条码{param["SFC"]}完成，已于NF排队！";
+            if (isLastProcedure)
+            {
+                defaultDto.Message = _localizationService.GetResource(nameof(ErrorCode.MES16349), param["SFC"]);
+            }
+            else
+            {
+                defaultDto.Message = _localizationService.GetResource(nameof(ErrorCode.MES16351), param["SFC"], nextProcedureCode);
+            }
+
             return defaultDto;
         }
 

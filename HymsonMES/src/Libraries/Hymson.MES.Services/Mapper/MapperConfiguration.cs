@@ -450,6 +450,7 @@ namespace Hymson.MES.Services.Mapper
 
             #region QualityLock
             CreateMap<ManuSfcProducePagedQueryDto, ManuSfcProducePagedQuery>();
+            CreateMap<ManuSfcProduceSelectPagedQueryDto, ManuSfcProduceSelectPagedQuery>();
             #endregion
 
             #region ManuProductBadRecord
@@ -572,8 +573,8 @@ namespace Hymson.MES.Services.Mapper
             #region WorkshopJobControl
             CreateMap<WorkshopJobControlReportPagedQueryDto, WorkshopJobControlReportPagedQuery>();
             CreateMap<WorkshopJobControlReportView, WorkshopJobControlReportViewDto>();
-
-            CreateMap<ManuSfcStepBySFCPagedQueryDto, ManuSfcStepBySFCPagedQuery>();
+            
+            CreateMap<ManuSfcStepBySFCPagedQueryDto, ManuSfcStepBySfcPagedQuery>();
             #endregion
 
             #region ComUsageReport

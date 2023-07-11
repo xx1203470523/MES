@@ -197,7 +197,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 操作类型（报废/取消报废）
         /// </summary>
-       // public ScrapOperateTypeEnum OperationType { get; set; }
+        public ScrapOperateTypeEnum OperationType { get; set; }
 
         /// <summary>
         /// 条码列表
@@ -510,6 +510,63 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     }
 
     /// <summary>
+    /// 条码生产信息查询 分页Dto
+    /// </summary>
+    public class ManuSfcProduceSelectPagedQueryDto : PagerInfo
+    {
+        /// <summary>
+        ///产品条码
+        /// </summary>
+        public string? Sfc { get; set; }
+
+        /// <summary>
+        /// 条码状态
+        /// </summary>
+        public SfcProduceStatusEnum? Status { get; set; }
+
+        /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long? OrderId { get; set; }
+
+        /// <summary>
+        /// 工序Id
+        /// </summary>
+        public long? ProcedureId { get; set; }
+
+        /// <summary>
+        /// 条码列表
+        /// </summary>
+        public string[]? Sfcs { get; set; }
+
+        /// <summary>
+        /// 资源id
+        /// </summary>
+        public long? ResourceId { get; set; }
+
+        /// <summary>
+        /// 锁定状态
+        /// </summary>
+        public int? Lock { get; set; }
+
+        /// <summary>
+        /// 查询锁定状态不为某个状态的sfc信息，即时锁定的不能操作不查
+        /// </summary>
+        public int? NoLock { get; set; }
+
+        ///// <summary>
+        ///// 是否报废
+        ///// </summary>
+        //public TrueOrFalseEnum? IsScrap { get; set; }
+
+        /// <summary>
+        /// 产品编码
+        /// </summary>
+        public string? MaterialCode { get; set; }
+    }
+
+
+    /// <summary>
     /// 分页查询返回实体
     /// </summary>
     public class ManuSfcProduceViewDto
@@ -596,6 +653,83 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     }
 
     /// <summary>
+    /// 分页查询返回实体
+    /// </summary>
+    public class ManuSfcProduceSelectViewDto
+    {
+        /// <summary>
+        ///  唯一标识
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string Sfc { get; set; }
+
+        /// <summary>
+        /// 锁;1：未锁定；2：即时锁；3：将来锁；
+        /// </summary>
+        public QualityLockEnum? Lock { get; set; }
+
+        /// <summary>
+        /// 未来锁工序id
+        /// </summary>
+        public long? LockProductionId { get; set; }
+
+        /// <summary>
+        /// BOMId
+        /// </summary>
+        public long? ProductBOMId { get; set; }
+
+        /// <summary>
+        /// 当前工序
+        /// </summary>
+        public long? ProcedureId { get; set; }
+
+        /// <summary>
+        /// 状态;1：排队；2：活动；
+        /// </summary>
+        public int Status { get; set; }
+
+        /// <summary>
+        /// 工单
+        /// </summary>
+        public string OrderCode { get; set; }
+
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 产品编码
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 产品名称
+        /// </summary>
+        public string MaterialName { get; set; }
+
+        /// <summary>
+        /// 产品版本
+        /// </summary>
+        public string Version { get; set; }
+
+        /// <summary>
+        /// 资源编码
+        /// </summary>
+        public string ResCode { get; set; }
+    }
+
+
+    /// <summary>
     /// 在制品步骤控制操作实体（操作条码）
     /// </summary>
     public record ManuSfcProduceStepSFCDto
@@ -643,7 +777,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 步骤
         /// </summary>
-        public int Step { get; set; }
+        public string Step { get; set; }
         /// <summary>
         /// 工序Id
         /// </summary>

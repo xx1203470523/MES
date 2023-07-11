@@ -71,7 +71,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
             IManuSfcRepository manuSfcRepository,
             IManuSfcStepRepository manuSfcStepRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
-             IPlanWorkOrderRepository planWorkOrderRepository,
+            IPlanWorkOrderRepository planWorkOrderRepository,
             IProcProcedureRepository procProcedureRepository)
         {
             _currentUser = currentUser;
@@ -136,12 +136,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
             };
 
             // 更新数据
+
             using (var trans = TransactionHelper.GetTransactionScope())
             {
+                List<Task> tasks = new();
+
                 /*
                  * 目前条码好像默认就是已使用，所以这里不需要再更新条码状态
                 // 修改条码使用状态为"已使用"
-                rows = await _manuSfcRepository.UpdateSfcIsUsedAsync(new ManuSfcUpdateIsUsedCommand
+                rows = await _manuSfcRepository.MultiUpdateSfcIsUsedAsync(new ManuSfcUpdateIsUsedCommand
                 {
                     Sfcs = new string[] { sfcProduceEntity.SFC },
                     UserId = sfcProduceEntity.UpdatedBy,
@@ -161,29 +164,33 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
                 }
 
                 // 更新工单统计表的 RealStart
-                rows += await _planWorkOrderRepository.UpdatePlanWorkOrderRealStartByWorkOrderIdAsync(new UpdateWorkOrderRealTimeCommand
+                var updatePlanWorkOrderRealStartByWorkOrderIdTask = _planWorkOrderRepository.UpdatePlanWorkOrderRealStartByWorkOrderIdAsync(new UpdateWorkOrderRealTimeCommand
                 {
                     UpdatedOn = sfcProduceEntity.UpdatedOn,
                     UpdatedBy = sfcProduceEntity.UpdatedBy,
                     WorkOrderIds = new long[] { sfcProduceEntity.WorkOrderId }
                 });
+                tasks.Add(updatePlanWorkOrderRealStartByWorkOrderIdTask);
 
                 // 插入 manu_sfc_step 状态为 进站
                 sfcStep.Operatetype = ManuSfcStepTypeEnum.InStock;
-                rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
+                var manuSfcStepTask = _manuSfcStepRepository.InsertAsync(sfcStep);
+                tasks.Add(manuSfcStepTask);
 
                 // 如果是首工序，更新工单的 InputQty
                 if (isFirstProcedure == true)
                 {
-                    rows += await _planWorkOrderRepository.UpdateInputQtyByWorkOrderId(new UpdateQtyCommand
+                    var updateInputQtyByWorkOrderIdTask = _planWorkOrderRepository.UpdateInputQtyByWorkOrderIdAsync(new UpdateQtyCommand
                     {
                         UpdatedBy = sfcProduceEntity.UpdatedBy,
                         UpdatedOn = sfcProduceEntity.UpdatedOn,
                         WorkOrderId = sfcProduceEntity.WorkOrderId,
                         Qty = 1,
                     });
+                    tasks.Add(updateInputQtyByWorkOrderIdTask);
                 }
 
+                await Task.WhenAll(tasks);
                 trans.Complete();
             }
 

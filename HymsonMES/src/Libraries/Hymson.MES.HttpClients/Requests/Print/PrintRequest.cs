@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,7 +16,7 @@ namespace Hymson.MES.HttpClients.Requests.Print
         /// <summary>
         /// 打印body
         /// </summary>
-        public PrintBody[] Bodies { get; set; }
+        public List<PrintBody> Bodies { get; set; } = new List<PrintBody>();
     }
     public class PrintBody
     {

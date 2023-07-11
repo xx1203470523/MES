@@ -288,21 +288,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 sqlBuilder.Where(" sp.`Status` =  @SFCProduceStatus ");
             }
 
-            //if (pageQuery.SFCIsLock.HasValue)
-            //{
-            //    sqlBuilder.Select(@"spb.BusinessType");
-
-            //    sqlBuilder.LeftJoin(" manu_sfc_produce_business spb on spb.SfcInfoId=si.Id ");
-            //    if (pageQuery.SFCIsLock == Core.Enums.TrueOrFalseEnum.Yes)
-            //    {
-            //        sqlBuilder.Where(" spb.BusinessType=2 ");
-            //    }
-            //    else
-            //    {
-            //        sqlBuilder.Where(" spb.BusinessType!=2 ");
-            //    }
-            //}
-
             var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pageQuery.PageSize });

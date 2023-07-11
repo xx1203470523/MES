@@ -19,9 +19,9 @@ namespace Hymson.MES.Services.Validators.Process
         public ProcProcedureCreateValidator()
         {
             RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10401));
-            RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10402));
+            RuleFor(x => x.Code).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES10402));
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10403));
-            RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10404));
+            RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES10404));
             RuleFor(x => x).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10409));
             RuleFor(x => x.Type).Must(x => Enum.IsDefined(typeof(ProcedureTypeEnum), x)).WithErrorCode(nameof(ErrorCode.MES10407));
             RuleFor(x => x.Status).Must(x => Enum.IsDefined(typeof(SysDataStatusEnum), x)).WithErrorCode(nameof(ErrorCode.MES10408));
@@ -38,7 +38,7 @@ namespace Hymson.MES.Services.Validators.Process
         public ProcProcedureModifyValidator()
         {
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10403));
-            RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10404));
+            RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES10404));
             RuleFor(x => x).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10409));
             RuleFor(x => x.Type).Must(x => Enum.IsDefined(typeof(ProcedureTypeEnum), x)).WithErrorCode(nameof(ErrorCode.MES10407));
             RuleFor(x => x.Status).Must(x => Enum.IsDefined(typeof(SysDataStatusEnum), x)).WithErrorCode(nameof(ErrorCode.MES10408));

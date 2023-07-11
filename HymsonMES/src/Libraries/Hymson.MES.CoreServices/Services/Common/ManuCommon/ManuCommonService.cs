@@ -3,18 +3,16 @@ using FluentValidation.Results;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Manufacture;
+using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Warehouse;
-using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
-using Hymson.Sequences;
+using Hymson.MES.Data.Repositories.Process.MaskCode;
 using System.Data;
 using System.Text.Json;
 
@@ -26,9 +24,9 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
     public class ManuCommonService : IManuCommonService
     {
         /// <summary>
-        /// 序列号服务
+        /// 
         /// </summary>
-        private readonly ISequenceService _sequenceService;
+        private readonly ILocalizationService _localizationService;
 
         /// <summary>
         /// 仓储接口（条码生产信息）
@@ -56,88 +54,43 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         private readonly IProcMaterialRepository _procMaterialRepository;
 
         /// <summary>
-        /// 仓储接口（物料库存）
+        /// 仓储接口（掩码规则维护）
         /// </summary>
-        private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private readonly ILocalizationService _localizationService;
-
+        private readonly IProcMaskCodeRuleRepository _procMaskCodeRuleRepository;
 
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="sequenceService"></param>
+        /// <param name="localizationService"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="manuSfcCirculationRepository"></param>
         /// <param name="manuContainerPackRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
+        /// <param name="planWorkOrderActivationRepository"></param>
+        /// <param name="procResourceRepository"></param>
         /// <param name="procBomDetailRepository"></param>
         /// <param name="procMaterialRepository"></param>
+        /// <param name="procProcedureRepository"></param>
+        /// <param name="procProcessRouteDetailLinkRepository"></param>
+        /// <param name="procProcessRouteDetailNodeRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
-        /// <param name="localizationService"></param>
-        public ManuCommonService(
-            ISequenceService sequenceService,
+        public ManuCommonService(ILocalizationService localizationService,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
             IManuContainerPackRepository manuContainerPackRepository,
             IProcBomDetailRepository procBomDetailRepository,
             IProcMaterialRepository procMaterialRepository,
-            IWhMaterialInventoryRepository whMaterialInventoryRepository,
-            ILocalizationService localizationService)
+            IProcMaskCodeRuleRepository procMaskCodeRuleRepository)
         {
-            _sequenceService = sequenceService;
+            _localizationService = localizationService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
             _manuContainerPackRepository = manuContainerPackRepository;
             _procBomDetailRepository = procBomDetailRepository;
             _procMaterialRepository = procMaterialRepository;
-            _whMaterialInventoryRepository = whMaterialInventoryRepository;
-            _localizationService = localizationService;
-        }
-
-
-        /// <summary>
-        /// 获取生产条码信息
-        /// </summary>
-        /// <param name="sfcBo"></param>
-        /// <returns></returns>
-        public async Task<(ManuSfcProduceEntity, ManuSfcProduceBusinessEntity)> GetProduceSFCAsync(SingleSFCBo sfcBo)
-        {
-            if (string.IsNullOrWhiteSpace(sfcBo.SFC) == true
-                || sfcBo.SFC.Contains(' ') == true) throw new CustomerValidationException(nameof(ErrorCode.MES16305));
-
-            // 条码在制表
-            var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery
-            {
-                SiteId = sfcBo.SiteId,
-                Sfc = sfcBo.SFC
-            });
-
-            // 不存在在制表的话，就去库存查找
-            if (sfcProduceEntity == null)
-            {
-                var whMaterialInventoryEntity = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery
-                {
-                    SiteId = sfcBo.SiteId,
-                    BarCode = sfcBo.SFC
-                });
-                if (whMaterialInventoryEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES16318));
-
-                throw new CustomerValidationException(nameof(ErrorCode.MES16306));
-            }
-
-            // 获取锁状态
-            var sfcProduceBusinessEntity = await _manuSfcProduceRepository.GetSfcProduceBusinessBySFCAsync(new SfcProduceBusinessQuery
-            {
-                SiteId = sfcBo.SiteId,
-                Sfc = sfcProduceEntity.SFC,
-                BusinessType = ManuSfcProduceBusinessType.Lock
-            });
-
-            return (sfcProduceEntity, sfcProduceBusinessEntity);
+            _procMaskCodeRuleRepository = procMaskCodeRuleRepository;
         }
 
         /// <summary>
@@ -154,7 +107,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                 BusinessType = ManuSfcProduceBusinessType.Lock
             });
 
-            if (sfcProduceBusinesss == null || sfcProduceBusinesss.Any() == false) return;
+            if (sfcProduceBusinesss == null || !sfcProduceBusinesss.Any()) return;
 
             List<ValidationFailure> validationFailures = new();
             foreach (var item in sfcProduceBusinesss)
@@ -162,14 +115,18 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                 var sfcProduceLockBo = JsonSerializer.Deserialize<SfcProduceLockBo>(item.BusinessContent);
                 if (sfcProduceLockBo == null) continue;
 
-                // 即时锁
-                if (sfcProduceLockBo.Lock != QualityLockEnum.InstantLock) continue;
-
-                // 将来锁
-                if (sfcProduceLockBo.Lock != QualityLockEnum.FutureLock) continue;
-
-                // 如果锁的不是目标工序，就跳过
-                if (procedureBo.ProcedureId.HasValue == true && sfcProduceLockBo.LockProductionId != procedureBo.ProcedureId) continue;
+                switch (sfcProduceLockBo.Lock)
+                {
+                    case QualityLockEnum.InstantLock:
+                        break;
+                    case QualityLockEnum.FutureLock:
+                        // 如果锁的不是目标工序，就跳过
+                        if (procedureBo.ProcedureId.HasValue && sfcProduceLockBo.LockProductionId != procedureBo.ProcedureId) continue;
+                        break;
+                    case QualityLockEnum.Unlock:
+                    default:
+                        continue;
+                }
 
                 validationFailures.Add(new ValidationFailure
                 {
@@ -179,7 +136,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             }
 
             // 是否存在错误
-            if (validationFailures.Any() == true)
+            if (validationFailures.Any())
             {
                 throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
             }
@@ -198,9 +155,9 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                 LadeBarCodes = sfcBos.SFCs.ToArray(),
             });
 
-            if (manuContainerPackEntities != null && manuContainerPackEntities.Any() == true)
+            if (manuContainerPackEntities != null && manuContainerPackEntities.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES18015)).WithData("SFCs", string.Join(",", sfcBos.SFCs));
+                throw new CustomerValidationException(nameof(ErrorCode.MES18015)).WithData("SFC", string.Join(",", sfcBos.SFCs));
                 //throw new CustomerValidationException(nameof(ErrorCode.MES18019)).WithData("SFC", string.Join(",", sfcs));
             }
         }
@@ -217,7 +174,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
 
             // 过滤出当前工序对应的物料（数据收集方式为内部和外部）
             procBomDetailEntities = procBomDetailEntities.Where(w => w.ProcedureId == procedureBomBo.ProcedureId && w.DataCollectionWay != MaterialSerialNumberEnum.Batch);
-            if (procBomDetailEntities == null) return;
+            if (procBomDetailEntities == null || procBomDetailEntities.Any() == false) return;
 
             // 流转信息（多条码）
             var sfcCirculationEntities = await _manuSfcCirculationRepository.GetSfcMoudulesAsync(new ManuSfcCirculationBySfcsQuery
@@ -232,14 +189,18 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                 ProcedureId = procedureBomBo.ProcedureId,
                 IsDisassemble = TrueOrFalseEnum.No
             });
-            if (sfcCirculationEntities == null || sfcCirculationEntities.Any() == false) return;
+
+            if (sfcCirculationEntities == null || sfcCirculationEntities.Any() == false)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16323));
+            }
 
             // 根据物料分组
             var procBomDetailDictionary = procBomDetailEntities.ToLookup(w => w.MaterialId).ToDictionary(d => d.Key, d => d);
             foreach (var item in procBomDetailDictionary)
             {
-                // 检查每个物料是否已经满足BOM用量要求
-                var currentQty = sfcCirculationEntities.Where(w => w.CirculationMainProductId == item.Key)
+                // 检查每个物料是否已经满足BOM用量要求（这里可以优化下）
+                var currentQty = sfcCirculationEntities?.Where(w => w.CirculationMainProductId == item.Key)
                     .Sum(s => s.CirculationQty);
 
                 // 目标用量
@@ -255,13 +216,29 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             }
         }
 
+        /// <summary>
+        /// 验证条码掩码规则
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <param name="materialId"></param>
+        /// <returns></returns>
+        public async Task<bool> CheckBarCodeByMaskCodeRuleAsync(string barCode, long materialId)
+        {
+            var material = await _procMaterialRepository.GetByIdAsync(materialId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10204));
 
+            // 物料未设置掩码
+            if (material.MaskCodeId.HasValue == false) throw new CustomerValidationException(nameof(ErrorCode.MES16616)).WithData("barCode", barCode);
+
+            // 未设置规则
+            var maskCodeRules = await _procMaskCodeRuleRepository.GetByMaskCodeIdAsync(material.MaskCodeId.Value);
+            if (maskCodeRules == null || maskCodeRules.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES16616)).WithData("barCode", barCode);
+
+            return barCode.VerifyBarCode(maskCodeRules);
+        }
 
         #region 内部方法
 
         #endregion
-
     }
-
-
 }

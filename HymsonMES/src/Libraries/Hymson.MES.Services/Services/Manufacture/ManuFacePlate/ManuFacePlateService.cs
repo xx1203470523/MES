@@ -6,11 +6,13 @@
  *build datetime: 2023-04-01 01:56:57
  */
 using FluentValidation;
+using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
@@ -24,6 +26,7 @@ using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Minio.DataModel;
 using System.Linq;
 using System.Transactions;
 
@@ -50,6 +53,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IProcProcedureRepository _procProcedureRepository;
         private readonly IProcResourceRepository _procResourceRepository;
         private readonly IInteJobRepository _inteJobRepository;
+        private readonly ILocalizationService _localizationService;
         private readonly AbstractValidator<ManuFacePlateCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ManuFacePlateModifyDto> _validationModifyRules;
         private readonly AbstractValidator<ManuFacePlateProductionCreateDto> _validationProductionCreateRules;
@@ -69,7 +73,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             AbstractValidator<ManuFacePlateContainerPackCreateDto> validationContainerPackCreateRules, AbstractValidator<ManuFacePlateContainerPackModifyDto> validationContainerPackModifyRules,
             IInteJobRepository inteJobRepository, AbstractValidator<ManuFacePlateButtonModifyDto> validationButtonModifyRules,
             AbstractValidator<ManuFacePlateButtonCreateDto> validationButtonCreateRules, IManuFacePlateButtonRepository manuFacePlateButtonRepository,
-            IManuFacePlateButtonJobRelationRepository manuFacePlateButtonJobRelationRepository)
+            IManuFacePlateButtonJobRelationRepository manuFacePlateButtonJobRelationRepository, ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -92,6 +96,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _validationButtonCreateRules = validationButtonCreateRules;
             _manuFacePlateButtonRepository = manuFacePlateButtonRepository;
             _manuFacePlateButtonJobRelationRepository = manuFacePlateButtonJobRelationRepository;
+            _localizationService = localizationService;
         }
         #endregion
 
@@ -638,14 +643,48 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             #endregion
 
+
             #region 按钮列表
+            var validationFailures = new List<ValidationFailure>();
             List<ManuFacePlateButtonEntity> manuFacePlateButtonEntityList = new List<ManuFacePlateButtonEntity>();
             //按钮关联JOB
             List<ManuFacePlateButtonJobRelationEntity> manuFacePlateButtonJobRelationEntityList = new List<ManuFacePlateButtonJobRelationEntity>();
             if (addManuFacePlateDto?.FacePlateButtonList?.Count > 0)
             {
+                int x = 0;
                 foreach (var manuFacePlateButtonCreateDto in addManuFacePlateDto.FacePlateButtonList)
                 {
+                    x++;
+                    if (string.IsNullOrWhiteSpace(manuFacePlateButtonCreateDto.Name.Trim()) || manuFacePlateButtonCreateDto.Name.Length > 50)
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", x } };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", x);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES17251);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
+                    if (manuFacePlateButtonCreateDto.Seq <= 0)
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", x } };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", x);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES17252);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
                     //验证按钮DTO
                     await _validationButtonCreateRules.ValidateAndThrowAsync(manuFacePlateButtonCreateDto);
                     var manuFacePlateButtonEntity = manuFacePlateButtonCreateDto.ToEntity<ManuFacePlateButtonEntity>();
@@ -657,9 +696,43 @@ namespace Hymson.MES.Services.Services.Manufacture
                     manuFacePlateButtonEntity.FacePlateId = manuFacePlateEntity.Id;
                     manuFacePlateButtonEntity.SiteId = _currentSite.SiteId ?? 0;
                     manuFacePlateButtonEntityList.Add(manuFacePlateButtonEntity);
+                    int i = 0;
                     //按钮关联JOb关系表
                     foreach (var manuFacePlateButtonJobRelations in manuFacePlateButtonCreateDto.ManuFacePlateButtonJobRelations)
                     {
+                        i++;
+                        if (manuFacePlateButtonJobRelations.Seq <= 0)
+                        {
+                            var validationFailure = new ValidationFailure();
+                            if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", i } };
+                            }
+                            else
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", x);
+                            }
+                            var MES17253 = string.Format(ErrorCode.MES17253, i);
+                            validationFailure.ErrorCode = nameof(MES17253);
+                            validationFailures.Add(validationFailure);
+                            continue;
+                        }
+                        if (manuFacePlateButtonJobRelations.JobId <= 0)
+                        {
+                            var validationFailure = new ValidationFailure();
+                            if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", i } };
+                            }
+                            else
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", x);
+                            }
+                            var MES17254 = string.Format(ErrorCode.MES17254, i);
+                            validationFailure.ErrorCode = nameof(MES17254);
+                            validationFailures.Add(validationFailure);
+                            continue;
+                        }
                         var manuFacePlateButtonJobRelationEntity = manuFacePlateButtonJobRelations.ToEntity<ManuFacePlateButtonJobRelationEntity>();
                         manuFacePlateButtonJobRelationEntity.Id = IdGenProvider.Instance.CreateId();
                         manuFacePlateButtonJobRelationEntity.CreatedBy = _currentUser.UserName;
@@ -671,6 +744,10 @@ namespace Hymson.MES.Services.Services.Manufacture
                         manuFacePlateButtonJobRelationEntityList.Add(manuFacePlateButtonJobRelationEntity);
                     }
                 }
+            }
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("MES10107"), validationFailures);
             }
             #endregion
 
@@ -776,6 +853,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             #endregion
 
             #region 按钮列表
+            var validationFailures = new List<ValidationFailure>();
 
             //保存id用于删除原有关联关系
             List<long> facePlateButtonIds = new List<long>();
@@ -788,21 +866,88 @@ namespace Hymson.MES.Services.Services.Manufacture
                 //查询原有面板对应的所有按钮
                 var manuFacePlateButtonList = await _manuFacePlateButtonRepository.GetByFacePlateIdAsync(manuFacePlateEntity.Id);
                 facePlateButtonIds = manuFacePlateButtonList.Select(c => c.Id).ToList();
+                int x = 0;
                 //处理按钮列表
                 foreach (var manuFacePlateButtonModifyDto in updateManuFacePlateDto.FacePlateButtonList)
                 {
                     //验证按钮DTO
                     await _validationButtonModifyRules.ValidateAndThrowAsync(manuFacePlateButtonModifyDto);
+                    x++;
+                    if (string.IsNullOrWhiteSpace(manuFacePlateButtonModifyDto.Name.Trim()) || manuFacePlateButtonModifyDto.Name.Length > 50)
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", x } };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", x);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES17251);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
+                    if (manuFacePlateButtonModifyDto.Seq <= 0)
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", x } };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", x);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES17252);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
+
+
                     var manuFacePlateButtonEntity = manuFacePlateButtonModifyDto.ToEntity<ManuFacePlateButtonEntity>();
                     //重新生成ID
                     manuFacePlateButtonEntity.Id = IdGenProvider.Instance.CreateId();
                     manuFacePlateButtonEntity.UpdatedBy = _currentUser.UserName;
                     manuFacePlateButtonEntity.UpdatedOn = HymsonClock.Now();
                     manuFacePlateButtonEntity.FacePlateId = manuFacePlateEntity.Id;
+                    manuFacePlateButtonEntity.SiteId = _currentSite.SiteId??0;
                     manuFacePlateButtonEntityList.Add(manuFacePlateButtonEntity);
+                    int i = 0;
                     //按钮关联JOb关系表
                     foreach (var manuFacePlateButtonJobRelations in manuFacePlateButtonModifyDto.ManuFacePlateButtonJobRelations)
                     {
+                        i++;
+                        if (manuFacePlateButtonJobRelations.Seq <= 0)
+                        {
+                            var validationFailure = new ValidationFailure();
+                            if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", i } };
+                            }
+                            else
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", x);
+                            }
+                            validationFailure.ErrorCode = nameof(ErrorCode.MES17253);
+                            validationFailures.Add(validationFailure);
+                            continue;
+                        }
+                        if (manuFacePlateButtonJobRelations.JobId <= 0)
+                        {
+                            var validationFailure = new ValidationFailure();
+                            if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", i } };
+                            }
+                            else
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", x);
+                            }
+                            validationFailure.ErrorCode = nameof(ErrorCode.MES17254);
+                            validationFailures.Add(validationFailure);
+                            continue;
+                        }
                         var manuFacePlateButtonJobRelationEntity = manuFacePlateButtonJobRelations.ToEntity<ManuFacePlateButtonJobRelationEntity>();
                         manuFacePlateButtonJobRelationEntity.Id = IdGenProvider.Instance.CreateId();
                         manuFacePlateButtonJobRelationEntity.UpdatedBy = _currentUser.UserName;
@@ -810,6 +955,10 @@ namespace Hymson.MES.Services.Services.Manufacture
                         manuFacePlateButtonJobRelationEntity.FacePlateButtonId = manuFacePlateButtonEntity.Id;
                         manuFacePlateButtonJobRelationEntityList.Add(manuFacePlateButtonJobRelationEntity);
                     }
+                }
+                if (validationFailures.Any())
+                {
+                    throw new ValidationException(_localizationService.GetResource("MES10107"), validationFailures);
                 }
             }
             #endregion

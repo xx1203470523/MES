@@ -135,7 +135,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                     throw new CustomerValidationException(nameof(ErrorCode.MES19132)).WithData("SFCS", string.Join(',', outBoundMoreSfcs.Select(c => c.SFC)));
             }
             //模组/PACK码信息
-            var mpManuSfc = await _manuSfcRepository.GetBySFCAsync(new GetBySFCQuery { SFC = sfcCirculationBindDto.SFC, SiteId = _currentEquipment.SiteId });
+            var mpManuSfc = await _manuSfcRepository.GetBySFCAsync(new GetBySfcQuery { SFC = sfcCirculationBindDto.SFC, SiteId = _currentEquipment.SiteId });
 
             //需要写入的实体
             var manuSfc = new ManuSfcEntity();
@@ -364,7 +364,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                 sfcCirculationBindDto.SFC = ManuProductParameter.DefaultSFC;
             }
             //获取主条码信息
-            var sfcEntity = await _manuSfcRepository.GetBySFCAsync(new GetBySFCQuery { SFC = sfcCirculationBindDto.SFC, SiteId = _currentEquipment.SiteId });
+            var sfcEntity = await _manuSfcRepository.GetBySFCAsync(new GetBySfcQuery { SFC = sfcCirculationBindDto.SFC, SiteId = _currentEquipment.SiteId });
             //查询已经存在条码的生产信息
             var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery { Sfc = sfcEntity.SFC, SiteId = _currentEquipment.SiteId })
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES19125)).WithData("SFCS", sfcEntity.SFC);

@@ -12,6 +12,7 @@ using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -22,9 +23,10 @@ namespace Hymson.MES.Data.Repositories.Plan
     /// </summary>
     public partial class PlanWorkOrderBindRepository : BaseRepository, IPlanWorkOrderBindRepository
     {
-
-        public PlanWorkOrderBindRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
+        private readonly IMemoryCache _memoryCache;
+        public PlanWorkOrderBindRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
         {
+            _memoryCache = memoryCache;
         }
 
         #region 方法
@@ -203,8 +205,12 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<PlanWorkOrderBindEntity> GetByResourceIDAsync(PlanWorkOrderBindByResourceIdQuery query)
         {
-            using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderBindEntity>(GetByIdSql, query);
+            var key = $"plan_work_order_bind&{query.ResourceId}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                using var conn = GetMESDbConnection();
+                return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderBindEntity>(GetByResourceIdSql, query);
+            });
         }
     }
 
@@ -239,6 +245,6 @@ namespace Hymson.MES.Data.Repositories.Plan
 
         const string GetByResourceIdSql = @"SELECT  
                                `Id`, `EquipmentId`, `ResourceId`, `WorkOrderId`, `CreatedBy`, `CreatedOn`, `SiteId`,UpdatedBy ,UpdatedOn ,IsDeleted
-                            FROM `plan_work_order_bind`  WHERE  IsDeleted=0 AND SiteId=@SiteId AND ResourceId = @ResourceId  AND EquipmentId=@EquipmentId";
+                            FROM `plan_work_order_bind`  WHERE  IsDeleted=0 AND SiteId=@SiteId AND ResourceId = @ResourceId ";
     }
 }

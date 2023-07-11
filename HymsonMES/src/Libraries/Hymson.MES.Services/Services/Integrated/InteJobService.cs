@@ -6,6 +6,9 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.CoreServices.Bos.Job;
+using Hymson.MES.CoreServices.Services.Job;
+using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
@@ -17,6 +20,8 @@ using Hymson.MES.Services.Services.Integrated.IIntegratedService;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Microsoft.Extensions.DependencyInjection;
+using OfficeOpenXml.ConditionalFormatting;
 
 namespace Hymson.MES.Services.Services.Integrated
 {
@@ -33,22 +38,29 @@ namespace Hymson.MES.Services.Services.Integrated
         /// 工序配置作业表仓储
         /// </summary>
         private readonly IInteJobBusinessRelationRepository _jobBusinessRelationRepository;
+        /// <summary>
+        /// 注入反射获取依赖对象
+        /// </summary>
+        private readonly IServiceProvider _serviceProvider;
         private readonly AbstractValidator<InteJobCreateDto> _validationCreateRules;
         private readonly AbstractValidator<InteJobModifyDto> _validationModifyRules;
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
-
+        private readonly IExecuteJobService<JobBaseBo> _executeJobService;
         /// <summary>
         /// 作业表服务
         /// </summary>
         /// <param name="inteJobRepository"></param>
+        /// <param name="jobBusinessRelationRepository"></param>
         /// <param name="validationCreateRules"></param>
         /// <param name="validationModifyRules"></param>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
+        /// <param name="serviceProvider"></param>
         public InteJobService(IInteJobRepository inteJobRepository,
             IInteJobBusinessRelationRepository jobBusinessRelationRepository,
-            AbstractValidator<InteJobCreateDto> validationCreateRules, AbstractValidator<InteJobModifyDto> validationModifyRules, ICurrentUser currentUser, ICurrentSite currentSite)
+            IExecuteJobService<JobBaseBo> executeJobService,
+            AbstractValidator<InteJobCreateDto> validationCreateRules, AbstractValidator<InteJobModifyDto> validationModifyRules, ICurrentUser currentUser, ICurrentSite currentSite, IServiceProvider serviceProvider)
         {
             _inteJobRepository = inteJobRepository;
             _jobBusinessRelationRepository = jobBusinessRelationRepository;
@@ -56,6 +68,8 @@ namespace Hymson.MES.Services.Services.Integrated
             _validationModifyRules = validationModifyRules;
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _serviceProvider = serviceProvider;
+            _executeJobService= executeJobService;
         }
 
         /// <summary>
@@ -65,6 +79,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task<PagedInfo<InteJobDto>> GetPageListAsync(InteJobPagedQueryDto pram)
         {
+           //await _executeJobService.ExecuteAsync(new List<JobBo> { new JobBo { Name= "BarcodeReceiveService" }, new JobBo { Name = "InStationJobService" } }, new JobRequestBo { SFCs = new List<string> { "test000011" }, SiteId = 123456});
             var inteJobPagedQuery = pram.ToQuery<InteJobPagedQuery>();
             inteJobPagedQuery.SiteId = _currentSite.SiteId;
             var pagedInfo = await _inteJobRepository.GetPagedInfoAsync(inteJobPagedQuery);
@@ -105,6 +120,12 @@ namespace Hymson.MES.Services.Services.Integrated
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(param);
 
+            // 获取所有实现类
+            var services = _serviceProvider.GetServices<IJobManufactureService>();
+            if (!services.Any(it => it.GetType().Name == param.ClassProgram))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12011));
+            }
             var inteJobEntity = await _inteJobRepository.GetByCodeAsync(new EntityByCodeQuery { Code = param.Code, Site = _currentSite.SiteId });
             if (inteJobEntity != null)
             {
@@ -162,6 +183,12 @@ namespace Hymson.MES.Services.Services.Integrated
             }
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(param);
+            // 获取所有实现类
+            var services = _serviceProvider.GetServices<IJobManufactureService>();
+            if (!services.Any(it => it.GetType().Name == param.ClassProgram))
+            {
+                throw new ValidationException(nameof(ErrorCode.MES12011));
+            }
             var userId = _currentUser.UserName;
             //DTO转换实体
             var inteJobEntity = param.ToEntity<InteJobEntity>();

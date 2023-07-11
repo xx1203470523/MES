@@ -16,7 +16,7 @@ namespace Hymson.MES.Services.Validators.Process
         public ProcResourceCreateValidator()
         {
             RuleFor(x => x.ResCode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10301));
-            RuleFor(x => x.ResCode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10302));
+            RuleFor(x => x.ResCode).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES10302));
             RuleFor(x => x.ResName).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10303));
             RuleFor(x => x.ResName).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES10304));
             RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(ErrorCode.MES10380);

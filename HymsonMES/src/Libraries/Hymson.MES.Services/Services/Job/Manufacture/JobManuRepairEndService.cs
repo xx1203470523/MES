@@ -1,9 +1,10 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.CoreServices.Dtos.Common;
-using Hymson.MES.CoreServices.Services.Common;
+using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.Services.Dtos.Common;
 
 namespace Hymson.MES.Services.Services.Job.Manufacture
@@ -23,15 +24,18 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
         /// </summary>
         private readonly ICurrentSite _currentSite;
 
+        private readonly ILocalizationService _localizationService;
+
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        public JobManuRepairEndService(ICurrentUser currentUser, ICurrentSite currentSite)
+        public JobManuRepairEndService(ICurrentUser currentUser, ICurrentSite currentSite,ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _localizationService = localizationService;
         }
 
 
@@ -66,7 +70,8 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             defaultDto.Content?.Add("BadEntryCom", "True");
             if (param.ContainsKey("IsClear")) defaultDto.Content?.Add("IsClear", param["IsClear"]);
 
-            defaultDto.Message = $"条码{param?["SFC"]}已于NF排队！";
+            //defaultDto.Message = $"条码{param?["SFC"]}已于NF排队！";
+            defaultDto.Message = _localizationService.GetResource(nameof(ErrorCode.MES16348), param["SFC"]); 
 
             return await Task.FromResult(defaultDto);
         }

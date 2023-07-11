@@ -386,13 +386,13 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
             }
 
             // 日历详情
-            if (calendarDates != null && calendarDates.Any() == true)
+            if (calendarDates != null && calendarDates.Any() )
             {
                 var first = calendarDates.FirstOrDefault();
 
                 var month = calendarDates.Select(a => a.Month).ToArray();
-                model.Year = first.Year;
-                model.ClassId = first.ClassId;
+                model.Year = first?.Year??"";
+                model.ClassId = first?.ClassId??0;
                 if (model.ClassId > 0)
                 {
                     var inteClass = await _inteClassRepository.GetByIdAsync(model.ClassId.Value);

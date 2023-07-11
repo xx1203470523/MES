@@ -47,6 +47,9 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
         private readonly AbstractValidator<ProcProcessRouteCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcProcessRouteModifyDto> _validationModifyRules;
 
+        private readonly AbstractValidator<FlowDynamicLinkDto> _validationFlowDynamicLinkRules;
+        private readonly AbstractValidator<FlowDynamicNodeDto> _validationFlowDynamicNodeRules;
+        
         /// <summary>
         /// 工艺路线表 仓储
         /// </summary>
@@ -75,7 +78,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             AbstractValidator<ProcProcessRouteModifyDto> validationModifyRules,
             IProcProcessRouteRepository procProcessRouteRepository,
             IProcProcessRouteDetailNodeRepository procProcessRouteNodeRepository,
-            IProcProcessRouteDetailLinkRepository procProcessRouteLinkRepository)
+            IProcProcessRouteDetailLinkRepository procProcessRouteLinkRepository, AbstractValidator<FlowDynamicLinkDto> validationFlowDynamicLinkRules, AbstractValidator<FlowDynamicNodeDto> validationFlowDynamicNodeRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -84,6 +87,8 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             _procProcessRouteRepository = procProcessRouteRepository;
             _procProcessRouteNodeRepository = procProcessRouteNodeRepository;
             _procProcessRouteLinkRepository = procProcessRouteLinkRepository;
+            _validationFlowDynamicLinkRules = validationFlowDynamicLinkRules;
+            _validationFlowDynamicNodeRules = validationFlowDynamicNodeRules;
         }
 
 
@@ -117,7 +122,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             model.Info = processRoute.ToModel<ProcProcessRouteDto>();
 
             var nodes = await _procProcessRouteNodeRepository.GetListAsync(new ProcProcessRouteDetailNodeQuery { ProcessRouteId = id });
-            nodes = nodes.OrderBy(x => x.SerialNo.ParseToInt());
+            nodes = nodes.OrderBy(x => x.ManualSortNumber);
             model.Nodes = nodes.Select(s =>
             {
                 // 实体转换
@@ -168,12 +173,63 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             #region 验证
             if (parm == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
 
+            // 验证DTO
+            await _validationCreateRules.ValidateAndThrowAsync(parm);
+
+            //验证工序集合
+            if (parm.DynamicData != null)
+            {
+                if (parm.DynamicData.Links != null && parm.DynamicData.Links.Any())
+                {
+                    foreach (var item in parm.DynamicData.Links)
+                    {
+                        await _validationFlowDynamicLinkRules.ValidateAndThrowAsync(item);
+                    }
+                }
+                else
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10454));
+                }
+
+                if (parm.DynamicData.Nodes != null && parm.DynamicData.Nodes.Any())
+                {
+                    foreach (var item in parm.DynamicData.Nodes)
+                    {
+                        if (item.ProcedureId<=0) 
+                        {
+                            throw new CustomerValidationException(nameof(ErrorCode.MES10461));
+                        }
+
+                        if (item.ProcedureId != EndNodeId) //不是结束节点
+                        {
+                            await _validationFlowDynamicNodeRules.ValidateAndThrowAsync(item);
+                        }
+                        else 
+                        {
+                            if (string.IsNullOrEmpty(item.ManualSortNumber))
+                                throw new CustomerValidationException(nameof(ErrorCode.MES10474));
+                            if (item.ManualSortNumber.Length > 18)
+                                throw new CustomerValidationException(nameof(ErrorCode.MES10475));
+                            if(string.IsNullOrEmpty(item.Extra1))
+                                throw new CustomerValidationException(nameof(ErrorCode.MES10468));
+                        }
+                    }
+                }
+                else
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10455));
+                }
+
+
+            }
+            else 
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10453));
+            }
+
             parm.Code = parm.Code.ToTrimSpace().ToUpperInvariant();
             parm.Name = parm.Name.Trim();
             parm.Remark = parm.Remark.Trim();
-
-            // 验证DTO
-            await _validationCreateRules.ValidateAndThrowAsync(parm);
 
             // DTO转换实体
             var procProcessRouteEntity = parm.ToEntity<ProcProcessRouteEntity>();
@@ -237,6 +293,57 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
 
             // 验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(parm);
+
+            //验证工序集合
+            if (parm.DynamicData != null)
+            {
+                if (parm.DynamicData.Links != null && parm.DynamicData.Links.Any())
+                {
+                    foreach (var item in parm.DynamicData.Links)
+                    {
+                        await _validationFlowDynamicLinkRules.ValidateAndThrowAsync(item);
+                    }
+                }
+                else
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10454));
+                }
+
+                if (parm.DynamicData.Nodes != null && parm.DynamicData.Nodes.Any())
+                {
+                    foreach (var item in parm.DynamicData.Nodes)
+                    {
+                        if (item.ProcedureId <= 0)
+                        {
+                            throw new CustomerValidationException(nameof(ErrorCode.MES10461));
+                        }
+
+                        if (item.ProcedureId != EndNodeId) //不是结束节点
+                        {
+                            await _validationFlowDynamicNodeRules.ValidateAndThrowAsync(item);
+                        }
+                        else
+                        {
+                            if (string.IsNullOrEmpty(item.ManualSortNumber))
+                                throw new CustomerValidationException(nameof(ErrorCode.MES10474));
+                            if (item.ManualSortNumber.Length > 18)
+                                throw new CustomerValidationException(nameof(ErrorCode.MES10475));
+                            if (string.IsNullOrEmpty(item.Extra1))
+                                throw new CustomerValidationException(nameof(ErrorCode.MES10468));
+                        }
+                    }
+                }
+                else
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10455));
+                }
+
+
+            }
+            else
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10453));
+            }
 
             // 判断是否存在
             var processRoute = await _procProcessRouteRepository.GetByIdAsync(parm.Id)
@@ -417,6 +524,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
                 SiteId = entity.SiteId,
                 ProcessRouteId = entity.Id,
                 SerialNo = "",
+                ManualSortNumber=s.ManualSortNumber,
                 ProcedureId = s.ProcedureId,
                 CheckType = s.CheckType,
                 CheckRate = s.CheckRate,

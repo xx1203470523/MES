@@ -366,10 +366,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES16600));
             }
             var manuSfcProduce = manuSfcProduces.ToList()[0];
-            if (manuSfcProduce.ProcedureId != removeDto.ProcedureId)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16612));
-            }
+
             //报废的不能操作
             if (manuSfcProduce.IsScrap == TrueOrFalseEnum.Yes)
             {
@@ -447,10 +444,14 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES16600));
             }
             var manuSfcProduce = manuSfcProduces.ToList()[0];
-            if (manuSfcProduce.ProcedureId != addDto.ProcedureId)
+            if (addDto.IsAssemble)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16612));
+                if (manuSfcProduce.ProcedureId != addDto.ProcedureId)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16612));
+                }
             }
+
             //报废的不能操作
             if (manuSfcProduce.IsScrap == TrueOrFalseEnum.Yes)
             {
@@ -679,10 +680,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES16600));
             }
             var manuSfcProduce = manuSfcProduces.ToList()[0];
-            if (manuSfcProduce.ProcedureId != replaceDto.ProcedureId)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16612));
-            }
             //报废的不能操作
             if (manuSfcProduce.IsScrap == TrueOrFalseEnum.Yes)
             {

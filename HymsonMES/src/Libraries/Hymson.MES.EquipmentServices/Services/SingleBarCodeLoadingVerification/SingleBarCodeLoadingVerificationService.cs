@@ -51,7 +51,7 @@ namespace Hymson.MES.EquipmentServices.Services.SingleBarCodeLoadingVerification
         public async Task SingleBarCodeLoadingVerificationAsync(SingleBarCodeLoadingVerificationDto singleBarCodeLoadingVerificationDto)
         {
             await _validationSingleBarCodeLoadingVerificationDtoRules.ValidateAndThrowAsync(singleBarCodeLoadingVerificationDto);
-            var manuSfcEntit = await _manuSfcRepository.GetBySFCAsync(new GetBySFCQuery { SFC = singleBarCodeLoadingVerificationDto.SFC, SiteId = _currentEquipment.SiteId });
+            var manuSfcEntit = await _manuSfcRepository.GetBySFCAsync(new GetBySfcQuery { SFC = singleBarCodeLoadingVerificationDto.SFC, SiteId = _currentEquipment.SiteId });
             if (manuSfcEntit == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19117)).WithData("SFC", singleBarCodeLoadingVerificationDto.SFC);

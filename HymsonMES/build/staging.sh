@@ -9,6 +9,7 @@ docker tag $imageName:$timestamp  $registryUrl/$imageName:$timestamp
 docker push $registryUrl/$imageName:$timestamp
 docker service rm $serviceName
 docker service create \
+  --with-registry-auth \
   --name $serviceName \
   --mode global \
   --publish mode=host,published=20023,target=80 \

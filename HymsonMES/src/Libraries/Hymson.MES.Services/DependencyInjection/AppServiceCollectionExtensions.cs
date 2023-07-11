@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Hymson.MES.CoreServices.Services.Common;
+using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -22,9 +22,7 @@ using Hymson.MES.Services.Services.Integrated.InteContainer;
 using Hymson.MES.Services.Services.Job.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuFeeding;
-using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
-using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCreateBarcode;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInStation;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOutStation;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPackage;
@@ -168,8 +166,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuFeedingService, ManuFeedingService>();
             services.AddSingleton<IManuSfcService, ManuSfcService>();
             services.AddSingleton<IManuSfcProduceService, ManuSfcProduceService>();
-            services.AddSingleton<IManuCreateBarcodeService, ManuCreateBarcodeService>();
-            services.AddSingleton<IManuGenerateBarcodeService, ManuGenerateBarcodeService>();
+            //services.AddSingleton<IManuGenerateBarcodeService, ManuGenerateBarcodeService>();
             services.AddSingleton<IManuProductBadRecordService, ManuProductBadRecordService>();
             services.AddSingleton<IManuFacePlateService, ManuFacePlateService>();
             services.AddSingleton<IManuFacePlateButtonService, ManuFacePlateButtonService>();
@@ -349,6 +346,9 @@ namespace Microsoft.Extensions.DependencyInjection
             #region ProcessRoute
             services.AddSingleton<AbstractValidator<ProcProcessRouteCreateDto>, ProcProcessRouteCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcProcessRouteModifyDto>, ProcProcessRouteModifyValidator>();
+
+            services.AddSingleton<AbstractValidator<FlowDynamicLinkDto>, ProcFlowDynamicLinkValidator>();
+            services.AddSingleton<AbstractValidator<FlowDynamicNodeDto>, ProcFlowDynamicNodeValidator>();
             #endregion
 
             #region LabelTemplate
@@ -463,6 +463,7 @@ namespace Microsoft.Extensions.DependencyInjection
             #region PlanWorkOrder
             services.AddSingleton<AbstractValidator<PlanWorkOrderCreateDto>, PlanWorkOrderCreateValidator>();
             services.AddSingleton<AbstractValidator<PlanWorkOrderModifyDto>, PlanWorkOrderModifyValidator>();
+            services.AddSingleton<AbstractValidator<PlanWorkOrderChangeStatusDto>, PlanWorkOrderChangeStatusValidator>();
             #endregion
 
             #region PlanSfcReceive

@@ -17,20 +17,18 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     public partial class ManuSfcCirculationRepository : BaseRepository, IManuSfcCirculationRepository
     {
         /// <summary>
-        /// 
+        /// 数据库连接
         /// </summary>
         private readonly ConnectionOptions _connectionOptions;
-        private readonly IMemoryCache _memoryCache;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
         /// <param name="memoryCache"></param>
-        public ManuSfcCirculationRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
+        public ManuSfcCirculationRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
-            _memoryCache = memoryCache;
         }
 
 
@@ -161,11 +159,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
-
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
+            sqlBuilder.Where("SiteId=@SiteId");
 
             var offSet = (manuSfcCirculationPagedQuery.PageIndex - 1) * manuSfcCirculationPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -254,7 +248,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> InsertRangeAsync(IEnumerable<ManuSfcCirculationEntity> manuSfcCirculationEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(InsertSql, manuSfcCirculationEntitys);
         }
 
@@ -334,24 +327,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 sqlBuilder.Where(" CirculationProductId=@CirculationProductId ");
             }
 
-            if (queryParam.CreatedOn != null && queryParam.CreatedOn.Length > 0)
+            if (queryParam.CreatedOn != null && queryParam.CreatedOn.Length >= 2)
             {
-                if (queryParam.CreatedOn.Length >= 2)
-                {
-                    sqlBuilder.AddParameters(new { CreatedOnStart = queryParam.CreatedOn[0], CreatedOnEnd = queryParam.CreatedOn[1].AddDays(1) });
-                    sqlBuilder.Where(" CreatedOn >= @CreatedOnStart AND CreatedOn < @CreatedOnEnd ");
-                }
+                sqlBuilder.AddParameters(new { CreatedOnStart = queryParam.CreatedOn[0], CreatedOnEnd = queryParam.CreatedOn[1].AddDays(1) });
+                sqlBuilder.Where(" CreatedOn >= @CreatedOnStart AND CreatedOn < @CreatedOnEnd ");
             }
-
-            //if (queryParam.CreatedOnS.HasValue || queryParam.CreatedOnE.HasValue)
-            //{
-            //    if (queryParam.CreatedOnS.HasValue && queryParam.CreatedOnE.HasValue) sqlBuilder.Where(" CreatedOn BETWEEN @CreatedOnS AND @CreatedOnE");
-            //    else
-            //    {
-            //        if (queryParam.CreatedOnS.HasValue) sqlBuilder.Where("CreatedOn >= @CreatedOnS");
-            //        if (queryParam.CreatedOnE.HasValue) sqlBuilder.Where("CreatedOn < @CreatedOnE");
-            //    }
-            //}
 
             if (!string.IsNullOrEmpty(queryParam.CirculationBarCode))
             {

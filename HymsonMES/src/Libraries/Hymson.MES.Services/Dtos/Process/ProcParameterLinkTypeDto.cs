@@ -26,59 +26,59 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 标准参数ID
         /// </summary>
         public long ParameterID { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 参数类型
         /// </summary>
         public ParameterTypeEnum ParameterType { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 说明
         /// </summary>
         public string? Remark { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 最后修改人
         /// </summary>
         public string? UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 修改时间
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否逻辑删除
         /// </summary>
         public bool? IsDeleted { get; set; }
 
-       
+
     }
 
 
     /// <summary>
     /// 标准参数关联类型表新增Dto
     /// </summary>
-    public record ProcParameterLinkTypeCreateDto 
+    public record ProcParameterLinkTypeCreateDto
     {
         /// <summary>
         /// 类型（设备/产品参数）
         /// </summary>
-        public ParameterTypeEnum ParameterType { get; set; } = ParameterTypeEnum.Equipment;
+        public ParameterTypeEnum? ParameterType { get; set; }
 
         /// <summary>
         /// 集合（标准参数）
@@ -89,7 +89,7 @@ namespace Hymson.MES.Services.Dtos.Process
     /// <summary>
     /// 标准参数关联类型表更新Dto
     /// </summary>
-    public record ProcParameterLinkTypeModifyDto 
+    public record ProcParameterLinkTypeModifyDto
     {
         /// <summary>
         /// 类型（设备/产品参数）
@@ -123,7 +123,7 @@ namespace Hymson.MES.Services.Dtos.Process
         public string? ParameterName { get; set; } = "";
     }
 
-    public record ProcParameterLinkTypeViewDto: BaseEntityDto
+    public record ProcParameterLinkTypeViewDto : BaseEntityDto
     {
         /// <summary>
         /// 唯一标识
@@ -189,7 +189,7 @@ namespace Hymson.MES.Services.Dtos.Process
     /// <summary>
     /// 查询对象（设备/产品参数） 分页
     /// </summary>
-    public class ProcParameterDetailPagerQueryDto : PagerInfo 
+    public class ProcParameterDetailPagerQueryDto : PagerInfo
     {
         /// <summary>
         /// 操作类型 1:add；2:edit；3:view；

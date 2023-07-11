@@ -34,25 +34,25 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         }
 
         /// <summary>
-        /// 
+        /// equipmentUnitEntity
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(EquEquipmentEntity entity)
+        public async Task<int> InsertAsync(EquEquipmentEntity equipmentUnitEntity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertSql, entity);
+            return await conn.ExecuteAsync(InsertSql, equipmentUnitEntity);
         }
 
         /// <summary>
-        /// 
+        /// equipmentUnitEntity
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(EquEquipmentEntity entity)
+        public async Task<int> UpdateAsync(EquEquipmentEntity equipmentUnitEntity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateSql, entity);
+            return await conn.ExecuteAsync(UpdateSql, equipmentUnitEntity);
         }
 
         /// <summary>
@@ -159,21 +159,21 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         }
 
         /// <summary>
-        /// 
+        /// equipmentQuery
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="equipmentQuery"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<EquEquipmentEntity>> GetEntitiesAsync(EquEquipmentQuery query)
+        public async Task<IEnumerable<EquEquipmentEntity>> GetEntitiesAsync(EquEquipmentQuery equipmentQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var equipmentEntities = await conn.QueryAsync<EquEquipmentEntity>(template.RawSql, query);
+            var equipmentEntities = await conn.QueryAsync<EquEquipmentEntity>(template.RawSql, equipmentQuery);
             return equipmentEntities;
         }
 
         /// <summary>
-        /// 
+        /// pagedQuery
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>

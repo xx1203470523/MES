@@ -110,14 +110,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        Task<int> UpdateSfcIsUsedAsync(ManuSfcUpdateIsUsedCommand command);
+        Task<int> MultiUpdateSfcIsUsedAsync(MultiSfcUpdateIsUsedCommand command);
+
+        /// <summary>
+        /// 批量更新条码（条码状态）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> MultiUpdateSfcStatusAsync(MultiSFCUpdateStatusCommand command);
 
         /// <summary>
         /// 获取SFC
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        Task<ManuSfcEntity> GetBySFCAsync(GetBySFCQuery command);
+        Task<ManuSfcEntity> GetBySFCAsync(GetBySfcQuery command);
 
         /// <summary>
         /// 更具sfc 获取条码信息
@@ -133,6 +140,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="query"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuSfcProduceView>> GetManuSfcPagedInfoAsync(ManuSfcProducePagedQuery manuSfcProducePagedQuery);
+
+        /// <summary>
+        /// 分页查询（查询所有条码信息）
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ManuSfcProduceSelectView>> GetManuSfcSelectPagedInfoAsync(ManuSfcProduceSelectPagedQuery query);
 
         /// <summary>
         /// 批量更新条码（条码状态与使用状态）

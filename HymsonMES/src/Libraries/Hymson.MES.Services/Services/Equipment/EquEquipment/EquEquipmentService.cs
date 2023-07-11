@@ -177,6 +177,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         {
             #region 参数处理
             if (string.IsNullOrEmpty(modifyDto.EntryDate) == true) modifyDto.EntryDate = SqlDateTime.MinValue.Value.ToString();
+            await _validationSaveRules.ValidateAndThrowAsync(modifyDto);
 
             // DTO转换实体
             var entity = modifyDto.ToEntity<EquEquipmentEntity>();

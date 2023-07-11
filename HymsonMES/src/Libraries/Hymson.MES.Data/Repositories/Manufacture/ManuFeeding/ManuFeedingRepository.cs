@@ -4,10 +4,8 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using System.Data;
 using System.Text;
 
 namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
@@ -18,20 +16,18 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
     public partial class ManuFeedingRepository : BaseRepository, IManuFeedingRepository
     {
         /// <summary>
-        /// 
+        /// 数据库连接
         /// </summary>
         private readonly ConnectionOptions _connectionOptions;
-        private readonly IMemoryCache _memoryCache;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
         /// <param name="memoryCache"></param>
-        public ManuFeedingRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
+        public ManuFeedingRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
-            _memoryCache = memoryCache;
         }
 
         /// <summary>
@@ -50,11 +46,39 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         /// </summary>
         /// <param name="commands"></param>
         /// <returns></returns>
+        public async Task<int> UpdateQtyByIdAsync(UpdateQtyByIdCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateQtyByIdSql, command);
+        }
+
+        /// <summary>
+        /// 更新数量
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
         public async Task<int> UpdateQtyByIdAsync(IEnumerable<UpdateQtyByIdCommand> commands)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(UpdateQtyByIdSql, commands);
+
+            /*
+            StringBuilder stringBuilder = new();
+            var updatesParams = new DynamicParameters();
+            var i = 0;
+            foreach (var item in commands)
+            {
+                stringBuilder.Append(UpdateQtyHeadSql);
+                stringBuilder.AppendFormat(UpdateQtyTailSql, i);
+
+                updatesParams.Add($"{nameof(item.Id)}{i}", item.Id);
+                updatesParams.Add($"{nameof(item.Qty)}{i}", item.Qty);
+                updatesParams.Add($"{nameof(item.UpdatedBy)}{i}", item.UpdatedBy);
+                updatesParams.Add($"{nameof(item.UpdatedOn)}{i}", item.UpdatedOn);
+                i++;
+            }
+            return await conn.ExecuteAsync(stringBuilder.ToString(), updatesParams);
+            */
         }
 
         /// <summary>
@@ -141,7 +165,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
     public partial class ManuFeedingRepository
     {
         const string InsertSql = "INSERT INTO `manu_feeding`(  `Id`, `ResourceId`, `FeedingPointId`, `ProductId`, SupplierId, `BarCode`, MaterialId, `InitQty`, `Qty`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @ResourceId, @FeedingPointId, @ProductId, @SupplierId, @BarCode, @MaterialId, @InitQty, @Qty, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
-        const string UpdateQtyByIdSql = "UPDATE manu_feeding SET Qty = CASE WHEN @Qty > Qty THEN 0 ELSE Qty - @Qty END, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Qty > 0 AND Id = @Id; ";
+        const string UpdateQtyHeadSql = "UPDATE manu_feeding SET ";
+        const string UpdateQtyTailSql = @"Qty = (CASE WHEN @Qty{0} > Qty THEN 0 ELSE Qty - @Qty{0} END), UpdatedBy = @UpdatedBy{0}, UpdatedOn = @UpdatedOn{0} WHERE Qty > 0 AND Id = @Id{0}; ";
+        const string UpdateQtyByIdSql = "UPDATE manu_feeding SET Qty = (CASE WHEN @Qty > Qty THEN 0 ELSE Qty - @Qty END), UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Qty > 0 AND Id = @Id; ";
         const string DeleteSql = "UPDATE manu_feeding SET `IsDeleted` = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids;";
         const string DeleteByIds = "DELETE FROM manu_feeding WHERE Id IN @ids; ";
         const string GetByIds = "SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND Id IN @ids; ";

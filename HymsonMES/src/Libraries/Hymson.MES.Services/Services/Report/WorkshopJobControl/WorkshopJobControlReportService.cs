@@ -89,7 +89,7 @@ namespace Hymson.MES.Services.Services.Report
                 throw new BusinessException(nameof(ErrorCode.MES18106)).WithData("sfc", sfc);
             }
 
-            var sfcSteps= await _manuSfcStepRepository.GetSFCInOutStepAsync(new SFCInOutStepQuery() { SiteId=_currentSite.SiteId??0,Sfc=sfc});
+            var sfcSteps= await _manuSfcStepRepository.GetSFCInOutStepAsync(new SfcInOutStepQuery() { SiteId=_currentSite.SiteId??0,Sfc=sfc});
 
             if (sfcSteps==null|| !sfcSteps.Any()) 
             {
@@ -190,7 +190,7 @@ namespace Hymson.MES.Services.Services.Report
         /// <returns></returns>
         public async Task<PagedInfo<ManuSfcStepBySFCViewDto>> GetSFCStepsBySFCPageListAsync(ManuSfcStepBySFCPagedQueryDto queryParam)
         {
-            var pagedQuery = queryParam.ToQuery<ManuSfcStepBySFCPagedQuery>();
+            var pagedQuery = queryParam.ToQuery<ManuSfcStepBySfcPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId.Value;
 
             if (string.IsNullOrEmpty(pagedQuery.SFC)) 

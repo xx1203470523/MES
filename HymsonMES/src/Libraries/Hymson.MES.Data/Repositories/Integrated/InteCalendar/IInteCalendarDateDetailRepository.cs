@@ -55,15 +55,5 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
         /// <param name="calendarId"></param>
         /// <returns></returns>
         Task<IEnumerable<InteCalendarDateDetailEntity>> GetEntitiesAsync(long calendarId);
-
-        /*
-        /// <summary>
-        /// 分页查询
-        /// </summary>
-        /// <param name="inteCalendarPagedQuery"></param>
-        /// <returns></returns>
-        Task<PagedInfo<InteCalendarDateDetailEntity>> GetPagedInfoAsync(InteCalendarPagedQuery inteCalendarPagedQuery);
-        */
-
     }
 }

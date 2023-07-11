@@ -318,7 +318,7 @@ namespace Hymson.MES.Services.Services.Report
             var procProcessRouteDetailNodeQuery = procSfcProcessRoutePagedQueryDto.ToQuery<ProcProcessRouteDetailNodePagedQuery>();
             IEnumerable<ProcSfcProcessRouteViewDto> procSfcProcessRouteViewDtos = new List<ProcSfcProcessRouteViewDto>();
             //查询条码信息
-            var manuSfcEntity = await _manuSfcRepository.GetBySFCAsync(new GetBySFCQuery { SFC = procSfcProcessRoutePagedQueryDto.SFC, SiteId = _currentSite.SiteId });
+            var manuSfcEntity = await _manuSfcRepository.GetBySFCAsync(new GetBySfcQuery { SFC = procSfcProcessRoutePagedQueryDto.SFC, SiteId = _currentSite.SiteId });
             if (manuSfcEntity == null)
             {
                 return new PagedInfo<ProcSfcProcessRouteViewDto>(procSfcProcessRouteViewDtos, procSfcProcessRoutePagedQueryDto.PageIndex, procSfcProcessRoutePagedQueryDto.PageSize, 0);
@@ -416,7 +416,7 @@ namespace Hymson.MES.Services.Services.Report
             var planWorkOrderPagedQuery = planWorkOrderPagedQueryDto.ToQuery<PlanWorkOrderPagedQuery>();
             IEnumerable<ProductTracePlanWorkOrderViewDto> productTracePlanWorkOrderViews = new List<ProductTracePlanWorkOrderViewDto>();
             //查询条码信息
-            var manuSfcEntity = await _manuSfcRepository.GetBySFCAsync(new GetBySFCQuery { SFC = planWorkOrderPagedQueryDto.SFC, SiteId = _currentSite.SiteId });
+            var manuSfcEntity = await _manuSfcRepository.GetBySFCAsync(new GetBySfcQuery { SFC = planWorkOrderPagedQueryDto.SFC, SiteId = _currentSite.SiteId });
             if (manuSfcEntity == null)
             {
                 return new PagedInfo<ProductTracePlanWorkOrderViewDto>(productTracePlanWorkOrderViews, planWorkOrderPagedQueryDto.PageIndex, planWorkOrderPagedQueryDto.PageSize, 0);

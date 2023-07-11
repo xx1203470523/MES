@@ -1,22 +1,13 @@
 ﻿using FluentValidation;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums.Integrated;
-using Hymson.MES.CoreServices.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGenerateBarcodeDto;
-using Hymson.MES.CoreServices.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode;
+using Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode;
+using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.EquipmentServices.Dtos.GenerateModuleSFC;
-using Hymson.MES.EquipmentServices.Dtos.SingleBarCodeLoadingVerification;
-using Hymson.Utils;
 using Hymson.Web.Framework.WorkContext;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.EquipmentServices.Services.GenerateModuleSFC
 {
@@ -71,7 +62,7 @@ namespace Hymson.MES.EquipmentServices.Services.GenerateModuleSFC
                 throw new CustomerValidationException(nameof(ErrorCode.MES19116)).WithData("Code", generateModuleSFCDto.ProductCode);
             }
             ////生成条码
-            var barcodeList = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new GenerateBarcodeDto
+            var barcodeList = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new GenerateBarcodeBo
             {
                 CodeRuleId = inteCodeRulesEntit.Id,
                 Count = generateModuleSFCDto.Qty,

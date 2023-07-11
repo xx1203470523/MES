@@ -7,6 +7,7 @@
  */
 using FluentValidation;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Services.Dtos.Integrated;
 using System;
 using System.Collections.Generic;
@@ -32,6 +33,7 @@ namespace Hymson.MES.Services.Validators.Integrated
 
             //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");
             //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
+            RuleFor(x => x.ValueTakingType).Must(it => Enum.IsDefined(typeof(CodeValueTakingTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES12437));
         }
     }
 

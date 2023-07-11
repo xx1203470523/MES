@@ -10,18 +10,22 @@ using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture;
+using Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
+using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.HttpClients;
 using Hymson.MES.HttpClients.Requests.Print;
+using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCreateBarcodeDto;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.Collections.Generic;
 
 namespace Hymson.MES.Services.Services.Plan
 {
@@ -81,6 +85,8 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
+        private readonly IManuCreateBarcodeService _manuCreateBarcodeService;
+
         /// <summary>
         /// 打印机配置
         /// </summary>
@@ -134,7 +140,8 @@ namespace Hymson.MES.Services.Services.Plan
             IManuSfcInfoRepository manuSfcInfoRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcStepRepository manuSfcStepRepository,
-            IPlanWorkOrderRepository planWorkOrderRepository)
+            IPlanWorkOrderRepository planWorkOrderRepository,
+            IManuCreateBarcodeService manuCreateBarcodeService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -154,6 +161,7 @@ namespace Hymson.MES.Services.Services.Plan
             _procMaterialRepository = procMaterialRepository;
             _procLabelTemplateRepository = procLabelTemplateRepository;
             _labelPrintRequest = labelPrintRequest;
+            _manuCreateBarcodeService = manuCreateBarcodeService;
         }
 
 
@@ -214,47 +222,43 @@ namespace Hymson.MES.Services.Services.Plan
                 SiteId = _currentSite.SiteId ?? 123456
 
             });
+            PrintRequest printEntity = new PrintRequest();
+
             foreach (var pprp in ppr)
             {
                 var tl = await _procLabelTemplateRepository.GetByIdAsync(pprp.TemplateId);
                 if (tl != null)
                 {
-                    PrintRequest printEntity = new PrintRequest()
+                    var body = new PrintBody()
                     {
-                        Bodies = new PrintBody[]
+                        TemplatePath = tl.Path,
+                        PrinterName = print.PrintName,
+                        PrintCount = pprp.Copy??1,
+                        Params = new List<PrintBody.ParamEntity>()
                         {
-                            new PrintBody()
+                            new PrintBody.ParamEntity()
                             {
-                                TemplatePath = tl.Path,
-                                PrinterName = print.PrintName,
-                                PrintCount = pprp.Copy??1,
-                                Params = new List<PrintBody.ParamEntity>()
-                                {
-                                    new PrintBody.ParamEntity()
-                                    {
-                                        ParamName = "SFC",
-                                        ParamValue = createDto.SFC
-                                    },
-                                    new PrintBody.ParamEntity()
-                                    {
-                                        ParamName = "SiteId",
-                                        ParamValue = (_currentSite.SiteId??123456).ToString()
-                                    }
-                                }
+                                ParamName = "SFC",
+                                ParamValue = createDto.SFC
+                            },
+                            new PrintBody.ParamEntity()
+                            {
+                                ParamName = "SiteId",
+                                ParamValue = (_currentSite.SiteId??123456).ToString()
                             }
                         }
                         
                     };
-                   
-                    var result = await _labelPrintRequest.PrintAsync(printEntity);
-                    if (!result.result)
-                        throw new CustomerValidationException(nameof(ErrorCode.MES17003)).WithData("msg", result.msg);
-                    
+                    printEntity.Bodies.Add(body);
                 }
                 else
                     throw new CustomerValidationException(nameof(ErrorCode.MES17001));
             }
-            
+            var result = await _labelPrintRequest.PrintAsync(printEntity);
+            if (!result.result)
+                throw new CustomerValidationException(nameof(ErrorCode.MES17003)).WithData("msg", result.msg);
+
+
         }
 
         /// <summary>
@@ -350,6 +354,47 @@ namespace Hymson.MES.Services.Services.Plan
             return new PagedInfo<PlanSfcPrintDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
+        /// <summary>
+        /// 生成条码
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        public async Task<List<ManuSfcEntity>> CreateBarcodeByWorkOrderIdAsync(CreateBarcodeByWorkOrderDto parm)
+        {
+            return await _manuCreateBarcodeService.CreateBarcodeByWorkOrderIdAsync(new CreateBarcodeByWorkOrderBo
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                UserName = _currentUser.UserName,
+                WorkOrderId = parm.WorkOrderId,
+                Qty = parm.Qty
+            });
+        }
 
+        /// <summary>
+        /// 工单下达及打印
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        public async Task CreateBarcodeByWorkOrderIdAndPrintAsync(CreateBarcodeByWorkOrderAndPrintDto param)
+        {
+            var list = await _manuCreateBarcodeService.CreateBarcodeByWorkOrderIdAsync(new CreateBarcodeByWorkOrderBo
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                UserName = _currentUser.UserName,
+                WorkOrderId = param.WorkOrderId,
+                Qty = param.Qty
+            });
+
+            foreach (var item in list)
+            {
+                await CreatePrintAsync(new Dtos.Plan.PlanSfcPrintCreatePrintDto()
+                {
+                    PrintId = param.PrintId,
+                    ProcedureId = param.ProcedureId,
+                    SFC = item.SFC,
+                    WorkOrderId = param.WorkOrderId
+                });
+            }
+        }
     }
 }

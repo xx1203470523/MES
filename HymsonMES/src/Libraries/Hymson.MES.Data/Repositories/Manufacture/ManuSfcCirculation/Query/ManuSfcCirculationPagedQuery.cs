@@ -19,7 +19,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query
     /// </summary>
     public class ManuSfcCirculationPagedQuery : PagerInfo
     {
-
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long SiteId { get; set; }
     }
 
     /// <summary>
@@ -41,16 +44,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query
         /// 开始时间
         /// </summary>
         public DateTime[]? CreatedOn { get; set; }
-
-        ///// <summary>
-        ///// 开始时间 
-        ///// </summary>
-        //public DateTime? CreatedOnS { get; set; }
-
-        ///// <summary>
-        ///// 结束时间
-        ///// </summary>
-        //public DateTime? CreatedOnE { get; set; }
 
         /// <summary>
         /// 批次条码
