@@ -115,10 +115,10 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
-        /// 客户编码
-        /// </summary>
-        public string Code { get; set; }
+       ///// <summary>
+       // /// 客户编码
+       // /// </summary>
+       // public string Code { get; set; }
 
        /// <summary>
         /// 客户名称
