@@ -932,6 +932,11 @@
         public const string MES18300 = "系统编码{code}已经存在";
         #endregion
 
+        #region 客户维护
+        public const string MES18400 = "客户维护错误";
+        public const string MES18401 = "对应客户维护不存在";
+        #endregion
+
         #region 设备对接错误
 
         #region 设备对接公用
@@ -974,6 +979,7 @@
 
 
         #endregion
+
         #endregion
 
         #region 系统执行出错 业务逻辑出错
