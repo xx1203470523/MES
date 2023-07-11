@@ -346,6 +346,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         {
             // 查询条码
             var inventory = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery { SiteId = _currentSite.SiteId, BarCode = saveDto.BarCode });
+            if (inventory.QuantityResidue <= 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16909)).WithData("barCode", saveDto.BarCode);
+            }
 
             // 查询物料
             var material = await _procMaterialRepository.GetByIdAsync(saveDto.ProductId) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10204));

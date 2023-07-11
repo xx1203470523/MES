@@ -1,32 +1,18 @@
 ﻿using FluentValidation;
 using Hymson.Infrastructure.Exceptions;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
-using Hymson.MES.CoreServices.Services.Job;
-using Hymson.MES.CoreServices.Services.Job.JobUtility;
-using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
-using Hymson.MES.Data.Repositories.Process;
-using Hymson.Snowflake;
-using Hymson.Utils;
-using Hymson.Utils.Tools;
-using MySqlX.XDevAPI.Common;
-using System.Threading.Tasks.Dataflow;
-using System.Linq;
-using Hymson.MES.CoreServices.Services.Common.MasterData;
-using Newtonsoft.Json;
-using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
+using Hymson.MES.CoreServices.Services.Common.MasterData;
+using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer;
-using Hymson.Localization.Services;
+using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.Utils;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -90,9 +76,17 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         {
             var bo = param.ToBo<PackageCloseRequestBo>() ?? throw new CustomerValidationException(nameof(ErrorCode.MES10103));
 
-            // 验证DTO
-            await _validationRepairJob.ValidateAndThrowAsync(bo);
-            await Task.CompletedTask;
+            try
+            {
+
+                // 验证DTO
+                await _validationRepairJob.ValidateAndThrowAsync(bo);
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
         }
 
         /// <summary>

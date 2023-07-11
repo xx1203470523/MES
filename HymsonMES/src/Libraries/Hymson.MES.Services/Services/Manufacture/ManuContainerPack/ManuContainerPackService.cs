@@ -453,7 +453,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             #endregion
 
             #region 调用作业
-            manuFacePlateContainerPackExJobDto.SFC = "";//manuFacePlateContainerPackExJobDto.SFC.Trim();
+            manuFacePlateContainerPackExJobDto.SFC = manuFacePlateContainerPackExJobDto.SFC.Trim();
             var jobDto = new ButtonRequestDto
             {
                 FacePlateId = manuFacePlateContainerPackExJobDto.FacePlateId,
