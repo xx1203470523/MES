@@ -487,7 +487,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             //更新汇总信息
             if (updateManuSfcSummaryList.Any())
             {
-                row += await _manuSfcSummaryRepository.UpdatesAsync(updateManuSfcSummaryList);
+                row += await _manuSfcSummaryRepository.InsertOrUpdateRangeAsync(updateManuSfcSummaryList);
             }
             //新增汇总信息
             if (manuSfcSummaryList.Any())
