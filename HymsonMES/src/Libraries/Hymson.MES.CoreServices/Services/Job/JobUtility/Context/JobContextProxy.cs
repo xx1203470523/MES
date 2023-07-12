@@ -1,6 +1,5 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
-using Hymson.Utils;
 using System.Collections.Concurrent;
 
 namespace Hymson.MES.CoreServices.Services.Job.JobUtility
@@ -183,7 +182,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// <returns></returns>
         public TResult? GetValue<T, TResult>(Func<T, TResult> func, T parameters)
         {
-            var cacheKey = (uint)$"{func.Method.DeclaringType?.FullName}.{func.Method.Name}{parameters?.ToSerialize()}".GetHashCode();
+            var cacheKey = (uint)$"{func.Method.DeclaringType?.FullName}.{func.Method.Name}{parameters}".GetHashCode();
 
             if (Has(cacheKey))
             {
@@ -217,7 +216,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// <returns></returns>
         public async Task<TResult?> GetValueAsync<T, TResult>(Func<T, Task<TResult>> func, T parameters)
         {
-            var cacheKey = (uint)$"{func.Method.DeclaringType?.FullName}.{func.Method.Name}{parameters?.ToSerialize()}".GetHashCode();
+            var cacheKey = (uint)$"{func.Method.DeclaringType?.FullName}.{func.Method.Name}{parameters}".GetHashCode();
 
             if (Has(cacheKey))
             {

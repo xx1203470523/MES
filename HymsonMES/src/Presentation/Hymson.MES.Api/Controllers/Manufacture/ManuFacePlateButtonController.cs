@@ -2,7 +2,6 @@ using Hymson.Infrastructure;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
-using Hymson.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -116,8 +115,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [AllowAnonymous]
         public async Task<Dictionary<string, JobResponseDto>> ClickAsync(ButtonRequestDto dto)
         {
-            _logger.LogInformation("ClickAsync -> " + dto.ToSerialize());
-
+            _logger.LogInformation("Job日志 -> 1");
             return await _manuFacePlateButtonService.ClickAsync(dto);
         }
         #endregion
