@@ -1852,7 +1852,14 @@ namespace Hymson.MES.Services.Services.Manufacture
                     default:
                         break;
                 }
-
+                await _manuSfcRepository.MultiUpdateSfcIsUsedAsync(new MultiSfcUpdateIsUsedCommand
+                {
+                    SFCs = manuSfcs,
+                    IsUsed = YesOrNoEnum.Yes,
+                    SiteId = _currentSite.SiteId ?? 0,
+                    UpdatedBy = _currentUser.UserName,
+                    UpdatedOn = HymsonClock.Now()
+                });
                 trans.Complete();
             }
             catch (Exception ex)
