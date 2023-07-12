@@ -250,6 +250,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             }
             catch
             {
+                _logger.LogInformation($"魉 -> ", parameters);
                 throw;
             }
             finally
