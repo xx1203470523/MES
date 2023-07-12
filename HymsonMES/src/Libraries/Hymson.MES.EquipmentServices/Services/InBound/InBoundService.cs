@@ -322,6 +322,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                         {
                             Id = IdGenProvider.Instance.CreateId(),
                             SiteId = _currentEquipment.SiteId,
+                            SFCId = sfcEntity.Id,
                             SFC = sfc,
                             ProductId = planWorkOrderEntity.ProductId,
                             WorkOrderId = planWorkOrderEntity.Id,
@@ -385,6 +386,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                 {
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = _currentEquipment.SiteId,
+                    SFCId = manuSfcEntity.Id,
                     SFC = sfc,
                     ProductId = planWorkOrderEntity.ProductId,
                     WorkOrderId = planWorkOrderEntity.Id,
