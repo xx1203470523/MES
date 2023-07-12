@@ -210,6 +210,10 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                 Set(cacheKey, obj);
                 return obj;
             }
+            catch
+            {
+                throw;
+            }
             finally
             {
                 _semaphores[hash].Release();
@@ -244,11 +248,9 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                 Set(cacheKey, obj);
                 return obj;
             }
-            catch (Exception ex)
+            catch
             {
-                _logger.LogInformation($"这是日志1 -> " + ex.Message);
-                _logger.LogInformation($"这是日志2 -> " + func.Method.Name + parameters);
-                return default;
+                throw;
             }
             finally
             {

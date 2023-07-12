@@ -33,8 +33,6 @@ namespace Hymson.MES.Api.Controllers.Manufacture
             _logger = logger;
         }
 
-        #region 框架生成方法
-
         /// <summary>
         /// 分页查询列表（操作面板按钮）
         /// </summary>
@@ -117,6 +115,31 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         {
             return await _manuFacePlateButtonService.ClickAsync(dto);
         }
-        #endregion
+
+        /// <summary>
+        /// 进站
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut("inStation")]
+        [AllowAnonymous]
+        public async Task<Dictionary<string, JobResponseDto>> InStationAsync(ButtonRequestDto dto)
+        {
+            return await _manuFacePlateButtonService.InStationAsync(dto);
+        }
+
+        /// <summary>
+        /// 出站
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut("outStation")]
+        [AllowAnonymous]
+        public async Task<Dictionary<string, JobResponseDto>> OutStationAsync(ButtonRequestDto dto)
+        {
+            return await _manuFacePlateButtonService.OutStationAsync(dto);
+        }
+
+
     }
 }
