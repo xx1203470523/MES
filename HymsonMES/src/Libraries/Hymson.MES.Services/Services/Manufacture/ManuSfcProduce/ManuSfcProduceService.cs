@@ -1614,6 +1614,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                             }
                         }
                     }
+                    else
+                    {
+                        if (notManuSfcs != null && notManuSfcs.Any())
+                            throw new CustomerValidationException(nameof(ErrorCode.MES18023)).WithData("SFC", string.Join(",", notManuSfcs));
+                    }
                     break;
                 case SfcProduceStatusEnum.lineUp:
                 case SfcProduceStatusEnum.Activity:
