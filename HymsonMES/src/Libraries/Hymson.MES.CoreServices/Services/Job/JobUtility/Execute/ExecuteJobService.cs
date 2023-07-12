@@ -51,12 +51,11 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
                 var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
                 if (service == null) continue;
 
-                /*
                 var dataAssembling = await service.DataAssemblingAsync(param);
                 if (dataAssembling == null) continue;
-                */
 
-                param.Proxy?.GetValue(job.Name, await service.DataAssemblingAsync(param));
+                param.Proxy.SetValue(job.Name, dataAssembling);
+                //param.Proxy?.GetValue(job.Name, await service.DataAssemblingAsync(param));
             }
 
             // 执行入库

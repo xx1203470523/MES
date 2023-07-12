@@ -183,6 +183,47 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             }
         }
 
+        /// <summary>
+        /// 取值
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public TResult? SetValue<TResult>(string key, TResult obj)
+        {
+            if (obj == null) return obj;
+
+            var cacheKey = (uint)$"{key}".GetHashCode();
+            //uint hash = cacheKey % (uint)_semaphores.Length;
+            //_semaphores[hash].Wait();
+            try
+            {
+                Set(cacheKey, obj);
+
+                /*
+                 * 暂时注释掉
+                foreach (var po in obj.GetType().GetProperties())
+                {
+                    var cacheKeyChild = (uint)$"{po.PropertyType}".GetHashCode();
+                    var value = po.GetValue(obj);
+                    if (value != null)
+                    {
+                        Set(cacheKeyChild, value);
+                    }
+                }
+                */
+                return obj;
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                //_semaphores[hash].Release();
+            }
+        }
+
 
         /// <summary>
         /// 取值

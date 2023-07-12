@@ -53,6 +53,14 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Context
         /// 取值
         /// </summary>
         /// <param name="key"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        TResult? SetValue<TResult>(string key, TResult obj);
+
+        /// <summary>
+        /// 取值
+        /// </summary>
+        /// <param name="key"></param>
         /// <returns></returns>
         object? GetValueOnly(string key);
 
