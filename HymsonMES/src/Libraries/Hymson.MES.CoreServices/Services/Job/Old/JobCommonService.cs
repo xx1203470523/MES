@@ -38,7 +38,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             // 获取所有实现类
             var services = _serviceProvider.GetServices<IJobManufactureService>();
-            using var trans = new TransactionScope();
+            //using var trans = new TransactionScope();
             foreach (var job in jobs)
             {
                 var service = services.FirstOrDefault(f => f.GetType().Name == job.ClassProgram);
@@ -58,14 +58,14 @@ namespace Hymson.MES.CoreServices.Services.Job
                 if (responseDto.Rows < 0) break;
             }
 
-            if (responseDtos.Any(a => a.Value.Rows < 0))
-            {
-                trans.Dispose();
-            }
-            else
-            {
-                trans.Complete();
-            }
+            //if (responseDtos.Any(a => a.Value.Rows < 0))
+            //{
+            //    trans.Dispose();
+            //}
+            //else
+            //{
+            //    trans.Complete();
+            //}
 
             return responseDtos;
         }
