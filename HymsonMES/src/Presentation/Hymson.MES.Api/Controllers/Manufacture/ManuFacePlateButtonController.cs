@@ -1,15 +1,8 @@
-/*
- *creator: Karl
- *
- *describe: 操作面板按钮    控制器 | 代码由框架生成  
- *builder:  Karl
- *build datetime: 2023-04-01 02:58:19
- */
 using Hymson.Infrastructure;
 using Hymson.MES.CoreServices.Dtos.Common;
-using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
+using Hymson.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,7 +13,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
     /// @author Karl
     /// @date 2023-04-01 02:58:19
     /// </summary>
-    
+
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ManuFacePlateButtonController : ControllerBase
@@ -123,6 +116,8 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [AllowAnonymous]
         public async Task<Dictionary<string, JobResponseDto>> ClickAsync(ButtonRequestDto dto)
         {
+            _logger.LogInformation("ClickAsync -> " + dto.ToSerialize());
+
             return await _manuFacePlateButtonService.ClickAsync(dto);
         }
         #endregion
