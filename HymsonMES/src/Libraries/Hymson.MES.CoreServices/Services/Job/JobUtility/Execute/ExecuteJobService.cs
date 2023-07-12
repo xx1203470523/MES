@@ -51,11 +51,14 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
                 var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
                 if (service == null) continue;
 
+                /*
                 var dataAssembling = await service.DataAssemblingAsync(param);
                 if (dataAssembling == null) continue;
 
                 param.Proxy.SetValue(job.Name, dataAssembling);
-                //param.Proxy?.GetValue(job.Name, await service.DataAssemblingAsync(param));
+                */
+
+                param.Proxy?.GetValue(job.Name, await service.DataAssemblingAsync(param));
             }
 
             // 执行入库
@@ -66,8 +69,8 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
                 var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
                 if (service == null) continue;
 
-                var obj = param.Proxy.GetValueOnly(job.Name);
-                //var obj = await param.Proxy.GetValueAsync(service.DataAssemblingAsync<T>, param);
+                //var obj = param.Proxy.GetValueOnly(job.Name);
+                var obj = param.Proxy?.GetValue(job.Name, await service.DataAssemblingAsync(param));
                 if (obj == null) continue;
 
                 var responseDto = await service.ExecuteAsync(obj);
