@@ -115,7 +115,6 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [AllowAnonymous]
         public async Task<Dictionary<string, JobResponseDto>> ClickAsync(ButtonRequestDto dto)
         {
-            _logger.LogInformation("Job日志 -> 1");
             return await _manuFacePlateButtonService.ClickAsync(dto);
         }
         #endregion

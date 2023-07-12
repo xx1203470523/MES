@@ -1,5 +1,6 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
+using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 
 namespace Hymson.MES.CoreServices.Services.Job.JobUtility
@@ -13,6 +14,10 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// 
         /// </summary>
         protected ConcurrentDictionary<uint, object> dictionary = new();
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly ILogger<JobContextProxy> _logger;
 
         /// <summary>
         /// 
@@ -22,7 +27,8 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// <summary>
         /// 构造函数
         /// </summary>
-        public JobContextProxy()
+        /// <param name="logger"></param>
+        public JobContextProxy(ILogger<JobContextProxy> logger)
         {
             // dictionary = new();
 
@@ -32,6 +38,8 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             {
                 _semaphores[i] = new SemaphoreSlim(1);
             }
+
+            _logger = logger;
         }
 
 
@@ -235,6 +243,12 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
 
                 Set(cacheKey, obj);
                 return obj;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation($"这是日志1 -> " + ex.Message);
+                _logger.LogInformation($"这是日志2 -> " + func.Method.Name + parameters);
+                return default;
             }
             finally
             {
