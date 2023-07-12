@@ -102,8 +102,8 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                 return (IEnumerable<TResult>)cacheResult;
             }
 
-            uint hash = cacheKey % (uint)_semaphores.Length;
-            _semaphores[hash].Wait();
+            //uint hash = cacheKey % (uint)_semaphores.Length;
+            //_semaphores[hash].Wait();
             try
             {
                 var obj = await GetValueAsync<T, IEnumerable<TResult>>(func, parameters);
@@ -113,7 +113,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             }
             finally
             {
-                _semaphores[hash].Release();
+                //_semaphores[hash].Release();
             }
         }
 
@@ -134,8 +134,8 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                 return new JobContextData<T>(true, (T)cacheObj);
             }
 
-            uint hash = cacheKey % (uint)_semaphores.Length;
-            _semaphores[hash].Wait();
+            //uint hash = cacheKey % (uint)_semaphores.Length;
+            //_semaphores[hash].Wait();
             try
             {
                 if (parameters != null)
@@ -150,7 +150,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             }
             finally
             {
-                _semaphores[hash].Release();
+                //_semaphores[hash].Release();
             }
         }
 
@@ -162,8 +162,8 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         public T? SetValue<T>(T parameters) where T : new()
         {
             var cacheKey = (uint)$"{parameters?.GetType()}".GetHashCode();
-            uint hash = cacheKey % (uint)_semaphores.Length;
-            _semaphores[hash].Wait();
+            //uint hash = cacheKey % (uint)_semaphores.Length;
+            //_semaphores[hash].Wait();
             try
             {
                 if (parameters != null)
@@ -178,7 +178,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             }
             finally
             {
-                _semaphores[hash].Release();
+                //_semaphores[hash].Release();
             }
         }
 
@@ -200,8 +200,8 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                 return (TResult)cacheObj;
             }
 
-            uint hash = cacheKey % (uint)_semaphores.Length;
-            _semaphores[hash].Wait();
+            //uint hash = cacheKey % (uint)_semaphores.Length;
+            //_semaphores[hash].Wait();
             try
             {
                 var obj = func(parameters);
@@ -216,7 +216,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             }
             finally
             {
-                _semaphores[hash].Release();
+                //_semaphores[hash].Release();
             }
         }
 
@@ -238,8 +238,8 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                 return (TResult)cacheObj;
             }
 
-            uint hash = cacheKey % (uint)_semaphores.Length;
-            await _semaphores[hash].WaitAsync();
+            //uint hash = cacheKey % (uint)_semaphores.Length;
+            //await _semaphores[hash].WaitAsync();
             try
             {
                 var obj = await func(parameters);
@@ -255,7 +255,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             }
             finally
             {
-                _semaphores[hash].Release();
+                //_semaphores[hash].Release();
             }
         }
 
