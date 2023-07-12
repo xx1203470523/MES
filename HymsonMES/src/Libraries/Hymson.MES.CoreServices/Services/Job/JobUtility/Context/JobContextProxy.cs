@@ -250,7 +250,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             }
             catch
             {
-                _logger.LogInformation($"魉 -> {0}, {1}", func.Method.Name, parameters);
+                _logger.LogInformation($"魉 -> {func.Method.Name}, {parameters?.ToString()}");
                 throw;
             }
             finally
