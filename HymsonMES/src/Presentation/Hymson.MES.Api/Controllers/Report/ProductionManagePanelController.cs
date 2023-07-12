@@ -9,6 +9,8 @@ namespace Hymson.MES.Api.Controllers.Report
     /// 生产管理看板控制器
     /// </summary>
     [AllowAnonymous]
+    [ApiController]
+    [Route("api/v1/[controller]")]
     public class ProductionManagePanelController : ControllerBase
     {
         private readonly IProductTraceReportService _productTraceReportService;
@@ -20,6 +22,8 @@ namespace Hymson.MES.Api.Controllers.Report
         /// 获取综合信息
         /// </summary>
         /// <returns></returns>
+        [HttpGet]
+        [Route("getOverallInfo")]
         public Task<ProductionManagePanelReportDto> GetOverallInfo()
         {
             //模拟数据
