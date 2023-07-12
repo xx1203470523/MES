@@ -384,7 +384,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             };
 
             var jobBos = new List<JobBo> { };
-            //jobBos.Add(new JobBo { Name = "InStationVerifyJobService" });
+            jobBos.Add(new JobBo { Name = "InStationVerifyJobService" });
             jobBos.Add(new JobBo { Name = "InStationJobService" });
 
             var responseBo = await _executeJobService.ExecuteAsync(jobBos, new JobRequestBo
