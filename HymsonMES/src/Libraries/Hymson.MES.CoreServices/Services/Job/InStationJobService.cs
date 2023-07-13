@@ -126,10 +126,16 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 获取当前工序信息
             var procedureEntity = await _masterDataService.GetProcProcedureEntityWithNullCheck(firstProduceEntity.ProcedureId);
 
+            // 更新工单信息
+            var updateQtyCommand = new UpdateQtyCommand
+            {
+                UpdatedBy = updatedBy,
+                UpdatedOn = updatedOn,
+                WorkOrderId = firstProduceEntity.WorkOrderId
+            };
+
             // 组装（进站数据）
             List<ManuSfcStepEntity> sfcStepEntities = new();
-            List<UpdateWorkOrderRealTimeCommand> updateWorkOrderRealTimeCommands = new();
-            List<UpdateQtyCommand> updateQtyCommands = new();
             MultiSfcUpdateIsUsedCommand sfcUpdateIsUsedCommand = new();
             entities.ForEach(sfcProduceEntity =>
             {
@@ -148,27 +154,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 sfcProduceEntity.Status = SfcProduceStatusEnum.Activity;
                 sfcProduceEntity.UpdatedBy = bo.UserName;
                 sfcProduceEntity.UpdatedOn = HymsonClock.Now();
-
-                // 更新工单统计表的 RealStart
-                updateWorkOrderRealTimeCommands.Add(new UpdateWorkOrderRealTimeCommand
-                {
-                    UpdatedOn = sfcProduceEntity.UpdatedOn,
-                    UpdatedBy = sfcProduceEntity.UpdatedBy,
-                    WorkOrderIds = new long[] { sfcProduceEntity.WorkOrderId }
-                });
-
-                // 如果是首工序
-                if (isFirstProcedure == true)
-                {
-                    // 更新工单的 InputQty
-                    updateQtyCommands.Add(new UpdateQtyCommand
-                    {
-                        UpdatedBy = sfcProduceEntity.UpdatedBy,
-                        UpdatedOn = sfcProduceEntity.UpdatedOn,
-                        WorkOrderId = sfcProduceEntity.WorkOrderId,
-                        Qty = 1,
-                    });
-                }
 
                 // 初始化步骤
                 sfcStepEntities.Add(new ManuSfcStepEntity
@@ -194,6 +179,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             if (isFirstProcedure == true)
             {
+                // 更新工单的 InputQty
+                updateQtyCommand.Qty = entities.Count;
+
                 // 修改条码使用状态为"已使用"
                 sfcUpdateIsUsedCommand = new MultiSfcUpdateIsUsedCommand
                 {
@@ -209,8 +197,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             {
                 IsFirstProcedure = isFirstProcedure,
                 SFCProduceEntities = entities,
-                UpdateWorkOrderRealTimeCommands = updateWorkOrderRealTimeCommands,
-                UpdateQtyCommands = updateQtyCommands,
+                UpdateQtyCommand = updateQtyCommand,
                 SFCStepEntities = sfcStepEntities,
                 MultiSfcUpdateIsUsedCommand = sfcUpdateIsUsedCommand
             };
@@ -240,10 +227,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 return responseBo;
             }
 
-            // 更新工单统计表的 RealStart
-            var updatePlanWorkOrderRealStartByWorkOrderIdTask = _planWorkOrderRepository.UpdatePlanWorkOrderRealStartByWorkOrderIdAsync(data.UpdateWorkOrderRealTimeCommands);
-            tasks.Add(updatePlanWorkOrderRealStartByWorkOrderIdTask);
-
             // 插入 manu_sfc_step 状态为 进站
             var manuSfcStepTask = _manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities);
             tasks.Add(manuSfcStepTask);
@@ -251,14 +234,14 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 如果是首工序
             if (data.IsFirstProcedure == true)
             {
-                // 更新工单的 InputQty
-                var updateInputQtyByWorkOrderIdTask = _planWorkOrderRepository.UpdateInputQtyByWorkOrderIdAsync(data.UpdateQtyCommands);
-                tasks.Add(updateInputQtyByWorkOrderIdTask);
-
                 // 修改条码使用状态为"已使用"
                 var multiUpdateSfcIsUsedTask = _manuSfcRepository.MultiUpdateSfcIsUsedAsync(data.MultiSfcUpdateIsUsedCommand);
                 tasks.Add(multiUpdateSfcIsUsedTask);
             }
+
+            // 更新工单的 InputQty
+            var updateInputQtyByWorkOrderIdTask = _planWorkOrderRepository.UpdateInputQtyByWorkOrderIdAsync(data.UpdateQtyCommand);
+            tasks.Add(updateInputQtyByWorkOrderIdTask);
 
             await Task.WhenAll(tasks);
             return responseBo;
