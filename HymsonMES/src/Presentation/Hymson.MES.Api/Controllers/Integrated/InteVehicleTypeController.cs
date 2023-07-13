@@ -108,5 +108,16 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         #endregion
+
+        /// <summary>
+        /// 查询详情（载具类型维护）
+        /// </summary>
+        /// <param name="vehicleTypeId"></param>
+        /// <returns></returns>
+        [HttpGet("getVehicleTypeVerify/{vehicleTypeId}")]
+        public async Task<IEnumerable<InteVehicleTypeVerifyDto>> QueryInteVehicleTypeVerifyByVehicleTypeIdAsync(long vehicleTypeId)
+        {
+            return await _inteVehicleTypeService.QueryInteVehicleTypeVerifyByVehicleTypeIdAsync(vehicleTypeId);
+        }
     }
 }

@@ -964,6 +964,10 @@
         public const string MES18511 = "单元数量应该为正整数";
         public const string MES18512 = "Id不合法";
 
+        public const string MES18513 = "载具类型验证类型不能为空";
+        public const string MES18514 = "载具类型验证类型不合法";
+        public const string MES18515 = "载具类型验证物料或物料组不合法";
+
         #endregion
 
         #region 设备对接错误

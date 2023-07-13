@@ -91,6 +91,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteCustomRepository, InteCustomRepository>();
 
             services.AddSingleton<IInteVehicleTypeRepository, InteVehicleTypeRepository>();
+            services.AddSingleton<IInteVehicleTypeVerifyRepository, InteVehicleTypeVerifyRepository>();
 
             #region CodeRule
             services.AddSingleton<IInteCodeRulesRepository, InteCodeRulesRepository>();
