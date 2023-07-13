@@ -1,13 +1,5 @@
-/*
- *creator: Karl
- *
- *describe: 操作面板按钮    控制器 | 代码由框架生成  
- *builder:  Karl
- *build datetime: 2023-04-01 02:58:19
- */
 using Hymson.Infrastructure;
 using Hymson.MES.CoreServices.Dtos.Common;
-using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
 using Microsoft.AspNetCore.Authorization;
@@ -20,7 +12,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
     /// @author Karl
     /// @date 2023-04-01 02:58:19
     /// </summary>
-    
+
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ManuFacePlateButtonController : ControllerBase
@@ -40,8 +32,6 @@ namespace Hymson.MES.Api.Controllers.Manufacture
             _manuFacePlateButtonService = manuFacePlateButtonService;
             _logger = logger;
         }
-
-        #region 框架生成方法
 
         /// <summary>
         /// 分页查询列表（操作面板按钮）
@@ -125,6 +115,31 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         {
             return await _manuFacePlateButtonService.ClickAsync(dto);
         }
-        #endregion
+
+        /// <summary>
+        /// 进站
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut("inStation")]
+        [AllowAnonymous]
+        public async Task<Dictionary<string, JobResponseDto>> InStationAsync(ButtonRequestDto dto)
+        {
+            return await _manuFacePlateButtonService.InStationAsync(dto);
+        }
+
+        /// <summary>
+        /// 出站
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut("outStation")]
+        [AllowAnonymous]
+        public async Task<Dictionary<string, JobResponseDto>> OutStationAsync(ButtonRequestDto dto)
+        {
+            return await _manuFacePlateButtonService.OutStationAsync(dto);
+        }
+
+
     }
 }

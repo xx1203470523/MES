@@ -143,8 +143,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             // 获取生产条码信息
             var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, bo);
+
+            if (sfcProduceEntities == null || sfcProduceEntities.Any() == false) return default;
             responseBo.SFCProduceEntities = sfcProduceEntities.AsList();
-            if (responseBo.SFCProduceEntities == null || responseBo.SFCProduceEntities.Any() == false) return default;
 
             var firstProduceEntity = responseBo.SFCProduceEntities.FirstOrDefault();
             if (firstProduceEntity == null) return default;

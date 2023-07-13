@@ -892,6 +892,7 @@
         public const string MES18020 = "库存信息不存在";
         public const string MES18021 = "物料库存不足";
         public const string MES18022 = "条码{SFC}不存在或已报废，不允许操作";
+        public const string MES18023 = "条码{SFC}不能直接从尾工序完成到其他工序完成，请先至于排队或活动";
 
 
         #endregion
