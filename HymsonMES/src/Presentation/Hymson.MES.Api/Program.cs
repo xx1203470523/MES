@@ -31,9 +31,9 @@ namespace Hymson.MES.Api
             // Add services to the container.
             builder.Services.AddControllers(options =>
             {
-                //options.Filters.Add(typeof(HttpGlobalExceptionFilter));
-                //options.Filters.Add(typeof(HttpGlobalActionFilter));
-                //options.Filters.Add(new AuthorizeFilter());
+                options.Filters.Add(typeof(HttpGlobalExceptionFilter));
+                options.Filters.Add(typeof(HttpGlobalActionFilter));
+                options.Filters.Add(new AuthorizeFilter());
             }).AddJsonOptions((jsonOptions) =>
             {
                 jsonOptions.JsonSerializerOptions.Converters.Add(new CustomInt64Converter());
@@ -42,7 +42,7 @@ namespace Hymson.MES.Api
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddMemoryCache();
             builder.Services.AddClearCacheService(builder.Configuration);
-            //builder.Services.AddHostedService<WorkService>();
+            builder.Services.AddHostedService<WorkService>();
 
             AddSwaggerGen(builder.Services);
 
@@ -96,8 +96,8 @@ namespace Hymson.MES.Api
 
             app.UseRequestLocalization(options);
             #endregion
-            //app.UseAuthentication();
-            //app.UseAuthorization();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.MapControllers();
             app.Run();
@@ -109,7 +109,7 @@ namespace Hymson.MES.Api
         /// <param name="services"></param>
         private static void AddSwaggerGen(IServiceCollection services)
         {
-//#if DEBUG
+            //#if DEBUG
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             services.AddSwaggerGen(options =>
             {
@@ -167,7 +167,7 @@ namespace Hymson.MES.Api
                 //options.OperationFilter<SecurityRequirementsOperationFilter>();
                 //options.OperationFilter<AuthorizationOperationFilter>();
             });
-//#endif
+            //#endif
         }
 
         /// <summary>
@@ -196,5 +196,6 @@ namespace Hymson.MES.Api
             //register
             AutoMapperConfiguration.Init(config);
         }
+
     }
 }
