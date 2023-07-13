@@ -226,6 +226,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             JobResponseBo responseBo = new();
             if (obj is not InStationResponseBo data) return responseBo;
 
+            responseBo.Rows = 1;
+            return responseBo;
+
             // 更新数据
             List<Task> tasks = new();
 

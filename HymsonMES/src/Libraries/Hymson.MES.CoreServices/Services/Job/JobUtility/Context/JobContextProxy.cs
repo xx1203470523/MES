@@ -23,7 +23,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// <summary>
         /// 
         /// </summary>
-        private static SemaphoreSlim[] _semaphores;
+        //private static SemaphoreSlim[] _semaphores;
 
         /// <summary>
         /// 构造函数
@@ -33,13 +33,14 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         {
             // dictionary = new();
 
+            /*
             int num = Math.Max(Environment.ProcessorCount * 8, 32);
             _semaphores = new SemaphoreSlim[num];
             for (int i = 0; i < _semaphores.Length; i++)
             {
                 _semaphores[i] = new SemaphoreSlim(1);
             }
-
+            */
             _logger = logger;
         }
 
