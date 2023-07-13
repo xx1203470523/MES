@@ -140,6 +140,16 @@ namespace Hymson.MES.Api.Controllers.Manufacture
             return await _manuFacePlateButtonService.OutStationAsync(dto);
         }
 
+        /// <summary>
+        /// 测试
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut("test")]
+        [AllowAnonymous]
+        public async Task TeastAsync()
+        {
+            await Task.CompletedTask;
+        }
 
     }
 }

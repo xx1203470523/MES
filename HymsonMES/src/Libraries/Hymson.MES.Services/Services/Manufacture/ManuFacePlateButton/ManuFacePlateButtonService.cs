@@ -419,7 +419,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
             var result = new Dictionary<string, JobResponseDto> { }; // 返回结果
 
-            /*
             var bo = new ManufactureBo
             {
                 SFC = dto.Param["SFC"],
@@ -450,7 +449,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Time = item.Value.Time
                 });
             }
-            */
 
             return result;
         }
