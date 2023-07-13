@@ -149,9 +149,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         public async Task<IEnumerable<ManuFeedingEntity>> GetByResourceIdAndMaterialIdsWithOutZeroAsync(GetByResourceIdAndMaterialIdsQuery query)
         {
             var sqlBuilder = new StringBuilder();
-            sqlBuilder.Append("SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND Qty > 0 AND ResourceId = @ResourceId ");
+            sqlBuilder.Append("SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND ResourceId = @ResourceId ");
 
-            if (query.MaterialIds != null) sqlBuilder.Append("AND ProductId IN @MaterialIds; ");
+            if (query.MaterialIds != null) sqlBuilder.Append("AND ProductId IN @MaterialIds ");
+
+            sqlBuilder.Append("AND Qty > 0 ");
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ManuFeedingEntity>(sqlBuilder.ToString(), query);
