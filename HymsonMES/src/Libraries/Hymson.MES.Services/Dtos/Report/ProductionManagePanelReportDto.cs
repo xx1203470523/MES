@@ -34,7 +34,7 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// true白班，false夜班
         /// </summary>
-        public bool DayShift { get; set; }
+        public int DayShift { get; set; }
         /// <summary>
         /// 工艺路线编码
         /// </summary>

@@ -298,8 +298,9 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// 流转表解绑
         /// </summary>
         /// <param name="sfcCirculationUnBindDto"></param>
+        /// <param name="sfcCirculationTypeEnum"></param>
         /// <returns></returns>
-        public async Task SfcCirculationUnBindAsync(SfcCirculationUnBindDto sfcCirculationUnBindDto)
+        public async Task SfcCirculationUnBindAsync(SfcCirculationUnBindDto sfcCirculationUnBindDto, SfcCirculationTypeEnum sfcCirculationTypeEnum)
         {
             await _validationSfcCirculationUnBindDtoRules.ValidateAndThrowAsync(sfcCirculationUnBindDto);
             if (sfcCirculationUnBindDto == null)
@@ -317,7 +318,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             }
             var manuSfcCirculationBarCodequery = new ManuSfcCirculationBarCodeQuery
             {
-                CirculationType = SfcCirculationTypeEnum.Merge,
+                CirculationType = sfcCirculationTypeEnum,
                 IsDisassemble = TrueOrFalseEnum.No,
                 CirculationBarCodes = new string[] { sfcCirculationUnBindDto.SFC },
                 SiteId = _currentEquipment.SiteId
@@ -408,7 +409,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// <exception cref="NotImplementedException"></exception>
         public async Task SfcCirculationModuleRemove(SfcCirculationUnBindDto sfcCirculationUnBindDto)
         {
-            await SfcCirculationUnBindAsync(sfcCirculationUnBindDto);
+            await SfcCirculationUnBindAsync(sfcCirculationUnBindDto,SfcCirculationTypeEnum.ModuleAdd);
         }
 
         /// <summary>

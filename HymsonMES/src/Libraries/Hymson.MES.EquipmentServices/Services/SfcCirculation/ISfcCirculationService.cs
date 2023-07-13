@@ -1,4 +1,5 @@
-﻿using Hymson.MES.EquipmentServices.Dtos.SfcCirculation;
+﻿using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.EquipmentServices.Dtos.SfcCirculation;
 
 namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
 {
@@ -18,8 +19,9 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// 解绑
         /// </summary>
         /// <param name="sfcCirculationUnBindDto"></param>
+        /// <param name="sfcCirculationTypeEnum"></param>
         /// <returns></returns>
-        Task SfcCirculationUnBindAsync(SfcCirculationUnBindDto sfcCirculationUnBindDto);
+        Task SfcCirculationUnBindAsync(SfcCirculationUnBindDto sfcCirculationUnBindDto, SfcCirculationTypeEnum sfcCirculationTypeEnum);
 
         /// <summary>
         /// 组件添加

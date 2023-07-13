@@ -1,4 +1,5 @@
-﻿using Hymson.MES.EquipmentServices;
+﻿using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.EquipmentServices;
 using Hymson.MES.EquipmentServices.Dtos.CCDFileUploadComplete;
 using Hymson.MES.EquipmentServices.Dtos.EquipmentCollect;
 using Hymson.MES.EquipmentServices.Dtos.Feeding;
@@ -530,7 +531,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [Route("SfcCirculationUnBind")]
         public async Task SfcCirculationUnBind(SfcCirculationUnBindDto request)
         {
-            await _sfcCirculationService.SfcCirculationUnBindAsync(request);
+            await _sfcCirculationService.SfcCirculationUnBindAsync(request,SfcCirculationTypeEnum.Merge);
         }
 
         /// <summary>

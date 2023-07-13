@@ -32,7 +32,7 @@ namespace Hymson.MES.Api.Controllers.Report
                 CompletedQty = 100,
                 CompletedRate = 80,
                 DayConsume = 120,
-                DayShift = false,
+                DayShift = 0,
                 InputQty = 120,
                 OverallPlanAchievingRate = 10,
                 OverallYieldRate = 90,
