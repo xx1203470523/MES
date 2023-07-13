@@ -109,6 +109,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteSystemTokenService, InteSystemTokenService>();
             services.AddSingleton<IInteCustomService, InteCustomService>();
 
+            services.AddSingleton<IInteVehicleTypeService, InteVehicleTypeService>();
+
             #region CodeRule
             services.AddSingleton<IInteCodeRulesService, InteCodeRulesService>();
             services.AddSingleton<IInteCodeRulesMakeService, InteCodeRulesMakeService>();
@@ -362,6 +364,9 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<AbstractValidator<InteCustomCreateDto>, InteCustomCreateValidator>();
             services.AddSingleton<AbstractValidator<InteCustomModifyDto>, InteCustomModifyValidator>();
+
+            services.AddSingleton<AbstractValidator<InteVehicleTypeCreateDto>, InteVehicleTypeCreateValidator>();
+            services.AddSingleton<AbstractValidator<InteVehicleTypeModifyDto>, InteVehicleTypeModifyValidator>();
 
             #region CodeRule
             services.AddSingleton<AbstractValidator<InteCodeRulesCreateDto>, InteCodeRulesCreateValidator>();

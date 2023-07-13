@@ -948,6 +948,23 @@
 
         #endregion
 
+        #region 载具类型维护
+        public const string MES18500 = "载具类型错误";
+        public const string MES18501 = "对应载具类型不存在";
+        public const string MES18502 = "载具类型编码已存在";
+        public const string MES18503 = "载具类型编码不能为空";
+        public const string MES18504 = "载具类型名称不能为空";
+        public const string MES18505 = "载具类型编码最大长度为100";
+        public const string MES18506 = "载具类型名称最大长度为100";
+        public const string MES18507 = "描述最大长度为255";
+        public const string MES18508 = "状态不合法";
+        public const string MES18509 = "行数应该为正整数";
+        public const string MES18510 = "列数应该为正整数";
+        public const string MES18511 = "单元数量应该为正整数";
+        public const string MES18512 = "Id不合法";
+
+        #endregion
+
         #region 设备对接错误
 
         #region 设备对接公用
