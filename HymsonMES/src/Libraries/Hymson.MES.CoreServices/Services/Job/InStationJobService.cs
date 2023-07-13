@@ -229,7 +229,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 更新数据
             List<Task> tasks = new();
 
-            /*
             // 更改状态
             responseBo.Rows += await _manuSfcProduceRepository.UpdateRangeWithStatusCheckAsync(data.SFCProduceEntities);
 
@@ -240,7 +239,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 responseBo.Rows = -1;
                 return responseBo;
             }
-            */
 
             // 更新工单统计表的 RealStart
             //var updatePlanWorkOrderRealStartByWorkOrderIdTask = _planWorkOrderRepository.UpdatePlanWorkOrderRealStartByWorkOrderIdAsync(data.UpdateWorkOrderRealTimeCommands);
