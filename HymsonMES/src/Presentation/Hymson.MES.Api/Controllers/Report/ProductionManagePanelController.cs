@@ -60,7 +60,7 @@ namespace Hymson.MES.Api.Controllers.Report
             {
                 new ProductionManagePanelPackDto()
                 {
-                    Order=1,
+                    Sort=1,
                     DateTimeRange = "8:30-10:30",
                     InputQty = 40,
                     TargetQty = 100,
@@ -68,7 +68,7 @@ namespace Hymson.MES.Api.Controllers.Report
                 },
                 new ProductionManagePanelPackDto()
                 {
-                    Order=2,
+                    Sort=2,
                     DateTimeRange = "10:30-12:30",
                     InputQty = 20,
                     TargetQty = 50,
@@ -76,7 +76,7 @@ namespace Hymson.MES.Api.Controllers.Report
                 },
                 new ProductionManagePanelPackDto()
                 {
-                    Order=3,
+                    Sort=3,
                     DateTimeRange = "12:30-14:30",
                     InputQty = 90,
                     TargetQty = 90,
@@ -84,7 +84,7 @@ namespace Hymson.MES.Api.Controllers.Report
                 },
                 new ProductionManagePanelPackDto()
                 {
-                    Order=4,
+                    Sort=4,
                     DateTimeRange = "14:30-16:30",
                     InputQty = 10,
                     TargetQty = 100,
@@ -92,7 +92,7 @@ namespace Hymson.MES.Api.Controllers.Report
                 },
                 new ProductionManagePanelPackDto()
                 {
-                    Order=5,
+                    Sort=5,
                     DateTimeRange = "16:30-18:30",
                     InputQty = 0,
                     TargetQty = 100,

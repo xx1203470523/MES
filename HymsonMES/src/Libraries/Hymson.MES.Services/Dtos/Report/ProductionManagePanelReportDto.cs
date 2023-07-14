@@ -90,7 +90,7 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 排序字段
         /// </summary>
-        public int Order { get; set; }
+        public int Sort { get; set; }
         /// <summary>
         /// 时间区间
         /// </summary>
