@@ -99,6 +99,7 @@ namespace Hymson.MES.Api.Controllers.Report
                     AchievingRate = 0,
                 },
             };
+            result = result.OrderBy(c => c.Sort).ToList();
             return Task.FromResult(result);
         }
     }
