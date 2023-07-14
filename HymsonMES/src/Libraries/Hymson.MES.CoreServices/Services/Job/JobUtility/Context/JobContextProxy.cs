@@ -365,7 +365,6 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             }
             catch
             {
-                _logger.LogInformation($"魉 -> {func.Method.Name}, {paramString}");
                 throw;
             }
             finally
