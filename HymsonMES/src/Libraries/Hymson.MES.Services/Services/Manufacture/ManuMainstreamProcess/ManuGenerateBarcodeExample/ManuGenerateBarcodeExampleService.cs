@@ -23,6 +23,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         private readonly ICurrentSite _currentSite;
 
         private readonly IManuGenerateBarcodeService _manuGenerateBarcodeService;
+
         /// <summary>
         /// 构造函数
         /// </summary>
