@@ -48,5 +48,53 @@ namespace Hymson.MES.Api.Controllers.Report
                 WorkOrderQty = 200
             });
         }
+
+        /// <summary>
+        /// 获取当天Pack达成数据
+        /// </summary>
+        /// <returns></returns>
+        [Route("getPackAchievingInfo")]
+        public Task<IEnumerable<ProductionManagePanelPackDto>> GetPackAchievingInfo()
+        {
+            IEnumerable<ProductionManagePanelPackDto> result = new List<ProductionManagePanelPackDto>
+            {
+                new ProductionManagePanelPackDto()
+                {
+                    DateTimeRange = "8:30-10:30",
+                    InputQty = 40,
+                    TargetQty = 100,
+                    AchievingRate = 25,
+                },
+                new ProductionManagePanelPackDto()
+                {
+                    DateTimeRange = "10:30-12:30",
+                    InputQty = 20,
+                    TargetQty = 50,
+                    AchievingRate = 15,
+                },
+                new ProductionManagePanelPackDto()
+                {
+                    DateTimeRange = "12:30-14:30",
+                    InputQty = 90,
+                    TargetQty = 90,
+                    AchievingRate = 90,
+                },
+                new ProductionManagePanelPackDto()
+                {
+                    DateTimeRange = "14:30-16:30",
+                    InputQty = 10,
+                    TargetQty = 100,
+                    AchievingRate = 10,
+                },
+                new ProductionManagePanelPackDto()
+                {
+                    DateTimeRange = "16:30-18:30",
+                    InputQty = 0,
+                    TargetQty = 100,
+                    AchievingRate = 0,
+                },
+            };
+            return Task.FromResult(result);
+        }
     }
 }

@@ -29,7 +29,7 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 完成率
         /// </summary>
-        public decimal CompletedRate { get; set;}
+        public decimal CompletedRate { get; set; }
 
         /// <summary>
         /// true白班，false夜班
@@ -78,10 +78,30 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 产品名称
         /// </summary>
-        public string ProductName{ get; set; }
+        public string ProductName { get; set; }
         /// <summary>
         /// 投入数量
         /// </summary>
         public int InputQty { get; set; }
+    }
+
+    public record ProductionManagePanelPackDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 时间区间
+        /// </summary>
+        public string DateTimeRange { get; set; }
+        /// <summary>
+        /// 投入数
+        /// </summary>
+        public decimal InputQty { get; set; }
+        /// <summary>
+        /// 目标数
+        /// </summary>
+        public decimal TargetQty { get; set; }
+        /// <summary>
+        /// 达成率
+        /// </summary>
+        public decimal AchievingRate { get; set; }
     }
 }
