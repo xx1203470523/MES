@@ -54,10 +54,10 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<InteCustomEntity> GetByCodeAsync(InteVehicleTypeCodeQuery query)
+        public async Task<InteVehicleTypeEntity> GetByCodeAsync(InteVehicleTypeCodeQuery query)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<InteCustomEntity>(GetByCodeSql, query);
+            return await conn.QueryFirstOrDefaultAsync<InteVehicleTypeEntity>(GetByCodeSql, query);
         }
 
         /// <summary>

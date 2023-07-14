@@ -935,7 +935,7 @@
         public const string MES18300 = "系统编码{code}已经存在";
         #endregion
 
-        #region 客户维护
+        #region 客户维护 18400
         public const string MES18400 = "客户维护错误";
         public const string MES18401 = "对应客户维护不存在";
         public const string MES18402 = "客户编码已存在";
@@ -949,7 +949,7 @@
 
         #endregion
 
-        #region 载具类型维护
+        #region 载具类型维护 18500
         public const string MES18500 = "载具类型错误";
         public const string MES18501 = "对应载具类型不存在";
         public const string MES18502 = "载具类型编码已存在";
@@ -967,6 +967,13 @@
         public const string MES18513 = "载具类型验证类型不能为空";
         public const string MES18514 = "载具类型验证类型不合法";
         public const string MES18515 = "载具类型验证物料或物料组不合法";
+
+        #endregion
+
+        #region 载具注册 18600
+        public const string MES18600 = "载具错误";
+        public const string MES18601 = "对应载具不存在";
+        public const string MES18602 = "载具编码已存在";
 
         #endregion
 

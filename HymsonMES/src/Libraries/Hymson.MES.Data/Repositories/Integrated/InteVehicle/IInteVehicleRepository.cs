@@ -1,9 +1,9 @@
 /*
  *creator: Karl
  *
- *describe: 载具类型维护仓储类 | 代码由框架生成
+ *describe: 载具注册表仓储类 | 代码由框架生成
  *builder:  Karl
- *build datetime: 2023-07-12 10:37:17
+ *build datetime: 2023-07-14 10:03:53
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
@@ -12,38 +12,38 @@ using Hymson.MES.Data.Repositories.Common.Command;
 namespace Hymson.MES.Data.Repositories.Integrated
 {
     /// <summary>
-    /// 载具类型维护仓储接口
+    /// 载具注册表仓储接口
     /// </summary>
-    public interface IInteVehicleTypeRepository
+    public interface IInteVehicleRepository
     {
         #region 
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="inteVehicleTypeEntity"></param>
+        /// <param name="inteVehicleEntity"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(InteVehicleTypeEntity inteVehicleTypeEntity);
+        Task<int> InsertAsync(InteVehicleEntity inteVehicleEntity);
         
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="inteVehicleTypeEntitys"></param>
+        /// <param name="inteVehicleEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertsAsync(List<InteVehicleTypeEntity> inteVehicleTypeEntitys);
+        Task<int> InsertsAsync(List<InteVehicleEntity> inteVehicleEntitys);
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="inteVehicleTypeEntity"></param>
+        /// <param name="inteVehicleEntity"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(InteVehicleTypeEntity inteVehicleTypeEntity);
+        Task<int> UpdateAsync(InteVehicleEntity inteVehicleEntity);
         
         /// <summary>
         /// 批量更新 
         /// </summary>
-        /// <param name="inteVehicleTypeEntitys"></param>
+        /// <param name="inteVehicleEntitys"></param>
         /// <returns></returns>
-        Task<int> UpdatesAsync(List<InteVehicleTypeEntity> inteVehicleTypeEntitys);
+        Task<int> UpdatesAsync(List<InteVehicleEntity> inteVehicleEntitys);
 
         /// <summary>
         /// 删除  
@@ -61,39 +61,39 @@ namespace Hymson.MES.Data.Repositories.Integrated
         Task<int> DeletesAsync(DeleteCommand param);
 
         /// <summary>
-        /// 根据Code获取数据
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        Task<InteVehicleTypeEntity> GetByCodeAsync(InteVehicleTypeCodeQuery query);
-
-        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<InteVehicleTypeEntity> GetByIdAsync(long id);
+        Task<InteVehicleEntity> GetByIdAsync(long id);
     
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<InteVehicleTypeEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<InteVehicleEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
         /// 获取List
         /// </summary>
-        /// <param name="inteVehicleTypeQuery"></param>
+        /// <param name="inteVehicleQuery"></param>
         /// <returns></returns>
-        Task<IEnumerable<InteVehicleTypeEntity>> GetInteVehicleTypeEntitiesAsync(InteVehicleTypeQuery inteVehicleTypeQuery);
-        
+        Task<IEnumerable<InteVehicleEntity>> GetInteVehicleEntitiesAsync(InteVehicleQuery inteVehicleQuery);
+
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="inteVehicleTypePagedQuery"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        Task<PagedInfo<InteVehicleTypeEntity>> GetPagedInfoAsync(InteVehicleTypePagedQuery inteVehicleTypePagedQuery);
+        Task<PagedInfo<InteVehicleView>> GetPagedInfoAsync(InteVehiclePagedQuery query);
         #endregion
+
+        /// <summary>
+        /// 根据Code获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<InteVehicleEntity> GetByCodeAsync(InteVehicleCodeQuery query);
     }
 }

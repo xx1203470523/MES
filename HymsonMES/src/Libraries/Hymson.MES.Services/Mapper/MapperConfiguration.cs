@@ -240,6 +240,16 @@ namespace Hymson.MES.Services.Mapper
 
             CreateMap<InteVehicleTypeVerifyEntity, InteVehicleTypeVerifyDto>();
             #endregion
+
+            #region InteVehicle
+            CreateMap<InteVehiclePagedQueryDto, InteVehiclePagedQuery>();
+            CreateMap<InteVehicleEntity, InteVehicleDto>();
+            CreateMap<InteVehicleCreateDto, InteVehicleEntity>();
+            CreateMap<InteVehicleModifyDto, InteVehicleEntity>();
+
+            CreateMap<InteVehicleEntity, InteVehicleViewDto>();
+            CreateMap<InteVehicleView, InteVehicleViewDto>();
+            #endregion
         }
 
         /// <summary>
