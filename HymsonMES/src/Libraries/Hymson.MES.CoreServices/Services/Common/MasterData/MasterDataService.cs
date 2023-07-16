@@ -2,6 +2,7 @@
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Process;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
@@ -10,8 +11,11 @@ using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Common.MasterData;
+using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
+using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
@@ -114,6 +118,10 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         private readonly IProcProductSetRepository _procProductSetRepository;
 
+        private readonly IInteJobBusinessRelationRepository _inteJobBusinessRelationRepository;
+
+        private readonly IInteJobRepository _inteJobRepository;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -147,7 +155,9 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
             IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
-            IProcProductSetRepository procProductSetRepository)
+            IProcProductSetRepository procProductSetRepository,
+            IInteJobBusinessRelationRepository inteJobBusinessRelationRepository,
+            IInteJobRepository inteJobRepository)
         {
             _sequenceService = sequenceService;
             _manuSfcRepository = manuSfcRepository;
@@ -165,6 +175,8 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _procProductSetRepository = procProductSetRepository;
+            _inteJobBusinessRelationRepository = inteJobBusinessRelationRepository;
+            _inteJobRepository = inteJobRepository;
         }
 
 
@@ -743,9 +755,9 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<long?> GetProductSetId(ProductSetBo param) 
+        public async Task<long?> GetProductSetId(ProductSetBo param)
         {
-           var productSetEntity= await _procProductSetRepository.GetByProcedureIdAndProductIdAsync(new GetByProcedureIdAndProductIdQuery { ProductId=param.ProductId,SetPointId=param.ResourceId,SiteId=param.SiteId });
+            var productSetEntity = await _procProductSetRepository.GetByProcedureIdAndProductIdAsync(new GetByProcedureIdAndProductIdQuery { ProductId = param.ProductId, SetPointId = param.ResourceId, SiteId = param.SiteId });
             if (productSetEntity == null)
             {
                 productSetEntity = await _procProductSetRepository.GetByProcedureIdAndProductIdAsync(new GetByProcedureIdAndProductIdQuery { ProductId = param.ProductId, SetPointId = param.ProcedureId, SiteId = param.SiteId });
@@ -756,6 +768,39 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             }
             return productSetEntity.SemiProductId;
         }
+
+        /// <summary>
+        /// 获取关联的job
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<JobBo>> GetJobRalationJobByProcedureIdOrResourceId(JobRelationBo param)
+        {
+            var InteJobBusinessRelations = await _inteJobBusinessRelationRepository.GetByJobByBusinessIdAsync(param.ResourceId);
+            if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any())
+            {
+                InteJobBusinessRelations = await _inteJobBusinessRelationRepository.GetByJobByBusinessIdAsync(param.ProcedureId);
+            }
+            if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any())
+            {
+
+                return null;
+            }
+            else
+            {
+                var jobEntitys = await _inteJobRepository.GetByIdsAsync(InteJobBusinessRelations.Select(x => x.JobId));
+                var jobs = new List<JobBo>();
+                foreach (var job in jobs)
+                {
+                    jobs.Add(new JobBo
+                    {
+                        Name = job.Name,
+                    });
+                }
+                return jobs;
+            }
+        }
+
 
         /// <summary>
         /// 组装工艺路线

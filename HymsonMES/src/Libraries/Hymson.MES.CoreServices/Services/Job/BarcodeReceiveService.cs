@@ -13,9 +13,8 @@ using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
-using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
-using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
@@ -23,7 +22,6 @@ using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using System.Runtime.CompilerServices;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
@@ -48,10 +46,10 @@ namespace Hymson.MES.CoreServices.Services.Job
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
 
         public BarcodeReceiveService(
-            IPlanWorkOrderRepository planWorkOrderRepository,
-            IManuSfcRepository manuSfcRepository,
-            IWhMaterialInventoryRepository whMaterialInventoryRepository,
-            ILocalizationService localizationService,
+           IPlanWorkOrderRepository planWorkOrderRepository,
+           IManuSfcRepository manuSfcRepository,
+           IWhMaterialInventoryRepository whMaterialInventoryRepository,
+           ILocalizationService localizationService,
            IProcMaterialRepository procMaterialRepository,
            IMasterDataService masterDataService,
            IManuSfcInfoRepository manuSfcInfoRepository,
@@ -97,6 +95,10 @@ namespace Hymson.MES.CoreServices.Services.Job
                _masterDataService.GetProduceEntitiesBySFCsAsync, new MultiSFCBo { SiteId = param.SiteId, SFCs = param.SFCs }
                 );
 
+            var sfcEntitys = await bo.Proxy.GetDataBaseValueAsync<ManuSfcQuery, ManuSfcEntity>(
+              _manuSfcRepository.GetManuSfcEntitiesAsync, new ManuSfcQuery { SiteId = param.SiteId, SFCs = param.SFCs }
+               );
+
             //获取绑定工单
             var planWorkOrderBindEntity = await _planWorkOrderBindRepository.GetByResourceIDAsync(new PlanWorkOrderBindByResourceIdQuery
             {
@@ -114,7 +116,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             //获取首工序
             //var firstProcedure = await _masterDataService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
             var productId = await _masterDataService.GetProductSetId(new ProductSetBo { SiteId = bo.SiteId, ProductId = planWorkOrderEntity.ProductId, ProcedureId = bo.ProcedureId, ResourceId = bo.ResourceId }) ?? planWorkOrderEntity.ProductId;
-            
+
             var boms = await _masterDataService.GetProcMaterialEntitiesByBomIdAndProcedureIdAsync(planWorkOrderEntity.ProductBOMId, bo.ProcedureId);
             var bomMaterials = GetBomMaterials(boms);
 
@@ -126,10 +128,17 @@ namespace Hymson.MES.CoreServices.Services.Job
             });
             var validationFailures = new List<ValidationFailure>();
             List<ManuSfcEntity> manuSfcList = new List<ManuSfcEntity>();
+            List<ManuSfcEntity> updateManuSfcList = new List<ManuSfcEntity>();
             List<ManuSfcInfoEntity> manuSfcInfoList = new List<ManuSfcInfoEntity>();
-            List<ManuSfcInfoEntity> updateManuSfcInfoList = new List<ManuSfcInfoEntity>();
             List<ManuSfcProduceEntity> manuSfcProduceList = new List<ManuSfcProduceEntity>();
             List<ManuSfcStepEntity> manuSfcStepList = new List<ManuSfcStepEntity>();
+            ManuSfcInfoUpdateIsUsedBo manuSfcInfoUpdateIsUsedBo = new ManuSfcInfoUpdateIsUsedBo()
+            {
+                UserId = bo.UserName,
+                UpdatedOn = HymsonClock.Now(),
+                SfcIds=new List<long>()
+            };
+            var updatInfoUsedSfcs=new List<string>();
             foreach (var sfc in bo.SFCs)
             {
                 if (sfcProduceEntities != null && sfcProduceEntities.Any(x => x.SFC == sfc)) continue;
@@ -154,6 +163,24 @@ namespace Hymson.MES.CoreServices.Services.Job
                     {
                         var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(material.MaterialId);
                         qty = procMaterialEntity.Batch;
+                        if (qty == 0)
+                        {
+                            var validationFailure = new ValidationFailure();
+                            if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", sfc}
+                            };
+                            }
+                            else
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", planWorkOrderEntity.OrderCode);
+                            }
+                            validationFailure.FormattedMessagePlaceholderValues.Add("MaterialCode", procMaterialEntity.MaterialCode);
+                            validationFailure.ErrorCode = nameof(ErrorCode.MES16137);
+                            validationFailures.Add(validationFailure);
+                            continue;
+                        }
                     }
                 }
                 else
@@ -164,37 +191,90 @@ namespace Hymson.MES.CoreServices.Services.Job
                         if (whMaterial.DataCollectionWay == MaterialSerialNumberEnum.Inside)
                         {
                             // 报错 内部条码  bom属性为外部
+
+                            var validationFailure = new ValidationFailure();
+                            if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", sfc}
+                            };
+                            }
+                            else
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
+                            }
+                            validationFailure.ErrorCode = nameof(ErrorCode.MES16134);
+                            validationFailures.Add(validationFailure);
                             continue;
                         }
                         qty = whMaterialInventory.QuantityResidue;
+
+                        if (qty == 0)
+                        {
+                            var validationFailure = new ValidationFailure();
+                            if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", sfc}
+                            };
+                            }
+                            else
+                            {
+                                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", planWorkOrderEntity.OrderCode);
+                            }
+                            validationFailure.ErrorCode = nameof(ErrorCode.MES16136);
+                            validationFailures.Add(validationFailure);
+                            continue;
+                        }
                     }
                 }
 
                 if (material == null)
                 {
                     //报错  不在bom中
-
-                    continue;
-                }
-
-                if (qty == 0)
-                {
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", sfc}
+                            };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", planWorkOrderEntity.OrderCode);
+                    }
+                    validationFailure.FormattedMessagePlaceholderValues.Add("WorkOrder", sfc);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES16135);
+                    validationFailures.Add(validationFailure);
                     continue;
                 }
 
                 //准备接收数据
-                var manuSfcEntity = new ManuSfcEntity
+                var manuSfcEntity = sfcEntitys?.FirstOrDefault(x => x.SFC == sfc);
+                if (manuSfcEntity == null)
                 {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = bo.SiteId,
-                    SFC = sfc,
-                    Qty = qty,
-                    IsUsed = YesOrNoEnum.No,
-                    Status = SfcStatusEnum.InProcess,
-                    CreatedBy = bo.UserName,
-                    UpdatedBy = bo.UserName
-                };
-                manuSfcList.Add(manuSfcEntity);
+                    manuSfcEntity = new ManuSfcEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = bo.SiteId,
+                        SFC = sfc,
+                        Qty = qty,
+                        IsUsed = YesOrNoEnum.No,
+                        Status = SfcStatusEnum.InProcess,
+                        CreatedBy = bo.UserName,
+                        UpdatedBy = bo.UserName
+                    };
+                    manuSfcList.Add(manuSfcEntity);
+                }
+                else
+                {
+                    manuSfcEntity.IsUsed = YesOrNoEnum.No;
+                    manuSfcEntity.Status = SfcStatusEnum.InProcess;
+                    manuSfcEntity.UpdatedBy = bo.UserName;
+                    manuSfcEntity.UpdatedOn = HymsonClock.Now();
+                    updateManuSfcList.Add(manuSfcEntity);
+                    manuSfcInfoUpdateIsUsedBo.SfcIds.Add(manuSfcEntity.Id);
+                }
 
                 manuSfcInfoList.Add(new ManuSfcInfoEntity
                 {
@@ -258,10 +338,11 @@ namespace Hymson.MES.CoreServices.Services.Job
                 PlanQuantity = planWorkOrderEntity.Qty * (1 + planWorkOrderEntity.OverScale / 100),
                 PassDownQuantity = manuSfcProduceList.Sum(x => x.Qty),
                 UserName = bo.UserName,
+                ManuSfcInfoUpdateIsUsed= manuSfcInfoUpdateIsUsedBo,
                 ManuSfcList = manuSfcList,
+                UpdateManuSfcList= updateManuSfcList,
                 ManuSfcInfoList = manuSfcInfoList,
-                UpdateManuSfcInfoList = updateManuSfcInfoList,
-                ManuSfcProduceList = manuSfcProduceList,
+                ManuSfcProduceList= manuSfcProduceList,
                 ManuSfcStepList = manuSfcStepList,
             };
         }
@@ -293,6 +374,19 @@ namespace Hymson.MES.CoreServices.Services.Job
             {
                 await _manuSfcRepository.InsertRangeAsync(data.ManuSfcList);
             }
+            if (data.UpdateManuSfcList != null && data.UpdateManuSfcList.Any())
+            {
+                await _manuSfcRepository.UpdateRangeAsync(data.UpdateManuSfcList);
+            }
+            if (data.ManuSfcInfoUpdateIsUsed.SfcIds != null && data.ManuSfcInfoUpdateIsUsed.SfcIds.Any())
+            {
+                await _manuSfcInfoRepository.UpdatesIsUsedAsync(new ManuSfcInfoUpdateIsUsedCommand()
+                {
+                    UpdatedOn= data.ManuSfcInfoUpdateIsUsed.UpdatedOn,
+                    SfcIds = data.ManuSfcInfoUpdateIsUsed.SfcIds,
+                    UserId = data.ManuSfcInfoUpdateIsUsed.UserId,
+                });
+            }
             if (data.ManuSfcInfoList != null && data.ManuSfcInfoList.Any())
             {
                 await _manuSfcInfoRepository.InsertsAsync(data.ManuSfcInfoList);
@@ -305,6 +399,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             {
                 await _manuSfcStepRepository.InsertRangeAsync(data.ManuSfcStepList);
             }
+       
             return await Task.FromResult(new JobResponseBo { });
         }
 

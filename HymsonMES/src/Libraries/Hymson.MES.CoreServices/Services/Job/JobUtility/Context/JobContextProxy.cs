@@ -1,7 +1,12 @@
 ﻿using Google.Protobuf.WellKnownTypes;
 using Hymson.Infrastructure;
+using Hymson.Kafka.Debezium;
 using Hymson.MES.Core.Attribute.Job;
+using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
+using MySqlX.XDevAPI.Common;
+using Newtonsoft.Json.Linq;
+using Org.BouncyCastle.Asn1.X509;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Reflection;
@@ -18,6 +23,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// </summary>
         protected ConcurrentDictionary<uint, object> dictionary = new();
 
+        private const string IncompleteKey = "incomplete";
         /// <summary>
         /// 
         /// </summary>
@@ -47,6 +53,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         }
 
         /// <summary>
+        /// 设置数据库缓存
         /// </summary>
         /// <param name="parameters"></param>
         /// <returns></returns>
@@ -59,84 +66,129 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             {
                 var cacheKey = (uint)$"{property.PropertyType}".GetHashCode();
                 var value = property.GetValue(obj);
+                if (value == null) continue;
                 //集合
-                if (typeof(IEnumerable).IsAssignableFrom(property.PropertyType))
+                if (typeof(IEnumerable).IsAssignableFrom(property.PropertyType) && value is not string)
                 {
                     var iEnumerableType = property.PropertyType.GetGenericArguments().FirstOrDefault();
-                    if (iEnumerableType != null)
+                    if (iEnumerableType == null) continue;
+                    if (iEnumerableType.BaseType == typeof(BaseEntity))
                     {
-                        if (iEnumerableType.BaseType == typeof(BaseEntity))
+                        var cacheValue = Get(cacheKey);
+                        if (cacheValue == null)
                         {
-                            if (value != null)
-                            {
-                                Set(cacheKey, value);
-                            }
+                            Set(cacheKey, value);
                         }
                         else
                         {
+                            var newCacheValue = cacheValue as IEnumerable<BaseEntity>;
+                            if (newCacheValue == null)
+                            {
+                                throw new Exception();//报错
+                            }
 
+                            var newCacheValuelist = newCacheValue.ToList();
+
+                            foreach (var valueItem in (IEnumerable<BaseEntity>)value)
+                            {
+                                var index = newCacheValuelist.FindIndex(x => x.Id == valueItem.Id);
+                                if (index > -1)
+                                {
+                                    newCacheValuelist[index] = valueItem;
+                                }
+                                else
+                                {
+                                    newCacheValuelist.Add((BaseEntity)value);
+                                }
+                            }
+                            Set(cacheKey, newCacheValuelist);
+                        }
+                    }
+                    else
+                    {
+                        var jobProxyAttribute = iEnumerableType.GetCustomAttribute<JobProxyAttribute>();
+                        if (jobProxyAttribute == null) continue;
+                        var cacheValue = Get(cacheKey);
+                        if (cacheValue != null)
+                        {
+                            foreach (var valueItem in (IEnumerable)value)
+                            {
+                                if (!Merge(valueItem, cacheValue))
+                                {
+                                    var incompleteKey = (uint)$"{IncompleteKey}{property.PropertyType}".GetHashCode();
+                                    IncompleteMerge(incompleteKey, valueItem);
+                                }
+                            }
+                            Set(cacheKey, cacheValue);
+                        }
+                        else
+                        {
+                            foreach (var item in (IEnumerable)value)
+                            {
+                                var incompleteKey = (uint)$"{IncompleteKey}{property.PropertyType}".GetHashCode();
+                                IncompleteMerge(incompleteKey, item);
+                            }
                         }
                     }
                 }
                 else
                 {
+                    var enumerableType = typeof(IEnumerable<>).MakeGenericType(property.PropertyType);
+                    cacheKey = (uint)$"{enumerableType}".GetHashCode();
                     if (property.PropertyType.BaseType == typeof(BaseEntity))
                     {
-                        if (value != null)
+                        var cacheValue = Get(cacheKey);
+                        if (cacheValue != null)
                         {
-                            Set(cacheKey, value);
+                            if (cacheValue != null)
+                            {
+                                var newCacheValue = cacheValue as IEnumerable<BaseEntity>;
+
+                                if (newCacheValue != null)
+                                {
+                                    var newCacheValuelist = newCacheValue.ToList();
+                                    var index = newCacheValuelist.FindIndex(x => x.Id == ((BaseEntity)value).Id);
+                                    if (index > -1)
+                                    {
+                                        newCacheValuelist[index] = (BaseEntity)value;
+                                    }
+                                    else
+                                    {
+                                        newCacheValuelist.Add((BaseEntity)value);
+                                    }
+                                    Set(cacheKey, newCacheValuelist);
+                                }
+                            }
                         }
                         else
-                        { 
-                        
+                        {
+                            var newCacheValue = new List<BaseEntity>();
+                            newCacheValue.Add((BaseEntity)value);
+                            Set(cacheKey, newCacheValue);
                         }
                     }
                     else
                     {
                         var jobProxyAttribute = property.PropertyType.GetCustomAttribute<JobProxyAttribute>();
-                        if (jobProxyAttribute != null)
+                        if (jobProxyAttribute == null) continue;
+                        cacheKey = (uint)$"{jobProxyAttribute.TableEntity}".GetHashCode();
+                        var cacheValue = Get(cacheKey);
+                        if (cacheValue != null)
                         {
-                            var primaryKeyName = "";
-                            var dicField = new Dictionary<string, object?>();
-                            foreach (var itemProperty in property.GetType().GetProperties())
+                            if (Merge(value, cacheValue))
                             {
-                                var primaryKey = itemProperty.PropertyType.GetCustomAttribute<PrimaryKeyAttribute>();
-                                var itemValue = itemProperty.GetValue(value);
-                                if (primaryKey != null)
-                                {
-                                    primaryKeyName = itemProperty.GetType().Name;
-                                    dicField.Add(primaryKeyName, itemValue);
-                                }
-                                else
-                                {
-                                 var ignore=  itemProperty.PropertyType.GetCustomAttribute<IgnoreAttribute>();
-                                    if (ignore == null|| !ignore.IsIgnore)
-                                    {
-                                        dicField.Add(primaryKeyName, itemValue);
-                                    }
-                                }
-                            }
-                            cacheKey = (uint)$"{jobProxyAttribute.TableEntity}".GetHashCode();
-                            var cacheValue = Get(cacheKey);
-                            if (cacheValue != null)
-                            {                              
-                                foreach (var item in (IEnumerable)cacheValue )
-                                { 
-                                   
-                                }
+                                Set(cacheKey, cacheValue);
                             }
                             else
                             {
-                                cacheValue = (IEnumerable)(Activator.CreateInstance(type: jobProxyAttribute.TableEntity));
-                                if (cacheValue != null)
-                                {
-                                    //foreach (var iten in cacheValue)
-                                    //{
-                                    //}
-                                }
-
-                                //不完整数据
+                                var incompleteKey = (uint)$"{IncompleteKey}{enumerableType}".GetHashCode();
+                                IncompleteMerge(incompleteKey, value);
                             }
+                        }
+                        else
+                        {
+                            var incompleteKey = (uint)$"{IncompleteKey}{enumerableType}".GetHashCode();
+                            IncompleteMerge(incompleteKey, value);
                         }
                     }
                 }
@@ -144,11 +196,147 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             return (TResult)obj;
         }
 
-        private bool IsCollection<T>()
+        /// <summary>
+        /// 处理额外数据
+        /// </summary>
+        /// <param name="incompleteKey"></param>
+        /// <param name="incompleteValue"></param>
+        public void IncompleteMerge(uint incompleteKey, object value)
         {
-            return typeof(T) is { } type && typeof(IEnumerable).IsAssignableFrom(type);
+            var incompleteCache = Get(incompleteKey);
+            if (incompleteCache == null)
+            {
+                var incompleteValueList = new List<object>();
+                incompleteValueList.Add(value);
+                Set(incompleteKey, incompleteValueList);
+            }
+            else
+            {
+                var incompletelist = ((IList<object>)incompleteCache);
+                if (incompletelist == null)
+                {
+                    throw new Exception();
+                }
+                if (Merge(value, incompletelist))
+                {
+                    Set(incompleteKey, incompletelist);
+                }
+                else
+                {
+                    incompletelist.Add(value);
+                    Set(incompleteKey, incompletelist);
+                }
+            }
         }
 
+        /// <summary>
+        /// 合并
+        /// </summary>
+        /// <param name="source">合并原</param>
+        /// <param name="target">目标</param>
+        /// <returns></returns>
+        private bool Merge(object? source, object? target)
+        {
+            if (target == null || source == null) return false;
+            var dicConditionField = new Dictionary<string, object?>();
+            var dicField = new Dictionary<string, object?>();
+            foreach (var itemProperty in source.GetType().GetProperties())
+            {
+                var itemValue = itemProperty.GetValue(source);
+                var fieldName = itemProperty.Name;
+                //字段名
+                var field = itemProperty.GetCustomAttribute<FieldAttribute>();
+                if (field != null)
+                {
+                    fieldName = field.Name;
+                }
+
+                //查询
+                var primaryKey = itemProperty.GetCustomAttribute<ConditionAttribute>();
+                if (primaryKey != null)
+                {
+                    dicConditionField.Add(fieldName, itemValue);
+                }
+
+                //更新字段   TODO 暂不支持集合更新
+                var ignore = itemProperty.GetCustomAttribute<IgnoreAttribute>();
+                if (ignore == null || !ignore.IsIgnore)
+                {
+                    dicField.Add(fieldName, itemValue);
+                }
+            }
+            var isUpdated = false;
+            foreach (var targetItem in (IEnumerable)target)
+            {
+                var isUpdate = false;
+                var cacheItemType = targetItem.GetType();
+                foreach (var field in dicConditionField)
+                {
+                    if (field.Value == null) continue;
+                    var itemPrimaryKeyValue = cacheItemType.GetProperties().FirstOrDefault(x => x.Name == field.Key);
+                    if (itemPrimaryKeyValue != null)
+                    {
+                        var itemValue = itemPrimaryKeyValue.GetValue(targetItem);
+                        if (typeof(IEnumerable).IsAssignableFrom(field.Value.GetType()) && field.Value is not string)
+                        {
+                            foreach (var fieldValue in (IEnumerable)field.Value)
+                            {
+                                if (itemValue?.ToString() == fieldValue.ToString())
+                                {
+                                    isUpdate = true;
+                                    break;
+                                }
+                                isUpdate = false;
+                            }
+                        }
+                        else
+                        {
+                            if (itemValue?.ToString() == field.Value?.ToString())
+                            {
+                                isUpdate = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!isUpdate) break;
+                }
+                if (isUpdate)
+                {
+                    foreach (var field in dicField)
+                    {
+                        var cacheItemProperty = cacheItemType.GetProperty(field.Key);
+                        if (cacheItemProperty != null)
+                        {
+                            cacheItemProperty.SetValue(targetItem, field.Value);
+                        }
+                    }
+                }
+                isUpdated = isUpdated && isUpdate;
+            }
+
+            return isUpdated;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="incompleteKey"></param>
+        /// <param name="target"></param>
+        private void IncompleteDatabaseMerge<TResult>(uint incompleteKey, IEnumerable<TResult>? target) where TResult : BaseEntity
+        {
+            var incompleteCache = Get(incompleteKey);
+            if (incompleteCache == null || target == null) return;
+            var incompleteValueList = new List<object>();
+            foreach (var item in (IEnumerable)incompleteCache)
+            {
+                if (!Merge(incompleteCache, target))
+                {
+                    incompleteValueList.Add(item);
+                }
+            }
+            Set(incompleteKey, incompleteValueList);
+        }
 
         /// <summary>
         /// 获取作业中入库的数据缓存
@@ -169,8 +357,12 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                 if (expectCount != 0 && cacheResult.Count() < expectCount)
                 {
                     var obj = await GetValueAsync<T, IEnumerable<TResult>>(func, parameters);
+       
                     if (obj != null)
                     {
+                        var incompleteKey = (uint)$"{IncompleteKey}{typeof(IEnumerable<TResult>)}".GetHashCode();
+                        IncompleteDatabaseMerge(cacheKey, obj);
+
                         cacheResult.Concat(obj.Where(x => !cacheResult.Any(o => o.Id == x.Id)));
                         Set(cacheKey, cacheResult);
                     }
@@ -292,7 +484,6 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             }
         }
 
-
         /// <summary>
         /// 取值
         /// </summary>
@@ -326,8 +517,6 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                 _semaphores[hash].Release();
             }
         }
-
-
 
         /// <summary>
         /// 存放

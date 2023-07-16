@@ -40,6 +40,14 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="jobIds"></param>
         /// <returns></returns>
         Task<IEnumerable<InteJobBusinessRelationEntity>> GetByJobIdsAsync(IEnumerable<long> jobIds);
+
+
+        /// <summary>
+        /// 更具业务id获取job
+        /// </summary>
+        /// <param name="businessId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteJobBusinessRelationEntity>> GetByJobByBusinessIdAsync(long businessId);
         /// <summary>
         /// 获取List
         /// </summary>

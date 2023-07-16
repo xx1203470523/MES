@@ -1,4 +1,5 @@
-﻿using Hymson.MES.Core.Domain.Manufacture;
+﻿using Hymson.MES.Core.Attribute.Job;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using System;
 using System.Collections.Generic;
@@ -41,9 +42,9 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// </summary>
         public MaterialSerialNumberEnum? DataCollectionWay { get; set; }
     }
+
     public class BarcodeSfcReceiveResponseBo
     {
-
         /// <summary>
         /// 工单id
         /// </summary>
@@ -69,29 +70,63 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// </summary>
         public string OrderCode { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public IEnumerable<ManuSfcEntity> ManuSfcList { get; set; }
+        public ManuSfcInfoUpdateIsUsedBo ManuSfcInfoUpdateIsUsed{ get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public IEnumerable<ManuSfcInfoEntity> ManuSfcInfoList { get; set; }
+        public IEnumerable<ManuSfcEntity> ManuSfcList { get; set; }=new List<ManuSfcEntity>();
 
         /// <summary>
         /// 
         /// </summary>
-        public IEnumerable<ManuSfcInfoEntity> UpdateManuSfcInfoList { get; set; } 
+        public IEnumerable<ManuSfcEntity> UpdateManuSfcList { get; set; } = new List<ManuSfcEntity>();
 
         /// <summary>
         /// 
         /// </summary>
-        public IEnumerable<ManuSfcProduceEntity> ManuSfcProduceList { get; set; } 
+        public IEnumerable<ManuSfcInfoEntity> ManuSfcInfoList { get; set; } = new List<ManuSfcInfoEntity>();
 
         /// <summary>
         /// 
         /// </summary>
-        public IEnumerable<ManuSfcStepEntity> ManuSfcStepList { get; set; } 
+        public IEnumerable<ManuSfcProduceEntity> ManuSfcProduceList { get; set; } = new List<ManuSfcProduceEntity>();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IEnumerable<ManuSfcStepEntity> ManuSfcStepList { get; set; } = new List<ManuSfcStepEntity>();
     }
+
+    /// <summary>
+    /// 更新
+    /// </summary>
+    public class ManuSfcInfoUpdateIsUsedBo
+    {
+        /// <summary>
+        /// 操作人员
+        /// </summary>
+        public string UserId { get; set; }
+
+        /// <summary>
+        /// 更新时间
+        /// </summary>
+        public DateTime UpdatedOn { get; set; }
+
+        /// <summary>
+        /// 产品条码ID列表 
+        /// </summary>
+        public IList<long>  SfcIds { get; set; }
+    }
+
+    //[JobProxy(typeof(IEnumerable<ManuSfcProduceEntity>))]
+    //public class Test
+    //{
+    //    public long SiteId { get; set; }
+
+    //    [Condition]
+    //    [Ignore]
+    //    [Field("SFC")]
+    //    public List<string> SFCs { get; set; }
+    //}
 }

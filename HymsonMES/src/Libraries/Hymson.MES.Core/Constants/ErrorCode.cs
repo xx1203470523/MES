@@ -610,6 +610,10 @@
         public const string MES16131 = "组件条码对应的批次大小未维护";
         public const string MES16132 = "条码{sfc}已经被装箱了";
         public const string MES16133 = "已经被装箱了";
+        public const string MES16134 = "但在bom属性为外部，条码已经存在";
+        public const string MES16135 = "条码不在工单{WorkOrder}的bom中";
+        public const string MES16136 = "库存不足";
+        public const string MES16137 = "物料{MaterialCode}批次数量大于0";
         #endregion
 
         #region 条码生成 MES16200

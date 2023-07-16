@@ -13,15 +13,18 @@ namespace Hymson.MES.Core.Attribute.Job
     [AttributeUsage(AttributeTargets.Class)]
     public class JobProxyAttribute : System.Attribute
     {
-        public JobProxyAttribute() { }
+        public JobProxyAttribute(Type tableEntity)
+        {
+            this.TableEntity = tableEntity;
+        }
 
         public Type TableEntity { get; set; }
     }
 
     /// <summary>
-    /// 作业特性
+    /// 作业忽略特性
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Property)]
     public class IgnoreAttribute : System.Attribute
     {
         public IgnoreAttribute()
@@ -41,24 +44,35 @@ namespace Hymson.MES.Core.Attribute.Job
     }
 
     /// <summary>
-    /// 作业特性
+    /// 查询键特性
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
-    public class PrimaryKeyAttribute : System.Attribute
+    [AttributeUsage(AttributeTargets.Property)]
+    public class ConditionAttribute : System.Attribute
     {
-        public PrimaryKeyAttribute()
+        public ConditionAttribute()
         {
-            this.IsPrimaryKey = true;
+            this.IsCondition = true;
         }
+        /// <summary>
+        /// 是否忽略
+        /// </summary>
+        public bool IsCondition { get; set; }
+    }
 
-        public PrimaryKeyAttribute(bool isPrimaryKey)
+    /// <summary>
+    /// 作业字段名字特性
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Property)]
+    public class FieldAttribute : System.Attribute
+    {
+        public FieldAttribute(string name)
         {
-            this.IsPrimaryKey = isPrimaryKey;
+            this.Name = name;
         }
 
         /// <summary>
         /// 是否忽略
         /// </summary>
-        public bool IsPrimaryKey { get; set; }
+        public string Name { get; set; }
     }
 }

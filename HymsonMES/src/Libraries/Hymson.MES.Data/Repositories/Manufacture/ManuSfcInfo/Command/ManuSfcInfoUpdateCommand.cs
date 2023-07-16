@@ -52,7 +52,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 产品条码ID列表 
         /// </summary>
-        public long[] SfcIds { get; set; }
+        public IEnumerable<long> SfcIds { get; set; }
+
         /// <summary>
         /// 产品条码列表
         /// </summary>

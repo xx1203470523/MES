@@ -92,7 +92,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InteJobEntity>> GetByIdsAsync(long[] ids)
+        public async Task<IEnumerable<InteJobEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<InteJobEntity>(GetByIdsSql, new { ids = ids });
