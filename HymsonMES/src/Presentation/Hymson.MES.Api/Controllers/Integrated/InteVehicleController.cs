@@ -108,5 +108,17 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         #endregion
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getVehicleVerifyByVehicleId/{id}")]
+        public async Task<InteVehicleVerifyDto> QueryVehicleVerifyByVehicleIdAsync(long id) 
+        {
+            return await _inteVehicleService.QueryVehicleVerifyByVehicleIdAsync(id);
+        }
     }
 }

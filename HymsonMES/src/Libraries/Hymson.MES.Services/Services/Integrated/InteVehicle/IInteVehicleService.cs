@@ -56,5 +56,12 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="id"></param>
         /// <returns></returns>
         Task<InteVehicleDto> QueryInteVehicleByIdAsync(long id);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="vehicleId"></param>
+        /// <returns></returns>
+        Task<InteVehicleVerifyDto> QueryVehicleVerifyByVehicleIdAsync(long vehicleId);
     }
 }
