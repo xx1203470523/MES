@@ -396,8 +396,8 @@ namespace Hymson.MES.Api.Controllers.Report
                 var processIndicators = new ProcessIndicatorsDto
                 {
                     Day = dayStr,
-                    ProccessCode = "TEST" + dayStr,
-                    ProcessName = "测试工序" + i.ToString(),
+                    ProccessCode = "TEST" ,
+                    ProcessName = "测试工序",
                     Indicators = randomInRange
                 };
                 indicatorsDtos.Add(processIndicators);
