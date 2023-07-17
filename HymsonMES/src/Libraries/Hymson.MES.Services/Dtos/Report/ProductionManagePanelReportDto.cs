@@ -111,4 +111,27 @@ namespace Hymson.MES.Services.Dtos.Report
         /// </summary>
         public decimal AchievingRate { get; set; }
     }
+
+    /// <summary>
+    /// 工序稼动率Dto
+    /// </summary>
+    public record ProcessUtilizationRateDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string ProccessCode { get; set; }
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string ProcessName { get; set; }
+        /// <summary>
+        /// 数值
+        /// </summary>
+        public decimal Utilization { get; set; }
+        /// <summary>
+        /// 稼动率
+        /// </summary>
+        public decimal UtilizationRate { get; set; }
+    }
 }

@@ -2,6 +2,7 @@
 using Hymson.MES.Services.Services.Report;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MySqlX.XDevAPI.Common;
 using System.Collections;
 using System.Data;
 using System.Dynamic;
@@ -30,7 +31,7 @@ namespace Hymson.MES.Api.Controllers.Report
         public Task<ProductionManagePanelReportDto> GetOverallInfoAsync()
         {
             //模拟数据
-            return Task.FromResult(new ProductionManagePanelReportDto()
+            var managePanelReportDto = new ProductionManagePanelReportDto()
             {
                 CompletedQty = 100,
                 CompletedRate = 80,
@@ -49,7 +50,8 @@ namespace Hymson.MES.Api.Controllers.Report
                 WorkOrderCode = "W292421AAFA",
                 WorkOrderDownTime = new DateTime(),
                 WorkOrderQty = 200
-            });
+            };
+            return Task.FromResult(managePanelReportDto);
         }
 
         /// <summary>
@@ -106,9 +108,12 @@ namespace Hymson.MES.Api.Controllers.Report
             result = result.OrderBy(c => c.Sort).ToList();
             return Task.FromResult(result);
         }
-
+        /// <summary>
+        /// 获取Pack详细信息
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
-        [Route("getPackInfoDynamicAsync")]
+        [Route("getPackInfoDynamic")]
         public Task<List<dynamic>> GetPackInfoDynamicAsync()
         {
             Dictionary<string, string> keyValues = new Dictionary<string, string>();
@@ -166,6 +171,86 @@ namespace Hymson.MES.Api.Controllers.Report
                 modelList.Add(model);
             }
             return modelList;
+        }
+
+        /// <summary>
+        /// 获取工艺路线稼动率
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getProcessUtilizationRate")]
+        public Task<IEnumerable<ProcessUtilizationRateDto>> GetProcessUtilizationRateAsync()
+        {
+            IEnumerable<ProcessUtilizationRateDto> processUtilizationRateDtos = new List<ProcessUtilizationRateDto>()
+            {
+                new ProcessUtilizationRateDto {
+                    ProccessCode="QA001",
+                    ProcessName="测试工序001",
+                    Utilization=80,
+                    UtilizationRate=10
+                },
+                new ProcessUtilizationRateDto {
+                    ProccessCode="QA002",
+                    ProcessName="测试工序002",
+                    Utilization=180,
+                    UtilizationRate=60
+                },
+                new ProcessUtilizationRateDto {
+                    ProccessCode="QA003",
+                    ProcessName="测试工序003",
+                    Utilization=100,
+                    UtilizationRate=40
+                },
+                new ProcessUtilizationRateDto {
+                    ProccessCode="QA004",
+                    ProcessName="测试工序004",
+                    Utilization=200,
+                    UtilizationRate=80
+                },
+                new ProcessUtilizationRateDto {
+                    ProccessCode="QA005",
+                    ProcessName="测试工序005",
+                    Utilization=240,
+                    UtilizationRate=100
+                },
+                new ProcessUtilizationRateDto {
+                    ProccessCode="QA006",
+                    ProcessName="测试工序006",
+                    Utilization=120,
+                    UtilizationRate=50
+                },
+                new ProcessUtilizationRateDto {
+                    ProccessCode="QA007",
+                    ProcessName="测试工序007",
+                    Utilization=70,
+                    UtilizationRate=30
+                },
+                new ProcessUtilizationRateDto {
+                    ProccessCode="QA008",
+                    ProcessName="测试工序008",
+                    Utilization=220,
+                    UtilizationRate=90
+                },
+                new ProcessUtilizationRateDto {
+                    ProccessCode="QA009",
+                    ProcessName="测试工序009",
+                    Utilization=210,
+                    UtilizationRate=85
+                },
+                new ProcessUtilizationRateDto {
+                    ProccessCode="QA010",
+                    ProcessName="测试工序010",
+                    Utilization=80,
+                    UtilizationRate=10
+                },
+                new ProcessUtilizationRateDto {
+                    ProccessCode="QA011",
+                    ProcessName="测试工序011",
+                    Utilization=180,
+                    UtilizationRate=80
+                },
+            };
+            return Task.FromResult(processUtilizationRateDtos);
         }
     }
 }
