@@ -105,10 +105,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             {
                 ProcedureId = bo.ProcedureId,
                 ResourceId = bo.ResourceId,
-                LinkPoint= ResourceJobLinkPointEnum.Start
+                LinkPoint = ResourceJobLinkPointEnum.Start
             });
         }
-
 
         /// <summary>
         /// 数据组装
@@ -231,9 +230,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             JobResponseBo responseBo = new();
             if (obj is not InStationResponseBo data) return responseBo;
 
-            // 更新数据
-            List<Task> tasks = new();
-
             // 更改状态
             responseBo.Rows += await _manuSfcProduceRepository.UpdateRangeWithStatusCheckAsync(data.SFCProduceEntities);
 
@@ -244,6 +240,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 responseBo.Rows = -1;
                 return responseBo;
             }
+
+            /*
+            // 更新数据
+            List<Task> tasks = new();
 
             // 插入 manu_sfc_step 状态为 进站
             var manuSfcStepTask = _manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities);
@@ -260,8 +260,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 更新工单的 InputQty
             var updateInputQtyByWorkOrderIdTask = _planWorkOrderRepository.UpdateInputQtyByWorkOrderIdAsync(data.UpdateQtyCommand);
             tasks.Add(updateInputQtyByWorkOrderIdTask);
-
+            
             await Task.WhenAll(tasks);
+            */
+
             return responseBo;
         }
 

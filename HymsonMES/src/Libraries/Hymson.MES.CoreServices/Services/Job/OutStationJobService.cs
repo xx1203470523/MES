@@ -380,8 +380,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             JobResponseBo responseBo = new();
             if (obj is not OutStationResponseBo data) return responseBo;
 
-            // 更新数据
-            List<Task<int>> tasks = new();
             //using var trans = new TransactionScope();
 
             // 更新物料库存
@@ -397,6 +395,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     return responseBo;
                 }
             }
+
+            /*
+            // 更新数据
+            List<Task<int>> tasks = new();
 
             // 添加流转记录
             if (data.ManuSfcCirculationEntities.Any())
@@ -458,6 +460,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 { "NextProcedureCode", $"{data.NextProcedureCode}" },
             };
             //trans.Complete();
+            */
 
             return responseBo;
         }

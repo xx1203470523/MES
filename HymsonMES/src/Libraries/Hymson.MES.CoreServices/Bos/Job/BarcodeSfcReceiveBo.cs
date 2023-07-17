@@ -70,12 +70,12 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// </summary>
         public string OrderCode { get; set; }
 
-        public ManuSfcInfoUpdateIsUsedBo ManuSfcInfoUpdateIsUsed{ get; set; }
+        public ManuSfcInfoUpdateIsUsedBo ManuSfcInfoUpdateIsUsed { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public IEnumerable<ManuSfcEntity> ManuSfcList { get; set; }=new List<ManuSfcEntity>();
+        public IEnumerable<ManuSfcEntity> ManuSfcList { get; set; } = new List<ManuSfcEntity>();
 
         /// <summary>
         /// 
@@ -116,7 +116,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 产品条码ID列表 
         /// </summary>
-        public IList<long>  SfcIds { get; set; }
+        public IList<long> SfcIds { get; set; }
     }
 
     //[JobProxy(typeof(IEnumerable<ManuSfcProduceEntity>))]
@@ -124,9 +124,9 @@ namespace Hymson.MES.CoreServices.Bos.Job
     //{
     //    public long SiteId { get; set; }
 
-    //    [Condition]
-    //    [Ignore]
-    //    [Field("SFC")]
+    //    [Condition] 这个是WHERE
+    //    [Ignore]  这个是忽略修改
+    //    [Field("SFC")] 这个是映射字段
     //    public List<string> SFCs { get; set; }
     //}
 }

@@ -13,7 +13,6 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
-using Hymson.MES.Data.Repositories.Integrated.InteJob;
 using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated.IIntegratedService;
@@ -21,7 +20,6 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.Extensions.DependencyInjection;
-using OfficeOpenXml.ConditionalFormatting;
 
 namespace Hymson.MES.Services.Services.Integrated
 {
@@ -47,11 +45,14 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
         private readonly IExecuteJobService<JobBaseBo> _executeJobService;
+
+
         /// <summary>
-        /// 作业表服务
+        /// 构造函数
         /// </summary>
         /// <param name="inteJobRepository"></param>
         /// <param name="jobBusinessRelationRepository"></param>
+        /// <param name="executeJobService"></param>
         /// <param name="validationCreateRules"></param>
         /// <param name="validationModifyRules"></param>
         /// <param name="currentUser"></param>
@@ -69,8 +70,9 @@ namespace Hymson.MES.Services.Services.Integrated
             _currentUser = currentUser;
             _currentSite = currentSite;
             _serviceProvider = serviceProvider;
-            _executeJobService= executeJobService;
+            _executeJobService = executeJobService;
         }
+
 
         /// <summary>
         /// 根据查询条件获取分页数据
@@ -213,5 +215,6 @@ namespace Hymson.MES.Services.Services.Integrated
             }
             return inteJobDtos;
         }
+
     }
 }
