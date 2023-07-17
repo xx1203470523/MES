@@ -85,6 +85,9 @@ namespace Hymson.MES.Services.Dtos.Report
         public int InputQty { get; set; }
     }
 
+    /// <summary>
+    /// Pack信息Dto
+    /// </summary>
     public record ProductionManagePanelPackDto : BaseEntityDto
     {
         /// <summary>

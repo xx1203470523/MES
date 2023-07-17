@@ -2,6 +2,9 @@
 using Hymson.MES.Services.Services.Report;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections;
+using System.Data;
+using System.Dynamic;
 
 namespace Hymson.MES.Api.Controllers.Report
 {
@@ -24,7 +27,7 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <returns></returns>
         [HttpGet]
         [Route("getOverallInfo")]
-        public Task<ProductionManagePanelReportDto> GetOverallInfo()
+        public Task<ProductionManagePanelReportDto> GetOverallInfoAsync()
         {
             //模拟数据
             return Task.FromResult(new ProductionManagePanelReportDto()
@@ -53,15 +56,16 @@ namespace Hymson.MES.Api.Controllers.Report
         /// 获取当天Pack达成数据
         /// </summary>
         /// <returns></returns>
+        [HttpGet]
         [Route("getPackAchievingInfo")]
-        public Task<IEnumerable<ProductionManagePanelPackDto>> GetPackAchievingInfo()
+        public Task<IEnumerable<ProductionManagePanelPackDto>> GetPackAchievingInfoAsync()
         {
             IEnumerable<ProductionManagePanelPackDto> result = new List<ProductionManagePanelPackDto>
             {
                 new ProductionManagePanelPackDto()
                 {
                     Sort=1,
-                    DateTimeRange = "8:30-10:30",
+                    DateTimeRange = "08:30-10:30",
                     InputQty = 40,
                     TargetQty = 100,
                     AchievingRate = 25,
@@ -101,6 +105,67 @@ namespace Hymson.MES.Api.Controllers.Report
             };
             result = result.OrderBy(c => c.Sort).ToList();
             return Task.FromResult(result);
+        }
+
+        [HttpGet]
+        [Route("getPackInfoDynamicAsync")]
+        public Task<List<dynamic>> GetPackInfoDynamicAsync()
+        {
+            Dictionary<string, string> keyValues = new Dictionary<string, string>();
+            var packInfo = GetPackAchievingInfoAsync().Result;
+            var managePanelPackDtos = packInfo.GroupBy(c => c.DateTimeRange);
+            DataTable dt = new();
+            //空列头
+            string NullColNmae = " ";
+            dt.Columns.Add(NullColNmae, typeof(string));
+            foreach (var item in managePanelPackDtos)
+            {
+                dt.Columns.Add(item.Key, typeof(string));
+            }
+
+            DataRow inputRow = dt.NewRow();
+            DataRow targetRow = dt.NewRow();
+            DataRow achievingRow = dt.NewRow();
+            inputRow[NullColNmae] = "投入数";
+            targetRow[NullColNmae] = "目标数";
+            achievingRow[NullColNmae] = "达成率";
+            for (int i = 0; i < dt.Columns.Count; i++)
+            {
+                var col = dt.Columns[i];
+                if (col.ColumnName != NullColNmae)
+                {
+                    var managePanelPackDto = packInfo.Where(c => c.DateTimeRange == col.ColumnName).FirstOrDefault();
+                    if (managePanelPackDto == null) { continue; }
+                    inputRow[col.ColumnName] = managePanelPackDto?.InputQty;
+                    targetRow[col.ColumnName] = managePanelPackDto?.TargetQty;
+                    achievingRow[col.ColumnName] = managePanelPackDto?.AchievingRate;
+
+                }
+            }
+            dt.Rows.Add(inputRow);
+            dt.Rows.Add(targetRow);
+            dt.Rows.Add(achievingRow);
+            var dynamics = ToDynamicList(dt);
+            return Task.FromResult(dynamics);
+        }
+        private List<dynamic> ToDynamicList(DataTable table, string[] filterFields = null, bool includeOrExclude = true)
+        {
+            var modelList = new List<dynamic>();
+            var isFilter = filterFields != null && filterFields.Any();
+            IEnumerable reservedColumns = table.Columns;
+            if (isFilter)
+                reservedColumns = table.Columns.Cast<DataColumn>().Where(c => filterFields?.Contains(c.ColumnName) == includeOrExclude);
+            foreach (DataRow row in table.Rows)
+            {
+                dynamic model = new ExpandoObject();
+                var dict = (IDictionary<string, object>)model;
+                foreach (DataColumn column in reservedColumns)
+                {
+                    dict[column.ColumnName] = row[column];
+                }
+                modelList.Add(model);
+            }
+            return modelList;
         }
     }
 }
