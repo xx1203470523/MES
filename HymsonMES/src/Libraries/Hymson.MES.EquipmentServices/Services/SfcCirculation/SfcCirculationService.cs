@@ -162,6 +162,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                     ProcedureId = sfcProduceEntity.ProcedureId,
                     ResourceId = sfcProduceEntity.ResourceId,
                     SFC = circulationBindSFC.SFC,
+                    Name = circulationBindSFC.Name,
                     WorkOrderId = sfcProduceEntity.WorkOrderId,
                     ProductId = sfcProduceEntity.ProductId,
                     EquipmentId = _currentEquipment.Id,
@@ -256,6 +257,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                     ProcedureId = sfcProduceEntity.ProcedureId,
                     ResourceId = sfcProduceEntity.ResourceId,
                     SFC = sfcCirculationBindDto.SFC,
+                    Name = sfcCirculationBindDto.Name,
                     WorkOrderId = sfcProduceEntity.WorkOrderId,
                     ProductId = sfcProduceEntity.ProductId,
                     EquipmentId = _currentEquipment.Id,
@@ -409,7 +411,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// <exception cref="NotImplementedException"></exception>
         public async Task SfcCirculationModuleRemove(SfcCirculationUnBindDto sfcCirculationUnBindDto)
         {
-            await SfcCirculationUnBindAsync(sfcCirculationUnBindDto,SfcCirculationTypeEnum.ModuleAdd);
+            await SfcCirculationUnBindAsync(sfcCirculationUnBindDto, SfcCirculationTypeEnum.ModuleAdd);
         }
 
         /// <summary>

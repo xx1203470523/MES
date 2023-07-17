@@ -37,5 +37,10 @@ namespace Hymson.MES.EquipmentServices.Dtos.SfcCirculation
         /// 绑定的条码
         /// </summary>
         public string SFC { get; set; }
+
+        /// <summary>
+        /// 绑定的批次条码名称
+        /// </summary>
+        public string Name { get; set; }
     }
 }

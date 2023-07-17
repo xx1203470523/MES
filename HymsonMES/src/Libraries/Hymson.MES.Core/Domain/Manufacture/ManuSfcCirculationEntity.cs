@@ -43,6 +43,11 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public string SFC { get; set; }
 
         /// <summary>
+        /// 绑定批次条码名称
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
         /// 流转前工单id
         /// </summary>
         public long WorkOrderId { get; set; }
