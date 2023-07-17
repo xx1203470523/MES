@@ -331,12 +331,45 @@ namespace Hymson.MES.Api.Controllers.Report
                 var processYieldRate = new ProcessYieldRateDto
                 {
                     Day = dayStr,
-                    ProccessCode = "TEST" + dayStr,
-                    ProcessName = "测试工序" + i.ToString(),
+                    ProccessCode = "TEST1",
+                    ProcessName = "测试工序1",
                     YieldQty = randomInRange,
                     YieldRate = randomInRange
                 };
                 yieldRateDtos.Add(processYieldRate);
+
+                int randomInRange2 = random.Next(minValue, maxValue + 1);
+                var processYieldRate2 = new ProcessYieldRateDto
+                {
+                    Day = dayStr,
+                    ProccessCode = "TEST2",
+                    ProcessName = "测试工序2",
+                    YieldQty = randomInRange2,
+                    YieldRate = randomInRange2
+                };
+                yieldRateDtos.Add(processYieldRate2);
+
+                int randomInRange3 = random.Next(minValue, maxValue + 1);
+                var processYieldRate3 = new ProcessYieldRateDto
+                {
+                    Day = dayStr,
+                    ProccessCode = "TEST3",
+                    ProcessName = "测试工序3",
+                    YieldQty = randomInRange3,
+                    YieldRate = randomInRange3
+                };
+                yieldRateDtos.Add(processYieldRate3);
+
+                int randomInRange4 = random.Next(minValue, maxValue + 1);
+                var processYieldRate4 = new ProcessYieldRateDto
+                {
+                    Day = dayStr,
+                    ProccessCode = "TEST4",
+                    ProcessName = "测试工序4",
+                    YieldQty = randomInRange4,
+                    YieldRate = randomInRange4
+                };
+                yieldRateDtos.Add(processYieldRate4);
             }
             return Task.FromResult(yieldRateDtos);
         }
@@ -360,7 +393,6 @@ namespace Hymson.MES.Api.Controllers.Report
                 int minValue = 1;
                 int maxValue = 100;
                 int randomInRange = random.Next(minValue, maxValue + 1);
-
                 var processIndicators = new ProcessIndicatorsDto
                 {
                     Day = dayStr,
@@ -369,6 +401,36 @@ namespace Hymson.MES.Api.Controllers.Report
                     Indicators = randomInRange
                 };
                 indicatorsDtos.Add(processIndicators);
+
+                int randomInRange2 = random.Next(minValue, maxValue + 1);
+                var processIndicators2 = new ProcessIndicatorsDto
+                {
+                    Day = dayStr,
+                    ProccessCode = "TEST2",
+                    ProcessName = "测试工序2",
+                    Indicators = randomInRange2
+                };
+                indicatorsDtos.Add(processIndicators2);
+
+                int randomInRange3 = random.Next(minValue, maxValue + 1);
+                var processIndicators3 = new ProcessIndicatorsDto
+                {
+                    Day = dayStr,
+                    ProccessCode = "TEST3",
+                    ProcessName = "测试工序3",
+                    Indicators = randomInRange3
+                };
+                indicatorsDtos.Add(processIndicators3);
+
+                int randomInRange4 = random.Next(minValue, maxValue + 1);
+                var processIndicators4 = new ProcessIndicatorsDto
+                {
+                    Day = dayStr,
+                    ProccessCode = "TEST4",
+                    ProcessName = "测试工序4",
+                    Indicators = randomInRange4
+                };
+                indicatorsDtos.Add(processIndicators4);
             }
             return Task.FromResult(indicatorsDtos);
         }
