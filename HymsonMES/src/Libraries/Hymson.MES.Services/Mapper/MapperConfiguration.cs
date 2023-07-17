@@ -223,6 +223,33 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteSystemTokenCreateDto, InteSystemTokenEntity>();
             CreateMap<InteSystemTokenModifyDto, InteSystemTokenEntity>();
             #endregion
+
+            #region InteCustom
+            CreateMap<InteCustomPagedQueryDto, InteCustomPagedQuery>();
+            CreateMap<InteCustomEntity, InteCustomDto>();
+            CreateMap<InteCustomCreateDto, InteCustomEntity>();
+            CreateMap<InteCustomModifyDto, InteCustomEntity>();
+
+            #endregion
+
+            #region InteVehicleType
+            CreateMap<InteVehicleTypePagedQueryDto, InteVehicleTypePagedQuery>();
+            CreateMap<InteVehicleTypeEntity, InteVehicleTypeDto>();
+            CreateMap<InteVehicleTypeCreateDto, InteVehicleTypeEntity>();
+            CreateMap<InteVehicleTypeModifyDto, InteVehicleTypeEntity>();
+
+            CreateMap<InteVehicleTypeVerifyEntity, InteVehicleTypeVerifyDto>();
+            #endregion
+
+            #region InteVehicle
+            CreateMap<InteVehiclePagedQueryDto, InteVehiclePagedQuery>();
+            CreateMap<InteVehicleEntity, InteVehicleDto>();
+            CreateMap<InteVehicleCreateDto, InteVehicleEntity>();
+            CreateMap<InteVehicleModifyDto, InteVehicleEntity>();
+
+            CreateMap<InteVehicleEntity, InteVehicleViewDto>();
+            CreateMap<InteVehicleView, InteVehicleViewDto>();
+            #endregion
         }
 
         /// <summary>

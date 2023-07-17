@@ -370,8 +370,8 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                 return (IEnumerable<TResult>)cacheResult;
             }
 
-            uint hash = cacheKey % (uint)_semaphores.Length;
-            _semaphores[hash].Wait();
+            //uint hash = cacheKey % (uint)_semaphores.Length;
+            //_semaphores[hash].Wait();
             try
             {
                 var obj = await GetValueAsync<T, IEnumerable<TResult>>(func, parameters);
@@ -381,7 +381,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             }
             finally
             {
-                _semaphores[hash].Release();
+                //_semaphores[hash].Release();
             }
         }
 
@@ -430,8 +430,8 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         public T? SetValue<T>(T parameters) where T : new()
         {
             var cacheKey = (uint)$"{parameters?.GetType()}".GetHashCode();
-            uint hash = cacheKey % (uint)_semaphores.Length;
-            _semaphores[hash].Wait();
+            //uint hash = cacheKey % (uint)_semaphores.Length;
+            //_semaphores[hash].Wait();
             try
             {
                 if (parameters != null)
@@ -446,9 +446,123 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             }
             finally
             {
-                _semaphores[hash].Release();
+                //_semaphores[hash].Release();
             }
         }
+
+        /// <summary>
+        /// 取值
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public TResult? SetValue<TResult>(string key, TResult obj)
+        {
+            if (obj == null) return obj;
+
+            var cacheKey = (uint)$"{key}".GetHashCode();
+            //uint hash = cacheKey % (uint)_semaphores.Length;
+            //_semaphores[hash].Wait();
+            try
+            {
+                Set(cacheKey, obj);
+
+                /*
+                 * 暂时注释掉
+                foreach (var po in obj.GetType().GetProperties())
+                {
+                    var cacheKeyChild = (uint)$"{po.PropertyType}".GetHashCode();
+                    var value = po.GetValue(obj);
+                    if (value != null)
+                    {
+                        Set(cacheKeyChild, value);
+                    }
+                }
+                */
+                return obj;
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                //_semaphores[hash].Release();
+            }
+        }
+
+
+        /// <summary>
+        /// 取值
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public object? GetValueOnly(string key)
+        {
+            var cacheKey = (uint)$"{key}".GetHashCode();
+            if (Has(cacheKey))
+            {
+                var cacheObj = Get(cacheKey);
+                if (cacheObj == null) return default;
+
+                return cacheObj;
+            }
+
+            return default;
+        }
+
+        /// <summary>
+        /// 取值
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public TResult? GetValue<TResult>(string key, TResult obj)
+        {
+            if (obj == null) return obj;
+
+            var cacheKey = (uint)$"{key}".GetHashCode();
+            if (Has(cacheKey))
+            {
+                var cacheObj = Get(cacheKey);
+                if (cacheObj == null) return default;
+
+                return (TResult)cacheObj;
+            }
+
+            //uint hash = cacheKey % (uint)_semaphores.Length;
+            //_semaphores[hash].Wait();
+            try
+            {
+                Set(cacheKey, obj);
+
+                /*
+                 * 暂时注释掉
+                foreach (var po in obj.GetType().GetProperties())
+                {
+                    var cacheKeyChild = (uint)$"{po.PropertyType}".GetHashCode();
+                    var value = po.GetValue(obj);
+                    if (value != null)
+                    {
+                        Set(cacheKeyChild, value);
+                    }
+                }
+                */
+                return obj;
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                //_semaphores[hash].Release();
+            }
+        }
+
+
+
+
 
         /// <summary>
         /// 取值
@@ -468,8 +582,8 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                 return (TResult)cacheObj;
             }
 
-            uint hash = cacheKey % (uint)_semaphores.Length;
-            _semaphores[hash].Wait();
+            //uint hash = cacheKey % (uint)_semaphores.Length;
+            //_semaphores[hash].Wait();
             try
             {
                 var obj = func(parameters);
@@ -480,7 +594,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             }
             finally
             {
-                _semaphores[hash].Release();
+                //_semaphores[hash].Release();
             }
         }
 
@@ -502,8 +616,8 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                 return (TResult)cacheObj;
             }
 
-            uint hash = cacheKey % (uint)_semaphores.Length;
-            await _semaphores[hash].WaitAsync();
+            //uint hash = cacheKey % (uint)_semaphores.Length;
+            //await _semaphores[hash].WaitAsync();
             try
             {
                 var obj = await func(parameters);
@@ -514,7 +628,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             }
             finally
             {
-                _semaphores[hash].Release();
+                //_semaphores[hash].Release();
             }
         }
 

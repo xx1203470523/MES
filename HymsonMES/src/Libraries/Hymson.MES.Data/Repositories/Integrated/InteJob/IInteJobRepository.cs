@@ -34,6 +34,13 @@ namespace Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository
         Task<IEnumerable<InteJobEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
+        /// 获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteJobEntity>> GetEntitiesAsync(EntityBySiteIdQuery query);
+
+        /// <summary>
         /// 根据编码获取数据
         /// </summary>
         /// <param name="param"></param>

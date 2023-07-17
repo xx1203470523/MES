@@ -10,6 +10,5 @@ namespace Hymson.MES.Core.Constants.Process
     public static class ProcessRoute
     {
         public const long LastProcedureId = 999999999;
+    }
 }
-}
-    

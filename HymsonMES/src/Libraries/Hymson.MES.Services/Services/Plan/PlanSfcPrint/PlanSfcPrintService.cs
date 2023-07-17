@@ -222,46 +222,42 @@ namespace Hymson.MES.Services.Services.Plan
                 SiteId = _currentSite.SiteId ?? 123456
 
             });
+            PrintRequest printEntity = new PrintRequest();
+
             foreach (var pprp in ppr)
             {
                 var tl = await _procLabelTemplateRepository.GetByIdAsync(pprp.TemplateId);
                 if (tl != null)
                 {
-                    PrintRequest printEntity = new PrintRequest()
+                    var body = new PrintBody()
                     {
-                        Bodies = new PrintBody[]
+                        TemplatePath = tl.Path,
+                        PrinterName = print.PrintName,
+                        PrintCount = pprp.Copy??1,
+                        Params = new List<PrintBody.ParamEntity>()
                         {
-                            new PrintBody()
+                            new PrintBody.ParamEntity()
                             {
-                                TemplatePath = tl.Path,
-                                PrinterName = print.PrintName,
-                                PrintCount = pprp.Copy??1,
-                                Params = new List<PrintBody.ParamEntity>()
-                                {
-                                    new PrintBody.ParamEntity()
-                                    {
-                                        ParamName = "SFC",
-                                        ParamValue = createDto.SFC
-                                    },
-                                    new PrintBody.ParamEntity()
-                                    {
-                                        ParamName = "SiteId",
-                                        ParamValue = (_currentSite.SiteId??123456).ToString()
-                                    }
-                                }
+                                ParamName = "SFC",
+                                ParamValue = createDto.SFC
+                            },
+                            new PrintBody.ParamEntity()
+                            {
+                                ParamName = "SiteId",
+                                ParamValue = (_currentSite.SiteId??123456).ToString()
                             }
                         }
-
+                        
                     };
-
-                    var result = await _labelPrintRequest.PrintAsync(printEntity);
-                    if (!result.result)
-                        throw new CustomerValidationException(nameof(ErrorCode.MES17003)).WithData("msg", result.msg);
-
+                    printEntity.Bodies.Add(body);
                 }
                 else
                     throw new CustomerValidationException(nameof(ErrorCode.MES17001));
             }
+            var result = await _labelPrintRequest.PrintAsync(printEntity);
+            if (!result.result)
+                throw new CustomerValidationException(nameof(ErrorCode.MES17003)).WithData("msg", result.msg);
+
 
         }
 

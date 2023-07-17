@@ -3,13 +3,11 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Job.Manufacture
@@ -94,7 +92,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             var jobBos = new List<JobBo> { };
             jobBos.Add(new JobBo { Name = "BadRecordJobService" });
 
-            var result = await _executeJobService.ExecuteAsync(jobBos, new JobRequestBo
+            var responseBo = await _executeJobService.ExecuteAsync(jobBos, new JobRequestBo
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 UserName = _currentUser.UserName,
@@ -105,10 +103,15 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
 
             // 判断面板是否显示
             var isShow = false;
-            var currentResponse = result.FirstOrDefault(f => f.Key == "BadRecordJobService").Value;
-            if (currentResponse != null)
+            foreach (var item in responseBo)
             {
-                isShow = currentResponse.Content["IsShow"].ParseToBool();
+                var content = item.Value.Content;
+                if (item.Key == "BadRecordJobService" && content != null && content.Any())
+                {
+                    isShow = content["IsShow"].ParseToBool();
+                }
+
+                defaultDto.Rows = item.Value.Rows;
             }
 
             defaultDto.Content?.Add("BadEntryCom", $"{isShow}".ToString());

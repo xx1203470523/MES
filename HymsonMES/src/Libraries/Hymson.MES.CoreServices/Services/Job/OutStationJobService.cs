@@ -129,6 +129,23 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         }
 
         /// <summary>
+        /// 执行前节点
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<JobBo>?> BeforeExecuteAsync<T>(T param) where T : JobBaseBo
+        {
+            var bo = param.ToBo<InStationRequestBo>();
+            if (bo == null) return null;
+            return await _masterDataService.GetJobRalationJobByProcedureIdOrResourceId(new Bos.Common.MasterData.JobRelationBo
+            {
+                ProcedureId = bo.ProcedureId,
+                ResourceId = bo.ResourceId,
+            });
+        }
+
+
+        /// <summary>
         /// 数据组装
         /// </summary>
         /// <param name="param"></param>
@@ -143,8 +160,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             // 获取生产条码信息
             var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, bo);
+
+            if (sfcProduceEntities == null || sfcProduceEntities.Any() == false) return default;
             responseBo.SFCProduceEntities = sfcProduceEntities.AsList();
-            if (responseBo.SFCProduceEntities == null || responseBo.SFCProduceEntities.Any() == false) return default;
 
             var firstProduceEntity = responseBo.SFCProduceEntities.FirstOrDefault();
             if (firstProduceEntity == null) return default;
@@ -428,7 +446,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             else
             {
                 // 修改 manu_sfc_produce 为排队, 工序修改为下一工序的id
-                tasks.Add(_manuSfcProduceRepository.UpdateRangeAsync(data.SFCProduceEntities));
+                tasks.Add(_manuSfcProduceRepository.UpdateRangeWithStatusCheckAsync(data.SFCProduceEntities));
             }
 
             var rowArray = await Task.WhenAll(tasks);
@@ -444,5 +462,20 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             return responseBo;
         }
 
+        /// <summary>
+        /// 执行后节点
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<JobBo>?> AfterExecuteAsync<T>(T param) where T : JobBaseBo
+        {
+            var bo = param.ToBo<InStationRequestBo>();
+            if (bo == null) return null;
+            return await _masterDataService.GetJobRalationJobByProcedureIdOrResourceId(new Bos.Common.MasterData.JobRelationBo
+            {
+                ProcedureId = bo.ProcedureId,
+                ResourceId = bo.ResourceId,
+            });
+        }
     }
 }

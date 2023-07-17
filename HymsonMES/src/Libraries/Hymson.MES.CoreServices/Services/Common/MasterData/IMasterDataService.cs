@@ -172,7 +172,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<IEnumerable<JobBo>> GetJobRalationJobByProcedureIdOrResourceId(JobRelationBo param);
+        Task<IEnumerable<JobBo>?> GetJobRalationJobByProcedureIdOrResourceId(JobRelationBo param);
 
         /// <summary>
         /// 获取即将扣料的物料数据

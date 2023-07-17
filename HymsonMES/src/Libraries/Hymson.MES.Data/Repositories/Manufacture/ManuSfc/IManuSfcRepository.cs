@@ -110,7 +110,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        Task<int> UpdateSfcIsUsedAsync(ManuSfcUpdateIsUsedCommand command);
+        Task<int> MultiUpdateSfcIsUsedAsync(MultiSfcUpdateIsUsedCommand command);
 
         /// <summary>
         /// 批量更新条码（条码状态）

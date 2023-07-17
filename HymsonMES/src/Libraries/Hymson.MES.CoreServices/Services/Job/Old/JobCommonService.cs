@@ -3,6 +3,7 @@ using Hymson.MES.CoreServices.Bos;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.RegularExpressions;
+using System.Transactions;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
@@ -33,10 +34,11 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <returns></returns>
         public async Task<Dictionary<string, JobResponseDto>> ExecuteJobAsync(IEnumerable<InteJobEntity> jobs, Dictionary<string, string>? param)
         {
-            var result = new Dictionary<string, JobResponseDto>(); // 返回结果
+            var responseDtos = new Dictionary<string, JobResponseDto>(); // 返回结果
 
             // 获取所有实现类
             var services = _serviceProvider.GetServices<IJobManufactureService>();
+            //using var trans = new TransactionScope();
             foreach (var job in jobs)
             {
                 var service = services.FirstOrDefault(f => f.GetType().Name == job.ClassProgram);
@@ -49,10 +51,23 @@ namespace Hymson.MES.CoreServices.Services.Job
                 await service.VerifyParamAsync(param);
 
                 // 执行job
-                result.Add(job.ClassProgram, await service.ExecuteAsync(param));
+                //result.Add(job.ClassProgram, await service.ExecuteAsync(param));
+                var responseDto = await service.ExecuteAsync(param);
+                responseDtos.Add(job.ClassProgram, responseDto);
+
+                if (responseDto.Rows < 0) break;
             }
 
-            return result;
+            //if (responseDtos.Any(a => a.Value.Rows < 0))
+            //{
+            //    trans.Dispose();
+            //}
+            //else
+            //{
+            //    trans.Complete();
+            //}
+
+            return responseDtos;
         }
 
         /// <summary>

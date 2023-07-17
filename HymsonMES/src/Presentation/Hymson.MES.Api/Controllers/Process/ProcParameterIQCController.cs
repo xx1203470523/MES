@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Hymson.MES.Api.Controllers.Process
 {
     /// <summary>
-    /// 控制器（IQC参数）
+    /// 控制器（质量参数）
     /// @author zhaoqing
     /// @date 2023-06-25 08:57:38
     /// </summary>
@@ -23,7 +23,7 @@ namespace Hymson.MES.Api.Controllers.Process
         private readonly ILogger<ProcParameterLinkTypeController> _logger;
 
         /// <summary>
-        /// 构造函数（IQC参数）
+        /// 构造函数（质量参数）
         /// </summary>
         /// <param name="procParameterLinkTypeService"></param>
         public ProcParameterIQCController(IProcParameterLinkTypeService procParameterLinkTypeService, ILogger<ProcParameterLinkTypeController> logger)
@@ -34,13 +34,13 @@ namespace Hymson.MES.Api.Controllers.Process
 
 
         /// <summary>
-        /// 添加（IQC参数）
+        /// 添加（质量参数）
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        [LogDescription("IQC参数", BusinessType.INSERT)]
+        [LogDescription("质量参数", BusinessType.INSERT)]
         [PermissionDescription("proc:parameterIQC:insert")]
         public async Task AddProcParameterLinkTypeAsync([FromBody] ProcParameterLinkTypeCreateDto parm)
         {
@@ -48,13 +48,13 @@ namespace Hymson.MES.Api.Controllers.Process
         }
 
         /// <summary>
-        /// 更新（IQC参数）
+        /// 更新（质量参数）
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
-        [LogDescription("IQC参数", BusinessType.UPDATE)]
+        [LogDescription("质量参数", BusinessType.UPDATE)]
         [PermissionDescription("proc:parameterIQC:update")]
         public async Task UpdateProcParameterLinkTypeAsync([FromBody] ProcParameterLinkTypeModifyDto parm)
         {
@@ -62,13 +62,13 @@ namespace Hymson.MES.Api.Controllers.Process
         }
 
         /// <summary>
-        /// 删除（IQC参数）
+        /// 删除（质量参数）
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
-        [LogDescription("IQC参数", BusinessType.DELETE)]
+        [LogDescription("质量参数", BusinessType.DELETE)]
         [PermissionDescription("proc:parameterIQC:delete")]
         public async Task<int> DeleteProcParameterLinkTypeAsync(long[] ids)
         {

@@ -86,6 +86,18 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             await _validationRepairJob.ValidateAndThrowAsync(bo);
         }
 
+
+        /// <summary>
+        /// 执行前节点
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<JobBo>?> BeforeExecuteAsync<T>(T param) where T : JobBaseBo
+        {
+            await Task.CompletedTask;
+            return null;
+        }
+
         /// <summary>
         /// 数据组装
         /// </summary>
@@ -140,5 +152,16 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             return new JobResponseBo { Content = data.Content, Message = data.Message, Rows = rows, Time = data.Time };
         }
 
+
+        /// <summary>
+        /// 执行后节点
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<JobBo>?> AfterExecuteAsync<T>(T param) where T : JobBaseBo
+        {
+            await Task.CompletedTask;
+            return null;
+        }
     }
 }

@@ -15,10 +15,12 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
+using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -325,7 +327,16 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (buttonJobs.Any() == false) return result;
 
             // 根据 buttonJobs 读取对应的job对象
-            var jobs = await _inteJobRepository.GetByIdsAsync(buttonJobs.Select(s => s.JobId).ToArray());
+            var jobsOfNotSort = await _inteJobRepository.GetEntitiesAsync(new EntityBySiteIdQuery { SiteId = _currentSite.SiteId ?? 0 });
+
+            List<InteJobEntity> jobs = new();
+            foreach (var item in buttonJobs)
+            {
+                var tempJob = jobsOfNotSort.FirstOrDefault(f => f.Id == item.JobId);
+                if (tempJob == null) continue;
+
+                jobs.Add(tempJob);
+            }
 
             // 是否清除条码
             if (buttonJobs.Any(a => a.IsClear) == true) dto.Param?.Add("IsClear", "True");
@@ -340,10 +351,105 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ResourceId = dto.Param["ResourceId"].ParseToLong(),
                 SFCs = new string[] { dto.Param["SFC"] }
             });
+            foreach (var item in jobResponses)
+            {
+                result.Add(item.Key, new JobResponseDto
+                {
+                    Rows = item.Value.Rows,
+                    Content = item.Value.Content,
+                    Message = item.Value.Message,
+                    Time = item.Value.Time
+                });
+            }
             */
-            //result = jobResponses.Select(s => s.Value == new JobResponseDto { Content = null });
 
             result = await _jobCommonService.ExecuteJobAsync(jobs, dto.Param);
+            return result;
+        }
+
+        /// <summary>
+        /// 进站（接口）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<Dictionary<string, JobResponseDto>> InStationAsync(ButtonRequestDto dto)
+        {
+            var result = new Dictionary<string, JobResponseDto> { }; // 返回结果
+
+            var bo = new ManufactureBo
+            {
+                SFC = dto.Param["SFC"],
+                ProcedureId = dto.Param["ProcedureId"].ParseToLong(),
+                ResourceId = dto.Param["ResourceId"].ParseToLong()
+            };
+
+            var jobBos = new List<JobBo> { };
+            jobBos.Add(new JobBo { Name = "InStationVerifyJobService" });
+            jobBos.Add(new JobBo { Name = "InStationJobService" });
+
+            var responseBo = await _executeJobService.ExecuteAsync(jobBos, new JobRequestBo
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                UserName = _currentUser.UserName,
+                ProcedureId = bo.ProcedureId,
+                ResourceId = bo.ResourceId,
+                SFCs = new string[] { bo.SFC }
+            });
+
+            foreach (var item in responseBo)
+            {
+                result.Add(item.Key, new JobResponseDto
+                {
+                    Rows = item.Value.Rows,
+                    Content = item.Value.Content,
+                    Message = item.Value.Message,
+                    Time = item.Value.Time
+                });
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 出站（接口）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<Dictionary<string, JobResponseDto>> OutStationAsync(ButtonRequestDto dto)
+        {
+            var result = new Dictionary<string, JobResponseDto> { }; // 返回结果
+            
+            var bo = new ManufactureBo
+            {
+                SFC = dto.Param["SFC"],
+                ProcedureId = dto.Param["ProcedureId"].ParseToLong(),
+                ResourceId = dto.Param["ResourceId"].ParseToLong()
+            };
+
+            var jobBos = new List<JobBo> { };
+            jobBos.Add(new JobBo { Name = "OutStationVerifyJobService" });
+            jobBos.Add(new JobBo { Name = "OutStationJobService" });
+
+            var responseBo = await _executeJobService.ExecuteAsync(jobBos, new JobRequestBo
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                UserName = _currentUser.UserName,
+                ProcedureId = bo.ProcedureId,
+                ResourceId = bo.ResourceId,
+                SFCs = new string[] { bo.SFC }
+            });
+
+            foreach (var item in responseBo)
+            {
+                result.Add(item.Key, new JobResponseDto
+                {
+                    Rows = item.Value.Rows,
+                    Content = item.Value.Content,
+                    Message = item.Value.Message,
+                    Time = item.Value.Time
+                });
+            }
+            
             return result;
         }
 
@@ -381,6 +487,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             // result = await _jobCommonService.ExecuteJobAsync(jobs, dto.Param);
             return result;
         }
+
 
     }
 }

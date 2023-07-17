@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Core.Enums.QualUnqualifiedCode;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,5 +50,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 不合格工艺路线Id
         /// </summary>
         public long? ProcessRouteId { get; set; }
+
+        /// <summary>
+        /// 类型
+        /// </summary>
+        public QualUnqualifiedCodeTypeEnum Type { get; set; }
     }
 }

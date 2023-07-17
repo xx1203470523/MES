@@ -1,18 +1,10 @@
-/*
- *creator: Karl
- *
- *describe: 操作面板按钮 仓储类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-04-01 02:58:19
- */
-
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -21,9 +13,19 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public partial class ManuFacePlateButtonRepository : BaseRepository, IManuFacePlateButtonRepository
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly IMemoryCache _memoryCache;
 
-        public ManuFacePlateButtonRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
+        /// <param name="memoryCache"></param>
+        public ManuFacePlateButtonRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
         {
+            _memoryCache = memoryCache;
         }
 
         #region 方法
@@ -67,8 +69,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<ManuFacePlateButtonEntity> GetByIdAsync(long id)
         {
-            using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ManuFacePlateButtonEntity>(GetByIdSql, new { Id = id });
+            var key = $"manu_face_plate_button&{id}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                using var conn = GetMESDbConnection();
+                return await conn.QueryFirstOrDefaultAsync<ManuFacePlateButtonEntity>(GetByIdSql, new { Id = id });
+            });
         }
 
         /// <summary>
@@ -204,9 +210,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string DeleteSql = "UPDATE `manu_face_plate_button` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `manu_face_plate_button` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
-        const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteId`, `FacePlateId`, `Seq`, `Name`, `Percentage`, `Hotkeys`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `manu_face_plate_button`  WHERE Id = @Id ";
+        const string GetByIdSql = @"SELECT * FROM `manu_face_plate_button`  WHERE Id = @Id ";
         const string GetByFacePlateIdSql = "SELECT * FROM manu_face_plate_button WHERE IsDeleted = 0 AND FacePlateId = @facePlateId ORDER BY Seq";
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `FacePlateId`, `Seq`, `Name`, `Percentage`, `Hotkeys`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`

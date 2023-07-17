@@ -123,6 +123,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         private readonly IManuCommonService _manuCommonService;
 
+        /// <summary>
+        /// 容器装载表（物理删除）仓储
+        /// </summary>
+        private readonly IManuContainerPackRepository _manuContainerPackRepository;
+
         private readonly ILocalizationService _localizationService;
         private readonly AbstractValidator<ManuFacePlateRepairCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ManuFacePlateRepairModifyDto> _validationModifyRules;
@@ -137,7 +142,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             IManuInStationService manuInStationService, IManuSfcStepRepository manuSfcStepRepository,
             IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
         AbstractValidator<ManuFacePlateRepairCreateDto> validationCreateRules, AbstractValidator<ManuFacePlateRepairModifyDto> validationModifyRules,
-        IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository, IManuCommonService manuCommonService)
+        IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository, IManuCommonService manuCommonService, IManuContainerPackRepository manuContainerPackRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -161,6 +166,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
             _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
             _manuCommonService = manuCommonService;
+            _manuContainerPackRepository = manuContainerPackRepository;
         }
 
         /// <summary>
@@ -339,7 +345,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16322)).WithData("SFC", manuSfcProduceEntit.SFC);
             }
-
+            //包装
+            var conPackList = await _manuContainerPackRepository.GetByLadeBarCodesAsync(new ManuContainerPackQuery { LadeBarCodes = new string[] { manuSfcProduceEntit.SFC }, SiteId = _currentSite.SiteId ?? 0 });
+            if (conPackList != null && conPackList.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18019)).WithData("SFCs", string.Join(",", conPackList.Select(it => it.LadeBarCode).ToArray()));
+            }
             // 产品信息
             ManuFacePlateRepairOpenInfoDto manuFacePlateRepairOpenInfoDto = new()
             {
@@ -378,6 +389,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     UnqualifiedId = s.UnqualifiedId,
                     UnqualifiedCode = s.UnqualifiedCode,
                     UnqualifiedCodeName = s.UnqualifiedCodeName,
+                    Type = s.Type,
                     CauseAnalyse = manuSfcRepairDetailList == null ? "" : manuSfcRepairDetailList.Where(it => it.ProductBadId == s.Id).FirstOrDefault()?.CauseAnalyse ?? "",
                     RepairMethod = manuSfcRepairDetailList == null ? "" : manuSfcRepairDetailList.Where(it => it.ProductBadId == s.Id).FirstOrDefault()?.RepairMethod ?? "",
                     ResCode = s.ResCode,

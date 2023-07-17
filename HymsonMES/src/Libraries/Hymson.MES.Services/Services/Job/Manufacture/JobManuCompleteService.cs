@@ -93,7 +93,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             jobBos.Add(new JobBo { Name = "OutStationVerifyJobService" });
             jobBos.Add(new JobBo { Name = "OutStationJobService" });
 
-            var result = await _executeJobService.ExecuteAsync(jobBos, new JobRequestBo
+            var responseBo = await _executeJobService.ExecuteAsync(jobBos, new JobRequestBo
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 UserName = _currentUser.UserName,
@@ -110,11 +110,16 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             // 判断是否尾工序
             var isLastProcedure = false;
             var nextProcedureCode = "";
-            var currentResponse = result.FirstOrDefault(f => f.Key == "IsLastProcedure").Value;
-            if (currentResponse != null)
+            foreach (var item in responseBo)
             {
-                isLastProcedure = currentResponse.Content["IsLastProcedure"].ParseToBool();
-                nextProcedureCode = currentResponse.Content["NextProcedureCode"];
+                var content = item.Value.Content;
+                if (item.Key == "OutStationJobService" && content != null && content.Any())
+                {
+                    isLastProcedure = content["IsLastProcedure"].ParseToBool();
+                    nextProcedureCode = content["NextProcedureCode"];
+                }
+
+                defaultDto.Rows = item.Value.Rows;
             }
 
             //defaultDto.Message = $"条码{param["SFC"]}完成，已于NF排队！";

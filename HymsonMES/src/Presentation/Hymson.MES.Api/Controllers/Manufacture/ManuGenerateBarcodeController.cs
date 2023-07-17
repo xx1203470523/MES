@@ -14,6 +14,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
     public class ManuGenerateBarcodeController : ControllerBase
     {
         private readonly IManuGenerateBarcodeExampleService _manuGenerateBarcodeService;
+
         public ManuGenerateBarcodeController(IManuGenerateBarcodeExampleService manuGenerateBarcodeService)
         {
             _manuGenerateBarcodeService = manuGenerateBarcodeService;

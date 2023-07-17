@@ -522,6 +522,8 @@
 
         #region 物料加载 15500
         public const string MES15501 = "当前线体无激活工单，请先激活工单！";
+        // MES15502-MES15503 已被占用
+        public const string MES15504 = "未找到资源关联的产线！";
         #endregion
 
         #region 工单 16000
@@ -651,7 +653,7 @@
         public const string MES16320 = "工单{ordercode}状态不为已下达|生产中，无法继续操作。";
         public const string MES16321 = "物料{Code}未添加组件，请检查";
         public const string MES16322 = "SFC条码{SFC}已报废，不允许操作。";
-        public const string MES16323 = "未添加组件，请检查";
+        public const string MES16323 = "物料未添加组件，请检查";
         public const string MES16324 = "存在已报废SFC条码，不允许操作。";
         public const string MES16325 = "存在已锁定SFC条码，不允许操作。";
         public const string MES16326 = "存在SFC状态不是{Status}状态，不允许操作。";
@@ -894,6 +896,7 @@
         public const string MES18020 = "库存信息不存在";
         public const string MES18021 = "物料库存不足";
         public const string MES18022 = "条码{SFC}不存在或已报废，不允许操作";
+        public const string MES18023 = "条码{SFC}不能直接从尾工序完成到其他工序完成，请先至于排队或活动";
 
 
         #endregion
@@ -934,6 +937,48 @@
 
         #region 系统Token MES18300
         public const string MES18300 = "系统编码{code}已经存在";
+        #endregion
+
+        #region 客户维护 18400
+        public const string MES18400 = "客户维护错误";
+        public const string MES18401 = "对应客户维护不存在";
+        public const string MES18402 = "客户编码已存在";
+        public const string MES18403 = "客户编码不能为空";
+        public const string MES18404 = "客户名称不能为空";
+        public const string MES18405 = "客户编码最大长度为50";
+        public const string MES18406 = "客户名称最大长度为50";
+        public const string MES18407 = "地址最大长度为255";
+        public const string MES18408 = "描述最大长度为255";
+        public const string MES18409 = "电话最大长度为50";
+
+        #endregion
+
+        #region 载具类型维护 18500
+        public const string MES18500 = "载具类型错误";
+        public const string MES18501 = "对应载具类型不存在";
+        public const string MES18502 = "载具类型编码已存在";
+        public const string MES18503 = "载具类型编码不能为空";
+        public const string MES18504 = "载具类型名称不能为空";
+        public const string MES18505 = "载具类型编码最大长度为100";
+        public const string MES18506 = "载具类型名称最大长度为100";
+        public const string MES18507 = "描述最大长度为255";
+        public const string MES18508 = "状态不合法";
+        public const string MES18509 = "行数应该为正整数";
+        public const string MES18510 = "列数应该为正整数";
+        public const string MES18511 = "单元数量应该为正整数";
+        public const string MES18512 = "Id不合法";
+
+        public const string MES18513 = "载具类型验证类型不能为空";
+        public const string MES18514 = "载具类型验证类型不合法";
+        public const string MES18515 = "载具类型验证物料或物料组不合法";
+
+        #endregion
+
+        #region 载具注册 18600
+        public const string MES18600 = "载具错误";
+        public const string MES18601 = "对应载具不存在";
+        public const string MES18602 = "载具编码已存在";
+
         #endregion
 
         #region 设备对接错误
@@ -978,6 +1023,7 @@
 
 
         #endregion
+
         #endregion
 
         #region 系统执行出错 业务逻辑出错

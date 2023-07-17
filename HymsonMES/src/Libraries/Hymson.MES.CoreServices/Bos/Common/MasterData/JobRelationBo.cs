@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hymson.MES.Core.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,5 +22,10 @@ namespace Hymson.MES.CoreServices.Bos.Common.MasterData
         /// 工序id
         /// </summary>
         public long ProcedureId { set; get; }
+
+        /// <summary>
+        /// 关联点
+        /// </summary>
+        public ResourceJobLinkPointEnum? LinkPoint { get; set; }
     }
 }

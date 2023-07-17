@@ -36,8 +36,28 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
             using var scope = _serviceProvider.CreateScope();
             param.Proxy = scope.ServiceProvider.GetRequiredService<IJobContextProxy>();
 
-            // 执行参数校验
+            var execJobBos = new List<JobBo>();
+
+            // 寻找关联点
             foreach (var job in jobBos)
+            {
+                var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
+                if (service == null) continue;
+                var beforeJobs= await service.BeforeExecuteAsync(param);
+                if (beforeJobs != null && beforeJobs.Any())
+                {
+                    execJobBos.Concat(beforeJobs);
+                }
+                execJobBos.Add(job);
+                var afterJobs = await service.AfterExecuteAsync(param);
+                if (afterJobs != null && afterJobs.Any())
+                {
+                    afterJobs.Concat(afterJobs);
+                }
+            }
+
+            // 执行参数校验
+            foreach (var job in execJobBos)
             {
                 var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
                 if (service == null) continue;
@@ -46,21 +66,33 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
             }
 
             // 执行数据组装
-            foreach (var job in jobBos)
+            foreach (var job in execJobBos)
             {
                 var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
                 if (service == null) continue;
-                await param.Proxy.SetDataBaseValueAsync(service.DataAssemblingAsync<T>, param);
+
+                /*
+                var dataAssembling = await service.DataAssemblingAsync(param);
+                if (dataAssembling == null) continue;
+
+                param.Proxy.SetValue(job.Name, dataAssembling);
+                */
+
+                await param.Proxy.GetValueAsync(service.DataAssemblingAsync<T>, param);
+                //await param.Proxy.SetDataBaseValueAsync(service.DataAssemblingAsync<T>, param);
+                //param.Proxy?.GetValue(job.Name, await service.DataAssemblingAsync(param));
             }
 
             // 执行入库
             var responseDtos = new Dictionary<string, JobResponseBo>();
             using var trans = new TransactionScope();
-            foreach (var job in jobBos)
+            foreach (var job in execJobBos)
             {
                 var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
                 if (service == null) continue;
 
+                //var obj = param.Proxy.GetValueOnly(job.Name);
+                //var obj = param.Proxy?.GetValue(job.Name, await service.DataAssemblingAsync(param));
                 var obj = await param.Proxy.GetValueAsync(service.DataAssemblingAsync<T>, param);
                 if (obj == null) continue;
 

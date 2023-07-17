@@ -8,6 +8,7 @@
 
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Core.Enums.QualUnqualifiedCode;
 
 namespace Hymson.MES.Services.Dtos.Manufacture
 {
@@ -288,6 +289,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 是否关闭
         /// </summary>
         public ProductBadRecordStatusEnum IsClose { get; set; }
+
+        /// <summary>
+        /// 类型
+        /// </summary>
+        public QualUnqualifiedCodeTypeEnum Type { get; set; }
     }
 
     /// <summary>
