@@ -46,13 +46,13 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
                 var beforeJobs = await service.BeforeExecuteAsync(param);
                 if (beforeJobs != null && beforeJobs.Any())
                 {
-                    execJobBos.Concat(beforeJobs);
+                    execJobBos.AddRange(beforeJobs);
                 }
                 execJobBos.Add(job);
                 var afterJobs = await service.AfterExecuteAsync(param);
                 if (afterJobs != null && afterJobs.Any())
                 {
-                    execJobBos.Concat(afterJobs);
+                    execJobBos.AddRange(afterJobs);
                 }
             }
 
