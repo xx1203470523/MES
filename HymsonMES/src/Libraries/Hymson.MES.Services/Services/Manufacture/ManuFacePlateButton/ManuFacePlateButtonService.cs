@@ -15,6 +15,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
+using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
@@ -366,6 +367,92 @@ namespace Hymson.MES.Services.Services.Manufacture
             return result;
         }
 
+        /// <summary>
+        /// 进站（接口）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<Dictionary<string, JobResponseDto>> InStationAsync(ButtonRequestDto dto)
+        {
+            var result = new Dictionary<string, JobResponseDto> { }; // 返回结果
+
+            var bo = new ManufactureBo
+            {
+                SFC = dto.Param["SFC"],
+                ProcedureId = dto.Param["ProcedureId"].ParseToLong(),
+                ResourceId = dto.Param["ResourceId"].ParseToLong()
+            };
+
+            var jobBos = new List<JobBo> { };
+            jobBos.Add(new JobBo { Name = "InStationVerifyJobService" });
+            jobBos.Add(new JobBo { Name = "InStationJobService" });
+
+            var responseBo = await _executeJobService.ExecuteAsync(jobBos, new JobRequestBo
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                UserName = _currentUser.UserName,
+                ProcedureId = bo.ProcedureId,
+                ResourceId = bo.ResourceId,
+                SFCs = new string[] { bo.SFC }
+            });
+
+            foreach (var item in responseBo)
+            {
+                result.Add(item.Key, new JobResponseDto
+                {
+                    Rows = item.Value.Rows,
+                    Content = item.Value.Content,
+                    Message = item.Value.Message,
+                    Time = item.Value.Time
+                });
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 出站（接口）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<Dictionary<string, JobResponseDto>> OutStationAsync(ButtonRequestDto dto)
+        {
+            var result = new Dictionary<string, JobResponseDto> { }; // 返回结果
+            
+            var bo = new ManufactureBo
+            {
+                SFC = dto.Param["SFC"],
+                ProcedureId = dto.Param["ProcedureId"].ParseToLong(),
+                ResourceId = dto.Param["ResourceId"].ParseToLong()
+            };
+
+            var jobBos = new List<JobBo> { };
+            jobBos.Add(new JobBo { Name = "OutStationVerifyJobService" });
+            jobBos.Add(new JobBo { Name = "OutStationJobService" });
+
+            var responseBo = await _executeJobService.ExecuteAsync(jobBos, new JobRequestBo
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                UserName = _currentUser.UserName,
+                ProcedureId = bo.ProcedureId,
+                ResourceId = bo.ResourceId,
+                SFCs = new string[] { bo.SFC }
+            });
+
+            foreach (var item in responseBo)
+            {
+                result.Add(item.Key, new JobResponseDto
+                {
+                    Rows = item.Value.Rows,
+                    Content = item.Value.Content,
+                    Message = item.Value.Message,
+                    Time = item.Value.Time
+                });
+            }
+            
+            return result;
+        }
+
 
         /// <summary>
         ///  新按钮（点击）
@@ -400,6 +487,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             // result = await _jobCommonService.ExecuteJobAsync(jobs, dto.Param);
             return result;
         }
+
 
     }
 }

@@ -22,6 +22,7 @@ using Hymson.MES.Services.Services.Integrated.InteContainer;
 using Hymson.MES.Services.Services.Job.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuFeeding;
+using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInStation;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOutStation;
@@ -109,6 +110,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteSystemTokenService, InteSystemTokenService>();
             services.AddSingleton<IInteCustomService, InteCustomService>();
 
+            services.AddSingleton<IInteVehicleTypeService, InteVehicleTypeService>();
+
+            services.AddSingleton<IInteVehicleService, InteVehicleService>();
+
             #region CodeRule
             services.AddSingleton<IInteCodeRulesService, InteCodeRulesService>();
             services.AddSingleton<IInteCodeRulesMakeService, InteCodeRulesMakeService>();
@@ -166,6 +171,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuSfcService, ManuSfcService>();
             services.AddSingleton<IManuSfcProduceService, ManuSfcProduceService>();
             //services.AddSingleton<IManuGenerateBarcodeService, ManuGenerateBarcodeService>();
+            services.AddSingleton<IManuGenerateBarcodeExampleService, ManuGenerateBarcodeExampleService>();
+
             services.AddSingleton<IManuProductBadRecordService, ManuProductBadRecordService>();
             services.AddSingleton<IManuFacePlateService, ManuFacePlateService>();
             services.AddSingleton<IManuFacePlateButtonService, ManuFacePlateButtonService>();
@@ -362,6 +369,14 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<AbstractValidator<InteCustomCreateDto>, InteCustomCreateValidator>();
             services.AddSingleton<AbstractValidator<InteCustomModifyDto>, InteCustomModifyValidator>();
+
+            services.AddSingleton<AbstractValidator<InteVehicleTypeCreateDto>, InteVehicleTypeCreateValidator>();
+            services.AddSingleton<AbstractValidator<InteVehicleTypeModifyDto>, InteVehicleTypeModifyValidator>();
+
+            services.AddSingleton<AbstractValidator<InteVehicleTypeVerifyCreateDto>, InteVehicleTypeVerifyCreateValidator>();
+
+            services.AddSingleton<AbstractValidator<InteVehicleCreateDto>, InteVehicleCreateValidator>();
+            services.AddSingleton<AbstractValidator<InteVehicleModifyDto>, InteVehicleModifyValidator>();
 
             #region CodeRule
             services.AddSingleton<AbstractValidator<InteCodeRulesCreateDto>, InteCodeRulesCreateValidator>();

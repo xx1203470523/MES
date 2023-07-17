@@ -367,17 +367,19 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             entity.InitQty = inventory.QuantityResidue;
             entity.Qty += entity.InitQty;
 
+            #region 这段代码可以达到校验工单状态
+            // 读取资源绑定的产线
+            var workCenter = await _inteWorkCenterRepository.GetByResourceIdAsync(entity.ResourceId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16803));    // ErrorCode.MES15502
+
+            // 通过产线->工单->BOM
+            var bomIds = await GetBomIdsByWorkCenterIdAsync(workCenter.Id, null);
+            if (bomIds == null || bomIds.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES10612));
+            #endregion
+
             // 检查物料条码和物料是否对应的上，如果不是主物料，就找下替代料
             if (inventory.MaterialId != material.Id)
             {
-                // 读取资源绑定的产线
-                var workCenter = await _inteWorkCenterRepository.GetByResourceIdAsync(entity.ResourceId)
-                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES16803));    // ErrorCode.MES15502
-
-                // 通过产线->工单->BOM
-                var bomIds = await GetBomIdsByWorkCenterIdAsync(workCenter.Id, null);
-                if (bomIds == null || bomIds.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES10612));
-
                 // 获取关联BOM
                 var bomDetailEntities = await _procBomDetailRepository.GetByBomIdsAsync(bomIds);
                 var bomDetailEntitiy = bomDetailEntities.FirstOrDefault(w => w.MaterialId == material.Id)

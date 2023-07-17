@@ -15,6 +15,7 @@ namespace Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command
         /// <summary>
         /// 数量
         /// </summary>
-        public decimal Qty { get; set; }
+        public decimal Qty { get; set; } = 0;
+
     }
 }

@@ -50,6 +50,29 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Context
         T? SetValue<T>(T parameters) where T : new();
 
         /// <summary>
+        /// 取值
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        TResult? SetValue<TResult>(string key, TResult obj);
+
+        /// <summary>
+        /// 取值
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        object? GetValueOnly(string key);
+
+        /// <summary>
+        /// 取值
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        TResult? GetValue<TResult>(string key, TResult obj);
+
+        /// <summary>
         /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>

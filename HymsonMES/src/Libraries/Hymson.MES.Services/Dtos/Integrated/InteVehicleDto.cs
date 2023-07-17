@@ -1,0 +1,188 @@
+/*
+ *creator: Karl
+ *
+ *describe: 载具注册表    Dto | 代码由框架生成
+ *builder:  Karl
+ *build datetime: 2023-07-14 10:03:53
+ */
+
+using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+
+namespace Hymson.MES.Services.Dtos.Integrated
+{
+    /// <summary>
+    /// 载具注册表Dto
+    /// </summary>
+    public record InteVehicleDto : BaseEntityDto
+    {
+        /// <summary>
+        /// id
+        /// </summary>
+        public long Id { get; set; }
+
+       /// <summary>
+        /// 托盘编码
+        /// </summary>
+        public string Code { get; set; }
+
+       /// <summary>
+        /// 托盘名称
+        /// </summary>
+        public string Name { get; set; }
+
+       /// <summary>
+        /// 状态;0-未启用 1-启用
+        /// </summary>
+        public EnableEnum Status { get; set; }
+
+       /// <summary>
+        /// 载具类型id
+        /// </summary>
+        public long VehicleTypeId { get; set; }
+
+       /// <summary>
+        /// 存放位置
+        /// </summary>
+        public string Position { get; set; }
+
+       /// <summary>
+        /// 说明
+        /// </summary>
+        public string Remark { get; set; }
+
+       /// <summary>
+        /// 创建人
+        /// </summary>
+        public string CreatedBy { get; set; }
+
+       /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime CreatedOn { get; set; }
+
+       /// <summary>
+        /// 最后修改人
+        /// </summary>
+        public string UpdatedBy { get; set; }
+
+       /// <summary>
+        /// 修改时间
+        /// </summary>
+        public DateTime? UpdatedOn { get; set; }
+
+       
+    }
+
+    /// <summary>
+    /// 载具注册View
+    /// </summary>
+    public record InteVehicleViewDto : InteVehicleDto
+    {
+        public string VehicleTypeCode { get; set; } = "";
+
+        public string VehicleTypeName { get; set; } = "";
+    }
+
+    /// <summary>
+    /// 载具注册表新增Dto
+    /// </summary>
+    public record InteVehicleCreateDto : BaseEntityDto
+    {
+       /// <summary>
+        /// 托盘编码
+        /// </summary>
+        public string Code { get; set; }
+
+       /// <summary>
+        /// 托盘名称
+        /// </summary>
+        public string Name { get; set; }
+
+       /// <summary>
+        /// 状态;0-未启用 1-启用
+        /// </summary>
+        public EnableEnum Status { get; set; }
+
+       /// <summary>
+        /// 载具类型id
+        /// </summary>
+        public long VehicleTypeId { get; set; }
+
+       /// <summary>
+        /// 存放位置
+        /// </summary>
+        public string Position { get; set; }
+
+       /// <summary>
+        /// 说明
+        /// </summary>
+        public string Remark { get; set; }
+
+       
+    }
+
+    /// <summary>
+    /// 载具注册表更新Dto
+    /// </summary>
+    public record InteVehicleModifyDto : BaseEntityDto
+    {
+        /// <summary>
+        /// id
+        /// </summary>
+        public long Id { get; set; }
+
+       /// <summary>
+        /// 托盘名称
+        /// </summary>
+        public string Name { get; set; }
+
+       /// <summary>
+        /// 状态;0-未启用 1-启用
+        /// </summary>
+        public EnableEnum Status { get; set; }
+
+       /// <summary>
+        /// 载具类型id
+        /// </summary>
+        public long VehicleTypeId { get; set; }
+
+       /// <summary>
+        /// 存放位置
+        /// </summary>
+        public string Position { get; set; }
+
+       /// <summary>
+        /// 说明
+        /// </summary>
+        public string Remark { get; set; }
+
+    }
+
+    /// <summary>
+    /// 载具注册表分页Dto
+    /// </summary>
+    public class InteVehiclePagedQueryDto : PagerInfo
+    {
+        /// <summary>
+        /// 托盘编码
+        /// </summary>
+        public string? Code { get; set; }
+
+        /// <summary>
+        /// 托盘名称
+        /// </summary>
+        public string? Name { get; set; }
+
+        /// <summary>
+        /// 状态;0-未启用 1-启用
+        /// </summary>
+        public EnableEnum? Status { get; set; }
+
+        ///// <summary>
+        ///// 载具类型id
+        ///// </summary>
+        //public long VehicleTypeId { get; set; }
+
+    }
+}

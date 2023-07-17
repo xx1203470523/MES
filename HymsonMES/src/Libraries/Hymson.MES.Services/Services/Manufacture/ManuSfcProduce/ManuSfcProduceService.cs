@@ -1554,8 +1554,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                             BarCodes = manuSfcs
                         });
 
-                        var notwhMaterialInventorySfcs = manuSfcInfos.Where(it => !whMaterialInventorys.Where(wmi => wmi.MaterialBarCode == it.SFC).Any());
-                        var procMaterials = await _procMaterialRepository.GetByIdsAsync(notwhMaterialInventorySfcs.Select(it => it.ProductId).ToArray());
+                        //var notwhMaterialInventorySfcs = manuSfcInfos.Where(it => !whMaterialInventorys.Where(wmi => wmi.MaterialBarCode == it.SFC).Any());
+                        //var procMaterials = await _procMaterialRepository.GetByIdsAsync(notwhMaterialInventorySfcs.Select(it => it.ProductId).ToArray());
+                        var procMaterials = await _procMaterialRepository.GetByIdsAsync(manuSfcInfos.Select(it => it.ProductId).ToArray());
                         bool isWhMaterialInventorys = whMaterialInventorys != null && whMaterialInventorys.Any() == true;
                         foreach (var item in manuSfcInfos)
                         {
@@ -1612,6 +1613,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                                 });
                             }
                         }
+                    }
+                    else
+                    {
+                        if (notManuSfcs != null && notManuSfcs.Any())
+                            throw new CustomerValidationException(nameof(ErrorCode.MES18023)).WithData("SFC", string.Join(",", notManuSfcs));
                     }
                     break;
                 case SfcProduceStatusEnum.lineUp:
@@ -1846,7 +1852,14 @@ namespace Hymson.MES.Services.Services.Manufacture
                     default:
                         break;
                 }
-
+                await _manuSfcRepository.MultiUpdateSfcIsUsedAsync(new MultiSfcUpdateIsUsedCommand
+                {
+                    SFCs = manuSfcs,
+                    IsUsed = YesOrNoEnum.Yes,
+                    SiteId = _currentSite.SiteId ?? 0,
+                    UpdatedBy = _currentUser.UserName,
+                    UpdatedOn = HymsonClock.Now()
+                });
                 trans.Complete();
             }
             catch (Exception ex)

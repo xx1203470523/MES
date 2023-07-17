@@ -46,7 +46,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 
         /// </summary>
-        public IEnumerable<UpdateQtyCommand> UpdateQtyCommands { get; set; } = new List<UpdateQtyCommand>();
+        public UpdateQtyCommand UpdateQtyCommand { get; set; } = new();
 
         /// <summary>
         /// 

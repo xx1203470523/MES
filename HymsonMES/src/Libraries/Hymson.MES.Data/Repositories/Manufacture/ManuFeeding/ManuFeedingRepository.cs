@@ -149,9 +149,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         public async Task<IEnumerable<ManuFeedingEntity>> GetByResourceIdAndMaterialIdsWithOutZeroAsync(GetByResourceIdAndMaterialIdsQuery query)
         {
             var sqlBuilder = new StringBuilder();
-            sqlBuilder.Append("SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND Qty > 0 AND ResourceId = @ResourceId ");
+            sqlBuilder.Append("SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND ResourceId = @ResourceId ");
 
-            if (query.MaterialIds != null) sqlBuilder.Append("AND ProductId IN @MaterialIds; ");
+            if (query.MaterialIds != null) sqlBuilder.Append("AND ProductId IN @MaterialIds ");
+
+            sqlBuilder.Append("AND Qty > 0 ");
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ManuFeedingEntity>(sqlBuilder.ToString(), query);
@@ -165,8 +167,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
     public partial class ManuFeedingRepository
     {
         const string InsertSql = "INSERT INTO `manu_feeding`(  `Id`, `ResourceId`, `FeedingPointId`, `ProductId`, SupplierId, `BarCode`, MaterialId, `InitQty`, `Qty`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @ResourceId, @FeedingPointId, @ProductId, @SupplierId, @BarCode, @MaterialId, @InitQty, @Qty, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
-        const string UpdateQtyHeadSql = "UPDATE manu_feeding SET ";
-        const string UpdateQtyTailSql = @"Qty = (CASE WHEN @Qty{0} > Qty THEN 0 ELSE Qty - @Qty{0} END), UpdatedBy = @UpdatedBy{0}, UpdatedOn = @UpdatedOn{0} WHERE Qty > 0 AND Id = @Id{0}; ";
         const string UpdateQtyByIdSql = "UPDATE manu_feeding SET Qty = (CASE WHEN @Qty > Qty THEN 0 ELSE Qty - @Qty END), UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Qty > 0 AND Id = @Id; ";
         const string DeleteSql = "UPDATE manu_feeding SET `IsDeleted` = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids;";
         const string DeleteByIds = "DELETE FROM manu_feeding WHERE Id IN @ids; ";

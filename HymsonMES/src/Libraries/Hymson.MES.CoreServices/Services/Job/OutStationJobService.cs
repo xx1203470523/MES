@@ -143,8 +143,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             // 获取生产条码信息
             var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, bo);
+
+            if (sfcProduceEntities == null || sfcProduceEntities.Any() == false) return default;
             responseBo.SFCProduceEntities = sfcProduceEntities.AsList();
-            if (responseBo.SFCProduceEntities == null || responseBo.SFCProduceEntities.Any() == false) return default;
 
             var firstProduceEntity = responseBo.SFCProduceEntities.FirstOrDefault();
             if (firstProduceEntity == null) return default;
@@ -428,7 +429,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             else
             {
                 // 修改 manu_sfc_produce 为排队, 工序修改为下一工序的id
-                tasks.Add(_manuSfcProduceRepository.UpdateRangeAsync(data.SFCProduceEntities));
+                tasks.Add(_manuSfcProduceRepository.UpdateRangeWithStatusCheckAsync(data.SFCProduceEntities));
             }
 
             var rowArray = await Task.WhenAll(tasks);
