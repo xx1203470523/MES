@@ -52,7 +52,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
                 var afterJobs = await service.AfterExecuteAsync(param);
                 if (afterJobs != null && afterJobs.Any())
                 {
-                    execJobBos.AddRange(afterJobs);
+                    execJobBos.Concat(afterJobs);
                 }
             }
 
