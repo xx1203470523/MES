@@ -2,6 +2,7 @@
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Process;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
@@ -9,18 +10,25 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.CoreServices.Bos.Common;
+using Hymson.MES.CoreServices.Bos.Common.MasterData;
+using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
+using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
+using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.ProductSet.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.Sequences;
 using Hymson.Snowflake;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Hymson.MES.CoreServices.Services.Common.MasterData
 {
@@ -106,6 +114,14 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
 
+        /// <summary>
+        /// 仓储接口（生产配置）
+        /// </summary>
+        private readonly IProcProductSetRepository _procProductSetRepository;
+
+        private readonly IInteJobBusinessRelationRepository _inteJobBusinessRelationRepository;
+
+        private readonly IInteJobRepository _inteJobRepository;
 
         /// <summary>
         /// 构造函数
@@ -139,7 +155,10 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             IProcProcessRouteRepository procProcessRouteRepository,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
             IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
-            IWhMaterialInventoryRepository whMaterialInventoryRepository)
+            IWhMaterialInventoryRepository whMaterialInventoryRepository,
+            IProcProductSetRepository procProductSetRepository,
+            IInteJobBusinessRelationRepository inteJobBusinessRelationRepository,
+            IInteJobRepository inteJobRepository)
         {
             _sequenceService = sequenceService;
             _manuSfcRepository = manuSfcRepository;
@@ -156,6 +175,9 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
             _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
+            _procProductSetRepository = procProductSetRepository;
+            _inteJobBusinessRelationRepository = inteJobBusinessRelationRepository;
+            _inteJobRepository = inteJobRepository;
         }
 
 
@@ -730,6 +752,65 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         }
 
         /// <summary>
+        /// 获取生产配置中产品id
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<long?> GetProductSetId(ProductSetBo param)
+        {
+            var productSetEntity = await _procProductSetRepository.GetByProcedureIdAndProductIdAsync(new GetByProcedureIdAndProductIdQuery { ProductId = param.ProductId, SetPointId = param.ResourceId, SiteId = param.SiteId });
+            if (productSetEntity == null)
+            {
+                productSetEntity = await _procProductSetRepository.GetByProcedureIdAndProductIdAsync(new GetByProcedureIdAndProductIdQuery { ProductId = param.ProductId, SetPointId = param.ProcedureId, SiteId = param.SiteId });
+                if (productSetEntity == null)
+                {
+                    return null;
+                }
+            }
+            return productSetEntity.SemiProductId;
+        }
+
+        /// <summary>
+        /// 获取关联的job
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<JobBo>?> GetJobRalationJobByProcedureIdOrResourceId(JobRelationBo param)
+        {
+            var InteJobBusinessRelations = await _inteJobBusinessRelationRepository.GetByJobByBusinessIdAsync(new InteJobBusinessRelationByBusinessIdQuery { 
+            BusinessId= param.ResourceId,
+            LinkPoint= param.LinkPoint
+            });
+            if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any())
+            {
+                InteJobBusinessRelations = await _inteJobBusinessRelationRepository.GetByJobByBusinessIdAsync(new InteJobBusinessRelationByBusinessIdQuery
+                {
+                    BusinessId = param.ProcedureId,
+                    LinkPoint = param.LinkPoint
+                });
+            }
+            if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any())
+            {
+
+                return null;
+            }
+            else
+            {
+                var jobEntitys = await _inteJobRepository.GetByIdsAsync(InteJobBusinessRelations.Select(x => x.JobId));
+                var jobs = new List<JobBo>();
+                foreach (var job in jobs)
+                {
+                    jobs.Add(new JobBo
+                    {
+                        Name = job.Name,
+                    });
+                }
+                return jobs;
+            }
+        }
+
+
+        /// <summary>
         /// 组装工艺路线
         /// </summary>
         /// <param name="list"></param>
@@ -785,8 +866,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 }
             }
         }
-
-
 
         /// <summary>
         /// 获取即将扣料的物料数据
@@ -893,8 +972,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
 
             return materialEntity.ConsumeRatio.Value;
         }
-
-
 
         /// <summary>
         /// 进行扣料（单一物料，包含物料的替代料）
@@ -1014,7 +1091,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                         DataCollectionWay = mainMaterialBo.DataCollectionWay
                     }, false);
             }
-
         }
 
         /// <summary>
@@ -1029,7 +1105,5 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             if (originQty == 0) return originValue;
             return targetQty * originValue / originQty;
         }
-
-
     }
 }

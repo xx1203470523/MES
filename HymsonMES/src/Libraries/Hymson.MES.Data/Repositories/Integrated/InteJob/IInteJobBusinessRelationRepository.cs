@@ -7,6 +7,7 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,6 +41,14 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="jobIds"></param>
         /// <returns></returns>
         Task<IEnumerable<InteJobBusinessRelationEntity>> GetByJobIdsAsync(IEnumerable<long> jobIds);
+
+
+        /// <summary>
+        /// 更具业务id获取job
+        /// </summary>
+        /// <param name="businessId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteJobBusinessRelationEntity>> GetByJobByBusinessIdAsync(InteJobBusinessRelationByBusinessIdQuery query);
         /// <summary>
         /// 获取List
         /// </summary>

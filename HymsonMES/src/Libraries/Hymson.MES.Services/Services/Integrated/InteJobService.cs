@@ -79,7 +79,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task<PagedInfo<InteJobDto>> GetPageListAsync(InteJobPagedQueryDto pram)
         {
-           //await _executeJobService.ExecuteAsync(new List<JobBo> { new JobBo { Name= "BarcodeReceiveService" }, new JobBo { Name = "InStationJobService" } }, new JobRequestBo { SFCs = new List<string> { "test000011" }, SiteId = 123456});
+            //await _executeJobService.ExecuteAsync(new List<JobBo> { new JobBo { Name = "BarcodeReceiveService" }, new JobBo { Name = "InStationJobService" } }, new JobRequestBo { SFCs = new List<string> { "test000011" }, SiteId = 123456 });
             var inteJobPagedQuery = pram.ToQuery<InteJobPagedQuery>();
             inteJobPagedQuery.SiteId = _currentSite.SiteId;
             var pagedInfo = await _inteJobRepository.GetPagedInfoAsync(inteJobPagedQuery);

@@ -17,6 +17,14 @@ namespace Hymson.MES.CoreServices.Services.Job
         Task VerifyParamAsync<T>(T param) where T : JobBaseBo;
 
         /// <summary>
+        /// 执行前
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<IEnumerable<JobBo>?> BeforeExecuteAsync<T>(T param) where T : JobBaseBo;
+
+        /// <summary>
         /// 数据组装
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -32,5 +40,12 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <returns></returns>
         Task<JobResponseBo> ExecuteAsync(object obj);
 
+        /// <summary>
+        /// 执行后
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<IEnumerable<JobBo>?> AfterExecuteAsync<T>(T param) where T : JobBaseBo;
     }
 }
