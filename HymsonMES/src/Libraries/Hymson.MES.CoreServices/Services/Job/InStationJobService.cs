@@ -93,6 +93,24 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         }
 
         /// <summary>
+        /// 执行前节点
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<JobBo>?> BeforeExecuteAsync<T>(T param) where T : JobBaseBo
+        {
+            var bo = param.ToBo<InStationRequestBo>();
+            if (bo == null) return null;
+            return await _masterDataService.GetJobRalationJobByProcedureIdOrResourceId(new Bos.Common.MasterData.JobRelationBo
+            {
+                ProcedureId = bo.ProcedureId,
+                ResourceId = bo.ResourceId,
+                LinkPoint= ResourceJobLinkPointEnum.Start
+            });
+        }
+
+
+        /// <summary>
         /// 数据组装
         /// </summary>
         /// <param name="param"></param>
@@ -247,5 +265,21 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             return responseBo;
         }
 
+        /// <summary>
+        /// 执行后节点
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<JobBo>?> AfterExecuteAsync<T>(T param) where T : JobBaseBo
+        {
+            var bo = param.ToBo<InStationRequestBo>();
+            if (bo == null) return null;
+            return await _masterDataService.GetJobRalationJobByProcedureIdOrResourceId(new Bos.Common.MasterData.JobRelationBo
+            {
+                ProcedureId = bo.ProcedureId,
+                ResourceId = bo.ResourceId,
+                LinkPoint = ResourceJobLinkPointEnum.Finish
+            });
+        }
     }
 }

@@ -38,8 +38,9 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly AbstractValidator<InteVehicleModifyDto> _validationModifyRules;
 
         private readonly IInteVehicleTypeRepository _inteVehicleTypeRepository;
+        private readonly IInteVehicleVerifyRepository _inteVehicleVerifyRepository;
 
-        public InteVehicleService(ICurrentUser currentUser, ICurrentSite currentSite, IInteVehicleRepository inteVehicleRepository, AbstractValidator<InteVehicleCreateDto> validationCreateRules, AbstractValidator<InteVehicleModifyDto> validationModifyRules,IInteVehicleTypeRepository inteVehicleTypeRepository)
+        public InteVehicleService(ICurrentUser currentUser, ICurrentSite currentSite, IInteVehicleRepository inteVehicleRepository, AbstractValidator<InteVehicleCreateDto> validationCreateRules, AbstractValidator<InteVehicleModifyDto> validationModifyRules,IInteVehicleTypeRepository inteVehicleTypeRepository, IInteVehicleVerifyRepository inteVehicleVerifyRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -47,6 +48,7 @@ namespace Hymson.MES.Services.Services.Integrated
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _inteVehicleTypeRepository = inteVehicleTypeRepository;
+            _inteVehicleVerifyRepository = inteVehicleVerifyRepository;
         }
 
         /// <summary>
@@ -85,8 +87,39 @@ namespace Hymson.MES.Services.Services.Integrated
                 throw new CustomerValidationException(nameof(ErrorCode.MES18602));
             }
 
-            //入库
-            await _inteVehicleRepository.InsertAsync(inteVehicleEntity);
+            #region 处理 载具验证数据
+            InteVehicleVerifyEntity? inteVehicleVerify = null;
+
+            if (inteVehicleCreateDto.InteVehicleVerify != null&& inteVehicleCreateDto.InteVehicleVerify.ExpirationDate.HasValue) 
+            {
+                inteVehicleVerify = new InteVehicleVerifyEntity() 
+                {
+                    VehicleId= inteVehicleEntity.Id,
+                    ExpirationDate = inteVehicleCreateDto.InteVehicleVerify.ExpirationDate.Value,
+
+                    Id = IdGenProvider.Instance.CreateId(),
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName,
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedOn = HymsonClock.Now(),
+                    SiteId = _currentSite.SiteId ?? 0
+                };
+            }
+
+            #endregion
+
+            using (TransactionScope ts = new TransactionScope())
+            {
+                //入库
+                await _inteVehicleRepository.InsertAsync(inteVehicleEntity);
+
+                if (inteVehicleVerify != null) 
+                {
+                    await _inteVehicleVerifyRepository.InsertAsync(inteVehicleVerify);
+                }
+
+                ts.Complete();
+            }
         }
 
         /// <summary>
@@ -145,7 +178,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="inteVehicleDto"></param>
+        /// <param name="inteVehicleModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyInteVehicleAsync(InteVehicleModifyDto inteVehicleModifyDto)
         {
@@ -163,7 +196,42 @@ namespace Hymson.MES.Services.Services.Integrated
             inteVehicleEntity.UpdatedBy = _currentUser.UserName;
             inteVehicleEntity.UpdatedOn = HymsonClock.Now();
 
-            await _inteVehicleRepository.UpdateAsync(inteVehicleEntity);
+            #region 处理 载具验证数据
+            InteVehicleVerifyEntity? inteVehicleVerify = null;
+
+            if (inteVehicleModifyDto.InteVehicleVerify != null && inteVehicleModifyDto.InteVehicleVerify.ExpirationDate.HasValue)
+            {
+                inteVehicleVerify = new InteVehicleVerifyEntity()
+                {
+                    VehicleId = inteVehicleEntity.Id,
+                    ExpirationDate = inteVehicleModifyDto.InteVehicleVerify.ExpirationDate.Value,
+
+                    Id = IdGenProvider.Instance.CreateId(),
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName,
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedOn = HymsonClock.Now(),
+                    SiteId = _currentSite.SiteId ?? 0
+                };
+            }
+
+            #endregion
+
+            using (TransactionScope ts = new TransactionScope())
+            {
+                await _inteVehicleRepository.UpdateAsync(inteVehicleEntity);
+
+                await _inteVehicleVerifyRepository.DeletesTrueByVehicleIdsAsync(new long[] { inteVehicleEntity.Id });
+
+                if (inteVehicleVerify != null)
+                {
+                    await _inteVehicleVerifyRepository.InsertAsync(inteVehicleVerify);
+                }
+
+                ts.Complete();
+            }
+
+            
         }
 
         /// <summary>
@@ -188,6 +256,22 @@ namespace Hymson.MES.Services.Services.Integrated
                return inteVehicleView;
            }
            throw new CustomerValidationException(nameof(ErrorCode.MES18601));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="vehicleId"></param>
+        /// <returns></returns>
+        public async Task<InteVehicleVerifyDto> QueryVehicleVerifyByVehicleIdAsync(long vehicleId) 
+        {
+            var inteVehicleVerify= await _inteVehicleVerifyRepository.GetByVehicleIdAsync(vehicleId);
+            if (inteVehicleVerify != null)
+            {
+                return inteVehicleVerify.ToModel<InteVehicleVerifyDto>();
+            }
+            else
+                return null;
         }
     }
 }

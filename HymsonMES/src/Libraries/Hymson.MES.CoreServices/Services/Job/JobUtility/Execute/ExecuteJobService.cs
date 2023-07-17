@@ -36,8 +36,28 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
             using var scope = _serviceProvider.CreateScope();
             param.Proxy = scope.ServiceProvider.GetRequiredService<IJobContextProxy>();
 
-            // 执行参数校验
+            var execJobBos = new List<JobBo>();
+
+            // 寻找关联点
             foreach (var job in jobBos)
+            {
+                var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
+                if (service == null) continue;
+                var beforeJobs = await service.BeforeExecuteAsync(param);
+                if (beforeJobs != null && beforeJobs.Any())
+                {
+                    execJobBos.AddRange(beforeJobs);
+                }
+                execJobBos.Add(job);
+                var afterJobs = await service.AfterExecuteAsync(param);
+                if (afterJobs != null && afterJobs.Any())
+                {
+                    execJobBos.AddRange(afterJobs);
+                }
+            }
+
+            // 执行参数校验
+            foreach (var job in execJobBos)
             {
                 var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
                 if (service == null) continue;
@@ -46,7 +66,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
             }
 
             // 执行数据组装
-            foreach (var job in jobBos)
+            foreach (var job in execJobBos)
             {
                 var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
                 if (service == null) continue;
@@ -66,7 +86,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
             // 执行入库
             var responseDtos = new Dictionary<string, JobResponseBo>();
             using var trans = new TransactionScope();
-            foreach (var job in jobBos)
+            foreach (var job in execJobBos)
             {
                 var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
                 if (service == null) continue;

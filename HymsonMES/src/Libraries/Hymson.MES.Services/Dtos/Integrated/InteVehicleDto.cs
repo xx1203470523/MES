@@ -118,8 +118,8 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 说明
         /// </summary>
         public string Remark { get; set; }
-
-       
+        
+        public InteVehicleVerifyCreateDto? InteVehicleVerify { get; set; }
     }
 
     /// <summary>
@@ -157,6 +157,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public string Remark { get; set; }
 
+        public InteVehicleVerifyCreateDto? InteVehicleVerify { get; set; }
     }
 
     /// <summary>
@@ -185,4 +186,65 @@ namespace Hymson.MES.Services.Dtos.Integrated
         //public long VehicleTypeId { get; set; }
 
     }
+
+    /// <summary>
+    /// 载具校验Dto
+    /// </summary>
+    public record InteVehicleVerifyDto : BaseEntityDto
+    {
+        /// <summary>
+        /// id
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 载具id
+        /// </summary>
+        public long VehicleId { get; set; }
+
+        /// <summary>
+        /// 有效期
+        /// </summary>
+        public DateTime? ExpirationDate { get; set; }
+
+        /// <summary>
+        /// 创建人
+        /// </summary>
+        public string CreatedBy { get; set; }
+
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime CreatedOn { get; set; }
+
+        /// <summary>
+        /// 最后修改人
+        /// </summary>
+        public string UpdatedBy { get; set; }
+
+        /// <summary>
+        /// 修改时间
+        /// </summary>
+        public DateTime? UpdatedOn { get; set; }
+
+    }
+
+
+    /// <summary>
+    /// 载具校验新增Dto
+    /// </summary>
+    public record InteVehicleVerifyCreateDto : BaseEntityDto
+    {
+        ///// <summary>
+        ///// 载具id
+        ///// </summary>
+        //public long VehicleId { get; set; }
+
+        /// <summary>
+        /// 有效期
+        /// </summary>
+        public DateTime? ExpirationDate { get; set; }
+
+    }
+
 }

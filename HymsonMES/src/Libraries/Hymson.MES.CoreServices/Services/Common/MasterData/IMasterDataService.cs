@@ -2,6 +2,8 @@
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.CoreServices.Bos.Common;
+using Hymson.MES.CoreServices.Bos.Common.MasterData;
+using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
@@ -158,7 +160,19 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <returns></returns>
         Task<IEnumerable<ProcessRouteDetailDto>> GetProcessRouteAsync(long processRouteId);
 
+        /// <summary>
+        /// 获取生产配置中产品id
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<long?> GetProductSetId(ProductSetBo param);
 
+        /// <summary>
+        /// 获取关联的job
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<IEnumerable<JobBo>?> GetJobRalationJobByProcedureIdOrResourceId(JobRelationBo param);
 
         /// <summary>
         /// 获取即将扣料的物料数据
@@ -186,7 +200,5 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
              MaterialDeductBo mainMaterialBo,
              MaterialDeductBo currentBo,
              bool isMain = true);
-
-
     }
 }

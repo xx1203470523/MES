@@ -298,7 +298,6 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
                         //更新旧条码在用
                         var updateSfcInfoIsUsed = new ManuSfcInfoUpdateIsUsedCommand
                         {
-                            IsUsed = false,
                             SfcIds = new long[] { sfcEntity.Id },
                             UpdatedOn = HymsonClock.Now(),
                             UserId = _currentEquipment.Name

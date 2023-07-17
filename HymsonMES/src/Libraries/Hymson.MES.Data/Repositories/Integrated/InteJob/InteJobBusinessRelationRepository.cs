@@ -2,6 +2,7 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -51,6 +52,17 @@ namespace Hymson.MES.Data.Repositories.Integrated
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<InteJobBusinessRelationEntity>(GetByJobIdsSql, new { jobIds = jobIds });
+        }
+
+        /// <summary>
+        /// 更具业务id获取job
+        /// </summary>
+        /// <param name="businessId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteJobBusinessRelationEntity>> GetByJobByBusinessIdAsync(InteJobBusinessRelationByBusinessIdQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<InteJobBusinessRelationEntity>(GetByJobBybusinessIdSql, query);
         }
 
         /// <summary>
@@ -215,6 +227,9 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string GetByJobIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `BusinessType`, `BusinessId`, `OrderNumber`, `JobId`, `IsUse`, `Parameter`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `inte_job_business_relation`  WHERE JobId IN @jobIds ";
+        const string GetByJobBybusinessIdSql = @"SELECT 
+                                          `Id`, `SiteId`, `BusinessType`, `BusinessId`, `OrderNumber`, `JobId`, `IsUse`, `Parameter`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `inte_job_business_relation`  WHERE BusinessId = @BusinessId AND  AND LinkPoint=@LinkPoint IsDeleted=0";
     }
 
 }
