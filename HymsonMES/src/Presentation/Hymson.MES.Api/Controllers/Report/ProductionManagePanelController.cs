@@ -334,7 +334,7 @@ namespace Hymson.MES.Api.Controllers.Report
                     ProccessCode = "TEST" + dayStr,
                     ProcessName = "测试工序" + i.ToString(),
                     YieldQty = randomInRange,
-                    YieldRate = (decimal)((100 / randomInRange) * 0.01)
+                    YieldRate = randomInRange
                 };
                 yieldRateDtos.Add(processYieldRate);
             }
