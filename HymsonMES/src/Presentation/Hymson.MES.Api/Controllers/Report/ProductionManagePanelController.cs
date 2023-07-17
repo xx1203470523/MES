@@ -174,7 +174,7 @@ namespace Hymson.MES.Api.Controllers.Report
         }
 
         /// <summary>
-        /// 获取工艺路线稼动率
+        /// 获取工序稼动率
         /// </summary>
         /// <returns></returns>
         [HttpGet]
@@ -252,5 +252,60 @@ namespace Hymson.MES.Api.Controllers.Report
             };
             return Task.FromResult(processUtilizationRateDtos);
         }
+
+        /// <summary>
+        /// 获取设备性能稼动率
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getEquipmentUtilizationRate")]
+        public Task<IEnumerable<EquipmentUtilizationRateDto>> GetEquipmentUtilizationRateAsync()
+        {
+            IEnumerable<EquipmentUtilizationRateDto> equipmentUtilizationRateDtos = new List<EquipmentUtilizationRateDto>()
+            {
+                new EquipmentUtilizationRateDto {
+                    EquipmentCode="AN001",
+                    EquipmentName="电芯分档设备",
+                    UtilizationRate=10
+                },
+                new EquipmentUtilizationRateDto {
+                    EquipmentCode="AN002",
+                    EquipmentName="电芯堆叠设备",
+                    UtilizationRate=60
+                },
+                new EquipmentUtilizationRateDto {
+                    EquipmentCode="AN003",
+                    EquipmentName="烤炉",
+                    UtilizationRate=40
+                },
+                new EquipmentUtilizationRateDto {
+                    EquipmentCode="AN004",
+                    EquipmentName="机型绝缘检测",
+                    UtilizationRate=80
+                },
+                new EquipmentUtilizationRateDto {
+                    EquipmentCode="AN005",
+                    EquipmentName="极柱清洗",
+                    UtilizationRate=50
+                },
+                new EquipmentUtilizationRateDto {
+                    EquipmentCode="AN006",
+                    EquipmentName="焊接",
+                    UtilizationRate=30
+                },
+                new EquipmentUtilizationRateDto {
+                    EquipmentCode="AN007",
+                    EquipmentName="DCIR测试",
+                    UtilizationRate=70
+                },
+                new EquipmentUtilizationRateDto {
+                    EquipmentCode="AN008",
+                    EquipmentName="捆扎",
+                    UtilizationRate=90
+                }
+            };
+            return Task.FromResult(equipmentUtilizationRateDtos);
+        }
+
     }
 }

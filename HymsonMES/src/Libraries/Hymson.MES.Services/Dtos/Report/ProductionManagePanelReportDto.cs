@@ -134,4 +134,23 @@ namespace Hymson.MES.Services.Dtos.Report
         /// </summary>
         public decimal UtilizationRate { get; set; }
     }
+
+    /// <summary>
+    /// 设备性能稼动率Dto
+    /// </summary>
+    public record EquipmentUtilizationRateDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 设备编码
+        /// </summary>
+        public string EquipmentCode { get; set; }
+        /// <summary>
+        /// 设备名称
+        /// </summary>
+        public string EquipmentName { get; set; }
+        /// <summary>
+        /// 稼动率
+        /// </summary>
+        public decimal UtilizationRate { get; set; }
+    }
 }
