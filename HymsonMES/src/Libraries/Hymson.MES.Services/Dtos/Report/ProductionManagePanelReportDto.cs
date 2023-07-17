@@ -153,4 +153,61 @@ namespace Hymson.MES.Services.Dtos.Report
         /// </summary>
         public decimal UtilizationRate { get; set; }
     }
+
+    /// <summary>
+    /// 工序良品率
+    /// </summary>
+    public record ProcessYieldRateDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string ProccessCode { get; set; }
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string ProcessName { get; set; }
+
+        /// <summary>
+        /// 良品率
+        /// </summary>
+        public decimal YieldRate { get; set; }
+
+        /// <summary>
+        /// 良品数量
+        /// </summary>
+        public decimal YieldQty { get; set; }
+
+        /// <summary>
+        /// 当月日期
+        /// 如01,02
+        /// </summary>
+        public string Day { get; set; }
+    }
+
+    /// <summary>
+    /// 工序指数
+    /// </summary>
+    public record ProcessIndicatorsDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string ProccessCode { get; set; }
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string ProcessName { get; set; }
+
+        /// <summary>
+        /// 指数值
+        /// </summary>
+        public decimal Indicators { get; set; }
+        /// <summary>
+        /// 当月日期
+        /// 如01,02
+        /// </summary>
+        public string Day { get; set; }
+    }
+
 }

@@ -3,6 +3,7 @@ using Hymson.MES.Services.Services.Report;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MySqlX.XDevAPI.Common;
+using System;
 using System.Collections;
 using System.Data;
 using System.Dynamic;
@@ -307,5 +308,69 @@ namespace Hymson.MES.Api.Controllers.Report
             return Task.FromResult(equipmentUtilizationRateDtos);
         }
 
+        /// <summary>
+        /// 获取工序良品率波动
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getProcessYieldRate")]
+        public Task<List<ProcessYieldRateDto>> GetProcessYieldRateAsync()
+        {
+            List<ProcessYieldRateDto> yieldRateDtos = new List<ProcessYieldRateDto>();
+            int year = DateTime.Now.Year;
+            int month = DateTime.Now.Month;
+            int daysInMonth = DateTime.DaysInMonth(year, month);
+            for (int i = 1; i <= daysInMonth; i++)
+            {
+                var dayStr = i < 10 ? i.ToString().PadLeft(2, '0') : i.ToString();
+                Random random = new Random(i);
+                int minValue = 1;
+                int maxValue = 100;
+                int randomInRange = random.Next(minValue, maxValue + 1);
+
+                var processYieldRate = new ProcessYieldRateDto
+                {
+                    Day = dayStr,
+                    ProccessCode = "TEST" + dayStr,
+                    ProcessName = "测试工序" + i.ToString(),
+                    YieldQty = randomInRange,
+                    YieldRate = (decimal)((100 / randomInRange) * 0.01)
+                };
+                yieldRateDtos.Add(processYieldRate);
+            }
+            return Task.FromResult(yieldRateDtos);
+        }
+
+        /// <summary>
+        /// 获取工序指数
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getProcessIndicators")]
+        public Task<List<ProcessIndicatorsDto>> GetProcessIndicatorsAsync()
+        {
+            List<ProcessIndicatorsDto> indicatorsDtos = new List<ProcessIndicatorsDto>();
+            int year = DateTime.Now.Year;
+            int month = DateTime.Now.Month;
+            int daysInMonth = DateTime.DaysInMonth(year, month);
+            for (int i = 1; i <= daysInMonth; i++)
+            {
+                var dayStr = i < 10 ? i.ToString().PadLeft(2, '0') : i.ToString();
+                Random random = new Random(i);
+                int minValue = 1;
+                int maxValue = 100;
+                int randomInRange = random.Next(minValue, maxValue + 1);
+
+                var processIndicators = new ProcessIndicatorsDto
+                {
+                    Day = dayStr,
+                    ProccessCode = "TEST" + dayStr,
+                    ProcessName = "测试工序" + i.ToString(),
+                    Indicators = randomInRange
+                };
+                indicatorsDtos.Add(processIndicators);
+            }
+            return Task.FromResult(indicatorsDtos);
+        }
     }
 }
