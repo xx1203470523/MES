@@ -172,13 +172,17 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var updatedOn = HymsonClock.Now();
 
             // 读取条码信息
-            var manuSfcEntities = await _masterDataService.GetManuSFCEntitiesWithNullCheck(bo);
+            var manuSfcEntitiesTask = _masterDataService.GetManuSFCEntitiesWithNullCheck(bo);
 
             // 读取产品基础信息
-            var procMaterialEntity = await _masterDataService.GetProcMaterialEntityWithNullCheck(firstProduceEntity.ProductId);
+            var procMaterialEntityTask = _masterDataService.GetProcMaterialEntityWithNullCheck(firstProduceEntity.ProductId);
 
             // 读取当前工艺路线信息
-            var procProcessRouteEntity = await _masterDataService.GetProcProcessRouteEntityWithNullCheck(firstProduceEntity.ProcessRouteId);
+            var procProcessRouteEntityTask = _masterDataService.GetProcProcessRouteEntityWithNullCheck(firstProduceEntity.ProcessRouteId);
+
+            var manuSfcEntities = await manuSfcEntitiesTask;
+            var procMaterialEntity = await procMaterialEntityTask;
+            var procProcessRouteEntity = await procProcessRouteEntityTask;
 
             // 合格品出站
             // 获取下一个工序（如果没有了，就表示完工）
@@ -396,21 +400,22 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 }
             }
 
-            /*
             // 更新数据
             List<Task<int>> tasks = new();
 
+            /*
             // 添加流转记录
             if (data.ManuSfcCirculationEntities.Any())
             {
                 tasks.Add(_manuSfcCirculationRepository.InsertRangeAsync(data.ManuSfcCirculationEntities));
             }
-
+            
             // 插入 manu_sfc_step
             if (data.SFCStepEntities.Any())
             {
                 tasks.Add(_manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities));
             }
+            */
 
             // 完工
             if (data.IsCompleted)
@@ -421,14 +426,16 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     // 删除 manu_sfc_produce
                     tasks.Add(_manuSfcProduceRepository.DeletePhysicalRangeAsync(data.DeletePhysicalBySfcsCommand));
 
+                    /*
                     // 删除 manu_sfc_produce_business
-                    //tasks.Add(_manuSfcProduceRepository.DeleteSfcProduceBusinessBySfcInfoIdsAsync(data.DeleteSfcProduceBusinesssBySfcInfoIdsCommand));
+                    tasks.Add(_manuSfcProduceRepository.DeleteSfcProduceBusinessBySfcInfoIdsAsync(data.DeleteSfcProduceBusinesssBySfcInfoIdsCommand));
 
                     // 更新完工数量
                     tasks.Add(_planWorkOrderRepository.UpdateFinishProductQuantityByWorkOrderIdAsync(data.UpdateQtyCommand));
 
                     // manu_sfc_info 修改为完成 且入库
                     tasks.Add(_manuSfcRepository.MultiUpdateSfcStatusAsync(data.MultiSFCUpdateStatusCommand));
+                    */
 
                     //// 2023.05.29 克明说不在这里更新完成时间
                     //// 更新工单统计表的 RealEnd
@@ -439,9 +446,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     //    WorkOrderIds = new long[] { sfcProduceEntity.WorkOrderId }
                     //});
 
+                    /*
                     // 入库
                     tasks.Add(_whMaterialInventoryRepository.InsertsAsync(data.WhMaterialInventoryEntities));
                     tasks.Add(_whMaterialStandingbookRepository.InsertsAsync(data.WhMaterialStandingbookEntities));
+                    */
                 }
             }
             // 未完工
@@ -460,7 +469,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 { "NextProcedureCode", $"{data.NextProcedureCode}" },
             };
             //trans.Complete();
-            */
 
             return responseBo;
         }
