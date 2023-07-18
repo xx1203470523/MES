@@ -303,7 +303,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> DeleteRangeAsync(IEnumerable<long> ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteRangeSql, new { ids = ids });
+            return await conn.ExecuteAsync(DeleteRangeSql, new { ids });
         }
 
         /// <summary>
@@ -326,6 +326,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeletePhysicalRangeSql, sfcsCommand);
+        }
+
+        /// <summary>
+        /// 批量删除（物理删除）条码信息
+        /// </summary>
+        /// <param name="sfcs"></param>
+        /// <returns></returns>
+        public async Task<int> DeletePhysicalRangeByIdsSqlAsync(DeletePhysicalByProduceIdsCommand idsCommand)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeletePhysicalRangeByIdsSql, idsCommand);
         }
 
         /// <summary>
@@ -600,6 +611,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetBySFCSql = @"SELECT * FROM manu_sfc_produce WHERE SFC = @Sfc and SiteId=@SiteId ";
         const string DeletePhysicalSql = "DELETE FROM manu_sfc_produce WHERE SFC = @Sfc and SiteId=@SiteId ";
         const string DeletePhysicalRangeSql = "DELETE FROM manu_sfc_produce WHERE SiteId = @SiteId AND SFC IN @Sfcs ";
+        const string DeletePhysicalRangeByIdsSql = "DELETE FROM manu_sfc_produce WHERE SiteId = @SiteId AND Id IN @Ids ";
         const string DeleteSfcProduceBusinessBySfcInfoIdSql = "DELETE FROM manu_sfc_produce_business WHERE SiteId = @SiteId AND SfcProduceId = @SfcInfoId";
         const string DeleteSfcProduceBusinessBySfcInfoIdsSql = "DELETE FROM manu_sfc_produce_business WHERE SiteId = @SiteId AND SfcProduceId IN @SfcInfoIds";
         const string RealDeletesSfcProduceBusinessSql = "DELETE FROM manu_sfc_produce_business WHERE SfcProduceId IN @SfcInfoIds AND BusinessType=@BusinessType";

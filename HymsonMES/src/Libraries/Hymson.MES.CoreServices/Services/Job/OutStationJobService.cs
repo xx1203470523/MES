@@ -159,7 +159,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             OutStationResponseBo responseBo = new();
 
             // 获取生产条码信息
-            var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, bo);
+            var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
 
             if (sfcProduceEntities == null || sfcProduceEntities.Any() == false) return default;
             responseBo.SFCProduceEntities = sfcProduceEntities.AsList();
@@ -193,8 +193,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 responseBo.NextProcedureCode = nextProcedure.Code;
             }
 
-            // 扣料
-            //await func(sfcProduceEntity.ProductBOMId, sfcProduceEntity.ProcedureId);
+            // 组合物料数据
             var initialMaterials = await bo.Proxy.GetValueAsync(_masterDataService.GetInitialMaterialsAsync, firstProduceEntity);
             if (initialMaterials == null) return default;
 
@@ -311,10 +310,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 };
 
                 // 删除 manu_sfc_produce
-                responseBo.DeletePhysicalBySfcsCommand = new DeletePhysicalBySfcsCommand
+                responseBo.DeletePhysicalByProduceIdsCommand = new DeletePhysicalByProduceIdsCommand
                 {
                     SiteId = bo.SiteId,
-                    Sfcs = responseBo.SFCProduceEntities.Select(s => s.SFC)
+                    Ids = responseBo.SFCProduceEntities.Select(s => s.Id)
                 };
 
                 // manu_sfc_info 修改为完成 且入库
@@ -325,7 +324,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     UpdatedOn = updatedOn,
                     Status = SfcStatusEnum.Complete,
                     SFCs = manuSfcEntities.Select(s => s.SFC)
-
                 };
 
                 // 入库
@@ -424,7 +422,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 if (data.ProcessRouteType == ProcessRouteTypeEnum.ProductionRoute)
                 {
                     // 删除 manu_sfc_produce
-                    tasks.Add(_manuSfcProduceRepository.DeletePhysicalRangeAsync(data.DeletePhysicalBySfcsCommand));
+                    tasks.Add(_manuSfcProduceRepository.DeletePhysicalRangeByIdsSqlAsync(data.DeletePhysicalByProduceIdsCommand));
 
                     /*
                     // 删除 manu_sfc_produce_business

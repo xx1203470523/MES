@@ -120,7 +120,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (bo == null) return default;
 
             // 获取生产条码信息
-            var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, bo);
+            var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
 
             if (sfcProduceEntities == null || sfcProduceEntities.Any() == false) return default;
             var entities = sfcProduceEntities.AsList();

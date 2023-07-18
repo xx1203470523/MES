@@ -132,6 +132,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> DeletePhysicalRangeAsync(DeletePhysicalBySfcsCommand sfcsCommand);
 
         /// <summary>
+        /// 批量删除（物理删除）条码信息
+        /// </summary>
+        /// <param name="sfcs"></param>
+        /// <returns></returns>
+        Task<int> DeletePhysicalRangeByIdsSqlAsync(DeletePhysicalByProduceIdsCommand idsCommand);
+
+        /// <summary>
         /// 批量更新条码IsScrap
         /// </summary>
         /// <param name="manuSfcInfoEntity"></param>

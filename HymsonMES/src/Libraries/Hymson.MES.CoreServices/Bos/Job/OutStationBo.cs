@@ -70,7 +70,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 
         /// </summary>
-        public DeletePhysicalBySfcsCommand DeletePhysicalBySfcsCommand { get; set; } = new();
+        public DeletePhysicalByProduceIdsCommand DeletePhysicalByProduceIdsCommand { get; set; } = new();
 
         /// <summary>
         /// 
