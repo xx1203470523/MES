@@ -85,6 +85,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, bo);
             if (sfcProduceEntities == null || sfcProduceEntities.Any() == false) return;
 
+            // 判断条码锁状态
             var sfcProduceBusinessEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, bo);
 
             // 合法性校验

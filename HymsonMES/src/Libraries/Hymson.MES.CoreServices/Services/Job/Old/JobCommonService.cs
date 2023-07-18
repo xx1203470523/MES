@@ -78,6 +78,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         {
             // 获取所有实现类
             var services = _serviceProvider.GetServices<IJobManufactureService>();
+            //var services = _serviceProvider.GetServices<IJobService>();
             return await Task.FromResult(services.Select(s =>
             {
                 var type = s.GetType();
