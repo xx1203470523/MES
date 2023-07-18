@@ -435,7 +435,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
                     // manu_sfc_info 修改为完成 且入库
                     tasks.Add(_manuSfcRepository.MultiUpdateSfcStatusAsync(data.MultiSFCUpdateStatusCommand));
-                    */
 
                     //// 2023.05.29 克明说不在这里更新完成时间
                     //// 更新工单统计表的 RealEnd
@@ -446,7 +445,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     //    WorkOrderIds = new long[] { sfcProduceEntity.WorkOrderId }
                     //});
 
-                    /*
                     // 入库
                     tasks.Add(_whMaterialInventoryRepository.InsertsAsync(data.WhMaterialInventoryEntities));
                     tasks.Add(_whMaterialStandingbookRepository.InsertsAsync(data.WhMaterialStandingbookEntities));
