@@ -21,7 +21,7 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 日电芯消耗数量
         /// 计算首工序进站电芯
         /// </summary>
-        public int DayConsume { get; set; }
+        public decimal DayConsume { get; set; }
         /// <summary>
         /// 线体名称
         /// </summary>
@@ -54,22 +54,22 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 工单数量
         /// </summary>
-        public int WorkOrderQty { get; set; }
+        public decimal WorkOrderQty { get; set; }
 
         /// <summary>
         /// 完工数量
         /// </summary>
-        public int CompletedQty { get; set; }
+        public decimal CompletedQty { get; set; }
 
         /// <summary>
         /// 不良数量
         /// </summary>
-        public int UnqualifiedQty { get; set; }
+        public decimal UnqualifiedQty { get; set; }
 
         /// <summary>
         /// 不良率
         /// </summary>
-        public int UnqualifiedRate { get; set; }
+        public decimal UnqualifiedRate { get; set; }
 
         /// <summary>
         /// 产品编码
@@ -82,7 +82,7 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 投入数量
         /// </summary>
-        public int InputQty { get; set; }
+        public decimal InputQty { get; set; }
     }
 
     /// <summary>

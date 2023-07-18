@@ -257,7 +257,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                     ProcedureId = sfcProduceEntity.ProcedureId,
                     ResourceId = sfcProduceEntity.ResourceId,
                     SFC = sfcCirculationBindDto.SFC,
-                    Name = sfcCirculationBindDto.Name,
+                    Name = string.Empty,
                     WorkOrderId = sfcProduceEntity.WorkOrderId,
                     ProductId = sfcProduceEntity.ProductId,
                     EquipmentId = _currentEquipment.Id,
