@@ -2,7 +2,6 @@
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Process;
-using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
@@ -28,7 +27,6 @@ using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.Sequences;
 using Hymson.Snowflake;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Hymson.MES.CoreServices.Services.Common.MasterData
 {
@@ -777,9 +775,10 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <returns></returns>
         public async Task<IEnumerable<JobBo>?> GetJobRalationJobByProcedureIdOrResourceId(JobRelationBo param)
         {
-            var InteJobBusinessRelations = await _inteJobBusinessRelationRepository.GetByJobByBusinessIdAsync(new InteJobBusinessRelationByBusinessIdQuery { 
-            BusinessId= param.ResourceId,
-            LinkPoint= param.LinkPoint
+            var InteJobBusinessRelations = await _inteJobBusinessRelationRepository.GetByJobByBusinessIdAsync(new InteJobBusinessRelationByBusinessIdQuery
+            {
+                BusinessId = param.ResourceId,
+                LinkPoint = param.LinkPoint
             });
             if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any())
             {
@@ -791,7 +790,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             }
             if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any())
             {
-
                 return null;
             }
             else
