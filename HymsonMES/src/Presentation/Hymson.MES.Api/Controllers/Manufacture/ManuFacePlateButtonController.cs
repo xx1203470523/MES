@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
+using Hymson.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -137,6 +138,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [AllowAnonymous]
         public async Task<Dictionary<string, JobResponseDto>> OutStationAsync(ButtonRequestDto dto)
         {
+            _logger.LogInformation($"魉 -> {dto.ToSerialize()}");
             return await _manuFacePlateButtonService.OutStationAsync(dto);
         }
 
