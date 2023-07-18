@@ -110,7 +110,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         #endregion
 
         /// <summary>
-        /// 
+        /// 获取载具验证
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -119,6 +119,18 @@ namespace Hymson.MES.Api.Controllers.Integrated
         public async Task<InteVehicleVerifyDto> QueryVehicleVerifyByVehicleIdAsync(long id) 
         {
             return await _inteVehicleService.QueryVehicleVerifyByVehicleIdAsync(id);
+        }
+
+        /// <summary>
+        /// 获取载具装载
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getVehicleFreightByVehicleId/{id}")]
+        public async Task<IEnumerable<InteVehicleFreightDto>> QueryVehicleFreightByVehicleIdAsync(long id)
+        {
+            return await _inteVehicleService.QueryVehicleFreightByVehicleIdAsync(id);
         }
     }
 }

@@ -98,6 +98,11 @@ namespace Hymson.MES.Data.Repositories.Integrated
             {
                 sqlBuilder.Where("v.Status=@Status");
             }
+            if (!string.IsNullOrWhiteSpace(query.VehicleTypeCode))
+            {
+                query.VehicleTypeCode = $"%{query.VehicleTypeCode}%";
+                sqlBuilder.Where("vt.Code LIKE @VehicleTypeCode");
+            }
 
             var offSet = (query.PageIndex - 1) * query.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -190,7 +195,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
                         v.*,vt.Code AS VehicleTypeCode,vt.Name AS VehicleTypeType  
                      FROM `inte_vehicle` v 
                      LEFT JOIN `inte_vehicle_type` vt ON vt.Id=v.VehicleTypeId
-                    /**where**/ LIMIT @Offset,@Rows ";
+                    /**where**/ ORDER BY v.UpdatedOn DESC LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = @"SELECT COUNT(*) 
                      FROM `inte_vehicle` v 
                      LEFT JOIN `inte_vehicle_type` vt ON vt.Id=v.VehicleTypeId 
