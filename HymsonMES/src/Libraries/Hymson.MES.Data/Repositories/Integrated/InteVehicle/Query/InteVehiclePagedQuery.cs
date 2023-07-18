@@ -21,5 +21,10 @@ namespace Hymson.MES.Data.Repositories.Integrated
         public string? Name { get; set; }
 
         public EnableEnum? Status { get; set; }
+
+        /// <summary>
+        /// 载具类型编码
+        /// </summary>
+        public string? VehicleTypeCode { get; set; }
     }
 }
