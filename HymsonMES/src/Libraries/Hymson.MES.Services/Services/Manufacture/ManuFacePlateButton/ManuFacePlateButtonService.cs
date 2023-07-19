@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 操作面板按钮    服务 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-04-01 02:58:19
- */
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -341,7 +334,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             // 是否清除条码
             if (buttonJobs.Any(a => a.IsClear) == true) dto.Param?.Add("IsClear", "True");
 
-            /*
             // 是否清除条码
             var isClear = false;
             if (buttonJobs.Any(a => a.IsClear) == true) isClear = true;
@@ -368,9 +360,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Time = item.Value.Time
                 });
             }
-            */
 
-            result = await _jobCommonService.ExecuteJobAsync(jobs, dto.Param);
+            //result = await _jobCommonService.ExecuteJobAsync(jobs, dto.Param);
             return result;
         }
 
