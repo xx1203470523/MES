@@ -121,9 +121,25 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("WorkOrderId = @WorkOrderId");
             }
-            if (manuSfcSummaryQuery.SFCS.Any())
+            if (manuSfcSummaryQuery.SFCS != null && manuSfcSummaryQuery.SFCS.Any())
             {
                 sqlBuilder.Where("SFC IN @SFCS");
+            }
+            if (manuSfcSummaryQuery.FirstQualityStatus.HasValue)
+            {
+                sqlBuilder.Where("FirstQualityStatus = @FirstQualityStatus");
+            }
+            if (manuSfcSummaryQuery.QualityStatus.HasValue)
+            {
+                sqlBuilder.Where("QualityStatus = @QualityStatus");
+            }
+            if (manuSfcSummaryQuery.StartTime.HasValue)
+            {
+                sqlBuilder.Where("CreatedOn >= @StartTime");
+            }
+            if (manuSfcSummaryQuery.EndTime.HasValue)
+            {
+                sqlBuilder.Where("CreatedOn < @EndTime");
             }
             using var conn = GetMESDbConnection();
             var manuSfcSummaryEntities = await conn.QueryAsync<ManuSfcSummaryEntity>(template.RawSql, manuSfcSummaryQuery);

@@ -25,36 +25,36 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 线体名称
         /// </summary>
-        public string WorkLineName { get; set; }
+        public string? WorkLineName { get; set; }
         /// <summary>
         /// 完成率
         /// </summary>
         public decimal CompletedRate { get; set; }
 
         /// <summary>
-        /// true白班，false夜班
+        /// 1白班，0夜班
         /// </summary>
         public int DayShift { get; set; }
         /// <summary>
         /// 工艺路线编码
         /// </summary>
-        public string ProcessRouteCode { get; set; }
+        public string? ProcessRouteCode { get; set; }
         /// <summary>
         /// 工艺路线名称
         /// </summary>
-        public string ProcessRouteName { get; set; }
+        public string? ProcessRouteName { get; set; }
         /// <summary>
         /// 工单下达时间
         /// </summary>
-        public DateTime WorkOrderDownTime { get; set; }
+        public DateTime? WorkOrderDownTime { get; set; }
         /// <summary>
         /// 工单号
         /// </summary>
-        public string WorkOrderCode { get; set; }
+        public string? WorkOrderCode { get; set; }
         /// <summary>
         /// 工单数量
         /// </summary>
-        public decimal WorkOrderQty { get; set; }
+        public decimal? WorkOrderQty { get; set; }
 
         /// <summary>
         /// 完工数量
@@ -74,15 +74,15 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 产品编码
         /// </summary>
-        public string ProductCode { get; set; }
+        public string? ProductCode { get; set; }
         /// <summary>
         /// 产品名称
         /// </summary>
-        public string ProductName { get; set; }
+        public string? ProductName { get; set; }
         /// <summary>
         /// 投入数量
         /// </summary>
-        public decimal InputQty { get; set; }
+        public decimal? InputQty { get; set; }
     }
 
     /// <summary>

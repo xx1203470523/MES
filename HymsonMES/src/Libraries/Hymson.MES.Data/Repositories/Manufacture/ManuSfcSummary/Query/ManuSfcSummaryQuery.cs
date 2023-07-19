@@ -17,7 +17,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 站点ID
         /// </summary>
         public long SiteId { get; set; }
-
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long? ProcedureId { get; set; }
         /// <summary>
         /// 设备ID
         /// </summary>
@@ -31,6 +34,27 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 条码
         /// </summary>
-        public string[] SFCS { get;set; }
+        public string[] SFCS { get; set; }
+
+        /// <summary>
+        /// 最终状态
+        /// </summary>
+        public int? QualityStatus { get; set; }
+
+        /// <summary>
+        /// 第一次合格状态
+        /// </summary>
+        public int? FirstQualityStatus { get; set; }
+
+        /// <summary>
+        ///生产开始时间
+        ///CreatedOn
+        /// </summary>
+        public DateTime? StartTime { get; set; }
+        /// <summary>
+        ///生产结束时间
+        ///CreatedOn
+        /// </summary>
+        public DateTime? EndTime { get; set; }
     }
 }

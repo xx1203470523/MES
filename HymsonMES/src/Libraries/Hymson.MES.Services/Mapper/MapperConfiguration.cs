@@ -599,6 +599,10 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<PlanWorkOrderListDetailView, ProductTracePlanWorkOrderViewDto>();
             #endregion
 
+            #region ProductionManagePanel
+
+            #endregion
+
         }
 
         /// <summary>
