@@ -191,5 +191,27 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             return managePanelReportDto;
         }
 
+        /// <summary>
+        /// 时间段定义
+        /// </summary>
+        private static List<ProductionManagePanelModuleRangeDto> DateTimeRanges = new List<ProductionManagePanelModuleRangeDto> {
+            new ProductionManagePanelModuleRangeDto
+            {
+                Sort=1,
+                DateTimeRange="08:30-10:30",
+                StartTime= new TimeSpan(8, 30, 0),
+                EndTime = new TimeSpan(10, 30,0)
+            }
+        };
+        /// <summary>
+        /// 获取模组达成信息
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        public async Task<ProductionManagePanelModuleDto> GetModuleAchievingInfoAsync(long siteId)
+        {
+            return new ProductionManagePanelModuleDto();
+        }
+
     }
 }

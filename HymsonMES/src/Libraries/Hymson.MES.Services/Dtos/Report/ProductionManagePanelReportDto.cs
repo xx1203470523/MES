@@ -86,9 +86,31 @@ namespace Hymson.MES.Services.Dtos.Report
     }
 
     /// <summary>
-    /// Pack信息Dto
+    /// 模组信息统计区间Dto
     /// </summary>
-    public record ProductionManagePanelPackDto : BaseEntityDto
+    public class ProductionManagePanelModuleRangeDto
+    {
+        /// <summary>
+        /// 排序字段
+        /// </summary>
+        public int Sort { get; set; }
+        /// <summary>
+        /// 描述
+        /// </summary>
+        public string DateTimeRange { get; set; }
+        /// <summary>
+        /// 开始时间
+        /// </summary>
+        public TimeSpan StartTime { get; set; }
+        /// <summary>
+        /// 结束时间
+        /// </summary>
+        public TimeSpan EndTime { get; set; }
+    }
+    /// <summary>
+    /// 模组信息Dto
+    /// </summary>
+    public record ProductionManagePanelModuleDto : BaseEntityDto
     {
         /// <summary>
         /// 排序字段

@@ -7,6 +7,17 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
     /// </summary>
     public interface IProductionManagePanelService
     {
+        /// <summary>
+        /// 获取综合信息
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
         Task<ProductionManagePanelReportDto?> GetOverallInfoAsync(long siteId);
+        /// <summary>
+        /// 获取模组达成信息
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        Task<ProductionManagePanelModuleDto> GetModuleAchievingInfoAsync(long siteId);
     }
 }

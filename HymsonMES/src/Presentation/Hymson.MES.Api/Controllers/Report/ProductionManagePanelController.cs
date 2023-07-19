@@ -1,10 +1,7 @@
 ﻿using Hymson.MES.Services.Dtos.Report;
-using Hymson.MES.Services.Services.Report;
 using Hymson.MES.Services.Services.Report.ProductionManagePanel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MySqlX.XDevAPI.Common;
-using System;
 using System.Collections;
 using System.Data;
 using System.Dynamic;
@@ -36,16 +33,16 @@ namespace Hymson.MES.Api.Controllers.Report
         }
 
         /// <summary>
-        /// 获取当天Pack达成数据
+        /// 获取当天模组达成数据
         /// </summary>
         /// <returns></returns>
         [HttpGet]
         [Route("getPackAchievingInfo")]
-        public Task<IEnumerable<ProductionManagePanelPackDto>> GetPackAchievingInfoAsync()
+        public Task<IEnumerable<ProductionManagePanelModuleDto>> GetPackAchievingInfoAsync()
         {
-            IEnumerable<ProductionManagePanelPackDto> result = new List<ProductionManagePanelPackDto>
+            IEnumerable<ProductionManagePanelModuleDto> result = new List<ProductionManagePanelModuleDto>
             {
-                new ProductionManagePanelPackDto()
+                new ProductionManagePanelModuleDto()
                 {
                     Sort=1,
                     DateTimeRange = "08:30-10:30",
@@ -53,7 +50,7 @@ namespace Hymson.MES.Api.Controllers.Report
                     TargetQty = 100,
                     AchievingRate = 25,
                 },
-                new ProductionManagePanelPackDto()
+                new ProductionManagePanelModuleDto()
                 {
                     Sort=2,
                     DateTimeRange = "10:30-12:30",
@@ -61,7 +58,7 @@ namespace Hymson.MES.Api.Controllers.Report
                     TargetQty = 50,
                     AchievingRate = 15,
                 },
-                new ProductionManagePanelPackDto()
+                new ProductionManagePanelModuleDto()
                 {
                     Sort=3,
                     DateTimeRange = "12:30-14:30",
@@ -69,7 +66,7 @@ namespace Hymson.MES.Api.Controllers.Report
                     TargetQty = 90,
                     AchievingRate = 90,
                 },
-                new ProductionManagePanelPackDto()
+                new ProductionManagePanelModuleDto()
                 {
                     Sort=4,
                     DateTimeRange = "14:30-16:30",
@@ -77,7 +74,7 @@ namespace Hymson.MES.Api.Controllers.Report
                     TargetQty = 100,
                     AchievingRate = 10,
                 },
-                new ProductionManagePanelPackDto()
+                new ProductionManagePanelModuleDto()
                 {
                     Sort=5,
                     DateTimeRange = "16:30-18:30",
@@ -90,7 +87,7 @@ namespace Hymson.MES.Api.Controllers.Report
             return Task.FromResult(result);
         }
         /// <summary>
-        /// 获取Pack详细信息
+        /// 获取模组达成详细信息
         /// </summary>
         /// <returns></returns>
         [HttpGet]
