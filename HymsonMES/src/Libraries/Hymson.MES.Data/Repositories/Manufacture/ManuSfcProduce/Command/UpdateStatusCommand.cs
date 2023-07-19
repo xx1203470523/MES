@@ -42,7 +42,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
         ///Id
         /// </summary>
         [Condition]
-        [Ignore] 
+        [Ignore]
+        [Field("Id")]
         public IEnumerable<long> Ids { get; set; }
 
         /// <summary>
