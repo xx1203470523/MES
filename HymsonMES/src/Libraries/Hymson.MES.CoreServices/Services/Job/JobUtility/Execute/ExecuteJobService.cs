@@ -41,7 +41,6 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
             // 寻找关联点
             foreach (var job in jobBos)
             {
-                /*
                 var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
                 if (service == null) continue;
 
@@ -50,15 +49,14 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
                 {
                     execJobBos.AddRange(beforeJobs);
                 }
-                */
+
                 execJobBos.Add(job);
-                /*
+
                 var afterJobs = await service.AfterExecuteAsync(param);
                 if (afterJobs != null && afterJobs.Any())
                 {
                     execJobBos.AddRange(afterJobs);
                 }
-                */
             }
 
             // 执行参数校验
