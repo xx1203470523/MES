@@ -1,5 +1,7 @@
-﻿using Dapper;
+﻿using Confluent.Kafka;
+using Dapper;
 using Hymson.Infrastructure.Exceptions;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
@@ -18,6 +20,7 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using ErrorCode = Hymson.MES.Core.Constants.ErrorCode;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -57,7 +60,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly ILocalizationService _localizationService;
 
         /// <summary>
         /// 构造函数
@@ -68,12 +74,14 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="manuSfcStepRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
+        /// <param name="localizationService"></param>
         public InStationJobService(IManuCommonService manuCommonService,
             IMasterDataService masterDataService,
             IManuSfcRepository manuSfcRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcStepRepository manuSfcStepRepository,
-            IPlanWorkOrderRepository planWorkOrderRepository)
+            IPlanWorkOrderRepository planWorkOrderRepository,
+            ILocalizationService localizationService)
         {
             _manuCommonService = manuCommonService;
             _masterDataService = masterDataService;
@@ -81,6 +89,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
+            _localizationService = localizationService;
         }
 
         /// <summary>
@@ -120,14 +129,17 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var bo = param.ToBo<InStationRequestBo>();
             if (bo == null) return default;
 
+            // 待执行的命令
+            InStationResponseBo responseBo = new();
+
             // 获取生产条码信息
             var sfcProduceEntities = await bo.Proxy.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
 
             if (sfcProduceEntities == null || sfcProduceEntities.Any() == false) return default;
             var entities = sfcProduceEntities.AsList();
 
-            var firstProduceEntity = entities.FirstOrDefault();
-            if (firstProduceEntity == null) return default;
+            responseBo.FirstSFCProduceEntity = entities.FirstOrDefault();
+            if (responseBo.FirstSFCProduceEntity == null) return default;
 
             // 更新时间
             var updatedBy = bo.UserName;
@@ -139,17 +151,17 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 var processRouteId = (long)parameters[0];
                 var procedureId = (long)parameters[1];
                 return await _masterDataService.IsFirstProcedureAsync(processRouteId, procedureId);
-            }, new object[] { firstProduceEntity.ProcessRouteId, firstProduceEntity.ProcedureId });
+            }, new object[] { responseBo.FirstSFCProduceEntity.ProcessRouteId, responseBo.FirstSFCProduceEntity.ProcedureId });
 
             // 获取当前工序信息
-            var procedureEntity = await _masterDataService.GetProcProcedureEntityWithNullCheck(firstProduceEntity.ProcedureId);
+            var procedureEntity = await _masterDataService.GetProcProcedureEntityWithNullCheck(responseBo.FirstSFCProduceEntity.ProcedureId);
 
             // 更新工单信息
             var updateQtyCommand = new UpdateQtyCommand
             {
                 UpdatedBy = updatedBy,
                 UpdatedOn = updatedOn,
-                WorkOrderId = firstProduceEntity.WorkOrderId
+                WorkOrderId = responseBo.FirstSFCProduceEntity.WorkOrderId
             };
 
             // 组装（进站数据）
@@ -161,8 +173,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 if (procedureEntity.Type == ProcedureTypeEnum.Test)
                 {
                     // 超过复投次数，标识为NG
-                    if (firstProduceEntity.RepeatedCount > procedureEntity.Cycle) throw new CustomerValidationException(nameof(ErrorCode.MES16036));
-                    firstProduceEntity.RepeatedCount++;
+                    if (responseBo.FirstSFCProduceEntity.RepeatedCount > procedureEntity.Cycle) throw new CustomerValidationException(nameof(ErrorCode.MES16036));
+                    responseBo.FirstSFCProduceEntity.RepeatedCount++;
                 }
 
                 /*
@@ -220,7 +232,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 ProcedureId = bo.ProcedureId,
                 ResourceId = bo.ResourceId,
                 Status = SfcProduceStatusEnum.Activity,
-                RepeatedCount = firstProduceEntity.RepeatedCount,
+                RepeatedCount = responseBo.FirstSFCProduceEntity.RepeatedCount,
                 UpdatedBy = updatedBy,
                 UpdatedOn = updatedOn
             };
@@ -257,9 +269,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 return responseBo;
             }
 
-            /*
             // 更新数据
-            List<Task> tasks = new();
+            List<Task<int>> tasks = new();
 
             // 插入 manu_sfc_step 状态为 进站
             var manuSfcStepTask = _manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities);
@@ -276,10 +287,18 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 更新工单的 InputQty
             var updateInputQtyByWorkOrderIdTask = _planWorkOrderRepository.UpdateInputQtyByWorkOrderIdAsync(data.UpdateQtyCommand);
             tasks.Add(updateInputQtyByWorkOrderIdTask);
-            
-            await Task.WhenAll(tasks);
-            */
 
+            // 等待所有任务完成
+            var rowArray = await Task.WhenAll(tasks);
+            responseBo.Rows += rowArray.Sum();
+
+            // 面板需要的数据
+            responseBo.Content = new Dictionary<string, string> {
+                { "PackageCom", "False" },
+                { "BadEntryCom", "False" },
+            };
+
+            responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18215), data.FirstSFCProduceEntity.SFC);
             return responseBo;
         }
 

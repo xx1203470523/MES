@@ -1,5 +1,7 @@
 ﻿using Dapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
@@ -80,6 +82,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         private readonly IWhMaterialStandingbookRepository _whMaterialStandingbookRepository;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly ILocalizationService _localizationService;
 
         /// <summary>
         /// 构造函数
@@ -94,6 +100,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="manuSfcCirculationRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="whMaterialStandingbookRepository"></param>
+        /// <param name="localizationService"></param>
         public OutStationJobService(IManuCommonService manuCommonService,
             IMasterDataService masterDataService,
             IPlanWorkOrderRepository planWorkOrderRepository,
@@ -103,7 +110,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             IManuSfcStepRepository manuSfcStepRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
-            IWhMaterialStandingbookRepository whMaterialStandingbookRepository)
+            IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
+            ILocalizationService localizationService)
         {
             _manuCommonService = manuCommonService;
             _masterDataService = masterDataService;
@@ -115,6 +123,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
+            _localizationService = localizationService;
         }
 
 
@@ -164,8 +173,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (sfcProduceEntities == null || sfcProduceEntities.Any() == false) return default;
             var entities = sfcProduceEntities.AsList();
 
-            var firstProduceEntity = entities.FirstOrDefault();
-            if (firstProduceEntity == null) return default;
+            responseBo.FirstSFCProduceEntity = entities.FirstOrDefault();
+            if (responseBo.FirstSFCProduceEntity == null) return default;
 
             // 更新时间
             var updatedBy = bo.UserName;
@@ -175,10 +184,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var manuSfcEntitiesTask = _masterDataService.GetManuSFCEntitiesWithNullCheck(bo);
 
             // 读取产品基础信息
-            var procMaterialEntityTask = _masterDataService.GetProcMaterialEntityWithNullCheck(firstProduceEntity.ProductId);
+            var procMaterialEntityTask = _masterDataService.GetProcMaterialEntityWithNullCheck(responseBo.FirstSFCProduceEntity.ProductId);
 
             // 读取当前工艺路线信息
-            var procProcessRouteEntityTask = _masterDataService.GetProcProcessRouteEntityWithNullCheck(firstProduceEntity.ProcessRouteId);
+            var procProcessRouteEntityTask = _masterDataService.GetProcProcessRouteEntityWithNullCheck(responseBo.FirstSFCProduceEntity.ProcessRouteId);
 
             var manuSfcEntities = await manuSfcEntitiesTask;
             var procMaterialEntity = await procMaterialEntityTask;
@@ -186,7 +195,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             // 合格品出站
             // 获取下一个工序（如果没有了，就表示完工）
-            var nextProcedure = await bo.Proxy.GetValueAsync(_masterDataService.GetNextProcedureAsync, firstProduceEntity);
+            var nextProcedure = await bo.Proxy.GetValueAsync(_masterDataService.GetNextProcedureAsync, responseBo.FirstSFCProduceEntity);
             if (nextProcedure != null)
             {
                 responseBo.IsCompleted = false;
@@ -194,7 +203,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }
 
             // 组合物料数据
-            var initialMaterials = await bo.Proxy.GetValueAsync(_masterDataService.GetInitialMaterialsAsync, firstProduceEntity);
+            var initialMaterials = await bo.Proxy.GetValueAsync(_masterDataService.GetInitialMaterialsAsync, responseBo.FirstSFCProduceEntity);
             if (initialMaterials == null) return default;
 
             // 物料ID集合
@@ -203,7 +212,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 读取物料加载数据（批量）
             var allFeedingEntities = await bo.Proxy.GetValueAsync(_manuFeedingRepository.GetByResourceIdAndMaterialIdsWithOutZeroAsync, new GetByResourceIdAndMaterialIdsQuery
             {
-                ResourceId = firstProduceEntity.ResourceId ?? 0,
+                ResourceId = responseBo.FirstSFCProduceEntity.ResourceId ?? 0,
                 MaterialIds = materialIds
             });
 
@@ -226,7 +235,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 if (materialBo.DataCollectionWay == MaterialSerialNumberEnum.Batch)
                 {
                     // 进行扣料
-                    _masterDataService.DeductMaterialQty(ref updates, ref adds, ref residue, firstProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
+                    _masterDataService.DeductMaterialQty(ref updates, ref adds, ref residue, responseBo.FirstSFCProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
                     continue;
                 }
 
@@ -234,7 +243,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 if (materialBo.SerialNumber != MaterialSerialNumberEnum.Batch) continue;
 
                 // 进行扣料
-                _masterDataService.DeductMaterialQty(ref updates, ref adds, ref residue, firstProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
+                _masterDataService.DeductMaterialQty(ref updates, ref adds, ref residue, responseBo.FirstSFCProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
             }
             responseBo.UpdateQtyByIdCommands = updates;
             responseBo.ManuSfcCirculationEntities = adds;
@@ -291,7 +300,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 {
                     UpdatedBy = updatedBy,
                     UpdatedOn = updatedOn,
-                    WorkOrderId = firstProduceEntity.WorkOrderId,
+                    WorkOrderId = responseBo.FirstSFCProduceEntity.WorkOrderId,
                     Qty = entities.Count
                 };
 
@@ -364,7 +373,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     ProcedureId = bo.ProcedureId,
                     ResourceId = bo.ResourceId,
                     Status = SfcProduceStatusEnum.lineUp,
-                    RepeatedCount = firstProduceEntity.RepeatedCount,
+                    RepeatedCount = responseBo.FirstSFCProduceEntity.RepeatedCount,
                     UpdatedBy = updatedBy,
                     UpdatedOn = updatedOn
                 };
@@ -393,8 +402,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             JobResponseBo responseBo = new();
             if (obj is not OutStationResponseBo data) return responseBo;
 
-            //using var trans = new TransactionScope();
-
             // 更新物料库存
             if (data.UpdateQtyByIdCommands.Any())
             {
@@ -412,19 +419,17 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 更新数据
             List<Task<int>> tasks = new();
 
-            /*
             // 添加流转记录
             if (data.ManuSfcCirculationEntities.Any())
             {
                 tasks.Add(_manuSfcCirculationRepository.InsertRangeAsync(data.ManuSfcCirculationEntities));
             }
-            
+
             // 插入 manu_sfc_step
             if (data.SFCStepEntities.Any())
             {
                 tasks.Add(_manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities));
             }
-            */
 
             // 完工
             if (data.IsCompleted)
@@ -435,7 +440,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     // 删除 manu_sfc_produce
                     tasks.Add(_manuSfcProduceRepository.DeletePhysicalRangeByIdsSqlAsync(data.DeletePhysicalByProduceIdsCommand));
 
-                    /*
                     // 删除 manu_sfc_produce_business
                     tasks.Add(_manuSfcProduceRepository.DeleteSfcProduceBusinessBySfcInfoIdsAsync(data.DeleteSfcProduceBusinesssBySfcInfoIdsCommand));
 
@@ -457,7 +461,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     // 入库
                     tasks.Add(_whMaterialInventoryRepository.InsertsAsync(data.WhMaterialInventoryEntities));
                     tasks.Add(_whMaterialStandingbookRepository.InsertsAsync(data.WhMaterialStandingbookEntities));
-                    */
                 }
             }
             // 未完工
@@ -471,12 +474,23 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var rowArray = await Task.WhenAll(tasks);
             responseBo.Rows += rowArray.Sum();
 
-            // 表示是尾工序
+            // 面板需要的参数
             responseBo.Content = new Dictionary<string, string> {
+                { "PackageCom", "False" },
+                { "BadEntryCom", "False" },
+                { "Qty", $"{data.SFCStepEntities.Count}" },
                 { "IsLastProcedure", $"{data.IsCompleted}" },
                 { "NextProcedureCode", $"{data.NextProcedureCode}" },
             };
-            //trans.Complete();
+
+            if (data.IsCompleted)
+            {
+                responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES16349), data.FirstSFCProduceEntity.SFC);
+            }
+            else
+            {
+                responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES16351), data.FirstSFCProduceEntity.SFC, data.NextProcedureCode);
+            }
 
             return responseBo;
         }

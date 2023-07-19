@@ -37,12 +37,14 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 
         /// </summary>
-        //public IEnumerable<ManuSfcProduceEntity> SFCProduceEntities { get; set; } = new List<ManuSfcProduceEntity>();
+        public ManuSfcProduceEntity FirstSFCProduceEntity { get; set; } = new();
 
+        /*
         /// <summary>
         /// 
         /// </summary>
         public IEnumerable<UpdateWorkOrderRealTimeCommand> UpdateWorkOrderRealTimeCommands = new List<UpdateWorkOrderRealTimeCommand>();
+        */
 
         /// <summary>
         /// 

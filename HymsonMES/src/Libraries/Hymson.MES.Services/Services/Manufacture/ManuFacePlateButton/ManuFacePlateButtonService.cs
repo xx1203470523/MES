@@ -342,6 +342,10 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (buttonJobs.Any(a => a.IsClear) == true) dto.Param?.Add("IsClear", "True");
 
             /*
+            // 是否清除条码
+            var isClear = false;
+            if (buttonJobs.Any(a => a.IsClear) == true) isClear = true;
+
             // 执行Job
             var jobResponses = await _executeJobService.ExecuteAsync(jobs.Select(s => new JobBo { Name = s.ClassProgram }), new JobRequestBo
             {
@@ -351,8 +355,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ResourceId = dto.Param["ResourceId"].ParseToLong(),
                 SFCs = new string[] { dto.Param["SFC"] }
             });
+
             foreach (var item in jobResponses)
             {
+                if (isClear) item.Value.Content.Add("IsClear", "True");
+
                 result.Add(item.Key, new JobResponseDto
                 {
                     Rows = item.Value.Rows,
@@ -418,7 +425,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task<Dictionary<string, JobResponseDto>> OutStationAsync(ButtonRequestDto dto)
         {
             var result = new Dictionary<string, JobResponseDto> { }; // 返回结果
-       
+
             var bo = new ManufactureBo
             {
                 SFC = dto.Param["SFC"],

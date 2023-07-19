@@ -3,7 +3,6 @@ using Hymson.MES.CoreServices.Bos;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.RegularExpressions;
-using System.Transactions;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {

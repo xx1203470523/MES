@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
@@ -114,20 +115,23 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var bo = param.ToBo<StopRequestBo>();
             if (bo == null) return default;
 
+            // 待执行的命令
+            StopResponseBo responseBo = new();
+
             // 获取生产条码信息
             var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
-            var entities = sfcProduceEntities.AsList();
-            if (entities == null || entities.Any() == false) return default;
+            responseBo.SFCProduceEntities = sfcProduceEntities.AsList();
+            if (responseBo.SFCProduceEntities == null || responseBo.SFCProduceEntities.Any() == false) return default;
 
-            var firstProduceEntity = entities.FirstOrDefault();
-            if (firstProduceEntity == null) return default;
+            responseBo.FirstSFCProduceEntity = responseBo.SFCProduceEntities.FirstOrDefault();
+            if (responseBo.FirstSFCProduceEntity == null) return default;
 
             // 更新时间
             var updatedBy = bo.UserName;
             var updatedOn = HymsonClock.Now();
 
             List<ManuSfcStepEntity> sfcStepEntities = new();
-            entities.ForEach(sfcProduceEntity =>
+            responseBo.SFCProduceEntities.ForEach(sfcProduceEntity =>
             {
                 // 更改状态，将条码由"活动"改为"排队"
                 sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
@@ -135,7 +139,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 sfcProduceEntity.UpdatedOn = updatedOn;
 
                 // 初始化步骤
-                sfcStepEntities.Add(new ManuSfcStepEntity
+                responseBo.SFCStepEntities.Add(new ManuSfcStepEntity
                 {
                     // 插入 manu_sfc_step 状态为 停止
                     Operatetype = ManuSfcStepTypeEnum.Stop,
@@ -157,11 +161,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 });
             });
 
-            return new StopResponseBo
-            {
-                SFCProduceEntities = entities,
-                SFCStepEntities = sfcStepEntities
-            };
+            return responseBo;
         }
 
         /// <summary>
@@ -174,9 +174,26 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             JobResponseBo responseBo = new();
             if (obj is not StopResponseBo data) return responseBo;
 
-            responseBo.Rows += await _manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities);
-            responseBo.Rows += await _manuSfcProduceRepository.UpdateRangeAsync(data.SFCProduceEntities);
+            // 更新数据
+            List<Task<int>> tasks = new();
 
+            var insertRangeTask = _manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities);
+            tasks.Add(insertRangeTask);
+
+            var updateRangeTask = _manuSfcProduceRepository.UpdateRangeAsync(data.SFCProduceEntities);
+            tasks.Add(updateRangeTask);
+
+            // 等待所有任务完成
+            var rowArray = await Task.WhenAll(tasks);
+            responseBo.Rows += rowArray.Sum();
+
+            // 面板需要的数据
+            responseBo.Content = new Dictionary<string, string> {
+                { "PackageCom", "False" },
+                { "BadEntryCom", "False" },
+            };
+
+            responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES16340), data.FirstSFCProduceEntity.SFC);
             return responseBo;
         }
 

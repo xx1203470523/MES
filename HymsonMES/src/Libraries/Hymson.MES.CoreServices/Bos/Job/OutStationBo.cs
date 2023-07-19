@@ -40,7 +40,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 
         /// </summary>
-        //public List<ManuSfcProduceEntity> SFCProduceEntities { get; set; } = new();
+        public ManuSfcProduceEntity FirstSFCProduceEntity { get; set; } = new();
 
         /// <summary>
         /// 
