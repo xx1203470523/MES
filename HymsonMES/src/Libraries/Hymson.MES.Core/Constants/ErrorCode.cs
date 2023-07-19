@@ -978,6 +978,16 @@
         public const string MES18600 = "载具错误";
         public const string MES18601 = "对应载具不存在";
         public const string MES18602 = "载具编码已存在";
+        public const string MES18603 = "载具编码[{codes}]有关联的产品序列码,请先解绑该载具所关联的产品序列码！";
+        public const string MES18604 = "载具编码不能为空";
+        public const string MES18605 = "载具名称不能为空";
+        public const string MES18606 = "载具编码最大长度为100";
+        public const string MES18607 = "载具名称最大长度为100";
+        public const string MES18608 = "载具描述最大长度为255";
+        public const string MES18609 = "载具状态不合法";
+        public const string MES18610 = "载具存放位置最大长度为100";
+        public const string MES18611 = "载具类型不能为空";
+        public const string MES18612 = "载具Id不能为空";
 
         #endregion
 

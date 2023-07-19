@@ -43,12 +43,15 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
             {
                 var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
                 if (service == null) continue;
+
                 var beforeJobs = await service.BeforeExecuteAsync(param);
                 if (beforeJobs != null && beforeJobs.Any())
                 {
                     execJobBos.AddRange(beforeJobs);
                 }
+
                 execJobBos.Add(job);
+
                 var afterJobs = await service.AfterExecuteAsync(param);
                 if (afterJobs != null && afterJobs.Any())
                 {
