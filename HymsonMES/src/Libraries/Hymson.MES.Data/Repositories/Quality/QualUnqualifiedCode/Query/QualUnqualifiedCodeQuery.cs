@@ -25,6 +25,16 @@ namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query
         public long? UnqualifiedGroupId { get; set; }
 
         /// <summary>
+        /// 不合格代码组id列表
+        /// </summary>
+        public long[] UnqualifiedGroupIds { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public SysDataStatusEnum? Status { get; set; }
+
+        /// <summary>
         /// 状态列表
         /// </summary>
         public SysDataStatusEnum[]? StatusArr { get; set; }

@@ -128,7 +128,8 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 UnqualifiedGroupId = groupId,
-                StatusArr = new SysDataStatusEnum[] { SysDataStatusEnum.Enable, SysDataStatusEnum.Retain }
+                Status= SysDataStatusEnum.Enable
+                // StatusArr = new SysDataStatusEnum[] { SysDataStatusEnum.Enable, SysDataStatusEnum.Retain }
             };
             var list = await _qualUnqualifiedCodeRepository.GetListByGroupIdAsync(query);
 
@@ -136,6 +137,50 @@ namespace Hymson.MES.Services.Services.Quality
             var qualUnqualifiedCodes = new List<QualUnqualifiedCodeDto>();
             foreach (var entity in list)
             {
+                var unqualifiedCodeDto = entity.ToModel<QualUnqualifiedCodeDto>();
+                qualUnqualifiedCodes.Add(unqualifiedCodeDto);
+            }
+            return qualUnqualifiedCodes;
+        }
+
+        /// <summary>
+        /// 根据工序id查询不合格代码列表
+        /// </summary>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualUnqualifiedCodeDto>> GetListByProcedureIdAsync(long procedureId)
+        {
+            //实体到DTO转换 装载数据
+            var qualUnqualifiedCodes = new List<QualUnqualifiedCodeDto>();
+            var groupQuery = new QualUnqualifiedGroupQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                ProcedureId = procedureId
+            };
+            var list = await _qualUnqualifiedGroupRepository.GetListByProcedureIdAsync(groupQuery);
+            if (list == null || !list.Any())
+            {
+                return qualUnqualifiedCodes;
+            }
+
+            var groupIds = list.Select(x => x.Id).ToArray();
+            var query = new QualUnqualifiedCodeQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                UnqualifiedGroupIds = groupIds,
+                Status = SysDataStatusEnum.Enable
+            };
+            var qualUnqualifieds = await _qualUnqualifiedCodeRepository.GetListByGroupIdAsync(query);
+            var qualCodes = new List<string>();
+
+            foreach (var entity in qualUnqualifieds)
+            {
+                if (qualCodes.Contains(entity.UnqualifiedCode))
+                {
+                    continue;
+                }
+
+                qualCodes.Add(entity.UnqualifiedCode);
                 var unqualifiedCodeDto = entity.ToModel<QualUnqualifiedCodeDto>();
                 qualUnqualifiedCodes.Add(unqualifiedCodeDto);
             }
@@ -208,8 +253,8 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task<int> DeletesQualUnqualifiedCodeAsync(long[] ids)
         {
-            var qualUnqualifiedList= await _qualUnqualifiedCodeRepository.GetByIdsAsync(ids);
-            if (qualUnqualifiedList != null&& qualUnqualifiedList.Any(x=>x.Status!= SysDataStatusEnum.Build))
+            var qualUnqualifiedList = await _qualUnqualifiedCodeRepository.GetByIdsAsync(ids);
+            if (qualUnqualifiedList != null && qualUnqualifiedList.Any(x => x.Status != SysDataStatusEnum.Build))
             {
                 throw new BusinessException(nameof(ErrorCode.MES10106));
             }

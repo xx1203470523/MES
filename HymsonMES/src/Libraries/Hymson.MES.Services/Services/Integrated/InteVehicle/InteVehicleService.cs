@@ -19,6 +19,7 @@ using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using IdGen;
+using Minio.DataModel;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Integrated
@@ -409,7 +410,76 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         private async Task VehicleBindOperationAsync(InteVehicleOperationDto dto)
         {
-
+            /* 指定位置绑定条码
+             * 载具类型是单格子单条码的情况下  条码存放在inte_vehicle_freight表中
+             * 载具类型是单格子多条码的情况下  条码存放在inte_vehice_freight_stack表中
+             */
+            //一个格子多个条码情况
+            var inteVehicleEntity = await _inteVehicleRepository.GetByCodeAsync(new InteVehicleCodeQuery()
+            {
+                Code = dto.PalletNo,
+                SiteId = _currentSite.SiteId.Value
+            });
+            var vtr = await _inteVehicleTypeRepository.GetByIdAsync(inteVehicleEntity.VehicleTypeId);
+            if (vtr.UnitNumber > 1)
+            {
+                //获取托盘所有条码记录
+                var vsr = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
+                {
+                    VehicleId = inteVehicleEntity.Id,
+                    SiteId = _currentSite.SiteId.Value
+                });
+                var foo = await _inteVehicleFreightRepository.GetByVehicleIdsAsync(new long[] { inteVehicleEntity.Id });
+                var count = foo.Where(i => i.Status == true).ToList().Count();
+                if(vsr.Count()>= count*vtr.UnitNumber) {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES18613));
+                }
+                else
+                {
+                    //获取指定位置信息
+                    var loc = await _inteVehicleFreightRepository.GetByIdAsync(dto.LocationId);
+                    var stack = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQueryByLocation()
+                    {
+                        LocationId = dto.LocationId,
+                        SiteId = _currentSite.SiteId.Value
+                    });
+                    if(stack.Count()>=vtr.UnitNumber)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES18614));
+                    }
+                    else
+                    {
+                        await _inteVehiceFreightStackRepository.InsertAsync(new InteVehiceFreightStackEntity()
+                        {
+                            BarCode = dto.SFC,
+                            CreatedBy = _currentUser.UserName,
+                            UpdatedBy = _currentUser.UserName,
+                            CreatedOn = HymsonClock.Now(),
+                            UpdatedOn = HymsonClock.Now(),
+                            SiteId = _currentSite.SiteId ?? 0,
+                            Id = IdGenProvider.Instance.CreateId(),
+                            LocationId = dto.LocationId,
+                            VehicleId = inteVehicleEntity.Id,
+                            IsDeleted = 0
+                        });
+                    }
+                }
+            }
+            else
+            {
+                var loc = await _inteVehicleFreightRepository.GetByIdAsync(dto.LocationId);
+                if(string.IsNullOrEmpty(loc.BarCode))
+                {
+                    loc.BarCode = dto.SFC;
+                    loc.UpdatedBy = _currentUser.UserName;
+                    loc.UpdatedOn = HymsonClock.Now();
+                    await _inteVehicleFreightRepository.UpdateAsync(loc);
+                }
+                else
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES18615)).WithData("sfc",loc.BarCode);
+                }
+            }
         }
         /// <summary>
         /// 载具解绑

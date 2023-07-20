@@ -159,6 +159,15 @@ namespace Hymson.MES.Data.Repositories.Integrated
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, inteVehiceFreightStackEntitys);
         }
+
+        public async Task<IEnumerable<InteVehiceFreightStackEntity>> GetInteVehiceFreightStackEntitiesAsync(InteVehiceFreightStackQueryByLocation inteVehiceFreightStackQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetInteVehiceFreightStackEntitiesSqlTemplate);
+            using var conn = GetMESDbConnection();
+            var inteVehiceFreightStackEntities = await conn.QueryAsync<InteVehiceFreightStackEntity>(template.RawSql, inteVehiceFreightStackQuery);
+            return inteVehiceFreightStackEntities;
+        }
         #endregion
 
     }

@@ -107,6 +107,49 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        ///分页查询工艺路线的工序列表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ProcProcedureEntity>> GetPagedInfoByProcessRouteIdAsync(ProcProcedurePagedQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedDataCountSqlTemplate);
+            sqlBuilder.Where("a.IsDeleted=0");
+            sqlBuilder.Where("a.SiteId = @SiteId");
+            sqlBuilder.Where("b.ProcessRouteId = @ProcessRouteId");
+            sqlBuilder.Select("a.*");
+
+            if (!string.IsNullOrWhiteSpace(query.Code))
+            {
+                query.Code = $"%{query.Code}%";
+                sqlBuilder.Where("a.Code like @Code");
+            }
+            if (!string.IsNullOrWhiteSpace(query.Name))
+            {
+                query.Name = $"%{query.Name}%";
+                sqlBuilder.Where("a.Name like @Name");
+            }
+            if (query.Type.HasValue)
+            {
+                sqlBuilder.Where("a.Type=@Type");
+            }
+
+            var offSet = (query.PageIndex - 1) * query.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = query.PageSize });
+            sqlBuilder.AddParameters(query);
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var procProcedureEntitiesTask = conn.QueryAsync<ProcProcedureView>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var procProcedureEntities = await procProcedureEntitiesTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<ProcProcedureEntity>(procProcedureEntities, query.PageIndex, query.PageSize, totalCount);
+        }
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -208,6 +251,10 @@ namespace Hymson.MES.Data.Repositories.Process
     {
         const string GetPagedInfoDataSqlTemplate = @"select a.*,b.ResType ,b.ResTypeName  from proc_procedure a left join proc_resource_type b on a.ResourceTypeId=b.Id and b.IsDeleted=0 /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "select COUNT(*) from proc_procedure a left join proc_resource_type b on a.ResourceTypeId=b.Id and b.IsDeleted=0 /**where**/ ";
+
+        const string GetPagedDataSqlTemplate = @"SELECT /**select**/ FROM `proc_procedure`  a /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedDataCountSqlTemplate = "SELECT COUNT(1) FROM `proc_procedure`  a  /**innerjoin**/ /**leftjoin**/  /**where**/ ";
+
         const string GetProcProcedureEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `proc_procedure` /**where**/  ";
