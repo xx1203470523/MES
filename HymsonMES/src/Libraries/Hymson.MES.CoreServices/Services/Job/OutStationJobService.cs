@@ -412,24 +412,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 if (data.UpdateQtyByIdCommands.Count() > responseBo.Rows)
                 {
                     responseBo.Rows = -1;
+                    responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18216), data.FirstSFCProduceEntity.SFC);
                     return responseBo;
                 }
             }
 
             // 更新数据
             List<Task<int>> tasks = new();
-
-            // 添加流转记录
-            if (data.ManuSfcCirculationEntities.Any())
-            {
-                tasks.Add(_manuSfcCirculationRepository.InsertRangeAsync(data.ManuSfcCirculationEntities));
-            }
-
-            // 插入 manu_sfc_step
-            if (data.SFCStepEntities.Any())
-            {
-                tasks.Add(_manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities));
-            }
 
             // 完工
             if (data.IsCompleted)
@@ -468,7 +457,28 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             {
                 // 修改 manu_sfc_produce 为排队, 工序修改为下一工序的id
                 //tasks.Add(_manuSfcProduceRepository.UpdateRangeWithStatusCheckAsync(data.SFCProduceEntities));
-                tasks.Add(_manuSfcProduceRepository.MultiUpdateRangeWithStatusCheckAsync(data.MultiUpdateProduceSFCCommand));
+                var rows = await _manuSfcProduceRepository.MultiUpdateRangeWithStatusCheckAsync(data.MultiUpdateProduceSFCCommand);
+
+                // 未更新到数据，事务回滚
+                if (rows <= 0)
+                {
+                    // 这里在外层会回滚事务
+                    responseBo.Rows = -1;
+                    responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18216), data.FirstSFCProduceEntity.SFC);
+                    return responseBo;
+                }
+            }
+
+            // 添加流转记录
+            if (data.ManuSfcCirculationEntities.Any())
+            {
+                tasks.Add(_manuSfcCirculationRepository.InsertRangeAsync(data.ManuSfcCirculationEntities));
+            }
+
+            // 插入 manu_sfc_step
+            if (data.SFCStepEntities.Any())
+            {
+                tasks.Add(_manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities));
             }
 
             var rowArray = await Task.WhenAll(tasks);
