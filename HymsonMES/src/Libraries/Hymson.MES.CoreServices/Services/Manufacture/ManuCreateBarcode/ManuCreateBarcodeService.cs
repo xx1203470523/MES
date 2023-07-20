@@ -111,6 +111,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                     Seq = s.Seq,
                     ValueTakingType = s.ValueTakingType,
                     SegmentedValue = s.SegmentedValue,
+                    CustomValue = s.CustomValue,
                 }),
 
                 CodeRuleKey = $"{inteCodeRulesEntity.Id}",
@@ -120,7 +121,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                 IgnoreChar = inteCodeRulesEntity.IgnoreChar,
                 OrderLength = inteCodeRulesEntity.OrderLength,
                 ResetType = inteCodeRulesEntity.ResetType,
-                StartNumber = inteCodeRulesEntity.StartNumber
+                StartNumber = inteCodeRulesEntity.StartNumber,
+                CodeMode = inteCodeRulesEntity.CodeMode,
             });
 
             // 开启事务

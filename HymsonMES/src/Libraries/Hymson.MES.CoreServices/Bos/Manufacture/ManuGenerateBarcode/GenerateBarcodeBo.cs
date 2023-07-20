@@ -56,6 +56,12 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode
         public CodeRuleCodeTypeEnum CodeType { get; set; }
 
         /// <summary>
+        /// 编码模式 1： 单个    2： 多个
+        /// </summary>
+        public CodeRuleCodeModeEnum CodeMode { get; set; }
+
+
+        /// <summary>
         /// 包装等级;1：一级；2：二级；3：三级；
         /// </summary>
         public CodeRulePackTypeEnum? PackType { get; set; }
@@ -112,5 +118,10 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode
         /// 分段值
         /// </summary>
         public string SegmentedValue { get; set; }
+
+        /// <summary>
+        /// 自定义值
+        /// </summary>
+        public string? CustomValue { get; set; }
     }
 }

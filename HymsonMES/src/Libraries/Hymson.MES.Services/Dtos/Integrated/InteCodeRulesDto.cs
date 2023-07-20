@@ -38,6 +38,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public CodeRuleCodeTypeEnum CodeType { get; set; }
 
         /// <summary>
+        /// 编码模式 1： 单个    2： 多个
+        /// </summary>
+        public CodeRuleCodeModeEnum CodeMode { get; set; }
+
+        /// <summary>
         /// 包装等级;1：一级；2：二级；3：三级；
         /// </summary>
         public CodeRulePackTypeEnum? PackType { get; set; }
@@ -127,6 +132,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public CodeRuleCodeTypeEnum CodeType { get; set; }
 
         /// <summary>
+        /// 编码模式 1： 单个    2： 多个
+        /// </summary>
+        public CodeRuleCodeModeEnum CodeMode { get; set; }
+
+        /// <summary>
         /// 包装等级;1：一级；2：二级；3：三级；
         /// </summary>
         public CodeRulePackTypeEnum? PackType { get; set; }
@@ -193,6 +203,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 编码类型;1：过程控制序列码；2：包装序列码；
         /// </summary>
         public CodeRuleCodeTypeEnum CodeType { get; set; }
+
+        /// <summary>
+        /// 编码模式 1： 单个    2： 多个
+        /// </summary>
+        public CodeRuleCodeModeEnum CodeMode { get; set; }
 
         /// <summary>
         /// 包装等级;1：一级；2：二级；3：三级；
@@ -284,6 +299,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 编码类型;1：过程控制序列码；2：包装序列码；
         /// </summary>
         public CodeRuleCodeTypeEnum CodeType { get; set; }
+
+        /// <summary>
+        /// 编码模式 1： 单个    2： 多个
+        /// </summary>
+        public CodeRuleCodeModeEnum CodeMode { get; set; }
 
         /// <summary>
         /// 包装等级;1：一级；2：二级；3：三级；
@@ -378,6 +398,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 编码类型;1：过程控制序列码；2：包装序列码；
         /// </summary>
         public CodeRuleCodeTypeEnum CodeType { get; set; }
+
+        /// <summary>
+        /// 编码模式 1： 单个    2： 多个
+        /// </summary>
+        public CodeRuleCodeModeEnum CodeMode { get; set; }
 
         /// <summary>
         /// 包装等级;1：一级；2：二级；3：三级；
