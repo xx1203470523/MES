@@ -18,6 +18,7 @@ using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using IdGen;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Integrated
@@ -40,8 +41,12 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly IInteVehicleTypeRepository _inteVehicleTypeRepository;
         private readonly IInteVehicleVerifyRepository _inteVehicleVerifyRepository;
         private readonly IInteVehicleFreightRepository _inteVehicleFreightRepository;
+        private readonly IInteVehiceFreightStackRepository _inteVehiceFreightStackRepository;
 
-        public InteVehicleService(ICurrentUser currentUser, ICurrentSite currentSite, IInteVehicleRepository inteVehicleRepository, AbstractValidator<InteVehicleCreateDto> validationCreateRules, AbstractValidator<InteVehicleModifyDto> validationModifyRules,IInteVehicleTypeRepository inteVehicleTypeRepository, IInteVehicleVerifyRepository inteVehicleVerifyRepository, IInteVehicleFreightRepository inteVehicleFreightRepository)
+        public InteVehicleService(ICurrentUser currentUser, ICurrentSite currentSite, IInteVehicleRepository inteVehicleRepository, AbstractValidator<InteVehicleCreateDto> validationCreateRules, AbstractValidator<InteVehicleModifyDto> validationModifyRules,IInteVehicleTypeRepository inteVehicleTypeRepository, 
+            IInteVehicleVerifyRepository inteVehicleVerifyRepository,
+            IInteVehiceFreightStackRepository inteVehiceFreightStackRepository,
+            IInteVehicleFreightRepository inteVehicleFreightRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -51,6 +56,7 @@ namespace Hymson.MES.Services.Services.Integrated
             _inteVehicleTypeRepository = inteVehicleTypeRepository;
             _inteVehicleVerifyRepository = inteVehicleVerifyRepository;
             _inteVehicleFreightRepository = inteVehicleFreightRepository;
+            _inteVehiceFreightStackRepository = inteVehiceFreightStackRepository;
         }
 
         /// <summary>
@@ -361,6 +367,24 @@ namespace Hymson.MES.Services.Services.Integrated
                 {
                     inteVehicleFreightDtos.Add(item.ToModel<InteVehicleFreightDto>());
                 }
+                //一个格子多个条码情况
+                var inteVehicleEntity = await _inteVehicleRepository.GetByIdAsync(vehicleId);
+                var vtr = await _inteVehicleTypeRepository.GetByIdAsync(inteVehicleEntity.VehicleTypeId);
+                if (vtr.UnitNumber>1)
+                {
+                    //获取托盘所有条码记录
+                    var vsr = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
+                    {
+                        VehicleId = vehicleId,
+                        SiteId = _currentSite.SiteId.Value
+                    });
+                    foreach (var item in inteVehicleFreightDtos)
+                    {
+                        var lst = vsr.Where(i => i.LocationId == item.Id).ToList();
+                        item.Stacks = lst;
+                    }
+                }
+
             }
 
             return inteVehicleFreightDtos;

@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Services.Dtos.Integrated
@@ -308,6 +309,10 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 修改时间
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
+        /// <summary>
+        /// 扩展条码集合，用于一个位置多个条码的情况
+        /// </summary>
+        public List<InteVehiceFreightStackEntity> Stacks { get; set; } = new List<InteVehiceFreightStackEntity>();
 
     }
 

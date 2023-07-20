@@ -13,5 +13,13 @@ namespace Hymson.MES.Data.Repositories.Integrated
     /// </summary>
     public class InteVehiceFreightStackQuery
     {
+        /// <summary>
+        /// 载具Id
+        /// </summary>
+        public long VehicleId { get; set; }
+        /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long SiteId { get; set; }
     }
 }

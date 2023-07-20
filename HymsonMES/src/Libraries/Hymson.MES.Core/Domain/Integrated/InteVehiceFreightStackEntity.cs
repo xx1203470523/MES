@@ -26,8 +26,12 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// 载具位置id
         /// </summary>
         public long LocationId { get; set; }
+        /// <summary>
+        /// 载具Id
+        /// </summary>
+        public long VehicleId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 装载条码
         /// </summary>
         public string BarCode { get; set; }

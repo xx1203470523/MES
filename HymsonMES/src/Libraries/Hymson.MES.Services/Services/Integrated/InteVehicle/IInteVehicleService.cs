@@ -70,5 +70,6 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="vehicleId"></param>
         /// <returns></returns>
         Task<IEnumerable<InteVehicleFreightDto>> QueryVehicleFreightByVehicleIdAsync(long vehicleId);
+        
     }
 }
