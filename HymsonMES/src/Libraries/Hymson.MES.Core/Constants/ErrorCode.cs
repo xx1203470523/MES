@@ -932,7 +932,7 @@
         public const string MES18214 = "工序不存在";
 
         public const string MES18215 = "条码{0}设置为活动状态成功！";
-        public const string MES18216 = "条码{0}状态修改失败，请联系管理员！";
+        public const string MES18216 = "条码{SFC}状态修改失败，请联系管理员！";
         #endregion
 
 

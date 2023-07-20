@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
@@ -464,8 +465,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 {
                     // 这里在外层会回滚事务
                     responseBo.Rows = -1;
-                    responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18216), data.FirstSFCProduceEntity.SFC);
-                    return responseBo;
+
+                    throw new CustomerValidationException(nameof(ErrorCode.MES18216)).WithData("SFC", data.FirstSFCProduceEntity.SFC);
+                    //responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18216), data.FirstSFCProduceEntity.SFC);
+                    //return responseBo;
                 }
             }
 
