@@ -988,6 +988,9 @@
         public const string MES18610 = "载具存放位置最大长度为100";
         public const string MES18611 = "载具类型不能为空";
         public const string MES18612 = "载具Id不能为空";
+        public const string MES18613 = "载具装载已达最大数量";
+        public const string MES18614 = "载具该单元格装载已达最大数量";
+        public const string MES18615 = "载具该单元格已装载了条码:{sfc}";
 
         #endregion
 
