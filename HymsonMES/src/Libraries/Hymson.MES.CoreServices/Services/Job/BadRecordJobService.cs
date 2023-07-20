@@ -1,5 +1,6 @@
 ﻿using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
@@ -70,7 +71,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (bo == null) return;
 
             // 获取生产条码信息
-            var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, bo);
+            var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
             if (sfcProduceEntities == null || sfcProduceEntities.Any() == false) return;
 
             var sfcProduceBusinessEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, bo);
@@ -119,6 +120,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 BusinessType = ManuSfcProduceBusinessType.Repair
             });
 
+            responseBo.SFCs = bo.SFCs;
             responseBo.IsShow = sfcProduceBusinessEntities.Any() == false;
             return responseBo;
         }
@@ -133,7 +135,14 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             JobResponseBo responseBo = new();
             if (obj is not BadRecordResponseBo data) return responseBo;
 
-            responseBo.Content.Add("IsShow", $"{data.IsShow}");
+            // 面板需要的数据
+            responseBo.Content = new Dictionary<string, string> {
+                { "PackageCom", "False" },
+                { "BadEntryCom", "False" },
+                { "IsShow", $"{data.IsShow}" },
+            };
+
+            responseBo.Message = _localizationService.GetResource(data.IsShow ? nameof(ErrorCode.MES16342) : nameof(ErrorCode.MES16343), data.SFCs.FirstOrDefault());
             return await Task.FromResult(responseBo);
         }
 
@@ -147,5 +156,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             await Task.CompletedTask;
             return null;
         }
+
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Hymson.MES.CoreServices.Bos.Job
+﻿using Hymson.MES.Core.Domain.Manufacture;
+
+namespace Hymson.MES.CoreServices.Bos.Job
 {
     /// <summary>
     /// 
@@ -24,6 +26,11 @@
     /// </summary>
     public class BadRecordResponseBo
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public IEnumerable<string> SFCs { get; set; } = new List<string>();
+
         /// <summary>
         /// 
         /// </summary>

@@ -355,7 +355,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="sfcBos"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcProduceEntity>> GetProduceEntitiesBySFCsAsync(MultiSFCBo sfcBos)
+        public async Task<IEnumerable<ManuSfcProduceEntity>> GetProduceEntitiesBySFCsWithCheckAsync(MultiSFCBo sfcBos)
         {
             if (sfcBos.SFCs.Any(a => a.Contains(' '))) throw new CustomerValidationException(nameof(ErrorCode.MES16305));
 

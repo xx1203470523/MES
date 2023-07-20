@@ -229,6 +229,7 @@ namespace Hymson.MES.Services.Services.Quality
                         Id = IdGenProvider.Instance.CreateId(),
                         UnqualifiedGroupId = item,
                         UnqualifiedCodeId = qualUnqualifiedCodeEntity.Id,
+                        SiteId = _currentSite.SiteId ?? 0,
                         CreatedBy = userId,
                         UpdatedBy = userId
                     });
@@ -295,8 +296,9 @@ namespace Hymson.MES.Services.Services.Quality
                     list.Add(new QualUnqualifiedCodeGroupRelation
                     {
                         Id = IdGenProvider.Instance.CreateId(),
-                        UnqualifiedGroupId = qualUnqualifiedCodeEntity.Id,
-                        UnqualifiedCodeId = item,
+                        UnqualifiedGroupId = item,
+                        UnqualifiedCodeId = qualUnqualifiedCodeEntity.Id,
+                        SiteId = _currentSite.SiteId ?? 0,
                         CreatedBy = userId,
                         UpdatedBy = userId
                     });

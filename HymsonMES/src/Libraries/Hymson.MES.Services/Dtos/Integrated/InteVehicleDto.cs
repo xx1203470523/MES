@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Services.Dtos.Integrated
@@ -308,6 +309,10 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 修改时间
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
+        /// <summary>
+        /// 扩展条码集合，用于一个位置多个条码的情况
+        /// </summary>
+        public List<InteVehiceFreightStackEntity> Stacks { get; set; } = new List<InteVehiceFreightStackEntity>();
 
     }
 
@@ -328,5 +333,28 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public bool? Status { get; set; }
 
     }
+    /// <summary>
+    /// 载具操作
+    /// </summary>
+    public class InteVehicleOperationDto
+    {
+        /// <summary>
+        /// 托盘码
+        /// </summary>
+        public string PalletNo { get; set; }
+        /// <summary>
+        /// 位置ID
+        /// </summary>
+        public long LocationId { get; set; }
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string SFC { get; set; }
+        /// <summary>
+        /// 操作方式 0 绑定，1解绑
+        /// </summary>
+        public int OperationType { get; set; }
+    }
+    
     #endregion
 }

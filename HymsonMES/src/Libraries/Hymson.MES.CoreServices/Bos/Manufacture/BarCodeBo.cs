@@ -22,6 +22,11 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// 分段值
         /// </summary>
         public string SegmentedValue { get; set; }
+
+        /// <summary>
+        /// 自定义值
+        /// </summary>
+        public string CustomValue { get; set; }
     }
 
     /// <summary>
@@ -84,6 +89,12 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// 重置序号;1：从不；2：每天；3：每周；4：每月；5：每年；
         /// </summary>
         public SerialNumberTypeEnum ResetType { get; set; }
+
+        /// <summary>
+        /// 编码模式 1： 单个    2： 多个
+        /// </summary>
+        public CodeRuleCodeModeEnum CodeMode { get; set; }
+
     }
 
 }

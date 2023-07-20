@@ -46,7 +46,12 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public string SegmentedValue { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 自定义值
+        /// </summary>
+        public string CustomValue { get; set; }
+
+        /// <summary>
         /// 描述
         /// </summary>
         public string Remark { get; set; }
@@ -83,7 +88,12 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public string SegmentedValue { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 自定义值
+        /// </summary>
+        public string? CustomValue { get; set; }
+
+        /// <summary>
         /// 描述
         /// </summary>
         public string? Remark { get; set; }
@@ -120,7 +130,12 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public string SegmentedValue { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 自定义值
+        /// </summary>
+        public string? CustomValue { get; set; }
+
+        /// <summary>
         /// 描述
         /// </summary>
         public string Remark { get; set; }
