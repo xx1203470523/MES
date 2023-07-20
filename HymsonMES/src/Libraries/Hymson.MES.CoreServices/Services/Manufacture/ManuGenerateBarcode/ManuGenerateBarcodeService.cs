@@ -6,6 +6,7 @@ using Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.Sequences;
 using Hymson.Utils;
+using System.Data;
 using System.Text;
 
 namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
@@ -59,6 +60,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                     Seq = s.Seq,
                     ValueTakingType = s.ValueTakingType,
                     SegmentedValue = s.SegmentedValue,
+                    CustomValue = s.CustomValue,
                 }),
 
                 CodeRuleKey = $"{param.CodeRuleId}",
@@ -68,7 +70,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                 IgnoreChar = codeRule.IgnoreChar,
                 OrderLength = codeRule.OrderLength,
                 ResetType = codeRule.ResetType,
-                StartNumber = codeRule.StartNumber
+                StartNumber = codeRule.StartNumber,
+                CodeMode = codeRule.CodeMode,
             });
         }
 
@@ -87,6 +90,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                     Seq = s.Seq,
                     ValueTakingType = s.ValueTakingType,
                     SegmentedValue = s.SegmentedValue,
+                    CustomValue=s.CustomValue??""
                 }),
 
                 CodeRuleKey = $"{param.ProductId}",
@@ -96,7 +100,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                 Increment = param.Increment,
                 OrderLength = param.OrderLength,
                 ResetType = param.ResetType,
-                StartNumber = param.StartNumber
+                StartNumber = param.StartNumber,
+                CodeMode=param.CodeMode,
             });
         }
 
@@ -107,10 +112,14 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
         /// <returns></returns>
         public async Task<IEnumerable<string>> GenerateBarCodeSerialNumberAsync(BarCodeSerialNumberBo bo)
         {
+            bo.CodeRulesMakeBos = bo.CodeRulesMakeBos.OrderBy(x => x.Seq);
+
             List<string> list = new();
 
             List<string> serialStrings = new();
-            var serialNumbers = await GenerateBarCodeSerialNumbersWithTryAsync(bo);
+            var copyBo= bo.ToSerialize().ToDeserialize<BarCodeSerialNumberBo>();//复制一份数据，因为下方GenerateBarCodeAboutMoreAsync 方法中有修改值的操作
+            //var serialNumbers = await GenerateBarCodeSerialNumbersWithTryAsync(copyBo);
+            var serialNumbers = await GenerateBarCodeAboutMoreAsync(copyBo);
             foreach (var item in serialNumbers)
             {
                 var str = bo.Base switch
@@ -134,36 +143,108 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                 throw new CustomerValidationException(nameof(ErrorCode.MES16203));
             }
 
-            StringBuilder stringBuilder = new();
-            foreach (var item in serialStrings)
+            #region 组合数据生成条码
+            var ruleMakeValues = new string[bo.CodeRulesMakeBos.Count()][];
+            var codeRulesMakeBosArray = bo.CodeRulesMakeBos.ToArray();
+            //根据编码规则获取到每行数据会生成的值
+            //foreach (var item in bo.CodeRulesMakeBos)
+            for (int i = 0; i < codeRulesMakeBosArray.Length; i++)
             {
-                stringBuilder.Clear();
-                bo.CodeRulesMakeBos = bo.CodeRulesMakeBos.OrderBy(x => x.Seq);
+                var item = codeRulesMakeBosArray[i];
 
-                foreach (var rule in bo.CodeRulesMakeBos)
+                if (item.ValueTakingType == CodeValueTakingTypeEnum.FixedValue)
                 {
-                    if (rule.ValueTakingType == CodeValueTakingTypeEnum.FixedValue)
-                    {
-                        stringBuilder.Append(rule.SegmentedValue);
-                        continue;
-                    }
-
-                    // TODO  暂时使用这种写法  王克明
-                    if (rule.SegmentedValue == "%ACTIVITY%")
-                    {
-                        stringBuilder.Append(item);
-                    }
-                    else if (rule.SegmentedValue == "%YYMMDD%")
-                    {
-                        stringBuilder.Append(HymsonClock.Now().ToString("yyMMdd"));
-                    }
-                    else
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", rule.SegmentedValue);
-                    }
+                    ruleMakeValues[i] = new string[] { item.SegmentedValue };
+                    continue;
                 }
-                list.Add(stringBuilder.ToString());
+
+                switch (item.SegmentedValue) 
+                {
+                    case "%ACTIVITY%":
+                            ruleMakeValues[i] = serialStrings.ToArray();
+                        break;
+                    case "%YYMMDD%":
+                        ruleMakeValues[i] = new string[] { HymsonClock.Now().ToString("yyMMdd") };
+                        break;
+                    case "%MULTIPLE_VARIABLE%":
+                        //模式是多个时，生成多个条码
+                        if (bo.CodeMode == CodeRuleCodeModeEnum.More
+                && item.ValueTakingType==CodeValueTakingTypeEnum.VariableValue&& !string.IsNullOrEmpty(item.CustomValue))
+                        {
+                            ruleMakeValues[i] = item.CustomValue.Split(';') ;//查询出自定义值能转换成几个
+                        }
+                        break;
+                    default:
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", item.SegmentedValue);
+                        break;
+                }
             }
+
+            //将上方 根据编码规则组成的数组值组成各种情况   ，如获取到[['A1'],['B1','B2'],['C1']]  去生成 A1B1C1、A1B2C1两个条码
+            List<string[]> combinations = new List<string[]>();
+            GenerateCombinationsHelper(ruleMakeValues, 0, new string[ruleMakeValues.Length], combinations);
+            foreach (var combination in combinations)
+            {
+                list.Add(string.Join("", combination));
+            }
+            #endregion
+
+            #region //之前的代码
+            //StringBuilder stringBuilder = new();
+            //foreach (var item in serialStrings)
+            //{
+            //    stringBuilder.Clear();
+
+
+            //    foreach (var rule in bo.CodeRulesMakeBos)
+            //    {
+            //        if (rule.ValueTakingType == CodeValueTakingTypeEnum.FixedValue)
+            //        {
+            //            stringBuilder.Append(rule.SegmentedValue);
+            //            continue;
+            //        }
+
+            //        // TODO  暂时使用这种写法  王克明
+            //        if (rule.SegmentedValue == "%ACTIVITY%")
+            //        {
+            //            stringBuilder.Append(item);
+            //        }
+            //        else if (rule.SegmentedValue == "%YYMMDD%")
+            //        {
+            //            stringBuilder.Append(HymsonClock.Now().ToString("yyMMdd"));
+            //        }
+            //        else if (rule.SegmentedValue == "%MULTIPLE_VARIABLE%")
+            //        {
+            //            //这里不做处理，下方有做处理，这里只是跳过下方的错误信息
+            //        }
+            //        else
+            //        {
+            //            throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", rule.SegmentedValue);
+            //        }
+            //    }
+
+            //     #region 生成多个
+            //    if (bo.CodeMode == CodeRuleCodeModeEnum.More
+            //        && bo.CodeRulesMakeBos.Any(x=> x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue == "%MULTIPLE_VARIABLE%" && !string.IsNullOrEmpty(x.CustomValue)))
+            //    {
+            //        //获取对应的编码规则第一条  只允许出现对应的一次，所以只获取一条
+            //        var oneCodeRulesMake = bo.CodeRulesMakeBos.FirstOrDefault(x=> x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue == "%MULTIPLE_VARIABLE%" && !string.IsNullOrEmpty(x.CustomValue));
+            //        var values = oneCodeRulesMake.CustomValue.Split(';');//查询出自定义值能转换成几个
+            //        foreach (var v in values)
+            //        {
+            //            var copyStringBuilder=new StringBuilder(stringBuilder.ToString());
+            //            copyStringBuilder.Append(v);
+            //            list.Add(copyStringBuilder.ToString());
+            //        }
+            //    }
+            //    #endregion
+            //    else
+            //    {
+            //        list.Add(stringBuilder.ToString());
+            //    }
+
+            //}
+            #endregion
 
             // 如果不是测试，且有模拟验证通过一次，就直接真实生成
             if (bo.IsTest == false && bo.IsSimulation == true)
@@ -173,6 +254,59 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
             }
 
             return list;
+        }
+
+        /// <summary>
+        ///  获取条码
+        ///  添加 针对于编码规则 编码类型为 多个的逻辑
+        /// </summary>
+        /// <param name="param"></param>
+        /// <param name="maxLength"></param>
+        /// <returns></returns>
+        private async Task<IEnumerable<int>> GenerateBarCodeAboutMoreAsync(BarCodeSerialNumberBo param, int maxLength = 9)
+        {
+            //处理数量： 如果有这种 %MULTIPLE_VARIABLE% 特殊情况的编码规则，则需要处理，
+            //如 该对应的自定义值为 L;R;M  ，前端传参又需要2个条码，则会生成3个条码，但是只走一次序列码
+            #region 生成多个
+            if (param.CodeMode == CodeRuleCodeModeEnum.More)
+            {
+                foreach (var rule in param.CodeRulesMakeBos)
+                {
+                    if (rule.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && rule.SegmentedValue == "%MULTIPLE_VARIABLE%" && !string.IsNullOrEmpty(rule.CustomValue))
+                    {
+                        var values = rule.CustomValue.Split(';');//查询出自定义值能转换成几个
+                        param.Count = (int)Math.Ceiling(param.Count /( values.Length * 1.0));//修改生成的数量
+
+                        break;//只允许出现一次
+                    }
+                }
+            }
+            #endregion
+
+            return await GenerateBarCodeSerialNumbersWithTryAsync(param, maxLength);
+        }
+
+        /// <summary>
+        /// 回溯算法
+        /// 递归出数组所有的路线
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="index"></param>
+        /// <param name="current"></param>
+        /// <param name="combinations"></param>
+        private void GenerateCombinationsHelper(string[][] array, int index, string[] current, List<string[]> combinations)
+        {
+            if (index == array.Length)
+            {
+                combinations.Add((string[])current.Clone());
+                return;
+            }
+
+            foreach (var item in array[index])
+            {
+                current[index] = item;
+                GenerateCombinationsHelper(array, index + 1, current, combinations);
+            }
         }
 
         /// <summary>

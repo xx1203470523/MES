@@ -63,6 +63,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                 Count = param.Count,
                 ProductId = param.ProductId,
                 CodeType = param.CodeType,
+                CodeMode= param.CodeMode,
                 PackType = param.PackType,
                 Base = param.Base,
                 IgnoreChar = param.IgnoreChar,
