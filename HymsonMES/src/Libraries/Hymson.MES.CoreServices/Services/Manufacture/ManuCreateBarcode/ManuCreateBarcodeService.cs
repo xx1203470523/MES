@@ -101,8 +101,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                 CodeRulesId = inteCodeRulesEntity.Id
             });
 
-            // 开启事务
-            using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
+
             var barcodeList = await _manuGenerateBarcodeService.GenerateBarCodeSerialNumberAsync(new BarCodeSerialNumberBo
             {
                 IsTest = false,
@@ -125,6 +124,9 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                 StartNumber = inteCodeRulesEntity.StartNumber,
                 CodeMode = inteCodeRulesEntity.CodeMode,
             });
+
+            // 开启事务
+            using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
 
             List<ManuSfcEntity> manuSfcList = new();
             List<ManuSfcInfoEntity> manuSfcInfoList = new();
@@ -166,7 +168,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = param.SiteId,
                     SFC = item,
-                    SFCId= manuSfcEntity.Id,
+                    SFCId = manuSfcEntity.Id,
                     ProductId = planWorkOrderEntity.ProductId,
                     WorkOrderId = planWorkOrderEntity.Id,
                     BarCodeInfoId = manuSfcEntity.Id,

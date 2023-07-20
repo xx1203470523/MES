@@ -123,7 +123,8 @@ namespace Hymson.MES.Services.Services.Integrated
             await _validationCreateRules.ValidateAndThrowAsync(param);
 
             // 获取所有实现类
-            var services = _serviceProvider.GetServices<IJobManufactureService>();
+            var services = _serviceProvider.GetServices<IJobService>();
+            //var services = _serviceProvider.GetServices<IJobManufactureService>();
             if (!services.Any(it => it.GetType().Name == param.ClassProgram))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12011));
@@ -186,7 +187,7 @@ namespace Hymson.MES.Services.Services.Integrated
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(param);
             // 获取所有实现类
-            var services = _serviceProvider.GetServices<IJobManufactureService>();
+            var services = _serviceProvider.GetServices<IJobService>();
             if (!services.Any(it => it.GetType().Name == param.ClassProgram))
             {
                 throw new ValidationException(nameof(ErrorCode.MES12011));

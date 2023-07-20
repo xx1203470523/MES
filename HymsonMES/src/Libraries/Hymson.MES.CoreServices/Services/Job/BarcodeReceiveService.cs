@@ -109,7 +109,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             if (bo == null) return default;
 
             var sfcProduceEntities = await bo.Proxy.GetDataBaseValueAsync<MultiSFCBo, ManuSfcProduceEntity>(
-               _masterDataService.GetProduceEntitiesBySFCsAsync, new MultiSFCBo { SiteId = param.SiteId, SFCs = param.SFCs }
+               _masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, new MultiSFCBo { SiteId = param.SiteId, SFCs = param.SFCs }
                 );
 
             var sfcEntitys = await bo.Proxy.GetDataBaseValueAsync<ManuSfcQuery, ManuSfcEntity>(

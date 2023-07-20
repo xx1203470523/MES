@@ -1,5 +1,7 @@
-﻿using Hymson.MES.Core.Domain.Manufacture;
+﻿using Hymson.MES.Core.Attribute.Job;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 
 namespace Hymson.MES.CoreServices.Bos.Job
@@ -36,17 +38,24 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 
         /// </summary>
-        public IEnumerable<ManuSfcProduceEntity> SFCProduceEntities { get; set; } = new List<ManuSfcProduceEntity>();
+        public ManuSfcProduceEntity FirstSFCProduceEntity { get; set; } = new();
 
+        /*
         /// <summary>
         /// 
         /// </summary>
         public IEnumerable<UpdateWorkOrderRealTimeCommand> UpdateWorkOrderRealTimeCommands = new List<UpdateWorkOrderRealTimeCommand>();
+        */
 
         /// <summary>
         /// 
         /// </summary>
         public UpdateQtyCommand UpdateQtyCommand { get; set; } = new();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public MultiUpdateProduceSFCCommand MultiUpdateProduceSFCCommand { get; set; } = new();
 
         /// <summary>
         /// 

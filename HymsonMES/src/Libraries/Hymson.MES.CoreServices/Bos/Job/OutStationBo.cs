@@ -40,7 +40,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 
         /// </summary>
-        public List<ManuSfcProduceEntity> SFCProduceEntities { get; set; } = new();
+        public ManuSfcProduceEntity FirstSFCProduceEntity { get; set; } = new();
 
         /// <summary>
         /// 
@@ -70,12 +70,17 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 
         /// </summary>
-        public DeletePhysicalBySfcsCommand DeletePhysicalBySfcsCommand { get; set; } = new();
+        public DeletePhysicalByProduceIdsCommand DeletePhysicalByProduceIdsCommand { get; set; } = new();
 
         /// <summary>
         /// 
         /// </summary>
         public UpdateQtyCommand UpdateQtyCommand { get; set; } = new();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public MultiUpdateProduceSFCCommand MultiUpdateProduceSFCCommand { get; set; } = new();
 
         /// <summary>
         /// 

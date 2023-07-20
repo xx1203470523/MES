@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 操作面板按钮    服务 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-04-01 02:58:19
- */
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -341,7 +334,10 @@ namespace Hymson.MES.Services.Services.Manufacture
             // 是否清除条码
             if (buttonJobs.Any(a => a.IsClear) == true) dto.Param?.Add("IsClear", "True");
 
-            /*
+            // 是否清除条码
+            var isClear = false;
+            if (buttonJobs.Any(a => a.IsClear) == true) isClear = true;
+
             // 执行Job
             var jobResponses = await _executeJobService.ExecuteAsync(jobs.Select(s => new JobBo { Name = s.ClassProgram }), new JobRequestBo
             {
@@ -351,8 +347,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ResourceId = dto.Param["ResourceId"].ParseToLong(),
                 SFCs = new string[] { dto.Param["SFC"] }
             });
+
             foreach (var item in jobResponses)
             {
+                if (isClear) item.Value.Content.Add("IsClear", "True");
+
                 result.Add(item.Key, new JobResponseDto
                 {
                     Rows = item.Value.Rows,
@@ -361,9 +360,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Time = item.Value.Time
                 });
             }
-            */
 
-            result = await _jobCommonService.ExecuteJobAsync(jobs, dto.Param);
+            //result = await _jobCommonService.ExecuteJobAsync(jobs, dto.Param);
             return result;
         }
 
@@ -418,7 +416,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task<Dictionary<string, JobResponseDto>> OutStationAsync(ButtonRequestDto dto)
         {
             var result = new Dictionary<string, JobResponseDto> { }; // 返回结果
-       
+
             var bo = new ManufactureBo
             {
                 SFC = dto.Param["SFC"],

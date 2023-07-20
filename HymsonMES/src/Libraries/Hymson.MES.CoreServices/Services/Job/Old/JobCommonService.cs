@@ -3,7 +3,6 @@ using Hymson.MES.CoreServices.Bos;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.RegularExpressions;
-using System.Transactions;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
@@ -77,8 +76,8 @@ namespace Hymson.MES.CoreServices.Services.Job
         public async Task<IEnumerable<JobClassBo>> GetJobClassBoListAsync()
         {
             // 获取所有实现类
-            var services = _serviceProvider.GetServices<IJobManufactureService>();
-            //var services = _serviceProvider.GetServices<IJobService>();
+            //var services = _serviceProvider.GetServices<IJobManufactureService>();
+            var services = _serviceProvider.GetServices<IJobService>();
             return await Task.FromResult(services.Select(s =>
             {
                 var type = s.GetType();
