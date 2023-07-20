@@ -389,5 +389,36 @@ namespace Hymson.MES.Services.Services.Integrated
 
             return inteVehicleFreightDtos;
         }
+        /// <summary>
+        /// 载具操作
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task VehicleOperationAsync(InteVehicleOperationDto dto)
+        {
+            if (dto.OperationType == 0)
+                await VehicleUnBindOperationAsync(dto);
+            else
+                await VehicleUnBindOperationAsync(dto);
+        }
+        /// <summary>
+        /// 载具绑定
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        private async Task VehicleBindOperationAsync(InteVehicleOperationDto dto)
+        {
+
+        }
+        /// <summary>
+        /// 载具解绑
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        private async Task VehicleUnBindOperationAsync(InteVehicleOperationDto dto)
+        {
+
+        }
     }
 }

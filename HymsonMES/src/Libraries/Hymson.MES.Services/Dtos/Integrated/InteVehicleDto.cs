@@ -333,5 +333,28 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public bool? Status { get; set; }
 
     }
+    /// <summary>
+    /// 载具操作
+    /// </summary>
+    public class InteVehicleOperationDto
+    {
+        /// <summary>
+        /// 托盘码
+        /// </summary>
+        public string PalletNo { get; set; }
+        /// <summary>
+        /// 位置ID
+        /// </summary>
+        public long LocationId { get; set; }
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string SFC { get; set; }
+        /// <summary>
+        /// 操作方式 0 绑定，1解绑
+        /// </summary>
+        public int OperationType { get; set; }
+    }
+    
     #endregion
 }

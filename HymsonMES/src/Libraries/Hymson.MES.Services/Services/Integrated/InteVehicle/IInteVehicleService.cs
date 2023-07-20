@@ -11,7 +11,7 @@ using Hymson.MES.Services.Dtos.Integrated;
 namespace Hymson.MES.Services.Services.Integrated
 {
     /// <summary>
-    /// 载具注册表 service接口
+    /// 载具 service接口
     /// </summary>
     public interface IInteVehicleService
     {
@@ -70,6 +70,12 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="vehicleId"></param>
         /// <returns></returns>
         Task<IEnumerable<InteVehicleFreightDto>> QueryVehicleFreightByVehicleIdAsync(long vehicleId);
+        /// <summary>
+        /// 载具操作
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task VehicleOperationAsync(InteVehicleOperationDto dto);
         
     }
 }
