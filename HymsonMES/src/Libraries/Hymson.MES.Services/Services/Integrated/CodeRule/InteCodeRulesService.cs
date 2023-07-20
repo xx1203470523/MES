@@ -88,6 +88,30 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
             {
                 throw new BusinessException(nameof(ErrorCode.MES12438));
             }
+            if (inteCodeRulesCreateDto.CodeRulesMakes.Where(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%ACTIVITY%").Count()!=1)
+            {
+                throw new BusinessException(nameof(ErrorCode.MES12444));
+            }
+            if (inteCodeRulesCreateDto.CodeRulesMakes.Any(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%MULTIPLE_VARIABLE%")) 
+            {
+                if (inteCodeRulesCreateDto.CodeRulesMakes.Where(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%MULTIPLE_VARIABLE%").Count() != 1)
+                {
+                    throw new BusinessException(nameof(ErrorCode.MES12445));
+                }
+                if (inteCodeRulesCreateDto.CodeRulesMakes.Any(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%MULTIPLE_VARIABLE%" && string.IsNullOrEmpty(x.CustomValue))) 
+                {
+                    throw new BusinessException(nameof(ErrorCode.MES12446));
+                }
+
+                foreach (var item in inteCodeRulesCreateDto.CodeRulesMakes.Where(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%MULTIPLE_VARIABLE%" && !string.IsNullOrEmpty(x.CustomValue)))
+                {
+                    if (item!.CustomValue!.Split(";").GroupBy(x => x).Any(g => g.Count() > 1)) 
+                    {
+                        throw new BusinessException(nameof(ErrorCode.MES12447));
+                    }
+                }
+                
+            }
 
 
             //DTO转换实体
@@ -230,6 +254,34 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
             {
                 await _validationMakeCreateRules.ValidateAndThrowAsync(item);
             }
+            if (!inteCodeRulesModifyDto.CodeRulesMakes.Any(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%ACTIVITY%"))
+            {
+                throw new BusinessException(nameof(ErrorCode.MES12438));
+            }
+            if (inteCodeRulesModifyDto.CodeRulesMakes.Where(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%ACTIVITY%").Count() != 1)
+            {
+                throw new BusinessException(nameof(ErrorCode.MES12444));
+            }
+            if (inteCodeRulesModifyDto.CodeRulesMakes.Any(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%MULTIPLE_VARIABLE%"))
+            {
+                if (inteCodeRulesModifyDto.CodeRulesMakes.Where(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%MULTIPLE_VARIABLE%").Count() != 1)
+                {
+                    throw new BusinessException(nameof(ErrorCode.MES12445));
+                }
+                if (inteCodeRulesModifyDto.CodeRulesMakes.Any(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%MULTIPLE_VARIABLE%" && string.IsNullOrEmpty(x.CustomValue)))
+                {
+                    throw new BusinessException(nameof(ErrorCode.MES12446));
+                }
+
+                foreach (var item in inteCodeRulesModifyDto.CodeRulesMakes.Where(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%MULTIPLE_VARIABLE%" && !string.IsNullOrEmpty(x.CustomValue)))
+                {
+                    if (item!.CustomValue!.Split(";").GroupBy(x => x).Any(g => g.Count() > 1))
+                    {
+                        throw new BusinessException(nameof(ErrorCode.MES12447));
+                    }
+                }
+            }
+
 
             //DTO转换实体
             var inteCodeRulesEntity = inteCodeRulesModifyDto.ToEntity<InteCodeRulesEntity>();
@@ -330,7 +382,7 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
                 }
 
                 //查询关联的编码规则组成
-                var inteCodeRulesMakeEntitys = await _inteCodeRulesMakeRepository.GetInteCodeRulesMakeEntitiesAsync(new InteCodeRulesMakeQuery { SiteId = _currentSite.SiteId ?? 0, CodeRulesId = inteCodeRulesEntity.Id });
+                var inteCodeRulesMakeEntitys = (await _inteCodeRulesMakeRepository.GetInteCodeRulesMakeEntitiesAsync(new InteCodeRulesMakeQuery { SiteId = _currentSite.SiteId ?? 0, CodeRulesId = inteCodeRulesEntity.Id })).OrderBy(x=>x.Seq);
 
                 List<InteCodeRulesMakeDto> inteCodeRulesDtos = new List<InteCodeRulesMakeDto>();
                 if (inteCodeRulesMakeEntitys != null && inteCodeRulesMakeEntitys.Count() > 0)
