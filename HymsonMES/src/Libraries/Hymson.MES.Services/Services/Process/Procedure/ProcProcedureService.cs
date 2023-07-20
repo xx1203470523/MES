@@ -129,6 +129,27 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         }
 
         /// <summary>
+        /// 分页查询工艺路线的工序列表
+        /// </summary>
+        /// <param name="procProcedurePagedQueryDto"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ProcProcedureDto>> GetPagedInfoByProcessRouteIdAsync(ProcProcedurePagedQueryDto procProcedurePagedQueryDto)
+        {
+            var procProcedurePagedQuery = procProcedurePagedQueryDto.ToQuery<ProcProcedurePagedQuery>();
+            procProcedurePagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            var pagedInfo = await _procProcedureRepository.GetPagedInfoAsync(procProcedurePagedQuery);
+
+            //实体到DTO转换 装载数据
+            var procProcedureDtos = new List<ProcProcedureDto>();
+            foreach (var procProcedureEntity in pagedInfo.Data)
+            {
+                var procProcedureDto = procProcedureEntity.ToModel<ProcProcedureDto>();
+                procProcedureDtos.Add(procProcedureDto);
+            }
+            return new PagedInfo<ProcProcedureDto>(procProcedureDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
         /// 分页实体转换
         /// </summary>
         /// <param name="pagedInfo"></param>

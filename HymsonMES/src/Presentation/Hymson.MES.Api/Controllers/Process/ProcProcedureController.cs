@@ -49,6 +49,18 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
+        /// 分页查询列表（工序表）
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getByProcessRouteId")]
+        public async Task<PagedInfo<ProcProcedureDto>> GetPagedInfoByProcessRouteIdAsync([FromQuery] ProcProcedurePagedQueryDto parm)
+        {
+            return await _procProcedureService.GetPagedInfoByProcessRouteIdAsync(parm);
+        }
+
+        /// <summary>
         /// 查询详情（工序表）
         /// </summary>
         /// <param name="id"></param>

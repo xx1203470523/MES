@@ -79,6 +79,18 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
         /// <summary>
+        /// 根据工序id查询不合格代码列表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [Route("listByProcedure/{id}")]
+        [HttpGet]
+        public async Task<IEnumerable<QualUnqualifiedCodeDto>> GetListByProcedureIdAsync(long id)
+        {
+            return await _qualUnqualifiedCodeService.GetListByProcedureIdAsync(id);
+        }
+
+        /// <summary>
         /// 添加
         /// </summary>
         /// <param name="parm"></param>

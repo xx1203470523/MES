@@ -27,6 +27,7 @@ namespace Hymson.MES.Services.Validators.Integrated
         public InteCodeRulesCreateValidator()
         {
             RuleFor(x => x.ProductId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12410));
+            RuleFor(x => x.CodeMode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12442));
             RuleFor(x => x.CodeType).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12411));
             RuleFor(x => x.Base).NotEmpty().GreaterThan(0).WithErrorCode(nameof(ErrorCode.MES12412));
             RuleFor(x => x.Increment).GreaterThan(0).WithErrorCode(nameof(ErrorCode.MES12413));
@@ -39,6 +40,7 @@ namespace Hymson.MES.Services.Validators.Integrated
 
             RuleFor(x => x.IgnoreChar).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES16030));
             RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES16030));
+            RuleFor(x => x.CodeMode).Must(it => Enum.IsDefined(typeof(CodeRuleCodeModeEnum), it)).WithErrorCode(nameof(ErrorCode.MES12443));
             RuleFor(x => x.CodeType).Must(it => Enum.IsDefined(typeof(CodeRuleCodeTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES16038));
             RuleFor(x => x.ResetType).Must(it => Enum.IsDefined(typeof(SerialNumberTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES12439));
             RuleFor(x => x.StartNumber).Must(it => it>=1 && it % 1== 0 ).WithErrorCode(nameof(ErrorCode.MES12440));
@@ -59,6 +61,7 @@ namespace Hymson.MES.Services.Validators.Integrated
             RuleFor(x => x.Id).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12419));
 
             RuleFor(x => x.ProductId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12410));
+            RuleFor(x => x.CodeMode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12442));
             RuleFor(x => x.CodeType).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12411));
             RuleFor(x => x.Base).NotEmpty().GreaterThan(0).WithErrorCode(nameof(ErrorCode.MES12412));
             RuleFor(x => x.Increment).GreaterThan(0).WithErrorCode(nameof(ErrorCode.MES12413));
@@ -70,6 +73,7 @@ namespace Hymson.MES.Services.Validators.Integrated
 
             RuleFor(x => x.IgnoreChar).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES16030));
             RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES16030));
+            RuleFor(x => x.CodeMode).Must(it => Enum.IsDefined(typeof(CodeRuleCodeModeEnum), it)).WithErrorCode(nameof(ErrorCode.MES12443));
             RuleFor(x => x.CodeType).Must(it => Enum.IsDefined(typeof(CodeRuleCodeTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES16038));
             RuleFor(x => x.ResetType).Must(it => Enum.IsDefined(typeof(SerialNumberTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES12439));
             RuleFor(x => x.StartNumber).Must(it => it >= 1 && it % 1 == 0).WithErrorCode(nameof(ErrorCode.MES12440));

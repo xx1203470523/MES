@@ -367,6 +367,13 @@
         public const string MES12439 = "编码规则重置序号 不合法！";
         public const string MES12440 = "编码规则初始值需要大于等于1的整数！";
         public const string MES12441 = "编码规则基数不合法！";
+
+        public const string MES12442 = "编码模式 不能为空！";
+        public const string MES12443 = "编码模式 不合法！";
+        public const string MES12444 = "编码规则组成只能有一行取值方式为可变值且分段值为%ACTIVITY%的数据！";
+        public const string MES12445 = "编码规则组成最多只有一行取值方式为可变值且分段值为%MULTIPLE_VARIABLE%的数据！";
+        public const string MES12446 = "编码规则组成取值方式为可变值且分段值为%MULTIPLE_VARIABLE%的数据需要填写自定义值！";
+        public const string MES12447 = "编码规则组成取值方式为可变值且分段值为%MULTIPLE_VARIABLE%数据中自定义值的区间值存在重复！";
         #endregion
 
         #region 容器维护 12500
@@ -932,6 +939,8 @@
         public const string MES18214 = "工序不存在";
 
         public const string MES18215 = "条码{0}设置为活动状态成功！";
+        public const string MES18216 = "条码{0}状态修改失败，请联系管理员！";
+        public const string MES18217 = "条码{SFC}状态不合法！";
         #endregion
 
 

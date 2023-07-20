@@ -47,5 +47,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 站点id
         /// </summary>
         public long SiteId { get; set; } = 0;
+
+        /// <summary>
+        /// 工艺路线id
+        /// </summary>
+        public long? ProcessRouteId { get; set; }
     }
 }

@@ -196,6 +196,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 描述 :资源类型名称 
         /// </summary>
         public string? ResTypeName { get; set; }
+
+        /// <summary>
+        /// 工艺路线id
+        /// </summary>
+        public long? ProcessRouteId { get; set; }
     }
 
     /// <summary>
