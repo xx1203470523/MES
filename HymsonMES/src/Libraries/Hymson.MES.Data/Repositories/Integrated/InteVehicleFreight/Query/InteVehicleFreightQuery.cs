@@ -13,5 +13,13 @@ namespace Hymson.MES.Data.Repositories.Integrated
     /// </summary>
     public class InteVehicleFreightQuery
     {
+        /// <summary>
+        /// 条码列表
+        /// </summary>
+        public IEnumerable<string> Sfcs { get; set; }
+        /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long SiteId { get; set; }
     }
 }
