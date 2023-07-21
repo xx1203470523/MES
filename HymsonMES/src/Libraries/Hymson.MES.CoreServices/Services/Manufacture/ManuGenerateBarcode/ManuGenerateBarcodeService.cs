@@ -51,7 +51,30 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
             var codeRulesMakeList = await getCodeRulesMakeListTask;
             var codeRule = await getCodeRulesTask;
 
-            return await GenerateBarCodeSerialNumberAsync(new BarCodeSerialNumberBo
+            //return await GenerateBarCodeSerialNumberAsync(new BarCodeSerialNumberBo
+            //{
+            //    IsTest = param.IsTest,
+            //    IsSimulation = false,
+            //    CodeRulesMakeBos = codeRulesMakeList.Select(s => new CodeRulesMakeBo
+            //    {
+            //        Seq = s.Seq,
+            //        ValueTakingType = s.ValueTakingType,
+            //        SegmentedValue = s.SegmentedValue,
+            //        CustomValue = s.CustomValue,
+            //    }),
+
+            //    CodeRuleKey = $"{param.CodeRuleId}",
+            //    Count = param.Count,
+            //    Base = codeRule.Base,
+            //    Increment = codeRule.Increment,
+            //    IgnoreChar = codeRule.IgnoreChar,
+            //    OrderLength = codeRule.OrderLength,
+            //    ResetType = codeRule.ResetType,
+            //    StartNumber = codeRule.StartNumber,
+            //    CodeMode = codeRule.CodeMode,
+            //});
+
+            return (await GenerateBarCodeSerialNumberReturnBarCodeInfosAsync(new BarCodeSerialNumberBo
             {
                 IsTest = param.IsTest,
                 IsSimulation = false,
@@ -72,7 +95,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                 ResetType = codeRule.ResetType,
                 StartNumber = codeRule.StartNumber,
                 CodeMode = codeRule.CodeMode,
-            });
+            })).Select(x=>x.BarCode);
         }
 
         /// <summary>
@@ -82,7 +105,29 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
         /// <returns></returns>
         public async Task<IEnumerable<string>> GenerateBarcodeListAsync(CodeRuleBo param)
         {
-            return await GenerateBarCodeSerialNumberAsync(new BarCodeSerialNumberBo
+            //return await GenerateBarCodeSerialNumberAsync(new BarCodeSerialNumberBo
+            //{
+            //    IsTest = param.IsTest,
+            //    CodeRulesMakeBos = param.CodeRulesMakeList.Select(s => new CodeRulesMakeBo
+            //    {
+            //        Seq = s.Seq,
+            //        ValueTakingType = s.ValueTakingType,
+            //        SegmentedValue = s.SegmentedValue,
+            //        CustomValue=s.CustomValue??""
+            //    }),
+
+            //    CodeRuleKey = $"{param.ProductId}",
+            //    Count = param.Count,
+            //    Base = param.Base,
+            //    IgnoreChar = param.IgnoreChar ?? "",
+            //    Increment = param.Increment,
+            //    OrderLength = param.OrderLength,
+            //    ResetType = param.ResetType,
+            //    StartNumber = param.StartNumber,
+            //    CodeMode=param.CodeMode,
+            //});
+
+            return (await GenerateBarCodeSerialNumberReturnBarCodeInfosAsync(new BarCodeSerialNumberBo
             {
                 IsTest = param.IsTest,
                 CodeRulesMakeBos = param.CodeRulesMakeList.Select(s => new CodeRulesMakeBo
@@ -90,7 +135,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                     Seq = s.Seq,
                     ValueTakingType = s.ValueTakingType,
                     SegmentedValue = s.SegmentedValue,
-                    CustomValue=s.CustomValue??""
+                    CustomValue = s.CustomValue ?? ""
                 }),
 
                 CodeRuleKey = $"{param.ProductId}",
@@ -101,8 +146,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                 OrderLength = param.OrderLength,
                 ResetType = param.ResetType,
                 StartNumber = param.StartNumber,
-                CodeMode=param.CodeMode,
-            });
+                CodeMode = param.CodeMode,
+            })).Select(x=>x.BarCode);
         }
 
         /// <summary>
@@ -110,6 +155,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
         /// </summary>
         /// <param name="bo"></param>
         /// <returns></returns>
+        [Obsolete("这个方法已经过期(单单返回生成的条码，没有标识)，请使用GenerateBarCodeSerialNumberReturnBarCodeInfosAsync方法")]
         public async Task<IEnumerable<string>> GenerateBarCodeSerialNumberAsync(BarCodeSerialNumberBo bo)
         {
             bo.CodeRulesMakeBos = bo.CodeRulesMakeBos.OrderBy(x => x.Seq);
@@ -250,7 +296,107 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
             if (bo.IsTest == false && bo.IsSimulation == true)
             {
                 bo.IsSimulation = false;
-                await GenerateBarCodeSerialNumberAsync(bo);
+                return await GenerateBarCodeSerialNumberAsync(bo);
+            }
+
+            return list;
+        }
+
+        /// <summary>
+        /// 生成 流水号
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<BarCodeInfo>> GenerateBarCodeSerialNumberReturnBarCodeInfosAsync(BarCodeSerialNumberBo bo)
+        {
+            bo.CodeRulesMakeBos = bo.CodeRulesMakeBos.OrderBy(x => x.Seq);
+
+            List<BarCodeInfo> list = new();
+
+            List<string> serialStrings = new();
+            var copyBo = bo.ToSerialize().ToDeserialize<BarCodeSerialNumberBo>();//复制一份数据，因为下方GenerateBarCodeAboutMoreAsync 方法中有修改值的操作
+            //var serialNumbers = await GenerateBarCodeSerialNumbersWithTryAsync(copyBo);
+            var serialNumbers = await GenerateBarCodeAboutMoreAsync(copyBo);
+            foreach (var item in serialNumbers)
+            {
+                var str = bo.Base switch
+                {
+                    10 => $"{item}",
+                    16 or 32 => ConvertNumber(item, bo.IgnoreChar, bo.Base),
+                    _ => throw new CustomerValidationException(nameof(ErrorCode.MES16202)),
+                };
+
+                if (bo.OrderLength > 0 && str.Length > bo.OrderLength)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16201));
+                }
+
+                str = str.PadLeft(bo.OrderLength, '0');
+                serialStrings.Add(str);
+            }
+
+            if (serialStrings == null || serialStrings.Any() == false)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16203));
+            }
+
+            #region 组合数据生成条码
+            var codeRulesMakeBosArray = bo.CodeRulesMakeBos.ToArray();
+            foreach (var serialStr in serialStrings)
+            {
+                var ruleMakeValues = new string[bo.CodeRulesMakeBos.Count()][];
+                //根据编码规则获取到每行数据会生成的值
+                //foreach (var item in bo.CodeRulesMakeBos)
+                for (int i = 0; i < codeRulesMakeBosArray.Length; i++)
+                {
+                    var item = codeRulesMakeBosArray[i];
+
+                    if (item.ValueTakingType == CodeValueTakingTypeEnum.FixedValue)
+                    {
+                        ruleMakeValues[i] = new string[] { item.SegmentedValue };
+                        continue;
+                    }
+
+                    switch (item.SegmentedValue)
+                    {
+                        case "%ACTIVITY%":
+                            ruleMakeValues[i] = new string[] { serialStr };
+                            break;
+                        case "%YYMMDD%":
+                            ruleMakeValues[i] = new string[] { HymsonClock.Now().ToString("yyMMdd") };
+                            break;
+                        case "%MULTIPLE_VARIABLE%":
+                            //模式是多个时，生成多个条码
+                            if (bo.CodeMode == CodeRuleCodeModeEnum.More
+                    && item.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && !string.IsNullOrEmpty(item.CustomValue))
+                            {
+                                ruleMakeValues[i] = item.CustomValue.Split(';');//查询出自定义值能转换成几个
+                            }
+                            break;
+                        default:
+                            throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", item.SegmentedValue);
+                            break;
+                    }
+                }
+
+                //将上方 根据编码规则组成的数组值组成各种情况   ，如获取到[['A1'],['B1','B2'],['C1']]  去生成 A1B1C1、A1B2C1两个条码
+                List<string[]> combinations = new List<string[]>();
+                GenerateCombinationsHelper(ruleMakeValues, 0, new string[ruleMakeValues.Length], combinations);
+                foreach (var combination in combinations)
+                {
+                    list.Add( new BarCodeInfo 
+                    {
+                        BarCode= string.Join("", combination),
+                        SerialNumber=serialStr
+                    });
+                }
+            }
+            #endregion
+
+            // 如果不是测试，且有模拟验证通过一次，就直接真实生成
+            if (bo.IsTest == false && bo.IsSimulation == true)
+            {
+                bo.IsSimulation = false;
+               return await GenerateBarCodeSerialNumberReturnBarCodeInfosAsync(bo);
             }
 
             return list;

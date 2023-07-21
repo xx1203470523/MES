@@ -15,7 +15,14 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
+        [Obsolete("这个方法已经过期(单单返回生成的条码，没有标识)，请使用GenerateBarCodeSerialNumberReturnBarCodeInfosAsync方法")]
         Task<IEnumerable<string>> GenerateBarCodeSerialNumberAsync(BarCodeSerialNumberBo param);
+
+        /// <summary>
+        /// 生成流水号
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<BarCodeInfo>> GenerateBarCodeSerialNumberReturnBarCodeInfosAsync(BarCodeSerialNumberBo bo);
 
         /// <summary>
         /// 条码生成
