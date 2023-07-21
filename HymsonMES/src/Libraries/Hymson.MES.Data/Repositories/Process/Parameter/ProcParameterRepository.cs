@@ -1,17 +1,8 @@
-/*
- *creator: Karl
- *
- *describe: 标准参数表 仓储类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-02-13 02:50:20
- */
-
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -64,17 +55,6 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
-        /// 根据IDs批量获取数据
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<ProcParameterEntity>> GetByIdsAsync(long[] ids)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcParameterEntity>(GetByIdsSql, new { ids = ids });
-        }
-
-        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="procParameterPagedQuery"></param>
@@ -90,7 +70,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
             //if (procParameterPagedQuery.SiteId != 0)
             //{
-                sqlBuilder.Where(" SiteId=@SiteId ");
+            sqlBuilder.Where(" SiteId = @SiteId ");
             //}
             if (!string.IsNullOrWhiteSpace(procParameterPagedQuery.ParameterCode))
             {
@@ -136,7 +116,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
             //if (procParameterQuery.SiteId != 0)
             //{
-                sqlBuilder.Where(" SiteId=@SiteId ");
+            sqlBuilder.Where(" SiteId=@SiteId ");
             //}
             if (!string.IsNullOrWhiteSpace(procParameterQuery.ParameterCode))
             {
@@ -161,17 +141,6 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
-        /// 批量新增
-        /// </summary>
-        /// <param name="procParameterEntitys"></param>
-        /// <returns></returns>
-        public async Task<int> InsertsAsync(List<ProcParameterEntity> procParameterEntitys)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertsSql, procParameterEntitys);
-        }
-
-        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="procParameterEntity"></param>
@@ -182,19 +151,12 @@ namespace Hymson.MES.Data.Repositories.Process
             return await conn.ExecuteAsync(UpdateSql, procParameterEntity);
         }
 
-        /// <summary>
-        /// 批量更新
-        /// </summary>
-        /// <param name="procParameterEntitys"></param>
-        /// <returns></returns>
-        public async Task<int> UpdatesAsync(List<ProcParameterEntity> procParameterEntitys)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdatesSql, procParameterEntitys);
-        }
 
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class ProcParameterRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_parameter` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
@@ -203,18 +165,12 @@ namespace Hymson.MES.Data.Repositories.Process
                                             /**select**/
                                            FROM `proc_parameter` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `proc_parameter`(  `Id`, `SiteId`, `ParameterCode`, `ParameterName`, `ParameterUnit`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ParameterCode, @ParameterName, @ParameterUnit, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `proc_parameter`(  `Id`, `SiteId`, `ParameterCode`, `ParameterName`, `ParameterUnit`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ParameterCode, @ParameterName, @ParameterUnit, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        //const string UpdateSql = "UPDATE `proc_parameter` SET   SiteId = @SiteId, ParameterCode = @ParameterCode, ParameterName = @ParameterName, ParameterUnit = @ParameterUnit, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdateSql = "UPDATE `proc_parameter` SET  ParameterUnit = @ParameterUnit, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `proc_parameter` SET   SiteId = @SiteId, ParameterCode = @ParameterCode, ParameterName = @ParameterName, ParameterUnit = @ParameterUnit, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string InsertSql = "INSERT INTO `proc_parameter`(  `Id`, `SiteId`, `ParameterCode`, `ParameterName`, `ParameterUnit`, DataType, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ParameterCode, @ParameterName, @ParameterUnit, @DataType, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string UpdateSql = "UPDATE `proc_parameter` SET ParameterUnit = @ParameterUnit, DataType = @DataType, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_parameter` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_parameter` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids";
-        const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteId`, `ParameterCode`, `ParameterName`, `ParameterUnit`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `proc_parameter`  WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteId`, `ParameterCode`, `ParameterName`, `ParameterUnit`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `proc_parameter`  WHERE Id IN @ids ";
+        const string GetByIdSql = @"SELECT * FROM `proc_parameter` WHERE Id = @Id ";
+
     }
+
 }
