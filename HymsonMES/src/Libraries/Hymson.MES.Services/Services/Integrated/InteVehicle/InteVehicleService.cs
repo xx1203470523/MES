@@ -535,7 +535,7 @@ namespace Hymson.MES.Services.Services.Integrated
             {
                 //获取指定位置信息
                 var loc = await _inteVehicleFreightRepository.GetByIdAsync(dto.LocationId);
-                var stack = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQueryByLocation()
+                var stack = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
                 {
                     LocationId = dto.LocationId,
                     SiteId = _currentSite.SiteId.Value
