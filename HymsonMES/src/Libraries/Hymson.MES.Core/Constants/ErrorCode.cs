@@ -981,6 +981,7 @@
         public const string MES18514 = "载具类型验证类型不合法";
         public const string MES18515 = "载具类型验证物料或物料组不合法";
 
+        public const string MES18516 = "载具类型编码不允许有空格";
         #endregion
 
         #region 载具注册 18600
