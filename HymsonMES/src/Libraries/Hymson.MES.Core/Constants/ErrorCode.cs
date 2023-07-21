@@ -1001,6 +1001,7 @@
         public const string MES18614 = "载具该单元格装载已达最大数量";
         public const string MES18615 = "载具该单元格已装载了条码:{sfc}";
         public const string MES18616 = "载具：重复装载该条码:{sfc},托盘码:{palletNo}";
+        public const string MES18617 = "载具不存在或者载具未激活";
 
         #endregion
 

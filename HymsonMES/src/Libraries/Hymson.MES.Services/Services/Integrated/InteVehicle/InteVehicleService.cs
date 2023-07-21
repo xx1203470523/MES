@@ -404,13 +404,18 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <exception cref="NotImplementedException"></exception>
         public async Task VehicleOperationAsync(InteVehicleOperationDto dto)
         {
-            if (dto.OperationType == 0)
-                await VehicleBindOperationAsync(dto);
-            else
-                await VehicleUnBindOperationAsync(dto);
+            //校验托盘是否可用
+            var v = await _inteVehicleRepository.GetByCodeAsync(new InteVehicleCodeQuery()
+            {
+                Code = dto.PalletNo,
+                SiteId = _currentSite.SiteId.Value
+            });
+            if (v==null|| v.Status == EnableEnum.No)
+                throw new CustomerValidationException(nameof(ErrorCode.MES18617));
+            
             switch (dto.OperationType)
             {
-                case 0: {   await VehicleUnBindOperationAsync(dto); } break;
+                case 0: {   await VehicleBindOperationAsync(dto); } break;
                 case 1: {   await VehicleUnBindOperationAsync(dto);}break;
                 case 2: {   await VehicleClearAsync(dto);}break;
                         
