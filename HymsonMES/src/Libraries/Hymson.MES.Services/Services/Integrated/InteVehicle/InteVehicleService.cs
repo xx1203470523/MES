@@ -16,6 +16,7 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCreateBarcodeDto;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using IdGen;
@@ -402,9 +403,16 @@ namespace Hymson.MES.Services.Services.Integrated
                 await VehicleUnBindOperationAsync(dto);
             else
                 await VehicleUnBindOperationAsync(dto);
+            switch (dto.OperationType)
+            {
+                case 0: { await VehicleUnBindOperationAsync(dto); } break;
+                case 1: {  await VehicleUnBindOperationAsync(dto);}break;
+                case 2: {  await VehicleClearAsync(dto);}break;
+                        
+            }
         }
         /// <summary>
-        /// 载具绑定
+        /// 绑盘操作
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -414,6 +422,17 @@ namespace Hymson.MES.Services.Services.Integrated
              * 载具类型是单格子单条码的情况下  条码存放在inte_vehicle_freight表中
              * 载具类型是单格子多条码的情况下  条码存放在inte_vehice_freight_stack表中
              */
+            //绑盘前校验该条码 绑定状态是否是已绑定
+            var vf = await _inteVehiceFreightStackRepository.GetBySFCAsync(dto.SFC);
+            if (vf != null)
+            {
+                var v1 = await _inteVehicleRepository.GetByIdAsync(vf.VehicleId);
+                throw new CustomerValidationException(nameof(ErrorCode.MES18616)).WithData("sfc",dto.SFC).WithData("palletNo", v1.Code);
+            }
+            else
+            {
+
+            }
             //一个格子多个条码情况
             var inteVehicleEntity = await _inteVehicleRepository.GetByCodeAsync(new InteVehicleCodeQuery()
             {
@@ -467,6 +486,7 @@ namespace Hymson.MES.Services.Services.Integrated
             }
             else
             {
+                
                 var loc = await _inteVehicleFreightRepository.GetByIdAsync(dto.LocationId);
                 if(string.IsNullOrEmpty(loc.BarCode))
                 {
@@ -487,6 +507,45 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="dto"></param>
         /// <returns></returns>
         private async Task VehicleUnBindOperationAsync(InteVehicleOperationDto dto)
+        {
+            var inteVehicleEntity = await _inteVehicleRepository.GetByCodeAsync(new InteVehicleCodeQuery()
+            {
+                Code = dto.PalletNo,
+                SiteId = _currentSite.SiteId.Value
+            });
+            var vtr = await _inteVehicleTypeRepository.GetByIdAsync(inteVehicleEntity.VehicleTypeId);
+            if (vtr.UnitNumber > 1)
+            {
+                //获取指定位置信息
+                var loc = await _inteVehicleFreightRepository.GetByIdAsync(dto.LocationId);
+                var stack = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQueryByLocation()
+                {
+                    LocationId = dto.LocationId,
+                    SiteId = _currentSite.SiteId.Value
+                });
+                var foo = stack.FirstOrDefault(s=>s.LocationId== dto.LocationId&&s.BarCode==dto.SFC);
+                if (foo!=null)
+                {
+                    await _inteVehiceFreightStackRepository.DeleteAsync(foo.Id);
+                }
+            }
+            else
+            {
+                var loc = await _inteVehicleFreightRepository.GetByIdAsync(dto.LocationId);
+                if (!string.IsNullOrEmpty(loc.BarCode))
+                {
+                    loc.BarCode = string.Empty;
+                    loc.UpdatedBy = _currentUser.UserName;
+                    loc.UpdatedOn = HymsonClock.Now();
+                    await _inteVehicleFreightRepository.UpdateAsync(loc);
+                }
+                else
+                {
+                   // throw new CustomerValidationException(nameof(ErrorCode.MES18615)).WithData("sfc", loc.BarCode);
+                }
+            }
+        }
+        private async Task VehicleClearAsync(InteVehicleOperationDto dto)
         {
 
         }

@@ -66,7 +66,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="id"></param>
         /// <returns></returns>
         Task<InteVehiceFreightStackEntity> GetByIdAsync(long id);
-    
+        Task<InteVehiceFreightStackEntity> GetBySFCAsync(string sfc);
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>

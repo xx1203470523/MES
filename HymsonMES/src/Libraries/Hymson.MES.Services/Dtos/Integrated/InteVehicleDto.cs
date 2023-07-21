@@ -351,7 +351,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public string SFC { get; set; }
         /// <summary>
-        /// 操作方式 0 绑定，1解绑
+        /// 操作方式 0 绑定，1解绑，2清盘
         /// </summary>
         public int OperationType { get; set; }
     }

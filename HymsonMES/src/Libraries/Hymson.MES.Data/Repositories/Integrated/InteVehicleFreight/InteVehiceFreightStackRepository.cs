@@ -28,7 +28,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
 
         #region 方法
         /// <summary>
-        /// 删除（软删除）
+        /// 删除
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -168,6 +168,12 @@ namespace Hymson.MES.Data.Repositories.Integrated
             var inteVehiceFreightStackEntities = await conn.QueryAsync<InteVehiceFreightStackEntity>(template.RawSql, inteVehiceFreightStackQuery);
             return inteVehiceFreightStackEntities;
         }
+
+        public async Task<InteVehiceFreightStackEntity> GetBySFCAsync(string sfc)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<InteVehiceFreightStackEntity>(GetBySFCSql, new { BarCode = sfc });
+        }
         #endregion
 
     }
@@ -187,12 +193,15 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string UpdateSql = "UPDATE `inte_vehice_freight_stack` SET   SiteId = @SiteId, LocationId = @LocationId, BarCode = @BarCode, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `inte_vehice_freight_stack` SET   SiteId = @SiteId, LocationId = @LocationId, BarCode = @BarCode, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
 
-        const string DeleteSql = "UPDATE `inte_vehice_freight_stack` SET IsDeleted = Id WHERE Id = @Id ";
+        const string DeleteSql = "DELETE `inte_vehice_freight_stack`  WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `inte_vehice_freight_stack` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteId`, `LocationId`, `BarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`
                             FROM `inte_vehice_freight_stack`  WHERE Id = @Id ";
+        const string GetBySFCSql = @"SELECT 
+                               `Id`, `SiteId`, `LocationId`, `BarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`
+                            FROM `inte_vehice_freight_stack`  WHERE BarCode = @BarCode ";
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `LocationId`, `BarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`
                             FROM `inte_vehice_freight_stack`  WHERE Id IN @Ids ";
