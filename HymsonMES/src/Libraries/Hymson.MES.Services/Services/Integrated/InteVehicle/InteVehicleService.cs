@@ -13,6 +13,10 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Services.Dtos.Integrated;
@@ -32,6 +36,7 @@ namespace Hymson.MES.Services.Services.Integrated
     {
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
+        
 
         /// <summary>
         /// 载具注册表 仓储
@@ -400,7 +405,7 @@ namespace Hymson.MES.Services.Services.Integrated
         public async Task VehicleOperationAsync(InteVehicleOperationDto dto)
         {
             if (dto.OperationType == 0)
-                await VehicleUnBindOperationAsync(dto);
+                await VehicleBindOperationAsync(dto);
             else
                 await VehicleUnBindOperationAsync(dto);
             switch (dto.OperationType)
@@ -422,7 +427,7 @@ namespace Hymson.MES.Services.Services.Integrated
              * 载具类型是单格子单条码的情况下  条码存放在inte_vehicle_freight表中
              * 载具类型是单格子多条码的情况下  条码存放在inte_vehice_freight_stack表中
              */
-            //绑盘前校验 该条码是否是已绑盘
+            //绑盘前校验 该条码是否已绑盘
             var check1 = await _inteVehiceFreightStackRepository.GetBySFCAsync(dto.SFC);
             if (check1 != null)
             {
@@ -473,7 +478,7 @@ namespace Hymson.MES.Services.Services.Integrated
                     }
                     else
                     {
-                        await _inteVehiceFreightStackRepository.InsertAsync(new InteVehiceFreightStackEntity()
+                        var stackentity = new InteVehiceFreightStackEntity()
                         {
                             BarCode = dto.SFC,
                             CreatedBy = _currentUser.UserName,
@@ -485,7 +490,9 @@ namespace Hymson.MES.Services.Services.Integrated
                             LocationId = dto.LocationId,
                             VehicleId = inteVehicleEntity.Id,
                             IsDeleted = 0
-                        });
+                        };
+
+                        await _inteVehiceFreightStackRepository.InsertAsync(stackentity);
                     }
                 }
             }
