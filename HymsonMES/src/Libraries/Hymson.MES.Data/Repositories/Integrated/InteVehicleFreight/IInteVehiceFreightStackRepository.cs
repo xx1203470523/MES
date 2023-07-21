@@ -80,13 +80,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="inteVehiceFreightStackQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<InteVehiceFreightStackEntity>> GetInteVehiceFreightStackEntitiesAsync(InteVehiceFreightStackQuery inteVehiceFreightStackQuery);
-        /// <summary>
-        /// 获取List
-        /// </summary>
-        /// <param name="inteVehiceFreightStackQuery"></param>
-        /// <returns></returns>
-        Task<IEnumerable<InteVehiceFreightStackEntity>> GetInteVehiceFreightStackEntitiesAsync(InteVehiceFreightStackQueryByLocation inteVehiceFreightStackQuery);
-
+        
         /// <summary>
         /// 分页查询
         /// </summary>

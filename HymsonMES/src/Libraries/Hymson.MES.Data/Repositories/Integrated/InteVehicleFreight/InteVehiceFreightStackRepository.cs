@@ -112,6 +112,19 @@ namespace Hymson.MES.Data.Repositories.Integrated
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetInteVehiceFreightStackEntitiesSqlTemplate);
+            sqlBuilder.Where("SiteId = @SiteId");
+            if(inteVehiceFreightStackQuery.VehicleId!=null)
+            {
+                sqlBuilder.Where("VehicleId = @VehicleId");
+            }
+            if (inteVehiceFreightStackQuery.LocationId != null)
+            {
+                sqlBuilder.Where("LocationId = @LocationId");
+            }
+            if (inteVehiceFreightStackQuery.Sfcs!=null&&inteVehiceFreightStackQuery.Sfcs.Any())
+            {
+                sqlBuilder.Where("BarCode IN @Sfcs");
+            }
             using var conn = GetMESDbConnection();
             var inteVehiceFreightStackEntities = await conn.QueryAsync<InteVehiceFreightStackEntity>(template.RawSql, inteVehiceFreightStackQuery);
             return inteVehiceFreightStackEntities;
