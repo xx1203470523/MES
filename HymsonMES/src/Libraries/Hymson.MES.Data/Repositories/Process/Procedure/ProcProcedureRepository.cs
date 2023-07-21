@@ -120,6 +120,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("a.SiteId = @SiteId");
             sqlBuilder.Where("b.ProcessRouteId = @ProcessRouteId");
             sqlBuilder.Select("a.*");
+            sqlBuilder.LeftJoin("proc_process_route_detail_node b on a.id=b.ProcedureId and b.IsDeleted =0 ");
 
             if (!string.IsNullOrWhiteSpace(query.Code))
             {

@@ -1,19 +1,7 @@
-/*
- *creator: Karl
- *
- *describe: 标准参数表    验证规则 | 代码由框架生成  
- *builder:  Karl
- *build datetime: 2023-02-13 02:50:20
- */
 using FluentValidation;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Services.Dtos.Process;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Validators.Process
 {
@@ -41,12 +29,13 @@ namespace Hymson.MES.Services.Validators.Process
     {
         public ProcParameterModifyValidator()
         {
-            RuleFor(x => x.ParameterCode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10509));
-            RuleFor(x => x.ParameterCode).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES10511));
+            //RuleFor(x => x.ParameterCode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10509));
+            //RuleFor(x => x.ParameterCode).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES10511));
             RuleFor(x => x.ParameterName).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10510));
             RuleFor(x => x.ParameterName).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES10515));
             RuleFor(x => x.ParameterUnit).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10508));
             RuleFor(x => x.ParameterUnit).Must(p => Enum.IsDefined(typeof(ParameterUnitEnum), p)).WithErrorCode(nameof(ErrorCode.MES10512));
         }
     }
+
 }
