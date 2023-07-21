@@ -108,6 +108,9 @@ namespace Microsoft.Extensions.DependencyInjection
             #region InteSystemToken
             services.AddSingleton<IInteSystemTokenRepository, InteSystemTokenRepository>();
             #endregion
+
+            //InteUnit
+            services.AddSingleton<IInteUnitRepository, InteUnitRepository>();
             #endregion
 
             #region Process
