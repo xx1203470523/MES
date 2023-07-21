@@ -3,7 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
+using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.View;
 using Microsoft.Extensions.Options;
@@ -194,19 +194,7 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.Where("uc.IsDeleted=0");
             sqlBuilder.Where($"uc.SiteId =@SiteId");
             sqlBuilder.LeftJoin("qual_unqualified_code_group_relation gr on uc.Id =gr.UnqualifiedCodeId and gr.IsDeleted =0  ");
-
-            if (query.UnqualifiedGroupId.HasValue)
-            {
-                sqlBuilder.Where("gr.UnqualifiedGroupId=@UnqualifiedGroupId");
-            }
-            if (query.UnqualifiedGroupIds != null && query.UnqualifiedGroupIds.Length > 0)
-            {
-                sqlBuilder.Where("gr.UnqualifiedGroupId in @UnqualifiedGroupIds");
-            }
-            if (query.Status!=null)
-            {
-                sqlBuilder.Where("uc.Status=@Status");
-            }
+            sqlBuilder.Where("gr.UnqualifiedGroupId=@UnqualifiedGroupId");
             if (query.StatusArr != null && query.StatusArr.Length > 0)
             {
                 sqlBuilder.Where("uc.Status in @StatusArr");

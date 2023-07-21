@@ -8,16 +8,15 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Quality;
-using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
+using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
+using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.Query;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Quality.IQualityService;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -128,7 +127,7 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 UnqualifiedGroupId = groupId,
-                Status= SysDataStatusEnum.Enable
+                Status = SysDataStatusEnum.Enable
                 // StatusArr = new SysDataStatusEnum[] { SysDataStatusEnum.Enable, SysDataStatusEnum.Retain }
             };
             var list = await _qualUnqualifiedCodeRepository.GetListByGroupIdAsync(query);

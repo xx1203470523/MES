@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.Query;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.View;
 using Microsoft.Extensions.Options;

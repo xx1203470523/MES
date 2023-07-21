@@ -14,7 +14,7 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
-using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
+using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Services.Report;

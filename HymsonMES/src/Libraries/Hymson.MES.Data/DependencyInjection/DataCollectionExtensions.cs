@@ -22,7 +22,8 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Quality;
-using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
+using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
+using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Microsoft.Extensions.Configuration;
 
@@ -98,7 +99,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteVehicleVerifyRepository, InteVehicleVerifyRepository>();
 
             services.AddSingleton<IInteVehicleFreightRepository, InteVehicleFreightRepository>();
-            services.AddSingleton<IInteVehiceFreightStackRepository, InteVehiceFreightStackRepository>();
             #region CodeRule
             services.AddSingleton<IInteCodeRulesRepository, InteCodeRulesRepository>();
             services.AddSingleton<IInteCodeRulesMakeRepository, InteCodeRulesMakeRepository>();

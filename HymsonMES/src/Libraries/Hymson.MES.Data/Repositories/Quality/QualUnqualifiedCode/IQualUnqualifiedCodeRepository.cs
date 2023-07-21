@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.Data.Repositories.Quality.IQualityRepository
+namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode
 {
     /// <summary>
     /// 不合格代码仓储接口

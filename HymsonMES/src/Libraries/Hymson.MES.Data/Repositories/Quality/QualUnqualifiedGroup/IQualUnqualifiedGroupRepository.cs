@@ -17,7 +17,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.Data.Repositories.Quality
+namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup
 {
     /// <summary>
     /// 不合格组仓储接口
