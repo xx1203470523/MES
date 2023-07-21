@@ -13,6 +13,7 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using Org.BouncyCastle.Crypto;
 
 namespace Hymson.MES.Data.Repositories.Integrated
 {
@@ -182,6 +183,12 @@ namespace Hymson.MES.Data.Repositories.Integrated
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesTrueByVehicleIdsSql, new { VehicleIds = vehicleIds });
         }
+
+        public async Task<InteVehicleFreightEntity> GetBySFCAsync(string sfc)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<InteVehicleFreightEntity>(GetBySFCSql, new { BarCode = sfc });
+        }
     }
 
     public partial class InteVehicleFreightRepository
@@ -205,6 +212,9 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteId`, `VehicleId`, `Location`, `BarCode`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `inte_vehicle_freight`  WHERE Id = @Id ";
+        const string GetBySFCSql = @"SELECT 
+                               `Id`, `SiteId`, `VehicleId`, `Location`, `BarCode`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `inte_vehicle_freight`  WHERE BarCode = @BarCode ";
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `VehicleId`, `Location`, `BarCode`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `inte_vehicle_freight`  WHERE Id IN @Ids ";
