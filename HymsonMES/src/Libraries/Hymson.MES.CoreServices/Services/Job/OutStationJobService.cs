@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
@@ -9,6 +8,7 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
+using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
@@ -135,7 +135,41 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task VerifyParamAsync<T>(T param) where T : JobBaseBo
         {
-            await Task.CompletedTask;
+            var bo = param.ToBo<OutStationRequestBo>();
+            if (bo == null) return;
+
+            // 获取生产条码信息
+            var sfcProduceEntities = await bo.Proxy.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
+            if (sfcProduceEntities == null || sfcProduceEntities.Any() == false) return;
+
+            // 判断条码锁状态
+            var sfcProduceBusinessEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, bo);
+
+            // 合法性校验
+            sfcProduceEntities.VerifySFCStatus(SfcProduceStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcProduceStatusEnum).FullName}.{nameof(SfcProduceStatusEnum.Activity)}"))
+                              .VerifyProcedure(bo.ProcedureId)
+                              .VerifyResource(bo.ResourceId);
+
+            //（前提：这些条码都是同一工单同一工序）
+            var firstProduceEntity = sfcProduceEntities.FirstOrDefault();
+            if (firstProduceEntity == null) return;
+
+            // 获取生产工单（附带工单状态校验）
+            _ = await bo.Proxy.GetValueAsync(async parameters =>
+            {
+                long workOrderId = (long)parameters[0];
+                bool isVerifyActivation = parameters.Length <= 1 || (bool)parameters[1];
+                return await _masterDataService.GetProduceWorkOrderByIdAsync(workOrderId, isVerifyActivation);
+            }, new object[] { firstProduceEntity.WorkOrderId, true });
+
+            // 验证BOM主物料数量
+            await _manuCommonService.VerifyBomQtyAsync(new ManuProcedureBomBo
+            {
+                SiteId = bo.SiteId,
+                SFCs = bo.SFCs,
+                ProcedureId = bo.ProcedureId,
+                BomId = firstProduceEntity.ProductBOMId
+            });
         }
 
         /// <summary>
@@ -153,7 +187,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 ResourceId = bo.ResourceId,
             });
         }
-
 
         /// <summary>
         /// 数据组装
@@ -466,9 +499,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     // 这里在外层会回滚事务
                     responseBo.Rows = -1;
 
-                    throw new CustomerValidationException(nameof(ErrorCode.MES18217)).WithData("SFC", data.FirstSFCProduceEntity.SFC);
-                    //responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18216), data.FirstSFCProduceEntity.SFC);
-                    //return responseBo;
+                    //throw new CustomerValidationException(nameof(ErrorCode.MES18217)).WithData("SFC", data.FirstSFCProduceEntity.SFC);
+                    responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18216), data.FirstSFCProduceEntity.SFC);
+                    return responseBo;
                 }
             }
 
@@ -523,5 +556,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 ResourceId = bo.ResourceId,
             });
         }
+
     }
 }

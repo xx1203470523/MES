@@ -52,13 +52,13 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> DeletesAsync(DeleteCommand param);
+        Task<int> DeletesAsync(long[] ids);
 
         /// <summary>
         /// 根据ID获取数据

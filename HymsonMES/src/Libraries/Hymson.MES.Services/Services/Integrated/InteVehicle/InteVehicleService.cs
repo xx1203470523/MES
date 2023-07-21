@@ -13,6 +13,10 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Services.Dtos.Integrated;
@@ -32,6 +36,7 @@ namespace Hymson.MES.Services.Services.Integrated
     {
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
+        
 
         /// <summary>
         /// 载具注册表 仓储
@@ -399,15 +404,20 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <exception cref="NotImplementedException"></exception>
         public async Task VehicleOperationAsync(InteVehicleOperationDto dto)
         {
-            if (dto.OperationType == 0)
-                await VehicleUnBindOperationAsync(dto);
-            else
-                await VehicleUnBindOperationAsync(dto);
+            //校验托盘是否可用
+            var v = await _inteVehicleRepository.GetByCodeAsync(new InteVehicleCodeQuery()
+            {
+                Code = dto.PalletNo,
+                SiteId = _currentSite.SiteId.Value
+            });
+            if (v==null|| v.Status == EnableEnum.No)
+                throw new CustomerValidationException(nameof(ErrorCode.MES18617));
+            
             switch (dto.OperationType)
             {
-                case 0: { await VehicleUnBindOperationAsync(dto); } break;
-                case 1: {  await VehicleUnBindOperationAsync(dto);}break;
-                case 2: {  await VehicleClearAsync(dto);}break;
+                case 0: {   await VehicleBindOperationAsync(dto); } break;
+                case 1: {   await VehicleUnBindOperationAsync(dto);}break;
+                case 2: {   await VehicleClearAsync(dto);}break;
                         
             }
         }
@@ -422,16 +432,21 @@ namespace Hymson.MES.Services.Services.Integrated
              * 载具类型是单格子单条码的情况下  条码存放在inte_vehicle_freight表中
              * 载具类型是单格子多条码的情况下  条码存放在inte_vehice_freight_stack表中
              */
-            //绑盘前校验该条码 绑定状态是否是已绑定
-            var vf = await _inteVehiceFreightStackRepository.GetBySFCAsync(dto.SFC);
-            if (vf != null)
+            //绑盘前校验 该条码是否已绑盘
+            var check1 = await _inteVehiceFreightStackRepository.GetBySFCAsync(dto.SFC);
+            if (check1 != null)
             {
-                var v1 = await _inteVehicleRepository.GetByIdAsync(vf.VehicleId);
+                var v1 = await _inteVehicleRepository.GetByIdAsync(check1.VehicleId);
                 throw new CustomerValidationException(nameof(ErrorCode.MES18616)).WithData("sfc",dto.SFC).WithData("palletNo", v1.Code);
             }
             else
             {
-
+                var check2 = await _inteVehicleFreightRepository.GetBySFCAsync(dto.SFC);
+                if (check2 != null)
+                {
+                    var v1 = await _inteVehicleRepository.GetByIdAsync(check2.VehicleId);
+                    throw new CustomerValidationException(nameof(ErrorCode.MES18616)).WithData("sfc", dto.SFC).WithData("palletNo", v1.Code);
+                }
             }
             //一个格子多个条码情况
             var inteVehicleEntity = await _inteVehicleRepository.GetByCodeAsync(new InteVehicleCodeQuery()
@@ -468,7 +483,7 @@ namespace Hymson.MES.Services.Services.Integrated
                     }
                     else
                     {
-                        await _inteVehiceFreightStackRepository.InsertAsync(new InteVehiceFreightStackEntity()
+                        var stackentity = new InteVehiceFreightStackEntity()
                         {
                             BarCode = dto.SFC,
                             CreatedBy = _currentUser.UserName,
@@ -480,7 +495,9 @@ namespace Hymson.MES.Services.Services.Integrated
                             LocationId = dto.LocationId,
                             VehicleId = inteVehicleEntity.Id,
                             IsDeleted = 0
-                        });
+                        };
+
+                        await _inteVehiceFreightStackRepository.InsertAsync(stackentity);
                     }
                 }
             }
@@ -545,9 +562,49 @@ namespace Hymson.MES.Services.Services.Integrated
                 }
             }
         }
+        /// <summary>
+        /// 载具清盘
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         private async Task VehicleClearAsync(InteVehicleOperationDto dto)
         {
-
+            var inteVehicleEntity = await _inteVehicleRepository.GetByCodeAsync(new InteVehicleCodeQuery()
+            {
+                Code = dto.PalletNo,
+                SiteId = _currentSite.SiteId.Value
+            });
+            var vtr = await _inteVehicleTypeRepository.GetByIdAsync(inteVehicleEntity.VehicleTypeId);
+            if (vtr.UnitNumber > 1)
+            {
+               
+                var vsr = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
+                {
+                    VehicleId = inteVehicleEntity.Id,
+                    SiteId = _currentSite.SiteId.Value
+                });
+                
+                if (vsr != null&&vsr.Any())
+                {
+                    await _inteVehiceFreightStackRepository.DeletesAsync(vsr.Select(v=>v.Id).ToArray());
+                }
+            }
+            else
+            {
+                var foo = await _inteVehicleFreightRepository.GetByVehicleIdsAsync(new long[] { inteVehicleEntity .Id});
+                if (foo != null && foo.Any())
+                {
+                    var bar = foo.ToList();
+                    bar.ForEach(i =>
+                    {
+                        i.BarCode = string.Empty;
+                        i.UpdatedBy = _currentUser.UserName;
+                        i.UpdatedOn = HymsonClock.Now();
+                    });
+                    await _inteVehicleFreightRepository.UpdatesAsync((bar));
+                }
+                
+            }
         }
     }
 }

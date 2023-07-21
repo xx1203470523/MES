@@ -13,6 +13,7 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using Org.BouncyCastle.Crypto;
 
 namespace Hymson.MES.Data.Repositories.Integrated
 {
@@ -39,14 +40,14 @@ namespace Hymson.MES.Data.Repositories.Integrated
         }
 
         /// <summary>
-        /// 批量删除（软删除）
+        /// 批量删除
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(long[] ids) 
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(DeletesSql, param);
+            return await conn.ExecuteAsync(DeletesSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -194,7 +195,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string UpdatesSql = "UPDATE `inte_vehice_freight_stack` SET   SiteId = @SiteId, LocationId = @LocationId, BarCode = @BarCode, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
 
         const string DeleteSql = "DELETE `inte_vehice_freight_stack`  WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE `inte_vehice_freight_stack` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
+        const string DeletesSql = "DELETE `inte_vehice_freight_stack`  WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteId`, `LocationId`, `BarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`
