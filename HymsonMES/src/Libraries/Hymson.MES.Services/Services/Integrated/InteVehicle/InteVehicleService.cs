@@ -429,8 +429,8 @@ namespace Hymson.MES.Services.Services.Integrated
         private async Task VehicleBindOperationAsync(InteVehicleOperationDto dto)
         {
             /* 指定位置绑定条码
-             * 载具类型是单格子单条码的情况下  条码存放在inte_vehicle_freight表中
-             * 载具类型是单格子多条码的情况下  条码存放在inte_vehice_freight_stack表中
+             * inte_vehicle_freight表 更新已装载数量信息
+             * 条码存放在inte_vehice_freight_stack表中
              */
             //绑盘前校验 该条码是否已绑盘
             var check1 = await _inteVehiceFreightStackRepository.GetBySFCAsync(dto.SFC);
@@ -439,15 +439,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 var v1 = await _inteVehicleRepository.GetByIdAsync(check1.VehicleId);
                 throw new CustomerValidationException(nameof(ErrorCode.MES18616)).WithData("sfc",dto.SFC).WithData("palletNo", v1.Code);
             }
-            else
-            {
-                var check2 = await _inteVehicleFreightRepository.GetBySFCAsync(dto.SFC);
-                if (check2 != null)
-                {
-                    var v1 = await _inteVehicleRepository.GetByIdAsync(check2.VehicleId);
-                    throw new CustomerValidationException(nameof(ErrorCode.MES18616)).WithData("sfc", dto.SFC).WithData("palletNo", v1.Code);
-                }
-            }
+            
             //一个格子多个条码情况
             var inteVehicleEntity = await _inteVehicleRepository.GetByCodeAsync(new InteVehicleCodeQuery()
             {
