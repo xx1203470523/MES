@@ -97,4 +97,20 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
 
     }
 
+    /// <summary>
+    /// 生成的条码信息
+    /// </summary>
+    public class BarCodeInfo 
+    {
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string BarCode { get; set; }
+
+        /// <summary>
+        /// 条码流水号
+        /// </summary>
+        public string SerialNumber { get; set; }
+    }
+
 }
