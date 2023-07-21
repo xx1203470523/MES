@@ -112,6 +112,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetInteVehiceFreightStackEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
             sqlBuilder.Where("SiteId = @SiteId");
             if(inteVehiceFreightStackQuery.VehicleId!=null)
             {
