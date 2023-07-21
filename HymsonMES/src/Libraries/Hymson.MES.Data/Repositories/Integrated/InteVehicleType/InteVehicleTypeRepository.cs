@@ -188,7 +188,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
     public partial class InteVehicleTypeRepository
     {
         #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_vehicle_type` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_vehicle_type` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `inte_vehicle_type` /**where**/ ";
         const string GetInteVehicleTypeEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
