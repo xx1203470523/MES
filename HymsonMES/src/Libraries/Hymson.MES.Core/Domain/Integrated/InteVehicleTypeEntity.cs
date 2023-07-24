@@ -46,7 +46,7 @@ namespace Hymson.MES.Core.Domain.Integrated
        /// <summary>
         /// 列
         /// </summary>
-        public int Arrange { get; set; }
+        public int Column { get; set; }
 
         /// <summary>
         /// 单元数量

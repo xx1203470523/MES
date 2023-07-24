@@ -45,7 +45,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
        /// <summary>
         /// 列
         /// </summary>
-        public int Arrange { get; set; }
+        public int Column { get; set; }
 
         /// <summary>
         /// 单元数量
@@ -107,7 +107,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
        /// <summary>
         /// 列
         /// </summary>
-        public int Arrange { get; set; }
+        public int Column { get; set; }
 
         /// <summary>
         /// 单元数量
@@ -158,7 +158,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
        /// <summary>
         /// 列
         /// </summary>
-        public int Arrange { get; set; }
+        public int Column { get; set; }
 
         /// <summary>
         /// 单元数量
