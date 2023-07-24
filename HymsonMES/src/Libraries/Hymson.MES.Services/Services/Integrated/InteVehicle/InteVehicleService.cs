@@ -134,10 +134,10 @@ namespace Hymson.MES.Services.Services.Integrated
                     {
                         VehicleId = inteVehicleEntity.Id,
                         Column = item.Column,
-                        Row =item.Row,
+                        Row = item.Row,
                         Location = item.Location,
-                        Status= item.Status,
-
+                        Status = item.Status,
+                        Qty = 0,
                         Id = IdGenProvider.Instance.CreateId(),
                         CreatedBy = _currentUser.UserName,
                         UpdatedBy = _currentUser.UserName,
