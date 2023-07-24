@@ -79,7 +79,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<QualEnvParameterGroupDto?> QueryQualEnvParameterGroupByIdAsync(long id)
+        public async Task<QualEnvParameterGroupInfoDto?> QueryQualEnvParameterGroupByIdAsync(long id)
         {
             return await _qualEnvParameterGroupService.QueryQualEnvParameterGroupByIdAsync(id);
         }

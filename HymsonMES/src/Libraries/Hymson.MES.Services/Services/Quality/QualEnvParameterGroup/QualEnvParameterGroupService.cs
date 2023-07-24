@@ -202,12 +202,12 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<QualEnvParameterGroupDto?> QueryQualEnvParameterGroupByIdAsync(long id)
+        public async Task<QualEnvParameterGroupInfoDto?> QueryQualEnvParameterGroupByIdAsync(long id)
         {
             var qualEnvParameterGroupEntity = await _qualEnvParameterGroupRepository.GetByIdAsync(id);
             if (qualEnvParameterGroupEntity == null) return null;
 
-            return qualEnvParameterGroupEntity.ToModel<QualEnvParameterGroupDto>();
+            return qualEnvParameterGroupEntity.ToModel<QualEnvParameterGroupInfoDto>();
         }
 
         /// <summary>
@@ -218,6 +218,7 @@ namespace Hymson.MES.Services.Services.Quality
         public async Task<PagedInfo<QualEnvParameterGroupDto>> GetPagedListAsync(QualEnvParameterGroupPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<QualEnvParameterGroupPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _qualEnvParameterGroupRepository.GetPagedInfoAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据

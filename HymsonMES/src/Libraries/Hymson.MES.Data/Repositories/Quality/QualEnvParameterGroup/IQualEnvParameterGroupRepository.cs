@@ -3,6 +3,7 @@ using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Quality.Query;
+using Hymson.MES.Data.Repositories.Quality.View;
 
 namespace Hymson.MES.Data.Repositories.Quality
 {
@@ -86,7 +87,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<QualEnvParameterGroupEntity>> GetPagedInfoAsync(QualEnvParameterGroupPagedQuery pagedQuery);
+        Task<PagedInfo<QualEnvParameterGroupView>> GetPagedInfoAsync(QualEnvParameterGroupPagedQuery pagedQuery);
 
     }
 }
