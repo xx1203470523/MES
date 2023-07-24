@@ -378,22 +378,18 @@ namespace Hymson.MES.Services.Services.Integrated
                 {
                     inteVehicleFreightDtos.Add(item.ToModel<InteVehicleFreightDto>());
                 }
-                //一个格子多个条码情况
-                var inteVehicleEntity = await _inteVehicleRepository.GetByIdAsync(vehicleId);
-                var vtr = await _inteVehicleTypeRepository.GetByIdAsync(inteVehicleEntity.VehicleTypeId);
-                if (vtr.Qty>1)
+               
+               
+                //获取托盘所有条码记录
+                var vsr = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
                 {
-                    //获取托盘所有条码记录
-                    var vsr = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
-                    {
-                        VehicleId = vehicleId,
-                        SiteId = _currentSite.SiteId.Value
-                    });
-                    foreach (var item in inteVehicleFreightDtos)
-                    {
-                        var lst = vsr.Where(i => i.LocationId == item.Id).ToList();
-                        item.Stacks = lst;
-                    }
+                    VehicleId = vehicleId,
+                    SiteId = _currentSite.SiteId.Value
+                });
+                foreach (var item in inteVehicleFreightDtos)
+                {
+                    var lst = vsr.Where(i => i.LocationId == item.Id).ToList();
+                    item.Stacks = lst;
                 }
 
             }
