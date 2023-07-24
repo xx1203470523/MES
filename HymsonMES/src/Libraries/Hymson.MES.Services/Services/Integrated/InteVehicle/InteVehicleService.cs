@@ -377,7 +377,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 //一个格子多个条码情况
                 var inteVehicleEntity = await _inteVehicleRepository.GetByIdAsync(vehicleId);
                 var vtr = await _inteVehicleTypeRepository.GetByIdAsync(inteVehicleEntity.VehicleTypeId);
-                if (vtr.UnitNumber>1)
+                if (vtr.CellQty>1)
                 {
                     //获取托盘所有条码记录
                     var vsr = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
@@ -456,7 +456,7 @@ namespace Hymson.MES.Services.Services.Integrated
             });
             var foo = await _inteVehicleFreightRepository.GetByVehicleIdsAsync(new long[] { inteVehicleEntity.Id });
             var count = foo.Where(i => i.Status == true).ToList().Count();
-            if(vsr.Count()>= count*vtr.UnitNumber) {
+            if(vsr.Count()>= count*vtr.CellQty) {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18613));
             }
             else
@@ -468,7 +468,7 @@ namespace Hymson.MES.Services.Services.Integrated
                     LocationId = dto.LocationId,
                     SiteId = _currentSite.SiteId.Value
                 });
-                if(stack.Count()>=vtr.UnitNumber)
+                if(stack.Count()>=vtr.CellQty)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES18614));
                 }
@@ -519,7 +519,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 SiteId = _currentSite.SiteId.Value
             });
             var vtr = await _inteVehicleTypeRepository.GetByIdAsync(inteVehicleEntity.VehicleTypeId);
-            if (vtr.UnitNumber > 1)
+            if (vtr.CellQty > 1)
             {
                 //获取指定位置信息
                 var loc = await _inteVehicleFreightRepository.GetByIdAsync(dto.LocationId);
@@ -563,7 +563,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 SiteId = _currentSite.SiteId.Value
             });
             var vtr = await _inteVehicleTypeRepository.GetByIdAsync(inteVehicleEntity.VehicleTypeId);
-            if (vtr.UnitNumber > 1)
+            if (vtr.CellQty > 1)
             {
                
                 var vsr = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()

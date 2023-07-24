@@ -194,20 +194,20 @@ namespace Hymson.MES.Data.Repositories.Integrated
                                             /**select**/
                                            FROM `inte_vehicle_type` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `inte_vehicle_type`(  `Id`, `SiteId`, `Code`, `Name`, `Status`, `Row`, `Arrange`, UnitNumber, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Status, @Row, @Arrange, @UnitNumber, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `inte_vehicle_type`(  `Id`, `SiteId`, `Code`, `Name`, `Status`, `Row`, `Arrange`, UnitNumber, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Status, @Row, @Arrange, @UnitNumber, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `inte_vehicle_type`(  `Id`, `SiteId`, `Code`, `Name`, `Status`, `Row`, `Arrange`, CellQty, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Status, @Row, @Arrange, @CellQty, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsSql = "INSERT INTO `inte_vehicle_type`(  `Id`, `SiteId`, `Code`, `Name`, `Status`, `Row`, `Arrange`, CellQty, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Status, @Row, @Arrange, @CellQty, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
-        const string UpdateSql = "UPDATE `inte_vehicle_type` SET   `Name` = @Name, `Status` = @Status, `Row` = @Row, `Arrange` = @Arrange,`UnitNumber`=@UnitNumber, `Remark` = @Remark, `UpdatedBy` = @UpdatedBy, `UpdatedOn` = @UpdatedOn  WHERE `Id` = @Id ";
-        const string UpdatesSql = "UPDATE `inte_vehicle_type` SET  `Name` = @Name, `Status` = @Status, `Row` = @Row, `Arrange` = @Arrange,`UnitNumber`=@UnitNumber, `Remark` = @Remark, `UpdatedBy` = @UpdatedBy, `UpdatedOn` = @UpdatedOn  WHERE `Id` = @Id ";
+        const string UpdateSql = "UPDATE `inte_vehicle_type` SET   `Name` = @Name, `Status` = @Status, `Row` = @Row, `Arrange` = @Arrange,`CellQty`=@CellQty, `Remark` = @Remark, `UpdatedBy` = @UpdatedBy, `UpdatedOn` = @UpdatedOn  WHERE `Id` = @Id ";
+        const string UpdatesSql = "UPDATE `inte_vehicle_type` SET  `Name` = @Name, `Status` = @Status, `Row` = @Row, `Arrange` = @Arrange,`CellQty`=@CellQty, `Remark` = @Remark, `UpdatedBy` = @UpdatedBy, `UpdatedOn` = @UpdatedOn  WHERE `Id` = @Id ";
 
         const string DeleteSql = "UPDATE `inte_vehicle_type` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `inte_vehicle_type` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteId`, `Code`, `Name`, `Status`, `Row`, `Arrange`,UnitNumber, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                               `Id`, `SiteId`, `Code`, `Name`, `Status`, `Row`, `Arrange`,CellQty, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `inte_vehicle_type`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteId`, `Code`, `Name`, `Status`, `Row`, `Arrange`,UnitNumber, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                                          `Id`, `SiteId`, `Code`, `Name`, `Status`, `Row`, `Arrange`,CellQty, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `inte_vehicle_type`  WHERE Id IN @Ids ";
 
         const string GetByCodeSql = @"SELECT * 

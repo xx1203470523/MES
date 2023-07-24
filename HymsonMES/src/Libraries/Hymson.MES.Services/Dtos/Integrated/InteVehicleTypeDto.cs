@@ -50,7 +50,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 单元数量
         /// </summary>
-        public int UnitNumber { get; set; }
+        public int CellQty { get; set; }
 
         /// <summary>
         /// 说明
@@ -112,7 +112,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 单元数量
         /// </summary>
-        public int UnitNumber { get; set; }
+        public int CellQty { get; set; }
 
         /// <summary>
         /// 说明
@@ -163,7 +163,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 单元数量
         /// </summary>
-        public int UnitNumber { get; set; }
+        public int CellQty { get; set; }
 
         /// <summary>
         /// 说明
