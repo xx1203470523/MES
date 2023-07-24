@@ -24,8 +24,8 @@ namespace Hymson.MES.Services.Validators.Integrated
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES18404));
             RuleFor(x => x.Code).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18405));
             RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18406));
-            RuleFor(x => x.Address).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18407));
-            RuleFor(x => x.Describe).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18408));
+            RuleFor(x => x.Address).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES18407));
+            RuleFor(x => x.Describe).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES18408));
             RuleFor(x => x.Telephone).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18409));
         }
     }
@@ -42,8 +42,8 @@ namespace Hymson.MES.Services.Validators.Integrated
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES18404));
             //RuleFor(x => x.Code).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18405));
             RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18406));
-            RuleFor(x => x.Address).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18407));
-            RuleFor(x => x.Describe).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18408));
+            RuleFor(x => x.Address).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES18407));
+            RuleFor(x => x.Describe).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES18408));
             RuleFor(x => x.Telephone).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18409));
         }
     }
