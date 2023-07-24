@@ -26,6 +26,7 @@ using Hymson.Utils;
 using IdGen;
 using Minio.DataModel;
 using System.Transactions;
+using System.Drawing.Drawing2D;
 
 namespace Hymson.MES.Services.Services.Integrated
 {
@@ -49,10 +50,12 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly IInteVehicleVerifyRepository _inteVehicleVerifyRepository;
         private readonly IInteVehicleFreightRepository _inteVehicleFreightRepository;
         private readonly IInteVehiceFreightStackRepository _inteVehiceFreightStackRepository;
+        private readonly IInteVehicleFreightRecordRepository _inteVehicleFreightRecordRepository;
 
         public InteVehicleService(ICurrentUser currentUser, ICurrentSite currentSite, IInteVehicleRepository inteVehicleRepository, AbstractValidator<InteVehicleCreateDto> validationCreateRules, AbstractValidator<InteVehicleModifyDto> validationModifyRules,IInteVehicleTypeRepository inteVehicleTypeRepository, 
             IInteVehicleVerifyRepository inteVehicleVerifyRepository,
             IInteVehiceFreightStackRepository inteVehiceFreightStackRepository,
+            IInteVehicleFreightRecordRepository inteVehicleFreightRecordRepository,
             IInteVehicleFreightRepository inteVehicleFreightRepository)
         {
             _currentUser = currentUser;
@@ -64,6 +67,7 @@ namespace Hymson.MES.Services.Services.Integrated
             _inteVehicleVerifyRepository = inteVehicleVerifyRepository;
             _inteVehicleFreightRepository = inteVehicleFreightRepository;
             _inteVehiceFreightStackRepository = inteVehiceFreightStackRepository;
+            _inteVehicleFreightRecordRepository = inteVehicleFreightRecordRepository;
         }
 
         /// <summary>
@@ -420,6 +424,22 @@ namespace Hymson.MES.Services.Services.Integrated
                 case 2: {   await VehicleClearAsync(dto);}break;
                         
             }
+            ThreadPool.QueueUserWorkItem(async o =>
+            {
+                await _inteVehicleFreightRecordRepository.InsertAsync(new InteVehicleFreightRecordEntity()
+                {
+                    BarCode = dto.SFC,
+                    CreatedBy = _currentUser.UserName,
+                    CreatedOn = HymsonClock.Now(),
+                    Id = IdGenProvider.Instance.CreateId(),
+                    LocationId = dto.LocationId,
+                    OperateType = dto.OperationType,
+                    SiteId = _currentSite.SiteId.Value,
+                    VehicleId = v.Id
+                });
+            });
+                
+          
         }
         /// <summary>
         /// 绑盘操作
@@ -486,7 +506,6 @@ namespace Hymson.MES.Services.Services.Integrated
                         VehicleId = inteVehicleEntity.Id,
                         IsDeleted = 0
                     };
-
                     await _inteVehiceFreightStackRepository.InsertAsync(stackentity);
                 }
             }
