@@ -959,6 +959,7 @@
         public const string MES18407 = "地址最大长度为255";
         public const string MES18408 = "描述最大长度为255";
         public const string MES18409 = "电话最大长度为50";
+        public const string MES18410 = "客户编码不允许有空格";
 
         #endregion
 
