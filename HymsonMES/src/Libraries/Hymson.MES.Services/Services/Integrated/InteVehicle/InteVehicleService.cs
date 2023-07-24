@@ -133,6 +133,8 @@ namespace Hymson.MES.Services.Services.Integrated
                     inteVehicleFreightEntitys.Add(new InteVehicleFreightEntity()
                     {
                         VehicleId = inteVehicleEntity.Id,
+                        Column = item.Column,
+                        Row =item.Row,
                         Location = item.Location,
                         Status= item.Status,
 
@@ -283,6 +285,8 @@ namespace Hymson.MES.Services.Services.Integrated
                     inteVehicleFreightEntitys.Add(new InteVehicleFreightEntity()
                     {
                         VehicleId = inteVehicleEntity.Id,
+                        Column = item.Column,
+                        Row=item.Row,
                         Location = item.Location,
                         Status = item.Status,
 

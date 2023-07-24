@@ -28,15 +28,26 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// </summary>
         public long VehicleId { get; set; }
 
-       /// <summary>
-        /// 位置号
+        /// <summary>
+        /// 已存放的数量
         /// </summary>
-        public string? Location { get; set; }
+        public int Qty { get; set; }
+
+        /// <summary>
+        /// x位置
+        /// </summary>
+        public int Column { get; set; }
+
+        /// <summary>
+        /// y位置
+        /// </summary>
+        public int Row { get; set; }
 
        /// <summary>
-        /// 装载条码
-        /// </summary>
-        public string BarCode { get; set; }
+       /// 位置号 
+       /// </summary>
+        public string? Location { get; set; }
+
 
        /// <summary>
         /// 状态;0-禁用 1-启用
