@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Services.Dtos.Quality
 {
@@ -40,7 +41,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 频率
         /// </summary>
-        public bool Frequency { get; set; }
+        public FrequencyEnum Frequency { get; set; }
 
         /// <summary>
         /// 录入次数
@@ -87,7 +88,7 @@ namespace Hymson.MES.Services.Dtos.Quality
        /// <summary>
         /// 频率
         /// </summary>
-        public bool Frequency { get; set; }
+        public FrequencyEnum Frequency { get; set; }
 
        /// <summary>
         /// 录入次数

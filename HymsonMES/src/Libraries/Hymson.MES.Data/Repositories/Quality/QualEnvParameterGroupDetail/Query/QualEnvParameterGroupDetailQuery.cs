@@ -5,6 +5,9 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
     /// </summary>
     public class QualEnvParameterGroupDetailQuery
     {
-    
+        /// <summary>
+        /// 环境检验参数id
+        /// </summary>
+        public long ParameterVerifyEnvId { get; set; }
     }
 }

@@ -44,6 +44,13 @@ namespace Hymson.MES.Services.Services.Quality
         Task<QualEnvParameterGroupInfoDto?> QueryQualEnvParameterGroupByIdAsync(long id);
 
         /// <summary>
+        /// 根据ID获取项目明细列表
+        /// </summary>
+        /// <param name="parameterVerifyEnvId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<QualEnvParameterGroupDetailDto>> QueryDetailsByParameterVerifyEnvIdAsync(long parameterVerifyEnvId);
+
+        /// <summary>
         /// 获取分页List
         /// </summary>
         /// <param name="pagedQueryDto"></param>

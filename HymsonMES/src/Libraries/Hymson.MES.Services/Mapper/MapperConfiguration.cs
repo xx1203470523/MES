@@ -453,6 +453,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualEnvParameterGroupPagedQueryDto, QualEnvParameterGroupPagedQuery>();
             CreateMap<QualEnvParameterGroupView, QualEnvParameterGroupDto>();
             CreateMap<QualEnvParameterGroupDetailSaveDto, QualEnvParameterGroupDetailEntity>();
+            CreateMap<QualEnvParameterGroupDetailEntity, QualEnvParameterGroupDetailDto>();
             #endregion
 
             #region QualUnqualifiedCode

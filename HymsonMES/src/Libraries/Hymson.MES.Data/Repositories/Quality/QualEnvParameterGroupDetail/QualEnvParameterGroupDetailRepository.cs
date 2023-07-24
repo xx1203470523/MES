@@ -79,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeleteByParentIdAsync(DeleteByParentIdCommand command) 
+        public async Task<int> DeleteByParentIdAsync(DeleteByParentIdCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteByParentId, command);
@@ -101,7 +101,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualEnvParameterGroupDetailEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<QualEnvParameterGroupDetailEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualEnvParameterGroupDetailEntity>(GetByIdsSql, new { Ids = ids });
@@ -116,6 +116,10 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetQualEnvParameterGroupDetailEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("ParameterVerifyEnvId = @ParameterVerifyEnvId");
+            sqlBuilder.Select("*");
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualEnvParameterGroupDetailEntity>(template.RawSql, query);
         }
@@ -132,7 +136,7 @@ namespace Hymson.MES.Data.Repositories.Quality
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Select("*");
-           
+
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });

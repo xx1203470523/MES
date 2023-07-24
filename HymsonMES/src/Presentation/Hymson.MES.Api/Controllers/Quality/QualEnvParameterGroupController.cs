@@ -48,7 +48,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         [PermissionDescription("quality:qualEnvParameterGroup:insert")]
         public async Task AddQualEnvParameterGroupAsync([FromBody] QualEnvParameterGroupSaveDto saveDto)
         {
-             await _qualEnvParameterGroupService.CreateQualEnvParameterGroupAsync(saveDto);
+            await _qualEnvParameterGroupService.CreateQualEnvParameterGroupAsync(saveDto);
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         [PermissionDescription("quality:qualEnvParameterGroup:update")]
         public async Task UpdateQualEnvParameterGroupAsync([FromBody] QualEnvParameterGroupSaveDto saveDto)
         {
-             await _qualEnvParameterGroupService.ModifyQualEnvParameterGroupAsync(saveDto);
+            await _qualEnvParameterGroupService.ModifyQualEnvParameterGroupAsync(saveDto);
         }
 
         /// <summary>
@@ -86,6 +86,17 @@ namespace Hymson.MES.Api.Controllers.Quality
         public async Task<QualEnvParameterGroupInfoDto?> QueryQualEnvParameterGroupByIdAsync(long id)
         {
             return await _qualEnvParameterGroupService.QueryQualEnvParameterGroupByIdAsync(id);
+        }
+
+        /// <summary>
+        /// 查询详情（环境检验参数表）
+        /// </summary>
+        /// <param name="parameterVerifyEnvId"></param>
+        /// <returns></returns>
+        [HttpGet("details/{id}")]
+        public async Task<IEnumerable<QualEnvParameterGroupDetailDto>?> QueryDetailsByParameterVerifyEnvIdAsync(long id)
+        {
+            return await _qualEnvParameterGroupService.QueryDetailsByParameterVerifyEnvIdAsync(id);
         }
 
         /// <summary>

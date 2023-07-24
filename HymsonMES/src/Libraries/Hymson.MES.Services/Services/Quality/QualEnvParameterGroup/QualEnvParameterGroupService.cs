@@ -211,6 +211,21 @@ namespace Hymson.MES.Services.Services.Quality
         }
 
         /// <summary>
+        /// 根据ID获取项目明细列表
+        /// </summary>
+        /// <param name="parameterVerifyEnvId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualEnvParameterGroupDetailDto>> QueryDetailsByParameterVerifyEnvIdAsync(long parameterVerifyEnvId)
+        {
+            var qualEnvParameterGroupDetailEntities = await _qualEnvParameterGroupDetailRepository.GetEntitiesAsync(new QualEnvParameterGroupDetailQuery
+            {
+                ParameterVerifyEnvId = parameterVerifyEnvId
+            });
+
+            return qualEnvParameterGroupDetailEntities.Select(s => s.ToModel<QualEnvParameterGroupDetailDto>());
+        }
+
+        /// <summary>
         /// 根据查询条件获取分页数据
         /// </summary>
         /// <param name="pagedQueryDto"></param>
