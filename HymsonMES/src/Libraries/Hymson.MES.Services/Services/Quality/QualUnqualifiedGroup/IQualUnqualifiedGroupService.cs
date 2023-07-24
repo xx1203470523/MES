@@ -2,7 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Quality;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Hymson.MES.Services.Services.Quality.IQualityService
+namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedGroup
 {
     /// <summary>
     /// 不合格代码服务接口

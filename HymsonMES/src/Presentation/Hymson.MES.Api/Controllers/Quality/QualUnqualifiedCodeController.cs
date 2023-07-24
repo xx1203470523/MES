@@ -1,7 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Quality;
-using Hymson.MES.Services.Services.Quality.IQualityService;
+using Hymson.MES.Services.Services.Quality.QualUnqualifiedCode;
 using Hymson.Utils;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
@@ -76,18 +76,6 @@ namespace Hymson.MES.Api.Controllers.Quality
         public async Task<IEnumerable<QualUnqualifiedCodeDto>> GetListByGroupIdAsync(long id)
         {
             return await _qualUnqualifiedCodeService.GetListByGroupIdAsync(id);
-        }
-
-        /// <summary>
-        /// 根据工序id查询不合格代码列表
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [Route("listByProcedure/{id}")]
-        [HttpGet]
-        public async Task<IEnumerable<QualUnqualifiedCodeDto>> GetListByProcedureIdAsync(long id)
-        {
-            return await _qualUnqualifiedCodeService.GetListByProcedureIdAsync(id);
         }
 
         /// <summary>

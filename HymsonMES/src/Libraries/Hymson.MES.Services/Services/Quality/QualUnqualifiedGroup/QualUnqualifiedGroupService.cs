@@ -11,13 +11,12 @@ using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.Query;
 using Hymson.MES.Services.Dtos.Quality;
-using Hymson.MES.Services.Services.Quality.IQualityService;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Hymson.MES.Services.Services.Quality
+namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedGroup
 {
     /// <summary>
     /// 不合格代码组服务
@@ -222,8 +221,8 @@ namespace Hymson.MES.Services.Services.Quality
                 {
                     qualUnqualifiedCodeGroupRelationlist.Add(new QualUnqualifiedCodeGroupRelation
                     {
-                        Id=IdGenProvider.Instance.CreateId(),
-                        SiteId=_currentSite.SiteId??0,
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = _currentSite.SiteId ?? 0,
 
                         UnqualifiedGroupId = qualUnqualifiedGroupEntity.Id,
                         UnqualifiedCodeId = item,

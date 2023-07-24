@@ -13,12 +13,11 @@ using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.Query;
 using Hymson.MES.Services.Dtos.Quality;
-using Hymson.MES.Services.Services.Quality.IQualityService;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 
-namespace Hymson.MES.Services.Services.Quality
+namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
 {
     /// <summary>
     /// 不合格代码服务

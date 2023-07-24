@@ -1,7 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Dtos.Quality;
-using Hymson.MES.Services.Services.Quality.IQualityService;
+using Hymson.MES.Services.Services.Quality.QualUnqualifiedGroup;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 

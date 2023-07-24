@@ -3,12 +3,17 @@
 namespace Hymson.MES.Data.Repositories.Common.Command
 {
     /// <summary>
-    /// 实体（更新）
+    /// 实体（删除）
     /// @author Czhipu
     /// @date 2023-02-11 04:45:25
     /// </summary>
-    public class UpdateCommand
+    public class DeleteByParentIdCommand
     {
+        /// <summary>
+        /// 主键Ids
+        /// </summary>
+        public long ParentId { get; set; }
+
         /// <summary>
         /// 更新人
         /// </summary>
