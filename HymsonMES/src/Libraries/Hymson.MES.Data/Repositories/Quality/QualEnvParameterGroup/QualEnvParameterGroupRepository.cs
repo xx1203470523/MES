@@ -5,6 +5,7 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Quality.Query;
+using Hymson.MES.Data.Repositories.Quality.View;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Quality
@@ -80,7 +81,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -113,7 +114,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualEnvParameterGroupEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<QualEnvParameterGroupEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualEnvParameterGroupEntity>(GetByIdsSql, new { Ids = ids });
@@ -137,25 +138,71 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<QualEnvParameterGroupEntity>> GetPagedInfoAsync(QualEnvParameterGroupPagedQuery pagedQuery)
+        public async Task<PagedInfo<QualEnvParameterGroupView>> GetPagedInfoAsync(QualEnvParameterGroupPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Select("*");
-           
+            sqlBuilder.LeftJoin("inte_work_center IWC ON IWC.Id = QEPG.WorkCenterId");
+            sqlBuilder.LeftJoin("proc_procedure PP ON PP.Id = QEPG.ProcedureId");
+            sqlBuilder.Where("QEPG.IsDeleted = 0");
+            sqlBuilder.Where("QEPG.SiteId = @SiteId");
+            sqlBuilder.Select("QEPG.*");
+            sqlBuilder.Select("IWC.Code AS WorkCenterCode, IWC.Name AS WorkCenterName");
+            sqlBuilder.Select("PP.Code AS ProcedureCode, PP.Name AS ProcedureName");
+
+            if (pagedQuery.Status.HasValue)
+            {
+                sqlBuilder.Where("QEPG.Status = @Status");
+            }
+
+            if (string.IsNullOrWhiteSpace(pagedQuery.Code) == false)
+            {
+                pagedQuery.Code = $"%{pagedQuery.Code}%";
+                sqlBuilder.Where("QEPG.Code LIKE @Code");
+            }
+
+            if (string.IsNullOrWhiteSpace(pagedQuery.Name) == false)
+            {
+                pagedQuery.Name = $"%{pagedQuery.Name}%";
+                sqlBuilder.Where("QEPG.Name LIKE @Name");
+            }
+
+            if (string.IsNullOrWhiteSpace(pagedQuery.WorkCenterCode) == false)
+            {
+                pagedQuery.WorkCenterCode = $"%{pagedQuery.WorkCenterCode}%";
+                sqlBuilder.Where("IWC.Code LIKE @WorkCenterCode");
+            }
+
+            if (string.IsNullOrWhiteSpace(pagedQuery.WorkCenterName) == false)
+            {
+                pagedQuery.WorkCenterName = $"%{pagedQuery.WorkCenterName}%";
+                sqlBuilder.Where("IWC.Name LIKE @WorkCenterName");
+            }
+
+            if (string.IsNullOrWhiteSpace(pagedQuery.ProcedureCode) == false)
+            {
+                pagedQuery.ProcedureCode = $"%{pagedQuery.ProcedureCode}%";
+                sqlBuilder.Where("PP.Code LIKE @ProcedureCode");
+            }
+
+            if (string.IsNullOrWhiteSpace(pagedQuery.ProcedureName) == false)
+            {
+                pagedQuery.ProcedureName = $"%{pagedQuery.ProcedureName}%";
+                sqlBuilder.Where("PP.Name LIKE @ProcedureName");
+            }
+
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
             sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = GetMESDbConnection();
-            var entitiesTask = conn.QueryAsync<QualEnvParameterGroupEntity>(templateData.RawSql, templateData.Parameters);
+            var entitiesTask = conn.QueryAsync<QualEnvParameterGroupView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var entities = await entitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<QualEnvParameterGroupEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
+            return new PagedInfo<QualEnvParameterGroupView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
     }
@@ -166,24 +213,24 @@ namespace Hymson.MES.Data.Repositories.Quality
     /// </summary>
     public partial class QualEnvParameterGroupRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `qual_env_parameter_group` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `qual_env_parameter_group` /**where**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM qual_env_parameter_group QEPG /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_env_parameter_group QEPG /**where**/ ";
         const string GetQualEnvParameterGroupEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
-                                           FROM `qual_env_parameter_group` /**where**/  ";
+                                           FROM qual_env_parameter_group /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `qual_env_parameter_group`(  `Id`, `Code`, `Name`, `Version`, `Status`, `WorkCenterId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Version, @Status, @WorkCenterId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
-        const string InsertsSql = "INSERT INTO `qual_env_parameter_group`(  `Id`, `Code`, `Name`, `Version`, `Status`, `WorkCenterId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Version, @Status, @WorkCenterId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
+        const string InsertSql = "INSERT INTO qual_env_parameter_group(`Id`, `Code`, `Name`, `Version`, `Status`, `WorkCenterId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @Code, @Name, @Version, @Status, @WorkCenterId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
+        const string InsertsSql = "INSERT INTO qual_env_parameter_group(`Id`, `Code`, `Name`, `Version`, `Status`, `WorkCenterId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @Code, @Name, @Version, @Status, @WorkCenterId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
 
-        const string UpdateSql = "UPDATE `qual_env_parameter_group` SET   Code = @Code, Name = @Name, Version = @Version, Status = @Status, WorkCenterId = @WorkCenterId, ProcedureId = @ProcedureId, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `qual_env_parameter_group` SET   Code = @Code, Name = @Name, Version = @Version, Status = @Status, WorkCenterId = @WorkCenterId, ProcedureId = @ProcedureId, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE qual_env_parameter_group SET Code = @Code, Name = @Name, Version = @Version, Status = @Status, WorkCenterId = @WorkCenterId, ProcedureId = @ProcedureId, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE qual_env_parameter_group SET Code = @Code, Name = @Name, Version = @Version, Status = @Status, WorkCenterId = @WorkCenterId, ProcedureId = @ProcedureId, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
 
-        const string DeleteSql = "UPDATE `qual_env_parameter_group` SET IsDeleted = Id WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE `qual_env_parameter_group` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
+        const string DeleteSql = "UPDATE qual_env_parameter_group SET IsDeleted = Id WHERE Id = @Id ";
+        const string DeletesSql = "UPDATE qual_env_parameter_group SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByCodeSql = "SELECT * FROM qual_env_parameter_group WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code LIMIT 1";
-        const string GetByIdSql = @"SELECT * FROM `qual_env_parameter_group`  WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT * FROM `qual_env_parameter_group`  WHERE Id IN @Ids ";
+        const string GetByIdSql = @"SELECT * FROM qual_env_parameter_group WHERE Id = @Id ";
+        const string GetByIdsSql = @"SELECT * FROM qual_env_parameter_group WHERE Id IN @Ids ";
 
     }
 }

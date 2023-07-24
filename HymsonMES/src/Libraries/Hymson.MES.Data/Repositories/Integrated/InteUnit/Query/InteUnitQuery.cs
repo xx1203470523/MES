@@ -23,11 +23,11 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// 描述 :单位编码
         /// 空值 : false  
         /// </summary>
-        public string? UnitCode { get; set; }
+        public string? Code { get; set; }
 
         /// <summary>
         /// 单位编码列表
         /// </summary>
-        public string[] UnitCodes { get; set; }
+        public string[] Codes { get; set; }
     }
 }
