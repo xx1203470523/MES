@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Quality
 {
@@ -28,7 +29,7 @@ namespace Hymson.MES.Core.Domain.Quality
        /// <summary>
         /// 状态
         /// </summary>
-        public bool Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
        /// <summary>
         /// 工作中心（车间或者线体）

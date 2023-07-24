@@ -41,7 +41,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<QualEnvParameterGroupDto?> QueryQualEnvParameterGroupByIdAsync(long id);
+        Task<QualEnvParameterGroupInfoDto?> QueryQualEnvParameterGroupByIdAsync(long id);
 
         /// <summary>
         /// 获取分页List
