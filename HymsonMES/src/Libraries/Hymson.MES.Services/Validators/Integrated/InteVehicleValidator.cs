@@ -21,6 +21,7 @@ namespace Hymson.MES.Services.Validators.Integrated
         {
             RuleFor(x => x).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10100));
             RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES18604));
+            RuleFor(x => x.Code).Must(x => !x.Any(x => Char.IsWhiteSpace(x))).WithErrorCode(nameof(ErrorCode.MES18618));
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES18605));
             RuleFor(x => x.Code).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES18606));
             RuleFor(x => x.Name).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES18607));
