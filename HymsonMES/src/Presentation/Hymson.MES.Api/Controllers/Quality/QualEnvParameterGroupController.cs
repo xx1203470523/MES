@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Quality;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -44,6 +45,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [PermissionDescription("quality:qualEnvParameterGroup:insert")]
         public async Task AddQualEnvParameterGroupAsync([FromBody] QualEnvParameterGroupSaveDto saveDto)
         {
              await _qualEnvParameterGroupService.CreateQualEnvParameterGroupAsync(saveDto);
@@ -56,6 +58,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [PermissionDescription("quality:qualEnvParameterGroup:update")]
         public async Task UpdateQualEnvParameterGroupAsync([FromBody] QualEnvParameterGroupSaveDto saveDto)
         {
              await _qualEnvParameterGroupService.ModifyQualEnvParameterGroupAsync(saveDto);
@@ -68,6 +71,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [PermissionDescription("quality:qualEnvParameterGroup:delete")]
         public async Task DeleteQualEnvParameterGroupAsync([FromBody] long[] ids)
         {
             await _qualEnvParameterGroupService.DeletesQualEnvParameterGroupAsync(ids);
