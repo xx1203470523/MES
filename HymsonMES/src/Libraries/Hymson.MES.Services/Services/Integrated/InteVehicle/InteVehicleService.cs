@@ -187,7 +187,7 @@ namespace Hymson.MES.Services.Services.Integrated
         {
             //校验数据 
             var inteVehicleFreights= await _inteVehicleFreightRepository.GetByVehicleIdsAsync(ids);
-            var hasBinds = inteVehicleFreights.Where(x => !string.IsNullOrWhiteSpace(x.BarCode));
+            var hasBinds = inteVehicleFreights.Where(x => x.Qty>0);
             if (hasBinds.Any()) 
             {
                 //查询是哪些载具
@@ -381,7 +381,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 //一个格子多个条码情况
                 var inteVehicleEntity = await _inteVehicleRepository.GetByIdAsync(vehicleId);
                 var vtr = await _inteVehicleTypeRepository.GetByIdAsync(inteVehicleEntity.VehicleTypeId);
-                if (vtr.CellQty>1)
+                if (vtr.Qty>1)
                 {
                     //获取托盘所有条码记录
                     var vsr = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
@@ -460,19 +460,18 @@ namespace Hymson.MES.Services.Services.Integrated
             });
             var foo = await _inteVehicleFreightRepository.GetByVehicleIdsAsync(new long[] { inteVehicleEntity.Id });
             var count = foo.Where(i => i.Status == true).ToList().Count();
-            if(vsr.Count()>= count*vtr.CellQty) {
+            if(vsr.Count()>= count*vtr.Qty) {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18613));
             }
             else
             {
                 //获取指定位置信息
-               
                 var stack = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
                 {
                     LocationId = dto.LocationId,
                     SiteId = _currentSite.SiteId.Value
                 });
-                if(stack.Count()>=vtr.CellQty)
+                if(stack.Count()>=vtr.Qty)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES18614));
                 }
@@ -497,17 +496,12 @@ namespace Hymson.MES.Services.Services.Integrated
             }
                 
             var loc = await _inteVehicleFreightRepository.GetByIdAsync(dto.LocationId);
-            if(string.IsNullOrEmpty(loc.BarCode))
-            {
-                loc.BarCode = dto.SFC;
-                loc.UpdatedBy = _currentUser.UserName;
-                loc.UpdatedOn = HymsonClock.Now();
-                await _inteVehicleFreightRepository.UpdateAsync(loc);
-            }
-            else
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES18615)).WithData("sfc",loc.BarCode);
-            }
+           
+            loc.Qty += 1;
+            loc.UpdatedBy = _currentUser.UserName;
+            loc.UpdatedOn = HymsonClock.Now();
+            await _inteVehicleFreightRepository.UpdateAsync(loc);
+           
             
         }
         /// <summary>
@@ -523,36 +517,26 @@ namespace Hymson.MES.Services.Services.Integrated
                 SiteId = _currentSite.SiteId.Value
             });
             var vtr = await _inteVehicleTypeRepository.GetByIdAsync(inteVehicleEntity.VehicleTypeId);
-            if (vtr.CellQty > 1)
+           
+            //获取指定位置信息
+            var loc = await _inteVehicleFreightRepository.GetByIdAsync(dto.LocationId);
+            var stack = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
             {
-                //获取指定位置信息
-                var loc = await _inteVehicleFreightRepository.GetByIdAsync(dto.LocationId);
-                var stack = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
-                {
-                    LocationId = dto.LocationId,
-                    SiteId = _currentSite.SiteId.Value
-                });
-                var foo = stack.FirstOrDefault(s=>s.LocationId== dto.LocationId&&s.BarCode==dto.SFC);
-                if (foo!=null)
-                {
-                    await _inteVehiceFreightStackRepository.DeleteAsync(foo.Id);
-                }
-            }
-            else
+                LocationId = dto.LocationId,
+                SiteId = _currentSite.SiteId.Value
+            });
+            var foo = stack.FirstOrDefault(s=>s.LocationId== dto.LocationId&&s.BarCode==dto.SFC);
+            if (foo!=null)
             {
-                var loc = await _inteVehicleFreightRepository.GetByIdAsync(dto.LocationId);
-                if (!string.IsNullOrEmpty(loc.BarCode))
-                {
-                    loc.BarCode = string.Empty;
-                    loc.UpdatedBy = _currentUser.UserName;
-                    loc.UpdatedOn = HymsonClock.Now();
-                    await _inteVehicleFreightRepository.UpdateAsync(loc);
-                }
-                else
-                {
-                   // throw new CustomerValidationException(nameof(ErrorCode.MES18615)).WithData("sfc", loc.BarCode);
-                }
+                await _inteVehiceFreightStackRepository.DeleteAsync(foo.Id);
             }
+            
+            loc.Qty-= 1;
+            loc.UpdatedBy = _currentUser.UserName;
+            loc.UpdatedOn = HymsonClock.Now();
+            await _inteVehicleFreightRepository.UpdateAsync(loc);
+            
+            
         }
         /// <summary>
         /// 载具清盘
@@ -567,36 +551,33 @@ namespace Hymson.MES.Services.Services.Integrated
                 SiteId = _currentSite.SiteId.Value
             });
             var vtr = await _inteVehicleTypeRepository.GetByIdAsync(inteVehicleEntity.VehicleTypeId);
-            if (vtr.CellQty > 1)
-            {
+            
                
-                var vsr = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
-                {
-                    VehicleId = inteVehicleEntity.Id,
-                    SiteId = _currentSite.SiteId.Value
-                });
-                
-                if (vsr != null&&vsr.Any())
-                {
-                    await _inteVehiceFreightStackRepository.DeletesAsync(vsr.Select(v=>v.Id).ToArray());
-                }
-            }
-            else
+            var vsr = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
             {
-                var foo = await _inteVehicleFreightRepository.GetByVehicleIdsAsync(new long[] { inteVehicleEntity .Id});
-                if (foo != null && foo.Any())
-                {
-                    var bar = foo.ToList();
-                    bar.ForEach(i =>
-                    {
-                        i.BarCode = string.Empty;
-                        i.UpdatedBy = _currentUser.UserName;
-                        i.UpdatedOn = HymsonClock.Now();
-                    });
-                    await _inteVehicleFreightRepository.UpdatesAsync((bar));
-                }
+                VehicleId = inteVehicleEntity.Id,
+                SiteId = _currentSite.SiteId.Value
+            });
                 
+            if (vsr != null&&vsr.Any())
+            {
+                await _inteVehiceFreightStackRepository.DeletesAsync(vsr.Select(v=>v.Id).ToArray());
             }
+           
+            var foo = await _inteVehicleFreightRepository.GetByVehicleIdsAsync(new long[] { inteVehicleEntity .Id});
+            if (foo != null && foo.Any())
+            {
+                var bar = foo.ToList();
+                bar.ForEach(i =>
+                {
+                    i.Qty = 0;
+                    i.UpdatedBy = _currentUser.UserName;
+                    i.UpdatedOn = HymsonClock.Now();
+                });
+                await _inteVehicleFreightRepository.UpdatesAsync((bar));
+            }
+                
+            
         }
     }
 }

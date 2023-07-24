@@ -281,11 +281,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public string Location { get; set; }
 
         /// <summary>
-        /// 装载条码
-        /// </summary>
-        public string BarCode { get; set; }
-
-        /// <summary>
         /// 状态;0-禁用 1-启用
         /// </summary>
         public bool? Status { get; set; }
