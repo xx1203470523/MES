@@ -200,8 +200,8 @@ namespace Hymson.MES.Data.Repositories.Integrated
                                             /**select**/
                                            FROM `inte_vehicle_freight` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `inte_vehicle_freight`(  `Id`, `SiteId`, `VehicleId`, Qty, Row, Column, `Location`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @VehicleId, @Qty, @Row, @Column, @Location,  @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `inte_vehicle_freight`(  `Id`, `SiteId`, `VehicleId`, Qty, Row, Column, `Location`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @VehicleId, @Qty, @Row, @Column, @Location, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `inte_vehicle_freight`(  `Id`, `SiteId`, `VehicleId`, `Qty`, `Row`, `Column`, `Location`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @VehicleId, @Qty, @Row, @Column, @Location,  @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsSql = "INSERT INTO `inte_vehicle_freight`(  `Id`, `SiteId`, `VehicleId`, `Qty`, `Row`, `Column`, `Location`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @VehicleId, @Qty, @Row, @Column, @Location, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
         const string UpdateSql = "UPDATE `inte_vehicle_freight` SET   SiteId = @SiteId, VehicleId = @VehicleId, Row=@Row, Column=@Column, Location = @Location, Status = @Status, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `inte_vehicle_freight` SET   SiteId = @SiteId, VehicleId = @VehicleId, Row=@Row, Column=@Column, Location = @Location, Status = @Status, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
@@ -210,13 +210,13 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string DeletesSql = "UPDATE `inte_vehicle_freight` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteId`, `VehicleId`, Qty, Row, Column, `Location`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                               `Id`, `SiteId`, `VehicleId`, `Qty`, `Row`, `Column`, `Location`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `inte_vehicle_freight`  WHERE Id = @Id ";
         const string GetBySFCSql = @"SELECT 
-                               `Id`, `SiteId`, `VehicleId`, Qty, Row, Column, `Location`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                               `Id`, `SiteId`, `VehicleId`, `Qty`, `Row`, `Column`, `Location`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `inte_vehicle_freight` ";//需要修改
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteId`, `VehicleId`, Qty, Row, Column, `Location`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                                          `Id`, `SiteId`, `VehicleId`, `Qty`, `Row`, `Column`, `Location`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `inte_vehicle_freight`  WHERE Id IN @Ids ";
         #endregion
 

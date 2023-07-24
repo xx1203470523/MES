@@ -276,6 +276,16 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public long VehicleId { get; set; }
 
         /// <summary>
+        /// x位置
+        /// </summary>
+        public int Column { get; set; } 
+
+        /// <summary>
+        /// y位置
+        /// </summary>
+        public int Row { get; set; }
+
+        /// <summary>
         /// 位置号
         /// </summary>
         public string Location { get; set; }
