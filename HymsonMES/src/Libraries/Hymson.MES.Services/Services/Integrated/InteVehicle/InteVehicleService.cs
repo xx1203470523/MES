@@ -456,7 +456,7 @@ namespace Hymson.MES.Services.Services.Integrated
             });
             var foo = await _inteVehicleFreightRepository.GetByVehicleIdsAsync(new long[] { inteVehicleEntity.Id });
             var count = foo.Where(i => i.Status == true).ToList().Count();
-            if(vsr.Count()>= count*vtr.Qty) {
+            if(vsr.Count()>= count*vtr.CellQty) {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18613));
             }
             else
@@ -467,7 +467,7 @@ namespace Hymson.MES.Services.Services.Integrated
                     LocationId = dto.LocationId,
                     SiteId = _currentSite.SiteId.Value
                 });
-                if(stack.Count()>=vtr.Qty)
+                if(stack.Count()>=vtr.CellQty)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES18614));
                 }

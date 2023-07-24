@@ -51,7 +51,7 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// <summary>
         /// 单元数量
         /// </summary>
-        public int Qty { get; set; }
+        public int CellQty { get; set; }
         
         /// <summary>
         /// 说明
