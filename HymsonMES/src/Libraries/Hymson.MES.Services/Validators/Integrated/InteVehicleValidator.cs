@@ -26,7 +26,7 @@ namespace Hymson.MES.Services.Validators.Integrated
             RuleFor(x => x.Code).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES18606));
             RuleFor(x => x.Name).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES18607));
             RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES18608));
-            RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(EnableEnum), it)).WithErrorCode(nameof(ErrorCode.MES18609));
+            RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(DisableOrEnableEnum), it)).WithErrorCode(nameof(ErrorCode.MES18609));
             RuleFor(x => x.Position).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES18610));
             RuleFor(x => x.VehicleTypeId).Must(it => it>0).WithErrorCode(nameof(ErrorCode.MES18611));
         }
@@ -47,7 +47,7 @@ namespace Hymson.MES.Services.Validators.Integrated
             //RuleFor(x => x.Code).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES18606));
             RuleFor(x => x.Name).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES18607));
             RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES18608));
-            RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(EnableEnum), it)).WithErrorCode(nameof(ErrorCode.MES18609));
+            RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(DisableOrEnableEnum), it)).WithErrorCode(nameof(ErrorCode.MES18609));
             RuleFor(x => x.Position).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES18610));
             RuleFor(x => x.VehicleTypeId).Must(it => it > 0).WithErrorCode(nameof(ErrorCode.MES18611));
 

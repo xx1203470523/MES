@@ -35,7 +35,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
        /// <summary>
         /// 状态;0-未启用 1-启用
         /// </summary>
-        public EnableEnum Status { get; set; }
+        public DisableOrEnableEnum Status { get; set; }
 
        /// <summary>
         /// 载具类型id
@@ -103,7 +103,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
        /// <summary>
         /// 状态;0-未启用 1-启用
         /// </summary>
-        public EnableEnum Status { get; set; }
+        public DisableOrEnableEnum Status { get; set; }
 
        /// <summary>
         /// 载具类型id
@@ -143,7 +143,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
        /// <summary>
         /// 状态;0-未启用 1-启用
         /// </summary>
-        public EnableEnum Status { get; set; }
+        public DisableOrEnableEnum Status { get; set; }
 
        /// <summary>
         /// 载具类型id
@@ -183,7 +183,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 状态;0-未启用 1-启用
         /// </summary>
-        public EnableEnum? Status { get; set; }
+        public DisableOrEnableEnum? Status { get; set; }
 
         ///// <summary>
         ///// 载具类型id

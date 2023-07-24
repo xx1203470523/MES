@@ -410,7 +410,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 Code = dto.PalletNo,
                 SiteId = _currentSite.SiteId.Value
             });
-            if (v==null|| v.Status == EnableEnum.No)
+            if (v==null|| v.Status == DisableOrEnableEnum.Disable)
                 throw new CustomerValidationException(nameof(ErrorCode.MES18617));
             
             switch (dto.OperationType)

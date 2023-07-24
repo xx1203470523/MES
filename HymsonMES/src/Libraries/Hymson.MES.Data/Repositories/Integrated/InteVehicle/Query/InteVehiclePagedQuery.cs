@@ -20,7 +20,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
 
         public string? Name { get; set; }
 
-        public EnableEnum? Status { get; set; }
+        public DisableOrEnableEnum? Status { get; set; }
 
         /// <summary>
         /// 载具类型编码
