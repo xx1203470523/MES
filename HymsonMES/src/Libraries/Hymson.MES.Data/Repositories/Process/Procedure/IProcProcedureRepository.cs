@@ -22,7 +22,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procProcedurePagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ProcProcedureView>> GetPagedInfoAsync(ProcProcedurePagedQuery procProcedurePagedQuery);
-
+        /// <summary>
+        /// 根据Code获取工序信息
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        Task<ProcProcedureEntity> GetByCodeAsync(string code, long siteId);
         /// <summary>
         /// 根据ID获取数据
         /// </summary>

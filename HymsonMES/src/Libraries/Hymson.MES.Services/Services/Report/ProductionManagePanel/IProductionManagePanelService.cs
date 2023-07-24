@@ -17,7 +17,9 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
         /// 获取模组达成信息
         /// </summary>
         /// <param name="siteId"></param>
+        /// <param name="procedureCode"></param>
+        /// <param name="targetTotal"></param>
         /// <returns></returns>
-        Task<ProductionManagePanelModuleDto> GetModuleAchievingInfoAsync(long siteId);
+        Task<IEnumerable<ProductionManagePanelModuleDto>> GetModuleAchievingInfoAsync(long siteId, string procedureCode, decimal targetTotal);
     }
 }

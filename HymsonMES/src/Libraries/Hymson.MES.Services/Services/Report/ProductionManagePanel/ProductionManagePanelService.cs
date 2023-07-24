@@ -1,10 +1,10 @@
 ﻿using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
-using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Report;
+using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
 {
@@ -21,12 +21,14 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
         private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
         private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
         private readonly IProcProcessRouteDetailNodeRepository _procProcessRouteDetailNodeRepository;
+        private readonly IProcProcedureRepository _procProcedureRepository;
 
         public ProductionManagePanelService(IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
             IPlanWorkOrderRepository planWorkOrderRepository, IProcProcessRouteRepository procProcessRouteRepository,
             IProcMaterialRepository procMaterialRepository, IInteWorkCenterRepository inteWorkCenterRepository,
             IManuSfcSummaryRepository manuSfcSummaryRepository,
-            IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository)
+            IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
+            IProcProcedureRepository procProcedureRepository)
         {
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
@@ -35,6 +37,7 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             _inteWorkCenterRepository = inteWorkCenterRepository;
             _manuSfcSummaryRepository = manuSfcSummaryRepository;
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
+            _procProcedureRepository = procProcedureRepository;
         }
 
         /// <summary>
@@ -54,51 +57,51 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             }
             return await _planWorkOrderRepository.GetByIdAsync(planWorkOrderActivationEntity.WorkOrderId);
         }
-
+        /// <summary>
+        /// 当前时间
+        /// </summary>
+        private DateTime NowTime
+        {
+            get
+            {
+                return HymsonClock.Now();
+            }
+        }
         /// <summary>
         /// 当天开始时间
         /// 白班开始时间
         /// </summary>
-        private DateTime DayStartTime
+        private DateTime DayShiftStartTime
         {
             get
             {
-                DateTime checkTime = DateTime.Now; // 当前时间
+                DateTime checkTime = NowTime; // 当前时间
                 DateTime startTime = new DateTime(checkTime.Year, checkTime.Month, checkTime.Day, 08, 30, 0); // 开始时间
                 return startTime;
             }
         }
+
         /// <summary>
-        /// 当天结束时间
-        /// 第二天08:30
-        /// </summary>
-        private DateTime DayEndTime
-        {
-            get
-            {
-                return DayStartTime.AddDays(1);
-            }
-        }
-        /// <summary>
-        /// 今天白班结束时间
+        /// 当天白班结束时间
         /// </summary>
         private DateTime DayShiftEndTime
         {
             get
             {
-                DateTime checkTime = DateTime.Now; // 当前时间
-                DateTime endTime = new DateTime(checkTime.Year, checkTime.Month, checkTime.Day, 18, 30, 0); // 结束时间
+                DateTime checkTime = NowTime; // 当前时间
+                DateTime endTime = new DateTime(checkTime.Year, checkTime.Month, checkTime.Day, 20, 30, 0); // 结束时间
                 return endTime;
             }
         }
+
         /// <summary>
         /// 当前时间是否是在白班范围
         /// </summary>
         /// <returns></returns>
         private bool IsDayShift()
         {
-            DateTime checkTime = DateTime.Now; // 当前时间
-            DateTime startTime = DayStartTime; // 开始时间
+            DateTime checkTime = NowTime; // 当前时间
+            DateTime startTime = DayShiftStartTime; // 开始时间
             DateTime endTime = DayShiftEndTime; // 结束时间
             // 检查时间是否在区间内
             if (checkTime >= startTime && checkTime <= endTime)
@@ -108,6 +111,52 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             else
             {
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// 当前时间班次开始时间
+        /// </summary>
+        /// <returns></returns>
+        private DateTime StartTime
+        {
+            get
+            {
+                if (!IsDayShift() && NowTime.Hour < 9)//如果为夜班 20:30-第二天08:30
+                {
+                    return DayShiftEndTime.AddDays(-1);
+                }
+                else if (!IsDayShift() && NowTime.Hour > 9)
+                {
+                    return DayShiftEndTime;
+                }
+                else
+                {
+
+                    return DayShiftStartTime;
+                }
+            }
+        }
+        /// <summary>
+        /// 当前时间班次结束时间
+        /// </summary>
+        /// <returns></returns>
+        private DateTime EndTime
+        {
+            get
+            {
+                if (IsDayShift())
+                {
+                    return DayShiftEndTime;
+                }
+                else if (!IsDayShift() && NowTime.Hour > 9)
+                {
+                    return DayShiftStartTime.AddDays(1);
+                }
+                else
+                {
+                    return DayShiftStartTime;
+                }
             }
         }
 
@@ -143,10 +192,10 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             {
                 SiteId = siteId,
                 ProcedureId = processRouteDetailNodeEntity.ProcedureId,
-                StartTime = DayStartTime,
-                EndTime = DayEndTime,
+                StartTime = StartTime,
+                EndTime = EndTime,
             });
-            //当天投入量
+            //当天投入量(当前班次)
             decimal dayConsume = firstProcedureSummaryEntities.Count();
 
             //投入数
@@ -190,27 +239,64 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             };
             return managePanelReportDto;
         }
-
-        /// <summary>
-        /// 时间段定义
-        /// </summary>
-        private static List<ProductionManagePanelModuleRangeDto> DateTimeRanges = new List<ProductionManagePanelModuleRangeDto> {
-            new ProductionManagePanelModuleRangeDto
-            {
-                Sort=1,
-                DateTimeRange="08:30-10:30",
-                StartTime= new TimeSpan(8, 30, 0),
-                EndTime = new TimeSpan(10, 30,0)
-            }
-        };
         /// <summary>
         /// 获取模组达成信息
+        /// 特定工序投入量 和 目标数（固定数值）计算得到达成率
         /// </summary>
-        /// <param name="siteId"></param>
+        /// <param name="siteId">站点Id</param>
+        /// <param name="procedureCode">工序编码</param>
+        /// <param name="targetTotal">目标总数</param>
         /// <returns></returns>
-        public async Task<ProductionManagePanelModuleDto> GetModuleAchievingInfoAsync(long siteId)
+        public async Task<IEnumerable<ProductionManagePanelModuleDto>> GetModuleAchievingInfoAsync(long siteId, string procedureCode, decimal targetTotal)
         {
-            return new ProductionManagePanelModuleDto();
+            var procProcedureEntity = await _procProcedureRepository.GetByCodeAsync(procedureCode, siteId);
+            if (procProcedureEntity == null)
+            {
+                return new List<ProductionManagePanelModuleDto>();
+            }
+            DateTime startTime = StartTime;//开始时间
+            DateTime endTime = EndTime;// 结束时间
+            //查询当前时间的投入量
+            var manuSfcSummaryQuery = new ManuSfcSummaryQuery
+            {
+                SiteId = siteId,
+                ProcedureId = procProcedureEntity.Id,
+                StartTime = startTime,
+                EndTime = endTime
+            };
+            var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
+            //按照2小时为间隔进行分段统计
+            TimeSpan interval = new(2, 0, 0);//分段间隔
+            //动态生成分段列表
+            List<Tuple<DateTime, DateTime>> segments = new List<Tuple<DateTime, DateTime>>();
+            DateTime segmentStart = startTime;
+            while (segmentStart < endTime)
+            {
+                DateTime segmentEnd = segmentStart.Add(interval);
+                segments.Add(new Tuple<DateTime, DateTime>(segmentStart, segmentEnd));
+                segmentStart = segmentEnd;
+            }
+            //按时间段取投入数平均值
+            var dateTimeRangeTarger = decimal.Parse((segments.Count / targetTotal).ToString("0.00"));
+            //统计每个分段的数据数量
+            var statistics = segments.Select((segment, index) =>
+            {
+                //目标数
+                var targetQty = dateTimeRangeTarger;
+                //投入数
+                int count = manuSfcSummaryEntities.Count(c => c.CreatedOn >= segment.Item1 && c.CreatedOn < segment.Item2);
+                //达成率
+                var achievingRate = decimal.Parse((count / (targetQty == 0 ? 1 : targetQty) * 100).ToString("0.00"));
+                return new ProductionManagePanelModuleDto
+                {
+                    DateTimeRange = $"{segment.Item1:HH:mm}-{segment.Item2:HH:mm}",
+                    InputQty = count,
+                    TargetQty = targetQty,
+                    AchievingRate = achievingRate,
+                    Sort = index + 1
+                };
+            }).ToList();
+            return statistics;
         }
 
     }

@@ -106,6 +106,10 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 结束时间
         /// </summary>
         public TimeSpan EndTime { get; set; }
+        /// <summary>
+        /// true 白班 false夜班
+        /// </summary>
+        public bool IsDayShift { get; set; }
     }
     /// <summary>
     /// 模组信息Dto

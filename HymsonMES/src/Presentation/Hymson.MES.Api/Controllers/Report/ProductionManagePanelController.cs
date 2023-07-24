@@ -1,5 +1,6 @@
 ﻿using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Services.Report.ProductionManagePanel;
+using Hymson.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections;
@@ -35,68 +36,31 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <summary>
         /// 获取当天模组达成数据
         /// </summary>
+        /// <param name="siteId">站点ID</param>
+        /// <param name="procedureCode">工序（特定工序投入量）</param>
+        /// <param name="targetTotal">时间分段计划总量</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("getPackAchievingInfo")]
-        public Task<IEnumerable<ProductionManagePanelModuleDto>> GetPackAchievingInfoAsync()
+        [Route("getModuleAchievingInfo")]
+        public async Task<IEnumerable<ProductionManagePanelModuleDto>> GetModuleAchievingInfoAsync(long siteId, string procedureCode, decimal targetTotal)
         {
-            IEnumerable<ProductionManagePanelModuleDto> result = new List<ProductionManagePanelModuleDto>
-            {
-                new ProductionManagePanelModuleDto()
-                {
-                    Sort=1,
-                    DateTimeRange = "08:30-10:30",
-                    InputQty = 40,
-                    TargetQty = 100,
-                    AchievingRate = 25,
-                },
-                new ProductionManagePanelModuleDto()
-                {
-                    Sort=2,
-                    DateTimeRange = "10:30-12:30",
-                    InputQty = 20,
-                    TargetQty = 50,
-                    AchievingRate = 15,
-                },
-                new ProductionManagePanelModuleDto()
-                {
-                    Sort=3,
-                    DateTimeRange = "12:30-14:30",
-                    InputQty = 90,
-                    TargetQty = 90,
-                    AchievingRate = 90,
-                },
-                new ProductionManagePanelModuleDto()
-                {
-                    Sort=4,
-                    DateTimeRange = "14:30-16:30",
-                    InputQty = 10,
-                    TargetQty = 100,
-                    AchievingRate = 10,
-                },
-                new ProductionManagePanelModuleDto()
-                {
-                    Sort=5,
-                    DateTimeRange = "16:30-18:30",
-                    InputQty = 0,
-                    TargetQty = 100,
-                    AchievingRate = 0,
-                },
-            };
-            result = result.OrderBy(c => c.Sort).ToList();
-            return Task.FromResult(result);
+            var managePanelModuleDtos = await _productionManagePanelService.GetModuleAchievingInfoAsync(siteId, procedureCode, targetTotal);
+            return managePanelModuleDtos;
         }
         /// <summary>
         /// 获取模组达成详细信息
         /// </summary>
+        /// <param name="siteId">站点ID</param>
+        /// <param name="procedureCode">工序（特定工序投入量）</param>
+        /// <param name="targetTotal">时间分段计划总量</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("getPackInfoDynamic")]
-        public Task<List<dynamic>> GetPackInfoDynamicAsync()
+        [Route("getModuleInfoDynamic")]
+        public async Task<List<dynamic>> GetModuleInfoDynamicAsync(long siteId, string procedureCode, decimal targetTotal)
         {
             Dictionary<string, string> keyValues = new Dictionary<string, string>();
-            var packInfo = GetPackAchievingInfoAsync().Result;
-            var managePanelPackDtos = packInfo.GroupBy(c => c.DateTimeRange);
+            var managePanelModuleDtos = await _productionManagePanelService.GetModuleAchievingInfoAsync(siteId, procedureCode, targetTotal); ;
+            var managePanelPackDtos = managePanelModuleDtos.GroupBy(c => c.DateTimeRange);
             DataTable dt = new();
             //空列头
             string NullColNmae = " ";
@@ -117,7 +81,7 @@ namespace Hymson.MES.Api.Controllers.Report
                 var col = dt.Columns[i];
                 if (col.ColumnName != NullColNmae)
                 {
-                    var managePanelPackDto = packInfo.Where(c => c.DateTimeRange == col.ColumnName).FirstOrDefault();
+                    var managePanelPackDto = managePanelModuleDtos.Where(c => c.DateTimeRange == col.ColumnName).FirstOrDefault();
                     if (managePanelPackDto == null) { continue; }
                     inputRow[col.ColumnName] = managePanelPackDto?.InputQty;
                     targetRow[col.ColumnName] = managePanelPackDto?.TargetQty;
@@ -129,7 +93,7 @@ namespace Hymson.MES.Api.Controllers.Report
             dt.Rows.Add(targetRow);
             dt.Rows.Add(achievingRow);
             var dynamics = ToDynamicList(dt);
-            return Task.FromResult(dynamics);
+            return dynamics;
         }
         private List<dynamic> ToDynamicList(DataTable table, string[] filterFields = null, bool includeOrExclude = true)
         {
@@ -294,8 +258,8 @@ namespace Hymson.MES.Api.Controllers.Report
         public Task<List<ProcessYieldRateDto>> GetProcessYieldRateAsync()
         {
             List<ProcessYieldRateDto> yieldRateDtos = new List<ProcessYieldRateDto>();
-            int year = DateTime.Now.Year;
-            int month = DateTime.Now.Month;
+            int year = HymsonClock.Now().Year;
+            int month = HymsonClock.Now().Month;
             int daysInMonth = DateTime.DaysInMonth(year, month);
             for (int i = 1; i <= daysInMonth; i++)
             {
@@ -360,8 +324,8 @@ namespace Hymson.MES.Api.Controllers.Report
         public Task<List<ProcessIndicatorsDto>> GetProcessIndicatorsAsync()
         {
             List<ProcessIndicatorsDto> indicatorsDtos = new List<ProcessIndicatorsDto>();
-            int year = DateTime.Now.Year;
-            int month = DateTime.Now.Month;
+            int year = HymsonClock.Now().Year;
+            int month = HymsonClock.Now().Month;
             int daysInMonth = DateTime.DaysInMonth(year, month);
             for (int i = 1; i <= daysInMonth; i++)
             {
