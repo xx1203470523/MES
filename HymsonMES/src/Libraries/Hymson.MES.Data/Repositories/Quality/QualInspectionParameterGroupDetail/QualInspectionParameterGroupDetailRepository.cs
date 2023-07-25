@@ -70,7 +70,7 @@ namespace Hymson.MES.Data.Repositories.Quality
                                             /**select**/
                                            FROM `qual_inspection_parameter_group_detail` /**where**/  ";
 
-        const string InsertsSql = "INSERT INTO `qual_inspection_parameter_group_detail`(`Id`, `ParameterGroupId`, `ParameterId`, `UpperLimit`, `CenterValue`, `LowerLimit`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @ParameterGroupId, @InspectionParameterId, @UpperLimit, @CenterValue, @LowerLimit, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
+        const string InsertsSql = "INSERT INTO `qual_inspection_parameter_group_detail`(`Id`, `ParameterGroupId`, `ParameterId`, `UpperLimit`, `CenterValue`, `LowerLimit`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @ParameterGroupId, @ParameterId, @UpperLimit, @CenterValue, @LowerLimit, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
 
         const string DeleteByParentId = "DELETE FROM qual_inspection_parameter_group_detail WHERE ParameterGroupId = @ParentId";
 
