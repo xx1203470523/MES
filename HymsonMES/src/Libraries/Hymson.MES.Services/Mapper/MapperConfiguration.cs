@@ -463,6 +463,15 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualEnvParameterGroupDetailEntity, QualEnvParameterGroupDetailDto>();
             #endregion
 
+            #region QualInspectionParameterGroup
+            CreateMap<QualInspectionParameterGroupSaveDto, QualInspectionParameterGroupEntity>();
+            CreateMap<QualInspectionParameterGroupPagedQueryDto, QualInspectionParameterGroupPagedQuery>();
+            CreateMap<QualInspectionParameterGroupView, QualInspectionParameterGroupDto>();
+            CreateMap<QualInspectionParameterGroupEntity, QualInspectionParameterGroupInfoDto>();
+            CreateMap<QualInspectionParameterGroupDetailSaveDto, QualInspectionParameterGroupDetailEntity>();
+            CreateMap<QualInspectionParameterGroupDetailEntity, QualInspectionParameterGroupDetailDto>();
+            #endregion
+
             #region QualUnqualifiedCode
             CreateMap<QualUnqualifiedCodeEntity, QualUnqualifiedCodeDto>();
             CreateMap<QualUnqualifiedCodeCreateDto, QualUnqualifiedCodeEntity>();

@@ -198,6 +198,8 @@ namespace Microsoft.Extensions.DependencyInjection
             #region Quality
             services.AddSingleton<IQualEnvParameterGroupRepository, QualEnvParameterGroupRepository>();
             services.AddSingleton<IQualEnvParameterGroupDetailRepository, QualEnvParameterGroupDetailRepository>();
+            services.AddSingleton<IQualInspectionParameterGroupRepository, QualInspectionParameterGroupRepository>();
+            services.AddSingleton<IQualInspectionParameterGroupDetailRepository, QualInspectionParameterGroupDetailRepository>();
 
             services.AddSingleton<IQualUnqualifiedCodeRepository, QualUnqualifiedCodeRepository>();
             services.AddSingleton<IQualUnqualifiedGroupRepository, QualUnqualifiedGroupRepository>();
