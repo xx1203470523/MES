@@ -75,7 +75,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="palletNo"></param>
         /// <returns></returns>
-        Task<IEnumerable<InteVehicleFreightDto>> QueryVehicleFreightByPalletNoAsync(string palletNo);
+        Task<InteVehicleStackView> QueryVehicleFreightByPalletNoAsync(string palletNo);
         /// <summary>
         /// 载具操作
         /// </summary>

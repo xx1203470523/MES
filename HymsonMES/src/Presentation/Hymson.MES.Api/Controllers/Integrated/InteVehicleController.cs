@@ -134,20 +134,47 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
-        /// 载具操作 0绑盘 1解盘 2清盘
+        /// 载具操作
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("VehicleFreightOperation")]
+        [Route("bindVehicle")]
         public async Task VehicleFreightOperationAsync(InteVehicleOperationDto dto)
         {
+            dto.OperationType = 0;
+            await _inteVehicleService.VehicleOperationAsync(dto);
+        }
+
+        /// <summary>
+        /// 载具操作解盘
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("unbindVehicle")]
+        public async Task UnbindVehicleAsync(InteVehicleOperationDto dto)
+        {
+            dto.OperationType = 1;
+            await _inteVehicleService.VehicleOperationAsync(dto);
+        }
+
+        /// <summary>
+        /// 载具操作清盘
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("clearVehicle")]
+        public async Task ClearVehicleAsync(InteVehicleOperationDto dto)
+        {
+            dto.OperationType = 2;
             await _inteVehicleService.VehicleOperationAsync(dto);
         }
 
         [HttpGet]
         [Route("getVehicleFreightByPalletNo/{palletNo}")]
-        public async Task<IEnumerable<InteVehicleFreightDto>> QueryVehicleFreightByVehicleIdAsync(string palletNo)
+        public async Task<InteVehicleStackView> QueryVehicleFreightByVehicleIdAsync(string palletNo)
         {
             return await _inteVehicleService.QueryVehicleFreightByPalletNoAsync(palletNo);
         }
