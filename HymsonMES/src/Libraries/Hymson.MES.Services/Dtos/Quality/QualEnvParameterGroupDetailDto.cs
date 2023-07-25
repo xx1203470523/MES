@@ -24,6 +24,16 @@ namespace Hymson.MES.Services.Dtos.Quality
         public long ParameterId { get; set; }
 
         /// <summary>
+        /// 参数编码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 数据类型（字典定义） 
+        /// </summary>
+        public DataTypeEnum DataType { get; set; } = DataTypeEnum.Text;
+
+        /// <summary>
         /// 规格上限
         /// </summary>
         public decimal? UpperLimit { get; set; }

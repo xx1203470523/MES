@@ -1,11 +1,14 @@
 using FluentValidation;
+using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Quality;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
@@ -66,6 +69,11 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly IProcParameterRepository _procParameterRepository;
 
         /// <summary>
+        /// 国际化服务
+        /// </summary>
+        private readonly ILocalizationService _localizationService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
@@ -76,12 +84,14 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="inteWorkCenterRepository"></param>
         /// <param name="procProcedureRepository"></param>
         /// <param name="procParameterRepository"></param>
+        /// <param name="localizationService"></param>
         public QualEnvParameterGroupService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<QualEnvParameterGroupSaveDto> validationSaveRules,
             IQualEnvParameterGroupRepository qualEnvParameterGroupRepository,
             IQualEnvParameterGroupDetailRepository qualEnvParameterGroupDetailRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
             IProcProcedureRepository procProcedureRepository,
-            IProcParameterRepository procParameterRepository)
+            IProcParameterRepository procParameterRepository,
+            ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -91,6 +101,7 @@ namespace Hymson.MES.Services.Services.Quality
             _inteWorkCenterRepository = inteWorkCenterRepository;
             _procProcedureRepository = procProcedureRepository;
             _procParameterRepository = procParameterRepository;
+            _localizationService = localizationService;
         }
 
 
@@ -123,6 +134,31 @@ namespace Hymson.MES.Services.Services.Quality
             // 编码唯一性验证
             var checkEntity = await _qualEnvParameterGroupRepository.GetByCodeAsync(new EntityByCodeQuery { Site = entity.SiteId, Code = entity.Code });
             if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES12600)).WithData("Code", entity.Code);
+
+            // 判断规格上限和规格下限（数据类型为数值）
+            List<ValidationFailure> validationFailures = new();
+            foreach (var item in saveDto.Details)
+            {
+                // 如果参数类型为数值，则判断规格上限和规格下限
+                if (item.DataType != DataTypeEnum.Numeric) continue;
+                if (item.UpperLimit >= item.LowerLimit) continue;
+
+                validationFailures.Add(new ValidationFailure
+                {
+                    FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                        { "CollectionIndex", item.Code },
+                        { "Code", item.Code }
+                    },
+                    ErrorCode = nameof(ErrorCode.MES10516)
+                });
+            }
+
+            // 是否存在错误
+            if (validationFailures.Any())
+            {
+                //throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
+                throw new ValidationException("", validationFailures);
+            }
 
             var details = saveDto.Details.Select(s =>
             {
