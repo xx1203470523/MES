@@ -159,6 +159,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcPrintConfigService, ProcPrintConfigService>();
             //标签模板
             services.AddSingleton<IProcLabelTemplateService, ProcLabelTemplateService>();
+
+            services.AddSingleton<IProcSortingRuleService, ProcSortingRuleService>();
             #endregion
 
             #region Quality
@@ -357,6 +359,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<ProcMaskCodeSaveDto>, ProcMaskCodeValidator>();
             #endregion
 
+            #region ProcSortingRule
+            services.AddSingleton<AbstractValidator<ProcSortingRuleCreateDto>, ProcSortingRuleCreateValidator>();
+            services.AddSingleton<AbstractValidator<ProcSortingRuleModifyDto>, ProcSortingRuleModifyValidator>();
+            #endregion
             #endregion
 
             #region Integrated

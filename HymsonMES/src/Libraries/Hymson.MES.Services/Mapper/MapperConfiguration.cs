@@ -54,7 +54,7 @@ namespace Hymson.MES.Services.Mapper
     public class MapperConfiguration : Profile, IOrderedMapperProfile
     {
         /// <summary>
-        /// 
+        /// 映射
         /// </summary>
         public MapperConfiguration()
         {
@@ -69,7 +69,7 @@ namespace Hymson.MES.Services.Mapper
         }
 
         /// <summary>
-        /// 
+        /// 设备模块
         /// </summary>
         protected virtual void CreateEquipmentMaps()
         {
@@ -156,7 +156,7 @@ namespace Hymson.MES.Services.Mapper
         }
 
         /// <summary>
-        /// 
+        /// 综合模块
         /// </summary>
         protected virtual void CreateIntegratedMaps()
         {
@@ -260,7 +260,7 @@ namespace Hymson.MES.Services.Mapper
         }
 
         /// <summary>
-        /// 
+        /// 工艺模块
         /// </summary>
         protected virtual void CreateProcessMaps()
         {
@@ -411,7 +411,13 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcLabelTemplatePagedQueryDto, ProcLabelTemplatePagedQuery>();
             #endregion
 
+            #region ProcSortingRule
 
+            CreateMap<ProcSortingRuleEntity, ProcSortingRuleDto>();
+            CreateMap<ProcSortingRuleCreateDto, ProcLabelTemplateEntity>();
+            CreateMap<ProcSortingRuleModifyDto, ProcLabelTemplateEntity>();
+            CreateMap<ProcSortingRulePagedQueryDto, ProcSortingRulePagedQuery>();
+            #endregion
         }
 
         /// <summary>
@@ -444,7 +450,7 @@ namespace Hymson.MES.Services.Mapper
         }
 
         /// <summary>
-        /// 
+        /// 质量模块
         /// </summary>
         protected virtual void CreateQualityMaps()
         {
