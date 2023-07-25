@@ -27,6 +27,7 @@ using IdGen;
 using Minio.DataModel;
 using System.Transactions;
 using System.Drawing.Drawing2D;
+using Hymson.MES.Data.Repositories.Manufacture;
 
 namespace Hymson.MES.Services.Services.Integrated
 {
@@ -51,11 +52,13 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly IInteVehicleFreightRepository _inteVehicleFreightRepository;
         private readonly IInteVehiceFreightStackRepository _inteVehiceFreightStackRepository;
         private readonly IInteVehicleFreightRecordRepository _inteVehicleFreightRecordRepository;
+        private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
         public InteVehicleService(ICurrentUser currentUser, ICurrentSite currentSite, IInteVehicleRepository inteVehicleRepository, AbstractValidator<InteVehicleCreateDto> validationCreateRules, AbstractValidator<InteVehicleModifyDto> validationModifyRules, IInteVehicleTypeRepository inteVehicleTypeRepository,
             IInteVehicleVerifyRepository inteVehicleVerifyRepository,
             IInteVehiceFreightStackRepository inteVehiceFreightStackRepository,
             IInteVehicleFreightRecordRepository inteVehicleFreightRecordRepository,
+            IManuSfcProduceRepository manuSfcProduceRepository,
             IInteVehicleFreightRepository inteVehicleFreightRepository)
         {
             _currentUser = currentUser;
@@ -68,6 +71,7 @@ namespace Hymson.MES.Services.Services.Integrated
             _inteVehicleFreightRepository = inteVehicleFreightRepository;
             _inteVehiceFreightStackRepository = inteVehiceFreightStackRepository;
             _inteVehicleFreightRecordRepository = inteVehicleFreightRecordRepository;
+            _manuSfcProduceRepository = manuSfcProduceRepository;
         }
 
         /// <summary>
@@ -479,7 +483,16 @@ namespace Hymson.MES.Services.Services.Integrated
              * 条码存放在inte_vehice_freight_stack表中
              */
             // 条码 是否在制品校验
-
+           
+            var manuSfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
+            {
+                Sfc = dto.SFC,
+                SiteId = _currentSite.SiteId??123456
+            });
+            if (manuSfcProduceEntity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19918)).WithData("SFC", dto.SFC);
+            }
             //绑盘前校验 该条码是否已绑盘
             var check1 = await _inteVehiceFreightStackRepository.GetBySFCAsync(dto.SFC);
             if (check1 != null)
