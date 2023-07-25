@@ -208,64 +208,48 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <returns></returns>
         [HttpGet]
         [Route("getProcessYieldRate")]
-        public Task<List<ProcessYieldRateDto>> GetProcessYieldRateAsync()
+        public async Task<List<ProcessYieldRateDto>> GetProcessYieldRateAsync([FromQuery] ProcessYieldRateQuery param)
         {
             List<ProcessYieldRateDto> yieldRateDtos = new List<ProcessYieldRateDto>();
             int year = HymsonClock.Now().Year;
             int month = HymsonClock.Now().Month;
             int daysInMonth = DateTime.DaysInMonth(year, month);
+            var processYieldRateDtos = await _productionManagePanelService.GetProcessYieldRateAsync(param);
             for (int i = 1; i <= daysInMonth; i++)
             {
                 var dayStr = i < 10 ? i.ToString().PadLeft(2, '0') : i.ToString();
-                Random random = new Random(i);
-                int minValue = 1;
-                int maxValue = 100;
-                int randomInRange = random.Next(minValue, maxValue + 1);
+                var processYields = processYieldRateDtos.Where(c => c.Day == dayStr)
+                    .Select(c => new ProcessYieldRateDto
+                    {
+                        Day = dayStr,
+                        ProccessCode = c.ProccessCode,
+                        ProcessName = c.ProcessName,
+                        YieldQty = c.YieldQty,
+                        YieldRate = c.YieldRate
 
-                var processYieldRate = new ProcessYieldRateDto
+                    });
+                //添加不存在数据的月份指标
+                if (!processYields.Any())
                 {
-                    Day = dayStr,
-                    ProccessCode = "TEST1",
-                    ProcessName = "测试工序1",
-                    YieldQty = randomInRange,
-                    YieldRate = randomInRange
-                };
-                yieldRateDtos.Add(processYieldRate);
-
-                int randomInRange2 = random.Next(minValue, maxValue + 1);
-                var processYieldRate2 = new ProcessYieldRateDto
-                {
-                    Day = dayStr,
-                    ProccessCode = "TEST2",
-                    ProcessName = "测试工序2",
-                    YieldQty = randomInRange2,
-                    YieldRate = randomInRange2
-                };
-                yieldRateDtos.Add(processYieldRate2);
-
-                int randomInRange3 = random.Next(minValue, maxValue + 1);
-                var processYieldRate3 = new ProcessYieldRateDto
-                {
-                    Day = dayStr,
-                    ProccessCode = "TEST3",
-                    ProcessName = "测试工序3",
-                    YieldQty = randomInRange3,
-                    YieldRate = randomInRange3
-                };
-                yieldRateDtos.Add(processYieldRate3);
-
-                int randomInRange4 = random.Next(minValue, maxValue + 1);
-                var processYieldRate4 = new ProcessYieldRateDto
-                {
-                    Day = dayStr,
-                    ProccessCode = "TEST4",
-                    ProcessName = "测试工序4",
-                    YieldQty = randomInRange4,
-                    YieldRate = randomInRange4
-                };
-                yieldRateDtos.Add(processYieldRate4);
+                    foreach (var item in param.ProcedureCodes)
+                    {
+                        //查询工序信息（有缓存）
+                        var procProcedure = await _productionManagePanelService.GetProcProcedure(item, param.SiteId);
+                        yieldRateDtos.Add(new ProcessYieldRateDto
+                        {
+                            Day = dayStr,
+                            ProccessCode = item,
+                            ProcessName = procProcedure?.Name ?? item,
+                            Total = 0,
+                            YieldQty = 0,
+                            YieldRate = 0
+                        });
+                    }
+                }
+                //添加存在数据的指标
+                yieldRateDtos.AddRange(processYields);
             }
-            return Task.FromResult(yieldRateDtos);
+            return yieldRateDtos;
         }
 
         /// <summary>

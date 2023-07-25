@@ -456,21 +456,38 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
                 .GroupBy(s => new { s.CreatedOn.Date, s.ProductId })
                 .Select(g => new
                 {
-                    ProcedureId = g.Max(c => c.ProductId),
+                    ProcedureId = g.Max(c => c.ProcedureId),
                     Day = g.Key,
                     PassQty = g.Where(c => c.QualityStatus == 1).Sum(s => s.Qty) ?? 0,//良品数
                     Total = g.Sum(s => s.Qty) ?? 0,//总数
                 })
-                .Select(x => new ProcessYieldRateDto
+                .Select(x =>
                 {
-                    Day = x.Day.Date.Day.ToString().PadLeft(2, '0'),
-                    YieldQty = x.PassQty,
-                    Total = x.Total,
-                    YieldRate = decimal.Parse((x.PassQty / x.Total == 0 ? 1 : x.Total).ToString("0.00"))
+                    var procProcedure = procProcedureEntities.Where(c => c.Id == x.ProcedureId).FirstOrDefault();
+                    return new ProcessYieldRateDto
+                    {
+                        ProccessCode = procProcedure?.Code ?? string.Empty,
+                        ProcessName = procProcedure?.Name ?? string.Empty,
+                        Day = x.Day.Date.Day.ToString().PadLeft(2, '0'),
+                        YieldQty = x.PassQty,
+                        Total = x.Total,
+                        YieldRate = decimal.Parse((x.PassQty / x.Total == 0 ? 1 : x.Total).ToString("0.00"))
+                    };
                 })
                 .OrderBy(x => x.Day)
                 .ToList();
             return dailyPassList;
+        }
+
+        /// <summary>
+        /// 查询工序信息（有缓存）
+        /// </summary>
+        /// <param name="procedureCode"></param>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        public async Task<ProcProcedureEntity> GetProcProcedure(string procedureCode, long siteId)
+        {
+            return await _procProcedureRepository.GetByCodeAsync(procedureCode, siteId);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Hymson.MES.Services.Dtos.Report;
+﻿using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Services.Dtos.Report;
 
 namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
 {
@@ -33,5 +34,13 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
         /// <param name="param"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcessYieldRateDto>> GetProcessYieldRateAsync(ProcessYieldRateQuery param);
+
+        /// <summary>
+        /// 查询工序信息
+        /// </summary>
+        /// <param name="procedureCode"></param>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        Task<ProcProcedureEntity> GetProcProcedure(string procedureCode, long siteId);
     }
 }
