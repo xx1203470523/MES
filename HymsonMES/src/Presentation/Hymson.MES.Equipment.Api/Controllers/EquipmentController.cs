@@ -99,7 +99,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="ngDataService"></param>
         /// <param name="sfcCirculationService"></param>
         public EquipmentController(ILogger<EquipmentController> logger,
-            IInStationService manuInStationService, 
+            IInStationService manuInStationService,
             ISfcBindingService sfcBindingService,
             IEquipmentCollectService equipmentService,
             IBindSFCService bindSFCService,
@@ -405,10 +405,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("GenerateModuleSFC")]
-        public async Task GenerateModuleSFCAsync(GenerateModuleSFCDto request)
+        public async Task<GenerateModuleSFCModelDto> GenerateModuleSFCAsync(GenerateModuleSFCDto request)
         {
-            _logger.LogInformation("请求生成模组码-电芯堆叠：GenerateModuleSFC,msg:{request}", request);
-            await _generateModuleSFCService.GenerateModuleSFCAsync(request);
+            return await _generateModuleSFCService.GenerateModuleSFCAsync(request);
         }
 
         ///// <summary>
@@ -504,7 +503,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("GetNGData")]
-        [ProducesResponseType(typeof(NGDataDto),200)]
+        [ProducesResponseType(typeof(NGDataDto), 200)]
         public async Task<NGDataDto> GetNGDataAsync(string sfc)
         {
             return await _ngDataService.GetNGData(sfc);
@@ -531,7 +530,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [Route("SfcCirculationUnBind")]
         public async Task SfcCirculationUnBind(SfcCirculationUnBindDto request)
         {
-            await _sfcCirculationService.SfcCirculationUnBindAsync(request,SfcCirculationTypeEnum.Merge);
+            await _sfcCirculationService.SfcCirculationUnBindAsync(request, SfcCirculationTypeEnum.Merge);
         }
 
         /// <summary>
