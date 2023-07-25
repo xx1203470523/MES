@@ -437,7 +437,7 @@ namespace Hymson.MES.Services.Services.Integrated
             var v = await _inteVehicleRepository.GetByCodeAsync(new InteVehicleCodeQuery()
             {
                 Code = dto.PalletNo,
-                SiteId = _currentSite.SiteId.Value
+                SiteId = _currentSite.SiteId??123456
             });
 
             if (v == null || v.Status == DisableOrEnableEnum.Disable)
@@ -459,9 +459,9 @@ namespace Hymson.MES.Services.Services.Integrated
                     CreatedBy = _currentUser.UserName,
                     CreatedOn = HymsonClock.Now(),
                     Id = IdGenProvider.Instance.CreateId(),
-                    LocationId = dto.LocationId.Value,
-                    OperateType = dto.OperationType.Value,
-                    SiteId = _currentSite.SiteId.Value,
+                    LocationId = dto.LocationId??0,
+                    OperateType = dto.OperationType??99,
+                    SiteId = _currentSite.SiteId??123456,
                     VehicleId = v.Id
                 });
             });
@@ -490,7 +490,7 @@ namespace Hymson.MES.Services.Services.Integrated
             var inteVehicleEntity = await _inteVehicleRepository.GetByCodeAsync(new InteVehicleCodeQuery()
             {
                 Code = dto.PalletNo,
-                SiteId = _currentSite.SiteId.Value
+                SiteId = _currentSite.SiteId??123456
             });
             var vtr = await _inteVehicleTypeRepository.GetByIdAsync(inteVehicleEntity.VehicleTypeId);
 
@@ -498,7 +498,7 @@ namespace Hymson.MES.Services.Services.Integrated
             var vsr = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
             {
                 VehicleId = inteVehicleEntity.Id,
-                SiteId = _currentSite.SiteId.Value
+                SiteId = _currentSite.SiteId??123456
             });
             var foo = await _inteVehicleFreightRepository.GetByVehicleIdsAsync(new long[] { inteVehicleEntity.Id });
             var count = foo.Where(i => i.Status == true).ToList().Count();
@@ -512,7 +512,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 var stack = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
                 {
                     LocationId = dto.LocationId,
-                    SiteId = _currentSite.SiteId.Value
+                    SiteId = _currentSite.SiteId ?? 123456
                 });
                 if (stack.Count() >= vtr.CellQty)
                 {
@@ -529,7 +529,7 @@ namespace Hymson.MES.Services.Services.Integrated
                         UpdatedOn = HymsonClock.Now(),
                         SiteId = _currentSite.SiteId ?? 0,
                         Id = IdGenProvider.Instance.CreateId(),
-                        LocationId = dto.LocationId.Value,
+                        LocationId = dto.LocationId??0,
                         VehicleId = inteVehicleEntity.Id,
                         IsDeleted = 0
                     };
@@ -555,7 +555,7 @@ namespace Hymson.MES.Services.Services.Integrated
             var inteVehicleEntity = await _inteVehicleRepository.GetByCodeAsync(new InteVehicleCodeQuery()
             {
                 Code = dto.PalletNo,
-                SiteId = _currentSite.SiteId.Value
+                SiteId = _currentSite.SiteId ?? 123456
             });
             var vtr = await _inteVehicleTypeRepository.GetByIdAsync(inteVehicleEntity.VehicleTypeId);
 
@@ -564,7 +564,7 @@ namespace Hymson.MES.Services.Services.Integrated
             var stack = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
             {
                 LocationId = dto.LocationId,
-                SiteId = _currentSite.SiteId.Value
+                SiteId = _currentSite.SiteId ?? 123456
             });
             var foo = stack.FirstOrDefault(s => s.LocationId == dto.LocationId && s.BarCode == dto.SFC);
             if (foo != null)
@@ -590,7 +590,7 @@ namespace Hymson.MES.Services.Services.Integrated
             var inteVehicleEntity = await _inteVehicleRepository.GetByCodeAsync(new InteVehicleCodeQuery()
             {
                 Code = dto.PalletNo,
-                SiteId = _currentSite.SiteId.Value
+                SiteId = _currentSite.SiteId??123456
             });
             var vtr = await _inteVehicleTypeRepository.GetByIdAsync(inteVehicleEntity.VehicleTypeId);
 
@@ -598,7 +598,7 @@ namespace Hymson.MES.Services.Services.Integrated
             var vsr = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
             {
                 VehicleId = inteVehicleEntity.Id,
-                SiteId = _currentSite.SiteId.Value
+                SiteId = _currentSite.SiteId??123456
             });
 
             if (vsr != null && vsr.Any())

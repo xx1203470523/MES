@@ -172,8 +172,8 @@ namespace Hymson.MES.Data.Repositories.Integrated
                                             /**select**/
                                            FROM `inte_vehicle_freight_record` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `inte_vehicle_freight_record`(  `Id`, `SiteId`, `VehicleId`, `LocationId`, `BarCode`, `OperateType`,`CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (   @Id, @SiteId, @VehicleId, @LocationId, @BarCode, @OperateType, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn )  ";
-        const string InsertsSql = "INSERT INTO `inte_vehicle_freight_record`(  `Id`, `SiteId`, `VehicleId`, `LocationId`, `BarCode`, `OperateType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (   @Id, @SiteId, @VehicleId, @LocationId, @BarCode, @OperateType, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn )  ";
+        const string InsertSql = "INSERT INTO `inte_vehicle_freight_record`(  `Id`, `SiteId`, `VehicleId`, `LocationId`, `BarCode`, `OperateType`,`CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (   @Id, @SiteId, @VehicleId, @LocationId, @BarCode, @OperateType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn )  ";
+        const string InsertsSql = "INSERT INTO `inte_vehicle_freight_record`(  `Id`, `SiteId`, `VehicleId`, `LocationId`, `BarCode`, `OperateType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (   @Id, @SiteId, @VehicleId, @LocationId, @BarCode, @OperateType,@CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn )  ";
 
         const string UpdateSql = "UPDATE `inte_vehicle_freight_record` SET   SiteId = @SiteId, VehicleId = @VehicleId, LocationId = @LocationId, BarCode = @BarCode, OperateType = @OperateType, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `inte_vehicle_freight_record` SET   SiteId = @SiteId, VehicleId = @VehicleId, LocationId = @LocationId, BarCode = @BarCode, OperateType = @OperateType, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
