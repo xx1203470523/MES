@@ -41,6 +41,6 @@ namespace Hymson.MES.EquipmentServices.Dtos.SfcCirculation
         /// <summary>
         /// 绑定的批次条码名称
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
     }
 }

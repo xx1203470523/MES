@@ -139,6 +139,25 @@ namespace Hymson.MES.Services.Dtos.Report
     }
 
     /// <summary>
+    /// 模组达成信息查询
+    /// </summary>
+    public record ModuleAchievingQueryDto
+    {
+        /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long SiteId { get; set; }
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string ProcedureCode { get; set; }
+        /// <summary>
+        /// 目标总数（未分段）
+        /// </summary>
+        public decimal TargetTotal { get; set; }
+    }
+
+    /// <summary>
     /// 工序稼动率Dto
     /// </summary>
     public record ProcessUtilizationRateDto : BaseEntityDto
@@ -199,6 +218,11 @@ namespace Hymson.MES.Services.Dtos.Report
         public string ProcessName { get; set; }
 
         /// <summary>
+        /// 总数
+        /// </summary>
+        public decimal Total { get; set; }
+
+        /// <summary>
         /// 良品率
         /// </summary>
         public decimal YieldRate { get; set; }
@@ -216,6 +240,35 @@ namespace Hymson.MES.Services.Dtos.Report
     }
 
     /// <summary>
+    /// 工序良率查询
+    /// </summary>
+    public record ProcessQualityRateQuery
+    {
+        /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long SiteId { get; set; }
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string[] ProcedureCodes { get; set; }
+    }
+
+    /// <summary>
+    /// 工序当月良品波动查询
+    /// </summary>
+    public record ProcessYieldRateQuery
+    {
+        /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long SiteId { get; set; }
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string[] ProcedureCodes { get; set; }
+    }
+    /// <summary>
     /// 工序指数
     /// </summary>
     public record ProcessIndicatorsDto : BaseEntityDto
@@ -230,7 +283,7 @@ namespace Hymson.MES.Services.Dtos.Report
         public string ProcessName { get; set; }
 
         /// <summary>
-        /// 指数值
+        /// 指数值(产量)
         /// </summary>
         public decimal Indicators { get; set; }
         /// <summary>

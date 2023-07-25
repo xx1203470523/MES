@@ -58,7 +58,25 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             return await _planWorkOrderRepository.GetByIdAsync(planWorkOrderActivationEntity.WorkOrderId);
         }
 
-        #region 班次计算
+        #region 班次计算相关时间
+
+        /// <summary>
+        /// 开始小时
+        /// </summary>
+        private int StartHour = 08;
+        /// <summary>
+        /// 开始分钟
+        /// </summary>
+        private int StartMinute = 30;
+        /// <summary>
+        /// 结束小时
+        /// </summary>
+        private int EndHour = 20;
+        /// <summary>
+        /// 结束分钟
+        /// </summary>
+        private int EndMinute = 30;
+
         /// <summary>
         /// 当前时间
         /// </summary>
@@ -78,7 +96,7 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             get
             {
                 DateTime checkTime = NowTime; // 当前时间
-                DateTime startTime = new DateTime(checkTime.Year, checkTime.Month, checkTime.Day, 08, 30, 0); // 开始时间
+                DateTime startTime = new DateTime(checkTime.Year, checkTime.Month, checkTime.Day, StartHour, StartMinute, 0); // 开始时间
                 return startTime;
             }
         }
@@ -91,7 +109,7 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             get
             {
                 DateTime checkTime = NowTime; // 当前时间
-                DateTime endTime = new DateTime(checkTime.Year, checkTime.Month, checkTime.Day, 20, 30, 0); // 结束时间
+                DateTime endTime = new DateTime(checkTime.Year, checkTime.Month, checkTime.Day, EndHour, EndMinute, 0); // 结束时间
                 return endTime;
             }
         }
@@ -196,6 +214,33 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
                 }
             }
         }
+
+        /// <summary>
+        /// 当月开始时间
+        /// 如2023-07-01 08:30:00
+        /// </summary>
+        private DateTime MonthStartTime
+        {
+            get
+            {
+                DateTime checkTime = NowTime; // 当前时间
+                DateTime startTime = new DateTime(checkTime.Year, checkTime.Month, 01, StartHour, StartMinute, 0);
+                return startTime;
+            }
+        }
+
+        /// <summary>
+        /// 当月结束时间
+        /// </summary>
+        private DateTime MonthEndTime
+        {
+            get
+            {
+                DateTime checkTime = NowTime.AddMonths(1); //结束时间在次月
+                DateTime startTime = new DateTime(checkTime.Year, checkTime.Month, 01, StartHour, StartMinute, 0);
+                return startTime;
+            }
+        }
         #endregion
 
         /// <summary>
@@ -280,13 +325,11 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
         /// 获取模组达成信息
         /// 特定工序投入量 和 目标数（固定数值）计算得到达成率
         /// </summary>
-        /// <param name="siteId">站点Id</param>
-        /// <param name="procedureCode">工序编码</param>
-        /// <param name="targetTotal">目标总数</param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProductionManagePanelModuleDto>> GetModuleAchievingInfoAsync(long siteId, string procedureCode, decimal targetTotal)
+        public async Task<IEnumerable<ProductionManagePanelModuleDto>> GetModuleAchievingInfoAsync(ModuleAchievingQueryDto param)
         {
-            var procProcedureEntity = await _procProcedureRepository.GetByCodeAsync(procedureCode, siteId);
+            var procProcedureEntity = await _procProcedureRepository.GetByCodeAsync(param.ProcedureCode, param.SiteId);
             if (procProcedureEntity == null)
             {
                 return new List<ProductionManagePanelModuleDto>();
@@ -296,7 +339,7 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             //查询当前时间的投入量
             var manuSfcSummaryQuery = new ManuSfcSummaryQuery
             {
-                SiteId = siteId,
+                SiteId = param.SiteId,
                 ProcedureIds = new long[] { procProcedureEntity.Id },
                 StartTime = startTime,
                 EndTime = endTime,
@@ -315,7 +358,7 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
                 segmentStart = segmentEnd;
             }
             //按时间段取投入数平均值
-            var dateTimeRangeTarger = decimal.Parse((segments.Count / targetTotal).ToString("0.00"));
+            var dateTimeRangeTarger = decimal.Parse((segments.Count / param.TargetTotal <= 0 ? 1 : param.TargetTotal).ToString("0.00"));
             //统计每个分段的数据数量
             var statistics = segments.Select((segment, index) =>
             {
@@ -340,13 +383,12 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
         /// <summary>
         /// 获取当天工序直通率和良品率
         /// </summary>
-        /// <param name="procedureCodes"></param>
-        /// <param name="siteId"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcessQualityRateDto>> GetProcessQualityRateAsync(string[] procedureCodes, long siteId)
+        public async Task<IEnumerable<ProcessQualityRateDto>> GetProcessQualityRateAsync(ProcessQualityRateQuery param)
         {
             List<ProcessQualityRateDto> processQualityRateDtos = new List<ProcessQualityRateDto>();
-            var procProcedureEntities = await _procProcedureRepository.GetByCodesAsync(procedureCodes, siteId);
+            var procProcedureEntities = await _procProcedureRepository.GetByCodesAsync(param.ProcedureCodes, param.SiteId);
             if (!procProcedureEntities.Any())
             {
                 return processQualityRateDtos;
@@ -355,7 +397,7 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             //查询当天汇总数据 包含良品和不良
             var manuSfcSummaryQuery = new ManuSfcSummaryQuery
             {
-                SiteId = siteId,
+                SiteId = param.SiteId,
                 ProcedureIds = procProcedureIds,
                 StartTime = DayStartTime,
                 EndTime = DayEndTime
@@ -384,6 +426,51 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
                 processQualityRateDtos.Add(processQualityRateDto);
             }
             return processQualityRateDtos;
+        }
+
+        /// <summary>
+        /// 获取工序良品趋势
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcessYieldRateDto>> GetProcessYieldRateAsync(ProcessYieldRateQuery param)
+        {
+            List<ProcessYieldRateDto> processYieldRateDtos = new List<ProcessYieldRateDto>();
+            var procProcedureEntities = await _procProcedureRepository.GetByCodesAsync(param.ProcedureCodes, param.SiteId);
+            if (!procProcedureEntities.Any())
+            {
+                return processYieldRateDtos;
+            }
+            var procProcedureIds = procProcedureEntities.Select(c => c.Id).ToArray();
+            //查询当天汇总数据 包含良品和不良
+            var manuSfcSummaryQuery = new ManuSfcSummaryQuery
+            {
+                SiteId = param.SiteId,
+                ProcedureIds = procProcedureIds,
+                StartTime = MonthStartTime,
+                EndTime = MonthEndTime
+            };
+            var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
+            var dailyPassList = manuSfcSummaryEntities
+                .Where(s => s.IsDeleted == 0)
+                .GroupBy(s => new { s.CreatedOn.Date, s.ProductId })
+                .Select(g => new
+                {
+                    ProcedureId = g.Max(c => c.ProductId),
+                    Day = g.Key,
+                    PassQty = g.Where(c => c.QualityStatus == 1).Sum(s => s.Qty) ?? 0,//良品数
+                    Total = g.Sum(s => s.Qty) ?? 0,//总数
+                })
+                .Select(x => new ProcessYieldRateDto
+                {
+                    Day = x.Day.Date.Day.ToString().PadLeft(2, '0'),
+                    YieldQty = x.PassQty,
+                    Total = x.Total,
+                    YieldRate = decimal.Parse((x.PassQty / x.Total == 0 ? 1 : x.Total).ToString("0.00"))
+                })
+                .OrderBy(x => x.Day)
+                .ToList();
+            return dailyPassList;
         }
     }
 }

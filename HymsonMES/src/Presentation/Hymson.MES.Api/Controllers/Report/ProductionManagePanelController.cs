@@ -37,29 +37,25 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <summary>
         /// 获取当天模组达成数据
         /// </summary>
-        /// <param name="siteId">站点ID</param>
-        /// <param name="procedureCode">工序（特定工序投入量）</param>
-        /// <param name="targetTotal">时间分段计划总量</param>
+        /// <param name="param">站点ID</param>
         /// <returns></returns>
         [HttpGet]
         [Route("getModuleAchievingInfo")]
-        public async Task<IEnumerable<ProductionManagePanelModuleDto>> GetModuleAchievingInfoAsync(long siteId, string procedureCode, decimal targetTotal)
+        public async Task<IEnumerable<ProductionManagePanelModuleDto>> GetModuleAchievingInfoAsync([FromQuery] ModuleAchievingQueryDto param)
         {
-            return await _productionManagePanelService.GetModuleAchievingInfoAsync(siteId, procedureCode, targetTotal);
+            return await _productionManagePanelService.GetModuleAchievingInfoAsync(param);
         }
         /// <summary>
         /// 获取模组达成详细信息
         /// </summary>
-        /// <param name="siteId">站点ID</param>
-        /// <param name="procedureCode">工序（特定工序投入量）</param>
-        /// <param name="targetTotal">时间分段计划总量</param>
+        /// <param name="param">/param>
         /// <returns></returns>
         [HttpGet]
         [Route("getModuleInfoDynamic")]
-        public async Task<List<dynamic>> GetModuleInfoDynamicAsync(long siteId, string procedureCode, decimal targetTotal)
+        public async Task<List<dynamic>> GetModuleInfoDynamicAsync([FromQuery] ModuleAchievingQueryDto param)
         {
             Dictionary<string, string> keyValues = new Dictionary<string, string>();
-            var managePanelModuleDtos = await _productionManagePanelService.GetModuleAchievingInfoAsync(siteId, procedureCode, targetTotal); ;
+            var managePanelModuleDtos = await _productionManagePanelService.GetModuleAchievingInfoAsync(param); ;
             var managePanelPackDtos = managePanelModuleDtos.GroupBy(c => c.DateTimeRange);
             DataTable dt = new();
             //空列头
@@ -201,9 +197,9 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <returns></returns>
         [HttpGet]
         [Route("getProcessQualityRate")]
-        public async Task<IEnumerable<ProcessQualityRateDto>> GetProcessQualityRateAsync(string[] procedureCodes, long siteId)
+        public async Task<IEnumerable<ProcessQualityRateDto>> GetProcessQualityRateAsync([FromQuery] ProcessQualityRateQuery param)
         {
-            return await _productionManagePanelService.GetProcessQualityRateAsync(procedureCodes, siteId);
+            return await _productionManagePanelService.GetProcessQualityRateAsync(param);
         }
 
         /// <summary>
