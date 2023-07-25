@@ -132,5 +132,24 @@ namespace Hymson.MES.Api.Controllers.Integrated
         {
             return await _inteVehicleService.QueryVehicleFreightByVehicleIdAsync(id);
         }
+
+        /// <summary>
+        /// 载具操作 0绑盘 1解盘 2清盘
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("VehicleFreightOperation")]
+        public async Task VehicleFreightOperationAsync(InteVehicleOperationDto dto)
+        {
+            await _inteVehicleService.VehicleOperationAsync(dto);
+        }
+
+        [HttpGet]
+        [Route("getVehicleFreightByPalletNo/{palletNo}")]
+        public async Task<IEnumerable<InteVehicleFreightDto>> QueryVehicleFreightByVehicleIdAsync(string palletNo)
+        {
+            return await _inteVehicleService.QueryVehicleFreightByPalletNoAsync(palletNo);
+        }
     }
 }

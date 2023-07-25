@@ -384,10 +384,44 @@ namespace Hymson.MES.Services.Services.Integrated
                 }
                
                
+                ////获取托盘所有条码记录
+                //var vsr = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
+                //{
+                //    VehicleId = vehicleId,
+                //    SiteId = _currentSite.SiteId.Value
+                //});
+                //foreach (var item in inteVehicleFreightDtos)
+                //{
+                //    var lst = vsr.Where(i => i.LocationId == item.Id).ToList();
+                //    item.Stacks = lst;
+                //}
+
+            }
+
+            return inteVehicleFreightDtos;
+        }
+   
+        public async Task<IEnumerable<InteVehicleFreightDto>> QueryVehicleFreightByPalletNoAsync(string palletNo)
+        {
+            var inteVehicle = await _inteVehicleRepository.GetByCodeAsync(new InteVehicleCodeQuery()
+            {
+                Code= palletNo,
+                SiteId=_currentSite.SiteId.Value
+            });
+            var inteVehicleFreights = await _inteVehicleFreightRepository.GetByVehicleIdsAsync(new long[] { inteVehicle.Id });
+            var inteVehicleFreightDtos = new List<InteVehicleFreightDto>();
+            if (inteVehicleFreights != null && inteVehicleFreights.Any())
+            {
+                foreach (var item in inteVehicleFreights)
+                {
+                    inteVehicleFreightDtos.Add(item.ToModel<InteVehicleFreightDto>());
+                }
+
+
                 //获取托盘所有条码记录
                 var vsr = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
                 {
-                    VehicleId = vehicleId,
+                    VehicleId = inteVehicle.Id,
                     SiteId = _currentSite.SiteId.Value
                 });
                 foreach (var item in inteVehicleFreightDtos)
@@ -594,5 +628,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 
             
         }
+
+  
     }
 }
