@@ -478,6 +478,8 @@ namespace Hymson.MES.Services.Services.Integrated
              * inte_vehicle_freight表 更新已装载数量信息
              * 条码存放在inte_vehice_freight_stack表中
              */
+            // 条码 是否在制品校验
+
             //绑盘前校验 该条码是否已绑盘
             var check1 = await _inteVehiceFreightStackRepository.GetBySFCAsync(dto.SFC);
             if (check1 != null)
