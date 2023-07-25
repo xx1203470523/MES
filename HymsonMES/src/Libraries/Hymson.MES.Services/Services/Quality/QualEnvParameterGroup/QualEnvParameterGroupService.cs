@@ -8,6 +8,8 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.MES.Services.Dtos.Quality;
@@ -47,6 +49,23 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly IQualEnvParameterGroupDetailRepository _qualEnvParameterGroupDetailRepository;
 
         /// <summary>
+        /// 仓储接口（工作中心）
+        /// </summary>
+        /// </summary>
+        private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
+
+        /// <summary>
+        /// 仓储接口（工序）
+        /// </summary>
+        /// </summary>
+        private readonly IProcProcedureRepository _procProcedureRepository;
+
+        /// <summary>
+        /// 仓储接口（标准参数）
+        /// </summary>
+        private readonly IProcParameterRepository _procParameterRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
@@ -54,15 +73,24 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="validationSaveRules"></param>
         /// <param name="qualEnvParameterGroupRepository"></param>
         /// <param name="qualEnvParameterGroupDetailRepository"></param>
+        /// <param name="inteWorkCenterRepository"></param>
+        /// <param name="procProcedureRepository"></param>
+        /// <param name="procParameterRepository"></param>
         public QualEnvParameterGroupService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<QualEnvParameterGroupSaveDto> validationSaveRules,
             IQualEnvParameterGroupRepository qualEnvParameterGroupRepository,
-            IQualEnvParameterGroupDetailRepository qualEnvParameterGroupDetailRepository)
+            IQualEnvParameterGroupDetailRepository qualEnvParameterGroupDetailRepository,
+            IInteWorkCenterRepository inteWorkCenterRepository,
+            IProcProcedureRepository procProcedureRepository,
+            IProcParameterRepository procParameterRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _qualEnvParameterGroupRepository = qualEnvParameterGroupRepository;
             _qualEnvParameterGroupDetailRepository = qualEnvParameterGroupDetailRepository;
+            _inteWorkCenterRepository = inteWorkCenterRepository;
+            _procProcedureRepository = procProcedureRepository;
+            _procParameterRepository = procParameterRepository;
         }
 
 
@@ -100,6 +128,7 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 var detailEntity = s.ToEntity<QualEnvParameterGroupDetailEntity>();
                 detailEntity.Id = IdGenProvider.Instance.CreateId();
+                detailEntity.ParameterVerifyEnvId = entity.Id;
                 detailEntity.CreatedBy = updatedBy;
                 detailEntity.CreatedOn = updatedOn;
                 detailEntity.UpdatedBy = updatedBy;
@@ -145,6 +174,7 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 var detailEntity = s.ToEntity<QualEnvParameterGroupDetailEntity>();
                 detailEntity.Id = IdGenProvider.Instance.CreateId();
+                detailEntity.ParameterVerifyEnvId = entity.Id;
                 detailEntity.CreatedBy = updatedBy;
                 detailEntity.CreatedOn = updatedOn;
                 detailEntity.UpdatedBy = updatedBy;
@@ -207,7 +237,19 @@ namespace Hymson.MES.Services.Services.Quality
             var qualEnvParameterGroupEntity = await _qualEnvParameterGroupRepository.GetByIdAsync(id);
             if (qualEnvParameterGroupEntity == null) return null;
 
-            return qualEnvParameterGroupEntity.ToModel<QualEnvParameterGroupInfoDto>();
+            var dto = qualEnvParameterGroupEntity.ToModel<QualEnvParameterGroupInfoDto>();
+            if (dto == null) return dto;
+
+            var workCenterTask = _inteWorkCenterRepository.GetByIdAsync(dto.WorkCenterId);
+            var procedureTask = _procProcedureRepository.GetByIdAsync(dto.ProcedureId);
+
+            var workCenterEntity = await workCenterTask;
+            var procedureEntity = await procedureTask;
+
+            if (workCenterEntity != null) dto.WorkCenterCode = workCenterEntity.Code;
+            if (procedureEntity != null) dto.ProcedureCode = procedureEntity.Code;
+
+            return dto;
         }
 
         /// <summary>
@@ -222,7 +264,31 @@ namespace Hymson.MES.Services.Services.Quality
                 ParameterVerifyEnvId = parameterVerifyEnvId
             });
 
-            return qualEnvParameterGroupDetailEntities.Select(s => s.ToModel<QualEnvParameterGroupDetailDto>());
+            // 查询已经缓存的参数实体
+            var parameterEntities = await _procParameterRepository.GetProcParameterEntitiesAsync(new ProcParameterQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0
+            });
+
+            List<QualEnvParameterGroupDetailDto> dtos = new();
+            foreach (var item in qualEnvParameterGroupDetailEntities)
+            {
+                var dto = item.ToModel<QualEnvParameterGroupDetailDto>();
+                var parameterEntity = parameterEntities.FirstOrDefault(f => f.Id == item.ParameterId);
+                if (dto == null) continue;
+
+                if (parameterEntity != null)
+                {
+                    dto.Code = parameterEntity.ParameterCode;
+                    dto.Name = parameterEntity.ParameterName;
+                    dto.Unit = parameterEntity.ParameterUnit;
+                    dto.DataType = parameterEntity.DataType;
+                }
+
+                dtos.Add(dto);
+            }
+
+            return dtos;
         }
 
         /// <summary>

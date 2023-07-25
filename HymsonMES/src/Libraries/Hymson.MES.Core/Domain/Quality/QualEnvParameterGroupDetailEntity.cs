@@ -24,7 +24,7 @@ namespace Hymson.MES.Core.Domain.Quality
        /// <summary>
         /// 规格上限
         /// </summary>
-        public decimal UpperLimit { get; set; }
+        public decimal? UpperLimit { get; set; }
 
        /// <summary>
         /// 中心值（均值）
@@ -34,12 +34,12 @@ namespace Hymson.MES.Core.Domain.Quality
        /// <summary>
         /// 规格下限
         /// </summary>
-        public decimal LowerLimit { get; set; }
+        public decimal? LowerLimit { get; set; }
 
        /// <summary>
         /// 频率
         /// </summary>
-        public FrequencyEnum Frequency { get; set; }
+        public FrequencyEnum? Frequency { get; set; }
 
        /// <summary>
         /// 录入次数

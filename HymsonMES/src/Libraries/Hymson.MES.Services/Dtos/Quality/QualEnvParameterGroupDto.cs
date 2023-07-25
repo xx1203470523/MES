@@ -158,24 +158,24 @@ namespace Hymson.MES.Services.Dtos.Quality
         public long WorkCenterId { get; set; }
 
         /// <summary>
+        /// 工作中心编码（车间或者线体）
+        /// </summary>
+        public string WorkCenterCode { get; set; }
+
+        /// <summary>
         /// 工序id
         /// </summary>
         public long ProcedureId { get; set; }
 
         /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string ProcedureCode { get; set; }
+
+        /// <summary>
         /// 备注
         /// </summary>
         public string Remark { get; set; }
-
-        /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-        /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime UpdatedOn { get; set; }
 
         /// <summary>
         /// 项目集合

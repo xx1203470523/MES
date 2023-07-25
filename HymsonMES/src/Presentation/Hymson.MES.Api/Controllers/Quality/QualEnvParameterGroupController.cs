@@ -91,7 +91,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <summary>
         /// 查询详情（环境检验参数表）
         /// </summary>
-        /// <param name="parameterVerifyEnvId"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("details/{id}")]
         public async Task<IEnumerable<QualEnvParameterGroupDetailDto>?> QueryDetailsByParameterVerifyEnvIdAsync(long id)
