@@ -5,16 +5,16 @@ using Hymson.MES.Data.Repositories.Quality.Query;
 namespace Hymson.MES.Data.Repositories.Quality
 {
     /// <summary>
-    /// 仓储接口（环境检验参数项目表）
+    /// 仓储接口（全检参数项目表）
     /// </summary>
-    public interface IQualEnvParameterGroupDetailRepository
+    public interface IQualInspectionParameterGroupDetailRepository
     {
         /// <summary>
         /// 新增（批量）
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        Task<int> InsertRangeAsync(IEnumerable<QualEnvParameterGroupDetailEntity> entities);
+        Task<int> InsertRangeAsync(IEnumerable<QualInspectionParameterGroupDetailEntity> entities);
 
         /// <summary>
         /// 删除（批量）
@@ -28,7 +28,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<QualEnvParameterGroupDetailEntity>> GetEntitiesAsync(QualEnvParameterGroupDetailQuery query);
+        Task<IEnumerable<QualInspectionParameterGroupDetailEntity>> GetEntitiesAsync(QualInspectionParameterGroupDetailQuery query);
         
     }
 }

@@ -14,10 +14,10 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// 环境检验参数id
         /// </summary>
-        public long ParameterVerifyEnvId { get; set; }
+        public long ParameterGroupId { get; set; }
 
        /// <summary>
-        /// 参数id
+        /// 参数id（环境参数）
         /// </summary>
         public long ParameterId { get; set; }
 

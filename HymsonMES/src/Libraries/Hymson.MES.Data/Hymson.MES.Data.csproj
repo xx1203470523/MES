@@ -21,6 +21,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Repositories\Manufacture\ManuReturnMaterial\ManuRequistionOrderDetailRepository.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Dapper.SqlBuilder" Version="2.0.78" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
@@ -40,6 +44,7 @@
     <Folder Include="Repositories\Manufacture\ManuFacePlate\View\" />
     <Folder Include="Repositories\Plan\PlanWorkOrderBind\View\" />
     <Folder Include="Repositories\Process\PrintConfig\Command\" />
+    <Folder Include="Repositories\Process\Recipe\" />
   </ItemGroup>
 
 </Project>

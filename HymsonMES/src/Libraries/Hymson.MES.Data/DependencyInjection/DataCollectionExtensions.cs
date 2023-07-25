@@ -185,11 +185,21 @@ namespace Microsoft.Extensions.DependencyInjection
             #region printConfig
             services.AddSingleton<IProcPrintConfigRepository, ProcPrintConfigRepository>();
             #endregion
+
+            #region ProcSortingRule
+
+            services.AddSingleton<IProcSortingRuleRepository, ProcSortingRuleRepository>();
+            services.AddSingleton<IProcSortingRuleDetailRepository, ProcSortingRuleDetailRepository>();
+            services.AddSingleton<IProcSortingRuleGradeRepository, ProcSortingRuleGradeRepository>();
+            services.AddSingleton<IProcSortingRuleGradeDetailsRepository, ProcSortingRuleGradeDetailsRepository>();
+            #endregion
             #endregion
 
             #region Quality
             services.AddSingleton<IQualEnvParameterGroupRepository, QualEnvParameterGroupRepository>();
             services.AddSingleton<IQualEnvParameterGroupDetailRepository, QualEnvParameterGroupDetailRepository>();
+            services.AddSingleton<IQualInspectionParameterGroupRepository, QualInspectionParameterGroupRepository>();
+            services.AddSingleton<IQualInspectionParameterGroupDetailRepository, QualInspectionParameterGroupDetailRepository>();
 
             services.AddSingleton<IQualUnqualifiedCodeRepository, QualUnqualifiedCodeRepository>();
             services.AddSingleton<IQualUnqualifiedGroupRepository, QualUnqualifiedGroupRepository>();

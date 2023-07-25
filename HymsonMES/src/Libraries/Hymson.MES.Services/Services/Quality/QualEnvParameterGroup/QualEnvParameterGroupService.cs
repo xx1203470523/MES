@@ -164,7 +164,7 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 var detailEntity = s.ToEntity<QualEnvParameterGroupDetailEntity>();
                 detailEntity.Id = IdGenProvider.Instance.CreateId();
-                detailEntity.ParameterVerifyEnvId = entity.Id;
+                detailEntity.ParameterGroupId = entity.Id;
                 detailEntity.CreatedBy = updatedBy;
                 detailEntity.CreatedOn = updatedOn;
                 detailEntity.UpdatedBy = updatedBy;
@@ -210,7 +210,7 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 var detailEntity = s.ToEntity<QualEnvParameterGroupDetailEntity>();
                 detailEntity.Id = IdGenProvider.Instance.CreateId();
-                detailEntity.ParameterVerifyEnvId = entity.Id;
+                detailEntity.ParameterGroupId = entity.Id;
                 detailEntity.CreatedBy = updatedBy;
                 detailEntity.CreatedOn = updatedOn;
                 detailEntity.UpdatedBy = updatedBy;
@@ -291,13 +291,13 @@ namespace Hymson.MES.Services.Services.Quality
         /// <summary>
         /// 根据ID获取项目明细列表
         /// </summary>
-        /// <param name="parameterVerifyEnvId"></param>
+        /// <param name="parameterGroupId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualEnvParameterGroupDetailDto>> QueryDetailsByParameterVerifyEnvIdAsync(long parameterVerifyEnvId)
+        public async Task<IEnumerable<QualEnvParameterGroupDetailDto>> QueryDetailsByParameterGroupIdAsync(long parameterGroupId)
         {
-            var qualEnvParameterGroupDetailEntities = await _qualEnvParameterGroupDetailRepository.GetEntitiesAsync(new QualEnvParameterGroupDetailQuery
+            var details = await _qualEnvParameterGroupDetailRepository.GetEntitiesAsync(new QualEnvParameterGroupDetailQuery
             {
-                ParameterVerifyEnvId = parameterVerifyEnvId
+                ParameterGroupId = parameterGroupId
             });
 
             // 查询已经缓存的参数实体
@@ -307,7 +307,7 @@ namespace Hymson.MES.Services.Services.Quality
             });
 
             List<QualEnvParameterGroupDetailDto> dtos = new();
-            foreach (var item in qualEnvParameterGroupDetailEntities)
+            foreach (var item in details)
             {
                 var dto = item.ToModel<QualEnvParameterGroupDetailDto>();
                 var parameterEntity = parameterEntities.FirstOrDefault(f => f.Id == item.ParameterId);

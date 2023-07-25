@@ -4,9 +4,9 @@ using Hymson.MES.Core.Enums;
 namespace Hymson.MES.Services.Dtos.Quality
 {
     /// <summary>
-    /// 环境检验参数表新增/更新Dto
+    /// 全检参数表新增/更新Dto
     /// </summary>
-    public record QualEnvParameterGroupSaveDto : BaseEntityDto
+    public record QualInspectionParameterGroupSaveDto : BaseEntityDto
     {
         /// <summary>
         /// 主键id
@@ -34,9 +34,9 @@ namespace Hymson.MES.Services.Dtos.Quality
         public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
-        /// 工作中心（车间或者线体）
+        /// 物料id
         /// </summary>
-        public long WorkCenterId { get; set; }
+        public long MaterialId { get; set; }
 
         /// <summary>
         /// 工序id
@@ -51,14 +51,14 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 项目集合
         /// </summary>
-        public IEnumerable<QualEnvParameterGroupDetailSaveDto> Details { get; set; }
+        public IEnumerable<QualInspectionParameterGroupDetailSaveDto> Details { get; set; }
 
     }
 
     /// <summary>
-    /// 环境检验参数表Dto
+    /// 全检参数表Dto
     /// </summary>
-    public record QualEnvParameterGroupDto : BaseEntityDto
+    public record QualInspectionParameterGroupDto : BaseEntityDto
     {
         /// <summary>
         /// 主键id
@@ -86,24 +86,14 @@ namespace Hymson.MES.Services.Dtos.Quality
         public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
-        /// 工作中心编码（车间或者线体）
+        /// 物料id
         /// </summary>
-        public string WorkCenterCode { get; set; }
+        public long MaterialId { get; set; }
 
         /// <summary>
-        /// 工作中心名称（车间或者线体）
+        /// 工序id
         /// </summary>
-        public string WorkCenterName { get; set; }
-
-        /// <summary>
-        /// 工序编码
-        /// </summary>
-        public string ProcedureCode { get; set; }
-
-        /// <summary>
-        /// 工序名称
-        /// </summary>
-        public string ProcedureName { get; set; }
+        public long ProcedureId { get; set; }
 
         /// <summary>
         /// 备注
@@ -123,9 +113,9 @@ namespace Hymson.MES.Services.Dtos.Quality
     }
 
     /// <summary>
-    /// 环境检验参数表Dto
+    /// 全检参数表Dto
     /// </summary>
-    public record QualEnvParameterGroupInfoDto : BaseEntityDto
+    public record QualInspectionParameterGroupInfoDto : BaseEntityDto
     {
         /// <summary>
         /// 主键id
@@ -153,14 +143,14 @@ namespace Hymson.MES.Services.Dtos.Quality
         public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
-        /// 工作中心（车间或者线体）
+        /// 物料id
         /// </summary>
-        public long WorkCenterId { get; set; }
+        public long MaterialId { get; set; }
 
         /// <summary>
-        /// 工作中心编码（车间或者线体）
+        /// 物料编码
         /// </summary>
-        public string WorkCenterCode { get; set; }
+        public string MaterialCode { get; set; }
 
         /// <summary>
         /// 工序id
@@ -180,9 +170,9 @@ namespace Hymson.MES.Services.Dtos.Quality
     }
 
     /// <summary>
-    /// 环境检验参数表分页Dto
+    /// 全检参数表分页Dto
     /// </summary>
-    public class QualEnvParameterGroupPagedQueryDto : PagerInfo
+    public class QualInspectionParameterGroupPagedQueryDto : PagerInfo
     {
         /// <summary>
         /// 参数集编码
@@ -200,14 +190,14 @@ namespace Hymson.MES.Services.Dtos.Quality
         public SysDataStatusEnum? Status { get; set; }
 
         /// <summary>
-        /// 工作中心编码（车间或者线体）
+        /// 物料编码
         /// </summary>
-        public string? WorkCenterCode { get; set; }
+        public long? MaterialCode { get; set; }
 
         /// <summary>
-        /// 工作中心名称（车间或者线体）
+        /// 物料名称
         /// </summary>
-        public string? WorkCenterName { get; set; }
+        public long? MaterialName { get; set; }
 
         /// <summary>
         /// 工序编码
@@ -218,7 +208,6 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 工序名称
         /// </summary>
         public long? ProcedureName { get; set; }
-
     }
 
 }

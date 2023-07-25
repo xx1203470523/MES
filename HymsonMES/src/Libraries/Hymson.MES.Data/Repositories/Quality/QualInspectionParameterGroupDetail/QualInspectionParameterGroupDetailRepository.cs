@@ -1,4 +1,5 @@
 using Dapper;
+using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -8,22 +9,22 @@ using Microsoft.Extensions.Options;
 namespace Hymson.MES.Data.Repositories.Quality
 {
     /// <summary>
-    /// 仓储（环境检验参数项目表）
+    /// 仓储（全检参数项目表）
     /// </summary>
-    public partial class QualEnvParameterGroupDetailRepository : BaseRepository, IQualEnvParameterGroupDetailRepository
+    public partial class QualInspectionParameterGroupDetailRepository : BaseRepository, IQualInspectionParameterGroupDetailRepository
     {
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public QualEnvParameterGroupDetailRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
+        public QualInspectionParameterGroupDetailRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
 
         /// <summary>
         /// 新增（批量）
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangeAsync(IEnumerable<QualEnvParameterGroupDetailEntity> entities)
+        public async Task<int> InsertRangeAsync(IEnumerable<QualInspectionParameterGroupDetailEntity> entities)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, entities);
@@ -45,16 +46,16 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualEnvParameterGroupDetailEntity>> GetEntitiesAsync(QualEnvParameterGroupDetailQuery query)
+        public async Task<IEnumerable<QualInspectionParameterGroupDetailEntity>> GetEntitiesAsync(QualInspectionParameterGroupDetailQuery query)
         {
             var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetQualEnvParameterGroupDetailEntitiesSqlTemplate);
+            var template = sqlBuilder.AddTemplate(GetQualInspectionParameterGroupDetailEntitiesSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("ParameterGroupId = @ParameterGroupId");
             sqlBuilder.Select("*");
 
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<QualEnvParameterGroupDetailEntity>(template.RawSql, query);
+            return await conn.QueryAsync<QualInspectionParameterGroupDetailEntity>(template.RawSql, query);
         }
 
     }
@@ -63,16 +64,15 @@ namespace Hymson.MES.Data.Repositories.Quality
     /// <summary>
     /// 
     /// </summary>
-    public partial class QualEnvParameterGroupDetailRepository
+    public partial class QualInspectionParameterGroupDetailRepository
     {
-        const string GetQualEnvParameterGroupDetailEntitiesSqlTemplate = @"SELECT 
+       const string GetQualInspectionParameterGroupDetailEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
-                                           FROM `qual_env_parameter_group_detail` /**where**/  ";
-        
-        const string InsertsSql = "INSERT INTO `qual_env_parameter_group_detail`(`Id`, `ParameterGroupId`, `ParameterId`, `UpperLimit`, `CenterValue`, `LowerLimit`, `Frequency`, `EntryCount`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @ParameterGroupId, @ParameterId, @UpperLimit, @CenterValue, @LowerLimit, @Frequency, @EntryCount, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
+                                           FROM `qual_inspection_parameter_group_detail` /**where**/  ";
 
-        const string DeleteByParentId = "DELETE FROM qual_env_parameter_group_detail WHERE ParameterGroupId = @ParentId";
+        const string InsertsSql = "INSERT INTO `qual_inspection_parameter_group_detail`(`Id`, `ParameterGroupId`, `ParameterId`, `UpperLimit`, `CenterValue`, `LowerLimit`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @ParameterGroupId, @InspectionParameterId, @UpperLimit, @CenterValue, @LowerLimit, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
 
+        const string DeleteByParentId = "DELETE FROM qual_inspection_parameter_group_detail WHERE ParameterGroupId = @ParentId";
 
     }
 }
