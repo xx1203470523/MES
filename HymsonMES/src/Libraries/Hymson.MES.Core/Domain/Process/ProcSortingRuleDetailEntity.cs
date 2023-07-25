@@ -45,7 +45,7 @@ namespace Hymson.MES.Core.Domain.Process
        /// <summary>
         /// 包含最小值类型;1< 2.≤
         /// </summary>
-        public bool? MinContainingType { get; set; }
+        public int MinContainingType { get; set; }
 
        /// <summary>
         /// 最大值
@@ -55,7 +55,7 @@ namespace Hymson.MES.Core.Domain.Process
        /// <summary>
         /// 包含最大值类型;1< 2.≥
         /// </summary>
-        public bool? MaxContainingType { get; set; }
+        public int MaxContainingType { get; set; }
 
        /// <summary>
         /// 参数值

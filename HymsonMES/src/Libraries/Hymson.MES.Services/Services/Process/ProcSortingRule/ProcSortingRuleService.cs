@@ -15,9 +15,11 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.ProductSet.Query;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Microsoft.AspNetCore.Components;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -34,14 +36,27 @@ namespace Hymson.MES.Services.Services.Process
         /// 分选规则 仓储
         /// </summary>
         private readonly IProcSortingRuleRepository _procSortingRuleRepository;
+        private readonly IProcSortingRuleDetailRepository _sortingRuleDetailRepository;
+        private readonly IProcSortingRuleGradeRepository _sortingRuleGradeRepository;
+        private readonly IProcSortingRuleGradeDetailsRepository _ruleGradeDetailsRepository;
+
         private readonly AbstractValidator<ProcSortingRuleCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcSortingRuleModifyDto> _validationModifyRules;
 
-        public ProcSortingRuleService(ICurrentUser currentUser, ICurrentSite currentSite, IProcSortingRuleRepository procSortingRuleRepository, AbstractValidator<ProcSortingRuleCreateDto> validationCreateRules, AbstractValidator<ProcSortingRuleModifyDto> validationModifyRules)
+        public ProcSortingRuleService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IProcSortingRuleRepository procSortingRuleRepository,
+            IProcSortingRuleDetailRepository sortingRuleDetailRepository,
+            IProcSortingRuleGradeRepository sortingRuleGradeRepository,
+            IProcSortingRuleGradeDetailsRepository ruleGradeDetailsRepository,
+            AbstractValidator<ProcSortingRuleCreateDto> validationCreateRules,
+            AbstractValidator<ProcSortingRuleModifyDto> validationModifyRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _procSortingRuleRepository = procSortingRuleRepository;
+            _sortingRuleDetailRepository = sortingRuleDetailRepository;
+            _sortingRuleGradeRepository = sortingRuleGradeRepository;
+            _ruleGradeDetailsRepository = ruleGradeDetailsRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
         }
@@ -64,7 +79,7 @@ namespace Hymson.MES.Services.Services.Process
 
             //DTO转换实体
             var procSortingRuleEntity = procSortingRuleCreateDto.ToEntity<ProcSortingRuleEntity>();
-            procSortingRuleEntity.Id= IdGenProvider.Instance.CreateId();
+            procSortingRuleEntity.Id = IdGenProvider.Instance.CreateId();
             procSortingRuleEntity.CreatedBy = _currentUser.UserName;
             procSortingRuleEntity.UpdatedBy = _currentUser.UserName;
             procSortingRuleEntity.CreatedOn = HymsonClock.Now();
@@ -111,11 +126,11 @@ namespace Hymson.MES.Services.Services.Process
         }
 
         /// <summary>
-        /// 
+        /// 实体转换
         /// </summary>
         /// <param name="pagedInfo"></param>
         /// <returns></returns>
-        private static List<ProcSortingRuleDto> PrepareProcSortingRuleDtos(PagedInfo<ProcSortingRuleEntity>   pagedInfo)
+        private static List<ProcSortingRuleDto> PrepareProcSortingRuleDtos(PagedInfo<ProcSortingRuleEntity> pagedInfo)
         {
             var procSortingRuleDtos = new List<ProcSortingRuleDto>();
             foreach (var procSortingRuleEntity in pagedInfo.Data)
@@ -130,17 +145,17 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="procSortingRuleDto"></param>
+        /// <param name="procSortingRuleModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyProcSortingRuleAsync(ProcSortingRuleModifyDto procSortingRuleModifyDto)
         {
-             // 判断是否有获取到站点码 
+            // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0)
             {
                 throw new ValidationException(nameof(ErrorCode.MES10101));
             }
 
-             //验证DTO
+            //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(procSortingRuleModifyDto);
 
             //DTO转换实体
@@ -156,14 +171,47 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ProcSortingRuleDto> QueryProcSortingRuleByIdAsync(long id) 
+        public async Task<ProcSortingRuleDto> QueryProcSortingRuleByIdAsync(long id)
         {
-           var procSortingRuleEntity = await _procSortingRuleRepository.GetByIdAsync(id);
-           if (procSortingRuleEntity != null) 
-           {
-               return procSortingRuleEntity.ToModel<ProcSortingRuleDto>();
-           }
+            var procSortingRuleEntity = await _procSortingRuleRepository.GetByIdAsync(id);
+            if (procSortingRuleEntity != null)
+            {
+                return procSortingRuleEntity.ToModel<ProcSortingRuleDto>();
+            }
             return null;
+        }
+
+        public async Task<IEnumerable<ProcSortingRuleDetailViewDto>> GetSortingRuleDetailListAsync(ProcSortingRuleDetailQueryDto queryDto)
+        {
+            var query = new ProcSortingRuleDetailQuery()
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                SortingRuleId = queryDto.SortingRuleId.Value
+            };
+
+            var sortingRuleDetailEntities = await _sortingRuleDetailRepository.GetProcSortingRuleDetailEntitiesAsync(query);
+
+            //实体到DTO转换 装载数据
+            List<ProcSortingRuleDetailViewDto>  ruleDetailViewDtos= new List<ProcSortingRuleDetailViewDto>();
+            if (sortingRuleDetailEntities != null && sortingRuleDetailEntities.Any())
+            {
+                foreach (var entity in sortingRuleDetailEntities)
+                {
+                    ruleDetailViewDtos.Add(new ProcSortingRuleDetailViewDto()
+                    {
+                        Id = entity.Id,
+                        ProcedureId=entity.ProcedureId,
+                        ParameterId=entity.ParameterId,
+                        MinValue=entity.MinValue,
+                        MinContainingType = entity.MinContainingType,
+                        MaxValue = entity.MaxValue,
+                        MaxContainingType = entity.MaxContainingType,
+                        ParameterValue=entity.ParameterValue,
+                        Rating=entity.Rating,
+                    }); ;
+                }
+            }
+            return ruleDetailViewDtos;
         }
     }
 }
