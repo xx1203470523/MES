@@ -4,9 +4,9 @@ using Hymson.MES.Core.Enums;
 namespace Hymson.MES.Services.Dtos.Quality
 {
     /// <summary>
-    /// 环境检验参数项目表新增/更新Dto
+    /// 全检参数项目表新增/更新Dto
     /// </summary>
-    public record QualEnvParameterGroupDetailSaveDto : BaseEntityDto
+    public record QualInspectionParameterGroupDetailSaveDto : BaseEntityDto
     {
         /// <summary>
         /// 主键id
@@ -14,12 +14,12 @@ namespace Hymson.MES.Services.Dtos.Quality
         public long Id { get; set; }
 
         /// <summary>
-        /// 环境检验参数id
+        /// 全检检验参数id
         /// </summary>
         public long ParameterGroupId { get; set; }
 
         /// <summary>
-        /// 参数id（环境参数）
+        /// 参数id（产品参数）
         /// </summary>
         public long ParameterId { get; set; }
 
@@ -48,25 +48,15 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public decimal? LowerLimit { get; set; }
 
-        /// <summary>
-        /// 频率
-        /// </summary>
-        public FrequencyEnum? Frequency { get; set; }
-
-        /// <summary>
-        /// 录入次数
-        /// </summary>
-        public int EntryCount { get; set; }
-
     }
 
     /// <summary>
-    /// 环境检验参数项目表Dto
+    /// 全检参数项目表Dto
     /// </summary>
-    public record QualEnvParameterGroupDetailDto : BaseEntityDto
+    public record QualInspectionParameterGroupDetailDto : BaseEntityDto
     {
         /// <summary>
-        /// 参数id（环境参数）
+        /// 参数id（产品参数）
         /// </summary>
         public long ParameterId { get; set; }
 
@@ -105,16 +95,6 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 规格下限
         /// </summary>
         public decimal? LowerLimit { get; set; }
-
-        /// <summary>
-        /// 频率
-        /// </summary>
-        public FrequencyEnum? Frequency { get; set; }
-
-        /// <summary>
-        /// 录入次数
-        /// </summary>
-        public int EntryCount { get; set; }
 
     }
 
